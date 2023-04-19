@@ -1,0 +1,3 @@
+[submodule "lib/rain.interface.interpreter"]
+	path = lib/rain.interface.interpreter
+	url = https://github.com/rainprotocol/rain.interface.interpreter
