@@ -1,3 +1,6 @@
 [submodule "lib/rain.interface.interpreter"]
 	path = lib/rain.interface.interpreter
 	url = https://github.com/rainprotocol/rain.interface.interpreter
+[submodule "lib/rain.lib.memkv"]
+	path = lib/rain.lib.memkv
+	url = https://github.com/rainprotocol/rain.lib.memkv
