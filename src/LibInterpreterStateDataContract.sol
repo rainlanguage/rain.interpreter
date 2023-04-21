@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
+import "sol.lib.memory/LibPointer.sol";
+import "./LibInterpreterState.sol";
+import "./LibCompile.sol";
+
 library LibInterpreterStateDataContract {
     function serializeSize(
         bytes[] memory sources_,
@@ -32,16 +36,13 @@ library LibInterpreterStateDataContract {
     /// @param opcodeFunctionPointers_ As per `IInterpreterV1.functionPointers`,
     /// bytes to be compiled into the final `InterpreterState.compiledSources`.
     function serialize(
-        Pointer memPointer_,
+        Pointer pointer_,
         bytes[] memory sources_,
         uint256[] memory constants_,
         uint256 stackLength_,
         bytes memory opcodeFunctionPointers_
     ) internal pure {
         unchecked {
-            StackPointer pointer_ = StackPointer.wrap(
-                Pointer.unwrap(memPointer_)
-            );
             // Copy stack length.
             pointer_ = pointer_.push(stackLength_);
 
@@ -52,7 +53,7 @@ library LibInterpreterStateDataContract {
             bytes memory source_;
             for (uint256 i_ = 0; i_ < sources_.length; i_++) {
                 source_ = sources_[i_];
-                compile(source_, opcodeFunctionPointers_);
+                LibCompile.compile(source_, opcodeFunctionPointers_);
                 pointer_ = pointer_.unalignedPushWithLength(source_);
             }
         }
@@ -86,9 +87,9 @@ library LibInterpreterStateDataContract {
             // here.
             state_.context = new uint256[][](0);
 
-            StackPointer cursor_ = serialized_.asStackPointer().up();
+            Pointer cursor_ = serialized_.dataPointer();
             // The end of processing is the end of the state bytes.
-            StackPointer end_ = cursor_.upBytes(cursor_.peek());
+            Pointer end_ = cursor_.upBytes(cursor_.peek());
 
             // Read the stack length and build a stack.
             cursor_ = cursor_.up();
@@ -107,10 +108,10 @@ library LibInterpreterStateDataContract {
 
             // Rebuild the sources array.
             uint256 i_ = 0;
-            StackPointer lengthCursor_ = cursor_;
+            Pointer lengthCursor_ = cursor_;
             uint256 sourcesLength_ = 0;
             while (
-                StackPointer.unwrap(lengthCursor_) < StackPointer.unwrap(end_)
+                Pointer.unwrap(lengthCursor_) < Pointer.unwrap(end_)
             ) {
                 lengthCursor_ = lengthCursor_
                     .upBytes(lengthCursor_.peekUp())
@@ -118,7 +119,7 @@ library LibInterpreterStateDataContract {
                 sourcesLength_++;
             }
             state_.compiledSources = new bytes[](sourcesLength_);
-            while (StackPointer.unwrap(cursor_) < StackPointer.unwrap(end_)) {
+            while (Pointer.unwrap(cursor_) < Pointer.unwrap(end_)) {
                 state_.compiledSources[i_] = cursor_.asBytes();
                 cursor_ = cursor_.upBytes(cursor_.peekUp()).up();
                 i_++;

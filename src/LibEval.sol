@@ -20,8 +20,8 @@ library LibEval {
     function eval(
         InterpreterState memory state_,
         SourceIndex sourceIndex_,
-        StackPointer stackTop_
-    ) internal view returns (StackPointer) {
+        Pointer stackTop_
+    ) internal view returns (Pointer) {
         unchecked {
             uint256 cursor_;
             uint256 end_;
@@ -46,10 +46,10 @@ library LibEval {
 
             // Loop until complete.
             while (cursor_ < end_) {
-                function(InterpreterState memory, Operand, StackPointer)
+                function(InterpreterState memory, Operand, Pointer)
                     internal
                     view
-                    returns (StackPointer) fn_;
+                    returns (Pointer) fn_;
                 Operand operand_;
                 cursor_ += 4;
                 {
