@@ -15,19 +15,9 @@ library LibNamespace {
     /// @param stateNamespace_ The state namespace as specified by the caller.
     /// @return A fully qualified namespace that cannot collide with any other
     /// state namespace specified by any other caller.
-    function qualifyNamespace(
-        StateNamespace stateNamespace_
-    ) internal view returns (FullyQualifiedNamespace) {
-        return
-            FullyQualifiedNamespace.wrap(
-                uint256(
-                    keccak256(
-                        abi.encodePacked(
-                            msg.sender,
-                            StateNamespace.unwrap(stateNamespace_)
-                        )
-                    )
-                )
-            );
+    function qualifyNamespace(StateNamespace stateNamespace_) internal view returns (FullyQualifiedNamespace) {
+        return FullyQualifiedNamespace.wrap(
+            uint256(keccak256(abi.encodePacked(msg.sender, StateNamespace.unwrap(stateNamespace_))))
+        );
     }
 }

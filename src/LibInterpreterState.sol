@@ -63,4 +63,3 @@ struct InterpreterState {
     uint256[][] context;
     bytes[] compiledSources;
 }
-

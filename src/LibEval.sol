@@ -17,30 +17,31 @@ library LibEval {
     /// entrypoint or a nested call.
     /// @param stackTop_ The current stack top, MUST be equal to the stack bottom
     /// on the intepreter state if the current eval is for an entrypoint.
-    function eval(
-        InterpreterState memory state_,
-        SourceIndex sourceIndex_,
-        Pointer stackTop_
-    ) internal view returns (Pointer) {
+    function eval(InterpreterState memory state_, SourceIndex sourceIndex_, Pointer stackTop_)
+        internal
+        view
+        returns (Pointer)
+    {
         unchecked {
             uint256 cursor_;
             uint256 end_;
             assembly ("memory-safe") {
-                cursor_ := mload(
-                    add(
-                        // MUST point to compiled sources. Needs updating if the
-                        // `IntepreterState` struct changes fields.
-                        mload(add(state_, 0xC0)),
+                cursor_ :=
+                    mload(
                         add(
-                            0x20,
-                            mul(
+                            // MUST point to compiled sources. Needs updating if the
+                            // `IntepreterState` struct changes fields.
+                            mload(add(state_, 0xC0)),
+                            add(
                                 0x20,
-                                // SourceIndex is a uint16 so needs cleaning.
-                                and(sourceIndex_, 0xFFFF)
+                                mul(
+                                    0x20,
+                                    // SourceIndex is a uint16 so needs cleaning.
+                                    and(sourceIndex_, 0xFFFF)
+                                )
                             )
                         )
                     )
-                )
                 end_ := add(cursor_, mload(cursor_))
             }
 

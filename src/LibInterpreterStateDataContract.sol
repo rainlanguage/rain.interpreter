@@ -2,59 +2,91 @@
 pragma solidity ^0.8.18;
 
 import "sol.lib.memory/LibPointer.sol";
+import "sol.lib.memory/LibMemCpy.sol";
+import "sol.lib.memory/LibBytes.sol";
+
 import "./LibInterpreterState.sol";
 import "./LibCompile.sol";
 
 library LibInterpreterStateDataContract {
-    function serializeSize(
-        bytes[] memory sources_,
-        uint256[] memory constants_,
-        uint256 stackLength_
-    ) internal pure returns (uint256) {
-        uint256 size_ = 0;
-        size_ += stackLength_.size();
-        size_ += constants_.size();
-        for (uint256 i_ = 0; i_ < sources_.length; i_++) {
-            size_ += sources_[i_].size();
+    using LibBytes for bytes;
+
+    function serializeSize(bytes[] memory sources, uint256[] memory constants, uint256 stackLength)
+        internal
+        pure
+        returns (uint256 size)
+    {
+        assembly ("memory-safe") {
+            let sourcesLength := mload(sources)
+            size := mul(0x20, add(sourcesLength, add(2, mload(constants))))
+
+            for {
+                let cursor := sources
+                let end := add(sources, mul(sourcesLength, 0x20))
+            } lt(cursor, end) { cursor := add(cursor, 0x20) } { size := add(size, mload(mload(cursor))) }
         }
-        return size_;
     }
 
-    /// Efficiently serializes some `IInterpreterV1` state config into bytes that
-    /// can be deserialized to an `InterpreterState` without memory allocation or
-    /// copying of data on the return trip. This is achieved by mutating data in
-    /// place for both serialization and deserialization so it is much more gas
-    /// efficient than abi encode/decode but is NOT SAFE to use the
-    /// `ExpressionConfig` after it has been serialized. Notably the index based
-    /// opcodes in the sources in `ExpressionConfig` will be replaced by function
-    /// pointer based opcodes in place, so are no longer usable in a portable
-    /// format.
-    /// @param sources_ As per `IExpressionDeployerV1`.
-    /// @param constants_ As per `IExpressionDeployerV1`.
-    /// @param stackLength_ Stack length calculated by `IExpressionDeployerV1`
+    /// Efficiently serializes enough information to build `InterpreterState`
+    /// without memory allocation or copying of data during deserialization.
+    ///
+    /// This is achieved by mutating data in place for both serialization and
+    /// deserialization so it is much more gas efficient than abi encode/decode
+    /// but is NOT SAFE to use any of the inputs after the serialization.
+    ///
+    /// Notably the index based opcodes in the `sources` will be compiled and
+    /// replaced by function pointer based opcodes in place.
+    ///
+    /// @param cursor Pointer to memory to start the serialization.
+    /// @param sources As per `IExpressionDeployerV1`.
+    /// @param constants As per `IExpressionDeployerV1`.
+    /// @param stackLength Stack length calculated by `IExpressionDeployerV1`
     /// that will be used to allocate memory for the stack upon deserialization.
-    /// @param opcodeFunctionPointers_ As per `IInterpreterV1.functionPointers`,
+    /// @param opcodeFunctionPointers As per `IInterpreterV1.functionPointers`,
     /// bytes to be compiled into the final `InterpreterState.compiledSources`.
-    function serialize(
-        Pointer pointer_,
-        bytes[] memory sources_,
-        uint256[] memory constants_,
-        uint256 stackLength_,
-        bytes memory opcodeFunctionPointers_
+    function unsafeSerialize(
+        Pointer cursor,
+        bytes[] memory sources,
+        uint256[] memory constants,
+        uint256 stackLength,
+        bytes memory opcodeFunctionPointers
     ) internal pure {
-        unchecked {
+        assembly ("memory-safe") {
             // Copy stack length.
-            pointer_ = pointer_.push(stackLength_);
+            mstore(cursor, stackLength)
+            cursor := add(cursor, 0x20)
 
-            // Then the constants.
-            pointer_ = pointer_.pushWithLength(constants_);
-
-            // Last the sources.
-            bytes memory source_;
-            for (uint256 i_ = 0; i_ < sources_.length; i_++) {
-                source_ = sources_[i_];
-                LibCompile.compile(source_, opcodeFunctionPointers_);
-                pointer_ = pointer_.unalignedPushWithLength(source_);
+            // Then constants including length.
+            for {
+                let constantsCursor := constants
+                let constantsEnd := add(constants, add(0x20, mul(0x20, mload(constants))))
+            } lt(constantsCursor, constantsEnd) {
+                cursor := add(cursor, 0x20)
+                constantsCursor := add(constantsCursor, 0x20)
+            } { mstore(cursor, mload(constantsCursor)) }
+        }
+        // Last the sources.
+        unchecked {
+            uint256 sourcesCursor;
+            uint256 sourcesEnd;
+            assembly ("memory-safe") {
+                sourcesCursor := sources
+                sourcesEnd := add(sources, add(0x20, mul(0x20, mload(sources))))
+            }
+            for (; sourcesCursor < sourcesEnd; sourcesCursor += 0x20) {
+                bytes memory source;
+                uint256 length;
+                Pointer sourceData;
+                assembly ("memory-safe") {
+                    source := mload(sourcesCursor)
+                    length := mload(source)
+                    sourceData := add(0x20, source)
+                }
+                LibCompile.compile(source, opcodeFunctionPointers);
+                LibMemCpy.unsafeCopyBytesTo(sourceData, cursor, length);
+                assembly ("memory-safe") {
+                    cursor := add(cursor, length)
+                }
             }
         }
     }
@@ -73,58 +105,67 @@ library LibInterpreterStateDataContract {
     /// by the deserialization process and so will need to be handled by the
     /// interpreter as part of `eval`.
     ///
-    /// @param serialized_ Bytes previously serialized by
+    /// @param serialized Bytes previously serialized by
     /// `LibInterpreterState.serialize`.
     /// @return An eval-able interpreter state with initialized stack.
-    function deserialize(
-        bytes memory serialized_
-    ) internal pure returns (InterpreterState memory) {
+    function deserialize(bytes memory serialized) internal pure returns (InterpreterState memory) {
         unchecked {
-            InterpreterState memory state_;
+            InterpreterState memory state;
 
             // Context will probably be overridden by the caller according to the
             // context scratch that we deserialize so best to just set it empty
             // here.
-            state_.context = new uint256[][](0);
+            state.context = new uint256[][](0);
 
-            Pointer cursor_ = serialized_.dataPointer();
-            // The end of processing is the end of the state bytes.
-            Pointer end_ = cursor_.upBytes(cursor_.peek());
+            Pointer cursor;
+            Pointer end;
+            assembly ("memory-safe") {
+                cursor := add(serialized, 0x20)
+                end := add(cursor, mload(serialized))
+            }
 
             // Read the stack length and build a stack.
-            cursor_ = cursor_.up();
-            uint256 stackLength_ = cursor_.peek();
+            Pointer stackBottom;
+            assembly ("memory-safe") {
+                let length := mload(cursor)
+                cursor := add(cursor, 0x20)
 
-            // The stack is never stored in stack bytes so we allocate a new
-            // array for it with length as per the indexes and point the state
-            // at it.
-            uint256[] memory stack_ = new uint256[](stackLength_);
-            state_.stackBottom = stack_.asStackPointerUp();
+                // We don't need to zero the stack because the interpreter
+                // assumes values above the stack top are dirty anyway.
+                let stack := mload(0x40)
+                mstore(stack, length)
+                stackBottom := add(stack, 0x20)
+                mstore(0x40, add(stackBottom, mul(length, 0x20)))
+            }
+            state.stackBottom = stackBottom;
 
             // Reference the constants array and move cursor past it.
-            cursor_ = cursor_.up();
-            state_.constantsBottom = cursor_;
-            cursor_ = cursor_.up(cursor_.peek());
+            Pointer constantsBottom;
+            assembly ("memory-safe") {
+                constantsBottom := add(cursor, 0x20)
+                cursor := add(constantsBottom, mload(cursor))
+            }
+            state.constantsBottom = constantsBottom;
 
             // Rebuild the sources array.
-            uint256 i_ = 0;
-            Pointer lengthCursor_ = cursor_;
-            uint256 sourcesLength_ = 0;
-            while (
-                Pointer.unwrap(lengthCursor_) < Pointer.unwrap(end_)
-            ) {
-                lengthCursor_ = lengthCursor_
-                    .upBytes(lengthCursor_.peekUp())
-                    .up();
-                sourcesLength_++;
+            bytes[] memory compiledSources;
+            assembly ("memory-safe") {
+                compiledSources := mload(0x40)
+                let length := 0
+                let compiledSourcesCursor := add(compiledSources, 0x20)
+                for {} lt(cursor, end) {
+                    cursor := add(cursor, add(0x20, mload(cursor)))
+                    compiledSourcesCursor := add(compiledSourcesCursor, 0x20)
+                } {
+                    mstore(compiledSourcesCursor, cursor)
+                    length := add(length, 1)
+                }
+                mstore(compiledSources, length)
+                mstore(0x40, compiledSourcesCursor)
             }
-            state_.compiledSources = new bytes[](sourcesLength_);
-            while (Pointer.unwrap(cursor_) < Pointer.unwrap(end_)) {
-                state_.compiledSources[i_] = cursor_.asBytes();
-                cursor_ = cursor_.upBytes(cursor_.peekUp()).up();
-                i_++;
-            }
-            return state_;
+            state.compiledSources = compiledSources;
+
+            return state;
         }
     }
 }

@@ -15,10 +15,7 @@ library LibCompile {
     /// @param source_ The input source as index based opcodes.
     /// @param pointers_ The function pointers ordered by index to replace the
     /// index based opcodes with.
-    function compile(
-        bytes memory source_,
-        bytes memory pointers_
-    ) internal pure {
+    function compile(bytes memory source_, bytes memory pointers_) internal pure {
         assembly ("memory-safe") {
             for {
                 let replaceMask_ := 0xFFFF
@@ -27,16 +24,9 @@ library LibCompile {
                 let pointersBottom_ := add(pointers_, 2)
                 let cursor_ := add(source_, 2)
                 let end_ := add(source_, sourceLength_)
-            } lt(cursor_, end_) {
-                cursor_ := add(cursor_, 4)
-            } {
+            } lt(cursor_, end_) { cursor_ := add(cursor_, 4) } {
                 let data_ := mload(cursor_)
-                let pointer_ := and(
-                    replaceMask_,
-                    mload(
-                        add(pointersBottom_, mul(2, and(data_, replaceMask_)))
-                    )
-                )
+                let pointer_ := and(replaceMask_, mload(add(pointersBottom_, mul(2, and(data_, replaceMask_)))))
                 mstore(cursor_, or(and(data_, preserveMask_), pointer_))
             }
         }
