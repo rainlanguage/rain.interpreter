@@ -12,58 +12,58 @@ library LibEval {
     /// source index and stack top alongside its state, it supports recursive
     /// calls via. opcodes that can manage scoped substacks, etc. without `eval`
     /// needing to house that complexity itself.
-    /// @param state_ The interpreter state to evaluate a source over.
-    /// @param sourceIndex_ The index of the source to evaluate. MAY be an
+    /// @param state The interpreter state to evaluate a source over.
+    /// @param sourceIndex The index of the source to evaluate. MAY be an
     /// entrypoint or a nested call.
-    /// @param stackTop_ The current stack top, MUST be equal to the stack bottom
+    /// @param stackTop The current stack top, MUST be equal to the stack bottom
     /// on the intepreter state if the current eval is for an entrypoint.
-    function eval(InterpreterState memory state_, SourceIndex sourceIndex_, Pointer stackTop_)
+    function eval(InterpreterState memory state, SourceIndex sourceIndex, Pointer stackTop)
         internal
         view
         returns (Pointer)
     {
         unchecked {
-            uint256 cursor_;
-            uint256 end_;
+            uint256 cursor;
+            uint256 end;
             assembly ("memory-safe") {
-                cursor_ :=
+                cursor :=
                     mload(
                         add(
                             // MUST point to compiled sources. Needs updating if the
                             // `IntepreterState` struct changes fields.
-                            mload(add(state_, 0xC0)),
+                            mload(add(state, 0xC0)),
                             add(
                                 0x20,
                                 mul(
                                     0x20,
                                     // SourceIndex is a uint16 so needs cleaning.
-                                    and(sourceIndex_, 0xFFFF)
+                                    and(sourceIndex, 0xFFFF)
                                 )
                             )
                         )
                     )
-                end_ := add(cursor_, mload(cursor_))
+                end := add(cursor, mload(cursor))
             }
 
             // Loop until complete.
-            while (cursor_ < end_) {
+            while (cursor < end) {
                 function(InterpreterState memory, Operand, Pointer)
                     internal
                     view
-                    returns (Pointer) fn_;
-                Operand operand_;
-                cursor_ += 4;
+                    returns (Pointer) f;
+                Operand operand;
+                cursor += 4;
                 {
-                    uint256 op_;
+                    uint256 op;
                     assembly ("memory-safe") {
-                        op_ := mload(cursor_)
-                        operand_ := and(op_, 0xFFFF)
-                        fn_ := and(shr(16, op_), 0xFFFF)
+                        op := mload(cursor)
+                        operand := and(op, 0xFFFF)
+                        f := and(shr(16, op), 0xFFFF)
                     }
                 }
-                stackTop_ = fn_(state_, operand_, stackTop_);
+                stackTop = f(state, operand, stackTop);
             }
-            return stackTop_;
+            return stackTop;
         }
     }
 }

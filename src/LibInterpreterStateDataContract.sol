@@ -11,18 +11,14 @@ import "./LibCompile.sol";
 library LibInterpreterStateDataContract {
     using LibBytes for bytes;
 
-    function serializeSize(bytes[] memory sources, uint256[] memory constants, uint256 stackLength)
-        internal
-        pure
-        returns (uint256 size)
-    {
+    function serializeSize(bytes[] memory sources, uint256[] memory constants) internal pure returns (uint256 size) {
         assembly ("memory-safe") {
             let sourcesLength := mload(sources)
             size := mul(0x20, add(sourcesLength, add(2, mload(constants))))
 
             for {
-                let cursor := sources
-                let end := add(sources, mul(sourcesLength, 0x20))
+                let cursor := add(sources, 0x20)
+                let end := add(cursor, mul(sourcesLength, 0x20))
             } lt(cursor, end) { cursor := add(cursor, 0x20) } { size := add(size, mload(mload(cursor))) }
         }
     }
@@ -53,10 +49,12 @@ library LibInterpreterStateDataContract {
     ) internal pure {
         assembly ("memory-safe") {
             // Copy stack length.
+            // Then constants length.
             mstore(cursor, stackLength)
-            cursor := add(cursor, 0x20)
+            mstore(add(cursor, 0x20), mload(constants))
+            cursor := add(cursor, 0x40)
 
-            // Then constants including length.
+            // Copy constants.
             for {
                 let constantsCursor := constants
                 let constantsEnd := add(constants, add(0x20, mul(0x20, mload(constants))))

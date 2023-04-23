@@ -3,14 +3,19 @@ pragma solidity ^0.8.18;
 
 import "sol.lib.memory/LibPointer.sol";
 import "sol.lib.memory/LibStackPointer.sol";
+import "sol.lib.memory/LibBytes.sol";
+import "sol.lib.memory/LibUint256Array.sol";
 
 import "../src/LibCompile.sol";
 import "../src/LibInterpreterState.sol";
 
 library LibInterpreterStateDataContractSlow {
     using LibStackPointer for Pointer;
+    using LibPointer for Pointer;
+    using LibBytes for bytes;
+    using LibUint256Array for uint256[];
 
-    function size(uint256 a) internal pure returns (uint256) {
+    function size(uint256) internal pure returns (uint256) {
         return 0x20;
     }
 
@@ -36,26 +41,30 @@ library LibInterpreterStateDataContractSlow {
         return totalSize;
     }
 
-    function serialize(
+    function serializeSlow(
         Pointer pointer,
-        bytes[] memory sources_,
-        uint256[] memory constants_,
-        uint256 stackLength_,
-        bytes memory opcodeFunctionPointers_
+        bytes[] memory sources,
+        uint256[] memory constants,
+        uint256 stackLength,
+        bytes memory opcodeFunctionPointers
     ) internal pure {
         unchecked {
             // Copy stack length.
-            pointer = pointer.push(stackLength_);
+            pointer = pointer.unsafePush(stackLength);
 
             // Then the constants.
-            pointer = pointer.pushWithLength(constants_);
+            pointer = pointer.unsafePush(constants.length);
+            for (uint256 i = 0; i < constants.length; i++) {
+                pointer = pointer.unsafePush(constants[i]);
+            }
 
             // Last the sources.
-            bytes memory source_;
-            for (uint256 i_ = 0; i_ < sources_.length; i_++) {
-                source_ = sources_[i_];
-                LibCompile.compile(source_, opcodeFunctionPointers_);
-                pointer = pointer.unalignedPushWithLength(source_);
+            bytes memory source;
+            for (uint256 i = 0; i < sources.length; i++) {
+                source = sources[i];
+                LibCompile.compile(source, opcodeFunctionPointers);
+                LibMemCpy.unsafeCopyBytesTo(source.dataPointer(), pointer, source.length);
+                pointer = pointer.unsafeAddWords(source.length);
             }
         }
     }
@@ -71,35 +80,35 @@ library LibInterpreterStateDataContractSlow {
 
             Pointer cursor = serialized.dataPointer();
             // The end of processing is the end of the state bytes.
-            Pointer end = cursor.upBytes(cursor.peek());
+            Pointer end = cursor.unsafeAddBytes(cursor.unsafePeek());
 
             // Read the stack length and build a stack.
-            cursor = cursor.up();
-            uint256 stackLength_ = cursor.peek();
+            cursor = cursor.unsafeAddWord();
+            uint256 stackLength = cursor.unsafePeek();
 
             // The stack is never stored in stack bytes so we allocate a new
             // array for it with length as per the indexes and point the state
             // at it.
-            uint256[] memory stack_ = new uint256[](stackLength_);
-            state.stackBottom = stack_.asStackPointerUp();
+            uint256[] memory stack = new uint256[](stackLength);
+            state.stackBottom = stack.dataPointer();
 
             // Reference the constants array and move cursor past it.
-            cursor = cursor.up();
+            cursor = cursor.unsafeAddWord();
             state.constantsBottom = cursor;
-            cursor = cursor.up(cursor.peek());
+            cursor = cursor.unsafeAddWords(cursor.unsafePeek());
 
             // Rebuild the sources array.
             uint256 i = 0;
             Pointer lengthCursor = cursor;
             uint256 sourcesLength_ = 0;
             while (Pointer.unwrap(lengthCursor) < Pointer.unwrap(end)) {
-                lengthCursor = lengthCursor.upBytes(lengthCursor.peekUp()).up();
+                lengthCursor = lengthCursor.unsafeAddBytes(lengthCursor.unsafeReadWord()).unsafeAddWord();
                 sourcesLength_++;
             }
             state.compiledSources = new bytes[](sourcesLength_);
             while (Pointer.unwrap(cursor) < Pointer.unwrap(end)) {
-                state.compiledSources[i] = cursor.asBytes();
-                cursor = cursor.upBytes(cursor.peekUp()).up();
+                state.compiledSources[i] = cursor.unsafeAsBytes();
+                cursor = cursor.unsafeAddBytes(cursor.unsafeReadWord()).unsafeAddWord();
                 i++;
             }
             return state;

@@ -5,12 +5,15 @@ import "rain.interface.interpreter/IInterpreterV1.sol";
 import "sol.lib.memory/LibPointer.sol";
 import "sol.lib.memory/LibMemCpy.sol";
 import "sol.lib.memory/LibStackPointer.sol";
+import "sol.lib.memory/LibUint256Array.sol";
 
 /// Thrown when the length of an array as the result of an applied function does
 /// not match expectations.
 error UnexpectedResultLength(uint256 expectedLength, uint256 actualLength);
 
 library LibOp {
+    using LibUint256Array for uint256[];
+    using LibPointer for Pointer;
     using LibStackPointer for Pointer;
 
     /// Execute a function, reading and writing inputs and outputs on the stack.
@@ -252,77 +255,77 @@ library LibOp {
     {
         (uint256 a, uint256[] memory tail) = stackTop.unsafeList(length);
         uint256 b = f(tail);
-        return tail.asStackPointer().push(a).push(b);
+        return tail.startPointer().unsafePush(a).unsafePush(b);
     }
 
     /// Execute a function, reading and writing inputs and outputs on the stack.
     /// The caller MUST ensure this does not result in unsafe reads and writes.
-    /// @param stackTop_ The stack top to read and write to.
-    /// @param fn_ The function to run on the stack.
-    /// @param length_ The length of the array to pass to fn_ from the stack.
-    /// @return stackTopAfter_ The new stack top above the outputs of fn_.
+    /// @param stackTop The stack top to read and write to.
+    /// @param f The function to run on the stack.
+    /// @param length The length of the array to pass to f from the stack.
+    /// @return stackTopAfter The new stack top above the outputs of f.
     function applyFn(
-        Pointer stackTop_,
+        Pointer stackTop,
         function(uint256, uint256, uint256[] memory)
             internal
             view
-            returns (uint256) fn_,
-        uint256 length_
+            returns (uint256) f,
+        uint256 length
     ) internal view returns (Pointer) {
-        (uint256 b_, uint256[] memory tail_) = stackTop_.list(length_);
-        Pointer stackTopAfter_ = tail_.asStackPointer();
-        (Pointer location_, uint256 a_) = stackTopAfter_.pop();
-        location_.set(fn_(a_, b_, tail_));
-        return stackTopAfter_;
+        (uint256 b, uint256[] memory tail) = stackTop.unsafeList(length);
+        Pointer stackTopAfter = tail.startPointer();
+        (Pointer location, uint256 a) = stackTopAfter.unsafePop();
+        location.unsafeWriteWord(f(a, b, tail));
+        return stackTopAfter;
     }
 
     /// Execute a function, reading and writing inputs and outputs on the stack.
     /// The caller MUST ensure this does not result in unsafe reads and writes.
-    /// @param stackTop_ The stack top to read and write to.
-    /// @param fn_ The function to run on the stack.
-    /// @param length_ The length of the array to pass to fn_ from the stack.
-    /// @return The new stack top above the outputs of fn_.
+    /// @param stackTop The stack top to read and write to.
+    /// @param f The function to run on the stack.
+    /// @param length The length of the array to pass to f from the stack.
+    /// @return The new stack top above the outputs of f.
     function applyFn(
-        Pointer stackTop_,
+        Pointer stackTop,
         function(uint256, uint256, uint256, uint256[] memory)
             internal
             view
-            returns (uint256) fn_,
-        uint256 length_
+            returns (uint256) f,
+        uint256 length
     ) internal view returns (Pointer) {
-        (uint256 c_, uint256[] memory tail_) = stackTop_.list(length_);
-        (Pointer stackTopAfter_, uint256 b_) = tail_.asStackPointer().pop();
-        uint256 a_ = stackTopAfter_.peek();
-        stackTopAfter_.down().set(fn_(a_, b_, c_, tail_));
-        return stackTopAfter_;
+        (uint256 c, uint256[] memory tail) = stackTop.unsafeList(length);
+        (Pointer stackTopAfter, uint256 b) = tail.startPointer().unsafePop();
+        uint256 a = stackTopAfter.unsafePeek();
+        stackTopAfter.unsafeSubWord().unsafeWriteWord(f(a, b, c, tail));
+        return stackTopAfter;
     }
 
     /// Execute a function, reading and writing inputs and outputs on the stack.
     /// The caller MUST ensure this does not result in unsafe reads and writes.
-    /// @param stackTop_ The stack top to read and write to.
-    /// @param fn_ The function to run on the stack.
-    /// @param length_ The length of the arrays to pass to fn_ from the stack.
-    /// @return The new stack top above the outputs of fn_.
+    /// @param stackTop The stack top to read and write to.
+    /// @param f The function to run on the stack.
+    /// @param length The length of the arrays to pass to f from the stack.
+    /// @return The new stack top above the outputs of f.
     function applyFn(
-        Pointer stackTop_,
+        Pointer stackTop,
         function(uint256, uint256[] memory, uint256[] memory)
             internal
             view
-            returns (uint256[] memory) fn_,
-        uint256 length_
+            returns (uint256[] memory) f,
+        uint256 length
     ) internal view returns (Pointer) {
-        Pointer csStart_ = stackTop_.down(length_);
-        uint256[] memory cs_ = new uint256[](length_);
-        LibMemCpy.unsafeCopyWordsTo(csStart_, cs_.dataPointer(), length_);
-        (uint256 a_, uint256[] memory bs_) = csStart_.list(length_);
+        Pointer csStart = stackTop.unsafeSubWords(length);
+        uint256[] memory cs = new uint256[](length);
+        LibMemCpy.unsafeCopyWordsTo(csStart, cs.dataPointer(), length);
+        (uint256 a, uint256[] memory bs) = csStart.unsafeList(length);
 
-        uint256[] memory results_ = fn_(a_, bs_, cs_);
-        if (results_.length != length_) {
-            revert UnexpectedResultLength(length_, results_.length);
+        uint256[] memory results = f(a, bs, cs);
+        if (results.length != length) {
+            revert UnexpectedResultLength(length, results.length);
         }
 
-        Pointer bottom_ = bs_.asStackPointer();
-        LibMemCpy.unsafeCopyWordsTo(results_.dataPointer(), bottom_, length_);
-        return bottom_.up(length_);
+        Pointer bottom = bs.startPointer();
+        LibMemCpy.unsafeCopyWordsTo(results.dataPointer(), bottom, length);
+        return bottom.unsafeAddWords(length);
     }
 }

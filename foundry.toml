@@ -12,7 +12,8 @@ optimizer_runs = 100000
 fuzz.runs = 1024
 
 [profile.default.model_checker]
-contracts = {'src/LibFoo.sol' = ['LibFoo']}
+# LibOp excluded due to the higher order functions breaking the solver.
+contracts = {'src/LibInterpreterState.sol' = ['LibInterpreterState'], 'src/LibNamespace.sol' = ['LibNamespace']}
 engine = 'chc'
 timeout = 10000
 targets = ['assert', 'underflow', 'overflow', 'divByZero', 'constantCondition', 'popEmptyArray', 'outOfBounds']

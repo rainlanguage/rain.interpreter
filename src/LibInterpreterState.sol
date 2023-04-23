@@ -2,12 +2,7 @@
 pragma solidity ^0.8.18;
 
 import "rain.interface.interpreter/IInterpreterV1.sol";
-// import "rain.interface.interpreter/IExpressionDeployerV1.sol";
 import "sol.lib.memory/LibPointer.sol";
-// import "rain.lib.typecast/LibConvert.sol";
-// import "sol.lib.memory/LibUint256Array.sol";
-// import "../../memory/LibMemorySize.sol";
-// import {SafeCastUpgradeable as SafeCast} from "@openzeppelin/contracts-upgradeable/utils/math/SafeCastUpgradeable.sol";
 import "rain.lib.memkv/LibMemoryKV.sol";
 
 /// The standard in-memory representation of an interpreter that facilitates
