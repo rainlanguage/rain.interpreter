@@ -12,22 +12,19 @@ library LibCompile {
     /// serialization, NOT the interpreter, the interpreter MUST guard against
     /// the compilation being garbage or outright hostile during `eval` by
     /// pointing to arbitrary internal functions of the interpreter.
-    /// @param source_ The input source as index based opcodes.
-    /// @param pointers_ The function pointers ordered by index to replace the
+    /// @param source The input source as index based opcodes.
+    /// @param pointers The function pointers ordered by index to replace the
     /// index based opcodes with.
-    function compile(bytes memory source_, bytes memory pointers_) internal pure {
+    function compile(bytes memory source, bytes memory pointers) internal pure {
         assembly ("memory-safe") {
             for {
-                let replaceMask_ := 0xFFFF
-                let preserveMask_ := not(replaceMask_)
-                let sourceLength_ := mload(source_)
-                let pointersBottom_ := add(pointers_, 2)
-                let cursor_ := add(source_, 2)
-                let end_ := add(source_, sourceLength_)
-            } lt(cursor_, end_) { cursor_ := add(cursor_, 4) } {
-                let data_ := mload(cursor_)
-                let pointer_ := and(replaceMask_, mload(add(pointersBottom_, mul(2, and(data_, replaceMask_)))))
-                mstore(cursor_, or(and(data_, preserveMask_), pointer_))
+                let pointersBottom := add(pointers, 2)
+                let cursor := add(source, 2)
+                let end := add(source, mload(source))
+            } lt(cursor, end) { cursor := add(cursor, 4) } {
+                let data := mload(cursor)
+                let pointer := and(0xFFFF, mload(add(pointersBottom, mul(2, and(data, 0xFFFF)))))
+                mstore(cursor, or(and(data, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000), pointer))
             }
         }
     }
