@@ -51,10 +51,9 @@ library LibInterpreterStateDataContract {
             // Copy stack length.
             // Then constants length.
             mstore(cursor, stackLength)
-            mstore(add(cursor, 0x20), mload(constants))
-            cursor := add(cursor, 0x40)
+            cursor := add(cursor, 0x20)
 
-            // Copy constants.
+            // Copy constants with length.
             for {
                 let constantsCursor := constants
                 let constantsEnd := add(constants, add(0x20, mul(0x20, mload(constants))))
@@ -68,8 +67,8 @@ library LibInterpreterStateDataContract {
             uint256 sourcesCursor;
             uint256 sourcesEnd;
             assembly ("memory-safe") {
-                sourcesCursor := sources
-                sourcesEnd := add(sources, add(0x20, mul(0x20, mload(sources))))
+                sourcesCursor := add(sources, 0x20)
+                sourcesEnd := add(sourcesCursor, mul(0x20, mload(sources)))
             }
             for (; sourcesCursor < sourcesEnd; sourcesCursor += 0x20) {
                 bytes memory source;
@@ -79,6 +78,9 @@ library LibInterpreterStateDataContract {
                     source := mload(sourcesCursor)
                     length := mload(source)
                     sourceData := add(0x20, source)
+
+                    mstore(cursor, length)
+                    cursor := add(cursor, 0x20)
                 }
                 LibCompile.compile(source, opcodeFunctionPointers);
                 LibMemCpy.unsafeCopyBytesTo(sourceData, cursor, length);

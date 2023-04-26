@@ -1,0 +1,7 @@
+LibInterpreterStateDataContractTest:testSerialize(bytes[],uint256[],uint8,bytes) (runs: 10, μ: 125287, ~: 133897)
+LibInterpreterStateDataContractTest:testSerializeEmpty() (gas: 22929)
+LibInterpreterStateDataContractTest:testSerializeGas0() (gas: 6764)
+LibInterpreterStateDataContractTest:testSerializeGasEmpty0() (gas: 1119)
+LibInterpreterStateDataContractTest:testSerializeGasSlow0() (gas: 10118)
+LibInterpreterStateDataContractTest:testSerializeGasSlowEmpty0() (gas: 1128)
+LibInterpreterStateDataContractTest:testSerializeSize(bytes[],uint256[],uint256) (runs: 10, μ: 235936, ~: 240941)
