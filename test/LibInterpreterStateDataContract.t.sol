@@ -10,10 +10,14 @@ import "../src/LibInterpreterStateDataContract.sol";
 contract LibInterpreterStateDataContractTest is Test {
     using LibBytes for bytes;
 
-    function convertToOps(bytes memory source, uint8 max) internal pure {
+    function convertToOps(bytes memory source, uint256 max) internal pure {
         unchecked {
-            for (uint256 i = 0; i < source.length; i += 2) {
-                source[i] = bytes1(uint8(source[i]) % max);
+            for (uint256 i = 0; i < source.length; i += 4) {
+                uint256 high = uint8(source[i]);
+                uint256 low = uint8(source[i + 1]);
+                uint256 opcode = (high << 8 | low) % max;
+                source[i] = bytes1(uint8(opcode >> 8));
+                source[i + 1] = bytes1(uint8(opcode & 0xFFFF));
             }
         }
     }
@@ -31,6 +35,10 @@ contract LibInterpreterStateDataContractTest is Test {
         uint8 stackLength,
         bytes memory opcodeFunctionPointers
     ) internal {
+        for (uint256 i = 0; i < sources.length; i++) {
+            convertToOps(sources[i], opcodeFunctionPointers.length);
+        }
+
         uint256 serializeSize = LibInterpreterStateDataContract.serializeSize(sources, constants);
 
         bytes memory serialized = new bytes(serializeSize);
@@ -56,55 +64,39 @@ contract LibInterpreterStateDataContractTest is Test {
         compareSerialize(new bytes[](0), new uint256[](0), 0, hex"000000010002");
     }
 
-    function testSerializeGasEmpty0() public {
+    function testSerializeGasEmpty0() public pure {
         bytes[] memory sources = new bytes[](0);
         uint256[] memory constants = new uint256[](0);
         bytes memory serialized = new bytes(LibInterpreterStateDataContract.serializeSize(sources, constants));
         LibInterpreterStateDataContract.unsafeSerialize(
-            serialized.dataPointer(),
-            sources,
-            constants,
-            0,
-            hex"000000010002"
+            serialized.dataPointer(), sources, constants, 0, hex"000000010002"
         );
     }
 
-    function testSerializeGas0() public {
+    function testSerializeGas0() public pure {
         bytes[] memory sources = new bytes[](10);
         uint256[] memory constants = new uint256[](10);
         bytes memory serialized = new bytes(LibInterpreterStateDataContract.serializeSize(sources, constants));
         LibInterpreterStateDataContract.unsafeSerialize(
-            serialized.dataPointer(),
-            sources,
-            constants,
-            0,
-            hex"000000010002"
+            serialized.dataPointer(), sources, constants, 0, hex"000000010002"
         );
     }
 
-    function testSerializeGasSlowEmpty0() public {
+    function testSerializeGasSlowEmpty0() public pure {
         bytes[] memory sources = new bytes[](0);
         uint256[] memory constants = new uint256[](0);
         bytes memory serialized = new bytes(LibInterpreterStateDataContract.serializeSize(sources, constants));
         LibInterpreterStateDataContractSlow.serializeSlow(
-            serialized.dataPointer(),
-            sources,
-            constants,
-            0,
-            hex"000000010002"
+            serialized.dataPointer(), sources, constants, 0, hex"000000010002"
         );
     }
 
-    function testSerializeGasSlow0() public {
+    function testSerializeGasSlow0() public pure {
         bytes[] memory sources = new bytes[](10);
         uint256[] memory constants = new uint256[](10);
         bytes memory serialized = new bytes(LibInterpreterStateDataContract.serializeSize(sources, constants));
         LibInterpreterStateDataContractSlow.serializeSlow(
-            serialized.dataPointer(),
-            sources,
-            constants,
-            0,
-            hex"000000010002"
+            serialized.dataPointer(), sources, constants, 0, hex"000000010002"
         );
     }
 
@@ -116,12 +108,8 @@ contract LibInterpreterStateDataContractTest is Test {
     ) public {
         vm.assume(opcodeFunctionPointers.length > 0);
         vm.assume(opcodeFunctionPointers.length <= type(uint8).max);
-        vm.assume(sources.length < 5);
-        vm.assume(constants.length < 10);
         for (uint256 i = 0; i < sources.length; i++) {
             vm.assume(sources[i].length % 2 == 0);
-            vm.assume(sources[i].length < 50);
-            convertToOps(sources[i], uint8(opcodeFunctionPointers.length));
         }
 
         compareSerialize(sources, constants, stackLength, opcodeFunctionPointers);
