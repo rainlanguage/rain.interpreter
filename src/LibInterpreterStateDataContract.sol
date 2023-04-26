@@ -108,7 +108,7 @@ library LibInterpreterStateDataContract {
     /// @param serialized Bytes previously serialized by
     /// `LibInterpreterState.serialize`.
     /// @return An eval-able interpreter state with initialized stack.
-    function deserialize(bytes memory serialized) internal pure returns (InterpreterState memory) {
+    function unsafeDeserialize(bytes memory serialized) internal pure returns (InterpreterState memory) {
         unchecked {
             InterpreterState memory state;
 
@@ -127,23 +127,24 @@ library LibInterpreterStateDataContract {
             // Read the stack length and build a stack.
             Pointer stackBottom;
             assembly ("memory-safe") {
-                let length := mload(cursor)
+                let stackLength := mload(cursor)
                 cursor := add(cursor, 0x20)
 
                 // We don't need to zero the stack because the interpreter
                 // assumes values above the stack top are dirty anyway.
                 let stack := mload(0x40)
-                mstore(stack, length)
+                mstore(stack, stackLength)
                 stackBottom := add(stack, 0x20)
-                mstore(0x40, add(stackBottom, mul(length, 0x20)))
+                mstore(0x40, add(stackBottom, mul(stackLength, 0x20)))
             }
             state.stackBottom = stackBottom;
 
             // Reference the constants array and move cursor past it.
             Pointer constantsBottom;
             assembly ("memory-safe") {
+                let constantsLength := mload(cursor)
                 constantsBottom := add(cursor, 0x20)
-                cursor := add(constantsBottom, mload(cursor))
+                cursor := add(constantsBottom, mul(constantsLength, 0x20))
             }
             state.constantsBottom = constantsBottom;
 

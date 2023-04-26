@@ -70,7 +70,7 @@ library LibInterpreterStateDataContractSlow {
         }
     }
 
-    function deserialize(bytes memory serialized) internal pure returns (InterpreterState memory) {
+    function deserializeSlow(bytes memory serialized) internal pure returns (InterpreterState memory) {
         unchecked {
             InterpreterState memory state;
 

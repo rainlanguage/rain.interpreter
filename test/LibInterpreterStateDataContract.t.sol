@@ -3,12 +3,14 @@ pragma solidity ^0.8.18;
 
 import "forge-std/Test.sol";
 import "sol.lib.memory/LibBytes.sol";
+import "sol.lib.memory/LibPointer.sol";
 
 import "./LibInterpreterStateDataContractSlow.sol";
 import "../src/LibInterpreterStateDataContract.sol";
 
 contract LibInterpreterStateDataContractTest is Test {
     using LibBytes for bytes;
+    using LibPointer for Pointer;
 
     function convertToOps(bytes memory source, uint256 max) internal pure {
         unchecked {
@@ -58,6 +60,39 @@ contract LibInterpreterStateDataContractTest is Test {
         );
 
         assertEq(serialized, serializedSlow);
+
+        InterpreterState memory deserialized = LibInterpreterStateDataContract.unsafeDeserialize(serialized);
+        InterpreterState memory deserializedSlow = LibInterpreterStateDataContractSlow.deserializeSlow(serializedSlow);
+
+        uint256[] memory deserializedStack = deserialized.stackBottom.unsafeSubWord().unsafeAsUint256Array();
+        uint256[] memory deserializedStackSlow = deserializedSlow.stackBottom.unsafeSubWord().unsafeAsUint256Array();
+
+        assertEq(deserializedStack, deserializedStackSlow);
+
+        uint256[] memory deserializedConstants = deserialized.constantsBottom.unsafeSubWord().unsafeAsUint256Array();
+        uint256[] memory deserializedConstantsSlow = deserializedSlow.constantsBottom.unsafeSubWord().unsafeAsUint256Array();
+
+        assertEq(deserializedConstants, deserializedConstantsSlow);
+        assertEq(deserializedConstants, constants);
+
+        assertEq(MemoryKV.unwrap(deserialized.stateKV), MemoryKV.unwrap(deserializedSlow.stateKV));
+
+        assertEq(
+            FullyQualifiedNamespace.unwrap(deserialized.namespace),
+            FullyQualifiedNamespace.unwrap(deserializedSlow.namespace)
+        );
+
+        assertEq(address(deserialized.store), address(deserializedSlow.store));
+
+        assertEq(deserialized.context.length, deserializedSlow.context.length);
+        for (uint256 i = 0; i < deserialized.context.length; i++) {
+            assertEq(deserialized.context[i], deserializedSlow.context[i]);
+        }
+
+        assertEq(deserialized.compiledSources.length, deserializedSlow.compiledSources.length);
+        for (uint256 i = 0; i < deserialized.compiledSources.length; i++) {
+            assertEq(deserialized.compiledSources[i], deserializedSlow.compiledSources[i]);
+        }
     }
 
     function testSerializeEmpty() public {
