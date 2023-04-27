@@ -47,10 +47,16 @@ contract LibInterpreterStateDataContractTest is Test {
         bytes memory serializedSlow = new bytes(serializeSize);
 
         bytes[] memory sourcesCopy = new bytes[](sources.length);
+        bytes[] memory sourcesCompiled = new bytes[](sources.length);
         for (uint256 i = 0; i < sources.length; i++) {
             bytes memory sourceCopy = new bytes(sources[i].length);
             LibMemCpy.unsafeCopyBytesTo(sources[i].dataPointer(), sourceCopy.dataPointer(), sources[i].length);
             sourcesCopy[i] = sourceCopy;
+
+            bytes memory sourceCompiled = new bytes(sources[i].length);
+            LibMemCpy.unsafeCopyBytesTo(sources[i].dataPointer(), sourceCompiled.dataPointer(), sources[i].length);
+            LibCompile.compile(sourceCompiled, opcodeFunctionPointers);
+            sourcesCompiled[i] = sourceCompiled;
         }
         LibInterpreterStateDataContract.unsafeSerialize(
             serialized.dataPointer(), sourcesCopy, constants, stackLength, opcodeFunctionPointers
@@ -68,6 +74,7 @@ contract LibInterpreterStateDataContractTest is Test {
         uint256[] memory deserializedStackSlow = deserializedSlow.stackBottom.unsafeSubWord().unsafeAsUint256Array();
 
         assertEq(deserializedStack, deserializedStackSlow);
+        assertEq(deserializedStack, new uint256[](stackLength));
 
         uint256[] memory deserializedConstants = deserialized.constantsBottom.unsafeSubWord().unsafeAsUint256Array();
         uint256[] memory deserializedConstantsSlow = deserializedSlow.constantsBottom.unsafeSubWord().unsafeAsUint256Array();
@@ -81,17 +88,26 @@ contract LibInterpreterStateDataContractTest is Test {
             FullyQualifiedNamespace.unwrap(deserialized.namespace),
             FullyQualifiedNamespace.unwrap(deserializedSlow.namespace)
         );
+        assertEq(0, FullyQualifiedNamespace.unwrap(deserialized.namespace));
 
         assertEq(address(deserialized.store), address(deserializedSlow.store));
+        assertEq(address(0), address(deserialized.store));
 
         assertEq(deserialized.context.length, deserializedSlow.context.length);
         for (uint256 i = 0; i < deserialized.context.length; i++) {
             assertEq(deserialized.context[i], deserializedSlow.context[i]);
         }
+        assertEq(0, deserialized.context.length);
 
         assertEq(deserialized.compiledSources.length, deserializedSlow.compiledSources.length);
         for (uint256 i = 0; i < deserialized.compiledSources.length; i++) {
             assertEq(deserialized.compiledSources[i], deserializedSlow.compiledSources[i]);
+        }
+
+        assertEq(sources.length, sourcesCompiled.length);
+        assertEq(deserialized.compiledSources.length, sourcesCompiled.length);
+        for (uint256 i = 0; i < sourcesCompiled.length; i++) {
+            assertEq(deserialized.compiledSources[i], sourcesCompiled[i]);
         }
     }
 
