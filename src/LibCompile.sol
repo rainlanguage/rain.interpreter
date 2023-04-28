@@ -15,7 +15,7 @@ library LibCompile {
     /// @param source The input source as index based opcodes.
     /// @param pointers The function pointers ordered by index to replace the
     /// index based opcodes with.
-    function compile(bytes memory source, bytes memory pointers) internal pure {
+    function unsafeCompile(bytes memory source, bytes memory pointers) internal pure {
         assembly ("memory-safe") {
             for {
                 let pointersBottom := add(pointers, 2)

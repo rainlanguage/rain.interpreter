@@ -7,22 +7,11 @@ import "sol.lib.memory/LibPointer.sol";
 
 import "./LibInterpreterStateDataContractSlow.sol";
 import "../src/LibInterpreterStateDataContract.sol";
+import "./LibCompileSlow.sol";
 
 contract LibInterpreterStateDataContractTest is Test {
     using LibBytes for bytes;
     using LibPointer for Pointer;
-
-    function convertToOps(bytes memory source, uint256 max) internal pure {
-        unchecked {
-            for (uint256 i = 0; i < source.length; i += 4) {
-                uint256 high = uint8(source[i]);
-                uint256 low = uint8(source[i + 1]);
-                uint256 opcode = (high << 8 | low) % max;
-                source[i] = bytes1(uint8(opcode >> 8));
-                source[i + 1] = bytes1(uint8(opcode & 0xFFFF));
-            }
-        }
-    }
 
     function testSerializeSize(bytes[] memory sources, uint256[] memory constants, uint256 stackLength) public {
         assertEq(
@@ -38,7 +27,7 @@ contract LibInterpreterStateDataContractTest is Test {
         bytes memory opcodeFunctionPointers
     ) internal {
         for (uint256 i = 0; i < sources.length; i++) {
-            convertToOps(sources[i], opcodeFunctionPointers.length);
+            LibCompileSlow.convertToOps(sources[i], opcodeFunctionPointers);
         }
 
         uint256 serializeSize = LibInterpreterStateDataContract.serializeSize(sources, constants);
@@ -55,7 +44,7 @@ contract LibInterpreterStateDataContractTest is Test {
 
             bytes memory sourceCompiled = new bytes(sources[i].length);
             LibMemCpy.unsafeCopyBytesTo(sources[i].dataPointer(), sourceCompiled.dataPointer(), sources[i].length);
-            LibCompile.compile(sourceCompiled, opcodeFunctionPointers);
+            LibCompile.unsafeCompile(sourceCompiled, opcodeFunctionPointers);
             sourcesCompiled[i] = sourceCompiled;
         }
         LibInterpreterStateDataContract.unsafeSerialize(
@@ -77,7 +66,8 @@ contract LibInterpreterStateDataContractTest is Test {
         assertEq(deserializedStack, new uint256[](stackLength));
 
         uint256[] memory deserializedConstants = deserialized.constantsBottom.unsafeSubWord().unsafeAsUint256Array();
-        uint256[] memory deserializedConstantsSlow = deserializedSlow.constantsBottom.unsafeSubWord().unsafeAsUint256Array();
+        uint256[] memory deserializedConstantsSlow =
+            deserializedSlow.constantsBottom.unsafeSubWord().unsafeAsUint256Array();
 
         assertEq(deserializedConstants, deserializedConstantsSlow);
         assertEq(deserializedConstants, constants);
@@ -162,6 +152,7 @@ contract LibInterpreterStateDataContractTest is Test {
         for (uint256 i = 0; i < sources.length; i++) {
             vm.assume(sources[i].length % 2 == 0);
         }
+        vm.assume(opcodeFunctionPointers.length % 2 == 0);
 
         compareSerialize(sources, constants, stackLength, opcodeFunctionPointers);
     }

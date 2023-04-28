@@ -82,7 +82,7 @@ library LibInterpreterStateDataContract {
                     mstore(cursor, length)
                     cursor := add(cursor, 0x20)
                 }
-                LibCompile.compile(source, opcodeFunctionPointers);
+                LibCompile.unsafeCompile(source, opcodeFunctionPointers);
                 LibMemCpy.unsafeCopyBytesTo(sourceData, cursor, length);
                 assembly ("memory-safe") {
                     cursor := add(cursor, length)

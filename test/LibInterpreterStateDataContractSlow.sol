@@ -62,7 +62,7 @@ library LibInterpreterStateDataContractSlow {
             bytes memory source;
             for (uint256 i = 0; i < sources.length; i++) {
                 source = sources[i];
-                LibCompile.compile(source, opcodeFunctionPointers);
+                LibCompile.unsafeCompile(source, opcodeFunctionPointers);
                 pointer = pointer.unsafePush(source.length);
                 LibMemCpy.unsafeCopyBytesTo(source.dataPointer(), pointer, source.length);
                 pointer = pointer.unsafeAddBytes(source.length);
