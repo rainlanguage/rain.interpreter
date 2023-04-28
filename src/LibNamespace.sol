@@ -12,12 +12,18 @@ library LibNamespace {
     /// and caller will produce the same fully qualified namespace, even across
     /// multiple transactions/blocks.
     ///
-    /// @param stateNamespace_ The state namespace as specified by the caller.
-    /// @return A fully qualified namespace that cannot collide with any other
-    /// state namespace specified by any other caller.
-    function qualifyNamespace(StateNamespace stateNamespace_) internal view returns (FullyQualifiedNamespace) {
-        return FullyQualifiedNamespace.wrap(
-            uint256(keccak256(abi.encodePacked(msg.sender, StateNamespace.unwrap(stateNamespace_))))
-        );
+    /// @param stateNamespace The state namespace as specified by the caller.
+    /// @return qualifiedNamespace A fully qualified namespace that cannot
+    /// collide with any other state namespace specified by any other caller.
+    function qualifyNamespace(StateNamespace stateNamespace)
+        internal
+        view
+        returns (FullyQualifiedNamespace qualifiedNamespace)
+    {
+        assembly ("memory-safe") {
+            mstore(0, caller())
+            mstore(0x20, stateNamespace)
+            qualifiedNamespace := keccak256(0, 0x40)
+        }
     }
 }

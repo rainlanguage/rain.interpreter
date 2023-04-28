@@ -28,19 +28,15 @@ contract LibCompileTest is Test {
     }
 
     function testCompileGas0() public pure {
-        bytes memory source =
-            hex"00010000";
-        bytes memory pointers =
-            hex"00000001";
+        bytes memory source = hex"00010000";
+        bytes memory pointers = hex"00000001";
 
         LibCompile.unsafeCompile(source, pointers);
     }
 
     function testCompileGas1() public pure {
-        bytes memory source =
-            hex"0001000000010000";
-        bytes memory pointers =
-            hex"00000001";
+        bytes memory source = hex"0001000000010000";
+        bytes memory pointers = hex"00000001";
 
         LibCompile.unsafeCompile(source, pointers);
     }
