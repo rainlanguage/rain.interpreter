@@ -95,8 +95,10 @@ library LibOp {
     /// arbitrarily decide how to handle `n < 2`. We DO NOT call `f`, instead:
     ///
     /// - `n=0` does NOT read any values. It pushes `0` to `pointer` always.
-    /// - `n=1` is treated as "identity". It pushes the word under `pointer` to
-    ///   `pointer` always.
+    /// - `n=1` is treated as a noop. It can be interpreted as popping one word
+    ///   from `pointer` to act as an accumulator, but then no susequent values
+    ///   are applied to the accumulator, so it is pushed back to `pointer`. The
+    ///   net result of popping and pushing some value is a noop.
     ///
     /// The caller MUST ensure this does not result in unsafe reads and writes.
     ///
@@ -138,35 +140,6 @@ library LibOp {
                 }
             }
         }
-    }
-
-    /// Reduce a function N times, reading and writing inputs and the accumulated
-    /// result on the stack.
-    /// The caller MUST ensure this does not result in unsafe reads and writes.
-    /// @param stackTop_ The stack top to read and write to.
-    /// @param fn_ The function to run on the stack.
-    /// @param n_ The number of times to apply fn_ to accumulate a final result.
-    /// @return stackTopAfter_ The new stack top above the outputs of fn_.
-    function applyFnN(Pointer stackTop_, function(uint256) internal view fn_, uint256 n_)
-        internal
-        view
-        returns (Pointer)
-    {
-        uint256 cursor_;
-        uint256 a_;
-        Pointer stackTopAfter_;
-        assembly ("memory-safe") {
-            stackTopAfter_ := sub(stackTop_, mul(n_, 0x20))
-            cursor_ := stackTopAfter_
-        }
-        while (cursor_ < Pointer.unwrap(stackTop_)) {
-            assembly ("memory-safe") {
-                a_ := mload(cursor_)
-                cursor_ := add(cursor_, 0x20)
-            }
-            fn_(a_);
-        }
-        return stackTopAfter_;
     }
 
     /// Execute a function, reading and writing inputs and outputs on the stack.

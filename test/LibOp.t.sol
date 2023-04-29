@@ -109,13 +109,13 @@ contract LibOpTest is Test {
         vm.assume(stack.length > uint256(n) + 1);
 
         (uint256[] memory stackBefore, uint256[] memory stackSlow) = stackCopies(stack);
+        (stackBefore);
         uint256[] memory slice = new uint256[](n);
 
         LibMemCpy.unsafeCopyWordsTo(stack.endPointer().unsafeSubWords(n + 1), slice.dataPointer(), n);
 
         Pointer stackPointer = stack.endPointer().unsafeSubWord();
         Pointer stackPointerSlow = stackSlow.endPointer().unsafeSubWord();
-        Pointer stackPointerBefore = stackBefore.endPointer().unsafeSubWord();
 
         uint256 expected = 0;
         if (n > 0) {
