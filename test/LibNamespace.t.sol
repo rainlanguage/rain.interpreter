@@ -14,11 +14,11 @@ contract LibNamespaceTest is Test {
         );
     }
 
-    function testQualifyNamespaceGas0(StateNamespace stateNamespace) public {
+    function testQualifyNamespaceGas0(StateNamespace stateNamespace) public view {
         LibNamespace.qualifyNamespace(stateNamespace);
     }
 
-    function testQualifyNamespaceGasSlow0(StateNamespace stateNamespace) public {
+    function testQualifyNamespaceGasSlow0(StateNamespace stateNamespace) public view {
         LibNamespaceSlow.qualifyNamespaceSlow(stateNamespace);
     }
 }
