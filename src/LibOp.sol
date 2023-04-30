@@ -154,6 +154,8 @@ library LibOp {
     /// @param f The function to run on the stack.
     /// @param operand Operand is passed from the source instead of the stack.
     /// @return The new stack top above the outputs of f.
+    /// Slither false positive https://github.com/crytic/slither/issues/1875
+    //slither-disable-next-line dead-code
     function applyFn(
         Pointer pointer,
         function(Operand, uint256, uint256) internal view returns (uint256) f,
