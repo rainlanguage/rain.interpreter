@@ -134,7 +134,7 @@ contract LibOpTest is Test {
 
         uint256 expectedOutput = hashVal(stackPointer.unsafePeek());
 
-        stackPointer.applyFn(hashVal);
+        Pointer stackPointerAfter = stackPointer.applyFn(hashVal);
         stackPointerSlow.applyFnSlow(hashVal);
 
         assertEq(stack, stackSlow);
@@ -142,6 +142,7 @@ contract LibOpTest is Test {
 
         stackBefore[stackBefore.length - 2] = expectedOutput;
         assertEq(stack, stackBefore);
+        assertEq(Pointer.unwrap(stackPointerAfter), Pointer.unwrap(stackPointer));
     }
 
     function testApplyFn1(Operand operand, uint256[] memory stack) public {
@@ -154,7 +155,7 @@ contract LibOpTest is Test {
 
         uint256 expectedOutput = hashOpVal(operand, stackPointer.unsafePeek());
 
-        stackPointer.applyFn(hashOpVal, operand);
+        Pointer stackPointerAfter = stackPointer.applyFn(hashOpVal, operand);
         stackPointerSlow.applyFnSlow(hashOpVal, operand);
 
         assertEq(stack, stackSlow);
@@ -162,6 +163,7 @@ contract LibOpTest is Test {
 
         stackBefore[stackBefore.length - 2] = expectedOutput;
         assertEq(stack, stackBefore);
+        assertEq(Pointer.unwrap(stackPointerAfter), Pointer.unwrap(stackPointer));
     }
 
     function testApplyFn2(uint256[] memory stack) public {
@@ -175,7 +177,7 @@ contract LibOpTest is Test {
         (uint256 beforeA, uint256 beforeB) = stackPointer.unsafePeek2();
         uint256 expectedOutput = hashValVal(beforeA, beforeB);
 
-        stackPointer.applyFn(hashValVal);
+        Pointer stackPointerAfter = stackPointer.applyFn(hashValVal);
         stackPointerSlow.applyFnSlow(hashValVal);
 
         assertEq(stack, stackSlow);
@@ -184,6 +186,7 @@ contract LibOpTest is Test {
         // Only the output position changes val.
         stackBefore[stackBefore.length - 3] = expectedOutput;
         assertEq(stack, stackBefore);
+        assertEq(Pointer.unwrap(stackPointerAfter), Pointer.unwrap(stackPointer.unsafeSubWord()));
     }
 
     function testApplyFn3(uint256[] memory stack) public {
@@ -208,6 +211,7 @@ contract LibOpTest is Test {
         // Only the output position changes val.
         stackBefore[stackBefore.length - 4] = expectedOutput;
         assertEq(stack, stackBefore);
+        assertEq(Pointer.unwrap(stackPointerAfter), Pointer.unwrap(stackPointer.unsafeSubWords(2)));
     }
 
     function testApplyFn4(uint256[] memory stack) public {
@@ -233,6 +237,7 @@ contract LibOpTest is Test {
         // Only the output position changes val.
         stackBefore[stackBefore.length - 5] = expectedOutput;
         assertEq(stack, stackBefore);
+        assertEq(Pointer.unwrap(stackPointerAfter), Pointer.unwrap(stackPointer.unsafeSubWords(3)));
     }
 
     function testApplyFn5(Operand operand, uint256[] memory stack) public {
@@ -256,6 +261,7 @@ contract LibOpTest is Test {
         // Only the output position changes val.
         stackBefore[stackBefore.length - 3] = expectedOutput;
         assertEq(stack, stackBefore);
+        assertEq(Pointer.unwrap(stackPointerAfter), Pointer.unwrap(stackPointer.unsafeSubWord()));
     }
 
     function testApplyFnList0(uint256[] memory stack, uint8 length) public {
@@ -280,6 +286,7 @@ contract LibOpTest is Test {
         // Only the output position changes val.
         stackBefore[stackBefore.length - length - 1] = expectedOutput;
         assertEq(stack, stackBefore);
+        assertEq(Pointer.unwrap(stackPointerAfter), Pointer.unwrap(stackPointer.unsafeSubWords(length).unsafeAddWord()));
     }
 
     function testApplyFnList1(uint256[] memory stack, uint8 length) public {
@@ -310,6 +317,7 @@ contract LibOpTest is Test {
         // The output position changes val.
         stackBefore[stackBefore.length - length - 3] = expectedOutput;
         assertEq(stack, stackBefore);
+        assertEq(Pointer.unwrap(stackPointerAfter), Pointer.unwrap(stackPointer.unsafeSubWords(length + 1)));
     }
 
     function testApplyFnList2(uint256[] memory stack, uint8 length) public {
@@ -341,6 +349,7 @@ contract LibOpTest is Test {
         // The output position changes val.
         stackBefore[stackBefore.length - length - 4] = expectedOutput;
         assertEq(stack, stackBefore);
+        assertEq(Pointer.unwrap(stackPointerAfter), Pointer.unwrap(stackPointer.unsafeSubWords(length + 2)));
     }
 
     function testApplyFnValListList0(uint256[] memory stack, uint8 length) public {
@@ -380,6 +389,7 @@ contract LibOpTest is Test {
             outputSlice.dataPointer(), stackBefore.endPointer().unsafeSubWords(length * 2 + 2), length
         );
         assertEq(stack, stackBefore);
+        assertEq(Pointer.unwrap(stackPointerAfter), Pointer.unwrap(stackPointer.unsafeSubWords(length + 1)));
     }
 
     function testApplyFnN(uint256[] memory stack, uint8 n) public {
