@@ -108,6 +108,22 @@ contract LibOpTest is Test {
         return uint256(LibHashNoAlloc.hashWords(toHash));
     }
 
+    function hashValListList(uint256 a, uint256[] memory xs, uint256[] memory ys)
+        internal
+        pure
+        returns (uint256[] memory zs)
+    {
+        require(xs.length == ys.length);
+        zs = new uint256[](xs.length);
+        uint256[] memory toHash = new uint256[](3);
+        for (uint256 i = 0; i < xs.length; i++) {
+            toHash[0] = a;
+            toHash[1] = xs[i];
+            toHash[2] = ys[i];
+            zs[i] = uint256(LibHashNoAlloc.hashWords(toHash));
+        }
+    }
+
     function testApplyFn0(uint256[] memory stack) public {
         vm.assume(stack.length > 1);
 
@@ -324,6 +340,45 @@ contract LibOpTest is Test {
 
         // The output position changes val.
         stackBefore[stackBefore.length - length - 4] = expectedOutput;
+        assertEq(stack, stackBefore);
+    }
+
+    function testApplyFnValListList0(uint256[] memory stack, uint8 length) public {
+        vm.assume(stack.length > uint256(length) * 2 + 2);
+
+        (uint256[] memory stackBefore, uint256[] memory stackSlow) = stackCopies(stack);
+
+        uint256[] memory slice1 = new uint256[](length);
+        LibMemCpy.unsafeCopyWordsTo(stack.endPointer().unsafeSubWords(length + 1), slice1.dataPointer(), length);
+
+        uint256[] memory slice0 = new uint256[](length);
+        LibMemCpy.unsafeCopyWordsTo(stack.endPointer().unsafeSubWords(length * 2 + 1), slice0.dataPointer(), length);
+
+        Pointer stackPointer = stack.endPointer().unsafeSubWord();
+        Pointer stackPointerSlow = stackSlow.endPointer().unsafeSubWord();
+
+        uint256 a = stack[stack.length - (length * 2) - 2];
+        uint256[] memory expectedOutput = hashValListList(a, slice0, slice1);
+
+        Pointer stackPointerAfter = stackPointer.applyFn(hashValListList, length);
+        stackPointerSlow.applyFnSlow(hashValListList, length);
+
+        // 0 length inputs get written internally without being overwritten
+        // again by outputs.
+        if (length == 0) {
+            stackBefore[stackBefore.length - length * 2 - 2] = length;
+            stackSlow[stackSlow.length - length * 2 - 2] = length;
+        }
+        assertEq(stack, stackSlow);
+
+        uint256[] memory outputSlice = new uint256[](length);
+        LibMemCpy.unsafeCopyWordsTo(stackPointerAfter.unsafeSubWords(length), outputSlice.dataPointer(), length);
+        assertEq(outputSlice, expectedOutput);
+
+        // The output list changes several vals.
+        LibMemCpy.unsafeCopyWordsTo(
+            outputSlice.dataPointer(), stackBefore.endPointer().unsafeSubWords(length * 2 + 2), length
+        );
         assertEq(stack, stackBefore);
     }
 
