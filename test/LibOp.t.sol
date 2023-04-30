@@ -54,10 +54,11 @@ contract LibOpTest is Test {
 
     function hashOpValVal(Operand operand, uint256 a, uint256 b) internal pure returns (uint256 c) {
         assembly ("memory-safe") {
-            mstore(0, operand)
-            mstore(0x20, a)
-            mstore(0x40, b)
-            c := keccak256(0, 0x60)
+            let pointer := mload(0x40)
+            mstore(pointer, operand)
+            mstore(add(pointer, 0x20), a)
+            mstore(add(pointer, 0x40), b)
+            c := keccak256(pointer, 0x60)
         }
     }
 
@@ -205,8 +206,8 @@ contract LibOpTest is Test {
         uint256 beforeB = stack[stack.length - 2];
         uint256 expectedOutput = hashOpValVal(operand, beforeA, beforeB);
 
-        Pointer stackPointerAfter = stackPointer.applyFn(hashOpValVal);
-        stackPointerSlow.applyFnSlow(hashOpValVal);
+        Pointer stackPointerAfter = stackPointer.applyFn(hashOpValVal, operand);
+        stackPointerSlow.applyFnSlow(hashOpValVal, operand);
 
         assertEq(stack, stackSlow);
         assertEq(stackPointerAfter.unsafePeek(), expectedOutput);
