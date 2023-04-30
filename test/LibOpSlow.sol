@@ -84,6 +84,33 @@ library LibOpSlow {
         return bottom.unsafePush(f(array));
     }
 
+    function applyFnSlow(
+        Pointer pointer,
+        function(uint256, uint256, uint256[] memory) internal view returns (uint256) f,
+        uint256 length
+    ) internal view returns (Pointer) {
+        uint256[] memory array = new uint256[](length);
+        Pointer bottom = pointer.unsafeSubWords(length + 2);
+        LibMemCpy.unsafeCopyWordsTo(bottom.unsafeAddWords(2), array.dataPointer(), length);
+        uint256 a = bottom.unsafeReadWord();
+        uint256 b = bottom.unsafeAddWord().unsafeReadWord();
+        return bottom.unsafePush(f(a, b, array));
+    }
+
+    function applyFnSlow(
+        Pointer pointer,
+        function(uint256, uint256, uint256, uint256[] memory) internal view returns (uint256) f,
+        uint256 length
+    ) internal view returns (Pointer) {
+        uint256[] memory array = new uint256[](length);
+        Pointer bottom = pointer.unsafeSubWords(length + 3);
+        LibMemCpy.unsafeCopyWordsTo(bottom.unsafeAddWords(3), array.dataPointer(), length);
+        uint256 a = bottom.unsafeReadWord();
+        uint256 b = bottom.unsafeAddWord().unsafeReadWord();
+        uint256 c = bottom.unsafeAddWords(2).unsafeReadWord();
+        return bottom.unsafePush(f(a, b, c, array));
+    }
+
     function applyFnNSlow(Pointer pointer, function(uint256, uint256) internal view returns (uint256) f, uint256 n)
         internal
         view

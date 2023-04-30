@@ -199,44 +199,44 @@ library LibOp {
 
     /// Execute a function, reading and writing inputs and outputs on the stack.
     /// The caller MUST ensure this does not result in unsafe reads and writes.
-    /// @param stackTop The stack top to read and write to.
+    /// @param pointer The stack top to read and write to.
     /// @param f The function to run on the stack.
     /// @param length The length of the array to pass to f from the stack.
-    /// @return stackTopAfter The new stack top above the outputs of f.
+    /// @return pointerAfter The new stack top above the outputs of f.
     function applyFn(
-        Pointer stackTop,
+        Pointer pointer,
         function(uint256, uint256, uint256[] memory)
             internal
             view
             returns (uint256) f,
         uint256 length
     ) internal view returns (Pointer) {
-        (uint256 b, uint256[] memory tail) = stackTop.unsafeList(length);
-        Pointer stackTopAfter = tail.startPointer();
-        (Pointer location, uint256 a) = stackTopAfter.unsafePop();
+        (uint256 b, uint256[] memory tail) = pointer.unsafeList(length);
+        Pointer pointerAfter = tail.startPointer();
+        (Pointer location, uint256 a) = pointerAfter.unsafePop();
         location.unsafeWriteWord(f(a, b, tail));
-        return stackTopAfter;
+        return pointerAfter;
     }
 
     /// Execute a function, reading and writing inputs and outputs on the stack.
     /// The caller MUST ensure this does not result in unsafe reads and writes.
-    /// @param stackTop The stack top to read and write to.
+    /// @param pointer The stack top to read and write to.
     /// @param f The function to run on the stack.
     /// @param length The length of the array to pass to f from the stack.
     /// @return The new stack top above the outputs of f.
     function applyFn(
-        Pointer stackTop,
+        Pointer pointer,
         function(uint256, uint256, uint256, uint256[] memory)
             internal
             view
             returns (uint256) f,
         uint256 length
     ) internal view returns (Pointer) {
-        (uint256 c, uint256[] memory tail) = stackTop.unsafeList(length);
-        (Pointer stackTopAfter, uint256 b) = tail.startPointer().unsafePop();
-        uint256 a = stackTopAfter.unsafePeek();
-        stackTopAfter.unsafeSubWord().unsafeWriteWord(f(a, b, c, tail));
-        return stackTopAfter;
+        (uint256 c, uint256[] memory tail) = pointer.unsafeList(length);
+        (Pointer pointerAfter, uint256 b) = tail.startPointer().unsafePop();
+        uint256 a = pointerAfter.unsafePeek();
+        pointerAfter.unsafeSubWord().unsafeWriteWord(f(a, b, c, tail));
+        return pointerAfter;
     }
 
     /// Execute a function, reading and writing inputs and outputs on the stack.

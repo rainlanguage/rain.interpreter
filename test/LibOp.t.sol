@@ -87,6 +87,27 @@ contract LibOpTest is Test {
         return uint256(LibHashNoAlloc.hashWords(array));
     }
 
+    function hashValValArray(uint256 a, uint256 b, uint256[] memory array) internal pure returns (uint256) {
+        uint256[] memory toHash = new uint256[](array.length + 2);
+        toHash[0] = a;
+        toHash[1] = b;
+        LibMemCpy.unsafeCopyWordsTo(array.dataPointer(), toHash.dataPointer().unsafeAddWords(2), array.length);
+        return uint256(LibHashNoAlloc.hashWords(toHash));
+    }
+
+    function hashValValValArray(uint256 a, uint256 b, uint256 c, uint256[] memory array)
+        internal
+        pure
+        returns (uint256)
+    {
+        uint256[] memory toHash = new uint256[](array.length + 3);
+        toHash[0] = a;
+        toHash[1] = b;
+        toHash[2] = c;
+        LibMemCpy.unsafeCopyWordsTo(array.dataPointer(), toHash.dataPointer().unsafeAddWords(3), array.length);
+        return uint256(LibHashNoAlloc.hashWords(toHash));
+    }
+
     function testApplyFn0(uint256[] memory stack) public {
         vm.assume(stack.length > 1);
 
@@ -242,6 +263,67 @@ contract LibOpTest is Test {
 
         // Only the output position changes val.
         stackBefore[stackBefore.length - length - 1] = expectedOutput;
+        assertEq(stack, stackBefore);
+    }
+
+    function testApplyFnList1(uint256[] memory stack, uint8 length) public {
+        vm.assume(stack.length > uint256(length) + 3);
+
+        (uint256[] memory stackBefore, uint256[] memory stackSlow) = stackCopies(stack);
+
+        uint256[] memory slice = new uint256[](length);
+        LibMemCpy.unsafeCopyWordsTo(stack.endPointer().unsafeSubWords(length + 1), slice.dataPointer(), length);
+
+        Pointer stackPointer = stack.endPointer().unsafeSubWord();
+        Pointer stackPointerSlow = stackSlow.endPointer().unsafeSubWord();
+
+        uint256 a = stack[stack.length - length - 3];
+        uint256 b = stack[stack.length - length - 2];
+        uint256 expectedOutput = hashValValArray(a, b, slice);
+
+        Pointer stackPointerAfter = stackPointer.applyFn(hashValValArray, length);
+        stackPointerSlow.applyFnSlow(hashValValArray, length);
+
+        // The length remains as an artifact of the internal list manipulation.
+        stackBefore[stackBefore.length - length - 2] = length;
+        stackSlow[stackSlow.length - length - 2] = length;
+
+        assertEq(stack, stackSlow);
+        assertEq(stackPointerAfter.unsafePeek(), expectedOutput);
+
+        // The output position changes val.
+        stackBefore[stackBefore.length - length - 3] = expectedOutput;
+        assertEq(stack, stackBefore);
+    }
+
+    function testApplyFnList2(uint256[] memory stack, uint8 length) public {
+        vm.assume(stack.length > uint256(length) + 4);
+
+        (uint256[] memory stackBefore, uint256[] memory stackSlow) = stackCopies(stack);
+
+        uint256[] memory slice = new uint256[](length);
+        LibMemCpy.unsafeCopyWordsTo(stack.endPointer().unsafeSubWords(length + 1), slice.dataPointer(), length);
+
+        Pointer stackPointer = stack.endPointer().unsafeSubWord();
+        Pointer stackPointerSlow = stackSlow.endPointer().unsafeSubWord();
+
+        uint256 a = stack[stack.length - length - 4];
+        uint256 b = stack[stack.length - length - 3];
+        uint256 c = stack[stack.length - length - 2];
+        uint256 expectedOutput = hashValValValArray(a, b, c, slice);
+
+        Pointer stackPointerAfter = stackPointer.applyFn(hashValValValArray, length);
+        stackPointerSlow.applyFnSlow(hashValValValArray, length);
+
+        // The length remains as an artifact of the internal list manipulation.
+        stackBefore[stackBefore.length - length - 2] = length;
+        stackSlow[stackSlow.length - length - 2] = length;
+
+        assertEq(stack, stackSlow);
+        assertEq(stackPointerAfter.unsafePeek(), expectedOutput);
+
+        // The output position changes val.
+        stackBefore[stackBefore.length - length - 4] = expectedOutput;
         assertEq(stack, stackBefore);
     }
 
