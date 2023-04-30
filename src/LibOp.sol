@@ -177,18 +177,24 @@ library LibOp {
 
     /// Execute a function, reading and writing inputs and outputs on the stack.
     /// The caller MUST ensure this does not result in unsafe reads and writes.
-    /// @param stackTop The stack top to read and write to.
+    /// @param pointer The stack top to read and write to.
     /// @param f The function to run on the stack.
     /// @param length The length of the array to pass to f from the stack.
     /// @return The new stack top above the outputs of f.
-    function applyFn(Pointer stackTop, function(uint256[] memory) internal view returns (uint256) f, uint256 length)
+    function applyFn(Pointer pointer, function(uint256[] memory) internal view returns (uint256) f, uint256 length)
         internal
         view
         returns (Pointer)
     {
-        (uint256 a, uint256[] memory tail) = stackTop.unsafeList(length);
+        (uint256 a, uint256[] memory tail) = pointer.unsafeList(length);
         uint256 b = f(tail);
-        return tail.startPointer().unsafePush(a).unsafePush(b);
+        assembly ("memory-safe") {
+            // Reinstate `a`.
+            mstore(tail, a)
+            mstore(add(tail, 0x20), b)
+            pointer := add(tail, 0x40)
+        }
+        return pointer;
     }
 
     /// Execute a function, reading and writing inputs and outputs on the stack.
