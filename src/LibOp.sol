@@ -67,6 +67,8 @@ library LibOp {
     /// @param pointer The stack top to read and write to.
     /// @param f The function to run on the stack.
     /// @return The new stack top above the outputs of f.
+    // Slither false positive https://github.com/crytic/slither/issues/1875
+    //slither-disable-next-line dead-code
     function applyFn(Pointer pointer, function(uint256, uint256) internal view returns (uint256) f)
         internal
         view
@@ -187,6 +189,8 @@ library LibOp {
     /// @param f The function to run on the stack.
     /// @param length The length of the array to pass to f from the stack.
     /// @return The new stack top above the outputs of f.
+    // Slither false positive https://github.com/crytic/slither/issues/1875
+    //slither-disable-next-line dead-code
     function applyFn(Pointer pointer, function(uint256[] memory) internal view returns (uint256) f, uint256 length)
         internal
         view
@@ -209,6 +213,8 @@ library LibOp {
     /// @param f The function to run on the stack.
     /// @param length The length of the array to pass to f from the stack.
     /// @return pointerAfter The new stack top above the outputs of f.
+    // Slither false positive https://github.com/crytic/slither/issues/1875
+    //slither-disable-next-line dead-code
     function applyFn(
         Pointer pointer,
         function(uint256, uint256, uint256[] memory)
@@ -230,6 +236,8 @@ library LibOp {
     /// @param f The function to run on the stack.
     /// @param length The length of the array to pass to f from the stack.
     /// @return The new stack top above the outputs of f.
+    // Slither false positive https://github.com/crytic/slither/issues/1875
+    //slither-disable-next-line dead-code
     function applyFn(
         Pointer pointer,
         function(uint256, uint256, uint256, uint256[] memory)
@@ -251,6 +259,8 @@ library LibOp {
     /// @param f The function to run on the stack.
     /// @param length The length of the arrays to pass to f from the stack.
     /// @return The new stack top above the outputs of f.
+    // Slither false positive https://github.com/crytic/slither/issues/1875
+    //slither-disable-next-line dead-code
     function applyFn(
         Pointer stackTop,
         function(uint256, uint256[] memory, uint256[] memory)
