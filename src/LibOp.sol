@@ -254,7 +254,15 @@ library LibOp {
         uint256 length
     ) internal view returns (Pointer) {
         Pointer csStart = stackTop.unsafeSubWords(length);
-        uint256[] memory cs = new uint256[](length);
+        // No need to use the `new` keyword which would loop the array to zero
+        // it but we're about to copy values to it.
+        uint256[] memory cs;
+        assembly ("memory-safe") {
+            let pointer := mload(0x40)
+            mstore(0x40, add(pointer, add(0x20, mul(0x20, length))))
+            mstore(pointer, length)
+            cs := pointer
+        }
         LibMemCpy.unsafeCopyWordsTo(csStart, cs.dataPointer(), length);
         (uint256 a, uint256[] memory bs) = csStart.unsafeList(length);
 
