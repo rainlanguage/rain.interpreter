@@ -93,6 +93,8 @@ library LibOp {
     /// @param pointer The stack top to read and write to.
     /// @param f The function to run on the stack.
     /// @return The new stack top above the outputs of f.
+    // Slither false positive https://github.com/crytic/slither/issues/1875
+    //slither-disable-next-line dead-code
     function applyFn(Pointer pointer, function(uint256, uint256, uint256) internal view returns (uint256) f)
         internal
         view
@@ -121,6 +123,8 @@ library LibOp {
     /// @param pointer The stack top to read and write to.
     /// @param f The function to run on the stack.
     /// @return The new stack top above the outputs of f.
+    // Slither false positive https://github.com/crytic/slither/issues/1875
+    //slither-disable-next-line dead-code
     function applyFn(
         Pointer pointer,
         function(uint256, uint256, uint256, uint256)
@@ -154,7 +158,7 @@ library LibOp {
     /// @param f The function to run on the stack.
     /// @param operand Operand is passed from the source instead of the stack.
     /// @return The new stack top above the outputs of f.
-    /// Slither false positive https://github.com/crytic/slither/issues/1875
+    // Slither false positive https://github.com/crytic/slither/issues/1875
     //slither-disable-next-line dead-code
     function applyFn(
         Pointer pointer,
