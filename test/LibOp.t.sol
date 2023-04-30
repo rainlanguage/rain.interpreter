@@ -52,6 +52,15 @@ contract LibOpTest is Test {
         }
     }
 
+    function hashOpValVal(Operand operand, uint256 a, uint256 b) internal pure returns (uint256 c) {
+        assembly ("memory-safe") {
+            mstore(0, operand)
+            mstore(0x20, a)
+            mstore(0x40, b)
+            c := keccak256(0, 0x60)
+        }
+    }
+
     function hashValValVal(uint256 a, uint256 b, uint256 c) internal pure returns (uint256 d) {
         assembly ("memory-safe") {
             let pointer := mload(0x40)
@@ -181,6 +190,29 @@ contract LibOpTest is Test {
 
         // Only the output position changes val.
         stackBefore[stackBefore.length - 5] = expectedOutput;
+        assertEq(stack, stackBefore);
+    }
+
+    function testApplyFn5(Operand operand, uint256[] memory stack) public {
+        vm.assume(stack.length > 2);
+
+        (uint256[] memory stackBefore, uint256[] memory stackSlow) = stackCopies(stack);
+
+        Pointer stackPointer = stack.endPointer().unsafeSubWord();
+        Pointer stackPointerSlow = stackSlow.endPointer().unsafeSubWord();
+
+        uint256 beforeA = stack[stack.length - 3];
+        uint256 beforeB = stack[stack.length - 2];
+        uint256 expectedOutput = hashOpValVal(operand, beforeA, beforeB);
+
+        Pointer stackPointerAfter = stackPointer.applyFn(hashOpValVal);
+        stackPointerSlow.applyFnSlow(hashOpValVal);
+
+        assertEq(stack, stackSlow);
+        assertEq(stackPointerAfter.unsafePeek(), expectedOutput);
+
+        // Only the output position changes val.
+        stackBefore[stackBefore.length - 3] = expectedOutput;
         assertEq(stack, stackBefore);
     }
 

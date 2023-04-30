@@ -150,29 +150,29 @@ library LibOp {
 
     /// Execute a function, reading and writing inputs and outputs on the stack.
     /// The caller MUST ensure this does not result in unsafe reads and writes.
-    /// @param stackTop_ The stack top to read and write to.
-    /// @param fn_ The function to run on the stack.
-    /// @param operand_ Operand is passed from the source instead of the stack.
-    /// @return The new stack top above the outputs of fn_.
+    /// @param pointer The stack top to read and write to.
+    /// @param f The function to run on the stack.
+    /// @param operand Operand is passed from the source instead of the stack.
+    /// @return The new stack top above the outputs of f.
     function applyFn(
-        Pointer stackTop_,
-        function(Operand, uint256, uint256) internal view returns (uint256) fn_,
-        Operand operand_
+        Pointer pointer,
+        function(Operand, uint256, uint256) internal view returns (uint256) f,
+        Operand operand
     ) internal view returns (Pointer) {
-        uint256 a_;
-        uint256 b_;
-        uint256 location_;
+        uint256 a;
+        uint256 b;
+        uint256 location;
         assembly ("memory-safe") {
-            stackTop_ := sub(stackTop_, 0x20)
-            location_ := sub(stackTop_, 0x20)
-            a_ := mload(location_)
-            b_ := mload(stackTop_)
+            pointer := sub(pointer, 0x20)
+            location := sub(pointer, 0x20)
+            a := mload(location)
+            b := mload(pointer)
         }
-        a_ = fn_(operand_, a_, b_);
+        a = f(operand, a, b);
         assembly ("memory-safe") {
-            mstore(location_, a_)
+            mstore(location, a)
         }
-        return stackTop_;
+        return pointer;
     }
 
     /// Execute a function, reading and writing inputs and outputs on the stack.
