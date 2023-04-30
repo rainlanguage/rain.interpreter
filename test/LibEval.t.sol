@@ -17,13 +17,10 @@ contract LibEvalTest is Test {
     function opCount(InterpreterState memory state, Operand operand, Pointer pointer) internal pure returns (Pointer) {
         require(Pointer.unwrap(state.stackBottom) >= Pointer.unwrap(pointer));
         MemoryKVKey key = MemoryKVKey.wrap(0);
-        (uint256 exists, MemoryKVVal value) = state.stateKV.get(
-            key
-        );
+        (uint256 exists, MemoryKVVal value) = state.stateKV.get(key);
         if (exists > 0) {
             value = MemoryKVVal.wrap(MemoryKVVal.unwrap(value) + Operand.unwrap(operand));
-        }
-        else {
+        } else {
             value = MemoryKVVal.wrap(1);
         }
         state.stateKV.set(key, value);
@@ -31,12 +28,15 @@ contract LibEvalTest is Test {
         return pointer.unsafePush(MemoryKVVal.unwrap(value));
     }
 
-    function opCountOrHash(InterpreterState memory state, Operand operand, Pointer pointer) internal pure returns (Pointer) {
+    function opCountOrHash(InterpreterState memory state, Operand operand, Pointer pointer)
+        internal
+        pure
+        returns (Pointer)
+    {
         require(Pointer.unwrap(state.stackBottom) >= Pointer.unwrap(pointer));
         if (Pointer.unwrap(state.stackBottom) == Pointer.unwrap(pointer)) {
             return opCount(state, operand, pointer);
-        }
-        else if (Pointer.unwrap(state.stackBottom) == Pointer.unwrap(pointer.unsafeSubWord())) {
+        } else if (Pointer.unwrap(state.stackBottom) == Pointer.unwrap(pointer.unsafeSubWord())) {
             Pointer location = state.stackBottom;
             uint256 value;
             assembly ("memory-safe") {
@@ -45,8 +45,7 @@ contract LibEvalTest is Test {
                 value := keccak256(0, 0x40)
             }
             return pointer.unsafePush(value);
-        }
-        else {
+        } else {
             Pointer location = pointer.unsafeSubWords(2);
             uint256 value;
             assembly ("memory-safe") {
@@ -57,11 +56,12 @@ contract LibEvalTest is Test {
                 value := keccak256(0, 0x60)
             }
             return location.unsafePush(value);
-         }
+        }
     }
 
     function opcodeFunctionPointers() internal pure returns (bytes memory) {
-        function (InterpreterState memory, Operand, Pointer) internal pure returns (Pointer)[] memory fns = new function (InterpreterState memory, Operand, Pointer) internal pure returns (Pointer)[](2);
+        function (InterpreterState memory, Operand, Pointer) internal pure returns (Pointer)[] memory fns =
+            new function (InterpreterState memory, Operand, Pointer) internal pure returns (Pointer)[](2);
         fns[0] = opCount;
         fns[1] = opCountOrHash;
         uint256[] memory ufns;
@@ -70,5 +70,4 @@ contract LibEvalTest is Test {
         }
         return LibConvert.unsafeTo16BitBytes(ufns);
     }
-
 }
