@@ -88,60 +88,6 @@ library LibOp {
         return pointer;
     }
 
-    /// Reduce a function `f` `n` times, reading and writing inputs and the
-    /// accumulated result on the stack.
-    ///
-    /// As `f` accepts 2 inputs and returns 1 output, we must somewhat
-    /// arbitrarily decide how to handle `n < 2`. We DO NOT call `f`, instead:
-    ///
-    /// - `n=0` does NOT read any values. It pushes `0` to `pointer` always.
-    /// - `n=1` is treated as a noop. It can be interpreted as popping one word
-    ///   from `pointer` to act as an accumulator, but then no susequent values
-    ///   are applied to the accumulator, so it is pushed back to `pointer`. The
-    ///   net result of popping and pushing some value is a noop.
-    ///
-    /// The caller MUST ensure this does not result in unsafe reads and writes.
-    ///
-    /// @param pointer The stack top to read and write to.
-    /// @param f The function to run on the stack.
-    /// @param n The number of times to apply f to accumulate a final result.
-    /// @return pointerAfter The new stack top above the outputs of f.
-    function applyFnN(Pointer pointer, function(uint256, uint256) internal view returns (uint256) f, uint256 n)
-        internal
-        view
-        returns (Pointer pointerAfter)
-    {
-        unchecked {
-            if (n > 0) {
-                uint256 bottom;
-                uint256 cursor;
-                uint256 a;
-                uint256 b;
-                assembly ("memory-safe") {
-                    bottom := sub(pointer, mul(n, 0x20))
-                    a := mload(bottom)
-                    pointerAfter := add(bottom, 0x20)
-                    cursor := pointerAfter
-                }
-                while (cursor < Pointer.unwrap(pointer)) {
-                    assembly ("memory-safe") {
-                        b := mload(cursor)
-                    }
-                    a = f(a, b);
-                    cursor += 0x20;
-                }
-                assembly ("memory-safe") {
-                    mstore(bottom, a)
-                }
-            } else {
-                assembly ("memory-safe") {
-                    mstore(pointer, 0)
-                    pointerAfter := add(pointer, 0x20)
-                }
-            }
-        }
-    }
-
     /// Execute a function, reading and writing inputs and outputs on the stack.
     /// The caller MUST ensure this does not result in unsafe reads and writes.
     /// @param stackTop_ The stack top to read and write to.
@@ -314,5 +260,59 @@ library LibOp {
         Pointer bottom = bs.startPointer();
         LibMemCpy.unsafeCopyWordsTo(results.dataPointer(), bottom, length);
         return bottom.unsafeAddWords(length);
+    }
+
+    /// Reduce a function `f` `n` times, reading and writing inputs and the
+    /// accumulated result on the stack.
+    ///
+    /// As `f` accepts 2 inputs and returns 1 output, we must somewhat
+    /// arbitrarily decide how to handle `n < 2`. We DO NOT call `f`, instead:
+    ///
+    /// - `n=0` does NOT read any values. It pushes `0` to `pointer` always.
+    /// - `n=1` is treated as a noop. It can be interpreted as popping one word
+    ///   from `pointer` to act as an accumulator, but then no susequent values
+    ///   are applied to the accumulator, so it is pushed back to `pointer`. The
+    ///   net result of popping and pushing some value is a noop.
+    ///
+    /// The caller MUST ensure this does not result in unsafe reads and writes.
+    ///
+    /// @param pointer The stack top to read and write to.
+    /// @param f The function to run on the stack.
+    /// @param n The number of times to apply f to accumulate a final result.
+    /// @return pointerAfter The new stack top above the outputs of f.
+    function applyFnN(Pointer pointer, function(uint256, uint256) internal view returns (uint256) f, uint256 n)
+        internal
+        view
+        returns (Pointer pointerAfter)
+    {
+        unchecked {
+            if (n > 0) {
+                uint256 bottom;
+                uint256 cursor;
+                uint256 a;
+                uint256 b;
+                assembly ("memory-safe") {
+                    bottom := sub(pointer, mul(n, 0x20))
+                    a := mload(bottom)
+                    pointerAfter := add(bottom, 0x20)
+                    cursor := pointerAfter
+                }
+                while (cursor < Pointer.unwrap(pointer)) {
+                    assembly ("memory-safe") {
+                        b := mload(cursor)
+                    }
+                    a = f(a, b);
+                    cursor += 0x20;
+                }
+                assembly ("memory-safe") {
+                    mstore(bottom, a)
+                }
+            } else {
+                assembly ("memory-safe") {
+                    mstore(pointer, 0)
+                    pointerAfter := add(pointer, 0x20)
+                }
+            }
+        }
     }
 }

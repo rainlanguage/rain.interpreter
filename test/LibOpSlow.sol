@@ -36,9 +36,21 @@ library LibOpSlow {
         view
         returns (Pointer)
     {
-        (Pointer popped0, uint256 a) = pointer.unsafePop();
-        (Pointer popped1, uint256 b) = popped0.unsafePop();
+        (Pointer popped0, uint256 b) = pointer.unsafePop();
+        (Pointer popped1, uint256 a) = popped0.unsafePop();
         Pointer pushed = popped1.unsafePush(f(a, b));
+        return pushed;
+    }
+
+    function applyFnSlow(Pointer pointer, function(uint256, uint256, uint256) internal view returns (uint256) f)
+        internal
+        view
+        returns (Pointer)
+    {
+        (Pointer popped0, uint256 c) = pointer.unsafePop();
+        (Pointer popped1, uint256 b) = popped0.unsafePop();
+        (Pointer popped2, uint256 a) = popped1.unsafePop();
+        Pointer pushed = popped2.unsafePush(f(a, b, c));
         return pushed;
     }
 
