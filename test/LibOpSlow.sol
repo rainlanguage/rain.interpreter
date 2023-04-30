@@ -5,11 +5,13 @@ import "rain.interface.interpreter/IInterpreterV1.sol";
 
 import "sol.lib.memory/LibPointer.sol";
 import "sol.lib.memory/LibStackPointer.sol";
+import "sol.lib.memory/LibUint256Array.sol";
 
 library LibOpSlow {
     using LibPointer for Pointer;
     using LibStackPointer for Pointer;
     using LibOpSlow for Pointer;
+    using LibUint256Array for uint256[];
 
     function applyFnSlow(Pointer pointer, function(uint256) internal view returns (uint256) f)
         internal
@@ -69,6 +71,17 @@ library LibOpSlow {
         (Pointer popped0, uint256 b) = pointer.unsafePop();
         (Pointer popped1, uint256 a) = popped0.unsafePop();
         return popped1.unsafePush(f(operand, a, b));
+    }
+
+    function applyFnSlow(Pointer pointer, function(uint256[] memory) internal view returns (uint256) f, uint256 length)
+        internal
+        view
+        returns (Pointer)
+    {
+        uint256[] memory array = new uint256[](length);
+        Pointer bottom = pointer.unsafeSubWords(length);
+        LibMemCpy.unsafeCopyWordsTo(bottom, array.dataPointer(), length);
+        return bottom.unsafePush(f(array));
     }
 
     function applyFnNSlow(Pointer pointer, function(uint256, uint256) internal view returns (uint256) f, uint256 n)

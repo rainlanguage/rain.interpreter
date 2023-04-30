@@ -83,6 +83,10 @@ contract LibOpTest is Test {
         }
     }
 
+    function hashArray(uint256[] memory array) internal pure returns (uint256) {
+        return uint256(LibHashNoAlloc.hashWords(array));
+    }
+
     function testApplyFn0(uint256[] memory stack) public {
         vm.assume(stack.length > 1);
 
@@ -221,23 +225,23 @@ contract LibOpTest is Test {
         vm.assume(stack.length > uint256(length) + 1);
 
         (uint256[] memory stackBefore, uint256[] memory stackSlow) = stackCopies(stack);
-        uint256[] memory slice = new uint256[length];
+        uint256[] memory slice = new uint256[](length);
 
-        LibMemCpy.unsafeCopyWordsTo(stack.endPointer().unsafeSubWords(n + 1), slice.dataPointer(), length);
+        LibMemCpy.unsafeCopyWordsTo(stack.endPointer().unsafeSubWords(length + 1), slice.dataPointer(), length);
 
         Pointer stackPointer = stack.endPointer().unsafeSubWord();
         Pointer stackPointerSlow = stackSlow.endPointer().unsafeSubWord();
 
         uint256 expectedOutput = hashArray(slice);
 
-        Pointer stackPointerAfter = stackPointer.applyFn(hashArray, operand);
-        stackPointerSlow.applyFnSlow(hashArray, operand);
+        Pointer stackPointerAfter = stackPointer.applyFn(hashArray, length);
+        stackPointerSlow.applyFnSlow(hashArray, length);
 
         assertEq(stack, stackSlow);
         assertEq(stackPointerAfter.unsafePeek(), expectedOutput);
 
         // Only the output position changes val.
-        stackBefore[stackBefore.length - 3] = expectedOutput;
+        stackBefore[stackBefore.length - length - 1] = expectedOutput;
         assertEq(stack, stackBefore);
     }
 
