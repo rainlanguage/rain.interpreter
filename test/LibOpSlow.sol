@@ -17,8 +17,7 @@ library LibOpSlow {
         returns (Pointer)
     {
         (Pointer popped, uint256 a) = pointer.unsafePop();
-        Pointer pushed = popped.unsafePush(f(a));
-        return pushed;
+        return popped.unsafePush(f(a));
     }
 
     function applyFnSlow(Pointer pointer, function(Operand, uint256) internal view returns (uint256) f, Operand operand)
@@ -27,8 +26,7 @@ library LibOpSlow {
         returns (Pointer)
     {
         (Pointer popped, uint256 a) = pointer.unsafePop();
-        Pointer pushed = popped.unsafePush(f(operand, a));
-        return pushed;
+        return popped.unsafePush(f(operand, a));
     }
 
     function applyFnSlow(Pointer pointer, function(uint256, uint256) internal view returns (uint256) f)
@@ -38,8 +36,7 @@ library LibOpSlow {
     {
         (Pointer popped0, uint256 b) = pointer.unsafePop();
         (Pointer popped1, uint256 a) = popped0.unsafePop();
-        Pointer pushed = popped1.unsafePush(f(a, b));
-        return pushed;
+        return popped1.unsafePush(f(a, b));
     }
 
     function applyFnSlow(Pointer pointer, function(uint256, uint256, uint256) internal view returns (uint256) f)
@@ -50,8 +47,18 @@ library LibOpSlow {
         (Pointer popped0, uint256 c) = pointer.unsafePop();
         (Pointer popped1, uint256 b) = popped0.unsafePop();
         (Pointer popped2, uint256 a) = popped1.unsafePop();
-        Pointer pushed = popped2.unsafePush(f(a, b, c));
-        return pushed;
+        return popped2.unsafePush(f(a, b, c));
+    }
+
+    function applyFnSlow(
+        Pointer pointer,
+        function(uint256, uint256, uint256, uint256) internal view returns (uint256) f
+    ) internal view returns (Pointer) {
+        (Pointer popped0, uint256 d) = pointer.unsafePop();
+        (Pointer popped1, uint256 c) = popped0.unsafePop();
+        (Pointer popped2, uint256 b) = popped1.unsafePop();
+        (Pointer popped3, uint256 a) = popped2.unsafePop();
+        return popped3.unsafePush(f(a, b, c, d));
     }
 
     function applyFnNSlow(Pointer pointer, function(uint256, uint256) internal view returns (uint256) f, uint256 n)

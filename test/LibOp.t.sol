@@ -62,6 +62,17 @@ contract LibOpTest is Test {
         }
     }
 
+    function hashValValValVal(uint256 a, uint256 b, uint256 c, uint256 d) internal pure returns (uint256 e) {
+        assembly ("memory-safe") {
+            let pointer := mload(0x40)
+            mstore(pointer, a)
+            mstore(add(pointer, 0x20), b)
+            mstore(add(pointer, 0x40), c)
+            mstore(add(pointer, 0x60), d)
+            e := keccak256(pointer, 0x80)
+        }
+    }
+
     function testApplyFn0(uint256[] memory stack) public {
         vm.assume(stack.length > 1);
 
@@ -145,6 +156,31 @@ contract LibOpTest is Test {
 
         // Only the output position changes val.
         stackBefore[stackBefore.length - 4] = expectedOutput;
+        assertEq(stack, stackBefore);
+    }
+
+    function testApplyFn4(uint256[] memory stack) public {
+        vm.assume(stack.length > 4);
+
+        (uint256[] memory stackBefore, uint256[] memory stackSlow) = stackCopies(stack);
+
+        Pointer stackPointer = stack.endPointer().unsafeSubWord();
+        Pointer stackPointerSlow = stackSlow.endPointer().unsafeSubWord();
+
+        uint256 beforeA = stack[stack.length - 5];
+        uint256 beforeB = stack[stack.length - 4];
+        uint256 beforeC = stack[stack.length - 3];
+        uint256 beforeD = stack[stack.length - 2];
+        uint256 expectedOutput = hashValValValVal(beforeA, beforeB, beforeC, beforeD);
+
+        Pointer stackPointerAfter = stackPointer.applyFn(hashValValValVal);
+        stackPointerSlow.applyFnSlow(hashValValValVal);
+
+        assertEq(stack, stackSlow);
+        assertEq(stackPointerAfter.unsafePeek(), expectedOutput);
+
+        // Only the output position changes val.
+        stackBefore[stackBefore.length - 5] = expectedOutput;
         assertEq(stack, stackBefore);
     }
 
