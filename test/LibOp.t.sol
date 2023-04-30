@@ -217,6 +217,30 @@ contract LibOpTest is Test {
         assertEq(stack, stackBefore);
     }
 
+    function testApplyFnList0(uint256[] memory stack, uint8 length) public {
+        vm.assume(stack.length > uint256(length) + 1);
+
+        (uint256[] memory stackBefore, uint256[] memory stackSlow) = stackCopies(stack);
+        uint256[] memory slice = new uint256[length];
+
+        LibMemCpy.unsafeCopyWordsTo(stack.endPointer().unsafeSubWords(n + 1), slice.dataPointer(), length);
+
+        Pointer stackPointer = stack.endPointer().unsafeSubWord();
+        Pointer stackPointerSlow = stackSlow.endPointer().unsafeSubWord();
+
+        uint256 expectedOutput = hashArray(slice);
+
+        Pointer stackPointerAfter = stackPointer.applyFn(hashArray, operand);
+        stackPointerSlow.applyFnSlow(hashArray, operand);
+
+        assertEq(stack, stackSlow);
+        assertEq(stackPointerAfter.unsafePeek(), expectedOutput);
+
+        // Only the output position changes val.
+        stackBefore[stackBefore.length - 3] = expectedOutput;
+        assertEq(stack, stackBefore);
+    }
+
     function testApplyFnN(uint256[] memory stack, uint8 n) public {
         vm.assume(stack.length > uint256(n) + 1);
 
