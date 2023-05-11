@@ -20,6 +20,8 @@ contract LibInterpreterStateDataContractTest is Test {
         );
     }
 
+    /// Exercises BOTH serialize and deserialize by round tripping inputs through
+    /// fast and slow implementations.
     function compareSerialize(
         bytes[] memory sources,
         uint256[] memory constants,
