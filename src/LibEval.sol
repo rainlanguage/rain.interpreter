@@ -50,13 +50,6 @@ library LibEval {
                 end := add(cursor, sub(length, m))
             }
 
-            //             let m := mod(length, 0x20)
-            // let end := add(sourceCursor, sub(length, m))
-            // for {} lt(sourceCursor, end) {
-            //     sourceCursor := add(sourceCursor, 0x20)
-            //     targetCursor := add(targetCursor, 0x20)
-            // } { mstore(targetCursor, mload(sourceCursor)) }
-
             function(InterpreterState memory, Operand, Pointer)
                     internal
                     view

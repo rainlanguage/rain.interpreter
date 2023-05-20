@@ -69,12 +69,9 @@ contract LibEvalTest is Test {
         }
     }
 
-    function opNoop(InterpreterState memory, Operand, Pointer pointer)
-        internal
-        pure
-        returns (Pointer) {
-            return pointer;
-        }
+    function opNoop(InterpreterState memory, Operand, Pointer pointer) internal pure returns (Pointer) {
+        return pointer;
+    }
 
     function opcodeFunctionPointers() internal pure returns (bytes memory) {
         function (InterpreterState memory, Operand, Pointer) internal view returns (Pointer)[] memory fns =
@@ -88,12 +85,220 @@ contract LibEvalTest is Test {
         return LibConvert.unsafeTo16BitBytes(ufns);
     }
 
-    function testEvalGas0() public {
-        uint256 x;
+    function prepGasTest(bytes memory source) internal pure returns (InterpreterState memory) {
+        function (InterpreterState memory, Operand, Pointer) internal view returns (Pointer)[] memory fns =
+            new function (InterpreterState memory, Operand, Pointer) internal view returns (Pointer)[](1);
+        fns[0] = opNoop;
+        uint256[] memory ufns;
         assembly ("memory-safe") {
-            x := opNoop
+            ufns := fns
         }
-        assertEq(x, 5);
+        bytes memory pointers = LibConvert.unsafeTo16BitBytes(ufns);
+
+        bytes[] memory sources = new bytes[](1);
+        sources[0] = source;
+        LibCompile.unsafeCompile(sources[0], pointers);
+
+        uint256[] memory empty = new uint256[](0);
+
+        return InterpreterState(
+            empty.dataPointer(),
+            empty.dataPointer(),
+            MemoryKV.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
+            IInterpreterStoreV1(address(0)),
+            new uint256[][](0),
+            sources
+        );
+    }
+
+    function testEvalGas0() public {
+        InterpreterState memory state = prepGasTest(hex"");
+        Pointer stackTop = LibEval.eval(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGasSlow0() public {
+        InterpreterState memory state = prepGasTest(hex"");
+        Pointer stackTop = LibEvalSlow.evalSlow(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGasSimpleLoop0() public {
+        InterpreterState memory state = prepGasTest(hex"");
+        Pointer stackTop = LibEvalSlow.evalSimpleLoop(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGas1() public {
+        InterpreterState memory state = prepGasTest(hex"00000000");
+        Pointer stackTop = LibEval.eval(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGasSlow1() public {
+        InterpreterState memory state = prepGasTest(hex"00000000");
+        Pointer stackTop = LibEvalSlow.evalSlow(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGasSimpleLoop1() public {
+        InterpreterState memory state = prepGasTest(hex"00000000");
+        Pointer stackTop = LibEvalSlow.evalSimpleLoop(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGas2() public {
+        InterpreterState memory state = prepGasTest(hex"0000000000000000");
+        Pointer stackTop = LibEval.eval(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGasSlow2() public {
+        InterpreterState memory state = prepGasTest(hex"0000000000000000");
+        Pointer stackTop = LibEvalSlow.evalSlow(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGasSimpleLoop2() public {
+        InterpreterState memory state = prepGasTest(hex"0000000000000000");
+        Pointer stackTop = LibEvalSlow.evalSimpleLoop(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGas3() public {
+        InterpreterState memory state = prepGasTest(hex"00000000000000000000000000000000");
+        Pointer stackTop = LibEval.eval(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGasSlow3() public {
+        InterpreterState memory state = prepGasTest(hex"00000000000000000000000000000000");
+        Pointer stackTop = LibEvalSlow.evalSlow(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGasSimpleLoop3() public {
+        InterpreterState memory state = prepGasTest(hex"00000000000000000000000000000000");
+        Pointer stackTop = LibEvalSlow.evalSimpleLoop(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGas4() public {
+        InterpreterState memory state =
+            prepGasTest(hex"0000000000000000000000000000000000000000000000000000000000000000");
+        Pointer stackTop = LibEval.eval(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGasSlow4() public {
+        InterpreterState memory state =
+            prepGasTest(hex"0000000000000000000000000000000000000000000000000000000000000000");
+        Pointer stackTop = LibEvalSlow.evalSlow(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGasSimpleLoop4() public {
+        InterpreterState memory state =
+            prepGasTest(hex"0000000000000000000000000000000000000000000000000000000000000000");
+        Pointer stackTop = LibEvalSlow.evalSimpleLoop(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGas5() public {
+        InterpreterState memory state = prepGasTest(
+            hex"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        );
+        Pointer stackTop = LibEval.eval(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGasSlow5() public {
+        InterpreterState memory state = prepGasTest(
+            hex"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        );
+        Pointer stackTop = LibEvalSlow.evalSlow(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGasSimpleLoop5() public {
+        InterpreterState memory state = prepGasTest(
+            hex"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        );
+        Pointer stackTop = LibEvalSlow.evalSimpleLoop(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGas6() public {
+        InterpreterState memory state = prepGasTest(
+            hex"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        );
+        Pointer stackTop = LibEval.eval(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGasSlow6() public {
+        InterpreterState memory state = prepGasTest(
+            hex"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        );
+        Pointer stackTop = LibEvalSlow.evalSlow(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGasSimpleLoop6() public {
+        InterpreterState memory state = prepGasTest(
+            hex"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        );
+        Pointer stackTop = LibEvalSlow.evalSimpleLoop(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGas7() public {
+        InterpreterState memory state = prepGasTest(
+            hex"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        );
+        Pointer stackTop = LibEval.eval(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGasSlow7() public {
+        InterpreterState memory state = prepGasTest(
+            hex"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        );
+        Pointer stackTop = LibEvalSlow.evalSlow(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGasSimpleLoop7() public {
+        InterpreterState memory state = prepGasTest(
+            hex"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        );
+        Pointer stackTop = LibEvalSlow.evalSimpleLoop(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGas8() public {
+        InterpreterState memory state = prepGasTest(
+            hex"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        );
+        Pointer stackTop = LibEval.eval(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGasSlow8() public {
+        InterpreterState memory state = prepGasTest(
+            hex"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        );
+        Pointer stackTop = LibEvalSlow.evalSlow(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
+    }
+
+    function testEvalGasSimpleLoop8() public {
+        InterpreterState memory state = prepGasTest(
+            hex"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        );
+        Pointer stackTop = LibEvalSlow.evalSimpleLoop(state, SourceIndex.wrap(0), state.stackBottom);
+        (stackTop);
     }
 
     function testEval(bytes[] memory sources, uint256[] memory constants, SourceIndex sourceIndex) public {

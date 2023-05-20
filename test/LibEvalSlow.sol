@@ -27,4 +27,54 @@ library LibEvalSlow {
         }
         return stackTop;
     }
+
+    function evalSimpleLoop(InterpreterState memory state, SourceIndex sourceIndex, Pointer stackTop)
+        internal
+        view
+        returns (Pointer)
+    {
+        unchecked {
+            uint256 cursor;
+            uint256 end;
+            assembly ("memory-safe") {
+                cursor :=
+                    mload(
+                        add(
+                            // MUST point to compiled sources. Needs updating if the
+                            // `IntepreterState` struct changes fields.
+                            mload(add(state, 0xC0)),
+                            add(
+                                0x20,
+                                mul(
+                                    0x20,
+                                    // SourceIndex is a uint16 so needs cleaning.
+                                    and(sourceIndex, 0xFFFF)
+                                )
+                            )
+                        )
+                    )
+                end := add(cursor, mload(cursor))
+            }
+
+            // Loop until complete.
+            while (cursor < end) {
+                function(InterpreterState memory, Operand, Pointer)
+                    internal
+                    view
+                    returns (Pointer) f;
+                Operand operand;
+                cursor += 4;
+                {
+                    uint256 op;
+                    assembly ("memory-safe") {
+                        op := mload(cursor)
+                        operand := and(op, 0xFFFF)
+                        f := and(shr(16, op), 0xFFFF)
+                    }
+                }
+                stackTop = f(state, operand, stackTop);
+            }
+            return stackTop;
+        }
+    }
 }
