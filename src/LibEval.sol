@@ -46,7 +46,6 @@ library LibEval {
                     )
                 length := mload(cursor)
                 m := mod(length, 0x20)
-                cursor := add(cursor, 0x20)
                 end := add(cursor, sub(length, m))
             }
 
@@ -58,6 +57,7 @@ library LibEval {
             uint256 op;
             while (cursor < end) {
                 assembly ("memory-safe") {
+                    cursor := add(cursor, 0x20)
                     op := mload(cursor)
                     f := shr(240, op)
                     operand := and(shr(224, op), 0xFFFF)
@@ -98,11 +98,9 @@ library LibEval {
                     operand := and(op, 0xFFFF)
                 }
                 stackTop = f(state, operand, stackTop);
-                cursor += 0x20;
             }
 
             // Loop until complete.
-            cursor -= 0x20;
             end = cursor + m;
             while (cursor < end) {
                 cursor += 4;
