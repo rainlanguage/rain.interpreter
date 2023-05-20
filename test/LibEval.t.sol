@@ -112,100 +112,100 @@ contract LibEvalTest is Test {
         );
     }
 
-    function testEvalGas0() public {
+    function testEvalGas0() public view {
         InterpreterState memory state = prepGasTest(hex"");
         Pointer stackTop = LibEval.eval(state, SourceIndex.wrap(0), state.stackBottom);
         (stackTop);
     }
 
-    function testEvalGasSlow0() public {
+    function testEvalGasSlow0() public view {
         InterpreterState memory state = prepGasTest(hex"");
         Pointer stackTop = LibEvalSlow.evalSlow(state, SourceIndex.wrap(0), state.stackBottom);
         (stackTop);
     }
 
-    function testEvalGasSimpleLoop0() public {
+    function testEvalGasSimpleLoop0() public view {
         InterpreterState memory state = prepGasTest(hex"");
         Pointer stackTop = LibEvalSlow.evalSimpleLoop(state, SourceIndex.wrap(0), state.stackBottom);
         (stackTop);
     }
 
-    function testEvalGas1() public {
+    function testEvalGas1() public view {
         InterpreterState memory state = prepGasTest(hex"00000000");
         Pointer stackTop = LibEval.eval(state, SourceIndex.wrap(0), state.stackBottom);
         (stackTop);
     }
 
-    function testEvalGasSlow1() public {
+    function testEvalGasSlow1() public view {
         InterpreterState memory state = prepGasTest(hex"00000000");
         Pointer stackTop = LibEvalSlow.evalSlow(state, SourceIndex.wrap(0), state.stackBottom);
         (stackTop);
     }
 
-    function testEvalGasSimpleLoop1() public {
+    function testEvalGasSimpleLoop1() public view {
         InterpreterState memory state = prepGasTest(hex"00000000");
         Pointer stackTop = LibEvalSlow.evalSimpleLoop(state, SourceIndex.wrap(0), state.stackBottom);
         (stackTop);
     }
 
-    function testEvalGas2() public {
+    function testEvalGas2() public view {
         InterpreterState memory state = prepGasTest(hex"0000000000000000");
         Pointer stackTop = LibEval.eval(state, SourceIndex.wrap(0), state.stackBottom);
         (stackTop);
     }
 
-    function testEvalGasSlow2() public {
+    function testEvalGasSlow2() public view {
         InterpreterState memory state = prepGasTest(hex"0000000000000000");
         Pointer stackTop = LibEvalSlow.evalSlow(state, SourceIndex.wrap(0), state.stackBottom);
         (stackTop);
     }
 
-    function testEvalGasSimpleLoop2() public {
+    function testEvalGasSimpleLoop2() public view {
         InterpreterState memory state = prepGasTest(hex"0000000000000000");
         Pointer stackTop = LibEvalSlow.evalSimpleLoop(state, SourceIndex.wrap(0), state.stackBottom);
         (stackTop);
     }
 
-    function testEvalGas3() public {
+    function testEvalGas3() public view {
         InterpreterState memory state = prepGasTest(hex"00000000000000000000000000000000");
         Pointer stackTop = LibEval.eval(state, SourceIndex.wrap(0), state.stackBottom);
         (stackTop);
     }
 
-    function testEvalGasSlow3() public {
+    function testEvalGasSlow3() public view {
         InterpreterState memory state = prepGasTest(hex"00000000000000000000000000000000");
         Pointer stackTop = LibEvalSlow.evalSlow(state, SourceIndex.wrap(0), state.stackBottom);
         (stackTop);
     }
 
-    function testEvalGasSimpleLoop3() public {
+    function testEvalGasSimpleLoop3() public view {
         InterpreterState memory state = prepGasTest(hex"00000000000000000000000000000000");
         Pointer stackTop = LibEvalSlow.evalSimpleLoop(state, SourceIndex.wrap(0), state.stackBottom);
         (stackTop);
     }
 
-    function testEvalGas4() public {
+    function testEvalGas4() public view {
         InterpreterState memory state =
             prepGasTest(hex"0000000000000000000000000000000000000000000000000000000000000000");
         Pointer stackTop = LibEval.eval(state, SourceIndex.wrap(0), state.stackBottom);
         (stackTop);
     }
 
-    function testEvalGasSlow4() public {
+    function testEvalGasSlow4() public view {
         InterpreterState memory state =
             prepGasTest(hex"0000000000000000000000000000000000000000000000000000000000000000");
         Pointer stackTop = LibEvalSlow.evalSlow(state, SourceIndex.wrap(0), state.stackBottom);
         (stackTop);
     }
 
-    function testEvalGasSimpleLoop4() public {
+    function testEvalGasSimpleLoop4() public view {
         InterpreterState memory state =
             prepGasTest(hex"0000000000000000000000000000000000000000000000000000000000000000");
         Pointer stackTop = LibEvalSlow.evalSimpleLoop(state, SourceIndex.wrap(0), state.stackBottom);
         (stackTop);
     }
 
-    function testEvalGas5() public {
+    function testEvalGas5() public view {
         InterpreterState memory state = prepGasTest(
             hex"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         );
@@ -213,7 +213,7 @@ contract LibEvalTest is Test {
         (stackTop);
     }
 
-    function testEvalGasSlow5() public {
+    function testEvalGasSlow5() public view {
         InterpreterState memory state = prepGasTest(
             hex"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         );
@@ -221,7 +221,7 @@ contract LibEvalTest is Test {
         (stackTop);
     }
 
-    function testEvalGasSimpleLoop5() public {
+    function testEvalGasSimpleLoop5() public view {
         InterpreterState memory state = prepGasTest(
             hex"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         );
@@ -229,7 +229,7 @@ contract LibEvalTest is Test {
         (stackTop);
     }
 
-    function testEvalGas6() public {
+    function testEvalGas6() public view {
         InterpreterState memory state = prepGasTest(
             hex"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         );
@@ -237,7 +237,7 @@ contract LibEvalTest is Test {
         (stackTop);
     }
 
-    function testEvalGasSlow6() public {
+    function testEvalGasSlow6() public view {
         InterpreterState memory state = prepGasTest(
             hex"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         );
@@ -245,7 +245,7 @@ contract LibEvalTest is Test {
         (stackTop);
     }
 
-    function testEvalGasSimpleLoop6() public {
+    function testEvalGasSimpleLoop6() public view {
         InterpreterState memory state = prepGasTest(
             hex"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         );
@@ -253,7 +253,7 @@ contract LibEvalTest is Test {
         (stackTop);
     }
 
-    function testEvalGas7() public {
+    function testEvalGas7() public view {
         InterpreterState memory state = prepGasTest(
             hex"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         );
@@ -261,7 +261,7 @@ contract LibEvalTest is Test {
         (stackTop);
     }
 
-    function testEvalGasSlow7() public {
+    function testEvalGasSlow7() public view {
         InterpreterState memory state = prepGasTest(
             hex"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         );
@@ -269,7 +269,7 @@ contract LibEvalTest is Test {
         (stackTop);
     }
 
-    function testEvalGasSimpleLoop7() public {
+    function testEvalGasSimpleLoop7() public view {
         InterpreterState memory state = prepGasTest(
             hex"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         );
@@ -277,7 +277,7 @@ contract LibEvalTest is Test {
         (stackTop);
     }
 
-    function testEvalGas8() public {
+    function testEvalGas8() public view {
         InterpreterState memory state = prepGasTest(
             hex"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         );
@@ -285,7 +285,7 @@ contract LibEvalTest is Test {
         (stackTop);
     }
 
-    function testEvalGasSlow8() public {
+    function testEvalGasSlow8() public view {
         InterpreterState memory state = prepGasTest(
             hex"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         );
@@ -293,7 +293,7 @@ contract LibEvalTest is Test {
         (stackTop);
     }
 
-    function testEvalGasSimpleLoop8() public {
+    function testEvalGasSimpleLoop8() public view {
         InterpreterState memory state = prepGasTest(
             hex"0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
         );
@@ -342,5 +342,26 @@ contract LibEvalTest is Test {
             Pointer.unwrap(stackTopSlow) - Pointer.unwrap(stateSlow.stackBottom)
         );
         assertEq(stack, stackSlow);
+
+        uint256[] memory stackSimpleLoop = new uint256[](2);
+
+        InterpreterState memory stateSimpleLoop = InterpreterState(
+            stackSimpleLoop.dataPointer(),
+            constants.dataPointer(),
+            MemoryKV.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
+            IInterpreterStoreV1(address(0)),
+            new uint256[][](0),
+            sources
+        );
+
+        Pointer stackTopSimpleLoop =
+            LibEvalSlow.evalSimpleLoop(stateSimpleLoop, sourceIndex, stateSimpleLoop.stackBottom);
+
+        assertEq(
+            Pointer.unwrap(stackTop) - Pointer.unwrap(state.stackBottom),
+            Pointer.unwrap(stackTopSimpleLoop) - Pointer.unwrap(stateSimpleLoop.stackBottom)
+        );
+        assertEq(stack, stackSimpleLoop);
     }
 }
