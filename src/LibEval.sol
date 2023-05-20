@@ -25,6 +25,8 @@ library LibEval {
         unchecked {
             uint256 cursor;
             uint256 end;
+            uint256 length;
+            uint256 m;
             assembly ("memory-safe") {
                 cursor :=
                     mload(
@@ -42,19 +44,76 @@ library LibEval {
                             )
                         )
                     )
-                end := add(cursor, mload(cursor))
+                length := mload(cursor)
+                m := mod(length, 0x20)
+                cursor := add(cursor, 0x20)
+                end := add(cursor, sub(length, m))
             }
 
-            // Loop until complete.
-            while (cursor < end) {
-                function(InterpreterState memory, Operand, Pointer)
+            //             let m := mod(length, 0x20)
+            // let end := add(sourceCursor, sub(length, m))
+            // for {} lt(sourceCursor, end) {
+            //     sourceCursor := add(sourceCursor, 0x20)
+            //     targetCursor := add(targetCursor, 0x20)
+            // } { mstore(targetCursor, mload(sourceCursor)) }
+
+            function(InterpreterState memory, Operand, Pointer)
                     internal
                     view
                     returns (Pointer) f;
-                Operand operand;
+            Operand operand;
+            uint256 op;
+            while (cursor < end) {
+                assembly ("memory-safe") {
+                    op := mload(cursor)
+                    f := shr(240, op)
+                    operand := and(shr(224, op), 0xFFFF)
+                }
+                stackTop = f(state, operand, stackTop);
+                assembly ("memory-safe") {
+                    f := and(shr(208, op), 0xFFFF)
+                    operand := and(shr(192, op), 0xFFFF)
+                }
+                stackTop = f(state, operand, stackTop);
+                assembly ("memory-safe") {
+                    f := and(shr(176, op), 0xFFFF)
+                    operand := and(shr(160, op), 0xFFFF)
+                }
+                stackTop = f(state, operand, stackTop);
+                assembly ("memory-safe") {
+                    f := and(shr(144, op), 0xFFFF)
+                    operand := and(shr(128, op), 0xFFFF)
+                }
+                stackTop = f(state, operand, stackTop);
+                assembly ("memory-safe") {
+                    f := and(shr(112, op), 0xFFFF)
+                    operand := and(shr(96, op), 0xFFFF)
+                }
+                stackTop = f(state, operand, stackTop);
+                assembly ("memory-safe") {
+                    f := and(shr(80, op), 0xFFFF)
+                    operand := and(shr(64, op), 0xFFFF)
+                }
+                stackTop = f(state, operand, stackTop);
+                assembly ("memory-safe") {
+                    f := and(shr(48, op), 0xFFFF)
+                    operand := and(shr(32, op), 0xFFFF)
+                }
+                stackTop = f(state, operand, stackTop);
+                assembly ("memory-safe") {
+                    f := and(shr(16, op), 0xFFFF)
+                    operand := and(op, 0xFFFF)
+                }
+                stackTop = f(state, operand, stackTop);
+                cursor += 0x20;
+            }
+
+            // Loop until complete.
+            cursor -= 0x20;
+            end = cursor + m;
+            while (cursor < end) {
                 cursor += 4;
                 {
-                    uint256 op;
                     assembly ("memory-safe") {
                         op := mload(cursor)
                         operand := and(op, 0xFFFF)

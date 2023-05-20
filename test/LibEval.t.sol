@@ -69,6 +69,13 @@ contract LibEvalTest is Test {
         }
     }
 
+    function opNoop(InterpreterState memory, Operand, Pointer pointer)
+        internal
+        pure
+        returns (Pointer) {
+            return pointer;
+        }
+
     function opcodeFunctionPointers() internal pure returns (bytes memory) {
         function (InterpreterState memory, Operand, Pointer) internal view returns (Pointer)[] memory fns =
             new function (InterpreterState memory, Operand, Pointer) internal view returns (Pointer)[](2);
@@ -79,6 +86,14 @@ contract LibEvalTest is Test {
             ufns := fns
         }
         return LibConvert.unsafeTo16BitBytes(ufns);
+    }
+
+    function testEvalGas0() public {
+        uint256 x;
+        assembly ("memory-safe") {
+            x := opNoop
+        }
+        assertEq(x, 5);
     }
 
     function testEval(bytes[] memory sources, uint256[] memory constants, SourceIndex sourceIndex) public {
