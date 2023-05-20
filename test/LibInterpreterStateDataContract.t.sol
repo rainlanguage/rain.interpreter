@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 import "forge-std/Test.sol";
 import "sol.lib.memory/LibBytes.sol";
 import "sol.lib.memory/LibPointer.sol";
-
+import "sol.lib.memory/LibUint256Array.sol";
 import "./LibInterpreterStateDataContractSlow.sol";
 import "../src/LibInterpreterStateDataContract.sol";
 import "./LibCompileSlow.sol";
@@ -12,6 +12,7 @@ import "./LibCompileSlow.sol";
 contract LibInterpreterStateDataContractTest is Test {
     using LibBytes for bytes;
     using LibPointer for Pointer;
+    using LibUint256Array for Pointer;
 
     function testSerializeSize(bytes[] memory sources, uint256[] memory constants, uint256 stackLength) public {
         assertEq(
