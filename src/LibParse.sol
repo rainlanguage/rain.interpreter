@@ -1,18 +1,28 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-error MissingFinalSemi();
+// Error 1
+error MissingFinalSemi(uint256 offset);
+
+// Error 2
+error UnexpectedLHSChar(uint256 offset);
 
 library LibParse {
-    function parse(bytes memory data) internal pure returns (bytes[] memory sources, uint256[] memory constants) {
+    function parse(bytes memory data) internal pure returns (bytes[] memory sources, uint256[] memory) {
         if (data.length > 0) {
             uint256 char;
+            uint256 errorCode;
             assembly ("memory-safe") {
+                function buildErrorCode(data_, cursor_, byteCode_) -> errorCode_ {
+                    errorCode_ := or(shl(8, sub(cursor_, add(data_, 1))), byteCode_)
+                }
+
                 // Notable excerpts from ASCII as shifted chars
                 // 0x20 = space = 0x0100000000
                 // 0x2C = , = 0x100000000000
                 // 0x3A = : = 0x0400000000000000
                 // 0x3B = ; = 0x0800000000000000
+                // 0x5F = _ = 0x800000000000000000000000
                 let lhs := 1
                 let outputCursor := mload(0x40)
 
@@ -68,11 +78,30 @@ library LibParse {
                         default { revert(0, 0) }
                         continue
                     }
+
+                    switch lhs
+                    case 1 {
+                        // mask for _
+                        masked := and(char, 0x800000000000000000000000)
+                        if iszero(masked) { errorCode := buildErrorCode(data, cursor, 2) }
+                    }
+                    case 0 {}
+                    // unreachable, implies broken lhs flag.
+                    default { revert(0, 0) }
                 }
                 mstore(0x40, outputCursor)
+
+                if iszero(eq(char, 0x0800000000000000)) { errorCode := buildErrorCode(data, cursor, 1) }
             }
-            if (char != 0x0800000000000000) {
-                revert MissingFinalSemi();
+
+            if (errorCode > 0) {
+                uint256 code = errorCode & 0xFF;
+                uint256 offset = errorCode >> 8;
+                if (code == 1) {
+                    revert MissingFinalSemi(offset);
+                } else if (code == 2) {
+                    revert UnexpectedLHSChar(offset);
+                }
             }
         }
     }

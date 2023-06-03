@@ -6,13 +6,14 @@ import "forge-std/Test.sol";
 import "src/LibParse.sol";
 
 contract LibParseTest is Test {
-    function testCharBuilder() external pure {
-        bytes memory char = ";";
+    function testCharBuilder() external view {
+        bytes memory char = "_";
+        uint256 x;
         assembly {
-            let x := shl(and(mload(add(char, 1)), 0xFF), 1)
+            x := shl(and(mload(add(char, 1)), 0xFF), 1)
             // let x := or(or(0x100000000000, 0x0400000000000000), 0x0800000000000000)
-            let y := mload(x)
         }
+        console.log(x);
     }
 
     function testParseEmpty() external {
@@ -29,14 +30,50 @@ contract LibParseTest is Test {
         assertEq(constants2.length, 0);
     }
 
+    function testParseGasEmpty0() external {
+        LibParse.parse("");
+    }
+
+    function testParseGasEmpty1() external {
+        LibParse.parse(":;");
+    }
+
+    function testParseGasEmpty2() external {
+        LibParse.parse(":;:;");
+    }
+
     function testParseMissingFinalSemi() external {
-        vm.expectRevert(abi.encodeWithSelector(MissingFinalSemi.selector));
+        vm.expectRevert(abi.encodeWithSelector(MissingFinalSemi.selector, 1));
         LibParse.parse(":");
 
-        vm.expectRevert(abi.encodeWithSelector(MissingFinalSemi.selector));
+        vm.expectRevert(abi.encodeWithSelector(MissingFinalSemi.selector, 3));
         LibParse.parse(":;:");
 
-        vm.expectRevert(abi.encodeWithSelector(MissingFinalSemi.selector));
+        vm.expectRevert(abi.encodeWithSelector(MissingFinalSemi.selector, 2));
         LibParse.parse("::");
+    }
+
+    function testParseInputsOnly() external {
+        (bytes[] memory sources1, uint256[] memory constants1) = LibParse.parse("_:;");
+        assertEq(sources1.length, 1);
+        assertEq(constants1.length, 0);
+    }
+
+    function testParseGasInputsOnly0() external {
+        LibParse.parse("_:;");
+    }
+
+    function testParseUnexpectedLHS() external {
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0));
+        LibParse.parse("0:;");
+
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0));
+        LibParse.parse("_0:;");
+
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0));
+        LibParse.parse("0_:;");
+
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0));
+        LibParse.parse("_0_:;");
     }
 }
