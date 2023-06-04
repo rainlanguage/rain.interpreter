@@ -55,8 +55,14 @@ library LibParse {
                 // mask for 0-9
                 // 0x3ff000000000000
                 //
-                // mask for kebab case a-z 0-9 -
+                // mask for lower alphanumeric kebab case a-z 0-9 -
                 // 0xffffffe0000000003ff200000000000
+                //
+                // mask for lower alpha kebab case a-z -
+                // 0xffffffe000000000000200000000000
+                //
+                // mask for lower alpha and underscore a-z _
+                // 0xffffffe800000000000000000000000
                 let outputCursor := mload(0x40)
 
                 // Layout of state is
@@ -66,7 +72,7 @@ library LibParse {
                 state := outputCursor
                 outputCursor := add(outputCursor, 0x60)
 
-                // start with lhs = 1
+                // start with lhs = 1 and yin/yang = 0
                 mstore(state, 1)
 
                 // start with empty stack
@@ -85,15 +91,26 @@ library LibParse {
                     // Cursor must be incremented by the inner logic.
                     char := shl(and(mload(cursor), 0xFF), 1)
 
-                    switch mload(state)
+                    switch and(mload(state), 1)
+                    // Process stack.
                     case 1 {
-                        // ignored stack items
-                        // first char equals _
-                        if eq(char, 0x800000000000000000000000) {
+                        // stack items
+                        // first char is lower alpha a-z _
+                        // tail chars will be lower alphanumeric kebab a-z 0-9 -
+                        if and(char, 0xffffffe800000000000000000000000) {
+                            // if yang we can't start a new stack item
+                            if and(mload(state), 2) {
+                                errorCode := buildErrorCode(data, cursor, 2)
+                                break
+                            }
+
                             {
-                                let stackIndex := mload(add(state, 0x20))
-                                stackIndex := add(stackIndex, 1)
-                                mstore(add(state, 0x20), stackIndex)
+                                // increment stack height
+                                let stateStackOffset := add(state, 0x20)
+                                mstore(stateStackOffset, add(mload(stateStackOffset), 1))
+
+                                // lhs/rhs = 1, yin/yang = 1
+                                mstore(state, 3)
                             }
                             let word := mload(add(cursor, 0x20))
 
@@ -101,6 +118,9 @@ library LibParse {
                             if iszero(and(shl(byte(0, word), 1), 0xffffffe0000000003ff200000000000)) { continue }
 
                             // inline the first 16 word chars for gas efficiency.
+                            // It is usual for named stack items to be more than
+                            // one char long, so we can do better than looping in
+                            // terms of gas.
                             if and(shl(byte(0, word), 1), 0xffffffe0000000003ff200000000000) {
                                 if and(shl(byte(0x01, word), 1), 0xffffffe0000000003ff200000000000) {
                                     if and(shl(byte(0x02, word), 1), 0xffffffe0000000003ff200000000000) {
@@ -221,11 +241,16 @@ library LibParse {
                         }
 
                         // only space is allowed whitespace on LHS
-                        if eq(char, 0x0100000000) { continue }
+                        if eq(char, 0x0100000000) {
+                            // lhs/rhs = 1, yin/yang = 0
+                            mstore(state, 1)
+                            continue
+                        }
 
                         // end of lhs
                         // char equals :
                         if eq(char, 0x0400000000000000) {
+                            // lhs/rhs = 0, yin/yang = 0
                             mstore(state, 0)
                             continue
                         }
@@ -236,6 +261,7 @@ library LibParse {
                         // end of rhs
                         // char equals ,
                         if eq(char, 0x100000000000) {
+                            // lhs/rhs = 1, yin/yang = 0
                             mstore(state, 1)
                             continue
                         }
@@ -244,6 +270,7 @@ library LibParse {
                         // implies end of rhs
                         // char equals ;
                         if eq(char, 0x0800000000000000) {
+                            // lhs/rhs = 1, yin/yang = 0
                             mstore(state, 1)
 
                             // Brute force a new list of references every time we
