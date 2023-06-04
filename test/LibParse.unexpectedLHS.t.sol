@@ -6,9 +6,10 @@ import "forge-std/Test.sol";
 import "src/LibParse.sol";
 
 contract LibParseTest is Test {
-    function testParseUnexpectedLHS() external {
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, "0"));
-        LibParse.parse("0:;");
+    function testParseUnexpectedLHS(bytes1 memory unexpected) external {
+
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, string(bytes(unexpected))));
+        LibParse.parse(bytes.concat(unexpected, ":;"));
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, "0"));
         LibParse.parse("_0:;");
