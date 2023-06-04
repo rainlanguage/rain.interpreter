@@ -9,6 +9,9 @@ error MissingFinalSemi(uint256 offset);
 // Error 2
 error UnexpectedLHSChar(uint256 offset, string char);
 
+// Error 3
+error UnexpectedRHSChar(uint256 offset, string char);
+
 library LibParse {
     function testCharBuilder(string memory s) external view {
         uint256 char = 1 << uint256(uint8(bytes1(bytes(s))));
@@ -34,6 +37,12 @@ library LibParse {
                 // 0x3A = : = 0x0400000000000000
                 // 0x3B = ; = 0x0800000000000000
                 // 0x5F = _ = 0x800000000000000000000000
+                //
+                // mask for structure , : ;
+                // 0x0C00100000000000
+                //
+                // mask for whitespace space \n \r \t
+                // 0x100002600
                 let lhs := 1
                 let outputCursor := mload(0x40)
 
@@ -64,29 +73,20 @@ library LibParse {
                             continue
                         }
                         errorCode := buildErrorCode(data, cursor, 2)
+                        break
                     }
-                    case 0 {}
-                    // unreachable, implies broken lhs flag.
-                    default { revert(0, 0) }
+                    case 0 {
+                        // end of rhs
+                        // char equals ,
+                        if eq(char, 0x100000000000) {
+                            lhs := 1
+                            continue
+                        }
 
-                    let masked :=
-                        and(
-                            char,
-                            // mask for , : ;
-                            0x0C00100000000000
-                        )
-                    if masked {
-                        switch masked
-                        // ,
-                        // rhs end
-                        case 0x100000000000 { lhs := 1 }
-                        // char :
-                        // lhs end
-                        case 0x0400000000000000 { lhs := 0 }
-                        // char ;
-                        // source end
-                        // implies rhs end
-                        case 0x0800000000000000 {
+                        // end of source
+                        // implies end of rhs
+                        // char equals ;
+                        if eq(char, 0x0800000000000000) {
                             lhs := 1
 
                             // Brute force a new list of references every time we
@@ -109,16 +109,22 @@ library LibParse {
                             source := outputCursor
                             mstore(source, 0)
                             outputCursor := add(outputCursor, 0x20)
+
+                            continue
                         }
-                        // unreachable, implies broken mask.
-                        default { revert(0, 0) }
-                        continue
+
+                        errorCode := buildErrorCode(data, cursor, 3)
+                        break
                     }
+                    // unreachable, implies broken lhs flag.
+                    default { revert(0, 0) }
                 }
                 mstore(0x40, outputCursor)
 
                 // missing final semi
-                if iszero(eq(char, 0x0800000000000000)) { errorCode := buildErrorCode(data, cursor, 1) }
+                if and(iszero(errorCode), iszero(eq(char, 0x0800000000000000))) {
+                    errorCode := buildErrorCode(data, cursor, 1)
+                }
             }
 
             if (errorCode > 0) {
@@ -129,6 +135,8 @@ library LibParse {
                     revert MissingFinalSemi(offset);
                 } else if (code == 2) {
                     revert UnexpectedLHSChar(offset, char);
+                } else if (code == 3) {
+                    revert UnexpectedRHSChar(offset, char);
                 }
             }
         }

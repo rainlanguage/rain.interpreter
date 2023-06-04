@@ -6,18 +6,26 @@ import "forge-std/Test.sol";
 import "src/LibParse.sol";
 
 contract LibParseTest is Test {
-    function testParseUnexpectedLHS(bytes1 memory unexpected) external {
+    function testParseUnexpectedLHS(bytes1 unexpected) external {
+        vm.assume(unexpected != bytes1("\t"));
+        vm.assume(unexpected != bytes1("\n"));
+        vm.assume(unexpected != bytes1("\r"));
+        vm.assume(unexpected != bytes1(" "));
+        vm.assume(unexpected != bytes1("_"));
+        vm.assume(unexpected != bytes1(":"));
 
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, string(bytes(unexpected))));
+        string memory unexpectedString = string(abi.encodePacked(unexpected));
+
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, unexpectedString));
         LibParse.parse(bytes.concat(unexpected, ":;"));
 
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, "0"));
-        LibParse.parse("_0:;");
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, unexpectedString));
+        LibParse.parse(bytes.concat("_", unexpected, ":;"));
 
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, "0"));
-        LibParse.parse("0_:;");
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, unexpectedString));
+        LibParse.parse(bytes.concat(unexpected, "_:;"));
 
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, "0"));
-        LibParse.parse("_0_:;");
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, unexpectedString));
+        LibParse.parse(bytes.concat("_", unexpected, "_:;"));
     }
 }
