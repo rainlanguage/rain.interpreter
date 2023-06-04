@@ -5,7 +5,7 @@ import "forge-std/Test.sol";
 
 import "src/LibParse.sol";
 
-contract LibParseTest is Test {
+contract LibParseEmptyTest is Test {
     function testParseEmpty() external {
         (bytes[] memory sources0, uint256[] memory constants0) = LibParse.parse("");
         assertEq(sources0.length, 0);
