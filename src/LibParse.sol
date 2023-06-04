@@ -21,10 +21,11 @@ library LibParse {
         console2.log(char);
     }
 
-    function parse(bytes memory data) internal pure returns (bytes[] memory sources, uint256[] memory) {
+    function parse(bytes memory data) internal pure returns (bytes[] memory, uint256[] memory) {
         if (data.length > 0) {
             uint256 char;
             uint256 errorCode;
+            uint256 state;
             assembly ("memory-safe") {
                 function buildErrorCode(data_, cursor_, byteCode_) -> errorCode_ {
                     errorCode_ :=
@@ -56,9 +57,23 @@ library LibParse {
                 //
                 // mask for kebab case a-z 0-9 -
                 // 0xffffffe0000000003ff200000000000
-                let lhs := 1
-                let stackIndex := 0
                 let outputCursor := mload(0x40)
+
+                // Layout of state is
+                // 0 => lhs/rhs
+                // 0x20 => stackIndex
+                // 0x40 => pointer to sources
+                state := outputCursor
+                outputCursor := add(outputCursor, 0x60)
+
+                // start with lhs = 1
+                mstore(state, 1)
+
+                // start with empty stack
+                mstore(add(state, 0x20), 0)
+
+                // start with empty sources
+                mstore(add(state, 0x40), 0x60)
 
                 let source := outputCursor
                 mstore(source, 0)
@@ -70,12 +85,16 @@ library LibParse {
                     // Cursor must be incremented by the inner logic.
                     char := shl(and(mload(cursor), 0xFF), 1)
 
-                    switch lhs
+                    switch mload(state)
                     case 1 {
                         // ignored stack items
                         // first char equals _
                         if eq(char, 0x800000000000000000000000) {
-                            stackIndex := add(stackIndex, 1)
+                            {
+                                let stackIndex := mload(add(state, 0x20))
+                                stackIndex := add(stackIndex, 1)
+                                mstore(add(state, 0x20), stackIndex)
+                            }
                             let word := mload(add(cursor, 0x20))
 
                             // The second char is not a word char so do nothing.
@@ -207,7 +226,7 @@ library LibParse {
                         // end of lhs
                         // char equals :
                         if eq(char, 0x0400000000000000) {
-                            lhs := 0
+                            mstore(state, 0)
                             continue
                         }
                         errorCode := buildErrorCode(data, cursor, 2)
@@ -217,7 +236,7 @@ library LibParse {
                         // end of rhs
                         // char equals ,
                         if eq(char, 0x100000000000) {
-                            lhs := 1
+                            mstore(state, 1)
                             continue
                         }
 
@@ -225,14 +244,15 @@ library LibParse {
                         // implies end of rhs
                         // char equals ;
                         if eq(char, 0x0800000000000000) {
-                            lhs := 1
+                            mstore(state, 1)
 
                             // Brute force a new list of references every time we
                             // encounter a new source. We assume that most parsed
                             // data will have a low number of sources, ~5 or less.
-                            let oldSourcesLength := mload(sources)
-                            let sourcesCursor := add(sources, 0x20)
-                            sources := outputCursor
+                            let sourcesCursor := mload(add(state, 0x40))
+                            let oldSourcesLength := mload(sourcesCursor)
+                            sourcesCursor := add(sourcesCursor, 0x20)
+                            mstore(add(state, 0x40), outputCursor)
 
                             mstore(outputCursor, add(oldSourcesLength, 1))
                             outputCursor := add(outputCursor, 0x20)
@@ -265,6 +285,12 @@ library LibParse {
                 }
             }
 
+            bytes[] memory sources;
+            uint256[] memory constants;
+            assembly ("memory-safe") {
+                sources := mload(add(state, 0x40))
+            }
+
             if (errorCode > 0) {
                 string memory s = string(abi.encodePacked(uint8(errorCode)));
                 uint256 code = errorCode >> 8 & 0xFF;
@@ -279,6 +305,8 @@ library LibParse {
                     revert WordTooLong(offset);
                 }
             }
+
+            return (sources, constants);
         }
     }
 }
