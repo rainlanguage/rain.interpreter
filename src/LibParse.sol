@@ -1,23 +1,34 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
+import "forge-std/console2.sol";
+
 // Error 1
 error MissingFinalSemi(uint256 offset);
 
 // Error 2
-error UnexpectedLHSChar(uint256 offset);
+error UnexpectedLHSChar(uint256 offset, string char);
 
 library LibParse {
+    function testCharBuilder(string memory s) external view {
+        uint256 char = 1 << uint256(uint8(bytes1(bytes(s))));
+        console2.log(char);
+    }
+
     function parse(bytes memory data) internal pure returns (bytes[] memory sources, uint256[] memory) {
         if (data.length > 0) {
             uint256 char;
             uint256 errorCode;
             assembly ("memory-safe") {
                 function buildErrorCode(data_, cursor_, byteCode_) -> errorCode_ {
-                    errorCode_ := or(shl(8, sub(cursor_, add(data_, 1))), byteCode_)
+                    errorCode_ :=
+                        or(shl(16, sub(cursor_, add(data_, 1))), or(shl(8, byteCode_), and(mload(cursor_), 0xFF)))
                 }
 
                 // Notable excerpts from ASCII as shifted chars
+                // 0x09 = \t = 0x200
+                // 0x0a = \n = 0x400
+                // 0x0d = \r = 0x2000
                 // 0x20 = space = 0x0100000000
                 // 0x2C = , = 0x100000000000
                 // 0x3A = : = 0x0400000000000000
@@ -35,6 +46,29 @@ library LibParse {
                 for {} lt(cursor, end) { cursor := add(cursor, 1) } {
                     // Cursor must be incremented by the inner logic.
                     char := shl(and(mload(cursor), 0xFF), 1)
+
+                    switch lhs
+                    case 1 {
+                        // ignored stack items
+                        // first char equals _
+                        if eq(char, 0x800000000000000000000000) { continue }
+
+                        // whitespace
+                        // first char in mask space \t \n \r
+                        if and(char, 0x100002600) { continue }
+
+                        // end of lhs
+                        // char equals :
+                        if eq(char, 0x0400000000000000) {
+                            lhs := 0
+                            continue
+                        }
+                        errorCode := buildErrorCode(data, cursor, 2)
+                    }
+                    case 0 {}
+                    // unreachable, implies broken lhs flag.
+                    default { revert(0, 0) }
+
                     let masked :=
                         and(
                             char,
@@ -73,34 +107,28 @@ library LibParse {
                             mstore(outputCursor, source)
                             outputCursor := add(outputCursor, 0x20)
                             source := outputCursor
+                            mstore(source, 0)
+                            outputCursor := add(outputCursor, 0x20)
                         }
                         // unreachable, implies broken mask.
                         default { revert(0, 0) }
                         continue
                     }
-
-                    switch lhs
-                    case 1 {
-                        // mask for _
-                        masked := and(char, 0x800000000000000000000000)
-                        if iszero(masked) { errorCode := buildErrorCode(data, cursor, 2) }
-                    }
-                    case 0 {}
-                    // unreachable, implies broken lhs flag.
-                    default { revert(0, 0) }
                 }
                 mstore(0x40, outputCursor)
 
+                // missing final semi
                 if iszero(eq(char, 0x0800000000000000)) { errorCode := buildErrorCode(data, cursor, 1) }
             }
 
             if (errorCode > 0) {
-                uint256 code = errorCode & 0xFF;
-                uint256 offset = errorCode >> 8;
+                string memory char = string(abi.encodePacked(uint8(errorCode)));
+                uint256 code = errorCode >> 8 & 0xFF;
+                uint256 offset = errorCode >> 16;
                 if (code == 1) {
                     revert MissingFinalSemi(offset);
                 } else if (code == 2) {
-                    revert UnexpectedLHSChar(offset);
+                    revert UnexpectedLHSChar(offset, char);
                 }
             }
         }
