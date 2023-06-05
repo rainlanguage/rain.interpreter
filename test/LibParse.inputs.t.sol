@@ -16,7 +16,7 @@ contract LibParseTest is Test {
         }
     }
 
-    function testParseGasInputsOnly0() external {
+    function testParseGasInputsOnly0() external pure {
         LibParse.parse("_:;");
     }
 }

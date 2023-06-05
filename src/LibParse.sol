@@ -16,8 +16,10 @@ error UnexpectedRHSChar(uint256 offset, string char);
 error WordTooLong(uint256 offset);
 
 uint256 constant LHS_RHS_DELIMITER_MASK = 0x0400000000000000;
-/// @dev lower alpha a-z _
+/// @dev lower alpha and underscore a-z _
 uint256 constant LHS_STACK_HEAD_MASK = 0xffffffe800000000000000000000000;
+/// @dev lower alpha a-z
+uint256 constant LHS_STACK_HEAD_NAMED_MASK = 0xffffffe000000000000000000000000;
 uint256 constant LHS_STACK_TAIL_MASK = 0xffffffe0000000003ff200000000000;
 uint256 constant LHS_STACK_DELIMITER_MASK = 0x0100000000;
 
@@ -71,11 +73,14 @@ library LibParse {
                 let outputCursor := mload(0x40)
 
                 // Layout of state is
-                // 0 => lhs/rhs
+                // EXTREME care must be taken if the layout changes to ensure ALL
+                // reads and writes are updated to match.
+                // 0 => lhs/rhs and yin/yang flags
                 // 0x20 => stackIndex
                 // 0x40 => pointer to sources
+                // 0x60 => named stack linked list head
                 state := outputCursor
-                outputCursor := add(outputCursor, 0x60)
+                outputCursor := add(outputCursor, 0x80)
 
                 // start with lhs = 1 and yin/yang = 0
                 mstore(state, 1)
@@ -85,6 +90,9 @@ library LibParse {
 
                 // start with empty sources
                 mstore(add(state, 0x40), 0x60)
+
+                // base of stack linked list is 0
+                mstore(add(state, 0x60), 0)
 
                 let source := outputCursor
                 mstore(source, 0)
@@ -109,14 +117,6 @@ library LibParse {
                                 break
                             }
 
-                            {
-                                // increment stack height
-                                let stateStackOffset := add(state, 0x20)
-                                mstore(stateStackOffset, add(mload(stateStackOffset), 1))
-
-                                // lhs/rhs = 1, yin/yang = 1
-                                mstore(state, 3)
-                            }
                             let word := mload(add(cursor, 0x20))
 
                             // loop over the word
@@ -126,6 +126,45 @@ library LibParse {
                                 iszero(iszero(and(shl(byte(i, word), 1), 0xffffffe0000000003ff200000000000)))
                             ) { i := add(i, 1) } {}
                             if lt(i, 0x20) {
+                                // If the stack item is named, save its stack
+                                // position in a FILO linked list structure.
+                                if and(char, 0xffffffe000000000000000000000000) {
+                                    let name := shr(sub(256, mul(add(i, 1), 8)), mload(add(cursor, 0x1F)))
+                                    mstore(0, name)
+                                    name := keccak256(0, 0x20)
+
+                                    // Prepend name to linked list.
+                                    mstore(outputCursor, mload(add(state, 0x60)))
+                                    mstore(
+                                        add(state, 0x60),
+                                        or(
+                                            // make room in the name for pointers
+                                            shl(0x20, name),
+                                            // pointers
+                                            or(
+                                                // current stack height, assume
+                                                // it can't exceed 16 bits.
+                                                shl(0x10, mload(add(state, 0x20))),
+                                                // pointer to old head, assume
+                                                // it can't exceed 16 bits of
+                                                // memory (64Kb)
+                                                outputCursor
+                                            )
+                                        )
+                                    )
+                                    outputCursor := add(outputCursor, 0x20)
+                                }
+
+                                // Update state ready for next char.
+                                {
+                                    // increment stack height
+                                    let stateStackOffset := add(state, 0x20)
+                                    mstore(stateStackOffset, add(mload(stateStackOffset), 1))
+
+                                    // lhs/rhs = 1, yin/yang = 1
+                                    mstore(state, 3)
+                                }
+
                                 cursor := add(cursor, i)
                                 continue
                             }

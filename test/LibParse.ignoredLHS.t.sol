@@ -22,131 +22,131 @@ contract LibParseIgnoredLHSTest is Test {
         assertEq(constants1.length, 0);
     }
 
-    function testParseIgnoredGas0() external {
+    function testParseIgnoredGas00() external pure {
         LibParse.parse("_:;");
     }
 
-    function testParseIgnoredGas1() external {
+    function testParseIgnoredGas01() external pure {
         LibParse.parse("_a:;");
     }
 
-    function testParseIgnoredGas2() external {
+    function testParseIgnoredGas02() external pure {
         LibParse.parse("_aa:;");
     }
 
-    function testParseIgnoredGas3() external {
+    function testParseIgnoredGas03() external pure {
         LibParse.parse("_aaa:;");
     }
 
-    function testParseIgnoredGas4() external {
+    function testParseIgnoredGas04() external pure {
         LibParse.parse("_aaaa:;");
     }
 
-    function testParseIgnoredGas5() external {
+    function testParseIgnoredGas05() external pure {
         LibParse.parse("_aaaaa:;");
     }
 
-    function testParseIgnoredGas6() external {
+    function testParseIgnoredGas06() external pure {
         LibParse.parse("_aaaaaa:;");
     }
 
-    function testParseIgnoredGas7() external {
+    function testParseIgnoredGas07() external pure {
         LibParse.parse("_aaaaaaa:;");
     }
 
-    function testParseIgnoredGas8() external {
+    function testParseIgnoredGas08() external pure {
         LibParse.parse("_aaaaaaaa:;");
     }
 
-    function testParseIgnoredGas9() external {
+    function testParseIgnoredGas09() external pure {
         LibParse.parse("_aaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas10() external {
+    function testParseIgnoredGas10() external pure {
         LibParse.parse("_aaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas11() external {
+    function testParseIgnoredGas11() external pure {
         LibParse.parse("_aaaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas12() external {
+    function testParseIgnoredGas12() external pure {
         LibParse.parse("_aaaaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas13() external {
+    function testParseIgnoredGas13() external pure {
         LibParse.parse("_aaaaaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas14() external {
+    function testParseIgnoredGas14() external pure {
         LibParse.parse("_aaaaaaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas15() external {
+    function testParseIgnoredGas15() external pure {
         LibParse.parse("_aaaaaaaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas16() external {
+    function testParseIgnoredGas16() external pure {
         LibParse.parse("_aaaaaaaaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas17() external {
+    function testParseIgnoredGas17() external pure {
         LibParse.parse("_aaaaaaaaaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas18() external {
+    function testParseIgnoredGas18() external pure {
         LibParse.parse("_aaaaaaaaaaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas19() external {
+    function testParseIgnoredGas19() external pure {
         LibParse.parse("_aaaaaaaaaaaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas20() external {
+    function testParseIgnoredGas20() external pure {
         LibParse.parse("_aaaaaaaaaaaaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas21() external {
+    function testParseIgnoredGas21() external pure {
         LibParse.parse("_aaaaaaaaaaaaaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas22() external {
+    function testParseIgnoredGas22() external pure {
         LibParse.parse("_aaaaaaaaaaaaaaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas23() external {
+    function testParseIgnoredGas23() external pure {
         LibParse.parse("_aaaaaaaaaaaaaaaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas24() external {
+    function testParseIgnoredGas24() external pure {
         LibParse.parse("_aaaaaaaaaaaaaaaaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas25() external {
+    function testParseIgnoredGas25() external pure {
         LibParse.parse("_aaaaaaaaaaaaaaaaaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas26() external {
+    function testParseIgnoredGas26() external pure {
         LibParse.parse("_aaaaaaaaaaaaaaaaaaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas27() external {
+    function testParseIgnoredGas27() external pure {
         LibParse.parse("_aaaaaaaaaaaaaaaaaaaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas28() external {
+    function testParseIgnoredGas28() external pure {
         LibParse.parse("_aaaaaaaaaaaaaaaaaaaaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas29() external {
+    function testParseIgnoredGas29() external pure {
         LibParse.parse("_aaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas30() external {
+    function testParseIgnoredGas30() external pure {
         LibParse.parse("_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;");
     }
 
-    function testParseIgnoredGas31() external {
+    function testParseIgnoredGas31() external pure {
         LibParse.parse("_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;");
     }
 
