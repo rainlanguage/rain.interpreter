@@ -15,10 +15,15 @@ error UnexpectedRHSChar(uint256 offset, string char);
 // Error 4
 error WordTooLong(uint256 offset);
 
+uint256 constant LHS_RHS_DELIMITER_MASK = 0x0400000000000000;
+/// @dev lower alpha a-z _
+uint256 constant LHS_STACK_HEAD_MASK = 0xffffffe800000000000000000000000;
+uint256 constant LHS_STACK_TAIL_MASK = 0xffffffe0000000003ff200000000000;
+uint256 constant LHS_STACK_DELIMITER_MASK = 0x0100000000;
+
 library LibParse {
-    function testCharBuilder(string memory s) external view {
-        uint256 char = 1 << uint256(uint8(bytes1(bytes(s))));
-        console2.log(char);
+    function stringToChar(string memory s) external pure returns (uint256 char) {
+        return 1 << uint256(uint8(bytes1(bytes(s))));
     }
 
     function parse(bytes memory data) internal pure returns (bytes[] memory, uint256[] memory) {
@@ -114,130 +119,18 @@ library LibParse {
                             }
                             let word := mload(add(cursor, 0x20))
 
-                            // The second char is not a word char so do nothing.
-                            if iszero(and(shl(byte(0, word), 1), 0xffffffe0000000003ff200000000000)) { continue }
-
-                            // inline the first 16 word chars for gas efficiency.
-                            // It is usual for named stack items to be more than
-                            // one char long, so we can do better than looping in
-                            // terms of gas.
-                            if and(shl(byte(0, word), 1), 0xffffffe0000000003ff200000000000) {
-                                if and(shl(byte(0x01, word), 1), 0xffffffe0000000003ff200000000000) {
-                                    if and(shl(byte(0x02, word), 1), 0xffffffe0000000003ff200000000000) {
-                                        if and(shl(byte(0x03, word), 1), 0xffffffe0000000003ff200000000000) {
-                                            if and(shl(byte(0x04, word), 1), 0xffffffe0000000003ff200000000000) {
-                                                if and(shl(byte(0x05, word), 1), 0xffffffe0000000003ff200000000000) {
-                                                    if and(shl(byte(0x06, word), 1), 0xffffffe0000000003ff200000000000)
-                                                    {
-                                                        if and(
-                                                            shl(byte(0x07, word), 1), 0xffffffe0000000003ff200000000000
-                                                        ) {
-                                                            if and(
-                                                                shl(byte(0x08, word), 1),
-                                                                0xffffffe0000000003ff200000000000
-                                                            ) {
-                                                                if and(
-                                                                    shl(byte(0x09, word), 1),
-                                                                    0xffffffe0000000003ff200000000000
-                                                                ) {
-                                                                    if and(
-                                                                        shl(byte(0x0A, word), 1),
-                                                                        0xffffffe0000000003ff200000000000
-                                                                    ) {
-                                                                        if and(
-                                                                            shl(byte(0x0B, word), 1),
-                                                                            0xffffffe0000000003ff200000000000
-                                                                        ) {
-                                                                            if and(
-                                                                                shl(byte(0x0C, word), 1),
-                                                                                0xffffffe0000000003ff200000000000
-                                                                            ) {
-                                                                                if and(
-                                                                                    shl(byte(0x0D, word), 1),
-                                                                                    0xffffffe0000000003ff200000000000
-                                                                                ) {
-                                                                                    if and(
-                                                                                        shl(byte(0x0E, word), 1),
-                                                                                        0xffffffe0000000003ff200000000000
-                                                                                    ) {
-                                                                                        if and(
-                                                                                            shl(byte(0x0F, word), 1),
-                                                                                            0xffffffe0000000003ff200000000000
-                                                                                        ) {
-                                                                                            // loop for the remainder for 16+ char words.
-                                                                                            let i := 0x10
-                                                                                            for {} and(
-                                                                                                lt(i, 0x20),
-                                                                                                iszero(
-                                                                                                    iszero(
-                                                                                                        and(
-                                                                                                            shl(
-                                                                                                                byte(
-                                                                                                                    i,
-                                                                                                                    word
-                                                                                                                ),
-                                                                                                                1
-                                                                                                            ),
-                                                                                                            0xffffffe0000000003ff200000000000
-                                                                                                        )
-                                                                                                    )
-                                                                                                )
-                                                                                            ) { i := add(i, 1) } {}
-                                                                                            if lt(i, 0x20) {
-                                                                                                cursor := add(cursor, i)
-                                                                                                continue
-                                                                                            }
-                                                                                            errorCode :=
-                                                                                                buildErrorCode(
-                                                                                                    data, cursor, 4
-                                                                                                )
-                                                                                            break
-                                                                                        }
-                                                                                        cursor := add(cursor, 0x0F)
-                                                                                        continue
-                                                                                    }
-                                                                                    cursor := add(cursor, 0x0E)
-                                                                                    continue
-                                                                                }
-                                                                                cursor := add(cursor, 0x0D)
-                                                                                continue
-                                                                            }
-                                                                            cursor := add(cursor, 0x0C)
-                                                                            continue
-                                                                        }
-                                                                        cursor := add(cursor, 0x0B)
-                                                                        continue
-                                                                    }
-                                                                    cursor := add(cursor, 0x0A)
-                                                                    continue
-                                                                }
-                                                                cursor := add(cursor, 0x09)
-                                                                continue
-                                                            }
-                                                            cursor := add(cursor, 0x08)
-                                                            continue
-                                                        }
-                                                        cursor := add(cursor, 0x07)
-                                                        continue
-                                                    }
-                                                    cursor := add(cursor, 0x06)
-                                                    continue
-                                                }
-                                                cursor := add(cursor, 0x05)
-                                                continue
-                                            }
-                                            cursor := add(cursor, 0x04)
-                                            continue
-                                        }
-                                        cursor := add(cursor, 0x03)
-                                        continue
-                                    }
-                                    cursor := add(cursor, 0x02)
-                                    continue
-                                }
-                                cursor := add(cursor, 0x01)
+                            // loop over the word
+                            let i := 0
+                            for {} and(
+                                lt(i, 0x20),
+                                iszero(iszero(and(shl(byte(i, word), 1), 0xffffffe0000000003ff200000000000)))
+                            ) { i := add(i, 1) } {}
+                            if lt(i, 0x20) {
+                                cursor := add(cursor, i)
                                 continue
                             }
+                            errorCode := buildErrorCode(data, cursor, 4)
+                            break
                         }
 
                         // only space is allowed whitespace on LHS
@@ -337,3 +230,128 @@ library LibParse {
         }
     }
 }
+
+// // The second char is not a word char so do nothing.
+// if iszero(and(shl(byte(0, word), 1), 0xffffffe0000000003ff200000000000)) { continue }
+
+// // inline the first 16 word chars for gas efficiency.
+// // It is usual for named stack items to be more than
+// // one char long, so we can do better than looping in
+// // terms of gas.
+// if and(shl(byte(0, word), 1), 0xffffffe0000000003ff200000000000) {
+//     if and(shl(byte(0x01, word), 1), 0xffffffe0000000003ff200000000000) {
+//         if and(shl(byte(0x02, word), 1), 0xffffffe0000000003ff200000000000) {
+//             if and(shl(byte(0x03, word), 1), 0xffffffe0000000003ff200000000000) {
+//                 if and(shl(byte(0x04, word), 1), 0xffffffe0000000003ff200000000000) {
+//                     if and(shl(byte(0x05, word), 1), 0xffffffe0000000003ff200000000000) {
+//                         if and(shl(byte(0x06, word), 1), 0xffffffe0000000003ff200000000000)
+//                         {
+//                             if and(
+//                                 shl(byte(0x07, word), 1), 0xffffffe0000000003ff200000000000
+//                             ) {
+//                                 if and(
+//                                     shl(byte(0x08, word), 1),
+//                                     0xffffffe0000000003ff200000000000
+//                                 ) {
+//                                     if and(
+//                                         shl(byte(0x09, word), 1),
+//                                         0xffffffe0000000003ff200000000000
+//                                     ) {
+//                                         if and(
+//                                             shl(byte(0x0A, word), 1),
+//                                             0xffffffe0000000003ff200000000000
+//                                         ) {
+//                                             if and(
+//                                                 shl(byte(0x0B, word), 1),
+//                                                 0xffffffe0000000003ff200000000000
+//                                             ) {
+//                                                 if and(
+//                                                     shl(byte(0x0C, word), 1),
+//                                                     0xffffffe0000000003ff200000000000
+//                                                 ) {
+//                                                     if and(
+//                                                         shl(byte(0x0D, word), 1),
+//                                                         0xffffffe0000000003ff200000000000
+//                                                     ) {
+//                                                         if and(
+//                                                             shl(byte(0x0E, word), 1),
+//                                                             0xffffffe0000000003ff200000000000
+//                                                         ) {
+//                                                             if and(
+//                                                                 shl(byte(0x0F, word), 1),
+//                                                                 0xffffffe0000000003ff200000000000
+//                                                             ) {
+//                                                                 // loop for the remainder for 16+ char words.
+//                                                                 let i := 0x10
+//                                                                 for {} and(
+//                                                                     lt(i, 0x20),
+//                                                                     iszero(
+//                                                                         iszero(
+//                                                                             and(
+//                                                                                 shl(
+//                                                                                     byte(
+//                                                                                         i,
+//                                                                                         word
+//                                                                                     ),
+//                                                                                     1
+//                                                                                 ),
+//                                                                                 0xffffffe0000000003ff200000000000
+//                                                                             )
+//                                                                         )
+//                                                                     )
+//                                                                 ) { i := add(i, 1) } {}
+//                                                                 if lt(i, 0x20) {
+//                                                                     cursor := add(cursor, i)
+//                                                                     continue
+//                                                                 }
+//                                                                 errorCode :=
+//                                                                     buildErrorCode(
+//                                                                         data, cursor, 4
+//                                                                     )
+//                                                                 break
+//                                                             }
+//                                                             cursor := add(cursor, 0x0F)
+//                                                             continue
+//                                                         }
+//                                                         cursor := add(cursor, 0x0E)
+//                                                         continue
+//                                                     }
+//                                                     cursor := add(cursor, 0x0D)
+//                                                     continue
+//                                                 }
+//                                                 cursor := add(cursor, 0x0C)
+//                                                 continue
+//                                             }
+//                                             cursor := add(cursor, 0x0B)
+//                                             continue
+//                                         }
+//                                         cursor := add(cursor, 0x0A)
+//                                         continue
+//                                     }
+//                                     cursor := add(cursor, 0x09)
+//                                     continue
+//                                 }
+//                                 cursor := add(cursor, 0x08)
+//                                 continue
+//                             }
+//                             cursor := add(cursor, 0x07)
+//                             continue
+//                         }
+//                         cursor := add(cursor, 0x06)
+//                         continue
+//                     }
+//                     cursor := add(cursor, 0x05)
+//                     continue
+//                 }
+//                 cursor := add(cursor, 0x04)
+//                 continue
+//             }
+//             cursor := add(cursor, 0x03)
+//             continue
+//         }
+//         cursor := add(cursor, 0x02)
+//         continue
+//     }
+//     cursor := add(cursor, 0x01)
+//     continue
+// }

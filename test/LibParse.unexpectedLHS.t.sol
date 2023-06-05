@@ -28,24 +28,42 @@ contract LibParseTest is Test {
         LibParse.parse("_;");
     }
 
-    function testParseUnexpectedLHSFuzz(bytes1 unexpected) external {
-        vm.assume(unexpected != bytes1(" "));
-        // vm.assume(unexpected != bytes1("_"));
-        // If we test ":" we will get unexpected RHS char error.
-        vm.assume(unexpected != bytes1(":"));
+    function testParseUnexpectedLHSSingleChar(bytes1 a) external {
+        vm.assume(
+            1 << uint256(uint8(a)) & (LHS_RHS_DELIMITER_MASK | LHS_STACK_HEAD_MASK | LHS_STACK_DELIMITER_MASK) == 0
+        );
 
-        string memory unexpectedString = string(abi.encodePacked(unexpected));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, string(abi.encodePacked(a))));
+        LibParse.parse(bytes.concat(a, ":;"));
+    }
 
-        // vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, unexpectedString));
-        // LibParse.parse(bytes.concat(unexpected, ":;"));
+    function testParseUnexpectedLHSIgnoredTail(bytes1 a) external {
+        vm.assume(
+            1 << uint256(uint8(a)) & (LHS_RHS_DELIMITER_MASK | LHS_STACK_TAIL_MASK | LHS_STACK_DELIMITER_MASK) == 0
+        );
 
-        // vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, unexpectedString));
-        // LibParse.parse(bytes.concat("_", unexpected, ":;"));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1, string(abi.encodePacked(a))));
+        LibParse.parse(bytes.concat("_", a, ":;"));
+    }
 
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, unexpectedString));
-        LibParse.parse(bytes.concat(unexpected, "_:;"));
+    function testParseUnexpectedLHSBadTail(uint8 a, bytes memory b) external {
+        // a-z
+        a = uint8(bound(a, 0x61, 0x7A));
 
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, unexpectedString));
-        LibParse.parse(bytes.concat("_", unexpected, "_:;"));
+        bool hasInvalidChar = false;
+        uint256 i = 0;
+        for (; i < b.length; i++) {
+            bytes1 c = b[i];
+            vm.assume(1 << uint256(uint8(c)) & (LHS_STACK_DELIMITER_MASK | LHS_RHS_DELIMITER_MASK) == 0);
+            hasInvalidChar = 1 << uint256(uint8(c)) & LHS_STACK_TAIL_MASK == 0;
+            if (hasInvalidChar) break;
+        }
+        vm.assume(hasInvalidChar);
+
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, i + 1, string(abi.encodePacked(b[i]))));
+        LibParse.parse(bytes.concat(bytes1(a), b, ":;"));
+
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, i + 1, string(abi.encodePacked(b[i]))));
+        LibParse.parse(bytes.concat("_", b, ":;"));
     }
 }
