@@ -23,15 +23,15 @@ contract LibParseEmptyTest is Test {
         assertEq(constants2.length, 0);
     }
 
-    function testParseGasEmpty0() external {
+    function testParseGasEmpty0() external pure {
         LibParse.parse("");
     }
 
-    function testParseGasEmpty1() external {
+    function testParseGasEmpty1() external pure {
         LibParse.parse(":;");
     }
 
-    function testParseGasEmpty2() external {
+    function testParseGasEmpty2() external pure {
         LibParse.parse(":;:;");
     }
 }

@@ -266,6 +266,8 @@ library LibParse {
             }
 
             return (sources, constants);
+        } else {
+            return (new bytes[](0), new uint256[](0));
         }
     }
 }
