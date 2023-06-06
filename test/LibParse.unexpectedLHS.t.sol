@@ -30,7 +30,7 @@ contract LibParseTest is Test {
 
     function testParseUnexpectedLHSSingleChar(bytes1 a) external {
         vm.assume(
-            1 << uint256(uint8(a)) & (LHS_RHS_DELIMITER_MASK | LHS_STACK_HEAD_MASK | LHS_STACK_DELIMITER_MASK) == 0
+            1 << uint256(uint8(a)) & (CMASK_LHS_RHS_DELIMITER | CMASK_LHS_STACK_HEAD | CMASK_LHS_STACK_DELIMITER) == 0
         );
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, string(abi.encodePacked(a))));
@@ -39,7 +39,7 @@ contract LibParseTest is Test {
 
     function testParseUnexpectedLHSIgnoredTail(bytes1 a) external {
         vm.assume(
-            1 << uint256(uint8(a)) & (LHS_RHS_DELIMITER_MASK | LHS_STACK_TAIL_MASK | LHS_STACK_DELIMITER_MASK) == 0
+            1 << uint256(uint8(a)) & (CMASK_LHS_RHS_DELIMITER | CMASK_IDENTIFIER_TAIL | CMASK_LHS_STACK_DELIMITER) == 0
         );
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1, string(abi.encodePacked(a))));
@@ -54,8 +54,8 @@ contract LibParseTest is Test {
         uint256 i = 0;
         for (; i < b.length; i++) {
             bytes1 c = b[i];
-            vm.assume(1 << uint256(uint8(c)) & (LHS_STACK_DELIMITER_MASK | LHS_RHS_DELIMITER_MASK) == 0);
-            hasInvalidChar = 1 << uint256(uint8(c)) & LHS_STACK_TAIL_MASK == 0;
+            vm.assume(1 << uint256(uint8(c)) & (CMASK_LHS_STACK_DELIMITER | CMASK_LHS_RHS_DELIMITER) == 0);
+            hasInvalidChar = 1 << uint256(uint8(c)) & CMASK_IDENTIFIER_TAIL == 0;
             if (hasInvalidChar) break;
         }
         vm.assume(hasInvalidChar);

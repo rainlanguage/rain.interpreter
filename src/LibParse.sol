@@ -13,13 +13,56 @@ error UnexpectedRHSChar(uint256 offset, string char);
 // Error 4
 error WordTooLong(uint256 offset);
 
-uint256 constant LHS_RHS_DELIMITER_MASK = 0x0400000000000000;
+/// @dev \t
+uint128 constant CMASK_TAB = 0x200;
+
+/// @dev \n
+uint128 constant CMASK_LINE_FEED = 0x400;
+
+/// @dev \r
+uint128 constant CMASK_CARRIAGE_RETURN = 0x2000;
+
+/// @dev space
+uint128 constant CMASK_SPACE = 0x0100000000;
+
+/// @dev ,
+uint128 constant CMASK_COMMA = 0x100000000000;
+
+/// @dev -
+uint128 constant CMASK_DASH = 0x200000000000;
+
+/// @dev :
+uint128 constant CMASK_COLON = 0x0400000000000000;
+
+/// @dev ;
+uint128 constant CMASK_SEMICOLON = 0x800000000000000;
+
+/// @dev _
+uint128 constant CMASK_UNDERSCORE = 0x800000000000000000000000;
+
+/// @dev (
+uint128 constant CMASK_LEFT_PAREN = 0x10000000000;
+
+/// @dev )
+uint128 constant CMASK_RIGHT_PAREN = 0x20000000000;
+
+/// @dev LHS/RHS delimiter is :
+uint128 constant CMASK_LHS_RHS_DELIMITER = 0x0400000000000000;
 /// @dev lower alpha and underscore a-z _
-uint256 constant LHS_STACK_HEAD_MASK = 0xffffffe800000000000000000000000;
+uint128 constant CMASK_LHS_STACK_HEAD = 0xffffffe800000000000000000000000;
+
 /// @dev lower alpha a-z
-uint256 constant LHS_STACK_HEAD_NAMED_MASK = 0xffffffe000000000000000000000000;
-uint256 constant LHS_STACK_TAIL_MASK = 0xffffffe0000000003ff200000000000;
-uint256 constant LHS_STACK_DELIMITER_MASK = 0x0100000000;
+uint128 constant CMASK_IDENTIFIER_HEAD = 0xffffffe000000000000000000000000;
+/// @dev lower alphanumeric kebab a-z 0-9 -
+uint128 constant CMASK_IDENTIFIER_TAIL = 0xffffffe0000000003ff200000000000;
+/// @dev NOT lower alphanumeric kebab
+uint128 constant CMASK_NOT_IDENTIFIER_TAIL = 0xf0000001fffffffffc00dfffffffffff;
+
+/// @dev stack item delimiter is space
+uint128 constant CMASK_LHS_STACK_DELIMITER = 0x0100000000;
+
+/// @dev whitespace is \n \r \t space
+uint128 constant CMASK_WHITESPACE = 0x100002600;
 
 library LibParse {
     function stringToChar(string memory s) external pure returns (uint256 char) {
@@ -38,21 +81,8 @@ library LibParse {
                 }
 
                 // Notable excerpts from ASCII as shifted chars
-                // 0x09 = \t = 0x200
-                // 0x0a = \n = 0x400
-                // 0x0d = \r = 0x2000
-                // 0x20 = space = 0x0100000000
-                // 0x2C = , = 0x100000000000
-                // 0x2D = - = 0x200000000000
-                // 0x3A = : = 0x0400000000000000
-                // 0x3B = ; = 0x0800000000000000
-                // 0x5F = _ = 0x800000000000000000000000
-                //
                 // mask for structure , : ;
                 // 0x0C00100000000000
-                //
-                // mask for whitespace space \n \r \t
-                // 0x100002600
                 //
                 // mask for a-z
                 // 0xffffffe000000000000000000000000
@@ -103,7 +133,7 @@ library LibParse {
                     char := shl(and(mload(cursor), 0xFF), 1)
 
                     switch and(mload(state), 1)
-                    // Process stack.
+                    // Process LHS (stack items).
                     case 1 {
                         // stack items
                         // first char is lower alpha a-z _
@@ -121,7 +151,8 @@ library LibParse {
                             let i := 0
                             for {} and(
                                 lt(i, 0x20),
-                                iszero(iszero(and(shl(byte(i, word), 1), 0xffffffe0000000003ff200000000000)))
+                                // not not a tail char
+                                iszero(and(shl(byte(i, word), 1), 0xf0000001fffffffffc00dfffffffffff))
                             ) { i := add(i, 1) } {}
                             if lt(i, 0x20) {
                                 // If the stack item is named, save its stack
@@ -170,8 +201,8 @@ library LibParse {
                             break
                         }
 
-                        // only space is allowed whitespace on LHS
-                        if eq(char, 0x0100000000) {
+                        // whitespace
+                        if and(char, 0x100002600) {
                             // lhs/rhs = 1, yin/yang = 0
                             mstore(state, 1)
                             continue
@@ -187,7 +218,61 @@ library LibParse {
                         errorCode := buildErrorCode(data, cursor, 2)
                         break
                     }
+                    // Process RHS (opcodes).
                     case 0 {
+                        // words
+                        // first char is lower a-z
+                        if and(char, 0xffffffe000000000000000000000000) {
+                            // if yang we can't start a new word
+                            if and(mload(state), 2) {
+                                errorCode := buildErrorCode(data, cursor, 2)
+                                break
+                            }
+
+                            let word := mload(add(cursor, 0x20))
+
+                            // loop over the word
+                            let i := 0
+                            for {} and(
+                                lt(i, 0x20),
+                                // not not a tail char
+                                iszero(and(shl(byte(i, word), 1), 0xf0000001fffffffffc00dfffffffffff))
+                            ) { i := add(i, 1) } {}
+
+                            // RHS words MUST be appended by a left paren (
+                            // literal byte check here, NOT a char shifted mask
+                            // for efficiency
+                            if eq(byte(i, word), 0x28) {
+                                cursor := add(cursor, add(i, 1))
+                                continue
+                            }
+
+                            if eq(i, 0x20) {
+                                errorCode := buildErrorCode(data, cursor, 4)
+                                break
+                            }
+
+                            errorCode := buildErrorCode(data, add(cursor, i), 3)
+                            break
+                        }
+
+                        // closing paren
+                        // char equals )
+                        if eq(char, 0x20000000000) {
+                            // rhs = 0, yin = 0
+                            mstore(state, 0)
+
+                            // @todo track nested inputs
+                            continue
+                        }
+
+                        // whitespace
+                        if and(char, 0x100002600) {
+                            // rhs = 0, yin = 0
+                            mstore(state, 0)
+                            continue
+                        }
+
                         // end of rhs
                         // char equals ,
                         if eq(char, 0x100000000000) {
