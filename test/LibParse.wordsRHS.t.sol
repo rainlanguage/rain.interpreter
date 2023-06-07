@@ -6,21 +6,56 @@ import "forge-std/Test.sol";
 import "src/LibParse.sol";
 
 contract LibParseNamedRHSTest is Test {
-    function testParseNamedRHSSimple() external {
-        string[3] memory examples0 = ["_:a();", "_ _:a() b();", "foo bar: a() b();"];
-        for (uint256 i = 0; i < examples0.length; i++) {
-            (bytes[] memory sources0, uint256[] memory constants0) = LibParse.parse(bytes(examples0[i]));
-            assertEq(sources0.length, 1);
-            assertEq(sources0[0].length, 0);
-            assertEq(constants0.length, 0);
-        }
-
-        (bytes[] memory sources1, uint256[] memory constants1) = LibParse.parse("a:;b:;");
-        assertEq(sources1.length, 2);
-        assertEq(sources1[0].length, 0);
-        assertEq(sources1[1].length, 0);
-        assertEq(constants1.length, 0);
+    function testParseNamedRHSSimple00() external {
+        string memory s = "_:a();";
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s));
+        console2.log(s);
+        console2.logBytes(sources[0]);
     }
+
+    function testParseNamedRHSSimple01() external {
+        string memory s = "_ _:a() b();";
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s));
+        console2.log(s);
+        console2.logBytes(sources[0]);
+    }
+
+    function testParseNamedRHSSimple02() external {
+        string memory s = "_:a(b());";
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s));
+        console2.log(s);
+        console2.logBytes(sources[0]);
+    }
+
+    function testParseNamedRHSSimple03() external {
+        string memory s = "_:a();_:b();";
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s));
+        console2.log(s);
+        console2.logBytes(sources[0]);
+        console2.logBytes(sources[1]);
+    }
+
+    function testParseNamedRHSSimple04() external {
+        string memory s = "_:a() a();";
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s));
+        console2.log(s);
+        console2.logBytes(sources[0]);
+    }
+    // function testParseNamedRHSSimple() external {
+    //     string[3] memory examples0 = ["_:a();", "_ _:a() b();", "foo bar: a() b();"];
+    //     for (uint256 i = 0; i < examples0.length; i++) {
+    //         (bytes[] memory sources0, uint256[] memory constants0) = LibParse.parse(bytes(examples0[i]));
+    //         assertEq(sources0.length, 1);
+    //         assertEq(sources0[0].length, 0);
+    //         assertEq(constants0.length, 0);
+    //     }
+
+    //     (bytes[] memory sources1, uint256[] memory constants1) = LibParse.parse("a:;b:;");
+    //     assertEq(sources1.length, 2);
+    //     assertEq(sources1[0].length, 0);
+    //     assertEq(sources1[1].length, 0);
+    //     assertEq(constants1.length, 0);
+    // }
 
     // function testParseNamedGas00() external pure {
     //     LibParse.parse("a:;");

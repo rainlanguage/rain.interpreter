@@ -107,8 +107,9 @@ library LibParse {
                 // 0x20 => stackIndex
                 // 0x40 => pointer to sources
                 // 0x60 => named stack linked list head
+                // 0x80 => current source linked list head
                 state := outputCursor
-                outputCursor := add(outputCursor, 0x80)
+                outputCursor := add(outputCursor, 0xA0)
 
                 // start with lhs = 1 and yin/yang = 0
                 mstore(state, 1)
@@ -122,9 +123,18 @@ library LibParse {
                 // base of stack linked list is 0
                 mstore(add(state, 0x60), 0)
 
-                let source := outputCursor
-                mstore(source, 0)
-                outputCursor := add(outputCursor, 0x20)
+                // base of source linked list is 0
+                // low 32 bits are the pointer to the next item
+                // high bits are bytecode of the source
+                mstore(add(state, 0x80), 0)
+
+                // Additionally we are using the scratch space to build source
+                // 0x0 => for tracking length of the current source, sources and
+                // pointers to all sources (max 14)
+                // low 16 bits = length of source (# of ops NOT bytes/bits)
+                // high 16 bits = length of sources
+                // big endian middle bits = 16 bit pointers to sources
+                mstore(0, 0)
 
                 let cursor := add(data, 1)
                 let end := add(cursor, mload(data))
@@ -159,8 +169,8 @@ library LibParse {
                                 // position in a FILO linked list structure.
                                 if and(char, 0xffffffe000000000000000000000000) {
                                     let name := shr(sub(256, mul(add(i, 1), 8)), mload(add(cursor, 0x1F)))
-                                    mstore(0, name)
-                                    name := keccak256(0, 0x20)
+                                    mstore(outputCursor, name)
+                                    name := keccak256(outputCursor, 0x20)
 
                                     // Prepend name to linked list.
                                     mstore(outputCursor, mload(add(state, 0x60)))
@@ -243,6 +253,39 @@ library LibParse {
                             // literal byte check here, NOT a char shifted mask
                             // for efficiency
                             if eq(byte(i, word), 0x28) {
+                                let op := shr(sub(256, mul(add(i, 1), 8)), mload(add(cursor, 0x1F)))
+                                mstore(outputCursor, op)
+                                // @todo this is fake, the hash bytes are mimic
+                                // for the opcode and the operand is left as 0
+                                op := shl(0x10, and(keccak256(outputCursor, 0x20), 0xFFFF))
+
+                                // Prepend op to source linked list
+                                let sourceLength := and(mload(0), 0xFFFF)
+                                let offset := mul(add(mod(sourceLength, 0x07), 1), 0x20)
+
+                                mstore(add(state, 0x80), or(mload(add(state, 0x80)), shl(offset, op)))
+                                // inc source length
+                                mstore(
+                                    0,
+                                    or(
+                                        add(sourceLength, 1),
+                                        and(
+                                            mload(0), 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000
+                                        )
+                                    )
+                                )
+
+                                if eq(offset, 0xe0) {
+                                    mstore(outputCursor, mload(add(state, 0x80)))
+                                    mstore(
+                                        add(state, 0x80),
+                                        // assume output cursor can't exceed 16
+                                        // bits.
+                                        outputCursor
+                                    )
+                                    outputCursor := add(outputCursor, 0x20)
+                                }
+
                                 cursor := add(cursor, add(i, 1))
                                 continue
                             }
@@ -288,27 +331,53 @@ library LibParse {
                             // lhs/rhs = 1, yin/yang = 0
                             mstore(state, 1)
 
-                            // Brute force a new list of references every time we
-                            // encounter a new source. We assume that most parsed
-                            // data will have a low number of sources, ~5 or less.
-                            let sourcesCursor := mload(add(state, 0x40))
-                            let oldSourcesLength := mload(sourcesCursor)
-                            sourcesCursor := add(sourcesCursor, 0x20)
-                            mstore(add(state, 0x40), outputCursor)
+                            // Update sources
+                            {
+                                let sourcesLength := byte(1, mload(0))
+                                mstore8(1, add(sourcesLength, 1))
+                                mstore(0, or(mload(0), shl(sub(0xe0, mul(sourcesLength, 0x10)), outputCursor)))
+                            }
 
-                            mstore(outputCursor, add(oldSourcesLength, 1))
+                            // Build solidity compatible `bytes` out of source
+                            // linked list
+                            let sourceLength := and(mload(0), 0xFFFF)
+                            // Reset source length in memory.
+                            mstore(0, and(mload(0), not(0xFFFF)))
+
+                            mstore(outputCursor, mul(sourceLength, 0x04))
                             outputCursor := add(outputCursor, 0x20)
 
-                            let sourcesEnd := add(sourcesCursor, mul(oldSourcesLength, 0x20))
-                            for {} lt(sourcesCursor, sourcesEnd) {
-                                sourcesCursor := add(sourcesCursor, 0x20)
-                                outputCursor := add(outputCursor, 0x20)
-                            } { mstore(outputCursor, mload(sourcesCursor)) }
-                            mstore(outputCursor, source)
-                            outputCursor := add(outputCursor, 0x20)
-                            source := outputCursor
-                            mstore(source, 0)
-                            outputCursor := add(outputCursor, 0x20)
+                            let sourceHead := mload(add(state, 0x80))
+                            // Write the head opcodes into the bytes
+                            mstore(
+                                outputCursor,
+                                // shift the ops up to start at the outputCursor
+                                shl(
+                                    // it's not possible to have a full item in
+                                    // the head position, as full items are
+                                    // always bumped to the tail, so we always
+                                    // shift at least one slot to the left
+                                    mul(sub(0x07, mod(sourceLength, 0x07)), 0x20),
+                                    // mask out the pointer to the next list item
+                                    and(sourceHead, not(0xFFFF))
+                                )
+                            )
+                            outputCursor := add(outputCursor, mul(mod(sourceLength, 0x07), 0x04))
+
+                            // Loop over the tail
+                            for { let tailPointer := and(sourceHead, 0xFFFF) } iszero(iszero(tailPointer)) {} {
+                                tailPointer := and(mload(tailPointer), 0xFFFF)
+                                mstore(outputCursor, and(mload(tailPointer), not(0xFFFF)))
+                                outputCursor := add(outputCursor, 0x1c)
+                            }
+
+                            // Reset the linked list
+                            mstore(add(state, 0x80), 0)
+                            // Realign outputCursor with 32 byte memory
+                            {
+                                let unaligned := mod(outputCursor, 0x20)
+                                outputCursor := add(sub(outputCursor, unaligned), and(add(unaligned, 0x1F), not(0x1F)))
+                            }
 
                             continue
                         }
@@ -319,6 +388,24 @@ library LibParse {
                     // unreachable, implies broken lhs flag.
                     default { revert(0, 0) }
                 }
+
+                // Build real sources
+                {
+                    let sourcesScratch := mload(0)
+                    let sourcesLength := byte(1, sourcesScratch)
+                    mstore(add(state, 0x40), outputCursor)
+                    mstore(outputCursor, sourcesLength)
+                    outputCursor := add(outputCursor, 0x20)
+                    for {
+                        let offset := 0xe0
+                        let sourcesEnd := sub(offset, mul(sourcesLength, 0x10))
+                    } gt(offset, sourcesEnd) {
+                        offset := sub(offset, 0x10)
+                        outputCursor := add(outputCursor, 0x20)
+                    } { mstore(outputCursor, and(shr(offset, sourcesScratch), 0xFFFF)) }
+                }
+
+                // Sync free memory pointer with final output cursor
                 mstore(0x40, outputCursor)
 
                 // missing final semi
