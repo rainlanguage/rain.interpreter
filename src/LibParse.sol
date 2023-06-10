@@ -69,6 +69,215 @@ library LibParse {
         return 1 << uint256(uint8(bytes1(bytes(s))));
     }
 
+    function buildMeta(bytes32[] memory words) internal pure returns (bytes memory meta) {
+        assembly ("memory-safe") {
+            function ctpop(i) -> x {
+                // https://en.wikipedia.org/wiki/Hamming_weight
+                // @todo - currently using naive/slow implementation
+
+                {
+                    let m1 := 0x5555555555555555555555555555555555555555555555555555555555555555
+                    x := add(and(i, m1), and(shl(1, i), m1))
+                }
+
+                {
+                    let m2 := 0x3333333333333333333333333333333333333333333333333333333333333333
+                    x := add(and(x, m2), and(shl(2, x), m2))
+                }
+
+                {
+                    let m4 := 0x0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F
+                    x := add(and(x, m4), and(shl(4, x), m4))
+                }
+
+                {
+                    let m8 := 0x00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF
+                    x := add(and(x, m8), and(shl(8, x), m8))
+                }
+
+                {
+                    let m16 := 0x0000ffff0000ffff0000ffff0000ffff0000ffff0000ffff0000ffff0000ffff
+                    x := add(and(x, m16), and(shl(16, x), m16))
+                }
+
+                {
+                    let m32 := 0x00000000ffffffff00000000ffffffff00000000ffffffff00000000ffffffff
+                    x := add(and(x, m32), and(shl(32, x), m32))
+                }
+
+                {
+                    let m64 := 0x00000000ffffffff00000000ffffffff00000000ffffffff00000000ffffffff
+                    x := add(and(x, m64), and(shl(64, x), m64))
+                }
+
+                {
+                    let m128 := 0x0000000000000000ffffffffffffffff0000000000000000ffffffffffffffff
+                    x := add(and(x, m128), and(shl(128, x), m128))
+                }
+            }
+
+            function wordHashed(seed, word) -> hashed {
+                mstore(0, seed)
+                mstore(0x20, word)
+                hashed := keccak256(0, 0x40)
+            }
+
+            function wordBitmapped(seed, word) -> shifted {
+                shifted := shl(and(wordHashed(seed, word), 0xFF), 1)
+            }
+
+            function collideOrWrite(seed, start, bitmap, word, i) -> didCollide {
+                let hashed := wordHashed(seed, word)
+                let bitmapMask := sub(shl(and(hashed, 0xFF), 1), 1)
+                let mtaCursor := add(start, mul(ctpop(and(bitmap, bitmapMask)), 6))
+                let mtaCollData := and(mload(mtaCursor), 0xFFFFFFFF)
+                let hashedCollData := and(hashed, 0xFFFFFFFF)
+
+                switch mtaCollData
+                // Write.
+                case 0 {
+                    mstore(mtaCursor, or(and(mload(mtaCursor), not(0xFFFFFFFFFFFF)), or(shl(32, i), hashedCollData)))
+                }
+                // Collide.
+                default {
+                    // Ambiguous coll data. Unrecoverable.
+                    if eq(hashedCollData, mtaCollData) {
+                        mstore(0, 2)
+                        revert(0, 0x20)
+                    }
+                    didCollide := 1
+                }
+            }
+
+            function checkSeed(seed, wrds) -> bitmap0, bitmap1, outcome {
+                bitmap0 := 0
+                bitmap1 := 0
+                let start := add(wrds, 0x20)
+                let end := add(start, mul(mload(wrds), 0x20))
+                let collisions := 0
+                for { let cursor := start } lt(cursor, end) { cursor := add(cursor, 0x20) } {
+                    let word := mload(cursor)
+                    let shifted := wordBitmapped(seed, word)
+
+                    switch and(shifted, bitmap0)
+                    // Not collision
+                    case 0 { bitmap0 := or(bitmap0, shifted) }
+                    // Collision
+                    default {
+                        collisions := add(collisions, 1)
+                        shifted := wordBitmapped(add(seed, 1), word)
+                        switch and(shifted, bitmap1)
+                        case 0 { bitmap1 := or(bitmap1, shifted) }
+                        // Double collision. Failure.
+                        default {
+                            outcome := 0
+                            leave
+                        }
+                    }
+                }
+                outcome := or(1, shl(1, collisions))
+            }
+
+            function buildMetaFromSeedTracker(bitmap0, bitmap1, seedTracker, wrds) -> mta {
+                let wordsCount := mload(wrds)
+                let start := add(wrds, 0x20)
+                let end := add(start, mul(wordsCount, 0x20))
+                let seed := shr(16, seedTracker)
+
+                {
+                    mta := mload(0x40)
+                    // 1 byte for base seed
+                    // 2 bytes for collisions count
+                    // 6 bytes per word => 4 bytes collision check, 2 bytes index
+                    let metaLength := add(3, mul(6, wordsCount))
+                    mstore(mta, metaLength)
+                    mstore(0x40, add(mta, and(add(add(metaLength, 0x20), 0x1f), not(0x1f))))
+                }
+
+                let mtaStart0 := add(mta, 9)
+                let mtaStart1 := add(mtaStart0, mul(ctpop(bitmap0), 6))
+                for { let i := 0 } lt(i, wordsCount) { i := add(i, 1) } {
+                    let word := mload(add(start, mul(i, 0x20)))
+
+                    if collideOrWrite(seed, mtaStart0, bitmap0, word, i) {
+                        let _didCollide := collideOrWrite(add(seed, 1), mtaStart1, bitmap1, word, i)
+                    }
+                }
+            }
+
+            function trackSeed(seed, collisions) -> seedTracker {
+                seedTracker := or(or(1, shl(1, collisions)), shl(16, seed))
+            }
+
+            let seedTracker := 0
+            let bitmap0 := 0
+            let bitmap1 := 0
+            for {
+                let seed := 0
+                let outcome := 0
+            } lt(seed, 0x100) { seed := add(seed, 1) } {
+                bitmap0, bitmap1, outcome := checkSeed(seed, words)
+                switch outcome
+                // Double collision. Failure.
+                case 0 { continue }
+                // Zero collisions. Perfect.
+                case 1 {
+                    seedTracker := trackSeed(seed, 0)
+                    break
+                }
+                default {
+                    let collisions := shr(1, outcome)
+                    let pbCollisions := shr(1, and(seedTracker, 0xFFFF))
+                    if lt(collisions, pbCollisions) { seedTracker := trackSeed(seed, collisions) }
+                }
+            }
+            if iszero(seedTracker) {
+                mstore(0, 1)
+                revert(0, 0x20)
+            }
+
+            meta := buildMetaFromSeedTracker(bitmap0, bitmap1, seedTracker, words)
+        }
+    }
+
+    function buildMeta1(bytes32[] memory words) internal pure returns (bytes memory meta) {
+        assembly ("memory-safe") {
+            let brutus := 0
+            let wordLength := mload(words)
+            let start := add(words, 0x20)
+            meta := mload(0x40)
+            // 4 bytes per meta. 2 bytes for brutus.
+            let metaLength := add(mul(wordLength, 4), 2)
+            mstore(meta, metaLength)
+            mstore(0x40, add(meta, and(add(add(metaLength, 0x20), 0x1f), not(0x1f))))
+
+            for { let i := 0 } lt(i, wordLength) { i := add(i, 1) } {
+                mstore(0, mload(add(start, mul(i, 0x20))))
+                mstore8(0x20, brutus)
+                let word := keccak256(0, 0x21)
+
+                let index := mod(word, mul(wordLength, shr(8, brutus)))
+                let cursor := add(meta, add(mul(add(index, 1), 4), 2))
+                // Collision brutally resets everything.
+                if and(mload(cursor), 0xFFFFFFFF) {
+                    // This is going to inc to 0 before next iteration.
+                    i := not(0)
+                    brutus := shl(8, add(byte(30, brutus), 1))
+                    let end := mload(0x40)
+                    for { cursor := add(meta, 0x20) } lt(cursor, end) { cursor := add(cursor, 0x20) } {
+                        mstore(cursor, 0)
+                    }
+                    continue
+                }
+                mstore(cursor, or(and(mload(cursor), not(0xFFFFFFFF)), and(or(shl(0x10, word), i), 0xFFFFFFFF)))
+            }
+
+            if gt(brutus, 0xFFFF) { revert(0, 0) }
+            let offset := add(meta, 2)
+            mstore(offset, or(and(mload(offset), not(0xFFFF)), brutus))
+        }
+    }
+
     function parse(bytes memory data) internal pure returns (bytes[] memory, uint256[] memory) {
         if (data.length > 0) {
             uint256 char;
