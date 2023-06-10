@@ -69,7 +69,11 @@ library LibParse {
         return 1 << uint256(uint8(bytes1(bytes(s))));
     }
 
-    function buildMeta(bytes32[] memory words) internal pure returns (bytes memory meta) {
+    function buildMeta(bytes32[] memory words, uint256 startSeed, uint256 endSeed)
+        internal
+        pure
+        returns (bytes memory meta)
+    {
         assembly ("memory-safe") {
             function ctpop(i) -> x {
                 // https://en.wikipedia.org/wiki/Hamming_weight
@@ -77,42 +81,42 @@ library LibParse {
 
                 {
                     let m1 := 0x5555555555555555555555555555555555555555555555555555555555555555
-                    x := add(and(i, m1), and(shl(1, i), m1))
+                    x := add(and(i, m1), and(shr(1, i), m1))
                 }
 
                 {
                     let m2 := 0x3333333333333333333333333333333333333333333333333333333333333333
-                    x := add(and(x, m2), and(shl(2, x), m2))
+                    x := add(and(x, m2), and(shr(2, x), m2))
                 }
 
                 {
                     let m4 := 0x0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F
-                    x := add(and(x, m4), and(shl(4, x), m4))
+                    x := add(and(x, m4), and(shr(4, x), m4))
                 }
 
                 {
                     let m8 := 0x00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF
-                    x := add(and(x, m8), and(shl(8, x), m8))
+                    x := add(and(x, m8), and(shr(8, x), m8))
                 }
 
                 {
                     let m16 := 0x0000ffff0000ffff0000ffff0000ffff0000ffff0000ffff0000ffff0000ffff
-                    x := add(and(x, m16), and(shl(16, x), m16))
+                    x := add(and(x, m16), and(shr(16, x), m16))
                 }
 
                 {
                     let m32 := 0x00000000ffffffff00000000ffffffff00000000ffffffff00000000ffffffff
-                    x := add(and(x, m32), and(shl(32, x), m32))
+                    x := add(and(x, m32), and(shr(32, x), m32))
                 }
 
                 {
-                    let m64 := 0x00000000ffffffff00000000ffffffff00000000ffffffff00000000ffffffff
-                    x := add(and(x, m64), and(shl(64, x), m64))
+                    let m64 := 0x0000000000000000ffffffffffffffff0000000000000000ffffffffffffffff
+                    x := add(and(x, m64), and(shr(64, x), m64))
                 }
 
                 {
-                    let m128 := 0x0000000000000000ffffffffffffffff0000000000000000ffffffffffffffff
-                    x := add(and(x, m128), and(shl(128, x), m128))
+                    let m128 := 0x00000000000000000000000000000000ffffffffffffffffffffffffffffffff
+                    x := add(and(x, m128), and(shr(128, x), m128))
                 }
             }
 
@@ -130,6 +134,7 @@ library LibParse {
                 let hashed := wordHashed(seed, word)
                 let bitmapMask := sub(shl(and(hashed, 0xFF), 1), 1)
                 let mtaCursor := add(start, mul(ctpop(and(bitmap, bitmapMask)), 6))
+                // if gt(mtaCursor, 1000) { revert(0, 0) }
                 let mtaCollData := and(mload(mtaCursor), 0xFFFFFFFF)
                 let hashedCollData := and(hashed, 0xFFFFFFFF)
 
@@ -186,10 +191,10 @@ library LibParse {
 
                 {
                     mta := mload(0x40)
-                    // 1 byte for base seed
+                    // 2 byte for base seed
                     // 2 bytes for collisions count
                     // 6 bytes per word => 4 bytes collision check, 2 bytes index
-                    let metaLength := add(3, mul(6, wordsCount))
+                    let metaLength := add(4, mul(6, wordsCount))
                     mstore(mta, metaLength)
                     mstore(0x40, add(mta, and(add(add(metaLength, 0x20), 0x1f), not(0x1f))))
                 }
@@ -213,9 +218,9 @@ library LibParse {
             let bitmap0 := 0
             let bitmap1 := 0
             for {
-                let seed := 0
                 let outcome := 0
-            } lt(seed, 0x100) { seed := add(seed, 1) } {
+                let seed := startSeed
+            } lt(seed, endSeed) { seed := add(seed, 1) } {
                 bitmap0, bitmap1, outcome := checkSeed(seed, words)
                 switch outcome
                 // Double collision. Failure.
