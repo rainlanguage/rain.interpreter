@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
+import "sol.lib.memory/LibPointer.sol";
+
 // Error 1
 error MissingFinalSemi(uint256 offset);
 
@@ -64,9 +66,221 @@ uint128 constant CMASK_LHS_STACK_DELIMITER = 0x0100000000;
 /// @dev whitespace is \n \r \t space
 uint128 constant CMASK_WHITESPACE = 0x100002600;
 
+/// @dev 010101... for ctpop
+uint256 constant CTPOP_M1 = 0x5555555555555555555555555555555555555555555555555555555555555555;
+/// @dev 00110011.. for ctpop
+uint256 constant CTPOP_M2 = 0x3333333333333333333333333333333333333333333333333333333333333333;
+/// @dev 4 bits alternating for ctpop
+uint256 constant CTPOP_M4 = 0x0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F;
+/// @dev 8 bits alternating for ctpop
+uint256 constant CTPOP_M8 = 0x00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF;
+/// @dev 16 bits alternating for ctpop
+uint256 constant CTPOP_M16 = 0x0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF;
+/// @dev 32 bits alternating for ctpop
+uint256 constant CTPOP_M32 = 0x00000000FFFFFFFF00000000FFFFFFFF00000000FFFFFFFF00000000FFFFFFFF;
+/// @dev 64 bits alternating for ctpop
+uint256 constant CTPOP_M64 = 0x0000000000000000FFFFFFFFFFFFFFFF0000000000000000FFFFFFFFFFFFFFFF;
+/// @dev 128 bits alternating for ctpop
+uint256 constant CTPOP_M128 = 0x00000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
+
+type Seed is uint256;
+
+struct SeedTracker {
+    bool success;
+    Seed seed0;
+    Seed seed1;
+    uint256 collisions;
+    Bitmap bitmap0;
+    Bitmap bitmap1;
+}
+
+type SeedOutcome is uint256;
+
+type Bitmap is uint256;
+
+error NoSeedFound();
+
 library LibParse {
     function stringToChar(string memory s) external pure returns (uint256 char) {
         return 1 << uint256(uint8(bytes1(bytes(s))));
+    }
+
+    function ctpop(uint256 x) internal pure returns (uint256) {
+        unchecked {
+            // https://en.wikipedia.org/wiki/Hamming_weight
+            // @todo - currently using naive/slow implementation
+            x = (x & CTPOP_M1) + ((x >> 1) & CTPOP_M1);
+            x = (x & CTPOP_M2) + ((x >> 2) & CTPOP_M2);
+            x = (x & CTPOP_M4) + ((x >> 4) & CTPOP_M4);
+            x = (x & CTPOP_M8) + ((x >> 8) & CTPOP_M8);
+            x = (x & CTPOP_M16) + ((x >> 16) & CTPOP_M16);
+            x = (x & CTPOP_M32) + ((x >> 32) & CTPOP_M32);
+            x = (x & CTPOP_M64) + ((x >> 64) & CTPOP_M64);
+            x = (x & CTPOP_M128) + ((x >> 128) & CTPOP_M128);
+
+            return x;
+        }
+    }
+
+    function wordHashed(Seed seed, bytes32 word) internal pure returns (bytes32 hashed) {
+        assembly ("memory-safe") {
+            mstore(0, seed)
+            mstore(0x20, word)
+            hashed := keccak256(0, 0x40)
+        }
+    }
+
+    function wordBitmapped(Seed seed, bytes32 word) internal pure returns (uint256) {
+        return 1 << (uint256(wordHashed(seed, word)) & 0xFF);
+    }
+
+    function checkSeed(Seed seed0, Seed seed1, bytes32[] memory words)
+        internal
+        pure
+        returns (bool success, Bitmap bitmap0, Bitmap bitmap1, uint256 collisions)
+    {
+        unchecked {
+            uint256 start;
+            uint256 end;
+            assembly ("memory-safe") {
+                start := add(words, 0x20)
+                end := add(start, mul(mload(words), 0x20))
+            }
+            collisions = 0;
+            for (uint256 cursor = start; cursor < end; cursor += 0x20) {
+                bytes32 word;
+                assembly ("memory-safe") {
+                    word := mload(cursor)
+                }
+                uint256 shifted = wordBitmapped(seed0, word);
+
+                if (shifted & Bitmap.unwrap(bitmap0) == 0) {
+                    bitmap0 = Bitmap.wrap(Bitmap.unwrap(bitmap0) | shifted);
+                    // Single collision. Try backup space.
+                } else {
+                    collisions++;
+                    shifted = wordBitmapped(seed1, word);
+                    if (shifted & Bitmap.unwrap(bitmap1) == 0) {
+                        bitmap1 = Bitmap.wrap(Bitmap.unwrap(bitmap1) | shifted);
+                    }
+                    // Double collision. Failure.
+                    else {
+                        return (false, bitmap0, bitmap1, collisions);
+                    }
+                }
+            }
+            return (true, bitmap0, bitmap1, collisions);
+        }
+    }
+
+    function collideOrWrite(Seed seed, Pointer start, Bitmap bitmap, bytes32 word, uint256 i)
+        internal
+        pure
+        returns (bool didCollide)
+    {
+        unchecked {
+            bytes32 hashed = wordHashed(seed, word);
+            uint256 bitmapMask = (1 << uint256(uint256(hashed) & 0xFF)) - 1;
+            Pointer writeAt = Pointer.wrap(Pointer.unwrap(start) + (6 * ctpop(Bitmap.unwrap(bitmap) & bitmapMask)));
+            assembly ("memory-safe") {
+                let metaCollData := and(mload(writeAt), 0xFFFFFFFF)
+                let hashedCollData := and(hashed, 0xFFFFFFFF)
+
+                switch metaCollData
+                // Write.
+                case 0 { mstore(writeAt, or(and(mload(writeAt), not(0xFFFFFFFFFFFF)), or(shl(32, i), hashedCollData))) }
+                // Collide.
+                default {
+                    // Ambiguous coll data. Unrecoverable.
+                    if eq(hashedCollData, metaCollData) {
+                        mstore(0, 2)
+                        revert(0, 0x20)
+                    }
+                    didCollide := 1
+                }
+            }
+        }
+    }
+
+    function buildMetaFromSeedTracker(SeedTracker memory seedTracker, bytes32[] memory words)
+        internal
+        pure
+        returns (bytes memory meta)
+    {
+        unchecked {
+            uint256 wordsCount = words.length;
+            // 2 byte for base seed
+            // 2 bytes for collisions count
+            // 6 bytes per word => 4 bytes collision check, 2 bytes index
+            uint256 metaLength = 4 + 6 * wordsCount;
+
+            assembly ("memory-safe") {
+                // Allocate meta without zeroing it out.
+                meta := mload(0x40)
+                mstore(meta, metaLength)
+                mstore(0x40, add(meta, and(add(add(metaLength, 0x20), 0x1f), not(0x1f))))
+            }
+
+            Pointer metaStart0;
+            Pointer metaStart1;
+            assembly {
+                metaStart0 := add(meta, 10)
+            }
+            metaStart1 = Pointer.wrap(Pointer.unwrap(metaStart0) + (ctpop(Bitmap.unwrap(seedTracker.bitmap0)) * 6));
+
+            Pointer wordsStart;
+            assembly {
+                wordsStart := add(words, 0x20)
+            }
+            for (uint256 i = 0; i < wordsCount; i++) {
+                bytes32 word;
+                assembly ("memory-safe") {
+                    word := mload(add(wordsStart, mul(i, 0x20)))
+                }
+
+                if (collideOrWrite(seedTracker.seed0, metaStart0, seedTracker.bitmap0, word, i)) {
+                    bool _didCollide = collideOrWrite(seedTracker.seed1, metaStart1, seedTracker.bitmap1, word, i);
+                }
+            }
+        }
+    }
+
+    function buildMetaSol(bytes32[] memory words) internal pure returns (bytes memory) {
+        SeedTracker memory seedTracker;
+        Bitmap bitmap0;
+        Bitmap bitmap1;
+
+        unchecked {
+            uint256 collisions;
+            bool success;
+            for (Seed seed0 = Seed.wrap(0); Seed.unwrap(seed0) < 0x100; seed0 = Seed.wrap(Seed.unwrap(seed0) + 1)) {
+                Seed seed1 = Seed.wrap(Seed.unwrap(seed0) + 1);
+                (success, bitmap0, bitmap1, collisions) = checkSeed(seed0, seed1, words);
+                if (!success) {
+                    continue;
+                } else {
+                    if (collisions < seedTracker.collisions || collisions == 0) {
+                        seedTracker.success = true;
+                        seedTracker.collisions = collisions;
+                        seedTracker.seed0 = seed0;
+                        seedTracker.seed1 = seed1;
+                        seedTracker.bitmap0 = bitmap0;
+                        seedTracker.bitmap1 = bitmap1;
+                    }
+                }
+
+                // Perfect result.
+                if (collisions == 0) {
+                    break;
+                }
+            }
+
+            if (seedTracker.success == false) {
+                revert NoSeedFound();
+            }
+
+            return buildMetaFromSeedTracker(seedTracker, words);
+        }
     }
 
     function buildMeta(bytes32[] memory words, uint256 startSeed, uint256 endSeed)
@@ -134,7 +348,6 @@ library LibParse {
                 let hashed := wordHashed(seed, word)
                 let bitmapMask := sub(shl(and(hashed, 0xFF), 1), 1)
                 let mtaCursor := add(start, mul(ctpop(and(bitmap, bitmapMask)), 6))
-                // if gt(mtaCursor, 1000) { revert(0, 0) }
                 let mtaCollData := and(mload(mtaCursor), 0xFFFFFFFF)
                 let hashedCollData := and(hashed, 0xFFFFFFFF)
 
@@ -199,7 +412,7 @@ library LibParse {
                     mstore(0x40, add(mta, and(add(add(metaLength, 0x20), 0x1f), not(0x1f))))
                 }
 
-                let mtaStart0 := add(mta, 9)
+                let mtaStart0 := add(mta, 10)
                 let mtaStart1 := add(mtaStart0, mul(ctpop(bitmap0), 6))
                 for { let i := 0 } lt(i, wordsCount) { i := add(i, 1) } {
                     let word := mload(add(start, mul(i, 0x20)))
