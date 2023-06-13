@@ -14,7 +14,7 @@ contract LibParseBuildMetaTest is Test {
         console2.logBytes(meta);
     }
 
-    function testMbuildMetaX() external {
+    function testbuildMetaX() external {
         bytes32[] memory words = new bytes32[](2);
         words[0] = bytes32("a");
         words[1] = bytes32("b");
@@ -27,6 +27,15 @@ contract LibParseBuildMetaTest is Test {
             words[i] = bytes32(i);
         }
         bytes memory meta = LibParse.buildMeta(words, 0, 100000);
+        console2.logBytes(meta);
+    }
+
+    function testBuildMetaY() external {
+        bytes32[] memory words = new bytes32[](170);
+        for (uint256 i = 0; i < words.length; i++) {
+            words[i] = bytes32(i);
+        }
+        bytes memory meta = LibParse.buildMetaSol2(words);
         console2.logBytes(meta);
     }
 }

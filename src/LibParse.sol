@@ -2,6 +2,7 @@
 pragma solidity ^0.8.18;
 
 import "sol.lib.memory/LibPointer.sol";
+import "forge-std/console.sol";
 
 // Error 1
 error MissingFinalSemi(uint256 offset);
@@ -101,6 +102,8 @@ type Bitmap is uint256;
 error NoSeedFound();
 
 library LibParse {
+    using LibPointer for Pointer;
+
     function stringToChar(string memory s) external pure returns (uint256 char) {
         return 1 << uint256(uint8(bytes1(bytes(s))));
     }
@@ -134,7 +137,7 @@ library LibParse {
         return 1 << (uint256(wordHashed(seed, word)) & 0xFF);
     }
 
-    function checkSeed(Seed seed0, Seed seed1, bytes32[] memory words)
+    function checkSeed2(Seed seed0, Seed seed1, bytes32[] memory words)
         internal
         pure
         returns (bool success, Bitmap bitmap0, Bitmap bitmap1, uint256 collisions)
@@ -245,6 +248,79 @@ library LibParse {
         }
     }
 
+    function buildMetaSol2(bytes32[] memory words) internal view returns (bytes memory) {
+        Seed seed;
+        Bitmap bitmap0;
+        Bitmap bitmap1;
+        Bitmap bitmap2;
+        Bitmap bitmap3;
+
+        unchecked {
+            bool success = false;
+            for (seed = Seed.wrap(0); !success && Seed.unwrap(seed) < 1000000; seed = Seed.wrap(Seed.unwrap(seed) + 1))
+            {
+                Pointer start;
+                Pointer end;
+                assembly ("memory-safe") {
+                    start := add(words, 0x20)
+                    end := add(start, mul(mload(words), 0x20))
+                }
+                bitmap0 = Bitmap.wrap(0);
+                bitmap1 = Bitmap.wrap(0);
+                bitmap2 = Bitmap.wrap(0);
+                bitmap3 = Bitmap.wrap(0);
+                success = true;
+                for (
+                    Pointer cursor = start;
+                    Pointer.unwrap(cursor) < Pointer.unwrap(end);
+                    cursor = cursor.unsafeAddWord()
+                ) {
+                    bytes32 word = bytes32(cursor.unsafeReadWord());
+                    uint256 shifted = wordBitmapped(seed, word);
+
+                    bytes32 hashed = wordHashed(seed, word);
+                    uint256 bitmapSelector = (uint256(hashed) >> 32) % 4;
+                    if (bitmapSelector == 0) {
+                        if (shifted & Bitmap.unwrap(bitmap0) == 0) {
+                            bitmap0 = Bitmap.wrap(Bitmap.unwrap(bitmap0) | shifted);
+                        } else {
+                            success = false;
+                            break;
+                        }
+                    } else if (bitmapSelector == 1) {
+                        if (shifted & Bitmap.unwrap(bitmap1) == 0) {
+                            bitmap1 = Bitmap.wrap(Bitmap.unwrap(bitmap1) | shifted);
+                        } else {
+                            success = false;
+                            break;
+                        }
+                    } else if (bitmapSelector == 2) {
+                        if (shifted & Bitmap.unwrap(bitmap2) == 0) {
+                            bitmap2 = Bitmap.wrap(Bitmap.unwrap(bitmap2) | shifted);
+                        } else {
+                            success = false;
+                            break;
+                        }
+                    } else if (bitmapSelector == 3) {
+                        if (shifted & Bitmap.unwrap(bitmap3) == 0) {
+                            bitmap3 = Bitmap.wrap(Bitmap.unwrap(bitmap3) | shifted);
+                        } else {
+                            success = false;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!success) {
+                revert NoSeedFound();
+            }
+
+            console.log(Seed.unwrap(seed));
+            console.log(Bitmap.unwrap(bitmap0), Bitmap.unwrap(bitmap1), Bitmap.unwrap(bitmap2), Bitmap.unwrap(bitmap3));
+        }
+    }
+
     function buildMetaSol(bytes32[] memory words) internal pure returns (bytes memory) {
         SeedTracker memory seedTracker;
         Bitmap bitmap0;
@@ -255,7 +331,7 @@ library LibParse {
             bool success;
             for (Seed seed0 = Seed.wrap(0); Seed.unwrap(seed0) < 0x100; seed0 = Seed.wrap(Seed.unwrap(seed0) + 1)) {
                 Seed seed1 = Seed.wrap(Seed.unwrap(seed0) + 1);
-                (success, bitmap0, bitmap1, collisions) = checkSeed(seed0, seed1, words);
+                (success, bitmap0, bitmap1, collisions) = checkSeed2(seed0, seed1, words);
                 if (!success) {
                     continue;
                 } else {
