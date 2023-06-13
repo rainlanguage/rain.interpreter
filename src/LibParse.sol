@@ -16,6 +16,9 @@ error UnexpectedRHSChar(uint256 offset, string char);
 // Error 4
 error WordTooLong(uint256 offset);
 
+// For metadata builder.
+error DuplicateFingerprint();
+
 /// @dev \t
 uint128 constant CMASK_TAB = 0x200;
 
@@ -248,18 +251,40 @@ library LibParse {
         }
     }
 
-    function findBestExpander2(bytes32[] memory words)
+    function findOverlay(uint256 baseExpansion, bytes32[] memory words)
         internal
         pure
-        returns (uint16 bestSeed, uint256 bestExpansion, bytes32[] memory remaining)
+        returns (uint16 seed, uint256 mergedExpansion)
+    {
+        unchecked {
+            bool didCollide = true;
+            uint16 seed = type(uint8).max;
+            while (didCollide && words.length > 0) {
+                mergedExpansion = baseExpansion;
+                for (uint256 i = 0; i < words.length; i++) {
+                    uint256 shifted = wordBitmapped(Seed.wrap(seed), words[i]);
+                    if ((shifted & mergedExpansion) == 0) {
+                        mergedExpansion = mergedExpansion | shifted;
+                        didCollide = false;
+                    } else {
+                        didCollide = true;
+                        seed++;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    function findBestExpander(bytes32[] memory words)
+        internal
+        pure
+        returns (uint8 bestSeed, uint256 bestExpansion, bytes32[] memory remaining)
     {
         unchecked {
             {
                 uint256 bestCt = 0;
-                // It's more difficult to saturate smaller word lists, and more
-                // efficient per attempt, so we can use a larger seed pool.
-                uint16 maxSeed = words.length < (type(uint8).max / 2) ? type(uint16).max : type(uint8).max;
-                for (uint16 seed = 0; seed < maxSeed; seed++) {
+                for (uint16 seed = 0; seed < type(uint8).max; seed++) {
                     uint256 expansion = 0;
                     for (uint256 i = 0; i < words.length; i++) {
                         expansion = expansion | wordBitmapped(Seed.wrap(seed), words[i]);
@@ -267,7 +292,7 @@ library LibParse {
                     uint256 ct = ctpop(expansion);
                     if (ct > bestCt) {
                         bestCt = ct;
-                        bestSeed = seed;
+                        bestSeed = uint8(seed);
                         bestExpansion = expansion;
                     }
                     // perfect expansion.
@@ -291,70 +316,66 @@ library LibParse {
         }
     }
 
-    function findBestExpander(bytes32[] memory words)
-        internal
-        pure
-        returns (uint8 bestSeed, uint256 bestExpansion, bytes32[] memory remaining)
-    {
+    function buildMetaExpander(bytes32[] memory words, uint8 maxDepth) internal view returns (bytes memory meta) {
         unchecked {
-            uint256 bestEvasions = 0;
-            {
-                for (uint16 seed = 0; seed <= type(uint8).max; seed++) {
-                    uint256 expansion = 0;
-                    uint256 evasion = 0;
-                    for (uint256 i = 0; i < words.length; i++) {
-                        uint256 shifted = wordBitmapped(Seed.wrap(seed), words[i]);
-                        // evasion
-                        if ((shifted & expansion) == 0) {
-                            expansion = shifted | expansion;
-                            evasion = shifted | evasion;
-                        }
-                        // collision
-                        else {
-                            evasion = ~shifted & evasion;
-                        }
-                    }
-                    uint256 evasions = ctpop(evasion);
-                    if (evasions > bestEvasions) {
-                        bestEvasions = evasions;
-                        bestSeed = uint8(seed);
-                        bestExpansion = expansion;
-                    }
-                    if (evasions == words.length) {
-                        break;
-                    }
+            uint8[] memory seeds = new uint8[](maxDepth);
+            uint256[] memory expansions = new uint256[](maxDepth);
+            uint256 i = 0;
+            bytes32[] memory ogWords = words;
+            while (words.length > 0) {
+                uint8 seed;
+                uint256 expansion;
+                (seed, expansion, words) = findBestExpander(words);
+                seeds[i] = seed;
+                expansions[i] = expansion;
+                i++;
+            }
+            // 0x21 = expansion + seed
+            // 6 per word = 4 byte fingerprint + 2 byte opcode
+            uint256 metaLength = i * 0x21 + ogWords.length * 6;
+            meta = new bytes(metaLength);
+            for (uint256 j = 0; j < i; j++) {
+                uint8 seed = seeds[j];
+                uint256 expansion = expansions[j];
+                assembly ("memory-safe") {
+                    mstore8(add(meta, add(0x20, j)), seed)
+                    mstore(add(meta, add(add(0x20, i), mul(0x20, j))), expansion)
                 }
             }
-            remaining = new bytes32[](words.length - ctpop(bestExpansion));
-            uint256 expansion = 0;
-            uint256 j = 0;
-            for (uint256 i = 0; i < words.length; i++) {
-                uint256 shifted = wordBitmapped(Seed.wrap(bestSeed), words[i]);
-                if ((shifted & expansion) == 0) {
-                    expansion = shifted | expansion;
-                } else {
-                    remaining[j] = words[i];
-                    j++;
-                }
-            }
-        }
-    }
 
-    function buildMetaExpander(bytes32[] memory words, uint8 maxDepth) internal view returns (bytes memory) {
-        uint16[] memory seeds = new uint16[](maxDepth);
-        uint256[] memory expansions = new uint256[](maxDepth);
-        uint256 i = 0;
-        while (words.length > 0) {
-            uint16 seed;
-            uint256 expansion;
-            (seed, expansion, words) = findBestExpander2(words);
-            seeds[i] = seed;
-            expansions[i] = expansion;
-            i++;
-        }
-        console.log(i);
-        for (uint256 j = 0; j < i; j++) {
-            console.log(expansions[j], ctpop(expansions[j]), seeds[j]);
+            uint256 dataStart;
+            assembly ("memory-safe") {
+                dataStart := add(add(meta, 6), mul(0x21, i))
+            }
+            for (uint256 k = 0; k < ogWords.length; k++) {
+                uint256 s = 0;
+                bool didCollide = true;
+                while (didCollide) {
+                    uint8 seed = seeds[s];
+                    uint256 expansion = expansions[s];
+                    bytes32 wordFingerprint = bytes32(uint256(wordHashed(Seed.wrap(seed), ogWords[k])) & 0xFFFFFFFF);
+                    uint256 toWrite = uint256(bytes32(wordFingerprint)) | (k << 32);
+
+                    uint256 shifted = wordBitmapped(Seed.wrap(seed), ogWords[k]);
+                    uint256 pos = ctpop(expansion & (shifted - 1));
+                    uint256 posFingerprint;
+                    uint256 writeAt;
+                    assembly ("memory-safe") {
+                        writeAt := add(dataStart, mul(pos, 6))
+                        posFingerprint := and(mload(writeAt), 0xFFFFFFFF)
+                    }
+
+                    if (posFingerprint == 0) {
+                        assembly ("memory-safe") {
+                            mstore(writeAt, or(and(mload(writeAt), not(0xFFFFFFFFFFFF)), toWrite))
+                        }
+                        didCollide = false;
+                    } else if (bytes32(posFingerprint) == wordFingerprint) {
+                        revert DuplicateFingerprint();
+                    }
+                    s++;
+                }
+            }
         }
     }
 
