@@ -40,7 +40,7 @@ contract LibParseBuildMetaTest is Test {
     }
 
     function testBuildMetaExpander() external {
-        bytes32[] memory words = new bytes32[](80);
+        bytes32[] memory words = new bytes32[](200);
         for (uint256 i = 0; i < words.length; i++) {
             words[i] = bytes32(i);
         }

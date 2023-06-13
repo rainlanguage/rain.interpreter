@@ -350,6 +350,7 @@ library LibParse {
             for (uint256 k = 0; k < ogWords.length; k++) {
                 uint256 s = 0;
                 bool didCollide = true;
+                uint256 cumulativePos = 0;
                 while (didCollide) {
                     uint8 seed = seeds[s];
                     uint256 expansion = expansions[s];
@@ -357,7 +358,8 @@ library LibParse {
                     uint256 toWrite = uint256(bytes32(wordFingerprint)) | (k << 32);
 
                     uint256 shifted = wordBitmapped(Seed.wrap(seed), ogWords[k]);
-                    uint256 pos = ctpop(expansion & (shifted - 1));
+                    uint256 pos = ctpop(expansion & (shifted - 1)) + cumulativePos;
+
                     uint256 posFingerprint;
                     uint256 writeAt;
                     assembly ("memory-safe") {
@@ -374,6 +376,7 @@ library LibParse {
                         revert DuplicateFingerprint();
                     }
                     s++;
+                    cumulativePos = cumulativePos + ctpop(expansion);
                 }
             }
         }
