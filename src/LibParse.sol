@@ -248,6 +248,73 @@ library LibParse {
         }
     }
 
+    function findBestExpander(bytes32[] memory words)
+        internal
+        pure
+        returns (uint8 bestSeed, uint256 bestExpansion, bytes32[] memory remaining)
+    {
+        unchecked {
+            uint256 bestEvasions = 0;
+            {
+                for (uint16 seed = 0; seed <= type(uint8).max; seed++) {
+                    uint256 expansion = 0;
+                    uint256 evasion = 0;
+                    for (uint256 i = 0; i < words.length; i++) {
+                        uint256 shifted = wordBitmapped(Seed.wrap(seed), words[i]);
+                        // evasion
+                        if ((shifted & expansion) == 0) {
+                            expansion = shifted | expansion;
+                            evasion = shifted | evasion;
+                        }
+                        // collision
+                        else {
+                            evasion = ~shifted & evasion;
+                        }
+                    }
+                    uint256 evasions = ctpop(evasion);
+                    if (evasions > bestEvasions) {
+                        bestEvasions = evasions;
+                        bestSeed = uint8(seed);
+                        bestExpansion = expansion;
+                    }
+                    if (evasions == words.length) {
+                        break;
+                    }
+                }
+            }
+            remaining = new bytes32[](words.length - ctpop(bestExpansion));
+            uint256 expansion = 0;
+            uint256 j = 0;
+            for (uint256 i = 0; i < words.length; i++) {
+                uint256 shifted = wordBitmapped(Seed.wrap(bestSeed), words[i]);
+                if ((shifted & expansion) == 0) {
+                    expansion = shifted | expansion;
+                } else {
+                    remaining[j] = words[i];
+                    j++;
+                }
+            }
+        }
+    }
+
+    function buildMetaExpander(bytes32[] memory words, uint8 maxDepth) internal view returns (bytes memory) {
+        uint8[] memory seeds = new uint8[](maxDepth);
+        uint256[] memory expansions = new uint256[](maxDepth);
+        uint256 i = 0;
+        while (words.length > 0) {
+            uint8 seed;
+            uint256 expansion;
+            (seed, expansion, words) = findBestExpander(words);
+            seeds[i] = seed;
+            expansions[i] = expansion;
+            i++;
+        }
+        console.log(i);
+        for (uint256 j = 0; j < i; j++) {
+            console.log(expansions[j], ctpop(expansions[j]));
+        }
+    }
+
     function buildMetaSol2(bytes32[] memory words) internal view returns (bytes memory) {
         Seed seed;
         Bitmap bitmap0;

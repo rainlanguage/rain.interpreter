@@ -38,4 +38,12 @@ contract LibParseBuildMetaTest is Test {
         bytes memory meta = LibParse.buildMetaSol2(words);
         console2.logBytes(meta);
     }
+
+    function testBuildMetaExpander() external {
+        bytes32[] memory words = new bytes32[](1000);
+        for (uint256 i = 0; i < words.length; i++) {
+            words[i] = bytes32(i);
+        }
+        bytes memory meta = LibParse.buildMetaExpander(words, 6);
+    }
 }
