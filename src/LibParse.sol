@@ -248,6 +248,49 @@ library LibParse {
         }
     }
 
+    function findBestExpander2(bytes32[] memory words)
+        internal
+        pure
+        returns (uint16 bestSeed, uint256 bestExpansion, bytes32[] memory remaining)
+    {
+        unchecked {
+            {
+                uint256 bestCt = 0;
+                // It's more difficult to saturate smaller word lists, and more
+                // efficient per attempt, so we can use a larger seed pool.
+                uint16 maxSeed = words.length < (type(uint8).max / 2) ? type(uint16).max : type(uint8).max;
+                for (uint16 seed = 0; seed < maxSeed; seed++) {
+                    uint256 expansion = 0;
+                    for (uint256 i = 0; i < words.length; i++) {
+                        expansion = expansion | wordBitmapped(Seed.wrap(seed), words[i]);
+                    }
+                    uint256 ct = ctpop(expansion);
+                    if (ct > bestCt) {
+                        bestCt = ct;
+                        bestSeed = seed;
+                        bestExpansion = expansion;
+                    }
+                    // perfect expansion.
+                    if (ct == words.length) {
+                        break;
+                    }
+                }
+            }
+            remaining = new bytes32[](words.length - ctpop(bestExpansion));
+            uint256 expansion = 0;
+            uint256 j = 0;
+            for (uint256 i = 0; i < words.length; i++) {
+                uint256 shifted = wordBitmapped(Seed.wrap(bestSeed), words[i]);
+                if ((shifted & expansion) == 0) {
+                    expansion = shifted | expansion;
+                } else {
+                    remaining[j] = words[i];
+                    j++;
+                }
+            }
+        }
+    }
+
     function findBestExpander(bytes32[] memory words)
         internal
         pure
@@ -298,20 +341,20 @@ library LibParse {
     }
 
     function buildMetaExpander(bytes32[] memory words, uint8 maxDepth) internal view returns (bytes memory) {
-        uint8[] memory seeds = new uint8[](maxDepth);
+        uint16[] memory seeds = new uint16[](maxDepth);
         uint256[] memory expansions = new uint256[](maxDepth);
         uint256 i = 0;
         while (words.length > 0) {
-            uint8 seed;
+            uint16 seed;
             uint256 expansion;
-            (seed, expansion, words) = findBestExpander(words);
+            (seed, expansion, words) = findBestExpander2(words);
             seeds[i] = seed;
             expansions[i] = expansion;
             i++;
         }
         console.log(i);
         for (uint256 j = 0; j < i; j++) {
-            console.log(expansions[j], ctpop(expansions[j]));
+            console.log(expansions[j], ctpop(expansions[j]), seeds[j]);
         }
     }
 
