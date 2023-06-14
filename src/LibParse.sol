@@ -133,9 +133,19 @@ type ConstantsBuilder is uint256;
 
 error NoSeedFound();
 
-library LibStackNames {
-    function pushWord(StackNames stackNames, bytes32) internal pure returns (StackNames) {
-        return stackNames;
+library LibParseState {
+    function pushStackName(ParseState memory state, bytes32 word) internal pure {
+        uint256 fingerprint;
+        uint256 ptr;
+        StackNames oldStackNames = state.stackNames;
+        assembly ("memory-safe") {
+            ptr := mload(0x40)
+            mstore(ptr, word)
+            fingerprint := and(keccak256(ptr, 0x20), not(0xFFFFFFFF))
+            mstore(ptr, oldStackNames)
+            mstore(0x40, add(ptr, 0x20))
+        }
+        state.stackNames = StackNames.wrap(fingerprint | (state.stackIndex << 0x10) | ptr);
     }
 }
 
@@ -161,7 +171,7 @@ library LibConstantsBuilder {
 
 library LibParse {
     using LibPointer for Pointer;
-    using LibStackNames for StackNames;
+    using LibParseState for ParseState;
     using LibSourcesBuilder for SourcesBuilder;
     using LibConstantsBuilder for ConstantsBuilder;
 
@@ -901,7 +911,7 @@ library LibParse {
                             // Named stack item.
                             if (char & CMASK_IDENTIFIER_HEAD > 0) {
                                 (cursor, word) = parseWord(cursor, CMASK_LHS_STACK_TAIL);
-                                state.stackNames = state.stackNames.pushWord(word);
+                                state.pushStackName(word);
                             }
                             // Anon stack item.
                             else {
