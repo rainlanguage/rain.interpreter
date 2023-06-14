@@ -87,6 +87,8 @@ uint256 constant CTPOP_M64 = 0x0000000000000000FFFFFFFFFFFFFFFF0000000000000000F
 /// @dev 128 bits alternating for ctpop
 uint256 constant CTPOP_M128 = 0x00000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
 
+uint256 constant FINGERPRINT_MASK = 0xFFFFFFFF;
+
 type Seed is uint256;
 
 struct SeedTracker {
@@ -316,6 +318,53 @@ library LibParse {
         }
     }
 
+    function lookupIndexMetaExpander(bytes memory meta, bytes32 word)
+        internal
+        view
+        returns (bool exists, uint256 index)
+    {
+        unchecked {
+            uint256 dataStart;
+            uint256 cursor;
+            uint256 end;
+            assembly ("memory-safe") {
+                // Read depth from first meta byte.
+                cursor := add(meta, 1)
+                let depth := and(mload(cursor), 0xFF)
+                // 33 bytes per depth
+                end := add(cursor, mul(depth, 0x21))
+                dataStart := add(end, 6)
+            }
+            uint256 cumulativeCt = 0;
+            while (cursor < end) {
+                Seed seed;
+                uint256 expansion;
+                assembly ("memory-safe") {
+                    cursor := add(cursor, 1)
+                    seed := and(mload(cursor), 0xFF)
+                    cursor := add(cursor, 0x20)
+                    expansion := mload(cursor)
+                }
+
+                uint256 shifted = wordBitmapped(seed, word);
+                uint256 pos = ctpop(expansion & (shifted - 1)) + cumulativeCt;
+                uint256 wordFingerprint = uint256(wordHashed(seed, word)) & FINGERPRINT_MASK;
+                uint256 posData;
+                assembly ("memory-safe") {
+                    posData := mload(add(dataStart, mul(pos, 6)))
+                }
+                // Match
+                if (wordFingerprint == posData & FINGERPRINT_MASK) {
+                    return (true, (posData >> 0x20) & 0xFFFF);
+                } else {
+                    cursor += 0x21;
+                    cumulativeCt += ctpop(expansion);
+                }
+            }
+            return (false, 0);
+        }
+    }
+
     function buildMetaExpander(bytes32[] memory words, uint8 maxDepth) internal view returns (bytes memory meta) {
         unchecked {
             uint8[] memory seeds = new uint8[](maxDepth);
@@ -330,22 +379,26 @@ library LibParse {
                 expansions[i] = expansion;
                 i++;
             }
-            // 0x21 = expansion + seed
+            // 1 = depth
+            // 0x21 per depth = expansion + seed
             // 6 per word = 4 byte fingerprint + 2 byte opcode
-            uint256 metaLength = i * 0x21 + ogWords.length * 6;
+            uint256 metaLength = 1 + i * 0x21 + ogWords.length * 6;
             meta = new bytes(metaLength);
+            assembly ("memory-safe") {
+                mstore8(add(meta, 0x20), i)
+            }
             for (uint256 j = 0; j < i; j++) {
                 uint8 seed = seeds[j];
                 uint256 expansion = expansions[j];
                 assembly ("memory-safe") {
-                    mstore8(add(meta, add(0x20, j)), seed)
-                    mstore(add(meta, add(add(0x20, i), mul(0x20, j))), expansion)
+                    mstore8(add(meta, add(0x21, j)), seed)
+                    mstore(add(add(meta, 1), add(add(0x20, i), mul(0x20, j))), expansion)
                 }
             }
 
             uint256 dataStart;
             assembly ("memory-safe") {
-                dataStart := add(add(meta, 6), mul(0x21, i))
+                dataStart := add(add(meta, 7), mul(0x21, i))
             }
             for (uint256 k = 0; k < ogWords.length; k++) {
                 uint256 s = 0;
@@ -354,7 +407,8 @@ library LibParse {
                 while (didCollide) {
                     uint8 seed = seeds[s];
                     uint256 expansion = expansions[s];
-                    bytes32 wordFingerprint = bytes32(uint256(wordHashed(Seed.wrap(seed), ogWords[k])) & 0xFFFFFFFF);
+                    bytes32 wordFingerprint =
+                        bytes32(uint256(wordHashed(Seed.wrap(seed), ogWords[k])) & FINGERPRINT_MASK);
                     uint256 toWrite = uint256(bytes32(wordFingerprint)) | (k << 32);
 
                     uint256 shifted = wordBitmapped(Seed.wrap(seed), ogWords[k]);
