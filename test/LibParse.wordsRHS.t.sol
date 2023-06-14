@@ -6,6 +6,17 @@ import "forge-std/Test.sol";
 import "src/LibParse.sol";
 
 contract LibParseNamedRHSTest is Test {
+    function testParseSol() external view {
+        string memory s = "_:a();";
+        bytes32[] memory words = new bytes32[](1);
+        words[0] = bytes32("a");
+        bytes memory meta = LibParse.buildMetaExpander(words, 2);
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parseSol(bytes(s), meta);
+        (constants);
+        console2.log(s);
+        console2.logBytes(sources[0]);
+    }
+
     function testParseNamedRHSSimple00() external view {
         string memory s = "_:a();";
         (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s));

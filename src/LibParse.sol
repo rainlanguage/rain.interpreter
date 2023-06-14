@@ -48,10 +48,12 @@ uint128 constant CMASK_DASH = 0x200000000000;
 
 /// @dev :
 uint128 constant CMASK_COLON = 0x0400000000000000;
-uint128 constant CMASK_EOS = CMASK_COLON;
+/// @dev LHS/RHS delimiter is :
+uint128 constant CMASK_LHS_RHS_DELIMITER = CMASK_COLON;
 
 /// @dev ;
 uint128 constant CMASK_SEMICOLON = 0x800000000000000;
+uint128 constant CMASK_EOS = CMASK_SEMICOLON;
 
 /// @dev _
 uint128 constant CMASK_UNDERSCORE = 0x800000000000000000000000;
@@ -62,8 +64,6 @@ uint128 constant CMASK_LEFT_PAREN = 0x10000000000;
 /// @dev )
 uint128 constant CMASK_RIGHT_PAREN = 0x20000000000;
 
-/// @dev LHS/RHS delimiter is :
-uint128 constant CMASK_LHS_RHS_DELIMITER = 0x0400000000000000;
 /// @dev lower alpha and underscore a-z _
 uint128 constant CMASK_LHS_STACK_HEAD = 0xffffffe800000000000000000000000;
 
@@ -142,6 +142,11 @@ type ConstantsBuilder is uint256;
 error NoSeedFound();
 
 library LibParseState {
+    function newState() internal pure returns (ParseState memory state) {
+        state.fsm = FSM_LHS_MASK;
+        state.activeSource = 0x20;
+    }
+
     function pushStackName(ParseState memory state, bytes32 word) internal pure {
         uint256 fingerprint;
         uint256 ptr;
@@ -223,7 +228,7 @@ library LibParseState {
             uint256 sourcesBuilder = state.sourcesBuilder;
             uint256 offset = sourcesBuilder >> 0xf0;
 
-            if (state.activeSource > 0) {
+            if (state.activeSource != 0x20) {
                 revert DanglingSource();
             }
 
@@ -932,6 +937,7 @@ library LibParse {
             for {} and(lt(i, 0x20), iszero(and(shl(byte(i, word), 1), not(mask)))) { i := add(i, 1) } {}
             let scrub := mul(sub(0x20, i), 8)
             word := shl(scrub, shr(scrub, word))
+            cursor := add(cursor, i)
         }
         if (i == 0x20) {
             revert WordSize(word);
@@ -940,12 +946,15 @@ library LibParse {
     }
 
     function skipWord(uint256 cursor, uint256 mask) internal pure returns (uint256) {
+        uint256 i;
         assembly ("memory-safe") {
             let done := 0
+            // process the tail
             for {} iszero(done) {} {
                 cursor := add(cursor, 0x20)
-                let i := 0
-                for { let word := mload(cursor) } and(lt(i, 0x20), iszero(and(shl(byte(i, word), 1), not(mask)))) {} {
+                i := 0
+                for { let word := mload(cursor) } and(lt(i, 0x20), iszero(iszero(and(shl(byte(i, word), 1), mask)))) {}
+                {
                     i := add(i, 1)
                 }
                 if lt(i, 0x20) {
@@ -953,17 +962,19 @@ library LibParse {
                     done := 1
                 }
             }
+            // compensate for the head
+            cursor := add(cursor, 1)
         }
         return cursor;
     }
 
     function parseSol(bytes memory data, bytes memory meta)
         internal
-        pure
+        view
         returns (bytes[] memory sources, uint256[] memory)
     {
         unchecked {
-            ParseState memory state;
+            ParseState memory state = LibParseState.newState();
             if (data.length > 0) {
                 bytes32 word;
                 uint256 cursor;
@@ -977,6 +988,7 @@ library LibParse {
                     assembly ("memory-safe") {
                         char := shl(and(mload(cursor), 0xFF), 1)
                     }
+                    console.log(cursor, char);
 
                     // LHS
                     if (state.fsm & FSM_LHS_MASK > 0) {
@@ -1039,9 +1051,11 @@ library LibParse {
                             cursor = skipWord(cursor, CMASK_WHITESPACE);
                         } else if (char & CMASK_EOL > 0) {
                             state.fsm = FSM_LHS_MASK;
+                            cursor++;
                         } else if (char & CMASK_EOS > 0) {
                             state.fsm = FSM_LHS_MASK;
                             state.newSource();
+                            cursor++;
                         } else {
                             (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
                             revert UnexpectedRHSChar(offset, charString);
