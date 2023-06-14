@@ -18,6 +18,12 @@ error WordTooLong(uint256 offset);
 
 error WordSize(bytes32 word);
 
+error UnknownWord(bytes32 word);
+
+error MaxSources();
+
+error DanglingSource();
+
 // For metadata builder.
 error DuplicateFingerprint();
 
@@ -117,7 +123,11 @@ struct ParseState {
     uint256 fsm;
     uint256 stackIndex;
     StackNames stackNames;
-    SourcesBuilder sourcesBuilder;
+    // low 16 bits = bitwise offset (starts at 0x20)
+    // mid 16 bits = LL pointer
+    // high bits = 4 byte ops
+    uint256 activeSource;
+    uint256 sourcesBuilder;
     ConstantsBuilder constantsBuilder;
 }
 
@@ -126,8 +136,6 @@ type SeedOutcome is uint256;
 type Bitmap is uint256;
 
 type StackNames is uint256;
-
-type SourcesBuilder is uint256;
 
 type ConstantsBuilder is uint256;
 
@@ -147,33 +155,104 @@ library LibParseState {
         }
         state.stackNames = StackNames.wrap(fingerprint | (state.stackIndex << 0x10) | ptr);
     }
-}
 
-library LibSourcesBuilder {
-    function pushWord(SourcesBuilder sourcesBuilder, bytes memory, bytes32) internal pure returns (SourcesBuilder) {
-        return sourcesBuilder;
+    function pushWordToSource(ParseState memory state, bytes memory meta, bytes32 word) internal pure {
+        unchecked {
+            // @todo handle operand.
+            (bool exists, uint256 i) = LibParse.lookupIndexMetaExpander(meta, word);
+            if (!exists) {
+                revert UnknownWord(word);
+            }
+            uint256 op = i << 0x10;
+            uint256 activeSource = state.activeSource;
+            uint256 offset = activeSource & 0xFFFF;
+
+            // We write sources RTL so they can run LTR.
+            activeSource = offset + 0x20 | activeSource & ~uint256(0xFFFF) | op << offset;
+
+            // active is full, link to it.
+            if (offset == 0xe0) {
+                assembly ("memory-safe") {
+                    let ptr := mload(0x40)
+                    mstore(ptr, activeSource)
+                    mstore(0x40, add(ptr, 0x20))
+                    activeSource := or(0x20, shl(0x10, ptr))
+                }
+            }
+            state.activeSource = activeSource;
+        }
     }
 
-    function newSource(SourcesBuilder sourcesBuilder) internal pure returns (SourcesBuilder) {
-        return sourcesBuilder;
+    function newSource(ParseState memory state) internal pure {
+        uint256 sourcesBuilder = state.sourcesBuilder;
+        uint256 offset = sourcesBuilder >> 0xf0;
+        uint256 activeSource = state.activeSource;
+
+        if (offset == 0xf0) {
+            revert MaxSources();
+        } else {
+            // close out the LL to fixed solidity compatible bytes.
+            uint256 source;
+            assembly ("memory-safe") {
+                source := mload(0x40)
+                let cursor := add(source, 0x20)
+
+                // handle the head first
+                let activeSourceOffset := and(activeSource, 0xFFFF)
+                mstore(cursor, shl(sub(0x100, activeSourceOffset), and(activeSource, not(0xFFFF))))
+                let length := div(sub(activeSourceOffset, 0x20), 8)
+                cursor := add(cursor, length)
+
+                // loop the tail
+                for { let tailPointer := and(shr(0x10, activeSource), 0xFFFF) } iszero(iszero(tailPointer)) {} {
+                    tailPointer := and(shr(0x10, mload(tailPointer)), 0xFFFF)
+                    mstore(cursor, and(mload(tailPointer), not(0xFFFFFFFF)))
+                    cursor := add(cursor, 0xe0)
+                    length := add(length, 0xe0)
+                }
+                mstore(source, length)
+                mstore(0x40, and(add(cursor, 0x1f), not(0x1f)))
+            }
+            state.activeSource = 0x20;
+            state.sourcesBuilder = (offset + 0x10) << 0xf0 | source << offset | sourcesBuilder;
+        }
     }
 
-    function build(SourcesBuilder) internal pure returns (bytes[] memory) {
-        return new bytes[](0);
-    }
-}
+    function buildSources(ParseState memory state) internal pure returns (bytes[] memory sources) {
+        unchecked {
+            uint256 sourcesBuilder = state.sourcesBuilder;
+            uint256 offset = sourcesBuilder >> 0xf0;
 
-library LibConstantsBuilder {
-    function build(ConstantsBuilder) internal pure returns (uint256[] memory) {
+            if (state.activeSource > 0) {
+                revert DanglingSource();
+            }
+
+            uint256 cursor;
+            assembly ("memory-safe") {
+                cursor := mload(0x40)
+                sources := cursor
+                mstore(cursor, shr(0xf0, sourcesBuilder))
+                cursor := add(cursor, 0x20)
+                // Expect underflow on the break condition.
+                for {} lt(offset, 0x100) {
+                    offset := sub(offset, 0x10)
+                    cursor := add(cursor, 0x20)
+                } { mstore(cursor, and(shr(offset, sourcesBuilder), 0xFFFF)) }
+                mstore(0x40, cursor)
+            }
+        }
+    }
+
+    function buildConstants(ParseState memory) internal pure returns (uint256[] memory) {
         return new uint256[](0);
     }
 }
 
+library LibConstantsBuilder {}
+
 library LibParse {
     using LibPointer for Pointer;
     using LibParseState for ParseState;
-    using LibSourcesBuilder for SourcesBuilder;
-    using LibConstantsBuilder for ConstantsBuilder;
 
     function stringToChar(string memory s) external pure returns (uint256 char) {
         return 1 << uint256(uint8(bytes1(bytes(s))));
@@ -941,7 +1020,7 @@ library LibParse {
                             }
 
                             (cursor, word) = parseWord(cursor, CMASK_RHS_WORD_TAIL);
-                            state.sourcesBuilder = state.sourcesBuilder.pushWord(meta, word);
+                            state.pushWordToSource(meta, word);
 
                             state.fsm = FSM_YANG_MASK | FSM_WORD_END_MASK;
                         } else if (state.fsm & FSM_WORD_END_MASK > 0) {
@@ -962,7 +1041,7 @@ library LibParse {
                             state.fsm = FSM_LHS_MASK;
                         } else if (char & CMASK_EOS > 0) {
                             state.fsm = FSM_LHS_MASK;
-                            state.sourcesBuilder = state.sourcesBuilder.newSource();
+                            state.newSource();
                         } else {
                             (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
                             revert UnexpectedRHSChar(offset, charString);
@@ -974,7 +1053,7 @@ library LibParse {
                     revert UnexpectedRHSChar(offset, charString);
                 }
             }
-            return (state.sourcesBuilder.build(), state.constantsBuilder.build());
+            return (state.buildSources(), state.buildConstants());
         }
     }
 
