@@ -6,38 +6,43 @@ import "forge-std/Test.sol";
 import "src/LibParse.sol";
 
 contract LibParseNamedRHSTest is Test {
-    function testParseNamedRHSSimple00() external {
+    function testParseNamedRHSSimple00() external view {
         string memory s = "_:a();";
         (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s));
+        (constants);
         console2.log(s);
         console2.logBytes(sources[0]);
     }
 
-    function testParseNamedRHSSimple01() external {
+    function testParseNamedRHSSimple01() external view {
         string memory s = "_ _:a() b();";
         (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s));
+        (constants);
         console2.log(s);
         console2.logBytes(sources[0]);
     }
 
-    function testParseNamedRHSSimple02() external {
+    function testParseNamedRHSSimple02() external view {
         string memory s = "_:a(b());";
         (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s));
+        (constants);
         console2.log(s);
         console2.logBytes(sources[0]);
     }
 
-    function testParseNamedRHSSimple03() external {
+    function testParseNamedRHSSimple03() external view {
         string memory s = "_:a();_:b();";
         (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s));
+        (constants);
         console2.log(s);
         console2.logBytes(sources[0]);
         console2.logBytes(sources[1]);
     }
 
-    function testParseNamedRHSSimple04() external {
+    function testParseNamedRHSSimple04() external view {
         string memory s = "_:a() a();";
         (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s));
+        (constants);
         console2.log(s);
         console2.logBytes(sources[0]);
     }

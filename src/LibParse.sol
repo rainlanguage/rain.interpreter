@@ -16,6 +16,8 @@ error UnexpectedRHSChar(uint256 offset, string char);
 // Error 4
 error WordTooLong(uint256 offset);
 
+error WordSize(bytes32 word);
+
 // For metadata builder.
 error DuplicateFingerprint();
 
@@ -33,12 +35,14 @@ uint128 constant CMASK_SPACE = 0x0100000000;
 
 /// @dev ,
 uint128 constant CMASK_COMMA = 0x100000000000;
+uint128 constant CMASK_EOL = CMASK_COMMA;
 
 /// @dev -
 uint128 constant CMASK_DASH = 0x200000000000;
 
 /// @dev :
 uint128 constant CMASK_COLON = 0x0400000000000000;
+uint128 constant CMASK_EOS = CMASK_COLON;
 
 /// @dev ;
 uint128 constant CMASK_SEMICOLON = 0x800000000000000;
@@ -59,8 +63,13 @@ uint128 constant CMASK_LHS_STACK_HEAD = 0xffffffe800000000000000000000000;
 
 /// @dev lower alpha a-z
 uint128 constant CMASK_IDENTIFIER_HEAD = 0xffffffe000000000000000000000000;
+uint128 constant CMASK_RHS_WORD_HEAD = CMASK_IDENTIFIER_HEAD;
+
 /// @dev lower alphanumeric kebab a-z 0-9 -
 uint128 constant CMASK_IDENTIFIER_TAIL = 0xffffffe0000000003ff200000000000;
+uint128 constant CMASK_LHS_STACK_TAIL = CMASK_IDENTIFIER_TAIL;
+uint128 constant CMASK_RHS_WORD_TAIL = CMASK_IDENTIFIER_TAIL;
+
 /// @dev NOT lower alphanumeric kebab
 uint128 constant CMASK_NOT_IDENTIFIER_TAIL = 0xf0000001fffffffffc00dfffffffffff;
 
@@ -89,6 +98,10 @@ uint256 constant CTPOP_M128 = 0x00000000000000000000000000000000FFFFFFFFFFFFFFFF
 
 uint256 constant FINGERPRINT_MASK = 0xFFFFFFFF;
 
+uint256 constant FSM_LHS_MASK = 1;
+uint256 constant FSM_YANG_MASK = 1 << 1;
+uint256 constant FSM_WORD_END_MASK = 1 << 2;
+
 type Seed is uint256;
 
 struct SeedTracker {
@@ -100,14 +113,57 @@ struct SeedTracker {
     Bitmap bitmap1;
 }
 
+struct ParseState {
+    uint256 fsm;
+    uint256 stackIndex;
+    StackNames stackNames;
+    SourcesBuilder sourcesBuilder;
+    ConstantsBuilder constantsBuilder;
+}
+
 type SeedOutcome is uint256;
 
 type Bitmap is uint256;
 
+type StackNames is uint256;
+
+type SourcesBuilder is uint256;
+
+type ConstantsBuilder is uint256;
+
 error NoSeedFound();
+
+library LibStackNames {
+    function pushWord(StackNames stackNames, bytes32) internal pure returns (StackNames) {
+        return stackNames;
+    }
+}
+
+library LibSourcesBuilder {
+    function pushWord(SourcesBuilder sourcesBuilder, bytes memory, bytes32) internal pure returns (SourcesBuilder) {
+        return sourcesBuilder;
+    }
+
+    function newSource(SourcesBuilder sourcesBuilder) internal pure returns (SourcesBuilder) {
+        return sourcesBuilder;
+    }
+
+    function build(SourcesBuilder) internal pure returns (bytes[] memory) {
+        return new bytes[](0);
+    }
+}
+
+library LibConstantsBuilder {
+    function build(ConstantsBuilder) internal pure returns (uint256[] memory) {
+        return new uint256[](0);
+    }
+}
 
 library LibParse {
     using LibPointer for Pointer;
+    using LibStackNames for StackNames;
+    using LibSourcesBuilder for SourcesBuilder;
+    using LibConstantsBuilder for ConstantsBuilder;
 
     function stringToChar(string memory s) external pure returns (uint256 char) {
         return 1 << uint256(uint8(bytes1(bytes(s))));
@@ -247,7 +303,8 @@ library LibParse {
                 }
 
                 if (collideOrWrite(seedTracker.seed0, metaStart0, seedTracker.bitmap0, word, i)) {
-                    bool _didCollide = collideOrWrite(seedTracker.seed1, metaStart1, seedTracker.bitmap1, word, i);
+                    bool didCollide = collideOrWrite(seedTracker.seed1, metaStart1, seedTracker.bitmap1, word, i);
+                    (didCollide);
                 }
             }
         }
@@ -260,7 +317,7 @@ library LibParse {
     {
         unchecked {
             bool didCollide = true;
-            uint16 seed = type(uint8).max;
+            seed = type(uint8).max;
             while (didCollide && words.length > 0) {
                 mergedExpansion = baseExpansion;
                 for (uint256 i = 0; i < words.length; i++) {
@@ -304,12 +361,12 @@ library LibParse {
                 }
             }
             remaining = new bytes32[](words.length - ctpop(bestExpansion));
-            uint256 expansion = 0;
+            uint256 usedExpansion = 0;
             uint256 j = 0;
             for (uint256 i = 0; i < words.length; i++) {
                 uint256 shifted = wordBitmapped(Seed.wrap(bestSeed), words[i]);
-                if ((shifted & expansion) == 0) {
-                    expansion = shifted | expansion;
+                if ((shifted & usedExpansion) == 0) {
+                    usedExpansion = shifted | usedExpansion;
                 } else {
                     remaining[j] = words[i];
                     j++;
@@ -320,7 +377,7 @@ library LibParse {
 
     function lookupIndexMetaExpander(bytes memory meta, bytes32 word)
         internal
-        view
+        pure
         returns (bool exists, uint256 index)
     {
         unchecked {
@@ -365,7 +422,7 @@ library LibParse {
         }
     }
 
-    function buildMetaExpander(bytes32[] memory words, uint8 maxDepth) internal view returns (bytes memory meta) {
+    function buildMetaExpander(bytes32[] memory words, uint8 maxDepth) internal pure returns (bytes memory meta) {
         unchecked {
             uint8[] memory seeds = new uint8[](maxDepth);
             uint256[] memory expansions = new uint256[](maxDepth);
@@ -436,7 +493,10 @@ library LibParse {
         }
     }
 
-    function buildMetaSol2(bytes32[] memory words) internal view returns (bytes memory) {
+    function buildMetaSol2(bytes32[] memory words) internal view returns (bytes memory meta) {
+        // @todo this function doesn't return built meta.
+        (meta);
+
         Seed seed;
         Bitmap bitmap0;
         Bitmap bitmap1;
@@ -757,6 +817,154 @@ library LibParse {
             if gt(brutus, 0xFFFF) { revert(0, 0) }
             let offset := add(meta, 2)
             mstore(offset, or(and(mload(offset), not(0xFFFF)), brutus))
+        }
+    }
+
+    function parseErrorContext(bytes memory data, uint256 cursor)
+        internal
+        pure
+        returns (uint256 offset, string memory char)
+    {
+        uint256 charCode;
+        assembly ("memory-safe") {
+            offset := sub(cursor, add(data, 1))
+            charCode := and(mload(cursor), 0xFF)
+        }
+        char = string(abi.encodePacked(charCode));
+    }
+
+    function parseWord(uint256 cursor, uint256 mask) internal pure returns (uint256, bytes32) {
+        bytes32 word;
+        uint256 i = 1;
+        assembly ("memory-safe") {
+            // word is head + tail
+            word := mload(add(cursor, 0x1f))
+            // loop over the tail
+            for {} and(lt(i, 0x20), iszero(and(shl(byte(i, word), 1), not(mask)))) { i := add(i, 1) } {}
+            let scrub := mul(sub(0x20, i), 8)
+            word := shl(scrub, shr(scrub, word))
+        }
+        if (i == 0x20) {
+            revert WordSize(word);
+        }
+        return (cursor, word);
+    }
+
+    function skipWord(uint256 cursor, uint256 mask) internal pure returns (uint256) {
+        assembly ("memory-safe") {
+            let done := 0
+            for {} iszero(done) {} {
+                cursor := add(cursor, 0x20)
+                let i := 0
+                for { let word := mload(cursor) } and(lt(i, 0x20), iszero(and(shl(byte(i, word), 1), not(mask)))) {} {
+                    i := add(i, 1)
+                }
+                if lt(i, 0x20) {
+                    cursor := sub(cursor, sub(0x20, i))
+                    done := 1
+                }
+            }
+        }
+        return cursor;
+    }
+
+    function parseSol(bytes memory data, bytes memory meta)
+        internal
+        pure
+        returns (bytes[] memory sources, uint256[] memory)
+    {
+        unchecked {
+            ParseState memory state;
+            if (data.length > 0) {
+                bytes32 word;
+                uint256 cursor;
+                uint256 end;
+                uint256 char;
+                assembly ("memory-safe") {
+                    cursor := add(data, 1)
+                    end := add(cursor, mload(data))
+                }
+                while (cursor < end) {
+                    assembly ("memory-safe") {
+                        char := shl(and(mload(cursor), 0xFF), 1)
+                    }
+
+                    // LHS
+                    if (state.fsm & FSM_LHS_MASK > 0) {
+                        if (char & CMASK_LHS_STACK_HEAD > 0) {
+                            // if yang we can't start new stack item
+                            if (state.fsm & FSM_YANG_MASK > 0) {
+                                (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
+                                revert UnexpectedLHSChar(offset, charString);
+                            }
+
+                            // Named stack item.
+                            if (char & CMASK_IDENTIFIER_HEAD > 0) {
+                                (cursor, word) = parseWord(cursor, CMASK_LHS_STACK_TAIL);
+                                state.stackNames = state.stackNames.pushWord(word);
+                            }
+                            // Anon stack item.
+                            else {
+                                cursor = skipWord(cursor, CMASK_LHS_STACK_TAIL);
+                            }
+
+                            state.stackIndex++;
+                            state.fsm = FSM_LHS_MASK | FSM_YANG_MASK;
+                        } else if (char & CMASK_WHITESPACE > 0) {
+                            cursor = skipWord(cursor, CMASK_WHITESPACE);
+                            state.fsm = FSM_LHS_MASK;
+                        } else if (char & CMASK_LHS_RHS_DELIMITER > 0) {
+                            state.fsm = 0;
+                            cursor++;
+                        } else {
+                            (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
+                            revert UnexpectedLHSChar(offset, charString);
+                        }
+                    }
+                    // RHS
+                    else {
+                        if (char & CMASK_RHS_WORD_HEAD > 0) {
+                            // If yang we can't start a new word.
+                            if (state.fsm & FSM_YANG_MASK > 0) {
+                                (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
+                                revert UnexpectedRHSChar(offset, charString);
+                            }
+
+                            (cursor, word) = parseWord(cursor, CMASK_RHS_WORD_TAIL);
+                            state.sourcesBuilder = state.sourcesBuilder.pushWord(meta, word);
+
+                            state.fsm = FSM_YANG_MASK | FSM_WORD_END_MASK;
+                        } else if (state.fsm & FSM_WORD_END_MASK > 0) {
+                            if (char & CMASK_LEFT_PAREN == 0) {
+                                (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
+                                revert UnexpectedRHSChar(offset, charString);
+                            }
+                            state.fsm = 0;
+                            cursor++;
+                        } else if (char & CMASK_RIGHT_PAREN > 0) {
+                            // @todo input handling.
+                            state.fsm = 0;
+                            cursor++;
+                        } else if (char & CMASK_WHITESPACE > 0) {
+                            state.fsm = 0;
+                            cursor = skipWord(cursor, CMASK_WHITESPACE);
+                        } else if (char & CMASK_EOL > 0) {
+                            state.fsm = FSM_LHS_MASK;
+                        } else if (char & CMASK_EOS > 0) {
+                            state.fsm = FSM_LHS_MASK;
+                            state.sourcesBuilder = state.sourcesBuilder.newSource();
+                        } else {
+                            (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
+                            revert UnexpectedRHSChar(offset, charString);
+                        }
+                    }
+                }
+                if (char & CMASK_EOS == 0) {
+                    (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
+                    revert UnexpectedRHSChar(offset, charString);
+                }
+            }
+            return (state.sourcesBuilder.build(), state.constantsBuilder.build());
         }
     }
 

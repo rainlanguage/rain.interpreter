@@ -6,7 +6,7 @@ import "forge-std/Test.sol";
 import "src/LibParse.sol";
 
 contract LibParseBuildMetaTest is Test {
-    function testBuildMeta0() external {
+    function testBuildMeta0() external view {
         bytes32[] memory words = new bytes32[](2);
         words[0] = bytes32("a");
         words[1] = bytes32("b");
@@ -21,7 +21,7 @@ contract LibParseBuildMetaTest is Test {
         assertEq(LibParse.buildMeta(words, 0, 0x100), LibParse.buildMetaSol(words));
     }
 
-    function testBuildMeta1() external {
+    function testBuildMeta1() external view {
         bytes32[] memory words = new bytes32[](70);
         for (uint256 i = 0; i < words.length; i++) {
             words[i] = bytes32(i);
@@ -30,7 +30,7 @@ contract LibParseBuildMetaTest is Test {
         console2.logBytes(meta);
     }
 
-    function testBuildMetaY() external {
+    function testBuildMetaY() external view {
         bytes32[] memory words = new bytes32[](170);
         for (uint256 i = 0; i < words.length; i++) {
             words[i] = bytes32(i);
@@ -39,7 +39,7 @@ contract LibParseBuildMetaTest is Test {
         console2.logBytes(meta);
     }
 
-    function testBuildMetaExpander() external {
+    function testBuildMetaExpander() external view {
         bytes32[] memory words = new bytes32[](80);
         for (uint256 i = 0; i < words.length; i++) {
             words[i] = bytes32(i);
