@@ -161,10 +161,8 @@ library LibParseState {
     function pushWordToSource(ParseState memory state, bytes memory meta, bytes32 word) internal pure {
         unchecked {
             // @todo handle operand.
-            (bool exists, uint256 i) = LibParse.lookupIndexMetaExpander(meta, word);
-            if (!exists) {
-                revert UnknownWord(word);
-            }
+            (uint256 exists, uint256 i) = LibParse.lookupIndexMetaExpander(meta, word);
+
             uint256 op = i << 0x10;
             uint256 activeSource = state.activeSource;
             uint256 offset = activeSource & 0xFFFF;
@@ -172,13 +170,22 @@ library LibParseState {
             // We write sources RTL so they can run LTR.
             activeSource = offset + 0x20 | activeSource & ~uint256(0xFFFF) | op << offset;
 
-            // active is full, link to it.
-            if (offset == 0xe0) {
-                assembly ("memory-safe") {
-                    let ptr := mload(0x40)
-                    mstore(ptr, activeSource)
-                    mstore(0x40, add(ptr, 0x20))
-                    activeSource := or(0x20, shl(0x10, ptr))
+            // maintenance is required
+            // less branching on happy path, more branching for duplicate checks
+            // on unhappy path.
+            if (exists == 0 || offset == 0xe0) {
+                // missing word is unrecoverable
+                if (exists == 0) {
+                    revert UnknownWord(word);
+                }
+                // active is full, link to it.
+                else {
+                    assembly ("memory-safe") {
+                        let ptr := mload(0x40)
+                        mstore(ptr, activeSource)
+                        mstore(0x40, add(ptr, 0x20))
+                        activeSource := or(0x20, shl(0x10, ptr))
+                    }
                 }
             }
             state.activeSource = activeSource;
@@ -469,7 +476,7 @@ library LibParse {
     function lookupIndexMetaExpander(bytes memory meta, bytes32 word)
         internal
         pure
-        returns (bool exists, uint256 index)
+        returns (uint256 exists, uint256 index)
     {
         unchecked {
             uint256 dataStart;
