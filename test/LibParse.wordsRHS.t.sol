@@ -58,7 +58,7 @@ contract LibParseNamedRHSTest is Test {
         (bytes[] memory sources, uint256[] memory constants) = LibParse.parseSol(bytes(s), meta);
         uint256 b = gasleft();
         console.log("g", a - b);
-        // (constants);
+        (constants);
         // console2.log(s);
         console2.logBytes(sources[0]);
     }

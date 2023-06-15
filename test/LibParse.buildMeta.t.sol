@@ -14,12 +14,12 @@ contract LibParseBuildMetaTest is Test {
         console2.logBytes(meta);
     }
 
-    function testbuildMetaX() external {
-        bytes32[] memory words = new bytes32[](2);
-        words[0] = bytes32("a");
-        words[1] = bytes32("b");
-        assertEq(LibParse.buildMeta(words, 0, 0x100), LibParse.buildMetaSol(words));
-    }
+    // function testbuildMetaX() external {
+    //     bytes32[] memory words = new bytes32[](2);
+    //     words[0] = bytes32("a");
+    //     words[1] = bytes32("b");
+    //     assertEq(LibParse.buildMeta(words, 0, 0x100), LibParse.buildMetaSol(words));
+    // }
 
     function testBuildMeta1() external view {
         bytes32[] memory words = new bytes32[](70);
@@ -30,14 +30,14 @@ contract LibParseBuildMetaTest is Test {
         console2.logBytes(meta);
     }
 
-    function testBuildMetaY() external view {
-        bytes32[] memory words = new bytes32[](170);
-        for (uint256 i = 0; i < words.length; i++) {
-            words[i] = bytes32(i);
-        }
-        bytes memory meta = LibParse.buildMetaSol2(words);
-        console2.logBytes(meta);
-    }
+    // function testBuildMetaY() external view {
+    //     bytes32[] memory words = new bytes32[](170);
+    //     for (uint256 i = 0; i < words.length; i++) {
+    //         words[i] = bytes32(i);
+    //     }
+    //     bytes memory meta = LibParse.buildMetaSol2(words);
+    //     console2.logBytes(meta);
+    // }
 
     function testBuildMetaExpander() external view {
         bytes32[] memory words = new bytes32[](80);
