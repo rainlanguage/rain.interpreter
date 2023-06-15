@@ -60,7 +60,7 @@ contract LibParseNamedRHSTest is Test {
         console.log("g", a - b);
         // (constants);
         // console2.log(s);
-        // console2.logBytes(sources[0]);
+        console2.logBytes(sources[0]);
     }
 
     function testParseNamedRHSSimple00() external view {

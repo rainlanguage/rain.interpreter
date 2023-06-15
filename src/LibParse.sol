@@ -103,6 +103,8 @@ uint256 constant CTPOP_M64 = 0x0000000000000000FFFFFFFFFFFFFFFF0000000000000000F
 uint256 constant CTPOP_M128 = 0x00000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
 
 uint256 constant FINGERPRINT_MASK = 0xFFFFFFFF;
+uint256 constant NOT_LOW_16_BIT_MASK = ~uint256(0xFFFF);
+uint256 constant ACTIVE_SOURCE_MASK = NOT_LOW_16_BIT_MASK;
 
 uint256 constant FSM_LHS_MASK = 1;
 uint256 constant FSM_YANG_MASK = 1 << 1;
@@ -160,34 +162,35 @@ library LibParseState {
 
     function pushWordToSource(ParseState memory state, bytes memory meta, bytes32 word) internal pure {
         unchecked {
-            // @todo handle operand.
-            (uint256 exists, uint256 i) = LibParse.lookupIndexMetaExpander(meta, word);
+            (bool exists, uint256 i) = LibParse.lookupIndexMetaExpander(meta, word);
 
-            uint256 op = i << 0x10;
             uint256 activeSource = state.activeSource;
-            uint256 offset = activeSource & 0xFFFF;
+            // The low byte of the active source is the current offset.
+            uint256 offset = uint8(activeSource);
 
             // We write sources RTL so they can run LTR.
-            activeSource = offset + 0x20 | activeSource & ~uint256(0xFFFF) | op << offset;
+            activeSource =
+            // increment offset. We have 16 bits allocated to the offset and stop
+            // processing at 0x100 so this never overflows into the actual source
+            // data.
+            activeSource + 0x20
+            // include new op
+            | i << (offset + 0x10);
 
-            // maintenance is required
-            // less branching on happy path, more branching for duplicate checks
-            // on unhappy path.
-            if (exists == 0 || offset == 0xe0) {
-                // missing word is unrecoverable
-                if (exists == 0) {
-                    revert UnknownWord(word);
-                }
-                // active is full, link to it.
-                else {
-                    assembly ("memory-safe") {
-                        let ptr := mload(0x40)
-                        mstore(ptr, activeSource)
-                        mstore(0x40, add(ptr, 0x20))
-                        activeSource := or(0x20, shl(0x10, ptr))
-                    }
-                }
+            // Maintenance branches.
+            if (!exists) {
+                revert UnknownWord(word);
             }
+            if (offset == 0xe0) {
+                uint256 ptr;
+                assembly ("memory-safe") {
+                    ptr := mload(0x40)
+                    mstore(ptr, activeSource)
+                    mstore(0x40, add(ptr, 0x20))
+                }
+                activeSource = EMPTY_ACTIVE_SOURCE | (ptr << 0x10);
+            }
+
             state.activeSource = activeSource;
         }
     }
@@ -476,7 +479,7 @@ library LibParse {
     function lookupIndexMetaExpander(bytes memory meta, bytes32 word)
         internal
         pure
-        returns (uint256 exists, uint256 index)
+        returns (bool exists, uint256 index)
     {
         unchecked {
             uint256 dataStart;
