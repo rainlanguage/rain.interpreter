@@ -108,6 +108,8 @@ uint256 constant FSM_LHS_MASK = 1;
 uint256 constant FSM_YANG_MASK = 1 << 1;
 uint256 constant FSM_WORD_END_MASK = 1 << 2;
 
+uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
+
 type Seed is uint256;
 
 struct SeedTracker {
@@ -122,35 +124,30 @@ struct SeedTracker {
 struct ParseState {
     uint256 fsm;
     uint256 stackIndex;
-    StackNames stackNames;
+    uint256 stackNames;
     // low 16 bits = bitwise offset (starts at 0x20)
     // mid 16 bits = LL pointer
     // high bits = 4 byte ops
     uint256 activeSource;
     uint256 sourcesBuilder;
-    ConstantsBuilder constantsBuilder;
+    uint256 constantsBuilder;
 }
 
 type SeedOutcome is uint256;
 
 type Bitmap is uint256;
 
-type StackNames is uint256;
-
-type ConstantsBuilder is uint256;
-
 error NoSeedFound();
 
 library LibParseState {
-    function newState() internal pure returns (ParseState memory state) {
-        state.fsm = FSM_LHS_MASK;
-        state.activeSource = 0x20;
+    function newState() internal pure returns (ParseState memory) {
+        return ParseState(FSM_LHS_MASK, 0, 0, EMPTY_ACTIVE_SOURCE, 0, 0);
     }
 
     function pushStackName(ParseState memory state, bytes32 word) internal pure {
         uint256 fingerprint;
         uint256 ptr;
-        StackNames oldStackNames = state.stackNames;
+        uint256 oldStackNames = state.stackNames;
         assembly ("memory-safe") {
             ptr := mload(0x40)
             mstore(ptr, word)
@@ -158,7 +155,7 @@ library LibParseState {
             mstore(ptr, oldStackNames)
             mstore(0x40, add(ptr, 0x20))
         }
-        state.stackNames = StackNames.wrap(fingerprint | (state.stackIndex << 0x10) | ptr);
+        state.stackNames = fingerprint | (state.stackIndex << 0x10) | ptr;
     }
 
     function pushWordToSource(ParseState memory state, bytes memory meta, bytes32 word) internal pure {
@@ -236,10 +233,10 @@ library LibParseState {
             assembly ("memory-safe") {
                 cursor := mload(0x40)
                 sources := cursor
-                mstore(cursor, shr(0xf0, sourcesBuilder))
+                mstore(cursor, div(offset, 0x10))
                 cursor := add(cursor, 0x20)
                 // Expect underflow on the break condition.
-                for {} lt(offset, 0x100) {
+                for { offset := sub(offset, 0x10) } lt(offset, 0x100) {
                     offset := sub(offset, 0x10)
                     cursor := add(cursor, 0x20)
                 } { mstore(cursor, and(shr(offset, sourcesBuilder), 0xFFFF)) }
@@ -657,9 +654,6 @@ library LibParse {
             if (!success) {
                 revert NoSeedFound();
             }
-
-            console.log(Seed.unwrap(seed));
-            console.log(Bitmap.unwrap(bitmap0), Bitmap.unwrap(bitmap1), Bitmap.unwrap(bitmap2), Bitmap.unwrap(bitmap3));
         }
     }
 
@@ -988,7 +982,6 @@ library LibParse {
                     assembly ("memory-safe") {
                         char := shl(and(mload(cursor), 0xFF), 1)
                     }
-                    console.log(cursor, char);
 
                     // LHS
                     if (state.fsm & FSM_LHS_MASK > 0) {

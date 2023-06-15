@@ -6,7 +6,7 @@ import "forge-std/Test.sol";
 import "src/LibParse.sol";
 
 contract LibParseNamedRHSTest is Test {
-    function testParseSol() external view {
+    function testParseSol01() external view {
         string memory s = "_:a();";
         bytes32[] memory words = new bytes32[](1);
         words[0] = bytes32("a");
@@ -15,6 +15,52 @@ contract LibParseNamedRHSTest is Test {
         (constants);
         console2.log(s);
         console2.logBytes(sources[0]);
+    }
+
+    function testParseSol02() external view {
+        string memory s = "_ _:a() b();";
+        bytes32[] memory words = new bytes32[](2);
+        words[0] = bytes32("a");
+        words[1] = bytes32("b");
+        bytes memory meta = LibParse.buildMetaExpander(words, 2);
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parseSol(bytes(s), meta);
+        (constants);
+        console2.log(s);
+        console2.logBytes(sources[0]);
+    }
+
+    function testParseSol03() external view {
+        string memory s = "_:a(b() c());";
+        bytes32[] memory words = new bytes32[](3);
+        words[0] = bytes32("a");
+        words[1] = bytes32("b");
+        words[2] = bytes32("c");
+        bytes memory meta = LibParse.buildMetaExpander(words, 2);
+        uint256 a = gasleft();
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parseSol(bytes(s), meta);
+        uint256 b = gasleft();
+        console.log("g", a - b);
+        (constants);
+        console2.log(s);
+        console2.logBytes(sources[0]);
+    }
+
+    function testParseSol04() external view {
+        string memory s = "_:a(b() c(d() e()));";
+        bytes32[] memory words = new bytes32[](5);
+        words[0] = bytes32("a");
+        words[1] = bytes32("b");
+        words[2] = bytes32("c");
+        words[3] = bytes32("d");
+        words[4] = bytes32("e");
+        bytes memory meta = LibParse.buildMetaExpander(words, 2);
+        uint256 a = gasleft();
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parseSol(bytes(s), meta);
+        uint256 b = gasleft();
+        console.log("g", a - b);
+        // (constants);
+        // console2.log(s);
+        // console2.logBytes(sources[0]);
     }
 
     function testParseNamedRHSSimple00() external view {
