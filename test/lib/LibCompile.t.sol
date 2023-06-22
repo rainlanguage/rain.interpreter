@@ -6,7 +6,7 @@ import "sol.lib.memory/LibMemCpy.sol";
 import "sol.lib.memory/LibBytes.sol";
 
 import "./LibCompileSlow.sol";
-import "../src/LibCompile.sol";
+import "src/lib/LibCompile.sol";
 
 contract LibCompileTest is Test {
     using LibBytes for bytes;
