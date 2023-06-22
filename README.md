@@ -1,10 +1,10 @@
-# rain.lib.interpreter
+# rain.interpreter
 
-Docs at https://rainprotocol.github.io/rain.lib.interpreter
+Docs at https://rainprotocol.github.io/rain.interpreter
 
 ## Overview
 
-Standard libraries defining and working with `InterpeterState` including:
+Standard libraries and interfaces defining and working with `InterpeterState` including:
 
 - the standard `eval` loop
 - source compilation from opcodes
