@@ -43,7 +43,7 @@ contract DeployerDiscoverableMetaV1Test is Test {
             abi.encodeWithSelector(
                 IExpressionDeployerV1.deployExpression.selector, new bytes[](0), new uint256[](0), new uint256[](0)
             ),
-            uint64(1)
+            1
         );
 
         address addr;
