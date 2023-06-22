@@ -3,7 +3,7 @@ pragma solidity ^0.8.18;
 
 import "rain.metadata/IMetaV1.sol";
 import "rain.metadata/LibMeta.sol";
-import "./LibDeployerDiscoverable.sol";
+import "../lib/LibDeployerDiscoverable.sol";
 
 /// Construction config for `DeployerDiscoverableMetaV1`.
 /// @param deployer Deployer the calling contract will be discoverable under.
