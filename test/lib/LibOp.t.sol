@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+pragma solidity =0.8.18;
 
 import "forge-std/Test.sol";
 
@@ -9,7 +9,7 @@ import "sol.lib.memory/LibStackPointer.sol";
 import "sol.lib.memory/LibUint256Array.sol";
 import "rain.lib.hash/LibHashNoAlloc.sol";
 
-import "../src/LibOp.sol";
+import "src/lib/LibOp.sol";
 import "./LibOpSlow.sol";
 
 contract LibOpTest is Test {

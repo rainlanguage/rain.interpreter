@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+pragma solidity =0.8.18;
 
 import "forge-std/Test.sol";
 
 import "./LibNamespaceSlow.sol";
-import "../src/LibNamespace.sol";
+import "src/lib/LibNamespace.sol";
 
 contract LibNamespaceTest is Test {
     function testQualifyNamespaceReferenceImplementation(StateNamespace stateNamespace) public {

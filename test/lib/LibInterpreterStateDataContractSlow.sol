@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+pragma solidity =0.8.18;
 
 import "sol.lib.memory/LibPointer.sol";
 import "sol.lib.memory/LibStackPointer.sol";
 import "sol.lib.memory/LibBytes.sol";
 import "sol.lib.memory/LibUint256Array.sol";
 
-import "../src/LibCompile.sol";
-import "../src/LibInterpreterState.sol";
+import "src/lib/LibCompile.sol";
+import "src/lib/LibInterpreterState.sol";
 
 library LibInterpreterStateDataContractSlow {
     using LibStackPointer for Pointer;
