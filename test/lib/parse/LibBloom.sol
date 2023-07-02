@@ -3,7 +3,7 @@ pragma solidity ^0.8.18;
 
 library LibBloom {
     /// Returns true if any of the words are duplicates according to a bloom filter.
-    /// The bloom filter is 512 bits.
+    /// The bloom filter is 1024 bits.
     function bloomFindsDupes(bytes32[] memory words) internal pure returns (bool dupes) {
         assembly ("memory-safe") {
             let bloom0 := 0
