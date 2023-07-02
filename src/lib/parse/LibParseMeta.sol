@@ -175,7 +175,6 @@ library LibParseMeta {
                 if (wordFingerprint == posData & FINGERPRINT_MASK) {
                     return (true, (posData >> 0x20) & 0xFFFF);
                 } else {
-                    cursor += 0x21;
                     cumulativeCt += LibCtPop.ctpop(expansion);
                 }
             }

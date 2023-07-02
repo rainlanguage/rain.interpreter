@@ -23,16 +23,23 @@ contract LibBloomTest is Test {
         assertTrue(LibBloom.bloomFindsDupes(words));
     }
 
-    function testLibBloomVaguelyAvoidsFalsePositives(uint256 start, uint8 len) external {
+    /// With random words the chance of false positives is much higher. Described
+    /// by the birthday paradox.
+    function testLibBloomVaguelyAvoidsFalsePositives(uint256 start, uint8 len) external pure {
         vm.assume(type(uint256).max - len > start);
-        len %= 200;
-        vm.assume(len > 40);
-        bytes32[] memory words = new bytes32[](len);
-        for (uint256 i = 0; i < len; i++) {
-            // Do a keccak256 here to avoid the trivial case of the bloom filter
-            // just mapping every sequential value to a bit in the filter.
-            words[i] = keccak256(abi.encodePacked(bytes32(start + i)));
+        // The ability for the bloom filter to avoid saturation starts to max out
+        // around 180 words. This is a very loose bound.
+        vm.assume(len < 180);
+        bool offsetFound = false;
+        while (!offsetFound) {
+            start++;
+            bytes32[] memory words = new bytes32[](len);
+            for (uint256 i = 0; i < len; i++) {
+                // Do a keccak256 here to avoid the trivial case of the bloom filter
+                // just mapping every sequential value to a bit in the filter.
+                words[i] = keccak256(abi.encodePacked(bytes32(start + i)));
+            }
+            offsetFound = !LibBloom.bloomFindsDupes(words);
         }
-        vm.assume(!LibBloom.bloomFindsDupes(words));
     }
 }
