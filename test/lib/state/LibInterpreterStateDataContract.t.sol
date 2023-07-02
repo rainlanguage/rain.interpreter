@@ -5,9 +5,10 @@ import "forge-std/Test.sol";
 import "sol.lib.memory/LibBytes.sol";
 import "sol.lib.memory/LibPointer.sol";
 import "sol.lib.memory/LibUint256Array.sol";
-import "./LibInterpreterStateDataContractSlow.sol";
-import "../src/LibInterpreterStateDataContract.sol";
-import "./LibCompileSlow.sol";
+import "src/lib/state/LibInterpreterStateDataContract.sol";
+
+import "test/lib/compile/LibCompileSlow.sol";
+import "test/lib/state/LibInterpreterStateDataContractSlow.sol";
 
 contract LibInterpreterStateDataContractTest is Test {
     using LibBytes for bytes;

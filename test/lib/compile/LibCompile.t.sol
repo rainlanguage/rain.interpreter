@@ -5,8 +5,8 @@ import "forge-std/Test.sol";
 import "sol.lib.memory/LibMemCpy.sol";
 import "sol.lib.memory/LibBytes.sol";
 
-import "./LibCompileSlow.sol";
-import "../src/LibCompile.sol";
+import "test/lib/compile//LibCompileSlow.sol";
+import "src/lib/compile/LibCompile.sol";
 
 contract LibCompileTest is Test {
     using LibBytes for bytes;

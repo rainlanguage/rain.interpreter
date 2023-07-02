@@ -3,7 +3,7 @@ pragma solidity ^0.8.18;
 
 import "forge-std/Test.sol";
 
-import "src/LibParse.sol";
+import "src/lib/parse/LibParse.sol";
 
 contract LibParseTest is Test {
     function testParseMissingFinalSemi() external {

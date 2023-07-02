@@ -112,15 +112,11 @@ uint256 constant FSM_WORD_END_MASK = 1 << 2;
 
 uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
 
-// struct SeedTracker {
-//     bool success;
-//     Seed seed0;
-//     Seed seed1;
-//     uint256 collisions;
-//     Bitmap bitmap0;
-//     Bitmap bitmap1;
-// }
-
+/// The parser is stateful. This struct keeps track of the entire state.
+/// @param fsm The finite state machine representation of the parser.
+/// - bit 0: LHS/RHS => 0 = LHS, 1 = RHS
+/// - bit 1: yang/yin => 0 = yin, 1 = yang
+/// - bit 2: word end => 0 = not end, 1 = end
 struct ParseState {
     uint256 fsm;
     uint256 stackIndex;
@@ -255,8 +251,6 @@ library LibParseState {
         return new uint256[](0);
     }
 }
-
-library LibConstantsBuilder {}
 
 library LibParse {
     using LibPointer for Pointer;

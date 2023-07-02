@@ -5,8 +5,8 @@ import "sol.lib.memory/LibPointer.sol";
 import "sol.lib.memory/LibMemCpy.sol";
 import "sol.lib.memory/LibBytes.sol";
 
-import "./LibInterpreterState.sol";
-import "./LibCompile.sol";
+import "../state/LibInterpreterState.sol";
+import "../compile/LibCompile.sol";
 
 library LibInterpreterStateDataContract {
     using LibBytes for bytes;

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "../src/LibInterpreterState.sol";
+import "src/lib/state/LibInterpreterState.sol";
 
 library LibEvalSlow {
     function evalSlow(InterpreterState memory state, SourceIndex sourceIndex, Pointer stackTop)
