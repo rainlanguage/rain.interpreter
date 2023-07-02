@@ -50,7 +50,7 @@ contract LibParseSingleRHSNamedGasTest is Test {
         words[30] = bytes32("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         words[31] = bytes32("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
-        meta = LibParse.buildMetaExpander(words, 2);
+        meta = LibParseMeta.buildMetaExpander(words, 2);
     }
 
     /// Test parsing "a" (1 char) as the RHS.

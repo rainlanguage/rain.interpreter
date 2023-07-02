@@ -2,7 +2,8 @@
 pragma solidity ^0.8.18;
 
 import "sol.lib.memory/LibPointer.sol";
-import "forge-std/console.sol";
+import "./LibCtPop.sol";
+import "./LibParseMeta.sol";
 
 // Error 1
 error MissingFinalSemi(uint256 offset);
@@ -23,9 +24,6 @@ error UnknownWord(bytes32 word);
 error MaxSources();
 
 error DanglingSource();
-
-// For metadata builder.
-error DuplicateFingerprint();
 
 /// @dev \t
 uint128 constant CMASK_TAB = 0x200;
@@ -85,24 +83,7 @@ uint128 constant CMASK_LHS_STACK_DELIMITER = 0x0100000000;
 /// @dev whitespace is \n \r \t space
 uint128 constant CMASK_WHITESPACE = 0x100002600;
 
-/// @dev 010101... for ctpop
-uint256 constant CTPOP_M1 = 0x5555555555555555555555555555555555555555555555555555555555555555;
-/// @dev 00110011.. for ctpop
-uint256 constant CTPOP_M2 = 0x3333333333333333333333333333333333333333333333333333333333333333;
-/// @dev 4 bits alternating for ctpop
-uint256 constant CTPOP_M4 = 0x0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F0F;
-/// @dev 8 bits alternating for ctpop
-uint256 constant CTPOP_M8 = 0x00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF;
-/// @dev 16 bits alternating for ctpop
-uint256 constant CTPOP_M16 = 0x0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF0000FFFF;
-/// @dev 32 bits alternating for ctpop
-uint256 constant CTPOP_M32 = 0x00000000FFFFFFFF00000000FFFFFFFF00000000FFFFFFFF00000000FFFFFFFF;
-/// @dev 64 bits alternating for ctpop
-uint256 constant CTPOP_M64 = 0x0000000000000000FFFFFFFFFFFFFFFF0000000000000000FFFFFFFFFFFFFFFF;
-/// @dev 128 bits alternating for ctpop
-uint256 constant CTPOP_M128 = 0x00000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
 
-uint256 constant FINGERPRINT_MASK = 0xFFFFFFFF;
 uint256 constant NOT_LOW_16_BIT_MASK = ~uint256(0xFFFF);
 uint256 constant ACTIVE_SOURCE_MASK = NOT_LOW_16_BIT_MASK;
 
@@ -154,7 +135,7 @@ library LibParseState {
 
     function pushWordToSource(ParseState memory state, bytes memory meta, bytes32 word) internal pure {
         unchecked {
-            (bool exists, uint256 i) = LibParse.lookupIndexMetaExpander(meta, word);
+            (bool exists, uint256 i) = LibParseMeta.lookupIndexMetaExpander(meta, word);
 
             uint256 activeSource = state.activeSource;
             // The low byte of the active source is the current offset.
@@ -260,261 +241,76 @@ library LibParse {
         return 1 << uint256(uint8(bytes1(bytes(s))));
     }
 
-    function ctpop(uint256 x) internal pure returns (uint256) {
-        unchecked {
-            // https://en.wikipedia.org/wiki/Hamming_weight
-            // @todo - currently using naive/slow implementation
-            x = (x & CTPOP_M1) + ((x >> 1) & CTPOP_M1);
-            x = (x & CTPOP_M2) + ((x >> 2) & CTPOP_M2);
-            x = (x & CTPOP_M4) + ((x >> 4) & CTPOP_M4);
-            x = (x & CTPOP_M8) + ((x >> 8) & CTPOP_M8);
-            x = (x & CTPOP_M16) + ((x >> 16) & CTPOP_M16);
-            x = (x & CTPOP_M32) + ((x >> 32) & CTPOP_M32);
-            x = (x & CTPOP_M64) + ((x >> 64) & CTPOP_M64);
-            x = (x & CTPOP_M128) + ((x >> 128) & CTPOP_M128);
+    // function checkSeed2(uint256 seed0, uint256 seed1, bytes32[] memory words)
+    //     internal
+    //     pure
+    //     returns (bool success, Bitmap bitmap0, Bitmap bitmap1, uint256 collisions)
+    // {
+    //     unchecked {
+    //         uint256 start;
+    //         uint256 end;
+    //         assembly ("memory-safe") {
+    //             start := add(words, 0x20)
+    //             end := add(start, mul(mload(words), 0x20))
+    //         }
+    //         collisions = 0;
+    //         for (uint256 cursor = start; cursor < end; cursor += 0x20) {
+    //             bytes32 word;
+    //             assembly ("memory-safe") {
+    //                 word := mload(cursor)
+    //             }
+    //             (uint256 shifted0, uint256 hashed0) = wordBitmapped(seed0, word);
+    //             (hashed0);
 
-            return x;
-        }
-    }
+    //             if (shifted0 & Bitmap.unwrap(bitmap0) == 0) {
+    //                 bitmap0 = Bitmap.wrap(Bitmap.unwrap(bitmap0) | shifted0);
+    //                 // Single collision. Try backup space.
+    //             } else {
+    //                 collisions++;
+    //                 (uint256 shifted1, uint256 hashed1) = wordBitmapped(seed1, word);
+    //                 (hashed1);
+    //                 if (shifted1 & Bitmap.unwrap(bitmap1) == 0) {
+    //                     bitmap1 = Bitmap.wrap(Bitmap.unwrap(bitmap1) | shifted1);
+    //                 }
+    //                 // Double collision. Failure.
+    //                 else {
+    //                     return (false, bitmap0, bitmap1, collisions);
+    //                 }
+    //             }
+    //         }
+    //         return (true, bitmap0, bitmap1, collisions);
+    //     }
+    // }
 
-    /// @return shifted
-    /// @return bitmapped
-    function wordBitmapped(uint256 seed, bytes32 word) internal pure returns (uint256, uint256) {
-        uint256 hashed;
-        assembly ("memory-safe") {
-            mstore(0x20, word)
-            mstore8(0x21, seed)
-            hashed := keccak256(0, 0x21)
-        }
-        return (1 << uint8(hashed), hashed);
-    }
+    // function findOverlay(uint256 baseExpansion, bytes32[] memory words)
+    //     internal
+    //     pure
+    //     returns (uint16 seed, uint256 mergedExpansion)
+    // {
+    //     unchecked {
+    //         bool didCollide = true;
+    //         seed = type(uint8).max;
+    //         while (didCollide && words.length > 0) {
+    //             mergedExpansion = baseExpansion;
+    //             for (uint256 i = 0; i < words.length; i++) {
+    //                 (uint256 shifted, uint256 hashed) = wordBitmapped(seed, words[i]);
+    //                 (hashed);
+    //                 if ((shifted & mergedExpansion) == 0) {
+    //                     mergedExpansion = mergedExpansion | shifted;
+    //                     didCollide = false;
+    //                 } else {
+    //                     didCollide = true;
+    //                     seed++;
+    //                     break;
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
-    function checkSeed2(uint256 seed0, uint256 seed1, bytes32[] memory words)
-        internal
-        pure
-        returns (bool success, Bitmap bitmap0, Bitmap bitmap1, uint256 collisions)
-    {
-        unchecked {
-            uint256 start;
-            uint256 end;
-            assembly ("memory-safe") {
-                start := add(words, 0x20)
-                end := add(start, mul(mload(words), 0x20))
-            }
-            collisions = 0;
-            for (uint256 cursor = start; cursor < end; cursor += 0x20) {
-                bytes32 word;
-                assembly ("memory-safe") {
-                    word := mload(cursor)
-                }
-                (uint256 shifted0, uint256 hashed0) = wordBitmapped(seed0, word);
-                (hashed0);
 
-                if (shifted0 & Bitmap.unwrap(bitmap0) == 0) {
-                    bitmap0 = Bitmap.wrap(Bitmap.unwrap(bitmap0) | shifted0);
-                    // Single collision. Try backup space.
-                } else {
-                    collisions++;
-                    (uint256 shifted1, uint256 hashed1) = wordBitmapped(seed1, word);
-                    (hashed1);
-                    if (shifted1 & Bitmap.unwrap(bitmap1) == 0) {
-                        bitmap1 = Bitmap.wrap(Bitmap.unwrap(bitmap1) | shifted1);
-                    }
-                    // Double collision. Failure.
-                    else {
-                        return (false, bitmap0, bitmap1, collisions);
-                    }
-                }
-            }
-            return (true, bitmap0, bitmap1, collisions);
-        }
-    }
 
-    function findOverlay(uint256 baseExpansion, bytes32[] memory words)
-        internal
-        pure
-        returns (uint16 seed, uint256 mergedExpansion)
-    {
-        unchecked {
-            bool didCollide = true;
-            seed = type(uint8).max;
-            while (didCollide && words.length > 0) {
-                mergedExpansion = baseExpansion;
-                for (uint256 i = 0; i < words.length; i++) {
-                    (uint256 shifted, uint256 hashed) = wordBitmapped(seed, words[i]);
-                    (hashed);
-                    if ((shifted & mergedExpansion) == 0) {
-                        mergedExpansion = mergedExpansion | shifted;
-                        didCollide = false;
-                    } else {
-                        didCollide = true;
-                        seed++;
-                        break;
-                    }
-                }
-            }
-        }
-    }
 
-    function findBestExpander(bytes32[] memory words)
-        internal
-        pure
-        returns (uint8 bestSeed, uint256 bestExpansion, bytes32[] memory remaining)
-    {
-        unchecked {
-            {
-                uint256 bestCt = 0;
-                for (uint256 seed = 0; seed < type(uint8).max; seed++) {
-                    uint256 expansion = 0;
-                    for (uint256 i = 0; i < words.length; i++) {
-                        (uint256 shifted, uint256 hashed) = wordBitmapped(seed, words[i]);
-                        (hashed);
-                        expansion = shifted | expansion;
-                    }
-                    uint256 ct = ctpop(expansion);
-                    if (ct > bestCt) {
-                        bestCt = ct;
-                        bestSeed = uint8(seed);
-                        bestExpansion = expansion;
-                    }
-                    // perfect expansion.
-                    if (ct == words.length) {
-                        break;
-                    }
-                }
-            }
-            remaining = new bytes32[](words.length - ctpop(bestExpansion));
-            uint256 usedExpansion = 0;
-            uint256 j = 0;
-            for (uint256 i = 0; i < words.length; i++) {
-                (uint256 shifted, uint256 hashed) = wordBitmapped(bestSeed, words[i]);
-                (hashed);
-                if ((shifted & usedExpansion) == 0) {
-                    usedExpansion = shifted | usedExpansion;
-                } else {
-                    remaining[j] = words[i];
-                    j++;
-                }
-            }
-        }
-    }
-
-    function lookupIndexMetaExpander(bytes memory meta, bytes32 word)
-        internal
-        pure
-        returns (bool exists, uint256 index)
-    {
-        unchecked {
-            uint256 dataStart;
-            uint256 cursor;
-            uint256 end;
-            assembly ("memory-safe") {
-                // Read depth from first meta byte.
-                cursor := add(meta, 1)
-                let depth := and(mload(cursor), 0xFF)
-                // 33 bytes per depth
-                end := add(cursor, mul(depth, 0x21))
-                dataStart := add(end, 6)
-            }
-            uint256 cumulativeCt = 0;
-            while (cursor < end) {
-                uint256 seed;
-                uint256 expansion;
-                assembly ("memory-safe") {
-                    cursor := add(cursor, 1)
-                    seed := and(mload(cursor), 0xFF)
-                    cursor := add(cursor, 0x20)
-                    expansion := mload(cursor)
-                }
-
-                (uint256 shifted, uint256 hashed) = wordBitmapped(seed, word);
-                uint256 pos = ctpop(expansion & (shifted - 1)) + cumulativeCt;
-                uint256 wordFingerprint = hashed & FINGERPRINT_MASK;
-                uint256 posData;
-                assembly ("memory-safe") {
-                    posData := mload(add(dataStart, mul(pos, 6)))
-                }
-                // Match
-                if (wordFingerprint == posData & FINGERPRINT_MASK) {
-                    return (true, (posData >> 0x20) & 0xFFFF);
-                } else {
-                    cursor += 0x21;
-                    cumulativeCt += ctpop(expansion);
-                }
-            }
-            return (false, 0);
-        }
-    }
-
-    function buildMetaExpander(bytes32[] memory words, uint8 maxDepth) internal pure returns (bytes memory meta) {
-        unchecked {
-            uint8[] memory seeds = new uint8[](maxDepth);
-            uint256[] memory expansions = new uint256[](maxDepth);
-            uint256 i = 0;
-            bytes32[] memory ogWords = words;
-            while (words.length > 0) {
-                uint8 seed;
-                uint256 expansion;
-                (seed, expansion, words) = findBestExpander(words);
-                seeds[i] = seed;
-                expansions[i] = expansion;
-                i++;
-            }
-            // 1 = depth
-            // 0x21 per depth = expansion + seed
-            // 6 per word = 4 byte fingerprint + 2 byte opcode
-            uint256 metaLength = 1 + i * 0x21 + ogWords.length * 6;
-            meta = new bytes(metaLength);
-            assembly ("memory-safe") {
-                mstore8(add(meta, 0x20), i)
-            }
-            for (uint256 j = 0; j < i; j++) {
-                uint8 seed = seeds[j];
-                uint256 expansion = expansions[j];
-                assembly ("memory-safe") {
-                    mstore8(add(meta, add(0x21, j)), seed)
-                    mstore(add(add(meta, 1), add(add(0x20, i), mul(0x20, j))), expansion)
-                }
-            }
-
-            uint256 dataStart;
-            assembly ("memory-safe") {
-                dataStart := add(add(meta, 7), mul(0x21, i))
-            }
-            for (uint256 k = 0; k < ogWords.length; k++) {
-                uint256 s = 0;
-                bool didCollide = true;
-                uint256 cumulativePos = 0;
-                while (didCollide) {
-                    uint8 seed = seeds[s];
-                    uint256 expansion = expansions[s];
-                    (uint256 shifted, uint256 hashed) = wordBitmapped(seed, ogWords[k]);
-                    uint256 wordFingerprint = hashed & FINGERPRINT_MASK;
-                    uint256 toWrite = wordFingerprint | (k << 32);
-
-                    uint256 pos = ctpop(expansion & (shifted - 1)) + cumulativePos;
-
-                    uint256 posFingerprint;
-                    uint256 writeAt;
-                    assembly ("memory-safe") {
-                        writeAt := add(dataStart, mul(pos, 6))
-                        posFingerprint := and(mload(writeAt), 0xFFFFFFFF)
-                    }
-
-                    if (posFingerprint == 0) {
-                        assembly ("memory-safe") {
-                            mstore(writeAt, or(and(mload(writeAt), not(0xFFFFFFFFFFFF)), toWrite))
-                        }
-                        didCollide = false;
-                    } else if (posFingerprint == wordFingerprint) {
-                        revert DuplicateFingerprint();
-                    }
-                    s++;
-                    cumulativePos = cumulativePos + ctpop(expansion);
-                }
-            }
-        }
-    }
 
     // function buildMeta(bytes32[] memory words, uint256 startSeed, uint256 endSeed)
     //     internal

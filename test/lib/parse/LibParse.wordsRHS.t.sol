@@ -21,7 +21,7 @@ contract LibParseNamedRHSTest is Test {
         words[2] = bytes32("c");
         words[3] = bytes32("d");
         words[4] = bytes32("e");
-        meta = LibParse.buildMetaExpander(words, 2);
+        meta = LibParseMeta.buildMetaExpander(words, 2);
     }
 
     /// The simplest RHS is a single word.

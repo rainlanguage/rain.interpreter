@@ -3,18 +3,18 @@ pragma solidity ^0.8.18;
 
 import "forge-std/Test.sol";
 
-import "src/lib/parse/LibParse.sol";
+import "src/lib/parse/LibCtPop.sol";
 
-/// @title LibParseCTPOPTest
+/// @title LibCtPopTest
 /// CTPOP (count population) is a function that counts the number of bits set in
 /// a `uint256`. The reference implementations are taken directly from Wikipedia.
 /// https://en.wikipedia.org/wiki/Hamming_weight
-contract LibParseCTPOPTest is Test {
+contract LibCtPopTest is Test {
     /// We should be able to count the number of bits set when we simply set a
     /// sequence of bits from the low bit to some mid bit.
     function testCTPOPUnshuffled(uint8 n) external {
         uint256 x = (1 << n) - 1;
-        uint256 ct = LibParse.ctpop(x);
+        uint256 ct = LibCtPop.ctpop(x);
         assertEq(n, ct);
     }
 
@@ -35,7 +35,7 @@ contract LibParseCTPOPTest is Test {
             y = y | (bit << (i - 1));
         }
 
-        uint256 ct = LibParse.ctpop(y);
+        uint256 ct = LibCtPop.ctpop(y);
         assertEq(n, ct);
     }
 }

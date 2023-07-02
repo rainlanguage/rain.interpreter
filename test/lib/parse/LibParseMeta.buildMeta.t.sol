@@ -3,9 +3,10 @@ pragma solidity ^0.8.18;
 
 import "forge-std/Test.sol";
 
-import "src/lib/parse/LibParse.sol";
+import "src/lib/parse/LibParseMeta.sol";
+import "test/lib/parse/LibBloom.sol";
 
-contract LibParseBuildMetaTest is Test {
+contract LibParseMetaBuildMetaTest is Test {
     // function testBuildMeta0() external view {
     //     bytes32[] memory words = new bytes32[](2);
     //     words[0] = bytes32("a");
@@ -39,40 +40,31 @@ contract LibParseBuildMetaTest is Test {
     //     console2.logBytes(meta);
     // }
 
-    function assumeNoDupes(bytes32[] memory words) internal pure {
-        uint256 bloom;
-        for (uint256 i = 0; i < words.length; i++) {
-            uint256 shifted = 1 << (uint256(words[i]) & 0xFF);
-            vm.assume(bloom & shifted == 0);
-            bloom |= shifted;
-        }
-    }
-
     /// This is super loose from limited empirical testing.
     function expanderDepth(uint256 n) internal pure returns (uint8) {
         return uint8(n / type(uint256).max + 2);
     }
 
     function testBuildMetaExpander(bytes32[] memory words) external view {
-        assumeNoDupes(words);
-        bytes memory meta = LibParse.buildMetaExpander(words, expanderDepth(words.length));
+        vm.assume(!LibBloom.bloomFindsDupes(words));
+        bytes memory meta = LibParseMeta.buildMetaExpander(words, expanderDepth(words.length));
         // console2.logBytes(meta);
     }
 
     function testRoundMetaExpander(bytes32[] memory words, uint8 j, bytes32 notFound) external {
         vm.assume(words.length > 0);
-        assumeNoDupes(words);
+        vm.assume(!LibBloom.bloomFindsDupes(words));
         for (uint256 i = 0; i < words.length; i++) {
             vm.assume(words[i] != notFound);
         }
         j = uint8(bound(j, uint8(0), uint8(words.length) - 1));
 
-        bytes memory meta = LibParse.buildMetaExpander(words, expanderDepth(words.length));
-        (bool exists, uint256 k) = LibParse.lookupIndexMetaExpander(meta, words[j]);
+        bytes memory meta = LibParseMeta.buildMetaExpander(words, expanderDepth(words.length));
+        (bool exists, uint256 k) = LibParseMeta.lookupIndexMetaExpander(meta, words[j]);
         assertTrue(exists);
         assertEq(j, k);
 
-        (bool notExists, uint256 l) = LibParse.lookupIndexMetaExpander(meta, notFound);
+        (bool notExists, uint256 l) = LibParseMeta.lookupIndexMetaExpander(meta, notFound);
         assertTrue(!notExists);
         assertEq(0, l);
     }

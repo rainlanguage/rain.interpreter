@@ -34,29 +34,4 @@ contract LibParseEmptyGasTest is Test {
     function testParseGasEmpty04() external pure {
         LibParse.parse(":;:;:;:;", "");
     }
-
-    /// Test parsing ":;:;:;:;:;" (10 chars) an empty expression.
-    function testParseGasEmpty05() external pure {
-        LibParse.parse(":;:;:;:;:;", "");
-    }
-
-    /// Test parsing ":;:;:;:;:;:;" (12 chars) an empty expression.
-    function testParseGasEmpty06() external pure {
-        LibParse.parse(":;:;:;:;:;:;", "");
-    }
-
-    /// Test parsing ":;:;:;:;:;:;:;" (14 chars) an empty expression.
-    function testParseGasEmpty07() external pure {
-        LibParse.parse(":;:;:;:;:;:;:;", "");
-    }
-
-    /// Test parsing ":;:;:;:;:;:;:;:;" (16 chars) an empty expression.
-    function testParseGasEmpty08() external pure {
-        LibParse.parse(":;:;:;:;:;:;:;:;", "");
-    }
-
-    /// Test parsing ":;:;:;:;:;:;:;:;:;" (18 chars) an empty expression.
-    function testParseGasEmpty09() external pure {
-        LibParse.parse(":;:;:;:;:;:;:;:;:;", "");
-    }
 }

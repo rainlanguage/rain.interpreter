@@ -36,4 +36,35 @@ contract LibParseEmptyTest is Test {
         assertEq(sources2[1].length, 0);
         assertEq(constants2.length, 0);
     }
+
+    /// Check three empty expressions. Should not revert and return length 3
+    /// sources and constants.
+    function testParseEmpty03() external {
+        (bytes[] memory sources3, uint256[] memory constants3) = LibParse.parse(":;:;:;", "");
+        assertEq(sources3.length, 3);
+        assertEq(sources3[0].length, 0);
+        assertEq(sources3[1].length, 0);
+        assertEq(sources3[2].length, 0);
+        assertEq(constants3.length, 0);
+    }
+
+    /// Check four empty expressions. Should not revert and return length 4
+    /// sources and constants.
+    function testParseEmpty04() external {
+        (bytes[] memory sources4, uint256[] memory constants4) = LibParse.parse(":;:;:;:;", "");
+        assertEq(sources4.length, 4);
+        assertEq(sources4[0].length, 0);
+        assertEq(sources4[1].length, 0);
+        assertEq(sources4[2].length, 0);
+        assertEq(sources4[3].length, 0);
+        assertEq(constants4.length, 0);
+    }
+
+    /// Five sources is a MaxSources error.
+    function testParseEmptyError05() external {
+        vm.expectRevert(abi.encodeWithSelector(MaxSources.selector));
+        (bytes[] memory sources5, uint256[] memory constants5) = LibParse.parse(":;:;:;:;:;", "");
+        (sources5);
+        (constants5);
+    }
 }
