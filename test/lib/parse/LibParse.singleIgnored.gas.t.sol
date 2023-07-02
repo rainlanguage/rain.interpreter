@@ -15,48 +15,48 @@ contract LibParseSingleLHSIgnoredGasTest is Test {
         LibParse.parse("_:;", "");
     }
 
-    /// Test parsing "__" (2 chars) an ignored LHS item.
+    /// Test parsing "_a" (2 chars) an ignored LHS item.
     function testParseGasSingleLHSIgnored01() external pure {
-        LibParse.parse("__:;", "");
+        LibParse.parse("_a:;", "");
     }
 
-    /// Test parsing "___" (3 chars) an ignored LHS item.
+    /// Test parsing "_ab" (3 chars) an ignored LHS item.
     function testParseGasSingleLHSIgnored02() external pure {
-        LibParse.parse("___:;", "");
+        LibParse.parse("_ab:;", "");
     }
 
-    /// Test parsing "____" (4 chars) an ignored LHS item.
+    /// Test parsing "_abc" (4 chars) an ignored LHS item.
     function testParseGasSingleLHSIgnored03() external pure {
-        LibParse.parse("____:;", "");
+        LibParse.parse("_abc:;", "");
     }
 
-    /// Test parsing "_____" (5 chars) an ignored LHS item.
+    /// Test parsing "_abcd" (5 chars) an ignored LHS item.
     function testParseGasSingleLHSIgnored04() external pure {
-        LibParse.parse("_____:;", "");
+        LibParse.parse("_abcd:;", "");
     }
 
-    /// Test parsing "______" (6 chars) an ignored LHS item.
+    /// Test parsing "_abcde" (6 chars) an ignored LHS item.
     function testParseGasSingleLHSIgnored05() external pure {
-        LibParse.parse("______:;", "");
+        LibParse.parse("_abcde:;", "");
     }
 
-    /// Test parsing "_______" (7 chars) an ignored LHS item.
+    /// Test parsing "_abcdef" (7 chars) an ignored LHS item.
     function testParseGasSingleLHSIgnored06() external pure {
-        LibParse.parse("_______:;", "");
+        LibParse.parse("_abcdef:;", "");
     }
 
-    /// Test parsing "________" (8 chars) an ignored LHS item.
+    /// Test parsing "_abcdefg" (8 chars) an ignored LHS item.
     function testParseGasSingleLHSIgnored07() external pure {
-        LibParse.parse("________:;", "");
+        LibParse.parse("_abcdefg:;", "");
     }
 
-    /// Test parsing "_________" (9 chars) an ignored LHS item.
+    /// Test parsing "_abcdefgh" (9 chars) an ignored LHS item.
     function testParseGasSingleLHSIgnored08() external pure {
-        LibParse.parse("_________:;", "");
+        LibParse.parse("_abcdefgh:;", "");
     }
 
-    /// Test parsing "__________" (10 chars) an ignored LHS item.
+    /// Test parsing "_abcdefghi" (10 chars) an ignored LHS item.
     function testParseGasSingleLHSIgnored09() external pure {
-        LibParse.parse("__________:;", "");
+        LibParse.parse("_abcdefghi:;", "");
     }
 }
