@@ -26,7 +26,7 @@ contract LibParseNamedLHSTest is Test {
 
     /// Exceeding the maximum length of a word should revert.
     function testParseNamedGas33() external {
-        vm.expectRevert(abi.encodeWithSelector(WordTooLong.selector, 0));
+        vm.expectRevert(abi.encodeWithSelector(WordSize.selector, 0));
         LibParse.parse("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;", "");
     }
 }

@@ -30,7 +30,7 @@ contract LibParseIgnoredLHSTest is Test {
 
     /// Test the case of a word that is too long and should revert.
     function testParseIgnoredWordTooLong() external {
-        vm.expectRevert(abi.encodeWithSelector(WordTooLong.selector, 0));
+        vm.expectRevert(abi.encodeWithSelector(WordSize.selector, 0));
         LibParse.parse("_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;", "");
     }
 }

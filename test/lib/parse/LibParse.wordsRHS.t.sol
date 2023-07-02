@@ -71,150 +71,15 @@ contract LibParseNamedRHSTest is Test {
     }
 
     /// Two full lines, each with a single LHS and RHS.
-    function testParseTwoFullLinesSingleRHSEach() external view {
+    function testParseTwoFullLinesSingleRHSEach() external {
         string memory s = "_:a();_:b();";
         (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
         (constants);
-        console2.log(s);
-        console2.logBytes(sources[0]);
-        console2.logBytes(sources[1]);
+        assertEq(sources.length, 2);
+        assertEq(sources[0].length, 4);
+        assertEq(sources[1].length, 4);
+        assertEq(constants.length, 0);
+        assertEq(sources[0], hex"00000000");
+        assertEq(sources[1], hex"00010000");
     }
-
-
-    // function testParseNamedGas00() external pure {
-    //     LibParse.parse("a:;");
-    // }
-
-    // function testParseNamedGas01() external pure {
-    //     LibParse.parse("a:;");
-    // }
-
-    // function testParseNamedGas02() external pure {
-    //     LibParse.parse("aa:;");
-    // }
-
-    // function testParseNamedGas03() external pure {
-    //     LibParse.parse("aaa:;");
-    // }
-
-    // function testParseNamedGas04() external pure {
-    //     LibParse.parse("aaaa:;");
-    // }
-
-    // function testParseNamedGas05() external pure {
-    //     LibParse.parse("aaaaa:;");
-    // }
-
-    // function testParseNamedGas06() external pure {
-    //     LibParse.parse("aaaaaa:;");
-    // }
-
-    // function testParseNamedGas07() external pure {
-    //     LibParse.parse("aaaaaaa:;");
-    // }
-
-    // function testParseNamedGas08() external pure {
-    //     LibParse.parse("aaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas09() external pure {
-    //     LibParse.parse("aaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas10() external pure {
-    //     LibParse.parse("aaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas11() external pure {
-    //     LibParse.parse("aaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas12() external pure {
-    //     LibParse.parse("aaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas13() external pure {
-    //     LibParse.parse("aaaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas14() external pure {
-    //     LibParse.parse("aaaaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas15() external pure {
-    //     LibParse.parse("aaaaaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas16() external pure {
-    //     LibParse.parse("aaaaaaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas17() external pure {
-    //     LibParse.parse("aaaaaaaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas18() external pure {
-    //     LibParse.parse("aaaaaaaaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas19() external pure {
-    //     LibParse.parse("aaaaaaaaaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas20() external pure {
-    //     LibParse.parse("aaaaaaaaaaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas21() external pure {
-    //     LibParse.parse("aaaaaaaaaaaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas22() external pure {
-    //     LibParse.parse("aaaaaaaaaaaaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas23() external pure {
-    //     LibParse.parse("aaaaaaaaaaaaaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas24() external pure {
-    //     LibParse.parse("aaaaaaaaaaaaaaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas25() external pure {
-    //     LibParse.parse("aaaaaaaaaaaaaaaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas26() external pure {
-    //     LibParse.parse("aaaaaaaaaaaaaaaaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas27() external pure {
-    //     LibParse.parse("aaaaaaaaaaaaaaaaaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas28() external pure {
-    //     LibParse.parse("aaaaaaaaaaaaaaaaaaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas29() external pure {
-    //     LibParse.parse("aaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas30() external pure {
-    //     LibParse.parse("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas31() external pure {
-    //     LibParse.parse("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas32() external pure {
-    //     LibParse.parse("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;");
-    // }
-
-    // function testParseNamedGas33() external {
-    //     vm.expectRevert(abi.encodeWithSelector(WordTooLong.selector, 0));
-    //     LibParse.parse("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;");
-    // }
 }
