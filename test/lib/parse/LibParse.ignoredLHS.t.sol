@@ -28,9 +28,12 @@ contract LibParseIgnoredLHSTest is Test {
         assertEq(constants1.length, 0);
     }
 
-    /// Test the case of a word that is too long and should revert.
+    /// Ignored words have no size limit. We can parse a 32 char ignored word.
+    /// Normally words are limited to 31 chars.
     function testParseIgnoredWordTooLong() external {
-        vm.expectRevert(abi.encodeWithSelector(WordSize.selector, 0));
-        LibParse.parse("_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;", "");
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse("_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;", "");
+        assertEq(sources.length, 1);
+        assertEq(sources[0].length, 0);
+        assertEq(constants.length, 0);
     }
 }

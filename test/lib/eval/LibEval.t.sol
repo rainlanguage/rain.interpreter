@@ -302,7 +302,8 @@ contract LibEvalTest is Test {
         (stackTop);
     }
 
-    function testEval(bytes[] memory sources, uint256[] memory constants, SourceIndex sourceIndex) public {
+    function testEval(bytes[] memory sources, uint256[] memory constants, uint8 sourceIndexInput) public {
+        SourceIndex sourceIndex = SourceIndex.wrap(sourceIndexInput);
         vm.assume(SourceIndex.unwrap(sourceIndex) < sources.length);
 
         bytes memory pointers = opcodeFunctionPointers();

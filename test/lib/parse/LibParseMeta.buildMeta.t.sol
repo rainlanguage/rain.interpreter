@@ -48,7 +48,7 @@ contract LibParseMetaBuildMetaTest is Test {
     function testBuildMetaExpander(bytes32[] memory words) external view {
         vm.assume(!LibBloom.bloomFindsDupes(words));
         bytes memory meta = LibParseMeta.buildMetaExpander(words, expanderDepth(words.length));
-        // console2.logBytes(meta);
+        (meta);
     }
 
     function testRoundMetaExpander(bytes32[] memory words, uint8 j, bytes32 notFound) external {
@@ -68,4 +68,23 @@ contract LibParseMetaBuildMetaTest is Test {
         assertTrue(!notExists);
         assertEq(0, l);
     }
+
+    function testRoundMetaExpanderDeeper(bytes32[] memory words, uint8 j, bytes32 notFound) external {
+        vm.assume(words.length > 50);
+        vm.assume(!LibBloom.bloomFindsDupes(words));
+        for (uint256 i = 0; i < words.length; i++) {
+            vm.assume(words[i] != notFound);
+        }
+        j = uint8(bound(j, uint8(0), uint8(words.length) - 1));
+
+        bytes memory meta = LibParseMeta.buildMetaExpander(words, expanderDepth(words.length));
+        (bool exists, uint256 k) = LibParseMeta.lookupIndexMetaExpander(meta, words[j]);
+        assertTrue(exists);
+        assertEq(j, k);
+
+        (bool notExists, uint256 l) = LibParseMeta.lookupIndexMetaExpander(meta, notFound);
+        assertTrue(!notExists);
+        assertEq(0, l);
+    }
+
 }

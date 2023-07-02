@@ -5,8 +5,6 @@ import "sol.lib.memory/LibPointer.sol";
 import "./LibCtPop.sol";
 import "./LibParseMeta.sol";
 
-import "forge-std/console2.sol";
-
 /// The expression does not finish with a semicolon (EOF).
 error MissingFinalSemi(uint256 offset);
 
@@ -20,7 +18,7 @@ error UnexpectedRHSChar(uint256 offset, string char);
 error UnexpectedRightParen(uint256 offset);
 
 /// Enountered a word that is longer than 32 bytes.
-error WordSize(bytes32 wordStart);
+error WordSize(string word);
 
 /// Parsed a word that is not in the meta.
 error UnknownWord(bytes32 word);
@@ -83,11 +81,11 @@ uint128 constant CMASK_RHS_WORD_TAIL = CMASK_IDENTIFIER_TAIL;
 /// @dev NOT lower alphanumeric kebab
 uint128 constant CMASK_NOT_IDENTIFIER_TAIL = 0xf0000001fffffffffc00dfffffffffff;
 
-/// @dev stack item delimiter is space
-uint128 constant CMASK_LHS_STACK_DELIMITER = 0x0100000000;
-
 /// @dev whitespace is \n \r \t space
 uint128 constant CMASK_WHITESPACE = 0x100002600;
+
+/// @dev stack item delimiter is whitespace
+uint128 constant CMASK_LHS_STACK_DELIMITER = CMASK_WHITESPACE;
 
 uint256 constant NOT_LOW_16_BIT_MASK = ~uint256(0xFFFF);
 uint256 constant ACTIVE_SOURCE_MASK = NOT_LOW_16_BIT_MASK;
@@ -286,7 +284,7 @@ library LibParse {
             cursor := add(cursor, i)
         }
         if (i == 0x20) {
-            revert WordSize(word);
+            revert WordSize(string(abi.encodePacked(word)));
         }
         return (cursor, word);
     }
@@ -421,7 +419,8 @@ library LibParse {
                 }
                 if (char & CMASK_EOS == 0) {
                     (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
-                    revert UnexpectedRHSChar(offset, charString);
+                    (charString);
+                    revert MissingFinalSemi(offset);
                 }
             }
             return (state.buildSources(), state.buildConstants());

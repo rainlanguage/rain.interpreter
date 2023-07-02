@@ -202,70 +202,80 @@ contract LibParseSingleRHSNamedGasTest is Test {
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaa" (22 chars) as the RHS.
     function testParseGasRHS21() external view {
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaa();"), meta);
+        (bytes[] memory sources, uint256[] memory constants) =
+            LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaa();"), meta);
         (sources);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaa" (23 chars) as the RHS.
     function testParseGasRHS22() external view {
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaaa();"), meta);
+        (bytes[] memory sources, uint256[] memory constants) =
+            LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaaa();"), meta);
         (sources);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaa" (24 chars) as the RHS.
     function testParseGasRHS23() external view {
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaaaa();"), meta);
+        (bytes[] memory sources, uint256[] memory constants) =
+            LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaaaa();"), meta);
         (sources);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaaa" (25 chars) as the RHS.
     function testParseGasRHS24() external view {
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaaaaa();"), meta);
+        (bytes[] memory sources, uint256[] memory constants) =
+            LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaaaaa();"), meta);
         (sources);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaaaa" (26 chars) as the RHS.
     function testParseGasRHS25() external view {
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaaaaaa();"), meta);
+        (bytes[] memory sources, uint256[] memory constants) =
+            LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaaaaaa();"), meta);
         (sources);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaaaaa" (27 chars) as the RHS.
     function testParseGasRHS26() external view {
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaaaaaaa();"), meta);
+        (bytes[] memory sources, uint256[] memory constants) =
+            LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaaaaaaa();"), meta);
         (sources);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaaaaaa" (28 chars) as the RHS.
     function testParseGasRHS27() external view {
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaaaaaaaa();"), meta);
+        (bytes[] memory sources, uint256[] memory constants) =
+            LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaaaaaaaa();"), meta);
         (sources);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa" (29 chars) as the RHS.
     function testParseGasRHS28() external view {
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaaaaaaaaa();"), meta);
+        (bytes[] memory sources, uint256[] memory constants) =
+            LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaaaaaaaaa();"), meta);
         (sources);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" (30 chars) as the RHS.
     function testParseGasRHS29() external view {
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa();"), meta);
+        (bytes[] memory sources, uint256[] memory constants) =
+            LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa();"), meta);
         (sources);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" (31 chars) as the RHS.
     function testParseGasRHS30() external view {
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa();"), meta);
+        (bytes[] memory sources, uint256[] memory constants) =
+            LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa();"), meta);
         (sources);
         (constants);
     }

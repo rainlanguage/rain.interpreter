@@ -9,7 +9,6 @@ import "src/lib/parse/LibParse.sol";
 /// Parse a single named LHS for many different sized LHS names just to include
 /// the gas cost of the parsing in the gas snapshot.
 contract LibParseSingleLHSNamedGasTest is Test {
-
     /// Test parsing "a" (1 char) a named LHS item.
     function testParseGasSingleLHSNamed00() external pure {
         LibParse.parse("a:;", "");
@@ -163,15 +162,5 @@ contract LibParseSingleLHSNamedGasTest is Test {
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" (31 chars) a named LHS item.
     function testParseGasSingleLHSNamed30() external pure {
         LibParse.parse("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;", "");
-    }
-
-    /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" (32 chars) a named LHS item.
-    function testParseGasSingleLHSNamed31() external pure {
-        LibParse.parse("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;", "");
-    }
-
-    /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" (33 chars) a named LHS item.
-    function testParseGasSingleLHSNamed32() external pure {
-        LibParse.parse("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;", "");
     }
 }

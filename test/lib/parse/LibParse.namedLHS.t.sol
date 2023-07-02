@@ -24,9 +24,22 @@ contract LibParseNamedLHSTest is Test {
         assertEq(constants1.length, 0);
     }
 
-    /// Exceeding the maximum length of a word should revert.
-    function testParseNamedGas33() external {
-        vm.expectRevert(abi.encodeWithSelector(WordSize.selector, 0));
+    /// Exceeding the maximum length of a word should revert. Testing a 32 char
+    /// is right at the limit.
+    function testParseNamedError32() external {
+        // Only the first 32 chars are visible in the error.
+        vm.expectRevert(abi.encodeWithSelector(WordSize.selector, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
+        // 32 chars is too long.
+        LibParse.parse("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;", "");
+    }
+
+    /// Exceeding the maximum length of a word should revert. Testing a 33 char
+    /// word shows the difference between the actual source and the error.
+    /// (The latter is truncated).
+    function testParseNamedError33() external {
+        // Only the first 32 chars are visible in the error.
+        vm.expectRevert(abi.encodeWithSelector(WordSize.selector, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
+        // 33 chars is too long.
         LibParse.parse("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;", "");
     }
 }

@@ -6,8 +6,13 @@ libs = ['lib']
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
 
 solc = "0.8.18"
+
+# Try to make sure the optimizer doesn't touch the output in a way that can break
+# source maps for debugging.
+via_ir = false
 optimizer = false
-optimizer_runs = 100000
+optimizer_runs = 0
+optimizer_steps = 0
 
 [fuzz]
 runs = 1024

@@ -9,7 +9,6 @@ import "src/lib/parse/LibParse.sol";
 /// Parse a single ignored LHS for many different sized LHS names just to include
 /// the gas cost of the parsing in the gas snapshot.
 contract LibParseSingleLHSIgnoredGasTest is Test {
-
     /// Test parsing "_" (1 char) an ignored LHS item.
     function testParseGasSingleLHSIgnored00() external pure {
         LibParse.parse("_:;", "");

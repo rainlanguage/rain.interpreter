@@ -9,7 +9,6 @@ import "src/lib/parse/LibParse.sol";
 /// Exercise a few different sized inputs-only expressions to get a gas
 /// snapshot of the parsing cost.
 contract LibParseInputsOnlyGasTest is Test {
-
     /// Test parsing "_:;" (3 chars) an inputs-only expression.
     function testParseGasInputsOnly00() external pure {
         LibParse.parse("_:;", "");

@@ -9,7 +9,6 @@ import "src/lib/parse/LibParse.sol";
 /// Exercise a few different sized empty expressions to get a gas snapshot of the
 /// parsing cost.
 contract LibParseEmptyGasTest is Test {
-
     /// Test parsing "" (0 chars) an empty expression.
     function testParseGasEmpty00() external pure {
         LibParse.parse("", "");

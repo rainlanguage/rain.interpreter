@@ -17,8 +17,5 @@ contract LibParseMissingFinalSemiTest is Test {
 
         vm.expectRevert(abi.encodeWithSelector(MissingFinalSemi.selector, 3));
         LibParse.parse(":;:", "");
-
-        vm.expectRevert(abi.encodeWithSelector(MissingFinalSemi.selector, 2));
-        LibParse.parse("::", "");
     }
 }

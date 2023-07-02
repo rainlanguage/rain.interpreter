@@ -60,11 +60,50 @@ contract LibParseEmptyTest is Test {
         assertEq(constants4.length, 0);
     }
 
-    /// Five sources is a MaxSources error.
-    function testParseEmptyError05() external {
+    /// Check eight empty expressions. Should not revert and return length 8
+    /// sources and constants.
+    function testParseEmpty08() external {
+        (bytes[] memory sources8, uint256[] memory constants8) = LibParse.parse(":;:;:;:;:;:;:;:;", "");
+        assertEq(sources8.length, 8);
+        assertEq(sources8[0].length, 0);
+        assertEq(sources8[1].length, 0);
+        assertEq(sources8[2].length, 0);
+        assertEq(sources8[3].length, 0);
+        assertEq(sources8[4].length, 0);
+        assertEq(sources8[5].length, 0);
+        assertEq(sources8[6].length, 0);
+        assertEq(sources8[7].length, 0);
+        assertEq(constants8.length, 0);
+    }
+
+    /// Check fifteen empty expressions. Should not revert and return length 15
+    /// sources and constants.
+    function testParseEmpty15() external {
+        (bytes[] memory sources15, uint256[] memory constants15) = LibParse.parse(":;:;:;:;:;:;:;:;:;:;:;:;:;:;:;", "");
+        assertEq(sources15.length, 15);
+        assertEq(sources15[0].length, 0);
+        assertEq(sources15[1].length, 0);
+        assertEq(sources15[2].length, 0);
+        assertEq(sources15[3].length, 0);
+        assertEq(sources15[4].length, 0);
+        assertEq(sources15[5].length, 0);
+        assertEq(sources15[6].length, 0);
+        assertEq(sources15[7].length, 0);
+        assertEq(sources15[8].length, 0);
+        assertEq(sources15[9].length, 0);
+        assertEq(sources15[10].length, 0);
+        assertEq(sources15[11].length, 0);
+        assertEq(sources15[12].length, 0);
+        assertEq(sources15[13].length, 0);
+        assertEq(sources15[14].length, 0);
+        assertEq(constants15.length, 0);
+    }
+
+    /// Check sixteen empty expressions. Should revert as one of the sources is
+    /// actually reserved to track the length of the sources in the internal
+    /// state of the parser.
+    function testParseEmptyError16() external {
         vm.expectRevert(abi.encodeWithSelector(MaxSources.selector));
-        (bytes[] memory sources5, uint256[] memory constants5) = LibParse.parse(":;:;:;:;:;", "");
-        (sources5);
-        (constants5);
+        LibParse.parse(":;:;:;:;:;:;:;:;:;:;:;:;:;:;:;:;", "");
     }
 }
