@@ -5,119 +5,81 @@ import "forge-std/Test.sol";
 
 import "src/lib/parse/LibParse.sol";
 
+/// @title LibParseNamedRHSTest
+/// Test that the parser can handle named RHS values.
 contract LibParseNamedRHSTest is Test {
-    function testParseSol01() external view {
-        string memory s = "_:a();";
-        bytes32[] memory words = new bytes32[](1);
-        words[0] = bytes32("a");
-        bytes memory meta = LibParse.buildMetaExpander(words, 2);
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parseSol(bytes(s), meta);
-        (constants);
-        console2.log(s);
-        console2.logBytes(sources[0]);
-    }
+    /// We build a shared meta for all the tests to simplify the implementation
+    /// of each. It also makes it easier to compare the expected bytes across
+    /// tests.
+    bytes internal meta;
 
-    function testParseSol02() external view {
-        string memory s = "_ _:a() b();";
-        bytes32[] memory words = new bytes32[](2);
-        words[0] = bytes32("a");
-        words[1] = bytes32("b");
-        bytes memory meta = LibParse.buildMetaExpander(words, 2);
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parseSol(bytes(s), meta);
-        (constants);
-        console2.log(s);
-        console2.logBytes(sources[0]);
-    }
-
-    function testParseSol03() external view {
-        string memory s = "_:a(b() c());";
-        bytes32[] memory words = new bytes32[](3);
-        words[0] = bytes32("a");
-        words[1] = bytes32("b");
-        words[2] = bytes32("c");
-        bytes memory meta = LibParse.buildMetaExpander(words, 2);
-        uint256 a = gasleft();
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parseSol(bytes(s), meta);
-        uint256 b = gasleft();
-        console.log("g", a - b);
-        (constants);
-        console2.log(s);
-        console2.logBytes(sources[0]);
-    }
-
-    function testParseSol04() external view {
-        string memory s = "_:a(b() c(d() e()));";
+    /// Constructor just builds the shared meta.
+    constructor() {
         bytes32[] memory words = new bytes32[](5);
         words[0] = bytes32("a");
         words[1] = bytes32("b");
         words[2] = bytes32("c");
         words[3] = bytes32("d");
         words[4] = bytes32("e");
-        bytes memory meta = LibParse.buildMetaExpander(words, 2);
-        uint256 a = gasleft();
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parseSol(bytes(s), meta);
-        uint256 b = gasleft();
-        console.log("g", a - b);
-        (constants);
-        // console2.log(s);
-        console2.logBytes(sources[0]);
+        meta = LibParse.buildMetaExpander(words, 2);
     }
 
-    function testParseNamedRHSSimple00() external view {
+    /// The simplest RHS is a single word.
+    function testParseSingleWord() external view {
         string memory s = "_:a();";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s));
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
         (constants);
         console2.log(s);
         console2.logBytes(sources[0]);
     }
 
-    function testParseNamedRHSSimple01() external view {
+    /// Two sequential words on the RHS.
+    function testParseTwoSequential() external view {
         string memory s = "_ _:a() b();";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s));
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
         (constants);
         console2.log(s);
         console2.logBytes(sources[0]);
     }
 
-    function testParseNamedRHSSimple02() external view {
+    /// Two words on the RHS, one nested as an input to the other.
+    function testParseTwoNested() external view {
         string memory s = "_:a(b());";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s));
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
         (constants);
         console2.log(s);
         console2.logBytes(sources[0]);
     }
 
-    function testParseNamedRHSSimple03() external view {
+    /// Three words on the RHS, two sequential nested as an input to the other.
+    function testParseTwoNestedAsThirdInput() external view {
+        string memory s = "_:a(b() c());";
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        (constants);
+        console2.log(s);
+        console2.logBytes(sources[0]);
+    }
+
+    /// Several words, mixing sequential and nested logic to some depth, but
+    /// still only one LHS in aggregate.
+    function testParseSingleLHSNestingAndSequential() external view {
+        string memory s = "_:a(b() c(d() e()));";
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        (constants);
+        console2.log(s);
+        console2.logBytes(sources[0]);
+    }
+
+    /// Two full lines, each with a single LHS and RHS.
+    function testParseTwoFullLinesSingleRHSEach() external view {
         string memory s = "_:a();_:b();";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s));
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
         (constants);
         console2.log(s);
         console2.logBytes(sources[0]);
         console2.logBytes(sources[1]);
     }
 
-    function testParseNamedRHSSimple04() external view {
-        string memory s = "_:a() a();";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s));
-        (constants);
-        console2.log(s);
-        console2.logBytes(sources[0]);
-    }
-    // function testParseNamedRHSSimple() external {
-    //     string[3] memory examples0 = ["_:a();", "_ _:a() b();", "foo bar: a() b();"];
-    //     for (uint256 i = 0; i < examples0.length; i++) {
-    //         (bytes[] memory sources0, uint256[] memory constants0) = LibParse.parse(bytes(examples0[i]));
-    //         assertEq(sources0.length, 1);
-    //         assertEq(sources0[0].length, 0);
-    //         assertEq(constants0.length, 0);
-    //     }
-
-    //     (bytes[] memory sources1, uint256[] memory constants1) = LibParse.parse("a:;b:;");
-    //     assertEq(sources1.length, 2);
-    //     assertEq(sources1[0].length, 0);
-    //     assertEq(sources1[1].length, 0);
-    //     assertEq(constants1.length, 0);
-    // }
 
     // function testParseNamedGas00() external pure {
     //     LibParse.parse("a:;");

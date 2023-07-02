@@ -5,13 +5,20 @@ import "forge-std/Test.sol";
 
 import "src/lib/parse/LibParse.sol";
 
+/// @title LibParseCTPOPTest
+/// CTPOP (count population) is a function that counts the number of bits set in
+/// a `uint256`. The reference implementations are taken directly from Wikipedia.
+/// https://en.wikipedia.org/wiki/Hamming_weight
 contract LibParseCTPOPTest is Test {
+    /// We should be able to count the number of bits set when we simply set a
+    /// sequence of bits from the low bit to some mid bit.
     function testCTPOPUnshuffled(uint8 n) external {
         uint256 x = (1 << n) - 1;
         uint256 ct = LibParse.ctpop(x);
         assertEq(n, ct);
     }
 
+    /// The distribution of bits in the underlying `uint256` should not matter.
     function testCTPOPShuffled(uint8 n, bytes32 rand) external {
         uint256 x = (1 << n) - 1;
         uint256 y = 0;

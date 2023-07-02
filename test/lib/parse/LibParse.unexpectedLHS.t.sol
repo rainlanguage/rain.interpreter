@@ -5,48 +5,58 @@ import "forge-std/Test.sol";
 
 import "src/lib/parse/LibParse.sol";
 
-contract LibParseTest is Test {
+/// @title LibParseUnexpectedLHSTest
+/// The parser should revert if it encounters an unexpected character on the LHS.
+contract LibParseUnexpectedLHSTest is Test {
+    /// Check the parser reverts if it encounters an unexpected EOL on the LHS.
     function testParseUnexpectedLHSEOL() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, ","));
-        LibParse.parse(",");
+        LibParse.parse(",", "");
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1, ","));
-        LibParse.parse(" ,");
+        LibParse.parse(" ,", "");
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1, ","));
-        LibParse.parse("_,");
+        LibParse.parse("_,", "");
     }
 
+    /// Check the parser reverts if it encounters an unexpected EOF on the LHS.
     function testParseUnexpectedLHSEOF() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, ";"));
-        LibParse.parse(";");
+        LibParse.parse(";", "");
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1, ";"));
-        LibParse.parse(" ;");
+        LibParse.parse(" ;", "");
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1, ";"));
-        LibParse.parse("_;");
+        LibParse.parse("_;", "");
     }
 
+    /// Check the parser reverts if it encounters an unexpected character as the
+    /// head of something on the LHS.
     function testParseUnexpectedLHSSingleChar(bytes1 a) external {
         vm.assume(
             1 << uint256(uint8(a)) & (CMASK_LHS_RHS_DELIMITER | CMASK_LHS_STACK_HEAD | CMASK_LHS_STACK_DELIMITER) == 0
         );
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, string(abi.encodePacked(a))));
-        LibParse.parse(bytes.concat(a, ":;"));
+        LibParse.parse(bytes.concat(a, ":;"), "");
     }
 
-    function testParseUnexpectedLHSIgnoredTail(bytes1 a) external {
+    /// Check the parser reverts if it encounters an unexpected character as the
+    /// first character of an anonymous identifier on the LHS.
+    function testParseUnexpectedLHSBadIgnoredTail(bytes1 a) external {
         vm.assume(
             1 << uint256(uint8(a)) & (CMASK_LHS_RHS_DELIMITER | CMASK_IDENTIFIER_TAIL | CMASK_LHS_STACK_DELIMITER) == 0
         );
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1, string(abi.encodePacked(a))));
-        LibParse.parse(bytes.concat("_", a, ":;"));
+        LibParse.parse(bytes.concat("_", a, ":;"), "");
     }
 
-    function testParseUnexpectedLHSBadTail(uint8 a, bytes memory b) external {
+    /// Check the parser reverts if it encounters an unexpected character as the
+    /// tail of a named identifier on the LHS.
+    function testParseUnexpectedLHSBadNamedTail(uint8 a, bytes memory b) external {
         // a-z
         a = uint8(bound(a, 0x61, 0x7A));
 
@@ -61,9 +71,6 @@ contract LibParseTest is Test {
         vm.assume(hasInvalidChar);
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, i + 1, string(abi.encodePacked(b[i]))));
-        LibParse.parse(bytes.concat(bytes1(a), b, ":;"));
-
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, i + 1, string(abi.encodePacked(b[i]))));
-        LibParse.parse(bytes.concat("_", b, ":;"));
+        LibParse.parse(bytes.concat(bytes1(a), b, ":;"), "");
     }
 }

@@ -5,7 +5,11 @@ import "forge-std/Test.sol";
 
 import "src/lib/parse/LibParse.sol";
 
-contract LibParseTest is Test {
+/// @title LibParseUnexpectedRHSTest
+/// The parser should revert if it encounters an unexpected character on the RHS.
+contract LibParseUnexpectedRHSTest is Test {
+    /// Check the parser reverts if it encounters an unexpected character as the
+    /// first character on the RHS.
     function testParseUnexpectedRHS(bytes1 unexpected) external {
         vm.assume(unexpected != bytes1("\t"));
         vm.assume(unexpected != bytes1("\n"));
@@ -17,6 +21,8 @@ contract LibParseTest is Test {
         string memory unexpectedString = string(abi.encodePacked(unexpected));
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 1, unexpectedString));
-        LibParse.parse(bytes.concat(":", unexpected, ";"));
+        // Meta can be empty because we should revert before we even try to
+        // lookup any words.
+        LibParse.parse(bytes.concat(":", unexpected, ";"), "");
     }
 }
