@@ -16,6 +16,9 @@ error UnexpectedLHSChar(uint256 offset, string char);
 /// Encountered an unexpected character on the RHS.
 error UnexpectedRHSChar(uint256 offset, string char);
 
+/// Encountered a right paren without a matching left paren.
+error UnexpectedRightParen(uint256 offset);
+
 /// Enountered a word that is longer than 32 bytes.
 error WordSize(bytes32 wordStart);
 
@@ -86,7 +89,6 @@ uint128 constant CMASK_LHS_STACK_DELIMITER = 0x0100000000;
 /// @dev whitespace is \n \r \t space
 uint128 constant CMASK_WHITESPACE = 0x100002600;
 
-
 uint256 constant NOT_LOW_16_BIT_MASK = ~uint256(0xFFFF);
 uint256 constant ACTIVE_SOURCE_MASK = NOT_LOW_16_BIT_MASK;
 
@@ -101,25 +103,34 @@ uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
 /// - bit 0: LHS/RHS => 0 = LHS, 1 = RHS
 /// - bit 1: yang/yin => 0 = yin, 1 = yang
 /// - bit 2: word end => 0 = not end, 1 = end
+/// @param stackIndex The current stack index. This is equal to the number of
+/// items on the LHS.
+/// @param stackNames A linked list of stack names. As the parser encounters
+/// named stack items it pushes them onto this linked list. The linked list is
+/// in FILO order, so the first item on the stack is the last item in the list.
+/// This makes it more efficient to reference more recent stack names on the RHS.
+/// @param activeSource The current source being built.
+/// - low 16 bits: bitwise offset into the source for the next word to be
+///   written. Starts at 0x20.
+/// - mid 16 bits: pointer to the previous active source. This is a linked list
+///   of sources that are built RTL and then reversed to LTR to eval.
+/// - high bits: 4 byte opcodes and operand pairs.
+/// @param sourcesBuilder A builder for the sources array. This is a 256 bit
+/// integer where each 16 bits is a literal memory pointer to a source.
+/// @param constantsBuilder A builder for the constants array.
 struct ParseState {
+    uint256 parenDepth;
     uint256 fsm;
     uint256 stackIndex;
     uint256 stackNames;
-    // low 16 bits = bitwise offset (starts at 0x20)
-    // mid 16 bits = LL pointer
-    // high bits = 4 byte ops
     uint256 activeSource;
     uint256 sourcesBuilder;
     uint256 constantsBuilder;
 }
 
-type Bitmap is uint256;
-
-error NoSeedFound();
-
 library LibParseState {
     function newState() internal pure returns (ParseState memory) {
-        return ParseState(FSM_LHS_MASK, 0, 0, EMPTY_ACTIVE_SOURCE, 0, 0);
+        return ParseState(0, FSM_LHS_MASK, 0, 0, EMPTY_ACTIVE_SOURCE, 0, 0);
     }
 
     function pushStackName(ParseState memory state, bytes32 word) internal pure {
@@ -202,7 +213,7 @@ library LibParseState {
                 mstore(0x40, and(add(cursor, 0x1f), not(0x1f)))
             }
             state.activeSource = 0x20;
-            state.sourcesBuilder = (offset + 0x10) << 0xf0 | source << offset | sourcesBuilder;
+            state.sourcesBuilder = (offset + 0x10) << 0xf0 | source << offset | (sourcesBuilder & ((1 << offset) - 1));
         }
     }
 
@@ -215,7 +226,7 @@ library LibParseState {
             // correctly, or the finalised offset is dangling. This implies that
             // we are building the overall sources array while still trying to
             // build one of the individual sources. This is a bug in the parser.
-            if (state.activeSource != 0x20) {
+            if (state.activeSource != EMPTY_ACTIVE_SOURCE) {
                 revert DanglingSource();
             }
 
@@ -223,7 +234,7 @@ library LibParseState {
             assembly ("memory-safe") {
                 cursor := mload(0x40)
                 sources := cursor
-                mstore(cursor, sub(div(offsetEnd, 0x10), 1))
+                mstore(cursor, div(offsetEnd, 0x10))
                 cursor := add(cursor, 0x20)
                 // Expect underflow on the break condition.
                 for { let offset := 0 } lt(offset, offsetEnd) {
@@ -253,12 +264,13 @@ library LibParse {
         pure
         returns (uint256 offset, string memory char)
     {
-        uint256 charCode;
         assembly ("memory-safe") {
             offset := sub(cursor, add(data, 1))
-            charCode := and(mload(cursor), 0xFF)
+            char := mload(0x40)
+            mstore(char, 1)
+            mstore8(add(char, 0x20), and(mload(cursor), 0xFF))
+            mstore(0x40, add(char, 0x21))
         }
-        char = string(abi.encodePacked(charCode));
     }
 
     function parseWord(uint256 cursor, uint256 mask) internal pure returns (uint256, bytes32) {
@@ -368,16 +380,26 @@ library LibParse {
                             state.pushWordToSource(meta, word);
 
                             state.fsm = FSM_YANG_MASK | FSM_WORD_END_MASK;
-                        } else if (state.fsm & FSM_WORD_END_MASK > 0) {
+                        }
+                        // If this is the end of a word we MUST start a paren.
+                        // @todo support operands and constants.
+                        else if (state.fsm & FSM_WORD_END_MASK > 0) {
                             if (char & CMASK_LEFT_PAREN == 0) {
                                 (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
                                 revert UnexpectedRHSChar(offset, charString);
                             }
                             state.fsm = 0;
+                            state.parenDepth++;
                             cursor++;
                         } else if (char & CMASK_RIGHT_PAREN > 0) {
                             // @todo input handling.
                             state.fsm = 0;
+                            if (state.parenDepth == 0) {
+                                (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
+                                (charString);
+                                revert UnexpectedRightParen(offset);
+                            }
+                            state.parenDepth--;
                             cursor++;
                         } else if (char & CMASK_WHITESPACE > 0) {
                             state.fsm = 0;
@@ -406,128 +428,3 @@ library LibParse {
         }
     }
 }
-
-// // The second char is not a word char so do nothing.
-// if iszero(and(shl(byte(0, word), 1), 0xffffffe0000000003ff200000000000)) { continue }
-
-// // inline the first 16 word chars for gas efficiency.
-// // It is usual for named stack items to be more than
-// // one char long, so we can do better than looping in
-// // terms of gas.
-// if and(shl(byte(0, word), 1), 0xffffffe0000000003ff200000000000) {
-//     if and(shl(byte(0x01, word), 1), 0xffffffe0000000003ff200000000000) {
-//         if and(shl(byte(0x02, word), 1), 0xffffffe0000000003ff200000000000) {
-//             if and(shl(byte(0x03, word), 1), 0xffffffe0000000003ff200000000000) {
-//                 if and(shl(byte(0x04, word), 1), 0xffffffe0000000003ff200000000000) {
-//                     if and(shl(byte(0x05, word), 1), 0xffffffe0000000003ff200000000000) {
-//                         if and(shl(byte(0x06, word), 1), 0xffffffe0000000003ff200000000000)
-//                         {
-//                             if and(
-//                                 shl(byte(0x07, word), 1), 0xffffffe0000000003ff200000000000
-//                             ) {
-//                                 if and(
-//                                     shl(byte(0x08, word), 1),
-//                                     0xffffffe0000000003ff200000000000
-//                                 ) {
-//                                     if and(
-//                                         shl(byte(0x09, word), 1),
-//                                         0xffffffe0000000003ff200000000000
-//                                     ) {
-//                                         if and(
-//                                             shl(byte(0x0A, word), 1),
-//                                             0xffffffe0000000003ff200000000000
-//                                         ) {
-//                                             if and(
-//                                                 shl(byte(0x0B, word), 1),
-//                                                 0xffffffe0000000003ff200000000000
-//                                             ) {
-//                                                 if and(
-//                                                     shl(byte(0x0C, word), 1),
-//                                                     0xffffffe0000000003ff200000000000
-//                                                 ) {
-//                                                     if and(
-//                                                         shl(byte(0x0D, word), 1),
-//                                                         0xffffffe0000000003ff200000000000
-//                                                     ) {
-//                                                         if and(
-//                                                             shl(byte(0x0E, word), 1),
-//                                                             0xffffffe0000000003ff200000000000
-//                                                         ) {
-//                                                             if and(
-//                                                                 shl(byte(0x0F, word), 1),
-//                                                                 0xffffffe0000000003ff200000000000
-//                                                             ) {
-//                                                                 // loop for the remainder for 16+ char words.
-//                                                                 let i := 0x10
-//                                                                 for {} and(
-//                                                                     lt(i, 0x20),
-//                                                                     iszero(
-//                                                                         iszero(
-//                                                                             and(
-//                                                                                 shl(
-//                                                                                     byte(
-//                                                                                         i,
-//                                                                                         word
-//                                                                                     ),
-//                                                                                     1
-//                                                                                 ),
-//                                                                                 0xffffffe0000000003ff200000000000
-//                                                                             )
-//                                                                         )
-//                                                                     )
-//                                                                 ) { i := add(i, 1) } {}
-//                                                                 if lt(i, 0x20) {
-//                                                                     cursor := add(cursor, i)
-//                                                                     continue
-//                                                                 }
-//                                                                 errorCode :=
-//                                                                     buildErrorCode(
-//                                                                         data, cursor, 4
-//                                                                     )
-//                                                                 break
-//                                                             }
-//                                                             cursor := add(cursor, 0x0F)
-//                                                             continue
-//                                                         }
-//                                                         cursor := add(cursor, 0x0E)
-//                                                         continue
-//                                                     }
-//                                                     cursor := add(cursor, 0x0D)
-//                                                     continue
-//                                                 }
-//                                                 cursor := add(cursor, 0x0C)
-//                                                 continue
-//                                             }
-//                                             cursor := add(cursor, 0x0B)
-//                                             continue
-//                                         }
-//                                         cursor := add(cursor, 0x0A)
-//                                         continue
-//                                     }
-//                                     cursor := add(cursor, 0x09)
-//                                     continue
-//                                 }
-//                                 cursor := add(cursor, 0x08)
-//                                 continue
-//                             }
-//                             cursor := add(cursor, 0x07)
-//                             continue
-//                         }
-//                         cursor := add(cursor, 0x06)
-//                         continue
-//                     }
-//                     cursor := add(cursor, 0x05)
-//                     continue
-//                 }
-//                 cursor := add(cursor, 0x04)
-//                 continue
-//             }
-//             cursor := add(cursor, 0x03)
-//             continue
-//         }
-//         cursor := add(cursor, 0x02)
-//         continue
-//     }
-//     cursor := add(cursor, 0x01)
-//     continue
-// }

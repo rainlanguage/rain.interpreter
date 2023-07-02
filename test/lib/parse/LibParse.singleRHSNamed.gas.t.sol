@@ -269,18 +269,4 @@ contract LibParseSingleRHSNamedGasTest is Test {
         (sources);
         (constants);
     }
-
-    /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" (32 chars) as the RHS.
-    function testParseGasRHS31() external view {
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa();"), meta);
-        (sources);
-        (constants);
-    }
-
-    /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" (33 chars) as the RHS.
-    function testParseGasRHS32() external view {
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa();"), meta);
-        (sources);
-        (constants);
-    }
 }

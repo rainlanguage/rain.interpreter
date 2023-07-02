@@ -11,12 +11,20 @@ contract LibParseUnexpectedRHSTest is Test {
     /// Check the parser reverts if it encounters an unexpected character as the
     /// first character on the RHS.
     function testParseUnexpectedRHS(bytes1 unexpected) external {
-        vm.assume(unexpected != bytes1("\t"));
-        vm.assume(unexpected != bytes1("\n"));
-        vm.assume(unexpected != bytes1("\r"));
-        vm.assume(unexpected != bytes1(" "));
-        vm.assume(unexpected != bytes1(","));
-        vm.assume(unexpected != bytes1(";"));
+        uint256 shifted = 1 << uint8(unexpected);
+        // Word heads are expected in this position.
+        vm.assume(shifted & CMASK_RHS_WORD_HEAD == 0);
+        // Right parens are NOT expected in this position but have a dedicated
+        // error message.
+        vm.assume(shifted & CMASK_RIGHT_PAREN == 0);
+        // Whitespace is expected in this position.
+        vm.assume(shifted & CMASK_WHITESPACE == 0);
+        // EOL is expected in this position. Note that the implied string for
+        // this test ":,;` is NOT valid.
+        vm.assume(shifted & CMASK_EOL == 0);
+        // EOS is also expected in this position. Note that the implied string
+        // for this test ":;;` is NOT valid.
+        vm.assume(shifted & CMASK_EOS == 0);
 
         string memory unexpectedString = string(abi.encodePacked(unexpected));
 

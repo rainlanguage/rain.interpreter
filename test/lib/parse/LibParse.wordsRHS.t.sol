@@ -62,12 +62,15 @@ contract LibParseNamedRHSTest is Test {
 
     /// Several words, mixing sequential and nested logic to some depth, but
     /// still only one LHS in aggregate.
-    function testParseSingleLHSNestingAndSequential() external view {
+    function testParseSingleLHSNestingAndSequential() external {
         string memory s = "_:a(b() c(d() e()));";
         (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
         (constants);
-        console2.log(s);
-        console2.logBytes(sources[0]);
+        assertEq(sources.length, 1);
+        assertEq(sources[0].length, 20);
+        assertEq(constants.length, 0);
+        /// Nested words compile RTL so that they execute LTR.
+        assertEq(sources[0], hex"0004000000030000000200000001000000000000");
     }
 
     /// Two full lines, each with a single LHS and RHS.
