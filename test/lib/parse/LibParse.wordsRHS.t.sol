@@ -25,39 +25,53 @@ contract LibParseNamedRHSTest is Test {
     }
 
     /// The simplest RHS is a single word.
-    function testParseSingleWord() external view {
+    function testParseSingleWord() external {
         string memory s = "_:a();";
         (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        (constants);
-        console2.log(s);
-        console2.logBytes(sources[0]);
+        assertEq(sources.length, 1);
+        // a
+        assertEq(sources[0], hex"00000000");
+        assertEq(constants.length, 0);
     }
 
     /// Two sequential words on the RHS.
-    function testParseTwoSequential() external view {
+    function testParseTwoSequential() external {
         string memory s = "_ _:a() b();";
         (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        (constants);
-        console2.log(s);
-        console2.logBytes(sources[0]);
+        assertEq(sources.length, 1);
+        // a b
+        assertEq(sources[0], hex"0000000000010000");
+        assertEq(constants.length, 0);
+    }
+
+    /// Two sequential words on the RHS, each with a single input.
+    function testParseTwoSequentialWithInputs() external {
+        string memory s = "_ _:a(b()) b(c());";
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        assertEq(sources.length, 1);
+        // b a c b
+        assertEq(sources[0], hex"00010000000000000002000000010000");
+        assertEq(constants.length, 0);
     }
 
     /// Two words on the RHS, one nested as an input to the other.
-    function testParseTwoNested() external view {
+    function testParseTwoNested() external {
         string memory s = "_:a(b());";
         (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        (constants);
-        console2.log(s);
-        console2.logBytes(sources[0]);
+        assertEq(sources.length, 1);
+        // b a
+        assertEq(sources[0], hex"0001000000000000");
+        assertEq(constants.length, 0);
     }
 
     /// Three words on the RHS, two sequential nested as an input to the other.
-    function testParseTwoNestedAsThirdInput() external view {
+    function testParseTwoNestedAsThirdInput() external {
         string memory s = "_:a(b() c());";
         (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        (constants);
-        console2.log(s);
-        console2.logBytes(sources[0]);
+        assertEq(sources.length, 1);
+        // c b a
+        assertEq(sources[0], hex"000200000001000000000000");
+        assertEq(constants.length, 0);
     }
 
     /// Several words, mixing sequential and nested logic to some depth, but
@@ -69,7 +83,8 @@ contract LibParseNamedRHSTest is Test {
         assertEq(sources.length, 1);
         assertEq(sources[0].length, 20);
         assertEq(constants.length, 0);
-        /// Nested words compile RTL so that they execute LTR.
+        // Nested words compile RTL so that they execute LTR.
+        // e d c b a
         assertEq(sources[0], hex"0004000000030000000200000001000000000000");
     }
 
@@ -82,7 +97,9 @@ contract LibParseNamedRHSTest is Test {
         assertEq(sources[0].length, 4);
         assertEq(sources[1].length, 4);
         assertEq(constants.length, 0);
+        // a
         assertEq(sources[0], hex"00000000");
+        // b
         assertEq(sources[1], hex"00010000");
     }
 }
