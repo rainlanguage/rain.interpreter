@@ -97,6 +97,19 @@ uint256 constant FSM_WORD_END_MASK = 1 << 2;
 uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
 
 /// The parser is stateful. This struct keeps track of the entire state.
+/// @param activeSource The current source being built.
+/// - low 16 bits: bitwise offset into the source for the next word to be
+///   written. Starts at 0x20. Once a source is no longer the active source, i.e.
+///   it is full and a member of the LL tail, the offset is replaced with a
+///   pointer to the next source to build a doubly linked list.
+/// - mid 16 bits: pointer to the previous active source. This is a linked list
+///   of sources that are built RTL and then reversed to LTR to eval.
+/// - high bits: 4 byte opcodes and operand pairs.
+/// @param sourcesBuilder A builder for the sources array. This is a 256 bit
+/// integer where each 16 bits is a literal memory pointer to a source.
+/// @param parenDepth The current paren depth. Each left paren increments this
+/// value and each right paren decrements it. The parser fails if this value
+/// ever goes negative.
 /// @param fsm The finite state machine representation of the parser.
 /// - bit 0: LHS/RHS => 0 = LHS, 1 = RHS
 /// - bit 1: yang/yin => 0 = yin, 1 = yang
@@ -107,28 +120,23 @@ uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
 /// named stack items it pushes them onto this linked list. The linked list is
 /// in FILO order, so the first item on the stack is the last item in the list.
 /// This makes it more efficient to reference more recent stack names on the RHS.
-/// @param activeSource The current source being built.
-/// - low 16 bits: bitwise offset into the source for the next word to be
-///   written. Starts at 0x20.
-/// - mid 16 bits: pointer to the previous active source. This is a linked list
-///   of sources that are built RTL and then reversed to LTR to eval.
-/// - high bits: 4 byte opcodes and operand pairs.
-/// @param sourcesBuilder A builder for the sources array. This is a 256 bit
-/// integer where each 16 bits is a literal memory pointer to a source.
 /// @param constantsBuilder A builder for the constants array.
 struct ParseState {
+    /// @dev WARNING: Referenced directly in assembly. If the order of these
+    /// fields changes, the assembly must be updated. Specifically, activeSource
+    /// is referenced as a pointer in pushWordToSource.
+    uint256 activeSource;
+    uint256 sourcesBuilder;
     uint256 parenDepth;
     uint256 fsm;
     uint256 stackIndex;
     uint256 stackNames;
-    uint256 activeSource;
-    uint256 sourcesBuilder;
     uint256 constantsBuilder;
 }
 
 library LibParseState {
     function newState() internal pure returns (ParseState memory) {
-        return ParseState(0, FSM_LHS_MASK, 0, 0, EMPTY_ACTIVE_SOURCE, 0, 0);
+        return ParseState(EMPTY_ACTIVE_SOURCE, 0, 0, FSM_LHS_MASK, 0, 0, 0);
     }
 
     function pushStackName(ParseState memory state, bytes32 word) internal pure {
@@ -147,11 +155,13 @@ library LibParseState {
 
     function pushWordToSource(ParseState memory state, bytes memory meta, bytes32 word) internal pure {
         unchecked {
+            // Convert the word to an offset that can be used to compile function
+            // pointers later.
             (bool exists, uint256 i) = LibParseMeta.lookupIndexMetaExpander(meta, word);
 
             uint256 activeSource = state.activeSource;
-            // The low byte of the active source is the current offset.
-            uint256 offset = uint8(activeSource);
+            // The low 16 bits of the active source is the current offset.
+            uint256 offset = uint16(activeSource);
 
             // We write sources RTL so they can run LTR.
             activeSource =
@@ -163,17 +173,37 @@ library LibParseState {
             | i << (offset + 0x10);
 
             // Maintenance branches.
+            // The lookup failed so the entire parsing process failed.
             if (!exists) {
                 revert UnknownWord(word);
             }
+            // We have filled the current source slot. Need to to shift it off
+            // to a newly allocated region of memory and reset the current active
+            // source. Both slots reference each other as a doubly linked list.
             if (offset == 0xe0) {
-                uint256 ptr;
+                // Pointer to what was the active source but is now being
+                // shifted off to the LL tail.
+                uint256 newTailPtr;
+                // Pointer to the old head of the LL tail.
+                uint256 oldTailPtr = (activeSource >> 0x10) & 0xFFFF;
                 assembly ("memory-safe") {
-                    ptr := mload(0x40)
-                    mstore(ptr, activeSource)
-                    mstore(0x40, add(ptr, 0x20))
+                    newTailPtr := mload(0x40)
+                    // Replace the offset of the active source to the pointer
+                    // back to new active source.
+                    // WARNING: state is being used as a pointer here, so if
+                    // the struct changes, this must be updated.
+                    activeSource := or(and(activeSource, not(0xFFFF)), state)
+                    // Build the new tail head.
+                    mstore(newTailPtr, activeSource)
+                    mstore(0x40, add(newTailPtr, 0x20))
+                    // The old tail head must now point back to the new tail
+                    // head.
+                    mstore(oldTailPtr, or(and(mload(oldTailPtr), not(0xFFFF)), newTailPtr))
                 }
-                activeSource = EMPTY_ACTIVE_SOURCE | (ptr << 0x10);
+
+                // The new active source has a fresh offset and points forward to
+                // the new tail head.
+                activeSource = EMPTY_ACTIVE_SOURCE | (newTailPtr << 0x10);
             }
 
             state.activeSource = activeSource;
