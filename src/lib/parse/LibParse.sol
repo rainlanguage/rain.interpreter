@@ -315,6 +315,7 @@ library LibParseState {
                     // tail item. Move the cursor back to the start of the words
                     // and copy the passed over bytes to the write cursor.
                     {
+                        let forwardTailPointer := tailPointer
                         let size := mul(wordsRemaining, 4)
                         cursor := sub(cursor, size)
                         mstore(writeCursor, mload(cursor))
@@ -327,14 +328,14 @@ library LibParseState {
                         for {} gt(wordsRemaining, 7) {} {
                             wordsRemaining := sub(wordsRemaining, 7)
                             // Follow the forward tail pointer.
-                            tailPointer := and(shr(0x10, mload(tailPointer)), 0xFFFF)
-                            mstore(writeCursor, mload(tailPointer))
-                            writeCursor := add(writeCursor, 0xe0)
+                            forwardTailPointer := and(shr(0x10, mload(forwardTailPointer)), 0xFFFF)
+                            mstore(writeCursor, mload(forwardTailPointer))
+                            writeCursor := add(writeCursor, 0x1c)
                         }
                         // Move over the remaining words in the tail item.
                         if gt(wordsRemaining, 0) {
-                            tailPointer := and(shr(0x10, mload(tailPointer)), 0xFFFF)
-                            mstore(writeCursor, mload(tailPointer))
+                            forwardTailPointer := and(shr(0x10, mload(forwardTailPointer)), 0xFFFF)
+                            mstore(writeCursor, mload(forwardTailPointer))
                             writeCursor := add(writeCursor, mul(wordsRemaining, 4))
                         }
                     }

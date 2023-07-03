@@ -23,6 +23,7 @@ contract LibParseMetaFindExpanderTest is Test {
         vm.assume(!LibBloom.bloomFindsDupes(words));
 
         (uint8 seed, uint256 expansion, bytes32[] memory remaining) = LibParseMeta.findBestExpander(words);
+        (seed);
         assertEq(LibCtPop.ctpop(expansion), words.length);
         assertEq(remaining.length, 0);
     }

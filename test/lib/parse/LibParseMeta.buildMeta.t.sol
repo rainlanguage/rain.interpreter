@@ -49,7 +49,7 @@ contract LibParseMetaBuildMetaTest is Test {
         return uint8(n / type(uint8).max + 3);
     }
 
-    function testBuildMetaExpander(bytes32[] memory words) external view {
+    function testBuildMetaExpander(bytes32[] memory words) external pure {
         vm.assume(!LibBloom.bloomFindsDupes(words));
         bytes memory meta = LibParseMeta.buildMetaExpander(words, expanderDepth(words.length));
         (meta);
