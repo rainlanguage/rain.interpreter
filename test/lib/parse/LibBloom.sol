@@ -33,16 +33,11 @@ library LibBloom {
                     shifted3 := shl(and(hashed3, 0xFF), 1)
                 }
 
-                let match := and(
+                let match :=
                     and(
-                        iszero(iszero(and(bloom0, shifted0))),
-                        iszero(iszero(and(bloom1, shifted1)))
-                    ),
-                    and(
-                        iszero(iszero(and(bloom2, shifted2))),
-                        iszero(iszero(and(bloom3, shifted3)))
+                        and(iszero(iszero(and(bloom0, shifted0))), iszero(iszero(and(bloom1, shifted1)))),
+                        and(iszero(iszero(and(bloom2, shifted2))), iszero(iszero(and(bloom3, shifted3))))
                     )
-                )
 
                 if iszero(iszero(match)) {
                     dupes := 1

@@ -15,12 +15,16 @@ contract LibParseNamedRHSTest is Test {
 
     /// Constructor just builds the shared meta.
     constructor() {
-        bytes32[] memory words = new bytes32[](5);
+        bytes32[] memory words = new bytes32[](9);
         words[0] = bytes32("a");
         words[1] = bytes32("b");
         words[2] = bytes32("c");
         words[3] = bytes32("d");
         words[4] = bytes32("e");
+        words[5] = bytes32("f");
+        words[6] = bytes32("g");
+        words[7] = bytes32("h");
+        words[8] = bytes32("i");
         meta = LibParseMeta.buildMetaExpander(words, 2);
     }
 
@@ -74,9 +78,9 @@ contract LibParseNamedRHSTest is Test {
         assertEq(constants.length, 0);
     }
 
-    /// Several words, mixing sequential and nested logic to some depth, but
-    /// still only one LHS in aggregate.
-    function testParseSingleLHSNestingAndSequential() external {
+    /// Several words, mixing sequential and nested logic to some depth, with
+    /// several LHS items.
+    function testParseSingleLHSNestingAndSequential00() external {
         string memory s = "_:a(b() c(d() e()));";
         (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
         (constants);
@@ -86,6 +90,20 @@ contract LibParseNamedRHSTest is Test {
         // Nested words compile RTL so that they execute LTR.
         // e d c b a
         assertEq(sources[0], hex"0004000000030000000200000001000000000000");
+    }
+
+    /// Several words, mixing sequential and nested logic to some depth, with
+    /// several LHS items.
+    function testParseSingleLHSNestingAndSequential01() external {
+        string memory s = "_:a(b() c(d() e()) f() g(h() i()));";
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        (constants);
+        assertEq(sources.length, 1);
+        assertEq(sources[0].length, 36);
+        assertEq(constants.length, 0);
+        // Nested words compile RTL so that they execute LTR.
+        // i h g f e d c b a
+        assertEq(sources[0], hex"000800000007000000060000000500000004000000030000000200000001000000000000");
     }
 
     /// Two full lines, each with a single LHS and RHS.

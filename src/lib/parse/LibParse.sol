@@ -5,6 +5,8 @@ import "sol.lib.memory/LibPointer.sol";
 import "./LibCtPop.sol";
 import "./LibParseMeta.sol";
 
+import "forge-std/console2.sol";
+
 /// The expression does not finish with a semicolon (EOF).
 error MissingFinalSemi(uint256 offset);
 
@@ -28,6 +30,8 @@ error MaxSources();
 
 /// The parser encountered a dangling source. This is a bug in the parser.
 error DanglingSource();
+
+error StackOverflow();
 
 /// @dev \t
 uint128 constant CMASK_TAB = 0x200;
@@ -114,8 +118,10 @@ uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
 /// - bit 0: LHS/RHS => 0 = LHS, 1 = RHS
 /// - bit 1: yang/yin => 0 = yin, 1 = yang
 /// - bit 2: word end => 0 = not end, 1 = end
-/// @param stackIndex The current stack index. This is equal to the number of
-/// items on the LHS.
+/// @param stackOffset The current stack offset in bytes. This is where the
+/// current stack word counter is.
+/// @param stack0 Memory region for stack word counters.
+/// @param stack1 Memory region for stack word counters.
 /// @param stackNames A linked list of stack names. As the parser encounters
 /// named stack items it pushes them onto this linked list. The linked list is
 /// in FILO order, so the first item on the stack is the last item in the list.
@@ -124,19 +130,45 @@ uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
 struct ParseState {
     /// @dev WARNING: Referenced directly in assembly. If the order of these
     /// fields changes, the assembly must be updated. Specifically, activeSource
-    /// is referenced as a pointer in pushWordToSource.
+    /// is referenced as a pointer in `pushWordToSource` and `newSource`.
     uint256 activeSource;
+    /// @dev These stack tracking items are all accessed as hardcoded offsets in
+    /// assembly.
+    uint256 stackRHSOffset;
+    uint256 stack0;
+    uint256 stack1;
     uint256 sourcesBuilder;
     uint256 parenDepth;
     uint256 fsm;
-    uint256 stackIndex;
+    uint256 stackLHSIndex;
     uint256 stackNames;
     uint256 constantsBuilder;
 }
 
 library LibParseState {
     function newState() internal pure returns (ParseState memory) {
-        return ParseState(EMPTY_ACTIVE_SOURCE, 0, 0, FSM_LHS_MASK, 0, 0, 0);
+        return ParseState(
+            // activeSource
+            EMPTY_ACTIVE_SOURCE,
+            // stackRHSOffset
+            0,
+            // stack0
+            0,
+            // stack1
+            0,
+            // sourcesBuilder
+            0,
+            // parenDepth
+            0,
+            // fsm
+            FSM_LHS_MASK,
+            // stackLHSIndex
+            0,
+            // stackNames
+            0,
+            // constantsBuilder
+            0
+        );
     }
 
     function pushStackName(ParseState memory state, bytes32 word) internal pure {
@@ -150,7 +182,7 @@ library LibParseState {
             mstore(ptr, oldStackNames)
             mstore(0x40, add(ptr, 0x20))
         }
-        state.stackNames = fingerprint | (state.stackIndex << 0x10) | ptr;
+        state.stackNames = fingerprint | (state.stackLHSIndex << 0x10) | ptr;
     }
 
     function pushWordToSource(ParseState memory state, bytes memory meta, bytes32 word) internal pure {
@@ -158,6 +190,15 @@ library LibParseState {
             // Convert the word to an offset that can be used to compile function
             // pointers later.
             (bool exists, uint256 i) = LibParseMeta.lookupIndexMetaExpander(meta, word);
+
+            // Increment the stack counter.
+            {
+                uint256 stackRHSOffset = state.stackRHSOffset;
+                assembly ("memory-safe") {
+                    let counter := and(mload(add(state, add(0x21, stackRHSOffset))), 0xFF)
+                    mstore8(add(state, add(0x40, stackRHSOffset)), add(counter, 1))
+                }
+            }
 
             uint256 activeSource = state.activeSource;
             // The low 16 bits of the active source is the current offset.
@@ -213,33 +254,100 @@ library LibParseState {
     function newSource(ParseState memory state) internal pure {
         uint256 sourcesBuilder = state.sourcesBuilder;
         uint256 offset = sourcesBuilder >> 0xf0;
-        uint256 activeSource = state.activeSource;
+        uint256 end = state.stackRHSOffset;
 
         if (offset == 0xf0) {
             revert MaxSources();
-        } else {
-            // close out the LL to fixed solidity compatible bytes.
+        }
+        // Follow the word counters to build the source with the correct
+        // combination of LTR and RTL words. The stack needs to be built
+        // LTR at the top level, so that as the evaluation proceeds LTR it
+        // can reference previous items in subsequent items. However, the
+        // stack is built RTL within each item, so that nested parens are
+        // evaluated correctly similar to reverse polish notation.
+        else {
             uint256 source;
             assembly ("memory-safe") {
+                // find the end of the LL tail.
+                let cursor := state
+
+                let tailPointer := and(shr(0x10, mload(cursor)), 0xFFFF)
+                for {} iszero(iszero(tailPointer)) {} {
+                    cursor := tailPointer
+                    tailPointer := and(shr(0x10, mload(cursor)), 0xFFFF)
+                }
+
+                // Move cursor to the end of the end of the LL tail item.
+                // This is 4 bytes from the end of the EVM word, to compensate
+                // for the offset and pointer positions.
+                tailPointer := cursor
+                cursor := add(cursor, 0x1C)
+                let length := 0
                 source := mload(0x40)
-                let cursor := add(source, 0x20)
+                let writeCursor := add(source, 0x20)
 
-                // handle the head first
-                let activeSourceOffset := and(activeSource, 0xFFFF)
-                mstore(cursor, shl(sub(0x100, activeSourceOffset), and(activeSource, not(0xFFFF))))
-                let length := div(sub(activeSourceOffset, 0x20), 8)
-                cursor := add(cursor, length)
+                let counterCursor := add(state, 0x21)
+                for {
+                    let i := 0
+                    let wordsTotal := and(mload(counterCursor), 0xFF)
+                    let wordsRemaining := wordsTotal
+                } lt(i, end) {
+                    i := add(i, 1)
+                    counterCursor := add(counterCursor, 1)
+                    wordsTotal := and(mload(counterCursor), 0xFF)
+                    wordsRemaining := wordsTotal
+                } {
+                    length := add(length, mul(wordsTotal, 4))
+                    {
+                        // 4 bytes per source word.
+                        let tailItemWordsRemaining := div(sub(cursor, tailPointer), 4)
+                        // loop to the tail item that contains the start of the words
+                        // that we need to copy.
+                        for {} gt(wordsRemaining, tailItemWordsRemaining) {} {
+                            wordsRemaining := sub(wordsRemaining, tailItemWordsRemaining)
+                            tailPointer := and(mload(tailPointer), 0xFFFF)
+                            tailItemWordsRemaining := 7
+                            cursor := add(tailPointer, 0x1C)
+                        }
+                    }
 
-                // loop the tail
-                for { let tailPointer := and(shr(0x10, activeSource), 0xFFFF) } iszero(iszero(tailPointer)) {} {
-                    tailPointer := and(shr(0x10, mload(tailPointer)), 0xFFFF)
-                    mstore(cursor, and(mload(tailPointer), not(0xFFFFFFFF)))
-                    cursor := add(cursor, 0xe0)
-                    length := add(length, 0xe0)
+                    // Now the words remaining is lte the words remaining in the
+                    // tail item. Move the cursor back to the start of the words
+                    // and copy the passed over bytes to the write cursor.
+                    {
+                        let size := mul(wordsRemaining, 4)
+                        cursor := sub(cursor, size)
+                        mstore(writeCursor, mload(cursor))
+                        writeCursor := add(writeCursor, size)
+
+                        // Redefine wordsRemaining to be the number of words
+                        // left to copy.
+                        wordsRemaining := sub(wordsTotal, wordsRemaining)
+                        // Move over whole tail items.
+                        for {} gt(wordsRemaining, 7) {} {
+                            wordsRemaining := sub(wordsRemaining, 7)
+                            // Follow the forward tail pointer.
+                            tailPointer := and(shr(0x10, mload(tailPointer)), 0xFFFF)
+                            mstore(writeCursor, mload(tailPointer))
+                            writeCursor := add(writeCursor, 0xe0)
+                        }
+                        // Move over the remaining words in the tail item.
+                        if gt(wordsRemaining, 0) {
+                            tailPointer := and(shr(0x10, mload(tailPointer)), 0xFFFF)
+                            mstore(writeCursor, mload(tailPointer))
+                            writeCursor := add(writeCursor, mul(wordsRemaining, 4))
+                        }
+                    }
                 }
                 mstore(source, length)
-                mstore(0x40, and(add(cursor, 0x1f), not(0x1f)))
+                // Round up to the nearest 32 bytes to realign memory.
+                mstore(0x40, and(add(writeCursor, 0x1f), not(0x1f)))
             }
+
+            // Reset state for next source.
+            state.stackRHSOffset = 0;
+            state.stack0 = 0;
+            state.stack1 = 0;
             state.activeSource = 0x20;
             state.sourcesBuilder = (offset + 0x10) << 0xf0 | source << offset | (sourcesBuilder & ((1 << offset) - 1));
         }
@@ -382,7 +490,7 @@ library LibParse {
                                 cursor = skipWord(cursor, CMASK_LHS_STACK_TAIL);
                             }
 
-                            state.stackIndex++;
+                            state.stackLHSIndex++;
                             state.fsm = FSM_LHS_MASK | FSM_YANG_MASK;
                         } else if (char & CMASK_WHITESPACE > 0) {
                             cursor = skipWord(cursor, CMASK_WHITESPACE);
@@ -428,6 +536,18 @@ library LibParse {
                                 revert UnexpectedRightParen(offset);
                             }
                             state.parenDepth--;
+
+                            // We just closed out some group of arbitrarily
+                            // nested parens. As we are at the top level we
+                            // move the immutable stack highwater mark forward
+                            // 1 item, which moves the RHS offset forward 1 byte
+                            // to start a new word counter.
+                            if (state.parenDepth == 0) {
+                                state.stackRHSOffset++;
+                                if (state.stackRHSOffset == 0x40) {
+                                    revert StackOverflow();
+                                }
+                            }
                             cursor++;
                         } else if (char & CMASK_WHITESPACE > 0) {
                             state.fsm = 0;
