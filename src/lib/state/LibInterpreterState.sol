@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 import "sol.lib.memory/LibPointer.sol";
 import "rain.lib.memkv/LibMemoryKV.sol";
 
-import "../interface/IInterpreterV1.sol";
+import "../../interface/IInterpreterV1.sol";
 
 /// The standard in-memory representation of an interpreter that facilitates
 /// decoupled coordination between opcodes. Opcodes MAY:

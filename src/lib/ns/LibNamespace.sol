@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "../interface/IInterpreterV1.sol";
+import "../../interface/IInterpreterV1.sol";
 
 library LibNamespace {
     /// Standard way to elevate a caller-provided state namespace to a universal

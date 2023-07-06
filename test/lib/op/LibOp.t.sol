@@ -9,13 +9,8 @@ import "sol.lib.memory/LibStackPointer.sol";
 import "sol.lib.memory/LibUint256Array.sol";
 import "rain.lib.hash/LibHashNoAlloc.sol";
 
-<<<<<<<< HEAD:test/lib/op/LibOp.t.sol
 import "src/lib/op/LibOp.sol";
 import "test/lib/op/LibOpSlow.sol";
-========
-import "src/lib/LibOp.sol";
-import "./LibOpSlow.sol";
->>>>>>>> 430eee5c5936112da2bdffd65d846224e8332055:test/lib/LibOp.t.sol
 
 contract LibOpTest is Test {
     using LibUint256Array for uint256[];

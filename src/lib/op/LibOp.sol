@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "../interface/IInterpreterV1.sol";
+import "../../interface/IInterpreterV1.sol";
 import "sol.lib.memory/LibPointer.sol";
 import "sol.lib.memory/LibMemCpy.sol";
 import "sol.lib.memory/LibStackPointer.sol";

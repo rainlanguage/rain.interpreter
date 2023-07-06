@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.18;
 
-import "src/lib/LibEvaluable.sol";
+import "src/lib/caller/LibEvaluable.sol";
 
 library LibEvaluableSlow {
     function hashSlow(Evaluable memory evaluable) internal pure returns (bytes32) {

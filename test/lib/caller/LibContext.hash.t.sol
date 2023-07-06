@@ -2,7 +2,7 @@
 pragma solidity =0.8.18;
 
 import "forge-std/Test.sol";
-import "src/lib/LibContext.sol";
+import "src/lib/caller/LibContext.sol";
 import "./LibContextSlow.sol";
 
 contract LibContextHashTest is Test {

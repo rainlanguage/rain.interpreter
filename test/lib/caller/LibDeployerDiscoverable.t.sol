@@ -3,7 +3,7 @@ pragma solidity =0.8.18;
 
 import "forge-std/Test.sol";
 import "src/interface/IExpressionDeployerV1.sol";
-import "src/lib/LibDeployerDiscoverable.sol";
+import "src/lib/caller/LibDeployerDiscoverable.sol";
 
 contract TestDeployer is IExpressionDeployerV1 {
     function deployExpression(bytes[] memory, uint256[] memory, uint256[] memory)

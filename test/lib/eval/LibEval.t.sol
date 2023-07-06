@@ -6,7 +6,6 @@ import "rain.lib.memkv/LibMemoryKV.sol";
 import "sol.lib.memory/LibPointer.sol";
 import "sol.lib.memory/LibStackPointer.sol";
 import "rain.lib.typecast/LibConvert.sol";
-<<<<<<<< HEAD:test/lib/eval/LibEval.t.sol
 
 import "src/lib/eval/LibEval.sol";
 import "src/lib/compile/LibCompile.sol";
@@ -14,15 +13,6 @@ import "src/lib/compile/LibCompile.sol";
 import "test/lib/compile/LibCompileSlow.sol";
 import "test/lib/eval/LibEvalSlow.sol";
 
-========
-
-import "src/lib/LibEval.sol";
-import "src/lib/LibCompile.sol";
-
-import "./LibCompileSlow.sol";
-import "./LibEvalSlow.sol";
-
->>>>>>>> 430eee5c5936112da2bdffd65d846224e8332055:test/lib/LibEval.t.sol
 contract LibEvalTest is Test {
     using LibMemoryKV for MemoryKV;
     using LibPointer for Pointer;

@@ -6,13 +6,8 @@ import "sol.lib.memory/LibStackPointer.sol";
 import "sol.lib.memory/LibBytes.sol";
 import "sol.lib.memory/LibUint256Array.sol";
 
-<<<<<<<< HEAD:test/lib/state/LibInterpreterStateDataContractSlow.sol
 import "src/lib/compile/LibCompile.sol";
 import "src/lib/state/LibInterpreterState.sol";
-========
-import "src/lib/LibCompile.sol";
-import "src/lib/LibInterpreterState.sol";
->>>>>>>> 430eee5c5936112da2bdffd65d846224e8332055:test/lib/LibInterpreterStateDataContractSlow.sol
 
 library LibInterpreterStateDataContractSlow {
     using LibStackPointer for Pointer;
