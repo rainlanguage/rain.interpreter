@@ -29,7 +29,9 @@ contract RainterpreterStore is IInterpreterStoreV1, ERC165 {
     /// 3. `uint256` is expression-provided value
     ///
     /// tiers 0 and 1 are both embodied in the `FullyQualifiedNamespace`.
-    mapping(FullyQualifiedNamespace => mapping(uint256 => uint256)) internal _sStore;
+    // Slither doesn't like the leading underscore.
+    //solhint-disable-next-line private-vars-leading-underscore
+    mapping(FullyQualifiedNamespace => mapping(uint256 => uint256)) internal sStore;
 
     // @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
@@ -44,13 +46,13 @@ contract RainterpreterStore is IInterpreterStoreV1, ERC165 {
         unchecked {
             FullyQualifiedNamespace fullyQualifiedNamespace = namespace.qualifyNamespace(msg.sender);
             for (uint256 i = 0; i < kvs.length; i += 2) {
-                _sStore[fullyQualifiedNamespace][kvs[i]] = kvs[i + 1];
+                sStore[fullyQualifiedNamespace][kvs[i]] = kvs[i + 1];
             }
         }
     }
 
     /// @inheritdoc IInterpreterStoreV1
     function get(FullyQualifiedNamespace namespace, uint256 key) external view returns (uint256) {
-        return _sStore[namespace][key];
+        return sStore[namespace][key];
     }
 }
