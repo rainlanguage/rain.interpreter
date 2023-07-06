@@ -455,6 +455,7 @@ library LibParse {
         return cursor;
     }
 
+    //slither-disable-next-line cyclomatic-complexity
     function parse(bytes memory data, bytes memory meta)
         internal
         pure
