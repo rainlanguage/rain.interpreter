@@ -483,6 +483,7 @@ library LibParse {
                         if (char & CMASK_LHS_STACK_HEAD > 0) {
                             // if yang we can't start new stack item
                             if (state.fsm & FSM_YANG_MASK > 0) {
+                                //slither-disable-next-line similar-names
                                 (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
                                 revert UnexpectedLHSChar(offset, charString);
                             }
@@ -506,6 +507,7 @@ library LibParse {
                             state.fsm = 0;
                             cursor++;
                         } else {
+                            //slither-disable-next-line similar-names
                             (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
                             revert UnexpectedLHSChar(offset, charString);
                         }
@@ -515,6 +517,7 @@ library LibParse {
                         if (char & CMASK_RHS_WORD_HEAD > 0) {
                             // If yang we can't start a new word.
                             if (state.fsm & FSM_YANG_MASK > 0) {
+                                //slither-disable-next-line similar-names
                                 (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
                                 revert UnexpectedRHSChar(offset, charString);
                             }
@@ -528,6 +531,7 @@ library LibParse {
                         // @todo support operands and constants.
                         else if (state.fsm & FSM_WORD_END_MASK > 0) {
                             if (char & CMASK_LEFT_PAREN == 0) {
+                                //slither-disable-next-line similar-names
                                 (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
                                 revert UnexpectedRHSChar(offset, charString);
                             }
@@ -538,6 +542,7 @@ library LibParse {
                             // @todo input handling.
                             state.fsm = 0;
                             if (state.parenDepth == 0) {
+                                //slither-disable-next-line similar-names
                                 (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
                                 (charString);
                                 revert UnexpectedRightParen(offset);
@@ -569,12 +574,14 @@ library LibParse {
                             state.newSource();
                             cursor++;
                         } else {
+                            //slither-disable-next-line similar-names
                             (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
                             revert UnexpectedRHSChar(offset, charString);
                         }
                     }
                 }
                 if (char & CMASK_EOS == 0) {
+                    //slither-disable-next-line similar-names
                     (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
                     (charString);
                     revert MissingFinalSemi(offset);
