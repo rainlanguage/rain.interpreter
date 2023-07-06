@@ -419,6 +419,7 @@ library LibParse {
             // word is head + tail
             word := mload(add(cursor, 0x1f))
             // loop over the tail
+            //slither-disable-next-line incorrect-shift
             for {} and(lt(i, 0x20), iszero(and(shl(byte(i, word), 1), not(mask)))) { i := add(i, 1) } {}
             let scrub := mul(sub(0x20, i), 8)
             word := shl(scrub, shr(scrub, word))
@@ -438,6 +439,7 @@ library LibParse {
             for {} iszero(done) {} {
                 cursor := add(cursor, 0x20)
                 i := 0
+                //slither-disable-next-line incorrect-shift
                 for { let word := mload(cursor) } and(lt(i, 0x20), iszero(iszero(and(shl(byte(i, word), 1), mask)))) {}
                 {
                     i := add(i, 1)
@@ -471,6 +473,7 @@ library LibParse {
                 }
                 while (cursor < end) {
                     assembly ("memory-safe") {
+                        //slither-disable-next-line incorrect-shift
                         char := shl(and(mload(cursor), 0xFF), 1)
                     }
 

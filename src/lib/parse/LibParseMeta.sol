@@ -18,6 +18,7 @@ library LibParseMeta {
             mstore8(0x20, seed)
             hashed := keccak256(0, 0x21)
         }
+        //slither-disable-next-line incorrect-shift
         return (1 << uint8(hashed), hashed);
     }
 
