@@ -88,13 +88,11 @@ library LibParseMeta {
                 mstore8(add(meta, 0x20), i)
             }
             for (uint256 j = 0; j < i; j++) {
-                uint8 seed = seeds[j];
-                uint256 expansion = expansions[j];
                 assembly ("memory-safe") {
                     // Write each seed immediately before its expansion.
                     let seedWriteAt := add(add(meta, 0x21), mul(0x21, j))
-                    mstore8(seedWriteAt, seed)
-                    mstore(add(seedWriteAt, 1), expansion)
+                    mstore8(seedWriteAt, mload(add(seeds, add(0x20, mul(0x20, j)))))
+                    mstore(add(seedWriteAt, 1), mload(add(expansions, add(0x20, mul(0x20, j)))))
                 }
             }
 
