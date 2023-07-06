@@ -3,9 +3,9 @@ pragma solidity =0.8.19;
 
 import "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
-import "src/interface/IInterpreterStoreV1.sol";
-import "src/lib/state/LibInterpreterState.sol";
-import "src/lib/ns/LibNamespace.sol";
+import "../interface/IInterpreterStoreV1.sol";
+import "../lib/state/LibInterpreterState.sol";
+import "../lib/ns/LibNamespace.sol";
 
 /// Thrown when a `set` call is made with an odd number of arguments.
 error RainterpreterStoreOddSetLength(uint256 length);
