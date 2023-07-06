@@ -7,6 +7,9 @@ import "src/interface/IInterpreterStoreV1.sol";
 import "src/lib/state/LibInterpreterState.sol";
 import "src/lib/ns/LibNamespace.sol";
 
+/// Thrown when a `set` call is made with an odd number of arguments.
+error RainterpreterStoreOddSetLength(uint256 length);
+
 /// @title RainterpreterStore
 /// @notice Simplest possible `IInterpreterStoreV1` that could work.
 /// Takes key/value pairings from the input array and stores each in an internal
@@ -35,6 +38,9 @@ contract RainterpreterStore is IInterpreterStoreV1, ERC165 {
 
     /// @inheritdoc IInterpreterStoreV1
     function set(StateNamespace namespace, uint256[] calldata kvs) external {
+        if (kvs.length % 2 != 0) {
+            revert RainterpreterStoreOddSetLength(kvs.length);
+        }
         unchecked {
             FullyQualifiedNamespace fullyQualifiedNamespace = namespace.qualifyNamespace(msg.sender);
             for (uint256 i = 0; i < kvs.length; i += 2) {

@@ -10,6 +10,8 @@ import "src/concrete/RainterpreterStore.sol";
 
 import "openzeppelin-contracts/contracts/utils/Address.sol";
 
+/// @title RainterpreterStoreTest
+/// Test suite for RainterpreterStore.
 contract RainterpreterStoreTest is Test {
     using LibNamespace for StateNamespace;
     using LibMemoryKV for MemoryKV;
@@ -25,6 +27,16 @@ contract RainterpreterStoreTest is Test {
         assertTrue(store.supportsInterface(type(IERC165).interfaceId));
         assertTrue(store.supportsInterface(type(IInterpreterStoreV1).interfaceId));
         assertFalse(store.supportsInterface(badInterfaceId));
+    }
+
+    /// Ensure the store gives a decent error message when an odd number of
+    /// arguments is passed to `set`.
+    function testRainterpreterStoreSetOddLength(StateNamespace namespace, uint256[] memory kvs) external {
+        vm.assume(kvs.length % 2 != 0);
+
+        RainterpreterStore store = new RainterpreterStore();
+        vm.expectRevert(abi.encodeWithSelector(RainterpreterStoreOddSetLength.selector, kvs.length));
+        store.set(namespace, kvs);
     }
 
     /// Store should set and get values correctly.
@@ -86,12 +98,19 @@ contract RainterpreterStoreTest is Test {
         }
     }
 
+    /// Fixed size version of `Set` that helps the fuzzer NOT blow up all
+    /// available memory. Requires some cheeky assembly to get around the
+    /// fixed size to dynamic size conversion.
+    /// @param namespace The namespace to set values in.
+    /// @param kvs The key/value pairs to set.
     struct Set11 {
         StateNamespace namespace;
         uint256[11] kvs;
     }
     /// Store should handle dupes correctly, where subsequent writes override
-    /// previous writes to the same key (i.e. like a k/v store).
+    /// previous writes to the same key (i.e. like a k/v store). The assumption
+    /// is that the fuzzer will generate some dupes just randomly, so there's
+    /// no special logic to make that happen.
 
     function testRainterpreterStoreSetGetDupes(Set11[] memory sets) external {
         vm.assume(sets.length < 20);
