@@ -1,5 +1,5 @@
-DeployerDiscoverableMetaV1Test:testDeployerDiscoverable(bytes) (runs: 1024, μ: 424415, ~: 424198)
-DeployerDiscoverableMetaV1Test:testDeployerDiscoverableInvalidMeta(bytes) (runs: 1024, μ: 260050, ~: 259735)
+DeployerDiscoverableMetaV1Test:testDeployerDiscoverable(bytes) (runs: 1024, μ: 240041, ~: 239824)
+DeployerDiscoverableMetaV1Test:testDeployerDiscoverableInvalidMeta(bytes) (runs: 1024, μ: 259741, ~: 259425)
 LibBloomTest:testLibBloomNoFalseNegatives(bytes32[],uint256,uint256) (runs: 1024, μ: 36106, ~: 30874)
 LibBloomTest:testLibBloomVaguelyAvoidsFalsePositives(uint256,uint8) (runs: 1024, μ: 1852779, ~: 17236)
 LibCompileTest:testCompileGas0() (gas: 543)
