@@ -350,7 +350,9 @@ library LibParseState {
             state.stack0 = 0;
             state.stack1 = 0;
             state.activeSource = 0x20;
-            state.sourcesBuilder = (offset + 0x10) << 0xf0 | source << offset | (sourcesBuilder & ((1 << offset) - 1));
+            //slither-disable-next-line incorrect-shift
+            state.sourcesBuilder =
+                ((offset + 0x10) << 0xf0) | (source << offset) | (sourcesBuilder & ((1 << offset) - 1));
         }
     }
 
