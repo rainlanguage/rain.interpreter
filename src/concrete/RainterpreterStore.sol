@@ -1,0 +1,50 @@
+// SPDX-License-Identifier: CAL
+pragma solidity =0.8.18;
+
+import "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
+
+import "src/interface/IInterpreterStoreV1.sol";
+import "src/lib/state/LibInterpreterState.sol";
+import "src/lib/ns/LibNamespace.sol";
+
+/// @title RainterpreterStore
+/// @notice Simplest possible `IInterpreterStoreV1` that could work.
+/// Takes key/value pairings from the input array and stores each in an internal
+/// mapping. `StateNamespace` is fully qualified only by `msg.sender` on set and
+/// doesn't attempt to do any deduping etc. if the same key appears twice it will
+/// be set twice.
+contract RainterpreterStore is IInterpreterStoreV1, ERC165 {
+    using LibNamespace for StateNamespace;
+
+    /// Store is several tiers of sandbox.
+    ///
+    /// 0. Address hashed into `FullyQualifiedNamespace` is `msg.sender` so that
+    ///    callers cannot attack each other
+    /// 1. StateNamespace is caller-provided namespace so that expressions cannot
+    ///    attack each other
+    /// 2. `uint256` is expression-provided key
+    /// 3. `uint256` is expression-provided value
+    ///
+    /// tiers 0 and 1 are both embodied in the `FullyQualifiedNamespace`.
+    mapping(FullyQualifiedNamespace => mapping(uint256 => uint256)) internal _sStore;
+
+    // @inheritdoc ERC165
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return interfaceId == type(IInterpreterStoreV1).interfaceId || super.supportsInterface(interfaceId);
+    }
+
+    /// @inheritdoc IInterpreterStoreV1
+    function set(StateNamespace namespace, uint256[] calldata kvs) external {
+        unchecked {
+            FullyQualifiedNamespace fullyQualifiedNamespace = namespace.qualifyNamespace(msg.sender);
+            for (uint256 i = 0; i < kvs.length; i += 2) {
+                _sStore[fullyQualifiedNamespace][kvs[i]] = kvs[i + 1];
+            }
+        }
+    }
+
+    /// @inheritdoc IInterpreterStoreV1
+    function get(FullyQualifiedNamespace namespace, uint256 key) external view returns (uint256) {
+        return _sStore[namespace][key];
+    }
+}

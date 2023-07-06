@@ -13,16 +13,17 @@ library LibNamespace {
     /// multiple transactions/blocks.
     ///
     /// @param stateNamespace The state namespace as specified by the caller.
+    /// @param sender The caller this namespace is bound to.
     /// @return qualifiedNamespace A fully qualified namespace that cannot
     /// collide with any other state namespace specified by any other caller.
-    function qualifyNamespace(StateNamespace stateNamespace)
+    function qualifyNamespace(StateNamespace stateNamespace, address sender)
         internal
-        view
+        pure
         returns (FullyQualifiedNamespace qualifiedNamespace)
     {
         assembly ("memory-safe") {
-            mstore(0, caller())
-            mstore(0x20, stateNamespace)
+            mstore(0, stateNamespace)
+            mstore(0x20, sender)
             qualifiedNamespace := keccak256(0, 0x40)
         }
     }

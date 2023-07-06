@@ -3,7 +3,7 @@ pragma solidity ^0.8.18;
 
 import "forge-std/Test.sol";
 
-import "test/lib/parse/LibBloom.sol";
+import "test/util/lib/bloom/LibBloom.sol";
 
 /// @title LibBloomTest
 /// @notice This is a test contract for LibBloom. LibBloom itself is only used
