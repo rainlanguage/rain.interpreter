@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 import "forge-std/Test.sol";
 
 import "src/lib/parse/LibParseMeta.sol";
-import "test/lib/parse/LibBloom.sol";
+import "test/util/lib/bloom/LibBloom.sol";
 
 /// @title LibParseMetaFindExpanderTest
 /// Test that we can find reasonable expansions in a reasonable number of

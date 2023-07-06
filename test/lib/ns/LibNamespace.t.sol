@@ -7,18 +7,18 @@ import "src/lib/ns/LibNamespace.sol";
 import "test/lib/ns/LibNamespaceSlow.sol";
 
 contract LibNamespaceTest is Test {
-    function testQualifyNamespaceReferenceImplementation(StateNamespace stateNamespace) public {
+    function testQualifyNamespaceReferenceImplementation(StateNamespace stateNamespace, address sender) public {
         assertEq(
-            FullyQualifiedNamespace.unwrap(LibNamespace.qualifyNamespace(stateNamespace)),
-            FullyQualifiedNamespace.unwrap(LibNamespaceSlow.qualifyNamespaceSlow(stateNamespace))
+            FullyQualifiedNamespace.unwrap(LibNamespace.qualifyNamespace(stateNamespace, sender)),
+            FullyQualifiedNamespace.unwrap(LibNamespaceSlow.qualifyNamespaceSlow(stateNamespace, sender))
         );
     }
 
-    function testQualifyNamespaceGas0(StateNamespace stateNamespace) public view {
-        LibNamespace.qualifyNamespace(stateNamespace);
+    function testQualifyNamespaceGas0(StateNamespace stateNamespace, address sender) public pure {
+        LibNamespace.qualifyNamespace(stateNamespace, sender);
     }
 
-    function testQualifyNamespaceGasSlow0(StateNamespace stateNamespace) public view {
-        LibNamespaceSlow.qualifyNamespaceSlow(stateNamespace);
+    function testQualifyNamespaceGasSlow0(StateNamespace stateNamespace, address sender) public pure {
+        LibNamespaceSlow.qualifyNamespaceSlow(stateNamespace, sender);
     }
 }
