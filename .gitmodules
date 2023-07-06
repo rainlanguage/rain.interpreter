@@ -10,3 +10,6 @@
 [submodule "lib/rain.lib.typecast"]
 	path = lib/rain.lib.typecast
 	url = https://github.com/rainprotocol/rain.lib.typecast
+[submodule "lib/forge-std"]
+	path = lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
