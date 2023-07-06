@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.18;
+pragma solidity =0.8.19;
 
 library LibCompileSlow {
     function convertToOps(bytes memory source, bytes memory pointers) internal pure {
