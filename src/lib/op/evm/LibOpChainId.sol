@@ -13,19 +13,15 @@ library LibOpChainId {
     using LibIntegrityCheck for IntegrityCheckState;
     using LibOp for Pointer;
 
-    function integrity(
-        IntegrityCheckState memory integrityCheckState_,
-        Operand,
-        Pointer stackTop_
-    ) internal pure returns (Pointer) {
-        return integrityCheckState_.push(stackTop_);
+    function integrity(IntegrityCheckState memory integrityCheckState, Operand, Pointer stackTop)
+        internal
+        pure
+        returns (Pointer)
+    {
+        return integrityCheckState.push(stackTop);
     }
 
-    function run(
-        InterpreterState memory,
-        Operand,
-        Pointer stackTop_
-    ) internal view returns (Pointer) {
-        return stackTop_.unsafePush(block.chainid);
+    function run(InterpreterState memory, Operand, Pointer stackTop) internal view returns (Pointer) {
+        return stackTop.unsafePush(block.chainid);
     }
 }

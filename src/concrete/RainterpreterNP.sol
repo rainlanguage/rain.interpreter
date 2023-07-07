@@ -30,18 +30,19 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV1, ERC165 {
     using LibEval for InterpreterState;
     using LibNamespace for StateNamespace;
     using LibInterpreterStateDataContract for bytes;
-    using LibCast for function(InterpreterState memory, Operand, Pointer)
-        view
-        returns (Pointer)[];
+    using
+    LibCast
+    for
+        function(InterpreterState memory, Operand, Pointer)
+            view
+            returns (Pointer)[];
     using Math for uint256;
     using LibMemoryKV for MemoryKV;
 
     // @inheritdoc ERC165
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override returns (bool) {
-        return
-            interfaceId == type(IInterpreterV1).interfaceId || interfaceId == type(IDebugInterpreterV1).interfaceId || super.supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return interfaceId == type(IInterpreterV1).interfaceId || interfaceId == type(IDebugInterpreterV1).interfaceId
+            || super.supportsInterface(interfaceId);
     }
 
     /// @inheritdoc IDebugInterpreterV1
@@ -77,16 +78,10 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV1, ERC165 {
         uint256[][] memory context_
     ) external view returns (uint256[] memory, uint256[] memory) {
         // Decode the dispatch.
-        (
-            address expression_,
-            SourceIndex sourceIndex_,
-            uint256 maxOutputs_
-        ) = LibEncodedDispatch.decode(dispatch_);
+        (address expression_, SourceIndex sourceIndex_, uint256 maxOutputs_) = LibEncodedDispatch.decode(dispatch_);
 
         // Build the interpreter state from the onchain expression.
-        InterpreterState memory state_ = LibDataContract
-            .read(expression_)
-            .unsafeDeserialize();
+        InterpreterState memory state_ = LibDataContract.read(expression_).unsafeDeserialize();
         state_.stateKV = MemoryKV.wrap(0);
         state_.namespace = namespace_.qualifyNamespace(msg.sender);
         state_.store = store_;
@@ -95,9 +90,7 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV1, ERC165 {
         // Eval the expression and return up to maxOutputs_ from the final stack.
         Pointer stackTop_ = state_.eval(sourceIndex_, state_.stackBottom);
         uint256 stackLength_ = state_.stackBottom.unsafeToIndex(stackTop_);
-        (, uint256[] memory tail_) = stackTop_.unsafeList(
-            stackLength_.min(maxOutputs_)
-        );
+        (, uint256[] memory tail_) = stackTop_.unsafeList(stackLength_.min(maxOutputs_));
         return (tail_, state_.stateKV.toUint256Array());
     }
 

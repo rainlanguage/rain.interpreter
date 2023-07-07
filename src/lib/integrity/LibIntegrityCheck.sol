@@ -108,20 +108,18 @@ library LibIntegrityCheck {
         uint256[] memory constants_,
         function(IntegrityCheckState memory, Operand, Pointer)
             view
-            returns (Pointer)[]
-            memory integrityFns_
+            returns (Pointer)[] memory integrityFns_
     ) internal pure returns (IntegrityCheckState memory) {
-        return
-            IntegrityCheckState(
-                sources_,
-                constants_.length,
-                INITIAL_STACK_BOTTOM,
-                // Highwater starts underneath stack bottom as it errors on an
-                // greater than _or equal to_ check.
-                INITIAL_STACK_BOTTOM.unsafeSubWord(),
-                INITIAL_STACK_BOTTOM,
-                integrityFns_
-            );
+        return IntegrityCheckState(
+            sources_,
+            constants_.length,
+            INITIAL_STACK_BOTTOM,
+            // Highwater starts underneath stack bottom as it errors on an
+            // greater than _or equal to_ check.
+            INITIAL_STACK_BOTTOM.unsafeSubWord(),
+            INITIAL_STACK_BOTTOM,
+            integrityFns_
+        );
     }
 
     /// If the given stack pointer is above the current state of the max stack
@@ -132,14 +130,8 @@ library LibIntegrityCheck {
     /// including the current max stack top.
     /// @param stackPointer_ The stack pointer to compare and potentially swap
     /// the max stack top for.
-    function syncStackMaxTop(
-        IntegrityCheckState memory integrityCheckState_,
-        Pointer stackPointer_
-    ) internal pure {
-        if (
-            Pointer.unwrap(stackPointer_) >
-            Pointer.unwrap(integrityCheckState_.stackMaxTop)
-        ) {
+    function syncStackMaxTop(IntegrityCheckState memory integrityCheckState_, Pointer stackPointer_) internal pure {
+        if (Pointer.unwrap(stackPointer_) > Pointer.unwrap(integrityCheckState_.stackMaxTop)) {
             integrityCheckState_.stackMaxTop = stackPointer_;
         }
     }
@@ -176,21 +168,13 @@ library LibIntegrityCheck {
             // It's generally more efficient to ensure the stack bottom has
             // plenty of headroom to make underflows from pops impossible rather
             // than guard every single pop against underflow.
-            if (
-                Pointer.unwrap(integrityCheckState_.stackBottom) <
-                Pointer.unwrap(INITIAL_STACK_BOTTOM)
-            ) {
+            if (Pointer.unwrap(integrityCheckState_.stackBottom) < Pointer.unwrap(INITIAL_STACK_BOTTOM)) {
                 revert MinStackBottom();
             }
             uint256 cursor_;
             uint256 end_;
             assembly ("memory-safe") {
-                cursor_ := mload(
-                    add(
-                        mload(integrityCheckState_),
-                        add(0x20, mul(0x20, sourceIndex_))
-                    )
-                )
+                cursor_ := mload(add(mload(integrityCheckState_), add(0x20, mul(0x20, sourceIndex_))))
                 end_ := add(cursor_, mload(cursor_))
             }
 
@@ -207,13 +191,10 @@ library LibIntegrityCheck {
                 // We index into the function pointers here rather than using raw
                 // assembly to ensure that any opcodes that we don't have a
                 // pointer for will error as a standard Solidity OOB read.
-                stackTop_ = integrityCheckState_.integrityFunctionPointers[
-                    opcode_
-                ](integrityCheckState_, operand_, stackTop_);
+                stackTop_ =
+                    integrityCheckState_.integrityFunctionPointers[opcode_](integrityCheckState_, operand_, stackTop_);
             }
-            uint256 finalStackOutputs_ = integrityCheckState_
-                .stackBottom
-                .unsafeToIndex(stackTop_);
+            uint256 finalStackOutputs_ = integrityCheckState_.stackBottom.unsafeToIndex(stackTop_);
             if (minStackOutputs_ > finalStackOutputs_) {
                 revert MinFinalStack(minStackOutputs_, finalStackOutputs_);
             }
@@ -228,10 +209,7 @@ library LibIntegrityCheck {
     /// @param stackTop_ The pointer to the virtual stack top for the current
     /// integrity check.
     /// @return The stack top after it has pushed an item.
-    function push(
-        IntegrityCheckState memory integrityCheckState_,
-        Pointer stackTop_
-    ) internal pure returns (Pointer) {
+    function push(IntegrityCheckState memory integrityCheckState_, Pointer stackTop_) internal pure returns (Pointer) {
         stackTop_ = stackTop_.unsafeAddWord();
         integrityCheckState_.syncStackMaxTop(stackTop_);
         return stackTop_;
@@ -242,19 +220,17 @@ library LibIntegrityCheck {
     /// @param integrityCheckState_ as per `push`.
     /// @param stackTop_ as per `push`.
     /// @param n_ The number of items to push to the virtual stack.
-    function push(
-        IntegrityCheckState memory integrityCheckState_,
-        Pointer stackTop_,
-        uint256 n_
-    ) internal pure returns (Pointer) {
+    function push(IntegrityCheckState memory integrityCheckState_, Pointer stackTop_, uint256 n_)
+        internal
+        pure
+        returns (Pointer)
+    {
         stackTop_ = stackTop_.unsafeAddWords(n_);
         // Any time we push more than 1 item to the stack we move the highwater
         // to the last item, as nested multioutput is disallowed.
         if (n_ > 1) {
             integrityCheckState_.stackHighwater = Pointer.wrap(
-                Pointer.unwrap(integrityCheckState_.stackHighwater).max(
-                    Pointer.unwrap(stackTop_.unsafeSubWord())
-                )
+                Pointer.unwrap(integrityCheckState_.stackHighwater).max(Pointer.unwrap(stackTop_.unsafeSubWord()))
             );
         }
         integrityCheckState_.syncStackMaxTop(stackTop_);
@@ -265,11 +241,11 @@ library LibIntegrityCheck {
     /// the highwater is already calculated somehow by the caller. This is also
     /// dangerous if used incorrectly as it could allow uncaught underflows to
     /// creep in.
-    function pushIgnoreHighwater(
-        IntegrityCheckState memory integrityCheckState_,
-        Pointer stackTop_,
-        uint256 n_
-    ) internal pure returns (Pointer) {
+    function pushIgnoreHighwater(IntegrityCheckState memory integrityCheckState_, Pointer stackTop_, uint256 n_)
+        internal
+        pure
+        returns (Pointer)
+    {
         stackTop_ = stackTop_.unsafeAddWords(n_);
         integrityCheckState_.syncStackMaxTop(stackTop_);
         return stackTop_;
@@ -282,10 +258,7 @@ library LibIntegrityCheck {
     /// @param integrityCheckState_ The state of the current integrity check.
     /// @param stackTop_ The virtual stack top before an item is popped.
     /// @return The virtual stack top after the pop.
-    function pop(
-        IntegrityCheckState memory integrityCheckState_,
-        Pointer stackTop_
-    ) internal pure returns (Pointer) {
+    function pop(IntegrityCheckState memory integrityCheckState_, Pointer stackTop_) internal pure returns (Pointer) {
         stackTop_ = stackTop_.unsafeSubWord();
         integrityCheckState_.popUnderflowCheck(stackTop_);
         return stackTop_;
@@ -296,11 +269,11 @@ library LibIntegrityCheck {
     /// @param integrityCheckState_ as per `pop`.
     /// @param stackTop_ as per `pop`.
     /// @param n_ The number of items to pop off the virtual stack.
-    function pop(
-        IntegrityCheckState memory integrityCheckState_,
-        Pointer stackTop_,
-        uint256 n_
-    ) internal pure returns (Pointer) {
+    function pop(IntegrityCheckState memory integrityCheckState_, Pointer stackTop_, uint256 n_)
+        internal
+        pure
+        returns (Pointer)
+    {
         if (n_ > 0) {
             stackTop_ = stackTop_.unsafeSubWords(n_);
             integrityCheckState_.popUnderflowCheck(stackTop_);
@@ -312,11 +285,11 @@ library LibIntegrityCheck {
     /// ensure that this does not result in illegal stack reads.
     /// @param stackTop_ as per `pop`.
     /// @param n_ as per `pop`.
-    function popIgnoreHighwater(
-        IntegrityCheckState memory,
-        Pointer stackTop_,
-        uint256 n_
-    ) internal pure returns (Pointer) {
+    function popIgnoreHighwater(IntegrityCheckState memory, Pointer stackTop_, uint256 n_)
+        internal
+        pure
+        returns (Pointer)
+    {
         return stackTop_.unsafeSubWords(n_);
     }
 
@@ -326,18 +299,10 @@ library LibIntegrityCheck {
     /// we don't have to deal with a numeric underflow of the stack top.
     /// @param integrityCheckState_ As per `pop`.
     /// @param stackTop_ as per `pop`.
-    function popUnderflowCheck(
-        IntegrityCheckState memory integrityCheckState_,
-        Pointer stackTop_
-    ) internal pure {
-        if (
-            Pointer.unwrap(stackTop_) <=
-            Pointer.unwrap(integrityCheckState_.stackHighwater)
-        ) {
+    function popUnderflowCheck(IntegrityCheckState memory integrityCheckState_, Pointer stackTop_) internal pure {
+        if (Pointer.unwrap(stackTop_) <= Pointer.unwrap(integrityCheckState_.stackHighwater)) {
             revert StackPopUnderflow(
-                integrityCheckState_.stackBottom.unsafeToIndex(
-                    integrityCheckState_.stackHighwater
-                ),
+                integrityCheckState_.stackBottom.unsafeToIndex(integrityCheckState_.stackHighwater),
                 integrityCheckState_.stackBottom.unsafeToIndex(stackTop_)
             );
         }
@@ -356,8 +321,7 @@ library LibIntegrityCheck {
         function(uint256, uint256) internal view returns (uint256),
         uint256 n_
     ) internal pure returns (Pointer) {
-        return
-            integrityCheckState_.push(integrityCheckState_.pop(stackTop_, n_));
+        return integrityCheckState_.push(integrityCheckState_.pop(stackTop_, n_));
     }
 
     /// Maps `function(uint256) internal view` to pops and pushes repeatedly N
@@ -415,8 +379,7 @@ library LibIntegrityCheck {
         Pointer stackTop_,
         function(uint256, uint256) internal view returns (uint256)
     ) internal pure returns (Pointer) {
-        return
-            integrityCheckState_.push(integrityCheckState_.pop(stackTop_, 2));
+        return integrityCheckState_.push(integrityCheckState_.pop(stackTop_, 2));
     }
 
     /// Maps
@@ -431,8 +394,7 @@ library LibIntegrityCheck {
         Pointer stackTop_,
         function(uint256, uint256, uint256) internal view returns (uint256)
     ) internal pure returns (Pointer) {
-        return
-            integrityCheckState_.push(integrityCheckState_.pop(stackTop_, 3));
+        return integrityCheckState_.push(integrityCheckState_.pop(stackTop_, 3));
     }
 
     /// Maps
@@ -455,8 +417,7 @@ library LibIntegrityCheck {
             view
             returns (uint256)
     ) internal pure returns (Pointer) {
-        return
-            integrityCheckState_.push(integrityCheckState_.pop(stackTop_, 4));
+        return integrityCheckState_.push(integrityCheckState_.pop(stackTop_, 4));
     }
 
     /// Maps `function(uint256[] memory) internal view returns (uint256)` to
@@ -473,10 +434,7 @@ library LibIntegrityCheck {
         function(uint256[] memory) internal view returns (uint256),
         uint256 length_
     ) internal pure returns (Pointer) {
-        return
-            integrityCheckState_.push(
-                integrityCheckState_.pop(stackTop_, length_)
-            );
+        return integrityCheckState_.push(integrityCheckState_.pop(stackTop_, length_));
     }
 
     /// Maps
@@ -503,10 +461,7 @@ library LibIntegrityCheck {
         uint256 length_
     ) internal pure returns (Pointer) {
         unchecked {
-            return
-                integrityCheckState_.push(
-                    integrityCheckState_.pop(stackTop_, length_ + 2)
-                );
+            return integrityCheckState_.push(integrityCheckState_.pop(stackTop_, length_ + 2));
         }
     }
 
@@ -534,10 +489,7 @@ library LibIntegrityCheck {
         uint256 length_
     ) internal pure returns (Pointer) {
         unchecked {
-            return
-                integrityCheckState_.push(
-                    integrityCheckState_.pop(stackTop_, length_ + 3)
-                );
+            return integrityCheckState_.push(integrityCheckState_.pop(stackTop_, length_ + 3));
         }
     }
 
@@ -565,11 +517,7 @@ library LibIntegrityCheck {
         uint256 length_
     ) internal pure returns (Pointer) {
         unchecked {
-            return
-                integrityCheckState_.push(
-                    integrityCheckState_.pop(stackTop_, length_ * 2 + 1),
-                    length_
-                );
+            return integrityCheckState_.push(integrityCheckState_.pop(stackTop_, length_ * 2 + 1), length_);
         }
     }
 
@@ -607,7 +555,6 @@ library LibIntegrityCheck {
         Pointer stackTop_,
         function(Operand, uint256, uint256) internal view returns (uint256)
     ) internal pure returns (Pointer) {
-        return
-            integrityCheckState_.push(integrityCheckState_.pop(stackTop_, 2));
+        return integrityCheckState_.push(integrityCheckState_.pop(stackTop_, 2));
     }
 }

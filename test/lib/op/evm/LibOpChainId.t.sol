@@ -18,9 +18,7 @@ contract LibOpChainIdTest is Test {
     using LibStackPointer for Pointer;
     using LibInterpreterState for InterpreterState;
 
-    function testOpChainIDRun(InterpreterState memory state, Operand operand, uint256 pre, uint256 post)
-        external
-    {
+    function testOpChainIDRun(InterpreterState memory state, Operand operand, uint256 pre, uint256 post) external {
         // Build a stack with two zeros on it. The first zero will be overridden
         // by the opcode. The second zero will be used to check that the opcode
         // doesn't modify the stack beyond the first element.
