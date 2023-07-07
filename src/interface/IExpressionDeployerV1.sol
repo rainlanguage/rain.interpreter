@@ -3,6 +3,8 @@ pragma solidity ^0.8.18;
 
 import "./IInterpreterV1.sol";
 
+string constant IERC1820_NAME_IEXPRESSION_DEPLOYER_V1 = "IExpressionDeployerV1";
+
 /// @title IExpressionDeployerV1
 /// @notice Companion to `IInterpreterV1` responsible for onchain static code
 /// analysis and deploying expressions. Each `IExpressionDeployerV1` is tightly

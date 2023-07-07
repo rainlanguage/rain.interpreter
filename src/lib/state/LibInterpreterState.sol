@@ -59,3 +59,12 @@ struct InterpreterState {
     uint256[][] context;
     bytes[] compiledSources;
 }
+
+library LibInterpreterState {
+    /// Fingerprint the current state of the interpreter. This is used primarily
+    /// for testing purposes to ensure that the interpreter is (not) modified
+    /// during evaluation.
+    function fingerprint(InterpreterState memory state) internal pure returns (bytes32) {
+        return keccak256(abi.encode(state));
+    }
+}

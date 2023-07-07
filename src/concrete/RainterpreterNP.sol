@@ -15,20 +15,6 @@ import "../lib/caller/LibEncodedDispatch.sol";
 
 import "../lib/op/LibAllStandardOpsNP.sol";
 
-// import "sol.lib.datacontract/LibDataContract.sol";
-
-// import "../ops/AllStandardOps.sol";
-// import "rain.interpreter/lib/caller/LibEncodedDispatch.sol";
-// import "rain.lib.memkv/LibMemoryKV.sol";
-// import "rain.interpreter/interface/IInterpreterStoreV1.sol";
-// import "rain.interpreter/interface/unstable/IDebugInterpreterV1.sol";
-// import "rain.interpreter/lib/state/LibInterpreterStateDataContract.sol";
-// import "rain.interpreter/lib/ns/LibNamespace.sol";
-// import "sol.lib.memory/LibUint256Array.sol";
-// import "rain.interpreter/lib/eval/LibEval.sol";
-// import {MathUpgradeable as Math} from "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
-// import {IERC165Upgradeable as IERC165} from "@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol";
-
 /// @title Rainterpreter
 /// @notice Minimal binding of the `IIinterpreterV1` interface to the
 /// `LibInterpreterState` library, including every opcode in `AllStandardOps`.
@@ -50,13 +36,12 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV1, ERC165 {
     using Math for uint256;
     using LibMemoryKV for MemoryKV;
 
-    // @inheritdoc IERC165
+    // @inheritdoc ERC165
     function supportsInterface(
-        bytes4 interfaceId_
+        bytes4 interfaceId
     ) public view virtual override returns (bool) {
         return
-            interfaceId_ == type(IInterpreterV1).interfaceId ||
-            interfaceId_ == type(IERC165).interfaceId;
+            interfaceId == type(IInterpreterV1).interfaceId || interfaceId == type(IDebugInterpreterV1).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /// @inheritdoc IDebugInterpreterV1
