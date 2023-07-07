@@ -385,12 +385,16 @@ library LibAllStandardOpsNP {
             function(InterpreterState memory, Operand, Pointer)
                 view
                 returns (Pointer)[ALL_STANDARD_OPS_LENGTH + 1]
-                memory pointersFixed_ = [
+                memory pointersFixed = [
                     asOpFunctionPointer(ALL_STANDARD_OPS_LENGTH),
                     LibOpChainId.run
                 ];
+            uint256[] memory pointersDynamic;
+            assembly ("memory-safe") {
+                pointersDynamic := pointersFixed
+            }
             return
-                LibConvert.unsafeTo16BitBytes(asUint256Array(pointersFixed_));
+                LibConvert.unsafeTo16BitBytes(pointersDynamic);
         }
     }
 }

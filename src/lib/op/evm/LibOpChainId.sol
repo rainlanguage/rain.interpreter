@@ -13,18 +13,12 @@ library LibOpChainId {
     using LibIntegrityCheck for IntegrityCheckState;
     using LibOp for Pointer;
 
-    function f() internal view returns (uint256 chainId) {
-        assembly {
-            chainId := chainid()
-        }
-    }
-
     function integrity(
         IntegrityCheckState memory integrityCheckState_,
         Operand,
         Pointer stackTop_
     ) internal pure returns (Pointer) {
-        return integrityCheckState_.applyFn(stackTop_, f);
+        return integrityCheckState_.push(stackTop_);
     }
 
     function run(
@@ -32,6 +26,6 @@ library LibOpChainId {
         Operand,
         Pointer stackTop_
     ) internal view returns (Pointer) {
-        return stackTop_.applyFn(f);
+        return stackTop_.unsafePush(block.chainid);
     }
 }
