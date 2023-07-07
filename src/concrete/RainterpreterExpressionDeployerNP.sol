@@ -15,17 +15,7 @@ import "../interface/unstable/IDebugInterpreterV1.sol";
 import "../lib/integrity/LibIntegrityCheck.sol";
 import "../lib/state/LibInterpreterStateDataContract.sol";
 import "../lib/op/LibAllStandardOpsNP.sol";
-
-// import "sol.lib.datacontract/LibDataContract.sol";
-
-// import "rain.interpreter/interface/IExpressionDeployerV1.sol";
-// import "rain.interpreter/interface/unstable/IDebugInterpreterV1.sol";
-// import "rain.interpreter/interface/unstable/IDebugExpressionDeployerV1.sol";
-// import "rain.interpreter/lib/state/LibInterpreterStateDataContract.sol";
-// import "../ops/AllStandardOps.sol";
-// import "../../ierc1820/LibIERC1820.sol";
-
-// import "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
+import "../lib/parse/LibParse.sol";
 
 /// @dev Thrown when the pointers known to the expression deployer DO NOT match
 /// the interpreter it is constructed for. This WILL cause undefined expression
@@ -58,17 +48,16 @@ error UnexpectedOpMetaHash(bytes32 actualOpMeta);
 /// immutable for any given interpreter so once the expression deployer is
 /// constructed and has verified that this matches what the interpreter reports,
 /// it can use this constant value to compile and serialize expressions.
-bytes constant OPCODE_FUNCTION_POINTERS =
-    hex"0c660c7d0c8c0d210d2f0d810df10e790f580fae104711f01230124e125d126b127a1288129612a412b2127a12c012ce134c135a136813761385139413a313b213c113d013df13ee13fd140c141b1469147b148914bb14c914d714e514f31501150f151d152b15391547155515631571157f158d159b15a915b715c515d415e315f21600160e161c162a1638164616541780180818171826183418a6";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"09ec";
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x690b38cff472a22ae81a617f6b1cbb97e2d334d6777181b241f179c0d45dbdaf);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xda69fab45680e6c6ea401753eff6a96472f30126e7c8fc6ccae147ab68e36776);
 
 /// @dev Hash of the known store bytecode.
 bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);
 
 /// @dev Hash of the known op meta.
-bytes32 constant OP_META_HASH = bytes32(0xe4c000f3728f30e612b34e401529ce5266061cc1233dc54a6a89524929571d8f);
+bytes32 constant OP_META_HASH = bytes32(0x2cf73adad61aae49cfe0a38448ca982e30a16b18fe56c294e51104f9148d94da);
 
 /// All config required to construct a `Rainterpreter`.
 /// @param store The `IInterpreterStoreV1`. MUST match known bytecode.
@@ -102,55 +91,55 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpre
     /// @param expression The address of the deployed expression.
     event ExpressionAddress(address sender, address expression);
 
-    IInterpreterV1 public immutable interpreter;
-    IInterpreterStoreV1 public immutable store;
+    IInterpreterV1 public immutable iInterpreter;
+    IInterpreterStoreV1 public immutable iStore;
 
     /// THIS IS NOT A SECURITY CHECK. IT IS AN INTEGRITY CHECK TO PREVENT HONEST
     /// MISTAKES. IT CANNOT PREVENT EITHER A MALICIOUS INTERPRETER OR DEPLOYER
     /// FROM BEING EXECUTED.
-    constructor(RainterpreterExpressionDeployerConstructionConfig memory config_) {
-        IInterpreterV1 interpreter_ = IInterpreterV1(config_.interpreter);
+    constructor(RainterpreterExpressionDeployerConstructionConfig memory config) {
+        IInterpreterV1 interpreter = IInterpreterV1(config.interpreter);
         // Guard against serializing incorrect function pointers, which would
         // cause undefined runtime behaviour for corrupted opcodes.
-        bytes memory functionPointers_ = interpreter_.functionPointers();
-        if (keccak256(functionPointers_) != keccak256(OPCODE_FUNCTION_POINTERS)) {
-            revert UnexpectedPointers(functionPointers_);
+        bytes memory functionPointers = interpreter.functionPointers();
+        if (keccak256(functionPointers) != keccak256(OPCODE_FUNCTION_POINTERS)) {
+            revert UnexpectedPointers(functionPointers);
         }
         // Guard against an interpreter with unknown bytecode.
-        bytes32 interpreterHash_;
+        bytes32 interpreterHash;
         assembly ("memory-safe") {
-            interpreterHash_ := extcodehash(interpreter_)
+            interpreterHash := extcodehash(interpreter)
         }
-        if (interpreterHash_ != INTERPRETER_BYTECODE_HASH) {
+        if (interpreterHash != INTERPRETER_BYTECODE_HASH) {
             /// THIS IS NOT A SECURITY CHECK. IT IS AN INTEGRITY CHECK TO PREVENT
             /// HONEST MISTAKES.
-            revert UnexpectedInterpreterBytecodeHash(interpreterHash_);
+            revert UnexpectedInterpreterBytecodeHash(interpreterHash);
         }
 
         // Guard against an store with unknown bytecode.
-        IInterpreterStoreV1 store_ = IInterpreterStoreV1(config_.store);
-        bytes32 storeHash_;
+        IInterpreterStoreV1 store = IInterpreterStoreV1(config.store);
+        bytes32 storeHash;
         assembly ("memory-safe") {
-            storeHash_ := extcodehash(store_)
+            storeHash := extcodehash(store)
         }
-        if (storeHash_ != STORE_BYTECODE_HASH) {
+        if (storeHash != STORE_BYTECODE_HASH) {
             /// THIS IS NOT A SECURITY CHECK. IT IS AN INTEGRITY CHECK TO PREVENT
             /// HONEST MISTAKES.
-            revert UnexpectedStoreBytecodeHash(storeHash_);
+            revert UnexpectedStoreBytecodeHash(storeHash);
         }
 
         /// This IS a security check. This prevents someone making an exact
         /// bytecode copy of the interpreter and shipping different meta for
         /// the copy to lie about what each op does in the interpreter.
-        bytes32 opMetaHash_ = keccak256(config_.meta);
-        if (opMetaHash_ != OP_META_HASH) {
-            revert UnexpectedOpMetaHash(opMetaHash_);
+        bytes32 opMetaHash = keccak256(config.meta);
+        if (opMetaHash != OP_META_HASH) {
+            revert UnexpectedOpMetaHash(opMetaHash);
         }
 
-        interpreter = interpreter_;
-        store = store_;
+        iInterpreter = interpreter;
+        iStore = store;
 
-        emit DISpair(msg.sender, address(this), config_.interpreter, config_.store, config_.meta);
+        emit DISpair(msg.sender, address(this), config.interpreter, config.store, config.meta);
 
         IERC1820_REGISTRY.setInterfaceImplementer(
             address(this), IERC1820_REGISTRY.interfaceHash(IERC1820_NAME_IEXPRESSION_DEPLOYER_V1), address(this)
@@ -178,8 +167,8 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpre
         virtual
         returns (
             function(IntegrityCheckState memory, Operand, Pointer)
-                        view
-                        returns (Pointer)[] memory
+                                        view
+                                        returns (Pointer)[] memory
         )
     {
         return LibAllStandardOpsNP.integrityFunctionPointers();
@@ -210,46 +199,52 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpre
             LibMemCpy.unsafeCopyWordsTo(initialStack_.dataPointer(), stack_.dataPointer(), initialStack_.length);
         }
 
-        return IDebugInterpreterV1(address(interpreter)).offchainDebugEval(
-            store, namespace_, sources_, constants_, context_, stack_, sourceIndex_
+        return IDebugInterpreterV1(address(iInterpreter)).offchainDebugEval(
+            iStore, namespace_, sources_, constants_, context_, stack_, sourceIndex_
         );
     }
 
-    function integrityCheck(bytes[] memory sources_, uint256[] memory constants_, uint256[] memory minOutputs_)
+    function parse(bytes memory data) external pure returns (bytes[] memory, uint256[] memory) {
+        bytes32[] memory words = new bytes32[](1);
+        words[0] = "chain-id";
+        return LibParse.parse(data, LibParseMeta.buildMetaExpander(words, 2));
+    }
+
+    function integrityCheck(bytes[] memory sources, uint256[] memory constants, uint256[] memory minOutputs)
         internal
         view
         returns (uint256)
     {
         // Ensure that we are not missing any entrypoints expected by the calling
         // contract.
-        if (minOutputs_.length > sources_.length) {
-            revert MissingEntrypoint(minOutputs_.length, sources_.length);
+        if (minOutputs.length > sources.length) {
+            revert MissingEntrypoint(minOutputs.length, sources.length);
         }
 
         // Build the initial state of the integrity check.
-        IntegrityCheckState memory integrityCheckState_ =
-            LibIntegrityCheck.newState(sources_, constants_, integrityFunctionPointers());
+        IntegrityCheckState memory integrityCheckState =
+            LibIntegrityCheck.newState(sources, constants, integrityFunctionPointers());
         // Loop over each possible entrypoint as defined by the calling contract
         // and check the integrity of each. At the least we need to be sure that
         // there are no out of bounds stack reads/writes and to know the total
         // memory to allocate when later deserializing an associated interpreter
         // state for evaluation.
-        Pointer initialStackBottom_ = integrityCheckState_.stackBottom;
-        Pointer initialStackHighwater_ = integrityCheckState_.stackHighwater;
-        for (uint16 i_ = 0; i_ < minOutputs_.length; i_++) {
+        Pointer initialStackBottom = integrityCheckState.stackBottom;
+        Pointer initialStackHighwater = integrityCheckState.stackHighwater;
+        for (uint16 i_ = 0; i_ < minOutputs.length; i_++) {
             // Reset the top, bottom and highwater between each entrypoint as
             // every external eval MUST have a fresh stack, but retain the max
             // stack height as the latter is used for unconditional memory
             // allocation so MUST be the max height across all possible
             // entrypoints.
-            integrityCheckState_.stackBottom = initialStackBottom_;
-            integrityCheckState_.stackHighwater = initialStackHighwater_;
+            integrityCheckState.stackBottom = initialStackBottom;
+            integrityCheckState.stackHighwater = initialStackHighwater;
             LibIntegrityCheck.ensureIntegrity(
-                integrityCheckState_, SourceIndex.wrap(i_), INITIAL_STACK_BOTTOM, minOutputs_[i_]
+                integrityCheckState, SourceIndex.wrap(i_), INITIAL_STACK_BOTTOM, minOutputs[i_]
             );
         }
 
-        return integrityCheckState_.stackBottom.unsafeToIndex(integrityCheckState_.stackMaxTop);
+        return integrityCheckState.stackBottom.unsafeToIndex(integrityCheckState.stackMaxTop);
     }
 
     /// @inheritdoc IExpressionDeployerV1
@@ -274,11 +269,11 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpre
         );
 
         // Deploy the serialized expression onchain.
-        address expression_ = LibDataContract.write(container_);
+        address expression = LibDataContract.write(container_);
 
         // Emit and return the address of the deployed expression.
-        emit ExpressionAddress(msg.sender, expression_);
+        emit ExpressionAddress(msg.sender, expression);
 
-        return (interpreter, store, expression_);
+        return (iInterpreter, iStore, expression);
     }
 }

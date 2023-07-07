@@ -8,8 +8,11 @@ import "sol.lib.memory/LibStackPointer.sol";
 
 import "src/lib/state/LibInterpreterState.sol";
 import "src/lib/op/evm/LibOpChainId.sol";
+import "src/lib/caller/LibContext.sol";
 
 import "src/concrete/RainterpreterNP.sol";
+import "src/concrete/RainterpreterStore.sol";
+import "src/concrete/RainterpreterExpressionDeployerNP.sol";
 
 /// @title LibOpChainIdTest
 /// @notice Test the runtime and integrity time logic of LibOpChainId.
@@ -46,5 +49,30 @@ contract LibOpChainIdTest is Test {
 
     function testOpChainIDEval() external {
         RainterpreterNP interpreter = new RainterpreterNP();
+        RainterpreterStore store = new RainterpreterStore();
+        // magic number.
+        bytes memory meta = hex"ff0a89c674ee7874";
+        vm.etch(address(IERC1820_REGISTRY), hex"00");
+        vm.mockCall(address(IERC1820_REGISTRY), "", abi.encode(true));
+        RainterpreterExpressionDeployerNP deployer =
+        new RainterpreterExpressionDeployerNP(RainterpreterExpressionDeployerConstructionConfig(
+            address(interpreter),
+            address(store),
+            meta
+        ));
+        (bytes[] memory sources, uint256[] memory constants) = deployer.parse("_: chain-id();");
+        uint256[] memory minOutputs = new uint256[](1);
+        minOutputs[0] = 1;
+        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+            deployer.deployExpression(sources, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            storeDeployer,
+            StateNamespace.wrap(0),
+            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+        );
+        assertEq(stack.length, 1);
+        assertEq(stack[0], block.chainid);
+        assertEq(kvs.length, 0);
     }
 }

@@ -34,8 +34,8 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV1, ERC165 {
     LibCast
     for
         function(InterpreterState memory, Operand, Pointer)
-            view
-            returns (Pointer)[];
+                    view
+                    returns (Pointer)[];
     using Math for uint256;
     using LibMemoryKV for MemoryKV;
 
@@ -72,20 +72,20 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV1, ERC165 {
 
     /// @inheritdoc IInterpreterV1
     function eval(
-        IInterpreterStoreV1 store_,
-        StateNamespace namespace_,
-        EncodedDispatch dispatch_,
-        uint256[][] memory context_
+        IInterpreterStoreV1 store,
+        StateNamespace namespace,
+        EncodedDispatch dispatch,
+        uint256[][] memory context
     ) external view returns (uint256[] memory, uint256[] memory) {
         // Decode the dispatch.
-        (address expression_, SourceIndex sourceIndex_, uint256 maxOutputs_) = LibEncodedDispatch.decode(dispatch_);
+        (address expression_, SourceIndex sourceIndex_, uint256 maxOutputs_) = LibEncodedDispatch.decode(dispatch);
 
         // Build the interpreter state from the onchain expression.
         InterpreterState memory state_ = LibDataContract.read(expression_).unsafeDeserialize();
         state_.stateKV = MemoryKV.wrap(0);
-        state_.namespace = namespace_.qualifyNamespace(msg.sender);
-        state_.store = store_;
-        state_.context = context_;
+        state_.namespace = namespace.qualifyNamespace(msg.sender);
+        state_.store = store;
+        state_.context = context;
 
         // Eval the expression and return up to maxOutputs_ from the final stack.
         Pointer stackTop_ = state_.eval(sourceIndex_, state_.stackBottom);
