@@ -316,6 +316,34 @@ library LibIntegrityCheck {
         return stackTop.unsafeSubWords(n);
     }
 
+    /// Maps `function(uint256) internal view returns (uint256)` to pops and
+    /// pushes once. The function itself is irrelevant we only care about the
+    /// signature to know how many items are popped/pushed.
+    /// @param integrityCheckState as per `pop` and `push`.
+    /// @param stackTop as per `pop` and `push`.
+    /// @return The stack top after the function has been applied once.
+    function applyFn(
+        IntegrityCheckState memory integrityCheckState,
+        Pointer stackTop,
+        function(uint256) internal view returns (uint256)
+    ) internal pure returns (Pointer) {
+        return integrityCheckState.push(integrityCheckState.pop(stackTop));
+    }
+
+    /// Maps `function(uint256, uint256) internal view` to pops and pushes once.
+    /// The function itself is irrelevant we only care about the signature to
+    /// know how many items are popped/pushed.
+    /// @param integrityCheckState as per `pop` and `push`.
+    /// @param stackTop as per `pop` and `push`.
+    /// @return The stack top after the function has been applied once.
+    function applyFn(
+        IntegrityCheckState memory integrityCheckState,
+        Pointer stackTop,
+        function(uint256, uint256) internal view
+    ) internal pure returns (Pointer) {
+        return integrityCheckState.pop(stackTop, 2);
+    }
+
     /// Maps `function(uint256, uint256) internal view returns (uint256)` to
     /// pops and pushes once. The function itself is irrelevant we only care
     /// about the signature to know how many items are popped/pushed.
@@ -330,9 +358,30 @@ library LibIntegrityCheck {
         return integrityCheckState.push(integrityCheckState.pop(stackTop, 2));
     }
 
-    /// Maps `function(uint256, uint256) internal view returns (uint256)` to pops
-    /// and pushes repeatedly N times. The function itself is irrelevant we only
-    /// care about the signature to know how many items are popped/pushed.
+    /// Reduces `function(uint256, uint256) internal view returns (uint256)`over
+    /// N stack items. The function itself is irrelevant we only care about the
+    /// signature to know how many items are popped/pushed. This is the same as
+    /// calling `applyFn` N - 1 times in a loop, because the first reduction
+    /// takes two items off the stack to start the accumulator, then each
+    /// subsequent reduction takes one item off the stack to incorporate into the
+    /// accumulator.
+    ///
+    /// As per LibOp the behaviour below n = 2 is somewhat arbitrary but is
+    /// defined as:
+    ///
+    /// - n = 0: Value `0` is _pushed_ to the stack.
+    /// - n = 1: Noop.
+    ///
+    /// Which is interpreted as:
+    ///
+    /// - n = 0: Falsey outcome.
+    /// - n = 1: Accumulator without any further inputs = Identity.
+    ///
+    /// Which pragmatically looks something like:
+    ///
+    /// - n = 0: `_: add();`
+    /// - n = 1: `_: add(1);`
+    ///
     /// @param integrityCheckState as per `pop` and `push`.
     /// @param stackTop as per `pop` and `push`.
     /// @param n The number of times the function is applied to the stack.
@@ -343,71 +392,28 @@ library LibIntegrityCheck {
         function(uint256, uint256) internal view returns (uint256),
         uint256 n
     ) internal pure returns (Pointer) {
-        if (n == 0) {
-            return stackTop;
-        }
-        else {
+        if (n > 1) {
             return integrityCheckState.push(integrityCheckState.pop(stackTop, n));
+        } else if (n == 1) {
+            return stackTop;
+        } else {
+            return integrityCheckState.push(stackTop);
         }
-    }
-
-    /// Maps `function(uint256) internal view` to pops and pushes repeatedly N
-    /// times. The function itself is irrelevant we only care about the
-    /// signature to know how many items are popped/pushed.
-    /// @param integrityCheckState_ as per `pop` and `push`.
-    /// @param stackTop_ as per `pop` and `push`.
-    /// @param n_ The number of times the function is applied to the stack.
-    /// @return The stack top after the function has been applied n times.
-    function applyFnN(
-        IntegrityCheckState memory integrityCheckState_,
-        Pointer stackTop_,
-        function(uint256) internal view,
-        uint256 n_
-    ) internal pure returns (Pointer) {
-        return integrityCheckState_.pop(stackTop_, n_);
-    }
-
-    /// Maps `function(uint256) internal view returns (uint256)` to pops and
-    /// pushes once. The function itself is irrelevant we only care about the
-    /// signature to know how many items are popped/pushed.
-    /// @param integrityCheckState_ as per `pop` and `push`.
-    /// @param stackTop_ as per `pop` and `push`.
-    /// @return The stack top after the function has been applied once.
-    function applyFn(
-        IntegrityCheckState memory integrityCheckState_,
-        Pointer stackTop_,
-        function(uint256) internal view returns (uint256)
-    ) internal pure returns (Pointer) {
-        return integrityCheckState_.push(integrityCheckState_.pop(stackTop_));
-    }
-
-    /// Maps `function(uint256, uint256) internal view` to pops and pushes once.
-    /// The function itself is irrelevant we only care about the signature to
-    /// know how many items are popped/pushed.
-    /// @param integrityCheckState_ as per `pop` and `push`.
-    /// @param stackTop_ as per `pop` and `push`.
-    /// @return The stack top after the function has been applied once.
-    function applyFn(
-        IntegrityCheckState memory integrityCheckState_,
-        Pointer stackTop_,
-        function(uint256, uint256) internal view
-    ) internal pure returns (Pointer) {
-        return integrityCheckState_.pop(stackTop_, 2);
     }
 
     /// Maps
     /// `function(uint256, uint256, uint256) internal view returns (uint256)` to
     /// pops and pushes once. The function itself is irrelevant we only care
     /// about the signature to know how many items are popped/pushed.
-    /// @param integrityCheckState_ as per `pop` and `push`.
-    /// @param stackTop_ as per `pop` and `push`.
+    /// @param integrityCheckState as per `pop` and `push`.
+    /// @param stackTop as per `pop` and `push`.
     /// @return The stack top after the function has been applied once.
     function applyFn(
-        IntegrityCheckState memory integrityCheckState_,
-        Pointer stackTop_,
+        IntegrityCheckState memory integrityCheckState,
+        Pointer stackTop,
         function(uint256, uint256, uint256) internal view returns (uint256)
     ) internal pure returns (Pointer) {
-        return integrityCheckState_.push(integrityCheckState_.pop(stackTop_, 3));
+        return integrityCheckState.push(integrityCheckState.pop(stackTop, 3));
     }
 
     /// Maps
@@ -419,35 +425,72 @@ library LibIntegrityCheck {
     /// ```
     /// to pops and pushes once. The function itself is irrelevant we only care
     /// about the signature to know how many items are popped/pushed.
-    /// @param integrityCheckState_ as per `pop` and `push`.
-    /// @param stackTop_ as per `pop` and `push`.
+    /// @param integrityCheckState as per `pop` and `push`.
+    /// @param stackTop as per `pop` and `push`.
     /// @return The stack top after the function has been applied once.
     function applyFn(
-        IntegrityCheckState memory integrityCheckState_,
-        Pointer stackTop_,
+        IntegrityCheckState memory integrityCheckState,
+        Pointer stackTop,
         function(uint256, uint256, uint256, uint256)
             internal
             view
             returns (uint256)
     ) internal pure returns (Pointer) {
-        return integrityCheckState_.push(integrityCheckState_.pop(stackTop_, 4));
+        return integrityCheckState.push(integrityCheckState.pop(stackTop, 4));
+    }
+
+    /// Maps `function(Operand, uint256) internal view returns (uint256)` to
+    /// pops and pushes once. The function itself is irrelevant we only care
+    /// about the signature to know how many items are popped/pushed.
+    ///
+    /// The operand MUST NOT influence the stack movements if this application
+    /// is to be valid.
+    ///
+    /// @param integrityCheckState as per `pop` and `push`.
+    /// @param stackTop as per `pop` and `push`.
+    /// @return The stack top after the function has been applied once.
+    function applyFn(
+        IntegrityCheckState memory integrityCheckState,
+        Pointer stackTop,
+        function(Operand, uint256) internal view returns (uint256)
+    ) internal pure returns (Pointer) {
+        return integrityCheckState.push(integrityCheckState.pop(stackTop));
+    }
+
+    /// Maps
+    /// `function(Operand, uint256, uint256) internal view returns (uint256)` to
+    /// pops and pushes once. The function itself is irrelevant we only care
+    /// about the signature to know how many items are popped/pushed.
+    ///
+    /// The operand MUST NOT influence the stack movements if this application
+    /// is to be valid.
+    ///
+    /// @param integrityCheckState as per `pop` and `push`.
+    /// @param stackTop as per `pop` and `push`.
+    /// @return The stack top after the function has been applied once.
+    function applyFn(
+        IntegrityCheckState memory integrityCheckState,
+        Pointer stackTop,
+        function(Operand, uint256, uint256) internal view returns (uint256)
+    ) internal pure returns (Pointer) {
+        return integrityCheckState.push(integrityCheckState.pop(stackTop, 2));
     }
 
     /// Maps `function(uint256[] memory) internal view returns (uint256)` to
     /// pops and pushes once given that we know the length of the dynamic array
     /// at deploy time. The function itself is irrelevant we only care about the
     /// signature to know how many items are popped/pushed.
-    /// @param integrityCheckState_ as per `pop` and `push`.
-    /// @param stackTop_ as per `pop` and `push`.
-    /// @param length_ The length of the dynamic input array.
+    /// @param integrityCheckState as per `pop` and `push`.
+    /// @param stackTop as per `pop` and `push`.
+    /// @param length The length of the dynamic input array.
     /// @return The stack top after the function has been applied once.
     function applyFn(
-        IntegrityCheckState memory integrityCheckState_,
-        Pointer stackTop_,
+        IntegrityCheckState memory integrityCheckState,
+        Pointer stackTop,
         function(uint256[] memory) internal view returns (uint256),
-        uint256 length_
+        uint256 length
     ) internal pure returns (Pointer) {
-        return integrityCheckState_.push(integrityCheckState_.pop(stackTop_, length_));
+        return integrityCheckState.push(integrityCheckState.pop(stackTop, length));
     }
 
     /// Maps
@@ -460,21 +503,21 @@ library LibIntegrityCheck {
     /// to pops and pushes once given that we know the length of the dynamic
     /// array at deploy time. The function itself is irrelevant we only care
     /// about the signature to know how many items are popped/pushed.
-    /// @param integrityCheckState_ as per `pop` and `push`.
-    /// @param stackTop_ as per `pop` and `push`.
-    /// @param length_ The length of the dynamic input array.
+    /// @param integrityCheckState as per `pop` and `push`.
+    /// @param stackTop as per `pop` and `push`.
+    /// @param length The length of the dynamic input array.
     /// @return The stack top after the function has been applied once.
     function applyFn(
-        IntegrityCheckState memory integrityCheckState_,
-        Pointer stackTop_,
+        IntegrityCheckState memory integrityCheckState,
+        Pointer stackTop,
         function(uint256, uint256, uint256[] memory)
             internal
             view
             returns (uint256),
-        uint256 length_
+        uint256 length
     ) internal pure returns (Pointer) {
         unchecked {
-            return integrityCheckState_.push(integrityCheckState_.pop(stackTop_, length_ + 2));
+            return integrityCheckState.push(integrityCheckState.pop(stackTop, length + 2));
         }
     }
 
@@ -488,21 +531,21 @@ library LibIntegrityCheck {
     /// to pops and pushes once given that we know the length of the dynamic
     /// array at deploy time. The function itself is irrelevant we only care
     /// about the signature to know how many items are popped/pushed.
-    /// @param integrityCheckState_ as per `pop` and `push`.
-    /// @param stackTop_ as per `pop` and `push`.
-    /// @param length_ The length of the dynamic input array.
+    /// @param integrityCheckState as per `pop` and `push`.
+    /// @param stackTop as per `pop` and `push`.
+    /// @param length The length of the dynamic input array.
     /// @return The stack top after the function has been applied once.
     function applyFn(
-        IntegrityCheckState memory integrityCheckState_,
-        Pointer stackTop_,
+        IntegrityCheckState memory integrityCheckState,
+        Pointer stackTop,
         function(uint256, uint256, uint256, uint256[] memory)
             internal
             view
             returns (uint256),
-        uint256 length_
+        uint256 length
     ) internal pure returns (Pointer) {
         unchecked {
-            return integrityCheckState_.push(integrityCheckState_.pop(stackTop_, length_ + 3));
+            return integrityCheckState.push(integrityCheckState.pop(stackTop, length + 3));
         }
     }
 
@@ -516,58 +559,21 @@ library LibIntegrityCheck {
     /// to pops and pushes once given that we know the length of the dynamic
     /// array at deploy time. The function itself is irrelevant we only care
     /// about the signature to know how many items are popped/pushed.
-    /// @param integrityCheckState_ as per `pop` and `push`.
-    /// @param stackTop_ as per `pop` and `push`.
-    /// @param length_ The length of the dynamic input array.
+    /// @param integrityCheckState as per `pop` and `push`.
+    /// @param stackTop as per `pop` and `push`.
+    /// @param length The length of the dynamic input array.
     /// @return The stack top after the function has been applied once.
     function applyFn(
-        IntegrityCheckState memory integrityCheckState_,
-        Pointer stackTop_,
+        IntegrityCheckState memory integrityCheckState,
+        Pointer stackTop,
         function(uint256, uint256[] memory, uint256[] memory)
             internal
             view
             returns (uint256[] memory),
-        uint256 length_
+        uint256 length
     ) internal pure returns (Pointer) {
         unchecked {
-            return integrityCheckState_.push(integrityCheckState_.pop(stackTop_, length_ * 2 + 1), length_);
+            return integrityCheckState.push(integrityCheckState.pop(stackTop, length * 2 + 1), length);
         }
-    }
-
-    /// Maps `function(Operand, uint256) internal view returns (uint256)` to
-    /// pops and pushes once. The function itself is irrelevant we only care
-    /// about the signature to know how many items are popped/pushed.
-    ///
-    /// The operand MUST NOT influence the stack movements if this application
-    /// is to be valid.
-    ///
-    /// @param integrityCheckState_ as per `pop` and `push`.
-    /// @param stackTop_ as per `pop` and `push`.
-    /// @return The stack top after the function has been applied once.
-    function applyFn(
-        IntegrityCheckState memory integrityCheckState_,
-        Pointer stackTop_,
-        function(Operand, uint256) internal view returns (uint256)
-    ) internal pure returns (Pointer) {
-        return integrityCheckState_.push(integrityCheckState_.pop(stackTop_));
-    }
-
-    /// Maps
-    /// `function(Operand, uint256, uint256) internal view returns (uint256)` to
-    /// pops and pushes once. The function itself is irrelevant we only care
-    /// about the signature to know how many items are popped/pushed.
-    ///
-    /// The operand MUST NOT influence the stack movements if this application
-    /// is to be valid.
-    ///
-    /// @param integrityCheckState_ as per `pop` and `push`.
-    /// @param stackTop_ as per `pop` and `push`.
-    /// @return The stack top after the function has been applied once.
-    function applyFn(
-        IntegrityCheckState memory integrityCheckState_,
-        Pointer stackTop_,
-        function(Operand, uint256, uint256) internal view returns (uint256)
-    ) internal pure returns (Pointer) {
-        return integrityCheckState_.push(integrityCheckState_.pop(stackTop_, 2));
     }
 }
