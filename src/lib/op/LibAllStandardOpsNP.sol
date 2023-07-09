@@ -43,6 +43,11 @@ library LibAllStandardOpsNP {
             assembly ("memory-safe") {
                 pointers := pointersFixed
             }
+            // Sanity check that the dynamic length is correct. Should be an
+            // unreachable error.
+            if (pointers.length != ALL_STANDARD_OPS_LENGTH) {
+                revert BadDynamicLength(pointers.length, length);
+            }
         }
     }
 
@@ -65,6 +70,11 @@ library LibAllStandardOpsNP {
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
                 pointersDynamic := pointersFixed
+            }
+            // Sanity check that the dynamic length is correct. Should be an
+            // unreachable error.
+            if (pointersDynamic.length != ALL_STANDARD_OPS_LENGTH) {
+                revert BadDynamicLength(pointersDynamic.length, length);
             }
             return LibConvert.unsafeTo16BitBytes(pointersDynamic);
         }
