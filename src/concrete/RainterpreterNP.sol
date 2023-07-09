@@ -15,14 +15,13 @@ import "../lib/caller/LibEncodedDispatch.sol";
 
 import "../lib/op/LibAllStandardOpsNP.sol";
 
-/// @title Rainterpreter
-/// @notice Minimal binding of the `IIinterpreterV1` interface to the
-/// `LibInterpreterState` library, including every opcode in `AllStandardOps`.
-/// This is the default implementation of "an interpreter" but is designed such
-/// that other interpreters can easily be developed alongside. Alterpreters can
-/// either be built by inheriting and overriding the functions on this contract,
-/// or using the relevant libraries to construct an alternative binding to the
-/// same interface.
+/// @title RainterpreterNP
+/// @notice !!EXPERIMENTAL!! implementation of a Rainlang interpreter that is
+/// compatible with native onchain Rainlang parsing. Initially copied verbatim
+/// from the JS compatible Rainterpreter. This interpreter is deliberately
+/// separate from the JS Rainterpreter to allow for experimentation with the
+/// onchain interpreter without affecting the JS interpreter, up to and including
+/// a complely different execution model and opcodes.
 contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV1, ERC165 {
     using LibStackPointer for Pointer;
     using LibStackPointer for uint256[];
@@ -34,8 +33,8 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV1, ERC165 {
     LibCast
     for
         function(InterpreterState memory, Operand, Pointer)
-                                    view
-                                    returns (Pointer)[];
+                                                view
+                                                returns (Pointer)[];
     using Math for uint256;
     using LibMemoryKV for MemoryKV;
 
@@ -47,27 +46,21 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV1, ERC165 {
 
     /// @inheritdoc IDebugInterpreterV1
     function offchainDebugEval(
-        IInterpreterStoreV1 store_,
-        FullyQualifiedNamespace namespace_,
-        bytes[] memory compiledSources_,
-        uint256[] memory constants_,
-        uint256[][] memory context_,
-        uint256[] memory stack_,
-        SourceIndex sourceIndex_
+        IInterpreterStoreV1 store,
+        FullyQualifiedNamespace namespace,
+        bytes[] memory compiledSources,
+        uint256[] memory constants,
+        uint256[][] memory context,
+        uint256[] memory stack,
+        SourceIndex sourceIndex
     ) external view returns (uint256[] memory, uint256[] memory) {
-        InterpreterState memory state_ = InterpreterState(
-            stack_.dataPointer(),
-            constants_.dataPointer(),
-            MemoryKV.wrap(0),
-            namespace_,
-            store_,
-            context_,
-            compiledSources_
+        InterpreterState memory state = InterpreterState(
+            stack.dataPointer(), constants.dataPointer(), MemoryKV.wrap(0), namespace, store, context, compiledSources
         );
-        Pointer stackTop_ = state_.eval(sourceIndex_, state_.stackBottom);
-        uint256 stackLengthFinal_ = state_.stackBottom.unsafeToIndex(stackTop_);
-        (, uint256[] memory tail_) = stackTop_.unsafeList(stackLengthFinal_);
-        return (tail_, state_.stateKV.toUint256Array());
+        Pointer stackTop = state.eval(sourceIndex, state.stackBottom);
+        uint256 stackLengthFinal = state.stackBottom.unsafeToIndex(stackTop);
+        (, uint256[] memory tail) = stackTop.unsafeList(stackLengthFinal);
+        return (tail, state.stateKV.toUint256Array());
     }
 
     /// @inheritdoc IInterpreterV1
@@ -78,20 +71,20 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV1, ERC165 {
         uint256[][] memory context
     ) external view returns (uint256[] memory, uint256[] memory) {
         // Decode the dispatch.
-        (address expression_, SourceIndex sourceIndex_, uint256 maxOutputs_) = LibEncodedDispatch.decode(dispatch);
+        (address expression, SourceIndex sourceIndex, uint256 maxOutputs) = LibEncodedDispatch.decode(dispatch);
 
         // Build the interpreter state from the onchain expression.
-        InterpreterState memory state_ = LibDataContract.read(expression_).unsafeDeserialize();
-        state_.stateKV = MemoryKV.wrap(0);
-        state_.namespace = namespace.qualifyNamespace(msg.sender);
-        state_.store = store;
-        state_.context = context;
+        InterpreterState memory state = LibDataContract.read(expression).unsafeDeserialize();
+        state.stateKV = MemoryKV.wrap(0);
+        state.namespace = namespace.qualifyNamespace(msg.sender);
+        state.store = store;
+        state.context = context;
 
-        // Eval the expression and return up to maxOutputs_ from the final stack.
-        Pointer stackTop_ = state_.eval(sourceIndex_, state_.stackBottom);
-        uint256 stackLength_ = state_.stackBottom.unsafeToIndex(stackTop_);
-        (, uint256[] memory tail_) = stackTop_.unsafeList(stackLength_.min(maxOutputs_));
-        return (tail_, state_.stateKV.toUint256Array());
+        // Eval the expression and return up to maxOutputs from the final stack.
+        Pointer stackTop = state.eval(sourceIndex, state.stackBottom);
+        uint256 stackLength = state.stackBottom.unsafeToIndex(stackTop);
+        (, uint256[] memory tail) = stackTop.unsafeList(stackLength.min(maxOutputs));
+        return (tail, state.stateKV.toUint256Array());
     }
 
     /// @inheritdoc IInterpreterV1
