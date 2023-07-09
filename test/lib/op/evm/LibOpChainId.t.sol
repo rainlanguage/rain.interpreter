@@ -22,8 +22,7 @@ contract LibOpChainIdTest is Test {
     using LibInterpreterState for InterpreterState;
 
     /// Directly test the integrity logic of LibOpChainId.
-    function testOpChainIDIntegrity(Operand operand, Pointer stackTop) external {
-        vm.assume(Pointer.unwrap(stackTop) <= type(uint256).max - 0x20);
+    function testOpChainIDIntegrity(Operand operand) external {
         function(IntegrityCheckState memory, Operand, Pointer)
         view
         returns (Pointer)[] memory integrityCheckers =
@@ -31,13 +30,14 @@ contract LibOpChainIdTest is Test {
         integrityCheckers[0] = LibOpChainId.integrity;
 
         IntegrityCheckState memory state =
-            IntegrityCheckState(new bytes[](0), 0, stackTop, stackTop, stackTop, integrityCheckers);
+            LibIntegrityCheck.newState(new bytes[](0), new uint256[](0), integrityCheckers);
+        Pointer stackTop = state.stackBottom;
 
         Pointer stackTopAfter = LibOpChainId.integrity(state, operand, stackTop);
 
         assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(stackTop.unsafeAddWord()));
         assertEq(Pointer.unwrap(state.stackBottom), Pointer.unwrap(stackTop));
-        assertEq(Pointer.unwrap(state.stackHighwater), Pointer.unwrap(stackTop));
+        assertEq(Pointer.unwrap(state.stackHighwater), Pointer.unwrap(INITIAL_STACK_HIGHWATER));
         assertEq(Pointer.unwrap(state.stackMaxTop), Pointer.unwrap(stackTopAfter));
     }
 

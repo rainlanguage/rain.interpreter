@@ -195,28 +195,28 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpre
     }
 
     /// @inheritdoc IExpressionDeployerV1
-    function deployExpression(bytes[] memory sources_, uint256[] memory constants_, uint256[] memory minOutputs_)
+    function deployExpression(bytes[] memory sources, uint256[] memory constants, uint256[] memory minOutputs)
         external
         returns (IInterpreterV1, IInterpreterStoreV1, address)
     {
-        uint256 stackLength_ = integrityCheck(sources_, constants_, minOutputs_);
+        uint256 stackLength = integrityCheck(sources, constants, minOutputs);
 
         // Emit the config of the expression _before_ we serialize it, as the
         // serialization process itself is destructive of the sources in memory.
-        emit NewExpression(msg.sender, sources_, constants_, minOutputs_);
+        emit NewExpression(msg.sender, sources, constants, minOutputs);
 
-        (DataContractMemoryContainer container_, Pointer pointer_) =
-            LibDataContract.newContainer(LibInterpreterStateDataContract.serializeSize(sources_, constants_));
+        (DataContractMemoryContainer container, Pointer pointer) =
+            LibDataContract.newContainer(LibInterpreterStateDataContract.serializeSize(sources, constants));
 
         // Serialize the state config into bytes that can be deserialized later
         // by the interpreter. This will compile the sources according to the
         // provided function pointers.
         LibInterpreterStateDataContract.unsafeSerialize(
-            pointer_, sources_, constants_, stackLength_, OPCODE_FUNCTION_POINTERS
+            pointer, sources, constants, stackLength, OPCODE_FUNCTION_POINTERS
         );
 
         // Deploy the serialized expression onchain.
-        address expression = LibDataContract.write(container_);
+        address expression = LibDataContract.write(container);
 
         // Emit and return the address of the deployed expression.
         emit ExpressionAddress(msg.sender, expression);
@@ -289,8 +289,8 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpre
         virtual
         returns (
             function(IntegrityCheckState memory, Operand, Pointer)
-                                                                                                                        view
-                                                                                                                        returns (Pointer)[]
+                                                                                                                                                                view
+                                                                                                                                                                returns (Pointer)[]
                 memory
         )
     {

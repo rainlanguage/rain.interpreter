@@ -15,6 +15,10 @@ import "../../interface/IInterpreterV1.sol";
 /// achieve something analogous to signed integers with unsigned integer types.
 Pointer constant INITIAL_STACK_BOTTOM = Pointer.wrap(type(uint256).max / 2);
 
+/// @dev Highwater starts underneath stack bottom as it errors on an greater than
+/// _or equal to_ check.
+Pointer constant INITIAL_STACK_HIGHWATER = Pointer.wrap(Pointer.unwrap(INITIAL_STACK_BOTTOM) - 0x20);
+
 /// It is a misconfiguration to set the initial stack bottom to zero or some
 /// small value as this trivially exposes the integrity check to potential
 /// underflow issues that are gas intensive to repeatedly guard against on every
@@ -106,36 +110,37 @@ library LibIntegrityCheck {
     using LibStackPointer for Pointer;
     using Math for uint256;
 
+    /// Build a new integrity check state from sane defaults. The initialization
+    /// of the stack bottom and highwater are important to avoid underflows
+    /// during the integrity check.
+    /// @param sources The sources of the expression to check.
+    /// @param constants The constants of the expression to check.
+    /// @param integrityFns The integrity check function pointers for each
+    /// opcode.
+    /// @return The new integrity check state.
     function newState(
-        bytes[] memory sources_,
-        uint256[] memory constants_,
+        bytes[] memory sources,
+        uint256[] memory constants,
         function(IntegrityCheckState memory, Operand, Pointer)
             view
-            returns (Pointer)[] memory integrityFns_
+            returns (Pointer)[] memory integrityFns
     ) internal pure returns (IntegrityCheckState memory) {
         return IntegrityCheckState(
-            sources_,
-            constants_.length,
-            INITIAL_STACK_BOTTOM,
-            // Highwater starts underneath stack bottom as it errors on an
-            // greater than _or equal to_ check.
-            INITIAL_STACK_BOTTOM.unsafeSubWord(),
-            INITIAL_STACK_BOTTOM,
-            integrityFns_
+            sources, constants.length, INITIAL_STACK_BOTTOM, INITIAL_STACK_HIGHWATER, INITIAL_STACK_BOTTOM, integrityFns
         );
     }
 
     /// If the given stack pointer is above the current state of the max stack
     /// top, the max stack top will be moved to the stack pointer.
-    /// i.e. this works like `stackMaxTop = stackMaxTop.max(stackPointer_)` but
+    /// i.e. this works like `stackMaxTop = stackMaxTop.max(stackPointer)` but
     /// with the type unwrapping boilerplate included for convenience.
-    /// @param integrityCheckState_ The state of the current integrity check
+    /// @param integrityCheckState The state of the current integrity check
     /// including the current max stack top.
-    /// @param stackPointer_ The stack pointer to compare and potentially swap
+    /// @param stackPointer The stack pointer to compare and potentially swap
     /// the max stack top for.
-    function syncStackMaxTop(IntegrityCheckState memory integrityCheckState_, Pointer stackPointer_) internal pure {
-        if (Pointer.unwrap(stackPointer_) > Pointer.unwrap(integrityCheckState_.stackMaxTop)) {
-            integrityCheckState_.stackMaxTop = stackPointer_;
+    function syncStackMaxTop(IntegrityCheckState memory integrityCheckState, Pointer stackPointer) internal pure {
+        if (Pointer.unwrap(stackPointer) > Pointer.unwrap(integrityCheckState.stackMaxTop)) {
+            integrityCheckState.stackMaxTop = stackPointer;
         }
     }
 
@@ -144,16 +149,16 @@ library LibIntegrityCheck {
     /// nesting of sources and substacks, loops, etc.
     /// If ANY of the integrity checks for ANY opcode fails the entire integrity
     /// check will revert.
-    /// @param integrityCheckState_ Current state of the integrity check passed
+    /// @param integrityCheckState Current state of the integrity check passed
     /// by reference to allow for recursive/nested integrity checking.
-    /// @param sourceIndex_ The source to check the integrity of which can be
+    /// @param sourceIndex The source to check the integrity of which can be
     /// either an entrypoint or a non-entrypoint source if this is a recursive
     /// call to `ensureIntegrity`.
-    /// @param stackTop_ The current top of the virtual stack as a pointer. This
+    /// @param stackTop The current top of the virtual stack as a pointer. This
     /// can be manipulated to create effective substacks/scoped/immutable
-    /// runtime values by restricting how the `stackTop_` can move at deploy
+    /// runtime values by restricting how the `stackTop` can move at deploy
     /// time.
-    /// @param minStackOutputs_ The minimum stack height required by the end of
+    /// @param minStackOutputs The minimum stack height required by the end of
     /// this integrity check. The caller MUST ensure that it sets this value high
     /// enough so that it can safely read enough values from the final stack
     /// without out of bounds reads. The external interface to the expression
@@ -162,153 +167,153 @@ library LibIntegrityCheck {
     /// opcode such as `call` can build scoped stacks, etc. so here we just put
     /// defining the requirements back on the caller.
     function ensureIntegrity(
-        IntegrityCheckState memory integrityCheckState_,
-        SourceIndex sourceIndex_,
-        Pointer stackTop_,
-        uint256 minStackOutputs_
+        IntegrityCheckState memory integrityCheckState,
+        SourceIndex sourceIndex,
+        Pointer stackTop,
+        uint256 minStackOutputs
     ) internal view returns (Pointer) {
         unchecked {
             // It's generally more efficient to ensure the stack bottom has
             // plenty of headroom to make underflows from pops impossible rather
             // than guard every single pop against underflow.
-            if (Pointer.unwrap(integrityCheckState_.stackBottom) < Pointer.unwrap(INITIAL_STACK_BOTTOM)) {
+            if (Pointer.unwrap(integrityCheckState.stackBottom) < Pointer.unwrap(INITIAL_STACK_BOTTOM)) {
                 revert MinStackBottom();
             }
-            uint256 cursor_;
-            uint256 end_;
+            uint256 cursor;
+            uint256 end;
             assembly ("memory-safe") {
-                cursor_ := mload(add(mload(integrityCheckState_), add(0x20, mul(0x20, sourceIndex_))))
-                end_ := add(cursor_, mload(cursor_))
+                cursor := mload(add(mload(integrityCheckState), add(0x20, mul(0x20, sourceIndex))))
+                end := add(cursor, mload(cursor))
             }
 
             // Loop until complete.
-            while (cursor_ < end_) {
-                uint256 opcode_;
-                Operand operand_;
-                cursor_ += 4;
+            while (cursor < end) {
+                uint256 opcode;
+                Operand operand;
+                cursor += 4;
                 assembly ("memory-safe") {
-                    let op_ := mload(cursor_)
-                    operand_ := and(op_, 0xFFFF)
-                    opcode_ := and(shr(16, op_), 0xFFFF)
+                    let op := mload(cursor)
+                    operand := and(op, 0xFFFF)
+                    opcode := and(shr(16, op), 0xFFFF)
                 }
                 // We index into the function pointers here rather than using raw
                 // assembly to ensure that any opcodes that we don't have a
                 // pointer for will error as a standard Solidity OOB read.
-                stackTop_ =
-                    integrityCheckState_.integrityFunctionPointers[opcode_](integrityCheckState_, operand_, stackTop_);
+                stackTop = integrityCheckState.integrityFunctionPointers[opcode](integrityCheckState, operand, stackTop);
             }
-            uint256 finalStackOutputs_ = integrityCheckState_.stackBottom.unsafeToIndex(stackTop_);
-            if (minStackOutputs_ > finalStackOutputs_) {
-                revert MinFinalStack(minStackOutputs_, finalStackOutputs_);
+            uint256 finalStackOutputs = integrityCheckState.stackBottom.unsafeToIndex(stackTop);
+            if (minStackOutputs > finalStackOutputs) {
+                revert MinFinalStack(minStackOutputs, finalStackOutputs);
             }
-            return stackTop_;
+            return stackTop;
         }
     }
 
     /// Push a single virtual item onto the virtual stack.
     /// Simply moves the stack top up one and syncs the interpreter max stack
     /// height with it if needed.
-    /// @param integrityCheckState_ The state of the current integrity check.
-    /// @param stackTop_ The pointer to the virtual stack top for the current
+    /// @param integrityCheckState The state of the current integrity check.
+    /// @param stackTop The pointer to the virtual stack top for the current
     /// integrity check.
     /// @return The stack top after it has pushed an item.
-    function push(IntegrityCheckState memory integrityCheckState_, Pointer stackTop_) internal pure returns (Pointer) {
-        stackTop_ = stackTop_.unsafeAddWord();
-        integrityCheckState_.syncStackMaxTop(stackTop_);
-        return stackTop_;
+    function push(IntegrityCheckState memory integrityCheckState, Pointer stackTop) internal pure returns (Pointer) {
+        stackTop = stackTop.unsafeAddWord();
+        integrityCheckState.syncStackMaxTop(stackTop);
+        return stackTop;
     }
 
-    /// Overloaded `push` to support `n_` pushes in a single movement.
-    /// `n_` MAY be 0 and this is a virtual noop stack movement.
-    /// @param integrityCheckState_ as per `push`.
-    /// @param stackTop_ as per `push`.
-    /// @param n_ The number of items to push to the virtual stack.
-    function push(IntegrityCheckState memory integrityCheckState_, Pointer stackTop_, uint256 n_)
+    /// Overloaded `push` to support `n` pushes in a single movement.
+    /// `n` MAY be 0 and this is a virtual noop stack movement.
+    /// @param integrityCheckState as per `push`.
+    /// @param stackTop as per `push`.
+    /// @param n The number of items to push to the virtual stack.
+    function push(IntegrityCheckState memory integrityCheckState, Pointer stackTop, uint256 n)
         internal
         pure
         returns (Pointer)
     {
-        stackTop_ = stackTop_.unsafeAddWords(n_);
+        stackTop = stackTop.unsafeAddWords(n);
         // Any time we push more than 1 item to the stack we move the highwater
         // to the last item, as nested multioutput is disallowed.
-        if (n_ > 1) {
-            integrityCheckState_.stackHighwater = Pointer.wrap(
-                Pointer.unwrap(integrityCheckState_.stackHighwater).max(Pointer.unwrap(stackTop_.unsafeSubWord()))
+        if (n > 1) {
+            integrityCheckState.stackHighwater = Pointer.wrap(
+                Pointer.unwrap(integrityCheckState.stackHighwater).max(Pointer.unwrap(stackTop.unsafeSubWord()))
             );
         }
-        integrityCheckState_.syncStackMaxTop(stackTop_);
-        return stackTop_;
+        integrityCheckState.syncStackMaxTop(stackTop);
+        return stackTop;
     }
 
     /// As push for 0+ values. Does NOT move the highwater. This may be useful if
     /// the highwater is already calculated somehow by the caller. This is also
     /// dangerous if used incorrectly as it could allow uncaught underflows to
     /// creep in.
-    function pushIgnoreHighwater(IntegrityCheckState memory integrityCheckState_, Pointer stackTop_, uint256 n_)
+    /// @param integrityCheckState as per `push`.
+    /// @param stackTop as per `push`.
+    /// @param n The number of items to push to the virtual stack.
+    function pushIgnoreHighwater(IntegrityCheckState memory integrityCheckState, Pointer stackTop, uint256 n)
         internal
         pure
         returns (Pointer)
     {
-        stackTop_ = stackTop_.unsafeAddWords(n_);
-        integrityCheckState_.syncStackMaxTop(stackTop_);
-        return stackTop_;
-    }
-
-    /// Move the stock top down one item then check that it hasn't underflowed
-    /// the stack bottom. If all virtual stack movements are defined in terms
-    /// of pops and pushes this will enforce that the gross stack movements do
-    /// not underflow, which would lead to out of bounds stack reads at runtime.
-    /// @param integrityCheckState_ The state of the current integrity check.
-    /// @param stackTop_ The virtual stack top before an item is popped.
-    /// @return The virtual stack top after the pop.
-    function pop(IntegrityCheckState memory integrityCheckState_, Pointer stackTop_) internal pure returns (Pointer) {
-        stackTop_ = stackTop_.unsafeSubWord();
-        integrityCheckState_.popUnderflowCheck(stackTop_);
-        return stackTop_;
-    }
-
-    /// Overloaded `pop` to support `n_` pops in a single movement.
-    /// `n_` MAY be 0 and this is a virtual noop stack movement.
-    /// @param integrityCheckState_ as per `pop`.
-    /// @param stackTop_ as per `pop`.
-    /// @param n_ The number of items to pop off the virtual stack.
-    function pop(IntegrityCheckState memory integrityCheckState_, Pointer stackTop_, uint256 n_)
-        internal
-        pure
-        returns (Pointer)
-    {
-        if (n_ > 0) {
-            stackTop_ = stackTop_.unsafeSubWords(n_);
-            integrityCheckState_.popUnderflowCheck(stackTop_);
-        }
-        return stackTop_;
-    }
-
-    /// DANGEROUS pop that does no underflow/highwater checks. The caller MUST
-    /// ensure that this does not result in illegal stack reads.
-    /// @param stackTop_ as per `pop`.
-    /// @param n_ as per `pop`.
-    function popIgnoreHighwater(IntegrityCheckState memory, Pointer stackTop_, uint256 n_)
-        internal
-        pure
-        returns (Pointer)
-    {
-        return stackTop_.unsafeSubWords(n_);
+        stackTop = stackTop.unsafeAddWords(n);
+        integrityCheckState.syncStackMaxTop(stackTop);
+        return stackTop;
     }
 
     /// Ensures that pops have not underflowed the stack, i.e. that the stack
     /// top is not below the stack bottom. We set a large stack bottom that is
     /// impossible to underflow within gas limits with realistic pops so that
     /// we don't have to deal with a numeric underflow of the stack top.
-    /// @param integrityCheckState_ As per `pop`.
-    /// @param stackTop_ as per `pop`.
-    function popUnderflowCheck(IntegrityCheckState memory integrityCheckState_, Pointer stackTop_) internal pure {
-        if (Pointer.unwrap(stackTop_) <= Pointer.unwrap(integrityCheckState_.stackHighwater)) {
+    /// @param integrityCheckState As per `pop`.
+    /// @param stackTop as per `pop`.
+    function popUnderflowCheck(IntegrityCheckState memory integrityCheckState, Pointer stackTop) internal pure {
+        if (Pointer.unwrap(stackTop) <= Pointer.unwrap(integrityCheckState.stackHighwater)) {
             revert StackPopUnderflow(
-                integrityCheckState_.stackBottom.unsafeToIndex(integrityCheckState_.stackHighwater),
-                integrityCheckState_.stackBottom.unsafeToIndex(stackTop_)
+                integrityCheckState.stackBottom.unsafeToIndex(integrityCheckState.stackHighwater),
+                integrityCheckState.stackBottom.unsafeToIndex(stackTop)
             );
         }
+    }
+
+    /// Move the stock top down one item then check that it hasn't underflowed
+    /// the stack bottom. If all virtual stack movements are defined in terms
+    /// of pops and pushes this will enforce that the gross stack movements do
+    /// not underflow, which would lead to out of bounds stack reads at runtime.
+    /// @param integrityCheckState The state of the current integrity check.
+    /// @param stackTop The virtual stack top before an item is popped.
+    /// @return The virtual stack top after the pop.
+    function pop(IntegrityCheckState memory integrityCheckState, Pointer stackTop) internal pure returns (Pointer) {
+        stackTop = stackTop.unsafeSubWord();
+        integrityCheckState.popUnderflowCheck(stackTop);
+        return stackTop;
+    }
+
+    /// Overloaded `pop` to support `n` pops in a single movement.
+    /// `n` MAY be 0 and this is a virtual noop stack movement.
+    /// @param integrityCheckState as per `pop`.
+    /// @param stackTop as per `pop`.
+    /// @param n The number of items to pop off the virtual stack.
+    function pop(IntegrityCheckState memory integrityCheckState, Pointer stackTop, uint256 n)
+        internal
+        pure
+        returns (Pointer)
+    {
+        stackTop = stackTop.unsafeSubWords(n);
+        integrityCheckState.popUnderflowCheck(stackTop);
+        return stackTop;
+    }
+
+    /// DANGEROUS pop that does no underflow/highwater checks. The caller MUST
+    /// ensure that this does not result in illegal stack reads.
+    /// @param stackTop as per `pop`.
+    /// @param n as per `pop`.
+    function popIgnoreHighwater(IntegrityCheckState memory, Pointer stackTop, uint256 n)
+        internal
+        pure
+        returns (Pointer)
+    {
+        return stackTop.unsafeSubWords(n);
     }
 
     /// Maps `function(uint256, uint256) internal view returns (uint256)` to pops
