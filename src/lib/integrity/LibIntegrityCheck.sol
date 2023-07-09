@@ -59,6 +59,9 @@ error MinFinalStack(uint256 minStackOutputs, uint256 actualStackOutputs);
 /// behaviour to read without additional gas for OOB index checks.
 /// @param stackBottom Pointer to the bottom of the virtual stack that the
 /// integrity check uses to simulate a real eval.
+/// @param stackHighwater Pointer to the highest point the virtual stack has
+/// frozen into an immutable state. This is used to prevent writes to values
+/// that should be read-only due to the Rainlang execution model.
 /// @param stackMaxTop Pointer to the maximum height the virtual stack has
 /// reached during the integrity check. The current virtual stack height will
 /// be handled separately to the state during the check.

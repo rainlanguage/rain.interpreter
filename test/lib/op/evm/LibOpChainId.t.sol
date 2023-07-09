@@ -21,6 +21,28 @@ contract LibOpChainIdTest is Test {
     using LibStackPointer for Pointer;
     using LibInterpreterState for InterpreterState;
 
+    /// Directly test the integrity logic of LibOpChainId.
+    function testOpChainIDIntegrity(Operand operand, Pointer stackTop) external {
+        vm.assume(Pointer.unwrap(stackTop) <= type(uint256).max - 0x20);
+        function(IntegrityCheckState memory, Operand, Pointer)
+        view
+        returns (Pointer)[] memory integrityCheckers =
+                new function(IntegrityCheckState memory, Operand, Pointer) view returns (Pointer)[](1);
+        integrityCheckers[0] = LibOpChainId.integrity;
+
+        IntegrityCheckState memory state =
+            IntegrityCheckState(new bytes[](0), 0, stackTop, stackTop, stackTop, integrityCheckers);
+
+        Pointer stackTopAfter = LibOpChainId.integrity(state, operand, stackTop);
+
+        assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(stackTop.unsafeAddWord()));
+        assertEq(Pointer.unwrap(state.stackBottom), Pointer.unwrap(stackTop));
+        assertEq(Pointer.unwrap(state.stackHighwater), Pointer.unwrap(stackTop));
+        assertEq(Pointer.unwrap(state.stackMaxTop), Pointer.unwrap(stackTopAfter));
+    }
+
+    /// Directly test the runtime logic of LibOpChainId. This tests that the
+    /// opcode correctly pushes the chain ID onto the stack.
     function testOpChainIDRun(InterpreterState memory state, Operand operand, uint256 pre, uint256 post) external {
         // Build a stack with two zeros on it. The first zero will be overridden
         // by the opcode. The second zero will be used to check that the opcode
@@ -47,6 +69,9 @@ contract LibOpChainIdTest is Test {
         assertEq(stackTopAfter.unsafeReadWord(), post);
     }
 
+    /// Test the eval of a chain ID opcode parsed from a string. This tests that
+    /// the opcode can be correctly parsed out of a rainlang string to be
+    /// evaluated.
     function testOpChainIDEval() external {
         RainterpreterNP interpreter = new RainterpreterNP();
         RainterpreterStore store = new RainterpreterStore();
