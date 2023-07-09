@@ -22,8 +22,8 @@ library LibAllStandardOpsNP {
         pure
         returns (
             function(IntegrityCheckState memory, Operand, Pointer)
-                                        view
-                                        returns (Pointer)[] memory pointers
+                                                view
+                                                returns (Pointer)[] memory pointers
         )
     {
         unchecked {
