@@ -17,6 +17,8 @@ uint256 constant ALL_STANDARD_OPS_LENGTH = 1;
 /// @notice Every opcode available from the core repository laid out as a single
 /// array to easily build function pointers for `IInterpreterV1`.
 library LibAllStandardOpsNP {
+    /// All function pointers for the integrity checks of the standard opcodes.
+    /// Intended to be used internally by a deployer when building an expression.
     function integrityFunctionPointers()
         internal
         pure
@@ -44,6 +46,9 @@ library LibAllStandardOpsNP {
         }
     }
 
+    /// All function pointers for the standard opcodes. Intended to be used to
+    /// build a `IInterpreterV1` instance, specifically the `functionPointers`
+    /// method can just be a thin wrapper around this function.
     function opcodeFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
             function(InterpreterState memory, Operand, Pointer)
