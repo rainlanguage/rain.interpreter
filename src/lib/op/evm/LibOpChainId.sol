@@ -13,6 +13,8 @@ library LibOpChainId {
     using LibIntegrityCheck for IntegrityCheckState;
     using LibOp for Pointer;
 
+    /// No special integrity checks are required for this opcode. Simply updates
+    /// the stack pointer.
     function integrity(IntegrityCheckState memory integrityCheckState, Operand, Pointer stackTop)
         internal
         pure
@@ -21,6 +23,7 @@ library LibOpChainId {
         return integrityCheckState.push(stackTop);
     }
 
+    /// @notice Pushes the current chain ID to the stack.
     function run(InterpreterState memory, Operand, Pointer stackTop) internal view returns (Pointer) {
         return stackTop.unsafePush(block.chainid);
     }
