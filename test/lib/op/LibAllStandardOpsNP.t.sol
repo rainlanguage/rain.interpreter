@@ -15,8 +15,7 @@ contract LibAllStandardOpsNPTest is Test {
     function testIntegrityFunctionPointersLength() external {
         function(IntegrityCheckState memory, Operand, Pointer)
             view
-            returns (Pointer)[] memory integrityCheckers =
-                LibAllStandardOpsNP.integrityFunctionPointers();
+            returns (Pointer)[] memory integrityCheckers = LibAllStandardOpsNP.integrityFunctionPointers();
         assertEq(integrityCheckers.length, ALL_STANDARD_OPS_LENGTH);
     }
 
@@ -32,8 +31,7 @@ contract LibAllStandardOpsNPTest is Test {
     function testIntegrityAndOpcodeFunctionPointersLength() external {
         function(IntegrityCheckState memory, Operand, Pointer)
             view
-            returns (Pointer)[] memory integrityCheckers =
-                LibAllStandardOpsNP.integrityFunctionPointers();
+            returns (Pointer)[] memory integrityCheckers = LibAllStandardOpsNP.integrityFunctionPointers();
         bytes memory functionPointers = LibAllStandardOpsNP.opcodeFunctionPointers();
         assertEq(integrityCheckers.length * 2, functionPointers.length);
     }
