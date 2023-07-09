@@ -60,6 +60,10 @@ struct InterpreterState {
     bytes[] compiledSources;
 }
 
+/// @title LibInterpreterState
+/// Largely the individual fields of `InterpreterState` should be worked with
+/// directly, but there are occasional cases where it is useful to have a
+/// library to work with the state as a whole.
 library LibInterpreterState {
     /// Fingerprint the current state of the interpreter. This is used primarily
     /// for testing purposes to ensure that the interpreter is (not) modified
