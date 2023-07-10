@@ -19,3 +19,6 @@
 [submodule "lib/rain.solmem"]
 	path = lib/rain.solmem
 	url = https://github.com/rainprotocol/rain.solmem
+[submodule "lib/rain.datacontract"]
+	path = lib/rain.datacontract
+	url = https://github.com/rainprotocol/rain.datacontract
