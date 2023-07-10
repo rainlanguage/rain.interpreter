@@ -22,12 +22,7 @@ library LibAllStandardOpsNP {
     function integrityFunctionPointers()
         internal
         pure
-        returns (
-            function(IntegrityCheckState memory, Operand, Pointer)
-                                                                                                                                                                                                                                                                                                                                                view
-                                                                                                                                                                                                                                                                                                                                                returns (Pointer)[]
-                memory pointers
-        )
+        returns (function(IntegrityCheckState memory, Operand, Pointer) view returns (Pointer)[] memory pointers)
     {
         unchecked {
             function(IntegrityCheckState memory, Operand, Pointer)
