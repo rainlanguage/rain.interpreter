@@ -298,12 +298,7 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
         internal
         view
         virtual
-        returns (
-            function(IntegrityCheckState memory, Operand, Pointer)
-                                                                                                                                                                                                                                                                                                                                        view
-                                                                                                                                                                                                                                                                                                                                        returns (Pointer)[]
-                memory
-        )
+        returns (function(IntegrityCheckState memory, Operand, Pointer) view returns (Pointer)[] memory)
     {
         return LibAllStandardOpsNP.integrityFunctionPointers();
     }
