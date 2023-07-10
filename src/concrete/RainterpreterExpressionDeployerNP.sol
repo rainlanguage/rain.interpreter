@@ -175,7 +175,12 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
             LibIntegrityCheck.newState(sources, constants, integrityFunctionPointers());
         Pointer stackTop = integrityCheckState.stackBottom;
         stackTop = LibIntegrityCheck.push(integrityCheckState, stackTop, initialStack.length);
-        LibIntegrityCheck.ensureIntegrity(integrityCheckState, sourceIndex, stackTop, minOutputs);
+        {
+            Pointer stackTopAfter =
+                LibIntegrityCheck.ensureIntegrity(integrityCheckState, sourceIndex, stackTop, minOutputs);
+            (stackTopAfter);
+        }
+
         uint256[] memory stack;
         {
             int256 stackLength = integrityCheckState.stackBottom.toIndexSigned(integrityCheckState.stackMaxTop);
