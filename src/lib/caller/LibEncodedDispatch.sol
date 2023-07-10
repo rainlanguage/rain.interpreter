@@ -8,20 +8,20 @@ import "../../interface/IInterpreterV1.sol";
 /// dispatch. Handles encoding of several things required for efficient dispatch.
 library LibEncodedDispatch {
     /// Builds an `EncodedDispatch` from its constituent parts.
-    /// @param expression_ The onchain address of the expression to run.
-    /// @param sourceIndex_ The index of the source to run within the expression
+    /// @param expression The onchain address of the expression to run.
+    /// @param sourceIndex The index of the source to run within the expression
     /// as an entrypoint.
-    /// @param maxOutputs_ The maximum outputs the caller can meaningfully use.
+    /// @param maxOutputs The maximum outputs the caller can meaningfully use.
     /// If the interpreter returns a larger stack than this it is merely wasting
     /// gas across the external call boundary.
     /// @return The encoded dispatch.
-    function encode(address expression_, SourceIndex sourceIndex_, uint16 maxOutputs_)
+    function encode(address expression, SourceIndex sourceIndex, uint16 maxOutputs)
         internal
         pure
         returns (EncodedDispatch)
     {
         return EncodedDispatch.wrap(
-            (uint256(uint160(expression_)) << 32) | (uint256(SourceIndex.unwrap(sourceIndex_)) << 16) | maxOutputs_
+            (uint256(uint160(expression)) << 32) | (uint256(SourceIndex.unwrap(sourceIndex)) << 16) | maxOutputs
         );
     }
 

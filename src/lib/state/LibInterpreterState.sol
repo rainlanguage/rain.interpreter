@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "sol.lib.memory/LibPointer.sol";
-import "rain.lib.memkv/LibMemoryKV.sol";
+import "rain.solmem/lib/LibPointer.sol";
+import "rain.lib.memkv/lib/LibMemoryKV.sol";
 
 import "../../interface/IInterpreterV1.sol";
 
@@ -58,4 +58,17 @@ struct InterpreterState {
     IInterpreterStoreV1 store;
     uint256[][] context;
     bytes[] compiledSources;
+}
+
+/// @title LibInterpreterState
+/// Largely the individual fields of `InterpreterState` should be worked with
+/// directly, but there are occasional cases where it is useful to have a
+/// library to work with the state as a whole.
+library LibInterpreterState {
+    /// Fingerprint the current state of the interpreter. This is used primarily
+    /// for testing purposes to ensure that the interpreter is (not) modified
+    /// during evaluation.
+    function fingerprint(InterpreterState memory state) internal pure returns (bytes32) {
+        return keccak256(abi.encode(state));
+    }
 }

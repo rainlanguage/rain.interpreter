@@ -2,15 +2,19 @@
 pragma solidity =0.8.19;
 
 import "forge-std/Test.sol";
-import "sol.lib.memory/LibBytes.sol";
-import "sol.lib.memory/LibPointer.sol";
-import "sol.lib.memory/LibUint256Array.sol";
+import "rain.solmem/lib/LibBytes.sol";
+import "rain.solmem/lib/LibPointer.sol";
+import "rain.solmem/lib/LibUint256Array.sol";
 
 import "src/lib/state/LibInterpreterStateDataContract.sol";
 
 import "test/lib/compile/LibCompileSlow.sol";
 import "test/lib/state/LibInterpreterStateDataContractSlow.sol";
 
+/// @title LibInterpreterStateDataContractTest
+/// @notice Exercises the data contract implementation of the interpreter state.
+/// It should be possible to round trip serialize and deserialize an interpreter
+/// state through an onchain data contract.
 contract LibInterpreterStateDataContractTest is Test {
     using LibBytes for bytes;
     using LibPointer for Pointer;

@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "./IInterpreterV1.sol";
+import "../IInterpreterV1.sol";
 
-string constant IERC1820_NAME_IEXPRESSION_DEPLOYER_V1 = "IExpressionDeployerV1";
+string constant IERC1820_NAME_IEXPRESSION_DEPLOYER_V2 = "IExpressionDeployerV2";
 
-/// @title IExpressionDeployerV1
+/// @title IExpressionDeployerV2
 /// @notice Companion to `IInterpreterV1` responsible for onchain static code
-/// analysis and deploying expressions. Each `IExpressionDeployerV1` is tightly
+/// analysis and deploying expressions. Each `IExpressionDeployerV2` is tightly
 /// coupled at the bytecode level to some interpreter that it knows how to
 /// analyse and deploy expressions for. The expression deployer can perform an
 /// integrity check "dry run" of candidate source code for the intepreter. The
@@ -32,7 +32,7 @@ string constant IERC1820_NAME_IEXPRESSION_DEPLOYER_V1 = "IExpressionDeployerV1";
 /// responsibility to do everything it can to prevent undefined behaviour in the
 /// interpreter, and the interpreter's responsibility to handle the expression
 /// deployer completely failing to do so.
-interface IExpressionDeployerV1 {
+interface IExpressionDeployerV2 {
     /// This is the literal InterpreterOpMeta bytes to be used offchain to make
     /// sense of the opcodes in this interpreter deployment, as a human. For
     /// formats like json that make heavy use of boilerplate, repetition and
@@ -67,13 +67,13 @@ interface IExpressionDeployerV1 {
     /// total, and that no out of bounds memory reads/writes occur within this
     /// stack. A simple example of an invalid source would be one that pushes one
     /// value to the stack then attempts to pops two values, clearly we cannot
-    /// remove more values than we added. The `IExpressionDeployerV1` MUST revert
+    /// remove more values than we added. The `IExpressionDeployerV2` MUST revert
     /// in the case of any integrity failure, all integrity checks MUST pass in
     /// order for the deployment to complete.
     ///
-    /// Once the integrity check is complete the `IExpressionDeployerV1` MUST do
+    /// Once the integrity check is complete the `IExpressionDeployerV2` MUST do
     /// any additional processing required by its paired interpreter.
-    /// For example, the `IExpressionDeployerV1` MAY NEED to replace the indexed
+    /// For example, the `IExpressionDeployerV2` MAY NEED to replace the indexed
     /// opcodes in the `ExpressionConfig` sources with real function pointers
     /// from the corresponding interpreter.
     ///
@@ -103,7 +103,7 @@ interface IExpressionDeployerV1 {
     /// with the interpreter.
     /// @return expression The address of the deployed onchain expression. MUST
     /// be valid according to all integrity checks the deployer is aware of.
-    function deployExpression(bytes[] memory sources, uint256[] memory constants, uint256[] memory minOutputs)
+    function deployExpression(bytes[] memory sources, uint256[] memory constants, uint8[] memory minOutputs)
         external
         returns (IInterpreterV1 interpreter, IInterpreterStoreV1 store, address expression);
 }

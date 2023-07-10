@@ -3,9 +3,9 @@ pragma solidity =0.8.19;
 
 import "src/interface/IInterpreterV1.sol";
 
-import "sol.lib.memory/LibPointer.sol";
-import "sol.lib.memory/LibStackPointer.sol";
-import "sol.lib.memory/LibUint256Array.sol";
+import "rain.solmem/lib/LibPointer.sol";
+import "rain.solmem/lib/LibStackPointer.sol";
+import "rain.solmem/lib/LibUint256Array.sol";
 
 library LibOpSlow {
     using LibPointer for Pointer;

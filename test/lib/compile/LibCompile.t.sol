@@ -2,8 +2,8 @@
 pragma solidity =0.8.19;
 
 import "forge-std/Test.sol";
-import "sol.lib.memory/LibMemCpy.sol";
-import "sol.lib.memory/LibBytes.sol";
+import "rain.solmem/lib/LibMemCpy.sol";
+import "rain.solmem/lib/LibBytes.sol";
 
 import "test/lib/compile//LibCompileSlow.sol";
 import "src/lib/compile/LibCompile.sol";

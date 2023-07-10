@@ -40,6 +40,8 @@ contract RainterpreterStore is IInterpreterStoreV1, ERC165 {
 
     /// @inheritdoc IInterpreterStoreV1
     function set(StateNamespace namespace, uint256[] calldata kvs) external {
+        /// This would be picked up by an out of bounds index below, but it's
+        /// nice to have a more specific error message.
         if (kvs.length % 2 != 0) {
             revert RainterpreterStoreOddSetLength(kvs.length);
         }
