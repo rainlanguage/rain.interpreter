@@ -194,6 +194,8 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
             LibMemCpy.unsafeCopyWordsTo(initialStack.dataPointer(), stack.dataPointer(), initialStack.length);
         }
 
+        // The return is used by returning it, so this is a false positive.
+        //slither-disable-next-line unused-return
         return IDebugInterpreterV1(address(iInterpreter)).offchainDebugEval(
             iStore, namespace, sources, constants, context, stack, sourceIndex
         );
