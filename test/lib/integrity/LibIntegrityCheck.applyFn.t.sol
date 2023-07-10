@@ -56,7 +56,11 @@ contract LibIntegrityCheckApplyFnTest is Test {
     /// least one word deep which means there is no transient underflow. In this
     /// case the net result is that the stack top is unchanged.
     function testIntegrityCheckApplyFni1o1(Pointer stackTop) external {
-        stackTop = Pointer.wrap(bound(Pointer.unwrap(stackTop), Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(2)), type(uint256).max));
+        stackTop = Pointer.wrap(
+            bound(
+                Pointer.unwrap(stackTop), Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(2)), type(uint256).max
+            )
+        );
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -102,7 +106,11 @@ contract LibIntegrityCheckApplyFnTest is Test {
     /// least two words deep which means there is no transient underflow. In this
     /// case the net result is that the stack top is decremented by two words.
     function testIntegrityCheckApplyFni2o0(Pointer stackTop) external {
-        stackTop = Pointer.wrap(bound(Pointer.unwrap(stackTop), Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(3)), type(uint256).max));
+        stackTop = Pointer.wrap(
+            bound(
+                Pointer.unwrap(stackTop), Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(3)), type(uint256).max
+            )
+        );
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -148,7 +156,11 @@ contract LibIntegrityCheckApplyFnTest is Test {
     /// least two words deep which means there is no transient underflow. In this
     /// case the net result is that the stack top is decremented by one word.
     function testIntegrityCheckApplyFni2o1(Pointer stackTop) external {
-        stackTop = Pointer.wrap(bound(Pointer.unwrap(stackTop), Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(3)), type(uint256).max));
+        stackTop = Pointer.wrap(
+            bound(
+                Pointer.unwrap(stackTop), Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(3)), type(uint256).max
+            )
+        );
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -193,8 +205,13 @@ contract LibIntegrityCheckApplyFnTest is Test {
     /// times over i2o1 for n > 1.
     function testIntegrityCheckApplyFnNi2o1(Pointer stackTop, uint8 n) external {
         vm.assume(n > 1);
-        // stackTop = Pointer.wrap(bound(Pointer.unwrap(stackTop), Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(n + 1)), type(uint256).max));
-        vm.assume(Pointer.unwrap(stackTop) > Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(n)));
+        stackTop = Pointer.wrap(
+            bound(
+                Pointer.unwrap(stackTop),
+                Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(uint256(n) + 1)),
+                type(uint256).max
+            )
+        );
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -219,7 +236,11 @@ contract LibIntegrityCheckApplyFnTest is Test {
 
     /// Calling applyFnN over i2o1 should behave as identity for n = 1.
     function testIntegrityCheckApplyFnN1i2o1(Pointer stackTop) external {
-        vm.assume(Pointer.unwrap(stackTop) > Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(1)));
+        stackTop = Pointer.wrap(
+            bound(
+                Pointer.unwrap(stackTop), Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(2)), type(uint256).max
+            )
+        );
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -236,7 +257,11 @@ contract LibIntegrityCheckApplyFnTest is Test {
 
     /// Calling applyFnN over i2o1 should behave as a falsey push for n = 0.
     function testIntegrityCheckApplyFnN0i2o1(Pointer stackTop) external {
-        vm.assume(Pointer.unwrap(stackTop) > Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(0)));
+        stackTop = Pointer.wrap(
+            bound(
+                Pointer.unwrap(stackTop), Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(1)), type(uint256).max
+            )
+        );
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -257,7 +282,11 @@ contract LibIntegrityCheckApplyFnTest is Test {
     /// this case the net result is that the stack top is decremented by two
     /// words.
     function testIntegrityCheckApplyFni3o1(Pointer stackTop) external {
-        vm.assume(Pointer.unwrap(stackTop) > Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(3)));
+        stackTop = Pointer.wrap(
+            bound(
+                Pointer.unwrap(stackTop), Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(4)), type(uint256).max
+            )
+        );
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -276,11 +305,8 @@ contract LibIntegrityCheckApplyFnTest is Test {
     /// then push one word back on. If the stack is zero, one, or two words deep,
     /// relative to the highwater, then the inital pop will underflow the stack.
     function testIntegrityCheckApplyFni3o1Underflow(Pointer stackTop, Pointer highwater) external {
-        // Avoid numeric underflow of the virtual stack space.
-        vm.assume(Pointer.unwrap(stackTop) >= 0x60);
-        vm.assume(Pointer.unwrap(highwater) >= 0x60);
-        // Ensure the stack top underflows the highwater when popping three words.
-        vm.assume(Pointer.unwrap(stackTop.unsafeSubWords(3)) <= Pointer.unwrap(highwater));
+        highwater = Pointer.wrap(bound(Pointer.unwrap(highwater), 0x60, type(uint256).max - 0x60));
+        stackTop = Pointer.wrap(bound(Pointer.unwrap(stackTop), 0x60, Pointer.unwrap(highwater.unsafeAddWords(3))));
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -305,7 +331,11 @@ contract LibIntegrityCheckApplyFnTest is Test {
     /// this case the net result is that the stack top is decremented by three
     /// words.
     function testIntegrityCheckApplyFni4o1(Pointer stackTop) external {
-        vm.assume(Pointer.unwrap(stackTop) > Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(4)));
+        stackTop = Pointer.wrap(
+            bound(
+                Pointer.unwrap(stackTop), Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(5)), type(uint256).max
+            )
+        );
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -325,11 +355,8 @@ contract LibIntegrityCheckApplyFnTest is Test {
     /// words deep, relative to the highwater, then the inital pop will underflow
     /// the stack.
     function testIntegrityCheckApplyFni4o1Underflow(Pointer stackTop, Pointer highwater) external {
-        // Avoid numeric underflow of the virtual stack space.
-        vm.assume(Pointer.unwrap(stackTop) >= 0x80);
-        vm.assume(Pointer.unwrap(highwater) >= 0x80);
-        // Ensure the stack top underflows the highwater when popping four words.
-        vm.assume(Pointer.unwrap(stackTop.unsafeSubWords(4)) <= Pointer.unwrap(highwater));
+        highwater = Pointer.wrap(bound(Pointer.unwrap(highwater), 0x80, type(uint256).max - 0x80));
+        stackTop = Pointer.wrap(bound(Pointer.unwrap(stackTop), 0x80, Pointer.unwrap(highwater.unsafeAddWords(4))));
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -353,7 +380,11 @@ contract LibIntegrityCheckApplyFnTest is Test {
     /// least one word deep which means there is no transient underflow. In this
     /// case the net result is that the stack top is unchanged.
     function testIntegrityCheckApplyFni1o1Operand(Pointer stackTop) external {
-        vm.assume(Pointer.unwrap(stackTop) > Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(1)));
+        stackTop = Pointer.wrap(
+            bound(
+                Pointer.unwrap(stackTop), Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(2)), type(uint256).max
+            )
+        );
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -372,11 +403,8 @@ contract LibIntegrityCheckApplyFnTest is Test {
     /// then push one word back on. If the stack is zero words deep, relative to
     /// the highwater, then the inital pop will underflow the stack.
     function testIntegrityCheckApplyFni1o1OperandUnderflow(Pointer stackTop, Pointer highwater) external {
-        // Avoid numeric underflow of the virtual stack space.
-        vm.assume(Pointer.unwrap(stackTop) >= 0x40);
-        vm.assume(Pointer.unwrap(highwater) >= 0x40);
-        // Ensure the stack top underflows the highwater when popping one word.
-        vm.assume(Pointer.unwrap(stackTop.unsafeSubWords(1)) <= Pointer.unwrap(highwater));
+        highwater = Pointer.wrap(bound(Pointer.unwrap(highwater), 0x40, type(uint256).max - 0x40));
+        stackTop = Pointer.wrap(bound(Pointer.unwrap(stackTop), 0x40, Pointer.unwrap(highwater.unsafeAddWord())));
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -400,7 +428,11 @@ contract LibIntegrityCheckApplyFnTest is Test {
     /// least two words deep which means there is no transient underflow. In this
     /// case the net result is that the stack top is decremented by one word.
     function testIntegrityCheckApplyFni2o1Operand(Pointer stackTop) external {
-        vm.assume(Pointer.unwrap(stackTop) > Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(2)));
+        stackTop = Pointer.wrap(
+            bound(
+                Pointer.unwrap(stackTop), Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(3)), type(uint256).max
+            )
+        );
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -419,11 +451,8 @@ contract LibIntegrityCheckApplyFnTest is Test {
     /// then push one word back on. If the stack is zero or one words deep,
     /// relative to the highwater, then the inital pop will underflow the stack.
     function testIntegrityCheckApplyFni2o1OperandUnderflow(Pointer stackTop, Pointer highwater) external {
-        // Avoid numeric underflow of the virtual stack space.
-        vm.assume(Pointer.unwrap(stackTop) >= 0x40);
-        vm.assume(Pointer.unwrap(highwater) >= 0x40);
-        // Ensure the stack top underflows the highwater when popping two words.
-        vm.assume(Pointer.unwrap(stackTop.unsafeSubWords(2)) <= Pointer.unwrap(highwater));
+        highwater = Pointer.wrap(bound(Pointer.unwrap(highwater), 0x40, type(uint256).max - 0x40));
+        stackTop = Pointer.wrap(bound(Pointer.unwrap(stackTop), 0x40, Pointer.unwrap(highwater.unsafeAddWords(2))));
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -487,10 +516,12 @@ contract LibIntegrityCheckApplyFnTest is Test {
     function testIntegrityCheckApplyFniDo1Underflow(Pointer stackTop, Pointer highwater, uint256[] memory array)
         external
     {
-        // Avoid numeric underflow of the virtual stack space.
-        vm.assume(Pointer.unwrap(stackTop) >= array.length * 0x20);
-        vm.assume(Pointer.unwrap(highwater) >= array.length * 0x20);
-        vm.assume(Pointer.unwrap(stackTop.unsafeSubWords(array.length)) <= Pointer.unwrap(highwater));
+        highwater = Pointer.wrap(
+            bound(Pointer.unwrap(highwater), 0x20 * array.length, type(uint256).max - (array.length + 1) * 0x20)
+        );
+        stackTop = Pointer.wrap(
+            bound(Pointer.unwrap(stackTop), 0x20 * array.length, Pointer.unwrap(highwater.unsafeAddWords(array.length)))
+        );
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -516,7 +547,13 @@ contract LibIntegrityCheckApplyFnTest is Test {
     /// underflow. In this case the net result is that the stack top is
     /// decremented by the length of the dynamic array plus one.
     function testIntegrityCheckApplyFni2Do1(Pointer stackTop, uint256[] memory array) external {
-        vm.assume(Pointer.unwrap(stackTop) > Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(array.length + 2)));
+        stackTop = Pointer.wrap(
+            bound(
+                Pointer.unwrap(stackTop),
+                Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(array.length + 3)),
+                type(uint256).max
+            )
+        );
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -540,10 +577,16 @@ contract LibIntegrityCheckApplyFnTest is Test {
     function testIntegrityCheckApplyFni2Do1Underflow(Pointer stackTop, Pointer highwater, uint256[] memory array)
         external
     {
-        // Avoid numeric underflow of the virtual stack space.
-        vm.assume(Pointer.unwrap(stackTop) >= array.length * 0x20 + 0x40);
-        vm.assume(Pointer.unwrap(highwater) >= array.length * 0x20 + 0x40);
-        vm.assume(Pointer.unwrap(stackTop.unsafeSubWords(array.length + 2)) <= Pointer.unwrap(highwater));
+        highwater = Pointer.wrap(
+            bound(Pointer.unwrap(highwater), 0x20 * array.length + 0x40, type(uint256).max - (array.length + 2) * 0x20)
+        );
+        stackTop = Pointer.wrap(
+            bound(
+                Pointer.unwrap(stackTop),
+                0x20 * array.length + 0x40,
+                Pointer.unwrap(highwater.unsafeAddWords(array.length + 2))
+            )
+        );
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers = new function(IntegrityCheckState memory, Operand, Pointer)
@@ -570,7 +613,13 @@ contract LibIntegrityCheckApplyFnTest is Test {
     /// underflow. In this case the net result is that the stack top is
     /// decremented by the length of the dynamic array plus two.
     function testIntegrityCheckApplyFni3Do1(Pointer stackTop, uint256[] memory array) public {
-        vm.assume(Pointer.unwrap(stackTop) >= Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(array.length + 3)));
+        stackTop = Pointer.wrap(
+            bound(
+                Pointer.unwrap(stackTop),
+                Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(array.length + 4)),
+                type(uint256).max
+            )
+        );
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers = new function(
@@ -595,10 +644,16 @@ contract LibIntegrityCheckApplyFnTest is Test {
     function testIntegrityCheckApplyFni3Do1Underflow(Pointer stackTop, Pointer highwater, uint256[] memory array)
         external
     {
-        // Avoid numeric underflow of the virtual stack space.
-        vm.assume(Pointer.unwrap(stackTop) >= array.length * 0x20 + 0x60);
-        vm.assume(Pointer.unwrap(highwater) >= array.length * 0x20 + 0x60);
-        vm.assume(Pointer.unwrap(stackTop) <= Pointer.unwrap(highwater.unsafeAddWords(array.length + 3)));
+        highwater = Pointer.wrap(
+            bound(Pointer.unwrap(highwater), 0x20 * array.length + 0x60, type(uint256).max - (array.length + 3) * 0x20)
+        );
+        stackTop = Pointer.wrap(
+            bound(
+                Pointer.unwrap(stackTop),
+                0x20 * array.length + 0x60,
+                Pointer.unwrap(highwater.unsafeAddWords(array.length + 3))
+            )
+        );
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers = new function(
@@ -627,8 +682,12 @@ contract LibIntegrityCheckApplyFnTest is Test {
     /// transient underflow. In this case the net result is that the stack top is
     /// decremented by the length of the dynamic array plus one.
     function testIntegrityCheckApplyFni1DDoD(Pointer stackTop, uint256[] memory array) external {
-        vm.assume(
-            Pointer.unwrap(stackTop) > Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(array.length * 2 + 1))
+        stackTop = Pointer.wrap(
+            bound(
+                Pointer.unwrap(stackTop),
+                Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(array.length * 2 + 2)),
+                type(uint256).max
+            )
         );
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
@@ -658,10 +717,20 @@ contract LibIntegrityCheckApplyFnTest is Test {
     function testIntegrityCheckApplyFni1DDoDUnderflow(Pointer stackTop, Pointer highwater, uint256[] memory array)
         external
     {
-        // Avoid numeric underflow of the virtual stack space.
-        vm.assume(Pointer.unwrap(stackTop) >= array.length * 0x40 + 0x20);
-        vm.assume(Pointer.unwrap(highwater) >= array.length * 0x40 + 0x20);
-        vm.assume(Pointer.unwrap(stackTop.unsafeSubWords(array.length * 2 + 1)) <= Pointer.unwrap(highwater));
+        highwater = Pointer.wrap(
+            bound(
+                Pointer.unwrap(highwater),
+                0x20 * array.length * 2 + 0x40,
+                type(uint256).max - (array.length * 2 + 2) * 0x20
+            )
+        );
+        stackTop = Pointer.wrap(
+            bound(
+                Pointer.unwrap(stackTop),
+                0x20 * array.length * 2 + 0x40,
+                Pointer.unwrap(highwater.unsafeAddWords(array.length * 2 + 1))
+            )
+        );
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers = new function(

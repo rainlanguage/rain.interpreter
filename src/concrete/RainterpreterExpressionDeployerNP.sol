@@ -289,8 +289,8 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpre
         virtual
         returns (
             function(IntegrityCheckState memory, Operand, Pointer)
-                                                                                                                                                                                                                view
-                                                                                                                                                                                                                returns (Pointer)[]
+                                                                                                                                                                                                                        view
+                                                                                                                                                                                                                        returns (Pointer)[]
                 memory
         )
     {
