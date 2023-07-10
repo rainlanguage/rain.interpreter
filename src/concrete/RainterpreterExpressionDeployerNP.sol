@@ -56,7 +56,7 @@ error NegativeStackIndex(int256 index);
 bytes constant OPCODE_FUNCTION_POINTERS = hex"0b0a";
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xdbcc72fcf68bbf73bb3c71e0c38fa3e78f865196eeac391aff092aacfd1fc282);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xca72c2296f5a5b8dc7315dbc2fc3a7cd9bb91366dcc4c791a424236afa34645c);
 
 /// @dev Hash of the known store bytecode.
 bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);
