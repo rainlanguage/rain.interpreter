@@ -128,7 +128,7 @@ LibInterpreterStateTest:testInterpreterStateFingerprint((uint256,uint256,uint256
 LibNamespaceTest:testQualifyNamespaceGas0(uint256,address) (runs: 1024, μ: 362, ~: 362)
 LibNamespaceTest:testQualifyNamespaceGasSlow0(uint256,address) (runs: 1024, μ: 569, ~: 569)
 LibNamespaceTest:testQualifyNamespaceReferenceImplementation(uint256,address) (runs: 1024, μ: 704, ~: 704)
-LibOpChainIdTest:testOpChainIDEval() (gas: 3715861)
+LibOpChainIdTest:testOpChainIDEval() (gas: 3716677)
 LibOpChainIdTest:testOpChainIDIntegrity(uint256) (runs: 1024, μ: 1522, ~: 1522)
 LibOpChainIdTest:testOpChainIDRun((uint256,uint256,uint256,uint256,address,uint256[][],bytes[]),uint256,uint256,uint256) (runs: 1024, μ: 10991542, ~: 9411635)
 LibOpTest:testApplyFn0(uint256[]) (runs: 1024, μ: 83787, ~: 84366)
