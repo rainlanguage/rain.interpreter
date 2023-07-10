@@ -8,6 +8,8 @@ import {Math} from "openzeppelin-contracts/contracts/utils/math/Math.sol";
 import "../../interface/IExpressionDeployerV1.sol";
 import "../../interface/IInterpreterV1.sol";
 
+import "forge-std/console2.sol";
+
 /// @dev The virtual stack pointers are never read or written so don't need to
 /// point to a real location in memory. We only care that the stack never moves
 /// below its starting point at the stack bottom. For the virtual stack used by
@@ -25,7 +27,8 @@ Pointer constant INITIAL_STACK_HIGHWATER = Pointer.wrap(Pointer.unwrap(INITIAL_S
 /// pop. The initial stack bottom for an `IntegrityCheckState` should be
 /// `INITIAL_STACK_BOTTOM` to safely avoid the need for underflow checks due to
 /// pops and pushes.
-error MinStackBottom();
+/// @param stackBottom The stack bottom that was set and is invalid.
+error MinStackBottom(Pointer stackBottom);
 
 /// The virtual stack top has underflowed the stack highwater (or zero) during an
 /// integrity check. The highwater will initially be the stack bottom but MAY
@@ -172,12 +175,13 @@ library LibIntegrityCheck {
         Pointer stackTop,
         uint256 minStackOutputs
     ) internal view returns (Pointer) {
+        console2.log("pointers", Pointer.unwrap(integrityCheckState.stackBottom), Pointer.unwrap(stackTop));
         unchecked {
             // It's generally more efficient to ensure the stack bottom has
             // plenty of headroom to make underflows from pops impossible rather
             // than guard every single pop against underflow.
             if (Pointer.unwrap(integrityCheckState.stackBottom) < Pointer.unwrap(INITIAL_STACK_BOTTOM)) {
-                revert MinStackBottom();
+                revert MinStackBottom(integrityCheckState.stackBottom);
             }
             uint256 cursor;
             uint256 end;
@@ -202,6 +206,8 @@ library LibIntegrityCheck {
                 stackTop = integrityCheckState.integrityFunctionPointers[opcode](integrityCheckState, operand, stackTop);
             }
             uint256 finalStackOutputs = integrityCheckState.stackBottom.unsafeToIndex(stackTop);
+            console2.log("finalStackOutputs", finalStackOutputs);
+            console2.log("minStackOutputs", minStackOutputs);
             if (minStackOutputs > finalStackOutputs) {
                 revert MinFinalStack(minStackOutputs, finalStackOutputs);
             }
