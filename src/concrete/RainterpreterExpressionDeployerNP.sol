@@ -279,16 +279,17 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
             // entrypoints.
             integrityCheckState.stackBottom = initialStackBottom;
             integrityCheckState.stackHighwater = initialStackHighwater;
-            LibIntegrityCheck.ensureIntegrity(
+            Pointer stackTopAfter = LibIntegrityCheck.ensureIntegrity(
                 integrityCheckState, SourceIndex.wrap(i_), INITIAL_STACK_BOTTOM, minOutputs[i_]
             );
+            (stackTopAfter);
         }
 
-        int256 finalIndex = integrityCheckState.stackBottom.toIndexSigned(integrityCheckState.stackMaxTop);
-        if (finalIndex < 0) {
-            revert NegativeStackIndex(finalIndex);
+        int256 finalMaxIndex = integrityCheckState.stackBottom.toIndexSigned(integrityCheckState.stackMaxTop);
+        if (finalMaxIndex < 0) {
+            revert NegativeStackIndex(finalMaxIndex);
         }
-        return uint256(finalIndex);
+        return uint256(finalMaxIndex);
     }
 
     /// Defines all the function pointers to integrity checks. This is the
