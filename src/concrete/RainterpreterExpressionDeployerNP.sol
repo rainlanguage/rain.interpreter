@@ -53,10 +53,10 @@ error NegativeStackIndex(int256 index);
 /// immutable for any given interpreter so once the expression deployer is
 /// constructed and has verified that this matches what the interpreter reports,
 /// it can use this constant value to compile and serialize expressions.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"0b0a";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"0b0d";
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xca72c2296f5a5b8dc7315dbc2fc3a7cd9bb91366dcc4c791a424236afa34645c);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xafddec5d61a620db286d2c56a8aebc70ddacedd759840e256e00722c7344f0ea);
 
 /// @dev Hash of the known store bytecode.
 bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);
