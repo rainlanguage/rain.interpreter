@@ -63,7 +63,7 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV1, ERC165 {
         uint256 stackLengthFinalPositive = uint256(stackLengthFinal);
         (uint256 head, uint256[] memory tail) = stackTop.unsafeList(stackLengthFinalPositive);
         // The head is irrelevant here because it's whatever was overridden by
-        // the length of the array in reading the final substack to return.
+        // the length of the array in building the final substack to return.
         (head);
         return (tail, state.stateKV.toUint256Array());
     }
@@ -92,7 +92,10 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV1, ERC165 {
             revert NegativeStackLength(stackLengthFinal);
         }
         uint256 stackLengthFinalPositive = uint256(stackLengthFinal);
-        (, uint256[] memory tail) = stackTop.unsafeList(stackLengthFinalPositive.min(maxOutputs));
+        (uint256 head, uint256[] memory tail) = stackTop.unsafeList(stackLengthFinalPositive.min(maxOutputs));
+        // The head is irrelevant here because it's whatever was overridden by
+        // the length of the array in building the final substack to return.
+        (head);
         return (tail, state.stateKV.toUint256Array());
     }
 
