@@ -32,12 +32,7 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV1, ERC165 {
     using LibEval for InterpreterState;
     using LibNamespace for StateNamespace;
     using LibInterpreterStateDataContract for bytes;
-    using
-    LibCast
-    for
-        function(InterpreterState memory, Operand, Pointer)
-                                                                                                                                            view
-                                                                                                                                            returns (Pointer)[];
+    using LibCast for function(InterpreterState memory, Operand, Pointer) view returns (Pointer)[];
     using Math for uint256;
     using LibMemoryKV for MemoryKV;
 
