@@ -205,6 +205,8 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
     function parse(bytes memory data) external pure returns (bytes[] memory, uint256[] memory) {
         bytes32[] memory words = new bytes32[](1);
         words[0] = "chain-id";
+        // The return is used by returning it, so this is a false positive.
+        //slither-disable-next-line unused-return
         return LibParse.parse(data, LibParseMeta.buildMetaExpander(words, 2));
     }
 
