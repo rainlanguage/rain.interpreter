@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import "forge-std/Test.sol";
 
-import "sol.lib.memory/LibPointer.sol";
+import "sol.lib.memory/lib/LibPointer.sol";
 
 import "src/lib/integrity/LibIntegrityCheck.sol";
 import "src/lib/parse/LibParse.sol";

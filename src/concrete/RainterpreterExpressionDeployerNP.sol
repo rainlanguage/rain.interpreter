@@ -3,8 +3,8 @@ pragma solidity =0.8.19;
 
 import "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
-import "sol.lib.memory/LibPointer.sol";
-import "sol.lib.memory/LibStackPointer.sol";
+import "rain.solmem/lib/LibPointer.sol";
+import "rain.solmem/lib/LibStackPointer.sol";
 import "rain.datacontract/LibDataContract.sol";
 import "rain.factory/src/lib/LibIERC1820.sol";
 
