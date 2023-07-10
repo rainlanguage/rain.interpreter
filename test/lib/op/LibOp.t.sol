@@ -3,10 +3,10 @@ pragma solidity =0.8.19;
 
 import "forge-std/Test.sol";
 
-import "sol.lib.memory/LibMemCpy.sol";
-import "sol.lib.memory/LibPointer.sol";
-import "sol.lib.memory/LibStackPointer.sol";
-import "sol.lib.memory/LibUint256Array.sol";
+import "rain.solmem/lib/LibMemCpy.sol";
+import "rain.solmem/lib/LibPointer.sol";
+import "rain.solmem/lib/LibStackPointer.sol";
+import "rain.solmem/lib/LibUint256Array.sol";
 import "rain.lib.hash/LibHashNoAlloc.sol";
 
 import "src/lib/op/LibOp.sol";

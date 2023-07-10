@@ -15,6 +15,9 @@ import "../lib/caller/LibEncodedDispatch.sol";
 
 import "../lib/op/LibAllStandardOpsNP.sol";
 
+/// Thrown when the stack length is negative during eval.
+error NegativeStackLength(int256 length);
+
 /// @title RainterpreterNP
 /// @notice !!EXPERIMENTAL!! implementation of a Rainlang interpreter that is
 /// compatible with native onchain Rainlang parsing. Initially copied verbatim
@@ -58,8 +61,12 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV1, ERC165 {
             stack.dataPointer(), constants.dataPointer(), MemoryKV.wrap(0), namespace, store, context, compiledSources
         );
         Pointer stackTop = state.eval(sourceIndex, state.stackBottom);
-        uint256 stackLengthFinal = state.stackBottom.unsafeToIndex(stackTop);
-        (, uint256[] memory tail) = stackTop.unsafeList(stackLengthFinal);
+        int256 stackLengthFinal = state.stackBottom.toIndexSigned(stackTop);
+        if (stackLengthFinal < 0) {
+            revert NegativeStackLength(stackLengthFinal);
+        }
+        uint256 stackLengthFinalPositive = uint256(stackLengthFinal);
+        (, uint256[] memory tail) = stackTop.unsafeList(stackLengthFinalPositive);
         return (tail, state.stateKV.toUint256Array());
     }
 
@@ -82,8 +89,12 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV1, ERC165 {
 
         // Eval the expression and return up to maxOutputs from the final stack.
         Pointer stackTop = state.eval(sourceIndex, state.stackBottom);
-        uint256 stackLength = state.stackBottom.unsafeToIndex(stackTop);
-        (, uint256[] memory tail) = stackTop.unsafeList(stackLength.min(maxOutputs));
+        int256 stackLengthFinal = state.stackBottom.toIndexSigned(stackTop);
+        if (stackLengthFinal < 0) {
+            revert NegativeStackLength(stackLengthFinal);
+        }
+        uint256 stackLengthFinalPositive = uint256(stackLengthFinal);
+        (, uint256[] memory tail) = stackTop.unsafeList(stackLengthFinalPositive.min(maxOutputs));
         return (tail, state.stateKV.toUint256Array());
     }
 

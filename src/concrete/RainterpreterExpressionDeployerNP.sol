@@ -8,7 +8,7 @@ import "rain.solmem/lib/LibStackPointer.sol";
 import "rain.datacontract/lib/LibDataContract.sol";
 import "rain.factory/src/lib/LibIERC1820.sol";
 
-import "../interface/IExpressionDeployerV1.sol";
+import "../interface/unstable/IExpressionDeployerV2.sol";
 import "../interface/unstable/IDebugExpressionDeployerV1.sol";
 import "../interface/unstable/IDebugInterpreterV1.sol";
 import "../interface/unstable/IParserV1.sol";
@@ -45,14 +45,18 @@ error UnexpectedStoreBytecodeHash(bytes32 actualBytecodeHash);
 /// Thrown when the `Rainterpreter` is constructed with unknown opMeta.
 error UnexpectedOpMetaHash(bytes32 actualOpMeta);
 
+/// Thrown when the integrity check returns a negative stack index.
+/// @param index The negative index.
+error NegativeStackIndex(int256 index);
+
 /// @dev The function pointers known to the expression deployer. These are
 /// immutable for any given interpreter so once the expression deployer is
 /// constructed and has verified that this matches what the interpreter reports,
 /// it can use this constant value to compile and serialize expressions.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"09ec";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"0b0a";
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xda69fab45680e6c6ea401753eff6a96472f30126e7c8fc6ccae147ab68e36776);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xdbcc72fcf68bbf73bb3c71e0c38fa3e78f865196eeac391aff092aacfd1fc282);
 
 /// @dev Hash of the known store bytecode.
 bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);
@@ -77,7 +81,7 @@ struct RainterpreterExpressionDeployerConstructionConfig {
 /// @notice !!!EXPERIMENTAL!!! This is the deployer for the RainterpreterNP
 /// interpreter. Notably includes onchain parsing/compiling of expressions from
 /// Rainlang strings.
-contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpressionDeployerV1, IParserV1, ERC165 {
+contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpressionDeployerV1, IParserV1, ERC165 {
     using LibStackPointer for Pointer;
     using LibUint256Array for uint256[];
 
@@ -87,7 +91,7 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpre
     /// @param sources As per `IExpressionDeployerV1`.
     /// @param constants As per `IExpressionDeployerV1`.
     /// @param minOutputs As per `IExpressionDeployerV1`.
-    event NewExpression(address sender, bytes[] sources, uint256[] constants, uint256[] minOutputs);
+    event NewExpression(address sender, bytes[] sources, uint256[] constants, uint8[] minOutputs);
 
     /// The address of the deployed expression. Will only be emitted once the
     /// expression can be loaded and deserialized into an evaluable interpreter
@@ -165,7 +169,7 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpre
         uint256[][] memory context,
         SourceIndex sourceIndex,
         uint256[] memory initialStack,
-        uint256 minOutputs
+        uint8 minOutputs
     ) external view returns (uint256[] memory, uint256[] memory) {
         IntegrityCheckState memory integrityCheckState =
             LibIntegrityCheck.newState(sources, constants, integrityFunctionPointers());
@@ -174,11 +178,14 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpre
         LibIntegrityCheck.ensureIntegrity(integrityCheckState, sourceIndex, stackTop, minOutputs);
         uint256[] memory stack;
         {
-            uint256 stackLength = integrityCheckState.stackBottom.unsafeToIndex(integrityCheckState.stackMaxTop);
+            int256 stackLength = integrityCheckState.stackBottom.toIndexSigned(integrityCheckState.stackMaxTop);
+            if (stackLength < 0) {
+                revert NegativeStackIndex(stackLength);
+            }
             for (uint256 i_; i_ < sources.length; i_++) {
                 LibCompile.unsafeCompile(sources[i_], OPCODE_FUNCTION_POINTERS);
             }
-            stack = new uint256[](stackLength);
+            stack = new uint256[](uint256(stackLength));
             LibMemCpy.unsafeCopyWordsTo(initialStack.dataPointer(), stack.dataPointer(), initialStack.length);
         }
 
@@ -194,8 +201,8 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpre
         return LibParse.parse(data, LibParseMeta.buildMetaExpander(words, 2));
     }
 
-    /// @inheritdoc IExpressionDeployerV1
-    function deployExpression(bytes[] memory sources, uint256[] memory constants, uint256[] memory minOutputs)
+    /// @inheritdoc IExpressionDeployerV2
+    function deployExpression(bytes[] memory sources, uint256[] memory constants, uint8[] memory minOutputs)
         external
         returns (IInterpreterV1, IInterpreterStoreV1, address)
     {
@@ -236,7 +243,7 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpre
     /// later so MUST be correct for ALL internal states of the evaluation. It
     /// is NOT sufficient to just return the final stack size as the stack
     /// grows and shrinks during evaluation.
-    function integrityCheck(bytes[] memory sources, uint256[] memory constants, uint256[] memory minOutputs)
+    function integrityCheck(bytes[] memory sources, uint256[] memory constants, uint8[] memory minOutputs)
         internal
         view
         returns (uint256)
@@ -270,7 +277,11 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpre
             );
         }
 
-        return integrityCheckState.stackBottom.unsafeToIndex(integrityCheckState.stackMaxTop);
+        int256 finalIndex = integrityCheckState.stackBottom.toIndexSigned(integrityCheckState.stackMaxTop);
+        if (finalIndex < 0) {
+            revert NegativeStackIndex(finalIndex);
+        }
+        return uint256(finalIndex);
     }
 
     /// Defines all the function pointers to integrity checks. This is the

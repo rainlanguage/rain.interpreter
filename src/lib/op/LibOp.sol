@@ -2,10 +2,10 @@
 pragma solidity ^0.8.18;
 
 import "../../interface/IInterpreterV1.sol";
-import "sol.lib.memory/LibPointer.sol";
-import "sol.lib.memory/LibMemCpy.sol";
-import "sol.lib.memory/LibStackPointer.sol";
-import "sol.lib.memory/LibUint256Array.sol";
+import "rain.solmem/lib/LibPointer.sol";
+import "rain.solmem/lib/LibMemCpy.sol";
+import "rain.solmem/lib/LibStackPointer.sol";
+import "rain.solmem/lib/LibUint256Array.sol";
 
 /// Thrown when the length of an array as the result of an applied function does
 /// not match expectations.

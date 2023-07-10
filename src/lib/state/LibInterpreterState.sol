@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "sol.lib.memory/LibPointer.sol";
-import "rain.lib.memkv/LibMemoryKV.sol";
+import "rain.solmem/lib/LibPointer.sol";
+import "rain.lib.memkv/lib/LibMemoryKV.sol";
 
 import "../../interface/IInterpreterV1.sol";
 

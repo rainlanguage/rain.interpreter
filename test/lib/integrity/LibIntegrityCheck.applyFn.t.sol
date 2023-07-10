@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import "forge-std/Test.sol";
 
-import "sol.lib.memory/LibPointer.sol";
+import "rain.solmem/lib/LibPointer.sol";
 import "src/lib/integrity/LibIntegrityCheck.sol";
 
 /// @title LibIntegrityCheckApplyFnTest
@@ -81,8 +81,10 @@ contract LibIntegrityCheckApplyFnTest is Test {
     function testIntegrityCheckApplyFni1o1Underflow(Pointer stackTop, Pointer highwater) external {
         // Avoid numeric underflow of the virtual stack space.
         highwater = Pointer.wrap(bound(Pointer.unwrap(highwater), 0x40, type(uint256).max - 0x20));
+        vm.assume(Pointer.unwrap(highwater) % 0x20 == 0);
         // Ensure the stack top underflows the highwater when popping one word.
         stackTop = Pointer.wrap(bound(Pointer.unwrap(stackTop), 0x40, Pointer.unwrap(highwater.unsafeAddWord())));
+        vm.assume(Pointer.unwrap(stackTop) % 0x20 == 0);
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -93,8 +95,8 @@ contract LibIntegrityCheckApplyFnTest is Test {
         vm.expectRevert(
             abi.encodeWithSelector(
                 StackPopUnderflow.selector,
-                state.stackBottom.unsafeToIndex(state.stackHighwater),
-                state.stackBottom.unsafeToIndex(stackTop.unsafeSubWords(1))
+                state.stackBottom.toIndexSigned(state.stackHighwater),
+                state.stackBottom.toIndexSigned(stackTop.unsafeSubWords(1))
             )
         );
         Pointer stackTopAfter = state.applyFn(stackTop, i1o1);
@@ -131,8 +133,10 @@ contract LibIntegrityCheckApplyFnTest is Test {
     function testIntegrityCheckApplyFni2o0Underflow(Pointer stackTop, Pointer highwater) external {
         // Avoid numeric underflow of the virtual stack space.
         highwater = Pointer.wrap(bound(Pointer.unwrap(highwater), 0x40, type(uint256).max - 0x40));
+        vm.assume(Pointer.unwrap(highwater) % 0x20 == 0);
         // Ensure the stack top underflows the highwater when popping two words.
         stackTop = Pointer.wrap(bound(Pointer.unwrap(stackTop), 0x40, Pointer.unwrap(highwater.unsafeAddWords(2))));
+        vm.assume(Pointer.unwrap(stackTop) % 0x20 == 0);
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -143,8 +147,8 @@ contract LibIntegrityCheckApplyFnTest is Test {
         vm.expectRevert(
             abi.encodeWithSelector(
                 StackPopUnderflow.selector,
-                state.stackBottom.unsafeToIndex(state.stackHighwater),
-                state.stackBottom.unsafeToIndex(stackTop.unsafeSubWords(2))
+                state.stackBottom.toIndexSigned(state.stackHighwater),
+                state.stackBottom.toIndexSigned(stackTop.unsafeSubWords(2))
             )
         );
         Pointer stackTopAfter = state.applyFn(stackTop, i2o0);
@@ -181,8 +185,10 @@ contract LibIntegrityCheckApplyFnTest is Test {
     function testIntegrityCheckApplyFni2o1Underflow(Pointer stackTop, Pointer highwater) external {
         // Avoid numeric underflow of the virtual stack space.
         highwater = Pointer.wrap(bound(Pointer.unwrap(highwater), 0x40, type(uint256).max - 0x40));
+        vm.assume(Pointer.unwrap(highwater) % 0x20 == 0);
         // Ensure the stack top underflows the highwater when popping two words.
         stackTop = Pointer.wrap(bound(Pointer.unwrap(stackTop), 0x40, Pointer.unwrap(highwater.unsafeAddWords(2))));
+        vm.assume(Pointer.unwrap(stackTop) % 0x20 == 0);
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -193,8 +199,8 @@ contract LibIntegrityCheckApplyFnTest is Test {
         vm.expectRevert(
             abi.encodeWithSelector(
                 StackPopUnderflow.selector,
-                state.stackBottom.unsafeToIndex(state.stackHighwater),
-                state.stackBottom.unsafeToIndex(stackTop.unsafeSubWords(2))
+                state.stackBottom.toIndexSigned(state.stackHighwater),
+                state.stackBottom.toIndexSigned(stackTop.unsafeSubWords(2))
             )
         );
         Pointer stackTopAfter = state.applyFn(stackTop, i2o1);
@@ -306,7 +312,9 @@ contract LibIntegrityCheckApplyFnTest is Test {
     /// relative to the highwater, then the inital pop will underflow the stack.
     function testIntegrityCheckApplyFni3o1Underflow(Pointer stackTop, Pointer highwater) external {
         highwater = Pointer.wrap(bound(Pointer.unwrap(highwater), 0x60, type(uint256).max - 0x60));
+        vm.assume(Pointer.unwrap(highwater) % 0x20 == 0);
         stackTop = Pointer.wrap(bound(Pointer.unwrap(stackTop), 0x60, Pointer.unwrap(highwater.unsafeAddWords(3))));
+        vm.assume(Pointer.unwrap(stackTop) % 0x20 == 0);
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -317,8 +325,8 @@ contract LibIntegrityCheckApplyFnTest is Test {
         vm.expectRevert(
             abi.encodeWithSelector(
                 StackPopUnderflow.selector,
-                state.stackBottom.unsafeToIndex(state.stackHighwater),
-                state.stackBottom.unsafeToIndex(stackTop.unsafeSubWords(3))
+                state.stackBottom.toIndexSigned(state.stackHighwater),
+                state.stackBottom.toIndexSigned(stackTop.unsafeSubWords(3))
             )
         );
         Pointer stackTopAfter = state.applyFn(stackTop, i3o1);
@@ -356,7 +364,9 @@ contract LibIntegrityCheckApplyFnTest is Test {
     /// the stack.
     function testIntegrityCheckApplyFni4o1Underflow(Pointer stackTop, Pointer highwater) external {
         highwater = Pointer.wrap(bound(Pointer.unwrap(highwater), 0x80, type(uint256).max - 0x80));
+        vm.assume(Pointer.unwrap(highwater) % 0x20 == 0);
         stackTop = Pointer.wrap(bound(Pointer.unwrap(stackTop), 0x80, Pointer.unwrap(highwater.unsafeAddWords(4))));
+        vm.assume(Pointer.unwrap(stackTop) % 0x20 == 0);
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -367,8 +377,8 @@ contract LibIntegrityCheckApplyFnTest is Test {
         vm.expectRevert(
             abi.encodeWithSelector(
                 StackPopUnderflow.selector,
-                state.stackBottom.unsafeToIndex(state.stackHighwater),
-                state.stackBottom.unsafeToIndex(stackTop.unsafeSubWords(4))
+                state.stackBottom.toIndexSigned(state.stackHighwater),
+                state.stackBottom.toIndexSigned(stackTop.unsafeSubWords(4))
             )
         );
         Pointer stackTopAfter = state.applyFn(stackTop, i4o1);
@@ -404,7 +414,9 @@ contract LibIntegrityCheckApplyFnTest is Test {
     /// the highwater, then the inital pop will underflow the stack.
     function testIntegrityCheckApplyFni1o1OperandUnderflow(Pointer stackTop, Pointer highwater) external {
         highwater = Pointer.wrap(bound(Pointer.unwrap(highwater), 0x40, type(uint256).max - 0x40));
+        vm.assume(Pointer.unwrap(highwater) % 0x20 == 0);
         stackTop = Pointer.wrap(bound(Pointer.unwrap(stackTop), 0x40, Pointer.unwrap(highwater.unsafeAddWord())));
+        vm.assume(Pointer.unwrap(stackTop) % 0x20 == 0);
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -415,8 +427,8 @@ contract LibIntegrityCheckApplyFnTest is Test {
         vm.expectRevert(
             abi.encodeWithSelector(
                 StackPopUnderflow.selector,
-                state.stackBottom.unsafeToIndex(state.stackHighwater),
-                state.stackBottom.unsafeToIndex(stackTop.unsafeSubWords(1))
+                state.stackBottom.toIndexSigned(state.stackHighwater),
+                state.stackBottom.toIndexSigned(stackTop.unsafeSubWords(1))
             )
         );
         Pointer stackTopAfter = state.applyFn(stackTop, i1o1Operand);
@@ -452,7 +464,9 @@ contract LibIntegrityCheckApplyFnTest is Test {
     /// relative to the highwater, then the inital pop will underflow the stack.
     function testIntegrityCheckApplyFni2o1OperandUnderflow(Pointer stackTop, Pointer highwater) external {
         highwater = Pointer.wrap(bound(Pointer.unwrap(highwater), 0x40, type(uint256).max - 0x40));
+        vm.assume(Pointer.unwrap(highwater) % 0x20 == 0);
         stackTop = Pointer.wrap(bound(Pointer.unwrap(stackTop), 0x40, Pointer.unwrap(highwater.unsafeAddWords(2))));
+        vm.assume(Pointer.unwrap(stackTop) % 0x20 == 0);
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -464,8 +478,8 @@ contract LibIntegrityCheckApplyFnTest is Test {
         vm.expectRevert(
             abi.encodeWithSelector(
                 StackPopUnderflow.selector,
-                state.stackBottom.unsafeToIndex(state.stackHighwater),
-                state.stackBottom.unsafeToIndex(stackTop.unsafeSubWords(2))
+                state.stackBottom.toIndexSigned(state.stackHighwater),
+                state.stackBottom.toIndexSigned(stackTop.unsafeSubWords(2))
             )
         );
         Pointer stackTopAfter = state.applyFn(stackTop, i2o1Operand);
@@ -519,9 +533,11 @@ contract LibIntegrityCheckApplyFnTest is Test {
         highwater = Pointer.wrap(
             bound(Pointer.unwrap(highwater), 0x20 * array.length, type(uint256).max - (array.length + 1) * 0x20)
         );
+        vm.assume(Pointer.unwrap(highwater) % 0x20 == 0);
         stackTop = Pointer.wrap(
             bound(Pointer.unwrap(stackTop), 0x20 * array.length, Pointer.unwrap(highwater.unsafeAddWords(array.length)))
         );
+        vm.assume(Pointer.unwrap(stackTop) % 0x20 == 0);
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers =
@@ -532,8 +548,8 @@ contract LibIntegrityCheckApplyFnTest is Test {
         vm.expectRevert(
             abi.encodeWithSelector(
                 StackPopUnderflow.selector,
-                state.stackBottom.unsafeToIndex(state.stackHighwater),
-                state.stackBottom.unsafeToIndex(stackTop.unsafeSubWords(array.length))
+                state.stackBottom.toIndexSigned(state.stackHighwater),
+                state.stackBottom.toIndexSigned(stackTop.unsafeSubWords(array.length))
             )
         );
         Pointer stackTopAfter = state.applyFn(stackTop, iDo1, array.length);
@@ -580,6 +596,7 @@ contract LibIntegrityCheckApplyFnTest is Test {
         highwater = Pointer.wrap(
             bound(Pointer.unwrap(highwater), 0x20 * array.length + 0x40, type(uint256).max - (array.length + 2) * 0x20)
         );
+        vm.assume(Pointer.unwrap(highwater) % 0x20 == 0);
         stackTop = Pointer.wrap(
             bound(
                 Pointer.unwrap(stackTop),
@@ -587,6 +604,7 @@ contract LibIntegrityCheckApplyFnTest is Test {
                 Pointer.unwrap(highwater.unsafeAddWords(array.length + 2))
             )
         );
+        vm.assume(Pointer.unwrap(stackTop) % 0x20 == 0);
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers = new function(IntegrityCheckState memory, Operand, Pointer)
@@ -598,8 +616,8 @@ contract LibIntegrityCheckApplyFnTest is Test {
         vm.expectRevert(
             abi.encodeWithSelector(
                 StackPopUnderflow.selector,
-                state.stackBottom.unsafeToIndex(state.stackHighwater),
-                state.stackBottom.unsafeToIndex(stackTop.unsafeSubWords(array.length + 2))
+                state.stackBottom.toIndexSigned(state.stackHighwater),
+                state.stackBottom.toIndexSigned(stackTop.unsafeSubWords(array.length + 2))
             )
         );
         Pointer stackTopAfter = state.applyFn(stackTop, i2Do1, array.length);
@@ -647,6 +665,7 @@ contract LibIntegrityCheckApplyFnTest is Test {
         highwater = Pointer.wrap(
             bound(Pointer.unwrap(highwater), 0x20 * array.length + 0x60, type(uint256).max - (array.length + 3) * 0x20)
         );
+        vm.assume(Pointer.unwrap(highwater) % 0x20 == 0);
         stackTop = Pointer.wrap(
             bound(
                 Pointer.unwrap(stackTop),
@@ -654,6 +673,7 @@ contract LibIntegrityCheckApplyFnTest is Test {
                 Pointer.unwrap(highwater.unsafeAddWords(array.length + 3))
             )
         );
+        vm.assume(Pointer.unwrap(stackTop) % 0x20 == 0);
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers = new function(
@@ -667,8 +687,8 @@ contract LibIntegrityCheckApplyFnTest is Test {
         vm.expectRevert(
             abi.encodeWithSelector(
                 StackPopUnderflow.selector,
-                state.stackBottom.unsafeToIndex(state.stackHighwater),
-                state.stackBottom.unsafeToIndex(stackTop.unsafeSubWords(array.length + 3))
+                state.stackBottom.toIndexSigned(state.stackHighwater),
+                state.stackBottom.toIndexSigned(stackTop.unsafeSubWords(array.length + 3))
             )
         );
         Pointer stackTopAfter = state.applyFn(stackTop, i3Do1, array.length);
@@ -724,6 +744,7 @@ contract LibIntegrityCheckApplyFnTest is Test {
                 type(uint256).max - (array.length * 2 + 2) * 0x20
             )
         );
+        vm.assume(Pointer.unwrap(highwater) % 0x20 == 0);
         stackTop = Pointer.wrap(
             bound(
                 Pointer.unwrap(stackTop),
@@ -731,6 +752,7 @@ contract LibIntegrityCheckApplyFnTest is Test {
                 Pointer.unwrap(highwater.unsafeAddWords(array.length * 2 + 1))
             )
         );
+        vm.assume(Pointer.unwrap(stackTop) % 0x20 == 0);
         function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[] memory pointers = new function(
@@ -745,8 +767,8 @@ contract LibIntegrityCheckApplyFnTest is Test {
         vm.expectRevert(
             abi.encodeWithSelector(
                 StackPopUnderflow.selector,
-                state.stackBottom.unsafeToIndex(state.stackHighwater),
-                state.stackBottom.unsafeToIndex(stackTop.unsafeSubWords(array.length * 2 + 1))
+                state.stackBottom.toIndexSigned(state.stackHighwater),
+                state.stackBottom.toIndexSigned(stackTop.unsafeSubWords(array.length * 2 + 1))
             )
         );
         Pointer stackTopAfter = state.applyFn(stackTop, i1DDoD, array.length);

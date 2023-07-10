@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import "forge-std/Test.sol";
 
-import "sol.lib.memory/lib/LibPointer.sol";
+import "rain.solmem/lib/LibPointer.sol";
 
 import "src/lib/integrity/LibIntegrityCheck.sol";
 import "src/lib/parse/LibParse.sol";
@@ -63,7 +63,7 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
     function testIntegrityEnsureIntegrityMinStackBottom(
         Pointer stackBottom,
         SourceIndex sourceIndex,
-        uint256 minStackOutputs
+        uint8 minStackOutputs
     ) public {
         stackBottom = Pointer.wrap(bound(Pointer.unwrap(stackBottom), 0, Pointer.unwrap(INITIAL_STACK_BOTTOM) - 1));
         IntegrityCheckState memory state = LibIntegrityCheck.newState(new bytes[](0), new uint256[](0), integrityPointers());
@@ -99,7 +99,7 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
     /// Popping without pushing will underflow the stack.
     function testIntegrityEnsureIntegrityPopUnderflow() public {
         (IntegrityCheckState memory state, Pointer stackTop) = newState("_: pop();");
-        vm.expectRevert(abi.encodeWithSelector(StackPopUnderflow.selector, 0, type(uint256).max));
+        vm.expectRevert(abi.encodeWithSelector(StackPopUnderflow.selector, -1, -1));
         state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 0);
     }
 }

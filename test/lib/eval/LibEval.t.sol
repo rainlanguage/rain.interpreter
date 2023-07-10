@@ -2,9 +2,9 @@
 pragma solidity =0.8.19;
 
 import "forge-std/Test.sol";
-import "rain.lib.memkv/LibMemoryKV.sol";
-import "sol.lib.memory/LibPointer.sol";
-import "sol.lib.memory/LibStackPointer.sol";
+import "rain.lib.memkv/lib/LibMemoryKV.sol";
+import "rain.solmem/lib/LibPointer.sol";
+import "rain.solmem/lib/LibStackPointer.sol";
 import "rain.lib.typecast/LibConvert.sol";
 
 import "src/lib/eval/LibEval.sol";

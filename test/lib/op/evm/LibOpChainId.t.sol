@@ -3,8 +3,8 @@ pragma solidity ^0.8.18;
 
 import "forge-std/Test.sol";
 
-import "sol.lib.memory/LibPointer.sol";
-import "sol.lib.memory/LibStackPointer.sol";
+import "rain.solmem/lib/LibPointer.sol";
+import "rain.solmem/lib/LibStackPointer.sol";
 
 import "src/lib/state/LibInterpreterState.sol";
 import "src/lib/op/evm/LibOpChainId.sol";
@@ -86,7 +86,7 @@ contract LibOpChainIdTest is Test {
             meta
         ));
         (bytes[] memory sources, uint256[] memory constants) = deployer.parse("_: chain-id();");
-        uint256[] memory minOutputs = new uint256[](1);
+        uint8[] memory minOutputs = new uint8[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             deployer.deployExpression(sources, constants, minOutputs);

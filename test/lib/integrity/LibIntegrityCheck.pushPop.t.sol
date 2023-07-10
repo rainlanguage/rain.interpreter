@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import "forge-std/Test.sol";
 
-import "sol.lib.memory/LibPointer.sol";
+import "rain.solmem/lib/LibPointer.sol";
 import "src/lib/integrity/LibIntegrityCheck.sol";
 
 /// @title LibIntegrityCheckPushPopTest
@@ -195,7 +195,10 @@ contract LibIntegrityCheckPushPopTest is Test {
     /// the highwater as that would imply that the stack can be written over an
     /// immutable value.
     function testIntegrityCheckUnderflowHighwater(Pointer stackTop) external {
-        vm.assume(Pointer.unwrap(stackTop) <= Pointer.unwrap(INITIAL_STACK_HIGHWATER));
+        stackTop = Pointer.wrap(
+            bound(Pointer.unwrap(stackTop), 0, Pointer.unwrap(INITIAL_STACK_HIGHWATER))
+        );
+        vm.assume(Pointer.unwrap(stackTop) % 0x20 == 0);
         IntegrityCheckState memory state = LibIntegrityCheck.newState(
             new bytes[](0),
             new uint256[](0),
@@ -206,8 +209,8 @@ contract LibIntegrityCheckPushPopTest is Test {
         vm.expectRevert(
             abi.encodeWithSelector(
                 StackPopUnderflow.selector,
-                state.stackBottom.unsafeToIndex(state.stackHighwater),
-                state.stackBottom.unsafeToIndex(stackTop)
+                state.stackBottom.toIndexSigned(state.stackHighwater),
+                state.stackBottom.toIndexSigned(stackTop)
             )
         );
         LibIntegrityCheck.popUnderflowCheck(state, stackTop);
@@ -248,10 +251,13 @@ contract LibIntegrityCheckPushPopTest is Test {
     function testIntegrityCheckPopUnderflow(Pointer stackTop) external {
         // Avoid underflow of the virtual pointer. An underflow could never
         // happen in practice as the stack bottom starts somewhere near infinity.
-        vm.assume(Pointer.unwrap(stackTop) > 0x20);
-        // The stack top can be anywhere up to one word above the highwater and
-        // it will underflow when popped.
-        vm.assume(Pointer.unwrap(stackTop) <= Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWord()));
+        stackTop = Pointer.wrap(bound(
+            Pointer.unwrap(stackTop),
+            0x40,
+            Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWord())
+        ));
+        vm.assume(Pointer.unwrap(stackTop) % 0x20 == 0);
+
         IntegrityCheckState memory state = LibIntegrityCheck.newState(
             new bytes[](0),
             new uint256[](0),
@@ -263,8 +269,8 @@ contract LibIntegrityCheckPushPopTest is Test {
         vm.expectRevert(
             abi.encodeWithSelector(
                 StackPopUnderflow.selector,
-                state.stackBottom.unsafeToIndex(state.stackHighwater),
-                state.stackBottom.unsafeToIndex(stackTop.unsafeSubWord())
+                state.stackBottom.toIndexSigned(state.stackHighwater),
+                state.stackBottom.toIndexSigned(stackTop.unsafeSubWord())
             )
         );
         LibIntegrityCheck.pop(state, stackTop);
@@ -354,9 +360,11 @@ contract LibIntegrityCheckPushPopTest is Test {
     /// Check that the n variant of pop catches underflow just like the regular
     /// pop.
     function testIntegrityCheckPopNUnderflow(Pointer stackTop, uint8 n) external {
-        vm.assume(Pointer.unwrap(stackTop) >= Pointer.unwrap(Pointer.wrap(0).unsafeAddWords(n)));
+        stackTop = Pointer.wrap(
+            bound(Pointer.unwrap(stackTop), Pointer.unwrap(Pointer.wrap(0).unsafeAddWords(n)), Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(n)))
+        );
         vm.assume(n > 1);
-        vm.assume(Pointer.unwrap(stackTop) < Pointer.unwrap(INITIAL_STACK_BOTTOM.unsafeAddWords(n)));
+        vm.assume(Pointer.unwrap(stackTop) % 0x20 == 0);
         IntegrityCheckState memory state = LibIntegrityCheck.newState(
             new bytes[](0),
             new uint256[](0),
@@ -368,8 +376,8 @@ contract LibIntegrityCheckPushPopTest is Test {
         vm.expectRevert(
             abi.encodeWithSelector(
                 StackPopUnderflow.selector,
-                state.stackBottom.unsafeToIndex(state.stackHighwater),
-                state.stackBottom.unsafeToIndex(stackTop.unsafeSubWords(n))
+                state.stackBottom.toIndexSigned(state.stackHighwater),
+                state.stackBottom.toIndexSigned(stackTop.unsafeSubWords(n))
             )
         );
         LibIntegrityCheck.pop(state, stackTop, n);

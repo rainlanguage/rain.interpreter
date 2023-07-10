@@ -3,7 +3,7 @@ pragma solidity =0.8.19;
 
 import "rain.lib.hash/LibHashNoAlloc.sol";
 import "rain.lib.typecast/LibCast.sol";
-import "sol.lib.memory/LibUint256Array.sol";
+import "rain.solmem/lib/LibUint256Array.sol";
 
 import "src/interface/IInterpreterCallerV2.sol";
 

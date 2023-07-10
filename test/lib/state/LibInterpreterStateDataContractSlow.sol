@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "sol.lib.memory/LibPointer.sol";
-import "sol.lib.memory/LibStackPointer.sol";
-import "sol.lib.memory/LibBytes.sol";
-import "sol.lib.memory/LibUint256Array.sol";
+import "rain.solmem/lib/LibPointer.sol";
+import "rain.solmem/lib/LibStackPointer.sol";
+import "rain.solmem/lib/LibBytes.sol";
+import "rain.solmem/lib/LibUint256Array.sol";
 
 import "src/lib/compile/LibCompile.sol";
 import "src/lib/state/LibInterpreterState.sol";

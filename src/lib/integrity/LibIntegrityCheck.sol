@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.19;
 
-import "sol.lib.memory/LibPointer.sol";
-import "sol.lib.memory/LibStackPointer.sol";
+import "rain.solmem/lib/LibPointer.sol";
+import "rain.solmem/lib/LibStackPointer.sol";
 import {Math} from "openzeppelin-contracts/contracts/utils/math/Math.sol";
 
 import "../../interface/IExpressionDeployerV1.sol";
@@ -15,7 +15,7 @@ import "forge-std/console2.sol";
 /// below its starting point at the stack bottom. For the virtual stack used by
 /// the integrity check we can start it in the middle of the `uint256` range and
 /// achieve something analogous to signed integers with unsigned integer types.
-Pointer constant INITIAL_STACK_BOTTOM = Pointer.wrap(type(uint256).max / 2);
+Pointer constant INITIAL_STACK_BOTTOM = Pointer.wrap(0x20 ** 0x20);
 
 /// @dev Highwater starts underneath stack bottom as it errors on an greater than
 /// _or equal to_ check.
@@ -38,14 +38,15 @@ error MinStackBottom(Pointer stackBottom);
 /// @param stackHighwaterIndex Index of the stack highwater at the moment of
 /// underflow.
 /// @param stackTopIndex Index of the stack top at the moment of underflow.
-error StackPopUnderflow(uint256 stackHighwaterIndex, uint256 stackTopIndex);
+error StackPopUnderflow(int256 stackHighwaterIndex, int256 stackTopIndex);
 
 /// The final stack produced by some source did not hit the minimum required for
 /// its calling context.
 /// @param minStackOutputs The required minimum stack height.
 /// @param actualStackOutputs The final stack height after evaluating a source.
-/// Will be less than the min stack outputs if this error is thrown.
-error MinFinalStack(uint256 minStackOutputs, uint256 actualStackOutputs);
+/// Will be less than the min stack outputs if this error is thrown. MAY be
+/// negative if the stack underflowed.
+error MinFinalStack(uint256 minStackOutputs, int256 actualStackOutputs);
 
 /// Running an integrity check is a stateful operation. As well as the basic
 /// configuration of what is being checked such as the sources and size of the
@@ -173,9 +174,8 @@ library LibIntegrityCheck {
         IntegrityCheckState memory integrityCheckState,
         SourceIndex sourceIndex,
         Pointer stackTop,
-        uint256 minStackOutputs
+        uint8 minStackOutputs
     ) internal view returns (Pointer) {
-        console2.log("pointers", Pointer.unwrap(integrityCheckState.stackBottom), Pointer.unwrap(stackTop));
         unchecked {
             // It's generally more efficient to ensure the stack bottom has
             // plenty of headroom to make underflows from pops impossible rather
@@ -205,10 +205,8 @@ library LibIntegrityCheck {
                 // pointer for will error as a standard Solidity OOB read.
                 stackTop = integrityCheckState.integrityFunctionPointers[opcode](integrityCheckState, operand, stackTop);
             }
-            uint256 finalStackOutputs = integrityCheckState.stackBottom.unsafeToIndex(stackTop);
-            console2.log("finalStackOutputs", finalStackOutputs);
-            console2.log("minStackOutputs", minStackOutputs);
-            if (minStackOutputs > finalStackOutputs) {
+            int256 finalStackOutputs = integrityCheckState.stackBottom.toIndexSigned(stackTop);
+            if (int256(uint256(minStackOutputs)) > finalStackOutputs) {
                 revert MinFinalStack(minStackOutputs, finalStackOutputs);
             }
             return stackTop;
@@ -276,8 +274,8 @@ library LibIntegrityCheck {
     function popUnderflowCheck(IntegrityCheckState memory integrityCheckState, Pointer stackTop) internal pure {
         if (Pointer.unwrap(stackTop) <= Pointer.unwrap(integrityCheckState.stackHighwater)) {
             revert StackPopUnderflow(
-                integrityCheckState.stackBottom.unsafeToIndex(integrityCheckState.stackHighwater),
-                integrityCheckState.stackBottom.unsafeToIndex(stackTop)
+                integrityCheckState.stackBottom.toIndexSigned(integrityCheckState.stackHighwater),
+                integrityCheckState.stackBottom.toIndexSigned(stackTop)
             );
         }
     }

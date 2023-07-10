@@ -11,6 +11,6 @@ interface IDebugExpressionDeployerV1 {
         uint256[][] memory context,
         SourceIndex sourceIndex,
         uint256[] memory initialStack,
-        uint256 minOutputs
+        uint8 minOutputs
     ) external view returns (uint256[] memory finalStack, uint256[] memory kvs);
 }
