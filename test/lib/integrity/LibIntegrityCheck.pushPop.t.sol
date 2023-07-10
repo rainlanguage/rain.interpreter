@@ -195,9 +195,7 @@ contract LibIntegrityCheckPushPopTest is Test {
     /// the highwater as that would imply that the stack can be written over an
     /// immutable value.
     function testIntegrityCheckUnderflowHighwater(Pointer stackTop) external {
-        stackTop = Pointer.wrap(
-            bound(Pointer.unwrap(stackTop), 0, Pointer.unwrap(INITIAL_STACK_HIGHWATER))
-        );
+        stackTop = Pointer.wrap(bound(Pointer.unwrap(stackTop), 0, Pointer.unwrap(INITIAL_STACK_HIGHWATER)));
         vm.assume(Pointer.unwrap(stackTop) % 0x20 == 0);
         IntegrityCheckState memory state = LibIntegrityCheck.newState(
             new bytes[](0),
@@ -251,11 +249,8 @@ contract LibIntegrityCheckPushPopTest is Test {
     function testIntegrityCheckPopUnderflow(Pointer stackTop) external {
         // Avoid underflow of the virtual pointer. An underflow could never
         // happen in practice as the stack bottom starts somewhere near infinity.
-        stackTop = Pointer.wrap(bound(
-            Pointer.unwrap(stackTop),
-            0x40,
-            Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWord())
-        ));
+        stackTop =
+            Pointer.wrap(bound(Pointer.unwrap(stackTop), 0x40, Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWord())));
         vm.assume(Pointer.unwrap(stackTop) % 0x20 == 0);
 
         IntegrityCheckState memory state = LibIntegrityCheck.newState(
@@ -361,7 +356,11 @@ contract LibIntegrityCheckPushPopTest is Test {
     /// pop.
     function testIntegrityCheckPopNUnderflow(Pointer stackTop, uint8 n) external {
         stackTop = Pointer.wrap(
-            bound(Pointer.unwrap(stackTop), Pointer.unwrap(Pointer.wrap(0).unsafeAddWords(n)), Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(n)))
+            bound(
+                Pointer.unwrap(stackTop),
+                Pointer.unwrap(Pointer.wrap(0).unsafeAddWords(n)),
+                Pointer.unwrap(INITIAL_STACK_HIGHWATER.unsafeAddWords(n))
+            )
         );
         vm.assume(n > 1);
         vm.assume(Pointer.unwrap(stackTop) % 0x20 == 0);

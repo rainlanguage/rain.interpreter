@@ -24,11 +24,19 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
         revert BadIntegrity();
     }
 
-    function integrityPushes(IntegrityCheckState memory state, Operand, Pointer stackTop) internal pure returns (Pointer) {
+    function integrityPushes(IntegrityCheckState memory state, Operand, Pointer stackTop)
+        internal
+        pure
+        returns (Pointer)
+    {
         return state.push(stackTop);
     }
 
-    function integrityPops(IntegrityCheckState memory state, Operand, Pointer stackTop) internal pure returns (Pointer) {
+    function integrityPops(IntegrityCheckState memory state, Operand, Pointer stackTop)
+        internal
+        pure
+        returns (Pointer)
+    {
         return state.pop(stackTop);
     }
 
@@ -40,7 +48,11 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
         return LibParseMeta.buildMetaExpander(words, 2);
     }
 
-    function integrityPointers() internal pure returns (function(IntegrityCheckState memory, Operand, Pointer) view returns (Pointer)[] memory pointers) {
+    function integrityPointers()
+        internal
+        pure
+        returns (function(IntegrityCheckState memory, Operand, Pointer) view returns (Pointer)[] memory pointers)
+    {
         pointers = new function(IntegrityCheckState memory, Operand, Pointer) view returns (Pointer)[](3);
         pointers[0] = integrityReverts;
         pointers[1] = integrityPushes;
@@ -66,7 +78,8 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
         uint8 minStackOutputs
     ) public {
         stackBottom = Pointer.wrap(bound(Pointer.unwrap(stackBottom), 0, Pointer.unwrap(INITIAL_STACK_BOTTOM) - 1));
-        IntegrityCheckState memory state = LibIntegrityCheck.newState(new bytes[](0), new uint256[](0), integrityPointers());
+        IntegrityCheckState memory state =
+            LibIntegrityCheck.newState(new bytes[](0), new uint256[](0), integrityPointers());
         Pointer stackTop = state.stackBottom;
         state.stackBottom = stackBottom;
         vm.expectRevert(abi.encodeWithSelector(MinStackBottom.selector, state.stackBottom));
@@ -82,11 +95,26 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
         (stackTopAfter);
     }
 
+    /// Reverting can happen in the middle of a series of integrity checks.
+    function testIntegrityEnsureIntegrityRevertMiddle() public {
+        (IntegrityCheckState memory state, Pointer stackTop) = newState("_: push(), _: revert(), _: push();");
+        vm.expectRevert(abi.encodeWithSelector(BadIntegrity.selector));
+        Pointer stackTopAfter = state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 0);
+        (stackTopAfter);
+    }
+
     /// Pushing a value onto the stack should increase the stack top by one.
     function testIntegrityEnsureIntegrityPush() public {
         (IntegrityCheckState memory state, Pointer stackTop) = newState("_: push();");
         Pointer stackTopAfter = state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 0);
         assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(stackTop.unsafeAddWord()));
+    }
+
+    /// Pushing two values onto the stack should increase the stack top by two.
+    function testIntegrityEnsureIntegrityPushPush() public {
+        (IntegrityCheckState memory state, Pointer stackTop) = newState("_ _: push() push();");
+        Pointer stackTopAfter = state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 0);
+        assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(stackTop.unsafeAddWord().unsafeAddWord()));
     }
 
     /// Pushing and then popping should have the same stack top as before.
@@ -101,5 +129,47 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
         (IntegrityCheckState memory state, Pointer stackTop) = newState("_: pop();");
         vm.expectRevert(abi.encodeWithSelector(StackPopUnderflow.selector, -1, -1));
         state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 0);
+    }
+
+    /// A more complex series of pushes and pops should work.
+    function testIntegrityEnsureIntegrityPushPop() public {
+        (IntegrityCheckState memory state, Pointer stackTop) =
+            newState("_ _: push(), _: push(), _:pop(), _: push(), _: pop(), _: pop();");
+        Pointer stackTopAfter = state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 0);
+        assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(stackTop));
+    }
+
+    /// If the min final stack is set higher than 0 the stack must be at least
+    /// that high. This test checks that min stack of 1 can be satisfied.
+    function testIntegrityEnsureIntegrityMinStack1() public {
+        (IntegrityCheckState memory state, Pointer stackTop) = newState("_: push();");
+        Pointer stackTopAfter = state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 1);
+        assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(stackTop.unsafeAddWord()));
+    }
+
+    /// If the min final stack is set higher than 0 the stack must be at least
+    /// that high. This test checks that min stack of 1 will error if the stack
+    /// is too small.
+    function testIntegrityEnsureIntegrityMinStack1Underflow() public {
+        (IntegrityCheckState memory state, Pointer stackTop) = newState(":;");
+        vm.expectRevert(abi.encodeWithSelector(MinFinalStack.selector, 1, 0));
+        state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 1);
+    }
+
+    /// If the min final stack is set higher than 0 the stack must be at least
+    /// that high. This test checks that min stack of 2 can be satisfied.
+    function testIntegrityEnsureIntegrityMinStack2() public {
+        (IntegrityCheckState memory state, Pointer stackTop) = newState("_ _: push() push();");
+        Pointer stackTopAfter = state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 2);
+        assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(stackTop.unsafeAddWord().unsafeAddWord()));
+    }
+
+    /// If the min final stack is set higher than 0 the stack must be at least
+    /// that high. This test checks that min stack of 2 will error if the stack
+    /// is too small.
+    function testIntegrityEnsureIntegrityMinStack2Underflow() public {
+        (IntegrityCheckState memory state, Pointer stackTop) = newState("_: push();");
+        vm.expectRevert(abi.encodeWithSelector(MinFinalStack.selector, 2, 1));
+        state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 2);
     }
 }
