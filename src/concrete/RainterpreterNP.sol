@@ -33,7 +33,6 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV1, ERC165 {
     using LibNamespace for StateNamespace;
     using LibInterpreterStateDataContract for bytes;
     using LibCast for function(InterpreterState memory, Operand, Pointer) view returns (Pointer)[];
-    using Math for uint256;
     using LibMemoryKV for MemoryKV;
 
     // @inheritdoc ERC165
@@ -92,7 +91,8 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV1, ERC165 {
             revert NegativeStackLength(stackLengthFinal);
         }
         uint256 stackLengthFinalPositive = uint256(stackLengthFinal);
-        (uint256 head, uint256[] memory tail) = stackTop.unsafeList(stackLengthFinalPositive.min(maxOutputs));
+        (uint256 head, uint256[] memory tail) =
+            stackTop.unsafeList(maxOutputs < stackLengthFinalPositive ? maxOutputs : stackLengthFinalPositive);
         // The head is irrelevant here because it's whatever was overridden by
         // the length of the array in building the final substack to return.
         (head);

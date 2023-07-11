@@ -5,8 +5,6 @@ import "rain.solmem/lib/LibPointer.sol";
 import "./LibCtPop.sol";
 import "./LibParseMeta.sol";
 
-import "forge-std/console2.sol";
-
 /// The expression does not finish with a semicolon (EOF).
 error MissingFinalSemi(uint256 offset);
 
