@@ -3,12 +3,9 @@ pragma solidity ^0.8.19;
 
 import "rain.solmem/lib/LibPointer.sol";
 import "rain.solmem/lib/LibStackPointer.sol";
-import {Math} from "openzeppelin-contracts/contracts/utils/math/Math.sol";
 
 import "../../interface/IExpressionDeployerV1.sol";
 import "../../interface/IInterpreterV1.sol";
-
-import "forge-std/console2.sol";
 
 /// @dev The virtual stack pointers are never read or written so don't need to
 /// point to a real location in memory. We only care that the stack never moves
@@ -112,7 +109,6 @@ library LibIntegrityCheck {
     using LibIntegrityCheck for IntegrityCheckState;
     using LibPointer for Pointer;
     using LibStackPointer for Pointer;
-    using Math for uint256;
 
     /// Build a new integrity check state from sane defaults. The initialization
     /// of the stack bottom and highwater are important to avoid underflows
@@ -240,9 +236,9 @@ library LibIntegrityCheck {
         // Any time we push more than 1 item to the stack we move the highwater
         // to the last item, as nested multioutput is disallowed.
         if (n > 1) {
-            integrityCheckState.stackHighwater = Pointer.wrap(
-                Pointer.unwrap(integrityCheckState.stackHighwater).max(Pointer.unwrap(stackTop.unsafeSubWord()))
-            );
+            Pointer lastItem = stackTop.unsafeSubWord();
+            integrityCheckState.stackHighwater = Pointer.unwrap(integrityCheckState.stackHighwater)
+                > Pointer.unwrap(lastItem) ? integrityCheckState.stackHighwater : lastItem;
         }
         integrityCheckState.syncStackMaxTop(stackTop);
         return stackTop;
