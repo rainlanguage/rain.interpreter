@@ -38,7 +38,7 @@ contract RainterpreterExtern is IInterpreterExternV1, ERC165 {
     }
 
     /// @inheritdoc IInterpreterExternV1
-    function extern(ExternDispatch dispatch, uint256[] memory inputs) external view returns (uint256[] memory) {
+    function extern(ExternDispatch dispatch, uint256[] memory inputs) external view returns (uint256[] memory outputs) {
         if (inputs.length != 2) {
             revert BadInputs(2, inputs.length);
         }
@@ -47,7 +47,6 @@ contract RainterpreterExtern is IInterpreterExternV1, ERC165 {
         uint256 opcode = (ExternDispatch.unwrap(dispatch) >> 16) & type(uint16).max;
         Operand operand = Operand.wrap(ExternDispatch.unwrap(dispatch) & type(uint16).max);
 
-        uint256[] memory outputs;
         // This is an O(n) approach to dispatch so it doesn't scale. This should
         // be replaced with an O(1) dispatch.
         if (opcode == 0) {
@@ -55,6 +54,5 @@ contract RainterpreterExtern is IInterpreterExternV1, ERC165 {
         } else {
             revert UnknownOp(opcode);
         }
-        return outputs;
     }
 }
