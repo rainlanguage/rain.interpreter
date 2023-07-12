@@ -25,7 +25,7 @@ contract LibOpChainlinkOraclePriceTest is Test {
         int256 answer,
         uint256 startedAt,
         uint256 updatedAt,
-        uint256 answeredInRound,
+        uint80 answeredInRound,
         uint8 decimals
     ) external {
         vm.warp(currentTimestamp);
@@ -36,7 +36,9 @@ contract LibOpChainlinkOraclePriceTest is Test {
         uint256 price =
             LibChainlink.roundDataToPrice(currentTimestamp, staleAfter, scalingFlags, answer, updatedAt, decimals);
         Operand operand = Operand.wrap(scalingFlags & type(uint16).max);
-        vm.assume(uint160(feed) > 10);
+
+        vm.assume(address(uint160(feed)) != address(this));
+        assumeNoPrecompiles(address(uint160(feed)));
         vm.etch(address(uint160(feed)), hex"00");
         vm.mockCall(
             address(uint160(feed)),
@@ -48,7 +50,6 @@ contract LibOpChainlinkOraclePriceTest is Test {
             abi.encodeWithSelector(AggregatorV3Interface.decimals.selector),
             abi.encode(decimals)
         );
-        vm.assume(address(uint160(feed)) != address(this));
 
         assertEq(LibOpChainlinkOraclePrice.f(operand, feed, staleAfter), price);
     }
