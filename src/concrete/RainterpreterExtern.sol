@@ -38,7 +38,11 @@ contract RainterpreterExtern is IInterpreterExternV1, ERC165 {
     }
 
     /// @inheritdoc IInterpreterExternV1
-    function extern(ExternDispatch dispatch, uint256[] memory inputs) external view returns (uint256[] memory outputs) {
+    function extern(ExternDispatch dispatch, uint256[] memory inputs)
+        external
+        view
+        returns (uint256[] memory outputs)
+    {
         if (inputs.length != 2) {
             revert BadInputs(2, inputs.length);
         }
