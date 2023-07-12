@@ -33,19 +33,12 @@ contract RainterpreterExtern is IInterpreterExternV1, ERC165 {
     using LibOp for Pointer;
 
     // @inheritdoc ERC165
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override returns (bool) {
-        return
-            interfaceId == type(IInterpreterExternV1).interfaceId ||
-            super.supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return interfaceId == type(IInterpreterExternV1).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /// @inheritdoc IInterpreterExternV1
-    function extern(
-        ExternDispatch dispatch,
-        uint256[] memory inputs
-    ) external view returns (uint256[] memory) {
+    function extern(ExternDispatch dispatch, uint256[] memory inputs) external view returns (uint256[] memory) {
         if (inputs.length != 2) {
             revert BadInputs(2, inputs.length);
         }
@@ -58,10 +51,7 @@ contract RainterpreterExtern is IInterpreterExternV1, ERC165 {
         // This is an O(n) approach to dispatch so it doesn't scale. This should
         // be replaced with an O(1) dispatch.
         if (opcode == 0) {
-            outputs = stackTop
-                .applyFn(LibOpChainlinkOraclePrice.f, operand)
-                .unsafePeek()
-                .arrayFrom();
+            outputs = stackTop.applyFn(LibOpChainlinkOraclePrice.f, operand).unsafePeek().arrayFrom();
         } else {
             revert UnknownOp(opcode);
         }
