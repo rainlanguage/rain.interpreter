@@ -14,12 +14,12 @@ type ExternDispatch is uint256;
 /// alongside interpreters.
 interface IInterpreterExternV1 {
     /// Handles a single dispatch.
-    /// @param dispatch_ Encoded information about the extern to dispatch.
+    /// @param dispatch Encoded information about the extern to dispatch.
     /// Analogous to the opcode/operand in the interpreter.
-    /// @param inputs_ The array of inputs for the dispatched logic.
-    /// @return outputs_ The result of the dispatched logic.
-    function extern(ExternDispatch dispatch_, uint256[] memory inputs_)
+    /// @param inputs The array of inputs for the dispatched logic.
+    /// @return outputs The result of the dispatched logic.
+    function extern(ExternDispatch dispatch, uint256[] memory inputs)
         external
         view
-        returns (uint256[] memory outputs_);
+        returns (uint256[] memory outputs);
 }
