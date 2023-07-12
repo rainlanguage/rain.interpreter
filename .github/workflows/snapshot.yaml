@@ -1,4 +1,4 @@
-name: QAKit test
+name: Gas snapshot
 
 on: [push]
 
@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: true
 
-    name: QAKit Tests
+    name: Gas snapshot
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -22,17 +22,8 @@ jobs:
         with:
           version: nightly
 
-      - name: Run Forge fmt
-        run: forge fmt --check
-        id: fmt
-
-      - name: Run Forge build
-        run: forge build --sizes
-        id: build
-
-      - name: Run Forge tests
-        run: forge test -vvv --gas-report
-        id: test
+      - name: Install deps
+        run: forge install --shallow
 
       - name: Check gas snapshots
         run: forge snapshot --check
