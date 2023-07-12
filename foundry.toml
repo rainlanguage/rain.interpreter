@@ -23,7 +23,7 @@ cbor_metadata = false
 
 # These tests have some issue with the encoding of mocked return data.
 # @todo fix this
-no_match_test = "testOpChainlinkOraclePriceF|testRainterpreterExternChainlinkOraclePrice"
+# no_match_test = "testOpChainlinkOraclePriceF|testRainterpreterExternChainlinkOraclePrice"
 
 [fuzz]
 runs = 2048
