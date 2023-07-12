@@ -44,29 +44,6 @@ library LibOp {
     /// @param pointer The stack top to read and write to.
     /// @param f The function to run on the stack.
     /// @return The new stack top above the outputs of f.
-    function applyFn(Pointer pointer, function(Operand, uint256) internal view returns (uint256) f, Operand operand)
-        internal
-        view
-        returns (Pointer)
-    {
-        uint256 io;
-        uint256 location;
-        assembly ("memory-safe") {
-            location := sub(pointer, 0x20)
-            io := mload(location)
-        }
-        io = f(operand, io);
-        assembly ("memory-safe") {
-            mstore(location, io)
-        }
-        return pointer;
-    }
-
-    /// Execute a function, reading and writing inputs and outputs on the stack.
-    /// The caller MUST ensure this does not result in unsafe reads and writes.
-    /// @param pointer The stack top to read and write to.
-    /// @param f The function to run on the stack.
-    /// @return The new stack top above the outputs of f.
     // Slither false positive https://github.com/crytic/slither/issues/1875
     //slither-disable-next-line dead-code
     function applyFn(Pointer pointer, function(uint256, uint256) internal view returns (uint256) f)
@@ -150,6 +127,29 @@ library LibOp {
         a = f(a, b, c, d);
         assembly ("memory-safe") {
             mstore(location, a)
+        }
+        return pointer;
+    }
+
+    /// Execute a function, reading and writing inputs and outputs on the stack.
+    /// The caller MUST ensure this does not result in unsafe reads and writes.
+    /// @param pointer The stack top to read and write to.
+    /// @param f The function to run on the stack.
+    /// @return The new stack top above the outputs of f.
+    function applyFn(Pointer pointer, function(Operand, uint256) internal view returns (uint256) f, Operand operand)
+        internal
+        view
+        returns (Pointer)
+    {
+        uint256 io;
+        uint256 location;
+        assembly ("memory-safe") {
+            location := sub(pointer, 0x20)
+            io := mload(location)
+        }
+        io = f(operand, io);
+        assembly ("memory-safe") {
+            mstore(location, io)
         }
         return pointer;
     }

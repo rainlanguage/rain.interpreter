@@ -2,13 +2,12 @@
 pragma solidity =0.8.19;
 
 import "forge-std/Test.sol";
+import "openzeppelin-contracts/contracts/utils/Address.sol";
 
 import "rain.solmem/lib/LibUint256Array.sol";
 
 import "src/lib/ns/LibNamespace.sol";
 import "src/concrete/RainterpreterStore.sol";
-
-import "openzeppelin-contracts/contracts/utils/Address.sol";
 
 /// @title RainterpreterStoreTest
 /// Test suite for RainterpreterStore.

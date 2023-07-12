@@ -1,4 +1,4 @@
-name: QAKit Slither Analysis
+name: Slither Analysis
 on: [push]
 jobs:
   analyze:
