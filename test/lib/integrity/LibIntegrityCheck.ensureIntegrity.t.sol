@@ -41,10 +41,13 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
     }
 
     function parseMeta() internal pure returns (bytes memory meta) {
-        bytes32[] memory words = new bytes32[](3);
+        bytes32[] memory words = new bytes32[](4);
         words[0] = "revert";
         words[1] = "push";
         words[2] = "pop";
+        // This has no implementation on the integrity check side. It should
+        // cause a revert.
+        words[3] = "invalid";
         return LibParseMeta.buildMetaExpander(words, 2);
     }
 
@@ -68,6 +71,34 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
         (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(expression, parseMeta());
         IntegrityCheckState memory state = LibIntegrityCheck.newState(sources, constants, integrityPointers());
         return (state, state.stackBottom);
+    }
+
+    /// If an integrity check is encountered that is not implemented, the
+    /// integrity check should revert.
+    function testIntegrityEnsureIntegrityNotImplemented() public {
+        // Test an invalid op in isolation.
+        (IntegrityCheckState memory state, Pointer stackTop) = newState(":invalid();");
+        vm.expectRevert(stdError.indexOOBError);
+        state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 0);
+
+        // Test an invalid op in a series of otherwise valid ops.
+        (IntegrityCheckState memory state2, Pointer stackTop2) = newState(": push() invalid() pop();");
+        vm.expectRevert(stdError.indexOOBError);
+        state2.ensureIntegrity(SourceIndex.wrap(0), stackTop2, 0);
+    }
+
+    /// In a multisource situation, invalid ops will only trigger a revert if
+    /// they are in the source that is being checked.
+    function testIntegrityEnsureIntegrityNotImplementedMultiSource() public {
+        // Source 0 will have an invalid op and revert.
+        (IntegrityCheckState memory state, Pointer stackTop) = newState(":invalid(); _: push();");
+        vm.expectRevert(stdError.indexOOBError);
+        Pointer stackTopAfter = state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 0);
+
+        // Source 1 will have valid ops so will not revert.
+        (IntegrityCheckState memory state2, Pointer stackTop2) = newState("_: invalid(); _: push();");
+        state2.ensureIntegrity(SourceIndex.wrap(1), stackTop2, 0);
+        assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(stackTop.unsafeAddWord()));
     }
 
     /// If the stack bottom is ever less than the initial stack bottom constant
@@ -145,6 +176,39 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
         (IntegrityCheckState memory state, Pointer stackTop) = newState("_: push();");
         Pointer stackTopAfter = state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 1);
         assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(stackTop.unsafeAddWord()));
+    }
+
+    /// An empty string has no sources so should error as there is nothing to
+    /// check.
+    function testIntegrityEnsureIntegrityEmpty(SourceIndex sourceIndex) public {
+        (IntegrityCheckState memory state, Pointer stackTop) = newState("");
+        vm.expectRevert(stdError.indexOOBError);
+        state.ensureIntegrity(sourceIndex, stackTop, 0);
+    }
+
+    /// An empty source with no minimum stack should not error.
+    function testIntegrityEnsureIntegrityMinStack0Empty() public {
+        (IntegrityCheckState memory state, Pointer stackTop) = newState(":;");
+        Pointer stackTopAfter = state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 0);
+        assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(stackTop));
+    }
+
+    /// Reading past the number of sources that exist should error.
+    /// Test reading past a single source.
+    function testIntegrityEnsureIntegrityOOB(SourceIndex sourceIndex) public {
+        vm.assume(SourceIndex.unwrap(sourceIndex) > 0);
+        (IntegrityCheckState memory state, Pointer stackTop) = newState(":;");
+        vm.expectRevert(stdError.indexOOBError);
+        state.ensureIntegrity(sourceIndex, stackTop, 0);
+    }
+
+    /// Reading past the number of sources that exist should error.
+    /// Test reading past multiple sources.
+    function testIntegrityEnsureIntegrityOOBMulti(SourceIndex sourceIndex) public {
+        vm.assume(SourceIndex.unwrap(sourceIndex) > 1);
+        (IntegrityCheckState memory state, Pointer stackTop) = newState(":;:;");
+        vm.expectRevert(stdError.indexOOBError);
+        state.ensureIntegrity(sourceIndex, stackTop, 0);
     }
 
     /// If the min final stack is set higher than 0 the stack must be at least

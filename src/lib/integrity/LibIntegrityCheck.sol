@@ -181,8 +181,10 @@ library LibIntegrityCheck {
             }
             uint256 cursor;
             uint256 end;
+            // Guard against out of bounds reads of the sources array.
+            bytes memory source = integrityCheckState.sources[SourceIndex.unwrap(sourceIndex)];
             assembly ("memory-safe") {
-                cursor := mload(add(mload(integrityCheckState), add(0x20, mul(0x20, sourceIndex))))
+                cursor := source
                 end := add(cursor, mload(cursor))
             }
 
