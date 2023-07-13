@@ -214,26 +214,29 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
     /// If the min final stack is set higher than 0 the stack must be at least
     /// that high. This test checks that min stack of 1 will error if the stack
     /// is too small.
-    function testIntegrityEnsureIntegrityMinStack1Underflow() public {
+    function testIntegrityEnsureIntegrityMinStack1Underflow(uint8 minStackOutputs) public {
+        vm.assume(minStackOutputs > 0);
         (IntegrityCheckState memory state, Pointer stackTop) = newState(":;");
-        vm.expectRevert(abi.encodeWithSelector(MinFinalStack.selector, 1, 0));
-        state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 1);
+        vm.expectRevert(abi.encodeWithSelector(MinFinalStack.selector, minStackOutputs, 0));
+        state.ensureIntegrity(SourceIndex.wrap(0), stackTop, minStackOutputs);
     }
 
     /// If the min final stack is set higher than 0 the stack must be at least
     /// that high. This test checks that min stack of 2 can be satisfied.
-    function testIntegrityEnsureIntegrityMinStack2() public {
+    function testIntegrityEnsureIntegrityMinStack2(uint8 minStackOutputs) public {
+        minStackOutputs = uint8(bound(minStackOutputs, 0, 2));
         (IntegrityCheckState memory state, Pointer stackTop) = newState("_ _: push() push();");
-        Pointer stackTopAfter = state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 2);
+        Pointer stackTopAfter = state.ensureIntegrity(SourceIndex.wrap(0), stackTop, minStackOutputs);
         assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(stackTop.unsafeAddWord().unsafeAddWord()));
     }
 
     /// If the min final stack is set higher than 0 the stack must be at least
     /// that high. This test checks that min stack of 2 will error if the stack
     /// is too small.
-    function testIntegrityEnsureIntegrityMinStack2Underflow() public {
+    function testIntegrityEnsureIntegrityMinStack2Underflow(uint8 minStackOutputs) public {
+        vm.assume(minStackOutputs > 1);
         (IntegrityCheckState memory state, Pointer stackTop) = newState("_: push();");
-        vm.expectRevert(abi.encodeWithSelector(MinFinalStack.selector, 2, 1));
-        state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 2);
+        vm.expectRevert(abi.encodeWithSelector(MinFinalStack.selector, minStackOutputs, 1));
+        state.ensureIntegrity(SourceIndex.wrap(0), stackTop, minStackOutputs);
     }
 }
