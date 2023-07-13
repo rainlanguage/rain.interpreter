@@ -6,10 +6,10 @@ import "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 import "rain.solmem/lib/LibStackPointer.sol";
 import "rain.solmem/lib/LibUint256Array.sol";
 
-import "src/interface/IInterpreterV1.sol";
-import "src/interface/IInterpreterExternV1.sol";
-import "src/lib/op/chainlink/LibOpChainlinkOraclePrice.sol";
-import "src/lib/op/LibOp.sol";
+import "../interface/IInterpreterV1.sol";
+import "../interface/IInterpreterExternV1.sol";
+import "../lib/op/chainlink/LibOpChainlinkOraclePrice.sol";
+import "../lib/op/LibOp.sol";
 
 /// Thrown when the inputs don't match the expected inputs.
 /// @param expected The expected number of inputs.
