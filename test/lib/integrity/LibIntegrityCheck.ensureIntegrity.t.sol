@@ -178,6 +178,39 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
         assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(stackTop.unsafeAddWord()));
     }
 
+    /// An empty string has no sources so should error as there is nothing to
+    /// check.
+    function testIntegrityEnsureIntegrityEmpty(SourceIndex sourceIndex) public {
+        (IntegrityCheckState memory state, Pointer stackTop) = newState("");
+        vm.expectRevert(stdError.indexOOBError);
+        state.ensureIntegrity(sourceIndex, stackTop, 0);
+    }
+
+    /// An empty source with no minimum stack should not error.
+    function testIntegrityEnsureIntegrityMinStack0Empty() public {
+        (IntegrityCheckState memory state, Pointer stackTop) = newState(":;");
+        Pointer stackTopAfter = state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 0);
+        assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(stackTop));
+    }
+
+    /// Reading past the number of sources that exist should error.
+    /// Test reading past a single source.
+    function testIntegrityEnsureIntegrityOOB(SourceIndex sourceIndex) public {
+        vm.assume(SourceIndex.unwrap(sourceIndex) > 0);
+        (IntegrityCheckState memory state, Pointer stackTop) = newState(":;");
+        vm.expectRevert(stdError.indexOOBError);
+        state.ensureIntegrity(sourceIndex, stackTop, 0);
+    }
+
+    /// Reading past the number of sources that exist should error.
+    /// Test reading past multiple sources.
+    function testIntegrityEnsureIntegrityOOBMulti(SourceIndex sourceIndex) public {
+        vm.assume(SourceIndex.unwrap(sourceIndex) > 1);
+        (IntegrityCheckState memory state, Pointer stackTop) = newState(":;:;");
+        vm.expectRevert(stdError.indexOOBError);
+        state.ensureIntegrity(sourceIndex, stackTop, 0);
+    }
+
     /// If the min final stack is set higher than 0 the stack must be at least
     /// that high. This test checks that min stack of 1 will error if the stack
     /// is too small.
