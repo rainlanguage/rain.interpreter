@@ -22,8 +22,9 @@ bytecode_hash = "none"
 cbor_metadata = false
 
 # These tests have some issue with the encoding of mocked return data.
-# @todo fix this
-no_match_test = "testOpChainlinkOraclePriceF|testRainterpreterExternChainlinkOraclePrice"
+# https://github.com/foundry-rs/foundry/issues/5359
+# https://github.com/foundry-rs/foundry/issues/5367
+no_match_test = "testOpChainlinkOraclePriceF|testRainterpreterExternChainlinkOraclePrice|testRainterpreterExpressionDeployerDeployInvalidFunctionPointers"
 
 [fuzz]
 runs = 2048

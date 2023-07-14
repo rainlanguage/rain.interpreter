@@ -187,7 +187,7 @@ library LibParseState {
         unchecked {
             // Convert the word to an offset that can be used to compile function
             // pointers later.
-            (bool exists, uint256 i) = LibParseMeta.lookupIndexMetaExpander(meta, word);
+            (bool exists, uint256 i) = LibParseMeta.lookupIndexFromMeta(meta, word);
 
             // Increment the stack counter.
             {

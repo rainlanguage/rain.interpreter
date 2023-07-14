@@ -53,28 +53,44 @@ error NegativeStackIndex(int256 index);
 /// immutable for any given interpreter so once the expression deployer is
 /// constructed and has verified that this matches what the interpreter reports,
 /// it can use this constant value to compile and serialize expressions.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"0afa";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"0b0f0b210b2f";
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xdfbbdaf24b08f29aef5b5dc337e7f3342da8225b8a830d0d7d5b5d0467507f2b);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xaf7836f97a8e94129d55e37d12748f69330e1612eb94efe3e3ba662e92a80e05);
 
 /// @dev Hash of the known store bytecode.
 bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);
 
-/// @dev Hash of the known op meta.
-bytes32 constant OP_META_HASH = bytes32(0x2cf73adad61aae49cfe0a38448ca982e30a16b18fe56c294e51104f9148d94da);
+/// @dev Hash of the known authoring meta.
+bytes32 constant AUTHORING_META_HASH = bytes32(0xb3580e2441ca4c843438bf97d7217c66bceed972bcce6ea7286c7f09819117a3);
+
+bytes constant PARSE_META =
+    hex"0100000000000800400000010000000000000000000000000000000000000000000000011ebeccb000009e8857ce0002d8448fdb";
 
 /// All config required to construct a `Rainterpreter`.
 /// @param interpreter The `IInterpreterV1` to use for evaluation. MUST match
 /// known bytecode.
 /// @param store The `IInterpreterStoreV1`. MUST match known bytecode.
-/// @param meta The meta emitted for offchain tooling. Traditionally this was
-/// mainly opmeta, used for the offchain compiler, but now with an onchain
-/// compiler the meta content and format is open to experimentation.
+/// @param authoringMeta The authoring meta as per `IParserV1`.
 struct RainterpreterExpressionDeployerConstructionConfig {
     address interpreter;
     address store;
-    bytes meta;
+    bytes authoringMeta;
+}
+
+library LibRainterpreterExpressionDeployerNPMeta {
+    function authoringMeta() internal pure returns (bytes memory) {
+        bytes32[] memory words = new bytes32[](3);
+        words[0] = "block-number";
+        words[1] = "chain-id";
+        words[2] = "block-timestamp";
+        return abi.encode(words);
+    }
+
+    function buildParseMetaFromAuthoringMeta(bytes memory inputAuthoringMeta) internal pure returns (bytes memory) {
+        bytes32[] memory words = abi.decode(inputAuthoringMeta, (bytes32[]));
+        return LibParseMeta.buildMeta(words, 2);
+    }
 }
 
 /// @title RainterpreterExpressionDeployer
@@ -144,15 +160,15 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
         /// This IS a security check. This prevents someone making an exact
         /// bytecode copy of the interpreter and shipping different meta for
         /// the copy to lie about what each op does in the interpreter.
-        bytes32 opMetaHash = keccak256(config.meta);
-        if (opMetaHash != OP_META_HASH) {
-            revert UnexpectedOpMetaHash(opMetaHash);
+        bytes32 configAuthoringMetaHash = keccak256(config.authoringMeta);
+        if (configAuthoringMetaHash != AUTHORING_META_HASH) {
+            revert UnexpectedOpMetaHash(configAuthoringMetaHash);
         }
 
-        emit DISpair(msg.sender, address(this), address(interpreter), address(store), config.meta);
+        emit DISpair(msg.sender, address(this), address(interpreter), address(store), config.authoringMeta);
 
         IERC1820_REGISTRY.setInterfaceImplementer(
-            address(this), IERC1820_REGISTRY.interfaceHash(IERC1820_NAME_IEXPRESSION_DEPLOYER_V1), address(this)
+            address(this), IERC1820_REGISTRY.interfaceHash(IERC1820_NAME_IEXPRESSION_DEPLOYER_V2), address(this)
         );
     }
 
@@ -202,12 +218,33 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
     }
 
     /// @inheritdoc IParserV1
-    function parse(bytes memory data) external pure returns (bytes[] memory, uint256[] memory) {
-        bytes32[] memory words = new bytes32[](1);
-        words[0] = "chain-id";
+    function authoringMetaHash() external pure virtual override returns (bytes32) {
+        return AUTHORING_META_HASH;
+    }
+
+    /// @inheritdoc IParserV1
+    function verifyAuthoringMeta(bytes memory authoringMeta) external pure virtual override returns (bool) {
+        if (keccak256(authoringMeta) != AUTHORING_META_HASH) {
+            return false;
+        }
+        bytes memory builtParseMeta =
+            LibRainterpreterExpressionDeployerNPMeta.buildParseMetaFromAuthoringMeta(authoringMeta);
+        if (keccak256(builtParseMeta) != keccak256(parseMeta())) {
+            return false;
+        }
+        return true;
+    }
+
+    /// @inheritdoc IParserV1
+    function parseMeta() public pure virtual override returns (bytes memory) {
+        return PARSE_META;
+    }
+
+    /// @inheritdoc IParserV1
+    function parse(bytes memory data) external pure virtual override returns (bytes[] memory, uint256[] memory) {
         // The return is used by returning it, so this is a false positive.
         //slither-disable-next-line unused-return
-        return LibParse.parse(data, LibParseMeta.buildMetaExpander(words, 2));
+        return LibParse.parse(data, parseMeta());
     }
 
     /// @inheritdoc IExpressionDeployerV2

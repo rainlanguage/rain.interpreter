@@ -4,14 +4,17 @@ pragma solidity ^0.8.19;
 import "rain.lib.typecast/LibConvert.sol";
 
 import "../state/LibInterpreterState.sol";
+
+import "./evm/LibOpBlockNumber.sol";
 import "./evm/LibOpChainId.sol";
+import "./evm/LibOpTimestamp.sol";
 
 /// Thrown when a dynamic length array is NOT 1 more than a fixed length array.
 /// Should never happen outside a major breaking change to memory layouts.
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 1;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 3;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -35,7 +38,7 @@ library LibAllStandardOpsNP {
             function(IntegrityCheckState memory, Operand, Pointer)
                 view
                 returns (Pointer)[ALL_STANDARD_OPS_LENGTH + 1] memory pointersFixed =
-                    [lengthPointer, LibOpChainId.integrity];
+                    [lengthPointer, LibOpBlockNumber.integrity, LibOpChainId.integrity, LibOpTimestamp.integrity];
             assembly ("memory-safe") {
                 pointers := pointersFixed
             }
@@ -62,7 +65,7 @@ library LibAllStandardOpsNP {
             function(InterpreterState memory, Operand, Pointer)
                 view
                 returns (Pointer)[ALL_STANDARD_OPS_LENGTH + 1] memory pointersFixed =
-                    [lengthPointer, LibOpChainId.run];
+                    [lengthPointer, LibOpBlockNumber.run, LibOpChainId.run, LibOpTimestamp.run];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
                 pointersDynamic := pointersFixed

@@ -65,7 +65,7 @@ library LibParseMeta {
         }
     }
 
-    function buildMetaExpander(bytes32[] memory words, uint8 maxDepth) internal pure returns (bytes memory meta) {
+    function buildMeta(bytes32[] memory words, uint8 maxDepth) internal pure returns (bytes memory meta) {
         unchecked {
             uint8[] memory seeds = new uint8[](maxDepth);
             uint256[] memory expansions = new uint256[](maxDepth);
@@ -135,11 +135,7 @@ library LibParseMeta {
         }
     }
 
-    function lookupIndexMetaExpander(bytes memory meta, bytes32 word)
-        internal
-        pure
-        returns (bool exists, uint256 index)
-    {
+    function lookupIndexFromMeta(bytes memory meta, bytes32 word) internal pure returns (bool exists, uint256 index) {
         unchecked {
             uint256 dataStart;
             uint256 cursor;
