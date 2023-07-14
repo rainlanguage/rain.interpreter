@@ -48,7 +48,7 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
         // This has no implementation on the integrity check side. It should
         // cause a revert.
         words[3] = "invalid";
-        return LibParseMeta.buildMetaExpander(words, 2);
+        return LibParseMeta.buildMeta(words, 2);
     }
 
     function integrityPointers()

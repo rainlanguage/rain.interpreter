@@ -16,9 +16,9 @@ contract LibParseMetaBuildMetaTest is Test {
         return uint8(n / type(uint8).max + 3);
     }
 
-    function testBuildMetaExpander(bytes32[] memory words) external pure {
+    function testBuildMeta(bytes32[] memory words) external pure {
         vm.assume(!LibBloom.bloomFindsDupes(words));
-        bytes memory meta = LibParseMeta.buildMetaExpander(words, expanderDepth(words.length));
+        bytes memory meta = LibParseMeta.buildMeta(words, expanderDepth(words.length));
         (meta);
     }
 
@@ -30,12 +30,12 @@ contract LibParseMetaBuildMetaTest is Test {
         }
         j = uint8(bound(j, uint8(0), uint8(words.length) - 1));
 
-        bytes memory meta = LibParseMeta.buildMetaExpander(words, expanderDepth(words.length));
-        (bool exists, uint256 k) = LibParseMeta.lookupIndexMetaExpander(meta, words[j]);
+        bytes memory meta = LibParseMeta.buildMeta(words, expanderDepth(words.length));
+        (bool exists, uint256 k) = LibParseMeta.lookupIndexFromMeta(meta, words[j]);
         assertTrue(exists);
         assertEq(j, k);
 
-        (bool notExists, uint256 l) = LibParseMeta.lookupIndexMetaExpander(meta, notFound);
+        (bool notExists, uint256 l) = LibParseMeta.lookupIndexFromMeta(meta, notFound);
         assertTrue(!notExists);
         assertEq(0, l);
     }
@@ -48,12 +48,12 @@ contract LibParseMetaBuildMetaTest is Test {
         }
         j = uint8(bound(j, uint8(0), uint8(words.length) - 1));
 
-        bytes memory meta = LibParseMeta.buildMetaExpander(words, expanderDepth(words.length));
-        (bool exists, uint256 k) = LibParseMeta.lookupIndexMetaExpander(meta, words[j]);
+        bytes memory meta = LibParseMeta.buildMeta(words, expanderDepth(words.length));
+        (bool exists, uint256 k) = LibParseMeta.lookupIndexFromMeta(meta, words[j]);
         assertTrue(exists);
         assertEq(j, k);
 
-        (bool notExists, uint256 l) = LibParseMeta.lookupIndexMetaExpander(meta, notFound);
+        (bool notExists, uint256 l) = LibParseMeta.lookupIndexFromMeta(meta, notFound);
         assertTrue(!notExists);
         assertEq(0, l);
     }

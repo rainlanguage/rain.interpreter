@@ -2,40 +2,37 @@
 pragma solidity =0.8.19;
 
 import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
-import "test/util/lib/etch/LibEtch.sol";
 
 import "rain.solmem/lib/LibPointer.sol";
 import "rain.solmem/lib/LibStackPointer.sol";
 import "rain.metadata/IMetaV1.sol";
 
 import "src/lib/state/LibInterpreterState.sol";
-import "src/lib/op/evm/LibOpChainId.sol";
+import "src/lib/integrity/LibIntegrityCheck.sol";
 import "src/lib/caller/LibContext.sol";
 
-import "src/concrete/RainterpreterNP.sol";
-import "src/concrete/RainterpreterStore.sol";
-import "src/concrete/RainterpreterExpressionDeployerNP.sol";
+import "src/lib/op/evm/LibOpBlockNumber.sol";
 
-/// @title LibOpChainIdTest
-/// @notice Test the runtime and integrity time logic of LibOpChainId.
-contract LibOpChainIdTest is RainterpreterExpressionDeployerDeploymentTest {
+/// @title LibOpBlockNumberTest
+/// @notice Test the runtime and integrity time logic of LibOpBlockNumber.
+contract LibOpBlockNumberTest is RainterpreterExpressionDeployerDeploymentTest {
     using LibPointer for Pointer;
     using LibStackPointer for Pointer;
     using LibInterpreterState for InterpreterState;
 
-    /// Directly test the integrity logic of LibOpChainId.
-    function testOpChainIDIntegrity(Operand operand) external {
+    /// Directly test the integrity logic of LibOpBlockNumber.
+    function testOpBlockNumberIntegrity(Operand operand) external {
         function(IntegrityCheckState memory, Operand, Pointer)
         view
         returns (Pointer)[] memory integrityCheckers =
                 new function(IntegrityCheckState memory, Operand, Pointer) view returns (Pointer)[](1);
-        integrityCheckers[0] = LibOpChainId.integrity;
+        integrityCheckers[0] = LibOpBlockNumber.integrity;
 
         IntegrityCheckState memory state =
             LibIntegrityCheck.newState(new bytes[](0), new uint256[](0), integrityCheckers);
         Pointer stackTop = state.stackBottom;
 
-        Pointer stackTopAfter = LibOpChainId.integrity(state, operand, stackTop);
+        Pointer stackTopAfter = LibOpBlockNumber.integrity(state, operand, stackTop);
 
         assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(stackTop.unsafeAddWord()));
         assertEq(Pointer.unwrap(state.stackBottom), Pointer.unwrap(stackTop));
@@ -43,12 +40,16 @@ contract LibOpChainIdTest is RainterpreterExpressionDeployerDeploymentTest {
         assertEq(Pointer.unwrap(state.stackMaxTop), Pointer.unwrap(stackTopAfter));
     }
 
-    /// Directly test the runtime logic of LibOpChainId. This tests that the
-    /// opcode correctly pushes the chain ID onto the stack.
-    function testOpChainIDRun(InterpreterState memory state, Operand operand, uint256 pre, uint256 post, uint64 chainId)
-        external
-    {
-        vm.chainId(chainId);
+    /// Directly test the runtime logic of LibOpBlockNumber. This tests that the
+    /// opcode correctly pushes the block number onto the stack.
+    function testOpBlockNumberRun(
+        InterpreterState memory state,
+        Operand operand,
+        uint256 pre,
+        uint256 post,
+        uint256 blockNumber
+    ) external {
+        vm.roll(blockNumber);
         // Build a stack with two zeros on it. The first zero will be overridden
         // by the opcode. The second zero will be used to check that the opcode
         // doesn't modify the stack beyond the first element.
@@ -59,25 +60,26 @@ contract LibOpChainIdTest is RainterpreterExpressionDeployerDeploymentTest {
             mstore(0x40, end)
         }
 
-        // Chain ID doesn't modify the state.
+        // Block number doesn't modify the state.
         bytes32 stateFingerprintBefore = state.fingerprint();
 
         // Run the opcode.
-        Pointer stackTopAfter = LibOpChainId.run(state, operand, stackTop);
+        Pointer stackTopAfter = LibOpBlockNumber.run(state, operand, stackTop);
 
         // Check that the opcode didn't modify the state.
         assertEq(state.fingerprint(), stateFingerprintBefore);
 
-        // The chain ID should be on the stack without modifying any other data.
+        // The block number should be on the stack without modifying any other
+        // data.
         assertEq(state.stackBottom.unsafeReadWord(), pre);
-        assertEq(stackTop.unsafeReadWord(), chainId);
+        assertEq(stackTop.unsafeReadWord(), blockNumber);
         assertEq(stackTopAfter.unsafeReadWord(), post);
     }
 
-    /// Test the eval of a chain ID opcode parsed from a string.
-    function testOpChainIDEval(uint64 chainId) external {
-        vm.chainId(chainId);
-        (bytes[] memory sources, uint256[] memory constants) = iDeployer.parse("_: chain-id();");
+    /// Test the eval of a block number opcode parsed from a string.
+    function testOpBlockNumberEval(uint256 blockNumber) external {
+        vm.roll(blockNumber);
+        (bytes[] memory sources, uint256[] memory constants) = iDeployer.parse("_: block-number();");
         uint8[] memory minOutputs = new uint8[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
@@ -89,7 +91,7 @@ contract LibOpChainIdTest is RainterpreterExpressionDeployerDeploymentTest {
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         assertEq(stack.length, 1);
-        assertEq(stack[0], chainId);
+        assertEq(stack[0], blockNumber);
         assertEq(kvs.length, 0);
     }
 }
