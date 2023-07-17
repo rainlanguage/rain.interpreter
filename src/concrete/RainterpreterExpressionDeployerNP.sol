@@ -5,8 +5,8 @@ import "../../lib/openzeppelin-contracts/contracts/utils/introspection/ERC165.so
 
 import "../../lib/rain.solmem/src/lib/LibPointer.sol";
 import "../../lib/rain.solmem/src/lib/LibStackPointer.sol";
-import "../../lib/rain.datacontract/src/lib/LibDataContract.sol";
-import "../../lib/rain.factory/src/lib/LibIERC1820.sol";
+import {Pointer as DataContractPointer, DataContractMemoryContainer, LibDataContract } from "../../lib/rain.datacontract/src/lib/LibDataContract.sol";
+import "../../lib/rain.erc1820/src/lib/LibIERC1820.sol";
 
 import "../interface/unstable/IExpressionDeployerV2.sol";
 import "../interface/unstable/IDebugExpressionDeployerV1.sol";
@@ -258,7 +258,7 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
         // serialization process itself is destructive of the sources in memory.
         emit NewExpression(msg.sender, sources, constants, minOutputs);
 
-        (DataContractMemoryContainer container, Pointer pointer) =
+        (DataContractMemoryContainer container, DataContractPointer pointer) =
             LibDataContract.newContainer(LibInterpreterStateDataContract.serializeSize(sources, constants));
 
         // Serialize the state config into bytes that can be deserialized later

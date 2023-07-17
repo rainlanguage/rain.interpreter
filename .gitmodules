@@ -19,9 +19,6 @@
 [submodule "lib/rain.lib.memkv"]
 	path = lib/rain.lib.memkv
 	url = https://github.com/rainprotocol/rain.lib.memkv
-[submodule "lib/rain.factory"]
-	path = lib/rain.factory
-	url = https://github.com/rainprotocol/rain.factory
 [submodule "lib/rain.chainlink"]
 	path = lib/rain.chainlink
 	url = https://github.com/rainprotocol/rain.chainlink
@@ -31,3 +28,6 @@
 [submodule "lib/rain.math.fixedpoint"]
 	path = lib/rain.math.fixedpoint
 	url = https://github.com/rainprotocol/rain.math.fixedpoint
+[submodule "lib/rain.erc1820"]
+	path = lib/rain.erc1820
+	url = https://github.com/rainprotocol/rain.erc1820

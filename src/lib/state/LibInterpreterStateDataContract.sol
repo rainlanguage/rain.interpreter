@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "../../../lib/rain.solmem/src/lib/LibPointer.sol";
-import "../../../lib/rain.solmem/src/lib/LibMemCpy.sol";
-import "../../../lib/rain.solmem/src/lib/LibBytes.sol";
+// import "../../../lib/rain.solmem/src/lib/LibMemCpy.sol";
+// import "../../../lib/rain.solmem/src/lib/LibBytes.sol";
+import "../../../lib/rain.datacontract/src/lib/LibDataContract.sol";
 
 import "../state/LibInterpreterState.sol";
 import "../compile/LibCompile.sol";

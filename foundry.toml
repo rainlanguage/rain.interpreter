@@ -25,7 +25,11 @@ cbor_metadata = false
 # https://github.com/foundry-rs/foundry/issues/5359
 # https://github.com/foundry-rs/foundry/issues/5367
 no_match_test = "testOpChainlinkOraclePriceF|testRainterpreterExternChainlinkOraclePrice|testRainterpreterExpressionDeployerDeployInvalidFunctionPointers"
+
+# no auto remappings
+# https://github.com/foundry-rs/foundry/issues/3440#issuecomment-1637471928
 auto_detect_remappings = false
 remappings = ["ds-test/=lib/forge-std/lib/ds-test/src/"]
+
 [fuzz]
 runs = 2048

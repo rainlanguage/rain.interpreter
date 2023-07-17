@@ -4,7 +4,7 @@ pragma solidity =0.8.19;
 import "../../lib/openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
 import "../../lib/rain.lib.typecast/src/LibCast.sol";
-import "../../lib/rain.datacontract/src/lib/LibDataContract.sol";
+import {Pointer as DataContractPointer, LibDataContract} from "../../lib/rain.datacontract/src/lib/LibDataContract.sol";
 
 import "../interface/unstable/IDebugInterpreterV1.sol";
 
