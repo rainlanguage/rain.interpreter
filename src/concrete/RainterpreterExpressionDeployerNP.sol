@@ -8,7 +8,7 @@ import "rain.solmem/lib/LibStackPointer.sol";
 import "rain.datacontract/lib/LibDataContract.sol";
 import "rain.erc1820/lib/LibIERC1820.sol";
 
-import "../interface/unstable/IExpressionDeployerV2.sol";
+import "../interface/IExpressionDeployerV1.sol";
 import "../interface/unstable/IDebugExpressionDeployerV1.sol";
 import "../interface/unstable/IDebugInterpreterV1.sol";
 import "../interface/unstable/IParserV1.sol";
@@ -97,7 +97,7 @@ library LibRainterpreterExpressionDeployerNPMeta {
 /// @notice !!!EXPERIMENTAL!!! This is the deployer for the RainterpreterNP
 /// interpreter. Notably includes onchain parsing/compiling of expressions from
 /// Rainlang strings.
-contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpressionDeployerV1, IParserV1, ERC165 {
+contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpressionDeployerV1, IParserV1, ERC165 {
     using LibStackPointer for Pointer;
     using LibUint256Array for uint256[];
 
@@ -107,7 +107,7 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
     /// @param sources As per `IExpressionDeployerV1`.
     /// @param constants As per `IExpressionDeployerV1`.
     /// @param minOutputs As per `IExpressionDeployerV1`.
-    event NewExpression(address sender, bytes[] sources, uint256[] constants, uint8[] minOutputs);
+    event NewExpression(address sender, bytes[] sources, uint256[] constants, uint256[] minOutputs);
 
     /// The address of the deployed expression. Will only be emitted once the
     /// expression can be loaded and deserialized into an evaluable interpreter
@@ -168,7 +168,7 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
         emit DISpair(msg.sender, address(this), address(interpreter), address(store), config.authoringMeta);
 
         IERC1820_REGISTRY.setInterfaceImplementer(
-            address(this), IERC1820_REGISTRY.interfaceHash(IERC1820_NAME_IEXPRESSION_DEPLOYER_V2), address(this)
+            address(this), IERC1820_REGISTRY.interfaceHash(IERC1820_NAME_IEXPRESSION_DEPLOYER_V1), address(this)
         );
     }
 
@@ -247,8 +247,8 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
         return LibParse.parse(data, parseMeta());
     }
 
-    /// @inheritdoc IExpressionDeployerV2
-    function deployExpression(bytes[] memory sources, uint256[] memory constants, uint8[] memory minOutputs)
+    /// @inheritdoc IExpressionDeployerV1
+    function deployExpression(bytes[] memory sources, uint256[] memory constants, uint256[] memory minOutputs)
         external
         returns (IInterpreterV1, IInterpreterStoreV1, address)
     {
@@ -289,7 +289,7 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
     /// later so MUST be correct for ALL internal states of the evaluation. It
     /// is NOT sufficient to just return the final stack size as the stack
     /// grows and shrinks during evaluation.
-    function integrityCheck(bytes[] memory sources, uint256[] memory constants, uint8[] memory minOutputs)
+    function integrityCheck(bytes[] memory sources, uint256[] memory constants, uint256[] memory minOutputs)
         internal
         view
         returns (uint256)
@@ -310,7 +310,7 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
         // state for evaluation.
         Pointer initialStackBottom = integrityCheckState.stackBottom;
         Pointer initialStackHighwater = integrityCheckState.stackHighwater;
-        for (uint16 i_ = 0; i_ < minOutputs.length; i_++) {
+        for (uint16 i = 0; i < minOutputs.length; i++) {
             // Reset the top, bottom and highwater between each entrypoint as
             // every external eval MUST have a fresh stack, but retain the max
             // stack height as the latter is used for unconditional memory
@@ -319,7 +319,7 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
             integrityCheckState.stackBottom = initialStackBottom;
             integrityCheckState.stackHighwater = initialStackHighwater;
             Pointer stackTopAfter = LibIntegrityCheck.ensureIntegrity(
-                integrityCheckState, SourceIndex.wrap(i_), INITIAL_STACK_BOTTOM, minOutputs[i_]
+                integrityCheckState, SourceIndex.wrap(i), INITIAL_STACK_BOTTOM, minOutputs[i]
             );
             (stackTopAfter);
         }

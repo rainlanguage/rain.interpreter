@@ -45,6 +45,10 @@ error StackPopUnderflow(int256 stackHighwaterIndex, int256 stackTopIndex);
 /// negative if the stack underflowed.
 error MinFinalStack(uint256 minStackOutputs, int256 actualStackOutputs);
 
+/// Thrown if the min stack height is outside what is considered reasonable.
+/// @param minStackOutputs The required minimum stack height.
+error UnsupportedStackHeight(uint256 minStackOutputs);
+
 /// Running an integrity check is a stateful operation. As well as the basic
 /// configuration of what is being checked such as the sources and size of the
 /// constants, the current and maximum stack height is being recomputed on every
@@ -170,9 +174,15 @@ library LibIntegrityCheck {
         IntegrityCheckState memory integrityCheckState,
         SourceIndex sourceIndex,
         Pointer stackTop,
-        uint8 minStackOutputs
+        uint256 minStackOutputs
     ) internal view returns (Pointer) {
         unchecked {
+            // Technically we could support more than 2^16 stack items because
+            // the hard limit is signed `int256`, but this is a reasonable
+            // limit for now.
+            if (minStackOutputs > type(uint16).max) {
+                revert UnsupportedStackHeight(minStackOutputs);
+            }
             // It's generally more efficient to ensure the stack bottom has
             // plenty of headroom to make underflows from pops impossible rather
             // than guard every single pop against underflow.

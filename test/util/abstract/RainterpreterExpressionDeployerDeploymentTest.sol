@@ -12,9 +12,9 @@ import "src/concrete/RainterpreterExpressionDeployerNP.sol";
 /// Tests that the RainterpreterExpressionDeployer meta is correct. Also tests
 /// basic functionality of the `IParserV1` interface implementation.
 abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
-    RainterpreterStore immutable iStore;
-    RainterpreterNP immutable iInterpreter;
-    RainterpreterExpressionDeployerNP immutable iDeployer;
+    RainterpreterStore internal immutable iStore;
+    RainterpreterNP internal immutable iInterpreter;
+    RainterpreterExpressionDeployerNP internal immutable iDeployer;
 
     constructor() {
         iStore = new RainterpreterStore();
@@ -44,7 +44,14 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
         console2.logBytes32(keccak256(authoringMeta));
 
         vm.etch(address(IERC1820_REGISTRY), REVERT_BYTECODE);
-        vm.mockCall(address(IERC1820_REGISTRY), "", abi.encode(""));
+        vm.mockCall(
+            address(IERC1820_REGISTRY),
+            abi.encodeWithSelector(IERC1820Registry.interfaceHash.selector),
+            abi.encode(bytes32(uint256(0)))
+        );
+        vm.mockCall(
+            address(IERC1820_REGISTRY), abi.encodeWithSelector(IERC1820Registry.setInterfaceImplementer.selector), ""
+        );
         iDeployer = new RainterpreterExpressionDeployerNP(RainterpreterExpressionDeployerConstructionConfig(
             address(iInterpreter),
             address(iStore),

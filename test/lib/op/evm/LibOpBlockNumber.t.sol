@@ -80,7 +80,7 @@ contract LibOpBlockNumberTest is RainterpreterExpressionDeployerDeploymentTest {
     function testOpBlockNumberEval(uint256 blockNumber) external {
         vm.roll(blockNumber);
         (bytes[] memory sources, uint256[] memory constants) = iDeployer.parse("_: block-number();");
-        uint8[] memory minOutputs = new uint8[](1);
+        uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(sources, constants, minOutputs);
