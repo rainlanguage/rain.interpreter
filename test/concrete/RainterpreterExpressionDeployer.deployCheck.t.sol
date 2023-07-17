@@ -18,8 +18,8 @@ contract RainterpreterExpressionDeployerDeployCheckTest is Test {
     ) external {
         vm.assume(keccak256(functionPointers) != keccak256(OPCODE_FUNCTION_POINTERS));
 
-        assumeNoPrecompiles(address(uint160(config.interpreter)));
-        assumeNoPrecompiles(address(uint160(config.store)));
+        assumeNotPrecompile(address(uint160(config.interpreter)));
+        assumeNotPrecompile(address(uint160(config.store)));
         vm.etch(address(uint160(config.interpreter)), REVERT_BYTECODE);
         vm.mockCall(
             address(uint160(config.interpreter)),

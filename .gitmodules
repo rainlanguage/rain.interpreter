@@ -7,9 +7,6 @@
 [submodule "lib/rain.metadata"]
 	path = lib/rain.metadata
 	url = https://github.com/rainprotocol/rain.metadata
-[submodule "lib/forge-std"]
-	path = lib/forge-std
-	url = https://github.com/foundry-rs/forge-std
 [submodule "lib/rain.solmem"]
 	path = lib/rain.solmem
 	url = https://github.com/rainprotocol/rain.solmem
@@ -19,9 +16,12 @@
 [submodule "lib/rain.lib.memkv"]
 	path = lib/rain.lib.memkv
 	url = https://github.com/rainprotocol/rain.lib.memkv
-[submodule "lib/rain.factory"]
-	path = lib/rain.factory
-	url = https://github.com/rainprotocol/rain.factory
 [submodule "lib/rain.chainlink"]
 	path = lib/rain.chainlink
 	url = https://github.com/rainprotocol/rain.chainlink
+[submodule "lib/forge-std"]
+	path = lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "lib/rain.erc1820"]
+	path = lib/rain.erc1820
+	url = https://github.com/rainprotocol/rain.erc1820

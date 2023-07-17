@@ -44,7 +44,7 @@ contract RainterpreterExternChainlinkTest is Test {
         }
 
         {
-            assumeNoPrecompiles(address(uint160(feed)));
+            assumeNotPrecompile(address(uint160(feed)));
             vm.etch(address(uint160(feed)), hex"00");
             vm.mockCall(
                 address(uint160(feed)),

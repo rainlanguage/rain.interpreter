@@ -6,7 +6,7 @@ import "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 import "rain.solmem/lib/LibPointer.sol";
 import "rain.solmem/lib/LibStackPointer.sol";
 import "rain.datacontract/lib/LibDataContract.sol";
-import "rain.factory/src/lib/LibIERC1820.sol";
+import "rain.erc1820/lib/LibIERC1820.sol";
 
 import "../interface/unstable/IExpressionDeployerV2.sol";
 import "../interface/unstable/IDebugExpressionDeployerV1.sol";
