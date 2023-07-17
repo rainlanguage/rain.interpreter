@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
-import "openzeppelin-contracts/contracts/utils/Address.sol";
+import "../../lib/forge-std/src/Test.sol";
+import "../../lib/openzeppelin-contracts/contracts/utils/Address.sol";
 
-import "rain.solmem/lib/LibUint256Array.sol";
+import "../../lib/rain.solmem/src/lib/LibUint256Array.sol";
 
-import "src/lib/ns/LibNamespace.sol";
-import "src/concrete/RainterpreterStore.sol";
+import "../../src/lib/ns/LibNamespace.sol";
+import "../../src/concrete/RainterpreterStore.sol";
 
 /// @title RainterpreterStoreTest
 /// Test suite for RainterpreterStore.

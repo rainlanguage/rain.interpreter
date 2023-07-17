@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "src/interface/IInterpreterV1.sol";
+import "../../../lib/rain.solmem/src/lib/LibPointer.sol";
+import "../../../lib/rain.solmem/src/lib/LibStackPointer.sol";
+import "../../../lib/rain.solmem/src/lib/LibUint256Array.sol";
 
-import "rain.solmem/lib/LibPointer.sol";
-import "rain.solmem/lib/LibStackPointer.sol";
-import "rain.solmem/lib/LibUint256Array.sol";
+import "../../../src/interface/IInterpreterV1.sol";
 
 library LibOpSlow {
     using LibPointer for Pointer;

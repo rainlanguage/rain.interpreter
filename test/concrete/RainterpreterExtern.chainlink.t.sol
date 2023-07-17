@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
-import {WillOverflow} from "rain.math.fixedpoint/../test/WillOverflow.sol";
+import "../../lib/forge-std/src/Test.sol";
+import {WillOverflow} from "../../lib/rain.math.fixedpoint/test/WillOverflow.sol";
 
-import "src/interface/IInterpreterV1.sol";
-import "src/lib/extern/LibExtern.sol";
-import "src/concrete/RainterpreterExtern.sol";
+import "../../src/interface/IInterpreterV1.sol";
+import "../../src/lib/extern/LibExtern.sol";
+import "../../src/concrete/RainterpreterExtern.sol";
 
 /// @title RainterpreterExternChainlinkTest
 /// Test the RainterpreterExtern implementation of the Chainlink opcode.

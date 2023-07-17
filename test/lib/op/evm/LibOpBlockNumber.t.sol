@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
+import "../../../util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
 
-import "rain.solmem/lib/LibPointer.sol";
-import "rain.solmem/lib/LibStackPointer.sol";
-import "rain.metadata/IMetaV1.sol";
+import "../../../../lib/rain.solmem/src/lib/LibPointer.sol";
+import "../../../../lib/rain.solmem/src/lib/LibStackPointer.sol";
+import "../../../../lib/rain.metadata/src/IMetaV1.sol";
 
-import "src/lib/state/LibInterpreterState.sol";
-import "src/lib/integrity/LibIntegrityCheck.sol";
-import "src/lib/caller/LibContext.sol";
+import "../../../../src/lib/state/LibInterpreterState.sol";
+import "../../../../src/lib/integrity/LibIntegrityCheck.sol";
+import "../../../../src/lib/caller/LibContext.sol";
 
-import "src/lib/op/evm/LibOpBlockNumber.sol";
+import "../../../../src/lib/op/evm/LibOpBlockNumber.sol";
 
 /// @title LibOpBlockNumberTest
 /// @notice Test the runtime and integrity time logic of LibOpBlockNumber.

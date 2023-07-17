@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
-import "src/interface/IExpressionDeployerV1.sol";
-import "src/abstract/DeployerDiscoverableMetaV1.sol";
+import "../../lib/forge-std/src/Test.sol";
+
+import "../../src/interface/IExpressionDeployerV1.sol";
+import "../../src/abstract/DeployerDiscoverableMetaV1.sol";
 
 contract TestDeployer is IExpressionDeployerV1 {
     function deployExpression(bytes[] memory, uint256[] memory, uint256[] memory)

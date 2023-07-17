@@ -25,3 +25,9 @@
 [submodule "lib/rain.chainlink"]
 	path = lib/rain.chainlink
 	url = https://github.com/rainprotocol/rain.chainlink
+[submodule "lib/rain.lib.hash"]
+	path = lib/rain.lib.hash
+	url = https://github.com/rainprotocol/rain.lib.hash
+[submodule "lib/rain.math.fixedpoint"]
+	path = lib/rain.math.fixedpoint
+	url = https://github.com/rainprotocol/rain.math.fixedpoint

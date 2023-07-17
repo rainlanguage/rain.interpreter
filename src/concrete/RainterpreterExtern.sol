@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
+import "../../lib/openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
-import "rain.solmem/lib/LibStackPointer.sol";
-import "rain.solmem/lib/LibUint256Array.sol";
+import "../../lib/rain.solmem/src/lib/LibStackPointer.sol";
+import "../../lib/rain.solmem/src/lib/LibUint256Array.sol";
 
 import "../interface/IInterpreterV1.sol";
 import "../interface/IInterpreterExternV1.sol";

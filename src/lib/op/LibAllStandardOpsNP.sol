@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.19;
 
-import "rain.lib.typecast/LibConvert.sol";
+import "../../../lib/rain.lib.typecast/src/LibConvert.sol";
 
 import "../state/LibInterpreterState.sol";
 

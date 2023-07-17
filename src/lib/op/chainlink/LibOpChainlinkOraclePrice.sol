@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "rain.chainlink/lib/LibChainlink.sol";
+import "../../../../lib/rain.chainlink/src/lib/LibChainlink.sol";
 
 import "../../../interface/IInterpreterV1.sol";
 

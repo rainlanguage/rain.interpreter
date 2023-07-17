@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "rain.solmem/lib/LibPointer.sol";
-import "rain.solmem/lib/LibStackPointer.sol";
-import "rain.solmem/lib/LibBytes.sol";
-import "rain.solmem/lib/LibUint256Array.sol";
+import "../../../lib/rain.solmem/src/lib/LibPointer.sol";
+import "../../../lib/rain.solmem/src/lib/LibStackPointer.sol";
+import "../../../lib/rain.solmem/src/lib/LibBytes.sol";
+import "../../../lib/rain.solmem/src/lib/LibUint256Array.sol";
 
-import "src/lib/compile/LibCompile.sol";
-import "src/lib/state/LibInterpreterState.sol";
+import "../../../src/lib/compile/LibCompile.sol";
+import "../../../src/lib/state/LibInterpreterState.sol";
 
 library LibInterpreterStateDataContractSlow {
     using LibStackPointer for Pointer;

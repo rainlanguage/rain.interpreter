@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
-import "test/util/lib/etch/LibEtch.sol";
+import "../../../util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
+import "../../../util/lib/etch/LibEtch.sol";
 
-import "rain.solmem/lib/LibPointer.sol";
-import "rain.solmem/lib/LibStackPointer.sol";
-import "rain.metadata/IMetaV1.sol";
+import "../../../../lib/rain.solmem/src/lib/LibPointer.sol";
+import "../../../../lib/rain.solmem/src/lib/LibStackPointer.sol";
+import "../../../../lib/rain.metadata/src/IMetaV1.sol";
 
-import "src/lib/state/LibInterpreterState.sol";
-import "src/lib/op/evm/LibOpChainId.sol";
-import "src/lib/caller/LibContext.sol";
+import "../../../../src/lib/state/LibInterpreterState.sol";
+import "../../../../src/lib/op/evm/LibOpChainId.sol";
+import "../../../../src/lib/caller/LibContext.sol";
 
-import "src/concrete/RainterpreterNP.sol";
-import "src/concrete/RainterpreterStore.sol";
-import "src/concrete/RainterpreterExpressionDeployerNP.sol";
+import "../../../../src/concrete/RainterpreterNP.sol";
+import "../../../../src/concrete/RainterpreterStore.sol";
+import "../../../../src/concrete/RainterpreterExpressionDeployerNP.sol";
 
 /// @title LibOpChainIdTest
 /// @notice Test the runtime and integrity time logic of LibOpChainId.

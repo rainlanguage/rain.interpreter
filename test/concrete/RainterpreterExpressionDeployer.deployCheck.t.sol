@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
-import "test/util/lib/etch/LibEtch.sol";
+import "../../lib/forge-std/src/Test.sol";
 
-import "src/interface/IInterpreterV1.sol";
-import "src/concrete/RainterpreterExpressionDeployerNP.sol";
+import "../../src/interface/IInterpreterV1.sol";
+import "../../src/concrete/RainterpreterExpressionDeployerNP.sol";
+
+import "../util/lib/etch/LibEtch.sol";
 
 /// @title RainterpreterExpressionDeployerDeployCheckTest
 /// Test that the RainterpreterExpressionDeployer deploy check reverts if the

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
+import "../../lib/openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
-import "rain.lib.typecast/LibCast.sol";
-import "rain.datacontract/lib/LibDataContract.sol";
+import "../../lib/rain.lib.typecast/src/LibCast.sol";
+import "../../lib/rain.datacontract/src/lib/LibDataContract.sol";
 
 import "../interface/unstable/IDebugInterpreterV1.sol";
 

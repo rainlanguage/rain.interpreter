@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
+import "../../../lib/rain.solmem/src/lib/LibPointer.sol";
+import "../../../lib/rain.solmem/src/lib/LibMemCpy.sol";
+import "../../../lib/rain.solmem/src/lib/LibStackPointer.sol";
+import "../../../lib/rain.solmem/src/lib/LibUint256Array.sol";
+
 import "../../interface/IInterpreterV1.sol";
-import "rain.solmem/lib/LibPointer.sol";
-import "rain.solmem/lib/LibMemCpy.sol";
-import "rain.solmem/lib/LibStackPointer.sol";
-import "rain.solmem/lib/LibUint256Array.sol";
 
 /// Thrown when the length of an array as the result of an applied function does
 /// not match expectations.

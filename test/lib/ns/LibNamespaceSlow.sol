@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "src/interface/IInterpreterV1.sol";
+import "../../../src/interface/IInterpreterV1.sol";
 
 library LibNamespaceSlow {
     /// Implements an abi encoding based version of `qualifyNamespace` that is

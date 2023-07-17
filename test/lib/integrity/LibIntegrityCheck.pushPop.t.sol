@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
+import "../../../lib/forge-std/src/Test.sol";
 
-import "rain.solmem/lib/LibPointer.sol";
-import "src/lib/integrity/LibIntegrityCheck.sol";
+import "../../../lib/rain.solmem/src/lib/LibPointer.sol";
+import "../../../src/lib/integrity/LibIntegrityCheck.sol";
 
 /// @title LibIntegrityCheckPushPopTest
 /// Test the basic push and pop movements of the integrity check.

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
-import {WillOverflow} from "rain.math.fixedpoint/../test/WillOverflow.sol";
+import "../../../../lib/forge-std/src/Test.sol";
+import {WillOverflow} from "../../../../lib/rain.math.fixedpoint/test/WillOverflow.sol";
 
 import "src/interface/IInterpreterV1.sol";
 import "src/lib/op/chainlink/LibOpChainlinkOraclePrice.sol";

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
+import "../../../lib/forge-std/src/Test.sol";
 
-import "src/lib/integrity/LibIntegrityCheck.sol";
-import "src/lib/state/LibInterpreterState.sol";
-import "src/lib/op/LibAllStandardOpsNP.sol";
+import "../../../src/lib/integrity/LibIntegrityCheck.sol";
+import "../../../src/lib/state/LibInterpreterState.sol";
+import "../../../src/lib/op/LibAllStandardOpsNP.sol";
 
 /// @title LibAllStandardOpsNPTest
 /// Some basic guard rails around the `LibAllStandardOpsNP` library. Most of the

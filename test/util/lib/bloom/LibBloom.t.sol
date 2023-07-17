@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "forge-std/Test.sol";
+import "../../../../lib/forge-std/src/Test.sol";
 
-import "test/util/lib/bloom/LibBloom.sol";
+import "./LibBloom.sol";
 
 /// @title LibBloomTest
 /// @notice This is a test contract for LibBloom. LibBloom itself is only used

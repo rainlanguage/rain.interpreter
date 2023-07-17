@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
+import "../../../lib/forge-std/src/Test.sol";
 
-import "src/lib/parse/LibParseMeta.sol";
-import "test/util/lib/bloom/LibBloom.sol";
+import "../../../src/lib/parse/LibParseMeta.sol";
+import "../../util/lib/bloom/LibBloom.sol";
 
 contract LibParseMetaBuildMetaTest is Test {
     /// This is super loose from limited empirical testing.

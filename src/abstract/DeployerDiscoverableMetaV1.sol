@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "rain.metadata/IMetaV1.sol";
-import "rain.metadata/LibMeta.sol";
+import "../../lib/rain.metadata/src/IMetaV1.sol";
+import "../../lib/rain.metadata/src/LibMeta.sol";
 import "../lib/caller/LibDeployerDiscoverable.sol";
 
 /// Construction config for `DeployerDiscoverableMetaV1`.

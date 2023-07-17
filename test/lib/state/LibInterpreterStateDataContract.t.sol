@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
-import "rain.solmem/lib/LibBytes.sol";
-import "rain.solmem/lib/LibPointer.sol";
-import "rain.solmem/lib/LibUint256Array.sol";
+import "../../../lib/forge-std/src/Test.sol";
+import "../../../lib/rain.solmem/src/lib/LibBytes.sol";
+import "../../../lib/rain.solmem/src/lib/LibPointer.sol";
+import "../../../lib/rain.solmem/src/lib/LibUint256Array.sol";
 
-import "src/lib/state/LibInterpreterStateDataContract.sol";
+import "../../../src/lib/state/LibInterpreterStateDataContract.sol";
 
-import "test/lib/compile/LibCompileSlow.sol";
-import "test/lib/state/LibInterpreterStateDataContractSlow.sol";
+import "../../lib/compile/LibCompileSlow.sol";
+import "./LibInterpreterStateDataContractSlow.sol";
 
 /// @title LibInterpreterStateDataContractTest
 /// @notice Exercises the data contract implementation of the interpreter state.

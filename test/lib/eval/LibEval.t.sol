@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
-import "rain.lib.memkv/lib/LibMemoryKV.sol";
-import "rain.solmem/lib/LibPointer.sol";
-import "rain.solmem/lib/LibStackPointer.sol";
-import "rain.lib.typecast/LibConvert.sol";
+import "../../../lib/forge-std/src/Test.sol";
+import "../../../lib/rain.lib.memkv/src/lib/LibMemoryKV.sol";
+import "../../../lib/rain.solmem/src/lib/LibPointer.sol";
+import "../../../lib/rain.solmem/src/lib/LibStackPointer.sol";
+import "../../../lib/rain.lib.typecast/src/LibConvert.sol";
 
-import "src/lib/eval/LibEval.sol";
-import "src/lib/compile/LibCompile.sol";
+import "../../../src/lib/eval/LibEval.sol";
+import "../../../src/lib/compile/LibCompile.sol";
 
-import "test/lib/compile/LibCompileSlow.sol";
-import "test/lib/eval/LibEvalSlow.sol";
+import "../compile/LibCompileSlow.sol";
+import "./LibEvalSlow.sol";
 
 contract LibEvalTest is Test {
     using LibMemoryKV for MemoryKV;

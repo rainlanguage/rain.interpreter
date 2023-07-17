@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
-import "test/util/lib/etch/LibEtch.sol";
-import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
+import "../../lib/forge-std/src/Test.sol";
+import "../util/lib/etch/LibEtch.sol";
+import "../util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
 
-import "src/concrete/RainterpreterStore.sol";
-import "src/concrete/RainterpreterNP.sol";
-import "src/concrete/RainterpreterExpressionDeployerNP.sol";
+import "../../src/concrete/RainterpreterStore.sol";
+import "../../src/concrete/RainterpreterNP.sol";
+import "../../src/concrete/RainterpreterExpressionDeployerNP.sol";
 
 /// @title RainterpreterExpressionDeployerMetaTest
 /// Tests that the RainterpreterExpressionDeployer meta is correct. Also tests

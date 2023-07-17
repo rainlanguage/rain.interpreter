@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
+import "../../../lib/forge-std/src/Test.sol";
 
-import "rain.solmem/lib/LibMemCpy.sol";
-import "rain.solmem/lib/LibPointer.sol";
-import "rain.solmem/lib/LibStackPointer.sol";
-import "rain.solmem/lib/LibUint256Array.sol";
-import "rain.lib.hash/LibHashNoAlloc.sol";
+import "../../../lib/rain.solmem/src/lib/LibMemCpy.sol";
+import "../../../lib/rain.solmem/src/lib/LibPointer.sol";
+import "../../../lib/rain.solmem/src/lib/LibStackPointer.sol";
+import "../../../lib/rain.solmem/src/lib/LibUint256Array.sol";
+import "../../../lib/rain.lib.hash/src/LibHashNoAlloc.sol";
 
-import "src/lib/op/LibOp.sol";
-import "test/lib/op/LibOpSlow.sol";
+import "../../../src/lib/op/LibOp.sol";
+import "./LibOpSlow.sol";
 
 contract LibOpTest is Test {
     using LibUint256Array for uint256[];

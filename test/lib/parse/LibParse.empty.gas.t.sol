@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
+import "../../../lib/forge-std/src/Test.sol";
 
-import "src/lib/parse/LibParse.sol";
+import "../../../src/lib/parse/LibParse.sol";
 
 /// @title LibParseEmptyGasTest
 /// Exercise a few different sized empty expressions to get a gas snapshot of the
