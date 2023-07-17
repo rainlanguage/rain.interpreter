@@ -23,6 +23,6 @@ abstract contract DeployerDiscoverableMetaV1 is IMetaV1 {
     constructor(bytes32 metaHash, DeployerDiscoverableMetaV1ConstructionConfig memory config) {
         LibMeta.checkMetaHashed(metaHash, config.meta);
         emit MetaV1(msg.sender, uint256(uint160(address(this))), config.meta);
-        LibDeployerDiscoverable.touchDeployer(config.deployer);
+        LibDeployerDiscoverable.touchDeployerV1(config.deployer);
     }
 }
