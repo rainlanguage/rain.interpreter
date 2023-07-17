@@ -73,6 +73,18 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
         return (state, state.stackBottom);
     }
 
+    /// Integrity check doesn't support min outputs greater than
+    /// `type(uint16).max` even though the interface is full `uint256`.
+    /// This is a sane range for this implementation of an interpreter, but also
+    /// it guards against overflowing signed ints when comparing against
+    /// potentially negative stack heights internally.
+    function testIntegrityEnsureIntegrityMinStackOutputsOverflow(uint256 minOutputs) public {
+        minOutputs = bound(minOutputs, uint256(type(uint16).max) + 1, type(uint256).max);
+        (IntegrityCheckState memory state, Pointer stackTop) = newState(":;");
+        vm.expectRevert(abi.encodeWithSelector(UnsupportedStackHeight.selector, minOutputs));
+        state.ensureIntegrity(SourceIndex.wrap(0), stackTop, minOutputs);
+    }
+
     /// If an integrity check is encountered that is not implemented, the
     /// integrity check should revert.
     function testIntegrityEnsureIntegrityNotImplemented() public {

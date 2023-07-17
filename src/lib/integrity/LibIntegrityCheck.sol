@@ -180,7 +180,7 @@ library LibIntegrityCheck {
             // Technically we could support more than 2^16 stack items because
             // the hard limit is signed `int256`, but this is a reasonable
             // limit for now.
-            if (minStackOutputs > type(uint16).max) {
+            if (minStackOutputs > uint256(type(uint16).max)) {
                 revert UnsupportedStackHeight(minStackOutputs);
             }
             // It's generally more efficient to ensure the stack bottom has
