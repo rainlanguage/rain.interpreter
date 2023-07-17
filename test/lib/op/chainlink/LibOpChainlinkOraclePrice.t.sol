@@ -38,7 +38,7 @@ contract LibOpChainlinkOraclePriceTest is Test {
         Operand operand = Operand.wrap(scalingFlags & type(uint16).max);
 
         vm.assume(address(uint160(feed)) != address(this));
-        assumeNoPrecompiles(address(uint160(feed)));
+        assumeNotPrecompile(address(uint160(feed)));
         vm.etch(address(uint160(feed)), hex"00");
         vm.mockCall(
             address(uint160(feed)),
