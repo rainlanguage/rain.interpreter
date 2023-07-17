@@ -27,18 +27,4 @@ contract LibDeployerDiscoverableTest is Test {
         );
         LibDeployerDiscoverable.touchDeployerV1(address(deployer));
     }
-
-    /// MUST be possible to touch a deployer with 0 data to support discovery.
-    /// Tests V2 of the deployer interface.
-    function testTouchDeployerMockV2() external {
-        TestDeployer deployer = new TestDeployer();
-        vm.expectCall(
-            address(deployer),
-            abi.encodeWithSelector(
-                IExpressionDeployerV1.deployExpression.selector, new bytes[](0), new uint256[](0), new uint256[](0)
-            ),
-            1
-        );
-        LibDeployerDiscoverable.touchDeployerV1(address(deployer));
-    }
 }
