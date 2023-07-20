@@ -20,6 +20,12 @@ error UnexpectedRightParen(uint256 offset);
 /// Encountered an unclosed left paren.
 error UnclosedLeftParen(uint256 offset);
 
+/// Encountered too many LHS items.
+error ExcessLHSItems(uint256 offset);
+
+/// Encountered too many RHS items.
+error ExcessRHSItems(uint256 offset);
+
 /// Enountered a word that is longer than 32 bytes.
 error WordSize(string word);
 
@@ -95,9 +101,10 @@ uint128 constant CMASK_LHS_STACK_DELIMITER = CMASK_WHITESPACE;
 uint256 constant NOT_LOW_16_BIT_MASK = ~uint256(0xFFFF);
 uint256 constant ACTIVE_SOURCE_MASK = NOT_LOW_16_BIT_MASK;
 
-uint256 constant FSM_LHS_MASK = 1;
+uint256 constant FSM_RHS_MASK = 1;
 uint256 constant FSM_YANG_MASK = 1 << 1;
 uint256 constant FSM_WORD_END_MASK = 1 << 2;
+uint256 constant FSM_ACCEPTING_INPUTS_MASK = 1 << 3;
 
 uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
 
@@ -119,6 +126,7 @@ uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
 /// - bit 0: LHS/RHS => 0 = LHS, 1 = RHS
 /// - bit 1: yang/yin => 0 = yin, 1 = yang
 /// - bit 2: word end => 0 = not end, 1 = end
+/// - bit 3: accepting inputs => 0 = not accepting, 1 = accepting
 /// @param stackOffset The current stack offset in bytes. This is where the
 /// current stack word counter is.
 /// @param stack0 Memory region for stack word counters.
@@ -161,8 +169,8 @@ library LibParseState {
             0,
             // parenDepth
             0,
-            // fsm
-            FSM_LHS_MASK,
+            // fsm initially is the LHS and accepting inputs.
+            FSM_ACCEPTING_INPUTS_MASK,
             // stackLHSIndex
             0,
             // stackNames
@@ -177,6 +185,24 @@ library LibParseState {
             (uint256 offset, string memory char) = LibParse.parseErrorContext(data, cursor);
             (char);
             revert UnclosedLeftParen(offset);
+        }
+
+        // Nested conditionals to make the happy path more efficient at the
+        // expense of the unhappy path.
+        if (state.stackLHSIndex != state.stackRHSOffset) {
+            (uint256 offset, string memory char) = LibParse.parseErrorContext(data, cursor);
+            (char);
+            if (state.stackLHSIndex > state.stackRHSOffset) {
+                if (state.fsm & FSM_ACCEPTING_INPUTS_MASK == 0) {
+                    revert ExcessLHSItems(offset);
+                } else {
+                    // Move the RHS offset to cover inputs to the source. This
+                    // gives a zero length of words for each input.
+                    state.stackRHSOffset = state.stackLHSIndex;
+                }
+            } else {
+                revert ExcessRHSItems(offset);
+            }
         }
     }
 
@@ -488,7 +514,7 @@ library LibParse {
                     }
 
                     // LHS
-                    if (state.fsm & FSM_LHS_MASK > 0) {
+                    if (state.fsm & FSM_RHS_MASK == 0) {
                         if (char & CMASK_LHS_STACK_HEAD > 0) {
                             // if yang we can't start new stack item
                             if (state.fsm & FSM_YANG_MASK > 0) {
@@ -508,12 +534,16 @@ library LibParse {
                             }
 
                             state.stackLHSIndex++;
-                            state.fsm = FSM_LHS_MASK | FSM_YANG_MASK;
+
+                            // Set yang as we are now building a stack item.
+                            state.fsm |= FSM_YANG_MASK;
                         } else if (char & CMASK_WHITESPACE > 0) {
                             cursor = skipWord(cursor, CMASK_WHITESPACE);
-                            state.fsm = FSM_LHS_MASK;
+                            // Set ying as we now open to possibilities.
+                            state.fsm &= ~FSM_YANG_MASK;
                         } else if (char & CMASK_LHS_RHS_DELIMITER > 0) {
-                            state.fsm = 0;
+                            // Set RHS and yin.
+                            state.fsm = (state.fsm | FSM_RHS_MASK) & ~FSM_YANG_MASK;
                             cursor++;
                         } else {
                             //slither-disable-next-line similar-names
@@ -534,7 +564,7 @@ library LibParse {
                             (cursor, word) = parseWord(cursor, CMASK_RHS_WORD_TAIL);
                             state.pushWordToSource(meta, word);
 
-                            state.fsm = FSM_YANG_MASK | FSM_WORD_END_MASK;
+                            state.fsm |= FSM_YANG_MASK | FSM_WORD_END_MASK;
                         }
                         // If this is the end of a word we MUST start a paren.
                         // @todo support operands and constants.
@@ -544,12 +574,14 @@ library LibParse {
                                 (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
                                 revert UnexpectedRHSChar(offset, charString);
                             }
-                            state.fsm = 0;
                             state.parenDepth++;
                             cursor++;
+
+                            // We've moved past the paren, so we are no longer at
+                            // the end of a word and are yin.
+                            state.fsm &= ~(FSM_WORD_END_MASK | FSM_YANG_MASK);
                         } else if (char & CMASK_RIGHT_PAREN > 0) {
                             // @todo input handling.
-                            state.fsm = 0;
                             if (state.parenDepth == 0) {
                                 //slither-disable-next-line similar-names
                                 (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
@@ -571,19 +603,20 @@ library LibParse {
                             }
                             cursor++;
                         } else if (char & CMASK_WHITESPACE > 0) {
-                            state.fsm = 0;
                             cursor = skipWord(cursor, CMASK_WHITESPACE);
+                            // Set yin as we now open to possibilities.
+                            state.fsm &= ~FSM_YANG_MASK;
                         } else if (char & CMASK_EOL > 0) {
                             state.balance(data, cursor);
-                            state.fsm = FSM_LHS_MASK;
                             cursor++;
+                            state.fsm = 0;
                         }
                         // End of source.
                         else if (char & CMASK_EOS > 0) {
                             state.balance(data, cursor);
-                            state.fsm = FSM_LHS_MASK;
                             state.newSource();
                             cursor++;
+                            state.fsm = FSM_ACCEPTING_INPUTS_MASK;
                         } else {
                             //slither-disable-next-line similar-names
                             (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
