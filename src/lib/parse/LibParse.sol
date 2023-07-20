@@ -17,6 +17,9 @@ error UnexpectedRHSChar(uint256 offset, string char);
 /// Encountered a right paren without a matching left paren.
 error UnexpectedRightParen(uint256 offset);
 
+/// Encountered an unclosed left paren.
+error UnclosedLeftParen(uint256 offset);
+
 /// Enountered a word that is longer than 32 bytes.
 error WordSize(string word);
 
@@ -167,6 +170,14 @@ library LibParseState {
             // constantsBuilder
             0
         );
+    }
+
+    function balance(ParseState memory state, bytes memory data, uint256 cursor) internal pure {
+        if (state.parenDepth > 0) {
+            (uint256 offset, string memory char) = LibParse.parseErrorContext(data, cursor);
+            (char);
+            revert UnclosedLeftParen(offset);
+        }
     }
 
     function pushStackName(ParseState memory state, bytes32 word) internal pure {
@@ -563,11 +574,13 @@ library LibParse {
                             state.fsm = 0;
                             cursor = skipWord(cursor, CMASK_WHITESPACE);
                         } else if (char & CMASK_EOL > 0) {
+                            state.balance(data, cursor);
                             state.fsm = FSM_LHS_MASK;
                             cursor++;
                         }
                         // End of source.
                         else if (char & CMASK_EOS > 0) {
+                            state.balance(data, cursor);
                             state.fsm = FSM_LHS_MASK;
                             state.newSource();
                             cursor++;
