@@ -4,6 +4,7 @@ pragma solidity ^0.8.18;
 import "rain.solmem/lib/LibPointer.sol";
 import "./LibCtPop.sol";
 import "./LibParseMeta.sol";
+import "./LibParseCMask.sol";
 
 /// The expression does not finish with a semicolon (EOF).
 error MissingFinalSemi(uint256 offset);
@@ -30,64 +31,6 @@ error MaxSources();
 error DanglingSource();
 
 error StackOverflow();
-
-/// @dev \t
-uint128 constant CMASK_TAB = 0x200;
-
-/// @dev \n
-uint128 constant CMASK_LINE_FEED = 0x400;
-
-/// @dev \r
-uint128 constant CMASK_CARRIAGE_RETURN = 0x2000;
-
-/// @dev space
-uint128 constant CMASK_SPACE = 0x0100000000;
-
-/// @dev ,
-uint128 constant CMASK_COMMA = 0x100000000000;
-uint128 constant CMASK_EOL = CMASK_COMMA;
-
-/// @dev -
-uint128 constant CMASK_DASH = 0x200000000000;
-
-/// @dev :
-uint128 constant CMASK_COLON = 0x0400000000000000;
-/// @dev LHS/RHS delimiter is :
-uint128 constant CMASK_LHS_RHS_DELIMITER = CMASK_COLON;
-
-/// @dev ;
-uint128 constant CMASK_SEMICOLON = 0x800000000000000;
-uint128 constant CMASK_EOS = CMASK_SEMICOLON;
-
-/// @dev _
-uint128 constant CMASK_UNDERSCORE = 0x800000000000000000000000;
-
-/// @dev (
-uint128 constant CMASK_LEFT_PAREN = 0x10000000000;
-
-/// @dev )
-uint128 constant CMASK_RIGHT_PAREN = 0x20000000000;
-
-/// @dev lower alpha and underscore a-z _
-uint128 constant CMASK_LHS_STACK_HEAD = 0xffffffe800000000000000000000000;
-
-/// @dev lower alpha a-z
-uint128 constant CMASK_IDENTIFIER_HEAD = 0xffffffe000000000000000000000000;
-uint128 constant CMASK_RHS_WORD_HEAD = CMASK_IDENTIFIER_HEAD;
-
-/// @dev lower alphanumeric kebab a-z 0-9 -
-uint128 constant CMASK_IDENTIFIER_TAIL = 0xffffffe0000000003ff200000000000;
-uint128 constant CMASK_LHS_STACK_TAIL = CMASK_IDENTIFIER_TAIL;
-uint128 constant CMASK_RHS_WORD_TAIL = CMASK_IDENTIFIER_TAIL;
-
-/// @dev NOT lower alphanumeric kebab
-uint128 constant CMASK_NOT_IDENTIFIER_TAIL = 0xf0000001fffffffffc00dfffffffffff;
-
-/// @dev whitespace is \n \r \t space
-uint128 constant CMASK_WHITESPACE = 0x100002600;
-
-/// @dev stack item delimiter is whitespace
-uint128 constant CMASK_LHS_STACK_DELIMITER = CMASK_WHITESPACE;
 
 uint256 constant NOT_LOW_16_BIT_MASK = ~uint256(0xFFFF);
 uint256 constant ACTIVE_SOURCE_MASK = NOT_LOW_16_BIT_MASK;
@@ -559,9 +502,14 @@ library LibParse {
                                 }
                             }
                             cursor++;
-                        } else if (char & CMASK_WHITESPACE > 0) {
+                        }
+                        else if (char & CMASK_WHITESPACE > 0) {
                             state.fsm = 0;
                             cursor = skipWord(cursor, CMASK_WHITESPACE);
+                        }
+                        // Handle all literals.
+                        else if (char & CMASK_LITERAL_HEAD > 0) {
+
                         } else if (char & CMASK_EOL > 0) {
                             state.fsm = FSM_LHS_MASK;
                             cursor++;
