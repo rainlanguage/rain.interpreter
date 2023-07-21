@@ -8,7 +8,6 @@ import "src/lib/parse/LibParse.sol";
 /// @title LibParseIntegerLiteralHexTest
 /// Tests parsing integer literal hex values.
 contract LibParseIntegerLiteralHexTest is Test {
-
     bytes internal meta;
 
     constructor() {
@@ -25,40 +24,33 @@ contract LibParseIntegerLiteralHexTest is Test {
     /// Check a single hex literal. Should not revert and return length 1
     /// sources and constants.
     function testParseIntegerLiteralHex00() external {
-        (bytes[] memory sources0, uint256[] memory constants0) = LibParse.parse("_: 0x00;", meta);
-        assertEq(sources0.length, 1);
-        assertEq(sources0[0], hex"00000000");
-        assertEq(constants0.length, 1);
-        assertEq(constants0[0], 0x00);
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse("_: 0xa2;", meta);
+        assertEq(sources.length, 1);
+        assertEq(sources[0], hex"00000000");
+        assertEq(constants.length, 1);
+        assertEq(constants[0], 0xa2);
     }
 
-    // /// Check a single hex literal. Should not revert and return length 1
-    // /// sources and constants.
-    // function testParseIntegerLiteralHex01() external {
-    //     (bytes[] memory sources1, uint256[] memory constants1) = LibParse.parse("0x1", "");
-    //     assertEq(sources1.length, 1);
-    //     assertEq(sources1[0].length, 0);
-    //     assertEq(constants1.length, 1);
-    //     assertEq(constants1[0], 1);
-    // }
+    /// Check 2 hex literals. Should not revert and return one source and
+    /// length 2 constants.
+    function testParseIntegerLiteralHex01() external {
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse("_ _: 0xa2 0x03;", meta);
+        assertEq(sources.length, 1);
+        assertEq(sources[0], hex"0000000000000001");
+        assertEq(constants.length, 2);
+        assertEq(constants[0], 0xa2);
+        assertEq(constants[1], 0x03);
+    }
 
-    // /// Check a single hex literal. Should not revert and return length 1
-    // /// sources and constants.
-    // function testParseIntegerLiteralHex02() external {
-    //     (bytes[] memory sources2, uint256[] memory constants2) = LibParse.parse("0x2", "");
-    //     assertEq(sources2.length, 1);
-    //     assertEq(sources2[0].length, 0);
-    //     assertEq(constants2.length, 1);
-    //     assertEq(constants2[0], 2);
-    // }
-
-    // /// Check a single hex literal. Should not revert and return length 1
-    // /// sources and constants.
-    // function testParseIntegerLiteralHex03() external {
-    //     (bytes[] memory sources3, uint256[] memory constants3) = LibParse.parse("0x3", "");
-    //     assertEq(sources3.length, 1);
-    //     assertEq(sources3[0].length, 0);
-    //     assertEq(constants3.length, 1);
-    //     assertEq(constants3[0], 3);
-    // }
+    /// Check 3 hex literals with 2 dupes. Should dedupe and respect ordering.
+    function testParseIntegerLiteralHex02() external {
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse("_ _ _: 0xa2 0x03 0xa2;", meta);
+        assertEq(sources.length, 1);
+        // Sources represents all 3 literals, but the dupe is deduped so that the
+        // operands only reference the first instance of the duped constant.
+        assertEq(sources[0], hex"000000000000000100000000");
+        assertEq(constants.length, 2);
+        assertEq(constants[0], 0xa2);
+        assertEq(constants[1], 0x03);
+    }
 }
