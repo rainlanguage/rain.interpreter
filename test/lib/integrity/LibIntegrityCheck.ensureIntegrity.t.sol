@@ -89,12 +89,12 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
     /// integrity check should revert.
     function testIntegrityEnsureIntegrityNotImplemented() public {
         // Test an invalid op in isolation.
-        (IntegrityCheckState memory state, Pointer stackTop) = newState(":invalid();");
+        (IntegrityCheckState memory state, Pointer stackTop) = newState("_:invalid();");
         vm.expectRevert(stdError.indexOOBError);
         state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 0);
 
         // Test an invalid op in a series of otherwise valid ops.
-        (IntegrityCheckState memory state2, Pointer stackTop2) = newState(": push() invalid() pop();");
+        (IntegrityCheckState memory state2, Pointer stackTop2) = newState("_ _ _: push() invalid() pop();");
         vm.expectRevert(stdError.indexOOBError);
         state2.ensureIntegrity(SourceIndex.wrap(0), stackTop2, 0);
     }
@@ -103,7 +103,7 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
     /// they are in the source that is being checked.
     function testIntegrityEnsureIntegrityNotImplementedMultiSource() public {
         // Source 0 will have an invalid op and revert.
-        (IntegrityCheckState memory state, Pointer stackTop) = newState(":invalid(); _: push();");
+        (IntegrityCheckState memory state, Pointer stackTop) = newState("_:invalid(); _: push();");
         vm.expectRevert(stdError.indexOOBError);
         Pointer stackTopAfter = state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 0);
 
@@ -132,7 +132,7 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
     /// If a reverting integrity check is encountered, the integrity check
     /// should revert overall.
     function testIntegrityEnsureIntegrityRevert() public {
-        (IntegrityCheckState memory state, Pointer stackTop) = newState(": revert();");
+        (IntegrityCheckState memory state, Pointer stackTop) = newState("_: revert();");
         vm.expectRevert(abi.encodeWithSelector(BadIntegrity.selector));
         Pointer stackTopAfter = state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 0);
         (stackTopAfter);

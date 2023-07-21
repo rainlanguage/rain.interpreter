@@ -29,14 +29,12 @@ contract LibParseUnexpectedRightParenTest is Test {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRightParen.selector, 1));
         // Meta can be empty because we should revert before we even try to
         // lookup any words.
-        LibParse.parse(":);", meta);
+        LibParse.parse(":);", "");
     }
 
     /// The parser should track the paren depth as it encounters left parens.
     function testParseUnexpectedRightParenNested() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRightParen.selector, 7));
-        // Meta can be empty because we should revert before we even try to
-        // lookup any words.
         LibParse.parse(":a(b()));", meta);
     }
 }

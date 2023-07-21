@@ -18,6 +18,15 @@ error UnexpectedRHSChar(uint256 offset, string char);
 /// Encountered a right paren without a matching left paren.
 error UnexpectedRightParen(uint256 offset);
 
+/// Encountered an unclosed left paren.
+error UnclosedLeftParen(uint256 offset);
+
+/// Encountered too many LHS items.
+error ExcessLHSItems(uint256 offset);
+
+/// Encountered too many RHS items.
+error ExcessRHSItems(uint256 offset);
+
 /// Enountered a word that is longer than 32 bytes.
 error WordSize(string word);
 
@@ -35,11 +44,14 @@ error StackOverflow();
 uint256 constant NOT_LOW_16_BIT_MASK = ~uint256(0xFFFF);
 uint256 constant ACTIVE_SOURCE_MASK = NOT_LOW_16_BIT_MASK;
 
-uint256 constant FSM_LHS_MASK = 1;
+uint256 constant FSM_RHS_MASK = 1;
 uint256 constant FSM_YANG_MASK = 1 << 1;
 uint256 constant FSM_WORD_END_MASK = 1 << 2;
+uint256 constant FSM_ACCEPTING_INPUTS_MASK = 1 << 3;
 
 uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
+
+uint256 constant LITERAL_TYPE_INTEGER_HEX = 1;
 
 /// The parser is stateful. This struct keeps track of the entire state.
 /// @param activeSource The current source being built.
@@ -59,6 +71,7 @@ uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
 /// - bit 0: LHS/RHS => 0 = LHS, 1 = RHS
 /// - bit 1: yang/yin => 0 = yin, 1 = yang
 /// - bit 2: word end => 0 = not end, 1 = end
+/// - bit 3: accepting inputs => 0 = not accepting, 1 = accepting
 /// @param stackOffset The current stack offset in bytes. This is where the
 /// current stack word counter is.
 /// @param stack0 Memory region for stack word counters.
@@ -67,6 +80,8 @@ uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
 /// named stack items it pushes them onto this linked list. The linked list is
 /// in FILO order, so the first item on the stack is the last item in the list.
 /// This makes it more efficient to reference more recent stack names on the RHS.
+/// @param literalBloom A bloom filter of all the literals that have been
+/// encountered so far. This is used to quickly dedupe literals.
 /// @param constantsBuilder A builder for the constants array.
 struct ParseState {
     /// @dev WARNING: Referenced directly in assembly. If the order of these
@@ -83,6 +98,7 @@ struct ParseState {
     uint256 fsm;
     uint256 stackLHSIndex;
     uint256 stackNames;
+    uint256 literalBloom;
     uint256 constantsBuilder;
 }
 
@@ -101,15 +117,43 @@ library LibParseState {
             0,
             // parenDepth
             0,
-            // fsm
-            FSM_LHS_MASK,
+            // fsm initially is the LHS and accepting inputs.
+            FSM_ACCEPTING_INPUTS_MASK,
             // stackLHSIndex
             0,
             // stackNames
             0,
+            // literalBloom
+            0,
             // constantsBuilder
             0
         );
+    }
+
+    function balance(ParseState memory state, bytes memory data, uint256 cursor) internal pure {
+        if (state.parenDepth > 0) {
+            (uint256 offset, string memory char) = LibParse.parseErrorContext(data, cursor);
+            (char);
+            revert UnclosedLeftParen(offset);
+        }
+
+        // Nested conditionals to make the happy path more efficient at the
+        // expense of the unhappy path.
+        if (state.stackLHSIndex != state.stackRHSOffset) {
+            (uint256 offset, string memory char) = LibParse.parseErrorContext(data, cursor);
+            (char);
+            if (state.stackLHSIndex > state.stackRHSOffset) {
+                if (state.fsm & FSM_ACCEPTING_INPUTS_MASK == 0) {
+                    revert ExcessLHSItems(offset);
+                } else {
+                    // Move the RHS offset to cover inputs to the source. This
+                    // gives a zero length of words for each input.
+                    state.stackRHSOffset = state.stackLHSIndex;
+                }
+            } else {
+                revert ExcessRHSItems(offset);
+            }
+        }
     }
 
     function pushStackName(ParseState memory state, bytes32 word) internal pure {
@@ -124,6 +168,26 @@ library LibParseState {
             mstore(0x40, add(ptr, 0x20))
         }
         state.stackNames = fingerprint | (state.stackLHSIndex << 0x10) | ptr;
+    }
+
+    function pushLiteral(ParseState memory state, uint256 cursor) internal pure returns (uint256) {
+        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) = LibParse.boundLiteral(cursor);
+        uint256 fingerprint;
+        assembly ("memory-safe") {
+            fingerprint := keccak256(cursor, outerEnd)
+        }
+        return outerEnd;
+        // uint256 fingerprint;
+        // uint256 ptr;
+        // uint256 oldLiteralBloom = state.literalBloom;
+        // assembly ("memory-safe") {
+        //     ptr := mload(0x40)
+        //     mstore(ptr, literal)
+        //     fingerprint := and(keccak256(ptr, 0x20), not(0xFFFFFFFF))
+        //     mstore(ptr, oldLiteralBloom)
+        //     mstore(0x40, add(ptr, 0x20))
+        // }
+        // state.literalBloom = fingerprint | (state.stackLHSIndex << 0x10) | ptr;
     }
 
     function pushWordToSource(ParseState memory state, bytes memory meta, bytes32 word) internal pure {
@@ -353,6 +417,40 @@ library LibParse {
         }
     }
 
+    /// @return literalType
+    /// - 0: error
+    /// - 1: hexadecimal integer
+    function boundLiteral(uint256 cursor)
+        internal
+        pure
+        returns (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd)
+    {
+        unchecked {
+            uint256 word;
+            uint256 head;
+            assembly ("memory-safe") {
+                word := mload(cursor)
+                head := shl(byte(0, word), 1)
+            }
+
+            // numeric literal head is 0-9
+            if (head & CMASK_NUMERIC_LITERAL_HEAD != 0) {
+                uint256 dispatch;
+                assembly ("memory-safe") {
+                    dispatch := shl(byte(1, word), 1)
+                }
+
+                // hexadecimal literal dispatch is 0x
+                if ((head | dispatch) == CMASK_LITERAL_HEX_DISPATCH) {
+                    literalType = LITERAL_TYPE_INTEGER_HEX;
+                    innerStart = cursor + 2;
+                    innerEnd = innerStart;
+                    outerEnd = innerStart + 1;
+                }
+            }
+        }
+    }
+
     function parseWord(uint256 cursor, uint256 mask) internal pure returns (uint256, bytes32) {
         bytes32 word;
         uint256 i = 1;
@@ -420,7 +518,7 @@ library LibParse {
                     }
 
                     // LHS
-                    if (state.fsm & FSM_LHS_MASK > 0) {
+                    if (state.fsm & FSM_RHS_MASK == 0) {
                         if (char & CMASK_LHS_STACK_HEAD > 0) {
                             // if yang we can't start new stack item
                             if (state.fsm & FSM_YANG_MASK > 0) {
@@ -440,12 +538,16 @@ library LibParse {
                             }
 
                             state.stackLHSIndex++;
-                            state.fsm = FSM_LHS_MASK | FSM_YANG_MASK;
+
+                            // Set yang as we are now building a stack item.
+                            state.fsm |= FSM_YANG_MASK;
                         } else if (char & CMASK_WHITESPACE > 0) {
                             cursor = skipWord(cursor, CMASK_WHITESPACE);
-                            state.fsm = FSM_LHS_MASK;
+                            // Set ying as we now open to possibilities.
+                            state.fsm &= ~FSM_YANG_MASK;
                         } else if (char & CMASK_LHS_RHS_DELIMITER > 0) {
-                            state.fsm = 0;
+                            // Set RHS and yin.
+                            state.fsm = (state.fsm | FSM_RHS_MASK) & ~FSM_YANG_MASK;
                             cursor++;
                         } else {
                             //slither-disable-next-line similar-names
@@ -466,7 +568,7 @@ library LibParse {
                             (cursor, word) = parseWord(cursor, CMASK_RHS_WORD_TAIL);
                             state.pushWordToSource(meta, word);
 
-                            state.fsm = FSM_YANG_MASK | FSM_WORD_END_MASK;
+                            state.fsm |= FSM_YANG_MASK | FSM_WORD_END_MASK;
                         }
                         // If this is the end of a word we MUST start a paren.
                         // @todo support operands and constants.
@@ -476,12 +578,14 @@ library LibParse {
                                 (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
                                 revert UnexpectedRHSChar(offset, charString);
                             }
-                            state.fsm = 0;
                             state.parenDepth++;
                             cursor++;
+
+                            // We've moved past the paren, so we are no longer at
+                            // the end of a word and are yin.
+                            state.fsm &= ~(FSM_WORD_END_MASK | FSM_YANG_MASK);
                         } else if (char & CMASK_RIGHT_PAREN > 0) {
                             // @todo input handling.
-                            state.fsm = 0;
                             if (state.parenDepth == 0) {
                                 //slither-disable-next-line similar-names
                                 (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
@@ -502,23 +606,28 @@ library LibParse {
                                 }
                             }
                             cursor++;
-                        }
-                        else if (char & CMASK_WHITESPACE > 0) {
-                            state.fsm = 0;
+                        } else if (char & CMASK_WHITESPACE > 0) {
                             cursor = skipWord(cursor, CMASK_WHITESPACE);
+                            // Set yin as we now open to possibilities.
+                            state.fsm &= ~FSM_YANG_MASK;
                         }
                         // Handle all literals.
                         else if (char & CMASK_LITERAL_HEAD > 0) {
-
+                            cursor = state.pushLiteral(cursor);
+                            // We are yang now. Need the next char to release to
+                            // yin.
+                            state.fsm |= FSM_YANG_MASK;
                         } else if (char & CMASK_EOL > 0) {
-                            state.fsm = FSM_LHS_MASK;
+                            state.balance(data, cursor);
                             cursor++;
+                            state.fsm = 0;
                         }
                         // End of source.
                         else if (char & CMASK_EOS > 0) {
-                            state.fsm = FSM_LHS_MASK;
+                            state.balance(data, cursor);
                             state.newSource();
                             cursor++;
+                            state.fsm = FSM_ACCEPTING_INPUTS_MASK;
                         } else {
                             //slither-disable-next-line similar-names
                             (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
