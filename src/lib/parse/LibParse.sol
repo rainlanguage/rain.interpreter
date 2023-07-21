@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "forge-std/console2.sol";
-
 import "rain.solmem/lib/LibPointer.sol";
 import "./LibCtPop.sol";
 import "./LibParseMeta.sol";
