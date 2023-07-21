@@ -39,4 +39,13 @@ contract LibParseUnexpectedRHSTest is Test {
         // lookup any words.
         LibParse.parse(bytes.concat(":", unexpected, ";"), "");
     }
+
+    /// Check the parser reverts on a left paren as the first character on the
+    /// RHS.
+    function testParseUnexpectedRHSLeftParen() external {
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 1, "("));
+        // Meta can be empty because we should revert before we even try to
+        // lookup any words.
+        LibParse.parse(":();", "");
+    }
 }

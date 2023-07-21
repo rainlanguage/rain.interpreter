@@ -32,6 +32,19 @@ contract LibParseUnexpectedLHSTest is Test {
         LibParse.parse("_;", "");
     }
 
+    /// Check the parser reverts if it encounters underscores in the tail of an
+    /// LHS item.
+    function testParseUnexpectedLHSUnderscoreTail() external {
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1, "_"));
+        LibParse.parse("a_:;", "");
+
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 2, "_"));
+        LibParse.parse("a __:;", "");
+
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 2, "_"));
+        LibParse.parse("_a_:;", "");
+    }
+
     /// Check the parser reverts if it encounters an unexpected character as the
     /// head of something on the LHS.
     function testParseUnexpectedLHSSingleChar(bytes1 a) external {
