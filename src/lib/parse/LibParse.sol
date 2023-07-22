@@ -278,7 +278,7 @@ library LibParseState {
             }
 
             // If the literal is not a duplicate, then we need to add it to the
-            // linked list of literals so that `i` can point to it, and we can
+            // linked list of literals so that `t` can point to it, and we can
             // build the constants array from the values in the linked list
             // later.
             if (!exists) {
