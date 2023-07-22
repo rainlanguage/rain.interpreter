@@ -649,10 +649,12 @@ library LibParse {
                 if (length > 0x40) {
                     revert LiteralSize(0x40, string(abi.encodePacked(start, end)));
                 } else if (length == 0) {
+                    //slither-disable-next-line similar-names
                     (uint256 offset, string memory errorChar) = parseErrorContext(data, start);
                     (errorChar);
                     revert ZeroLengthHexLiteral(offset);
                 } else if (length % 2 == 1) {
+                    //slither-disable-next-line similar-names
                     (uint256 offset, string memory errorChar) = parseErrorContext(data, end);
                     (errorChar);
                     revert OddLengthHexLiteral(offset);
