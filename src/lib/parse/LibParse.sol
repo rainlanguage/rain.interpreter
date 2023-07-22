@@ -220,6 +220,7 @@ library LibParseState {
             uint256 fingerprintBloom;
             assembly ("memory-safe") {
                 fingerprint := and(keccak256(cursor, sub(outerEnd, cursor)), not(0xFFFF))
+                //slither-disable-next-line incorrect-shift
                 fingerprintBloom := shl(byte(0, fingerprint), 1)
             }
 
@@ -602,6 +603,7 @@ library LibParse {
             uint256 head;
             assembly ("memory-safe") {
                 word := mload(cursor)
+                //slither-disable-next-line incorrect-shift
                 head := shl(byte(0, word), 1)
             }
 
@@ -609,6 +611,7 @@ library LibParse {
             if (head & CMASK_NUMERIC_LITERAL_HEAD != 0) {
                 uint256 dispatch;
                 assembly ("memory-safe") {
+                    //slither-disable-next-line incorrect-shift
                     dispatch := shl(byte(1, word), 1)
                 }
 
@@ -621,6 +624,7 @@ library LibParse {
                         //slither-disable-next-line incorrect-shift
                         for { let char := shl(byte(0, mload(innerEnd)), 1) } iszero(iszero(and(char, hexCharMask))) {
                             innerEnd := add(innerEnd, 1)
+                            //slither-disable-next-line incorrect-shift
                             char := shl(byte(0, mload(innerEnd)), 1)
                         } {}
                     }
@@ -660,6 +664,7 @@ library LibParse {
                         assembly ("memory-safe") {
                             hexCharByte := byte(0, mload(cursor))
                         }
+                        //slither-disable-next-line incorrect-shift
                         uint256 hexChar = 1 << hexCharByte;
 
                         uint256 nybble;
