@@ -31,8 +31,8 @@ error ExcessRHSItems(uint256 offset);
 /// Encountered a word that is longer than 32 bytes.
 error WordSize(string word);
 
-/// Encountered a literal that is longer than supported.
-error LiteralSize(uint256 maxLength, string literal);
+/// Encountered a literal that is larger than supported.
+error HexLiteralOverflow(uint256 maxLength, string literal);
 
 /// Encountered a zero length hex literal.
 error ZeroLengthHexLiteral(uint256 offset);
@@ -42,6 +42,9 @@ error OddLengthHexLiteral(uint256 offset);
 
 /// Encountered a hex literal with an invalid character.
 error MalformedHexLiteral(uint256 offset, string char);
+
+/// Encountered a decimal literal that is larger than supported.
+error DecimalLiteralOverflow(uint256 maxLength, string literal);
 
 /// Parsed a word that is not in the meta.
 error UnknownWord(bytes32 word);
@@ -74,6 +77,7 @@ uint256 constant FSM_ACCEPTING_INPUTS_MASK = 1 << 3;
 uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
 
 uint256 constant LITERAL_TYPE_INTEGER_HEX = 1;
+uint256 constant LITERAL_TYPE_INTEGER_DECIMAL = 2;
 
 /// @dev The opcode that will be used in the source to represent a literal after
 /// it has been parsed into a constant.
@@ -622,13 +626,25 @@ library LibParse {
                     uint256 hexCharMask = CMASK_HEX;
                     assembly ("memory-safe") {
                         //slither-disable-next-line incorrect-shift
-                        for { let char := shl(byte(0, mload(innerEnd)), 1) } iszero(iszero(and(char, hexCharMask))) {
+                        for {} iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), hexCharMask))) {
                             innerEnd := add(innerEnd, 1)
-                            //slither-disable-next-line incorrect-shift
-                            char := shl(byte(0, mload(innerEnd)), 1)
                         } {}
                     }
                     return (LITERAL_TYPE_INTEGER_HEX, innerStart, innerEnd, innerEnd);
+                }
+                // decimal is the fallback as continuous numeric digits 0-9.
+                else {
+                    uint256 innerStart = cursor;
+                    // We know the head is a numeric so we can move past it.
+                    uint256 innerEnd = innerStart + 1;
+                    uint256 decimalCharMask = CMASK_NUMERIC_0_9;
+                    assembly ("memory-safe") {
+                        //slither-disable-next-line incorrect-shift
+                        for {} iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), decimalCharMask))) {
+                            innerEnd := add(innerEnd, 1)
+                        } {}
+                    }
+                    return (LITERAL_TYPE_INTEGER_DECIMAL, innerStart, innerEnd, innerEnd);
                 }
             }
 
@@ -644,10 +660,17 @@ library LibParse {
         returns (uint256 value)
     {
         unchecked {
+            // Algorithm for parsing hexadecimal literals:
+            // - start at the end of the literal
+            // - for each character:
+            //   - convert the character to a nybble
+            //   - shift the nybble into the total at the correct position
+            //     (4 bits per nybble)
+            // - return the total
             if (literalType == LITERAL_TYPE_INTEGER_HEX) {
                 uint256 length = end - start;
                 if (length > 0x40) {
-                    revert LiteralSize(0x40, string(abi.encodePacked(start, end)));
+                    revert HexLiteralOverflow(0x40, string(abi.encodePacked(start, end)));
                 } else if (length == 0) {
                     //slither-disable-next-line similar-names
                     (uint256 offset, string memory errorChar) = parseErrorContext(data, start);
@@ -690,6 +713,77 @@ library LibParse {
                         value |= nybble << valueOffset;
                         valueOffset += 4;
                         cursor--;
+                    }
+                }
+            }
+            // Algorithm for parsing decimal literals:
+            // - start at the end of the literal
+            // - for each digit:
+            //   - multiply the digit by 10^digit position
+            //   - add the result to the total
+            // - return the total
+            else if (literalType == LITERAL_TYPE_INTEGER_DECIMAL) {
+                uint256 exponent = 0;
+                uint256 cursor = end - 1;
+                // Anything under 10^77 is safe to multiply by 10 without
+                // overflowing a uint256.
+                while (cursor >= start && exponent < 77) {
+                    uint256 decimalCharByte;
+                    assembly ("memory-safe") {
+                        decimalCharByte := byte(0, mload(cursor))
+                    }
+                    // We don't need to check the bounds of the byte because
+                    // we know it is a decimal literal as long as the bounds
+                    // are correct (calculated in `boundLiteral`).
+                    uint256 digit = decimalCharByte - uint256(uint8(bytes1("0")));
+                    value += digit * (10 ** exponent);
+                    exponent++;
+                    cursor--;
+                }
+
+                // If we didn't consume the entire literal, then we have
+                // to check if the remaining digit is safe to multiply
+                // by 10 without overflowing a uint256.
+                if (cursor >= start) {
+                    {
+                        uint256 decimalCharByte;
+                        assembly ("memory-safe") {
+                            decimalCharByte := byte(0, mload(cursor))
+                        }
+                        uint256 digit = decimalCharByte - uint256(uint8(bytes1("0")));
+                        // If the digit is greater than 1, then we know that
+                        // multiplying it by 10^77 will overflow a uint256.
+                        if (digit > 1) {
+                            (uint256 errorOffset, string memory errorChar) = parseErrorContext(data, cursor);
+                            (errorChar);
+                            revert DecimalLiteralOverflow(errorOffset, errorChar);
+                        } else {
+                            uint256 scaled = digit * (10 ** exponent);
+                            if (value + scaled < value) {
+                                (uint256 errorOffset, string memory errorChar) = parseErrorContext(data, cursor);
+                                (errorChar);
+                                revert DecimalLiteralOverflow(errorOffset, errorChar);
+                            }
+                            value += scaled;
+                        }
+                        cursor--;
+                    }
+
+                    {
+                        // If we didn't consume the entire literal, then only
+                        // leading zeros are allowed.
+                        while (cursor >= start) {
+                            uint256 decimalCharByte;
+                            assembly ("memory-safe") {
+                                decimalCharByte := byte(0, mload(cursor))
+                            }
+                            if (decimalCharByte != uint256(uint8(bytes1("0")))) {
+                                (uint256 errorOffset, string memory errorChar) = parseErrorContext(data, cursor);
+                                (errorChar);
+                                revert DecimalLiteralOverflow(errorOffset, errorChar);
+                            }
+                            cursor--;
+                        }
                     }
                 }
             } else {
