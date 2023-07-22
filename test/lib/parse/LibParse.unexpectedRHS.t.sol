@@ -18,6 +18,8 @@ contract LibParseUnexpectedRHSTest is Test {
                 // Word heads are expected in this position.
                 & (
                     CMASK_RHS_WORD_HEAD
+                    // Literals are expected in this position.
+                    | CMASK_LITERAL_HEAD
                     // Right parens are NOT expected in this position but have a dedicated
                     // error message.
                     | CMASK_RIGHT_PAREN
