@@ -56,7 +56,8 @@ contract LibParseIntegerLiteralDecimalTest is Test {
 
     /// Check that we can parse uint256 max int in decimal form.
     function testParseIntegerLiteralDecimalUint256Max() external {
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse("_: 115792089237316195423570985008687907853269984665640564039457584007913129639935;", meta);
+        (bytes[] memory sources, uint256[] memory constants) =
+            LibParse.parse("_: 115792089237316195423570985008687907853269984665640564039457584007913129639935;", meta);
         assertEq(sources.length, 1);
         assertEq(sources[0], hex"00000000");
         assertEq(constants.length, 1);
@@ -66,7 +67,9 @@ contract LibParseIntegerLiteralDecimalTest is Test {
     /// Check that we can parse uint256 max int in decimal form with leading
     /// zeros.
     function testParseIntegerLiteralDecimalUint256MaxLeadingZeros() external {
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse("_: 000115792089237316195423570985008687907853269984665640564039457584007913129639935;", meta);
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(
+            "_: 000115792089237316195423570985008687907853269984665640564039457584007913129639935;", meta
+        );
         assertEq(sources.length, 1);
         assertEq(sources[0], hex"00000000");
         assertEq(constants.length, 1);
@@ -76,7 +79,8 @@ contract LibParseIntegerLiteralDecimalTest is Test {
     /// Check that decimal literals will revert if they overflow uint256.
     function testParseIntegerLiteralDecimalUint256Overflow() external {
         vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 3, "1"));
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse("_: 115792089237316195423570985008687907853269984665640564039457584007913129639936;", meta);
+        (bytes[] memory sources, uint256[] memory constants) =
+            LibParse.parse("_: 115792089237316195423570985008687907853269984665640564039457584007913129639936;", meta);
         (sources);
         (constants);
     }
@@ -85,7 +89,8 @@ contract LibParseIntegerLiteralDecimalTest is Test {
     /// leading zeros.
     function testParseIntegerLiteralDecimalUint256OverflowLeadingZeros() external {
         vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 5, "1"));
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse("_: 00115792089237316195423570985008687907853269984665640564039457584007913129639936;", meta);
+        (bytes[] memory sources, uint256[] memory constants) =
+            LibParse.parse("_: 00115792089237316195423570985008687907853269984665640564039457584007913129639936;", meta);
         (sources);
         (constants);
     }
@@ -94,7 +99,8 @@ contract LibParseIntegerLiteralDecimalTest is Test {
     // a non-one leading digit.
     function testParseIntegerLiteralDecimalUint256OverflowLeadingDigit() external {
         vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 3, "2"));
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse("_: 215792089237316195423570985008687907853269984665640564039457584007913129639935;", meta);
+        (bytes[] memory sources, uint256[] memory constants) =
+            LibParse.parse("_: 215792089237316195423570985008687907853269984665640564039457584007913129639935;", meta);
         (sources);
         (constants);
     }
@@ -103,8 +109,22 @@ contract LibParseIntegerLiteralDecimalTest is Test {
     /// a non-one leading digit and leading zeros.
     function testParseIntegerLiteralDecimalUint256OverflowLeadingDigitLeadingZeros() external {
         vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 5, "2"));
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse("_: 00215792089237316195423570985008687907853269984665640564039457584007913129639935;", meta);
+        (bytes[] memory sources, uint256[] memory constants) =
+            LibParse.parse("_: 00215792089237316195423570985008687907853269984665640564039457584007913129639935;", meta);
         (sources);
         (constants);
+    }
+
+    /// Check that e notation works.
+    function testParseIntegerLiteralDecimalENotation() external {
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse("_ _ _ _ _: 1e2 10e2 1e30 1e18 1001e15;", meta);
+        assertEq(sources.length, 1);
+        assertEq(sources[0], hex"0000000000000001000000020000000300000004");
+        assertEq(constants.length, 5);
+        assertEq(constants[0], 1e2);
+        assertEq(constants[1], 10e2);
+        assertEq(constants[2], 1e30);
+        assertEq(constants[3], 1e18);
+        assertEq(constants[4], 1001e15);
     }
 }

@@ -46,6 +46,10 @@ error MalformedHexLiteral(uint256 offset, string char);
 /// Encountered a decimal literal that is larger than supported.
 error DecimalLiteralOverflow(uint256 maxLength, string literal);
 
+/// Encountered a decimal literal with an exponent that has too many or no
+/// digits.
+error MalformedExponentDigits(uint256 offset);
+
 /// Parsed a word that is not in the meta.
 error UnknownWord(bytes32 word);
 
@@ -637,13 +641,36 @@ library LibParse {
                     uint256 innerStart = cursor;
                     // We know the head is a numeric so we can move past it.
                     uint256 innerEnd = innerStart + 1;
-                    uint256 decimalCharMask = CMASK_NUMERIC_0_9;
-                    assembly ("memory-safe") {
-                        //slither-disable-next-line incorrect-shift
-                        for {} iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), decimalCharMask))) {
-                            innerEnd := add(innerEnd, 1)
-                        } {}
+                    uint256 ePosition = 0;
+
+                    {
+                        uint256 decimalCharMask = CMASK_NUMERIC_0_9;
+                        uint256 eMask = CMASK_E_NOTATION;
+                        assembly ("memory-safe") {
+                            //slither-disable-next-line incorrect-shift
+                            for {} iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), decimalCharMask))) {
+                                innerEnd := add(innerEnd, 1)
+                            } {}
+
+                            // If we're now pointing at an e notation, then we need
+                            // to move past it. Negative exponents are not supported.
+                            if iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), eMask))) {
+                                ePosition := innerEnd
+                                innerEnd := add(innerEnd, 1)
+
+                                // Move past the exponent digits.
+                                for {} iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), decimalCharMask))) {
+                                    innerEnd := add(innerEnd, 1)
+                                } {}
+                            }
+                        }
                     }
+                    if (ePosition != 0 && (innerEnd > ePosition + 3 || innerEnd == ePosition + 1)) {
+                        (uint256 errorOffset, string memory errorChar) = parseErrorContext(data, ePosition);
+                        (errorChar);
+                        revert MalformedExponentDigits(errorOffset);
+                    }
+
                     return (LITERAL_TYPE_INTEGER_DECIMAL, innerStart, innerEnd, innerEnd);
                 }
             }
@@ -723,8 +750,50 @@ library LibParse {
             //   - add the result to the total
             // - return the total
             else if (literalType == LITERAL_TYPE_INTEGER_DECIMAL) {
-                uint256 exponent = 0;
-                uint256 cursor = end - 1;
+                // Look for an exponent.
+                uint256 exponent;
+                uint256 cursor;
+                {
+                    uint256 word;
+                    assembly ("memory-safe") {
+                        word := mload(sub(end, 3))
+                    }
+                    uint256 decimalCharByte;
+                    uint256 digit;
+                    assembly ("memory-safe") {
+                        decimalCharByte := byte(0, word)
+                    }
+                    // If the last 3 bytes are e notation, then we need to parse
+                    // the exponent.
+                    if (((1 << decimalCharByte) & CMASK_E_NOTATION) != 0) {
+                        cursor = end - 4;
+                        assembly ("memory-safe") {
+                            digit := byte(1, word)
+                        }
+                        exponent = (digit - uint256(uint8(bytes1("0")))) * 10;
+                        assembly ("memory-safe") {
+                            digit := byte(2, word)
+                        }
+                        exponent += digit - uint256(uint8(bytes1("0")));
+                    } else {
+                        assembly ("memory-safe") {
+                            decimalCharByte := byte(1, word)
+                        }
+                        // If the last 2 bytes are e notation, then we need to parse
+                        // the exponent.
+                        if (((1 << decimalCharByte) & CMASK_E_NOTATION) != 0) {
+                            cursor = end - 3;
+                            assembly ("memory-safe") {
+                                digit := byte(2, word)
+                            }
+                            exponent = digit - uint256(uint8(bytes1("0")));
+                        } else {
+                            cursor = end - 1;
+                            exponent = 0;
+                        }
+                    }
+                }
+
                 // Anything under 10^77 is safe to multiply by 10 without
                 // overflowing a uint256.
                 while (cursor >= start && exponent < 77) {
