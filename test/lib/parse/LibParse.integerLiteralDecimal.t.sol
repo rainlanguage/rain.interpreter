@@ -117,7 +117,8 @@ contract LibParseIntegerLiteralDecimalTest is Test {
 
     /// Check that e notation works.
     function testParseIntegerLiteralDecimalENotation() external {
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse("_ _ _ _ _: 1e2 10e2 1e30 1e18 1001e15;", meta);
+        (bytes[] memory sources, uint256[] memory constants) =
+            LibParse.parse("_ _ _ _ _: 1e2 10e2 1e30 1e18 1001e15;", meta);
         assertEq(sources.length, 1);
         assertEq(sources[0], hex"0000000000000001000000020000000300000004");
         assertEq(constants.length, 5);
