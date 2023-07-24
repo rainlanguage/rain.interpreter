@@ -128,4 +128,42 @@ contract LibParseIntegerLiteralDecimalTest is Test {
         assertEq(constants[3], 1e18);
         assertEq(constants[4], 1001e15);
     }
+
+    /// Check that decimals cause yang.
+    function testParseIntegerLiteralDecimalYang() external {
+        // The second e will happily be parsed up to by the internal bounds logic
+        // but the parser will be in a state of yang, unable to receive the next
+        // non-yin char.
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 5, "e"));
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse("_:1e0e;", meta);
+        (sources);
+        (constants);
+    }
+
+    /// Check that decimals cannot be used with parens as they are literals not
+    /// words. This tests left paren.
+    function testParseIntegerLiteralDecimalParensLeft() external {
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 3, "("));
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse("_:1(;", meta);
+        (sources);
+        (constants);
+    }
+
+    /// Check that decimals cannot be used with parens as they are literals not
+    /// words. This tests right paren.
+    function testParseIntegerLiteralDecimalParensRight() external {
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedRightParen.selector, 3));
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse("_:1);", meta);
+        (sources);
+        (constants);
+    }
+
+    /// Check that decimals cannot be used with parens as they are literals not
+    /// words. This tests both parens.
+    function testParseIntegerLiteralDecimalParensBoth() external {
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 3, "("));
+        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse("_:1();", meta);
+        (sources);
+        (constants);
+    }
 }

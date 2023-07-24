@@ -41,12 +41,6 @@ error MaxSources();
 /// The parser encountered a dangling source. This is a bug in the parser.
 error DanglingSource();
 
-/// The parser tried to bound an unsupported literal that we have no type for.
-error UnsupportedLiteralType(uint256 offset);
-
-/// The parser encountered a literal type that it does not know how to parse.
-error UnknownLiteralType(uint256 offset);
-
 /// The parser moved past the end of the data.
 error ParserOutOfBounds();
 

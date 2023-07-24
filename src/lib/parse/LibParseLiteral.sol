@@ -4,6 +4,9 @@ pragma solidity ^0.8.18;
 import "./LibParseCMask.sol";
 import "./LibParse.sol";
 
+/// The parser tried to bound an unsupported literal that we have no type for.
+error UnsupportedLiteralType(uint256 offset);
+
 /// Encountered a literal that is larger than supported.
 error HexLiteralOverflow(uint256 maxLength, string literal);
 
