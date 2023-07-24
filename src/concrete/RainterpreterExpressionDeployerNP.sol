@@ -53,19 +53,19 @@ error NegativeStackIndex(int256 index);
 /// immutable for any given interpreter so once the expression deployer is
 /// constructed and has verified that this matches what the interpreter reports,
 /// it can use this constant value to compile and serialize expressions.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"0b1f0b2e0b410b530b61";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"0b270b360b490b5b0b690b97";
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xf577c509eff07d19c73304e278ec34efb3695a21cc5fdcd06cb4402110d69a57);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x4656ed695c297833a1a573cb6a964c0f4959be284ff28ec7bf53868008bc03af);
 
 /// @dev Hash of the known store bytecode.
 bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);
 
 /// @dev Hash of the known authoring meta.
-bytes32 constant AUTHORING_META_HASH = bytes32(0x9f6a87109941d52fa2c60747ff23989bd15bd43d07defb4ee5338026005b82ec);
+bytes32 constant AUTHORING_META_HASH = bytes32(0xfabffb8bff66e519a08a9294c12c2971c63b4176ee2946287fdf1c6eb192b6bb);
 
 bytes constant PARSE_META =
-    hex"010000000000080040000001000000000010000000000000000000002000000000000000e688702d00019c03838400031ebeccb000029e8857ce0004d8448fdb";
+    hex"010000000000080040000001000000000010000000000010000000002000000000000000e688702d00042dd7225400019c03838400031ebeccb000029e8857ce0005d8448fdb";
 
 /// All config required to construct a `Rainterpreter`.
 /// @param interpreter The `IInterpreterV1` to use for evaluation. MUST match
@@ -80,12 +80,13 @@ struct RainterpreterExpressionDeployerConstructionConfig {
 
 library LibRainterpreterExpressionDeployerNPMeta {
     function authoringMeta() internal pure returns (bytes memory) {
-        bytes32[] memory words = new bytes32[](5);
+        bytes32[] memory words = new bytes32[](6);
         words[0] = "stack";
         words[1] = "constant";
         words[2] = "block-number";
         words[3] = "chain-id";
-        words[4] = "block-timestamp";
+        words[4] = "max-uint-256";
+        words[5] = "block-timestamp";
         return abi.encode(words);
     }
 
