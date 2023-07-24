@@ -219,7 +219,6 @@ library LibParseLiteral {
                     assembly ("memory-safe") {
                         exponent := add(sub(byte(2, word), digitOffset), mul(sub(byte(1, word), digitOffset), 10))
                     }
-
                 } else {
                     assembly ("memory-safe") {
                         decimalCharByte := byte(1, word)
