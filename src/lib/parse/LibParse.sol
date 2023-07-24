@@ -56,10 +56,15 @@ uint256 constant FSM_ACCEPTING_INPUTS_MASK = 1 << 3;
 
 uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
 
+/// @dev The opcode that will be used in the source to represent a stack copy
+/// implied by named LHS stack items.
+/// @dev @todo support the meta defining the opcode.
+uint256 constant OPCODE_STACK = 0;
+
 /// @dev The opcode that will be used in the source to represent a literal after
 /// it has been parsed into a constant.
 /// @dev @todo support the meta defining the opcode.
-uint256 constant OPCODE_LITERAL = 0;
+uint256 constant OPCODE_LITERAL = 1;
 
 /// The parser is stateful. This struct keeps track of the entire state.
 /// @param activeSource The current source being built.
