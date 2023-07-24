@@ -53,4 +53,14 @@ contract LibParseIntegerLiteralHexTest is Test {
         assertEq(constants[0], 0xa2);
         assertEq(constants[1], 0x03);
     }
+
+    /// Check that we can parse uint256 max int in hex form.
+    function testParseIntegerLiteralHexUint256Max() external {
+        (bytes[] memory sources, uint256[] memory constants) =
+            LibParse.parse("_: 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;", meta);
+        assertEq(sources.length, 1);
+        assertEq(sources[0], hex"00000000");
+        assertEq(constants.length, 1);
+        assertEq(constants[0], type(uint256).max);
+    }
 }

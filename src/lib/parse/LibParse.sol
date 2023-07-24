@@ -5,6 +5,7 @@ import "rain.solmem/lib/LibPointer.sol";
 import "./LibCtPop.sol";
 import "./LibParseMeta.sol";
 import "./LibParseCMask.sol";
+import "./LibParseLiteral.sol";
 import "../../interface/IInterpreterV1.sol";
 
 /// The expression does not finish with a semicolon (EOF).
@@ -31,18 +32,6 @@ error ExcessRHSItems(uint256 offset);
 /// Encountered a word that is longer than 32 bytes.
 error WordSize(string word);
 
-/// Encountered a literal that is longer than supported.
-error LiteralSize(uint256 maxLength, string literal);
-
-/// Encountered a zero length hex literal.
-error ZeroLengthHexLiteral(uint256 offset);
-
-/// Encountered an odd sized hex literal.
-error OddLengthHexLiteral(uint256 offset);
-
-/// Encountered a hex literal with an invalid character.
-error MalformedHexLiteral(uint256 offset, string char);
-
 /// Parsed a word that is not in the meta.
 error UnknownWord(bytes32 word);
 
@@ -51,12 +40,6 @@ error MaxSources();
 
 /// The parser encountered a dangling source. This is a bug in the parser.
 error DanglingSource();
-
-/// The parser tried to bound an unsupported literal that we have no type for.
-error UnsupportedLiteralType(uint256 offset);
-
-/// The parser encountered a literal type that it does not know how to parse.
-error UnknownLiteralType(uint256 offset);
 
 /// The parser moved past the end of the data.
 error ParserOutOfBounds();
@@ -72,8 +55,6 @@ uint256 constant FSM_WORD_END_MASK = 1 << 2;
 uint256 constant FSM_ACCEPTING_INPUTS_MASK = 1 << 3;
 
 uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
-
-uint256 constant LITERAL_TYPE_INTEGER_HEX = 1;
 
 /// @dev The opcode that will be used in the source to represent a literal after
 /// it has been parsed into a constant.
@@ -127,12 +108,32 @@ struct ParseState {
     uint256 stackNames;
     uint256 literalBloom;
     uint256 constantsBuilder;
+    uint256 literalParsers;
 }
 
 library LibParseState {
     using LibParseState for ParseState;
 
     function newState() internal pure returns (ParseState memory) {
+        // Register all the literal parsers in the parse state. Each is a 16 bit
+        // function pointer so we can have up to 16 literal types. This needs to
+        // be done at runtime because the library code doesn't know the bytecode
+        // offsets of the literal parsers until it is compiled into a contract.
+        uint256 literalParsers;
+        {
+            function(bytes memory, uint256, uint256) pure returns (uint256) parseLiteralHex =
+                LibParseLiteral.parseLiteralHex;
+            uint256 parseLiteralHexOffset = LITERAL_TYPE_INTEGER_HEX;
+            function(bytes memory, uint256, uint256) pure returns (uint256) parseLiteralDecimal =
+                LibParseLiteral.parseLiteralDecimal;
+            uint256 parseLiteralDecimalOffset = LITERAL_TYPE_INTEGER_DECIMAL;
+
+            assembly ("memory-safe") {
+                literalParsers :=
+                    or(shl(parseLiteralHexOffset, parseLiteralHex), shl(parseLiteralDecimalOffset, parseLiteralDecimal))
+            }
+        }
+
         return ParseState(
             // activeSource
             EMPTY_ACTIVE_SOURCE,
@@ -155,7 +156,9 @@ library LibParseState {
             // literalBloom
             0,
             // constantsBuilder
-            0
+            0,
+            // literalParsers
+            literalParsers
         );
     }
 
@@ -215,7 +218,7 @@ library LibParseState {
     function pushLiteral(ParseState memory state, bytes memory data, uint256 cursor) internal pure returns (uint256) {
         unchecked {
             (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-                LibParse.boundLiteral(data, cursor);
+                LibParseLiteral.boundLiteral(data, cursor);
             uint256 fingerprint;
             uint256 fingerprintBloom;
             assembly ("memory-safe") {
@@ -284,17 +287,32 @@ library LibParseState {
             // later.
             if (!exists) {
                 uint256 ptr;
+                assembly ("memory-safe") {
+                    // Allocate two words.
+                    ptr := mload(0x40)
+                    mstore(0x40, add(ptr, 0x40))
+                }
+                // First word is the key.
                 {
                     // tail key is the fingerprint with the low 16 bits set to
                     // the pointer to the next item in the linked list.
                     uint256 tailKey = state.constantsBuilder >> 0x10 | fingerprint;
-                    uint256 tailValue = LibParse.parseLiteral(data, literalType, innerStart, innerEnd);
                     assembly ("memory-safe") {
-                        ptr := mload(0x40)
-                        // Allocate two words.
-                        mstore(0x40, add(ptr, 0x40))
-                        // First word is the key
                         mstore(ptr, tailKey)
+                    }
+                }
+                // Second word is the value.
+                {
+                    function(bytes memory, uint256, uint256) pure returns (uint256) parser;
+                    uint256 parsers = state.literalParsers;
+                    // `boundLiteral` MUST return a literal type that is
+                    // supported by the parser OR revert.
+                    assembly ("memory-safe") {
+                        parser := and(shr(literalType, parsers), 0xFFFF)
+                    }
+                    uint256 tailValue = parser(data, innerStart, innerEnd);
+
+                    assembly ("memory-safe") {
                         // Second word is the value
                         mstore(add(ptr, 0x20), tailValue)
                     }
@@ -575,126 +593,6 @@ library LibParse {
             mstore8(add(char, 0x20), byte(0, mload(cursor)))
             // Allocate two full words to keep memory aligned.
             mstore(0x40, add(char, 0x40))
-        }
-    }
-
-    /// Find the bounds for some literal at the cursor. The caller is responsible
-    /// for checking that the cursor is at the start of a literal. As each
-    /// literal type has a different format, this function returns the bounds
-    /// for the literal and the type of the literal. The bounds are:
-    /// - innerStart: the start of the literal, e.g. after the 0x in 0x1234
-    /// - innerEnd: the end of the literal, e.g. after the 1234 in 0x1234
-    /// - outerEnd: the end of the literal including any suffixes, MAY be the
-    ///   same as innerEnd if there is no suffix.
-    /// The outerStart is the cursor, so it is not returned.
-    /// @param cursor The start of the literal.
-    /// @return The type of the literal. This is used to determine how to parse
-    /// the literal once the bounds are known.
-    /// @return The inner start.
-    /// @return The inner end.
-    /// @return The outer end.
-    function boundLiteral(bytes memory data, uint256 cursor)
-        internal
-        pure
-        returns (uint256, uint256, uint256, uint256)
-    {
-        unchecked {
-            uint256 word;
-            uint256 head;
-            assembly ("memory-safe") {
-                word := mload(cursor)
-                //slither-disable-next-line incorrect-shift
-                head := shl(byte(0, word), 1)
-            }
-
-            // numeric literal head is 0-9
-            if (head & CMASK_NUMERIC_LITERAL_HEAD != 0) {
-                uint256 dispatch;
-                assembly ("memory-safe") {
-                    //slither-disable-next-line incorrect-shift
-                    dispatch := shl(byte(1, word), 1)
-                }
-
-                // hexadecimal literal dispatch is 0x
-                if ((head | dispatch) == CMASK_LITERAL_HEX_DISPATCH) {
-                    uint256 innerStart = cursor + 2;
-                    uint256 innerEnd = innerStart;
-                    uint256 hexCharMask = CMASK_HEX;
-                    assembly ("memory-safe") {
-                        //slither-disable-next-line incorrect-shift
-                        for { let char := shl(byte(0, mload(innerEnd)), 1) } iszero(iszero(and(char, hexCharMask))) {
-                            innerEnd := add(innerEnd, 1)
-                            //slither-disable-next-line incorrect-shift
-                            char := shl(byte(0, mload(innerEnd)), 1)
-                        } {}
-                    }
-                    return (LITERAL_TYPE_INTEGER_HEX, innerStart, innerEnd, innerEnd);
-                }
-            }
-
-            (uint256 offset, string memory char) = parseErrorContext(data, cursor);
-            (char);
-            revert UnsupportedLiteralType(offset);
-        }
-    }
-
-    function parseLiteral(bytes memory data, uint256 literalType, uint256 start, uint256 end)
-        internal
-        pure
-        returns (uint256 value)
-    {
-        unchecked {
-            if (literalType == LITERAL_TYPE_INTEGER_HEX) {
-                uint256 length = end - start;
-                if (length > 0x40) {
-                    revert LiteralSize(0x40, string(abi.encodePacked(start, end)));
-                } else if (length == 0) {
-                    //slither-disable-next-line similar-names
-                    (uint256 offset, string memory errorChar) = parseErrorContext(data, start);
-                    (errorChar);
-                    revert ZeroLengthHexLiteral(offset);
-                } else if (length % 2 == 1) {
-                    //slither-disable-next-line similar-names
-                    (uint256 offset, string memory errorChar) = parseErrorContext(data, end);
-                    (errorChar);
-                    revert OddLengthHexLiteral(offset);
-                } else {
-                    uint256 cursor = end - 1;
-                    uint256 valueOffset = 0;
-                    while (cursor >= start) {
-                        uint256 hexCharByte;
-                        assembly ("memory-safe") {
-                            hexCharByte := byte(0, mload(cursor))
-                        }
-                        //slither-disable-next-line incorrect-shift
-                        uint256 hexChar = 1 << hexCharByte;
-
-                        uint256 nybble;
-                        // 0-9
-                        if (hexChar & CMASK_NUMERIC_0_9 != 0) {
-                            nybble = hexCharByte - uint256(uint8(bytes1("0")));
-                        }
-                        // a-f
-                        else if (hexChar & CMASK_LOWER_ALPHA_A_F != 0) {
-                            nybble = hexCharByte - uint256(uint8(bytes1("a"))) + 10;
-                        }
-                        // A-F
-                        else if (hexChar & CMASK_UPPER_ALPHA_A_F != 0) {
-                            nybble = hexCharByte - uint256(uint8(bytes1("A"))) + 10;
-                        } else {
-                            (uint256 offset, string memory errorChar) = parseErrorContext(data, cursor);
-                            (errorChar);
-                            revert MalformedHexLiteral(offset, errorChar);
-                        }
-
-                        value |= nybble << valueOffset;
-                        valueOffset += 4;
-                        cursor--;
-                    }
-                }
-            } else {
-                revert UnknownLiteralType(literalType);
-            }
         }
     }
 
