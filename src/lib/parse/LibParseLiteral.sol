@@ -193,6 +193,13 @@ library LibParseLiteral {
     ///   - multiply the digit by 10^digit position
     ///   - add the result to the total
     /// - return the total
+    ///
+    /// This algorithm is ONLY safe if the caller has already checked that the
+    /// start/end span a non-zero length of valid decimal chars. The caller
+    /// can most easily do this by using the `boundLiteral` function.
+    ///
+    /// Unsafe behavior is undefined and can easily result in out of bounds
+    /// reads as there are no checks that start/end are within `data`.
     function parseLiteralDecimal(bytes memory data, uint256 start, uint256 end) internal pure returns (uint256 value) {
         unchecked {
             // Tracks which digit we're on.
