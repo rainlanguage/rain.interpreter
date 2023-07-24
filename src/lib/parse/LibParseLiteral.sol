@@ -195,46 +195,47 @@ library LibParseLiteral {
     /// - return the total
     function parseLiteralDecimal(bytes memory data, uint256 start, uint256 end) internal pure returns (uint256 value) {
         unchecked {
-            // Look for an exponent.
-            uint256 exponent;
+            // Tracks which digit we're on.
             uint256 cursor;
+            // The ASCII byte can be translated to a numeric digit by subtracting
+            // the digit offset.
+            uint256 digitOffset = uint256(uint8(bytes1("0")));
+            // Tracks the exponent of the current digit. Can start above 0 if
+            // the literal is in e notation.
+            uint256 exponent;
             {
                 uint256 word;
+                //slither-disable-next-line similar-names
+                uint256 decimalCharByte;
                 assembly ("memory-safe") {
                     word := mload(sub(end, 3))
-                }
-                uint256 decimalCharByte;
-                uint256 digit;
-                assembly ("memory-safe") {
                     decimalCharByte := byte(0, word)
                 }
                 // If the last 3 bytes are e notation, then we need to parse
-                // the exponent.
+                // the exponent as a 2 digit number.
                 //slither-disable-next-line incorrect-shift
                 if (((1 << decimalCharByte) & CMASK_E_NOTATION) != 0) {
                     cursor = end - 4;
                     assembly ("memory-safe") {
-                        digit := byte(1, word)
+                        exponent := add(sub(byte(2, word), digitOffset), mul(sub(byte(1, word), digitOffset), 10))
                     }
-                    exponent = (digit - uint256(uint8(bytes1("0")))) * 10;
-                    assembly ("memory-safe") {
-                        digit := byte(2, word)
-                    }
-                    exponent += digit - uint256(uint8(bytes1("0")));
+
                 } else {
                     assembly ("memory-safe") {
                         decimalCharByte := byte(1, word)
                     }
                     // If the last 2 bytes are e notation, then we need to parse
-                    // the exponent.
+                    // the exponent as a 1 digit number.
                     //slither-disable-next-line incorrect-shift
                     if (((1 << decimalCharByte) & CMASK_E_NOTATION) != 0) {
                         cursor = end - 3;
                         assembly ("memory-safe") {
-                            digit := byte(2, word)
+                            exponent := sub(byte(2, word), digitOffset)
                         }
-                        exponent = digit - uint256(uint8(bytes1("0")));
-                    } else {
+                    }
+                    // Otherwise, we're not in e notation and we can start at the
+                    // end of the literal with 0 starting exponent.
+                    else {
                         cursor = end - 1;
                         exponent = 0;
                     }
@@ -244,15 +245,12 @@ library LibParseLiteral {
             // Anything under 10^77 is safe to raise to its power of 10 without
             // overflowing a uint256.
             while (cursor >= start && exponent < 77) {
-                uint256 decimalCharByte;
-                assembly ("memory-safe") {
-                    decimalCharByte := byte(0, mload(cursor))
-                }
                 // We don't need to check the bounds of the byte because
                 // we know it is a decimal literal as long as the bounds
                 // are correct (calculated in `boundLiteral`).
-                uint256 digit = decimalCharByte - uint256(uint8(bytes1("0")));
-                value += digit * (10 ** exponent);
+                assembly ("memory-safe") {
+                    value := add(value, mul(sub(byte(0, mload(cursor)), digitOffset), exp(10, exponent)))
+                }
                 exponent++;
                 cursor--;
             }
@@ -262,22 +260,21 @@ library LibParseLiteral {
             // by 10 without overflowing a uint256.
             if (cursor >= start) {
                 {
-                    uint256 decimalCharByte;
+                    uint256 digit;
                     assembly ("memory-safe") {
-                        decimalCharByte := byte(0, mload(cursor))
+                        digit := sub(byte(0, mload(cursor)), digitOffset)
                     }
-                    uint256 digit = decimalCharByte - uint256(uint8(bytes1("0")));
                     // If the digit is greater than 1, then we know that
                     // multiplying it by 10^77 will overflow a uint256.
                     if (digit > 1) {
+                        //slither-disable-next-line similar-names
                         (uint256 errorOffset, string memory errorChar) = LibParse.parseErrorContext(data, cursor);
-                        (errorChar);
                         revert DecimalLiteralOverflow(errorOffset, errorChar);
                     } else {
                         uint256 scaled = digit * (10 ** exponent);
                         if (value + scaled < value) {
+                            //slither-disable-next-line similar-names
                             (uint256 errorOffset, string memory errorChar) = LibParse.parseErrorContext(data, cursor);
-                            (errorChar);
                             revert DecimalLiteralOverflow(errorOffset, errorChar);
                         }
                         value += scaled;
@@ -289,13 +286,14 @@ library LibParseLiteral {
                     // If we didn't consume the entire literal, then only
                     // leading zeros are allowed.
                     while (cursor >= start) {
+                        //slither-disable-next-line similar-names
                         uint256 decimalCharByte;
                         assembly ("memory-safe") {
                             decimalCharByte := byte(0, mload(cursor))
                         }
                         if (decimalCharByte != uint256(uint8(bytes1("0")))) {
+                            //slither-disable-next-line similar-names
                             (uint256 errorOffset, string memory errorChar) = LibParse.parseErrorContext(data, cursor);
-                            (errorChar);
                             revert DecimalLiteralOverflow(errorOffset, errorChar);
                         }
                         cursor--;
