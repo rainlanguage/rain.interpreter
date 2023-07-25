@@ -7,6 +7,7 @@ import "./LibParseMeta.sol";
 import "./LibParseCMask.sol";
 import "./LibParseLiteral.sol";
 import "../../interface/IInterpreterV1.sol";
+import "./LibParseStackName.sol";
 
 /// The expression does not finish with a semicolon (EOF).
 error MissingFinalSemi(uint256 offset);
@@ -22,6 +23,10 @@ error UnexpectedRightParen(uint256 offset);
 
 /// Encountered an unclosed left paren.
 error UnclosedLeftParen(uint256 offset);
+
+/// @dev Thrown when a stack name is duplicated. Shadowing in all forms is
+/// disallowed in Rainlang.
+error DuplicateLHSItem(uint256 errorOffset, string errorCharString);
 
 /// Encountered too many LHS items.
 error ExcessLHSItems(uint256 offset);
@@ -111,6 +116,7 @@ struct ParseState {
     uint256 fsm;
     uint256 stackLHSIndex;
     uint256 stackNames;
+    uint256 stackNameBloom;
     uint256 literalBloom;
     uint256 constantsBuilder;
     uint256 literalParsers;
@@ -158,6 +164,8 @@ library LibParseState {
             0,
             // stackNames
             0,
+            // stackNameBloom
+            0,
             // literalBloom
             0,
             // constantsBuilder
@@ -204,20 +212,6 @@ library LibParseState {
                 revert StackOverflow();
             }
         }
-    }
-
-    function pushStackName(ParseState memory state, bytes32 word) internal pure {
-        uint256 fingerprint;
-        uint256 ptr;
-        uint256 oldStackNames = state.stackNames;
-        assembly ("memory-safe") {
-            ptr := mload(0x40)
-            mstore(ptr, word)
-            fingerprint := and(keccak256(ptr, 0x20), not(0xFFFFFFFF))
-            mstore(ptr, oldStackNames)
-            mstore(0x40, add(ptr, 0x20))
-        }
-        state.stackNames = fingerprint | (state.stackLHSIndex << 0x10) | ptr;
     }
 
     function pushLiteral(ParseState memory state, bytes memory data, uint256 cursor) internal pure returns (uint256) {
@@ -581,6 +575,7 @@ library LibParseState {
 library LibParse {
     using LibPointer for Pointer;
     using LibParseState for ParseState;
+    using LibParseStackName for ParseState;
 
     function stringToChar(string memory s) external pure returns (uint256 char) {
         return 1 << uint256(uint8(bytes1(bytes(s))));
@@ -679,14 +674,24 @@ library LibParse {
                             // Named stack item.
                             if (char & CMASK_IDENTIFIER_HEAD > 0) {
                                 (cursor, word) = parseWord(cursor, CMASK_LHS_STACK_TAIL);
-                                state.pushStackName(word);
+                                (uint256 exists, uint256 index) = state.pushStackName(word);
+
+                                // If the stack name already exists, then we
+                                // revert as shadowing is not allowed.
+                                if (exists != 0) {
+                                    //slither-disable-next-line similar-names
+                                    (uint256 errorOffset, string memory errorCharString) = parseErrorContext(data, cursor);
+                                    revert DuplicateLHSItem(errorOffset, errorCharString);
+                                }
+
+                                state.stackLHSIndex = index;
                             }
                             // Anon stack item.
                             else {
                                 cursor = skipWord(cursor, CMASK_LHS_STACK_TAIL);
+                                // Bump the index without pushing a name.
+                                state.stackLHSIndex++;
                             }
-
-                            state.stackLHSIndex++;
 
                             // Set yang as we are now building a stack item.
                             state.fsm |= FSM_YANG_MASK;
