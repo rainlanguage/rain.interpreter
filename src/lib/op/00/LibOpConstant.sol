@@ -17,7 +17,7 @@ library LibOpConstant {
     using LibIntegrityCheck for IntegrityCheckState;
 
     /// Copies a constant from the constants array to the stack. Reading past
-    /// the end of the constants array is an integrity error.
+    /// the end of the constants array will simply error.
     /// @param integrityCheckState The integrity check state.
     /// @param stackTop The stack top.
     /// @return The new stack top.
@@ -26,24 +26,22 @@ library LibOpConstant {
         pure
         returns (Pointer)
     {
-        unchecked {
-            if (Operand.unwrap(operand) >= integrityCheckState.constantsLength) {
-                revert OutOfBoundsConstantsRead(integrityCheckState.constantsLength, Operand.unwrap(operand));
-            }
-            return integrityCheckState.push(stackTop);
+        if (Operand.unwrap(operand) >= integrityCheckState.constantsLength) {
+            revert OutOfBoundsConstantsRead(integrityCheckState.constantsLength, Operand.unwrap(operand));
         }
+        return integrityCheckState.push(stackTop);
     }
 
-    /// Copies a constant from the constants array to the stack.
+    /// Copies a constant from the constants array to the stack. Does NOT do
+    /// any bounds checking as the integrity check MUST already have been
+    /// performed.
     /// @param stackTop The stack top.
     /// @return The new stack top.
     function run(InterpreterState memory state, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
-        unchecked {
-            assembly ("memory-safe") {
-                mstore(stackTop, mload(add(mload(add(state, 0x20)), mul(0x20, operand))))
-                stackTop := add(stackTop, 0x20)
-            }
-            return stackTop;
+        assembly ("memory-safe") {
+            mstore(stackTop, mload(add(mload(add(state, 0x20)), mul(operand, 0x20))))
+            stackTop := add(stackTop, 0x20)
         }
+        return stackTop;
     }
 }

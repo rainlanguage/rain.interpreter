@@ -28,36 +28,32 @@ library LibOpStack {
         pure
         returns (Pointer)
     {
-        unchecked {
-            Pointer operandPointer = integrityCheckState.stackBottom.unsafeAddWords(Operand.unwrap(operand));
+        Pointer operandPointer = integrityCheckState.stackBottom.unsafeAddWords(Operand.unwrap(operand));
 
-            // Ensure that we aren't reading beyond the current stack top.
-            if (Pointer.unwrap(operandPointer) >= Pointer.unwrap(stackTop)) {
-                revert OutOfBoundsStackRead(
-                    integrityCheckState.stackBottom.toIndexSigned(stackTop), Operand.unwrap(operand)
-                );
-            }
-
-            // Ensure that highwater is moved past any stack item that we
-            // read so that copied values cannot later be consumed.
-            if (Pointer.unwrap(operandPointer) > Pointer.unwrap(integrityCheckState.stackHighwater)) {
-                integrityCheckState.stackHighwater = operandPointer;
-            }
-
-            return integrityCheckState.push(stackTop);
+        // Ensure that we aren't reading beyond the current stack top.
+        if (Pointer.unwrap(operandPointer) >= Pointer.unwrap(stackTop)) {
+            revert OutOfBoundsStackRead(
+                integrityCheckState.stackBottom.toIndexSigned(stackTop), Operand.unwrap(operand)
+            );
         }
+
+        // Ensure that highwater is moved past any stack item that we
+        // read so that copied values cannot later be consumed.
+        if (Pointer.unwrap(operandPointer) > Pointer.unwrap(integrityCheckState.stackHighwater)) {
+            integrityCheckState.stackHighwater = operandPointer;
+        }
+
+        return integrityCheckState.push(stackTop);
     }
 
-    /// Copies a constant from the constants array to the stack.
+    /// Copies a stack item from the stack array to the stack.
     /// @param stackTop The stack top.
     /// @return The new stack top.
     function run(InterpreterState memory state, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
-        unchecked {
-            assembly ("memory-safe") {
-                mstore(stackTop, mload(add(mload(state), mul(0x20, operand))))
-                stackTop := add(stackTop, 0x20)
-            }
-            return stackTop;
+        assembly ("memory-safe") {
+            mstore(stackTop, mload(add(mload(state), mul(0x20, operand))))
+            stackTop := add(stackTop, 0x20)
         }
+        return stackTop;
     }
 }
