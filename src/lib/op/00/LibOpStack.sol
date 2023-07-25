@@ -18,8 +18,8 @@ library LibOpStack {
     using LibIntegrityCheck for IntegrityCheckState;
 
     /// Copies a stack item from the stack to the stack. Reading past the end of
-    /// the stack is an integrity error. Reading below the highwater is also an
-    /// integrity error.
+    /// the stack is an integrity error. Reading a value moves the highwater so
+    /// that the value cannot be consumed. i.e. the stack is immutable once read.
     /// @param integrityCheckState The integrity check state.
     /// @param stackTop The stack top.
     /// @return The new stack top.

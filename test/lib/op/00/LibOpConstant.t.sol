@@ -15,19 +15,15 @@ contract LibOpConstantTest is RainterpreterExpressionDeployerDeploymentTest {
 
     /// Directly test the integrity logic of LibOpConstant. This tests the happy
     /// path where the operand points to a constant in the constants array.
-    function testOpConstantIntegrity(Operand operand, uint8 extraConstants) external {
+    function testOpConstantIntegrity(Operand operand, uint256[] memory constants) external {
+        vm.assume(constants.length > 0);
         function(IntegrityCheckState memory, Operand, Pointer)
             view
             returns (Pointer)[] memory integrityCheckers =
                 new function(IntegrityCheckState memory, Operand, Pointer) view returns (Pointer)[](1);
         integrityCheckers[0] = LibOpConstant.integrity;
 
-        // Test up to 50 operand index.
-        operand = Operand.wrap(bound(Operand.unwrap(operand), 0, 50));
-        // and up to an extra 50 constants.
-        extraConstants = uint8(bound(extraConstants, 1, 50));
-
-        uint256[] memory constants = new uint256[](Operand.unwrap(operand) + extraConstants);
+        operand = Operand.wrap(bound(Operand.unwrap(operand), 0, constants.length - 1));
 
         IntegrityCheckState memory state = LibIntegrityCheck.newState(new bytes[](0), constants, integrityCheckers);
         Pointer stackTop = state.stackBottom;
@@ -38,24 +34,6 @@ contract LibOpConstantTest is RainterpreterExpressionDeployerDeploymentTest {
         assertEq(Pointer.unwrap(state.stackBottom), Pointer.unwrap(stackTop));
         assertEq(Pointer.unwrap(state.stackHighwater), Pointer.unwrap(INITIAL_STACK_HIGHWATER));
         assertEq(Pointer.unwrap(state.stackMaxTop), Pointer.unwrap(stackTopAfter));
-    }
-
-    /// Directly test the integrity logic of LibOpConstant. This tests the case
-    /// where the constants array is empty, which MUST always error as an OOB
-    /// read.
-    function testOpConstantIntegrityZeroConstants(Operand operand) external {
-        function(IntegrityCheckState memory, Operand, Pointer)
-            view
-            returns (Pointer)[] memory integrityCheckers =
-                new function(IntegrityCheckState memory, Operand, Pointer) view returns (Pointer)[](1);
-        integrityCheckers[0] = LibOpConstant.integrity;
-
-        IntegrityCheckState memory state =
-            LibIntegrityCheck.newState(new bytes[](0), new uint256[](0), integrityCheckers);
-        Pointer stackTop = state.stackBottom;
-
-        vm.expectRevert(abi.encodeWithSelector(OutOfBoundsConstantsRead.selector, 0, Operand.unwrap(operand)));
-        LibOpConstant.integrity(state, operand, stackTop);
     }
 
     /// Directly test the integrity logic of LibOpConstant. This tests the case
