@@ -38,7 +38,7 @@ error ExcessRHSItems(uint256 offset);
 error WordSize(string word);
 
 /// Parsed a word that is not in the meta.
-error UnknownWord(bytes32 word);
+error UnknownWord(uint256 offset, bytes32 word);
 
 /// The parser exceeded the maximum number of sources that it can build.
 error MaxSources();
@@ -384,21 +384,6 @@ library LibParseState {
         state.activeSource = activeSource;
     }
 
-    function pushWordToSource(ParseState memory state, bytes memory meta, bytes32 word) internal pure {
-        unchecked {
-            // Convert the word to an offset that can be used to compile function
-            // pointers later.
-            (bool exists, uint256 opcode) = LibParseMeta.lookupIndexFromMeta(meta, word);
-            // The lookup failed so the entire parsing process failed.
-            if (!exists) {
-                revert UnknownWord(word);
-            }
-
-            // @todo support operands.
-            state.pushOpToSource(opcode, Operand.wrap(0));
-        }
-    }
-
     function newSource(ParseState memory state) internal pure {
         uint256 sourcesBuilder = state.sourcesBuilder;
         uint256 offset = sourcesBuilder >> 0xf0;
@@ -674,13 +659,14 @@ library LibParse {
                             // Named stack item.
                             if (char & CMASK_IDENTIFIER_HEAD > 0) {
                                 (cursor, word) = parseWord(cursor, CMASK_LHS_STACK_TAIL);
-                                (uint256 exists, uint256 index) = state.pushStackName(word);
+                                (bool exists, uint256 index) = state.pushStackName(word);
 
                                 // If the stack name already exists, then we
                                 // revert as shadowing is not allowed.
-                                if (exists != 0) {
+                                if (exists) {
                                     //slither-disable-next-line similar-names
-                                    (uint256 errorOffset, string memory errorCharString) = parseErrorContext(data, cursor);
+                                    (uint256 errorOffset, string memory errorCharString) =
+                                        parseErrorContext(data, cursor);
                                     revert DuplicateLHSItem(errorOffset, errorCharString);
                                 }
 
@@ -720,9 +706,33 @@ library LibParse {
                             }
 
                             (cursor, word) = parseWord(cursor, CMASK_RHS_WORD_TAIL);
-                            state.pushWordToSource(meta, word);
 
-                            state.fsm |= FSM_YANG_MASK | FSM_WORD_END_MASK;
+                            // First check if this word is in meta.
+                            (bool exists, uint256 index) = LibParseMeta.lookupIndexFromMeta(meta, word);
+                            if (exists) {
+                                state.pushOpToSource(index, Operand.wrap(0));
+                                // This is a real word so we expect to see parens
+                                // after it.
+                                state.fsm |= FSM_WORD_END_MASK;
+                            }
+                            // Fallback to LHS items.
+                            else {
+                                (exists, index) = LibParseStackName.stackNameIndex(state, word);
+                                if (exists) {
+                                    state.pushOpToSource(OPCODE_STACK, Operand.wrap(index));
+                                    // Need to process highwater here because we
+                                    // don't have any parens to open or close.
+                                    state.highwater();
+                                } else {
+                                    //slither-disable-next-line similar-names
+                                    (uint256 errorOffset, string memory errorCharString) =
+                                        parseErrorContext(data, cursor);
+                                    (errorCharString);
+                                    revert UnknownWord(errorOffset, word);
+                                }
+                            }
+
+                            state.fsm |= FSM_YANG_MASK;
                         }
                         // If this is the end of a word we MUST start a paren.
                         // @todo support operands and constants.

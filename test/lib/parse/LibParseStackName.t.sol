@@ -14,12 +14,14 @@ contract LibParseStackNameTest is Test {
         state.stackLHSIndex = 0;
         state.stackNames = 0;
 
-        LibParseStackName.pushStackName(state, word);
+        (bool exists, uint256 index) = LibParseStackName.pushStackName(state, word);
+        assertFalse(exists);
+        assertEq(index, 1);
 
-        assertEq(state.stackLHSIndex, 1);
+        state.stackLHSIndex = index;
 
-        (uint256 exists, uint256 index) = LibParseStackName.stackNameIndex(state, word);
-        assertEq(exists, 1);
+        (exists, index) = LibParseStackName.stackNameIndex(state, word);
+        assertTrue(exists);
         assertEq(index, 0);
     }
 
@@ -29,22 +31,22 @@ contract LibParseStackNameTest is Test {
         state.stackLHSIndex = 0;
         state.stackNames = 0;
 
-        (uint256 exists, uint256 index) = LibParseStackName.pushStackName(state, word1);
-        assertEq(exists, 0);
+        (bool exists, uint256 index) = LibParseStackName.pushStackName(state, word1);
+        assertFalse(exists);
         assertEq(index, 1);
         state.stackLHSIndex = index;
 
         (exists, index) = LibParseStackName.pushStackName(state, word2);
-        assertEq(exists, 0);
+        assertFalse(exists);
         assertEq(index, 2);
         state.stackLHSIndex = index;
 
         (exists, index) = LibParseStackName.stackNameIndex(state, word1);
-        assertEq(exists, 1);
+        assertTrue(exists);
         assertEq(index, 0);
 
         (exists, index) = LibParseStackName.stackNameIndex(state, word2);
-        assertEq(exists, 1);
+        assertTrue(exists);
         assertEq(index, 1);
     }
 
@@ -53,31 +55,33 @@ contract LibParseStackNameTest is Test {
         state.stackLHSIndex = 0;
         state.stackNames = 0;
 
-        (uint256 exists, uint256 index) = LibParseStackName.pushStackName(state, word);
-        assertEq(exists, 0);
+        (bool exists, uint256 index) = LibParseStackName.pushStackName(state, word);
+        assertFalse(exists);
         assertEq(index, 1);
         state.stackLHSIndex = index;
 
         (exists, index) = LibParseStackName.pushStackName(state, word);
-        assertEq(exists, 1);
+        assertTrue(exists);
         assertEq(index, 0);
     }
 
     /// Test that we can push and retrieve many stack names.
-    function testPushAndRetrieveStackName(ParseState memory state, bytes32[] memory words) external {
-        vm.assume(words.length > 0);
+    function testPushAndRetrieveStackNameMany(ParseState memory state, uint256 n) external {
+        n = bound(n, 1, 100);
         state.stackLHSIndex = 0;
         state.stackNames = 0;
 
-        for (uint256 i = 0; i < words.length; i++) {
-            LibParseStackName.pushStackName(state, words[i]);
+        // Do this sequentially to avoid dupes.
+        for (uint256 i = 0; i < n; i++) {
+            (bool exists, uint256 index) = LibParseStackName.pushStackName(state, bytes32(i));
+            assertFalse(exists);
+            assertEq(index, i + 1);
+            state.stackLHSIndex = index;
         }
 
-        assertEq(state.stackLHSIndex, words.length);
-
-        for (uint256 i = 0; i < words.length; i++) {
-            (uint256 exists, uint256 index) = LibParseStackName.stackNameIndex(state, words[i]);
-            assertEq(exists, 1);
+        for (uint256 i = 0; i < n; i++) {
+            (bool exists, uint256 index) = LibParseStackName.stackNameIndex(state, bytes32(i));
+            assertTrue(exists);
             assertEq(index, i);
         }
     }

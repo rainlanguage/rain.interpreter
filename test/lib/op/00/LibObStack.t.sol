@@ -97,4 +97,28 @@ contract LibOpStackTest is RainterpreterExpressionDeployerDeploymentTest {
         // Check the stack value was copied correctly.
         assertEq(stackTop.unsafeReadWord(), stack[Operand.unwrap(operand)]);
     }
+
+    /// Test the eval of a stack opcode parsed from a string.
+    function testOpStackEval() external {
+        (bytes[] memory sources, uint256[] memory constants) = iDeployer.parse("foo: 1, bar: foo;");
+        assertEq(sources.length, 1);
+        assertEq(sources[0], hex"0001000000000000");
+        assertEq(constants.length, 1);
+        assertEq(constants[0], 1);
+
+        uint256[] memory minOutputs = new uint256[](1);
+        minOutputs[0] = 2;
+        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+            iDeployer.deployExpression(sources, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            storeDeployer,
+            StateNamespace.wrap(0),
+            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 2),
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+        );
+        assertEq(stack.length, 2);
+        assertEq(stack[0], 1);
+        assertEq(stack[1], 1);
+        assertEq(kvs.length, 0);
+    }
 }
