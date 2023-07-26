@@ -37,6 +37,7 @@ library LibParseStackName {
         assembly ("memory-safe") {
             mstore(0, word)
             fingerprint := shr(0x20, keccak256(0, 0x20))
+            //slither-disable-next-line incorrect-shift
             bloom := shl(and(fingerprint, 0xFF), 1)
 
             // If the bloom matches then maybe the stack name is in the stack.
