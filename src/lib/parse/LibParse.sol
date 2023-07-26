@@ -102,15 +102,14 @@ uint256 constant OPCODE_LITERAL = 1;
 /// encountered so far. This is used to quickly dedupe literals.
 /// @param constantsBuilder A builder for the constants array.
 struct ParseState {
-    /// @dev WARNING: Referenced directly in assembly. If the order of these
-    /// fields changes, the assembly must be updated. Specifically, activeSource
-    /// is referenced as a pointer in `pushOpToSource` and `newSource`.
+    /// @dev START things that are referenced directly in assembly by hardcoded
+    /// offsets. E.g. `pushOpToSource` and `newSource`.
     uint256 activeSource;
-    /// @dev These stack tracking items are all accessed as hardcoded offsets in
-    /// assembly.
     uint256 stackRHSOffset;
     uint256 stack0;
     uint256 stack1;
+    /// @dev END things that are referenced directly in assembly by hardcoded
+    /// offsets.
     uint256 sourcesBuilder;
     uint256 parenDepth;
     uint256 fsm;
@@ -330,8 +329,10 @@ library LibParseState {
         {
             uint256 stackRHSOffset = state.stackRHSOffset;
             assembly ("memory-safe") {
-                let counter := and(mload(add(state, add(0x21, stackRHSOffset))), 0xFF)
-                mstore8(add(state, add(0x40, stackRHSOffset)), add(counter, 1))
+                // Hardcoded offset into the state struct.
+                let counterPos := add(add(state, 0x40), stackRHSOffset)
+                // Increment the counter.
+                mstore8(counterPos, add(byte(0, mload(counterPos)), 1))
             }
         }
 
@@ -419,15 +420,15 @@ library LibParseState {
                 source := mload(0x40)
                 let writeCursor := add(source, 0x20)
 
-                let counterCursor := add(state, 0x21)
+                let counterCursor := add(state, 0x40)
                 for {
                     let i := 0
-                    let wordsTotal := and(mload(counterCursor), 0xFF)
+                    let wordsTotal := byte(0, mload(counterCursor))
                     let wordsRemaining := wordsTotal
                 } lt(i, end) {
                     i := add(i, 1)
                     counterCursor := add(counterCursor, 1)
-                    wordsTotal := and(mload(counterCursor), 0xFF)
+                    wordsTotal := byte(0, mload(counterCursor))
                     wordsRemaining := wordsTotal
                 } {
                     length := add(length, mul(wordsTotal, 4))
@@ -561,10 +562,6 @@ library LibParse {
     using LibPointer for Pointer;
     using LibParseState for ParseState;
     using LibParseStackName for ParseState;
-
-    function stringToChar(string memory s) external pure returns (uint256 char) {
-        return 1 << uint256(uint8(bytes1(bytes(s))));
-    }
 
     function parseErrorContext(bytes memory data, uint256 cursor)
         internal
