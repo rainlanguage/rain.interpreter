@@ -18,6 +18,10 @@ error UnexpectedLHSChar(uint256 offset, string char);
 /// Encountered an unexpected character on the RHS.
 error UnexpectedRHSChar(uint256 offset, string char);
 
+/// More specific version of UnexpectedRHSChar where we specifically expected
+/// a left paren but got some other char.
+error ExpectedLeftParen(uint256 offset, string char);
+
 /// Encountered a right paren without a matching left paren.
 error UnexpectedRightParen(uint256 offset);
 
@@ -49,7 +53,13 @@ error DanglingSource();
 /// The parser moved past the end of the data.
 error ParserOutOfBounds();
 
+/// The parser encountered a stack deeper than it can process in the memory
+/// region allocated for stack names.
 error StackOverflow();
+
+/// The parser encountered a paren group deeper than it can process in the
+/// memory region allocated for paren tracking.
+error ParenOverflow();
 
 uint256 constant NOT_LOW_16_BIT_MASK = ~uint256(0xFFFF);
 uint256 constant ACTIVE_SOURCE_MASK = NOT_LOW_16_BIT_MASK;
@@ -82,9 +92,6 @@ uint256 constant OPCODE_LITERAL = 1;
 /// - high bits: 4 byte opcodes and operand pairs.
 /// @param sourcesBuilder A builder for the sources array. This is a 256 bit
 /// integer where each 16 bits is a literal memory pointer to a source.
-/// @param parenDepth The current paren depth. Each left paren increments this
-/// value and each right paren decrements it. The parser fails if this value
-/// ever goes negative.
 /// @param fsm The finite state machine representation of the parser.
 /// - bit 0: LHS/RHS => 0 = LHS, 1 = RHS
 /// - bit 1: yang/yin => 0 = yin, 1 = yang
@@ -92,7 +99,12 @@ uint256 constant OPCODE_LITERAL = 1;
 /// - bit 3: accepting inputs => 0 = not accepting, 1 = accepting
 /// @param stack0 Memory region for stack word counters. The first byte is a
 /// counter/offset into the region. The remaining 31 bytes are the stack words.
-/// @param stack1 Memory region for stack word counters.
+/// @param stack1 32 additional bytes of stack words.
+/// @param parenTracker0 Memory region for tracking pointers to words in the
+/// source, and counters for the number of words in each paren group. The first
+/// byte is a counter/offset into the region. The second byte is a phantom
+/// counter for the root level, the remaining 33 bytes are the paren group words.
+/// @param parenTracker1 32 additional bytes of paren group words.
 /// @param stackNames A linked list of stack names. As the parser encounters
 /// named stack items it pushes them onto this linked list. The linked list is
 /// in FILO order, so the first item on the stack is the last item in the list.
@@ -106,10 +118,11 @@ struct ParseState {
     uint256 activeSource;
     uint256 stack0;
     uint256 stack1;
+    uint256 parenTracker0;
+    uint256 parenTracker1;
     /// @dev END things that are referenced directly in assembly by hardcoded
     /// offsets.
     uint256 sourcesBuilder;
-    uint256 parenDepth;
     uint256 fsm;
     uint256 stackLHSIndex;
     uint256 stackNames;
@@ -149,9 +162,11 @@ library LibParseState {
             0,
             // stack1
             0,
-            // sourcesBuilder
+            // parenTracker0
             0,
-            // parenDepth
+            // parenTracker1
+            0,
+            // sourcesBuilder
             0,
             // fsm initially is the LHS and accepting inputs.
             FSM_ACCEPTING_INPUTS_MASK,
@@ -171,7 +186,11 @@ library LibParseState {
     }
 
     function balance(ParseState memory state, bytes memory data, uint256 cursor) internal pure {
-        if (state.parenDepth > 0) {
+        uint256 parenOffset;
+        assembly ("memory-safe") {
+            parenOffset := byte(0, mload(add(state, 0x60)))
+        }
+        if (parenOffset > 0) {
             (uint256 offset, string memory char) = LibParse.parseErrorContext(data, cursor);
             (char);
             revert UnclosedLeftParen(offset);
@@ -208,7 +227,11 @@ library LibParseState {
     /// move the immutable stack highwater mark forward 1 item, which moves the
     /// RHS offset forward 1 byte to start a new word counter.
     function highwater(ParseState memory state) internal pure {
-        if (state.parenDepth == 0) {
+        uint256 parenOffset;
+        assembly ("memory-safe") {
+            parenOffset := byte(0, mload(add(state, 0x60)))
+        }
+        if (parenOffset == 0) {
             uint256 newStackRHSOffset;
             assembly ("memory-safe") {
                 newStackRHSOffset := add(byte(0, mload(add(state, 0x20))), 1)
@@ -748,23 +771,42 @@ library LibParse {
                             if (char & CMASK_LEFT_PAREN == 0) {
                                 //slither-disable-next-line similar-names
                                 (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
-                                revert UnexpectedRHSChar(offset, charString);
+                                revert ExpectedLeftParen(offset, charString);
                             }
-                            state.parenDepth++;
+                            // Increase the paren depth by 1.
+                            // i.e. move the byte offset by 3
+                            uint256 newParenOffset;
+                            assembly ("memory-safe") {
+                                newParenOffset := add(byte(0, mload(add(state, 0x60))), 3)
+                                mstore8(add(state, 0x60), newParenOffset)
+                            }
+                            // first 2 bytes are reserved, then remaining 62
+                            // bytes are for paren groups, so the offset MUST
+                            // not imply writing to the 63rd byte.
+                            if (newParenOffset > 59) {
+                                revert ParenOverflow();
+                            }
                             cursor++;
 
                             // We've moved past the paren, so we are no longer at
                             // the end of a word and are yin.
                             state.fsm &= ~(FSM_WORD_END_MASK | FSM_YANG_MASK);
                         } else if (char & CMASK_RIGHT_PAREN > 0) {
-                            // @todo input handling.
-                            if (state.parenDepth == 0) {
+                            uint256 parenOffset;
+                            assembly ("memory-safe") {
+                                parenOffset := byte(0, mload(add(state, 0x60)))
+                            }
+                            if (parenOffset == 0) {
                                 //slither-disable-next-line similar-names
                                 (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
                                 (charString);
                                 revert UnexpectedRightParen(offset);
                             }
-                            state.parenDepth--;
+                            // Decrease the paren depth by 1.
+                            // i.e. move the byte offset by -3
+                            assembly ("memory-safe") {
+                                mstore8(add(state, 0x60), sub(parenOffset, 3))
+                            }
                             state.highwater();
                             cursor++;
                         } else if (char & CMASK_WHITESPACE > 0) {
