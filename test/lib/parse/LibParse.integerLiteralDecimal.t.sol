@@ -26,7 +26,7 @@ contract LibParseIntegerLiteralDecimalTest is Test {
     function testParseIntegerLiteralDecimal00() external {
         (bytes[] memory sources, uint256[] memory constants) = LibParse.parse("_: 1;", meta);
         assertEq(sources.length, 1);
-        assertEq(sources[0], hex"00000000");
+        assertEq(sources[0], hex"00010000");
         assertEq(constants.length, 1);
         assertEq(constants[0], 1);
     }
@@ -36,7 +36,7 @@ contract LibParseIntegerLiteralDecimalTest is Test {
     function testParseIntegerLiteralDecimal01() external {
         (bytes[] memory sources, uint256[] memory constants) = LibParse.parse("_ _: 10 25;", meta);
         assertEq(sources.length, 1);
-        assertEq(sources[0], hex"0000000000000001");
+        assertEq(sources[0], hex"0001000000010001");
         assertEq(constants.length, 2);
         assertEq(constants[0], 10);
         assertEq(constants[1], 25);
@@ -48,7 +48,7 @@ contract LibParseIntegerLiteralDecimalTest is Test {
         assertEq(sources.length, 1);
         // Sources represents all 3 literals, but the dupe is deduped so that the
         // operands only reference the first instance of the duped constant.
-        assertEq(sources[0], hex"000000000000000100000000");
+        assertEq(sources[0], hex"000100000001000100010000");
         assertEq(constants.length, 2);
         assertEq(constants[0], 11);
         assertEq(constants[1], 233);
@@ -59,7 +59,7 @@ contract LibParseIntegerLiteralDecimalTest is Test {
         (bytes[] memory sources, uint256[] memory constants) =
             LibParse.parse("_: 115792089237316195423570985008687907853269984665640564039457584007913129639935;", meta);
         assertEq(sources.length, 1);
-        assertEq(sources[0], hex"00000000");
+        assertEq(sources[0], hex"00010000");
         assertEq(constants.length, 1);
         assertEq(constants[0], type(uint256).max);
     }
@@ -71,7 +71,7 @@ contract LibParseIntegerLiteralDecimalTest is Test {
             "_: 000115792089237316195423570985008687907853269984665640564039457584007913129639935;", meta
         );
         assertEq(sources.length, 1);
-        assertEq(sources[0], hex"00000000");
+        assertEq(sources[0], hex"00010000");
         assertEq(constants.length, 1);
         assertEq(constants[0], type(uint256).max);
     }
@@ -120,7 +120,7 @@ contract LibParseIntegerLiteralDecimalTest is Test {
         (bytes[] memory sources, uint256[] memory constants) =
             LibParse.parse("_ _ _ _ _: 1e2 10e2 1e30 1e18 1001e15;", meta);
         assertEq(sources.length, 1);
-        assertEq(sources[0], hex"0000000000000001000000020000000300000004");
+        assertEq(sources[0], hex"0001000000010001000100020001000300010004");
         assertEq(constants.length, 5);
         assertEq(constants[0], 1e2);
         assertEq(constants[1], 10e2);

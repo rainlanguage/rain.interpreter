@@ -5,8 +5,12 @@ import "rain.lib.typecast/LibConvert.sol";
 
 import "../state/LibInterpreterState.sol";
 
+import "./00/LibOpStack.sol";
+import "./00/LibOpConstant.sol";
+
 import "./evm/LibOpBlockNumber.sol";
 import "./evm/LibOpChainId.sol";
+import "./evm/LibOpMaxUint256.sol";
 import "./evm/LibOpTimestamp.sol";
 
 /// Thrown when a dynamic length array is NOT 1 more than a fixed length array.
@@ -14,7 +18,7 @@ import "./evm/LibOpTimestamp.sol";
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 3;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 6;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -37,8 +41,19 @@ library LibAllStandardOpsNP {
             }
             function(IntegrityCheckState memory, Operand, Pointer)
                 view
-                returns (Pointer)[ALL_STANDARD_OPS_LENGTH + 1] memory pointersFixed =
-                    [lengthPointer, LibOpBlockNumber.integrity, LibOpChainId.integrity, LibOpTimestamp.integrity];
+                returns (Pointer)[ALL_STANDARD_OPS_LENGTH + 1] memory pointersFixed = [
+                    lengthPointer,
+                    // Stack then constant are the first two ops to match the
+                    // field ordering in the interpreter state NOT the lexical
+                    // ordering of the file system.
+                    LibOpStack.integrity,
+                    LibOpConstant.integrity,
+                    // Everything else is alphabetical, including folders.
+                    LibOpBlockNumber.integrity,
+                    LibOpChainId.integrity,
+                    LibOpMaxUint256.integrity,
+                    LibOpTimestamp.integrity
+                ];
             assembly ("memory-safe") {
                 pointers := pointersFixed
             }
@@ -64,8 +79,19 @@ library LibAllStandardOpsNP {
             }
             function(InterpreterState memory, Operand, Pointer)
                 view
-                returns (Pointer)[ALL_STANDARD_OPS_LENGTH + 1] memory pointersFixed =
-                    [lengthPointer, LibOpBlockNumber.run, LibOpChainId.run, LibOpTimestamp.run];
+                returns (Pointer)[ALL_STANDARD_OPS_LENGTH + 1] memory pointersFixed = [
+                    lengthPointer,
+                    // Stack then constant are the first two ops to match the
+                    // field ordering in the interpreter state NOT the lexical
+                    // ordering of the file system.
+                    LibOpStack.run,
+                    LibOpConstant.run,
+                    // Everything else is alphabetical, including folders.
+                    LibOpBlockNumber.run,
+                    LibOpChainId.run,
+                    LibOpMaxUint256.run,
+                    LibOpTimestamp.run
+                ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
                 pointersDynamic := pointersFixed

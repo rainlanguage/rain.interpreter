@@ -7,6 +7,7 @@ import "./LibParseMeta.sol";
 import "./LibParseCMask.sol";
 import "./LibParseLiteral.sol";
 import "../../interface/IInterpreterV1.sol";
+import "./LibParseStackName.sol";
 
 /// The expression does not finish with a semicolon (EOF).
 error MissingFinalSemi(uint256 offset);
@@ -23,6 +24,10 @@ error UnexpectedRightParen(uint256 offset);
 /// Encountered an unclosed left paren.
 error UnclosedLeftParen(uint256 offset);
 
+/// @dev Thrown when a stack name is duplicated. Shadowing in all forms is
+/// disallowed in Rainlang.
+error DuplicateLHSItem(uint256 errorOffset, string errorCharString);
+
 /// Encountered too many LHS items.
 error ExcessLHSItems(uint256 offset);
 
@@ -33,7 +38,7 @@ error ExcessRHSItems(uint256 offset);
 error WordSize(string word);
 
 /// Parsed a word that is not in the meta.
-error UnknownWord(bytes32 word);
+error UnknownWord(uint256 offset, bytes32 word);
 
 /// The parser exceeded the maximum number of sources that it can build.
 error MaxSources();
@@ -56,10 +61,15 @@ uint256 constant FSM_ACCEPTING_INPUTS_MASK = 1 << 3;
 
 uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
 
+/// @dev The opcode that will be used in the source to represent a stack copy
+/// implied by named LHS stack items.
+/// @dev @todo support the meta defining the opcode.
+uint256 constant OPCODE_STACK = 0;
+
 /// @dev The opcode that will be used in the source to represent a literal after
 /// it has been parsed into a constant.
 /// @dev @todo support the meta defining the opcode.
-uint256 constant OPCODE_LITERAL = 0;
+uint256 constant OPCODE_LITERAL = 1;
 
 /// The parser is stateful. This struct keeps track of the entire state.
 /// @param activeSource The current source being built.
@@ -106,6 +116,7 @@ struct ParseState {
     uint256 fsm;
     uint256 stackLHSIndex;
     uint256 stackNames;
+    uint256 stackNameBloom;
     uint256 literalBloom;
     uint256 constantsBuilder;
     uint256 literalParsers;
@@ -153,6 +164,8 @@ library LibParseState {
             0,
             // stackNames
             0,
+            // stackNameBloom
+            0,
             // literalBloom
             0,
             // constantsBuilder
@@ -199,20 +212,6 @@ library LibParseState {
                 revert StackOverflow();
             }
         }
-    }
-
-    function pushStackName(ParseState memory state, bytes32 word) internal pure {
-        uint256 fingerprint;
-        uint256 ptr;
-        uint256 oldStackNames = state.stackNames;
-        assembly ("memory-safe") {
-            ptr := mload(0x40)
-            mstore(ptr, word)
-            fingerprint := and(keccak256(ptr, 0x20), not(0xFFFFFFFF))
-            mstore(ptr, oldStackNames)
-            mstore(0x40, add(ptr, 0x20))
-        }
-        state.stackNames = fingerprint | (state.stackLHSIndex << 0x10) | ptr;
     }
 
     function pushLiteral(ParseState memory state, bytes memory data, uint256 cursor) internal pure returns (uint256) {
@@ -383,21 +382,6 @@ library LibParseState {
         }
 
         state.activeSource = activeSource;
-    }
-
-    function pushWordToSource(ParseState memory state, bytes memory meta, bytes32 word) internal pure {
-        unchecked {
-            // Convert the word to an offset that can be used to compile function
-            // pointers later.
-            (bool exists, uint256 opcode) = LibParseMeta.lookupIndexFromMeta(meta, word);
-            // The lookup failed so the entire parsing process failed.
-            if (!exists) {
-                revert UnknownWord(word);
-            }
-
-            // @todo support operands.
-            state.pushOpToSource(opcode, Operand.wrap(0));
-        }
     }
 
     function newSource(ParseState memory state) internal pure {
@@ -576,6 +560,7 @@ library LibParseState {
 library LibParse {
     using LibPointer for Pointer;
     using LibParseState for ParseState;
+    using LibParseStackName for ParseState;
 
     function stringToChar(string memory s) external pure returns (uint256 char) {
         return 1 << uint256(uint8(bytes1(bytes(s))));
@@ -674,14 +659,25 @@ library LibParse {
                             // Named stack item.
                             if (char & CMASK_IDENTIFIER_HEAD > 0) {
                                 (cursor, word) = parseWord(cursor, CMASK_LHS_STACK_TAIL);
-                                state.pushStackName(word);
+                                (bool exists, uint256 index) = state.pushStackName(word);
+
+                                // If the stack name already exists, then we
+                                // revert as shadowing is not allowed.
+                                if (exists) {
+                                    //slither-disable-next-line similar-names
+                                    (uint256 errorOffset, string memory errorCharString) =
+                                        parseErrorContext(data, cursor);
+                                    revert DuplicateLHSItem(errorOffset, errorCharString);
+                                }
+
+                                state.stackLHSIndex = index;
                             }
                             // Anon stack item.
                             else {
                                 cursor = skipWord(cursor, CMASK_LHS_STACK_TAIL);
+                                // Bump the index without pushing a name.
+                                state.stackLHSIndex++;
                             }
-
-                            state.stackLHSIndex++;
 
                             // Set yang as we are now building a stack item.
                             state.fsm |= FSM_YANG_MASK;
@@ -710,9 +706,33 @@ library LibParse {
                             }
 
                             (cursor, word) = parseWord(cursor, CMASK_RHS_WORD_TAIL);
-                            state.pushWordToSource(meta, word);
 
-                            state.fsm |= FSM_YANG_MASK | FSM_WORD_END_MASK;
+                            // First check if this word is in meta.
+                            (bool exists, uint256 index) = LibParseMeta.lookupIndexFromMeta(meta, word);
+                            if (exists) {
+                                state.pushOpToSource(index, Operand.wrap(0));
+                                // This is a real word so we expect to see parens
+                                // after it.
+                                state.fsm |= FSM_WORD_END_MASK;
+                            }
+                            // Fallback to LHS items.
+                            else {
+                                (exists, index) = LibParseStackName.stackNameIndex(state, word);
+                                if (exists) {
+                                    state.pushOpToSource(OPCODE_STACK, Operand.wrap(index));
+                                    // Need to process highwater here because we
+                                    // don't have any parens to open or close.
+                                    state.highwater();
+                                } else {
+                                    //slither-disable-next-line similar-names
+                                    (uint256 errorOffset, string memory errorCharString) =
+                                        parseErrorContext(data, cursor);
+                                    (errorCharString);
+                                    revert UnknownWord(errorOffset, word);
+                                }
+                            }
+
+                            state.fsm |= FSM_YANG_MASK;
                         }
                         // If this is the end of a word we MUST start a paren.
                         // @todo support operands and constants.
