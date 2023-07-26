@@ -90,9 +90,8 @@ uint256 constant OPCODE_LITERAL = 1;
 /// - bit 1: yang/yin => 0 = yin, 1 = yang
 /// - bit 2: word end => 0 = not end, 1 = end
 /// - bit 3: accepting inputs => 0 = not accepting, 1 = accepting
-/// @param stackOffset The current stack offset in bytes. This is where the
-/// current stack word counter is.
-/// @param stack0 Memory region for stack word counters.
+/// @param stack0 Memory region for stack word counters. The first byte is a
+/// counter/offset into the region. The remaining 31 bytes are the stack words.
 /// @param stack1 Memory region for stack word counters.
 /// @param stackNames A linked list of stack names. As the parser encounters
 /// named stack items it pushes them onto this linked list. The linked list is
@@ -105,7 +104,6 @@ struct ParseState {
     /// @dev START things that are referenced directly in assembly by hardcoded
     /// offsets. E.g. `pushOpToSource` and `newSource`.
     uint256 activeSource;
-    uint256 stackRHSOffset;
     uint256 stack0;
     uint256 stack1;
     /// @dev END things that are referenced directly in assembly by hardcoded
@@ -147,8 +145,6 @@ library LibParseState {
         return ParseState(
             // activeSource
             EMPTY_ACTIVE_SOURCE,
-            // stackRHSOffset
-            0,
             // stack0
             0,
             // stack1
@@ -183,16 +179,23 @@ library LibParseState {
 
         // Nested conditionals to make the happy path more efficient at the
         // expense of the unhappy path.
-        if (state.stackLHSIndex != state.stackRHSOffset) {
+        uint256 stackLHSIndex = state.stackLHSIndex;
+        uint256 stackRHSOffset;
+        assembly ("memory-safe") {
+            stackRHSOffset := byte(0, mload(add(state, 0x20)))
+        }
+        if (stackLHSIndex != stackRHSOffset) {
             (uint256 offset, string memory char) = LibParse.parseErrorContext(data, cursor);
             (char);
-            if (state.stackLHSIndex > state.stackRHSOffset) {
+            if (stackLHSIndex > stackRHSOffset) {
                 if (state.fsm & FSM_ACCEPTING_INPUTS_MASK == 0) {
                     revert ExcessLHSItems(offset);
                 } else {
                     // Move the RHS offset to cover inputs to the source. This
                     // gives a zero length of words for each input.
-                    state.stackRHSOffset = state.stackLHSIndex;
+                    assembly ("memory-safe") {
+                        mstore8(add(state, 0x20), stackLHSIndex)
+                    }
                 }
             } else {
                 revert ExcessRHSItems(offset);
@@ -206,8 +209,12 @@ library LibParseState {
     /// RHS offset forward 1 byte to start a new word counter.
     function highwater(ParseState memory state) internal pure {
         if (state.parenDepth == 0) {
-            state.stackRHSOffset++;
-            if (state.stackRHSOffset == 0x40) {
+            uint256 newStackRHSOffset;
+            assembly ("memory-safe") {
+                newStackRHSOffset := add(byte(0, mload(add(state, 0x20))), 1)
+                mstore8(add(state, 0x20), newStackRHSOffset)
+            }
+            if (newStackRHSOffset == 0x3f) {
                 revert StackOverflow();
             }
         }
@@ -327,10 +334,10 @@ library LibParseState {
     function pushOpToSource(ParseState memory state, uint256 opcode, Operand operand) internal pure {
         // Increment the stack counter.
         {
-            uint256 stackRHSOffset = state.stackRHSOffset;
             assembly ("memory-safe") {
                 // Hardcoded offset into the state struct.
-                let counterPos := add(add(state, 0x40), stackRHSOffset)
+                let counterPos := add(state, 0x20)
+                counterPos := add(add(counterPos, byte(0, mload(counterPos))), 1)
                 // Increment the counter.
                 mstore8(counterPos, add(byte(0, mload(counterPos)), 1))
             }
@@ -388,7 +395,12 @@ library LibParseState {
     function newSource(ParseState memory state) internal pure {
         uint256 sourcesBuilder = state.sourcesBuilder;
         uint256 offset = sourcesBuilder >> 0xf0;
-        uint256 end = state.stackRHSOffset;
+
+        // End is the number of top level words in the source.
+        uint256 end;
+        assembly ("memory-safe") {
+            end := add(byte(0, mload(add(state, 0x20))), 1)
+        }
 
         if (offset == 0xf0) {
             revert MaxSources();
@@ -420,7 +432,7 @@ library LibParseState {
                 source := mload(0x40)
                 let writeCursor := add(source, 0x20)
 
-                let counterCursor := add(state, 0x40)
+                let counterCursor := add(state, 0x21)
                 for {
                     let i := 0
                     let wordsTotal := byte(0, mload(counterCursor))
@@ -480,7 +492,6 @@ library LibParseState {
             }
 
             // Reset state for next source.
-            state.stackRHSOffset = 0;
             state.stack0 = 0;
             state.stack1 = 0;
             state.activeSource = 0x20;
