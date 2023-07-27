@@ -830,6 +830,12 @@ library LibParse {
                             }
                             // Increase the paren depth by 1.
                             // i.e. move the byte offset by 3
+                            // There MAY be garbage at this new offset due to
+                            // a previous paren group being deallocated. The
+                            // deallocation process writes the input counter
+                            // to zero but leaves a garbage word in place, with
+                            // the expectation that it will be overwritten by
+                            // the next paren group.
                             uint256 newParenOffset;
                             assembly ("memory-safe") {
                                 newParenOffset := add(byte(0, mload(add(state, 0x60))), 3)
