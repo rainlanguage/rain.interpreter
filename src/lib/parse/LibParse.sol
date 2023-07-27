@@ -18,6 +18,10 @@ error UnexpectedLHSChar(uint256 offset, string char);
 /// Encountered an unexpected character on the RHS.
 error UnexpectedRHSChar(uint256 offset, string char);
 
+/// More specific version of UnexpectedRHSChar where we specifically expected
+/// a left paren but got some other char.
+error ExpectedLeftParen(uint256 offset, string char);
+
 /// Encountered a right paren without a matching left paren.
 error UnexpectedRightParen(uint256 offset);
 
@@ -49,7 +53,13 @@ error DanglingSource();
 /// The parser moved past the end of the data.
 error ParserOutOfBounds();
 
+/// The parser encountered a stack deeper than it can process in the memory
+/// region allocated for stack names.
 error StackOverflow();
+
+/// The parser encountered a paren group deeper than it can process in the
+/// memory region allocated for paren tracking.
+error ParenOverflow();
 
 uint256 constant NOT_LOW_16_BIT_MASK = ~uint256(0xFFFF);
 uint256 constant ACTIVE_SOURCE_MASK = NOT_LOW_16_BIT_MASK;
@@ -72,28 +82,32 @@ uint256 constant OPCODE_STACK = 0;
 uint256 constant OPCODE_LITERAL = 1;
 
 /// The parser is stateful. This struct keeps track of the entire state.
-/// @param activeSource The current source being built.
+/// @param activeSourcePtr The pointer to the current source being built.
+/// The active source being pointed to is:
 /// - low 16 bits: bitwise offset into the source for the next word to be
 ///   written. Starts at 0x20. Once a source is no longer the active source, i.e.
 ///   it is full and a member of the LL tail, the offset is replaced with a
-///   pointer to the next source to build a doubly linked list.
-/// - mid 16 bits: pointer to the previous active source. This is a linked list
-///   of sources that are built RTL and then reversed to LTR to eval.
+///   pointer to the next source (towards the head) to build a doubly linked
+///   list.
+/// - mid 16 bits: pointer to the previous active source (towards teh tail). This
+///   is a linked list of sources that are built RTL and then reversed to LTR to
+///   eval.
 /// - high bits: 4 byte opcodes and operand pairs.
 /// @param sourcesBuilder A builder for the sources array. This is a 256 bit
 /// integer where each 16 bits is a literal memory pointer to a source.
-/// @param parenDepth The current paren depth. Each left paren increments this
-/// value and each right paren decrements it. The parser fails if this value
-/// ever goes negative.
 /// @param fsm The finite state machine representation of the parser.
 /// - bit 0: LHS/RHS => 0 = LHS, 1 = RHS
 /// - bit 1: yang/yin => 0 = yin, 1 = yang
 /// - bit 2: word end => 0 = not end, 1 = end
 /// - bit 3: accepting inputs => 0 = not accepting, 1 = accepting
-/// @param stackOffset The current stack offset in bytes. This is where the
-/// current stack word counter is.
-/// @param stack0 Memory region for stack word counters.
-/// @param stack1 Memory region for stack word counters.
+/// @param stack0 Memory region for stack word counters. The first byte is a
+/// counter/offset into the region. The remaining 31 bytes are the stack words.
+/// @param stack1 32 additional bytes of stack words.
+/// @param parenTracker0 Memory region for tracking pointers to words in the
+/// source, and counters for the number of words in each paren group. The first
+/// byte is a counter/offset into the region. The second byte is a phantom
+/// counter for the root level, the remaining 30 bytes are the paren group words.
+/// @param parenTracker1 32 additional bytes of paren group words.
 /// @param stackNames A linked list of stack names. As the parser encounters
 /// named stack items it pushes them onto this linked list. The linked list is
 /// in FILO order, so the first item on the stack is the last item in the list.
@@ -102,17 +116,16 @@ uint256 constant OPCODE_LITERAL = 1;
 /// encountered so far. This is used to quickly dedupe literals.
 /// @param constantsBuilder A builder for the constants array.
 struct ParseState {
-    /// @dev WARNING: Referenced directly in assembly. If the order of these
-    /// fields changes, the assembly must be updated. Specifically, activeSource
-    /// is referenced as a pointer in `pushOpToSource` and `newSource`.
-    uint256 activeSource;
-    /// @dev These stack tracking items are all accessed as hardcoded offsets in
-    /// assembly.
-    uint256 stackRHSOffset;
+    /// @dev START things that are referenced directly in assembly by hardcoded
+    /// offsets. E.g. `pushOpToSource` and `newSource`.
+    uint256 activeSourcePtr;
     uint256 stack0;
     uint256 stack1;
+    uint256 parenTracker0;
+    uint256 parenTracker1;
+    /// @dev END things that are referenced directly in assembly by hardcoded
+    /// offsets.
     uint256 sourcesBuilder;
-    uint256 parenDepth;
     uint256 fsm;
     uint256 stackLHSIndex;
     uint256 stackNames;
@@ -145,18 +158,26 @@ library LibParseState {
             }
         }
 
+        uint256 emptyActiveSource = EMPTY_ACTIVE_SOURCE;
+        uint256 activeSourcePtr;
+        assembly ("memory-safe") {
+            activeSourcePtr := mload(0x40)
+            mstore(activeSourcePtr, emptyActiveSource)
+            mstore(0x40, add(activeSourcePtr, 0x20))
+        }
+
         return ParseState(
             // activeSource
-            EMPTY_ACTIVE_SOURCE,
-            // stackRHSOffset
-            0,
+            activeSourcePtr,
             // stack0
             0,
             // stack1
             0,
-            // sourcesBuilder
+            // parenTracker0
             0,
-            // parenDepth
+            // parenTracker1
+            0,
+            // sourcesBuilder
             0,
             // fsm initially is the LHS and accepting inputs.
             FSM_ACCEPTING_INPUTS_MASK,
@@ -176,7 +197,11 @@ library LibParseState {
     }
 
     function balance(ParseState memory state, bytes memory data, uint256 cursor) internal pure {
-        if (state.parenDepth > 0) {
+        uint256 parenOffset;
+        assembly ("memory-safe") {
+            parenOffset := byte(0, mload(add(state, 0x60)))
+        }
+        if (parenOffset > 0) {
             (uint256 offset, string memory char) = LibParse.parseErrorContext(data, cursor);
             (char);
             revert UnclosedLeftParen(offset);
@@ -184,16 +209,23 @@ library LibParseState {
 
         // Nested conditionals to make the happy path more efficient at the
         // expense of the unhappy path.
-        if (state.stackLHSIndex != state.stackRHSOffset) {
+        uint256 stackLHSIndex = state.stackLHSIndex;
+        uint256 stackRHSOffset;
+        assembly ("memory-safe") {
+            stackRHSOffset := byte(0, mload(add(state, 0x20)))
+        }
+        if (stackLHSIndex != stackRHSOffset) {
             (uint256 offset, string memory char) = LibParse.parseErrorContext(data, cursor);
             (char);
-            if (state.stackLHSIndex > state.stackRHSOffset) {
+            if (stackLHSIndex > stackRHSOffset) {
                 if (state.fsm & FSM_ACCEPTING_INPUTS_MASK == 0) {
                     revert ExcessLHSItems(offset);
                 } else {
                     // Move the RHS offset to cover inputs to the source. This
                     // gives a zero length of words for each input.
-                    state.stackRHSOffset = state.stackLHSIndex;
+                    assembly ("memory-safe") {
+                        mstore8(add(state, 0x20), stackLHSIndex)
+                    }
                 }
             } else {
                 revert ExcessRHSItems(offset);
@@ -206,9 +238,18 @@ library LibParseState {
     /// move the immutable stack highwater mark forward 1 item, which moves the
     /// RHS offset forward 1 byte to start a new word counter.
     function highwater(ParseState memory state) internal pure {
-        if (state.parenDepth == 0) {
-            state.stackRHSOffset++;
-            if (state.stackRHSOffset == 0x40) {
+        uint256 parenOffset;
+        assembly ("memory-safe") {
+            parenOffset := byte(0, mload(add(state, 0x60)))
+        }
+        if (parenOffset == 0) {
+            uint256 newStackRHSOffset;
+            assembly ("memory-safe") {
+                let stackRHSOffsetPtr := add(state, 0x20)
+                newStackRHSOffset := add(byte(0, mload(stackRHSOffsetPtr)), 1)
+                mstore8(stackRHSOffsetPtr, newStackRHSOffset)
+            }
+            if (newStackRHSOffset == 0x3f) {
                 revert StackOverflow();
             }
         }
@@ -326,68 +367,107 @@ library LibParseState {
     }
 
     function pushOpToSource(ParseState memory state, uint256 opcode, Operand operand) internal pure {
-        // Increment the stack counter.
-        {
-            uint256 stackRHSOffset = state.stackRHSOffset;
+        unchecked {
+            // Increment the stack counter.
             assembly ("memory-safe") {
-                let counter := and(mload(add(state, add(0x21, stackRHSOffset))), 0xFF)
-                mstore8(add(state, add(0x40, stackRHSOffset)), add(counter, 1))
-            }
-        }
-
-        uint256 activeSource = state.activeSource;
-        // The low 16 bits of the active source is the current offset.
-        uint256 offset = uint16(activeSource);
-
-        // We write sources RTL so they can run LTR.
-        activeSource =
-        // increment offset. We have 16 bits allocated to the offset and stop
-        // processing at 0x100 so this never overflows into the actual source
-        // data.
-        activeSource + 0x20
-        // include the operand. The operand is assumed to be 16 bits, so we shift
-        // it into the correct position.
-        | Operand.unwrap(operand) << offset
-        // include new op. The opcode is assumed to be 16 bits, so we shift it
-        // into the correct position, beyond the operand.
-        | opcode << (offset + 0x10);
-
-        // We have filled the current source slot. Need to to shift it off
-        // to a newly allocated region of memory and reset the current active
-        // source. Both slots reference each other as a doubly linked list.
-        if (offset == 0xe0) {
-            // Pointer to what was the active source but is now being
-            // shifted off to the LL tail.
-            uint256 newTailPtr;
-            // Pointer to the old head of the LL tail.
-            uint256 oldTailPtr = (activeSource >> 0x10) & 0xFFFF;
-            assembly ("memory-safe") {
-                newTailPtr := mload(0x40)
-                // Replace the offset of the active source to the pointer
-                // back to new active source.
-                // WARNING: state is being used as a pointer here, so if
-                // the struct changes, this must be updated.
-                activeSource := or(and(activeSource, not(0xFFFF)), state)
-                // Build the new tail head.
-                mstore(newTailPtr, activeSource)
-                mstore(0x40, add(newTailPtr, 0x20))
-                // The old tail head must now point back to the new tail
-                // head.
-                mstore(oldTailPtr, or(and(mload(oldTailPtr), not(0xFFFF)), newTailPtr))
+                // Hardcoded offset into the state struct.
+                let counterPos := add(state, 0x20)
+                counterPos := add(add(counterPos, byte(0, mload(counterPos))), 1)
+                // Increment the counter.
+                mstore8(counterPos, add(byte(0, mload(counterPos)), 1))
             }
 
-            // The new active source has a fresh offset and points forward to
-            // the new tail head.
-            activeSource = EMPTY_ACTIVE_SOURCE | (newTailPtr << 0x10);
-        }
+            uint256 activeSource;
+            uint256 offset;
+            assembly ("memory-safe") {
+                let activeSourcePointer := mload(state)
+                activeSource := mload(activeSourcePointer)
+                // The low 16 bits of the active source is the current offset.
+                offset := and(activeSource, 0xFFFF)
 
-        state.activeSource = activeSource;
+                // The offset is in bits so for a byte pointer we need to divide
+                // by 8, then add 1 to move to the operand low byte.
+                let operandLowBytePointer := sub(add(activeSourcePointer, 0x20), add(div(offset, 8), 1))
+
+                // Increment the paren input counter. The input counter is for the paren
+                // group that is currently being built. This means the counter is for
+                // the paren group that is one level above the current paren offset.
+                // Assumes that every word has exactly 1 output, therefore the input
+                // counter always increases by 1.
+                // Hardcoded offset into the state struct.
+                let inputCounterPos := add(state, 0x60)
+                inputCounterPos :=
+                    add(
+                        add(
+                            inputCounterPos,
+                            // the offset
+                            byte(0, mload(inputCounterPos))
+                        ),
+                        // +2 for the reserved bytes -1 to move back to the counter
+                        // for the previous paren group.
+                        1
+                    )
+                // Increment the parent counter.
+                mstore8(inputCounterPos, add(byte(0, mload(inputCounterPos)), 1))
+                // Zero out the current counter.
+                mstore8(add(inputCounterPos, 3), 0)
+
+                // Write the operand low byte pointer into the paren tracker.
+                // Move 3 bytes after the input counter pos, then shift down 32
+                // bytes to accomodate the full mload.
+                let parenTrackerPointer := sub(inputCounterPos, 29)
+                mstore(parenTrackerPointer, or(and(mload(parenTrackerPointer), not(0xFFFF)), operandLowBytePointer))
+            }
+
+            // We write sources RTL so they can run LTR.
+            activeSource =
+            // increment offset. We have 16 bits allocated to the offset and stop
+            // processing at 0x100 so this never overflows into the actual source
+            // data.
+            activeSource + 0x20
+            // include the operand. The operand is assumed to be 16 bits, so we shift
+            // it into the correct position.
+            | Operand.unwrap(operand) << offset
+            // include new op. The opcode is assumed to be 16 bits, so we shift it
+            // into the correct position, beyond the operand.
+            | opcode << (offset + 0x10);
+            assembly ("memory-safe") {
+                mstore(mload(state), activeSource)
+            }
+
+            // We have filled the current source slot. Need to create a new active
+            // source and fulfill the doubly linked list.
+            if (offset == 0xe0) {
+                // Pointer to a newly allocated active source.
+                uint256 newTailPtr;
+                // Pointer to the old head of the LL tail.
+                uint256 oldTailPtr;
+                uint256 emptyActiveSource = EMPTY_ACTIVE_SOURCE;
+                assembly ("memory-safe") {
+                    oldTailPtr := mload(state)
+
+                    // Build the new tail head.
+                    newTailPtr := mload(0x40)
+                    mstore(state, newTailPtr)
+                    mstore(newTailPtr, or(emptyActiveSource, shl(0x10, oldTailPtr)))
+                    mstore(0x40, add(newTailPtr, 0x20))
+
+                    // The old tail head must now point back to the new tail head.
+                    mstore(oldTailPtr, or(and(mload(oldTailPtr), not(0xFFFF)), newTailPtr))
+                }
+            }
+        }
     }
 
     function newSource(ParseState memory state) internal pure {
         uint256 sourcesBuilder = state.sourcesBuilder;
         uint256 offset = sourcesBuilder >> 0xf0;
-        uint256 end = state.stackRHSOffset;
+
+        // End is the number of top level words in the source.
+        uint256 end;
+        assembly ("memory-safe") {
+            end := add(byte(0, mload(add(state, 0x20))), 1)
+        }
 
         if (offset == 0xf0) {
             revert MaxSources();
@@ -402,7 +482,7 @@ library LibParseState {
             uint256 source;
             assembly ("memory-safe") {
                 // find the end of the LL tail.
-                let cursor := state
+                let cursor := mload(state)
 
                 let tailPointer := and(shr(0x10, mload(cursor)), 0xFFFF)
                 for {} iszero(iszero(tailPointer)) {} {
@@ -422,12 +502,12 @@ library LibParseState {
                 let counterCursor := add(state, 0x21)
                 for {
                     let i := 0
-                    let wordsTotal := and(mload(counterCursor), 0xFF)
+                    let wordsTotal := byte(0, mload(counterCursor))
                     let wordsRemaining := wordsTotal
                 } lt(i, end) {
                     i := add(i, 1)
                     counterCursor := add(counterCursor, 1)
-                    wordsTotal := and(mload(counterCursor), 0xFF)
+                    wordsTotal := byte(0, mload(counterCursor))
                     wordsRemaining := wordsTotal
                 } {
                     length := add(length, mul(wordsTotal, 4))
@@ -479,10 +559,16 @@ library LibParseState {
             }
 
             // Reset state for next source.
-            state.stackRHSOffset = 0;
+            uint256 emptyActiveSource = EMPTY_ACTIVE_SOURCE;
+            assembly ("memory-safe") {
+                let ptr := mload(0x40)
+                mstore(ptr, emptyActiveSource)
+                mstore(0x40, add(ptr, 0x20))
+                mstore(state, ptr)
+            }
             state.stack0 = 0;
             state.stack1 = 0;
-            state.activeSource = 0x20;
+
             //slither-disable-next-line incorrect-shift
             state.sourcesBuilder =
                 ((offset + 0x10) << 0xf0) | (source << offset) | (sourcesBuilder & ((1 << offset) - 1));
@@ -498,7 +584,11 @@ library LibParseState {
             // correctly, or the finalised offset is dangling. This implies that
             // we are building the overall sources array while still trying to
             // build one of the individual sources. This is a bug in the parser.
-            if (state.activeSource != EMPTY_ACTIVE_SOURCE) {
+            uint256 activeSource;
+            assembly ("memory-safe") {
+                activeSource := mload(mload(state))
+            }
+            if (activeSource != EMPTY_ACTIVE_SOURCE) {
                 revert DanglingSource();
             }
 
@@ -561,10 +651,6 @@ library LibParse {
     using LibPointer for Pointer;
     using LibParseState for ParseState;
     using LibParseStackName for ParseState;
-
-    function stringToChar(string memory s) external pure returns (uint256 char) {
-        return 1 << uint256(uint8(bytes1(bytes(s))));
-    }
 
     function parseErrorContext(bytes memory data, uint256 cursor)
         internal
@@ -740,23 +826,62 @@ library LibParse {
                             if (char & CMASK_LEFT_PAREN == 0) {
                                 //slither-disable-next-line similar-names
                                 (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
-                                revert UnexpectedRHSChar(offset, charString);
+                                revert ExpectedLeftParen(offset, charString);
                             }
-                            state.parenDepth++;
+                            // Increase the paren depth by 1.
+                            // i.e. move the byte offset by 3
+                            // There MAY be garbage at this new offset due to
+                            // a previous paren group being deallocated. The
+                            // deallocation process writes the input counter
+                            // to zero but leaves a garbage word in place, with
+                            // the expectation that it will be overwritten by
+                            // the next paren group.
+                            uint256 newParenOffset;
+                            assembly ("memory-safe") {
+                                newParenOffset := add(byte(0, mload(add(state, 0x60))), 3)
+                                mstore8(add(state, 0x60), newParenOffset)
+                            }
+                            // first 2 bytes are reserved, then remaining 62
+                            // bytes are for paren groups, so the offset MUST NOT
+                            // imply writing to the 63rd byte.
+                            if (newParenOffset > 59) {
+                                revert ParenOverflow();
+                            }
                             cursor++;
 
                             // We've moved past the paren, so we are no longer at
                             // the end of a word and are yin.
                             state.fsm &= ~(FSM_WORD_END_MASK | FSM_YANG_MASK);
                         } else if (char & CMASK_RIGHT_PAREN > 0) {
-                            // @todo input handling.
-                            if (state.parenDepth == 0) {
+                            uint256 parenOffset;
+                            assembly ("memory-safe") {
+                                parenOffset := byte(0, mload(add(state, 0x60)))
+                            }
+                            if (parenOffset == 0) {
                                 //slither-disable-next-line similar-names
                                 (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
                                 (charString);
                                 revert UnexpectedRightParen(offset);
                             }
-                            state.parenDepth--;
+                            // Decrease the paren depth by 1.
+                            // i.e. move the byte offset by -3.
+                            // This effectively deallocates the paren group, so
+                            // write the input counter out to the operand pointed
+                            // to by the pointer we deallocated.
+                            assembly ("memory-safe") {
+                                // State field offset.
+                                let stateOffset := add(state, 0x60)
+                                parenOffset := sub(parenOffset, 3)
+                                mstore8(stateOffset, parenOffset)
+                                mstore8(
+                                    // Add 2 for the reserved bytes to the offset
+                                    // then read top 16 bits from the pointer.
+                                    shr(0xf0, mload(add(add(stateOffset, 2), parenOffset))),
+                                    // Store the input counter, which is 2 bytes
+                                    // after the operand write pointer.
+                                    byte(0, mload(add(add(stateOffset, 4), parenOffset)))
+                                )
+                            }
                             state.highwater();
                             cursor++;
                         } else if (char & CMASK_WHITESPACE > 0) {
