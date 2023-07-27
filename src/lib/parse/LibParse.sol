@@ -836,8 +836,8 @@ library LibParse {
                                 mstore8(add(state, 0x60), newParenOffset)
                             }
                             // first 2 bytes are reserved, then remaining 62
-                            // bytes are for paren groups, so the offset MUST
-                            // not imply writing to the 63rd byte.
+                            // bytes are for paren groups, so the offset MUST NOT
+                            // imply writing to the 63rd byte.
                             if (newParenOffset > 59) {
                                 revert ParenOverflow();
                             }
