@@ -245,8 +245,9 @@ library LibParseState {
         if (parenOffset == 0) {
             uint256 newStackRHSOffset;
             assembly ("memory-safe") {
-                newStackRHSOffset := add(byte(0, mload(add(state, 0x20))), 1)
-                mstore8(add(state, 0x20), newStackRHSOffset)
+                let stackRHSOffsetPtr := add(state, 0x20)
+                newStackRHSOffset := add(byte(0, mload(stackRHSOffsetPtr)), 1)
+                mstore8(stackRHSOffsetPtr, newStackRHSOffset)
             }
             if (newStackRHSOffset == 0x3f) {
                 revert StackOverflow();
