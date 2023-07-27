@@ -438,8 +438,7 @@ library LibParseState {
             // We have filled the current source slot. Need to create a new active
             // source and fulfill the doubly linked list.
             if (offset == 0xe0) {
-                // Pointer to what was the active source but is now being
-                // shifted off to the LL tail.
+                // Pointer to a newly allocated active source.
                 uint256 newTailPtr;
                 // Pointer to the old head of the LL tail.
                 uint256 oldTailPtr;
