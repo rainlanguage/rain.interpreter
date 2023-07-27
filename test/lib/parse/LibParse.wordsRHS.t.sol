@@ -61,7 +61,7 @@ contract LibParseNamedRHSTest is Test {
         (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
         assertEq(sources.length, 1);
         // b a c b
-        assertEq(sources[0], hex"00010000000000000002000000010000");
+        assertEq(sources[0], hex"00010000000000010002000000010001");
         assertEq(constants.length, 0);
     }
 
@@ -71,7 +71,7 @@ contract LibParseNamedRHSTest is Test {
         (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
         assertEq(sources.length, 1);
         // b a
-        assertEq(sources[0], hex"0001000000000000");
+        assertEq(sources[0], hex"0001000000000001");
         assertEq(constants.length, 0);
     }
 
@@ -81,7 +81,7 @@ contract LibParseNamedRHSTest is Test {
         (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
         assertEq(sources.length, 1);
         // c b a
-        assertEq(sources[0], hex"000200000001000000000000");
+        assertEq(sources[0], hex"000200000001000000000002");
         assertEq(constants.length, 0);
     }
 
@@ -96,7 +96,7 @@ contract LibParseNamedRHSTest is Test {
         assertEq(constants.length, 0);
         // Nested words compile RTL so that they execute LTR.
         // e d c b a
-        assertEq(sources[0], hex"0004000000030000000200000001000000000000");
+        assertEq(sources[0], hex"0004000000030000000200020001000000000002");
     }
 
     /// Several words, mixing sequential and nested logic to some depth, with
@@ -110,7 +110,7 @@ contract LibParseNamedRHSTest is Test {
         assertEq(constants.length, 0);
         // Nested words compile RTL so that they execute LTR.
         // i h g f e d c b a
-        assertEq(sources[0], hex"000800000007000000060000000500000004000000030000000200000001000000000000");
+        assertEq(sources[0], hex"000800000007000000060002000500000004000000030000000200020001000000000004");
     }
 
     /// Several words, mixing sequential and nested logic to some depth, with
@@ -124,7 +124,7 @@ contract LibParseNamedRHSTest is Test {
         assertEq(constants.length, 0);
         // Nested words compile RTL so that they execute LTR.
         // d c b a d b e
-        assertEq(sources[0], hex"00030000000200000001000000000000000300000001000000040000");
+        assertEq(sources[0], hex"00030000000200010001000000000002000300000001000000040001");
     }
 
     /// More than 14 words deep triggers a whole other internal loop due to there
@@ -141,8 +141,8 @@ contract LibParseNamedRHSTest is Test {
         // p o n m l k j i h g f e d c b a a b c d e f g h i j k l m n o p
         assertEq(
             sources[0],
-            hex"000f0000000e0000000d0000000c0000000b0000000a000000090000000800000007000000060000000500000004000000030000000200000001000000000000"
-            hex"00000000000100000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c0000000d0000000e0000000f0000"
+            hex"000f0000000e0000000d0000000c0000000b0000000a0000000900000008000000070000000600000005000000040000000300000002000d0001000000000002"
+            hex"00000000000100000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c0000000d000d000e0000000f0002"
         );
     }
 

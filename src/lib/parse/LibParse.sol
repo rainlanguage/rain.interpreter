@@ -375,35 +375,47 @@ library LibParseState {
                 // Increment the counter.
                 mstore8(counterPos, add(byte(0, mload(counterPos)), 1))
             }
-            // Increment the paren input counter. The input counter is for the paren
-            // group that is currently being built. This means the counter is for
-            // the paren group that is one level above the current paren offset.
-            // Assumes that every word has exactly 1 output, therefore the input
-            // counter always increases by 1.
+
+            uint256 activeSource;
+            uint256 offset;
             assembly ("memory-safe") {
+                let activeSourcePointer := mload(state)
+                activeSource := mload(activeSourcePointer)
+                // The low 16 bits of the active source is the current offset.
+                offset := and(activeSource, 0xFFFF)
+
+                // The offset is in bits so for a byte pointer we need to divide
+                // by 8, then add 1 to move to the operand low byte.
+                let operandLowBytePointer := sub(add(activeSourcePointer, 0x20), add(div(offset, 8), 1))
+
+                // Increment the paren input counter. The input counter is for the paren
+                // group that is currently being built. This means the counter is for
+                // the paren group that is one level above the current paren offset.
+                // Assumes that every word has exactly 1 output, therefore the input
+                // counter always increases by 1.
                 // Hardcoded offset into the state struct.
-                let counterPos := add(state, 0x60)
-                counterPos :=
+                let inputCounterPos := add(state, 0x60)
+                inputCounterPos :=
                     add(
                         add(
-                            counterPos,
+                            inputCounterPos,
                             // the offset
-                            byte(0, mload(counterPos))
+                            byte(0, mload(inputCounterPos))
                         ),
                         // +2 for the reserved bytes -1 to move back to the counter
                         // for the previous paren group.
                         1
                     )
-                // Increment the counter.
-                mstore8(counterPos, add(byte(0, mload(counterPos)), 1))
-            }
+                // Increment the parent counter.
+                mstore8(inputCounterPos, add(byte(0, mload(inputCounterPos)), 1))
+                // Zero out the current counter.
+                mstore8(add(inputCounterPos, 3), 0)
 
-            uint256 activeSource;
-            uint256 offset;
-            assembly ("memory-safe") {
-                activeSource := mload(mload(state))
-                // The low 16 bits of the active source is the current offset.
-                offset := and(activeSource, 0xFFFF)
+                // Write the operand low byte pointer into the paren tracker.
+                // Move 3 bytes after the input counter pos, then shift down 32
+                // bytes to accomodate the full mload.
+                let parenTrackerPointer := sub(inputCounterPos, 29)
+                mstore(parenTrackerPointer, or(and(mload(parenTrackerPointer), not(0xFFFF)), operandLowBytePointer))
             }
 
             // We write sources RTL so they can run LTR.
@@ -442,20 +454,7 @@ library LibParseState {
 
                     // The old tail head must now point back to the new tail head.
                     mstore(oldTailPtr, or(and(mload(oldTailPtr), not(0xFFFF)), newTailPtr))
-
-                    // // Replace the offset of the active source to the pointer
-                    // // back to new active source.
-                    // // WARNING: state is being used as a pointer here, so if
-                    // // the struct changes, this must be updated.
-                    // activeSource := or(and(activeSource, not(0xFFFF)), state)
-                    // // The old tail head must now point back to the new tail
-                    // // head.
-                    // mstore(oldTailPtr, or(and(mload(oldTailPtr), not(0xFFFF)), newTailPtr))
                 }
-
-                // // The new active source has a fresh offset and points forward to
-                // // the new tail head.
-                // activeSource = EMPTY_ACTIVE_SOURCE | (newTailPtr << 0x10);
             }
         }
     }
@@ -868,14 +867,14 @@ library LibParse {
                                 let stateOffset := add(state, 0x60)
                                 parenOffset := sub(parenOffset, 3)
                                 mstore8(stateOffset, parenOffset)
-                                // mstore8(
-                                //     // Add 2 for the reserved bytes to the offset
-                                //     // then read top 16 bits from the pointer.
-                                //     shr(0xf0, mload(add(add(stateOffset, 2), parenOffset))),
-                                //     // Store the input counter, which is 2 bytes
-                                //     // after the operand write pointer.
-                                //     byte(0, mload(add(add(stateOffset, 4), parenOffset)))
-                                // )
+                                mstore8(
+                                    // Add 2 for the reserved bytes to the offset
+                                    // then read top 16 bits from the pointer.
+                                    shr(0xf0, mload(add(add(stateOffset, 2), parenOffset))),
+                                    // Store the input counter, which is 2 bytes
+                                    // after the operand write pointer.
+                                    byte(0, mload(add(add(stateOffset, 4), parenOffset)))
+                                )
                             }
                             state.highwater();
                             cursor++;
