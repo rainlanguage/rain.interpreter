@@ -76,10 +76,9 @@ uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
 /// @dev @todo support the meta defining the opcode.
 uint256 constant OPCODE_STACK = 0;
 
-/// @dev The opcode that will be used in the source to represent a literal after
-/// it has been parsed into a constant.
+/// @dev The opcode that will be used in the source to read a constant.
 /// @dev @todo support the meta defining the opcode.
-uint256 constant OPCODE_LITERAL = 1;
+uint256 constant OPCODE_CONSTANT = 1;
 
 /// The parser is stateful. This struct keeps track of the entire state.
 /// @param activeSourcePtr The pointer to the current source being built.
@@ -318,7 +317,7 @@ library LibParseState {
             // 0 indexed from the bottom of the linked list to the top.
             {
                 uint256 constantsHeight = state.constantsBuilder & 0xFFFF;
-                state.pushOpToSource(OPCODE_LITERAL, Operand.wrap(exists ? constantsHeight - t : constantsHeight));
+                state.pushOpToSource(OPCODE_CONSTANT, Operand.wrap(exists ? constantsHeight - t : constantsHeight));
             }
 
             // If the literal is not a duplicate, then we need to add it to the
@@ -386,8 +385,8 @@ library LibParseState {
                 offset := and(activeSource, 0xFFFF)
 
                 // The offset is in bits so for a byte pointer we need to divide
-                // by 8, then add 1 to move to the operand low byte.
-                let operandLowBytePointer := sub(add(activeSourcePointer, 0x20), add(div(offset, 8), 1))
+                // by 8, then add 4 to move to the operand low byte.
+                let inputsBytePointer := sub(add(activeSourcePointer, 0x20), add(div(offset, 8), 4))
 
                 // Increment the paren input counter. The input counter is for the paren
                 // group that is currently being built. This means the counter is for
@@ -416,7 +415,7 @@ library LibParseState {
                 // Move 3 bytes after the input counter pos, then shift down 32
                 // bytes to accomodate the full mload.
                 let parenTrackerPointer := sub(inputCounterPos, 29)
-                mstore(parenTrackerPointer, or(and(mload(parenTrackerPointer), not(0xFFFF)), operandLowBytePointer))
+                mstore(parenTrackerPointer, or(and(mload(parenTrackerPointer), not(0xFFFF)), inputsBytePointer))
             }
 
             // We write sources RTL so they can run LTR.
