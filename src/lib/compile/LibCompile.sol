@@ -23,9 +23,9 @@ library LibCompile {
                 let end := add(source, mload(source))
             } lt(cursor, end) { cursor := add(cursor, 4) } {
                 let data := mload(cursor)
-                let pointer := and(0xFFFF, mload(add(pointersBottom, mul(2, and(data, 0xFFFF)))))
+                let pointer := and(0xFFFF, mload(add(pointersBottom, mul(2, byte(31, data)))))
                 mstore(
-                    cursor, or(and(data, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000), pointer)
+                    cursor, or(and(data, not(0xFFFF)), pointer)
                 )
             }
         }
