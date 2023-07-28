@@ -226,16 +226,12 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpre
     }
 
     /// @inheritdoc IParserV1
-    function verifyAuthoringMeta(bytes memory authoringMeta) external pure virtual override returns (bool) {
-        if (keccak256(authoringMeta) != AUTHORING_META_HASH) {
-            return false;
+    function buildParseMeta(bytes memory authoringMeta) external pure virtual override returns (bytes memory) {
+        bytes32 inputAuthoringMetaHash = keccak256(authoringMeta);
+        if (inputAuthoringMetaHash != AUTHORING_META_HASH) {
+            revert AuthoringMetaHashMismatch(AUTHORING_META_HASH, inputAuthoringMetaHash);
         }
-        bytes memory builtParseMeta =
-            LibRainterpreterExpressionDeployerNPMeta.buildParseMetaFromAuthoringMeta(authoringMeta);
-        if (keccak256(builtParseMeta) != keccak256(parseMeta())) {
-            return false;
-        }
-        return true;
+        return LibRainterpreterExpressionDeployerNPMeta.buildParseMetaFromAuthoringMeta(authoringMeta);
     }
 
     /// @inheritdoc IParserV1
