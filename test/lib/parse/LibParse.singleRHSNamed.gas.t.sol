@@ -5,6 +5,8 @@ import "forge-std/Test.sol";
 
 import "src/lib/parse/LibParse.sol";
 
+import "test/util/lib/io/LibIOFnPointers.sol";
+
 /// @title LibParseSingleRHSNamedGasTest
 /// Parse a single RHS name for many different sized RHS names just to include
 /// the gas cost of the name lookup in the gas snapshot.
@@ -50,7 +52,7 @@ contract LibParseSingleRHSNamedGasTest is Test {
         words[30] = bytes32("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         words[31] = bytes32("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
-        meta = LibParseMeta.buildMeta(words, 2);
+        meta = LibParseMeta.buildMeta(words, LibIOFnPointers.indexPointersForWords(words), 2);
     }
 
     /// Test parsing "a" (1 char) as the RHS.

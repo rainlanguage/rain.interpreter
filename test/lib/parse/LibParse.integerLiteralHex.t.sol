@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import "forge-std/Test.sol";
 
 import "src/lib/parse/LibParse.sol";
+import "test/util/lib/io/LibIOFnPointers.sol";
 
 /// @title LibParseIntegerLiteralHexTest
 /// Tests parsing integer literal hex values.
@@ -19,7 +20,7 @@ contract LibParseIntegerLiteralHexTest is Test {
         words[4] = bytes32("c");
         words[5] = bytes32("d");
         words[6] = bytes32("e");
-        meta = LibParseMeta.buildMeta(words, 1);
+        meta = LibParseMeta.buildMeta(words, LibIOFnPointers.indexPointersForWords(words), 1);
     }
 
     /// Check a single hex literal. Should not revert and return length 1

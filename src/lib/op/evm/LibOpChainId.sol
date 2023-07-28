@@ -5,6 +5,7 @@ import "rain.solmem/lib/LibStackPointer.sol";
 import "../LibOp.sol";
 import "../../state/LibInterpreterState.sol";
 import "../../integrity/LibIntegrityCheck.sol";
+import "../../io/LibIOCheck.sol";
 
 /// @title LibOpChainId
 /// Implementation of the EVM `CHAINID` opcode as a standard Rainlang opcode.
@@ -23,6 +24,10 @@ library LibOpChainId {
         returns (Pointer)
     {
         return integrityCheckState.push(stackTop);
+    }
+
+    function io(IOCheckState memory, Operand, uint256) internal pure returns (Operand, uint256, uint256) {
+        return (Operand.wrap(0), 0, 1);
     }
 
     /// Pushes the current chain ID onto the stack.

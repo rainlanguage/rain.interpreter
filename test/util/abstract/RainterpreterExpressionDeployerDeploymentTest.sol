@@ -39,7 +39,7 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
         }
         console2.logBytes32(storeHash);
 
-        bytes memory authoringMeta = LibRainterpreterExpressionDeployerNPMeta.authoringMeta();
+        bytes memory authoringMeta = LibAllStandardOpsNP.authoringMeta();
         console2.log("current authoring meta hash:");
         console2.logBytes32(keccak256(authoringMeta));
 

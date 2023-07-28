@@ -5,6 +5,7 @@ import "forge-std/Test.sol";
 
 import "src/lib/parse/LibParseMeta.sol";
 import "test/util/lib/bloom/LibBloom.sol";
+import "test/util/lib/io/LibIOFnPointers.sol";
 
 contract LibParseMetaBuildMetaTest is Test {
     /// This is super loose from limited empirical testing.
@@ -18,7 +19,8 @@ contract LibParseMetaBuildMetaTest is Test {
 
     function testBuildMeta(bytes32[] memory words) external pure {
         vm.assume(!LibBloom.bloomFindsDupes(words));
-        bytes memory meta = LibParseMeta.buildMeta(words, expanderDepth(words.length));
+        bytes memory meta =
+            LibParseMeta.buildMeta(words, LibIOFnPointers.indexPointersForWords(words), expanderDepth(words.length));
         (meta);
     }
 
@@ -30,7 +32,8 @@ contract LibParseMetaBuildMetaTest is Test {
         }
         j = uint8(bound(j, uint8(0), uint8(words.length) - 1));
 
-        bytes memory meta = LibParseMeta.buildMeta(words, expanderDepth(words.length));
+        bytes memory meta =
+            LibParseMeta.buildMeta(words, LibIOFnPointers.indexPointersForWords(words), expanderDepth(words.length));
         (bool exists, uint256 k) = LibParseMeta.lookupIndexFromMeta(meta, words[j]);
         assertTrue(exists);
         assertEq(j, k);
@@ -48,7 +51,8 @@ contract LibParseMetaBuildMetaTest is Test {
         }
         j = uint8(bound(j, uint8(0), uint8(words.length) - 1));
 
-        bytes memory meta = LibParseMeta.buildMeta(words, expanderDepth(words.length));
+        bytes memory meta =
+            LibParseMeta.buildMeta(words, LibIOFnPointers.indexPointersForWords(words), expanderDepth(words.length));
         (bool exists, uint256 k) = LibParseMeta.lookupIndexFromMeta(meta, words[j]);
         assertTrue(exists);
         assertEq(j, k);

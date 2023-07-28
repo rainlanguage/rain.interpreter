@@ -3,8 +3,11 @@ pragma solidity ^0.8.18;
 
 import "./LibCtPop.sol";
 
-// For metadata builder.
+/// @dev For metadata builder.
 error DuplicateFingerprint();
+
+/// @dev Words and io fn pointers aren't the same length.
+error WordIOFnPointerMismatch(uint256 wordsLength, uint256 ioFnPointersLength);
 
 uint256 constant FINGERPRINT_MASK = 0xFFFFFFFF;
 /// @dev 7 = 1 byte opcode index + 2 byte io fn ptr + 6 byte fingerprint
@@ -72,80 +75,122 @@ library LibParseMeta {
         }
     }
 
-    function buildMeta(bytes32[] memory words, uint8 maxDepth) internal pure returns (bytes memory meta) {
+    function buildMeta(bytes32[] memory words, bytes memory ioFnPointers, uint8 maxDepth)
+        internal
+        pure
+        returns (bytes memory meta)
+    {
         unchecked {
-            uint8[] memory seeds = new uint8[](maxDepth);
-            uint256[] memory expansions = new uint256[](maxDepth);
-            uint256 depth = 0;
-            bytes32[] memory ogWords = words;
-            while (words.length > 0) {
-                uint8 seed;
-                uint256 expansion;
-                (seed, expansion, words) = findBestExpander(words);
-                seeds[depth] = seed;
-                expansions[depth] = expansion;
-                depth++;
-            }
-            // 1 = depth
-            // 0x21 per depth = expansion + seed
-            // 6 per word = 4 byte fingerprint + 2 byte opcode
-            uint256 metaLength = META_PREFIX_SIZE + depth * META_EXPANSION_SIZE + ogWords.length * META_ITEM_SIZE;
-            meta = new bytes(metaLength);
-            assembly ("memory-safe") {
-                mstore8(add(meta, 0x20), depth)
-            }
-            for (uint256 j = 0; j < depth; j++) {
-                assembly ("memory-safe") {
-                    // Write each seed immediately before its expansion.
-                    let seedWriteAt := add(add(meta, 0x21), mul(0x21, j))
-                    mstore8(seedWriteAt, mload(add(seeds, add(0x20, mul(0x20, j)))))
-                    mstore(add(seedWriteAt, 1), mload(add(expansions, add(0x20, mul(0x20, j)))))
-                }
+            // Need a 16 bit io pointer for each word.
+            if (words.length * 2 != ioFnPointers.length) {
+                revert WordIOFnPointerMismatch(words.length, ioFnPointers.length);
             }
 
+            // Write out expansions.
+            uint8[] memory seeds;
+            uint256[] memory expansions;
+            bytes32[] memory ogWords;
             uint256 dataStart;
             {
-                uint256 dataOffset = META_PREFIX_SIZE + META_ITEM_SIZE + depth * META_EXPANSION_SIZE;
+                uint256 depth = 0;
+                seeds = new uint8[](maxDepth);
+                expansions = new uint256[](maxDepth);
+                ogWords = words;
+                while (words.length > 0) {
+                    uint8 seed;
+                    uint256 expansion;
+                    (seed, expansion, words) = findBestExpander(words);
+                    seeds[depth] = seed;
+                    expansions[depth] = expansion;
+                    depth++;
+                }
+                // 1 = depth
+                // 0x21 per depth = expansion + seed
+                // 6 per word = 4 byte fingerprint + 2 byte opcode
+                uint256 metaLength = META_PREFIX_SIZE + depth * META_EXPANSION_SIZE + ogWords.length * META_ITEM_SIZE;
+                meta = new bytes(metaLength);
                 assembly ("memory-safe") {
-                    dataStart := add(meta, dataOffset)
+                    mstore8(add(meta, 0x20), depth)
+                }
+                for (uint256 j = 0; j < depth; j++) {
+                    assembly ("memory-safe") {
+                        // Write each seed immediately before its expansion.
+                        let seedWriteAt := add(add(meta, 0x21), mul(0x21, j))
+                        mstore8(seedWriteAt, mload(add(seeds, add(0x20, mul(0x20, j)))))
+                        mstore(add(seedWriteAt, 1), mload(add(expansions, add(0x20, mul(0x20, j)))))
+                    }
+                }
+
+                {
+                    uint256 dataOffset = META_PREFIX_SIZE + META_ITEM_SIZE + depth * META_EXPANSION_SIZE;
+                    assembly ("memory-safe") {
+                        dataStart := add(meta, dataOffset)
+                    }
                 }
             }
+
+            // Write words.
             for (uint256 k = 0; k < ogWords.length; k++) {
                 uint256 s = 0;
-                bool didCollide = true;
                 uint256 cumulativePos = 0;
-                while (didCollide) {
-                    uint8 seed = seeds[s];
-                    uint256 expansion = expansions[s];
-                    (uint256 shifted, uint256 hashed) = wordBitmapped(seed, ogWords[k]);
-                    uint256 wordFingerprint = hashed & FINGERPRINT_MASK;
-                    // @todo real pointer.
+                while (true) {
                     uint256 toWrite;
-                    {
-                        uint256 ioFnPtr = 0;
-                        toWrite = wordFingerprint | (ioFnPtr << 0x20) | (k << 0x30);
-                    }
-
-                    uint256 pos = LibCtPop.ctpop(expansion & (shifted - 1)) + cumulativePos;
-                    uint256 posFingerprint;
                     uint256 writeAt;
-                    uint256 metaItemSize = META_ITEM_SIZE;
-                    assembly ("memory-safe") {
-                        writeAt := add(dataStart, mul(pos, metaItemSize))
-                        posFingerprint := and(mload(writeAt), 0xFFFFFFFF)
+
+                    // Need some careful scoping here to avoid stack too deep.
+                    {
+                        uint256 expansion = expansions[s];
+
+                        uint256 shifted;
+                        uint256 hashed;
+                        {
+                            uint8 seed = seeds[s];
+                            (shifted, hashed) = wordBitmapped(seed, ogWords[k]);
+
+                            uint256 metaItemSize = META_ITEM_SIZE;
+                            uint256 pos = LibCtPop.ctpop(expansion & (shifted - 1)) + cumulativePos;
+                            assembly ("memory-safe") {
+                                writeAt := add(dataStart, mul(pos, metaItemSize))
+                            }
+                        }
+
+                        {
+                            uint256 wordFingerprint = hashed & FINGERPRINT_MASK;
+                            uint256 posFingerprint;
+                            assembly ("memory-safe") {
+                                posFingerprint := and(mload(writeAt), 0xFFFFFFFF)
+                            }
+                            if (posFingerprint != 0) {
+                                if (posFingerprint == wordFingerprint) {
+                                    revert DuplicateFingerprint();
+                                }
+                                // Collision, try next expansion.
+                                s++;
+                                cumulativePos = cumulativePos + LibCtPop.ctpop(expansion);
+                                continue;
+                            }
+                            // Not collision, start preparing the write with the
+                            // fingerprint.
+                            toWrite = wordFingerprint;
+                        }
                     }
 
-                    if (posFingerprint == 0) {
-                        uint256 mask = ~META_ITEM_MASK;
+                    // Write the io fn pointer and index offset.
+                    {
+                        uint256 ioFnPtr;
                         assembly ("memory-safe") {
-                            mstore(writeAt, or(and(mload(writeAt), mask), toWrite))
+                            // Get the 16 bit io fn pointer for this word.
+                            ioFnPtr := and(mload(add(ioFnPointers, mul(2, add(k, 1)))), 0xFFFF)
                         }
-                        didCollide = false;
-                    } else if (posFingerprint == wordFingerprint) {
-                        revert DuplicateFingerprint();
+                        toWrite |= (ioFnPtr << 0x20) | (k << 0x30);
                     }
-                    s++;
-                    cumulativePos = cumulativePos + LibCtPop.ctpop(expansion);
+
+                    uint256 mask = ~META_ITEM_MASK;
+                    assembly ("memory-safe") {
+                        mstore(writeAt, or(and(mload(writeAt), mask), toWrite))
+                    }
+                    // We're done with this word.
+                    break;
                 }
             }
         }

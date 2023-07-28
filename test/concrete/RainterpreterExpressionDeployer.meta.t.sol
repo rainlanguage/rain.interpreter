@@ -15,24 +15,15 @@ import "src/concrete/RainterpreterExpressionDeployerNP.sol";
 contract RainterpreterExpressionDeployerMetaTest is RainterpreterExpressionDeployerDeploymentTest {
     /// Test that the authoring meta hash is correct.
     function testRainterpreterExpressionDeployerAuthoringMetaHash() external {
-        bytes memory authoringMeta = LibRainterpreterExpressionDeployerNPMeta.authoringMeta();
+        bytes memory authoringMeta = LibAllStandardOpsNP.authoringMeta();
         bytes32 expectedHash = keccak256(authoringMeta);
         bytes32 actualHash = iDeployer.authoringMetaHash();
         assertEq(actualHash, expectedHash);
     }
 
-    /// Test that the parse meta is correct.
-    function testRainterpreterExpressionDeployerParseMeta() external {
-        bytes memory parseMeta = iDeployer.parseMeta();
-        bytes memory expectedParseMeta = LibRainterpreterExpressionDeployerNPMeta.buildParseMetaFromAuthoringMeta(
-            LibRainterpreterExpressionDeployerNPMeta.authoringMeta()
-        );
-        assertEq(parseMeta, expectedParseMeta);
-    }
-
     /// Test that the deployer agrees with itself for a build and view.
     function testRainterpreterExpressionDeployerBuildAndParse() external {
-        bytes memory authoringMeta = LibRainterpreterExpressionDeployerNPMeta.authoringMeta();
+        bytes memory authoringMeta = LibAllStandardOpsNP.authoringMeta();
         bytes memory builtParseMeta = iDeployer.buildParseMeta(authoringMeta);
         bytes memory parseMeta = iDeployer.parseMeta();
         assertEq(keccak256(builtParseMeta), keccak256(parseMeta));

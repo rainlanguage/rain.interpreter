@@ -3,6 +3,7 @@ pragma solidity ^0.8.19;
 
 import "rain.lib.typecast/LibConvert.sol";
 
+import "../io/LibIOCheck.sol";
 import "../state/LibInterpreterState.sol";
 
 import "./00/LibOpStack.sol";
@@ -62,6 +63,54 @@ library LibAllStandardOpsNP {
             if (pointers.length != ALL_STANDARD_OPS_LENGTH) {
                 revert BadDynamicLength(pointers.length, length);
             }
+        }
+    }
+
+    function authoringMeta() internal pure returns (bytes memory) {
+        bytes32[] memory words = new bytes32[](6);
+        words[0] = "stack";
+        words[1] = "constant";
+        words[2] = "block-number";
+        words[3] = "chain-id";
+        words[4] = "max-uint-256";
+        words[5] = "block-timestamp";
+        return abi.encode(words);
+    }
+
+    function ioFunctionPointers() internal pure returns (bytes memory) {
+        unchecked {
+            function(IOCheckState memory, Operand, uint256)
+                view
+                returns (Operand, uint256, uint256) lengthPointer;
+            uint256 length = ALL_STANDARD_OPS_LENGTH;
+            assembly ("memory-safe") {
+                lengthPointer := length
+            }
+            function(IOCheckState memory, Operand, uint256)
+                view
+                returns (Operand, uint256, uint256)[ALL_STANDARD_OPS_LENGTH + 1] memory pointersFixed = [
+                    lengthPointer,
+                    // Stack then constant are the first two ops to match the
+                    // field ordering in the interpreter state NOT the lexical
+                    // ordering of the file system.
+                    LibOpStack.io,
+                    LibOpConstant.io,
+                    // Everything else is alphabetical, including folders.
+                    LibOpBlockNumber.io,
+                    LibOpChainId.io,
+                    LibOpMaxUint256.io,
+                    LibOpTimestamp.io
+                ];
+            uint256[] memory pointersDynamic;
+            assembly ("memory-safe") {
+                pointersDynamic := pointersFixed
+            }
+            // Sanity check that the dynamic length is correct. Should be an
+            // unreachable error.
+            if (pointersDynamic.length != ALL_STANDARD_OPS_LENGTH) {
+                revert BadDynamicLength(pointersDynamic.length, length);
+            }
+            return LibConvert.unsafeTo16BitBytes(pointersDynamic);
         }
     }
 

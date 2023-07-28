@@ -4,6 +4,7 @@ pragma solidity ^0.8.18;
 import "rain.solmem/lib/LibStackPointer.sol";
 import "../../state/LibInterpreterState.sol";
 import "../../integrity/LibIntegrityCheck.sol";
+import "../../io/LibIOCheck.sol";
 
 /// @title LibOpBlockNumber
 /// Implementation of the EVM `BLOCKNUMBER` opcode as a standard Rainlang opcode.
@@ -22,6 +23,10 @@ library LibOpBlockNumber {
         returns (Pointer)
     {
         return integrityCheckState.push(stackTop);
+    }
+
+    function io(IOCheckState memory, Operand, uint256) internal pure returns (Operand, uint256, uint256) {
+        return (Operand.wrap(0), 0, 1);
     }
 
     /// Pushes the current block number onto the stack.

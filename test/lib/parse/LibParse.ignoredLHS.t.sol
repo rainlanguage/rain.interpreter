@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import "forge-std/Test.sol";
 
 import "src/lib/parse/LibParse.sol";
+import "test/util/lib/io/LibIOFnPointers.sol";
 
 /// @title LibParseIgnoredLHSTest
 /// Tests parsing ignored LHS items. An ignored LHS item is one that starts with
@@ -16,7 +17,7 @@ contract LibParseIgnoredLHSTest is Test {
     constructor() {
         bytes32[] memory words = new bytes32[](1);
         words[0] = bytes32("a");
-        meta = LibParseMeta.buildMeta(words, 1);
+        meta = LibParseMeta.buildMeta(words, LibIOFnPointers.indexPointersForWords(words), 1);
     }
 
     /// A lone underscore should parse to an empty source and constant.
