@@ -7,6 +7,13 @@ import "./LibCtPop.sol";
 error DuplicateFingerprint();
 
 uint256 constant FINGERPRINT_MASK = 0xFFFFFFFF;
+/// @dev 7 = 1 byte opcode index + 2 byte io fn ptr + 6 byte fingerprint
+uint256 constant META_ITEM_SIZE = 7;
+uint256 constant META_ITEM_MASK = (1 << META_ITEM_SIZE) - 1;
+/// @dev 33 = 32 bytes for expansion + 1 byte for seed
+uint256 constant META_EXPANSION_SIZE = 0x21;
+/// @dev 1 = 1 byte for depth
+uint256 constant META_PREFIX_SIZE = 1;
 
 library LibParseMeta {
     /// @return shifted
@@ -69,25 +76,25 @@ library LibParseMeta {
         unchecked {
             uint8[] memory seeds = new uint8[](maxDepth);
             uint256[] memory expansions = new uint256[](maxDepth);
-            uint256 i = 0;
+            uint256 depth = 0;
             bytes32[] memory ogWords = words;
             while (words.length > 0) {
                 uint8 seed;
                 uint256 expansion;
                 (seed, expansion, words) = findBestExpander(words);
-                seeds[i] = seed;
-                expansions[i] = expansion;
-                i++;
+                seeds[depth] = seed;
+                expansions[depth] = expansion;
+                depth++;
             }
             // 1 = depth
             // 0x21 per depth = expansion + seed
             // 6 per word = 4 byte fingerprint + 2 byte opcode
-            uint256 metaLength = 1 + i * 0x21 + ogWords.length * 6;
+            uint256 metaLength = META_PREFIX_SIZE + depth * META_EXPANSION_SIZE + ogWords.length * META_ITEM_SIZE;
             meta = new bytes(metaLength);
             assembly ("memory-safe") {
-                mstore8(add(meta, 0x20), i)
+                mstore8(add(meta, 0x20), depth)
             }
-            for (uint256 j = 0; j < i; j++) {
+            for (uint256 j = 0; j < depth; j++) {
                 assembly ("memory-safe") {
                     // Write each seed immediately before its expansion.
                     let seedWriteAt := add(add(meta, 0x21), mul(0x21, j))
@@ -97,8 +104,11 @@ library LibParseMeta {
             }
 
             uint256 dataStart;
-            assembly ("memory-safe") {
-                dataStart := add(add(meta, 7), mul(0x21, i))
+            {
+                uint256 dataOffset = META_PREFIX_SIZE + META_ITEM_SIZE + depth * META_EXPANSION_SIZE;
+                assembly ("memory-safe") {
+                    dataStart := add(meta, dataOffset)
+                }
             }
             for (uint256 k = 0; k < ogWords.length; k++) {
                 uint256 s = 0;
@@ -109,20 +119,26 @@ library LibParseMeta {
                     uint256 expansion = expansions[s];
                     (uint256 shifted, uint256 hashed) = wordBitmapped(seed, ogWords[k]);
                     uint256 wordFingerprint = hashed & FINGERPRINT_MASK;
-                    uint256 toWrite = wordFingerprint | (k << 32);
+                    // @todo real pointer.
+                    uint256 toWrite;
+                    {
+                        uint256 ioFnPtr = 0;
+                        toWrite = wordFingerprint | (ioFnPtr << 0x20) | (k << 0x30);
+                    }
 
                     uint256 pos = LibCtPop.ctpop(expansion & (shifted - 1)) + cumulativePos;
-
                     uint256 posFingerprint;
                     uint256 writeAt;
+                    uint256 metaItemSize = META_ITEM_SIZE;
                     assembly ("memory-safe") {
-                        writeAt := add(dataStart, mul(pos, 6))
+                        writeAt := add(dataStart, mul(pos, metaItemSize))
                         posFingerprint := and(mload(writeAt), 0xFFFFFFFF)
                     }
 
                     if (posFingerprint == 0) {
+                        uint256 mask = ~META_ITEM_MASK;
                         assembly ("memory-safe") {
-                            mstore(writeAt, or(and(mload(writeAt), not(0xFFFFFFFFFFFF)), toWrite))
+                            mstore(writeAt, or(and(mload(writeAt), mask), toWrite))
                         }
                         didCollide = false;
                     } else if (posFingerprint == wordFingerprint) {
@@ -140,13 +156,15 @@ library LibParseMeta {
             uint256 dataStart;
             uint256 cursor;
             uint256 end;
+            uint256 metaExpansionSize = META_EXPANSION_SIZE;
+            uint256 metaItemSize = META_ITEM_SIZE;
             assembly ("memory-safe") {
                 // Read depth from first meta byte.
                 cursor := add(meta, 1)
                 let depth := and(mload(cursor), 0xFF)
                 // 33 bytes per depth
-                end := add(cursor, mul(depth, 0x21))
-                dataStart := add(end, 6)
+                end := add(cursor, mul(depth, metaExpansionSize))
+                dataStart := add(end, metaItemSize)
             }
             uint256 cumulativeCt = 0;
             while (cursor < end) {
@@ -164,11 +182,11 @@ library LibParseMeta {
                 uint256 wordFingerprint = hashed & FINGERPRINT_MASK;
                 uint256 posData;
                 assembly ("memory-safe") {
-                    posData := mload(add(dataStart, mul(pos, 6)))
+                    posData := mload(add(dataStart, mul(pos, metaItemSize)))
                 }
                 // Match
                 if (wordFingerprint == posData & FINGERPRINT_MASK) {
-                    return (true, (posData >> 0x20) & 0xFFFF);
+                    return (true, (posData >> 0x30) & 0xFF);
                 } else {
                     cumulativeCt += LibCtPop.ctpop(expansion);
                 }
