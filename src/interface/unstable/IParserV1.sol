@@ -17,8 +17,8 @@ interface IParserV1 {
     /// NOT be modified after deployment. There MUST be a one-to-one mapping
     /// between authoring meta and parse meta that can be verified externally in
     /// a deterministic way.
-    /// @return authoringMetaHash The authoring meta hash.
-    function authoringMetaHash() external pure returns (bytes32 authoringMetaHash);
+    /// @return metaHash The authoring meta hash.
+    function authoringMetaHash() external pure returns (bytes32 metaHash);
 
     /// Builds the parse meta from authoring meta. MUST be deterministic and
     /// MUST NOT have side effects. The only input is the authoring meta.
