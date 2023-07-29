@@ -19,8 +19,7 @@ contract LibParseMetaBuildMetaTest is Test {
 
     function testBuildMeta(bytes32[] memory words) external pure {
         vm.assume(!LibBloom.bloomFindsDupes(words));
-        bytes memory meta =
-            LibParseMeta.buildMeta(words, expanderDepth(words.length));
+        bytes memory meta = LibParseMeta.buildMeta(words, expanderDepth(words.length));
         (meta);
     }
 
@@ -32,8 +31,7 @@ contract LibParseMetaBuildMetaTest is Test {
         }
         j = uint8(bound(j, uint8(0), uint8(words.length) - 1));
 
-        bytes memory meta =
-            LibParseMeta.buildMeta(words, expanderDepth(words.length));
+        bytes memory meta = LibParseMeta.buildMeta(words, expanderDepth(words.length));
         (bool exists, uint256 k) = LibParseMeta.lookupWordIndex(meta, words[j]);
         assertTrue(exists);
         assertEq(j, k);
@@ -51,8 +49,7 @@ contract LibParseMetaBuildMetaTest is Test {
         }
         j = uint8(bound(j, uint8(0), uint8(words.length) - 1));
 
-        bytes memory meta =
-            LibParseMeta.buildMeta(words, expanderDepth(words.length));
+        bytes memory meta = LibParseMeta.buildMeta(words, expanderDepth(words.length));
         (bool exists, uint256 k) = LibParseMeta.lookupWordIndex(meta, words[j]);
         assertTrue(exists);
         assertEq(j, k);

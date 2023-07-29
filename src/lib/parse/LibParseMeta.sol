@@ -87,11 +87,7 @@ library LibParseMeta {
         }
     }
 
-    function buildMeta(bytes32[] memory words, uint8 maxDepth)
-        internal
-        pure
-        returns (bytes memory meta)
-    {
+    function buildMeta(bytes32[] memory words, uint8 maxDepth) internal pure returns (bytes memory meta) {
         unchecked {
             // Write out expansions.
             uint8[] memory seeds;
