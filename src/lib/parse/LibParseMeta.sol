@@ -10,7 +10,7 @@ error DuplicateFingerprint();
 error WordIOFnPointerMismatch(uint256 wordsLength, uint256 ioFnPointersLength);
 
 uint256 constant FINGERPRINT_MASK = 0xFFFFFFFF;
-/// @dev 7 = 1 byte opcode index + 2 byte io fn ptr + 6 byte fingerprint
+/// @dev 7 = 1 byte opcode index + 2 byte io fn ptr + 4 byte fingerprint
 uint256 constant META_ITEM_SIZE = 7;
 uint256 constant META_ITEM_MASK = (1 << META_ITEM_SIZE) - 1;
 /// @dev 33 = 32 bytes for expansion + 1 byte for seed
@@ -196,47 +196,69 @@ library LibParseMeta {
         }
     }
 
-    function lookupIndexFromMeta(bytes memory meta, bytes32 word) internal pure returns (bool exists, uint256 index) {
+    /// Given the parse meta and a word, return the index and io fn pointer for
+    /// the word. If the word is not found, then `exists` will be false. The
+    /// caller MUST check `exists` before using the other return values.
+    /// @param meta The parse meta.
+    /// @param word The word to lookup.
+    /// @return True if the word exists in the parse meta.
+    /// @return The index of the word in the parse meta.
+    /// @return The io fn pointer for the word.
+    function lookupWordMeta(bytes memory meta, bytes32 word) internal pure returns (bool, uint256, uint256) {
         unchecked {
             uint256 dataStart;
             uint256 cursor;
             uint256 end;
-            uint256 metaExpansionSize = META_EXPANSION_SIZE;
-            uint256 metaItemSize = META_ITEM_SIZE;
-            assembly ("memory-safe") {
-                // Read depth from first meta byte.
-                cursor := add(meta, 1)
-                let depth := and(mload(cursor), 0xFF)
-                // 33 bytes per depth
-                end := add(cursor, mul(depth, metaExpansionSize))
-                dataStart := add(end, metaItemSize)
+
+            {
+                uint256 metaExpansionSize = META_EXPANSION_SIZE;
+                uint256 metaItemSize = META_ITEM_SIZE;
+                assembly ("memory-safe") {
+                    // Read depth from first meta byte.
+                    cursor := add(meta, 1)
+                    let depth := and(mload(cursor), 0xFF)
+                    // 33 bytes per depth
+                    end := add(cursor, mul(depth, metaExpansionSize))
+                    dataStart := add(end, metaItemSize)
+                }
             }
+
             uint256 cumulativeCt = 0;
             while (cursor < end) {
-                uint256 seed;
                 uint256 expansion;
-                assembly ("memory-safe") {
-                    cursor := add(cursor, 1)
-                    seed := and(mload(cursor), 0xFF)
-                    cursor := add(cursor, 0x20)
-                    expansion := mload(cursor)
+                uint256 posData;
+                uint256 wordFingerprint;
+                // Lookup the data at pos.
+                {
+                    uint256 seed;
+                    assembly ("memory-safe") {
+                        cursor := add(cursor, 1)
+                        seed := and(mload(cursor), 0xFF)
+                        cursor := add(cursor, 0x20)
+                        expansion := mload(cursor)
+                    }
+
+                    (uint256 shifted, uint256 hashed) = wordBitmapped(seed, word);
+                    uint256 pos = LibCtPop.ctpop(expansion & (shifted - 1)) + cumulativeCt;
+                    wordFingerprint = hashed & FINGERPRINT_MASK;
+                    uint256 metaItemSize = META_ITEM_SIZE;
+                    assembly ("memory-safe") {
+                        posData := mload(add(dataStart, mul(pos, metaItemSize)))
+                    }
                 }
 
-                (uint256 shifted, uint256 hashed) = wordBitmapped(seed, word);
-                uint256 pos = LibCtPop.ctpop(expansion & (shifted - 1)) + cumulativeCt;
-                uint256 wordFingerprint = hashed & FINGERPRINT_MASK;
-                uint256 posData;
-                assembly ("memory-safe") {
-                    posData := mload(add(dataStart, mul(pos, metaItemSize)))
-                }
                 // Match
                 if (wordFingerprint == posData & FINGERPRINT_MASK) {
-                    return (true, (posData >> 0x30) & 0xFF);
+                    uint256 index;
+                    assembly ("memory-safe") {
+                        index := byte(25, posData)
+                    }
+                    return (true, index, posData >> 0x20 & 0xFFFF);
                 } else {
                     cumulativeCt += LibCtPop.ctpop(expansion);
                 }
             }
-            return (false, 0);
+            return (false, 0, 0);
         }
     }
 }

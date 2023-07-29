@@ -793,7 +793,7 @@ library LibParse {
                             (cursor, word) = parseWord(cursor, CMASK_RHS_WORD_TAIL);
 
                             // First check if this word is in meta.
-                            (bool exists, uint256 index) = LibParseMeta.lookupIndexFromMeta(meta, word);
+                            (bool exists, uint256 index, uint256 ioFnPointer) = LibParseMeta.lookupWordMeta(meta, word);
                             if (exists) {
                                 state.pushOpToSource(index, Operand.wrap(0));
                                 // This is a real word so we expect to see parens
