@@ -9,9 +9,19 @@ error DuplicateFingerprint();
 /// @dev Words and io fn pointers aren't the same length.
 error WordIOFnPointerMismatch(uint256 wordsLength, uint256 ioFnPointersLength);
 
-uint256 constant FINGERPRINT_MASK = 0xFFFFFFFF;
-/// @dev 7 = 1 byte opcode index + 2 byte io fn ptr + 4 byte fingerprint
-uint256 constant META_ITEM_SIZE = 7;
+/// @dev 0xFFFFFF = 3 byte fingerprint
+/// The fingerprint is 3 bytes because we're targetting the same collision
+/// resistance on words as solidity functions. As we already use a fully byte to
+/// map words across the expander, we only need 3 bytes for the fingerprint to
+/// achieve 4 bytes of collision resistance, which is the same as a solidity
+/// selector. This assumes that the byte selected to expand is uncorrelated with
+/// the fingerprint bytes, which is a reasonable assumption as long as we use
+/// different bytes from a keccak256 hash for each.
+/// This assumes a single expander, if there are multiple expanders, then the
+/// collision resistance only improves, so this is still safe.
+uint256 constant FINGERPRINT_MASK = 0xFFFFFF;
+/// @dev 6 = 1 byte opcode index + 2 byte io fn ptr + 3 byte fingerprint
+uint256 constant META_ITEM_SIZE = 6;
 uint256 constant META_ITEM_MASK = (1 << META_ITEM_SIZE) - 1;
 /// @dev 33 = 32 bytes for expansion + 1 byte for seed
 uint256 constant META_EXPANSION_SIZE = 0x21;
@@ -104,9 +114,7 @@ library LibParseMeta {
                     expansions[depth] = expansion;
                     depth++;
                 }
-                // 1 = depth
-                // 0x21 per depth = expansion + seed
-                // 6 per word = 4 byte fingerprint + 2 byte opcode
+
                 uint256 metaLength = META_PREFIX_SIZE + depth * META_EXPANSION_SIZE + ogWords.length * META_ITEM_SIZE;
                 meta = new bytes(metaLength);
                 assembly ("memory-safe") {
@@ -158,8 +166,9 @@ library LibParseMeta {
                             uint256 wordFingerprint = hashed & FINGERPRINT_MASK;
                             uint256 posFingerprint;
                             assembly ("memory-safe") {
-                                posFingerprint := and(mload(writeAt), 0xFFFFFFFF)
+                                posFingerprint := mload(writeAt)
                             }
+                            posFingerprint &= FINGERPRINT_MASK;
                             if (posFingerprint != 0) {
                                 if (posFingerprint == wordFingerprint) {
                                     revert DuplicateFingerprint();
@@ -182,7 +191,7 @@ library LibParseMeta {
                             // Get the 16 bit io fn pointer for this word.
                             ioFnPtr := and(mload(add(ioFnPointers, mul(2, add(k, 1)))), 0xFFFF)
                         }
-                        toWrite |= (ioFnPtr << 0x20) | (k << 0x30);
+                        toWrite |= (ioFnPtr << 0x18) | (k << 0x28);
                     }
 
                     uint256 mask = ~META_ITEM_MASK;
@@ -251,9 +260,9 @@ library LibParseMeta {
                 if (wordFingerprint == posData & FINGERPRINT_MASK) {
                     uint256 index;
                     assembly ("memory-safe") {
-                        index := byte(25, posData)
+                        index := byte(26, posData)
                     }
-                    return (true, index, posData >> 0x20 & 0xFFFF);
+                    return (true, index, posData >> 0x18 & 0xFFFF);
                 } else {
                     cumulativeCt += LibCtPop.ctpop(expansion);
                 }
