@@ -23,7 +23,7 @@ contract LibParseUnclosedLeftParenTest is Test {
         words[2] = bytes32("c");
         words[3] = bytes32("d");
         words[4] = bytes32("e");
-        meta = LibParseMeta.buildMeta(words, LibIOFnPointers.indexPointersForWords(words), 1);
+        meta = LibParseMeta.buildMeta(words, 1);
     }
 
     /// Check the parser reverts if it encounters an unclosed left paren.

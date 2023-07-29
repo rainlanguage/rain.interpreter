@@ -20,8 +20,8 @@ error WordIOFnPointerMismatch(uint256 wordsLength, uint256 ioFnPointersLength);
 /// This assumes a single expander, if there are multiple expanders, then the
 /// collision resistance only improves, so this is still safe.
 uint256 constant FINGERPRINT_MASK = 0xFFFFFF;
-/// @dev 6 = 1 byte opcode index + 2 byte io fn ptr + 3 byte fingerprint
-uint256 constant META_ITEM_SIZE = 6;
+/// @dev 4 = 1 byte opcode index + 3 byte fingerprint
+uint256 constant META_ITEM_SIZE = 4;
 uint256 constant META_ITEM_MASK = (1 << META_ITEM_SIZE) - 1;
 /// @dev 33 = 32 bytes for expansion + 1 byte for seed
 uint256 constant META_EXPANSION_SIZE = 0x21;
@@ -29,17 +29,19 @@ uint256 constant META_EXPANSION_SIZE = 0x21;
 uint256 constant META_PREFIX_SIZE = 1;
 
 library LibParseMeta {
-    /// @return shifted
-    /// @return bitmapped
-    function wordBitmapped(uint256 seed, bytes32 word) internal pure returns (uint256, uint256) {
-        uint256 hashed;
+    function wordBitmapped(uint256 seed, bytes32 word) internal pure returns (uint256 bitmap, uint256 hashed) {
         assembly ("memory-safe") {
             mstore(0, word)
             mstore8(0x20, seed)
             hashed := keccak256(0, 0x21)
+            // We have to be careful here to avoid using the same byte for both
+            // the expansion and the fingerprint. This is because we are relying
+            // on the combined effect of both for collision resistance. We do
+            // this by using the high byte of the hash for the bitmap, and the
+            // low 3 bytes for the fingerprint.
+            //slither-disable-next-line incorrect-shift
+            bitmap := shl(byte(0, hashed), 1)
         }
-        //slither-disable-next-line incorrect-shift
-        return (1 << uint8(hashed), hashed);
     }
 
     function findBestExpander(bytes32[] memory words)
@@ -85,17 +87,12 @@ library LibParseMeta {
         }
     }
 
-    function buildMeta(bytes32[] memory words, bytes memory ioFnPointers, uint8 maxDepth)
+    function buildMeta(bytes32[] memory words, uint8 maxDepth)
         internal
         pure
         returns (bytes memory meta)
     {
         unchecked {
-            // Need a 16 bit io pointer for each word.
-            if (words.length * 2 != ioFnPointers.length) {
-                revert WordIOFnPointerMismatch(words.length, ioFnPointers.length);
-            }
-
             // Write out expansions.
             uint8[] memory seeds;
             uint256[] memory expansions;
@@ -185,14 +182,7 @@ library LibParseMeta {
                     }
 
                     // Write the io fn pointer and index offset.
-                    {
-                        uint256 ioFnPtr;
-                        assembly ("memory-safe") {
-                            // Get the 16 bit io fn pointer for this word.
-                            ioFnPtr := and(mload(add(ioFnPointers, mul(2, add(k, 1)))), 0xFFFF)
-                        }
-                        toWrite |= (ioFnPtr << 0x18) | (k << 0x28);
-                    }
+                    toWrite |= k << 0x18;
 
                     uint256 mask = ~META_ITEM_MASK;
                     assembly ("memory-safe") {
@@ -212,13 +202,11 @@ library LibParseMeta {
     /// @param word The word to lookup.
     /// @return True if the word exists in the parse meta.
     /// @return The index of the word in the parse meta.
-    /// @return The io fn pointer for the word.
-    function lookupWordMeta(bytes memory meta, bytes32 word) internal pure returns (bool, uint256, uint256) {
+    function lookupWordIndex(bytes memory meta, bytes32 word) internal pure returns (bool, uint256) {
         unchecked {
             uint256 dataStart;
             uint256 cursor;
             uint256 end;
-
             {
                 uint256 metaExpansionSize = META_EXPANSION_SIZE;
                 uint256 metaItemSize = META_ITEM_SIZE;
@@ -260,14 +248,14 @@ library LibParseMeta {
                 if (wordFingerprint == posData & FINGERPRINT_MASK) {
                     uint256 index;
                     assembly ("memory-safe") {
-                        index := byte(26, posData)
+                        index := byte(28, posData)
                     }
-                    return (true, index, posData >> 0x18 & 0xFFFF);
+                    return (true, index);
                 } else {
                     cumulativeCt += LibCtPop.ctpop(expansion);
                 }
             }
-            return (false, 0, 0);
+            return (false, 0);
         }
     }
 }

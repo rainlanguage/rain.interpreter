@@ -34,7 +34,7 @@ contract LibParseNamedRHSTest is Test {
         words[13] = bytes32("n");
         words[14] = bytes32("o");
         words[15] = bytes32("p");
-        meta = LibParseMeta.buildMeta(words, LibIOFnPointers.indexPointersForWords(words), 2);
+        meta = LibParseMeta.buildMeta(words, 2);
     }
 
     /// The simplest RHS is a single word.

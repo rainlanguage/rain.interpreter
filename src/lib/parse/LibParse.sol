@@ -114,6 +114,8 @@ uint256 constant OPCODE_CONSTANT = 1;
 /// @param literalBloom A bloom filter of all the literals that have been
 /// encountered so far. This is used to quickly dedupe literals.
 /// @param constantsBuilder A builder for the constants array.
+/// @param literalParsers A 256 bit integer where each 16 bits is a function
+/// pointer to a literal parser.
 struct ParseState {
     /// @dev START things that are referenced directly in assembly by hardcoded
     /// offsets. E.g. `pushOpToSource` and `newSource`.
@@ -793,7 +795,7 @@ library LibParse {
                             (cursor, word) = parseWord(cursor, CMASK_RHS_WORD_TAIL);
 
                             // First check if this word is in meta.
-                            (bool exists, uint256 index, uint256 ioFnPointer) = LibParseMeta.lookupWordMeta(meta, word);
+                            (bool exists, uint256 index) = LibParseMeta.lookupWordIndex(meta, word);
                             if (exists) {
                                 state.pushOpToSource(index, Operand.wrap(0));
                                 // This is a real word so we expect to see parens

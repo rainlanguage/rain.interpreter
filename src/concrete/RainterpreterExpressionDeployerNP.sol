@@ -65,7 +65,7 @@ bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd
 bytes32 constant AUTHORING_META_HASH = bytes32(0xfabffb8bff66e519a08a9294c12c2971c63b4176ee2946287fdf1c6eb192b6bb);
 
 bytes constant PARSE_META =
-    hex"01000000000008004000000100000000001000000000001000000000200000000000002acb88702d042b91d72254012b3e038384032b91beccb0022b918857ce052b91448fdb";
+    hex"0100000000010000000080200000000200010000000000001000000000000000000005448fdb0088702d04d7225403beccb001038384028857ce";
 
 /// All config required to construct a `Rainterpreter`.
 /// @param interpreter The `IInterpreterV1` to use for evaluation. MUST match
@@ -81,7 +81,7 @@ struct RainterpreterExpressionDeployerConstructionConfig {
 library LibRainterpreterExpressionDeployerNPMeta {
     function buildParseMetaFromAuthoringMeta(bytes memory inputAuthoringMeta) internal pure returns (bytes memory) {
         bytes32[] memory words = abi.decode(inputAuthoringMeta, (bytes32[]));
-        return LibParseMeta.buildMeta(words, LibAllStandardOpsNP.ioFunctionPointers(), 2);
+        return LibParseMeta.buildMeta(words, 2);
     }
 }
 
