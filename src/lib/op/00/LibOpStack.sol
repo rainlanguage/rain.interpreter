@@ -4,9 +4,10 @@ pragma solidity ^0.8.18;
 import "rain.solmem/lib/LibStackPointer.sol";
 import "../../state/LibInterpreterState.sol";
 import "../../integrity/LibIntegrityCheck.sol";
+import "../../io/LibIOCheck.sol";
 
 /// Thrown when a stack read index is outside the current stack top.
-error OutOfBoundsStackRead(int256 stackTopIndex, uint256 stackRead);
+error OutOfBoundsStackRead(uint256 stackTopIndex, uint256 stackRead);
 
 /// @title LibOpStack
 /// Implementation of copying a stack item from the stack to the stack.
@@ -33,7 +34,10 @@ library LibOpStack {
         // Ensure that we aren't reading beyond the current stack top.
         if (Pointer.unwrap(operandPointer) >= Pointer.unwrap(stackTop)) {
             revert OutOfBoundsStackRead(
-                integrityCheckState.stackBottom.toIndexSigned(stackTop), Operand.unwrap(operand)
+                // Assume that negative stack top has been handled elsewhere by
+                // caller.
+                uint256(integrityCheckState.stackBottom.toIndexSigned(stackTop)),
+                Operand.unwrap(operand)
             );
         }
 
@@ -44,6 +48,24 @@ library LibOpStack {
         }
 
         return integrityCheckState.push(stackTop);
+    }
+
+    function io(IOCheckState memory state, Operand operand, uint256)
+        internal
+        pure
+        returns (Operand, uint256, uint256)
+    {
+        // Operand is the index so ensure it doesn't exceed the stack index.
+        if (Operand.unwrap(operand) >= state.stackIndex) {
+            revert OutOfBoundsStackRead(state.stackIndex, Operand.unwrap(operand));
+        }
+
+        // Move the read highwater if needed.
+        if (Operand.unwrap(operand) > state.readHighwater) {
+            state.readHighwater = Operand.unwrap(operand);
+        }
+
+        return (operand, 0, 1);
     }
 
     /// Copies a stack item from the stack array to the stack.

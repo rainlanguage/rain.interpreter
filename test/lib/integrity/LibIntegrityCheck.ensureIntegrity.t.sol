@@ -7,6 +7,7 @@ import "rain.solmem/lib/LibPointer.sol";
 
 import "src/lib/integrity/LibIntegrityCheck.sol";
 import "src/lib/parse/LibParse.sol";
+import "test/util/lib/io/LibIOFnPointers.sol";
 
 /// Thrown by `integrityReverts` to show that the integrity check can revert
 /// with a custom error.

@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import "forge-std/Test.sol";
 
 import "src/lib/parse/LibParse.sol";
+import "test/util/lib/io/LibIOFnPointers.sol";
 
 /// @title LibParseIntegerLiteralDecimalTest
 /// Tests parsing integer literal decimal values.

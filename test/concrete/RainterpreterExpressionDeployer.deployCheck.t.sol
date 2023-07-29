@@ -48,7 +48,7 @@ contract RainterpreterExpressionDeployerDeployCheckTest is Test {
         new RainterpreterExpressionDeployerNP(RainterpreterExpressionDeployerConstructionConfig(
             address(new RainterpreterNP()),
             address(new RainterpreterStore()),
-            LibRainterpreterExpressionDeployerNPMeta.authoringMeta()
+            LibAllStandardOpsNP.authoringMeta()
         ));
     }
 }

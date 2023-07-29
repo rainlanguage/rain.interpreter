@@ -65,7 +65,7 @@ bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd
 bytes32 constant AUTHORING_META_HASH = bytes32(0xfabffb8bff66e519a08a9294c12c2971c63b4176ee2946287fdf1c6eb192b6bb);
 
 bytes constant PARSE_META =
-    hex"010000000000080040000001000000000010000000000010000000002000000000000000e688702d00042dd7225400019c03838400031ebeccb000029e8857ce0005d8448fdb";
+    hex"0100000000010000000080200000000200010000000000001000000000000000000005448fdb0088702d04d7225403beccb001038384028857ce";
 
 /// All config required to construct a `Rainterpreter`.
 /// @param interpreter The `IInterpreterV1` to use for evaluation. MUST match
@@ -79,17 +79,6 @@ struct RainterpreterExpressionDeployerConstructionConfig {
 }
 
 library LibRainterpreterExpressionDeployerNPMeta {
-    function authoringMeta() internal pure returns (bytes memory) {
-        bytes32[] memory words = new bytes32[](6);
-        words[0] = "stack";
-        words[1] = "constant";
-        words[2] = "block-number";
-        words[3] = "chain-id";
-        words[4] = "max-uint-256";
-        words[5] = "block-timestamp";
-        return abi.encode(words);
-    }
-
     function buildParseMetaFromAuthoringMeta(bytes memory inputAuthoringMeta) internal pure returns (bytes memory) {
         bytes32[] memory words = abi.decode(inputAuthoringMeta, (bytes32[]));
         return LibParseMeta.buildMeta(words, 2);
@@ -226,16 +215,12 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpre
     }
 
     /// @inheritdoc IParserV1
-    function verifyAuthoringMeta(bytes memory authoringMeta) external pure virtual override returns (bool) {
-        if (keccak256(authoringMeta) != AUTHORING_META_HASH) {
-            return false;
+    function buildParseMeta(bytes memory authoringMeta) external pure virtual override returns (bytes memory) {
+        bytes32 inputAuthoringMetaHash = keccak256(authoringMeta);
+        if (inputAuthoringMetaHash != AUTHORING_META_HASH) {
+            revert AuthoringMetaHashMismatch(AUTHORING_META_HASH, inputAuthoringMetaHash);
         }
-        bytes memory builtParseMeta =
-            LibRainterpreterExpressionDeployerNPMeta.buildParseMetaFromAuthoringMeta(authoringMeta);
-        if (keccak256(builtParseMeta) != keccak256(parseMeta())) {
-            return false;
-        }
-        return true;
+        return LibRainterpreterExpressionDeployerNPMeta.buildParseMetaFromAuthoringMeta(authoringMeta);
     }
 
     /// @inheritdoc IParserV1

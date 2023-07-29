@@ -5,6 +5,8 @@ import "forge-std/Test.sol";
 
 import "src/lib/parse/LibParse.sol";
 
+import "test/util/lib/io/LibIOFnPointers.sol";
+
 /// @title LibParseUnexpectedRightParenTest
 /// Test that the parser errors when it encounters an unexpected right paren.
 contract LibParseUnexpectedRightParenTest is Test {

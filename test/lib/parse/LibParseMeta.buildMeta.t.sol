@@ -5,6 +5,7 @@ import "forge-std/Test.sol";
 
 import "src/lib/parse/LibParseMeta.sol";
 import "test/util/lib/bloom/LibBloom.sol";
+import "test/util/lib/io/LibIOFnPointers.sol";
 
 contract LibParseMetaBuildMetaTest is Test {
     /// This is super loose from limited empirical testing.
@@ -22,7 +23,7 @@ contract LibParseMetaBuildMetaTest is Test {
         (meta);
     }
 
-    function testRoundMetaExpander(bytes32[] memory words, uint8 j, bytes32 notFound) external {
+    function testRoundMetaExpanderShallow(bytes32[] memory words, uint8 j, bytes32 notFound) external {
         vm.assume(words.length > 0);
         vm.assume(!LibBloom.bloomFindsDupes(words));
         for (uint256 i = 0; i < words.length; i++) {
@@ -31,11 +32,11 @@ contract LibParseMetaBuildMetaTest is Test {
         j = uint8(bound(j, uint8(0), uint8(words.length) - 1));
 
         bytes memory meta = LibParseMeta.buildMeta(words, expanderDepth(words.length));
-        (bool exists, uint256 k) = LibParseMeta.lookupIndexFromMeta(meta, words[j]);
+        (bool exists, uint256 k) = LibParseMeta.lookupWordIndex(meta, words[j]);
         assertTrue(exists);
         assertEq(j, k);
 
-        (bool notExists, uint256 l) = LibParseMeta.lookupIndexFromMeta(meta, notFound);
+        (bool notExists, uint256 l) = LibParseMeta.lookupWordIndex(meta, notFound);
         assertTrue(!notExists);
         assertEq(0, l);
     }
@@ -49,11 +50,11 @@ contract LibParseMetaBuildMetaTest is Test {
         j = uint8(bound(j, uint8(0), uint8(words.length) - 1));
 
         bytes memory meta = LibParseMeta.buildMeta(words, expanderDepth(words.length));
-        (bool exists, uint256 k) = LibParseMeta.lookupIndexFromMeta(meta, words[j]);
+        (bool exists, uint256 k) = LibParseMeta.lookupWordIndex(meta, words[j]);
         assertTrue(exists);
         assertEq(j, k);
 
-        (bool notExists, uint256 l) = LibParseMeta.lookupIndexFromMeta(meta, notFound);
+        (bool notExists, uint256 l) = LibParseMeta.lookupWordIndex(meta, notFound);
         assertTrue(!notExists);
         assertEq(0, l);
     }

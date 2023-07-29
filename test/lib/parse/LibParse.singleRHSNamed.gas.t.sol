@@ -5,6 +5,8 @@ import "forge-std/Test.sol";
 
 import "src/lib/parse/LibParse.sol";
 
+import "test/util/lib/io/LibIOFnPointers.sol";
+
 /// @title LibParseSingleRHSNamedGasTest
 /// Parse a single RHS name for many different sized RHS names just to include
 /// the gas cost of the name lookup in the gas snapshot.
