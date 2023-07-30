@@ -31,6 +31,8 @@ contract LibParseUnexpectedRHSTest is Test {
                     // EOS is also expected in this position. Note that the implied string
                     // for this test ":;;` is NOT valid.
                     | CMASK_EOS
+                    // Comments will give a more specialized error on the RHS.
+                    | CMASK_COMMENT_HEAD
                 )
         );
 

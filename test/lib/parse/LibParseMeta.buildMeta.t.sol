@@ -5,7 +5,6 @@ import "forge-std/Test.sol";
 
 import "src/lib/parse/LibParseMeta.sol";
 import "test/util/lib/bloom/LibBloom.sol";
-import "test/util/lib/io/LibIOFnPointers.sol";
 
 contract LibParseMetaBuildMetaTest is Test {
     /// This is super loose from limited empirical testing.

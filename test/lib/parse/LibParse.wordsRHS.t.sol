@@ -5,8 +5,6 @@ import "forge-std/Test.sol";
 
 import "src/lib/parse/LibParse.sol";
 
-import "test/util/lib/io/LibIOFnPointers.sol";
-
 /// @title LibParseNamedRHSTest
 /// Test that the parser can handle named RHS values.
 contract LibParseNamedRHSTest is Test {

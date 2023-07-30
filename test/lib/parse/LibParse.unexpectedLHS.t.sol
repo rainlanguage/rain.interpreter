@@ -49,7 +49,8 @@ contract LibParseUnexpectedLHSTest is Test {
     /// head of something on the LHS.
     function testParseUnexpectedLHSSingleChar(bytes1 a) external {
         vm.assume(
-            1 << uint256(uint8(a)) & (CMASK_LHS_RHS_DELIMITER | CMASK_LHS_STACK_HEAD | CMASK_LHS_STACK_DELIMITER) == 0
+            1 << uint256(uint8(a))
+                & (CMASK_LHS_RHS_DELIMITER | CMASK_LHS_STACK_HEAD | CMASK_LHS_STACK_DELIMITER | CMASK_COMMENT_HEAD) == 0
         );
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, string(abi.encodePacked(a))));
@@ -60,7 +61,8 @@ contract LibParseUnexpectedLHSTest is Test {
     /// first character of an anonymous identifier on the LHS.
     function testParseUnexpectedLHSBadIgnoredTail(bytes1 a) external {
         vm.assume(
-            1 << uint256(uint8(a)) & (CMASK_LHS_RHS_DELIMITER | CMASK_IDENTIFIER_TAIL | CMASK_LHS_STACK_DELIMITER) == 0
+            1 << uint256(uint8(a))
+                & (CMASK_LHS_RHS_DELIMITER | CMASK_IDENTIFIER_TAIL | CMASK_LHS_STACK_DELIMITER | CMASK_COMMENT_HEAD) == 0
         );
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1, string(abi.encodePacked(a))));
@@ -77,7 +79,9 @@ contract LibParseUnexpectedLHSTest is Test {
         uint256 i = 0;
         for (; i < b.length; i++) {
             bytes1 c = b[i];
-            vm.assume(1 << uint256(uint8(c)) & (CMASK_LHS_STACK_DELIMITER | CMASK_LHS_RHS_DELIMITER) == 0);
+            vm.assume(
+                1 << uint256(uint8(c)) & (CMASK_LHS_STACK_DELIMITER | CMASK_LHS_RHS_DELIMITER | CMASK_COMMENT_HEAD) == 0
+            );
             hasInvalidChar = 1 << uint256(uint8(c)) & CMASK_IDENTIFIER_TAIL == 0;
             if (hasInvalidChar) break;
         }
