@@ -28,6 +28,12 @@ error UnexpectedRightParen(uint256 offset);
 /// Encountered an unclosed left paren.
 error UnclosedLeftParen(uint256 offset);
 
+/// Encountered a comment outside the interstitial space between lines.
+error UnexpectedComment(uint256 offset);
+
+/// Encountered a comment start sequence that is malformed.
+error MalformedCommentStart(uint256 offset);
+
 /// @dev Thrown when a stack name is duplicated. Shadowing in all forms is
 /// disallowed in Rainlang.
 error DuplicateLHSItem(uint256 errorOffset, string errorCharString);
@@ -69,6 +75,23 @@ uint256 constant FSM_YANG_MASK = 1 << 1;
 uint256 constant FSM_WORD_END_MASK = 1 << 2;
 uint256 constant FSM_ACCEPTING_INPUTS_MASK = 1 << 3;
 
+/// @dev The space between lines where comments and whitespace is allowed.
+/// The first LHS item breaks us out of the interstitial.
+uint256 constant FSM_INTERSTITIAL_MASK = 1 << 4;
+
+/// @dev fsm default state is:
+/// - LHS
+/// - yin
+/// - not word end
+/// - accepting inputs
+/// - interstitial
+uint256 constant FSM_DEFAULT = FSM_ACCEPTING_INPUTS_MASK | FSM_INTERSTITIAL_MASK;
+
+/// @dev The source ended if we are accepting inputs and are in the interstitial.
+/// We don't care about things such as yin/yang because comments are allowed
+/// after sources.
+uint256 constant FSM_SOURCE_END_MASK = FSM_ACCEPTING_INPUTS_MASK | FSM_INTERSTITIAL_MASK;
+
 uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
 
 /// @dev The opcode that will be used in the source to represent a stack copy
@@ -99,6 +122,7 @@ uint256 constant OPCODE_CONSTANT = 1;
 /// - bit 1: yang/yin => 0 = yin, 1 = yang
 /// - bit 2: word end => 0 = not end, 1 = end
 /// - bit 3: accepting inputs => 0 = not accepting, 1 = accepting
+/// - bit 4: interstitial => 0 = not interstitial, 1 = interstitial
 /// @param stack0 Memory region for stack word counters. The first byte is a
 /// counter/offset into the region. The remaining 31 bytes are the stack words.
 /// @param stack1 32 additional bytes of stack words.
@@ -180,8 +204,8 @@ library LibParseState {
             0,
             // sourcesBuilder
             0,
-            // fsm initially is the LHS and accepting inputs.
-            FSM_ACCEPTING_INPUTS_MASK,
+            // fsm
+            FSM_DEFAULT,
             // stackLHSIndex
             0,
             // stackNames
@@ -560,6 +584,8 @@ library LibParseState {
             }
 
             // Reset state for next source.
+            state.stackLHSIndex = 0;
+
             uint256 emptyActiveSource = EMPTY_ACTIVE_SOURCE;
             assembly ("memory-safe") {
                 let ptr := mload(0x40)
@@ -710,6 +736,58 @@ library LibParse {
         return cursor;
     }
 
+    /// The cursor currently points at the head of a comment. We need to skip
+    /// over all data until we find the end of the comment. This MAY REVERT if
+    /// the comment is malformed, e.g. if the comment doesn't start with `/*`.
+    /// @param data The source data.
+    /// @param cursor The current cursor position.
+    /// @return The new cursor position.
+    function skipComment(bytes memory data, uint256 cursor) internal pure returns (uint256) {
+        // First check the comment opening sequence is not malformed.
+        uint256 startSequence;
+        assembly ("memory-safe") {
+            startSequence := shr(0xf0, mload(cursor))
+        }
+        if (startSequence != COMMENT_START_SEQUENCE) {
+            (uint256 errorOffset, string memory errorCharString) = parseErrorContext(data, cursor);
+            (errorCharString);
+            revert MalformedCommentStart(errorOffset);
+        }
+        uint256 commentEndSequenceStart = COMMENT_END_SEQUENCE >> 8;
+        uint256 commentEndSequenceEnd = COMMENT_END_SEQUENCE & 0xFF;
+        uint256 max;
+        assembly ("memory-safe") {
+            // Move past the start sequence.
+            cursor := add(cursor, 2)
+            max := add(data, add(mload(data), 0x20))
+
+            // Loop until we find the end sequence.
+            let done := 0
+            for {} iszero(done) {} {
+                for {} and(iszero(eq(byte(0, mload(cursor)), commentEndSequenceStart)), lt(cursor, max)) {} {
+                    cursor := add(cursor, 1)
+                }
+                // We have found the start of the end sequence. Now check the
+                // end sequence is correct.
+                cursor := add(cursor, 1)
+                // Only exit the loop if the end sequence is correct. We don't
+                // move the cursor forward unless we haven exact match on the
+                // end byte. E.g. consider the sequence `/** comment **/`.
+                if or(eq(byte(0, mload(cursor)), commentEndSequenceEnd), iszero(lt(cursor, max))) {
+                    done := 1
+                    cursor := add(cursor, 1)
+                }
+            }
+        }
+        // If the cursor is past the max we either never even started an end
+        // sequence, or we started parsing an end sequence but couldn't complete
+        // it. Either way, the comment is malformed, and the parser is OOB.
+        if (cursor > max) {
+            revert ParserOutOfBounds();
+        }
+        return cursor;
+    }
+
     //slither-disable-next-line cyclomatic-complexity
     function parse(bytes memory data, bytes memory meta)
         internal
@@ -739,8 +817,8 @@ library LibParse {
                             // if yang we can't start new stack item
                             if (state.fsm & FSM_YANG_MASK > 0) {
                                 //slither-disable-next-line similar-names
-                                (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
-                                revert UnexpectedLHSChar(offset, charString);
+                                (uint256 errorOffset, string memory errorCharString) = parseErrorContext(data, cursor);
+                                revert UnexpectedLHSChar(errorOffset, errorCharString);
                             }
 
                             // Named stack item.
@@ -756,7 +834,6 @@ library LibParse {
                                         parseErrorContext(data, cursor);
                                     revert DuplicateLHSItem(errorOffset, errorCharString);
                                 }
-
                                 state.stackLHSIndex = index;
                             }
                             // Anon stack item.
@@ -767,19 +844,32 @@ library LibParse {
                             }
 
                             // Set yang as we are now building a stack item.
-                            state.fsm |= FSM_YANG_MASK;
-                        } else if (char & CMASK_WHITESPACE > 0) {
+                            // We are also no longer interstitial
+                            state.fsm = (state.fsm | FSM_YANG_MASK) & ~FSM_INTERSTITIAL_MASK;
+                        } else if (char & CMASK_WHITESPACE != 0) {
                             cursor = skipWord(cursor, CMASK_WHITESPACE);
                             // Set ying as we now open to possibilities.
                             state.fsm &= ~FSM_YANG_MASK;
-                        } else if (char & CMASK_LHS_RHS_DELIMITER > 0) {
-                            // Set RHS and yin.
-                            state.fsm = (state.fsm | FSM_RHS_MASK) & ~FSM_YANG_MASK;
+                        } else if (char & CMASK_LHS_RHS_DELIMITER != 0) {
+                            // Set RHS and yin. Move out of the interstitial if
+                            // we haven't already.
+                            state.fsm = (state.fsm | FSM_RHS_MASK) & ~(FSM_YANG_MASK | FSM_INTERSTITIAL_MASK);
                             cursor++;
+                        } else if (char & CMASK_COMMENT_HEAD != 0) {
+                            if (state.fsm & FSM_INTERSTITIAL_MASK == 0) {
+                                //slither-disable-next-line similar-names
+                                (uint256 errorOffset, string memory errorCharString) = parseErrorContext(data, cursor);
+                                (errorCharString);
+                                revert UnexpectedComment(errorOffset);
+                            }
+                            cursor = skipComment(data, cursor);
+                            // Set yang for comments to force a little breathing
+                            // room between comments and the next item.
+                            state.fsm |= FSM_YANG_MASK;
                         } else {
                             //slither-disable-next-line similar-names
-                            (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
-                            revert UnexpectedLHSChar(offset, charString);
+                            (uint256 errorOffset, string memory errorCharString) = parseErrorContext(data, cursor);
+                            revert UnexpectedLHSChar(errorOffset, errorCharString);
                         }
                     }
                     // RHS
@@ -900,14 +990,24 @@ library LibParse {
                         } else if (char & CMASK_EOL > 0) {
                             state.balance(data, cursor);
                             cursor++;
-                            state.fsm = 0;
+
+                            state.fsm = FSM_DEFAULT & ~FSM_ACCEPTING_INPUTS_MASK;
                         }
                         // End of source.
                         else if (char & CMASK_EOS > 0) {
                             state.balance(data, cursor);
                             state.newSource();
                             cursor++;
-                            state.fsm = FSM_ACCEPTING_INPUTS_MASK;
+
+                            state.fsm = FSM_DEFAULT;
+                        }
+                        // Comments aren't allowed in the RHS but we can give a
+                        // nicer error message than the default.
+                        else if (char & CMASK_COMMENT_HEAD != 0) {
+                            //slither-disable-next-line similar-names
+                            (uint256 errorOffset, string memory errorCharString) = parseErrorContext(data, cursor);
+                            (errorCharString);
+                            revert UnexpectedComment(errorOffset);
                         } else {
                             //slither-disable-next-line similar-names
                             (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
@@ -918,11 +1018,21 @@ library LibParse {
                 if (cursor != end) {
                     revert ParserOutOfBounds();
                 }
-                if (char & CMASK_EOS == 0) {
+                if (
+                    state
+                        // If the lhs index is non-zero we didn't clear the sources.
+                        .stackLHSIndex != 0
+                    // If the stack is non-empty we didn't clear the sources.
+                    || state.stack0 != 0
+                    // If we're not in an interstitial state accepting inputs
+                    // then we're not at potential start of a source, so we
+                    // started a source without finishing it.
+                    || state.fsm & FSM_SOURCE_END_MASK != FSM_SOURCE_END_MASK
+                ) {
                     //slither-disable-next-line similar-names
-                    (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
-                    (charString);
-                    revert MissingFinalSemi(offset);
+                    (uint256 errorOffset, string memory errorCharString) = parseErrorContext(data, cursor);
+                    (errorCharString);
+                    revert MissingFinalSemi(errorOffset);
                 }
             }
             return (state.buildSources(), state.buildConstants());
