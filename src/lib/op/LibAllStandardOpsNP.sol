@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import "rain.lib.typecast/LibConvert.sol";
 
-import "../io/LibIOCheck.sol";
+import "../integrity/LibIntegrityCheckNP.sol";
 import "../state/LibInterpreterState.sol";
 
 import "./00/LibOpStack.sol";
@@ -77,29 +77,29 @@ library LibAllStandardOpsNP {
         return abi.encode(words);
     }
 
-    function ioFunctionPointers() internal pure returns (bytes memory) {
+    function integrityNPFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
-            function(IOCheckState memory, Operand, uint256)
+            function(IntegrityCheckStateNP memory, Operand, uint256)
                 view
                 returns (Operand, uint256, uint256) lengthPointer;
             uint256 length = ALL_STANDARD_OPS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(IOCheckState memory, Operand, uint256)
+            function(IntegrityCheckStateNP memory, Operand, uint256)
                 view
                 returns (Operand, uint256, uint256)[ALL_STANDARD_OPS_LENGTH + 1] memory pointersFixed = [
                     lengthPointer,
                     // Stack then constant are the first two ops to match the
                     // field ordering in the interpreter state NOT the lexical
                     // ordering of the file system.
-                    LibOpStack.io,
-                    LibOpConstant.io,
+                    LibOpStack.integrityNP,
+                    LibOpConstant.integrityNP,
                     // Everything else is alphabetical, including folders.
-                    LibOpBlockNumber.io,
-                    LibOpChainId.io,
-                    LibOpMaxUint256.io,
-                    LibOpTimestamp.io
+                    LibOpBlockNumber.integrityNP,
+                    LibOpChainId.integrityNP,
+                    LibOpMaxUint256.integrityNP,
+                    LibOpTimestamp.integrityNP
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {

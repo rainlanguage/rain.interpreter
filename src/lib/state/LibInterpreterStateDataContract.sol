@@ -4,12 +4,15 @@ pragma solidity ^0.8.18;
 import "rain.solmem/lib/LibPointer.sol";
 import "rain.solmem/lib/LibMemCpy.sol";
 import "rain.solmem/lib/LibBytes.sol";
+import "rain.solmem/lib/LibUint256Array.sol";
 
 import "../state/LibInterpreterState.sol";
 import "../compile/LibCompile.sol";
+import "../ns/LibNamespace.sol";
 
 library LibInterpreterStateDataContract {
     using LibBytes for bytes;
+    using LibUint256Array for uint256[];
 
     function serializeSize(bytes[] memory sources, uint256[] memory constants) internal pure returns (uint256 size) {
         assembly ("memory-safe") {

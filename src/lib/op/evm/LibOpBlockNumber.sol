@@ -4,13 +4,14 @@ pragma solidity ^0.8.18;
 import "rain.solmem/lib/LibStackPointer.sol";
 import "../../state/LibInterpreterState.sol";
 import "../../integrity/LibIntegrityCheck.sol";
-import "../../io/LibIOCheck.sol";
+import "../../integrity/LibIntegrityCheckNP.sol";
 
 /// @title LibOpBlockNumber
 /// Implementation of the EVM `BLOCKNUMBER` opcode as a standard Rainlang opcode.
 library LibOpBlockNumber {
     using LibStackPointer for Pointer;
     using LibIntegrityCheck for IntegrityCheckState;
+    using LibIntegrityCheckNP for IntegrityCheckStateNP;
 
     /// Block number is an EVM constant, so it's always safe to push.
     /// There are no inputs, so no need to check the stack.
@@ -25,7 +26,7 @@ library LibOpBlockNumber {
         return integrityCheckState.push(stackTop);
     }
 
-    function io(IOCheckState memory, Operand, uint256) internal pure returns (Operand, uint256, uint256) {
+    function integrityNP(IntegrityCheckStateNP memory, Operand, uint256) internal pure returns (Operand, uint256, uint256) {
         return (Operand.wrap(0), 0, 1);
     }
 

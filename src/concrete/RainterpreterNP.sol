@@ -6,17 +6,28 @@ import "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 import "rain.lib.typecast/LibCast.sol";
 import "rain.datacontract/lib/LibDataContract.sol";
 
-import "../interface/unstable/IDebugInterpreterV1.sol";
+import "../interface/unstable/IDebugInterpreterV2.sol";
 
-import "../lib/eval/LibEval.sol";
+import "../lib/eval/LibEvalNP.sol";
 import "../lib/ns/LibNamespace.sol";
-import "../lib/state/LibInterpreterStateDataContract.sol";
+import "../lib/state/LibInterpreterStateDataContractNP.sol";
 import "../lib/caller/LibEncodedDispatch.sol";
 
 import "../lib/op/LibAllStandardOpsNP.sol";
 
 /// Thrown when the stack length is negative during eval.
 error NegativeStackLength(int256 length);
+
+/// Thrown when the source index is invalid during eval. This is a runtime check
+/// for the exposed external eval entrypoint. Internally recursive evals are
+/// expected to preflight check the source index.
+error InvalidSourceIndex(SourceIndex sourceIndex);
+
+/// @dev The function pointers known to the interpreter for dynamic dispatch.
+/// By setting these as a constant they can be inlined into the interpreter
+/// and loaded at eval time for very low gas (~100) due to the compiler
+/// optimising it to a single `codecopy` to build the in memory bytes array.
+bytes constant OPCODE_FUNCTION_POINTERS = hex"0c150c240c370c490c570c85";
 
 /// @title RainterpreterNP
 /// @notice !!EXPERIMENTAL!! implementation of a Rainlang interpreter that is
@@ -25,37 +36,43 @@ error NegativeStackLength(int256 length);
 /// separate from the JS Rainterpreter to allow for experimentation with the
 /// onchain interpreter without affecting the JS interpreter, up to and including
 /// a complely different execution model and opcodes.
-contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV1, ERC165 {
+contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
     using LibStackPointer for Pointer;
     using LibStackPointer for uint256[];
     using LibUint256Array for uint256[];
-    using LibEval for InterpreterState;
+    using LibEvalNP for InterpreterStateNP;
     using LibNamespace for StateNamespace;
-    using LibInterpreterStateDataContract for bytes;
+    using LibInterpreterStateDataContractNP for bytes;
     using LibCast for function(InterpreterState memory, Operand, Pointer) view returns (Pointer)[];
     using LibMemoryKV for MemoryKV;
+    using LibNamespace for StateNamespace;
 
     // @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IInterpreterV1).interfaceId || interfaceId == type(IDebugInterpreterV1).interfaceId
+        return interfaceId == type(IInterpreterV1).interfaceId || interfaceId == type(IDebugInterpreterV2).interfaceId
             || super.supportsInterface(interfaceId);
     }
 
-    /// @inheritdoc IDebugInterpreterV1
+    /// @inheritdoc IDebugInterpreterV2
     function offchainDebugEval(
         IInterpreterStoreV1 store,
+        bytes memory expressionData,
         FullyQualifiedNamespace namespace,
-        bytes[] memory compiledSources,
-        uint256[] memory constants,
         uint256[][] memory context,
         uint256[] memory stack,
         SourceIndex sourceIndex
     ) external view returns (uint256[] memory, uint256[] memory) {
-        InterpreterState memory state = InterpreterState(
-            stack.dataPointer(), constants.dataPointer(), MemoryKV.wrap(0), namespace, store, context, compiledSources
+        InterpreterStateNP memory state = expressionData.unsafeDeserializeNP(
+            namespace, store, context, OPCODE_FUNCTION_POINTERS
         );
-        Pointer stackTop = state.eval(sourceIndex, state.stackBottom);
-        int256 stackLengthFinal = state.stackBottom.toIndexSigned(stackTop);
+
+        if (SourceIndex.unwrap(sourceIndex) >= state.bytecode.length) {
+            revert InvalidSourceIndex(sourceIndex);
+        }
+
+        Pointer stackBottom = stack.endPointer();
+        Pointer stackTop = state.evalNP(sourceIndex, stackBottom);
+        int256 stackLengthFinal = stackTop.toIndexSigned(stackBottom);
         if (stackLengthFinal < 0) {
             revert NegativeStackLength(stackLengthFinal);
         }
@@ -78,15 +95,18 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV1, ERC165 {
         (address expression, SourceIndex sourceIndex, uint256 maxOutputs) = LibEncodedDispatch.decode(dispatch);
 
         // Build the interpreter state from the onchain expression.
-        InterpreterState memory state = LibDataContract.read(expression).unsafeDeserialize();
-        state.stateKV = MemoryKV.wrap(0);
-        state.namespace = namespace.qualifyNamespace(msg.sender);
-        state.store = store;
-        state.context = context;
+        InterpreterStateNP memory state = LibDataContract.read(expression).unsafeDeserializeNP(
+            namespace.qualifyNamespace(msg.sender), store, context, OPCODE_FUNCTION_POINTERS
+        );
+
+        if (SourceIndex.unwrap(sourceIndex) >= state.bytecode.length) {
+            revert InvalidSourceIndex(sourceIndex);
+        }
 
         // Eval the expression and return up to maxOutputs from the final stack.
-        Pointer stackTop = state.eval(sourceIndex, state.stackBottom);
-        int256 stackLengthFinal = state.stackBottom.toIndexSigned(stackTop);
+        Pointer stackBottom = state.stacks[SourceIndex.unwrap(sourceIndex)].endPointer();
+        Pointer stackTop = state.evalNP(sourceIndex, stackBottom);
+        int256 stackLengthFinal = stackTop.toIndexSigned(stackBottom);
         if (stackLengthFinal < 0) {
             revert NegativeStackLength(stackLengthFinal);
         }

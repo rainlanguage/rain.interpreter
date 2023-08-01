@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 import "rain.solmem/lib/LibStackPointer.sol";
 import "../../state/LibInterpreterState.sol";
 import "../../integrity/LibIntegrityCheck.sol";
-import "../../io/LibIOCheck.sol";
+import "../../integrity/LibIntegrityCheckNP.sol";
 
 /// Thrown when a constant read index is outside the constants array.
 error OutOfBoundsConstantsRead(uint256 constantsLength, uint256 constantsRead);
@@ -16,6 +16,7 @@ error OutOfBoundsConstantsRead(uint256 constantsLength, uint256 constantsRead);
 library LibOpConstant {
     using LibStackPointer for Pointer;
     using LibIntegrityCheck for IntegrityCheckState;
+    using LibIntegrityCheckNP for IntegrityCheckStateNP;
 
     /// Copies a constant from the constants array to the stack. Reading past
     /// the end of the constants array will simply error.
@@ -33,7 +34,7 @@ library LibOpConstant {
         return integrityCheckState.push(stackTop);
     }
 
-    function io(IOCheckState memory state, Operand operand, uint256)
+    function integrityNP(IntegrityCheckStateNP memory state, Operand operand, uint256)
         internal
         pure
         returns (Operand, uint256, uint256)

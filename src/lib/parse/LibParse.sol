@@ -792,7 +792,7 @@ library LibParse {
     function parse(bytes memory data, bytes memory meta)
         internal
         pure
-        returns (bytes[] memory sources, uint256[] memory)
+        returns (bytes memory bytecode, uint256[] memory)
     {
         unchecked {
             ParseState memory state = LibParseState.newState();

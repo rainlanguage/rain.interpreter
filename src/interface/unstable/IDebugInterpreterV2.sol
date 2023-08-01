@@ -3,12 +3,11 @@ pragma solidity ^0.8.18;
 
 import "../IInterpreterV1.sol";
 
-interface IDebugInterpreterV1 {
+interface IDebugInterpreterV2 {
     function offchainDebugEval(
         IInterpreterStoreV1 store,
+        bytes calldata expressionData,
         FullyQualifiedNamespace namespace,
-        bytes[] calldata compiledSources,
-        uint256[] calldata constants,
         uint256[][] calldata context,
         uint256[] calldata initialStack,
         SourceIndex sourceIndex_

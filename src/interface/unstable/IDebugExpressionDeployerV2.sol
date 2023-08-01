@@ -3,10 +3,9 @@ pragma solidity ^0.8.18;
 
 import "../IInterpreterV1.sol";
 
-interface IDebugExpressionDeployerV1 {
+interface IDebugExpressionDeployerV2 {
     function offchainDebugEval(
-        bytes[] memory sources,
-        uint256[] memory constants,
+        bytes memory expressionData,
         FullyQualifiedNamespace namespace,
         uint256[][] memory context,
         SourceIndex sourceIndex,

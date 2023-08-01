@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 import "rain.solmem/lib/LibStackPointer.sol";
 import "../../state/LibInterpreterState.sol";
 import "../../integrity/LibIntegrityCheck.sol";
-import "../../io/LibIOCheck.sol";
+import "../../integrity/LibIntegrityCheckNP.sol";
 
 /// Thrown when a stack read index is outside the current stack top.
 error OutOfBoundsStackRead(uint256 stackTopIndex, uint256 stackRead);
@@ -17,6 +17,7 @@ library LibOpStack {
     using LibPointer for Pointer;
     using LibStackPointer for Pointer;
     using LibIntegrityCheck for IntegrityCheckState;
+    using LibIntegrityCheckNP for IntegrityCheckStateNP;
 
     /// Copies a stack item from the stack to the stack. Reading past the end of
     /// the stack is an integrity error. Reading a value moves the highwater so
@@ -50,7 +51,7 @@ library LibOpStack {
         return integrityCheckState.push(stackTop);
     }
 
-    function io(IOCheckState memory state, Operand operand, uint256)
+    function integrityNP(IntegrityCheckStateNP memory state, Operand operand, uint256)
         internal
         pure
         returns (Operand, uint256, uint256)

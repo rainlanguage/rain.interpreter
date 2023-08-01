@@ -9,14 +9,16 @@ import "rain.datacontract/lib/LibDataContract.sol";
 import "rain.erc1820/lib/LibIERC1820.sol";
 
 import "../interface/IExpressionDeployerV1.sol";
-import "../interface/unstable/IDebugExpressionDeployerV1.sol";
-import "../interface/unstable/IDebugInterpreterV1.sol";
+import "../interface/unstable/IDebugExpressionDeployerV2.sol";
+import "../interface/unstable/IDebugInterpreterV2.sol";
 import "../interface/unstable/IParserV1.sol";
 
 import "../lib/integrity/LibIntegrityCheck.sol";
 import "../lib/state/LibInterpreterStateDataContract.sol";
 import "../lib/op/LibAllStandardOpsNP.sol";
 import "../lib/parse/LibParse.sol";
+
+import "./RainterpreterNP.sol";
 
 /// @dev Thrown when the pointers known to the expression deployer DO NOT match
 /// the interpreter it is constructed for. This WILL cause undefined expression
@@ -49,14 +51,8 @@ error UnexpectedOpMetaHash(bytes32 actualOpMeta);
 /// @param index The negative index.
 error NegativeStackIndex(int256 index);
 
-/// @dev The function pointers known to the expression deployer. These are
-/// immutable for any given interpreter so once the expression deployer is
-/// constructed and has verified that this matches what the interpreter reports,
-/// it can use this constant value to compile and serialize expressions.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"0b270b360b490b5b0b690b97";
-
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x4656ed695c297833a1a573cb6a964c0f4959be284ff28ec7bf53868008bc03af);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x142a865d854d903b77185b6a50a27c519e22bc978fd9098a0038031ba2802b83);
 
 /// @dev Hash of the known store bytecode.
 bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);
@@ -89,7 +85,7 @@ library LibRainterpreterExpressionDeployerNPMeta {
 /// @notice !!!EXPERIMENTAL!!! This is the deployer for the RainterpreterNP
 /// interpreter. Notably includes onchain parsing/compiling of expressions from
 /// Rainlang strings.
-contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpressionDeployerV1, IParserV1, ERC165 {
+contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpressionDeployerV2, IParserV1, ERC165 {
     using LibStackPointer for Pointer;
     using LibUint256Array for uint256[];
 
@@ -169,43 +165,42 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpre
         return interfaceId_ == type(IExpressionDeployerV1).interfaceId || interfaceId_ == type(IERC165).interfaceId;
     }
 
-    /// @inheritdoc IDebugExpressionDeployerV1
+    /// @inheritdoc IDebugExpressionDeployerV2
     function offchainDebugEval(
-        bytes[] memory sources,
-        uint256[] memory constants,
+        bytes memory expressionData,
         FullyQualifiedNamespace namespace,
         uint256[][] memory context,
         SourceIndex sourceIndex,
         uint256[] memory initialStack,
         uint8 minOutputs
     ) external view returns (uint256[] memory, uint256[] memory) {
-        IntegrityCheckState memory integrityCheckState =
-            LibIntegrityCheck.newState(sources, constants, integrityFunctionPointers());
-        Pointer stackTop = integrityCheckState.stackBottom;
-        stackTop = LibIntegrityCheck.push(integrityCheckState, stackTop, initialStack.length);
-        {
-            Pointer stackTopAfter =
-                LibIntegrityCheck.ensureIntegrity(integrityCheckState, sourceIndex, stackTop, minOutputs);
-            (stackTopAfter);
-        }
+        // IntegrityCheckState memory integrityCheckState =
+        //     LibIntegrityCheck.newState(sources, constants, integrityFunctionPointers());
+        // Pointer stackTop = integrityCheckState.stackBottom;
+        // stackTop = LibIntegrityCheck.push(integrityCheckState, stackTop, initialStack.length);
+        // {
+        //     Pointer stackTopAfter =
+        //         LibIntegrityCheck.ensureIntegrity(integrityCheckState, sourceIndex, stackTop, minOutputs);
+        //     (stackTopAfter);
+        // }
 
-        uint256[] memory stack;
-        {
-            int256 stackLength = integrityCheckState.stackBottom.toIndexSigned(integrityCheckState.stackMaxTop);
-            if (stackLength < 0) {
-                revert NegativeStackIndex(stackLength);
-            }
-            for (uint256 i_; i_ < sources.length; i_++) {
-                LibCompile.unsafeCompile(sources[i_], OPCODE_FUNCTION_POINTERS);
-            }
-            stack = new uint256[](uint256(stackLength));
-            LibMemCpy.unsafeCopyWordsTo(initialStack.dataPointer(), stack.dataPointer(), initialStack.length);
-        }
+        // uint256[] memory stack;
+        // {
+        //     int256 stackLength = integrityCheckState.stackBottom.toIndexSigned(integrityCheckState.stackMaxTop);
+        //     if (stackLength < 0) {
+        //         revert NegativeStackIndex(stackLength);
+        //     }
+        //     for (uint256 i_; i_ < sources.length; i_++) {
+        //         LibCompile.unsafeCompile(sources[i_], OPCODE_FUNCTION_POINTERS);
+        //     }
+        //     stack = new uint256[](uint256(stackLength));
+        //     LibMemCpy.unsafeCopyWordsTo(initialStack.dataPointer(), stack.dataPointer(), initialStack.length);
+        // }
 
         // The return is used by returning it, so this is a false positive.
         //slither-disable-next-line unused-return
-        return IDebugInterpreterV1(address(iInterpreter)).offchainDebugEval(
-            iStore, namespace, sources, constants, context, stack, sourceIndex
+        return IDebugInterpreterV2(address(iInterpreter)).offchainDebugEval(
+            iStore, expressionData, namespace, context, initialStack, sourceIndex
         );
     }
 
