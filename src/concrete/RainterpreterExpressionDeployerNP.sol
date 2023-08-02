@@ -8,13 +8,13 @@ import "rain.solmem/lib/LibStackPointer.sol";
 import "rain.datacontract/lib/LibDataContract.sol";
 import "rain.erc1820/lib/LibIERC1820.sol";
 
-import "../interface/IExpressionDeployerV1.sol";
+import "../interface/unstable/IExpressionDeployerV2.sol";
 import "../interface/unstable/IDebugExpressionDeployerV2.sol";
 import "../interface/unstable/IDebugInterpreterV2.sol";
 import "../interface/unstable/IParserV1.sol";
 
 import "../lib/integrity/LibIntegrityCheck.sol";
-import "../lib/state/LibInterpreterStateDataContract.sol";
+import "../lib/state/LibInterpreterStateDataContractNP.sol";
 import "../lib/op/LibAllStandardOpsNP.sol";
 import "../lib/parse/LibParse.sol";
 
@@ -85,7 +85,7 @@ library LibRainterpreterExpressionDeployerNPMeta {
 /// @notice !!!EXPERIMENTAL!!! This is the deployer for the RainterpreterNP
 /// interpreter. Notably includes onchain parsing/compiling of expressions from
 /// Rainlang strings.
-contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpressionDeployerV2, IParserV1, ERC165 {
+contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpressionDeployerV2, IParserV1, ERC165 {
     using LibStackPointer for Pointer;
     using LibUint256Array for uint256[];
 
@@ -224,31 +224,31 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV1, IDebugExpre
     }
 
     /// @inheritdoc IParserV1
-    function parse(bytes memory data) external pure virtual override returns (bytes[] memory, uint256[] memory) {
+    function parse(bytes memory data) external pure virtual override returns (bytes memory, uint256[] memory) {
         // The return is used by returning it, so this is a false positive.
         //slither-disable-next-line unused-return
         return LibParse.parse(data, parseMeta());
     }
 
-    /// @inheritdoc IExpressionDeployerV1
-    function deployExpression(bytes[] memory sources, uint256[] memory constants, uint256[] memory minOutputs)
+    /// @inheritdoc IExpressionDeployerV2
+    function deployExpression(bytes memory bytecode, uint256[] memory constants, uint256[] memory minOutputs)
         external
         returns (IInterpreterV1, IInterpreterStoreV1, address)
     {
-        uint256 stackLength = integrityCheck(sources, constants, minOutputs);
+        // uint256 stackLength = integrityCheck(sources, constants, minOutputs);
 
-        // Emit the config of the expression _before_ we serialize it, as the
-        // serialization process itself is destructive of the sources in memory.
-        emit NewExpression(msg.sender, sources, constants, minOutputs);
+        // // Emit the config of the expression _before_ we serialize it, as the
+        // // serialization process itself is destructive of the sources in memory.
+        // emit NewExpression(msg.sender, sources, constants, minOutputs);
 
         (DataContractMemoryContainer container, Pointer pointer) =
-            LibDataContract.newContainer(LibInterpreterStateDataContract.serializeSize(sources, constants));
+            LibDataContract.newContainer(LibInterpreterStateDataContractNP.serializeSizeNP(bytecode, constants));
 
         // Serialize the state config into bytes that can be deserialized later
         // by the interpreter. This will compile the sources according to the
         // provided function pointers.
-        LibInterpreterStateDataContract.unsafeSerialize(
-            pointer, sources, constants, stackLength, OPCODE_FUNCTION_POINTERS
+        LibInterpreterStateDataContractNP.unsafeSerializeNP(
+            pointer, bytecode, constants
         );
 
         // Deploy the serialized expression onchain.

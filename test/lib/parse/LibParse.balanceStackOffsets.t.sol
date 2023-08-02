@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import "forge-std/Test.sol";
 
 import "src/lib/parse/LibParse.sol";
+import "src/lib/bytecode/LibBytecode.sol";
 
 /// @title LibParseBalanceStackOffsetsTest
 /// Test that the parser correctly balances the stack offsets each line.
@@ -73,12 +74,19 @@ contract LibParseBalanceStackOffsetsTest is Test {
 
     /// Inputs don't cause a revert but should still balance the stack offsets.
     function testParseBalanceStackOffsetsInputs() external {
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse("_ _:a(), _:b();", meta);
-        assertEq(sources.length, 1);
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_ _:a(), _:b();", meta);
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
+        assertEq(constants.length, 0);
         // a and b should be parsed and inputs are just ignored in the output
         // source.
-        assertEq(sources[0], hex"0000000000010000");
-        assertEq(constants.length, 0);
+        assertEq(bytecode, hex"0000000000010000");
+
+        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 0);
     }
 
     /// Nested RHS items only count as one LHS item.

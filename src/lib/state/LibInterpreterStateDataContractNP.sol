@@ -1,11 +1,46 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
+import "rain.solmem/lib/LibPointer.sol";
+import "rain.solmem/lib/LibMemCpy.sol";
+import "rain.solmem/lib/LibBytes.sol";
+
 import "../ns/LibNamespace.sol";
 import "./LibInterpreterStateNP.sol";
 
 library LibInterpreterStateDataContractNP {
-    function unsafeDeserializeNP(bytes memory serialized, FullyQualifiedNamespace namespace, IInterpreterStoreV1 store, uint256[][] memory context, bytes memory fs) internal pure returns (InterpreterStateNP memory) {
+    using LibBytes for bytes;
+
+    function serializeSizeNP(bytes memory bytecode, uint256[] memory constants) internal pure returns (uint256 size) {
+        unchecked {
+            size = bytecode.length + constants.length * 0x20 + 0x40;
+        }
+    }
+
+    function unsafeSerializeNP(Pointer cursor, bytes memory bytecode, uint256[] memory constants) internal pure {
+        unchecked {
+            // Copy constants into place with length.
+            assembly ("memory-safe") {
+                for {
+                    let constantsCursor := constants
+                    let constantsEnd := add(constantsCursor, mul(0x20, add(mload(constants), 1)))
+                } lt(constantsCursor, constantsEnd) {
+                    constantsCursor := add(constantsCursor, 0x20)
+                    cursor := add(cursor, 0x20)
+                } { mstore(cursor, mload(constantsCursor)) }
+            }
+            // Copy the bytecode into place with length.
+            LibMemCpy.unsafeCopyBytesTo(bytecode.startPointer(), cursor, bytecode.length + 0x20);
+        }
+    }
+
+    function unsafeDeserializeNP(
+        bytes memory serialized,
+        FullyQualifiedNamespace namespace,
+        IInterpreterStoreV1 store,
+        uint256[][] memory context,
+        bytes memory fs
+    ) internal pure returns (InterpreterStateNP memory) {
         unchecked {
             Pointer cursor;
             assembly ("memory-safe") {
@@ -42,7 +77,7 @@ library LibInterpreterStateDataContractNP {
 
                 // Allocate each stack and point to it.
                 let stacksCursor := add(stacks, 0x20)
-                for { let i := 0} lt(i, stacksLength) {
+                for { let i := 0 } lt(i, stacksLength) {
                     i := add(i, 1)
                     // Move over the 2 byte source pointer.
                     cursor := add(cursor, 2)
@@ -67,16 +102,7 @@ library LibInterpreterStateDataContractNP {
                 }
             }
 
-            return InterpreterStateNP(
-                stacks,
-                firstConstant,
-                MemoryKV.wrap(0),
-                namespace,
-                store,
-                context,
-                bytecode,
-                fs
-            );
+            return InterpreterStateNP(stacks, firstConstant, MemoryKV.wrap(0), namespace, store, context, bytecode, fs);
         }
     }
 }

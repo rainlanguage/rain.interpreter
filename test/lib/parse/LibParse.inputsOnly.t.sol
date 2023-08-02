@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import "forge-std/Test.sol";
 
 import "src/lib/parse/LibParse.sol";
+import "src/lib/bytecode/LibBytecode.sol";
 
 /// @title LibParseInputsOnlyTest
 /// @notice Tests that inputs (leading LHS items without RHS items) to an
@@ -12,13 +13,33 @@ import "src/lib/parse/LibParse.sol";
 /// I.e. the expression is basically an identity function.
 contract LibParseInputsOnlyTest is Test {
     /// Some inputs-only examples. Should produce an empty source.
-    function testParseInputsOnly() external {
-        string[2] memory examples = ["_:;", "_ _:;"];
-        for (uint256 i = 0; i < examples.length; i++) {
-            (bytes[] memory sources1, uint256[] memory constants1) = LibParse.parse(bytes(examples[i]), "");
-            assertEq(sources1.length, 1);
-            assertEq(sources1[0].length, 0);
-            assertEq(constants1.length, 0);
-        }
+    /// Test a single input.
+    function testParseInputsOnlySingle() external {
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes("_;"), "");
+        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        assertEq(bytecode, hex"");
+
+        assertEq(constants.length, 0);
+    }
+
+    /// Test multiple inputs.
+    function testParseInputsOnlyMultiple() external {
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes("_ _;"), "");
+        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
+        assertEq(bytecode, hex"");
+
+        assertEq(constants.length, 0);
     }
 }

@@ -77,11 +77,11 @@ contract LibOpChainIdTest is RainterpreterExpressionDeployerDeploymentTest {
     /// Test the eval of a chain ID opcode parsed from a string.
     function testOpChainIDEval(uint64 chainId) external {
         vm.chainId(chainId);
-        (bytes[] memory sources, uint256[] memory constants) = iDeployer.parse("_: chain-id();");
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: chain-id();");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(sources, constants, minOutputs);
+            iDeployer.deployExpression(bytecode, constants, minOutputs);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),

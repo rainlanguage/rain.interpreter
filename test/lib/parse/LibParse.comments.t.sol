@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import "forge-std/Test.sol";
 
 import "src/lib/parse/LibParse.sol";
+import "src/lib/bytecode/LibBytecode.sol";
 
 /// @title LibParseCommentsTest
 /// Test that the parser correctly parses comments.
@@ -24,99 +25,188 @@ contract LibParseCommentsTest is Test {
     /// A single comment with no expected bytecode.
     function testParseCommentNoWords() external {
         string memory s = "/* empty output */:;";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        assertEq(sources.length, 1);
-        assertEq(sources[0], hex"");
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(constants.length, 0);
+
+        assertEq(bytecode, hex"");
+        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 0);
     }
 
     /// A single comment with a single word in the bytecode.
     function testParseCommentSingleWord() external {
         string memory s = "/* one word */\n_:a();";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        assertEq(sources.length, 1);
-        // a
-        assertEq(sources[0], hex"00000000");
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(constants.length, 0);
+
+        // a
+        assertEq(bytecode, hex"00000000");
+        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
     }
 
     /// Comments can be on the same line as source if there is some whitespace.
     function testParseCommentSingleWordSameLine() external {
         string memory s = "/* same line comment */ _:a();";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        assertEq(sources.length, 1);
-        // a
-        assertEq(sources[0], hex"00000000");
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(constants.length, 0);
+
+        // a
+        assertEq(bytecode, hex"00000000");
+        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
     }
 
     /// Comments can appear between sources.
     function testParseCommentBetweenSources() external {
         string memory s = "_:a(); /* interstitial comment */ _:b();";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        assertEq(sources.length, 2);
-        // a
-        assertEq(sources[0], hex"00000000");
-        // b
-        assertEq(sources[1], hex"00010000");
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        assertEq(LibBytecode.sourceCount(bytecode), 2);
         assertEq(constants.length, 0);
+
+        // a
+        assertEq(bytecode, hex"00000000");
+        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+
+        // b
+        assertEq(bytecode, hex"00010000");
+        sourceIndex = SourceIndex.wrap(1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
     }
 
     /// Comments can appear after sources.
     function testParseCommentAfterSources() external {
         string memory s = "_:a(); _:b(); /* trailing comment */";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        assertEq(sources.length, 2);
-        // a
-        assertEq(sources[0], hex"00000000");
-        // b
-        assertEq(sources[1], hex"00010000");
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        assertEq(LibBytecode.sourceCount(bytecode), 2);
         assertEq(constants.length, 0);
+
+        // a
+        assertEq(bytecode, hex"00000000");
+        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+
+        // b
+        assertEq(bytecode, hex"00010000");
+        sourceIndex = SourceIndex.wrap(1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
     }
 
     /// Multiple comments can appear in a row.
     function testParseCommentMultiple() external {
         string memory s = "/* comment 1 */ /* comment 2 */ _:a(); /* comment 3 */ _:b(); /* comment 4 */";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        assertEq(sources.length, 2);
-        // a
-        assertEq(sources[0], hex"00000000");
-        // b
-        assertEq(sources[1], hex"00010000");
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        assertEq(LibBytecode.sourceCount(bytecode), 2);
         assertEq(constants.length, 0);
+
+        // a
+        assertEq(bytecode, hex"00000000");
+        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+
+        // b
+        assertEq(bytecode, hex"00010000");
+        sourceIndex = SourceIndex.wrap(1);
+
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
     }
 
     /// Comments can have many astericks within them without breaking out of the
     /// comment. Tests extra leading astericks.
     function testParseCommentManyAstericks() external {
         string memory s = "/** _ */ _:a();";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        assertEq(sources.length, 1);
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
         // a
-        assertEq(sources[0], hex"00000000");
+        assertEq(bytecode, hex"00000000");
         assertEq(constants.length, 0);
+
+        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
     }
 
     /// Comments can have many astericks within them without breaking out of the
     /// comment. Tests extra trailing astericks.
     function testParseCommentManyAstericksTrailing() external {
         string memory s = "/* _ **/ _:a();";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        assertEq(sources.length, 1);
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
         // a
-        assertEq(sources[0], hex"00000000");
+        assertEq(bytecode, hex"00000000");
         assertEq(constants.length, 0);
+
+        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
     }
 
     /// Comments can be very long and span multiple lines.
     function testParseCommentLong() external {
         string memory s =
             "/* this is a very \nlong comment that \nspans multiple lines **** and has many \nwords */ _:a();";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        assertEq(sources.length, 1);
-        // a
-        assertEq(sources[0], hex"00000000");
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(constants.length, 0);
+
+        // a
+        assertEq(bytecode, hex"00000000");
+
+        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
     }
 
     /// Comments cause yang so cannot be without trailing whitespace.

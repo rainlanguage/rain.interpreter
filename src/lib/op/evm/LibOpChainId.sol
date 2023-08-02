@@ -27,7 +27,11 @@ library LibOpChainId {
         return integrityCheckState.push(stackTop);
     }
 
-    function integrityNP(IntegrityCheckStateNP memory, Operand, uint256) internal pure returns (Operand, uint256, uint256) {
+    function integrityNP(IntegrityCheckStateNP memory, Operand, uint256)
+        internal
+        pure
+        returns (Operand, uint256, uint256)
+    {
         return (Operand.wrap(0), 0, 1);
     }
 

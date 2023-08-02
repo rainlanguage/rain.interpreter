@@ -602,7 +602,7 @@ library LibParseState {
         }
     }
 
-    function buildSources(ParseState memory state) internal pure returns (bytes[] memory sources) {
+    function buildBytecode(ParseState memory state) internal pure returns (bytes memory bytecode) {
         unchecked {
             uint256 sourcesBuilder = state.sourcesBuilder;
             uint256 offsetEnd = (sourcesBuilder >> 0xf0);
@@ -622,7 +622,7 @@ library LibParseState {
             uint256 cursor;
             assembly ("memory-safe") {
                 cursor := mload(0x40)
-                sources := cursor
+                bytecode := cursor
                 mstore(cursor, div(offsetEnd, 0x10))
                 cursor := add(cursor, 0x20)
                 // Expect underflow on the break condition.
@@ -1035,7 +1035,7 @@ library LibParse {
                     revert MissingFinalSemi(errorOffset);
                 }
             }
-            return (state.buildSources(), state.buildConstants());
+            return (state.buildBytecode(), state.buildConstants());
         }
     }
 }

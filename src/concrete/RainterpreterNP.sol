@@ -62,9 +62,8 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
         uint256[] memory stack,
         SourceIndex sourceIndex
     ) external view returns (uint256[] memory, uint256[] memory) {
-        InterpreterStateNP memory state = expressionData.unsafeDeserializeNP(
-            namespace, store, context, OPCODE_FUNCTION_POINTERS
-        );
+        InterpreterStateNP memory state =
+            expressionData.unsafeDeserializeNP(namespace, store, context, OPCODE_FUNCTION_POINTERS);
 
         if (SourceIndex.unwrap(sourceIndex) >= state.bytecode.length) {
             revert InvalidSourceIndex(sourceIndex);

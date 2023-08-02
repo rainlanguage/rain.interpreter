@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
 
 import "src/lib/caller/LibContext.sol";
+import "src/lib/bytecode/LibBytecode.sol";
 
 /// @title LibOpConstantTest
 /// @notice Test the runtime and integrity time logic of LibOpConstant.
@@ -105,17 +106,24 @@ contract LibOpConstantTest is RainterpreterExpressionDeployerDeploymentTest {
     /// Test the case of an empty constants array via. an end to end test. We
     /// expect the deployer to revert, as the integrity check MUST fail.
     function testOpConstantEvalZeroConstants() external {
-        (bytes[] memory sources, uint256[] memory constants) =
+        (bytes memory bytecode, uint256[] memory constants) =
             iDeployer.parse("_ _ _: constant() constant() constant();");
-        assertEq(sources.length, 1);
-        assertEq(sources[0], hex"000100000001000000010000");
+        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 3);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 3);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 3);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 3);
+        assertEq(bytecode, hex"000100000001000000010000");
+
         assertEq(constants.length, 0);
 
         uint256[] memory minOuputs = new uint256[](1);
         minOuputs[0] = 3;
         vm.expectRevert(abi.encodeWithSelector(OutOfBoundsConstantsRead.selector, 0, 0));
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(sources, constants, minOuputs);
+            iDeployer.deployExpression(bytecode, constants, minOuputs);
         (interpreterDeployer);
         (storeDeployer);
         (expression);
@@ -123,16 +131,22 @@ contract LibOpConstantTest is RainterpreterExpressionDeployerDeploymentTest {
 
     /// Test the eval of a constant opcode parsed from a string.
     function testOpConstantEval() external {
-        (bytes[] memory sources, uint256[] memory constants) = iDeployer.parse("_ _: max-uint-256() 1001e15;");
-        assertEq(sources.length, 1);
-        assertEq(sources[0], hex"0004000000010000");
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_ _: max-uint-256() 1001e15;");
+        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
+        assertEq(bytecode, hex"0004000000010000");
         assertEq(constants.length, 1);
         assertEq(constants[0], 1001e15);
 
         uint256[] memory minOuputs = new uint256[](1);
         minOuputs[0] = 2;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(sources, constants, minOuputs);
+            iDeployer.deployExpression(bytecode, constants, minOuputs);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),

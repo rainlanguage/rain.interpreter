@@ -7,6 +7,7 @@ import "rain.solmem/lib/LibPointer.sol";
 
 import "src/lib/integrity/LibIntegrityCheck.sol";
 import "src/lib/parse/LibParse.sol";
+import "src/lib/bytecode/LibBytecode.sol";
 
 /// Thrown by `integrityReverts` to show that the integrity check can revert
 /// with a custom error.
@@ -68,7 +69,8 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
     /// @return state The new integrity check state.
     /// @return stackTop The stack top pointer.
     function newState(bytes memory expression) internal pure returns (IntegrityCheckState memory, Pointer) {
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(expression, parseMeta());
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(expression, parseMeta());
+        bytes[] memory sources = LibBytecode.bytecodeToSources(bytecode);
         IntegrityCheckState memory state = LibIntegrityCheck.newState(sources, constants, integrityPointers());
         return (state, state.stackBottom);
     }

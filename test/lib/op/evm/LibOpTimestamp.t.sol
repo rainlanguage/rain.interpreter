@@ -79,11 +79,11 @@ contract LibOpTimestampTest is RainterpreterExpressionDeployerDeploymentTest {
     /// Test the eval of a timestamp opcode parsed from a string.
     function testOpTimestampEval(uint256 blockTimestamp) external {
         vm.warp(blockTimestamp);
-        (bytes[] memory sources, uint256[] memory constants) = iDeployer.parse("_: block-timestamp();");
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: block-timestamp();");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(sources, constants, minOutputs);
+            iDeployer.deployExpression(bytecode, constants, minOutputs);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),

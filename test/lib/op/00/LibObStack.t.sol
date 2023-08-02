@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
 
 import "src/lib/caller/LibContext.sol";
+import "src/lib/bytecode/LibBytecode.sol";
 
 /// @title LibOpStackTest
 /// @notice Test the runtime and integrity time logic of LibOpStack.
@@ -100,16 +101,23 @@ contract LibOpStackTest is RainterpreterExpressionDeployerDeploymentTest {
 
     /// Test the eval of a stack opcode parsed from a string.
     function testOpStackEval() external {
-        (bytes[] memory sources, uint256[] memory constants) = iDeployer.parse("foo: 1, bar: foo;");
-        assertEq(sources.length, 1);
-        assertEq(sources[0], hex"0001000000000000");
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("foo: 1, bar: foo;");
+        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        assertEq(bytecode, hex"0001000000000000");
+
         assertEq(constants.length, 1);
         assertEq(constants[0], 1);
 
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 2;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(sources, constants, minOutputs);
+            iDeployer.deployExpression(bytecode, constants, minOutputs);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),

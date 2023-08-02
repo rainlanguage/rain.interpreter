@@ -10,7 +10,11 @@ library LibEvalNP {
     /// sourceIndex is valid. The interpreter is responsible for ensuring that
     /// the sourceIndex is valid for the externally exposed `eval` entrypoint on
     /// the interface.
-    function evalNP(InterpreterStateNP memory state, SourceIndex sourceIndex, Pointer stackTop) internal view returns (Pointer) {
+    function evalNP(InterpreterStateNP memory state, SourceIndex sourceIndex, Pointer stackTop)
+        internal
+        view
+        returns (Pointer)
+    {
         unchecked {
             uint256 cursor;
             uint256 end;
