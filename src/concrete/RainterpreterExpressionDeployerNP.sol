@@ -247,9 +247,7 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
         // Serialize the state config into bytes that can be deserialized later
         // by the interpreter. This will compile the sources according to the
         // provided function pointers.
-        LibInterpreterStateDataContractNP.unsafeSerializeNP(
-            pointer, bytecode, constants
-        );
+        LibInterpreterStateDataContractNP.unsafeSerializeNP(pointer, bytecode, constants);
 
         // Deploy the serialized expression onchain.
         address expression = LibDataContract.write(container);

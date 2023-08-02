@@ -2,6 +2,8 @@
 pragma solidity ^0.8.18;
 
 import "rain.solmem/lib/LibPointer.sol";
+import "rain.solmem/lib/LibMemCpy.sol";
+
 import "./LibCtPop.sol";
 import "./LibParseMeta.sol";
 import "./LibParseCMask.sol";
@@ -453,9 +455,9 @@ library LibParseState {
             // include the operand. The operand is assumed to be 16 bits, so we shift
             // it into the correct position.
             | Operand.unwrap(operand) << offset
-            // include new op. The opcode is assumed to be 16 bits, so we shift it
+            // include new op. The opcode is assumed to be 8 bits, so we shift it
             // into the correct position, beyond the operand.
-            | opcode << (offset + 0x10);
+            | opcode << (offset + 0x18);
             assembly ("memory-safe") {
                 mstore(mload(state), activeSource)
             }
@@ -520,9 +522,12 @@ library LibParseState {
                 // for the offset and pointer positions.
                 tailPointer := cursor
                 cursor := add(cursor, 0x1C)
-                let length := 0
+                // leave space for the source prefix.
+                let length := 4
                 source := mload(0x40)
+                // Move over the source 32 byte length and the 4 byte prefix.
                 let writeCursor := add(source, 0x20)
+                writeCursor := add(writeCursor, 4)
 
                 let counterCursor := add(state, 0x21)
                 for {
@@ -578,7 +583,11 @@ library LibParseState {
                         }
                     }
                 }
+                // Store the bytes length in the source.
                 mstore(source, length)
+                // Store the opcodes length in the source prefix.
+                mstore8(add(source, 0x20), sub(div(length, 4), 1))
+
                 // Round up to the nearest 32 bytes to realign memory.
                 mstore(0x40, and(add(writeCursor, 0x1f), not(0x1f)))
             }
@@ -620,17 +629,67 @@ library LibParseState {
             }
 
             uint256 cursor;
+            uint256 sourcesCount;
+            uint256 sourcesStart;
             assembly ("memory-safe") {
                 cursor := mload(0x40)
                 bytecode := cursor
-                mstore(cursor, div(offsetEnd, 0x10))
+                // Move past the bytecode length, we will write this at the end.
                 cursor := add(cursor, 0x20)
-                // Expect underflow on the break condition.
-                for { let offset := 0 } lt(offset, offsetEnd) {
-                    offset := add(offset, 0x10)
-                    cursor := add(cursor, 0x20)
-                } { mstore(cursor, and(shr(offset, sourcesBuilder), 0xFFFF)) }
-                mstore(0x40, cursor)
+
+                // First byte is the number of sources.
+                sourcesCount := div(offsetEnd, 0x10)
+                mstore8(cursor, sourcesCount)
+                cursor := add(cursor, 1)
+
+                let pointersCursor := cursor
+
+                // Skip past the pointer space. We'll back fill it.
+                cursor := add(cursor, mul(sourcesCount, 2))
+                sourcesStart := cursor
+
+                // Write total bytes length into bytecode. We do ths and handle
+                // the allocation in this same assembly block for memory safety
+                // for the compiler optimiser.
+                let sourcesLength := 0
+                let sourcePointers := 0
+                for { let offset := 0 } lt(offset, offsetEnd) { offset := add(offset, 0x10) } {
+                    let currentSourcePointer := and(shr(offset, sourcesBuilder), 0xFFFF)
+                    // add 4 byte prefix to the length of the sources, all as
+                    // bytes.
+                    sourcePointers := or(sourcePointers, shl(sub(0xf0, offset), sourcesLength))
+                    let currentSourceLength := mload(currentSourcePointer)
+
+                    // Put the reference source pointer and length into the
+                    // prefix so that we can use them to copy the actual data
+                    // into the bytecode.
+                    let tmpPrefix := shl(0xe0, or(shl(0x10, currentSourcePointer), currentSourceLength))
+                    mstore(add(sourcesStart, sourcesLength), tmpPrefix)
+                    sourcesLength := add(sourcesLength, currentSourceLength)
+                }
+                mstore(pointersCursor, or(mload(pointersCursor), sourcePointers))
+                mstore(bytecode, add(sourcesLength, sub(sub(sourcesStart, 0x20), bytecode)))
+
+                // Round up to the nearest 32 bytes past cursor to realign and
+                // allocate memory.
+                mstore(0x40, and(add(add(add(0x20, mload(bytecode)), bytecode), 0x1f), not(0x1f)))
+            }
+
+            // Loop over the sources and write them into the bytecode. Perhaps
+            // there is a more efficient way to do this in the future that won't
+            // cause each source to be written twice in memory.
+            for (uint256 i = 0; i < sourcesCount; i++) {
+                Pointer sourcePointer;
+                uint256 length;
+                Pointer targetPointer;
+                assembly ("memory-safe") {
+                    let relativePointer := and(mload(add(bytecode, add(3, mul(i, 2)))), 0xFFFF)
+                    targetPointer := add(sourcesStart, relativePointer)
+                    let tmpPrefix := mload(targetPointer)
+                    sourcePointer := add(0x20, shr(0xf0, tmpPrefix))
+                    length := and(shr(0xe0, tmpPrefix), 0xFFFF)
+                }
+                LibMemCpy.unsafeCopyBytesTo(sourcePointer, targetPointer, length);
             }
         }
     }
@@ -967,7 +1026,10 @@ library LibParse {
                                 mstore8(
                                     // Add 2 for the reserved bytes to the offset
                                     // then read top 16 bits from the pointer.
-                                    shr(0xf0, mload(add(add(stateOffset, 2), parenOffset))),
+                                    // Add 1 to sandwitch the inputs byte between
+                                    // the opcode index byte and the operand low
+                                    // bytes.
+                                    add(1, shr(0xf0, mload(add(add(stateOffset, 2), parenOffset)))),
                                     // Store the input counter, which is 2 bytes
                                     // after the operand write pointer.
                                     byte(0, mload(add(add(stateOffset, 4), parenOffset)))

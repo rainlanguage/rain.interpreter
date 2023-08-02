@@ -205,7 +205,7 @@ contract LibParseNamedRHSTest is Test {
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
         sourceIndex = SourceIndex.wrap(1);
-        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 8);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
@@ -213,6 +213,34 @@ contract LibParseNamedRHSTest is Test {
 
         assertEq(constants.length, 0);
         // a ; b
-        assertEq(bytecode, hex"00000000");
+        assertEq(
+            bytecode,
+            // 2 sources
+            hex"02"
+            // offset 0
+            hex"0000"
+            // 8 bytes pointers to second source (4 byte prefix + 1 opcode for a)
+            hex"0008"
+            // a ops count
+            hex"01"
+            // a stack allocation
+            hex"01"
+            // a inputs count
+            hex"00"
+            // a outputs count
+            hex"01"
+            // a
+            hex"00000000"
+            // b ops count
+            hex"01"
+            // b stack allocation
+            hex"01"
+            // b inputs count
+            hex"00"
+            // b outputs count
+            hex"01"
+            // b
+            hex"01000000"
+        );
     }
 }
