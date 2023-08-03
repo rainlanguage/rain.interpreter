@@ -223,7 +223,7 @@ library LibParseState {
         );
     }
 
-    function balance(ParseState memory state, bytes memory data, uint256 cursor) internal pure {
+    function balanceLine(ParseState memory state, bytes memory data, uint256 cursor) internal pure {
         uint256 parenOffset;
         assembly ("memory-safe") {
             parenOffset := byte(0, mload(add(state, 0x60)))
@@ -1050,14 +1050,14 @@ library LibParse {
                             // yin.
                             state.fsm |= FSM_YANG_MASK;
                         } else if (char & CMASK_EOL > 0) {
-                            state.balance(data, cursor);
+                            state.balanceLine(data, cursor);
                             cursor++;
 
                             state.fsm = FSM_DEFAULT & ~FSM_ACCEPTING_INPUTS_MASK;
                         }
                         // End of source.
                         else if (char & CMASK_EOS > 0) {
-                            state.balance(data, cursor);
+                            state.balanceLine(data, cursor);
                             state.newSource();
                             cursor++;
 
