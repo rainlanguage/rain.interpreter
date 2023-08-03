@@ -113,7 +113,7 @@ uint256 constant OPCODE_CONSTANT = 1;
 ///   it is full and a member of the LL tail, the offset is replaced with a
 ///   pointer to the next source (towards the head) to build a doubly linked
 ///   list.
-/// - mid 16 bits: pointer to the previous active source (towards teh tail). This
+/// - mid 16 bits: pointer to the previous active source (towards the tail). This
 ///   is a linked list of sources that are built RTL and then reversed to LTR to
 ///   eval.
 /// - high bits: 4 byte opcodes and operand pairs.
@@ -126,13 +126,31 @@ uint256 constant OPCODE_CONSTANT = 1;
 /// - bit 3: accepting inputs => 0 = not accepting, 1 = accepting
 /// - bit 4: interstitial => 0 = not interstitial, 1 = interstitial
 /// @param stack0 Memory region for stack word counters. The first byte is a
-/// counter/offset into the region. The remaining 31 bytes are the stack words.
-/// @param stack1 32 additional bytes of stack words.
+/// counter/offset into the region, which increments for every top level item
+/// parsed on the RHS. The remaining 31 bytes are the word counters for each
+/// stack item, which are incremented for every op pushed to the source. This is
+/// reset to 0 for every new source.
+/// @param stack1 32 additional bytes of stack words, allowing for 63 top level
+/// stack items total per source.
 /// @param parenTracker0 Memory region for tracking pointers to words in the
 /// source, and counters for the number of words in each paren group. The first
 /// byte is a counter/offset into the region. The second byte is a phantom
 /// counter for the root level, the remaining 30 bytes are the paren group words.
 /// @param parenTracker1 32 additional bytes of paren group words.
+/// @param lineTracker A 32 byte memory region for tracking the current line.
+/// Will be partially reset for each line when `balanceLine` is called. Fully
+/// reset when a new source is started.
+/// Bytes from high to low:
+/// - byte 0: A snapshot of the first high byte of `stack0`, i.e. the offset of
+/// top level items as at the beginning of the line. This is reset to the high
+/// byte of `stack0` on each new line.
+/// - byte 1+: A sequence of 2 byte pointers to the end of each paren group's
+/// actual opcodes in the source LL. Reading from this pointer through the LL
+/// will simulate the eval order of the final source. These are all reset to 0
+/// after balancing each line.
+/// - byte 31: Final low byte is the number of LHS items parsed. This is the low
+/// byte so that a simple ++ is a valid operation on the line tracker while
+/// parsing the LHS. This is reset to 0 for each new line.
 /// @param stackNames A linked list of stack names. As the parser encounters
 /// named stack items it pushes them onto this linked list. The linked list is
 /// in FILO order, so the first item on the stack is the last item in the list.
@@ -150,11 +168,11 @@ struct ParseState {
     uint256 stack1;
     uint256 parenTracker0;
     uint256 parenTracker1;
+    uint256 lineTracker;
     /// @dev END things that are referenced directly in assembly by hardcoded
     /// offsets.
     uint256 sourcesBuilder;
     uint256 fsm;
-    uint256 stackLHSIndex;
     uint256 stackNames;
     uint256 stackNameBloom;
     uint256 literalBloom;
@@ -164,6 +182,20 @@ struct ParseState {
 
 library LibParseState {
     using LibParseState for ParseState;
+
+    function resetSource(ParseState memory state) internal pure {
+        uint256 activeSourcePtr;
+        uint256 emptyActiveSource = EMPTY_ACTIVE_SOURCE;
+        assembly ("memory-safe") {
+            activeSourcePtr := mload(0x40)
+            mstore(activeSourcePtr, emptyActiveSource)
+            mstore(0x40, add(activeSourcePtr, 0x20))
+        }
+        state.activeSourcePtr = activeSourcePtr;
+        state.stack0 = 0;
+        state.stack1 = 0;
+        state.lineTracker = 0;
+    }
 
     function newState() internal pure returns (ParseState memory) {
         // Register all the literal parsers in the parse state. Each is a 16 bit
@@ -185,17 +217,10 @@ library LibParseState {
             }
         }
 
-        uint256 emptyActiveSource = EMPTY_ACTIVE_SOURCE;
-        uint256 activeSourcePtr;
-        assembly ("memory-safe") {
-            activeSourcePtr := mload(0x40)
-            mstore(activeSourcePtr, emptyActiveSource)
-            mstore(0x40, add(activeSourcePtr, 0x20))
-        }
-
-        return ParseState(
+        ParseState memory state = ParseState(
             // activeSource
-            activeSourcePtr,
+            // (will be built in `newActiveSource`)
+            0,
             // stack0
             0,
             // stack1
@@ -204,12 +229,13 @@ library LibParseState {
             0,
             // parenTracker1
             0,
+            // lineTracker
+            // (will be built in `newActiveSource`)
+            0,
             // sourcesBuilder
             0,
             // fsm
             FSM_DEFAULT,
-            // stackLHSIndex
-            0,
             // stackNames
             0,
             // stackNameBloom
@@ -221,9 +247,11 @@ library LibParseState {
             // literalParsers
             literalParsers
         );
+        state.resetSource();
+        return state;
     }
 
-    function balanceLine(ParseState memory state, bytes memory data, uint256 cursor) internal pure {
+    function endLine(ParseState memory state, bytes memory data, uint256 cursor) internal pure {
         uint256 parenOffset;
         assembly ("memory-safe") {
             parenOffset := byte(0, mload(add(state, 0x60)))
@@ -236,7 +264,7 @@ library LibParseState {
 
         // Nested conditionals to make the happy path more efficient at the
         // expense of the unhappy path.
-        uint256 stackLHSIndex = state.stackLHSIndex;
+        uint256 stackLHSIndex = state.lineTracker & 0xFF;
         uint256 stackRHSOffset;
         assembly ("memory-safe") {
             stackRHSOffset := byte(0, mload(add(state, 0x20)))
@@ -398,10 +426,10 @@ library LibParseState {
             // Increment the stack counter.
             assembly ("memory-safe") {
                 // Hardcoded offset into the state struct.
-                let counterPos := add(state, 0x20)
-                counterPos := add(add(counterPos, byte(0, mload(counterPos))), 1)
+                let counterOffset := add(state, 0x20)
+                let counterPointer := add(counterOffset, add(byte(0, mload(counterOffset)), 1))
                 // Increment the counter.
-                mstore8(counterPos, add(byte(0, mload(counterPos)), 1))
+                mstore8(counterPointer, add(byte(0, mload(counterPointer)), 1))
             }
 
             uint256 activeSource;
@@ -486,11 +514,12 @@ library LibParseState {
         }
     }
 
-    function newSource(ParseState memory state) internal pure {
+    function endSource(ParseState memory state) internal pure {
         uint256 sourcesBuilder = state.sourcesBuilder;
         uint256 offset = sourcesBuilder >> 0xf0;
 
-        // End is the number of top level words in the source.
+        // End is the number of top level words in the source, which is the
+        // byte offset index + 1.
         uint256 end;
         assembly ("memory-safe") {
             end := add(byte(0, mload(add(state, 0x20))), 1)
@@ -522,7 +551,7 @@ library LibParseState {
                 // for the offset and pointer positions.
                 tailPointer := cursor
                 cursor := add(cursor, 0x1C)
-                // leave space for the source prefix.
+                // leave space for the source prefix in the bytecode output.
                 let length := 4
                 source := mload(0x40)
                 // Move over the source 32 byte length and the 4 byte prefix.
@@ -592,22 +621,12 @@ library LibParseState {
                 mstore(0x40, and(add(writeCursor, 0x1f), not(0x1f)))
             }
 
-            // Reset state for next source.
-            state.stackLHSIndex = 0;
-
-            uint256 emptyActiveSource = EMPTY_ACTIVE_SOURCE;
-            assembly ("memory-safe") {
-                let ptr := mload(0x40)
-                mstore(ptr, emptyActiveSource)
-                mstore(0x40, add(ptr, 0x20))
-                mstore(state, ptr)
-            }
-            state.stack0 = 0;
-            state.stack1 = 0;
-
             //slither-disable-next-line incorrect-shift
             state.sourcesBuilder =
                 ((offset + 0x10) << 0xf0) | (source << offset) | (sourcesBuilder & ((1 << offset) - 1));
+
+            // Reset source as we're done with this one.
+            state.resetSource();
         }
     }
 
@@ -893,14 +912,14 @@ library LibParse {
                                         parseErrorContext(data, cursor);
                                     revert DuplicateLHSItem(errorOffset, errorCharString);
                                 }
-                                state.stackLHSIndex = index;
                             }
                             // Anon stack item.
                             else {
                                 cursor = skipWord(cursor, CMASK_LHS_STACK_TAIL);
-                                // Bump the index without pushing a name.
-                                state.stackLHSIndex++;
                             }
+                            // Bump the index regardless of whether the stack
+                            // item is named or not.
+                            state.lineTracker++;
 
                             // Set yang as we are now building a stack item.
                             // We are also no longer interstitial
@@ -1050,15 +1069,15 @@ library LibParse {
                             // yin.
                             state.fsm |= FSM_YANG_MASK;
                         } else if (char & CMASK_EOL > 0) {
-                            state.balanceLine(data, cursor);
+                            state.endLine(data, cursor);
                             cursor++;
 
                             state.fsm = FSM_DEFAULT & ~FSM_ACCEPTING_INPUTS_MASK;
                         }
                         // End of source.
                         else if (char & CMASK_EOS > 0) {
-                            state.balanceLine(data, cursor);
-                            state.newSource();
+                            state.endLine(data, cursor);
+                            state.endSource();
                             cursor++;
 
                             state.fsm = FSM_DEFAULT;
@@ -1082,8 +1101,9 @@ library LibParse {
                 }
                 if (
                     state
-                        // If the lhs index is non-zero we didn't clear the sources.
-                        .stackLHSIndex != 0
+                        // If the line tracker is non-zero we didn't clear the
+                        // sources.
+                        .lineTracker != 0
                     // If the stack is non-empty we didn't clear the sources.
                     || state.stack0 != 0
                     // If we're not in an interstitial state accepting inputs
