@@ -11,6 +11,8 @@ import "./LibParseLiteral.sol";
 import "../../interface/IInterpreterV1.sol";
 import "./LibParseStackName.sol";
 
+import "forge-std/console2.sol";
+
 /// The expression does not finish with a semicolon (EOF).
 error MissingFinalSemi(uint256 offset);
 
@@ -65,6 +67,9 @@ error ParserOutOfBounds();
 /// region allocated for stack names.
 error StackOverflow();
 
+/// The parser encountered a stack underflow.
+error StackUnderflow();
+
 /// The parser encountered a paren group deeper than it can process in the
 /// memory region allocated for paren tracking.
 error ParenOverflow();
@@ -105,6 +110,8 @@ uint256 constant OPCODE_STACK = 0;
 /// @dev @todo support the meta defining the opcode.
 uint256 constant OPCODE_CONSTANT = 1;
 
+type StackTracker is uint256;
+
 /// The parser is stateful. This struct keeps track of the entire state.
 /// @param activeSourcePtr The pointer to the current source being built.
 /// The active source being pointed to is:
@@ -125,13 +132,13 @@ uint256 constant OPCODE_CONSTANT = 1;
 /// - bit 2: word end => 0 = not end, 1 = end
 /// - bit 3: accepting inputs => 0 = not accepting, 1 = accepting
 /// - bit 4: interstitial => 0 = not interstitial, 1 = interstitial
-/// @param stack0 Memory region for stack word counters. The first byte is a
+/// @param topLevel0 Memory region for stack word counters. The first byte is a
 /// counter/offset into the region, which increments for every top level item
 /// parsed on the RHS. The remaining 31 bytes are the word counters for each
 /// stack item, which are incremented for every op pushed to the source. This is
 /// reset to 0 for every new source.
-/// @param stack1 32 additional bytes of stack words, allowing for 63 top level
-/// stack items total per source.
+/// @param topLevel1 32 additional bytes of stack words, allowing for 63 top
+/// level stack items total per source.
 /// @param parenTracker0 Memory region for tracking pointers to words in the
 /// source, and counters for the number of words in each paren group. The first
 /// byte is a counter/offset into the region. The second byte is a phantom
@@ -140,17 +147,17 @@ uint256 constant OPCODE_CONSTANT = 1;
 /// @param lineTracker A 32 byte memory region for tracking the current line.
 /// Will be partially reset for each line when `balanceLine` is called. Fully
 /// reset when a new source is started.
-/// Bytes from high to low:
-/// - byte 0: A snapshot of the first high byte of `stack0`, i.e. the offset of
-/// top level items as at the beginning of the line. This is reset to the high
-/// byte of `stack0` on each new line.
-/// - byte 1+: A sequence of 2 byte pointers to the end of each paren group's
-/// actual opcodes in the source LL. Reading from this pointer through the LL
-/// will simulate the eval order of the final source. These are all reset to 0
-/// after balancing each line.
-/// - byte 31: Final low byte is the number of LHS items parsed. This is the low
+/// Bytes from low to high:
+/// - byte 0: Lowest byte is the number of LHS items parsed. This is the low
 /// byte so that a simple ++ is a valid operation on the line tracker while
 /// parsing the LHS. This is reset to 0 for each new line.
+/// - byte 1: A snapshot of the first high byte of `topLevel0`, i.e. the offset
+/// of top level items as at the beginning of the line. This is reset to the high
+/// byte of `topLevel0` on each new line.
+/// - bytes 2+: A sequence of 2 byte pointers to before the start of each top
+/// level item, which is implictly after the end of the previous top level item.
+/// Allows us to quickly find the start of the RHS source for each top level
+/// item.
 /// @param stackNames A linked list of stack names. As the parser encounters
 /// named stack items it pushes them onto this linked list. The linked list is
 /// in FILO order, so the first item on the stack is the last item in the list.
@@ -162,10 +169,13 @@ uint256 constant OPCODE_CONSTANT = 1;
 /// pointer to a literal parser.
 struct ParseState {
     /// @dev START things that are referenced directly in assembly by hardcoded
-    /// offsets. E.g. `pushOpToSource` and `newSource`.
+    /// offsets. E.g.
+    /// - `pushOpToSource`
+    /// - `snapshotSourceHeadToLineTracker`
+    /// - `newSource`
     uint256 activeSourcePtr;
-    uint256 stack0;
-    uint256 stack1;
+    uint256 topLevel0;
+    uint256 topLevel1;
     uint256 parenTracker0;
     uint256 parenTracker1;
     uint256 lineTracker;
@@ -178,10 +188,48 @@ struct ParseState {
     uint256 literalBloom;
     uint256 constantsBuilder;
     uint256 literalParsers;
+    StackTracker stackTracker;
+}
+
+library LibStackTracker {
+    using LibStackTracker for StackTracker;
+
+    function inputs(StackTracker tracker, uint256 n) internal pure returns (StackTracker) {
+        unchecked {
+            tracker = tracker.push(n);
+            uint256 inputs = (StackTracker.unwrap(tracker) >> 8) & 0xFF;
+            inputs += n;
+            return StackTracker.wrap((StackTracker.unwrap(tracker) & ~uint256(0xFF00)) | (inputs << 8));
+        }
+    }
+
+    function push(StackTracker tracker, uint256 n) internal pure returns (StackTracker) {
+        unchecked {
+            uint256 current = StackTracker.unwrap(tracker) & 0xFF;
+            uint256 inputs = (StackTracker.unwrap(tracker) >> 8) & 0xFF;
+            uint256 max = StackTracker.unwrap(tracker) >> 0x10;
+            current += n;
+            if (current > max) {
+                max = current;
+            }
+            return StackTracker.wrap(current | (inputs << 8) | (max << 0x10));
+        }
+    }
+
+    function pop(StackTracker tracker, uint256 n) internal pure returns (StackTracker) {
+        unchecked {
+            uint256 current = StackTracker.unwrap(tracker) & 0xFF;
+            if (current < n) {
+                revert StackUnderflow();
+            }
+            return StackTracker.wrap(StackTracker.unwrap(tracker) - n);
+        }
+    }
 }
 
 library LibParseState {
     using LibParseState for ParseState;
+    using LibStackTracker for StackTracker;
 
     function resetSource(ParseState memory state) internal pure {
         uint256 activeSourcePtr;
@@ -192,8 +240,8 @@ library LibParseState {
             mstore(0x40, add(activeSourcePtr, 0x20))
         }
         state.activeSourcePtr = activeSourcePtr;
-        state.stack0 = 0;
-        state.stack1 = 0;
+        state.topLevel0 = 0;
+        state.topLevel1 = 0;
         state.lineTracker = 0;
     }
 
@@ -221,9 +269,9 @@ library LibParseState {
             // activeSource
             // (will be built in `newActiveSource`)
             0,
-            // stack0
+            // topLevel0
             0,
-            // stack1
+            // topLevel1
             0,
             // parenTracker0
             0,
@@ -245,46 +293,137 @@ library LibParseState {
             // constantsBuilder
             0,
             // literalParsers
-            literalParsers
+            literalParsers,
+            // stackTracker
+            StackTracker.wrap(0)
         );
         state.resetSource();
         return state;
     }
 
-    function endLine(ParseState memory state, bytes memory data, uint256 cursor) internal pure {
-        uint256 parenOffset;
+    // Find the pointer to the first opcode in the source LL. Put it in the line
+    // tracker at the appropriate offset.
+    function snapshotSourceHeadToLineTracker(ParseState memory state) internal pure {
         assembly ("memory-safe") {
-            parenOffset := byte(0, mload(add(state, 0x60)))
-        }
-        if (parenOffset > 0) {
-            (uint256 offset, string memory char) = LibParse.parseErrorContext(data, cursor);
-            (char);
-            revert UnclosedLeftParen(offset);
-        }
+            let topLevel0Pointer := add(state, 0x20)
+            let totalRHSTopLevel := byte(0, mload(topLevel0Pointer))
+            // Only do stuff if the current word counter is zero.
+            if iszero(byte(0, mload(add(topLevel0Pointer, add(totalRHSTopLevel, 1))))) {
+                let sourceHead := mload(state)
+                let byteOffset := div(and(mload(sourceHead), 0xFFFF), 8)
+                sourceHead := add(sourceHead, sub(0x20, byteOffset))
 
-        // Nested conditionals to make the happy path more efficient at the
-        // expense of the unhappy path.
-        uint256 stackLHSIndex = state.lineTracker & 0xFF;
-        uint256 stackRHSOffset;
-        assembly ("memory-safe") {
-            stackRHSOffset := byte(0, mload(add(state, 0x20)))
+                let lineTracker := mload(add(state, 0xa0))
+                let lineRHSTopLevel := sub(totalRHSTopLevel, byte(30, lineTracker))
+                let offset := mul(0x10, add(lineRHSTopLevel, 1))
+                lineTracker := or(lineTracker, shl(offset, sourceHead))
+                mstore(add(state, 0xa0), lineTracker)
+            }
         }
-        if (stackLHSIndex != stackRHSOffset) {
-            (uint256 offset, string memory char) = LibParse.parseErrorContext(data, cursor);
-            (char);
-            if (stackLHSIndex > stackRHSOffset) {
+    }
+
+    function endLine(ParseState memory state, bytes memory data, uint256 cursor) internal pure {
+        unchecked {
+            {
+                uint256 parenOffset;
+                assembly ("memory-safe") {
+                    parenOffset := byte(0, mload(add(state, 0x60)))
+                }
+                if (parenOffset > 0) {
+                    (uint256 errorOffset, string memory errorChar) = LibParse.parseErrorContext(data, cursor);
+                    (errorChar);
+                    revert UnclosedLeftParen(errorOffset);
+                }
+            }
+
+            // This will snapshot the current head of the source, which will be
+            // the start of where we want to read for the final line RHS item,
+            // if it exists.
+            state.snapshotSourceHeadToLineTracker();
+
+            uint256 lineLHSItems = state.lineTracker & 0xFF;
+            // Total number of RHS at top level is the top byte of topLevel0.
+            uint256 totalRHSTopLevel = state.topLevel0 >> 0xf8;
+            // Snapshot for RHS from start of line is top byte of lineTracker.
+            uint256 lineRHSTopLevel = totalRHSTopLevel - ((state.lineTracker >> 8) & 0xFF);
+
+            // If:
+            // - we are accepting inputs
+            // - the RHS on this line is empty
+            // Then we treat the LHS items as inputs to the source. This means that
+            // we need to move the RHS offset to the end of the LHS items. There MAY
+            // be 0 LHS items, e.g. if the entire source is empty. This can only
+            // happen at the start of the source, as any RHS item immediately flips
+            // the FSM to not accepting inputs.
+            if (lineRHSTopLevel == 0) {
                 if (state.fsm & FSM_ACCEPTING_INPUTS_MASK == 0) {
-                    revert ExcessLHSItems(offset);
+                    (uint256 errorOffset, string memory errorChar) = LibParse.parseErrorContext(data, cursor);
+                    (errorChar);
+                    revert ExcessLHSItems(errorOffset);
                 } else {
-                    // Move the RHS offset to cover inputs to the source. This
-                    // gives a zero length of words for each input.
-                    assembly ("memory-safe") {
-                        mstore8(add(state, 0x20), stackLHSIndex)
+                    // As there are no RHS opcodes yet we can simply set topLevel0 directly.
+                    // This is the only case where we defer to the LHS to tell
+                    // us how many top level items there are.
+                    totalRHSTopLevel += lineLHSItems;
+
+                    // Push the inputs onto the stack tracker.
+                    state.stackTracker = state.stackTracker.inputs(lineLHSItems);
+                }
+            }
+            // If:
+            // - there are multiple RHS items on this line
+            // Then there must be the same number of LHS items. Multi or zero output
+            // RHS top level items are NOT supported unless they are the only RHS
+            // item on that line.
+            else if (lineRHSTopLevel > 1) {
+                if (lineLHSItems < lineRHSTopLevel) {
+                    (uint256 errorOffset, string memory errorChar) = LibParse.parseErrorContext(data, cursor);
+                    (errorChar);
+                    revert ExcessRHSItems(errorOffset);
+                } else if (lineLHSItems > lineRHSTopLevel) {
+                    (uint256 errorOffset, string memory errorChar) = LibParse.parseErrorContext(data, cursor);
+                    (errorChar);
+                    revert ExcessLHSItems(errorOffset);
+                }
+            }
+
+            // Follow pointers to the start of the RHS item.
+            uint256 topLevelOffset = 1 + totalRHSTopLevel - lineRHSTopLevel;
+            for (uint256 offset = (0x10 * lineRHSTopLevel) + 0x20; offset > 0x20; offset -= 0x10) {
+                uint256 itemSourceHead = (state.lineTracker >> offset) & 0xFFFF;
+                uint256 opsDepth;
+                assembly ("memory-safe") {
+                    opsDepth := byte(0, mload(add(state, add(0x20, topLevelOffset))))
+                }
+                for (uint256 i = 1; i <= opsDepth; i++) {
+                    {
+                        uint256 opInputs;
+                        assembly ("memory-safe") {
+                            opInputs := byte(1, mload(itemSourceHead))
+                        }
+                        state.stackTracker = state.stackTracker.pop(opInputs);
+                        // Nested multi or zero output RHS items are NOT
+                        // supported. If the top level RHS item is the ONLY RHS
+                        // item on the line then it MAY have multiple or zero
+                        // outputs. In this case we defer to the LHS to tell us
+                        // how many outputs there are. If the LHS is wrong then
+                        // later integrity checks will need to flag it.
+                        state.stackTracker =
+                            state.stackTracker.push(i == opsDepth && lineRHSTopLevel == 1 ? lineLHSItems : 1);
+                    }
+                    itemSourceHead += 4;
+                    // We've hit the end of a LL item so have to jump towards the
+                    // tail to keep going.
+                    if (itemSourceHead % 0x20 == 0xc0) {
+                        assembly ("memory-safe") {
+                            itemSourceHead := shr(0xf0, mload(itemSourceHead))
+                        }
                     }
                 }
-            } else {
-                revert ExcessRHSItems(offset);
+                topLevelOffset++;
             }
+
+            state.lineTracker = totalRHSTopLevel << 8;
         }
     }
 
@@ -423,7 +562,12 @@ library LibParseState {
 
     function pushOpToSource(ParseState memory state, uint256 opcode, Operand operand) internal pure {
         unchecked {
-            // Increment the stack counter.
+            // This might be a top level item so try to snapshot its pointer to
+            // the line tracker before writing the stack counter.
+            state.snapshotSourceHeadToLineTracker();
+
+            // Increment the top level stack counter for the current top level
+            // word. MAY be setting 0 to 1 if this is the top level.
             assembly ("memory-safe") {
                 // Hardcoded offset into the state struct.
                 let counterOffset := add(state, 0x20)
@@ -536,6 +680,7 @@ library LibParseState {
         // evaluated correctly similar to reverse polish notation.
         else {
             uint256 source;
+            StackTracker stackTracker = state.stackTracker;
             assembly ("memory-safe") {
                 // find the end of the LL tail.
                 let cursor := mload(state)
@@ -614,8 +759,16 @@ library LibParseState {
                 }
                 // Store the bytes length in the source.
                 mstore(source, length)
-                // Store the opcodes length in the source prefix.
-                mstore8(add(source, 0x20), sub(div(length, 4), 1))
+                // Store the opcodes length and stack tracker in the source
+                // prefix.
+                let prefixWritePointer := add(source, 4)
+                mstore(
+                    prefixWritePointer,
+                    or(
+                        and(mload(prefixWritePointer), not(0xFFFFFFFF)),
+                        or(shl(0x18, sub(div(length, 4), 1)), stackTracker)
+                    )
+                )
 
                 // Round up to the nearest 32 bytes to realign memory.
                 mstore(0x40, and(add(writeCursor, 0x1f), not(0x1f)))
@@ -1105,7 +1258,7 @@ library LibParse {
                         // sources.
                         .lineTracker != 0
                     // If the stack is non-empty we didn't clear the sources.
-                    || state.stack0 != 0
+                    || state.topLevel0 != 0
                     // If we're not in an interstitial state accepting inputs
                     // then we're not at potential start of a source, so we
                     // started a source without finishing it.
