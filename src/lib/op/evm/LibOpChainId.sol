@@ -4,6 +4,7 @@ pragma solidity ^0.8.18;
 import "rain.solmem/lib/LibStackPointer.sol";
 import "../LibOp.sol";
 import "../../state/LibInterpreterState.sol";
+import "../../state/LibInterpreterStateNP.sol";
 import "../../integrity/LibIntegrityCheck.sol";
 import "../../integrity/LibIntegrityCheckNP.sol";
 
@@ -40,5 +41,13 @@ library LibOpChainId {
     /// @return The new stack top.
     function run(InterpreterState memory, Operand, Pointer stackTop) internal view returns (Pointer) {
         return stackTop.unsafePush(block.chainid);
+    }
+
+    function runNP(InterpreterStateNP memory, Operand, Pointer stackTop) internal view returns (Pointer) {
+        assembly ("memory-safe") {
+            stackTop := sub(stackTop, 0x20)
+            mstore(stackTop, chainid())
+        }
+        return stackTop;
     }
 }

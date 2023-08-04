@@ -3,6 +3,7 @@ pragma solidity ^0.8.18;
 
 import "rain.solmem/lib/LibStackPointer.sol";
 import "../../state/LibInterpreterState.sol";
+import "../../state/LibInterpreterStateNP.sol";
 import "../../integrity/LibIntegrityCheck.sol";
 import "../../integrity/LibIntegrityCheckNP.sol";
 
@@ -76,6 +77,15 @@ library LibOpStack {
         assembly ("memory-safe") {
             mstore(stackTop, mload(add(mload(state), mul(0x20, operand))))
             stackTop := add(stackTop, 0x20)
+        }
+        return stackTop;
+    }
+
+    function runNP(InterpreterStateNP memory state, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
+        assembly ("memory-safe") {
+            let stackValue := mload(add(mload(state), mul(0x20, operand)))
+            stackTop := sub(stackTop, 0x20)
+            mstore(stackTop, stackValue)
         }
         return stackTop;
     }

@@ -52,7 +52,7 @@ error UnexpectedOpMetaHash(bytes32 actualOpMeta);
 error NegativeStackIndex(int256 index);
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x142a865d854d903b77185b6a50a27c519e22bc978fd9098a0038031ba2802b83);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x61ec3ed030cc545b49cbf40d67424f2313de807526f135cf225340737eee5ec0);
 
 /// @dev Hash of the known store bytecode.
 bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);

@@ -27,7 +27,7 @@ error InvalidSourceIndex(SourceIndex sourceIndex);
 /// By setting these as a constant they can be inlined into the interpreter
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"0c150c240c370c490c570c85";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"0be90c1d0c530c820cb10d00";
 
 /// @title RainterpreterNP
 /// @notice !!EXPERIMENTAL!! implementation of a Rainlang interpreter that is
@@ -98,9 +98,10 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
             namespace.qualifyNamespace(msg.sender), store, context, OPCODE_FUNCTION_POINTERS
         );
 
-        if (SourceIndex.unwrap(sourceIndex) >= state.bytecode.length) {
-            revert InvalidSourceIndex(sourceIndex);
-        }
+        // @todo fix sources length.
+        // if (SourceIndex.unwrap(sourceIndex) >= state.bytecode.length) {
+        //     revert InvalidSourceIndex(sourceIndex);
+        // }
 
         // Eval the expression and return up to maxOutputs from the final stack.
         Pointer stackBottom = state.stacks[SourceIndex.unwrap(sourceIndex)].endPointer();

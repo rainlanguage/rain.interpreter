@@ -3,6 +3,7 @@ pragma solidity ^0.8.18;
 
 import "rain.solmem/lib/LibStackPointer.sol";
 import "../../state/LibInterpreterState.sol";
+import "../../state/LibInterpreterStateNP.sol";
 import "../../integrity/LibIntegrityCheck.sol";
 import "../../integrity/LibIntegrityCheckNP.sol";
 
@@ -39,5 +40,14 @@ library LibOpMaxUint256 {
     /// @return The new stack top.
     function run(InterpreterState memory, Operand, Pointer stackTop) internal pure returns (Pointer) {
         return stackTop.unsafePush(type(uint256).max);
+    }
+
+    function runNP(InterpreterStateNP memory, Operand, Pointer stackTop) internal pure returns (Pointer) {
+        uint256 value = type(uint256).max;
+        assembly ("memory-safe") {
+            stackTop := sub(stackTop, 0x20)
+            mstore(stackTop, value)
+        }
+        return stackTop;
     }
 }

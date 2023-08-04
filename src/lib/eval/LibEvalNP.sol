@@ -121,14 +121,16 @@ library LibEvalNP {
                     f := shr(0xf0, mload(add(fPointersStart, mul(byte(28, word), 2))))
                     operand := and(word, 0xFFFFFF)
                 }
+                stackTop = f(state, operand, stackTop);
 
                 cursor += 0x20;
             }
 
             // Loop over the remainder.
-            // Need to shift the cursor back so that we're reading from its low
-            // bits rather than high bits, to make the loop logic more efficient.
-            cursor -= 0xe0;
+            // Need to shift the cursor back 28 bytes so that we're reading from
+            // its 4 low bits rather than high bits, to make the loop logic more
+            // efficient.
+            cursor -= 0x1c;
             end = cursor + m * 4;
             while (cursor < end) {
                 assembly ("memory-safe") {
@@ -136,6 +138,7 @@ library LibEvalNP {
                     f := shr(0xf0, mload(add(fPointersStart, mul(byte(28, word), 2))))
                     operand := and(word, 0xFFFFFF)
                 }
+                stackTop = f(state, operand, stackTop);
                 cursor += 4;
             }
             return stackTop;

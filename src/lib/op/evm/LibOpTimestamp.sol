@@ -3,6 +3,7 @@ pragma solidity ^0.8.18;
 
 import "rain.solmem/lib/LibStackPointer.sol";
 import "../../state/LibInterpreterState.sol";
+import "../../state/LibInterpreterStateNP.sol";
 import "../../integrity/LibIntegrityCheck.sol";
 import "../../integrity/LibIntegrityCheckNP.sol";
 
@@ -39,5 +40,13 @@ library LibOpTimestamp {
     /// @return The new stack top.
     function run(InterpreterState memory, Operand, Pointer stackTop) internal view returns (Pointer) {
         return stackTop.unsafePush(block.timestamp);
+    }
+
+    function runNP(InterpreterStateNP memory, Operand, Pointer stackTop) internal view returns (Pointer) {
+        assembly ("memory-safe") {
+            stackTop := sub(stackTop, 0x20)
+            mstore(stackTop, timestamp())
+        }
+        return stackTop;
     }
 }

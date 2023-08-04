@@ -119,27 +119,27 @@ library LibAllStandardOpsNP {
     /// method can just be a thin wrapper around this function.
     function opcodeFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
-            function(InterpreterState memory, Operand, Pointer)
+            function(InterpreterStateNP memory, Operand, Pointer)
                 view
                 returns (Pointer) lengthPointer;
             uint256 length = ALL_STANDARD_OPS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(InterpreterState memory, Operand, Pointer)
+            function(InterpreterStateNP memory, Operand, Pointer)
                 view
                 returns (Pointer)[ALL_STANDARD_OPS_LENGTH + 1] memory pointersFixed = [
                     lengthPointer,
                     // Stack then constant are the first two ops to match the
                     // field ordering in the interpreter state NOT the lexical
                     // ordering of the file system.
-                    LibOpStack.run,
-                    LibOpConstant.run,
+                    LibOpStack.runNP,
+                    LibOpConstant.runNP,
                     // Everything else is alphabetical, including folders.
-                    LibOpBlockNumber.run,
-                    LibOpChainId.run,
-                    LibOpMaxUint256.run,
-                    LibOpTimestamp.run
+                    LibOpBlockNumber.runNP,
+                    LibOpChainId.runNP,
+                    LibOpMaxUint256.runNP,
+                    LibOpTimestamp.runNP
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {

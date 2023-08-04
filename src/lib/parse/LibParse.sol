@@ -243,6 +243,7 @@ library LibParseState {
         state.topLevel0 = 0;
         state.topLevel1 = 0;
         state.lineTracker = 0;
+        state.stackTracker = StackTracker.wrap(0);
     }
 
     function newState() internal pure returns (ParseState memory) {
@@ -389,7 +390,7 @@ library LibParseState {
 
             // Follow pointers to the start of the RHS item.
             uint256 topLevelOffset = 1 + totalRHSTopLevel - lineRHSTopLevel;
-            for (uint256 offset = (0x10 * lineRHSTopLevel) + 0x20; offset > 0x20; offset -= 0x10) {
+            for (uint256 offset = (0x10 * lineRHSTopLevel) + 0x10; offset > 0x10; offset -= 0x10) {
                 uint256 itemSourceHead = (state.lineTracker >> offset) & 0xFFFF;
                 uint256 opsDepth;
                 assembly ("memory-safe") {
