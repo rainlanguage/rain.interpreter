@@ -35,7 +35,22 @@ contract LibParseIntegerLiteralHexTest is Test {
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
 
-        assertEq(bytecode, hex"00010000");
+        assertEq(bytecode,
+        // 1 source.
+        hex"01"
+        // offset 0
+        hex"0000"
+        // 1 op
+        hex"01"
+        // 1 stack allocation
+        hex"01"
+        // 0 inputs
+        hex"00"
+        // 1 output
+        hex"01"
+        // constant 0
+        hex"01000000"
+        );
 
         assertEq(constants.length, 1);
         assertEq(constants[0], 0xa2);
@@ -53,7 +68,25 @@ contract LibParseIntegerLiteralHexTest is Test {
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
 
-        assertEq(bytecode, hex"0001000000010001");
+        assertEq(bytecode,
+        // 1 source.
+        hex"01"
+        // offset 0
+        hex"0000"
+        // 2 ops
+        hex"02"
+        // 2 stack allocation
+        hex"02"
+        // 0 inputs
+        hex"00"
+        // 2 outputs
+        hex"02"
+        // constant 0
+        hex"01000000"
+        // constant 1
+        hex"01000001"
+        );
+
         assertEq(constants.length, 2);
         assertEq(constants[0], 0xa2);
         assertEq(constants[1], 0x03);
@@ -71,7 +104,27 @@ contract LibParseIntegerLiteralHexTest is Test {
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 3);
         // Sources represents all 3 literals, but the dupe is deduped so that the
         // operands only reference the first instance of the duped constant.
-        assertEq(bytecode, hex"000100000001000100010000");
+        assertEq(bytecode,
+        // 1 source.
+        hex"01"
+        // offset 0
+        hex"0000"
+        // 3 ops
+        hex"03"
+        // 3 stack allocation
+        hex"03"
+        // 0 inputs
+        hex"00"
+        // 3 outputs
+        hex"03"
+        // constant 0
+        hex"01000000"
+        // constant 1
+        hex"01000001"
+        // constant 0
+        hex"01000000"
+        );
+
         assertEq(constants.length, 2);
         assertEq(constants[0], 0xa2);
         assertEq(constants[1], 0x03);
@@ -88,7 +141,23 @@ contract LibParseIntegerLiteralHexTest is Test {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
-        assertEq(bytecode, hex"00010000");
+        assertEq(
+            bytecode,
+            // 1 source.
+            hex"01"
+            // offset 0
+            hex"0000"
+            // 1 op
+            hex"01"
+            // 1 stack allocation
+            hex"01"
+            // 0 inputs
+            hex"00"
+            // 1 output
+            hex"01"
+            // constant 0
+            hex"01000000"
+        );
         assertEq(constants.length, 1);
         assertEq(constants[0], type(uint256).max);
     }
