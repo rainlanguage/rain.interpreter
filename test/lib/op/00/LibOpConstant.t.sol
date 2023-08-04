@@ -115,7 +115,27 @@ contract LibOpConstantTest is RainterpreterExpressionDeployerDeploymentTest {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 3);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 3);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 3);
-        assertEq(bytecode, hex"000100000001000000010000");
+
+        assertEq(bytecode,
+        // 1 source.
+        hex"01"
+        // offset 0
+        hex"0000"
+        // 3 ops
+        hex"03"
+        // 3 stack allocation
+        hex"03"
+        // 0 inputs
+        hex"00"
+        // 3 outputs
+        hex"03"
+        // constant 0
+        hex"01000000"
+        // constant 0
+        hex"01000000"
+        // constant 0
+        hex"01000000"
+        );
 
         assertEq(constants.length, 0);
 
