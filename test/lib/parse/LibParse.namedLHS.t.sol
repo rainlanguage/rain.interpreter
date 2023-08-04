@@ -22,24 +22,52 @@ contract LibParseNamedLHSTest is Test {
             assertEq(LibBytecode.sourceOutputsLength(bytecode0, sourceIndex0), 2);
             assertEq(constants0.length, 0);
         }
+    }
 
-        (bytes memory bytecode1, uint256[] memory constants1) = LibParse.parse("a:;b:;", "");
-        assertEq(LibBytecode.sourceCount(bytecode1), 2);
-        SourceIndex sourceIndex1 = SourceIndex.wrap(0);
-        assertEq(LibBytecode.sourceRelativeOffset(bytecode1, sourceIndex1), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode1, sourceIndex1), 0);
-        assertEq(LibBytecode.sourceStackAllocation(bytecode1, sourceIndex1), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode1, sourceIndex1), 1);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode1, sourceIndex1), 1);
+    /// Two sources with one named input each.
+    function testParseNamedLHSTwoInputs() external {
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("a:;b:;", "");
+        assertEq(bytecode,
+        // 2 sources.
+        hex"02"
+        // offset 0
+        hex"0000"
+        // offset 4
+        hex"0004"
+        // 0 ops
+        hex"00"
+        // 1 stack allocation
+        hex"01"
+        // 1 input
+        hex"01"
+        // 1 output
+        hex"01"
+        // 0 ops
+        hex"00"
+        // 1 stack allocation
+        hex"01"
+        // 1 input
+        hex"01"
+        // 1 output
+        hex"01");
 
-        sourceIndex1 = SourceIndex.wrap(1);
-        assertEq(LibBytecode.sourceRelativeOffset(bytecode1, sourceIndex1), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode1, sourceIndex1), 0);
-        assertEq(LibBytecode.sourceStackAllocation(bytecode1, sourceIndex1), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode1, sourceIndex1), 1);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode1, sourceIndex1), 1);
+        assertEq(LibBytecode.sourceCount(bytecode), 2);
 
-        assertEq(constants1.length, 0);
+        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+
+        sourceIndex = SourceIndex.wrap(1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 4);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+
+        assertEq(constants.length, 0);
     }
 
     /// Exceeding the maximum length of a word should revert. Testing a 32 char

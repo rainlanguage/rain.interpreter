@@ -390,7 +390,8 @@ library LibParseState {
 
             // Follow pointers to the start of the RHS item.
             uint256 topLevelOffset = 1 + totalRHSTopLevel - lineRHSTopLevel;
-            for (uint256 offset = (0x10 * lineRHSTopLevel) + 0x10; offset > 0x10; offset -= 0x10) {
+            uint256 end = (0x10 * lineRHSTopLevel) + 0x20;
+            for (uint256 offset = 0x20; offset < end; offset += 0x10) {
                 uint256 itemSourceHead = (state.lineTracker >> offset) & 0xFFFF;
                 uint256 opsDepth;
                 assembly ("memory-safe") {
@@ -415,7 +416,7 @@ library LibParseState {
                     itemSourceHead += 4;
                     // We've hit the end of a LL item so have to jump towards the
                     // tail to keep going.
-                    if (itemSourceHead % 0x20 == 0xc0) {
+                    if (itemSourceHead % 0x20 == 0x1c) {
                         assembly ("memory-safe") {
                             itemSourceHead := shr(0xf0, mload(itemSourceHead))
                         }

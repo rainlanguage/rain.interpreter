@@ -201,11 +201,34 @@ contract LibParseNamedRHSTest is Test {
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 5);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
         assertEq(constants.length, 0);
         // Nested words compile RTL so that they execute LTR.
         // e d c b a
-        assertEq(bytecode, hex"0004000000030000020200000001000002000000");
+        assertEq(bytecode,
+        // 1 source
+        hex"01"
+        // offset 0
+        hex"0000"
+        // e d c b a ops count
+        hex"05"
+        // e d c b a stack allocation
+        hex"02"
+        // e d c b a inputs count
+        hex"00"
+        // e d c b a outputs count
+        hex"01"
+        // e
+        hex"04000000"
+        // d
+        hex"03000000"
+        // c 2 inputs
+        hex"02020000"
+        // b
+        hex"01000000"
+        // a 2 inputs
+        hex"00020000"
+        );
     }
 
     /// Several words, mixing sequential and nested logic to some depth, with
@@ -223,7 +246,38 @@ contract LibParseNamedRHSTest is Test {
         assertEq(constants.length, 0);
         // Nested words compile RTL so that they execute LTR.
         // i h g f e d c b a
-        assertEq(bytecode, hex"000800000007000002060000000500000004000000030000020200000001000004000000");
+        assertEq(bytecode,
+        // 1 source
+        hex"01"
+        // offset 0
+        hex"0000"
+        // i h g f e d c b a ops count
+        hex"09"
+        // i h g f e d c b a stack allocation
+        hex"04"
+        // i h g f e d c b a inputs count
+        hex"00"
+        // i h g f e d c b a outputs count
+        hex"01"
+        // i
+        hex"08000000"
+        // h
+        hex"07000000"
+        // g 2 inputs
+        hex"06020000"
+        // f
+        hex"05000000"
+        // e
+        hex"04000000"
+        // d
+        hex"03000000"
+        // c 2 inputs
+        hex"02020000"
+        // b
+        hex"01000000"
+        // a 4 inputs
+        hex"00040000"
+        );
     }
 
     /// Several words, mixing sequential and nested logic to some depth, with
