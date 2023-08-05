@@ -41,7 +41,7 @@ contract LibParseNamedRHSTest is Test {
         string memory s = "_:a();";
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
         assertEq(LibBytecode.sourceCount(bytecode), 1);
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
@@ -56,7 +56,7 @@ contract LibParseNamedRHSTest is Test {
     function testParseTwoSequential() external {
         string memory s = "_ _:a() b();";
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 2);
@@ -90,7 +90,7 @@ contract LibParseNamedRHSTest is Test {
     function testParseTwoSequentialWithInputs() external {
         string memory s = "_ _:a(b()) b(c());";
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 4);
@@ -128,7 +128,7 @@ contract LibParseNamedRHSTest is Test {
     function testParseTwoNested() external {
         string memory s = "_:a(b());";
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 2);
@@ -162,7 +162,7 @@ contract LibParseNamedRHSTest is Test {
     function testParseTwoNestedAsThirdInput() external {
         string memory s = "_:a(b() c());";
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 3);
@@ -199,7 +199,7 @@ contract LibParseNamedRHSTest is Test {
     function testParseSingleLHSNestingAndSequential00() external {
         string memory s = "_:a(b() c(d() e()));";
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 5);
@@ -241,7 +241,7 @@ contract LibParseNamedRHSTest is Test {
     function testParseSingleLHSNestingAndSequential01() external {
         string memory s = "_:a(b() c(d() e()) f() g(h() i()));";
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 9);
@@ -320,7 +320,7 @@ contract LibParseNamedRHSTest is Test {
             // e 1 input
             hex"04010000"
         );
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 7);
@@ -336,7 +336,7 @@ contract LibParseNamedRHSTest is Test {
         string memory s =
             "_ _:a(b() c(d() e() f() g() h() i() j() k() l() m() n() o() p())) p(o() n(m() l() k() j() i() h() g() f() e() d() c() b() a()));";
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0x20);
@@ -435,7 +435,7 @@ contract LibParseNamedRHSTest is Test {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
         // assertEq(LibBytecode.sourceCount(bytecode), 1);
 
-        // SourceIndex sourceIndex = SourceIndex.wrap(0);
+        // uint256 sourceIndex = 0;
         // assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         // assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 4);
         // assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 3);
@@ -475,13 +475,14 @@ contract LibParseNamedRHSTest is Test {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
         assertEq(LibBytecode.sourceCount(bytecode), 2);
 
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
-        sourceIndex = SourceIndex.wrap(1);
+
+        sourceIndex = 1;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 8);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);

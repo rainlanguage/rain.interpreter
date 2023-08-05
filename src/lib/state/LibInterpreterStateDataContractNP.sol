@@ -36,6 +36,7 @@ library LibInterpreterStateDataContractNP {
 
     function unsafeDeserializeNP(
         bytes memory serialized,
+        uint256 sourceIndex,
         FullyQualifiedNamespace namespace,
         IInterpreterStoreV1 store,
         uint256[][] memory context,
@@ -62,21 +63,21 @@ library LibInterpreterStateDataContractNP {
             }
 
             // Build all the stacks.
-            uint256[][] memory stacks;
+            Pointer[] memory stackBottoms;
             assembly ("memory-safe") {
                 cursor := add(cursor, 0x20)
                 let stacksLength := byte(0, mload(cursor))
                 cursor := add(cursor, 1)
                 let sourcesStart := add(cursor, mul(stacksLength, 2))
 
-                // Allocate the memory for stacks.
+                // Allocate the memory for stackBottoms.
                 // We don't need to zero this because we're about to write to it.
-                stacks := mload(0x40)
-                mstore(stacks, stacksLength)
-                mstore(0x40, add(stacks, mul(add(stacksLength, 1), 0x20)))
+                stackBottoms := mload(0x40)
+                mstore(stackBottoms, stacksLength)
+                mstore(0x40, add(stackBottoms, mul(add(stacksLength, 1), 0x20)))
 
                 // Allocate each stack and point to it.
-                let stacksCursor := add(stacks, 0x20)
+                let stacksCursor := add(stackBottoms, 0x20)
                 for { let i := 0 } lt(i, stacksLength) {
                     i := add(i, 1)
                     // Move over the 2 byte source pointer.
@@ -95,14 +96,15 @@ library LibInterpreterStateDataContractNP {
                     // assumes values above the stack top are dirty anyway.
                     let stack := mload(0x40)
                     mstore(stack, stackSize)
-                    mstore(0x40, add(stack, mul(add(stackSize, 1), 0x20)))
+                    let stackBottom := add(stack, mul(add(stackSize, 1), 0x20))
+                    mstore(0x40, stackBottom)
 
-                    // Point to the stack.
-                    mstore(stacksCursor, stack)
+                    // Point to the stack bottom
+                    mstore(stacksCursor, stackBottom)
                 }
             }
 
-            return InterpreterStateNP(stacks, firstConstant, MemoryKV.wrap(0), namespace, store, context, bytecode, fs);
+            return InterpreterStateNP(stackBottoms, firstConstant, sourceIndex, MemoryKV.wrap(0), namespace, store, context, bytecode, fs);
         }
     }
 }

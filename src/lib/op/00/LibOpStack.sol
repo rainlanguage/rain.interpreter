@@ -86,8 +86,10 @@ library LibOpStack {
         pure
         returns (Pointer)
     {
+        uint256 sourceIndex = state.sourceIndex;
         assembly ("memory-safe") {
-            let stackValue := mload(add(mload(state), mul(0x20, operand)))
+            let stackBottom := mload(add(mload(state), mul(0x20, add(sourceIndex, 1))))
+            let stackValue := mload(sub(stackBottom, mul(0x20, add(operand, 1))))
             stackTop := sub(stackTop, 0x20)
             mstore(stackTop, stackValue)
         }

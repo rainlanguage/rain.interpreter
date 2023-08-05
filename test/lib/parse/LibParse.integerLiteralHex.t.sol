@@ -27,7 +27,7 @@ contract LibParseIntegerLiteralHexTest is Test {
     /// sources and constants.
     function testParseIntegerLiteralHex00() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_: 0xa2;", meta);
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
@@ -61,7 +61,7 @@ contract LibParseIntegerLiteralHexTest is Test {
     /// length 2 constants.
     function testParseIntegerLiteralHex01() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_ _: 0xa2 0x03;", meta);
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 2);
@@ -97,7 +97,7 @@ contract LibParseIntegerLiteralHexTest is Test {
     /// Check 3 hex literals with 2 dupes. Should dedupe and respect ordering.
     function testParseIntegerLiteralHex02() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_ _ _: 0xa2 0x03 0xa2;", meta);
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 3);
@@ -137,7 +137,7 @@ contract LibParseIntegerLiteralHexTest is Test {
     function testParseIntegerLiteralHexUint256Max() external {
         (bytes memory bytecode, uint256[] memory constants) =
             LibParse.parse("_: 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;", meta);
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);

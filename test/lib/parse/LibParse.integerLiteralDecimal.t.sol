@@ -26,7 +26,7 @@ contract LibParseIntegerLiteralDecimalTest is Test {
     /// sources and constants.
     function testParseIntegerLiteralDecimal00() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_: 1;", meta);
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
@@ -60,7 +60,7 @@ contract LibParseIntegerLiteralDecimalTest is Test {
     /// length 2 constants.
     function testParseIntegerLiteralDecimal01() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_ _: 10 25;", meta);
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 2);
@@ -96,7 +96,7 @@ contract LibParseIntegerLiteralDecimalTest is Test {
     /// Check 3 decimal literals with 2 dupes. Should dedupe and respect ordering.
     function testParseIntegerLiteralDecimal02() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_ _ _: 11 233 11;", meta);
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 3);
@@ -135,7 +135,7 @@ contract LibParseIntegerLiteralDecimalTest is Test {
     function testParseIntegerLiteralDecimalUint256Max() external {
         (bytes memory bytecode, uint256[] memory constants) =
             LibParse.parse("_: 115792089237316195423570985008687907853269984665640564039457584007913129639935;", meta);
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
@@ -170,7 +170,7 @@ contract LibParseIntegerLiteralDecimalTest is Test {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(
             "_: 000115792089237316195423570985008687907853269984665640564039457584007913129639935;", meta
         );
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
@@ -241,7 +241,7 @@ contract LibParseIntegerLiteralDecimalTest is Test {
     function testParseIntegerLiteralDecimalENotation() external {
         (bytes memory bytecode, uint256[] memory constants) =
             LibParse.parse("_ _ _ _ _: 1e2 10e2 1e30 1e18 1001e15;", meta);
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 5);

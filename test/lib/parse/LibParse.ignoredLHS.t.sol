@@ -23,7 +23,7 @@ contract LibParseIgnoredLHSTest is Test {
     /// A lone underscore should parse to an empty source and constant.
     function testParseIgnoredLHSLoneUnderscore() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:;", "");
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
@@ -37,7 +37,7 @@ contract LibParseIgnoredLHSTest is Test {
     /// Two underscores should parse to an empty source and constant.
     function testParseIgnoredLHSTwoUnderscores() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_ _:;", "");
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
@@ -53,7 +53,7 @@ contract LibParseIgnoredLHSTest is Test {
     /// with no constants.
     function testParseIgnoredLHSUnderscoreNotInput() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":,_:a();", meta);
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
@@ -69,7 +69,7 @@ contract LibParseIgnoredLHSTest is Test {
     /// source and constant.
     function testParseIgnoredLHSUnderscoreAlpha() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_a:;", "");
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
@@ -83,7 +83,7 @@ contract LibParseIgnoredLHSTest is Test {
     /// Two ignored alphas should parse to an empty source and constant.
     function testParseIgnoredLHSTwoAlphas() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_a _b:;", "");
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
@@ -98,7 +98,7 @@ contract LibParseIgnoredLHSTest is Test {
     // Ignored alphas can be multiple chars long each.
     function testParseIgnoredLHSAlphaTooLong() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_foo _bar:;", "");
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
@@ -113,7 +113,7 @@ contract LibParseIgnoredLHSTest is Test {
     /// Normally words are limited to 31 chars.
     function testParseIgnoredWordTooLong() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;", "");
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);

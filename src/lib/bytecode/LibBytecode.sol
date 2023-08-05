@@ -19,7 +19,7 @@ library LibBytecode {
         }
     }
 
-    function sourceRelativeOffset(bytes memory bytecode, SourceIndex sourceIndex)
+    function sourceRelativeOffset(bytes memory bytecode, uint256 sourceIndex)
         internal
         pure
         returns (uint256 offset)
@@ -31,7 +31,7 @@ library LibBytecode {
         }
     }
 
-    function sourcePointer(bytes memory bytecode, SourceIndex sourceIndex) internal pure returns (Pointer pointer) {
+    function sourcePointer(bytes memory bytecode, uint256 sourceIndex) internal pure returns (Pointer pointer) {
         unchecked {
             uint256 sourcesStartOffset = 1 + sourceCount(bytecode) * 2;
             uint256 offset = sourceRelativeOffset(bytecode, sourceIndex);
@@ -41,7 +41,7 @@ library LibBytecode {
         }
     }
 
-    function sourceOpsLength(bytes memory bytecode, SourceIndex sourceIndex) internal pure returns (uint256 length) {
+    function sourceOpsLength(bytes memory bytecode, uint256 sourceIndex) internal pure returns (uint256 length) {
         unchecked {
             Pointer pointer = sourcePointer(bytecode, sourceIndex);
             assembly ("memory-safe") {
@@ -50,7 +50,7 @@ library LibBytecode {
         }
     }
 
-    function sourceStackAllocation(bytes memory bytecode, SourceIndex sourceIndex)
+    function sourceStackAllocation(bytes memory bytecode, uint256 sourceIndex)
         internal
         pure
         returns (uint256 allocation)
@@ -63,7 +63,7 @@ library LibBytecode {
         }
     }
 
-    function sourceInputsLength(bytes memory bytecode, SourceIndex sourceIndex)
+    function sourceInputsLength(bytes memory bytecode, uint256 sourceIndex)
         internal
         pure
         returns (uint256 length)
@@ -76,7 +76,7 @@ library LibBytecode {
         }
     }
 
-    function sourceOutputsLength(bytes memory bytecode, SourceIndex sourceIndex)
+    function sourceOutputsLength(bytes memory bytecode, uint256 sourceIndex)
         internal
         pure
         returns (uint256 length)
@@ -97,10 +97,9 @@ library LibBytecode {
         unchecked {
             uint256 count = sourceCount(bytecode);
             bytes[] memory sources = new bytes[](count);
-            for (uint16 i = 0; i < count; i++) {
-                SourceIndex sourceIndex = SourceIndex.wrap(i);
-                Pointer pointer = sourcePointer(bytecode, sourceIndex).unsafeAddBytes(4);
-                uint256 length = sourceOpsLength(bytecode, sourceIndex) * 4;
+            for (uint256 i = 0; i < count; i++) {
+                Pointer pointer = sourcePointer(bytecode, i).unsafeAddBytes(4);
+                uint256 length = sourceOpsLength(bytecode, i) * 4;
                 bytes memory source = new bytes(length);
                 pointer.unsafeCopyBytesTo(source.dataPointer(), length);
                 sources[i] = source;

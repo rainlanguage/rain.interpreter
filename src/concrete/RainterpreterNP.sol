@@ -75,8 +75,15 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
         uint256[][] memory context
     ) external view returns (uint256[] memory, uint256[] memory) {
         // Decode the dispatch.
-        (address expression, SourceIndex sourceIndex, uint256 maxOutputs) = LibEncodedDispatch.decode(dispatch);
+        (address expression, SourceIndex sourceIndex16, uint256 maxOutputs) = LibEncodedDispatch.decode(dispatch);
         bytes memory expressionData = LibDataContract.read(expression);
+
+        // Need to clean source index as it is a uint16.
+        uint256 sourceIndex;
+        assembly ("memory-safe") {
+            sourceIndex := and(sourceIndex16, 0xFFFF)
+        }
+
         return _eval(
             store,
             namespace.qualifyNamespace(msg.sender),
@@ -99,11 +106,16 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
         IInterpreterStoreV1 store,
         FullyQualifiedNamespace namespace,
         bytes memory expressionData,
-        SourceIndex sourceIndex,
+        SourceIndex sourceIndex16,
         uint256 maxOutputs,
         uint256[][] memory context,
         uint256[] memory inputs
     ) external view returns (uint256[] memory, uint256[] memory) {
+        // Need to clean source index as it is a uint16.
+        uint256 sourceIndex;
+        assembly ("memory-safe") {
+            sourceIndex := and(sourceIndex16, 0xFFFF)
+        }
         _eval(store, namespace, expressionData, sourceIndex, maxOutputs, context, inputs);
     }
 
@@ -116,19 +128,15 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
         IInterpreterStoreV1 store,
         FullyQualifiedNamespace namespace,
         bytes memory expressionData,
-        SourceIndex sourceIndex,
+        uint256 sourceIndex,
         uint256 maxOutputs,
         uint256[][] memory context,
         uint256[] memory inputs
     ) internal view returns (uint256[] memory, uint256[] memory) {
-        // Need to clean source index as it is a uint16.
-        assembly ("memory-safe") {
-            sourceIndex := and(sourceIndex, 0xFFFF)
-        }
         InterpreterStateNP memory state =
-            expressionData.unsafeDeserializeNP(namespace, store, context, OPCODE_FUNCTION_POINTERS);
+            expressionData.unsafeDeserializeNP(sourceIndex, namespace, store, context, OPCODE_FUNCTION_POINTERS);
 
-        Pointer stackBottom = state.stacks[SourceIndex.unwrap(sourceIndex)].endPointer();
+        Pointer stackBottom = state.stackBottoms[sourceIndex];
         // Copy inputs into place.
         Pointer stackTop = stackBottom.unsafeSubWords(inputs.length);
         LibMemCpy.unsafeCopyWordsTo(inputs.dataPointer(), stackTop, inputs.length);

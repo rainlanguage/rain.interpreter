@@ -6,8 +6,9 @@ import "rain.lib.memkv/lib/LibMemoryKV.sol";
 import "../ns/LibNamespace.sol";
 
 struct InterpreterStateNP {
-    uint256[][] stacks;
+    Pointer[] stackBottoms;
     Pointer firstConstant;
+    uint256 sourceIndex;
     MemoryKV stateKV;
     FullyQualifiedNamespace namespace;
     IInterpreterStoreV1 store;

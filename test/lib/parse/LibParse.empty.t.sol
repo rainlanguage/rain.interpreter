@@ -17,7 +17,10 @@ contract LibParseEmptyTest is Test {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("", "");
 
         assertEq(LibBytecode.sourceCount(bytecode), 0);
-        assertEq(bytecode, hex"");
+        assertEq(bytecode,
+        // 0 sources
+        hex"00"
+        );
 
         assertEq(constants.length, 0);
     }
@@ -27,14 +30,27 @@ contract LibParseEmptyTest is Test {
     function testParseEmpty01() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":;", "");
         assertEq(LibBytecode.sourceCount(bytecode), 1);
-        assertEq(bytecode, hex"");
+        assertEq(bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 0 ops
+            hex"00"
+            // 0 stack allocation
+            hex"00"
+            // 0 inputs
+            hex"00"
+            // 0 outputs
+            hex"00"
+        );
 
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 0);
 
         assertEq(constants.length, 0);
     }
@@ -44,15 +60,37 @@ contract LibParseEmptyTest is Test {
     function testParseEmpty02() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":;:;", "");
         assertEq(LibBytecode.sourceCount(bytecode), 2);
-        assertEq(bytecode, hex"");
+        assertEq(bytecode,
+            // 2 sources
+            hex"02"
+            // 0 offset
+            hex"0000"
+            // 4 offset
+            hex"0004"
+            // 0. 0 ops
+            hex"00"
+            // 0. 0 stack allocation
+            hex"00"
+            // 0. 0 inputs
+            hex"00"
+            // 0. 0 outputs
+            hex"00"
+            // 1. 0 ops
+            hex"00"
+            // 1. 0 stack allocation
+            hex"00"
+            // 1. 0 inputs
+            hex"00"
+            // 1. 0 outputs
+            hex"00"
+        );
 
         for (uint256 i = 0; i < 2; i++) {
-            SourceIndex sourceIndex = SourceIndex.wrap(uint16(i));
-            assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-            assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
-            assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 0);
-            assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-            assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 0);
+            assertEq(LibBytecode.sourceRelativeOffset(bytecode, i), i * 4);
+            assertEq(LibBytecode.sourceOpsLength(bytecode, i), 0);
+            assertEq(LibBytecode.sourceStackAllocation(bytecode, i), 0);
+            assertEq(LibBytecode.sourceInputsLength(bytecode, i), 0);
+            assertEq(LibBytecode.sourceOutputsLength(bytecode, i), 0);
         }
 
         assertEq(constants.length, 0);
@@ -63,15 +101,47 @@ contract LibParseEmptyTest is Test {
     function testParseEmpty03() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":;:;:;", "");
         assertEq(LibBytecode.sourceCount(bytecode), 3);
-        assertEq(bytecode, hex"");
+        assertEq(bytecode,
+            // 3 sources
+            hex"03"
+            // 0 offset
+            hex"0000"
+            // 4 offset
+            hex"0004"
+            // 8 offset
+            hex"0008"
+            // 0. 0 ops
+            hex"00"
+            // 0. 0 stack allocation
+            hex"00"
+            // 0. 0 inputs
+            hex"00"
+            // 0. 0 outputs
+            hex"00"
+            // 1. 0 ops
+            hex"00"
+            // 1. 0 stack allocation
+            hex"00"
+            // 1. 0 inputs
+            hex"00"
+            // 1. 0 outputs
+            hex"00"
+            // 2. 0 ops
+            hex"00"
+            // 2. 0 stack allocation
+            hex"00"
+            // 2. 0 inputs
+            hex"00"
+            // 2. 0 outputs
+            hex"00"
+        );
 
         for (uint256 i = 0; i < 3; i++) {
-            SourceIndex sourceIndex = SourceIndex.wrap(uint16(i));
-            assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-            assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
-            assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 0);
-            assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-            assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 0);
+            assertEq(LibBytecode.sourceRelativeOffset(bytecode, i), i * 4);
+            assertEq(LibBytecode.sourceOpsLength(bytecode, i), 0);
+            assertEq(LibBytecode.sourceStackAllocation(bytecode, i), 0);
+            assertEq(LibBytecode.sourceInputsLength(bytecode, i), 0);
+            assertEq(LibBytecode.sourceOutputsLength(bytecode, i), 0);
         }
 
         assertEq(constants.length, 0);
@@ -82,15 +152,57 @@ contract LibParseEmptyTest is Test {
     function testParseEmpty04() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":;:;:;:;", "");
         assertEq(LibBytecode.sourceCount(bytecode), 4);
-        assertEq(bytecode, hex"");
+        assertEq(bytecode,
+            // 4 sources
+            hex"04"
+            // 0 offset
+            hex"0000"
+            // 4 offset
+            hex"0004"
+            // 8 offset
+            hex"0008"
+            // 12 offset
+            hex"000c"
+            // 0. 0 ops
+            hex"00"
+            // 0. 0 stack allocation
+            hex"00"
+            // 0. 0 inputs
+            hex"00"
+            // 0. 0 outputs
+            hex"00"
+            // 1. 0 ops
+            hex"00"
+            // 1. 0 stack allocation
+            hex"00"
+            // 1. 0 inputs
+            hex"00"
+            // 1. 0 outputs
+            hex"00"
+            // 2. 0 ops
+            hex"00"
+            // 2. 0 stack allocation
+            hex"00"
+            // 2. 0 inputs
+            hex"00"
+            // 2. 0 outputs
+            hex"00"
+            // 3. 0 ops
+            hex"00"
+            // 3. 0 stack allocation
+            hex"00"
+            // 3. 0 inputs
+            hex"00"
+            // 3. 0 outputs
+            hex"00"
+        );
 
         for (uint256 i = 0; i < 4; i++) {
-            SourceIndex sourceIndex = SourceIndex.wrap(uint16(i));
-            assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-            assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
-            assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 0);
-            assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-            assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 0);
+            assertEq(LibBytecode.sourceRelativeOffset(bytecode, i), i * 4);
+            assertEq(LibBytecode.sourceOpsLength(bytecode, i), 0);
+            assertEq(LibBytecode.sourceStackAllocation(bytecode, i), 0);
+            assertEq(LibBytecode.sourceInputsLength(bytecode, i), 0);
+            assertEq(LibBytecode.sourceOutputsLength(bytecode, i), 0);
         }
 
         assertEq(constants.length, 0);
@@ -101,15 +213,97 @@ contract LibParseEmptyTest is Test {
     function testParseEmpty08() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":;:;:;:;:;:;:;:;", "");
         assertEq(LibBytecode.sourceCount(bytecode), 8);
-        assertEq(bytecode, hex"");
+        assertEq(bytecode,
+            // 8 sources
+            hex"08"
+            // 0 offset
+            hex"0000"
+            // 4 offset
+            hex"0004"
+            // 8 offset
+            hex"0008"
+            // 12 offset
+            hex"000c"
+            // 16 offset
+            hex"0010"
+            // 20 offset
+            hex"0014"
+            // 24 offset
+            hex"0018"
+            // 28 offset
+            hex"001c"
+            // 0. 0 ops
+            hex"00"
+            // 0. 0 stack allocation
+            hex"00"
+            // 0. 0 inputs
+            hex"00"
+            // 0. 0 outputs
+            hex"00"
+            // 1. 0 ops
+            hex"00"
+            // 1. 0 stack allocation
+            hex"00"
+            // 1. 0 inputs
+            hex"00"
+            // 1. 0 outputs
+            hex"00"
+            // 2. 0 ops
+            hex"00"
+            // 2. 0 stack allocation
+            hex"00"
+            // 2. 0 inputs
+            hex"00"
+            // 2. 0 outputs
+            hex"00"
+            // 3. 0 ops
+            hex"00"
+            // 3. 0 stack allocation
+            hex"00"
+            // 3. 0 inputs
+            hex"00"
+            // 3. 0 outputs
+            hex"00"
+            // 4. 0 ops
+            hex"00"
+            // 4. 0 stack allocation
+            hex"00"
+            // 4. 0 inputs
+            hex"00"
+            // 4. 0 outputs
+            hex"00"
+            // 5. 0 ops
+            hex"00"
+            // 5. 0 stack allocation
+            hex"00"
+            // 5. 0 inputs
+            hex"00"
+            // 5. 0 outputs
+            hex"00"
+            // 6. 0 ops
+            hex"00"
+            // 6. 0 stack allocation
+            hex"00"
+            // 6. 0 inputs
+            hex"00"
+            // 6. 0 outputs
+            hex"00"
+            // 7. 0 ops
+            hex"00"
+            // 7. 0 stack allocation
+            hex"00"
+            // 7. 0 inputs
+            hex"00"
+            // 7. 0 outputs
+            hex"00"
+        );
 
         for (uint256 i = 0; i < 8; i++) {
-            SourceIndex sourceIndex = SourceIndex.wrap(uint16(i));
-            assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-            assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
-            assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 0);
-            assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-            assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 0);
+            assertEq(LibBytecode.sourceRelativeOffset(bytecode, i), i * 4);
+            assertEq(LibBytecode.sourceOpsLength(bytecode, i), 0);
+            assertEq(LibBytecode.sourceStackAllocation(bytecode, i), 0);
+            assertEq(LibBytecode.sourceInputsLength(bytecode, i), 0);
+            assertEq(LibBytecode.sourceOutputsLength(bytecode, i), 0);
         }
 
         assertEq(constants.length, 0);
@@ -120,15 +314,167 @@ contract LibParseEmptyTest is Test {
     function testParseEmpty15() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":;:;:;:;:;:;:;:;:;:;:;:;:;:;:;", "");
         assertEq(LibBytecode.sourceCount(bytecode), 15);
-        assertEq(bytecode, hex"");
+        assertEq(bytecode,
+            // 15 sources
+            hex"0f"
+            // 0 offset
+            hex"0000"
+            // 4 offset
+            hex"0004"
+            // 8 offset
+            hex"0008"
+            // 12 offset
+            hex"000c"
+            // 16 offset
+            hex"0010"
+            // 20 offset
+            hex"0014"
+            // 24 offset
+            hex"0018"
+            // 28 offset
+            hex"001c"
+            // 32 offset
+            hex"0020"
+            // 36 offset
+            hex"0024"
+            // 40 offset
+            hex"0028"
+            // 44 offset
+            hex"002c"
+            // 48 offset
+            hex"0030"
+            // 52 offset
+            hex"0034"
+            // 56 offset
+            hex"0038"
+            // 0. 0 ops
+            hex"00"
+            // 0. 0 stack allocation
+            hex"00"
+            // 0. 0 inputs
+            hex"00"
+            // 0. 0 outputs
+            hex"00"
+            // 1. 0 ops
+            hex"00"
+            // 1. 0 stack allocation
+            hex"00"
+            // 1. 0 inputs
+            hex"00"
+            // 1. 0 outputs
+            hex"00"
+            // 2. 0 ops
+            hex"00"
+            // 2. 0 stack allocation
+            hex"00"
+            // 2. 0 inputs
+            hex"00"
+            // 2. 0 outputs
+            hex"00"
+            // 3. 0 ops
+            hex"00"
+            // 3. 0 stack allocation
+            hex"00"
+            // 3. 0 inputs
+            hex"00"
+            // 3. 0 outputs
+            hex"00"
+            // 4. 0 ops
+            hex"00"
+            // 4. 0 stack allocation
+            hex"00"
+            // 4. 0 inputs
+            hex"00"
+            // 4. 0 outputs
+            hex"00"
+            // 5. 0 ops
+            hex"00"
+            // 5. 0 stack allocation
+            hex"00"
+            // 5. 0 inputs
+            hex"00"
+            // 5. 0 outputs
+            hex"00"
+            // 6. 0 ops
+            hex"00"
+            // 6. 0 stack allocation
+            hex"00"
+            // 6. 0 inputs
+            hex"00"
+            // 6. 0 outputs
+            hex"00"
+            // 7. 0 ops
+            hex"00"
+            // 7. 0 stack allocation
+            hex"00"
+            // 7. 0 inputs
+            hex"00"
+            // 7. 0 outputs
+            hex"00"
+            // 8. 0 ops
+            hex"00"
+            // 8. 0 stack allocation
+            hex"00"
+            // 8. 0 inputs
+            hex"00"
+            // 8. 0 outputs
+            hex"00"
+            // 9. 0 ops
+            hex"00"
+            // 9. 0 stack allocation
+            hex"00"
+            // 9. 0 inputs
+            hex"00"
+            // 9. 0 outputs
+            hex"00"
+            // 10. 0 ops
+            hex"00"
+            // 10. 0 stack allocation
+            hex"00"
+            // 10. 0 inputs
+            hex"00"
+            // 10. 0 outputs
+            hex"00"
+            // 11. 0 ops
+            hex"00"
+            // 11. 0 stack allocation
+            hex"00"
+            // 11. 0 inputs
+            hex"00"
+            // 11. 0 outputs
+            hex"00"
+            // 12. 0 ops
+            hex"00"
+            // 12. 0 stack allocation
+            hex"00"
+            // 12. 0 inputs
+            hex"00"
+            // 12. 0 outputs
+            hex"00"
+            // 13. 0 ops
+            hex"00"
+            // 13. 0 stack allocation
+            hex"00"
+            // 13. 0 inputs
+            hex"00"
+            // 13. 0 outputs
+            hex"00"
+            // 14. 0 ops
+            hex"00"
+            // 14. 0 stack allocation
+            hex"00"
+            // 14. 0 inputs
+            hex"00"
+            // 14. 0 outputs
+            hex"00"
+        );
 
         for (uint256 i = 0; i < 15; i++) {
-            SourceIndex sourceIndex = SourceIndex.wrap(uint16(i));
-            assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-            assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
-            assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 0);
-            assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-            assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 0);
+            assertEq(LibBytecode.sourceRelativeOffset(bytecode, i), i * 4);
+            assertEq(LibBytecode.sourceOpsLength(bytecode, i), 0);
+            assertEq(LibBytecode.sourceStackAllocation(bytecode, i), 0);
+            assertEq(LibBytecode.sourceInputsLength(bytecode, i), 0);
+            assertEq(LibBytecode.sourceOutputsLength(bytecode, i), 0);
         }
 
         assertEq(constants.length, 0);

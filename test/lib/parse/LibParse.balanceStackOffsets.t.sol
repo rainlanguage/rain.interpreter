@@ -81,7 +81,7 @@ contract LibParseBalanceStackOffsetsTest is Test {
         // source.
         assertEq(bytecode, hex"0000000000010000");
 
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);

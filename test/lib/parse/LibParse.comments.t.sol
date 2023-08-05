@@ -29,8 +29,21 @@ contract LibParseCommentsTest is Test {
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(constants.length, 0);
 
-        assertEq(bytecode, hex"");
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        assertEq(bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 0 op
+            hex"00"
+            // 0 stack allocation
+            hex"00"
+            // 0 inputs
+            hex"00"
+            // 0 outputs
+            hex"00"
+        );
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 0);
@@ -46,12 +59,27 @@ contract LibParseCommentsTest is Test {
         assertEq(constants.length, 0);
 
         // a
-        assertEq(bytecode, hex"00000000");
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        assertEq(bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 1 op
+            hex"01"
+            // 1 stack allocation
+            hex"01"
+            // 0 inputs
+            hex"00"
+            // 1 output
+            hex"01"
+            // a
+            hex"00000000"
+        );
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
     }
 
@@ -63,12 +91,27 @@ contract LibParseCommentsTest is Test {
         assertEq(constants.length, 0);
 
         // a
-        assertEq(bytecode, hex"00000000");
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        assertEq(bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 1 op
+            hex"01"
+            // 1 stack allocation
+            hex"01"
+            // 0 inputs
+            hex"00"
+            // 1 output
+            hex"01"
+            // a
+            hex"00000000"
+        );
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
     }
 
@@ -79,22 +122,50 @@ contract LibParseCommentsTest is Test {
         assertEq(LibBytecode.sourceCount(bytecode), 2);
         assertEq(constants.length, 0);
 
+        assertEq(
+            bytecode,
+            // 2 sources
+            hex"02"
+            // 0 offset
+            hex"0000"
+            // 8 offset
+            hex"0008"
+            // 1 op
+            hex"01"
+            // 1 stack allocation
+            hex"01"
+            // 0 inputs
+            hex"00"
+            // 1 output
+            hex"01"
+            // a
+            hex"00000000"
+            // 1 op
+            hex"01"
+            // 1 stack allocation
+            hex"01"
+            // 0 inputs
+            hex"00"
+            // 1 output
+            hex"01"
+            // b
+            hex"01000000"
+        );
+
         // a
-        assertEq(bytecode, hex"00000000");
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
 
         // b
-        assertEq(bytecode, hex"00010000");
-        sourceIndex = SourceIndex.wrap(1);
-        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        sourceIndex = 1;
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 8);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
     }
 
@@ -105,22 +176,50 @@ contract LibParseCommentsTest is Test {
         assertEq(LibBytecode.sourceCount(bytecode), 2);
         assertEq(constants.length, 0);
 
+        assertEq(
+            bytecode,
+            // 2 sources
+            hex"02"
+            // 0 offset
+            hex"0000"
+            // 8 offset
+            hex"0008"
+            // 1 op
+            hex"01"
+            // 1 stack allocation
+            hex"01"
+            // 0 inputs
+            hex"00"
+            // 1 output
+            hex"01"
+            // a
+            hex"00000000"
+            // 1 op
+            hex"01"
+            // 1 stack allocation
+            hex"01"
+            // 0 inputs
+            hex"00"
+            // 1 output
+            hex"01"
+            // b
+            hex"01000000"
+        );
+
         // a
-        assertEq(bytecode, hex"00000000");
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
 
         // b
-        assertEq(bytecode, hex"00010000");
-        sourceIndex = SourceIndex.wrap(1);
-        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        sourceIndex = 1;
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 8);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
     }
 
@@ -131,23 +230,49 @@ contract LibParseCommentsTest is Test {
         assertEq(LibBytecode.sourceCount(bytecode), 2);
         assertEq(constants.length, 0);
 
+        assertEq(bytecode,
+            // 2 sources
+            hex"02"
+            // 0 offset
+            hex"0000"
+            // 4 offset
+            hex"0008"
+            // 1 op
+            hex"01"
+            // 1 stack allocation
+            hex"01"
+            // 0 inputs
+            hex"00"
+            // 1 output
+            hex"01"
+            // a
+            hex"00000000"
+            // 1 op
+            hex"01"
+            // 1 stack allocation
+            hex"01"
+            // 0 inputs
+            hex"00"
+            // 1 output
+            hex"01"
+            // b
+            hex"01000000"
+        );
+
         // a
-        assertEq(bytecode, hex"00000000");
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
 
         // b
-        assertEq(bytecode, hex"00010000");
-        sourceIndex = SourceIndex.wrap(1);
-
-        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        sourceIndex = 1;
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 8);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
     }
 
@@ -159,14 +284,29 @@ contract LibParseCommentsTest is Test {
 
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         // a
-        assertEq(bytecode, hex"00000000");
+        assertEq(bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 1 op
+            hex"01"
+            // 1 stack allocation
+            hex"01"
+            // 1 input
+            hex"00"
+            // 1 output
+            hex"01"
+            // a
+            hex"00000000"
+        );
         assertEq(constants.length, 0);
 
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
     }
 
@@ -178,14 +318,29 @@ contract LibParseCommentsTest is Test {
 
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         // a
-        assertEq(bytecode, hex"00000000");
+        assertEq(bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 1 op
+            hex"01"
+            // 1 stack allocation
+            hex"01"
+            // 1 input
+            hex"00"
+            // 1 output
+            hex"01"
+            // a
+            hex"00000000"
+        );
         assertEq(constants.length, 0);
 
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
     }
 
@@ -199,13 +354,28 @@ contract LibParseCommentsTest is Test {
         assertEq(constants.length, 0);
 
         // a
-        assertEq(bytecode, hex"00000000");
+        assertEq(bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 1 op
+            hex"01"
+            // 1 stack allocation
+            hex"01"
+            // 1 input
+            hex"00"
+            // 1 output
+            hex"01"
+            // a
+            hex"00000000"
+        );
 
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
     }
 

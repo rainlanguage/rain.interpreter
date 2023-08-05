@@ -14,7 +14,7 @@ contract LibParseNamedLHSTest is Test {
         for (uint256 i = 0; i < examples0.length; i++) {
             (bytes memory bytecode0, uint256[] memory constants0) = LibParse.parse(bytes(examples0[i]), "");
             assertEq(LibBytecode.sourceCount(bytecode0), 1);
-            SourceIndex sourceIndex0 = SourceIndex.wrap(0);
+            uint256 sourceIndex0 = 0;
             assertEq(LibBytecode.sourceRelativeOffset(bytecode0, sourceIndex0), 0);
             assertEq(LibBytecode.sourceOpsLength(bytecode0, sourceIndex0), 0);
             assertEq(LibBytecode.sourceStackAllocation(bytecode0, sourceIndex0), 2);
@@ -55,14 +55,14 @@ contract LibParseNamedLHSTest is Test {
 
         assertEq(LibBytecode.sourceCount(bytecode), 2);
 
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
 
-        sourceIndex = SourceIndex.wrap(1);
+        sourceIndex = 1;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 4);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);

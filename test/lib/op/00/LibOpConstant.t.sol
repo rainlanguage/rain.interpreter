@@ -108,7 +108,7 @@ contract LibOpConstantTest is RainterpreterExpressionDeployerDeploymentTest {
     function testOpConstantEvalZeroConstants() external {
         (bytes memory bytecode, uint256[] memory constants) =
             iDeployer.parse("_ _ _: constant() constant() constant();");
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 3);
@@ -153,7 +153,7 @@ contract LibOpConstantTest is RainterpreterExpressionDeployerDeploymentTest {
     /// Test the eval of a constant opcode parsed from a string.
     function testOpConstantEval() external {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_ _: max-uint-256() 1001e15;");
-        SourceIndex sourceIndex = SourceIndex.wrap(0);
+        uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 2);
