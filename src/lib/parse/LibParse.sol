@@ -45,6 +45,9 @@ error DuplicateLHSItem(uint256 errorOffset, string errorCharString);
 /// Encountered too many LHS items.
 error ExcessLHSItems(uint256 offset);
 
+/// Encountered inputs where they can't be handled.
+error NotAcceptingInputs(uint256 offset);
+
 /// Encountered too many RHS items.
 error ExcessRHSItems(uint256 offset);
 
@@ -86,6 +89,10 @@ uint256 constant FSM_ACCEPTING_INPUTS_MASK = 1 << 3;
 /// The first LHS item breaks us out of the interstitial.
 uint256 constant FSM_INTERSTITIAL_MASK = 1 << 4;
 
+/// @dev If a source is active we cannot finish parsing without a semi to trigger
+/// finalisation.
+uint256 constant FSM_ACTIVE_SOURCE_MASK = 1 << 5;
+
 /// @dev fsm default state is:
 /// - LHS
 /// - yin
@@ -93,11 +100,6 @@ uint256 constant FSM_INTERSTITIAL_MASK = 1 << 4;
 /// - accepting inputs
 /// - interstitial
 uint256 constant FSM_DEFAULT = FSM_ACCEPTING_INPUTS_MASK | FSM_INTERSTITIAL_MASK;
-
-/// @dev The source ended if we are accepting inputs and are in the interstitial.
-/// We don't care about things such as yin/yang because comments are allowed
-/// after sources.
-uint256 constant FSM_SOURCE_END_MASK = FSM_ACCEPTING_INPUTS_MASK | FSM_INTERSTITIAL_MASK;
 
 uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
 
@@ -344,10 +346,17 @@ library LibParseState {
             // if it exists.
             state.snapshotSourceHeadToLineTracker();
 
+            // Preserve the accepting inputs flag but set
+            // everything else back to defaults. Also set that
+            // there is an active source.
+            state.fsm = (FSM_DEFAULT & ~FSM_ACCEPTING_INPUTS_MASK) | (state.fsm & FSM_ACCEPTING_INPUTS_MASK)
+                | FSM_ACTIVE_SOURCE_MASK;
+
             uint256 lineLHSItems = state.lineTracker & 0xFF;
             // Total number of RHS at top level is the top byte of topLevel0.
             uint256 totalRHSTopLevel = state.topLevel0 >> 0xf8;
-            // Snapshot for RHS from start of line is top byte of lineTracker.
+            // Snapshot for RHS from start of line is second low byte of
+            // lineTracker.
             uint256 lineRHSTopLevel = totalRHSTopLevel - ((state.lineTracker >> 8) & 0xFF);
 
             // If:
@@ -362,12 +371,13 @@ library LibParseState {
                 if (state.fsm & FSM_ACCEPTING_INPUTS_MASK == 0) {
                     (uint256 errorOffset, string memory errorChar) = LibParse.parseErrorContext(data, cursor);
                     (errorChar);
-                    revert ExcessLHSItems(errorOffset);
+                    revert NotAcceptingInputs(errorOffset);
                 } else {
                     // As there are no RHS opcodes yet we can simply set topLevel0 directly.
                     // This is the only case where we defer to the LHS to tell
                     // us how many top level items there are.
                     totalRHSTopLevel += lineLHSItems;
+                    state.topLevel0 = totalRHSTopLevel << 0xf8;
 
                     // Push the inputs onto the stack tracker.
                     state.stackTracker = state.stackTracker.pushInputs(lineLHSItems);
@@ -570,6 +580,11 @@ library LibParseState {
             // the line tracker before writing the stack counter.
             state.snapshotSourceHeadToLineTracker();
 
+            // As soon as we push an op to source we can no longer accept inputs.
+            state.fsm &= ~FSM_ACCEPTING_INPUTS_MASK;
+            // We also have an active source;
+            state.fsm |= FSM_ACTIVE_SOURCE_MASK;
+
             // Increment the top level stack counter for the current top level
             // word. MAY be setting 0 to 1 if this is the top level.
             assembly ("memory-safe") {
@@ -663,6 +678,8 @@ library LibParseState {
     }
 
     function endSource(ParseState memory state) internal pure {
+        state.fsm &= ~FSM_ACTIVE_SOURCE_MASK;
+
         uint256 sourcesBuilder = state.sourcesBuilder;
         uint256 offset = sourcesBuilder >> 0xf0;
 
@@ -1080,7 +1097,7 @@ library LibParse {
 
                             // Set yang as we are now building a stack item.
                             // We are also no longer interstitial
-                            state.fsm = (state.fsm | FSM_YANG_MASK) & ~FSM_INTERSTITIAL_MASK;
+                            state.fsm = (state.fsm | FSM_YANG_MASK | FSM_ACTIVE_SOURCE_MASK) & ~FSM_INTERSTITIAL_MASK;
                         } else if (char & CMASK_WHITESPACE != 0) {
                             cursor = skipWord(cursor, CMASK_WHITESPACE);
                             // Set ying as we now open to possibilities.
@@ -1088,7 +1105,8 @@ library LibParse {
                         } else if (char & CMASK_LHS_RHS_DELIMITER != 0) {
                             // Set RHS and yin. Move out of the interstitial if
                             // we haven't already.
-                            state.fsm = (state.fsm | FSM_RHS_MASK) & ~(FSM_YANG_MASK | FSM_INTERSTITIAL_MASK);
+                            state.fsm = (state.fsm | FSM_RHS_MASK | FSM_ACTIVE_SOURCE_MASK)
+                                & ~(FSM_YANG_MASK | FSM_INTERSTITIAL_MASK);
                             cursor++;
                         } else if (char & CMASK_COMMENT_HEAD != 0) {
                             if (state.fsm & FSM_INTERSTITIAL_MASK == 0) {
@@ -1228,8 +1246,6 @@ library LibParse {
                         } else if (char & CMASK_EOL > 0) {
                             state.endLine(data, cursor);
                             cursor++;
-
-                            state.fsm = FSM_DEFAULT & ~FSM_ACCEPTING_INPUTS_MASK;
                         }
                         // End of source.
                         else if (char & CMASK_EOS > 0) {
@@ -1256,18 +1272,7 @@ library LibParse {
                 if (cursor != end) {
                     revert ParserOutOfBounds();
                 }
-                if (
-                    state
-                        // If the line tracker is non-zero we didn't clear the
-                        // sources.
-                        .lineTracker != 0
-                    // If the stack is non-empty we didn't clear the sources.
-                    || state.topLevel0 != 0
-                    // If we're not in an interstitial state accepting inputs
-                    // then we're not at potential start of a source, so we
-                    // started a source without finishing it.
-                    || state.fsm & FSM_SOURCE_END_MASK != FSM_SOURCE_END_MASK
-                ) {
+                if (state.fsm & FSM_ACTIVE_SOURCE_MASK != 0) {
                     //slither-disable-next-line similar-names
                     (uint256 errorOffset, string memory errorCharString) = parseErrorContext(data, cursor);
                     (errorCharString);

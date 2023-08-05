@@ -19,11 +19,7 @@ library LibBytecode {
         }
     }
 
-    function sourceRelativeOffset(bytes memory bytecode, uint256 sourceIndex)
-        internal
-        pure
-        returns (uint256 offset)
-    {
+    function sourceRelativeOffset(bytes memory bytecode, uint256 sourceIndex) internal pure returns (uint256 offset) {
         assembly {
             // After the first byte, all the relative offset pointers are
             // stored sequentially as 16 bit values.
@@ -63,11 +59,7 @@ library LibBytecode {
         }
     }
 
-    function sourceInputsLength(bytes memory bytecode, uint256 sourceIndex)
-        internal
-        pure
-        returns (uint256 length)
-    {
+    function sourceInputsLength(bytes memory bytecode, uint256 sourceIndex) internal pure returns (uint256 length) {
         unchecked {
             Pointer pointer = sourcePointer(bytecode, sourceIndex);
             assembly ("memory-safe") {
@@ -76,11 +68,7 @@ library LibBytecode {
         }
     }
 
-    function sourceOutputsLength(bytes memory bytecode, uint256 sourceIndex)
-        internal
-        pure
-        returns (uint256 length)
-    {
+    function sourceOutputsLength(bytes memory bytecode, uint256 sourceIndex) internal pure returns (uint256 length) {
         unchecked {
             Pointer pointer = sourcePointer(bytecode, sourceIndex);
             assembly ("memory-safe") {

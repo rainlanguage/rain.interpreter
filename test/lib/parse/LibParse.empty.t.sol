@@ -17,9 +17,10 @@ contract LibParseEmptyTest is Test {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("", "");
 
         assertEq(LibBytecode.sourceCount(bytecode), 0);
-        assertEq(bytecode,
-        // 0 sources
-        hex"00"
+        assertEq(
+            bytecode,
+            // 0 sources
+            hex"00"
         );
 
         assertEq(constants.length, 0);
@@ -30,7 +31,8 @@ contract LibParseEmptyTest is Test {
     function testParseEmpty01() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":;", "");
         assertEq(LibBytecode.sourceCount(bytecode), 1);
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset
@@ -60,7 +62,8 @@ contract LibParseEmptyTest is Test {
     function testParseEmpty02() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":;:;", "");
         assertEq(LibBytecode.sourceCount(bytecode), 2);
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 2 sources
             hex"02"
             // 0 offset
@@ -101,7 +104,8 @@ contract LibParseEmptyTest is Test {
     function testParseEmpty03() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":;:;:;", "");
         assertEq(LibBytecode.sourceCount(bytecode), 3);
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 3 sources
             hex"03"
             // 0 offset
@@ -152,7 +156,8 @@ contract LibParseEmptyTest is Test {
     function testParseEmpty04() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":;:;:;:;", "");
         assertEq(LibBytecode.sourceCount(bytecode), 4);
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 4 sources
             hex"04"
             // 0 offset
@@ -213,7 +218,8 @@ contract LibParseEmptyTest is Test {
     function testParseEmpty08() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":;:;:;:;:;:;:;:;", "");
         assertEq(LibBytecode.sourceCount(bytecode), 8);
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 8 sources
             hex"08"
             // 0 offset
@@ -314,7 +320,8 @@ contract LibParseEmptyTest is Test {
     function testParseEmpty15() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":;:;:;:;:;:;:;:;:;:;:;:;:;:;:;", "");
         assertEq(LibBytecode.sourceCount(bytecode), 15);
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 15 sources
             hex"0f"
             // 0 offset

@@ -106,7 +106,8 @@ contract LibParseIntegerLiteralDecimalTest is Test {
 
         // Sources represents all 3 literals, but the dupe is deduped so that the
         // operands only reference the first instance of the duped constant.
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset
@@ -143,7 +144,8 @@ contract LibParseIntegerLiteralDecimalTest is Test {
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
 
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset
@@ -178,7 +180,8 @@ contract LibParseIntegerLiteralDecimalTest is Test {
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
 
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset
@@ -249,7 +252,8 @@ contract LibParseIntegerLiteralDecimalTest is Test {
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 5);
 
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset

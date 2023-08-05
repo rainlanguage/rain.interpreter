@@ -109,23 +109,24 @@ contract LibOpStackTest is RainterpreterExpressionDeployerDeploymentTest {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
-        assertEq(bytecode,
-        // 1 source
-        hex"01"
-        // 0 offset
-        hex"0000"
-        // 2 ops
-        hex"02"
-        // 2 stack allocation
-        hex"02"
-        // 0 inputs
-        hex"00"
-        // 2 outputs
-        hex"02"
-        // constant 0
-        hex"01000000"
-        // stack 0
-        hex"00000000"
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 2 ops
+            hex"02"
+            // 2 stack allocation
+            hex"02"
+            // 0 inputs
+            hex"00"
+            // 2 outputs
+            hex"02"
+            // constant 0
+            hex"01000000"
+            // stack 0
+            hex"00000000"
         );
 
         assertEq(constants.length, 1);

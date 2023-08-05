@@ -53,7 +53,8 @@ contract LibParseInputsOnlyTest is Test {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset

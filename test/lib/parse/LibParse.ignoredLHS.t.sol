@@ -30,7 +30,8 @@ contract LibParseIgnoredLHSTest is Test {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset
@@ -57,7 +58,8 @@ contract LibParseIgnoredLHSTest is Test {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset
@@ -85,7 +87,8 @@ contract LibParseIgnoredLHSTest is Test {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 3);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 3);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 3);
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset
@@ -114,7 +117,8 @@ contract LibParseIgnoredLHSTest is Test {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset
@@ -145,7 +149,8 @@ contract LibParseIgnoredLHSTest is Test {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset
@@ -172,7 +177,8 @@ contract LibParseIgnoredLHSTest is Test {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset
@@ -200,7 +206,8 @@ contract LibParseIgnoredLHSTest is Test {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset
@@ -228,7 +235,8 @@ contract LibParseIgnoredLHSTest is Test {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset

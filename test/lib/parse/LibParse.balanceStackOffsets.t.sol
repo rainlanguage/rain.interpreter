@@ -79,7 +79,8 @@ contract LibParseBalanceStackOffsetsTest is Test {
         assertEq(constants.length, 0);
         // a and b should be parsed and inputs are just ignored in the output
         // source.
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset

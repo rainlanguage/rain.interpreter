@@ -104,7 +104,9 @@ library LibInterpreterStateDataContractNP {
                 }
             }
 
-            return InterpreterStateNP(stackBottoms, firstConstant, sourceIndex, MemoryKV.wrap(0), namespace, store, context, bytecode, fs);
+            return InterpreterStateNP(
+                stackBottoms, firstConstant, sourceIndex, MemoryKV.wrap(0), namespace, store, context, bytecode, fs
+            );
         }
     }
 }

@@ -45,4 +45,10 @@ contract LibParseMissingFinalSemiTest is Test {
         vm.expectRevert(abi.encodeWithSelector(MissingFinalSemi.selector, 4));
         LibParse.parse(":a()", meta);
     }
+
+    /// Some detached LHS items should error as missing a semi.
+    function testParseMissingFinalSemiRevertsLHSItems() external {
+        vm.expectRevert(abi.encodeWithSelector(MissingFinalSemi.selector, 3));
+        LibParse.parse("_ _", meta);
+    }
 }

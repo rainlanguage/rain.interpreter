@@ -29,7 +29,8 @@ contract LibParseCommentsTest is Test {
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(constants.length, 0);
 
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset
@@ -59,7 +60,8 @@ contract LibParseCommentsTest is Test {
         assertEq(constants.length, 0);
 
         // a
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset
@@ -91,7 +93,8 @@ contract LibParseCommentsTest is Test {
         assertEq(constants.length, 0);
 
         // a
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset
@@ -230,7 +233,8 @@ contract LibParseCommentsTest is Test {
         assertEq(LibBytecode.sourceCount(bytecode), 2);
         assertEq(constants.length, 0);
 
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 2 sources
             hex"02"
             // 0 offset
@@ -284,7 +288,8 @@ contract LibParseCommentsTest is Test {
 
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         // a
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset
@@ -318,7 +323,8 @@ contract LibParseCommentsTest is Test {
 
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         // a
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset
@@ -354,7 +360,8 @@ contract LibParseCommentsTest is Test {
         assertEq(constants.length, 0);
 
         // a
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 source
             hex"01"
             // 0 offset
