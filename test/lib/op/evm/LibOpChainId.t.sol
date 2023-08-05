@@ -75,16 +75,35 @@ contract LibOpChainIdTest is RainterpreterExpressionDeployerDeploymentTest {
     }
 
     /// Test the eval of a chain ID opcode parsed from a string.
-    function testOpChainIDEval(uint64 chainId) external {
-        vm.chainId(chainId);
+    function testOpChainIDEval(uint64 chainId, StateNamespace namespace) public {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: chain-id();");
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 1 op
+            hex"01"
+            // 1 stack allocation
+            hex"01"
+            // 0 inputs
+            hex"00"
+            // 1 output
+            hex"01"
+            // chain id
+            hex"03000000"
+        );
+
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
+
+        vm.chainId(chainId);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
-            StateNamespace.wrap(0),
+            namespace,
             LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );

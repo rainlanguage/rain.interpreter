@@ -194,7 +194,9 @@ struct ParseState {
 library LibStackTracker {
     using LibStackTracker for StackTracker;
 
-    function inputs(StackTracker tracker, uint256 n) internal pure returns (StackTracker) {
+    /// Pushing inputs requires special handling as the inputs need to be tallied
+    /// separately and in addition to the regular stack pushes.
+    function pushInputs(StackTracker tracker, uint256 n) internal pure returns (StackTracker) {
         unchecked {
             tracker = tracker.push(n);
             uint256 inputs = (StackTracker.unwrap(tracker) >> 8) & 0xFF;
@@ -368,7 +370,7 @@ library LibParseState {
                     totalRHSTopLevel += lineLHSItems;
 
                     // Push the inputs onto the stack tracker.
-                    state.stackTracker = state.stackTracker.inputs(lineLHSItems);
+                    state.stackTracker = state.stackTracker.pushInputs(lineLHSItems);
                 }
             }
             // If:
@@ -399,6 +401,13 @@ library LibParseState {
                 }
                 for (uint256 i = 1; i <= opsDepth; i++) {
                     {
+                        // We've hit the end of a LL item so have to jump towards the
+                        // tail to keep going.
+                        if (itemSourceHead % 0x20 == 0x1c) {
+                            assembly ("memory-safe") {
+                                itemSourceHead := shr(0xf0, mload(itemSourceHead))
+                            }
+                        }
                         uint256 opInputs;
                         assembly ("memory-safe") {
                             opInputs := byte(1, mload(itemSourceHead))
@@ -414,13 +423,6 @@ library LibParseState {
                             state.stackTracker.push(i == opsDepth && lineRHSTopLevel == 1 ? lineLHSItems : 1);
                     }
                     itemSourceHead += 4;
-                    // We've hit the end of a LL item so have to jump towards the
-                    // tail to keep going.
-                    if (itemSourceHead % 0x20 == 0x1c) {
-                        assembly ("memory-safe") {
-                            itemSourceHead := shr(0xf0, mload(itemSourceHead))
-                        }
-                    }
                 }
                 topLevelOffset++;
             }
@@ -1058,7 +1060,7 @@ library LibParse {
                             if (char & CMASK_IDENTIFIER_HEAD > 0) {
                                 (cursor, word) = parseWord(cursor, CMASK_LHS_STACK_TAIL);
                                 (bool exists, uint256 index) = state.pushStackName(word);
-
+                                (index);
                                 // If the stack name already exists, then we
                                 // revert as shadowing is not allowed.
                                 if (exists) {

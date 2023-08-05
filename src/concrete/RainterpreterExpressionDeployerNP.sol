@@ -52,7 +52,7 @@ error UnexpectedOpMetaHash(bytes32 actualOpMeta);
 error NegativeStackIndex(int256 index);
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x61ec3ed030cc545b49cbf40d67424f2313de807526f135cf225340737eee5ec0);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x395d2703075713b54d1fad1188a8baf5a79781f4f7e4e4d8933a7c081ae6d0f0);
 
 /// @dev Hash of the known store bytecode.
 bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);
@@ -167,12 +167,13 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
 
     /// @inheritdoc IDebugExpressionDeployerV2
     function offchainDebugEval(
-        bytes memory expressionData,
         FullyQualifiedNamespace namespace,
-        uint256[][] memory context,
+        bytes memory expressionData,
         SourceIndex sourceIndex,
-        uint256[] memory initialStack,
-        uint8 minOutputs
+        uint256 maxOutputs,
+        uint256[][] memory context,
+        uint256[] memory inputs,
+        uint256 minOutputs
     ) external view returns (uint256[] memory, uint256[] memory) {
         // IntegrityCheckState memory integrityCheckState =
         //     LibIntegrityCheck.newState(sources, constants, integrityFunctionPointers());
@@ -200,7 +201,7 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
         // The return is used by returning it, so this is a false positive.
         //slither-disable-next-line unused-return
         return IDebugInterpreterV2(address(iInterpreter)).offchainDebugEval(
-            iStore, expressionData, namespace, context, initialStack, sourceIndex
+            iStore, namespace, expressionData, sourceIndex, maxOutputs, context, inputs
         );
     }
 

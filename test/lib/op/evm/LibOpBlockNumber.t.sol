@@ -79,7 +79,8 @@ contract LibOpBlockNumberTest is RainterpreterExpressionDeployerDeploymentTest {
     /// Test the eval of a block number opcode parsed from a string.
     function testOpBlockNumberEval() public {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: block-number();");
-        assertEq(bytecode,
+        assertEq(
+            bytecode,
             // 1 op
             hex"01"
             // 0 offset

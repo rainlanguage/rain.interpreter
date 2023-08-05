@@ -81,7 +81,11 @@ library LibOpStack {
         return stackTop;
     }
 
-    function runNP(InterpreterStateNP memory state, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
+    function runNP(InterpreterStateNP memory state, Operand operand, Pointer stackTop)
+        internal
+        pure
+        returns (Pointer)
+    {
         assembly ("memory-safe") {
             let stackValue := mload(add(mload(state), mul(0x20, operand)))
             stackTop := sub(stackTop, 0x20)

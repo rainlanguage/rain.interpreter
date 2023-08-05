@@ -13,8 +13,8 @@ contract LibParseIntegerLiteralDecimalTest is Test {
 
     constructor() {
         bytes32[] memory words = new bytes32[](6);
-        words[0] = bytes32("constant");
-        words[1] = bytes32("a");
+        words[0] = bytes32("stack");
+        words[1] = bytes32("constant");
         words[2] = bytes32("b");
         words[3] = bytes32("c");
         words[4] = bytes32("d");
@@ -33,7 +33,24 @@ contract LibParseIntegerLiteralDecimalTest is Test {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
-        assertEq(bytecode, hex"00010000");
+
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 1 op
+            hex"01"
+            // 1 stack allocation
+            hex"01"
+            // 0 inputs
+            hex"00"
+            // 1 output
+            hex"01"
+            // constant 0
+            hex"01000000"
+        );
 
         assertEq(constants.length, 1);
         assertEq(constants[0], 1);
@@ -50,7 +67,26 @@ contract LibParseIntegerLiteralDecimalTest is Test {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
-        assertEq(bytecode, hex"0001000000010001");
+
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 2 ops
+            hex"02"
+            // 2 stack allocation
+            hex"02"
+            // 0 inputs
+            hex"00"
+            // 2 outputs
+            hex"02"
+            // constant 0
+            hex"01000000"
+            // constant 1
+            hex"01000001"
+        );
 
         assertEq(constants.length, 2);
         assertEq(constants[0], 10);
@@ -70,7 +106,26 @@ contract LibParseIntegerLiteralDecimalTest is Test {
 
         // Sources represents all 3 literals, but the dupe is deduped so that the
         // operands only reference the first instance of the duped constant.
-        assertEq(bytecode, hex"000100000001000100010000");
+        assertEq(bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 3 ops
+            hex"03"
+            // 3 stack allocation
+            hex"03"
+            // 0 inputs
+            hex"00"
+            // 3 outputs
+            hex"03"
+            // constant 0
+            hex"01000000"
+            // constant 1
+            hex"01000001"
+            // constant 0
+            hex"01000000"
+        );
         assertEq(constants.length, 2);
         assertEq(constants[0], 11);
         assertEq(constants[1], 233);
@@ -88,7 +143,23 @@ contract LibParseIntegerLiteralDecimalTest is Test {
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
 
-        assertEq(bytecode, hex"00010000");
+        assertEq(bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 1 op
+            hex"01"
+            // 1 stack allocation
+            hex"01"
+            // 0 inputs
+            hex"00"
+            // 1 output
+            hex"01"
+            // constant 0
+            hex"01000000"
+        );
+
         assertEq(constants.length, 1);
         assertEq(constants[0], type(uint256).max);
     }
@@ -107,7 +178,22 @@ contract LibParseIntegerLiteralDecimalTest is Test {
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
 
-        assertEq(bytecode, hex"00010000");
+        assertEq(bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 1 op
+            hex"01"
+            // 1 stack allocation
+            hex"01"
+            // 0 inputs
+            hex"00"
+            // 1 output
+            hex"01"
+            // constant 0
+            hex"01000000"
+        );
         assertEq(constants.length, 1);
         assertEq(constants[0], type(uint256).max);
     }
@@ -162,7 +248,31 @@ contract LibParseIntegerLiteralDecimalTest is Test {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 5);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 5);
-        assertEq(bytecode, hex"0001000000010001000100020001000300010004");
+
+        assertEq(bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 5 ops
+            hex"05"
+            // 5 stack allocation
+            hex"05"
+            // 0 inputs
+            hex"00"
+            // 5 outputs
+            hex"05"
+            // constant 0
+            hex"01000000"
+            // constant 1
+            hex"01000001"
+            // constant 2
+            hex"01000002"
+            // constant 3
+            hex"01000003"
+            // constant 4
+            hex"01000004"
+        );
 
         assertEq(constants.length, 5);
         assertEq(constants[0], 1e2);

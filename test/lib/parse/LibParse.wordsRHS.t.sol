@@ -64,23 +64,24 @@ contract LibParseNamedRHSTest is Test {
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
         // a b
-        assertEq(bytecode,
-        // 1 source
-        hex"01"
-        // offset 0
-        hex"0000"
-        // a b ops count
-        hex"02"
-        // a b stack allocation
-        hex"02"
-        // a b inputs count
-        hex"00"
-        // a b outputs count
-        hex"02"
-        // a
-        hex"00000000"
-        // b
-        hex"01000000"
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // offset 0
+            hex"0000"
+            // a b ops count
+            hex"02"
+            // a b stack allocation
+            hex"02"
+            // a b inputs count
+            hex"00"
+            // a b outputs count
+            hex"02"
+            // a
+            hex"00000000"
+            // b
+            hex"01000000"
         );
         assertEq(constants.length, 0);
     }
@@ -97,27 +98,28 @@ contract LibParseNamedRHSTest is Test {
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
         // b a c b
-        assertEq(bytecode,
-        // 1 source
-        hex"01"
-        // offset 0
-        hex"0000"
-        // b a c b ops count
-        hex"04"
-        // b a c b stack allocation
-        hex"02"
-        // b a c b inputs count
-        hex"00"
-        // b a c b outputs count
-        hex"02"
-        // b
-        hex"01000000"
-        // a 1 input
-        hex"00010000"
-        // c
-        hex"02000000"
-        // b 1 input
-        hex"01010000"
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // offset 0
+            hex"0000"
+            // b a c b ops count
+            hex"04"
+            // b a c b stack allocation
+            hex"02"
+            // b a c b inputs count
+            hex"00"
+            // b a c b outputs count
+            hex"02"
+            // b
+            hex"01000000"
+            // a 1 input
+            hex"00010000"
+            // c
+            hex"02000000"
+            // b 1 input
+            hex"01010000"
         );
         assertEq(constants.length, 0);
     }
@@ -134,23 +136,24 @@ contract LibParseNamedRHSTest is Test {
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
         // b a
-        assertEq(bytecode,
-        // 1 source
-        hex"01"
-        // offset 0
-        hex"0000"
-        // b a ops count
-        hex"02"
-        // b a stack allocation
-        hex"01"
-        // b a inputs count
-        hex"00"
-        // b a outputs count
-        hex"01"
-        // b
-        hex"01000000"
-        // a 1 input
-        hex"00010000"
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // offset 0
+            hex"0000"
+            // b a ops count
+            hex"02"
+            // b a stack allocation
+            hex"01"
+            // b a inputs count
+            hex"00"
+            // b a outputs count
+            hex"01"
+            // b
+            hex"01000000"
+            // a 1 input
+            hex"00010000"
         );
         assertEq(constants.length, 0);
     }
@@ -167,25 +170,26 @@ contract LibParseNamedRHSTest is Test {
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
         // c b a
-        assertEq(bytecode,
-        // 1 source
-        hex"01"
-        // offset 0
-        hex"0000"
-        // c b a ops count
-        hex"03"
-        // c b a stack allocation
-        hex"02"
-        // c b a inputs count
-        hex"00"
-        // c b a outputs count
-        hex"01"
-        // c
-        hex"02000000"
-        // b
-        hex"01000000"
-        // a 2 inputs
-        hex"00020000"
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // offset 0
+            hex"0000"
+            // c b a ops count
+            hex"03"
+            // c b a stack allocation
+            hex"02"
+            // c b a inputs count
+            hex"00"
+            // c b a outputs count
+            hex"01"
+            // c
+            hex"02000000"
+            // b
+            hex"01000000"
+            // a 2 inputs
+            hex"00020000"
         );
         assertEq(constants.length, 0);
     }
@@ -205,29 +209,30 @@ contract LibParseNamedRHSTest is Test {
         assertEq(constants.length, 0);
         // Nested words compile RTL so that they execute LTR.
         // e d c b a
-        assertEq(bytecode,
-        // 1 source
-        hex"01"
-        // offset 0
-        hex"0000"
-        // e d c b a ops count
-        hex"05"
-        // e d c b a stack allocation
-        hex"02"
-        // e d c b a inputs count
-        hex"00"
-        // e d c b a outputs count
-        hex"01"
-        // e
-        hex"04000000"
-        // d
-        hex"03000000"
-        // c 2 inputs
-        hex"02020000"
-        // b
-        hex"01000000"
-        // a 2 inputs
-        hex"00020000"
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // offset 0
+            hex"0000"
+            // e d c b a ops count
+            hex"05"
+            // e d c b a stack allocation
+            hex"02"
+            // e d c b a inputs count
+            hex"00"
+            // e d c b a outputs count
+            hex"01"
+            // e
+            hex"04000000"
+            // d
+            hex"03000000"
+            // c 2 inputs
+            hex"02020000"
+            // b
+            hex"01000000"
+            // a 2 inputs
+            hex"00020000"
         );
     }
 
@@ -246,37 +251,38 @@ contract LibParseNamedRHSTest is Test {
         assertEq(constants.length, 0);
         // Nested words compile RTL so that they execute LTR.
         // i h g f e d c b a
-        assertEq(bytecode,
-        // 1 source
-        hex"01"
-        // offset 0
-        hex"0000"
-        // i h g f e d c b a ops count
-        hex"09"
-        // i h g f e d c b a stack allocation
-        hex"04"
-        // i h g f e d c b a inputs count
-        hex"00"
-        // i h g f e d c b a outputs count
-        hex"01"
-        // i
-        hex"08000000"
-        // h
-        hex"07000000"
-        // g 2 inputs
-        hex"06020000"
-        // f
-        hex"05000000"
-        // e
-        hex"04000000"
-        // d
-        hex"03000000"
-        // c 2 inputs
-        hex"02020000"
-        // b
-        hex"01000000"
-        // a 4 inputs
-        hex"00040000"
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // offset 0
+            hex"0000"
+            // i h g f e d c b a ops count
+            hex"09"
+            // i h g f e d c b a stack allocation
+            hex"04"
+            // i h g f e d c b a inputs count
+            hex"00"
+            // i h g f e d c b a outputs count
+            hex"01"
+            // i
+            hex"08000000"
+            // h
+            hex"07000000"
+            // g 2 inputs
+            hex"06020000"
+            // f
+            hex"05000000"
+            // e
+            hex"04000000"
+            // d
+            hex"03000000"
+            // c 2 inputs
+            hex"02020000"
+            // b
+            hex"01000000"
+            // a 4 inputs
+            hex"00040000"
         );
     }
 
@@ -285,6 +291,35 @@ contract LibParseNamedRHSTest is Test {
     function testParseSingleLHSNestingAndSequential02() external {
         string memory s = "_ _ _:a(b() c(d())) d() e(b());";
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // offset 0
+            hex"0000"
+            // d c b a d b e ops count
+            hex"07"
+            // d c b a d b e stack allocation
+            hex"03"
+            // d c b a d b e inputs count
+            hex"00"
+            // d c b a d b e outputs count
+            hex"03"
+            // d
+            hex"03000000"
+            // c 1 input
+            hex"02010000"
+            // b
+            hex"01000000"
+            // a 2 inputs
+            hex"00020000"
+            // d
+            hex"03000000"
+            // b
+            hex"01000000"
+            // e 1 input
+            hex"04010000"
+        );
         SourceIndex sourceIndex = SourceIndex.wrap(0);
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -293,9 +328,6 @@ contract LibParseNamedRHSTest is Test {
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 3);
         assertEq(constants.length, 0);
-        // Nested words compile RTL so that they execute LTR.
-        // d c b a d b e
-        assertEq(bytecode, hex"00030000010200000001000002000000000300000001000001040000");
     }
 
     /// More than 14 words deep triggers a whole other internal loop due to there
@@ -307,8 +339,10 @@ contract LibParseNamedRHSTest is Test {
         SourceIndex sourceIndex = SourceIndex.wrap(0);
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 15);
-        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0x20);
+        // High point is 13 for the second top level item + 1 for the first top
+        // level item = 14.
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 14);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
         assertEq(constants.length, 0);
@@ -316,7 +350,82 @@ contract LibParseNamedRHSTest is Test {
         // p o n m l k j i h g f e d c b a a b c d e f g h i j k l m n o p
         assertEq(
             bytecode,
-            hex"000f0000000e0000000d0000000c0000000b0000000a0000000900000008000000070000000600000005000000040000000300000d020000000100000200000000000000000100000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c00000d0d0000000e0000020f0000"
+            // 1 source
+            hex"01"
+            // offset 0
+            hex"0000"
+            // p o n m l k j i h g f e d c b a a b c d e f g h i j k l m n o p ops count
+            hex"20"
+            // p o n m l k j i h g f e d c b a a b c d e f g h i j k l m n o p stack allocation
+            hex"0e"
+            // p o n m l k j i h g f e d c b a a b c d e f g h i j k l m n o p inputs count
+            hex"00"
+            // p o n m l k j i h g f e d c b a a b c d e f g h i j k l m n o p outputs count
+            hex"02"
+            // p
+            hex"0f000000"
+            // o
+            hex"0e000000"
+            // n
+            hex"0d000000"
+            // m
+            hex"0c000000"
+            // l
+            hex"0b000000"
+            // k
+            hex"0a000000"
+            // j
+            hex"09000000"
+            // i
+            hex"08000000"
+            // h
+            hex"07000000"
+            // g
+            hex"06000000"
+            // f
+            hex"05000000"
+            // e
+            hex"04000000"
+            // d
+            hex"03000000"
+            // c 13 inputs
+            hex"020d0000"
+            // b
+            hex"01000000"
+            // a 2 inputs
+            hex"00020000"
+            // a
+            hex"00000000"
+            // b
+            hex"01000000"
+            // c
+            hex"02000000"
+            // d
+            hex"03000000"
+            // e
+            hex"04000000"
+            // f
+            hex"05000000"
+            // g
+            hex"06000000"
+            // h
+            hex"07000000"
+            // i
+            hex"08000000"
+            // j
+            hex"09000000"
+            // k
+            hex"0a000000"
+            // l
+            hex"0b000000"
+            // m
+            hex"0c000000"
+            // n 13 inputs
+            hex"0d0d0000"
+            // o
+            hex"0e000000"
+            // p 2 inputs
+            hex"0f020000"
         );
     }
 

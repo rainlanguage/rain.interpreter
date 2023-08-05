@@ -27,29 +27,31 @@ contract LibParseNamedLHSTest is Test {
     /// Two sources with one named input each.
     function testParseNamedLHSTwoInputs() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("a:;b:;", "");
-        assertEq(bytecode,
-        // 2 sources.
-        hex"02"
-        // offset 0
-        hex"0000"
-        // offset 4
-        hex"0004"
-        // 0 ops
-        hex"00"
-        // 1 stack allocation
-        hex"01"
-        // 1 input
-        hex"01"
-        // 1 output
-        hex"01"
-        // 0 ops
-        hex"00"
-        // 1 stack allocation
-        hex"01"
-        // 1 input
-        hex"01"
-        // 1 output
-        hex"01");
+        assertEq(
+            bytecode,
+            // 2 sources.
+            hex"02"
+            // offset 0
+            hex"0000"
+            // offset 4
+            hex"0004"
+            // 0 ops
+            hex"00"
+            // 1 stack allocation
+            hex"01"
+            // 1 input
+            hex"01"
+            // 1 output
+            hex"01"
+            // 0 ops
+            hex"00"
+            // 1 stack allocation
+            hex"01"
+            // 1 input
+            hex"01"
+            // 1 output
+            hex"01"
+        );
 
         assertEq(LibBytecode.sourceCount(bytecode), 2);
 
