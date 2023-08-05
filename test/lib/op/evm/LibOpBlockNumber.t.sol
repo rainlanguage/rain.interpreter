@@ -77,7 +77,7 @@ contract LibOpBlockNumberTest is RainterpreterExpressionDeployerDeploymentTest {
     }
 
     /// Test the eval of a block number opcode parsed from a string.
-    function testOpBlockNumberEval() public {
+    function testOpBlockNumberEval(uint256 blockNumber) public {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: block-number();");
         assertEq(
             bytecode,
@@ -103,7 +103,7 @@ contract LibOpBlockNumberTest is RainterpreterExpressionDeployerDeploymentTest {
 
         // @todo support fuzzing all block numbers.
         // Seems to be a bug in foundry, perhaps fixed in newer versions.
-        // vm.roll(blockNumber);
+        vm.roll(blockNumber);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),
@@ -111,7 +111,7 @@ contract LibOpBlockNumberTest is RainterpreterExpressionDeployerDeploymentTest {
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         assertEq(stack.length, 1);
-        assertEq(stack[0], block.number);
+        assertEq(stack[0], blockNumber);
         assertEq(kvs.length, 0);
     }
 }

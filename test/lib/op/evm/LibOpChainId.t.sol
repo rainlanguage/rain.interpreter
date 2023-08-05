@@ -107,8 +107,8 @@ contract LibOpChainIdTest is RainterpreterExpressionDeployerDeploymentTest {
             LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
-        assertEq(stack.length, 1);
-        assertEq(stack[0], chainId);
-        assertEq(kvs.length, 0);
+        assertEq(stack.length, 1, "stack length");
+        assertEq(stack[0], chainId, "stack item");
+        assertEq(kvs.length, 0, "kvs length");
     }
 }

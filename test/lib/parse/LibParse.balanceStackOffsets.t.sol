@@ -79,14 +79,31 @@ contract LibParseBalanceStackOffsetsTest is Test {
         assertEq(constants.length, 0);
         // a and b should be parsed and inputs are just ignored in the output
         // source.
-        assertEq(bytecode, hex"0000000000010000");
+        assertEq(bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 2 ops
+            hex"02"
+            // 3 stack allocation
+            hex"03"
+            // 1 input
+            hex"01"
+            // 3 outputs
+            hex"03"
+            // a
+            hex"00000000"
+            // b
+            hex"01000000"
+        );
 
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 2);
-        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 2);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 3);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 3);
     }
 
     /// Nested RHS items only count as one LHS item.

@@ -119,6 +119,46 @@ library LibAllStandardOpsNP {
     /// method can just be a thin wrapper around this function.
     function opcodeFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
+            function(InterpreterState memory, Operand, Pointer)
+                view
+                returns (Pointer) lengthPointer;
+            uint256 length = ALL_STANDARD_OPS_LENGTH;
+            assembly ("memory-safe") {
+                lengthPointer := length
+            }
+            function(InterpreterState memory, Operand, Pointer)
+                view
+                returns (Pointer)[ALL_STANDARD_OPS_LENGTH + 1] memory pointersFixed = [
+                    lengthPointer,
+                    // Stack then constant are the first two ops to match the
+                    // field ordering in the interpreter state NOT the lexical
+                    // ordering of the file system.
+                    LibOpStack.run,
+                    LibOpConstant.run,
+                    // Everything else is alphabetical, including folders.
+                    LibOpBlockNumber.run,
+                    LibOpChainId.run,
+                    LibOpMaxUint256.run,
+                    LibOpTimestamp.run
+                ];
+            uint256[] memory pointersDynamic;
+            assembly ("memory-safe") {
+                pointersDynamic := pointersFixed
+            }
+            // Sanity check that the dynamic length is correct. Should be an
+            // unreachable error.
+            if (pointersDynamic.length != ALL_STANDARD_OPS_LENGTH) {
+                revert BadDynamicLength(pointersDynamic.length, length);
+            }
+            return LibConvert.unsafeTo16BitBytes(pointersDynamic);
+        }
+    }
+
+    /// All function pointers for the standard opcodes. Intended to be used to
+    /// build a `IInterpreterV1` instance, specifically the `functionPointers`
+    /// method can just be a thin wrapper around this function.
+    function opcodeFunctionPointersNP() internal pure returns (bytes memory) {
+        unchecked {
             function(InterpreterStateNP memory, Operand, Pointer)
                 view
                 returns (Pointer) lengthPointer;

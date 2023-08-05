@@ -30,7 +30,20 @@ contract LibParseIgnoredLHSTest is Test {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
-        assertEq(bytecode, hex"");
+        assertEq(bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 0 ops
+            hex"00"
+            // 1 stack allocation
+            hex"01"
+            // 1 input
+            hex"01"
+            // 1 output
+            hex"01"
+        );
         assertEq(constants.length, 0);
     }
 
@@ -44,7 +57,48 @@ contract LibParseIgnoredLHSTest is Test {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
-        assertEq(bytecode, hex"");
+        assertEq(bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 0 ops
+            hex"00"
+            // 2 stack allocation
+            hex"02"
+            // 2 inputs
+            hex"02"
+            // 2 outputs
+            hex"02"
+        );
+
+        assertEq(constants.length, 0);
+    }
+
+    /// Inputs can be on multiple lines if there are no RHS items.
+    function testParseIgnoredLHSMultipleLines() external {
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:,_ _:;", "");
+        uint256 sourceIndex = 0;
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 3);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 3);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 3);
+        assertEq(bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 0 ops
+            hex"00"
+            // 3 stack allocation
+            hex"03"
+            // 3 inputs
+            hex"03"
+            // 3 outputs
+            hex"03"
+        );
 
         assertEq(constants.length, 0);
     }
@@ -60,7 +114,22 @@ contract LibParseIgnoredLHSTest is Test {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
-        assertEq(bytecode, hex"00000000");
+        assertEq(bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 1 ops
+            hex"01"
+            // 1 stack allocation
+            hex"01"
+            // 0 inputs
+            hex"00"
+            // 1 output
+            hex"01"
+            // a
+            hex"00000000"
+        );
 
         assertEq(constants.length, 0);
     }
@@ -76,7 +145,20 @@ contract LibParseIgnoredLHSTest is Test {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
-        assertEq(bytecode, hex"");
+        assertEq(bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 0 ops
+            hex"00"
+            // 1 stack allocation
+            hex"01"
+            // 1 input
+            hex"01"
+            // 1 output
+            hex"01"
+        );
         assertEq(constants.length, 0);
     }
 
@@ -90,7 +172,20 @@ contract LibParseIgnoredLHSTest is Test {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
-        assertEq(bytecode, hex"");
+        assertEq(bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 0 ops
+            hex"00"
+            // 2 stack allocation
+            hex"02"
+            // 2 inputs
+            hex"02"
+            // 2 outputs
+            hex"02"
+        );
 
         assertEq(constants.length, 0);
     }
@@ -102,10 +197,23 @@ contract LibParseIgnoredLHSTest is Test {
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
-        assertEq(bytecode, hex"");
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
+        assertEq(bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 0 ops
+            hex"00"
+            // 2 stack allocation
+            hex"02"
+            // 2 inputs
+            hex"02"
+            // 2 output
+            hex"02"
+        );
         assertEq(constants.length, 0);
     }
 
@@ -120,7 +228,20 @@ contract LibParseIgnoredLHSTest is Test {
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
-        assertEq(bytecode, hex"");
+        assertEq(bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 0 ops
+            hex"00"
+            // 1 stack allocation
+            hex"01"
+            // 1 input
+            hex"01"
+            // 1 output
+            hex"01"
+        );
         assertEq(constants.length, 0);
     }
 }

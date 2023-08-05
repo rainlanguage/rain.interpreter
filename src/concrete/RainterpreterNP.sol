@@ -28,7 +28,7 @@ error InvalidSourceIndex(SourceIndex sourceIndex);
 /// By setting these as a constant they can be inlined into the interpreter
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"0aba0aee0b240b530b820bd1";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"0a8f0ad70b0d0b3c0b6b0bba";
 
 /// @title RainterpreterNP
 /// @notice !!EXPERIMENTAL!! implementation of a Rainlang interpreter that is
@@ -121,7 +121,7 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
 
     /// @inheritdoc IInterpreterV1
     function functionPointers() external view virtual returns (bytes memory) {
-        return LibAllStandardOpsNP.opcodeFunctionPointers();
+        return LibAllStandardOpsNP.opcodeFunctionPointersNP();
     }
 
     function _eval(
@@ -156,11 +156,13 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
         // will be built within the bounds of the stack. After this point `tail`
         // and the original stack MUST be immutable as they're both pointing to
         // the same memory region.
-        (uint256 head, uint256[] memory tail) = stackTop.unsafeList(maxOutputs < outputs ? maxOutputs : outputs);
-        // The head is irrelevant here because it's whatever was overridden by
-        // the length of the array in building the final substack to return.
-        (head);
+        outputs = maxOutputs < outputs ? maxOutputs : outputs;
+        uint256[] memory result;
+        assembly ("memory-safe") {
+            result := sub(stackTop, 0x20)
+            mstore(result, outputs)
+        }
 
-        return (tail, state.stateKV.toUint256Array());
+        return (result, state.stateKV.toUint256Array());
     }
 }
