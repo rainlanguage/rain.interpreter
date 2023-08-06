@@ -77,18 +77,18 @@ library LibAllStandardOpsNP {
         return abi.encode(words);
     }
 
-    function integrityNPFunctionPointers() internal pure returns (bytes memory) {
+    function integrityFunctionPointersNP() internal pure returns (bytes memory) {
         unchecked {
-            function(IntegrityCheckStateNP memory, Operand, uint256)
+            function(IntegrityCheckStateNP memory, Operand)
                 view
-                returns (Operand, uint256, uint256) lengthPointer;
+                returns (uint256, uint256) lengthPointer;
             uint256 length = ALL_STANDARD_OPS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(IntegrityCheckStateNP memory, Operand, uint256)
+            function(IntegrityCheckStateNP memory, Operand)
                 view
-                returns (Operand, uint256, uint256)[ALL_STANDARD_OPS_LENGTH + 1] memory pointersFixed = [
+                returns (uint256, uint256)[ALL_STANDARD_OPS_LENGTH + 1] memory pointersFixed = [
                     lengthPointer,
                     // Stack then constant are the first two ops to match the
                     // field ordering in the interpreter state NOT the lexical

@@ -7,8 +7,11 @@ import "../../state/LibInterpreterStateNP.sol";
 import "../../integrity/LibIntegrityCheck.sol";
 import "../../integrity/LibIntegrityCheckNP.sol";
 
+/// Legacy error without op index.
+error BadConstantRead(uint256 constantsLength, uint256 constantRead);
+
 /// Thrown when a constant read index is outside the constants array.
-error OutOfBoundsConstantsRead(uint256 constantsLength, uint256 constantsRead);
+error OutOfBoundsConstantRead(uint256 opIndex, uint256 constantsLength, uint256 constantRead);
 
 /// @title LibOpConstant
 /// Implementation of copying a constant from the constants array to the stack.
@@ -30,21 +33,9 @@ library LibOpConstant {
         returns (Pointer)
     {
         if (Operand.unwrap(operand) >= integrityCheckState.constantsLength) {
-            revert OutOfBoundsConstantsRead(integrityCheckState.constantsLength, Operand.unwrap(operand));
+            revert BadConstantRead(integrityCheckState.constantsLength, Operand.unwrap(operand));
         }
         return integrityCheckState.push(stackTop);
-    }
-
-    function integrityNP(IntegrityCheckStateNP memory state, Operand operand, uint256)
-        internal
-        pure
-        returns (Operand, uint256, uint256)
-    {
-        // Operand is the index so ensure it doesn't exceed the constants length.
-        if (Operand.unwrap(operand) >= state.constantsLength) {
-            revert OutOfBoundsConstantsRead(state.constantsLength, Operand.unwrap(operand));
-        }
-        return (operand, 0, 1);
     }
 
     /// Copies a constant from the constants array to the stack. Does NOT do
@@ -58,6 +49,20 @@ library LibOpConstant {
             stackTop := add(stackTop, 0x20)
         }
         return stackTop;
+    }
+
+    function integrityNP(IntegrityCheckStateNP memory state, Operand operand)
+        internal
+        pure
+        returns (uint256, uint256)
+    {
+        // Operand is the index so ensure it doesn't exceed the constants length.
+        if (Operand.unwrap(operand) >= state.constantsLength) {
+            revert OutOfBoundsConstantRead(state.opIndex, state.constantsLength, Operand.unwrap(operand));
+        }
+        // As inputs MUST always be 0, we don't have to check the high byte of
+        // the operand here, the integrity check will do that for us.
+        return (0, 1);
     }
 
     function runNP(InterpreterStateNP memory state, Operand operand, Pointer stackTop)

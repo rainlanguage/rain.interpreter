@@ -54,7 +54,7 @@ contract LibOpConstantTest is RainterpreterExpressionDeployerDeploymentTest {
         Pointer stackTop = state.stackBottom;
 
         vm.expectRevert(
-            abi.encodeWithSelector(OutOfBoundsConstantsRead.selector, constants.length, Operand.unwrap(operand))
+            abi.encodeWithSelector(OutOfBoundsConstantRead.selector, 0, constants.length, Operand.unwrap(operand))
         );
         LibOpConstant.integrity(state, operand, stackTop);
     }
@@ -113,7 +113,7 @@ contract LibOpConstantTest is RainterpreterExpressionDeployerDeploymentTest {
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 3);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 3);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 3);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 3);
 
         assertEq(
@@ -142,7 +142,7 @@ contract LibOpConstantTest is RainterpreterExpressionDeployerDeploymentTest {
 
         uint256[] memory minOuputs = new uint256[](1);
         minOuputs[0] = 3;
-        vm.expectRevert(abi.encodeWithSelector(OutOfBoundsConstantsRead.selector, 0, 0));
+        vm.expectRevert(abi.encodeWithSelector(OutOfBoundsConstantRead.selector, 0, 0, 0));
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOuputs);
         (interpreterDeployer);

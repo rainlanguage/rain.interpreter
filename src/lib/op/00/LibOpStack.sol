@@ -7,8 +7,11 @@ import "../../state/LibInterpreterStateNP.sol";
 import "../../integrity/LibIntegrityCheck.sol";
 import "../../integrity/LibIntegrityCheckNP.sol";
 
+/// Legacy error without op index.
+error BadStackRead(uint256 stackIndex, uint256 stackRead);
+
 /// Thrown when a stack read index is outside the current stack top.
-error OutOfBoundsStackRead(uint256 stackTopIndex, uint256 stackRead);
+error OutOfBoundsStackRead(uint256 opIndex, uint256 stackTopIndex, uint256 stackRead);
 
 /// @title LibOpStack
 /// Implementation of copying a stack item from the stack to the stack.
@@ -35,7 +38,7 @@ library LibOpStack {
 
         // Ensure that we aren't reading beyond the current stack top.
         if (Pointer.unwrap(operandPointer) >= Pointer.unwrap(stackTop)) {
-            revert OutOfBoundsStackRead(
+            revert BadStackRead(
                 // Assume that negative stack top has been handled elsewhere by
                 // caller.
                 uint256(integrityCheckState.stackBottom.toIndexSigned(stackTop)),
@@ -52,22 +55,23 @@ library LibOpStack {
         return integrityCheckState.push(stackTop);
     }
 
-    function integrityNP(IntegrityCheckStateNP memory state, Operand operand, uint256)
+    function integrityNP(IntegrityCheckStateNP memory state, Operand operand)
         internal
         pure
-        returns (Operand, uint256, uint256)
+        returns (uint256, uint256)
     {
+        uint256 readIndex = Operand.unwrap(operand);
         // Operand is the index so ensure it doesn't exceed the stack index.
-        if (Operand.unwrap(operand) >= state.stackIndex) {
-            revert OutOfBoundsStackRead(state.stackIndex, Operand.unwrap(operand));
+        if (readIndex >= state.stackIndex) {
+            revert OutOfBoundsStackRead(state.opIndex, state.stackIndex, readIndex);
         }
 
         // Move the read highwater if needed.
-        if (Operand.unwrap(operand) > state.readHighwater) {
-            state.readHighwater = Operand.unwrap(operand);
+        if (readIndex > state.readHighwater) {
+            state.readHighwater = readIndex;
         }
 
-        return (operand, 0, 1);
+        return (0, 1);
     }
 
     /// Copies a stack item from the stack array to the stack.

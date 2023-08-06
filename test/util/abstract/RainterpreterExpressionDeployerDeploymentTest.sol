@@ -12,36 +12,55 @@ import "src/concrete/RainterpreterExpressionDeployerNP.sol";
 /// Tests that the RainterpreterExpressionDeployer meta is correct. Also tests
 /// basic functionality of the `IParserV1` interface implementation.
 abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
+    //solhint-disable-next-line private-vars-leading-underscore
     RainterpreterStore internal immutable iStore;
+    //solhint-disable-next-line private-vars-leading-underscore
     RainterpreterNP internal immutable iInterpreter;
+    //solhint-disable-next-line private-vars-leading-underscore
     RainterpreterExpressionDeployerNP internal immutable iDeployer;
 
     constructor() {
         iStore = new RainterpreterStore();
         iInterpreter = new RainterpreterNP();
 
-        console2.log("current function pointers:");
-        console2.logBytes(iInterpreter.functionPointers());
+        // Sanity check the interpreter's opcode function pointers.
+        bytes memory opcodeFunctionPointers = iInterpreter.functionPointers();
+        if (keccak256(opcodeFunctionPointers) != keccak256(OPCODE_FUNCTION_POINTERS)) {
+            console2.log("current interpreter opcode function pointers hash:");
+            console2.logBytes(opcodeFunctionPointers);
+            revert("unexpected interpreter opcode function pointers");
+        }
 
-        console2.log("current i9r bytecode hash:");
+        // Sanity check the interpreter's bytecode hash.
         bytes32 i9rHash;
         address interpreter = address(iInterpreter);
         assembly {
             i9rHash := extcodehash(interpreter)
         }
-        console2.logBytes32(i9rHash);
+        if (i9rHash != INTERPRETER_BYTECODE_HASH) {
+            console2.log("current i9r bytecode hash:");
+            console2.logBytes32(i9rHash);
+            revert("unexpected interpreter bytecode hash");
+        }
 
-        console2.log("current store bytecode hash:");
         bytes32 storeHash;
         address store = address(iStore);
         assembly {
             storeHash := extcodehash(store)
         }
-        console2.logBytes32(storeHash);
+        if (storeHash != STORE_BYTECODE_HASH) {
+            console2.log("current store bytecode hash:");
+            console2.logBytes32(storeHash);
+            revert("unexpected store bytecode hash");
+        }
 
         bytes memory authoringMeta = LibAllStandardOpsNP.authoringMeta();
-        console2.log("current authoring meta hash:");
-        console2.logBytes32(keccak256(authoringMeta));
+        bytes32 authoringMetaHash = keccak256(authoringMeta);
+        if (authoringMetaHash != AUTHORING_META_HASH) {
+            console2.log("current authoring meta hash:");
+            console2.logBytes32(authoringMetaHash);
+            revert("unexpected authoring meta hash");
+        }
 
         vm.etch(address(IERC1820_REGISTRY), REVERT_BYTECODE);
         vm.mockCall(
@@ -57,5 +76,13 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
             address(iStore),
             authoringMeta
         ));
+
+        // Sanity check the deployer's integrity function pointers.
+        bytes memory integrityFunctionPointers = iDeployer.integrityFunctionPointers();
+        if (keccak256(integrityFunctionPointers) != keccak256(INTEGRITY_FUNCTION_POINTERS)) {
+            console2.log("current deployer integrity function pointers hash:");
+            console2.logBytes(integrityFunctionPointers);
+            revert("unexpected deployer integrity function pointers");
+        }
     }
 }

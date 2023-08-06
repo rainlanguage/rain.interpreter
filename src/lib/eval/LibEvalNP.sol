@@ -136,6 +136,7 @@ library LibEvalNP {
                 assembly ("memory-safe") {
                     word := mload(cursor)
                     f := shr(0xf0, mload(add(fPointersStart, mul(byte(28, word), 2))))
+                    // 3 bytes mask.
                     operand := and(word, 0xFFFFFF)
                 }
                 stackTop = f(state, operand, stackTop);

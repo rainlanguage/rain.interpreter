@@ -16,7 +16,7 @@ import "../interface/unstable/IParserV1.sol";
 import "../lib/integrity/LibIntegrityCheck.sol";
 import "../lib/state/LibInterpreterStateDataContractNP.sol";
 import "../lib/op/LibAllStandardOpsNP.sol";
-import "../lib/parse/LibParse.sol";
+import {LibParse, LibParseMeta} from "../lib/parse/LibParse.sol";
 
 import "./RainterpreterNP.sol";
 
@@ -37,7 +37,33 @@ error UnexpectedInterpreterBytecodeHash(bytes32 actualBytecodeHash);
 /// there are provided sources. This means the calling contract WILL attempt to
 /// eval a dangling reference to a non-existent source at some point, so this
 /// MUST REVERT.
-error MissingEntrypoint(uint256 expectedEntrypoints, uint256 actualEntrypoints);
+error EntrypointMissing(uint256 expectedEntrypoints, uint256 actualEntrypoints);
+
+/// Thrown when some entrypoint has non-zero inputs. This is not allowed as
+/// only internal dispatches can have source level inputs.
+error EntrypointNonZeroInput(uint256 entrypointIndex, uint256 inputsLength);
+
+/// Thrown when some entrypoint has less outputs than the minimum required.
+error EntrypointMinOutputs(uint256 entrypointIndex, uint256 outputsLength, uint256 minOutputs);
+
+/// The bytecode and integrity function disagree on number of inputs.
+error BadOpInputsLength(uint256 opIndex, uint256 calculatedInputs, uint256 bytecodeInputs);
+
+/// The stack underflowed during integrity check.
+error StackUnderflow(uint256 opIndex, uint256 stackIndex, uint256 calculatedInputs);
+
+/// The stack underflowed the highwater during integrity check.
+error StackUnderflowHighwater(uint256 opIndex, uint256 stackIndex, uint256 stackHighwater);
+
+/// The stack max index does not match the bytecode allocation.
+error StackMaxIndexMismatch(uint256 stackMaxIndex, uint256 bytecodeAllocation);
+
+/// The bytecode stack allocation does not match the allocation calculated by
+/// the integrity check.
+error StackAllocationMismatch(uint256 stackMaxIndex, uint256 bytecodeAllocation);
+
+/// The final stack index does not match the bytecode outputs.
+error StackOutputsMismatch(uint256 stackIndex, uint256 bytecodeOutputs);
 
 /// Thrown when the `Rainterpreter` is constructed with unknown store bytecode.
 /// @param actualBytecodeHash The bytecode hash that was found at the store
@@ -47,9 +73,12 @@ error UnexpectedStoreBytecodeHash(bytes32 actualBytecodeHash);
 /// Thrown when the `Rainterpreter` is constructed with unknown opMeta.
 error UnexpectedOpMetaHash(bytes32 actualOpMeta);
 
-/// Thrown when the integrity check returns a negative stack index.
-/// @param index The negative index.
-error NegativeStackIndex(int256 index);
+// /// Thrown when the integrity check returns a negative stack index.
+// /// @param index The negative index.
+// error NegativeStackIndex(int256 index);
+
+/// @dev The function pointers for the integrity check fns.
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"144a14c4152b152b152b152b";
 
 /// @dev Hash of the known interpreter bytecode.
 bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x5caf9f163930d03d49ba32544f022213f36cf58ee5aeeccec879d253dced7b04);
@@ -86,16 +115,17 @@ library LibRainterpreterExpressionDeployerNPMeta {
 /// interpreter. Notably includes onchain parsing/compiling of expressions from
 /// Rainlang strings.
 contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpressionDeployerV2, IParserV1, ERC165 {
+    using LibPointer for Pointer;
     using LibStackPointer for Pointer;
     using LibUint256Array for uint256[];
 
     /// The config of the deployed expression including uncompiled sources. Will
     /// only be emitted after the config passes the integrity check.
     /// @param sender The caller of `deployExpression`.
-    /// @param sources As per `IExpressionDeployerV1`.
-    /// @param constants As per `IExpressionDeployerV1`.
-    /// @param minOutputs As per `IExpressionDeployerV1`.
-    event NewExpression(address sender, bytes[] sources, uint256[] constants, uint256[] minOutputs);
+    /// @param bytecode As per `IExpressionDeployerV2`.
+    /// @param constants As per `IExpressionDeployerV2`.
+    /// @param minOutputs As per `IExpressionDeployerV2`.
+    event NewExpression(address sender, bytes bytecode, uint256[] constants, uint256[] minOutputs);
 
     /// The address of the deployed expression. Will only be emitted once the
     /// expression can be loaded and deserialized into an evaluable interpreter
@@ -162,7 +192,7 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
 
     // @inheritdoc IERC165
     function supportsInterface(bytes4 interfaceId_) public view virtual override returns (bool) {
-        return interfaceId_ == type(IExpressionDeployerV1).interfaceId || interfaceId_ == type(IERC165).interfaceId;
+        return interfaceId_ == type(IExpressionDeployerV2).interfaceId || interfaceId_ == type(IERC165).interfaceId;
     }
 
     /// @inheritdoc IDebugExpressionDeployerV2
@@ -236,18 +266,15 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
         external
         returns (IInterpreterV1, IInterpreterStoreV1, address)
     {
-        // uint256 stackLength = integrityCheck(sources, constants, minOutputs);
+        integrityCheck(bytecode, constants, minOutputs);
 
-        // // Emit the config of the expression _before_ we serialize it, as the
-        // // serialization process itself is destructive of the sources in memory.
-        // emit NewExpression(msg.sender, sources, constants, minOutputs);
+        emit NewExpression(msg.sender, bytecode, constants, minOutputs);
 
         (DataContractMemoryContainer container, Pointer pointer) =
             LibDataContract.newContainer(LibInterpreterStateDataContractNP.serializeSizeNP(bytecode, constants));
 
         // Serialize the state config into bytes that can be deserialized later
-        // by the interpreter. This will compile the sources according to the
-        // provided function pointers.
+        // by the interpreter.
         LibInterpreterStateDataContractNP.unsafeSerializeNP(pointer, bytecode, constants);
 
         // Deploy the serialized expression onchain.
@@ -259,8 +286,8 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
         return (iInterpreter, iStore, expression);
     }
 
-    /// Drives an integrity check of the provided sources and constants. This
-    /// @param sources The sources to check.
+    /// Drives an integrity check of the provided bytecode and constants.
+    /// @param bytecode The bytecode to check.
     /// @param constants The constants to check.
     /// @param minOutputs The minimum number of outputs expected from each of
     /// the sources. Only applies to sources that are entrypoints. Internal
@@ -271,46 +298,110 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
     /// later so MUST be correct for ALL internal states of the evaluation. It
     /// is NOT sufficient to just return the final stack size as the stack
     /// grows and shrinks during evaluation.
-    function integrityCheck(bytes[] memory sources, uint256[] memory constants, uint256[] memory minOutputs)
+    function integrityCheck(bytes memory bytecode, uint256[] memory constants, uint256[] memory minOutputs)
         internal
         view
         returns (uint256)
     {
-        // Ensure that we are not missing any entrypoints expected by the calling
-        // contract.
-        if (minOutputs.length > sources.length) {
-            revert MissingEntrypoint(minOutputs.length, sources.length);
-        }
+        unchecked {
+            bytes memory integrityFunctionPointers = INTEGRITY_FUNCTION_POINTERS;
 
-        // Build the initial state of the integrity check.
-        IntegrityCheckState memory integrityCheckState =
-            LibIntegrityCheck.newState(sources, constants, integrityFunctionPointers());
-        // Loop over each possible entrypoint as defined by the calling contract
-        // and check the integrity of each. At the least we need to be sure that
-        // there are no out of bounds stack reads/writes and to know the total
-        // memory to allocate when later deserializing an associated interpreter
-        // state for evaluation.
-        Pointer initialStackBottom = integrityCheckState.stackBottom;
-        Pointer initialStackHighwater = integrityCheckState.stackHighwater;
-        for (uint16 i = 0; i < minOutputs.length; i++) {
-            // Reset the top, bottom and highwater between each entrypoint as
-            // every external eval MUST have a fresh stack, but retain the max
-            // stack height as the latter is used for unconditional memory
-            // allocation so MUST be the max height across all possible
-            // entrypoints.
-            integrityCheckState.stackBottom = initialStackBottom;
-            integrityCheckState.stackHighwater = initialStackHighwater;
-            Pointer stackTopAfter = LibIntegrityCheck.ensureIntegrity(
-                integrityCheckState, SourceIndex.wrap(i), INITIAL_STACK_BOTTOM, minOutputs[i]
-            );
-            (stackTopAfter);
-        }
+            uint256 sourceCount = LibBytecode.sourceCount(bytecode);
 
-        int256 finalMaxIndex = integrityCheckState.stackBottom.toIndexSigned(integrityCheckState.stackMaxTop);
-        if (finalMaxIndex < 0) {
-            revert NegativeStackIndex(finalMaxIndex);
+            // Ensure that we are not missing any entrypoints expected by the calling
+            // contract.
+            if (minOutputs.length > sourceCount) {
+                revert EntrypointMissing(minOutputs.length, sourceCount);
+            }
+
+            uint256 fPointersStart;
+            assembly {
+                fPointersStart := add(integrityFunctionPointers, 0x20)
+            }
+
+            // Run the integrity check over each source.
+            for (uint256 i = 0; i < sourceCount; i++) {
+                // Ensure that each entrypoint has zero source inputs.
+                uint256 inputsLength = LibBytecode.sourceInputsLength(bytecode, i);
+
+                // Ensure that each entrypoint has the minimum number of outputs.
+                uint256 outputsLength = LibBytecode.sourceOutputsLength(bytecode, i);
+
+                // This is an entrypoint so has additional restrictions.
+                if (i < minOutputs.length) {
+                    if (inputsLength != 0) {
+                        revert EntrypointNonZeroInput(i, inputsLength);
+                    }
+
+                    if (outputsLength < minOutputs[i]) {
+                        revert EntrypointMinOutputs(i, outputsLength, minOutputs[i]);
+                    }
+                }
+
+                IntegrityCheckStateNP memory state =
+                    LibIntegrityCheckNP.newState(bytecode, inputsLength, constants.length);
+
+                // Have low 4 bytes of cursor overlap the first op, skipping the
+                // prefix.
+                uint256 cursor = Pointer.unwrap(LibBytecode.sourcePointer(bytecode, i)) - 0x18;
+                uint256 end = cursor + LibBytecode.sourceOpsLength(bytecode, i) * 4;
+
+                while (cursor < end) {
+                    Operand operand;
+                    uint256 bytecodeOpInputs;
+                    function(IntegrityCheckStateNP memory, Operand)
+                    view
+                    returns (uint256, uint256) f;
+                    assembly ("memory-safe") {
+                        let word := mload(cursor)
+                        f := shr(0xf0, mload(add(fPointersStart, mul(byte(28, word), 2))))
+                        // 3 bytes mask.
+                        operand := and(word, 0xFFFFFF)
+                        bytecodeOpInputs := byte(29, word)
+                    }
+                    (uint256 calcOpInputs, uint256 calcOpOutputs) = f(state, operand);
+                    if (calcOpInputs != bytecodeOpInputs) {
+                        revert BadOpInputsLength(state.opIndex, calcOpInputs, bytecodeOpInputs);
+                    }
+
+                    if (calcOpInputs > state.stackIndex) {
+                        revert StackUnderflow(state.opIndex, state.stackIndex, calcOpInputs);
+                    }
+                    state.stackIndex -= calcOpInputs;
+
+                    // The stack index can't move below the highwater.
+                    if (state.stackIndex < state.readHighwater) {
+                        revert StackUnderflowHighwater(state.opIndex, state.stackIndex, state.readHighwater);
+                    }
+
+                    // Let's assume that sane opcode implementations don't
+                    // overflow uint256 due to their outputs.
+                    state.stackIndex += calcOpOutputs;
+
+                    // Ensure the max stack index is updated if needed.
+                    if (state.stackIndex > state.stackMaxIndex) {
+                        state.stackMaxIndex = state.stackIndex;
+                    }
+
+                    // If there are multiple outputs the highwater MUST move.
+                    if (calcOpOutputs > 1) {
+                        state.readHighwater = state.stackIndex;
+                    }
+
+                    state.opIndex++;
+                }
+
+                // The final stack max index MUST match the bytecode allocation.
+                if (state.stackMaxIndex != LibBytecode.sourceStackAllocation(bytecode, i)) {
+                    revert StackAllocationMismatch(state.stackMaxIndex, LibBytecode.sourceStackAllocation(bytecode, i));
+                }
+
+                // The final stack index MUST match the bytecode source outputs.
+                if (state.stackIndex != outputsLength) {
+                    revert StackOutputsMismatch(state.stackIndex, outputsLength);
+                }
+            }
         }
-        return uint256(finalMaxIndex);
     }
 
     /// Defines all the function pointers to integrity checks. This is the
@@ -323,12 +414,7 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
     /// pointers. This function is `virtual` so that it can be overridden
     /// pairwise with overrides to `functionPointers` on `Rainterpreter`.
     /// @return The list of integrity function pointers.
-    function integrityFunctionPointers()
-        internal
-        view
-        virtual
-        returns (function(IntegrityCheckState memory, Operand, Pointer) view returns (Pointer)[] memory)
-    {
-        return LibAllStandardOpsNP.integrityFunctionPointers();
+    function integrityFunctionPointers() external view virtual returns (bytes memory) {
+        return LibAllStandardOpsNP.integrityFunctionPointersNP();
     }
 }

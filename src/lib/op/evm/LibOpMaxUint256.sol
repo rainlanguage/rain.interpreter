@@ -27,12 +27,8 @@ library LibOpMaxUint256 {
         return integrityCheckState.push(stackTop);
     }
 
-    function integrityNP(IntegrityCheckStateNP memory, Operand, uint256)
-        internal
-        pure
-        returns (Operand, uint256, uint256)
-    {
-        return (Operand.wrap(0), 0, 1);
+    function integrityNP(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
+        return (0, 1);
     }
 
     /// Pushes `type(uint256).max` onto the stack.
