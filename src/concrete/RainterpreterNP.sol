@@ -28,7 +28,7 @@ error InvalidSourceIndex(SourceIndex sourceIndex);
 /// By setting these as a constant they can be inlined into the interpreter
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"0a8f0ad70b0d0b3c0b6b0bba";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"0af50b3d0b730ba20bd10c20";
 
 /// @title RainterpreterNP
 /// @notice !!EXPERIMENTAL!! implementation of a Rainlang interpreter that is
@@ -161,6 +161,21 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
         assembly ("memory-safe") {
             result := sub(stackTop, 0x20)
             mstore(result, outputs)
+
+            // Need to reverse the result array for backwards compatibility.
+            // Ideally we'd not do this, but will need to roll a new interface
+            // for such a breaking change.
+            for {
+                let a := add(result, 0x20)
+                let b := add(result, mul(outputs, 0x20))
+            } lt(a, b) {
+                a := add(a, 0x20)
+                b := sub(b, 0x20)
+            } {
+                let tmp := mload(a)
+                mstore(a, mload(b))
+                mstore(b, tmp)
+            }
         }
 
         return (result, state.stateKV.toUint256Array());

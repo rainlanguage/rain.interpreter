@@ -144,7 +144,7 @@ contract LibOpStackTest is RainterpreterExpressionDeployerDeploymentTest {
         );
         assertEq(stack.length, 2);
         assertEq(stack[0], 1);
-        // assertEq(stack[1], 1);
-        // assertEq(kvs.length, 0);
+        assertEq(stack[1], 1);
+        assertEq(kvs.length, 0);
     }
 }
