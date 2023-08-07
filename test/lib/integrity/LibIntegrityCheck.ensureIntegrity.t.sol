@@ -186,7 +186,7 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
 
     /// If the min final stack is set higher than 0 the stack must be at least
     /// that high. This test checks that min stack of 1 can be satisfied.
-    function testIntegrityEnsureIntegrityMinStack1() public {
+    function testIntegrityEnsureIntegrityMinStack1Valid() public {
         (IntegrityCheckState memory state, Pointer stackTop) = newState("_: push();");
         Pointer stackTopAfter = state.ensureIntegrity(SourceIndex.wrap(0), stackTop, 1);
         assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(stackTop.unsafeAddWord()));

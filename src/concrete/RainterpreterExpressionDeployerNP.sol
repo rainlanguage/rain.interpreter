@@ -78,10 +78,10 @@ error UnexpectedOpMetaHash(bytes32 actualOpMeta);
 // error NegativeStackIndex(int256 index);
 
 /// @dev The function pointers for the integrity check fns.
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"144a14c4152b152b152b152b";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"144314bd1524152415241524";
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x5caf9f163930d03d49ba32544f022213f36cf58ee5aeeccec879d253dced7b04);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xf30cc4ab09f0f113c506bc8616c35c838293ff06b29d9ed46a1161538ef01dee);
 
 /// @dev Hash of the known store bytecode.
 bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);
@@ -203,7 +203,7 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
         uint256 maxOutputs,
         uint256[][] memory context,
         uint256[] memory inputs,
-        uint256 minOutputs
+        uint256
     ) external view returns (uint256[] memory, uint256[] memory) {
         // IntegrityCheckState memory integrityCheckState =
         //     LibIntegrityCheck.newState(sources, constants, integrityFunctionPointers());
@@ -293,19 +293,11 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
     /// the sources. Only applies to sources that are entrypoints. Internal
     /// sources have their integrity checked implicitly by the use of opcodes
     /// such as `call` that have min/max outputs in their operand.
-    /// @return The total stack size required to fully evaluate the expression.
-    /// This is used to allocate the stack when deserializing the expression
-    /// later so MUST be correct for ALL internal states of the evaluation. It
-    /// is NOT sufficient to just return the final stack size as the stack
-    /// grows and shrinks during evaluation.
     function integrityCheck(bytes memory bytecode, uint256[] memory constants, uint256[] memory minOutputs)
         internal
         view
-        returns (uint256)
     {
         unchecked {
-            bytes memory integrityFunctionPointers = INTEGRITY_FUNCTION_POINTERS;
-
             uint256 sourceCount = LibBytecode.sourceCount(bytecode);
 
             // Ensure that we are not missing any entrypoints expected by the calling
@@ -314,9 +306,10 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
                 revert EntrypointMissing(minOutputs.length, sourceCount);
             }
 
+            bytes memory fPointers = INTEGRITY_FUNCTION_POINTERS;
             uint256 fPointersStart;
             assembly {
-                fPointersStart := add(integrityFunctionPointers, 0x20)
+                fPointersStart := add(fPointers, 0x20)
             }
 
             // Run the integrity check over each source.

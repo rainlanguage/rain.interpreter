@@ -86,6 +86,7 @@ library LibBytecode {
             uint256 count = sourceCount(bytecode);
             bytes[] memory sources = new bytes[](count);
             for (uint256 i = 0; i < count; i++) {
+                // Skip over the prefix 4 bytes.
                 Pointer pointer = sourcePointer(bytecode, i).unsafeAddBytes(4);
                 uint256 length = sourceOpsLength(bytecode, i) * 4;
                 bytes memory source = new bytes(length);

@@ -12,10 +12,10 @@ contract RainterpreterExpressionDeployerTouchDeployer is RainterpreterExpression
         vm.expectCall(
             address(iDeployer),
             abi.encodeWithSelector(
-                IExpressionDeployerV1.deployExpression.selector, new bytes[](0), new uint256[](0), new uint256[](0)
+                IExpressionDeployerV2.deployExpression.selector, "", new uint256[](0), new uint256[](0)
             ),
             1
         );
-        LibDeployerDiscoverable.touchDeployerV1(address(iDeployer));
+        LibDeployerDiscoverable.touchDeployerV2(address(iDeployer));
     }
 }

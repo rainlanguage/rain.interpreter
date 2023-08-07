@@ -204,9 +204,9 @@ library LibIntegrityCheck {
                 Operand operand;
                 cursor += 4;
                 assembly ("memory-safe") {
-                    let op := mload(cursor)
-                    operand := and(op, 0xFFFF)
-                    opcode := and(shr(16, op), 0xFFFF)
+                    let word := mload(cursor)
+                    operand := and(word, 0xFFFF)
+                    opcode := byte(28, word)
                 }
                 // We index into the function pointers here rather than using raw
                 // assembly to ensure that any opcodes that we don't have a
