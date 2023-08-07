@@ -78,7 +78,7 @@ error UnexpectedOpMetaHash(bytes32 actualOpMeta);
 // error NegativeStackIndex(int256 index);
 
 /// @dev The function pointers for the integrity check fns.
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"144314bd1524152415241524";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"144a14c4152b152b152b152b";
 
 /// @dev Hash of the known interpreter bytecode.
 bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xf30cc4ab09f0f113c506bc8616c35c838293ff06b29d9ed46a1161538ef01dee);
@@ -382,6 +382,7 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
                     }
 
                     state.opIndex++;
+                    cursor += 4;
                 }
 
                 // The final stack max index MUST match the bytecode allocation.

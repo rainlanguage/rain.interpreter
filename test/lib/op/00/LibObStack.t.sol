@@ -64,7 +64,7 @@ contract LibOpStackTest is RainterpreterExpressionDeployerDeploymentTest {
         Pointer stackTop = state.stackBottom.unsafeAddWords(stackHeight);
         state.syncStackMaxTop(stackTop);
 
-        vm.expectRevert(abi.encodeWithSelector(OutOfBoundsStackRead.selector, stackHeight, Operand.unwrap(operand)));
+        vm.expectRevert(abi.encodeWithSelector(BadStackRead.selector, stackHeight, Operand.unwrap(operand)));
         LibOpStack.integrity(state, operand, stackTop);
     }
 

@@ -54,7 +54,7 @@ contract LibOpConstantTest is RainterpreterExpressionDeployerDeploymentTest {
         Pointer stackTop = state.stackBottom;
 
         vm.expectRevert(
-            abi.encodeWithSelector(OutOfBoundsConstantRead.selector, 0, constants.length, Operand.unwrap(operand))
+            abi.encodeWithSelector(BadConstantRead.selector, constants.length, Operand.unwrap(operand))
         );
         LibOpConstant.integrity(state, operand, stackTop);
     }
