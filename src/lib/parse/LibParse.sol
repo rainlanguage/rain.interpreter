@@ -388,10 +388,12 @@ library LibParseState {
             // item on that line.
             else if (lineRHSTopLevel > 1) {
                 if (lineLHSItems < lineRHSTopLevel) {
+                    //slither-disable-next-line similar-names
                     (uint256 errorOffset, string memory errorChar) = LibParse.parseErrorContext(data, cursor);
                     (errorChar);
                     revert ExcessRHSItems(errorOffset);
                 } else if (lineLHSItems > lineRHSTopLevel) {
+                    //slither-disable-next-line similar-names
                     (uint256 errorOffset, string memory errorChar) = LibParse.parseErrorContext(data, cursor);
                     (errorChar);
                     revert ExcessLHSItems(errorOffset);
