@@ -33,9 +33,6 @@ error UnexpectedPointers(bytes actualPointers);
 /// address upon construction.
 error UnexpectedInterpreterBytecodeHash(bytes32 actualBytecodeHash);
 
-/// The stack max index does not match the bytecode allocation.
-error StackMaxIndexMismatch(uint256 stackMaxIndex, uint256 bytecodeAllocation);
-
 /// Thrown when the `Rainterpreter` is constructed with unknown store bytecode.
 /// @param actualBytecodeHash The bytecode hash that was found at the store
 /// address upon construction.
@@ -68,13 +65,6 @@ struct RainterpreterExpressionDeployerConstructionConfig {
     address interpreter;
     address store;
     bytes authoringMeta;
-}
-
-library LibRainterpreterExpressionDeployerNPMeta {
-    function buildParseMetaFromAuthoringMeta(bytes memory inputAuthoringMeta) internal pure returns (bytes memory) {
-        bytes32[] memory words = abi.decode(inputAuthoringMeta, (bytes32[]));
-        return LibParseMeta.buildMeta(words, 2);
-    }
 }
 
 /// @title RainterpreterExpressionDeployer
@@ -173,7 +163,8 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
         if (inputAuthoringMetaHash != AUTHORING_META_HASH) {
             revert AuthoringMetaHashMismatch(AUTHORING_META_HASH, inputAuthoringMetaHash);
         }
-        return LibRainterpreterExpressionDeployerNPMeta.buildParseMetaFromAuthoringMeta(authoringMeta);
+        bytes32[] memory words = abi.decode(authoringMeta, (bytes32[]));
+        return LibParseMeta.buildMeta(words, 2);
     }
 
     /// @inheritdoc IParserV1
