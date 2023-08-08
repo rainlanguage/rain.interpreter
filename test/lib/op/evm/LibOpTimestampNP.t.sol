@@ -18,62 +18,66 @@ import "src/lib/op/evm/LibOpTimestampNP.sol";
 contract LibOpTimestampNPTest is RainterpreterExpressionDeployerDeploymentTest {
     using LibPointer for Pointer;
     using LibStackPointer for Pointer;
+    using LibInterpreterStateNP for InterpreterStateNP;
 
-    // /// Directly test the integrity logic of LibOpTimestamp.
-    // function testOpTimestampIntegrity(Operand operand) external {
-    //     function(IntegrityCheckState memory, Operand, Pointer)
-    //     view
-    //     returns (Pointer)[] memory integrityCheckers =
-    //             new function(IntegrityCheckState memory, Operand, Pointer) view returns (Pointer)[](1);
-    //     integrityCheckers[0] = LibOpTimestamp.integrity;
+    /// Directly test the integrity logic of LibOpTimestampNP.
+    function testOpTimestampNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+        (uint256 inputs, uint256 outputs) = LibOpTimestampNP.integrity(state, operand);
 
-    //     IntegrityCheckState memory state =
-    //         LibIntegrityCheck.newState(new bytes[](0), new uint256[](0), integrityCheckers);
-    //     Pointer stackTop = state.stackBottom;
+        assertEq(inputs, 0);
+        assertEq(outputs, 1);
+    }
 
-    //     Pointer stackTopAfter = LibOpTimestampNP.integrity(state, operand, stackTop);
+    /// Directly test the runtime logic of LibOpTimestamp. This tests that the
+    /// opcode correctly pushes the timestamp onto the stack.
+    function testOpTimestampNPRun(
+        InterpreterStateNP memory state,
+        Operand operand,
+        uint256 pre,
+        uint256 post,
+        uint256 blockTimestamp
+    ) external {
+        vm.warp(blockTimestamp);
+        // Build a stack with two zeros on it. The first zero will be overridden
+        // by the opcode. The second zero will be used to check that the opcode
+        // doesn't modify the stack beyond the first element.
+        Pointer stackBottom;
+        Pointer stackTop;
+        Pointer expectedStackTopAfter;
+        Pointer end;
+        assembly ("memory-safe") {
+            end := mload(0x40)
+            mstore(end, post)
+            expectedStackTopAfter := add(end, 0x20)
+            mstore(expectedStackTopAfter, 0)
+            stackTop := add(expectedStackTopAfter, 0x20)
+            mstore(stackTop, pre)
+            stackBottom := add(stackTop, 0x20)
+            mstore(0x40, stackBottom)
+        }
 
-    //     assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(stackTop.unsafeAddWord()));
-    //     assertEq(Pointer.unwrap(state.stackBottom), Pointer.unwrap(stackTop));
-    //     assertEq(Pointer.unwrap(state.stackHighwater), Pointer.unwrap(INITIAL_STACK_HIGHWATER));
-    //     assertEq(Pointer.unwrap(state.stackMaxTop), Pointer.unwrap(stackTopAfter));
-    // }
+        // Timestamp doesn't modify the state.
+        bytes32 stateFingerprintBefore = state.fingerprint();
+        Pointer stackTopAfter = LibOpTimestampNP.run(state, operand, stackTop);
+        bytes32 stateFingerprintAfter = state.fingerprint();
+        assertEq(stateFingerprintBefore, stateFingerprintAfter);
 
-    // /// Directly test the runtime logic of LibOpTimestamp. This tests that the
-    // /// opcode correctly pushes the timestamp onto the stack.
-    // function testOpTimestampRunNP(
-    //     InterpreterState memory state,
-    //     Operand operand,
-    //     uint256 pre,
-    //     uint256 post,
-    //     uint256 blockTimestamp
-    // ) external {
-    //     vm.warp(blockTimestamp);
-    //     // Build a stack with two zeros on it. The first zero will be overridden
-    //     // by the opcode. The second zero will be used to check that the opcode
-    //     // doesn't modify the stack beyond the first element.
-    //     state.stackBottom = LibPointer.allocatedMemoryPointer();
-    //     Pointer stackTop = state.stackBottom.unsafePush(pre);
-    //     Pointer end = stackTop.unsafePush(0).unsafePush(post);
-    //     assembly ("memory-safe") {
-    //         mstore(0x40, end)
-    //     }
+        assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(expectedStackTopAfter));
 
-    //     // Timestamp doesn't modify the state.
-    //     bytes32 stateFingerprintBefore = state.fingerprint();
+        // Check that the opcode didn't modify the stack beyond the first element.
+        uint256 actualPost;
+        uint256 actualTimestamp;
+        uint256 actualPre;
+        assembly {
+            actualPost := mload(end)
+            actualTimestamp := mload(add(end, 0x20))
+            actualPre := mload(add(end, 0x40))
+        }
 
-    //     // Run the opcode.
-    //     Pointer stackTopAfter = LibOpTimestampNP.run(state, operand, stackTop);
-
-    //     // Check that the opcode didn't modify the state.
-    //     assertEq(state.fingerprint(), stateFingerprintBefore);
-
-    //     // Check that the opcode pushed the correct value onto the stack without
-    //     // modifying the stack beyond the first element.
-    //     assertEq(state.stackBottom.unsafeReadWord(), pre);
-    //     assertEq(stackTop.unsafeReadWord(), blockTimestamp);
-    //     assertEq(stackTopAfter.unsafeReadWord(), post);
-    // }
+        assertEq(actualPost, post);
+        assertEq(actualTimestamp, blockTimestamp);
+        assertEq(actualPre, pre);
+    }
 
     /// Test the eval of a timestamp opcode parsed from a string.
     function testOpTimestampEval(uint256 blockTimestamp) external {

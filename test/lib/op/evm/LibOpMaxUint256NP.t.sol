@@ -2,43 +2,27 @@
 pragma solidity =0.8.19;
 
 import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
-import "test/util/lib/etch/LibEtch.sol";
 
-import "rain.solmem/lib/LibPointer.sol";
-import "rain.solmem/lib/LibStackPointer.sol";
-import "rain.metadata/IMetaV1.sol";
-
-import "src/lib/state/LibInterpreterStateNP.sol";
-import "src/lib/op/evm/LibOpChainIdNP.sol";
 import "src/lib/caller/LibContext.sol";
 
-import "src/concrete/RainterpreterNP.sol";
-import "src/concrete/RainterpreterStore.sol";
-import "src/concrete/RainterpreterExpressionDeployerNP.sol";
-
-/// @title LibOpChainIdNPTest
-/// @notice Test the runtime and integrity time logic of LibOpChainIdNP.
-contract LibOpChainIdNPTest is RainterpreterExpressionDeployerDeploymentTest {
+/// @title LibOpMaxUint256NPTest
+/// @notice Test the runtime and integrity time logic of LibOpMaxUint256NP.
+contract LibOpMaxUint256NPTest is RainterpreterExpressionDeployerDeploymentTest {
     using LibInterpreterStateNP for InterpreterStateNP;
 
-    /// Directly test the integrity logic of LibOpChainIdNP.
-    function testOpChainIDNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
-        (uint256 inputs, uint256 outputs) = LibOpChainIdNP.integrity(state, operand);
+    /// Directly test the integrity logic of LibOpMaxUint256NP.
+    function testOpMaxUint256NPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+        (uint256 inputs, uint256 outputs) = LibOpMaxUint256NP.integrity(state, operand);
 
         assertEq(inputs, 0);
         assertEq(outputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpChainId. This tests that the
-    /// opcode correctly pushes the chain ID onto the stack.
-    function testOpChainIDNPRun(
-        InterpreterStateNP memory state,
-        Operand operand,
-        uint256 pre,
-        uint256 post,
-        uint64 chainId
-    ) external {
-        vm.chainId(chainId);
+    /// Directly test the runtime logic of LibOpMaxUint256NP. This tests that the
+    /// opcode correctly pushes the max uint256 onto the stack.
+    function testOpMaxUint256NPRun(InterpreterStateNP memory state, Operand operand, uint256 pre, uint256 post)
+        external
+    {
         // Build a stack with two zeros on it. The first zero will be overridden
         // by the opcode. The second zero will be used to check that the opcode
         // doesn't modify the stack beyond the first element.
@@ -57,42 +41,39 @@ contract LibOpChainIdNPTest is RainterpreterExpressionDeployerDeploymentTest {
             mstore(0x40, stackBottom)
         }
 
-        // Chain ID doesn't modify the state.
+        // Max uint256 doesn't modify the state.
         bytes32 stateFingerprintBefore = state.fingerprint();
-
-        // Run the opcode.
-        Pointer stackTopAfter = LibOpChainIdNP.run(state, operand, stackTop);
+        Pointer stackTopAfter = LibOpMaxUint256NP.run(state, operand, stackTop);
+        bytes32 stateFingerprintAfter = state.fingerprint();
+        assertEq(stateFingerprintBefore, stateFingerprintAfter);
 
         assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(expectedStackTopAfter));
 
-        // Check that the opcode didn't modify the state.
-        assertEq(state.fingerprint(), stateFingerprintBefore);
-
-        // The chain ID should be on the stack without modifying any other data.
+        // Check that the opcode didn't modify the stack beyond the first element.
         uint256 actualPost;
-        uint256 actualChainId;
+        uint256 actualMaxUint256;
         uint256 actualPre;
-        assembly ("memory-safe") {
+        assembly {
             actualPost := mload(end)
-            actualChainId := mload(add(end, 0x20))
+            actualMaxUint256 := mload(add(end, 0x20))
             actualPre := mload(add(end, 0x40))
         }
 
         assertEq(actualPost, post);
-        assertEq(actualChainId, chainId);
+        assertEq(actualMaxUint256, type(uint256).max);
         assertEq(actualPre, pre);
     }
 
-    /// Test the eval of a chain ID opcode parsed from a string.
-    function testOpChainIDNPEval(uint64 chainId, StateNamespace namespace) public {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: chain-id();");
+    /// Test the eval of LibOpMaxUint256NP parsed from a string.
+    function testOpMaxUint256NPEval(StateNamespace namespace) external {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: max-uint-256();");
         assertEq(
             bytecode,
             // 1 source
             hex"01"
             // 0 offset
             hex"0000"
-            // 1 op
+            // 1 opcode
             hex"01"
             // 1 stack allocation
             hex"01"
@@ -100,8 +81,8 @@ contract LibOpChainIdNPTest is RainterpreterExpressionDeployerDeploymentTest {
             hex"00"
             // 1 output
             hex"01"
-            // chain id
-            hex"03000000"
+            // max uint256
+            hex"04000000"
         );
         assertEq(constants.length, 0);
 
@@ -110,15 +91,15 @@ contract LibOpChainIdNPTest is RainterpreterExpressionDeployerDeploymentTest {
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
 
-        vm.chainId(chainId);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             namespace,
             LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
-        assertEq(stack.length, 1, "stack length");
-        assertEq(stack[0], chainId, "stack item");
-        assertEq(kvs.length, 0, "kvs length");
+
+        assertEq(stack.length, 1);
+        assertEq(stack[0], type(uint256).max);
+        assertEq(kvs.length, 0);
     }
 }

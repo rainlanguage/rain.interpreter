@@ -18,62 +18,70 @@ import "src/lib/op/evm/LibOpBlockNumberNP.sol";
 contract LibOpBlockNumberNPTest is RainterpreterExpressionDeployerDeploymentTest {
     using LibPointer for Pointer;
     using LibStackPointer for Pointer;
+    using LibInterpreterStateNP for InterpreterStateNP;
 
-    // /// Directly test the integrity logic of LibOpBlockNumber.
-    // function testOpBlockNumberNPIntegrity(Operand operand) external {
-    //     function(IntegrityCheckState memory, Operand, Pointer)
-    //     view
-    //     returns (Pointer)[] memory integrityCheckers =
-    //             new function(IntegrityCheckState memory, Operand, Pointer) view returns (Pointer)[](1);
-    //     integrityCheckers[0] = LibOpBlockNumber.integrity;
+    /// Directly test the integrity logic of LibOpBlockNumberNP.
+    function testOpBlockNumberNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+        (uint256 inputs, uint256 outputs) = LibOpBlockNumberNP.integrity(state, operand);
 
-    //     IntegrityCheckState memory state =
-    //         LibIntegrityCheck.newState(new bytes[](0), new uint256[](0), integrityCheckers);
-    //     Pointer stackTop = state.stackBottom;
+        assertEq(inputs, 0);
+        assertEq(outputs, 1);
+    }
 
-    //     Pointer stackTopAfter = LibOpBlockNumberNP.integrity(state, operand, stackTop);
+    /// Directly test the runtime logic of LibOpBlockNumber. This tests that the
+    /// opcode correctly pushes the block number onto the stack.
+    function testOpBlockNumberNPRun(
+        InterpreterStateNP memory state,
+        Operand operand,
+        uint256 pre,
+        uint256 post,
+        uint256 blockNumber
+    ) external {
+        vm.roll(blockNumber);
+        // Build a stack with two zeros on it. The first zero will be overridden
+        // by the opcode. The second zero will be used to check that the opcode
+        // doesn't modify the stack beyond the first element.
+        Pointer stackBottom;
+        Pointer stackTop;
+        Pointer expectedStackTopAfter;
+        Pointer end;
+        assembly ("memory-safe") {
+            end := mload(0x40)
+            mstore(end, post)
+            expectedStackTopAfter := add(end, 0x20)
+            mstore(expectedStackTopAfter, 0)
+            stackTop := add(expectedStackTopAfter, 0x20)
+            mstore(stackTop, pre)
+            stackBottom := add(stackTop, 0x20)
+            mstore(0x40, stackBottom)
+        }
 
-    //     assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(stackTop.unsafeAddWord()));
-    //     assertEq(Pointer.unwrap(state.stackBottom), Pointer.unwrap(stackTop));
-    //     assertEq(Pointer.unwrap(state.stackHighwater), Pointer.unwrap(INITIAL_STACK_HIGHWATER));
-    //     assertEq(Pointer.unwrap(state.stackMaxTop), Pointer.unwrap(stackTopAfter));
-    // }
+        // Block number doesn't modify the state.
+        bytes32 stateFingerprintBefore = state.fingerprint();
 
-    // /// Directly test the runtime logic of LibOpBlockNumber. This tests that the
-    // /// opcode correctly pushes the block number onto the stack.
-    // function testOpBlockNumberNPRun(
-    //     InterpreterState memory state,
-    //     Operand operand,
-    //     uint256 pre,
-    //     uint256 post,
-    //     uint256 blockNumber
-    // ) external {
-    //     vm.roll(blockNumber);
-    //     // Build a stack with two zeros on it. The first zero will be overridden
-    //     // by the opcode. The second zero will be used to check that the opcode
-    //     // doesn't modify the stack beyond the first element.
-    //     state.stackBottom = LibPointer.allocatedMemoryPointer();
-    //     Pointer stackTop = state.stackBottom.unsafePush(pre);
-    //     Pointer end = stackTop.unsafePush(0).unsafePush(post);
-    //     assembly ("memory-safe") {
-    //         mstore(0x40, end)
-    //     }
+        // Run the opcode.
+        Pointer stackTopAfter = LibOpBlockNumberNP.run(state, operand, stackTop);
 
-    //     // Block number doesn't modify the state.
-    //     bytes32 stateFingerprintBefore = state.fingerprint();
+        // Check that the opcode didn't modify the state.
+        assertEq(state.fingerprint(), stateFingerprintBefore);
 
-    //     // Run the opcode.
-    //     Pointer stackTopAfter = LibOpBlockNumberNP.run(state, operand, stackTop);
+        assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(expectedStackTopAfter));
 
-    //     // Check that the opcode didn't modify the state.
-    //     assertEq(state.fingerprint(), stateFingerprintBefore);
+        // The block number should be on the stack without modifying any other
+        // data.
+        uint256 actualPost;
+        uint256 actualBlockNumber;
+        uint256 actualPre;
+        assembly ("memory-safe") {
+            actualPost := mload(end)
+            actualBlockNumber := mload(add(end, 0x20))
+            actualPre := mload(add(end, 0x40))
+        }
 
-    //     // The block number should be on the stack without modifying any other
-    //     // data.
-    //     assertEq(state.stackBottom.unsafeReadWord(), pre);
-    //     assertEq(stackTop.unsafeReadWord(), blockNumber);
-    //     assertEq(stackTopAfter.unsafeReadWord(), post);
-    // }
+        assertEq(actualPost, post);
+        assertEq(actualBlockNumber, blockNumber);
+        assertEq(actualPre, pre);
+    }
 
     /// Test the eval of a block number opcode parsed from a string.
     function testOpBlockNumberNPEval(uint256 blockNumber) public {
