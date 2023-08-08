@@ -143,7 +143,7 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
         // Eval the source.
         stackTop = state.evalNP(sourceIndex, stackTop);
 
-        // Use the bytecode's own definition if its outputs. Clear example of
+        // Use the bytecode's own definition of its outputs. Clear example of
         // how the bytecode could accidentally or maliciously force OOB reads
         // if the integrity check is not run.
         uint256 outputs = LibBytecode.sourceOutputsLength(state.bytecode, sourceIndex);
