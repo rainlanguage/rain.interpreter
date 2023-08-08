@@ -42,7 +42,7 @@ error UnexpectedStoreBytecodeHash(bytes32 actualBytecodeHash);
 error UnexpectedOpMetaHash(bytes32 actualOpMeta);
 
 /// @dev The function pointers for the integrity check fns.
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"124212bc1323132313231323";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"18b3192d1994199419941994";
 
 /// @dev Hash of the known interpreter bytecode.
 bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xf30cc4ab09f0f113c506bc8616c35c838293ff06b29d9ed46a1161538ef01dee);

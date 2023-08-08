@@ -91,6 +91,17 @@ library LibBytecode {
                 uint256 length = sourceOpsLength(bytecode, i) * 4;
                 bytes memory source = new bytes(length);
                 pointer.unsafeCopyBytesTo(source.dataPointer(), length);
+                // Move the opcode index one byte for each opcode, into the input
+                // position, as legacly sources did not have input bytes.
+                assembly ("memory-safe") {
+                    for {
+                        let cursor := add(source, 0x20)
+                        let end := add(cursor, length)
+                    } lt(cursor, end) { cursor := add(cursor, 4) } {
+                        mstore8(add(cursor, 1), byte(0, mload(cursor)))
+                        mstore8(cursor, 0)
+                    }
+                }
                 sources[i] = source;
             }
             return sources;

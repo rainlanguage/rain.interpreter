@@ -433,40 +433,40 @@ contract LibParseNamedRHSTest is Test {
     function testParseTwoFullLinesSingleRHSEach() external {
         string memory s = "_:a(),_ _:b() c(d());";
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        // assertEq(LibBytecode.sourceCount(bytecode), 1);
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
 
-        // uint256 sourceIndex = 0;
-        // assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        // assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 4);
-        // assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 3);
-        // assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        // assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 3);
+        uint256 sourceIndex = 0;
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 4);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 3);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 3);
 
-        // assertEq(constants.length, 0);
-        // // a b d c
-        // assertEq(
-        //     bytecode,
-        //     // 1 source
-        //     hex"01"
-        //     // offset 0
-        //     hex"0000"
-        //     // a b d c ops count
-        //     hex"04"
-        //     // a b d c stack allocation
-        //     hex"03"
-        //     // a b d c inputs count
-        //     hex"00"
-        //     // a b d c outputs count
-        //     hex"03"
-        //     // a
-        //     hex"00000000"
-        //     // b
-        //     hex"01000000"
-        //     // d
-        //     hex"03000000"
-        //     // c 1 input
-        //     hex"02010000"
-        // );
+        assertEq(constants.length, 0);
+        // a b d c
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // offset 0
+            hex"0000"
+            // a b d c ops count
+            hex"04"
+            // a b d c stack allocation
+            hex"03"
+            // a b d c inputs count
+            hex"00"
+            // a b d c outputs count
+            hex"03"
+            // a
+            hex"00000000"
+            // b
+            hex"01000000"
+            // d
+            hex"03000000"
+            // c 1 input
+            hex"02010000"
+        );
     }
 
     /// Two full sources, each with a single LHS and RHS.
