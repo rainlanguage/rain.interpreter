@@ -836,7 +836,8 @@ library LibParseState {
                 let pointersCursor := cursor
 
                 // Skip past the pointer space. We'll back fill it.
-                cursor := add(cursor, mul(sourcesCount, 2))
+                // Divide offsetEnd to convert from a bit to a byte shift.
+                cursor := add(cursor, div(offsetEnd, 8))
                 sourcesStart := cursor
 
                 // Write total bytes length into bytecode. We do ths and handle
