@@ -13,7 +13,7 @@ import "../interface/unstable/IDebugExpressionDeployerV2.sol";
 import "../interface/unstable/IDebugInterpreterV2.sol";
 import "../interface/unstable/IParserV1.sol";
 
-import "../lib/integrity/LibIntegrityCheck.sol";
+import "../lib/integrity/LibIntegrityCheckNP.sol";
 import "../lib/state/LibInterpreterStateDataContractNP.sol";
 import "../lib/op/LibAllStandardOpsNP.sol";
 import {LibParse, LibParseMeta} from "../lib/parse/LibParse.sol";
@@ -33,37 +33,8 @@ error UnexpectedPointers(bytes actualPointers);
 /// address upon construction.
 error UnexpectedInterpreterBytecodeHash(bytes32 actualBytecodeHash);
 
-/// @dev There are more entrypoints defined by the minimum stack outputs than
-/// there are provided sources. This means the calling contract WILL attempt to
-/// eval a dangling reference to a non-existent source at some point, so this
-/// MUST REVERT.
-error EntrypointMissing(uint256 expectedEntrypoints, uint256 actualEntrypoints);
-
-/// Thrown when some entrypoint has non-zero inputs. This is not allowed as
-/// only internal dispatches can have source level inputs.
-error EntrypointNonZeroInput(uint256 entrypointIndex, uint256 inputsLength);
-
-/// Thrown when some entrypoint has less outputs than the minimum required.
-error EntrypointMinOutputs(uint256 entrypointIndex, uint256 outputsLength, uint256 minOutputs);
-
-/// The bytecode and integrity function disagree on number of inputs.
-error BadOpInputsLength(uint256 opIndex, uint256 calculatedInputs, uint256 bytecodeInputs);
-
-/// The stack underflowed during integrity check.
-error StackUnderflow(uint256 opIndex, uint256 stackIndex, uint256 calculatedInputs);
-
-/// The stack underflowed the highwater during integrity check.
-error StackUnderflowHighwater(uint256 opIndex, uint256 stackIndex, uint256 stackHighwater);
-
 /// The stack max index does not match the bytecode allocation.
 error StackMaxIndexMismatch(uint256 stackMaxIndex, uint256 bytecodeAllocation);
-
-/// The bytecode stack allocation does not match the allocation calculated by
-/// the integrity check.
-error StackAllocationMismatch(uint256 stackMaxIndex, uint256 bytecodeAllocation);
-
-/// The final stack index does not match the bytecode outputs.
-error StackOutputsMismatch(uint256 stackIndex, uint256 bytecodeOutputs);
 
 /// Thrown when the `Rainterpreter` is constructed with unknown store bytecode.
 /// @param actualBytecodeHash The bytecode hash that was found at the store
@@ -73,12 +44,8 @@ error UnexpectedStoreBytecodeHash(bytes32 actualBytecodeHash);
 /// Thrown when the `Rainterpreter` is constructed with unknown opMeta.
 error UnexpectedOpMetaHash(bytes32 actualOpMeta);
 
-// /// Thrown when the integrity check returns a negative stack index.
-// /// @param index The negative index.
-// error NegativeStackIndex(int256 index);
-
 /// @dev The function pointers for the integrity check fns.
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"144a14c4152b152b152b152b";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"124212bc1323132313231323";
 
 /// @dev Hash of the known interpreter bytecode.
 bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xf30cc4ab09f0f113c506bc8616c35c838293ff06b29d9ed46a1161538ef01dee);
@@ -186,53 +153,13 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
         emit DISpair(msg.sender, address(this), address(interpreter), address(store), config.authoringMeta);
 
         IERC1820_REGISTRY.setInterfaceImplementer(
-            address(this), IERC1820_REGISTRY.interfaceHash(IERC1820_NAME_IEXPRESSION_DEPLOYER_V1), address(this)
+            address(this), IERC1820_REGISTRY.interfaceHash(IERC1820_NAME_IEXPRESSION_DEPLOYER_V2), address(this)
         );
     }
 
     // @inheritdoc IERC165
     function supportsInterface(bytes4 interfaceId_) public view virtual override returns (bool) {
         return interfaceId_ == type(IExpressionDeployerV2).interfaceId || interfaceId_ == type(IERC165).interfaceId;
-    }
-
-    /// @inheritdoc IDebugExpressionDeployerV2
-    function offchainDebugEval(
-        FullyQualifiedNamespace namespace,
-        bytes memory expressionData,
-        SourceIndex sourceIndex,
-        uint256 maxOutputs,
-        uint256[][] memory context,
-        uint256[] memory inputs,
-        uint256
-    ) external view returns (uint256[] memory, uint256[] memory) {
-        // IntegrityCheckState memory integrityCheckState =
-        //     LibIntegrityCheck.newState(sources, constants, integrityFunctionPointers());
-        // Pointer stackTop = integrityCheckState.stackBottom;
-        // stackTop = LibIntegrityCheck.push(integrityCheckState, stackTop, initialStack.length);
-        // {
-        //     Pointer stackTopAfter =
-        //         LibIntegrityCheck.ensureIntegrity(integrityCheckState, sourceIndex, stackTop, minOutputs);
-        //     (stackTopAfter);
-        // }
-
-        // uint256[] memory stack;
-        // {
-        //     int256 stackLength = integrityCheckState.stackBottom.toIndexSigned(integrityCheckState.stackMaxTop);
-        //     if (stackLength < 0) {
-        //         revert NegativeStackIndex(stackLength);
-        //     }
-        //     for (uint256 i_; i_ < sources.length; i_++) {
-        //         LibCompile.unsafeCompile(sources[i_], OPCODE_FUNCTION_POINTERS);
-        //     }
-        //     stack = new uint256[](uint256(stackLength));
-        //     LibMemCpy.unsafeCopyWordsTo(initialStack.dataPointer(), stack.dataPointer(), initialStack.length);
-        // }
-
-        // The return is used by returning it, so this is a false positive.
-        //slither-disable-next-line unused-return
-        return IDebugInterpreterV2(address(iInterpreter)).offchainDebugEval(
-            iStore, namespace, expressionData, sourceIndex, maxOutputs, context, inputs
-        );
     }
 
     /// @inheritdoc IParserV1
@@ -286,116 +213,12 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
         return (iInterpreter, iStore, expression);
     }
 
-    /// Drives an integrity check of the provided bytecode and constants.
-    /// @param bytecode The bytecode to check.
-    /// @param constants The constants to check.
-    /// @param minOutputs The minimum number of outputs expected from each of
-    /// the sources. Only applies to sources that are entrypoints. Internal
-    /// sources have their integrity checked implicitly by the use of opcodes
-    /// such as `call` that have min/max outputs in their operand.
+    /// @inheritdoc IDebugExpressionDeployerV2
     function integrityCheck(bytes memory bytecode, uint256[] memory constants, uint256[] memory minOutputs)
-        internal
+        public
         view
     {
-        unchecked {
-            uint256 sourceCount = LibBytecode.sourceCount(bytecode);
-
-            // Ensure that we are not missing any entrypoints expected by the calling
-            // contract.
-            if (minOutputs.length > sourceCount) {
-                revert EntrypointMissing(minOutputs.length, sourceCount);
-            }
-
-            bytes memory fPointers = INTEGRITY_FUNCTION_POINTERS;
-            uint256 fPointersStart;
-            assembly {
-                fPointersStart := add(fPointers, 0x20)
-            }
-
-            // Run the integrity check over each source.
-            for (uint256 i = 0; i < sourceCount; i++) {
-                // Ensure that each entrypoint has zero source inputs.
-                uint256 inputsLength = LibBytecode.sourceInputsLength(bytecode, i);
-
-                // Ensure that each entrypoint has the minimum number of outputs.
-                uint256 outputsLength = LibBytecode.sourceOutputsLength(bytecode, i);
-
-                // This is an entrypoint so has additional restrictions.
-                if (i < minOutputs.length) {
-                    if (inputsLength != 0) {
-                        revert EntrypointNonZeroInput(i, inputsLength);
-                    }
-
-                    if (outputsLength < minOutputs[i]) {
-                        revert EntrypointMinOutputs(i, outputsLength, minOutputs[i]);
-                    }
-                }
-
-                IntegrityCheckStateNP memory state =
-                    LibIntegrityCheckNP.newState(bytecode, inputsLength, constants.length);
-
-                // Have low 4 bytes of cursor overlap the first op, skipping the
-                // prefix.
-                uint256 cursor = Pointer.unwrap(LibBytecode.sourcePointer(bytecode, i)) - 0x18;
-                uint256 end = cursor + LibBytecode.sourceOpsLength(bytecode, i) * 4;
-
-                while (cursor < end) {
-                    Operand operand;
-                    uint256 bytecodeOpInputs;
-                    function(IntegrityCheckStateNP memory, Operand)
-                    view
-                    returns (uint256, uint256) f;
-                    assembly ("memory-safe") {
-                        let word := mload(cursor)
-                        f := shr(0xf0, mload(add(fPointersStart, mul(byte(28, word), 2))))
-                        // 3 bytes mask.
-                        operand := and(word, 0xFFFFFF)
-                        bytecodeOpInputs := byte(29, word)
-                    }
-                    (uint256 calcOpInputs, uint256 calcOpOutputs) = f(state, operand);
-                    if (calcOpInputs != bytecodeOpInputs) {
-                        revert BadOpInputsLength(state.opIndex, calcOpInputs, bytecodeOpInputs);
-                    }
-
-                    if (calcOpInputs > state.stackIndex) {
-                        revert StackUnderflow(state.opIndex, state.stackIndex, calcOpInputs);
-                    }
-                    state.stackIndex -= calcOpInputs;
-
-                    // The stack index can't move below the highwater.
-                    if (state.stackIndex < state.readHighwater) {
-                        revert StackUnderflowHighwater(state.opIndex, state.stackIndex, state.readHighwater);
-                    }
-
-                    // Let's assume that sane opcode implementations don't
-                    // overflow uint256 due to their outputs.
-                    state.stackIndex += calcOpOutputs;
-
-                    // Ensure the max stack index is updated if needed.
-                    if (state.stackIndex > state.stackMaxIndex) {
-                        state.stackMaxIndex = state.stackIndex;
-                    }
-
-                    // If there are multiple outputs the highwater MUST move.
-                    if (calcOpOutputs > 1) {
-                        state.readHighwater = state.stackIndex;
-                    }
-
-                    state.opIndex++;
-                    cursor += 4;
-                }
-
-                // The final stack max index MUST match the bytecode allocation.
-                if (state.stackMaxIndex != LibBytecode.sourceStackAllocation(bytecode, i)) {
-                    revert StackAllocationMismatch(state.stackMaxIndex, LibBytecode.sourceStackAllocation(bytecode, i));
-                }
-
-                // The final stack index MUST match the bytecode source outputs.
-                if (state.stackIndex != outputsLength) {
-                    revert StackOutputsMismatch(state.stackIndex, outputsLength);
-                }
-            }
-        }
+        LibIntegrityCheckNP.integrityCheck(INTEGRITY_FUNCTION_POINTERS, bytecode, constants, minOutputs);
     }
 
     /// Defines all the function pointers to integrity checks. This is the
@@ -409,6 +232,6 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
     /// pairwise with overrides to `functionPointers` on `Rainterpreter`.
     /// @return The list of integrity function pointers.
     function integrityFunctionPointers() external view virtual returns (bytes memory) {
-        return LibAllStandardOpsNP.integrityFunctionPointersNP();
+        return LibAllStandardOpsNP.integrityFunctionPointers();
     }
 }

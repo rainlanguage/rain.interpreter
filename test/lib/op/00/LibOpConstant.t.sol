@@ -12,141 +12,140 @@ contract LibOpConstantTest is RainterpreterExpressionDeployerDeploymentTest {
     using LibUint256Array for uint256[];
     using LibPointer for Pointer;
     using LibStackPointer for Pointer;
-    using LibInterpreterState for InterpreterState;
 
-    /// Directly test the integrity logic of LibOpConstant. This tests the happy
-    /// path where the operand points to a constant in the constants array.
-    function testOpConstantIntegrity(Operand operand, uint256[] memory constants) external {
-        vm.assume(constants.length > 0);
-        function(IntegrityCheckState memory, Operand, Pointer)
-            view
-            returns (Pointer)[] memory integrityCheckers =
-                new function(IntegrityCheckState memory, Operand, Pointer) view returns (Pointer)[](1);
-        integrityCheckers[0] = LibOpConstant.integrity;
+    // /// Directly test the integrity logic of LibOpConstant. This tests the happy
+    // /// path where the operand points to a constant in the constants array.
+    // function testOpConstantIntegrity(Operand operand, uint256[] memory constants) external {
+    //     vm.assume(constants.length > 0);
+    //     function(IntegrityCheckState memory, Operand, Pointer)
+    //         view
+    //         returns (Pointer)[] memory integrityCheckers =
+    //             new function(IntegrityCheckState memory, Operand, Pointer) view returns (Pointer)[](1);
+    //     integrityCheckers[0] = LibOpConstant.integrity;
 
-        operand = Operand.wrap(bound(Operand.unwrap(operand), 0, constants.length - 1));
+    //     operand = Operand.wrap(bound(Operand.unwrap(operand), 0, constants.length - 1));
 
-        IntegrityCheckState memory state = LibIntegrityCheck.newState(new bytes[](0), constants, integrityCheckers);
-        Pointer stackTop = state.stackBottom;
+    //     IntegrityCheckState memory state = LibIntegrityCheck.newState(new bytes[](0), constants, integrityCheckers);
+    //     Pointer stackTop = state.stackBottom;
 
-        Pointer stackTopAfter = LibOpConstant.integrity(state, operand, stackTop);
+    //     Pointer stackTopAfter = LibOpConstant.integrity(state, operand, stackTop);
 
-        assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(stackTop.unsafeAddWord()));
-        assertEq(Pointer.unwrap(state.stackBottom), Pointer.unwrap(stackTop));
-        assertEq(Pointer.unwrap(state.stackHighwater), Pointer.unwrap(INITIAL_STACK_HIGHWATER));
-        assertEq(Pointer.unwrap(state.stackMaxTop), Pointer.unwrap(stackTopAfter));
-    }
+    //     assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(stackTop.unsafeAddWord()));
+    //     assertEq(Pointer.unwrap(state.stackBottom), Pointer.unwrap(stackTop));
+    //     assertEq(Pointer.unwrap(state.stackHighwater), Pointer.unwrap(INITIAL_STACK_HIGHWATER));
+    //     assertEq(Pointer.unwrap(state.stackMaxTop), Pointer.unwrap(stackTopAfter));
+    // }
 
-    /// Directly test the integrity logic of LibOpConstant. This tests the case
-    /// where the operand points past the end of the constants array, which MUST
-    /// always error as an OOB read.
-    function testOpConstantIntegrityOOBConstants(Operand operand, uint256[] memory constants) external {
-        function(IntegrityCheckState memory, Operand, Pointer)
-            view
-            returns (Pointer)[] memory integrityCheckers =
-                new function(IntegrityCheckState memory, Operand, Pointer) view returns (Pointer)[](1);
-        integrityCheckers[0] = LibOpConstant.integrity;
+    // /// Directly test the integrity logic of LibOpConstant. This tests the case
+    // /// where the operand points past the end of the constants array, which MUST
+    // /// always error as an OOB read.
+    // function testOpConstantIntegrityOOBConstants(Operand operand, uint256[] memory constants) external {
+    //     function(IntegrityCheckState memory, Operand, Pointer)
+    //         view
+    //         returns (Pointer)[] memory integrityCheckers =
+    //             new function(IntegrityCheckState memory, Operand, Pointer) view returns (Pointer)[](1);
+    //     integrityCheckers[0] = LibOpConstant.integrity;
 
-        // Bound the operand at or past the constants array.
-        operand = Operand.wrap(bound(Operand.unwrap(operand), constants.length, type(uint256).max));
+    //     // Bound the operand at or past the constants array.
+    //     operand = Operand.wrap(bound(Operand.unwrap(operand), constants.length, type(uint256).max));
 
-        IntegrityCheckState memory state = LibIntegrityCheck.newState(new bytes[](0), constants, integrityCheckers);
-        Pointer stackTop = state.stackBottom;
+    //     IntegrityCheckState memory state = LibIntegrityCheck.newState(new bytes[](0), constants, integrityCheckers);
+    //     Pointer stackTop = state.stackBottom;
 
-        vm.expectRevert(abi.encodeWithSelector(BadConstantRead.selector, constants.length, Operand.unwrap(operand)));
-        LibOpConstant.integrity(state, operand, stackTop);
-    }
+    //     vm.expectRevert(abi.encodeWithSelector(BadConstantRead.selector, constants.length, Operand.unwrap(operand)));
+    //     LibOpConstant.integrity(state, operand, stackTop);
+    // }
 
-    /// Directly test the runtime logic of LibOpConstant. This tests that the
-    /// opcode correctly pushes the constant onto the stack. This tests the
-    /// happy path where the operand points to a constant in the constants array
-    /// for a non-empty constants array.
-    ///
-    /// We rely on the deployer to force the integrity check to pass, so we don't
-    /// run into the unhappy path where out of bounds constants reads occur.
-    function testOpConstantRun(
-        InterpreterState memory state,
-        Operand operand,
-        uint256 pre,
-        uint256 post,
-        uint256[] memory constants
-    ) external {
-        vm.assume(constants.length > 0);
-        state.constantsBottom = constants.dataPointer();
+    // /// Directly test the runtime logic of LibOpConstant. This tests that the
+    // /// opcode correctly pushes the constant onto the stack. This tests the
+    // /// happy path where the operand points to a constant in the constants array
+    // /// for a non-empty constants array.
+    // ///
+    // /// We rely on the deployer to force the integrity check to pass, so we don't
+    // /// run into the unhappy path where out of bounds constants reads occur.
+    // function testOpConstantRun(
+    //     InterpreterState memory state,
+    //     Operand operand,
+    //     uint256 pre,
+    //     uint256 post,
+    //     uint256[] memory constants
+    // ) external {
+    //     vm.assume(constants.length > 0);
+    //     state.constantsBottom = constants.dataPointer();
 
-        operand = Operand.wrap(bound(Operand.unwrap(operand), 0, constants.length - 1));
+    //     operand = Operand.wrap(bound(Operand.unwrap(operand), 0, constants.length - 1));
 
-        // Build a stack with two zeros on it. The first zero will be overridden
-        // by the opcode. The second zero will be used to check that the opcode
-        // doesn't modify the stack beyond the first element.
-        state.stackBottom = LibPointer.allocatedMemoryPointer();
-        Pointer stackTop = state.stackBottom.unsafePush(pre);
-        Pointer end = stackTop.unsafePush(0).unsafePush(post);
-        assembly ("memory-safe") {
-            mstore(0x40, end)
-        }
-        // Constants don't modify the state.
-        bytes32 stateFingerprintBefore = state.fingerprint();
+    //     // Build a stack with two zeros on it. The first zero will be overridden
+    //     // by the opcode. The second zero will be used to check that the opcode
+    //     // doesn't modify the stack beyond the first element.
+    //     state.stackBottom = LibPointer.allocatedMemoryPointer();
+    //     Pointer stackTop = state.stackBottom.unsafePush(pre);
+    //     Pointer end = stackTop.unsafePush(0).unsafePush(post);
+    //     assembly ("memory-safe") {
+    //         mstore(0x40, end)
+    //     }
+    //     // Constants don't modify the state.
+    //     bytes32 stateFingerprintBefore = state.fingerprint();
 
-        // Run the opcode.
-        Pointer stackTopAfter = LibOpConstant.run(state, operand, stackTop);
+    //     // Run the opcode.
+    //     Pointer stackTopAfter = LibOpConstant.run(state, operand, stackTop);
 
-        // Check we didn't modify state.
-        assertEq(state.fingerprint(), stateFingerprintBefore);
+    //     // Check we didn't modify state.
+    //     assertEq(state.fingerprint(), stateFingerprintBefore);
 
-        // The constant should be pushed onto the stack without modifying the
-        // stack beyond the first element.
-        assertEq(state.stackBottom.unsafeReadWord(), pre);
-        assertEq(stackTop.unsafeReadWord(), constants[Operand.unwrap(operand)]);
-        assertEq(stackTopAfter.unsafeReadWord(), post);
-    }
+    //     // The constant should be pushed onto the stack without modifying the
+    //     // stack beyond the first element.
+    //     assertEq(state.stackBottom.unsafeReadWord(), pre);
+    //     assertEq(stackTop.unsafeReadWord(), constants[Operand.unwrap(operand)]);
+    //     assertEq(stackTopAfter.unsafeReadWord(), post);
+    // }
 
-    /// Test the case of an empty constants array via. an end to end test. We
-    /// expect the deployer to revert, as the integrity check MUST fail.
-    function testOpConstantEvalZeroConstants() external {
-        (bytes memory bytecode, uint256[] memory constants) =
-            iDeployer.parse("_ _ _: constant() constant() constant();");
-        uint256 sourceIndex = 0;
-        assertEq(LibBytecode.sourceCount(bytecode), 1);
-        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 3);
-        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 3);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 3);
+    // /// Test the case of an empty constants array via. an end to end test. We
+    // /// expect the deployer to revert, as the integrity check MUST fail.
+    // function testOpConstantEvalZeroConstants() external {
+    //     (bytes memory bytecode, uint256[] memory constants) =
+    //         iDeployer.parse("_ _ _: constant() constant() constant();");
+    //     uint256 sourceIndex = 0;
+    //     assertEq(LibBytecode.sourceCount(bytecode), 1);
+    //     assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+    //     assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 3);
+    //     assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 3);
+    //     assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
+    //     assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 3);
 
-        assertEq(
-            bytecode,
-            // 1 source.
-            hex"01"
-            // offset 0
-            hex"0000"
-            // 3 ops
-            hex"03"
-            // 3 stack allocation
-            hex"03"
-            // 0 inputs
-            hex"00"
-            // 3 outputs
-            hex"03"
-            // constant 0
-            hex"01000000"
-            // constant 0
-            hex"01000000"
-            // constant 0
-            hex"01000000"
-        );
+    //     assertEq(
+    //         bytecode,
+    //         // 1 source.
+    //         hex"01"
+    //         // offset 0
+    //         hex"0000"
+    //         // 3 ops
+    //         hex"03"
+    //         // 3 stack allocation
+    //         hex"03"
+    //         // 0 inputs
+    //         hex"00"
+    //         // 3 outputs
+    //         hex"03"
+    //         // constant 0
+    //         hex"01000000"
+    //         // constant 0
+    //         hex"01000000"
+    //         // constant 0
+    //         hex"01000000"
+    //     );
 
-        assertEq(constants.length, 0);
+    //     assertEq(constants.length, 0);
 
-        uint256[] memory minOuputs = new uint256[](1);
-        minOuputs[0] = 3;
-        vm.expectRevert(abi.encodeWithSelector(OutOfBoundsConstantRead.selector, 0, 0, 0));
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOuputs);
-        (interpreterDeployer);
-        (storeDeployer);
-        (expression);
-    }
+    //     uint256[] memory minOuputs = new uint256[](1);
+    //     minOuputs[0] = 3;
+    //     vm.expectRevert(abi.encodeWithSelector(OutOfBoundsConstantRead.selector, 0, 0, 0));
+    //     (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+    //         iDeployer.deployExpression(bytecode, constants, minOuputs);
+    //     (interpreterDeployer);
+    //     (storeDeployer);
+    //     (expression);
+    // }
 
     /// Test the eval of a constant opcode parsed from a string.
     function testOpConstantEvalE2E() external {

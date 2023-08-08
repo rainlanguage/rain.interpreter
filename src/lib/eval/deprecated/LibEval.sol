@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "../state/LibInterpreterState.sol";
+import "../../state/deprecated/LibInterpreterState.sol";
 
 library LibEval {
     /// The main eval loop. Does as little as possible as it is an extremely hot

@@ -6,10 +6,10 @@ import "rain.solmem/lib/LibBytes.sol";
 import "rain.solmem/lib/LibPointer.sol";
 import "rain.solmem/lib/LibUint256Array.sol";
 
-import "src/lib/state/LibInterpreterStateDataContract.sol";
+import "src/lib/state/deprecated/LibInterpreterStateDataContract.sol";
 
 import "test/lib/compile/LibCompileSlow.sol";
-import "test/lib/state/LibInterpreterStateDataContractSlow.sol";
+import "./LibInterpreterStateDataContractSlow.sol";
 
 /// @title LibInterpreterStateDataContractTest
 /// @notice Exercises the data contract implementation of the interpreter state.

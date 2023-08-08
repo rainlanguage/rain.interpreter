@@ -4,7 +4,7 @@ pragma solidity =0.8.19;
 import "forge-std/Test.sol";
 
 import "rain.solmem/lib/LibPointer.sol";
-import "src/lib/integrity/LibIntegrityCheck.sol";
+import "src/lib/integrity/deprecated/LibIntegrityCheck.sol";
 
 /// @title LibIntegrityCheckPushPopTest
 /// Test the basic push and pop movements of the integrity check.

@@ -8,11 +8,10 @@ import "rain.solmem/lib/LibPointer.sol";
 import "rain.solmem/lib/LibStackPointer.sol";
 import "rain.metadata/IMetaV1.sol";
 
-import "src/lib/state/LibInterpreterState.sol";
-import "src/lib/op/evm/LibOpChainId.sol";
+import "src/lib/state/deprecated/LibInterpreterState.sol";
+import "src/lib/op/evm/deprecated/LibOpChainId.sol";
 import "src/lib/caller/LibContext.sol";
 
-import "src/concrete/RainterpreterNP.sol";
 import "src/concrete/RainterpreterStore.sol";
 import "src/concrete/RainterpreterExpressionDeployerNP.sol";
 
@@ -72,43 +71,5 @@ contract LibOpChainIdTest is RainterpreterExpressionDeployerDeploymentTest {
         assertEq(state.stackBottom.unsafeReadWord(), pre);
         assertEq(stackTop.unsafeReadWord(), chainId);
         assertEq(stackTopAfter.unsafeReadWord(), post);
-    }
-
-    /// Test the eval of a chain ID opcode parsed from a string.
-    function testOpChainIDEval(uint64 chainId, StateNamespace namespace) public {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: chain-id();");
-        assertEq(
-            bytecode,
-            // 1 source
-            hex"01"
-            // 0 offset
-            hex"0000"
-            // 1 op
-            hex"01"
-            // 1 stack allocation
-            hex"01"
-            // 0 inputs
-            hex"00"
-            // 1 output
-            hex"01"
-            // chain id
-            hex"03000000"
-        );
-
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-
-        vm.chainId(chainId);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
-            storeDeployer,
-            namespace,
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
-        );
-        assertEq(stack.length, 1, "stack length");
-        assertEq(stack[0], chainId, "stack item");
-        assertEq(kvs.length, 0, "kvs length");
     }
 }

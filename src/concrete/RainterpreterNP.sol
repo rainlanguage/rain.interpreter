@@ -45,7 +45,6 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
     using LibEvalNP for InterpreterStateNP;
     using LibNamespace for StateNamespace;
     using LibInterpreterStateDataContractNP for bytes;
-    using LibCast for function(InterpreterState memory, Operand, Pointer) view returns (Pointer)[];
     using LibMemoryKV for MemoryKV;
     using LibNamespace for StateNamespace;
 
@@ -121,7 +120,7 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
 
     /// @inheritdoc IInterpreterV1
     function functionPointers() external view virtual returns (bytes memory) {
-        return LibAllStandardOpsNP.opcodeFunctionPointersNP();
+        return LibAllStandardOpsNP.opcodeFunctionPointers();
     }
 
     function _eval(

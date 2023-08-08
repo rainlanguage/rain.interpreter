@@ -5,6 +5,9 @@ import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
 
 import "src/lib/caller/LibContext.sol";
 import "src/lib/bytecode/LibBytecode.sol";
+import "src/lib/integrity/deprecated/LibIntegrityCheck.sol";
+import "src/lib/state/deprecated/LibInterpreterState.sol";
+import "src/lib/op/00/deprecated/LibOpStack.sol";
 
 /// @title LibOpStackTest
 /// @notice Test the runtime and integrity time logic of LibOpStack.

@@ -3,7 +3,7 @@ pragma solidity =0.8.19;
 
 import "forge-std/Test.sol";
 
-import "src/lib/state/LibInterpreterState.sol";
+import "src/lib/state/deprecated/LibInterpreterState.sol";
 
 /// @title LibInterpreterStateTest
 /// @notice Exercises the interpreter state utility library.

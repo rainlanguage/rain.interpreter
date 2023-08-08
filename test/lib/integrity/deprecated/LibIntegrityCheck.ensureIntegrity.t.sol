@@ -5,7 +5,7 @@ import "forge-std/Test.sol";
 
 import "rain.solmem/lib/LibPointer.sol";
 
-import "src/lib/integrity/LibIntegrityCheck.sol";
+import "src/lib/integrity/deprecated/LibIntegrityCheck.sol";
 import "src/lib/parse/LibParse.sol";
 import "src/lib/bytecode/LibBytecode.sol";
 

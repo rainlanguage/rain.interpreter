@@ -7,11 +7,11 @@ import "rain.solmem/lib/LibPointer.sol";
 import "rain.solmem/lib/LibStackPointer.sol";
 import "rain.lib.typecast/LibConvert.sol";
 
-import "src/lib/eval/LibEval.sol";
+import "src/lib/eval/deprecated/LibEval.sol";
 import "src/lib/compile/LibCompile.sol";
 
 import "test/lib/compile/LibCompileSlow.sol";
-import "test/lib/eval/LibEvalSlow.sol";
+import "test/lib/eval/deprecated/LibEvalSlow.sol";
 
 contract LibEvalTest is Test {
     using LibMemoryKV for MemoryKV;

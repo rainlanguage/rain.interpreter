@@ -6,9 +6,9 @@ import "rain.solmem/lib/LibMemCpy.sol";
 import "rain.solmem/lib/LibBytes.sol";
 import "rain.solmem/lib/LibUint256Array.sol";
 
-import "../state/LibInterpreterState.sol";
-import "../compile/LibCompile.sol";
-import "../ns/LibNamespace.sol";
+import "../../state/deprecated/LibInterpreterState.sol";
+import "../../compile/LibCompile.sol";
+import "../../ns/LibNamespace.sol";
 
 library LibInterpreterStateDataContract {
     using LibBytes for bytes;

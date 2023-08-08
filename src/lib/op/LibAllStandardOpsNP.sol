@@ -4,15 +4,15 @@ pragma solidity ^0.8.19;
 import "rain.lib.typecast/LibConvert.sol";
 
 import "../integrity/LibIntegrityCheckNP.sol";
-import "../state/LibInterpreterState.sol";
+import "../state/LibInterpreterStateNP.sol";
 
-import "./00/LibOpStack.sol";
-import "./00/LibOpConstant.sol";
+import "./00/LibOpStackNP.sol";
+import "./00/LibOpConstantNP.sol";
 
-import "./evm/LibOpBlockNumber.sol";
-import "./evm/LibOpChainId.sol";
-import "./evm/LibOpMaxUint256.sol";
-import "./evm/LibOpTimestamp.sol";
+import "./evm/LibOpBlockNumberNP.sol";
+import "./evm/LibOpChainIdNP.sol";
+import "./evm/LibOpMaxUint256NP.sol";
+import "./evm/LibOpTimestampNP.sol";
 
 /// Thrown when a dynamic length array is NOT 1 more than a fixed length array.
 /// Should never happen outside a major breaking change to memory layouts.
@@ -25,47 +25,6 @@ uint256 constant ALL_STANDARD_OPS_LENGTH = 6;
 /// @notice Every opcode available from the core repository laid out as a single
 /// array to easily build function pointers for `IInterpreterV1`.
 library LibAllStandardOpsNP {
-    /// All function pointers for the integrity checks of the standard opcodes.
-    /// Intended to be used internally by a deployer when building an expression.
-    function integrityFunctionPointers()
-        internal
-        pure
-        returns (function(IntegrityCheckState memory, Operand, Pointer) view returns (Pointer)[] memory pointers)
-    {
-        unchecked {
-            function(IntegrityCheckState memory, Operand, Pointer)
-                view
-                returns (Pointer) lengthPointer;
-            uint256 length = ALL_STANDARD_OPS_LENGTH;
-            assembly ("memory-safe") {
-                lengthPointer := length
-            }
-            function(IntegrityCheckState memory, Operand, Pointer)
-                view
-                returns (Pointer)[ALL_STANDARD_OPS_LENGTH + 1] memory pointersFixed = [
-                    lengthPointer,
-                    // Stack then constant are the first two ops to match the
-                    // field ordering in the interpreter state NOT the lexical
-                    // ordering of the file system.
-                    LibOpStack.integrity,
-                    LibOpConstant.integrity,
-                    // Everything else is alphabetical, including folders.
-                    LibOpBlockNumber.integrity,
-                    LibOpChainId.integrity,
-                    LibOpMaxUint256.integrity,
-                    LibOpTimestamp.integrity
-                ];
-            assembly ("memory-safe") {
-                pointers := pointersFixed
-            }
-            // Sanity check that the dynamic length is correct. Should be an
-            // unreachable error.
-            if (pointers.length != ALL_STANDARD_OPS_LENGTH) {
-                revert BadDynamicLength(pointers.length, length);
-            }
-        }
-    }
-
     function authoringMeta() internal pure returns (bytes memory) {
         bytes32[] memory words = new bytes32[](6);
         words[0] = "stack";
@@ -77,7 +36,7 @@ library LibAllStandardOpsNP {
         return abi.encode(words);
     }
 
-    function integrityFunctionPointersNP() internal pure returns (bytes memory) {
+    function integrityFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
             function(IntegrityCheckStateNP memory, Operand)
                 view
@@ -93,13 +52,13 @@ library LibAllStandardOpsNP {
                     // Stack then constant are the first two ops to match the
                     // field ordering in the interpreter state NOT the lexical
                     // ordering of the file system.
-                    LibOpStack.integrityNP,
-                    LibOpConstant.integrityNP,
+                    LibOpStackNP.integrity,
+                    LibOpConstantNP.integrity,
                     // Everything else is alphabetical, including folders.
-                    LibOpBlockNumber.integrityNP,
-                    LibOpChainId.integrityNP,
-                    LibOpMaxUint256.integrityNP,
-                    LibOpTimestamp.integrityNP
+                    LibOpBlockNumberNP.integrity,
+                    LibOpChainIdNP.integrity,
+                    LibOpMaxUint256NP.integrity,
+                    LibOpTimestampNP.integrity
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
@@ -119,46 +78,6 @@ library LibAllStandardOpsNP {
     /// method can just be a thin wrapper around this function.
     function opcodeFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
-            function(InterpreterState memory, Operand, Pointer)
-                view
-                returns (Pointer) lengthPointer;
-            uint256 length = ALL_STANDARD_OPS_LENGTH;
-            assembly ("memory-safe") {
-                lengthPointer := length
-            }
-            function(InterpreterState memory, Operand, Pointer)
-                view
-                returns (Pointer)[ALL_STANDARD_OPS_LENGTH + 1] memory pointersFixed = [
-                    lengthPointer,
-                    // Stack then constant are the first two ops to match the
-                    // field ordering in the interpreter state NOT the lexical
-                    // ordering of the file system.
-                    LibOpStack.run,
-                    LibOpConstant.run,
-                    // Everything else is alphabetical, including folders.
-                    LibOpBlockNumber.run,
-                    LibOpChainId.run,
-                    LibOpMaxUint256.run,
-                    LibOpTimestamp.run
-                ];
-            uint256[] memory pointersDynamic;
-            assembly ("memory-safe") {
-                pointersDynamic := pointersFixed
-            }
-            // Sanity check that the dynamic length is correct. Should be an
-            // unreachable error.
-            if (pointersDynamic.length != ALL_STANDARD_OPS_LENGTH) {
-                revert BadDynamicLength(pointersDynamic.length, length);
-            }
-            return LibConvert.unsafeTo16BitBytes(pointersDynamic);
-        }
-    }
-
-    /// All function pointers for the standard opcodes. Intended to be used to
-    /// build a `IInterpreterV1` instance, specifically the `functionPointers`
-    /// method can just be a thin wrapper around this function.
-    function opcodeFunctionPointersNP() internal pure returns (bytes memory) {
-        unchecked {
             function(InterpreterStateNP memory, Operand, Pointer)
                 view
                 returns (Pointer) lengthPointer;
@@ -173,13 +92,13 @@ library LibAllStandardOpsNP {
                     // Stack then constant are the first two ops to match the
                     // field ordering in the interpreter state NOT the lexical
                     // ordering of the file system.
-                    LibOpStack.runNP,
-                    LibOpConstant.runNP,
+                    LibOpStackNP.run,
+                    LibOpConstantNP.run,
                     // Everything else is alphabetical, including folders.
-                    LibOpBlockNumber.runNP,
-                    LibOpChainId.runNP,
-                    LibOpMaxUint256.runNP,
-                    LibOpTimestamp.runNP
+                    LibOpBlockNumberNP.run,
+                    LibOpChainIdNP.run,
+                    LibOpMaxUint256NP.run,
+                    LibOpTimestampNP.run
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {

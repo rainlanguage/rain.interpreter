@@ -7,7 +7,7 @@ import "rain.solmem/lib/LibBytes.sol";
 import "rain.solmem/lib/LibUint256Array.sol";
 
 import "src/lib/compile/LibCompile.sol";
-import "src/lib/state/LibInterpreterState.sol";
+import "src/lib/state/deprecated/LibInterpreterState.sol";
 
 library LibInterpreterStateDataContractSlow {
     using LibStackPointer for Pointer;

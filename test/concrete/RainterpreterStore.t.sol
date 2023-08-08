@@ -5,6 +5,7 @@ import "forge-std/Test.sol";
 import "openzeppelin-contracts/contracts/utils/Address.sol";
 
 import "rain.solmem/lib/LibUint256Array.sol";
+import "rain.lib.memkv/lib/LibMemoryKV.sol";
 
 import "src/lib/ns/LibNamespace.sol";
 import "src/concrete/RainterpreterStore.sol";
