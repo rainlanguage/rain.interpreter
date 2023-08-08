@@ -66,6 +66,11 @@ library LibIntegrityCheckNP {
         );
     }
 
+    // The cyclomatic complexity here comes from all the `if` checks for each
+    // integrity check. While the scanner isn't wrong, if we broke the checks
+    // out into functions it would be a mostly superficial reduction in
+    // complexity, and would make the code harder to read, as well as cost gas.
+    //slither-disable-next-line cyclomatic-complexity
     function integrityCheck(
         bytes memory fPointers,
         bytes memory bytecode,
