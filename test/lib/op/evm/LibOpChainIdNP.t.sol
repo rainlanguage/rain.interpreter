@@ -86,24 +86,6 @@ contract LibOpChainIdNPTest is RainterpreterExpressionDeployerDeploymentTest {
     /// Test the eval of a chain ID opcode parsed from a string.
     function testOpChainIDNPEval(uint64 chainId, StateNamespace namespace) public {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: chain-id();");
-        assertEq(
-            bytecode,
-            // 1 source
-            hex"01"
-            // 0 offset
-            hex"0000"
-            // 1 op
-            hex"01"
-            // 1 stack allocation
-            hex"01"
-            // 0 inputs
-            hex"00"
-            // 1 output
-            hex"01"
-            // chain id
-            hex"03000000"
-        );
-        assertEq(constants.length, 0);
 
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;

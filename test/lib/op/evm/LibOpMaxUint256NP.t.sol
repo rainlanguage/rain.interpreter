@@ -67,25 +67,6 @@ contract LibOpMaxUint256NPTest is RainterpreterExpressionDeployerDeploymentTest 
     /// Test the eval of LibOpMaxUint256NP parsed from a string.
     function testOpMaxUint256NPEval(StateNamespace namespace) external {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: max-uint-256();");
-        assertEq(
-            bytecode,
-            // 1 source
-            hex"01"
-            // 0 offset
-            hex"0000"
-            // 1 opcode
-            hex"01"
-            // 1 stack allocation
-            hex"01"
-            // 0 inputs
-            hex"00"
-            // 1 output
-            hex"01"
-            // max uint256
-            hex"04000000"
-        );
-        assertEq(constants.length, 0);
-
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =

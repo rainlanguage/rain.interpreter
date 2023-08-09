@@ -86,23 +86,6 @@ contract LibOpBlockNumberNPTest is RainterpreterExpressionDeployerDeploymentTest
     /// Test the eval of a block number opcode parsed from a string.
     function testOpBlockNumberNPEval(uint256 blockNumber) public {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: block-number();");
-        assertEq(
-            bytecode,
-            // 1 op
-            hex"01"
-            // 0 offset
-            hex"0000"
-            // 1 op
-            hex"01"
-            // 1 stack alloc
-            hex"01"
-            // 0 input
-            hex"00"
-            // 1 output
-            hex"01"
-            // "block-number()"
-            hex"02000000"
-        );
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =

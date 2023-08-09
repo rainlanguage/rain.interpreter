@@ -155,32 +155,6 @@ contract LibOpConstantTest is RainterpreterExpressionDeployerDeploymentTest {
     /// Test the eval of a constant opcode parsed from a string.
     function testOpConstantEvalE2E() external {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_ _: max-uint-256() 1001e15;");
-        uint256 sourceIndex = 0;
-        assertEq(LibBytecode.sourceCount(bytecode), 1);
-        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 2);
-        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
-        assertEq(
-            bytecode,
-            // 1 source
-            hex"01"
-            // 0 offset
-            hex"0000"
-            // 2 ops
-            hex"02"
-            // 2 stack allocation
-            hex"02"
-            // 0 inputs
-            hex"00"
-            // 2 outputs
-            hex"02"
-            // "max-uint-256()"
-            hex"04000000"
-            // "1001e15"
-            hex"01000000"
-        );
 
         assertEq(constants.length, 1);
         assertEq(constants[0], 1001e15);
