@@ -9,6 +9,8 @@ import "../state/LibInterpreterStateNP.sol";
 import "./00/LibOpStackNP.sol";
 import "./00/LibOpConstantNP.sol";
 
+import "./crypto/LibOpHashNP.sol";
+
 import "./evm/LibOpBlockNumberNP.sol";
 import "./evm/LibOpChainIdNP.sol";
 import "./evm/LibOpMaxUint256NP.sol";
@@ -19,21 +21,30 @@ import "./evm/LibOpTimestampNP.sol";
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 6;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 7;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
 /// array to easily build function pointers for `IInterpreterV1`.
 library LibAllStandardOpsNP {
     function authoringMeta() internal pure returns (bytes memory) {
-        bytes32[] memory words = new bytes32[](6);
-        words[0] = "stack";
-        words[1] = "constant";
-        words[2] = "block-number";
-        words[3] = "chain-id";
-        words[4] = "max-uint-256";
-        words[5] = "block-timestamp";
-        return abi.encode(words);
+        bytes32[ALL_STANDARD_OPS_LENGTH + 1] memory wordsFixed = [
+            bytes32(ALL_STANDARD_OPS_LENGTH),
+            // Stack and constant MUST be in this order for parsing to work.
+            "stack",
+            "constant",
+            // These are all ordered according to how they appear in the file system.
+            "hash",
+            "block-number",
+            "chain-id",
+            "max-uint-256",
+            "block-timestamp"
+        ];
+        bytes32[] memory wordsDynamic;
+        assembly ("memory-safe") {
+            wordsDynamic := wordsFixed
+        }
+        return abi.encode(wordsDynamic);
     }
 
     function integrityFunctionPointers() internal pure returns (bytes memory) {
@@ -55,6 +66,7 @@ library LibAllStandardOpsNP {
                     LibOpStackNP.integrity,
                     LibOpConstantNP.integrity,
                     // Everything else is alphabetical, including folders.
+                    LibOpHashNP.integrity,
                     LibOpBlockNumberNP.integrity,
                     LibOpChainIdNP.integrity,
                     LibOpMaxUint256NP.integrity,
@@ -95,6 +107,7 @@ library LibAllStandardOpsNP {
                     LibOpStackNP.run,
                     LibOpConstantNP.run,
                     // Everything else is alphabetical, including folders.
+                    LibOpHashNP.run,
                     LibOpBlockNumberNP.run,
                     LibOpChainIdNP.run,
                     LibOpMaxUint256NP.run,
