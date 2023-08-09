@@ -21,9 +21,10 @@ library LibParseStackName {
                 mstore(ptr, oldStackNames)
                 mstore(0x40, add(ptr, 0x20))
             }
-            state.stackNames = fingerprint | (state.stackLHSIndex << 0x10) | ptr;
+            uint256 stackLHSIndex = state.lineTracker & 0xFF;
+            state.stackNames = fingerprint | (stackLHSIndex << 0x10) | ptr;
             unchecked {
-                index = state.stackLHSIndex + 1;
+                index = stackLHSIndex + 1;
             }
         }
     }

@@ -3,8 +3,8 @@ pragma solidity =0.8.19;
 
 import "forge-std/Test.sol";
 
-import "src/lib/integrity/LibIntegrityCheck.sol";
-import "src/lib/state/LibInterpreterState.sol";
+import "src/lib/integrity/LibIntegrityCheckNP.sol";
+import "src/lib/state/LibInterpreterStateNP.sol";
 import "src/lib/op/LibAllStandardOpsNP.sol";
 
 /// @title LibAllStandardOpsNPTest
@@ -13,10 +13,8 @@ import "src/lib/op/LibAllStandardOpsNP.sol";
 contract LibAllStandardOpsNPTest is Test {
     /// Test that the dynamic length of the function pointers is correct.
     function testIntegrityFunctionPointersLength() external {
-        function(IntegrityCheckState memory, Operand, Pointer)
-            view
-            returns (Pointer)[] memory integrityCheckers = LibAllStandardOpsNP.integrityFunctionPointers();
-        assertEq(integrityCheckers.length, ALL_STANDARD_OPS_LENGTH);
+        bytes memory integrityFunctionPointers = LibAllStandardOpsNP.integrityFunctionPointers();
+        assertEq(integrityFunctionPointers.length, ALL_STANDARD_OPS_LENGTH * 2);
     }
 
     /// Test that the dynamic length of the function pointers is correct.
@@ -29,10 +27,13 @@ contract LibAllStandardOpsNPTest is Test {
     /// Test that the integrity function pointers length and opcode function
     /// pointers length are the same.
     function testIntegrityAndOpcodeFunctionPointersLength() external {
-        function(IntegrityCheckState memory, Operand, Pointer)
-            view
-            returns (Pointer)[] memory integrityCheckers = LibAllStandardOpsNP.integrityFunctionPointers();
+        bytes memory integrityFunctionPointers = LibAllStandardOpsNP.integrityFunctionPointers();
         bytes memory functionPointers = LibAllStandardOpsNP.opcodeFunctionPointers();
-        assertEq(integrityCheckers.length * 2, functionPointers.length);
+
+        bytes memory authoringMeta = LibAllStandardOpsNP.authoringMeta();
+        bytes32[] memory words = abi.decode(authoringMeta, (bytes32[]));
+
+        assertEq(integrityFunctionPointers.length, functionPointers.length);
+        assertEq(integrityFunctionPointers.length, words.length * 2);
     }
 }

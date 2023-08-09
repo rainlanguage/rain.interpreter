@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import "forge-std/Test.sol";
 
 import "src/lib/parse/LibParse.sol";
+import "src/lib/bytecode/LibBytecode.sol";
 
 /// @title LibParseNamedRHSTest
 /// Test that the parser can handle named RHS values.
@@ -38,50 +39,158 @@ contract LibParseNamedRHSTest is Test {
     /// The simplest RHS is a single word.
     function testParseSingleWord() external {
         string memory s = "_:a();";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        assertEq(sources.length, 1);
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
+        uint256 sourceIndex = 0;
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
         // a
-        assertEq(sources[0], hex"00000000");
+        assertEq(bytecode, hex"0100000101000100000000");
         assertEq(constants.length, 0);
     }
 
     /// Two sequential words on the RHS.
     function testParseTwoSequential() external {
         string memory s = "_ _:a() b();";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        assertEq(sources.length, 1);
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        uint256 sourceIndex = 0;
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
         // a b
-        assertEq(sources[0], hex"0000000000010000");
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // offset 0
+            hex"0000"
+            // a b ops count
+            hex"02"
+            // a b stack allocation
+            hex"02"
+            // a b inputs count
+            hex"00"
+            // a b outputs count
+            hex"02"
+            // a
+            hex"00000000"
+            // b
+            hex"01000000"
+        );
         assertEq(constants.length, 0);
     }
 
     /// Two sequential words on the RHS, each with a single input.
     function testParseTwoSequentialWithInputs() external {
         string memory s = "_ _:a(b()) b(c());";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        assertEq(sources.length, 1);
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        uint256 sourceIndex = 0;
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 4);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
         // b a c b
-        assertEq(sources[0], hex"00010000010000000002000001010000");
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // offset 0
+            hex"0000"
+            // b a c b ops count
+            hex"04"
+            // b a c b stack allocation
+            hex"02"
+            // b a c b inputs count
+            hex"00"
+            // b a c b outputs count
+            hex"02"
+            // b
+            hex"01000000"
+            // a 1 input
+            hex"00010000"
+            // c
+            hex"02000000"
+            // b 1 input
+            hex"01010000"
+        );
         assertEq(constants.length, 0);
     }
 
     /// Two words on the RHS, one nested as an input to the other.
     function testParseTwoNested() external {
         string memory s = "_:a(b());";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        assertEq(sources.length, 1);
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        uint256 sourceIndex = 0;
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
         // b a
-        assertEq(sources[0], hex"0001000001000000");
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // offset 0
+            hex"0000"
+            // b a ops count
+            hex"02"
+            // b a stack allocation
+            hex"01"
+            // b a inputs count
+            hex"00"
+            // b a outputs count
+            hex"01"
+            // b
+            hex"01000000"
+            // a 1 input
+            hex"00010000"
+        );
         assertEq(constants.length, 0);
     }
 
     /// Three words on the RHS, two sequential nested as an input to the other.
     function testParseTwoNestedAsThirdInput() external {
         string memory s = "_:a(b() c());";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        assertEq(sources.length, 1);
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        uint256 sourceIndex = 0;
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 3);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
         // c b a
-        assertEq(sources[0], hex"000200000001000002000000");
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // offset 0
+            hex"0000"
+            // c b a ops count
+            hex"03"
+            // c b a stack allocation
+            hex"02"
+            // c b a inputs count
+            hex"00"
+            // c b a outputs count
+            hex"01"
+            // c
+            hex"02000000"
+            // b
+            hex"01000000"
+            // a 2 inputs
+            hex"00020000"
+        );
         assertEq(constants.length, 0);
     }
 
@@ -89,42 +198,136 @@ contract LibParseNamedRHSTest is Test {
     /// several LHS items.
     function testParseSingleLHSNestingAndSequential00() external {
         string memory s = "_:a(b() c(d() e()));";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        (constants);
-        assertEq(sources.length, 1);
-        assertEq(sources[0].length, 20);
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        uint256 sourceIndex = 0;
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 5);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
         assertEq(constants.length, 0);
         // Nested words compile RTL so that they execute LTR.
         // e d c b a
-        assertEq(sources[0], hex"0004000000030000020200000001000002000000");
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // offset 0
+            hex"0000"
+            // e d c b a ops count
+            hex"05"
+            // e d c b a stack allocation
+            hex"02"
+            // e d c b a inputs count
+            hex"00"
+            // e d c b a outputs count
+            hex"01"
+            // e
+            hex"04000000"
+            // d
+            hex"03000000"
+            // c 2 inputs
+            hex"02020000"
+            // b
+            hex"01000000"
+            // a 2 inputs
+            hex"00020000"
+        );
     }
 
     /// Several words, mixing sequential and nested logic to some depth, with
     /// several LHS items.
     function testParseSingleLHSNestingAndSequential01() external {
         string memory s = "_:a(b() c(d() e()) f() g(h() i()));";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        (constants);
-        assertEq(sources.length, 1);
-        assertEq(sources[0].length, 36);
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        uint256 sourceIndex = 0;
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 9);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 4);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
         assertEq(constants.length, 0);
         // Nested words compile RTL so that they execute LTR.
         // i h g f e d c b a
-        assertEq(sources[0], hex"000800000007000002060000000500000004000000030000020200000001000004000000");
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // offset 0
+            hex"0000"
+            // i h g f e d c b a ops count
+            hex"09"
+            // i h g f e d c b a stack allocation
+            hex"04"
+            // i h g f e d c b a inputs count
+            hex"00"
+            // i h g f e d c b a outputs count
+            hex"01"
+            // i
+            hex"08000000"
+            // h
+            hex"07000000"
+            // g 2 inputs
+            hex"06020000"
+            // f
+            hex"05000000"
+            // e
+            hex"04000000"
+            // d
+            hex"03000000"
+            // c 2 inputs
+            hex"02020000"
+            // b
+            hex"01000000"
+            // a 4 inputs
+            hex"00040000"
+        );
     }
 
     /// Several words, mixing sequential and nested logic to some depth, with
     /// several LHS items.
     function testParseSingleLHSNestingAndSequential02() external {
         string memory s = "_ _ _:a(b() c(d())) d() e(b());";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        (constants);
-        assertEq(sources.length, 1);
-        assertEq(sources[0].length, 28);
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // offset 0
+            hex"0000"
+            // d c b a d b e ops count
+            hex"07"
+            // d c b a d b e stack allocation
+            hex"03"
+            // d c b a d b e inputs count
+            hex"00"
+            // d c b a d b e outputs count
+            hex"03"
+            // d
+            hex"03000000"
+            // c 1 input
+            hex"02010000"
+            // b
+            hex"01000000"
+            // a 2 inputs
+            hex"00020000"
+            // d
+            hex"03000000"
+            // b
+            hex"01000000"
+            // e 1 input
+            hex"04010000"
+        );
+        uint256 sourceIndex = 0;
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 7);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 3);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 3);
         assertEq(constants.length, 0);
-        // Nested words compile RTL so that they execute LTR.
-        // d c b a d b e
-        assertEq(sources[0], hex"00030000010200000001000002000000000300000001000001040000");
     }
 
     /// More than 14 words deep triggers a whole other internal loop due to there
@@ -132,31 +335,190 @@ contract LibParseNamedRHSTest is Test {
     function testParseSingleLHSNestingAndSequential03() external {
         string memory s =
             "_ _:a(b() c(d() e() f() g() h() i() j() k() l() m() n() o() p())) p(o() n(m() l() k() j() i() h() g() f() e() d() c() b() a()));";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        (constants);
-        assertEq(sources.length, 1);
-        assertEq(sources[0].length, 128);
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        uint256 sourceIndex = 0;
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0x20);
+        // High point is 13 for the second top level item + 1 for the first top
+        // level item = 14.
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 14);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
         assertEq(constants.length, 0);
         // Nested words compile RTL so that they execute LTR.
         // p o n m l k j i h g f e d c b a a b c d e f g h i j k l m n o p
         assertEq(
-            sources[0],
-            hex"000f0000000e0000000d0000000c0000000b0000000a0000000900000008000000070000000600000005000000040000000300000d020000000100000200000000000000000100000002000000030000000400000005000000060000000700000008000000090000000a0000000b0000000c00000d0d0000000e0000020f0000"
+            bytecode,
+            // 1 source
+            hex"01"
+            // offset 0
+            hex"0000"
+            // p o n m l k j i h g f e d c b a a b c d e f g h i j k l m n o p ops count
+            hex"20"
+            // p o n m l k j i h g f e d c b a a b c d e f g h i j k l m n o p stack allocation
+            hex"0e"
+            // p o n m l k j i h g f e d c b a a b c d e f g h i j k l m n o p inputs count
+            hex"00"
+            // p o n m l k j i h g f e d c b a a b c d e f g h i j k l m n o p outputs count
+            hex"02"
+            // p
+            hex"0f000000"
+            // o
+            hex"0e000000"
+            // n
+            hex"0d000000"
+            // m
+            hex"0c000000"
+            // l
+            hex"0b000000"
+            // k
+            hex"0a000000"
+            // j
+            hex"09000000"
+            // i
+            hex"08000000"
+            // h
+            hex"07000000"
+            // g
+            hex"06000000"
+            // f
+            hex"05000000"
+            // e
+            hex"04000000"
+            // d
+            hex"03000000"
+            // c 13 inputs
+            hex"020d0000"
+            // b
+            hex"01000000"
+            // a 2 inputs
+            hex"00020000"
+            // a
+            hex"00000000"
+            // b
+            hex"01000000"
+            // c
+            hex"02000000"
+            // d
+            hex"03000000"
+            // e
+            hex"04000000"
+            // f
+            hex"05000000"
+            // g
+            hex"06000000"
+            // h
+            hex"07000000"
+            // i
+            hex"08000000"
+            // j
+            hex"09000000"
+            // k
+            hex"0a000000"
+            // l
+            hex"0b000000"
+            // m
+            hex"0c000000"
+            // n 13 inputs
+            hex"0d0d0000"
+            // o
+            hex"0e000000"
+            // p 2 inputs
+            hex"0f020000"
         );
     }
 
-    /// Two full lines, each with a single LHS and RHS.
+    /// Two lines, each with LHS and RHS.
     function testParseTwoFullLinesSingleRHSEach() external {
-        string memory s = "_:a();_:b();";
-        (bytes[] memory sources, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
-        (constants);
-        assertEq(sources.length, 2);
-        assertEq(sources[0].length, 4);
-        assertEq(sources[1].length, 4);
+        string memory s = "_:a(),_ _:b() c(d());";
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
+
+        uint256 sourceIndex = 0;
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 4);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 3);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 3);
+
         assertEq(constants.length, 0);
-        // a
-        assertEq(sources[0], hex"00000000");
-        // b
-        assertEq(sources[1], hex"00010000");
+        // a b d c
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // offset 0
+            hex"0000"
+            // a b d c ops count
+            hex"04"
+            // a b d c stack allocation
+            hex"03"
+            // a b d c inputs count
+            hex"00"
+            // a b d c outputs count
+            hex"03"
+            // a
+            hex"00000000"
+            // b
+            hex"01000000"
+            // d
+            hex"03000000"
+            // c 1 input
+            hex"02010000"
+        );
+    }
+
+    /// Two full sources, each with a single LHS and RHS.
+    function testParseTwoFullSourcesSingleRHSEach() external {
+        string memory s = "_:a();_:b();";
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), meta);
+        assertEq(LibBytecode.sourceCount(bytecode), 2);
+
+        uint256 sourceIndex = 0;
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+
+        sourceIndex = 1;
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 8);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+
+        assertEq(constants.length, 0);
+        // a ; b
+        assertEq(
+            bytecode,
+            // 2 sources
+            hex"02"
+            // offset 0
+            hex"0000"
+            // 8 bytes pointers to second source (4 byte prefix + 1 opcode for a)
+            hex"0008"
+            // a ops count
+            hex"01"
+            // a stack allocation
+            hex"01"
+            // a inputs count
+            hex"00"
+            // a outputs count
+            hex"01"
+            // a
+            hex"00000000"
+            // b ops count
+            hex"01"
+            // b stack allocation
+            hex"01"
+            // b inputs count
+            hex"00"
+            // b outputs count
+            hex"01"
+            // b
+            hex"01000000"
+        );
     }
 }

@@ -51,7 +51,7 @@ interface IParserV1 {
     /// is invalid. This function takes `bytes` instead of `string` to allow
     /// for definitions of "string" other than UTF-8.
     /// @param data The Rainlang bytes to parse.
-    /// @return sources The expressions that can be evaluated.
+    /// @return bytecode The expressions that can be evaluated.
     /// @return constants The constants that can be referenced by sources.
-    function parse(bytes memory data) external pure returns (bytes[] memory sources, uint256[] memory constants);
+    function parse(bytes memory data) external pure returns (bytes memory bytecode, uint256[] memory constants);
 }

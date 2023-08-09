@@ -2,6 +2,7 @@
 pragma solidity ^0.8.18;
 
 import "../../interface/IExpressionDeployerV1.sol";
+import "../../interface/unstable/IExpressionDeployerV2.sol";
 
 library LibDeployerDiscoverable {
     /// Hack so that some deployer will emit an event with the sender as the
@@ -18,6 +19,14 @@ library LibDeployerDiscoverable {
     function touchDeployerV1(address deployer) internal {
         (IInterpreterV1 interpreter, IInterpreterStoreV1 store, address expression) =
             IExpressionDeployerV1(deployer).deployExpression(new bytes[](0), new uint256[](0), new uint256[](0));
+        (interpreter);
+        (store);
+        (expression);
+    }
+
+    function touchDeployerV2(address deployer) internal {
+        (IInterpreterV1 interpreter, IInterpreterStoreV1 store, address expression) =
+            IExpressionDeployerV2(deployer).deployExpression("", new uint256[](0), new uint256[](0));
         (interpreter);
         (store);
         (expression);

@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import "forge-std/Test.sol";
 
 import "src/lib/parse/LibParse.sol";
+import "src/lib/bytecode/LibBytecode.sol";
 
 /// @title LibParseInputsOnlyTest
 /// @notice Tests that inputs (leading LHS items without RHS items) to an
@@ -12,13 +13,62 @@ import "src/lib/parse/LibParse.sol";
 /// I.e. the expression is basically an identity function.
 contract LibParseInputsOnlyTest is Test {
     /// Some inputs-only examples. Should produce an empty source.
-    function testParseInputsOnly() external {
-        string[2] memory examples = ["_:;", "_ _:;"];
-        for (uint256 i = 0; i < examples.length; i++) {
-            (bytes[] memory sources1, uint256[] memory constants1) = LibParse.parse(bytes(examples[i]), "");
-            assertEq(sources1.length, 1);
-            assertEq(sources1[0].length, 0);
-            assertEq(constants1.length, 0);
-        }
+    /// Test a single input.
+    function testParseInputsOnlySingle() external {
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes("_:;"), "");
+        uint256 sourceIndex = 0;
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 0 ops
+            hex"00"
+            // 1 stack allocation
+            hex"01"
+            // 1 input
+            hex"01"
+            // 1 output
+            hex"01"
+        );
+
+        assertEq(constants.length, 0);
+    }
+
+    /// Test multiple inputs.
+    function testParseInputsOnlyMultiple() external {
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes("_ _:;"), "");
+        uint256 sourceIndex = 0;
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 0 ops
+            hex"00"
+            // 2 stack allocation
+            hex"02"
+            // 2 inputs
+            hex"02"
+            // 2 outputs
+            hex"02"
+        );
+
+        assertEq(constants.length, 0);
     }
 }
