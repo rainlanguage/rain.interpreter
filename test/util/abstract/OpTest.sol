@@ -13,6 +13,17 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
     using LibUint256Array for uint256[];
     using LibPointer for Pointer;
 
+    function checkUnsupportedNonZeroOperandBody(IntegrityCheckStateNP memory state, uint8 inputs, uint16 badOp)
+        internal
+    {
+        vm.assume(badOp != 0);
+        Operand operand = Operand.wrap((uint256(inputs) << 0x10) | uint256(badOp));
+        vm.expectRevert(abi.encodeWithSelector(UnsupportedOperand.selector, state.opIndex, operand));
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpAnyNP.integrity(state, operand);
+        (calcInputs);
+        (calcOutputs);
+    }
+
     function opReferenceCheck(
         InterpreterStateNP memory state,
         uint256 seed,

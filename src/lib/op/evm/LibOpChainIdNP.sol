@@ -7,7 +7,8 @@ import "../../integrity/LibIntegrityCheckNP.sol";
 /// @title LibOpChainIdNP
 /// Implementation of the EVM `CHAINID` opcode as a standard Rainlang opcode.
 library LibOpChainIdNP {
-    function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
+    function integrity(IntegrityCheckStateNP memory state, Operand operand) internal pure returns (uint256, uint256) {
+        LibIntegrityCheckNP.checkOpUnsupportedNonZeroOperandBody(state, operand);
         return (0, 1);
     }
 

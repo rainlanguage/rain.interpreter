@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import "rain.solmem/lib/LibStackPointer.sol";
-import "../../LibOp.sol";
+import "../../deprecated/LibOp.sol";
 import "../../../state/deprecated/LibInterpreterState.sol";
 import "../../../integrity/deprecated/LibIntegrityCheck.sol";
 

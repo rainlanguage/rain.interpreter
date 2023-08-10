@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
+import "test/util/abstract/OpTest.sol";
 import "test/util/lib/etch/LibEtch.sol";
 
 import "rain.solmem/lib/LibPointer.sol";
@@ -18,15 +18,22 @@ import "src/concrete/RainterpreterExpressionDeployerNP.sol";
 
 /// @title LibOpChainIdNPTest
 /// @notice Test the runtime and integrity time logic of LibOpChainIdNP.
-contract LibOpChainIdNPTest is RainterpreterExpressionDeployerDeploymentTest {
+contract LibOpChainIdNPTest is OpTest {
     using LibInterpreterStateNP for InterpreterStateNP;
 
     /// Directly test the integrity logic of LibOpChainIdNP.
-    function testOpChainIDNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
-        (uint256 inputs, uint256 outputs) = LibOpChainIdNP.integrity(state, operand);
+    function testOpChainIDNPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs) external {
+        (uint256 calcInputs, uint256 calcOutputs) =
+            LibOpChainIdNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
 
-        assertEq(inputs, 0);
-        assertEq(outputs, 1);
+        assertEq(calcInputs, 0);
+        assertEq(calcOutputs, 1);
+    }
+
+    /// Directly test the integrity logic of LibOpChainIdNP. This tests the
+    /// unhappy path where the operand is invalid.
+    function testOpChainIdNPIntegrityUnhappy(IntegrityCheckStateNP memory state, uint16 badOp) external {
+        checkUnsupportedNonZeroOperandBody(state, 0, badOp);
     }
 
     /// Directly test the runtime logic of LibOpChainId. This tests that the

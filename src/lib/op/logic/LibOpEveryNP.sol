@@ -6,10 +6,10 @@ import "rain.solmem/lib/LibPointer.sol";
 import "../../state/LibInterpreterStateNP.sol";
 import "../../integrity/LibIntegrityCheckNP.sol";
 
-/// @title LibOpAnyNP
-/// @notice Opcode to return the first nonzero item on the stack up to the inputs
-/// limit.
-library LibOpAnyNP {
+/// @title LibOpEveryNP
+/// @notice Opcode to return the last item out of N items if they are all true,
+/// else 0.
+library LibOpEveryNP {
     using LibPointer for Pointer;
 
     function integrity(IntegrityCheckStateNP memory state, Operand operand) internal pure returns (uint256, uint256) {
@@ -17,8 +17,7 @@ library LibOpAnyNP {
         return (LibIntegrityCheckNP.readOpNonZeroInputs(state, operand), 1);
     }
 
-    /// ANY
-    /// ANY is the first nonzero item, else 0.
+    /// EVERY is the last nonzero item, else 0.
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         assembly ("memory-safe") {
             let length := mul(shr(0x10, operand), 0x20)
@@ -26,7 +25,7 @@ library LibOpAnyNP {
             stackTop := sub(add(stackTop, length), 0x20)
             for { let end := add(cursor, length) } lt(cursor, end) { cursor := add(cursor, 0x20) } {
                 let item := mload(cursor)
-                if gt(item, 0) {
+                if iszero(item) {
                     mstore(stackTop, item)
                     break
                 }
@@ -35,11 +34,11 @@ library LibOpAnyNP {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of ANY for testing.
+    /// Gas intensive reference implementation of EVERY for testing.
     function referenceFn(uint256[] memory inputs) internal pure returns (uint256 value) {
         for (uint256 i = 0; i < inputs.length; i++) {
             value = inputs[i];
-            if (value != 0) {
+            if (value == 0) {
                 break;
             }
         }

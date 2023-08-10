@@ -9,7 +9,7 @@ import "rain.solmem/lib/LibStackPointer.sol";
 import "rain.solmem/lib/LibUint256Array.sol";
 import "rain.lib.hash/LibHashNoAlloc.sol";
 
-import "src/lib/op/LibOp.sol";
+import "src/lib/op/deprecated/LibOp.sol";
 import "test/lib/op/LibOpSlow.sol";
 
 contract LibOpTest is Test {
