@@ -4,44 +4,44 @@ pragma solidity =0.8.19;
 import "test/util/abstract/OpTest.sol";
 import "src/lib/caller/LibContext.sol";
 
-contract LibOpAnyNPTest is OpTest {
-    /// Directly test the integrity logic of LibOpAnyNP. This tests the happy
+contract LibOpEveryNPTest is OpTest {
+    /// Directly test the integrity logic of LibOpEveryNP. This tests the happy
     /// path where the operand is valid.
-    function testOpAnyNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external {
+    function testOpEveryNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external {
         vm.assume(inputs != 0);
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpAnyNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpEveryNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
 
         assertEq(calcInputs, inputs);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the integrity logic of LibOpAnyNP. This tests the unhappy
+    /// Directly test the integrity logic of LibOpEveryNP. This tests the unhappy
     /// path where the operand is invalid due to 0 inputs.
-    function testOpAnyNPIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external {
+    function testOpEveryNPIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external {
         vm.expectRevert(abi.encodeWithSelector(UnsupportedInputs.selector, state.opIndex, 0));
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpAnyNP.integrity(state, Operand.wrap(0));
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpEveryNP.integrity(state, Operand.wrap(0));
         (calcInputs);
         (calcOutputs);
     }
 
-    /// Directly test the integrity logic of LibOpAnyNP. This tests the unhappy
+    /// Directly test the integrity logic of LibOpEveryNP. This tests the unhappy
     /// path where the operand body is non zero.
-    function testOpAnyNPIntegrityUnhappyNonZeroBody(IntegrityCheckStateNP memory state, uint8 inputs, uint16 badOp)
+    function testOpEveryNPIntegrityUnhappyNonZeroBody(IntegrityCheckStateNP memory state, uint8 inputs, uint16 badOp)
         external
     {
         vm.assume(inputs != 0);
         checkUnsupportedNonZeroOperandBody(state, inputs, badOp);
     }
 
-    /// Directly test the runtime logic of LibOpAnyNP.
-    function testOpAnyNPRun(InterpreterStateNP memory state, uint256 seed, uint256[] memory inputs) external {
+    /// Directly test the runtime logic of LibOpEveryNP.
+    function testOpEveryNPRun(InterpreterStateNP memory state, uint256 seed, uint256[] memory inputs) external {
         vm.assume(inputs.length != 0);
-        opReferenceCheck(state, seed, LibOpAnyNP.referenceFn, LibOpAnyNP.integrity, LibOpAnyNP.run, inputs);
+        opReferenceCheck(state, seed, LibOpEveryNP.referenceFn, LibOpEveryNP.integrity, LibOpEveryNP.run, inputs);
     }
 
-    /// Test the eval of any opcode parsed from a string. Tests 1 true input.
-    function testOpAnyNPEval1TrueInput() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: any(5);");
+    /// Test the eval of every opcode parsed from a string. Tests 1 true input.
+    function testOpEveryNPEval1TrueInput() external {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: every(5);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
@@ -58,9 +58,9 @@ contract LibOpAnyNPTest is OpTest {
         assertEq(kvs.length, 0);
     }
 
-    /// Test the eval of any opcode parsed from a string. Tests 1 false input.
-    function testOpAnyNPEval1FalseInput() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: any(0);");
+    /// Test the eval of every opcode parsed from a string. Tests 1 false input.
+    function testOpEveryNPEval1FalseInput() external {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: every(0);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
@@ -77,10 +77,10 @@ contract LibOpAnyNPTest is OpTest {
         assertEq(kvs.length, 0);
     }
 
-    /// Test the eval of any opcode parsed from a string. Tests 2 true inputs.
-    /// The first true input should be the overall result.
-    function testOpAnyNPEval2TrueInputs() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: any(5 6);");
+    /// Test the eval of every opcode parsed from a string. Tests 2 true inputs.
+    /// The last true input should be the overall result.
+    function testOpEveryNPEval2TrueInputs() external {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: every(5 6);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
@@ -93,13 +93,13 @@ contract LibOpAnyNPTest is OpTest {
         );
 
         assertEq(stack.length, 1);
-        assertEq(stack[0], 5);
+        assertEq(stack[0], 6);
         assertEq(kvs.length, 0);
     }
 
-    /// Test the eval of any opcode parsed from a string. Tests 2 false inputs.
-    function testOpAnyNPEval2FalseInputs() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: any(0 0);");
+    /// Test the eval of every opcode parsed from a string. Tests 2 false inputs.
+    function testOpEveryNPEval2FalseInputs() external {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: every(0 0);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
@@ -116,11 +116,10 @@ contract LibOpAnyNPTest is OpTest {
         assertEq(kvs.length, 0);
     }
 
-    /// Test the eval of any opcode parsed from a string. Tests 2 inputs, one
-    /// true and one false. The first true input should be the overall result.
-    /// The first value is the true value.
-    function testOpAnyNPEval2MixedInputs() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: any(5 0);");
+    /// Test the eval of every opcode parsed from a string. Tests 2 inputs, one
+    /// true and one false. The overall result is false.
+    function testOpEveryNPEval2MixedInputs() external {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: every(5 0);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
@@ -133,15 +132,14 @@ contract LibOpAnyNPTest is OpTest {
         );
 
         assertEq(stack.length, 1);
-        assertEq(stack[0], 5);
+        assertEq(stack[0], 0);
         assertEq(kvs.length, 0);
     }
 
-    /// Test the eval of any opcode parsed from a string. Tests 2 inputs, one
-    /// true and one false. The first true input should be the overall result.
-    /// The first value is the false value.
-    function testOpAnyNPEval2MixedInputs2() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: any(0 5);");
+    /// Test the eval of every opcode parsed from a string. Tests 2 inputs, one
+    /// true and one false. The overall result is false.
+    function testOpEveryNPEval2MixedInputs2() external {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: every(0 5);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
@@ -154,7 +152,7 @@ contract LibOpAnyNPTest is OpTest {
         );
 
         assertEq(stack.length, 1);
-        assertEq(stack[0], 5);
+        assertEq(stack[0], 0);
         assertEq(kvs.length, 0);
     }
 }

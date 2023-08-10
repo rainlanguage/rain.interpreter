@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
+import "test/util/abstract/OpTest.sol";
 
 import "rain.solmem/lib/LibPointer.sol";
 import "rain.solmem/lib/LibStackPointer.sol";
@@ -15,17 +15,26 @@ import "src/lib/op/evm/LibOpTimestampNP.sol";
 
 /// @title LibOpTimestampNPTest
 /// @notice Test the runtime and integrity time logic of LibOpTimestampNP.
-contract LibOpTimestampNPTest is RainterpreterExpressionDeployerDeploymentTest {
+contract LibOpTimestampNPTest is OpTest {
     using LibPointer for Pointer;
     using LibStackPointer for Pointer;
     using LibInterpreterStateNP for InterpreterStateNP;
 
     /// Directly test the integrity logic of LibOpTimestampNP.
-    function testOpTimestampNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
-        (uint256 inputs, uint256 outputs) = LibOpTimestampNP.integrity(state, operand);
+    function testOpTimestampNPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs) external {
+        (uint256 calcInputs, uint256 calcOutputs) =
+            LibOpTimestampNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
 
-        assertEq(inputs, 0);
-        assertEq(outputs, 1);
+        assertEq(calcInputs, 0);
+        assertEq(calcOutputs, 1);
+    }
+
+    /// Directly test the integrity logic of LibOpTimestampNP. This tests the
+    /// unhappy path where the operand is invalid.
+    function testOpTimestampNPIntegrityUnhappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 badOp)
+        external
+    {
+        checkUnsupportedNonZeroOperandBody(state, inputs, badOp);
     }
 
     /// Directly test the runtime logic of LibOpTimestamp. This tests that the

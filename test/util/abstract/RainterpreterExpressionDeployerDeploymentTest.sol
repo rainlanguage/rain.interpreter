@@ -26,7 +26,7 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
         // Sanity check the interpreter's opcode function pointers.
         bytes memory opcodeFunctionPointers = iInterpreter.functionPointers();
         if (keccak256(opcodeFunctionPointers) != keccak256(OPCODE_FUNCTION_POINTERS)) {
-            console2.log("current interpreter opcode function pointers hash:");
+            console2.log("current interpreter opcode function pointers:");
             console2.logBytes(opcodeFunctionPointers);
             revert("unexpected interpreter opcode function pointers");
         }

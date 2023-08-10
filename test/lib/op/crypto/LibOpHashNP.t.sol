@@ -29,16 +29,8 @@ contract LibOpHashNPTest is OpTest {
 
     /// Directly test the integrity logic of LibOpHashNP. This tests the unhappy
     /// path where the operand is invalid.
-    function testOpHashNPIntegrityUnhappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 badOperand)
-        external
-    {
-        // 0 is the only valid operand.
-        vm.assume(badOperand != 0);
-        Operand operand = Operand.wrap(uint256(inputs) << 0x10 | uint256(badOperand));
-        vm.expectRevert(abi.encodeWithSelector(UnsupportedOperand.selector, state.opIndex, operand));
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpHashNP.integrity(state, operand);
-        (calcInputs);
-        (calcOutputs);
+    function testOpHashNPIntegrityUnhappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 badOp) external {
+        checkUnsupportedNonZeroOperandBody(state, inputs, badOp);
     }
 
     /// Directly test the runtime logic of LibOpHashNP.

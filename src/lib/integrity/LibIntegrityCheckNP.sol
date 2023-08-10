@@ -74,6 +74,25 @@ library LibIntegrityCheckNP {
         );
     }
 
+    function readOpNonZeroInputs(IntegrityCheckStateNP memory state, Operand operand)
+        internal
+        pure
+        returns (uint256 inputs)
+    {
+        // There must be at least one input.
+        inputs = Operand.unwrap(operand) >> 0x10;
+        if (inputs == 0) {
+            revert UnsupportedInputs(state.opIndex, inputs);
+        }
+    }
+
+    function checkOpUnsupportedNonZeroOperandBody(IntegrityCheckStateNP memory state, Operand operand) internal pure {
+        // Operand body must be zero.
+        if (Operand.unwrap(operand) & 0xFFFF != 0) {
+            revert UnsupportedOperand(state.opIndex, operand);
+        }
+    }
+
     // The cyclomatic complexity here comes from all the `if` checks for each
     // integrity check. While the scanner isn't wrong, if we broke the checks
     // out into functions it would be a mostly superficial reduction in

@@ -1,21 +1,30 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
+import "test/util/abstract/OpTest.sol";
 
 import "src/lib/caller/LibContext.sol";
 
 /// @title LibOpMaxUint256NPTest
 /// @notice Test the runtime and integrity time logic of LibOpMaxUint256NP.
-contract LibOpMaxUint256NPTest is RainterpreterExpressionDeployerDeploymentTest {
+contract LibOpMaxUint256NPTest is OpTest {
     using LibInterpreterStateNP for InterpreterStateNP;
 
     /// Directly test the integrity logic of LibOpMaxUint256NP.
-    function testOpMaxUint256NPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
-        (uint256 inputs, uint256 outputs) = LibOpMaxUint256NP.integrity(state, operand);
+    function testOpMaxUint256NPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs) external {
+        (uint256 calcInputs, uint256 calcOutputs) =
+            LibOpMaxUint256NP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
 
-        assertEq(inputs, 0);
-        assertEq(outputs, 1);
+        assertEq(calcInputs, 0);
+        assertEq(calcOutputs, 1);
+    }
+
+    /// Directly test the integrity logic of LibOpMaxUint256NP. This tests the
+    /// unhappy path where the operand is invalid.
+    function testOpMaxUint256NPIntegrityUnhappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 badOp)
+        external
+    {
+        checkUnsupportedNonZeroOperandBody(state, inputs, badOp);
     }
 
     /// Directly test the runtime logic of LibOpMaxUint256NP. This tests that the
