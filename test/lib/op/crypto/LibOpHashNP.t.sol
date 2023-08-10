@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
+import "test/util/abstract/OpTest.sol";
 
 import "src/lib/op/crypto/LibOpHashNP.sol";
 import "src/lib/caller/LibContext.sol";
@@ -12,7 +12,7 @@ import "rain.solmem/lib/LibUint256Array.sol";
 
 /// @title LibOpHashNPTest
 /// @notice Test the runtime and integrity time logic of LibOpHashNP.
-contract LibOpHashNPTest is RainterpreterExpressionDeployerDeploymentTest {
+contract LibOpHashNPTest is OpTest {
     using LibInterpreterStateNP for InterpreterStateNP;
     using LibPointer for Pointer;
     using LibUint256Array for uint256[];
@@ -41,113 +41,9 @@ contract LibOpHashNPTest is RainterpreterExpressionDeployerDeploymentTest {
         (calcOutputs);
     }
 
-    /// Directly test the runtime logic of LibOpHashNP. This tests that a 0
-    /// length hash is correctly calculated.
-    function testOpHashNPRun0Inputs(InterpreterStateNP memory state, uint256 pre, uint256 post) external {
-        Pointer stackBottom;
-        Pointer stackTop;
-        Pointer expectedStackTopAfter;
-        Pointer end;
-        assembly ("memory-safe") {
-            end := mload(0x40)
-            mstore(end, post)
-            expectedStackTopAfter := add(end, 0x20)
-            mstore(expectedStackTopAfter, 0)
-            stackTop := add(expectedStackTopAfter, 0x20)
-            mstore(stackTop, pre)
-            stackBottom := add(stackTop, 0x20)
-            mstore(0x40, stackBottom)
-        }
-
-        // Hash doesn't modify the state.
-        bytes32 stateFingerprintBefore = state.fingerprint();
-        Pointer stackTopAfter = LibOpHashNP.run(state, Operand.wrap(0), stackTop);
-        bytes32 stateFingerprintAfter = state.fingerprint();
-        assertEq(stateFingerprintBefore, stateFingerprintAfter);
-
-        // The stack should have been updated with a 0 length hash.
-        assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(expectedStackTopAfter));
-
-        // Check that the opcode didn't modify the stack beyond the first element.
-        uint256 actualPost;
-        bytes32 actualHash;
-        uint256 actualPre;
-        assembly {
-            actualPost := mload(end)
-            actualHash := mload(add(end, 0x20))
-            actualPre := mload(add(end, 0x40))
-        }
-
-        assertEq(actualPost, post);
-        assertEq(actualHash, keccak256(""));
-        assertEq(actualPre, pre);
-    }
-
-    /// Directly test the runtime logic of LibOpHashNP. This tests that a list
-    /// of inputs are hashed in the same way as hashing the packed abi encoding.
-    function testOpHashNPRunManyInputs(
-        InterpreterStateNP memory state,
-        uint256 pre,
-        uint256[] memory inputs,
-        uint256 post
-    ) external {
-        // 0 length inputs is already tested in testOpHashNPRun0Inputs.
-        vm.assume(inputs.length > 0);
-
-        Pointer prePointer;
-        Pointer postPointer;
-        Pointer stackTop;
-        Pointer expectedStackTopAfter;
-        Pointer cursor;
-        uint256 bytesLength = inputs.length * 0x20;
-        assembly ("memory-safe") {
-            cursor := mload(0x40)
-            // allocate the bytes and pre/post.
-            mstore(0x40, add(cursor, add(bytesLength, 0x40)))
-            // store the post and move past it.
-            mstore(cursor, post)
-            postPointer := cursor
-            cursor := add(cursor, 0x20)
-        }
-        // Copy all the inputs.
-        LibMemCpy.unsafeCopyWordsTo(inputs.dataPointer(), cursor, inputs.length);
-        assembly ("memory-safe") {
-            // Set the stack top to the end of the inputs then move the cursor
-            // over them.
-            stackTop := cursor
-            cursor := add(cursor, bytesLength)
-            mstore(cursor, pre)
-            prePointer := cursor
-            // The expected stack top after is 1 word above the base of the
-            // inputs being hashed.
-            expectedStackTopAfter := sub(cursor, 0x20)
-        }
-
-        // Hash doesn't modify the state.
-        Pointer stackTopAfter;
-        {
-            bytes32 stateFingerprintBefore = state.fingerprint();
-            stackTopAfter = LibOpHashNP.run(state, Operand.wrap(uint256(inputs.length) << 0x10), stackTop);
-            bytes32 stateFingerprintAfter = state.fingerprint();
-            assertEq(stateFingerprintBefore, stateFingerprintAfter);
-        }
-
-        // The stack should have been updated with the hash of the inputs.
-        assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(expectedStackTopAfter));
-
-        // Check that the opcode didn't modify the stack beyond the inputs.
-        uint256 actualPost;
-        bytes32 actualHash;
-        uint256 actualPre;
-        assembly {
-            actualPost := mload(postPointer)
-            actualHash := mload(stackTopAfter)
-            actualPre := mload(prePointer)
-        }
-
-        assertEq(actualPost, post);
-        assertEq(actualHash, keccak256(abi.encodePacked(inputs)));
-        assertEq(actualPre, pre);
+    /// Directly test the runtime logic of LibOpHashNP.
+    function testOpHashNPRun(InterpreterStateNP memory state, uint256 seed, uint256[] memory inputs) external {
+        opReferenceCheck(state, seed, LibOpHashNP.referenceFn, LibOpHashNP.integrity, LibOpHashNP.run, inputs);
     }
 
     /// Test the eval of a hash opcode parsed from a string. Tests 0 inputs.

@@ -24,6 +24,10 @@ error BadOpInputsLength(uint256 opIndex, uint256 calculatedInputs, uint256 bytec
 /// support some operand.
 error UnsupportedOperand(uint256 opIndex, Operand operand);
 
+/// Generic error that individual opcode implementations can throw if they don't
+/// support some number of inputs.
+error UnsupportedInputs(uint256 opIndex, uint256 inputs);
+
 /// The stack underflowed during integrity check.
 error StackUnderflow(uint256 opIndex, uint256 stackIndex, uint256 calculatedInputs);
 
