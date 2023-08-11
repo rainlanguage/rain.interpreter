@@ -7,11 +7,7 @@ import "../../integrity/LibIntegrityCheckNP.sol";
 /// @title LibOpBlockNumberNP
 /// Implementation of the EVM `BLOCKNUMBER` opcode as a standard Rainlang opcode.
 library LibOpBlockNumberNP {
-    function integrity(IntegrityCheckStateNP memory state, Operand operand) internal pure returns (uint256, uint256) {
-        // Operand body must be zero.
-        if (uint16(Operand.unwrap(operand)) != 0) {
-            revert UnsupportedOperand(state.opIndex, operand);
-        }
+    function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
         return (0, 1);
     }
 

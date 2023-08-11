@@ -12,11 +12,7 @@ import "../../integrity/LibIntegrityCheckNP.sol";
 library LibOpAnyNP {
     using LibPointer for Pointer;
 
-    function integrity(IntegrityCheckStateNP memory state, Operand operand) internal pure returns (uint256, uint256) {
-        // Operand body must be zero.
-        if (uint16(Operand.unwrap(operand)) != 0) {
-            revert UnsupportedOperand(state.opIndex, operand);
-        }
+    function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
         // There must be at least one input.
         uint256 inputs = Operand.unwrap(operand) >> 0x10;
         inputs = inputs > 0 ? inputs : 1;

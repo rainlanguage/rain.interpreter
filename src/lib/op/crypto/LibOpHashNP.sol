@@ -7,11 +7,7 @@ import "../../integrity/LibIntegrityCheckNP.sol";
 /// @title LibOpHashNP
 /// Implementation of keccak256 hashing as a standard Rainlang opcode.
 library LibOpHashNP {
-    function integrity(IntegrityCheckStateNP memory state, Operand operand) internal pure returns (uint256, uint256) {
-        // Operand body must be zero.
-        if (uint16(Operand.unwrap(operand)) != 0) {
-            revert UnsupportedOperand(state.opIndex, operand);
-        }
+    function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
         // Any number of inputs are valid.
         // 0 inputs will be the hash of empty (0 length) bytes.
         uint256 inputs = Operand.unwrap(operand) >> 0x10;

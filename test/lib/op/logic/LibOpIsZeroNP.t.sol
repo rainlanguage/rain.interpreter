@@ -20,14 +20,6 @@ contract LibOpIsZeroNPTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the integrity logic of LibOpIsZeroNP. This tests the unhappy
-    /// path where the operand body is non zero.
-    function testOpIsZeroNPIntegrityUnhappyNonZeroBody(IntegrityCheckStateNP memory state, uint8 inputs, uint16 badOp)
-        external
-    {
-        checkUnsupportedNonZeroOperandBody(state, inputs, badOp);
-    }
-
     /// Directly test the runtime logic of LibOpIsZeroNP.
     function testOpIsZeroNPRun(InterpreterStateNP memory state, uint256 seed, uint256 input) external {
         uint256[] memory inputs = new uint256[](1);

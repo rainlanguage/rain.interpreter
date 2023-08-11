@@ -20,10 +20,6 @@ error EntrypointMinOutputs(uint256 entrypointIndex, uint256 outputsLength, uint2
 /// The bytecode and integrity function disagree on number of inputs.
 error BadOpInputsLength(uint256 opIndex, uint256 calculatedInputs, uint256 bytecodeInputs);
 
-/// Generic error that individual opcode implementations can throw if they don't
-/// support some operand.
-error UnsupportedOperand(uint256 opIndex, Operand operand);
-
 /// The stack underflowed during integrity check.
 error StackUnderflow(uint256 opIndex, uint256 stackIndex, uint256 calculatedInputs);
 

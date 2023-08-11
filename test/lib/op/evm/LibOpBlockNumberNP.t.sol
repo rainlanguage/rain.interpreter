@@ -29,14 +29,6 @@ contract LibOpBlockNumberNPTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the integrity logic of LibOpBlockNumberNP. This tests the
-    /// unhappy path where the operand is invalid.
-    function testOpBlockNumberNPIntegrityUnhappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 badOp)
-        external
-    {
-        checkUnsupportedNonZeroOperandBody(state, inputs, badOp);
-    }
-
     /// Directly test the runtime logic of LibOpBlockNumber. This tests that the
     /// opcode correctly pushes the block number onto the stack.
     function testOpBlockNumberNPRun(

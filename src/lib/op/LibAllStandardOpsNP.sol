@@ -17,15 +17,20 @@ import "./evm/LibOpMaxUint256NP.sol";
 import "./evm/LibOpTimestampNP.sol";
 
 import "./logic/LibOpAnyNP.sol";
+import "./logic/LibOpEqualToNP.sol";
 import "./logic/LibOpEveryNP.sol";
+import "./logic/LibOpGreaterThanNP.sol";
+import "./logic/LibOpGreaterThanOrEqualToNP.sol";
 import "./logic/LibOpIsZeroNP.sol";
+import "./logic/LibOpLessThanNP.sol";
+import "./logic/LibOpLessThanOrEqualToNP.sol";
 
 /// Thrown when a dynamic length array is NOT 1 more than a fixed length array.
 /// Should never happen outside a major breaking change to memory layouts.
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 10;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 15;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -44,8 +49,13 @@ library LibAllStandardOpsNP {
             "max-uint-256",
             "block-timestamp",
             "any",
+            "equal-to",
             "every",
-            "is-zero"
+            "greater-than",
+            "greater-than-or-equal-to",
+            "is-zero",
+            "less-than",
+            "less-than-or-equal-to"
         ];
         bytes32[] memory wordsDynamic;
         assembly ("memory-safe") {
@@ -79,8 +89,13 @@ library LibAllStandardOpsNP {
                     LibOpMaxUint256NP.integrity,
                     LibOpTimestampNP.integrity,
                     LibOpAnyNP.integrity,
+                    LibOpEqualToNP.integrity,
                     LibOpEveryNP.integrity,
-                    LibOpIsZeroNP.integrity
+                    LibOpGreaterThanNP.integrity,
+                    LibOpGreaterThanOrEqualToNP.integrity,
+                    LibOpIsZeroNP.integrity,
+                    LibOpLessThanNP.integrity,
+                    LibOpLessThanOrEqualToNP.integrity
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
@@ -123,8 +138,13 @@ library LibAllStandardOpsNP {
                     LibOpMaxUint256NP.run,
                     LibOpTimestampNP.run,
                     LibOpAnyNP.run,
+                    LibOpEqualToNP.run,
                     LibOpEveryNP.run,
-                    LibOpIsZeroNP.run
+                    LibOpGreaterThanNP.run,
+                    LibOpGreaterThanOrEqualToNP.run,
+                    LibOpIsZeroNP.run,
+                    LibOpLessThanNP.run,
+                    LibOpLessThanOrEqualToNP.run
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {

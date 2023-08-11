@@ -24,15 +24,6 @@ contract LibOpEveryNPTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the integrity logic of LibOpEveryNP. This tests the unhappy
-    /// path where the operand body is non zero.
-    function testOpEveryNPIntegrityUnhappyNonZeroBody(IntegrityCheckStateNP memory state, uint8 inputs, uint16 badOp)
-        external
-    {
-        vm.assume(inputs != 0);
-        checkUnsupportedNonZeroOperandBody(state, inputs, badOp);
-    }
-
     /// Directly test the runtime logic of LibOpEveryNP.
     function testOpEveryNPRun(InterpreterStateNP memory state, uint256 seed, uint256[] memory inputs) external {
         vm.assume(inputs.length != 0);
