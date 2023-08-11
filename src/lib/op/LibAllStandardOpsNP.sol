@@ -18,13 +18,14 @@ import "./evm/LibOpTimestampNP.sol";
 
 import "./logic/LibOpAnyNP.sol";
 import "./logic/LibOpEveryNP.sol";
+import "./logic/LibOpIsZeroNP.sol";
 
 /// Thrown when a dynamic length array is NOT 1 more than a fixed length array.
 /// Should never happen outside a major breaking change to memory layouts.
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 9;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 10;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -43,7 +44,8 @@ library LibAllStandardOpsNP {
             "max-uint-256",
             "block-timestamp",
             "any",
-            "every"
+            "every",
+            "is-zero"
         ];
         bytes32[] memory wordsDynamic;
         assembly ("memory-safe") {
@@ -77,7 +79,8 @@ library LibAllStandardOpsNP {
                     LibOpMaxUint256NP.integrity,
                     LibOpTimestampNP.integrity,
                     LibOpAnyNP.integrity,
-                    LibOpEveryNP.integrity
+                    LibOpEveryNP.integrity,
+                    LibOpIsZeroNP.integrity
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
@@ -120,7 +123,8 @@ library LibAllStandardOpsNP {
                     LibOpMaxUint256NP.run,
                     LibOpTimestampNP.run,
                     LibOpAnyNP.run,
-                    LibOpEveryNP.run
+                    LibOpEveryNP.run,
+                    LibOpIsZeroNP.run
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {

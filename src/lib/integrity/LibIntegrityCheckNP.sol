@@ -24,10 +24,6 @@ error BadOpInputsLength(uint256 opIndex, uint256 calculatedInputs, uint256 bytec
 /// support some operand.
 error UnsupportedOperand(uint256 opIndex, Operand operand);
 
-/// Generic error that individual opcode implementations can throw if they don't
-/// support some number of inputs.
-error UnsupportedInputs(uint256 opIndex, uint256 inputs);
-
 /// The stack underflowed during integrity check.
 error StackUnderflow(uint256 opIndex, uint256 stackIndex, uint256 calculatedInputs);
 
@@ -72,25 +68,6 @@ library LibIntegrityCheckNP {
             // bytecode
             bytecode
         );
-    }
-
-    function readOpNonZeroInputs(IntegrityCheckStateNP memory state, Operand operand)
-        internal
-        pure
-        returns (uint256 inputs)
-    {
-        // There must be at least one input.
-        inputs = Operand.unwrap(operand) >> 0x10;
-        if (inputs == 0) {
-            revert UnsupportedInputs(state.opIndex, inputs);
-        }
-    }
-
-    function checkOpUnsupportedNonZeroOperandBody(IntegrityCheckStateNP memory state, Operand operand) internal pure {
-        // Operand body must be zero.
-        if (Operand.unwrap(operand) & 0xFFFF != 0) {
-            revert UnsupportedOperand(state.opIndex, operand);
-        }
     }
 
     // The cyclomatic complexity here comes from all the `if` checks for each

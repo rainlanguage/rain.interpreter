@@ -4,23 +4,29 @@ pragma solidity ^0.8.18;
 import "../../state/LibInterpreterStateNP.sol";
 import "../../integrity/LibIntegrityCheckNP.sol";
 
-/// @title LibOpMaxUint256NP
-/// Exposes `type(uint256).max` as a Rainlang opcode.
-library LibOpMaxUint256NP {
+/// @title LibOpIsZeroNP
+/// @notice Opcode to return 1 if the top item on the stack is zero, else 0.
+library LibOpIsZeroNP {
     function integrity(IntegrityCheckStateNP memory state, Operand operand) internal pure returns (uint256, uint256) {
         // Operand body must be zero.
         if (uint16(Operand.unwrap(operand)) != 0) {
             revert UnsupportedOperand(state.opIndex, operand);
         }
-        return (0, 1);
+        return (1, 1);
     }
 
+    /// ISZERO
+    /// ISZERO is 1 if the top item is zero, else 0.
     function run(InterpreterStateNP memory, Operand, Pointer stackTop) internal pure returns (Pointer) {
-        uint256 value = type(uint256).max;
         assembly ("memory-safe") {
-            stackTop := sub(stackTop, 0x20)
-            mstore(stackTop, value)
+            mstore(stackTop, iszero(mload(stackTop)))
         }
         return stackTop;
+    }
+
+    /// Gas intensive reference implementation of ISZERO for testing.
+    function referenceFn(uint256[] memory inputs) internal pure returns (uint256[] memory outputs) {
+        outputs = new uint256[](1);
+        outputs[0] = inputs[0] == 0 ? 1 : 0;
     }
 }

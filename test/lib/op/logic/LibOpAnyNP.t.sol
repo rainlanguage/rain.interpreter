@@ -18,10 +18,10 @@ contract LibOpAnyNPTest is OpTest {
     /// Directly test the integrity logic of LibOpAnyNP. This tests the unhappy
     /// path where the operand is invalid due to 0 inputs.
     function testOpAnyNPIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external {
-        vm.expectRevert(abi.encodeWithSelector(UnsupportedInputs.selector, state.opIndex, 0));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpAnyNP.integrity(state, Operand.wrap(0));
-        (calcInputs);
-        (calcOutputs);
+        // Calc inputs will be minimum 1.
+        assertEq(calcInputs, 1);
+        assertEq(calcOutputs, 1);
     }
 
     /// Directly test the integrity logic of LibOpAnyNP. This tests the unhappy
@@ -36,7 +36,8 @@ contract LibOpAnyNPTest is OpTest {
     /// Directly test the runtime logic of LibOpAnyNP.
     function testOpAnyNPRun(InterpreterStateNP memory state, uint256 seed, uint256[] memory inputs) external {
         vm.assume(inputs.length != 0);
-        opReferenceCheck(state, seed, LibOpAnyNP.referenceFn, LibOpAnyNP.integrity, LibOpAnyNP.run, inputs);
+        Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
+        opReferenceCheck(state, seed, operand, LibOpAnyNP.referenceFn, LibOpAnyNP.integrity, LibOpAnyNP.run, inputs);
     }
 
     /// Test the eval of any opcode parsed from a string. Tests 1 true input.
