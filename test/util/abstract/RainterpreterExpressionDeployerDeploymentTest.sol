@@ -80,7 +80,7 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
         // Sanity check the deployer's integrity function pointers.
         bytes memory integrityFunctionPointers = iDeployer.integrityFunctionPointers();
         if (keccak256(integrityFunctionPointers) != keccak256(INTEGRITY_FUNCTION_POINTERS)) {
-            console2.log("current deployer integrity function pointers hash:");
+            console2.log("current deployer integrity function pointers:");
             console2.logBytes(integrityFunctionPointers);
             revert("unexpected deployer integrity function pointers");
         }

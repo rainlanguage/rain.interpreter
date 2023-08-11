@@ -29,14 +29,6 @@ contract LibOpTimestampNPTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the integrity logic of LibOpTimestampNP. This tests the
-    /// unhappy path where the operand is invalid.
-    function testOpTimestampNPIntegrityUnhappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 badOp)
-        external
-    {
-        checkUnsupportedNonZeroOperandBody(state, inputs, badOp);
-    }
-
     /// Directly test the runtime logic of LibOpTimestamp. This tests that the
     /// opcode correctly pushes the timestamp onto the stack.
     function testOpTimestampNPRun(InterpreterStateNP memory state, uint256 seed, uint256 blockTimestamp) external {

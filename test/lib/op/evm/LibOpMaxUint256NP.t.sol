@@ -19,14 +19,6 @@ contract LibOpMaxUint256NPTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the integrity logic of LibOpMaxUint256NP. This tests the
-    /// unhappy path where the operand is invalid.
-    function testOpMaxUint256NPIntegrityUnhappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 badOp)
-        external
-    {
-        checkUnsupportedNonZeroOperandBody(state, inputs, badOp);
-    }
-
     /// Directly test the runtime logic of LibOpMaxUint256NP. This tests that the
     /// opcode correctly pushes the max uint256 onto the stack.
     function testOpMaxUint256NPRun(InterpreterStateNP memory state, Operand operand, uint256 pre, uint256 post)

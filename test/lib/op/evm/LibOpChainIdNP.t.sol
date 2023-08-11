@@ -30,12 +30,6 @@ contract LibOpChainIdNPTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the integrity logic of LibOpChainIdNP. This tests the
-    /// unhappy path where the operand is invalid.
-    function testOpChainIdNPIntegrityUnhappy(IntegrityCheckStateNP memory state, uint16 badOp) external {
-        checkUnsupportedNonZeroOperandBody(state, 0, badOp);
-    }
-
     /// Directly test the runtime logic of LibOpChainId. This tests that the
     /// opcode correctly pushes the chain ID onto the stack.
     function testOpChainIDNPRun(

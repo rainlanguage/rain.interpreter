@@ -7,11 +7,7 @@ import "../../integrity/LibIntegrityCheckNP.sol";
 /// @title LibOpMaxUint256NP
 /// Exposes `type(uint256).max` as a Rainlang opcode.
 library LibOpMaxUint256NP {
-    function integrity(IntegrityCheckStateNP memory state, Operand operand) internal pure returns (uint256, uint256) {
-        // Operand body must be zero.
-        if (uint16(Operand.unwrap(operand)) != 0) {
-            revert UnsupportedOperand(state.opIndex, operand);
-        }
+    function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
         return (0, 1);
     }
 

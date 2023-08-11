@@ -27,12 +27,6 @@ contract LibOpHashNPTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the integrity logic of LibOpHashNP. This tests the unhappy
-    /// path where the operand is invalid.
-    function testOpHashNPIntegrityUnhappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 badOp) external {
-        checkUnsupportedNonZeroOperandBody(state, inputs, badOp);
-    }
-
     /// Directly test the runtime logic of LibOpHashNP.
     function testOpHashNPRun(InterpreterStateNP memory state, uint256 seed, uint256[] memory inputs) external {
         Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
