@@ -42,7 +42,7 @@ library LibOpEveryNP {
 
     /// Gas intensive reference implementation of EVERY for testing.
     function referenceFn(uint256[] memory inputs) internal pure returns (uint256[] memory outputs) {
-        uint256 value;
+        uint256 value = 0;
         for (uint256 i = 0; i < inputs.length; i++) {
             value = inputs[i];
             if (value == 0) {
