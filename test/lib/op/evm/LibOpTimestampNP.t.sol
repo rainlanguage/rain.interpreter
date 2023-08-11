@@ -39,53 +39,13 @@ contract LibOpTimestampNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpTimestamp. This tests that the
     /// opcode correctly pushes the timestamp onto the stack.
-    function testOpTimestampNPRun(
-        InterpreterStateNP memory state,
-        Operand operand,
-        uint256 pre,
-        uint256 post,
-        uint256 blockTimestamp
-    ) external {
+    function testOpTimestampNPRun(InterpreterStateNP memory state, uint256 seed, uint256 blockTimestamp) external {
         vm.warp(blockTimestamp);
-        // Build a stack with two zeros on it. The first zero will be overridden
-        // by the opcode. The second zero will be used to check that the opcode
-        // doesn't modify the stack beyond the first element.
-        Pointer stackBottom;
-        Pointer stackTop;
-        Pointer expectedStackTopAfter;
-        Pointer end;
-        assembly ("memory-safe") {
-            end := mload(0x40)
-            mstore(end, post)
-            expectedStackTopAfter := add(end, 0x20)
-            mstore(expectedStackTopAfter, 0)
-            stackTop := add(expectedStackTopAfter, 0x20)
-            mstore(stackTop, pre)
-            stackBottom := add(stackTop, 0x20)
-            mstore(0x40, stackBottom)
-        }
-
-        // Timestamp doesn't modify the state.
-        bytes32 stateFingerprintBefore = state.fingerprint();
-        Pointer stackTopAfter = LibOpTimestampNP.run(state, operand, stackTop);
-        bytes32 stateFingerprintAfter = state.fingerprint();
-        assertEq(stateFingerprintBefore, stateFingerprintAfter);
-
-        assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(expectedStackTopAfter));
-
-        // Check that the opcode didn't modify the stack beyond the first element.
-        uint256 actualPost;
-        uint256 actualTimestamp;
-        uint256 actualPre;
-        assembly {
-            actualPost := mload(end)
-            actualTimestamp := mload(add(end, 0x20))
-            actualPre := mload(add(end, 0x40))
-        }
-
-        assertEq(actualPost, post);
-        assertEq(actualTimestamp, blockTimestamp);
-        assertEq(actualPre, pre);
+        uint256[] memory inputs = new uint256[](0);
+        Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
+        opReferenceCheck(
+            state, seed, operand, LibOpTimestampNP.referenceFn, LibOpTimestampNP.integrity, LibOpTimestampNP.run, inputs
+        );
     }
 
     /// Test the eval of a timestamp opcode parsed from a string.

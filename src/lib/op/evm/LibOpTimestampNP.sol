@@ -8,7 +8,10 @@ import "../../integrity/LibIntegrityCheckNP.sol";
 /// Implementation of the EVM `TIMESTAMP` opcode as a standard Rainlang opcode.
 library LibOpTimestampNP {
     function integrity(IntegrityCheckStateNP memory state, Operand operand) internal pure returns (uint256, uint256) {
-        LibIntegrityCheckNP.checkOpUnsupportedNonZeroOperandBody(state, operand);
+        // Operand body must be zero.
+        if (uint16(Operand.unwrap(operand)) != 0) {
+            revert UnsupportedOperand(state.opIndex, operand);
+        }
         return (0, 1);
     }
 
@@ -18,5 +21,11 @@ library LibOpTimestampNP {
             mstore(stackTop, timestamp())
         }
         return stackTop;
+    }
+
+    function referenceFn(uint256[] memory) internal view returns (uint256[] memory) {
+        uint256[] memory outputs = new uint256[](1);
+        outputs[0] = block.timestamp;
+        return outputs;
     }
 }
