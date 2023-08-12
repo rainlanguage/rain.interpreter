@@ -149,4 +149,13 @@ contract LibOpEveryNPTest is OpTest {
         assertEq(stack[0], 0);
         assertEq(kvs.length, 0);
     }
+
+    /// Test that every without inputs fails integrity check.
+    function testOpAnyNPEvalFail() public {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: every();");
+        uint256[] memory minOutputs = new uint256[](1);
+        minOutputs[0] = 1;
+        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 1, 0));
+        iDeployer.integrityCheck(bytecode, constants, minOutputs);
+    }
 }

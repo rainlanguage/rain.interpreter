@@ -18,4 +18,10 @@ library LibOpBlockNumberNP {
         }
         return stackTop;
     }
+
+    function referenceFn(Operand, uint256[] memory) internal view returns (uint256[] memory) {
+        uint256[] memory outputs = new uint256[](1);
+        outputs[0] = block.number;
+        return outputs;
+    }
 }

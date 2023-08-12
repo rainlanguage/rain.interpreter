@@ -29,59 +29,21 @@ contract LibOpBlockNumberNPTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpBlockNumber. This tests that the
+    /// Directly test the runtime logic of LibOpBlockNumberNP. This tests that the
     /// opcode correctly pushes the block number onto the stack.
-    function testOpBlockNumberNPRun(
-        InterpreterStateNP memory state,
-        Operand operand,
-        uint256 pre,
-        uint256 post,
-        uint256 blockNumber
-    ) external {
+    function testOpBlockNumberNPRun(InterpreterStateNP memory state, uint256 seed, uint256 blockNumber) external {
         vm.roll(blockNumber);
-        // Build a stack with two zeros on it. The first zero will be overridden
-        // by the opcode. The second zero will be used to check that the opcode
-        // doesn't modify the stack beyond the first element.
-        Pointer stackBottom;
-        Pointer stackTop;
-        Pointer expectedStackTopAfter;
-        Pointer end;
-        assembly ("memory-safe") {
-            end := mload(0x40)
-            mstore(end, post)
-            expectedStackTopAfter := add(end, 0x20)
-            mstore(expectedStackTopAfter, 0)
-            stackTop := add(expectedStackTopAfter, 0x20)
-            mstore(stackTop, pre)
-            stackBottom := add(stackTop, 0x20)
-            mstore(0x40, stackBottom)
-        }
-
-        // Block number doesn't modify the state.
-        bytes32 stateFingerprintBefore = state.fingerprint();
-
-        // Run the opcode.
-        Pointer stackTopAfter = LibOpBlockNumberNP.run(state, operand, stackTop);
-
-        // Check that the opcode didn't modify the state.
-        assertEq(state.fingerprint(), stateFingerprintBefore);
-
-        assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(expectedStackTopAfter));
-
-        // The block number should be on the stack without modifying any other
-        // data.
-        uint256 actualPost;
-        uint256 actualBlockNumber;
-        uint256 actualPre;
-        assembly ("memory-safe") {
-            actualPost := mload(end)
-            actualBlockNumber := mload(add(end, 0x20))
-            actualPre := mload(add(end, 0x40))
-        }
-
-        assertEq(actualPost, post);
-        assertEq(actualBlockNumber, blockNumber);
-        assertEq(actualPre, pre);
+        uint256[] memory inputs = new uint256[](0);
+        Operand operand = Operand.wrap(0);
+        opReferenceCheck(
+            state,
+            seed,
+            operand,
+            LibOpBlockNumberNP.referenceFn,
+            LibOpBlockNumberNP.integrity,
+            LibOpBlockNumberNP.run,
+            inputs
+        );
     }
 
     /// Test the eval of a block number opcode parsed from a string.
@@ -92,8 +54,6 @@ contract LibOpBlockNumberNPTest is OpTest {
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
 
-        // @todo support fuzzing all block numbers.
-        // Seems to be a bug in foundry, perhaps fixed in newer versions.
         vm.roll(blockNumber);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
@@ -104,5 +64,14 @@ contract LibOpBlockNumberNPTest is OpTest {
         assertEq(stack.length, 1);
         assertEq(stack[0], blockNumber);
         assertEq(kvs.length, 0);
+    }
+
+    /// Test that a block number with inputs fails integrity check.
+    function testOpBlockNumberNPEvalFail() public {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: block-number(0x00);");
+        uint256[] memory minOutputs = new uint256[](1);
+        minOutputs[0] = 1;
+        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
+        iDeployer.integrityCheck(bytecode, constants, minOutputs);
     }
 }

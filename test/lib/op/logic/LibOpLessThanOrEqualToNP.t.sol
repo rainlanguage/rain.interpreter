@@ -115,4 +115,32 @@ contract LibOpLessThanOrEqualToNPTest is OpTest {
         assertEq(stack[0], 1);
         assertEq(kvs.length, 0);
     }
+
+    /// Test that a less than or equal to without inputs fails integrity check.
+    function testOpLessThanOrEqualToNPEvalFail0Inputs() public {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: less-than-or-equal-to();");
+        uint256[] memory minOutputs = new uint256[](1);
+        minOutputs[0] = 1;
+        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));
+        iDeployer.integrityCheck(bytecode, constants, minOutputs);
+    }
+
+    /// Test that a less than or equal to with 1 input fails integrity check.
+    function testOpLessThanOrEqualToNPEvalFail1Input() public {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: less-than-or-equal-to(0x00);");
+        uint256[] memory minOutputs = new uint256[](1);
+        minOutputs[0] = 1;
+        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 2, 1));
+        iDeployer.integrityCheck(bytecode, constants, minOutputs);
+    }
+
+    /// Test that a less than or equal to with 3 inputs fails integrity check.
+    function testOpLessThanOrEqualToNPEvalFail3Inputs() public {
+        (bytes memory bytecode, uint256[] memory constants) =
+            iDeployer.parse("_: less-than-or-equal-to(0x00 0x00 0x00);");
+        uint256[] memory minOutputs = new uint256[](1);
+        minOutputs[0] = 1;
+        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
+        iDeployer.integrityCheck(bytecode, constants, minOutputs);
+    }
 }

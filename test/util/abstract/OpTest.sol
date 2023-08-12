@@ -22,7 +22,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
         InterpreterStateNP memory state,
         uint256 seed,
         Operand operand,
-        function(uint256[] memory) view returns (uint256[] memory) referenceFn,
+        function(Operand, uint256[] memory) view returns (uint256[] memory) referenceFn,
         function(IntegrityCheckStateNP memory, Operand) pure returns (uint256, uint256) integrityFn,
         function(InterpreterStateNP memory, Operand, Pointer) view returns (Pointer) runFn,
         uint256[] memory inputs
@@ -47,7 +47,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
                 // modify what the real function sees.
                 uint256[] memory inputsClone = new uint256[](inputs.length);
                 LibMemCpy.unsafeCopyWordsTo(inputs.dataPointer(), inputsClone.dataPointer(), inputs.length);
-                expectedOutputs = referenceFn(inputsClone);
+                expectedOutputs = referenceFn(operand, inputsClone);
                 assertEq(expectedOutputs.length, calcOutputs, "expected outputs length");
             }
 

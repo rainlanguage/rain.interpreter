@@ -17,10 +17,12 @@ import "./evm/LibOpMaxUint256NP.sol";
 import "./evm/LibOpTimestampNP.sol";
 
 import "./logic/LibOpAnyNP.sol";
+import "./logic/LibOpConditionsNP.sol";
 import "./logic/LibOpEqualToNP.sol";
 import "./logic/LibOpEveryNP.sol";
 import "./logic/LibOpGreaterThanNP.sol";
 import "./logic/LibOpGreaterThanOrEqualToNP.sol";
+import "./logic/LibOpIfNP.sol";
 import "./logic/LibOpIsZeroNP.sol";
 import "./logic/LibOpLessThanNP.sol";
 import "./logic/LibOpLessThanOrEqualToNP.sol";
@@ -30,7 +32,7 @@ import "./logic/LibOpLessThanOrEqualToNP.sol";
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 15;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 17;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -49,10 +51,12 @@ library LibAllStandardOpsNP {
             "max-uint-256",
             "block-timestamp",
             "any",
+            "conditions",
             "equal-to",
             "every",
             "greater-than",
             "greater-than-or-equal-to",
+            "if",
             "is-zero",
             "less-than",
             "less-than-or-equal-to"
@@ -89,10 +93,12 @@ library LibAllStandardOpsNP {
                     LibOpMaxUint256NP.integrity,
                     LibOpTimestampNP.integrity,
                     LibOpAnyNP.integrity,
+                    LibOpConditionsNP.integrity,
                     LibOpEqualToNP.integrity,
                     LibOpEveryNP.integrity,
                     LibOpGreaterThanNP.integrity,
                     LibOpGreaterThanOrEqualToNP.integrity,
+                    LibOpIfNP.integrity,
                     LibOpIsZeroNP.integrity,
                     LibOpLessThanNP.integrity,
                     LibOpLessThanOrEqualToNP.integrity
@@ -138,10 +144,12 @@ library LibAllStandardOpsNP {
                     LibOpMaxUint256NP.run,
                     LibOpTimestampNP.run,
                     LibOpAnyNP.run,
+                    LibOpConditionsNP.run,
                     LibOpEqualToNP.run,
                     LibOpEveryNP.run,
                     LibOpGreaterThanNP.run,
                     LibOpGreaterThanOrEqualToNP.run,
+                    LibOpIfNP.run,
                     LibOpIsZeroNP.run,
                     LibOpLessThanNP.run,
                     LibOpLessThanOrEqualToNP.run

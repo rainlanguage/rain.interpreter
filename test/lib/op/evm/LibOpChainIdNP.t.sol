@@ -32,56 +32,13 @@ contract LibOpChainIdNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpChainId. This tests that the
     /// opcode correctly pushes the chain ID onto the stack.
-    function testOpChainIDNPRun(
-        InterpreterStateNP memory state,
-        Operand operand,
-        uint256 pre,
-        uint256 post,
-        uint64 chainId
-    ) external {
+    function testOpChainIdNPRun(InterpreterStateNP memory state, uint256 seed, uint64 chainId) external {
         vm.chainId(chainId);
-        // Build a stack with two zeros on it. The first zero will be overridden
-        // by the opcode. The second zero will be used to check that the opcode
-        // doesn't modify the stack beyond the first element.
-        Pointer stackBottom;
-        Pointer stackTop;
-        Pointer expectedStackTopAfter;
-        Pointer end;
-        assembly ("memory-safe") {
-            end := mload(0x40)
-            mstore(end, post)
-            expectedStackTopAfter := add(end, 0x20)
-            mstore(expectedStackTopAfter, 0)
-            stackTop := add(expectedStackTopAfter, 0x20)
-            mstore(stackTop, pre)
-            stackBottom := add(stackTop, 0x20)
-            mstore(0x40, stackBottom)
-        }
-
-        // Chain ID doesn't modify the state.
-        bytes32 stateFingerprintBefore = state.fingerprint();
-
-        // Run the opcode.
-        Pointer stackTopAfter = LibOpChainIdNP.run(state, operand, stackTop);
-
-        assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(expectedStackTopAfter));
-
-        // Check that the opcode didn't modify the state.
-        assertEq(state.fingerprint(), stateFingerprintBefore);
-
-        // The chain ID should be on the stack without modifying any other data.
-        uint256 actualPost;
-        uint256 actualChainId;
-        uint256 actualPre;
-        assembly ("memory-safe") {
-            actualPost := mload(end)
-            actualChainId := mload(add(end, 0x20))
-            actualPre := mload(add(end, 0x40))
-        }
-
-        assertEq(actualPost, post);
-        assertEq(actualChainId, chainId);
-        assertEq(actualPre, pre);
+        uint256[] memory inputs = new uint256[](0);
+        Operand operand = Operand.wrap(0);
+        opReferenceCheck(
+            state, seed, operand, LibOpChainIdNP.referenceFn, LibOpChainIdNP.integrity, LibOpChainIdNP.run, inputs
+        );
     }
 
     /// Test the eval of a chain ID opcode parsed from a string.
@@ -103,5 +60,14 @@ contract LibOpChainIdNPTest is OpTest {
         assertEq(stack.length, 1, "stack length");
         assertEq(stack[0], chainId, "stack item");
         assertEq(kvs.length, 0, "kvs length");
+    }
+
+    /// Test that a chain ID with inputs fails integrity check.
+    function testOpChainIdNPEvalFail() public {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: chain-id(0x00);");
+        uint256[] memory minOutputs = new uint256[](1);
+        minOutputs[0] = 1;
+        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
+        iDeployer.integrityCheck(bytecode, constants, minOutputs);
     }
 }

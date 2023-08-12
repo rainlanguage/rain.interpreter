@@ -67,4 +67,22 @@ contract LibOpIsZeroNPTest is OpTest {
         assertEq(stack[0], 1);
         assertEq(kvs.length, 0);
     }
+
+    /// Test that an iszero without inputs fails integrity check.
+    function testOpIsZeroNPEvalFail0Inputs() public {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: is-zero();");
+        uint256[] memory minOutputs = new uint256[](1);
+        minOutputs[0] = 1;
+        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 1, 0));
+        iDeployer.integrityCheck(bytecode, constants, minOutputs);
+    }
+
+    /// Test that an iszero with 2 inputs fails integrity check.
+    function testOpIsZeroNPEvalFail2Inputs() public {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: is-zero(0x00 0x00);");
+        uint256[] memory minOutputs = new uint256[](1);
+        minOutputs[0] = 1;
+        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 2, 1, 2));
+        iDeployer.integrityCheck(bytecode, constants, minOutputs);
+    }
 }

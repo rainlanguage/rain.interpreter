@@ -115,4 +115,31 @@ contract LibOpGreaterThanNPTest is OpTest {
         assertEq(stack[0], 0);
         assertEq(kvs.length, 0);
     }
+
+    /// Test that a greater than without inputs fails integrity check.
+    function testOpGreaterThanNPEvalFail0Inputs() public {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: greater-than();");
+        uint256[] memory minOutputs = new uint256[](1);
+        minOutputs[0] = 1;
+        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));
+        iDeployer.integrityCheck(bytecode, constants, minOutputs);
+    }
+
+    /// Test that a greater than with 1 input fails integrity check.
+    function testOpGreaterThanNPEvalFail1Input() public {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: greater-than(0x00);");
+        uint256[] memory minOutputs = new uint256[](1);
+        minOutputs[0] = 1;
+        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 2, 1));
+        iDeployer.integrityCheck(bytecode, constants, minOutputs);
+    }
+
+    /// Test that a greater than with 3 inputs fails integrity check.
+    function testOpGreaterThanNPEvalFail3Inputs() public {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: greater-than(0x00 0x00 0x00);");
+        uint256[] memory minOutputs = new uint256[](1);
+        minOutputs[0] = 1;
+        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
+        iDeployer.integrityCheck(bytecode, constants, minOutputs);
+    }
 }

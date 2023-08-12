@@ -19,7 +19,7 @@ library LibOpTimestampNP {
         return stackTop;
     }
 
-    function referenceFn(uint256[] memory) internal view returns (uint256[] memory) {
+    function referenceFn(Operand, uint256[] memory) internal view returns (uint256[] memory) {
         uint256[] memory outputs = new uint256[](1);
         outputs[0] = block.timestamp;
         return outputs;
