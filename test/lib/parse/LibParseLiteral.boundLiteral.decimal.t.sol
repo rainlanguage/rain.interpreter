@@ -12,351 +12,235 @@ import "src/lib/parse/LibParseLiteral.sol";
 contract LibParseLiteralBoundLiteralDecimalTest is Test {
     using LibBytes for bytes;
 
-    /// Check that an empty string is not treated as a literal.
-    function testParseLiteralBoundLiteralDecimalEmpty() external {
-        bytes memory data = "";
+    function checkUnsupportedLiteralType(bytes memory data, uint256 offset) internal {
         uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(UnsupportedLiteralType.selector, 0));
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
+        vm.expectRevert(abi.encodeWithSelector(UnsupportedLiteralType.selector, offset));
+        (
+            function(bytes memory, uint256, uint256) pure returns (uint256) parser,
+            uint256 innerStart,
+            uint256 innerEnd,
+            uint256 outerEnd
+        ) = LibParseLiteral.boundLiteral(LibParseLiteral.buildLiteralParsers(), data, outerStart);
+        (parser);
         (innerStart);
         (innerEnd);
         (outerEnd);
     }
 
-    /// Check that a single digit is bounded as a decimal literal.
-    function testParseLiteralBoundLiteralDecimalZero() external {
-        string[10] memory datas = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-        for (uint256 i = 0; i < datas.length; i++) {
-            bytes memory data = bytes(datas[i]);
-            uint256 outerStart = Pointer.unwrap(data.dataPointer());
-            (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-                LibParseLiteral.boundLiteral(data, outerStart);
-            assertEq(literalType, LITERAL_TYPE_INTEGER_DECIMAL);
-            assertEq(innerStart, outerStart);
-            assertEq(innerEnd, outerStart + 1);
-            assertEq(outerEnd, outerStart + 1);
+    function checkDecimalBounds(
+        bytes memory data,
+        uint256 expectedInnerStart,
+        uint256 expectedInnerEnd,
+        uint256 expectedOuterEnd
+    ) internal {
+        uint256 outerStart = Pointer.unwrap(data.dataPointer());
+        (
+            function(bytes memory, uint256, uint256) pure returns (uint256) parser,
+            uint256 innerStart,
+            uint256 innerEnd,
+            uint256 outerEnd
+        ) = LibParseLiteral.boundLiteral(LibParseLiteral.buildLiteralParsers(), data, outerStart);
+        uint256 expectedParser;
+        function(bytes memory, uint256, uint256) pure returns (uint256) parseLiteralDecimal =
+            LibParseLiteral.parseLiteralDecimal;
+        assembly {
+            expectedParser := parseLiteralDecimal
         }
+        uint256 actualParser;
+        assembly {
+            actualParser := parser
+        }
+        assertEq(actualParser, expectedParser);
+        assertEq(innerStart, expectedInnerStart);
+        assertEq(innerEnd, expectedInnerEnd);
+        assertEq(outerEnd, expectedOuterEnd);
+    }
+
+    function checkMalformedExponentDigits(bytes memory data, uint256 offset) internal {
+        uint256 outerStart = Pointer.unwrap(data.dataPointer());
+        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, offset));
+        (
+            function(bytes memory, uint256, uint256) pure returns (uint256) parser,
+            uint256 innerStart,
+            uint256 innerEnd,
+            uint256 outerEnd
+        ) = LibParseLiteral.boundLiteral(LibParseLiteral.buildLiteralParsers(), data, outerStart);
+        (parser);
+        (innerStart);
+        (innerEnd);
+        (outerEnd);
+    }
+
+    /// Check that an empty string is not treated as a literal.
+    function testParseLiteralBoundLiteralDecimalEmpty() external {
+        checkUnsupportedLiteralType("", 0);
+    }
+
+    /// Check that a single digit is bounded as a decimal literal. Tests "0".
+    function testParseLiteralBoundLiteralDecimal0() external {
+        checkDecimalBounds("0", 0, 1, 1);
+    }
+
+    /// Check that a single digit is bounded as a decimal literal. Tests "1".
+    function testParseLiteralBoundLiteralDecimal1() external {
+        checkDecimalBounds("1", 0, 1, 1);
+    }
+
+    /// Check that a single digit is bounded as a decimal literal. Tests "2".
+    function testParseLiteralBoundLiteralDecimal2() external {
+        checkDecimalBounds("2", 0, 1, 1);
+    }
+
+    /// Check that a single digit is bounded as a decimal literal. Tests "3".
+    function testParseLiteralBoundLiteralDecimal3() external {
+        checkDecimalBounds("3", 0, 1, 1);
+    }
+
+    /// Check that a single digit is bounded as a decimal literal. Tests "4".
+    function testParseLiteralBoundLiteralDecimal4() external {
+        checkDecimalBounds("4", 0, 1, 1);
+    }
+
+    /// Check that a single digit is bounded as a decimal literal. Tests "5".
+    function testParseLiteralBoundLiteralDecimal5() external {
+        checkDecimalBounds("5", 0, 1, 1);
+    }
+
+    /// Check that a single digit is bounded as a decimal literal. Tests "6".
+    function testParseLiteralBoundLiteralDecimal6() external {
+        checkDecimalBounds("6", 0, 1, 1);
+    }
+
+    /// Check that a single digit is bounded as a decimal literal. Tests "7".
+    function testParseLiteralBoundLiteralDecimal7() external {
+        checkDecimalBounds("7", 0, 1, 1);
+    }
+
+    /// Check that a single digit is bounded as a decimal literal. Tests "8".
+    function testParseLiteralBoundLiteralDecimal8() external {
+        checkDecimalBounds("8", 0, 1, 1);
+    }
+
+    /// Check that a single digit is bounded as a decimal literal. Tests "9".
+    function testParseLiteralBoundLiteralDecimal9() external {
+        checkDecimalBounds("9", 0, 1, 1);
     }
 
     /// Check that "e" or "E" in isolation is not treated as a literal.
     function testParseLiteralBoundLiteralDecimalE() external {
-        bytes memory data = "e";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(UnsupportedLiteralType.selector, 0));
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
-
-        data = "E";
-        outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(UnsupportedLiteralType.selector, 0));
-        (literalType, innerStart, innerEnd, outerEnd) = LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        checkUnsupportedLiteralType("e", 0);
+        checkUnsupportedLiteralType("E", 0);
     }
 
     /// Check that a single digit followed by "e" is treated as malformed.
     function testParseLiteralBoundLiteralDecimalZeroE() external {
-        bytes memory data = "0e";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 1));
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        checkMalformedExponentDigits("0e", 1);
     }
 
     /// Check that a single digit followed by "E" is treated as malformed.
     function testParseLiteralBoundLiteralDecimalZeroEUpper() external {
-        bytes memory data = "0E";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 1));
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        checkMalformedExponentDigits("0E", 1);
     }
 
     /// Check that a single digit followed by "e+" is treated as malformed.
     function testParseLiteralBoundLiteralDecimalZeroEPlus() external {
-        bytes memory data = "0e+";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 1));
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        checkMalformedExponentDigits("0e+", 1);
     }
 
     /// Check that a single digit followed by "E+" is treated as malformed.
     function testParseLiteralBoundLiteralDecimalZeroEPlusUpper() external {
-        bytes memory data = "0E+";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 1));
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        checkMalformedExponentDigits("0E+", 1);
     }
 
     /// Check that a single digit followed by "e-" is treated as malformed.
     function testParseLiteralBoundLiteralDecimalZeroEMinus() external {
-        bytes memory data = "0e-";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 1));
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        checkMalformedExponentDigits("0e-", 1);
     }
 
     /// Check that a single digit followed by "E-" is treated as malformed.
     function testParseLiteralBoundLiteralDecimalZeroEMinusUpper() external {
-        bytes memory data = "0E-";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 1));
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        checkMalformedExponentDigits("0E-", 1);
     }
 
     /// Check that a single digit followed by "e+1" is treated as malformed.
     function testParseLiteralBoundLiteralDecimalZeroEPlusOne() external {
-        bytes memory data = "0e+1";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 1));
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        checkMalformedExponentDigits("0e+1", 1);
     }
 
     /// Check that a single digit followed by "E+1" is treated as malformed.
     function testParseLiteralBoundLiteralDecimalZeroEPlusOneUpper() external {
-        bytes memory data = "0E+1";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 1));
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        checkMalformedExponentDigits("0E+1", 1);
     }
 
     /// Check that a single digit followed by "e-1" is treated as malformed.
     function testParseLiteralBoundLiteralDecimalZeroEMinusOne() external {
-        bytes memory data = "0e-1";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 1));
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        checkMalformedExponentDigits("0e-1", 1);
     }
 
     /// Check that a single digit followed by "E-1" is treated as malformed.
     function testParseLiteralBoundLiteralDecimalZeroEMinusOneUpper() external {
-        bytes memory data = "0E-1";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 1));
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        checkMalformedExponentDigits("0E-1", 1);
     }
 
     /// Check that a single digit followed by "e+01" is treated as malformed.
     function testParseLiteralBoundLiteralDecimalZeroEPlusZeroOne() external {
-        bytes memory data = "0e+01";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 1));
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        checkMalformedExponentDigits("0e+01", 1);
     }
 
     /// Check that a single digit followed by "E+01" is treated as malformed.
     function testParseLiteralBoundLiteralDecimalZeroEPlusZeroOneUpper() external {
-        bytes memory data = "0E+01";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 1));
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        checkMalformedExponentDigits("0E+01", 1);
     }
 
     /// Check that a single digit followed by "e-01" is treated as malformed.
     function testParseLiteralBoundLiteralDecimalZeroEMinusZeroOne() external {
-        bytes memory data = "0e-01";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 1));
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        checkMalformedExponentDigits("0e-01", 1);
     }
 
     /// Check that a single digit followed by "E+10" is treated as malformed.
     function testParseLiteralBoundLiteralDecimalZeroEPlusTen() external {
-        bytes memory data = "0E+10";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 1));
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        checkMalformedExponentDigits("0e+10", 1);
     }
 
     /// Check a decimal with "e" followed by three digits is treated as
     /// malformed.
     function testParseLiteralBoundLiteralDecimalEPlusThreeDigits() external {
-        bytes memory data = "01e123";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 2));
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        checkMalformedExponentDigits("01e123", 2);
     }
 
     /// Check a decimal with "E" followed by three digits is treated as
     /// malformed.
     function testParseLiteralBoundLiteralDecimalEPlusThreeDigitsUpper() external {
-        bytes memory data = "01E123";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 2));
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        checkMalformedExponentDigits("01E123", 2);
     }
 
     /// Check a decimal with "e" followed by four digits is treated as malformed.
     function testParseLiteralBoundLiteralDecimalEPlusFourDigits() external {
-        bytes memory data = "01e1234";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 2));
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        checkMalformedExponentDigits("01e1234", 2);
     }
 
     /// Check a decimal with "E" followed by four digits is treated as malformed.
     function testParseLiteralBoundLiteralDecimalEPlusFourDigitsUpper() external {
-        bytes memory data = "01E1234";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 2));
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        (literalType);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        checkMalformedExponentDigits("01E1234", 2);
     }
 
     /// Check that a string with multiple e/E only bounds the first.
     function testParseLiteralBoundLiteralDecimalMultipleE() external {
-        bytes memory data = "0e0e0";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        assertEq(literalType, LITERAL_TYPE_INTEGER_DECIMAL);
-        assertEq(innerStart, outerStart);
-        assertEq(innerEnd, outerStart + 3);
-        assertEq(outerEnd, outerStart + 3);
-
-        data = "0E0E0";
-        outerStart = Pointer.unwrap(data.dataPointer());
-        (literalType, innerStart, innerEnd, outerEnd) = LibParseLiteral.boundLiteral(data, outerStart);
-        assertEq(literalType, LITERAL_TYPE_INTEGER_DECIMAL);
-        assertEq(innerStart, outerStart);
-        assertEq(innerEnd, outerStart + 3);
-        assertEq(outerEnd, outerStart + 3);
+        checkDecimalBounds("0e0e0", 0, 3, 3);
+        checkDecimalBounds("0E0E0", 0, 3, 3);
     }
 
     /// Check that a string with non digit characters after the first exponent
     /// digit is handled correctly (bounds up to the first exponent digit).
     function testParseLiteralBoundLiteralDecimalNonDigitAfterFirstExponent() external {
-        bytes memory data = "0e0ze0";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        assertEq(literalType, LITERAL_TYPE_INTEGER_DECIMAL);
-        assertEq(innerStart, outerStart);
-        assertEq(innerEnd, outerStart + 3);
-        assertEq(outerEnd, outerStart + 3);
-
-        data = "0E0ZE0";
-        outerStart = Pointer.unwrap(data.dataPointer());
-        (literalType, innerStart, innerEnd, outerEnd) = LibParseLiteral.boundLiteral(data, outerStart);
-        assertEq(literalType, LITERAL_TYPE_INTEGER_DECIMAL);
-        assertEq(innerStart, outerStart);
-        assertEq(innerEnd, outerStart + 3);
-        assertEq(outerEnd, outerStart + 3);
+        checkDecimalBounds("0e0ze0", 0, 3, 3);
+        checkDecimalBounds("0E0ZE0", 0, 3, 3);
     }
 
     /// Check that a string with non digit characters after the second exponent
     /// digit is handled correctly (bounds up to the second exponent digit).
     function testParseLiteralBoundLiteralDecimalNonDigitAfterExponent() external {
-        bytes memory data = "0e00ze0";
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            LibParseLiteral.boundLiteral(data, outerStart);
-        assertEq(literalType, LITERAL_TYPE_INTEGER_DECIMAL);
-        assertEq(innerStart, outerStart);
-        assertEq(innerEnd, outerStart + 4);
-        assertEq(outerEnd, outerStart + 4);
-
-        data = "0E00ZE0";
-        outerStart = Pointer.unwrap(data.dataPointer());
-        (literalType, innerStart, innerEnd, outerEnd) = LibParseLiteral.boundLiteral(data, outerStart);
-        assertEq(literalType, LITERAL_TYPE_INTEGER_DECIMAL);
-        assertEq(innerStart, outerStart);
-        assertEq(innerEnd, outerStart + 4);
-        assertEq(outerEnd, outerStart + 4);
+        checkDecimalBounds("0e00ze0", 0, 4, 4);
+        checkDecimalBounds("0E00ZE0", 0, 4, 4);
     }
 }
