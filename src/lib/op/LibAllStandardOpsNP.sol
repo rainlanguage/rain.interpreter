@@ -5,6 +5,8 @@ import "rain.lib.typecast/LibConvert.sol";
 
 import "../integrity/LibIntegrityCheckNP.sol";
 import "../state/LibInterpreterStateNP.sol";
+import {AuthoringMeta} from "../parse/LibParseMeta.sol";
+import {OPERAND_PARSER_OFFSET_DISALLOWED, OPERAND_PARSER_OFFSET_SINGLE_FULL} from "../parse/LibParseOperand.sol";
 
 import "./00/LibOpStackNP.sol";
 import "./00/LibOpConstantNP.sol";
@@ -39,31 +41,36 @@ uint256 constant ALL_STANDARD_OPS_LENGTH = 17;
 /// array to easily build function pointers for `IInterpreterV1`.
 library LibAllStandardOpsNP {
     function authoringMeta() internal pure returns (bytes memory) {
-        bytes32[ALL_STANDARD_OPS_LENGTH + 1] memory wordsFixed = [
-            bytes32(ALL_STANDARD_OPS_LENGTH),
+        AuthoringMeta memory lengthPlaceholder;
+        AuthoringMeta[ALL_STANDARD_OPS_LENGTH + 1] memory wordsFixed = [
+            lengthPlaceholder,
+
             // Stack and constant MUST be in this order for parsing to work.
-            "stack",
-            "constant",
+            AuthoringMeta("stack", OPERAND_PARSER_OFFSET_SINGLE_FULL, "Copies an existing value from the stack."),
+            AuthoringMeta("constant", OPERAND_PARSER_OFFSET_SINGLE_FULL, "Copies a constant value onto the stack."),
+
             // These are all ordered according to how they appear in the file system.
-            "hash",
-            "block-number",
-            "chain-id",
-            "max-uint-256",
-            "block-timestamp",
-            "any",
-            "conditions",
-            "equal-to",
-            "every",
-            "greater-than",
-            "greater-than-or-equal-to",
-            "if",
-            "is-zero",
-            "less-than",
-            "less-than-or-equal-to"
+            AuthoringMeta("hash", OPERAND_PARSER_OFFSET_DISALLOWED, "Hashes all inputs into a single 32 byte value using keccak256."),
+            AuthoringMeta("block-number", OPERAND_PARSER_OFFSET_DISALLOWED, "The current block number."),
+            AuthoringMeta("chain-id", OPERAND_PARSER_OFFSET_DISALLOWED, "The current chain id."),
+            AuthoringMeta("max-uint-256", OPERAND_PARSER_OFFSET_DISALLOWED, "The maximum possible unsigned 32 byte integer value."),
+            AuthoringMeta("block-timestamp", OPERAND_PARSER_OFFSET_DISALLOWED, "The current block timestamp."),
+            AuthoringMeta("any", OPERAND_PARSER_OFFSET_DISALLOWED, "The first non-zero value out of all inputs, or 0 if every input is 0."),
+            AuthoringMeta("conditions", OPERAND_PARSER_OFFSET_SINGLE_FULL, "Treats inputs as pairwise condition/value pairs. The first nonzero condition's value is used. If no conditions are nonzero, the expression reverts. The operand can be used as an error code to differentiate between multiple conditions in the same expression."),
+            AuthoringMeta("equal-to", OPERAND_PARSER_OFFSET_DISALLOWED, "1 if all inputs are equal, 0 otherwise."),
+            AuthoringMeta("every", OPERAND_PARSER_OFFSET_DISALLOWED, "The last nonzero value out of all inputs, or 0 if any input is 0."),
+            AuthoringMeta("greater-than", OPERAND_PARSER_OFFSET_DISALLOWED, "1 if the first input is greater than the second input, 0 otherwise."),
+            AuthoringMeta("greater-than-or-equal-to", OPERAND_PARSER_OFFSET_DISALLOWED, "1 if the first input is greater than or equal to the second input, 0 otherwise."),
+            AuthoringMeta("if", OPERAND_PARSER_OFFSET_DISALLOWED, "If the first input is nonzero, the second input is used. Otherwise, the third input is used. If is eagerly evaluated."),
+            AuthoringMeta("is-zero", OPERAND_PARSER_OFFSET_DISALLOWED, "1 if the input is 0, 0 otherwise."),
+            AuthoringMeta("less-than", OPERAND_PARSER_OFFSET_DISALLOWED, "1 if the first input is less than the second input, 0 otherwise."),
+            AuthoringMeta("less-than-or-equal-to", OPERAND_PARSER_OFFSET_DISALLOWED, "1 if the first input is less than or equal to the second input, 0 otherwise.")
         ];
-        bytes32[] memory wordsDynamic;
+        AuthoringMeta[] memory wordsDynamic;
+        uint256 length = ALL_STANDARD_OPS_LENGTH;
         assembly ("memory-safe") {
             wordsDynamic := wordsFixed
+            mstore(wordsDynamic, length)
         }
         return abi.encode(wordsDynamic);
     }

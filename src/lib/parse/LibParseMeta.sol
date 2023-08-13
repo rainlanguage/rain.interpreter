@@ -2,6 +2,8 @@
 pragma solidity ^0.8.18;
 
 import "./LibCtPop.sol";
+import "../../interface/IInterpreterV1.sol";
+import "./LibParseOperand.sol";
 
 /// @dev For metadata builder.
 error DuplicateFingerprint();
@@ -20,13 +22,20 @@ error WordIOFnPointerMismatch(uint256 wordsLength, uint256 ioFnPointersLength);
 /// This assumes a single expander, if there are multiple expanders, then the
 /// collision resistance only improves, so this is still safe.
 uint256 constant FINGERPRINT_MASK = 0xFFFFFF;
-/// @dev 4 = 1 byte opcode index + 3 byte fingerprint
-uint256 constant META_ITEM_SIZE = 4;
+/// @dev 4 = 1 byte opcode index + 1 byte operand parser offset + 3 byte fingerprint
+uint256 constant META_ITEM_SIZE = 5;
 uint256 constant META_ITEM_MASK = (1 << META_ITEM_SIZE) - 1;
 /// @dev 33 = 32 bytes for expansion + 1 byte for seed
 uint256 constant META_EXPANSION_SIZE = 0x21;
 /// @dev 1 = 1 byte for depth
 uint256 constant META_PREFIX_SIZE = 1;
+
+struct AuthoringMeta {
+    // `word` is referenced directly in assembly so don't move the field.
+    bytes32 word;
+    uint8 operandParserOffset;
+    string description;
+}
 
 library LibParseMeta {
     function wordBitmapped(uint256 seed, bytes32 word) internal pure returns (uint256 bitmap, uint256 hashed) {
@@ -44,18 +53,30 @@ library LibParseMeta {
         }
     }
 
-    function findBestExpander(bytes32[] memory words)
+    function copyWordsFromAuthoringMeta(AuthoringMeta[] memory authoringMeta)
         internal
         pure
-        returns (uint8 bestSeed, uint256 bestExpansion, bytes32[] memory remaining)
+        returns (bytes32[] memory)
+    {
+        bytes32[] memory words = new bytes32[](authoringMeta.length);
+        for (uint256 i = 0; i < authoringMeta.length; i++) {
+            words[i] = authoringMeta[i].word;
+        }
+        return words;
+    }
+
+    function findBestExpander(AuthoringMeta[] memory metas)
+        internal
+        pure
+        returns (uint8 bestSeed, uint256 bestExpansion, AuthoringMeta[] memory remaining)
     {
         unchecked {
             {
                 uint256 bestCt = 0;
                 for (uint256 seed = 0; seed < type(uint8).max; seed++) {
                     uint256 expansion = 0;
-                    for (uint256 i = 0; i < words.length; i++) {
-                        (uint256 shifted, uint256 hashed) = wordBitmapped(seed, words[i]);
+                    for (uint256 i = 0; i < metas.length; i++) {
+                        (uint256 shifted, uint256 hashed) = wordBitmapped(seed, metas[i].word);
                         (hashed);
                         expansion = shifted | expansion;
                     }
@@ -66,57 +87,69 @@ library LibParseMeta {
                         bestExpansion = expansion;
                     }
                     // perfect expansion.
-                    if (ct == words.length) {
+                    if (ct == metas.length) {
                         break;
                     }
                 }
+
+                uint256 remainingLength = metas.length - bestCt;
+                assembly ("memory-safe") {
+                    remaining := mload(0x40)
+                    mstore(remaining, remainingLength)
+                    mstore(0x40, add(remaining, mul(0x20, add(1, remainingLength))))
+                }
             }
-            remaining = new bytes32[](words.length - LibCtPop.ctpop(bestExpansion));
             uint256 usedExpansion = 0;
             uint256 j = 0;
-            for (uint256 i = 0; i < words.length; i++) {
-                (uint256 shifted, uint256 hashed) = wordBitmapped(bestSeed, words[i]);
+            for (uint256 i = 0; i < metas.length; i++) {
+                (uint256 shifted, uint256 hashed) = wordBitmapped(bestSeed, metas[i].word);
                 (hashed);
                 if ((shifted & usedExpansion) == 0) {
                     usedExpansion = shifted | usedExpansion;
                 } else {
-                    remaining[j] = words[i];
+                    remaining[j] = metas[i];
                     j++;
                 }
             }
         }
     }
 
-    function buildMeta(bytes32[] memory words, uint8 maxDepth) internal pure returns (bytes memory meta) {
+    function buildParseMeta(AuthoringMeta[] memory authoringMeta, uint8 maxDepth)
+        internal
+        pure
+        returns (bytes memory parseMeta)
+    {
         unchecked {
             // Write out expansions.
             uint8[] memory seeds;
             uint256[] memory expansions;
-            bytes32[] memory ogWords;
             uint256 dataStart;
             {
                 uint256 depth = 0;
                 seeds = new uint8[](maxDepth);
                 expansions = new uint256[](maxDepth);
-                ogWords = words;
-                while (words.length > 0) {
-                    uint8 seed;
-                    uint256 expansion;
-                    (seed, expansion, words) = findBestExpander(words);
-                    seeds[depth] = seed;
-                    expansions[depth] = expansion;
-                    depth++;
+                {
+                    AuthoringMeta[] memory remainingAuthoringMeta = authoringMeta;
+                    while (remainingAuthoringMeta.length > 0) {
+                        uint8 seed;
+                        uint256 expansion;
+                        (seed, expansion, remainingAuthoringMeta) = findBestExpander(remainingAuthoringMeta);
+                        seeds[depth] = seed;
+                        expansions[depth] = expansion;
+                        depth++;
+                    }
                 }
 
-                uint256 metaLength = META_PREFIX_SIZE + depth * META_EXPANSION_SIZE + ogWords.length * META_ITEM_SIZE;
-                meta = new bytes(metaLength);
+                uint256 parseMetaLength =
+                    META_PREFIX_SIZE + depth * META_EXPANSION_SIZE + authoringMeta.length * META_ITEM_SIZE;
+                parseMeta = new bytes(parseMetaLength);
                 assembly ("memory-safe") {
-                    mstore8(add(meta, 0x20), depth)
+                    mstore8(add(parseMeta, 0x20), depth)
                 }
                 for (uint256 j = 0; j < depth; j++) {
                     assembly ("memory-safe") {
                         // Write each seed immediately before its expansion.
-                        let seedWriteAt := add(add(meta, 0x21), mul(0x21, j))
+                        let seedWriteAt := add(add(parseMeta, 0x21), mul(0x21, j))
                         mstore8(seedWriteAt, mload(add(seeds, add(0x20, mul(0x20, j)))))
                         mstore(add(seedWriteAt, 1), mload(add(expansions, add(0x20, mul(0x20, j)))))
                     }
@@ -125,13 +158,13 @@ library LibParseMeta {
                 {
                     uint256 dataOffset = META_PREFIX_SIZE + META_ITEM_SIZE + depth * META_EXPANSION_SIZE;
                     assembly ("memory-safe") {
-                        dataStart := add(meta, dataOffset)
+                        dataStart := add(parseMeta, dataOffset)
                     }
                 }
             }
 
             // Write words.
-            for (uint256 k = 0; k < ogWords.length; k++) {
+            for (uint256 k = 0; k < authoringMeta.length; k++) {
                 uint256 s = 0;
                 uint256 cumulativePos = 0;
                 while (true) {
@@ -142,11 +175,10 @@ library LibParseMeta {
                     {
                         uint256 expansion = expansions[s];
 
-                        uint256 shifted;
                         uint256 hashed;
                         {
-                            uint8 seed = seeds[s];
-                            (shifted, hashed) = wordBitmapped(seed, ogWords[k]);
+                            uint256 shifted;
+                            (shifted, hashed) = wordBitmapped(seeds[s], authoringMeta[k].word);
 
                             uint256 metaItemSize = META_ITEM_SIZE;
                             uint256 pos = LibCtPop.ctpop(expansion & (shifted - 1)) + cumulativePos;
@@ -178,7 +210,7 @@ library LibParseMeta {
                     }
 
                     // Write the io fn pointer and index offset.
-                    toWrite |= k << 0x18;
+                    toWrite |= (k << 0x20) | (uint256(authoringMeta[k].operandParserOffset) << 0x18);
 
                     uint256 mask = ~META_ITEM_MASK;
                     assembly ("memory-safe") {
@@ -198,7 +230,11 @@ library LibParseMeta {
     /// @param word The word to lookup.
     /// @return True if the word exists in the parse meta.
     /// @return The index of the word in the parse meta.
-    function lookupWordIndex(bytes memory meta, bytes32 word) internal pure returns (bool, uint256) {
+    function lookupWord(bytes memory meta, uint256 operandParsers, bytes32 word)
+        internal
+        pure
+        returns (bool, uint256, function(uint256, bytes memory, uint256) pure returns (uint256, Operand))
+    {
         unchecked {
             uint256 dataStart;
             uint256 cursor;
@@ -243,15 +279,17 @@ library LibParseMeta {
                 // Match
                 if (wordFingerprint == posData & FINGERPRINT_MASK) {
                     uint256 index;
+                    function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParser;
                     assembly ("memory-safe") {
-                        index := byte(28, posData)
+                        index := byte(27, posData)
+                        operandParser := shr(byte(28, posData), operandParsers)
                     }
-                    return (true, index);
+                    return (true, index, operandParser);
                 } else {
                     cumulativeCt += LibCtPop.ctpop(expansion);
                 }
             }
-            return (false, 0);
+            return (false, 0, LibParseOperand.parseOperandDisallowed);
         }
     }
 }

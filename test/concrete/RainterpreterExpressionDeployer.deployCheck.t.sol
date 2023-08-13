@@ -45,10 +45,11 @@ contract RainterpreterExpressionDeployerDeployCheckTest is Test {
         vm.mockCall(
             address(IERC1820_REGISTRY), abi.encodeWithSelector(IERC1820Registry.setInterfaceImplementer.selector), ""
         );
+        bytes memory authoringMeta = LibAllStandardOpsNP.authoringMeta();
         new RainterpreterExpressionDeployerNP(RainterpreterExpressionDeployerConstructionConfig(
             address(new RainterpreterNP()),
             address(new RainterpreterStore()),
-            LibAllStandardOpsNP.authoringMeta()
+            authoringMeta
         ));
     }
 }

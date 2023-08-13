@@ -8,6 +8,7 @@ import "./LibCtPop.sol";
 import "./LibParseMeta.sol";
 import "./LibParseCMask.sol";
 import "./LibParseLiteral.sol";
+import "./LibParseOperand.sol";
 import "../../interface/IInterpreterV1.sol";
 import "./LibParseStackName.sol";
 
@@ -188,6 +189,7 @@ struct ParseState {
     uint256 literalBloom;
     uint256 constantsBuilder;
     uint256 literalParsers;
+    uint256 operandParsers;
     StackTracker stackTracker;
 }
 
@@ -278,6 +280,8 @@ library LibParseState {
             0,
             // literalParsers
             LibParseLiteral.buildLiteralParsers(),
+            // operandParsers
+            LibParseOperand.buildOperandParsers(),
             // stackTracker
             StackTracker.wrap(0)
         );
@@ -900,11 +904,7 @@ library LibParse {
     using LibParseState for ParseState;
     using LibParseStackName for ParseState;
 
-    function parseErrorOffset(bytes memory data, uint256 cursor)
-        internal
-        pure
-        returns (uint256 offset)
-    {
+    function parseErrorOffset(bytes memory data, uint256 cursor) internal pure returns (uint256 offset) {
         assembly ("memory-safe") {
             offset := sub(cursor, add(data, 0x20))
         }
@@ -929,7 +929,9 @@ library LibParse {
         return (cursor, word);
     }
 
-    function skipWord(uint256 cursor, uint256 mask) internal pure returns (uint256) {
+    /// Skip an unlimited number of chars until we find one that is not in the
+    /// mask. This MAY REVERT if the cursor is OOB.
+    function skipMask(uint256 cursor, uint256 mask) internal pure returns (uint256) {
         uint256 i;
         assembly ("memory-safe") {
             let done := 0
@@ -1046,7 +1048,7 @@ library LibParse {
                             }
                             // Anon stack item.
                             else {
-                                cursor = skipWord(cursor, CMASK_LHS_STACK_TAIL);
+                                cursor = skipMask(cursor, CMASK_LHS_STACK_TAIL);
                             }
                             // Bump the index regardless of whether the stack
                             // item is named or not.
@@ -1056,7 +1058,7 @@ library LibParse {
                             // We are also no longer interstitial
                             state.fsm = (state.fsm | FSM_YANG_MASK | FSM_ACTIVE_SOURCE_MASK) & ~FSM_INTERSTITIAL_MASK;
                         } else if (char & CMASK_WHITESPACE != 0) {
-                            cursor = skipWord(cursor, CMASK_WHITESPACE);
+                            cursor = skipMask(cursor, CMASK_WHITESPACE);
                             // Set ying as we now open to possibilities.
                             state.fsm &= ~FSM_YANG_MASK;
                         } else if (char & CMASK_LHS_RHS_DELIMITER != 0) {
@@ -1088,18 +1090,24 @@ library LibParse {
                             (cursor, word) = parseWord(cursor, CMASK_RHS_WORD_TAIL);
 
                             // First check if this word is in meta.
-                            (bool exists, uint256 index) = LibParseMeta.lookupWordIndex(meta, word);
+                            (
+                                bool exists,
+                                uint256 opcodeIndex,
+                                function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParser
+                            ) = LibParseMeta.lookupWord(meta, state.operandParsers, word);
                             if (exists) {
-                                state.pushOpToSource(index, Operand.wrap(0));
+                                Operand operand;
+                                (cursor, operand) = operandParser(state.literalParsers, data, cursor);
+                                state.pushOpToSource(opcodeIndex, operand);
                                 // This is a real word so we expect to see parens
                                 // after it.
                                 state.fsm |= FSM_WORD_END_MASK;
                             }
                             // Fallback to LHS items.
                             else {
-                                (exists, index) = LibParseStackName.stackNameIndex(state, word);
+                                (exists, opcodeIndex) = LibParseStackName.stackNameIndex(state, word);
                                 if (exists) {
-                                    state.pushOpToSource(OPCODE_STACK, Operand.wrap(index));
+                                    state.pushOpToSource(OPCODE_STACK, Operand.wrap(opcodeIndex));
                                     // Need to process highwater here because we
                                     // don't have any parens to open or close.
                                     state.highwater();
@@ -1173,7 +1181,7 @@ library LibParse {
                             state.highwater();
                             cursor++;
                         } else if (char & CMASK_WHITESPACE > 0) {
-                            cursor = skipWord(cursor, CMASK_WHITESPACE);
+                            cursor = skipMask(cursor, CMASK_WHITESPACE);
                             // Set yin as we now open to possibilities.
                             state.fsm &= ~FSM_YANG_MASK;
                         }

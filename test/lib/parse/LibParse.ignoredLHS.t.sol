@@ -2,6 +2,7 @@
 pragma solidity =0.8.19;
 
 import "forge-std/Test.sol";
+import "test/util/lib/parse/LibMetaFixture.sol";
 
 import "src/lib/parse/LibParse.sol";
 import "src/lib/bytecode/LibBytecode.sol";
@@ -11,15 +12,6 @@ import "src/lib/bytecode/LibBytecode.sol";
 /// an underscore and is cheaper than named LHS items as they don't need to be
 /// tracked for potential use in the RHS.
 contract LibParseIgnoredLHSTest is Test {
-    bytes internal meta;
-
-    /// Constructor just builds the shared meta.
-    constructor() {
-        bytes32[] memory words = new bytes32[](1);
-        words[0] = bytes32("a");
-        meta = LibParseMeta.buildMeta(words, 1);
-    }
-
     /// A lone underscore should parse to an empty source and constant.
     function testParseIgnoredLHSLoneUnderscore() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:;", "");
@@ -109,7 +101,7 @@ contract LibParseIgnoredLHSTest is Test {
     /// An underscore that is NOT an input should parse to a non-empty source
     /// with no constants.
     function testParseIgnoredLHSUnderscoreNotInput() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":,_:a();", meta);
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":,_:a();", LibMetaFixture.parseMeta());
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
