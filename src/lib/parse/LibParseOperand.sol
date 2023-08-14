@@ -57,6 +57,7 @@ library LibParseOperand {
         unchecked {
             uint256 char;
             assembly {
+                //slither-disable-next-line incorrect-shift
                 char := shl(byte(0, mload(cursor)), 1)
             }
             if (char == CMASK_OPERAND_START) {
@@ -74,6 +75,7 @@ library LibParseOperand {
                 cursor = outerEnd;
                 cursor = LibParse.skipMask(cursor, CMASK_WHITESPACE);
                 assembly ("memory-safe") {
+                    //slither-disable-next-line incorrect-shift
                     char := shl(byte(0, mload(cursor)), 1)
                 }
                 if (char != CMASK_OPERAND_END) {
