@@ -88,28 +88,9 @@ contract LibOpConditionsNPTest is OpTest {
         );
     }
 
-    /// Test the eval of any opcode parsed from a string. Tests 1 true input.
-    function testOpAnyNPEval1TrueInput() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: any(5);");
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
-            storeDeployer,
-            StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 5);
-        assertEq(kvs.length, 0);
-    }
-
-    /// Test the eval of any opcode parsed from a string. Tests 1 false input.
-    function testOpAnyNPEval1FalseInput() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: any(0);");
+    /// Test the eval of conditions opcode parsed from a string. Tests 1 true input 1 zero output.
+    function testOpConditionsNPEval1TrueInputZeroOutput() external {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: conditions(5 0);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
@@ -126,10 +107,10 @@ contract LibOpConditionsNPTest is OpTest {
         assertEq(kvs.length, 0);
     }
 
-    /// Test the eval of any opcode parsed from a string. Tests 2 true inputs.
-    /// The first true input should be the overall result.
-    function testOpAnyNPEval2TrueInputs() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: any(5 6);");
+    /// Test the eval of conditions opcode parsed from a string. Tests 1 nonzero
+    /// input 1 nonzero output.
+    function testOpConditionsNPEval2MixedInputs() external {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: conditions(5 6);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
@@ -142,13 +123,71 @@ contract LibOpConditionsNPTest is OpTest {
         );
 
         assertEq(stack.length, 1);
-        assertEq(stack[0], 5);
+        assertEq(stack[0], 6);
         assertEq(kvs.length, 0);
     }
 
-    /// Test the eval of any opcode parsed from a string. Tests 2 false inputs.
-    function testOpAnyNPEval2FalseInputs() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: any(0 0);");
+    /// Test that if conditions are NOT met, the expression reverts.
+    function testOpConditionsNPEval1FalseInputRevert() external {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: conditions(0 5);");
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 3 ops
+            hex"03"
+            // 2 stack allocation
+            hex"02"
+            // 0 inputs
+            hex"00"
+            // 1 outputs
+            hex"01"
+            // constant 1
+            hex"01000001"
+            // constant 0
+            hex"01000000"
+            // conditions 2 inputs
+            hex"08020000"
+        );
+        uint256[] memory minOutputs = new uint256[](1);
+        minOutputs[0] = 0;
+        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+            iDeployer.deployExpression(bytecode, constants, minOutputs);
+        vm.expectRevert(abi.encodeWithSelector(NoConditionsMet.selector, 0));
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            storeDeployer,
+            StateNamespace.wrap(0),
+            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 0),
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+        );
+        (stack);
+        (kvs);
+    }
+
+    /// Test that conditions can take an error code as an operand.
+    function testOpConditionsNPEvalErrorCode() external {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: conditions<7>(0x00 0x00 0x00 0x00);");
+        uint256[] memory minOutputs = new uint256[](1);
+        minOutputs[0] = 1;
+        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+            iDeployer.deployExpression(bytecode, constants, minOutputs);
+        vm.expectRevert(abi.encodeWithSelector(NoConditionsMet.selector, 7));
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            storeDeployer,
+            StateNamespace.wrap(0),
+            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+        );
+        (stack);
+        (kvs);
+    }
+
+    /// Test the eval of conditions opcode parsed from a string. Tests 1 zero
+    /// then 1 nonzero condition.
+    function testOpConditionsNPEval1FalseInput1TrueInput() external {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: conditions(0 9 3 4);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
@@ -161,15 +200,14 @@ contract LibOpConditionsNPTest is OpTest {
         );
 
         assertEq(stack.length, 1);
-        assertEq(stack[0], 0);
+        assertEq(stack[0], 4);
         assertEq(kvs.length, 0);
     }
 
-    /// Test the eval of any opcode parsed from a string. Tests 2 inputs, one
-    /// true and one false. The first true input should be the overall result.
-    /// The first value is the true value.
-    function testOpAnyNPEval2MixedInputs() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: any(5 0);");
+    /// Test the eval of conditions opcode parsed from a string. Tests 2 true
+    /// conditions. The first should be used.
+    function testOpConditionsNPEval2TrueInputs() external {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: conditions(5 6 7 8);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
@@ -182,15 +220,14 @@ contract LibOpConditionsNPTest is OpTest {
         );
 
         assertEq(stack.length, 1);
-        assertEq(stack[0], 5);
+        assertEq(stack[0], 6);
         assertEq(kvs.length, 0);
     }
 
-    /// Test the eval of any opcode parsed from a string. Tests 2 inputs, one
-    /// true and one false. The first true input should be the overall result.
-    /// The first value is the false value.
-    function testOpAnyNPEval2MixedInputs2() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: any(0 5);");
+    /// Test the eval of conditions opcode parsed from a string. Tests 1 nonzero
+    /// condition then 1 zero condition.
+    function testOpConditionsNPEval1TrueInput1FalseInput() external {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: conditions(5 6 0 9);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
@@ -203,7 +240,7 @@ contract LibOpConditionsNPTest is OpTest {
         );
 
         assertEq(stack.length, 1);
-        assertEq(stack[0], 5);
+        assertEq(stack[0], 6);
         assertEq(kvs.length, 0);
     }
 

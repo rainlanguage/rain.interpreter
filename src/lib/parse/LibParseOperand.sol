@@ -57,7 +57,7 @@ library LibParseOperand {
         unchecked {
             uint256 char;
             assembly {
-                char := byte(0, mload(cursor))
+                char := shl(byte(0, mload(cursor)), 1)
             }
             if (char == CMASK_OPERAND_START) {
                 cursor = LibParse.skipMask(cursor + 1, CMASK_WHITESPACE);
@@ -74,7 +74,7 @@ library LibParseOperand {
                 cursor = outerEnd;
                 cursor = LibParse.skipMask(cursor, CMASK_WHITESPACE);
                 assembly ("memory-safe") {
-                    char := byte(0, mload(cursor))
+                    char := shl(byte(0, mload(cursor)), 1)
                 }
                 if (char != CMASK_OPERAND_END) {
                     revert UnclosedOperand(LibParse.parseErrorOffset(data, cursor));

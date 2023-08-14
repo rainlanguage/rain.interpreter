@@ -40,15 +40,16 @@ library LibOpConditionsNP {
         uint256 condition;
         assembly ("memory-safe") {
             let cursor := stackTop
-            condition := mload(cursor)
             for {
                 let end := add(cursor, mul(shr(0x10, operand), 0x20))
                 stackTop := sub(end, 0x20)
-            } and(iszero(condition), lt(cursor, end)) {} {
-                cursor := add(cursor, 0x40)
+            } lt(cursor, end) { cursor := add(cursor, 0x40) } {
                 condition := mload(cursor)
+                if condition {
+                    mstore(stackTop, mload(add(cursor, 0x20)))
+                    break
+                }
             }
-            mstore(stackTop, mload(add(cursor, 0x20)))
         }
         if (condition == 0) {
             revert NoConditionsMet(uint16(Operand.unwrap(operand)));

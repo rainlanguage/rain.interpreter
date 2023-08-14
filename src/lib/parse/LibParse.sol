@@ -935,10 +935,7 @@ library LibParse {
         uint256 i;
         assembly ("memory-safe") {
             let done := 0
-            // process the tail
             for {} iszero(done) {} {
-                // we already know the head is to be ignored so move past it.
-                cursor := add(cursor, 1)
                 i := 0
                 //slither-disable-next-line incorrect-shift
                 for { let word := mload(cursor) } and(lt(i, 0x20), iszero(iszero(and(shl(byte(i, word), 1), mask)))) {}
@@ -1048,7 +1045,7 @@ library LibParse {
                             }
                             // Anon stack item.
                             else {
-                                cursor = skipMask(cursor, CMASK_LHS_STACK_TAIL);
+                                cursor = skipMask(cursor + 1, CMASK_LHS_STACK_TAIL);
                             }
                             // Bump the index regardless of whether the stack
                             // item is named or not.
@@ -1058,7 +1055,7 @@ library LibParse {
                             // We are also no longer interstitial
                             state.fsm = (state.fsm | FSM_YANG_MASK | FSM_ACTIVE_SOURCE_MASK) & ~FSM_INTERSTITIAL_MASK;
                         } else if (char & CMASK_WHITESPACE != 0) {
-                            cursor = skipMask(cursor, CMASK_WHITESPACE);
+                            cursor = skipMask(cursor + 1, CMASK_WHITESPACE);
                             // Set ying as we now open to possibilities.
                             state.fsm &= ~FSM_YANG_MASK;
                         } else if (char & CMASK_LHS_RHS_DELIMITER != 0) {
@@ -1119,7 +1116,6 @@ library LibParse {
                             state.fsm |= FSM_YANG_MASK;
                         }
                         // If this is the end of a word we MUST start a paren.
-                        // @todo support operands and constants.
                         else if (state.fsm & FSM_WORD_END_MASK > 0) {
                             if (char & CMASK_LEFT_PAREN == 0) {
                                 revert ExpectedLeftParen(parseErrorOffset(data, cursor));
@@ -1181,7 +1177,7 @@ library LibParse {
                             state.highwater();
                             cursor++;
                         } else if (char & CMASK_WHITESPACE > 0) {
-                            cursor = skipMask(cursor, CMASK_WHITESPACE);
+                            cursor = skipMask(cursor + 1, CMASK_WHITESPACE);
                             // Set yin as we now open to possibilities.
                             state.fsm &= ~FSM_YANG_MASK;
                         }
