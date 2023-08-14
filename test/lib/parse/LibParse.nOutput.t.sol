@@ -29,7 +29,7 @@ contract LibParseNOutputTest is Test {
             // 0 outputs
             hex"00"
             // a
-            hex"00000000"
+            hex"02000000"
         );
         assertEq(constants.length, 0);
     }
@@ -67,9 +67,9 @@ contract LibParseNOutputTest is Test {
             // 2 outputs
             hex"02"
             // b
-            hex"01000000"
+            hex"03000000"
             // a 1 input
-            hex"00010000"
+            hex"02010000"
         );
         assertEq(constants.length, 0);
     }
@@ -105,9 +105,9 @@ contract LibParseNOutputTest is Test {
             // 3 outputs
             hex"03"
             // a
-            hex"00000000"
+            hex"02000000"
             // b
-            hex"01000000"
+            hex"03000000"
         );
 
         uint256 sourceIndex = 0;

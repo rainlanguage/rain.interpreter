@@ -10,38 +10,38 @@ import "src/lib/parse/LibParse.sol";
 contract LibParseUnexpectedLHSTest is Test {
     /// Check the parser reverts if it encounters an unexpected EOL on the LHS.
     function testParseUnexpectedLHSEOL() external {
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, ","));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0));
         LibParse.parse(",", "");
 
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1, ","));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1));
         LibParse.parse(" ,", "");
 
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1, ","));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1));
         LibParse.parse("_,", "");
     }
 
     /// Check the parser reverts if it encounters an unexpected EOF on the LHS.
     function testParseUnexpectedLHSEOF() external {
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, ";"));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0));
         LibParse.parse(";", "");
 
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1, ";"));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1));
         LibParse.parse(" ;", "");
 
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1, ";"));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1));
         LibParse.parse("_;", "");
     }
 
     /// Check the parser reverts if it encounters underscores in the tail of an
     /// LHS item.
     function testParseUnexpectedLHSUnderscoreTail() external {
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1, "_"));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1));
         LibParse.parse("a_:;", "");
 
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 2, "_"));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 2));
         LibParse.parse("a __:;", "");
 
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 2, "_"));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 2));
         LibParse.parse("_a_:;", "");
     }
 
@@ -53,7 +53,7 @@ contract LibParseUnexpectedLHSTest is Test {
                 & (CMASK_LHS_RHS_DELIMITER | CMASK_LHS_STACK_HEAD | CMASK_LHS_STACK_DELIMITER | CMASK_COMMENT_HEAD) == 0
         );
 
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0, string(abi.encodePacked(a))));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0));
         LibParse.parse(bytes.concat(a, ":;"), "");
     }
 
@@ -65,7 +65,7 @@ contract LibParseUnexpectedLHSTest is Test {
                 & (CMASK_LHS_RHS_DELIMITER | CMASK_IDENTIFIER_TAIL | CMASK_LHS_STACK_DELIMITER | CMASK_COMMENT_HEAD) == 0
         );
 
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1, string(abi.encodePacked(a))));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1));
         LibParse.parse(bytes.concat("_", a, ":;"), "");
     }
 
@@ -87,7 +87,7 @@ contract LibParseUnexpectedLHSTest is Test {
         }
         vm.assume(hasInvalidChar);
 
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, i + 1, string(abi.encodePacked(b[i]))));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, i + 1));
         LibParse.parse(bytes.concat(bytes1(a), b, ":;"), "");
     }
 }

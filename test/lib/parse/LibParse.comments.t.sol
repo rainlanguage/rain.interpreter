@@ -63,7 +63,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // a
-            hex"00000000"
+            hex"02000000"
         );
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -96,7 +96,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // a
-            hex"00000000"
+            hex"02000000"
         );
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -130,7 +130,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // a
-            hex"00000000"
+            hex"02000000"
             // 1 op
             hex"01"
             // 1 stack allocation
@@ -140,7 +140,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // b
-            hex"01000000"
+            hex"03000000"
         );
 
         // a
@@ -184,7 +184,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // a
-            hex"00000000"
+            hex"02000000"
             // 1 op
             hex"01"
             // 1 stack allocation
@@ -194,7 +194,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // b
-            hex"01000000"
+            hex"03000000"
         );
 
         // a
@@ -238,7 +238,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // a
-            hex"00000000"
+            hex"02000000"
             // 1 op
             hex"01"
             // 1 stack allocation
@@ -248,7 +248,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // b
-            hex"01000000"
+            hex"03000000"
         );
 
         // a
@@ -291,7 +291,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // a
-            hex"00000000"
+            hex"02000000"
         );
         assertEq(constants.length, 0);
 
@@ -326,7 +326,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // a
-            hex"00000000"
+            hex"02000000"
         );
         assertEq(constants.length, 0);
 
@@ -363,7 +363,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // a
-            hex"00000000"
+            hex"02000000"
         );
 
         uint256 sourceIndex = 0;
@@ -377,7 +377,7 @@ contract LibParseCommentsTest is Test {
     /// Comments cause yang so cannot be without trailing whitespace.
     function testParseCommentNoTrailingWhitespace() external {
         string memory s = "/* comment */_:a();";
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 13, "_"));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 13));
         LibParse.parse(bytes(s), LibMetaFixture.parseMeta());
     }
 

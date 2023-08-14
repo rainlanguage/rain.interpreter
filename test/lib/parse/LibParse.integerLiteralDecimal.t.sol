@@ -195,7 +195,7 @@ contract LibParseIntegerLiteralDecimalTest is Test {
 
     /// Check that decimal literals will revert if they overflow uint256.
     function testParseIntegerLiteralDecimalUint256Overflow() external {
-        vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 3, "1"));
+        vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 3));
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(
             "_: 115792089237316195423570985008687907853269984665640564039457584007913129639936;",
             LibMetaFixture.parseMeta()
@@ -207,7 +207,7 @@ contract LibParseIntegerLiteralDecimalTest is Test {
     /// Check that decimal literals will revert if they overflow uint256 with
     /// leading zeros.
     function testParseIntegerLiteralDecimalUint256OverflowLeadingZeros() external {
-        vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 5, "1"));
+        vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 5));
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(
             "_: 00115792089237316195423570985008687907853269984665640564039457584007913129639936;",
             LibMetaFixture.parseMeta()
@@ -219,7 +219,7 @@ contract LibParseIntegerLiteralDecimalTest is Test {
     // Check that decimal literals will revert if they overflow uint256 with
     // a non-one leading digit.
     function testParseIntegerLiteralDecimalUint256OverflowLeadingDigit() external {
-        vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 3, "2"));
+        vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 3));
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(
             "_: 215792089237316195423570985008687907853269984665640564039457584007913129639935;",
             LibMetaFixture.parseMeta()
@@ -231,7 +231,7 @@ contract LibParseIntegerLiteralDecimalTest is Test {
     /// Check that decimal literals will revert if they overflow uint256 with
     /// a non-one leading digit and leading zeros.
     function testParseIntegerLiteralDecimalUint256OverflowLeadingDigitLeadingZeros() external {
-        vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 5, "2"));
+        vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 5));
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(
             "_: 00215792089237316195423570985008687907853269984665640564039457584007913129639935;",
             LibMetaFixture.parseMeta()
@@ -291,7 +291,7 @@ contract LibParseIntegerLiteralDecimalTest is Test {
         // The second e will happily be parsed up to by the internal bounds logic
         // but the parser will be in a state of yang, unable to receive the next
         // non-yin char.
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 5, "e"));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 5));
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:1e0e;", LibMetaFixture.parseMeta());
         (bytecode);
         (constants);
@@ -300,7 +300,7 @@ contract LibParseIntegerLiteralDecimalTest is Test {
     /// Check that decimals cannot be used with parens as they are literals not
     /// words. This tests left paren.
     function testParseIntegerLiteralDecimalParensLeft() external {
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 3, "("));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 3));
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:1(;", LibMetaFixture.parseMeta());
         (bytecode);
         (constants);
@@ -318,7 +318,7 @@ contract LibParseIntegerLiteralDecimalTest is Test {
     /// Check that decimals cannot be used with parens as they are literals not
     /// words. This tests both parens.
     function testParseIntegerLiteralDecimalParensBoth() external {
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 3, "("));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 3));
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:1();", LibMetaFixture.parseMeta());
         (bytecode);
         (constants);

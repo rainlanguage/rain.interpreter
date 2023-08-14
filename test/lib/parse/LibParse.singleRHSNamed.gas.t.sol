@@ -154,49 +154,56 @@ contract LibParseSingleRHSNamedGasTest is Test {
 
     /// Test parsing "aaaaaaaaaaaaaaaa" (16 chars) as the RHS.
     function testParseGasRHS15() external pure {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes("_:aaaaaaaaaaaaaaaa();"), parseMeta());
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibParse.parse(bytes("_:aaaaaaaaaaaaaaaa();"), parseMeta());
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaa" (17 chars) as the RHS.
     function testParseGasRHS16() external pure {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaa();"), parseMeta());
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaa();"), parseMeta());
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaa" (18 chars) as the RHS.
     function testParseGasRHS17() external pure {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaa();"), parseMeta());
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaa();"), parseMeta());
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaa" (19 chars) as the RHS.
     function testParseGasRHS18() external pure {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaa();"), parseMeta());
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaa();"), parseMeta());
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaa" (20 chars) as the RHS.
     function testParseGasRHS19() external pure {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaa();"), parseMeta());
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaa();"), parseMeta());
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaa" (21 chars) as the RHS.
     function testParseGasRHS20() external pure {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaa();"), parseMeta());
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaa();"), parseMeta());
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaa" (22 chars) as the RHS.
     function testParseGasRHS21() external pure {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaa();"), parseMeta());
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibParse.parse(bytes("_:aaaaaaaaaaaaaaaaaaaaaa();"), parseMeta());
         (bytecode);
         (constants);
     }

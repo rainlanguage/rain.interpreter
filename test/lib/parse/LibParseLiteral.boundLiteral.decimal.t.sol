@@ -50,10 +50,10 @@ contract LibParseLiteralBoundLiteralDecimalTest is Test {
         assembly {
             actualParser := parser
         }
-        assertEq(actualParser, expectedParser);
-        assertEq(innerStart, expectedInnerStart);
-        assertEq(innerEnd, expectedInnerEnd);
-        assertEq(outerEnd, expectedOuterEnd);
+        assertEq(actualParser, expectedParser, "parser");
+        assertEq(innerStart, outerStart + expectedInnerStart, "innerStart");
+        assertEq(innerEnd, outerStart + expectedInnerEnd, "innerEnd");
+        assertEq(outerEnd, outerStart + expectedOuterEnd, "outerEnd");
     }
 
     function checkMalformedExponentDigits(bytes memory data, uint256 offset) internal {

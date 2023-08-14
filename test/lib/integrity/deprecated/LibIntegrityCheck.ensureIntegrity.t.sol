@@ -87,7 +87,7 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
 
     /// If an integrity check is encountered that is not implemented, the
     /// integrity check should revert.
-    function testIntegrityEnsureIntegrityNotImplemented() public {
+    function testIntegrityEnsureIntegrityNotImplementedSingleSource() public {
         // Test an invalid op in isolation.
         (IntegrityCheckState memory state, Pointer stackTop) = newState("_:invalid();");
         vm.expectRevert(stdError.indexOOBError);

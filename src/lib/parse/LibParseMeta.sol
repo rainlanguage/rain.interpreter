@@ -282,14 +282,19 @@ library LibParseMeta {
                     function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParser;
                     assembly ("memory-safe") {
                         index := byte(27, posData)
-                        operandParser := shr(byte(28, posData), operandParsers)
+                        operandParser := and(shr(byte(28, posData), operandParsers), 0xFFFF)
                     }
                     return (true, index, operandParser);
                 } else {
                     cumulativeCt += LibCtPop.ctpop(expansion);
                 }
             }
-            return (false, 0, LibParseOperand.parseOperandDisallowed);
+            // The caller MUST NOT use this operand parser as `exists` is false.
+            function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParserZero;
+            assembly ("memory-safe") {
+                operandParserZero := 0
+            }
+            return (false, 0, operandParserZero);
         }
     }
 }
