@@ -930,23 +930,10 @@ library LibParse {
     }
 
     /// Skip an unlimited number of chars until we find one that is not in the
-    /// mask. This MAY REVERT if the cursor is OOB.
-    function skipMask(uint256 cursor, uint256 mask) internal pure returns (uint256) {
-        uint256 i;
+    /// mask.
+    function skipMask(uint256 cursor, uint256 end, uint256 mask) internal pure returns (uint256) {
         assembly ("memory-safe") {
-            let done := 0
-            for {} iszero(done) {} {
-                i := 0
-                //slither-disable-next-line incorrect-shift
-                for { let word := mload(cursor) } and(lt(i, 0x20), iszero(iszero(and(shl(byte(i, word), 1), mask)))) {}
-                {
-                    i := add(i, 1)
-                }
-                if lt(i, 0x20) {
-                    cursor := add(cursor, i)
-                    done := 1
-                }
-            }
+            for {} and(lt(cursor, end), gt(and(shl(byte(0, mload(cursor)), 1), mask), 0)) { cursor := add(cursor, 1) } {}
         }
         return cursor;
     }
@@ -1045,7 +1032,7 @@ library LibParse {
                             }
                             // Anon stack item.
                             else {
-                                cursor = skipMask(cursor + 1, CMASK_LHS_STACK_TAIL);
+                                cursor = skipMask(cursor + 1, end, CMASK_LHS_STACK_TAIL);
                             }
                             // Bump the index regardless of whether the stack
                             // item is named or not.
@@ -1055,7 +1042,7 @@ library LibParse {
                             // We are also no longer interstitial
                             state.fsm = (state.fsm | FSM_YANG_MASK | FSM_ACTIVE_SOURCE_MASK) & ~FSM_INTERSTITIAL_MASK;
                         } else if (char & CMASK_WHITESPACE != 0) {
-                            cursor = skipMask(cursor + 1, CMASK_WHITESPACE);
+                            cursor = skipMask(cursor + 1, end, CMASK_WHITESPACE);
                             // Set ying as we now open to possibilities.
                             state.fsm &= ~FSM_YANG_MASK;
                         } else if (char & CMASK_LHS_RHS_DELIMITER != 0) {
@@ -1177,7 +1164,7 @@ library LibParse {
                             state.highwater();
                             cursor++;
                         } else if (char & CMASK_WHITESPACE > 0) {
-                            cursor = skipMask(cursor + 1, CMASK_WHITESPACE);
+                            cursor = skipMask(cursor + 1, end, CMASK_WHITESPACE);
                             // Set yin as we now open to possibilities.
                             state.fsm &= ~FSM_YANG_MASK;
                         }

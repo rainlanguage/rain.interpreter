@@ -39,7 +39,7 @@ library LibParseOperand {
     {
         uint256 char;
         assembly {
-            char := byte(0, mload(cursor))
+            char := shl(byte(0, mload(cursor)), 1)
         }
         if (char == CMASK_OPERAND_START) {
             revert UnexpectedOperand(LibParse.parseErrorOffset(data, cursor));
@@ -56,12 +56,14 @@ library LibParseOperand {
     {
         unchecked {
             uint256 char;
+            uint256 end;
             assembly {
+                end := add(data, add(mload(data), 0x20))
                 //slither-disable-next-line incorrect-shift
                 char := shl(byte(0, mload(cursor)), 1)
             }
             if (char == CMASK_OPERAND_START) {
-                cursor = LibParse.skipMask(cursor + 1, CMASK_WHITESPACE);
+                cursor = LibParse.skipMask(cursor + 1, end, CMASK_WHITESPACE);
                 (
                     function(bytes memory, uint256, uint256) pure returns (uint256) literalParser,
                     uint256 innerStart,
@@ -73,7 +75,7 @@ library LibParseOperand {
                     revert OperandOverflow(LibParse.parseErrorOffset(data, cursor));
                 }
                 cursor = outerEnd;
-                cursor = LibParse.skipMask(cursor, CMASK_WHITESPACE);
+                cursor = LibParse.skipMask(cursor, end, CMASK_WHITESPACE);
                 assembly ("memory-safe") {
                     //slither-disable-next-line incorrect-shift
                     char := shl(byte(0, mload(cursor)), 1)
