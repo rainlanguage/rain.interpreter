@@ -6,10 +6,12 @@ import "rain.lib.typecast/LibConvert.sol";
 import "../integrity/LibIntegrityCheckNP.sol";
 import "../state/LibInterpreterStateNP.sol";
 import {AuthoringMeta} from "../parse/LibParseMeta.sol";
-import {OPERAND_PARSER_OFFSET_DISALLOWED, OPERAND_PARSER_OFFSET_SINGLE_FULL} from "../parse/LibParseOperand.sol";
+import {OPERAND_PARSER_OFFSET_DISALLOWED, OPERAND_PARSER_OFFSET_SINGLE_FULL, OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE} from "../parse/LibParseOperand.sol";
 
 import "./00/LibOpStackNP.sol";
 import "./00/LibOpConstantNP.sol";
+
+import "./context/LibOpContextNP.sol";
 
 import "./crypto/LibOpHashNP.sol";
 
@@ -34,7 +36,7 @@ import "./logic/LibOpLessThanOrEqualToNP.sol";
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 17;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 18;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -44,10 +46,17 @@ library LibAllStandardOpsNP {
         AuthoringMeta memory lengthPlaceholder;
         AuthoringMeta[ALL_STANDARD_OPS_LENGTH + 1] memory wordsFixed = [
             lengthPlaceholder,
+
             // Stack and constant MUST be in this order for parsing to work.
             AuthoringMeta("stack", OPERAND_PARSER_OFFSET_SINGLE_FULL, "Copies an existing value from the stack."),
             AuthoringMeta("constant", OPERAND_PARSER_OFFSET_SINGLE_FULL, "Copies a constant value onto the stack."),
+
             // These are all ordered according to how they appear in the file system.
+            AuthoringMeta(
+                "context",
+                OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE,
+                "Copies a value from the context. The first operand is the context column and second is the context row."
+            ),
             AuthoringMeta(
                 "hash", OPERAND_PARSER_OFFSET_DISALLOWED, "Hashes all inputs into a single 32 byte value using keccak256."
             ),
@@ -128,6 +137,7 @@ library LibAllStandardOpsNP {
                     LibOpStackNP.integrity,
                     LibOpConstantNP.integrity,
                     // Everything else is alphabetical, including folders.
+                    LibOpContextNP.integrity,
                     LibOpHashNP.integrity,
                     LibOpBlockNumberNP.integrity,
                     LibOpChainIdNP.integrity,
@@ -179,6 +189,7 @@ library LibAllStandardOpsNP {
                     LibOpStackNP.run,
                     LibOpConstantNP.run,
                     // Everything else is alphabetical, including folders.
+                    LibOpContextNP.run,
                     LibOpHashNP.run,
                     LibOpBlockNumberNP.run,
                     LibOpChainIdNP.run,

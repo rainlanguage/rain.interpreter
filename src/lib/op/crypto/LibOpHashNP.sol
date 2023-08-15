@@ -24,7 +24,7 @@ library LibOpHashNP {
         return stackTop;
     }
 
-    function referenceFn(Operand, uint256[] memory inputs) internal pure returns (uint256[] memory outputs) {
+    function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs) internal pure returns (uint256[] memory outputs) {
         outputs = new uint256[](1);
         outputs[0] = uint256(keccak256(abi.encodePacked(inputs)));
     }

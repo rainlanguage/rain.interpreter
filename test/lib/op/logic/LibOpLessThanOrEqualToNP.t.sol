@@ -18,7 +18,7 @@ contract LibOpLessThanOrEqualToNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpLessThanOrEqualToNP.
-    function testOpLessThanOrEqualToNPRun(InterpreterStateNP memory state, uint256 seed, uint256 input1, uint256 input2)
+    function testOpLessThanOrEqualToNPRun(InterpreterStateNP memory state, uint256 input1, uint256 input2)
         external
     {
         uint256[] memory inputs = new uint256[](2);
@@ -27,7 +27,6 @@ contract LibOpLessThanOrEqualToNPTest is OpTest {
         Operand operand = Operand.wrap(inputs.length << 0x10);
         opReferenceCheck(
             state,
-            seed,
             operand,
             LibOpLessThanOrEqualToNP.referenceFn,
             LibOpLessThanOrEqualToNP.integrity,

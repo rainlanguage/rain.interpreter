@@ -21,12 +21,12 @@ contract LibOpIsZeroNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpIsZeroNP.
-    function testOpIsZeroNPRun(InterpreterStateNP memory state, uint256 seed, uint256 input) external {
+    function testOpIsZeroNPRun(InterpreterStateNP memory state, uint256 input) external {
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = input;
         Operand operand = Operand.wrap(inputs.length << 0x10);
         opReferenceCheck(
-            state, seed, operand, LibOpIsZeroNP.referenceFn, LibOpIsZeroNP.integrity, LibOpIsZeroNP.run, inputs
+            state, operand, LibOpIsZeroNP.referenceFn, LibOpIsZeroNP.integrity, LibOpIsZeroNP.run, inputs
         );
     }
 

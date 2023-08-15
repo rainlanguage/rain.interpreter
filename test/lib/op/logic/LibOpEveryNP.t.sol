@@ -25,11 +25,11 @@ contract LibOpEveryNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpEveryNP.
-    function testOpEveryNPRun(InterpreterStateNP memory state, uint256 seed, uint256[] memory inputs) external {
+    function testOpEveryNPRun(InterpreterStateNP memory state, uint256[] memory inputs) external {
         vm.assume(inputs.length != 0);
         Operand operand = Operand.wrap(inputs.length << 0x10);
         opReferenceCheck(
-            state, seed, operand, LibOpEveryNP.referenceFn, LibOpEveryNP.integrity, LibOpEveryNP.run, inputs
+            state, operand, LibOpEveryNP.referenceFn, LibOpEveryNP.integrity, LibOpEveryNP.run, inputs
         );
     }
 

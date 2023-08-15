@@ -33,9 +33,9 @@ contract LibOpConditionsNPTest is OpTest {
     /// Directly test the runtime logic of LibOpConditionsNP.
     function testOpConditionsNPRun(
         InterpreterStateNP memory state,
-        uint256 seed,
         uint256[] memory inputs,
-        uint16 conditionCode
+        uint16 conditionCode,
+        uint256 finalNonZero
     ) external {
         // Ensure that we have inputs that are a valid pairwise conditions.
         vm.assume(inputs.length > 1);
@@ -44,12 +44,12 @@ contract LibOpConditionsNPTest is OpTest {
         }
         // Ensure the final condition is nonzero so that we don't error.
         if (inputs[inputs.length - 2] == 0) {
-            inputs[inputs.length - 2] = uint256(keccak256(abi.encodePacked(seed)));
+            vm.assume(finalNonZero != 0);
+            inputs[inputs.length - 2] = finalNonZero;
         }
         Operand operand = Operand.wrap(uint256(inputs.length) << 0x10 | uint256(conditionCode));
         opReferenceCheck(
             state,
-            seed,
             operand,
             LibOpConditionsNP.referenceFn,
             LibOpConditionsNP.integrity,
@@ -61,7 +61,6 @@ contract LibOpConditionsNPTest is OpTest {
     /// Test the error case where no conditions are met.
     function testOpConditionsNPRunNoConditionsMet(
         InterpreterStateNP memory state,
-        uint256 seed,
         uint256[] memory inputs,
         uint16 conditionCode
     ) external {
@@ -79,7 +78,6 @@ contract LibOpConditionsNPTest is OpTest {
         vm.expectRevert(abi.encodeWithSelector(NoConditionsMet.selector, uint256(conditionCode)));
         opReferenceCheck(
             state,
-            seed,
             operand,
             LibOpConditionsNP.referenceFn,
             LibOpConditionsNP.integrity,

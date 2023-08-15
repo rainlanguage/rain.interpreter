@@ -20,7 +20,7 @@ library LibOpMaxUint256NP {
         return stackTop;
     }
 
-    function referenceFn(Operand, uint256[] memory) internal pure returns (uint256[] memory) {
+    function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory) internal pure returns (uint256[] memory) {
         uint256[] memory outputs = new uint256[](1);
         outputs[0] = type(uint256).max;
         return outputs;

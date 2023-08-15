@@ -30,4 +30,14 @@ library LibOpConstantNP {
         }
         return stackTop;
     }
+
+    function referenceFn(InterpreterStateNP memory state, Operand operand, uint256[] memory) internal pure returns (uint256[] memory outputs) {
+        uint256[] memory constants;
+        assembly ("memory-safe") {
+            constants := sub(mload(add(state, 0x20)), 0x20)
+        }
+        uint256 index = Operand.unwrap(operand);
+        outputs = new uint256[](1);
+        outputs[0] = constants[index];
+    }
 }

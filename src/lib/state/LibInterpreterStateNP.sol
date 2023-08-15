@@ -7,6 +7,8 @@ import "../ns/LibNamespace.sol";
 
 struct InterpreterStateNP {
     Pointer[] stackBottoms;
+    // This is referenced directly in assembly by offset, don't move the constant
+    // field.
     Pointer firstConstant;
     uint256 sourceIndex;
     MemoryKV stateKV;

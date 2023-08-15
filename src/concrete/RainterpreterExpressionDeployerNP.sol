@@ -42,19 +42,19 @@ error UnexpectedStoreBytecodeHash(bytes32 actualBytecodeHash);
 error UnexpectedOpMetaHash(bytes32 actualOpMeta);
 
 /// @dev The function pointers for the integrity check fns.
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"1a2b1aa51b0c1b161b161b161b161b201b421b6c1b201b6c1b6c1b761b801b6c1b6c";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"1a961b101b771b811b771b771b771b771b8b1bad1bd71b8b1bd71bd71be11beb1bd71bd7";
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xb9b7faaf7da7383722ec2ff0b6ca01505f729b758d37a1a2fa718e6d540a1405);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x1e1db69ce6ab5d94173335894049c5b8d6a01e176927478a1bff32de23611f14);
 
 /// @dev Hash of the known store bytecode.
 bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);
 
 /// @dev Hash of the known authoring meta.
-bytes32 constant AUTHORING_META_HASH = bytes32(0x9fea417a6aa3cfb391d2085793e6a8aa05e4715b40fe369ac6097fb88b9fbfdc);
+bytes32 constant AUTHORING_META_HASH = bytes32(0xd944095cc74e1d9c1087b624397550804e2d9a9f907cbc01bdd25eedde9eea66);
 
 bytes constant PARSE_META =
-    hex"0102400000001001000400000202000140408000004020840100000000020200000001104832da0400a60ffe0a00cb7e9f08104313730f0050b8280010ba92eb0c003e4ad302004f3902100088d21a050079d25c0b007f014c0e00fdd2230d0017bbc8070069f8d906002a2ac009004633980300a30651";
+    hex"0102400000001001000400000202000140408000004020842100000000020200000001104832da0500a60ffe0b00cb7e9f02209033250910431373100050b8280010ba92eb0d003e4ad303004f3902110088d21a060079d25c0c007f014c0f00fdd2230e0017bbc8080069f8d907002a2ac00a004633980400a30651";
 
 /// All config required to construct a `Rainterpreter`.
 /// @param interpreter The `IInterpreterV1` to use for evaluation. MUST match

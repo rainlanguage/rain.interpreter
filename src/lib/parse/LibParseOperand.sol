@@ -8,6 +8,7 @@ import "./LibParseLiteral.sol";
 
 uint8 constant OPERAND_PARSER_OFFSET_DISALLOWED = 0;
 uint8 constant OPERAND_PARSER_OFFSET_SINGLE_FULL = 0x10;
+uint8 constant OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE = 0x20;
 
 error UnexpectedOperand(uint256 offset);
 

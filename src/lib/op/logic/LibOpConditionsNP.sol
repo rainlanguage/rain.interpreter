@@ -58,7 +58,7 @@ library LibOpConditionsNP {
     }
 
     /// Gas intensive reference implementation of `condition` for testing.
-    function referenceFn(Operand operand, uint256[] memory inputs) internal pure returns (uint256[] memory outputs) {
+    function referenceFn(InterpreterStateNP memory, Operand operand, uint256[] memory inputs) internal pure returns (uint256[] memory outputs) {
         unchecked {
             uint256 length = inputs.length;
             require(length % 2 == 0, "Odd number of inputs");

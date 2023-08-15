@@ -8,37 +8,45 @@ import "rain.solmem/lib/LibPointer.sol";
 import "./RainterpreterExpressionDeployerDeploymentTest.sol";
 import "../../../src/lib/state/LibInterpreterStateNP.sol";
 
+uint256 constant PRE = uint256(keccak256(abi.encodePacked("pre")));
+uint256 constant POST = uint256(keccak256(abi.encodePacked("post")));
+
 abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
     using LibInterpreterStateNP for InterpreterStateNP;
     using LibUint256Array for uint256[];
     using LibPointer for Pointer;
 
-    function calcPrePost(uint256 seed) internal pure returns (uint256 pre, uint256 post) {
-        pre = uint256(keccak256(abi.encodePacked(seed)));
-        post = uint256(keccak256(abi.encodePacked(pre)));
+    struct ReferenceCheckPointers {
+        Pointer pre;
+        Pointer post;
+        Pointer stackTop;
+        Pointer expectedStackTopAfter;
     }
 
     function opReferenceCheck(
         InterpreterStateNP memory state,
-        uint256 seed,
         Operand operand,
-        function(Operand, uint256[] memory) view returns (uint256[] memory) referenceFn,
+        function(InterpreterStateNP memory, Operand, uint256[] memory) view returns (uint256[] memory) referenceFn,
         function(IntegrityCheckStateNP memory, Operand) pure returns (uint256, uint256) integrityFn,
         function(InterpreterStateNP memory, Operand, Pointer) view returns (Pointer) runFn,
         uint256[] memory inputs
     ) internal {
         uint256[] memory expectedOutputs;
-
-        Pointer stackTop;
-        Pointer expectedStackTopAfter;
-        Pointer prePointer;
-        Pointer postPointer;
+        ReferenceCheckPointers memory pointers;
 
         {
             uint256 calcInputs;
             uint256 calcOutputs;
             {
-                IntegrityCheckStateNP memory integrityState = LibIntegrityCheckNP.newState("", 0, 0);
+                IntegrityCheckStateNP memory integrityState;
+                {
+                    uint256 constantsLength;
+                    Pointer firstConstant = state.firstConstant;
+                    assembly ("memory-safe") {
+                        constantsLength := mload(sub(firstConstant, 0x20))
+                    }
+                    integrityState = LibIntegrityCheckNP.newState("", 0, constantsLength);
+                }
                 (calcInputs, calcOutputs) = integrityFn(integrityState, operand);
                 assertEq(calcInputs, inputs.length, "inputs length");
                 assertEq(calcInputs, Operand.unwrap(operand) >> 0x10, "operand inputs");
@@ -47,10 +55,14 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
                 // modify what the real function sees.
                 uint256[] memory inputsClone = new uint256[](inputs.length);
                 LibMemCpy.unsafeCopyWordsTo(inputs.dataPointer(), inputsClone.dataPointer(), inputs.length);
-                expectedOutputs = referenceFn(operand, inputsClone);
+                expectedOutputs = referenceFn(state, operand, inputsClone);
                 assertEq(expectedOutputs.length, calcOutputs, "expected outputs length");
             }
 
+            Pointer prePointer;
+            Pointer postPointer;
+            Pointer stackTop;
+            Pointer expectedStackTopAfter;
             assembly ("memory-safe") {
                 let headroom := 0x20
                 if gt(calcOutputs, calcInputs) { headroom := add(headroom, mul(sub(calcOutputs, calcInputs), 0x20)) }
@@ -61,34 +73,36 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
                 expectedStackTopAfter := sub(add(stackTop, mul(calcInputs, 0x20)), mul(calcOutputs, 0x20))
                 mstore(0x40, add(prePointer, 0x20))
             }
-            LibMemCpy.unsafeCopyWordsTo(inputs.dataPointer(), stackTop, inputs.length);
+            pointers.pre = prePointer;
+            pointers.post = postPointer;
+            pointers.stackTop = stackTop;
+            pointers.expectedStackTopAfter = expectedStackTopAfter;
+            LibMemCpy.unsafeCopyWordsTo(inputs.dataPointer(), pointers.stackTop, inputs.length);
         }
 
         {
             // Pure reference functions don't modify the state.
             bytes32 stateFingerprintBefore = state.fingerprint();
             {
-                (uint256 pre, uint256 post) = calcPrePost(seed);
-                prePointer.unsafeWriteWord(pre);
-                postPointer.unsafeWriteWord(post);
+                pointers.pre.unsafeWriteWord(PRE);
+                pointers.post.unsafeWriteWord(POST);
             }
-            Pointer stackTopAfter = runFn(state, operand, stackTop);
+            Pointer stackTopAfter = runFn(state, operand, pointers.stackTop);
             bytes32 stateFingerprintAfter = state.fingerprint();
 
             assertEq(stateFingerprintBefore, stateFingerprintAfter, "state fingerprint");
-            assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(expectedStackTopAfter), "stack top after");
+            assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(pointers.expectedStackTopAfter), "stack top after");
         }
 
         // Compare against reference values.
         {
-            (uint256 pre, uint256 post) = calcPrePost(seed);
-            assertEq(pre, prePointer.unsafeReadWord(), "pre");
+            assertEq(PRE, pointers.pre.unsafeReadWord(), "pre");
             for (uint256 i = 0; i < expectedOutputs.length; i++) {
                 console2.log("expectedOutputs[i]", expectedOutputs[i]);
-                assertEq(expectedOutputs[i], expectedStackTopAfter.unsafeReadWord(), "value");
-                expectedStackTopAfter = expectedStackTopAfter.unsafeAddWord();
+                assertEq(expectedOutputs[i], pointers.expectedStackTopAfter.unsafeReadWord(), "value");
+                pointers.expectedStackTopAfter = pointers.expectedStackTopAfter.unsafeAddWord();
             }
-            assertEq(post, postPointer.unsafeReadWord(), "post");
+            assertEq(POST, pointers.post.unsafeReadWord(), "post");
         }
     }
 }
