@@ -8,6 +8,7 @@ import "./LibCtPop.sol";
 import "./LibParseMeta.sol";
 import "./LibParseCMask.sol";
 import "./LibParseLiteral.sol";
+import "./LibParseOperand.sol";
 import "../../interface/IInterpreterV1.sol";
 import "./LibParseStackName.sol";
 
@@ -15,14 +16,14 @@ import "./LibParseStackName.sol";
 error MissingFinalSemi(uint256 offset);
 
 /// Enountered an unexpected character on the LHS.
-error UnexpectedLHSChar(uint256 offset, string char);
+error UnexpectedLHSChar(uint256 offset);
 
 /// Encountered an unexpected character on the RHS.
-error UnexpectedRHSChar(uint256 offset, string char);
+error UnexpectedRHSChar(uint256 offset);
 
 /// More specific version of UnexpectedRHSChar where we specifically expected
 /// a left paren but got some other char.
-error ExpectedLeftParen(uint256 offset, string char);
+error ExpectedLeftParen(uint256 offset);
 
 /// Encountered a right paren without a matching left paren.
 error UnexpectedRightParen(uint256 offset);
@@ -38,7 +39,7 @@ error MalformedCommentStart(uint256 offset);
 
 /// @dev Thrown when a stack name is duplicated. Shadowing in all forms is
 /// disallowed in Rainlang.
-error DuplicateLHSItem(uint256 errorOffset, string errorCharString);
+error DuplicateLHSItem(uint256 errorOffset);
 
 /// Encountered too many LHS items.
 error ExcessLHSItems(uint256 offset);
@@ -53,7 +54,7 @@ error ExcessRHSItems(uint256 offset);
 error WordSize(string word);
 
 /// Parsed a word that is not in the meta.
-error UnknownWord(uint256 offset, bytes32 word);
+error UnknownWord(uint256 offset);
 
 /// The parser exceeded the maximum number of sources that it can build.
 error MaxSources();
@@ -188,6 +189,7 @@ struct ParseState {
     uint256 literalBloom;
     uint256 constantsBuilder;
     uint256 literalParsers;
+    uint256 operandParsers;
     StackTracker stackTracker;
 }
 
@@ -249,25 +251,6 @@ library LibParseState {
     }
 
     function newState() internal pure returns (ParseState memory) {
-        // Register all the literal parsers in the parse state. Each is a 16 bit
-        // function pointer so we can have up to 16 literal types. This needs to
-        // be done at runtime because the library code doesn't know the bytecode
-        // offsets of the literal parsers until it is compiled into a contract.
-        uint256 literalParsers;
-        {
-            function(bytes memory, uint256, uint256) pure returns (uint256) parseLiteralHex =
-                LibParseLiteral.parseLiteralHex;
-            uint256 parseLiteralHexOffset = LITERAL_TYPE_INTEGER_HEX;
-            function(bytes memory, uint256, uint256) pure returns (uint256) parseLiteralDecimal =
-                LibParseLiteral.parseLiteralDecimal;
-            uint256 parseLiteralDecimalOffset = LITERAL_TYPE_INTEGER_DECIMAL;
-
-            assembly ("memory-safe") {
-                literalParsers :=
-                    or(shl(parseLiteralHexOffset, parseLiteralHex), shl(parseLiteralDecimalOffset, parseLiteralDecimal))
-            }
-        }
-
         ParseState memory state = ParseState(
             // activeSource
             // (will be built in `newActiveSource`)
@@ -296,7 +279,9 @@ library LibParseState {
             // constantsBuilder
             0,
             // literalParsers
-            literalParsers,
+            LibParseLiteral.buildLiteralParsers(),
+            // operandParsers
+            LibParseOperand.buildOperandParsers(),
             // stackTracker
             StackTracker.wrap(0)
         );
@@ -333,9 +318,7 @@ library LibParseState {
                     parenOffset := byte(0, mload(add(state, 0x60)))
                 }
                 if (parenOffset > 0) {
-                    (uint256 errorOffset, string memory errorChar) = LibParse.parseErrorContext(data, cursor);
-                    (errorChar);
-                    revert UnclosedLeftParen(errorOffset);
+                    revert UnclosedLeftParen(LibParse.parseErrorOffset(data, cursor));
                 }
             }
 
@@ -367,9 +350,7 @@ library LibParseState {
             // the FSM to not accepting inputs.
             if (lineRHSTopLevel == 0) {
                 if (state.fsm & FSM_ACCEPTING_INPUTS_MASK == 0) {
-                    (uint256 errorOffset, string memory errorChar) = LibParse.parseErrorContext(data, cursor);
-                    (errorChar);
-                    revert NotAcceptingInputs(errorOffset);
+                    revert NotAcceptingInputs(LibParse.parseErrorOffset(data, cursor));
                 } else {
                     // As there are no RHS opcodes yet we can simply set topLevel0 directly.
                     // This is the only case where we defer to the LHS to tell
@@ -388,15 +369,9 @@ library LibParseState {
             // item on that line.
             else if (lineRHSTopLevel > 1) {
                 if (lineLHSItems < lineRHSTopLevel) {
-                    //slither-disable-next-line similar-names
-                    (uint256 errorOffset, string memory errorChar) = LibParse.parseErrorContext(data, cursor);
-                    (errorChar);
-                    revert ExcessRHSItems(errorOffset);
+                    revert ExcessRHSItems(LibParse.parseErrorOffset(data, cursor));
                 } else if (lineLHSItems > lineRHSTopLevel) {
-                    //slither-disable-next-line similar-names
-                    (uint256 errorOffset, string memory errorChar) = LibParse.parseErrorContext(data, cursor);
-                    (errorChar);
-                    revert ExcessLHSItems(errorOffset);
+                    revert ExcessLHSItems(LibParse.parseErrorOffset(data, cursor));
                 }
             }
 
@@ -465,8 +440,12 @@ library LibParseState {
 
     function pushLiteral(ParseState memory state, bytes memory data, uint256 cursor) internal pure returns (uint256) {
         unchecked {
-            (uint256 literalType, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-                LibParseLiteral.boundLiteral(data, cursor);
+            (
+                function(bytes memory, uint256, uint256) pure returns (uint256) parser,
+                uint256 innerStart,
+                uint256 innerEnd,
+                uint256 outerEnd
+            ) = LibParseLiteral.boundLiteral(state.literalParsers, data, cursor);
             uint256 fingerprint;
             uint256 fingerprintBloom;
             assembly ("memory-safe") {
@@ -551,13 +530,6 @@ library LibParseState {
                 }
                 // Second word is the value.
                 {
-                    function(bytes memory, uint256, uint256) pure returns (uint256) parser;
-                    uint256 parsers = state.literalParsers;
-                    // `boundLiteral` MUST return a literal type that is
-                    // supported by the parser OR revert.
-                    assembly ("memory-safe") {
-                        parser := and(shr(literalType, parsers), 0xFFFF)
-                    }
                     uint256 tailValue = parser(data, innerStart, innerEnd);
 
                     assembly ("memory-safe") {
@@ -932,18 +904,9 @@ library LibParse {
     using LibParseState for ParseState;
     using LibParseStackName for ParseState;
 
-    function parseErrorContext(bytes memory data, uint256 cursor)
-        internal
-        pure
-        returns (uint256 offset, string memory char)
-    {
+    function parseErrorOffset(bytes memory data, uint256 cursor) internal pure returns (uint256 offset) {
         assembly ("memory-safe") {
             offset := sub(cursor, add(data, 0x20))
-            char := mload(0x40)
-            mstore(char, 1)
-            mstore8(add(char, 0x20), byte(0, mload(cursor)))
-            // Allocate two full words to keep memory aligned.
-            mstore(0x40, add(char, 0x40))
         }
     }
 
@@ -966,25 +929,12 @@ library LibParse {
         return (cursor, word);
     }
 
-    function skipWord(uint256 cursor, uint256 mask) internal pure returns (uint256) {
-        uint256 i;
+    /// Skip an unlimited number of chars until we find one that is not in the
+    /// mask.
+    function skipMask(uint256 cursor, uint256 end, uint256 mask) internal pure returns (uint256) {
         assembly ("memory-safe") {
-            let done := 0
-            // process the tail
-            for {} iszero(done) {} {
-                // we already know the head is to be ignored so move past it.
-                cursor := add(cursor, 1)
-                i := 0
-                //slither-disable-next-line incorrect-shift
-                for { let word := mload(cursor) } and(lt(i, 0x20), iszero(iszero(and(shl(byte(i, word), 1), mask)))) {}
-                {
-                    i := add(i, 1)
-                }
-                if lt(i, 0x20) {
-                    cursor := add(cursor, i)
-                    done := 1
-                }
-            }
+            //slither-disable-next-line incorrect-shift
+            for {} and(lt(cursor, end), gt(and(shl(byte(0, mload(cursor)), 1), mask), 0)) { cursor := add(cursor, 1) } {}
         }
         return cursor;
     }
@@ -1002,9 +952,7 @@ library LibParse {
             startSequence := shr(0xf0, mload(cursor))
         }
         if (startSequence != COMMENT_START_SEQUENCE) {
-            (uint256 errorOffset, string memory errorCharString) = parseErrorContext(data, cursor);
-            (errorCharString);
-            revert MalformedCommentStart(errorOffset);
+            revert MalformedCommentStart(parseErrorOffset(data, cursor));
         }
         uint256 commentEndSequenceStart = COMMENT_END_SEQUENCE >> 8;
         uint256 commentEndSequenceEnd = COMMENT_END_SEQUENCE & 0xFF;
@@ -1069,9 +1017,7 @@ library LibParse {
                         if (char & CMASK_LHS_STACK_HEAD > 0) {
                             // if yang we can't start new stack item
                             if (state.fsm & FSM_YANG_MASK > 0) {
-                                //slither-disable-next-line similar-names
-                                (uint256 errorOffset, string memory errorCharString) = parseErrorContext(data, cursor);
-                                revert UnexpectedLHSChar(errorOffset, errorCharString);
+                                revert UnexpectedLHSChar(parseErrorOffset(data, cursor));
                             }
 
                             // Named stack item.
@@ -1082,15 +1028,12 @@ library LibParse {
                                 // If the stack name already exists, then we
                                 // revert as shadowing is not allowed.
                                 if (exists) {
-                                    //slither-disable-next-line similar-names
-                                    (uint256 errorOffset, string memory errorCharString) =
-                                        parseErrorContext(data, cursor);
-                                    revert DuplicateLHSItem(errorOffset, errorCharString);
+                                    revert DuplicateLHSItem(parseErrorOffset(data, cursor));
                                 }
                             }
                             // Anon stack item.
                             else {
-                                cursor = skipWord(cursor, CMASK_LHS_STACK_TAIL);
+                                cursor = skipMask(cursor + 1, end, CMASK_LHS_STACK_TAIL);
                             }
                             // Bump the index regardless of whether the stack
                             // item is named or not.
@@ -1100,7 +1043,7 @@ library LibParse {
                             // We are also no longer interstitial
                             state.fsm = (state.fsm | FSM_YANG_MASK | FSM_ACTIVE_SOURCE_MASK) & ~FSM_INTERSTITIAL_MASK;
                         } else if (char & CMASK_WHITESPACE != 0) {
-                            cursor = skipWord(cursor, CMASK_WHITESPACE);
+                            cursor = skipMask(cursor + 1, end, CMASK_WHITESPACE);
                             // Set ying as we now open to possibilities.
                             state.fsm &= ~FSM_YANG_MASK;
                         } else if (char & CMASK_LHS_RHS_DELIMITER != 0) {
@@ -1111,19 +1054,14 @@ library LibParse {
                             cursor++;
                         } else if (char & CMASK_COMMENT_HEAD != 0) {
                             if (state.fsm & FSM_INTERSTITIAL_MASK == 0) {
-                                //slither-disable-next-line similar-names
-                                (uint256 errorOffset, string memory errorCharString) = parseErrorContext(data, cursor);
-                                (errorCharString);
-                                revert UnexpectedComment(errorOffset);
+                                revert UnexpectedComment(parseErrorOffset(data, cursor));
                             }
                             cursor = skipComment(data, cursor);
                             // Set yang for comments to force a little breathing
                             // room between comments and the next item.
                             state.fsm |= FSM_YANG_MASK;
                         } else {
-                            //slither-disable-next-line similar-names
-                            (uint256 errorOffset, string memory errorCharString) = parseErrorContext(data, cursor);
-                            revert UnexpectedLHSChar(errorOffset, errorCharString);
+                            revert UnexpectedLHSChar(parseErrorOffset(data, cursor));
                         }
                     }
                     // RHS
@@ -1131,47 +1069,44 @@ library LibParse {
                         if (char & CMASK_RHS_WORD_HEAD > 0) {
                             // If yang we can't start a new word.
                             if (state.fsm & FSM_YANG_MASK > 0) {
-                                //slither-disable-next-line similar-names
-                                (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
-                                revert UnexpectedRHSChar(offset, charString);
+                                revert UnexpectedRHSChar(parseErrorOffset(data, cursor));
                             }
 
                             (cursor, word) = parseWord(cursor, CMASK_RHS_WORD_TAIL);
 
                             // First check if this word is in meta.
-                            (bool exists, uint256 index) = LibParseMeta.lookupWordIndex(meta, word);
+                            (
+                                bool exists,
+                                uint256 opcodeIndex,
+                                function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParser
+                            ) = LibParseMeta.lookupWord(meta, state.operandParsers, word);
                             if (exists) {
-                                state.pushOpToSource(index, Operand.wrap(0));
+                                Operand operand;
+                                (cursor, operand) = operandParser(state.literalParsers, data, cursor);
+                                state.pushOpToSource(opcodeIndex, operand);
                                 // This is a real word so we expect to see parens
                                 // after it.
                                 state.fsm |= FSM_WORD_END_MASK;
                             }
                             // Fallback to LHS items.
                             else {
-                                (exists, index) = LibParseStackName.stackNameIndex(state, word);
+                                (exists, opcodeIndex) = LibParseStackName.stackNameIndex(state, word);
                                 if (exists) {
-                                    state.pushOpToSource(OPCODE_STACK, Operand.wrap(index));
+                                    state.pushOpToSource(OPCODE_STACK, Operand.wrap(opcodeIndex));
                                     // Need to process highwater here because we
                                     // don't have any parens to open or close.
                                     state.highwater();
                                 } else {
-                                    //slither-disable-next-line similar-names
-                                    (uint256 errorOffset, string memory errorCharString) =
-                                        parseErrorContext(data, cursor);
-                                    (errorCharString);
-                                    revert UnknownWord(errorOffset, word);
+                                    revert UnknownWord(parseErrorOffset(data, cursor));
                                 }
                             }
 
                             state.fsm |= FSM_YANG_MASK;
                         }
                         // If this is the end of a word we MUST start a paren.
-                        // @todo support operands and constants.
                         else if (state.fsm & FSM_WORD_END_MASK > 0) {
                             if (char & CMASK_LEFT_PAREN == 0) {
-                                //slither-disable-next-line similar-names
-                                (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
-                                revert ExpectedLeftParen(offset, charString);
+                                revert ExpectedLeftParen(parseErrorOffset(data, cursor));
                             }
                             // Increase the paren depth by 1.
                             // i.e. move the byte offset by 3
@@ -1203,10 +1138,7 @@ library LibParse {
                                 parenOffset := byte(0, mload(add(state, 0x60)))
                             }
                             if (parenOffset == 0) {
-                                //slither-disable-next-line similar-names
-                                (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
-                                (charString);
-                                revert UnexpectedRightParen(offset);
+                                revert UnexpectedRightParen(parseErrorOffset(data, cursor));
                             }
                             // Decrease the paren depth by 1.
                             // i.e. move the byte offset by -3.
@@ -1233,7 +1165,7 @@ library LibParse {
                             state.highwater();
                             cursor++;
                         } else if (char & CMASK_WHITESPACE > 0) {
-                            cursor = skipWord(cursor, CMASK_WHITESPACE);
+                            cursor = skipMask(cursor + 1, end, CMASK_WHITESPACE);
                             // Set yin as we now open to possibilities.
                             state.fsm &= ~FSM_YANG_MASK;
                         }
@@ -1259,14 +1191,9 @@ library LibParse {
                         // Comments aren't allowed in the RHS but we can give a
                         // nicer error message than the default.
                         else if (char & CMASK_COMMENT_HEAD != 0) {
-                            //slither-disable-next-line similar-names
-                            (uint256 errorOffset, string memory errorCharString) = parseErrorContext(data, cursor);
-                            (errorCharString);
-                            revert UnexpectedComment(errorOffset);
+                            revert UnexpectedComment(parseErrorOffset(data, cursor));
                         } else {
-                            //slither-disable-next-line similar-names
-                            (uint256 offset, string memory charString) = parseErrorContext(data, cursor);
-                            revert UnexpectedRHSChar(offset, charString);
+                            revert UnexpectedRHSChar(parseErrorOffset(data, cursor));
                         }
                     }
                 }
@@ -1274,10 +1201,7 @@ library LibParse {
                     revert ParserOutOfBounds();
                 }
                 if (state.fsm & FSM_ACTIVE_SOURCE_MASK != 0) {
-                    //slither-disable-next-line similar-names
-                    (uint256 errorOffset, string memory errorCharString) = parseErrorContext(data, cursor);
-                    (errorCharString);
-                    revert MissingFinalSemi(errorOffset);
+                    revert MissingFinalSemi(parseErrorOffset(data, cursor));
                 }
             }
             return (state.buildBytecode(), state.buildConstants());

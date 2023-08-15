@@ -41,15 +41,13 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
         return state.pop(stackTop);
     }
 
-    function parseMeta() internal pure returns (bytes memory meta) {
-        bytes32[] memory words = new bytes32[](4);
-        words[0] = "revert";
-        words[1] = "push";
-        words[2] = "pop";
-        // This has no implementation on the integrity check side. It should
-        // cause a revert.
-        words[3] = "invalid";
-        return LibParseMeta.buildMeta(words, 2);
+    function parseMeta() internal pure returns (bytes memory) {
+        AuthoringMeta[] memory authoringMeta = new AuthoringMeta[](4);
+        authoringMeta[0] = AuthoringMeta("revert", 0, "always reverts");
+        authoringMeta[1] = AuthoringMeta("push", 0, "increase the stack top by one");
+        authoringMeta[2] = AuthoringMeta("pop", 0, "decrease the stack top by one");
+        authoringMeta[3] = AuthoringMeta("invalid", 0, "has no implementation in the integrity check, should revert");
+        return LibParseMeta.buildParseMeta(authoringMeta, 2);
     }
 
     function integrityPointers()
@@ -89,7 +87,7 @@ contract LibIntegrityCheckEnsureIntegrityTest is Test {
 
     /// If an integrity check is encountered that is not implemented, the
     /// integrity check should revert.
-    function testIntegrityEnsureIntegrityNotImplemented() public {
+    function testIntegrityEnsureIntegrityNotImplementedSingleSource() public {
         // Test an invalid op in isolation.
         (IntegrityCheckState memory state, Pointer stackTop) = newState("_:invalid();");
         vm.expectRevert(stdError.indexOOBError);

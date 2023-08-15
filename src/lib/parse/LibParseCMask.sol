@@ -436,6 +436,12 @@ uint128 constant CMASK_IDENTIFIER_TAIL = CMASK_IDENTIFIER_HEAD | CMASK_NUMERIC_0
 uint128 constant CMASK_LHS_STACK_TAIL = CMASK_IDENTIFIER_TAIL;
 uint128 constant CMASK_RHS_WORD_TAIL = CMASK_IDENTIFIER_TAIL;
 
+/// @dev Rainlang operand start is <
+uint128 constant CMASK_OPERAND_START = CMASK_LESS_THAN_SIGN;
+
+/// @dev Rainlang operand end is >
+uint128 constant CMASK_OPERAND_END = CMASK_GREATER_THAN_SIGN;
+
 /// @dev NOT lower alphanumeric kebab
 uint128 constant CMASK_NOT_IDENTIFIER_TAIL = ~CMASK_IDENTIFIER_TAIL;
 

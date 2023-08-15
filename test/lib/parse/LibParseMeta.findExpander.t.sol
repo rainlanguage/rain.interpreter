@@ -18,13 +18,13 @@ contract LibParseMetaFindExpanderTest is Test {
     /// The probability of finding a collision in EVERY iteration is 0.8676^256
     /// which is 1.621075e-16. I.e. we shoud expect the fuzz test to basically
     /// never fail for ~1000 runs.
-    function testFindExpanderSmall(bytes32[] memory words) external {
-        vm.assume(words.length <= 0x20);
-        vm.assume(!LibBloom.bloomFindsDupes(words));
+    function testFindExpanderSmall(AuthoringMeta[] memory authoringMeta) external {
+        vm.assume(authoringMeta.length <= 0x20);
+        vm.assume(!LibBloom.bloomFindsDupes(LibParseMeta.copyWordsFromAuthoringMeta(authoringMeta)));
 
-        (uint8 seed, uint256 expansion, bytes32[] memory remaining) = LibParseMeta.findBestExpander(words);
+        (uint8 seed, uint256 expansion, AuthoringMeta[] memory remaining) = LibParseMeta.findBestExpander(authoringMeta);
         (seed);
-        assertEq(LibCtPop.ctpop(expansion), words.length);
+        assertEq(LibCtPop.ctpop(expansion), authoringMeta.length);
         assertEq(remaining.length, 0);
     }
 }

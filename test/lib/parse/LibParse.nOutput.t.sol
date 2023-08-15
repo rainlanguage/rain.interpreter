@@ -2,6 +2,7 @@
 pragma solidity =0.8.19;
 
 import "forge-std/Test.sol";
+import "test/util/lib/parse/LibMetaFixture.sol";
 
 import "src/lib/parse/LibParse.sol";
 import "src/lib/bytecode/LibBytecode.sol";
@@ -10,25 +11,9 @@ import "src/lib/bytecode/LibBytecode.sol";
 /// Test that the parser can handle multi and zero outputs for RHS items when
 /// they are singular on a line, and mandates individual items otherwise.
 contract LibParseNOutputTest is Test {
-    /// Build a shared meta for all the tests to simplify the implementation
-    /// of each. It also makes it easier to compare the expected bytes across
-    /// tests.
-    bytes internal meta;
-
-    /// Constructor just builds the shared meta.
-    constructor() {
-        bytes32[] memory words = new bytes32[](5);
-        words[0] = bytes32("a");
-        words[1] = bytes32("b");
-        words[2] = bytes32("c");
-        words[3] = bytes32("d");
-        words[4] = bytes32("e");
-        meta = LibParseMeta.buildMeta(words, 1);
-    }
-
     /// A single RHS item MAY have 0 outputs.
     function testParseNOutputExcessRHS0() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":a();", meta);
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":a();", LibMetaFixture.parseMeta());
         assertEq(
             bytecode,
             // 1 source
@@ -44,7 +29,7 @@ contract LibParseNOutputTest is Test {
             // 0 outputs
             hex"00"
             // a
-            hex"00000000"
+            hex"02000000"
         );
         assertEq(constants.length, 0);
     }
@@ -53,19 +38,20 @@ contract LibParseNOutputTest is Test {
     /// LHS items.
     function testParseNOutputExcessRHS1() external {
         vm.expectRevert(abi.encodeWithSelector(ExcessRHSItems.selector, 8));
-        LibParse.parse(":a() b();", meta);
+        LibParse.parse(":a() b();", LibMetaFixture.parseMeta());
     }
 
     /// Multiple RHS items MUST NOT have 0 outputs. Tests two RHS items and one
     /// LHS item.
     function testParseNOutputExcessRHS2() external {
         vm.expectRevert(abi.encodeWithSelector(ExcessRHSItems.selector, 9));
-        LibParse.parse("_:a() b();", meta);
+        LibParse.parse("_:a() b();", LibMetaFixture.parseMeta());
     }
 
     /// A single RHS item can have multiple outputs. This RHS item has nesting.
     function testParseNOutputNestedRHS() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":,_ _:a(b());", meta);
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibParse.parse(":,_ _:a(b());", LibMetaFixture.parseMeta());
         assertEq(
             bytecode,
             // 1 source
@@ -81,9 +67,9 @@ contract LibParseNOutputTest is Test {
             // 2 outputs
             hex"02"
             // b
-            hex"01000000"
+            hex"03000000"
             // a 1 input
-            hex"00010000"
+            hex"02010000"
         );
         assertEq(constants.length, 0);
     }
@@ -92,13 +78,14 @@ contract LibParseNOutputTest is Test {
     /// and three LHS items.
     function testParseNOutputExcessRHS3() external {
         vm.expectRevert(abi.encodeWithSelector(ExcessLHSItems.selector, 13));
-        LibParse.parse("_ _ _:a() b();", meta);
+        LibParse.parse("_ _ _:a() b();", LibMetaFixture.parseMeta());
     }
 
     /// Multiple output RHS items MAY be followed by single output RHS items,
     /// on a new line.
     function testParseBalanceStackOffsetsInputs() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_ _:a(), _:b();", meta);
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibParse.parse("_ _:a(), _:b();", LibMetaFixture.parseMeta());
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(constants.length, 0);
         // a and b should be parsed and inputs are just ignored in the output
@@ -118,9 +105,9 @@ contract LibParseNOutputTest is Test {
             // 3 outputs
             hex"03"
             // a
-            hex"00000000"
+            hex"02000000"
             // b
-            hex"01000000"
+            hex"03000000"
         );
 
         uint256 sourceIndex = 0;
