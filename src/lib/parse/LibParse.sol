@@ -933,6 +933,7 @@ library LibParse {
     /// mask.
     function skipMask(uint256 cursor, uint256 end, uint256 mask) internal pure returns (uint256) {
         assembly ("memory-safe") {
+            //slither-disable-next-line incorrect-shift
             for {} and(lt(cursor, end), gt(and(shl(byte(0, mload(cursor)), 1), mask), 0)) { cursor := add(cursor, 1) } {}
         }
         return cursor;

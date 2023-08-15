@@ -39,6 +39,7 @@ library LibParseOperand {
     {
         uint256 char;
         assembly {
+            //slither-disable-next-line incorrect-shift
             char := shl(byte(0, mload(cursor)), 1)
         }
         if (char == CMASK_OPERAND_START) {
