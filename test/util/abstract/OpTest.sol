@@ -38,7 +38,8 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
             uint256 calcInputs;
             uint256 calcOutputs;
             {
-                IntegrityCheckStateNP memory integrityState = LibIntegrityCheckNP.newState("", 0, state.constants.length);
+                IntegrityCheckStateNP memory integrityState =
+                    LibIntegrityCheckNP.newState("", 0, state.constants.length);
                 (calcInputs, calcOutputs) = integrityFn(integrityState, operand);
                 assertEq(calcInputs, inputs.length, "inputs length");
                 assertEq(calcInputs, Operand.unwrap(operand) >> 0x10, "operand inputs");

@@ -49,12 +49,7 @@ contract LibOpConditionsNPTest is OpTest {
         }
         Operand operand = Operand.wrap(uint256(inputs.length) << 0x10 | uint256(conditionCode));
         opReferenceCheck(
-            state,
-            operand,
-            LibOpConditionsNP.referenceFn,
-            LibOpConditionsNP.integrity,
-            LibOpConditionsNP.run,
-            inputs
+            state, operand, LibOpConditionsNP.referenceFn, LibOpConditionsNP.integrity, LibOpConditionsNP.run, inputs
         );
     }
 
@@ -77,12 +72,7 @@ contract LibOpConditionsNPTest is OpTest {
 
         vm.expectRevert(abi.encodeWithSelector(NoConditionsMet.selector, uint256(conditionCode)));
         opReferenceCheck(
-            state,
-            operand,
-            LibOpConditionsNP.referenceFn,
-            LibOpConditionsNP.integrity,
-            LibOpConditionsNP.run,
-            inputs
+            state, operand, LibOpConditionsNP.referenceFn, LibOpConditionsNP.integrity, LibOpConditionsNP.run, inputs
         );
     }
 

@@ -40,15 +40,19 @@ contract LibOpConstantNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpConstantNP. This tests that the
     /// operand always puts a single value on the stack.
-    function testOpConstantNPRun(
-        InterpreterStateNP memory state,
-        uint256 constantIndex
-    ) external {
+    function testOpConstantNPRun(InterpreterStateNP memory state, uint256 constantIndex) external {
         vm.assume(state.constants.length > 0);
         constantIndex = bound(constantIndex, 0, state.constants.length - 1);
 
         uint256[] memory inputs = new uint256[](0);
-        opReferenceCheck(state, Operand.wrap(constantIndex), LibOpConstantNP.referenceFn, LibOpConstantNP.integrity, LibOpConstantNP.run, inputs);
+        opReferenceCheck(
+            state,
+            Operand.wrap(constantIndex),
+            LibOpConstantNP.referenceFn,
+            LibOpConstantNP.integrity,
+            LibOpConstantNP.run,
+            inputs
+        );
     }
 
     /// Test the case of an empty constants array via. an end to end test. We

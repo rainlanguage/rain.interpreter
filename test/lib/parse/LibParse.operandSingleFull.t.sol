@@ -29,6 +29,23 @@ contract LibParseOperandSingleFullTest is Test {
         assertEq(constants.length, 0);
     }
 
+    /// Empty operand is disallowed.
+    function testOperandSingleFullEmpty() external {
+        vm.expectRevert(abi.encodeWithSelector(ExpectedOperand.selector, 4));
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b<>();", LibMetaFixture.parseMeta());
+        (bytecode);
+        (constants);
+    }
+
+    /// Multiple operands are disallowed.
+    function testOperandSingleFullMultiple() external {
+        vm.expectRevert(abi.encodeWithSelector(UnclosedOperand.selector, 9));
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibParse.parse("_:b<0x00 0x01>();", LibMetaFixture.parseMeta());
+        (bytecode);
+        (constants);
+    }
+
     /// Can provide decimal 0 as single full operand.
     function testOperandSingleFullZero() external {
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b<0>();", LibMetaFixture.parseMeta());

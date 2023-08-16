@@ -31,7 +31,11 @@ library LibOpContextNP {
         return stackTop;
     }
 
-    function referenceFn(InterpreterStateNP memory state, Operand operand, uint256[] memory) internal pure returns (uint256[] memory outputs) {
+    function referenceFn(InterpreterStateNP memory state, Operand operand, uint256[] memory)
+        internal
+        pure
+        returns (uint256[] memory outputs)
+    {
         uint256 i = Operand.unwrap(operand) & 0xFF;
         uint256 j = (Operand.unwrap(operand) >> 8) & 0xFF;
         // We want these indexes to be checked at runtime for OOB accesses

@@ -25,12 +25,7 @@ contract LibOpMaxUint256NPTest is OpTest {
         uint256[] memory inputs = new uint256[](0);
         Operand operand = Operand.wrap(0);
         opReferenceCheck(
-            state,
-            operand,
-            LibOpMaxUint256NP.referenceFn,
-            LibOpMaxUint256NP.integrity,
-            LibOpMaxUint256NP.run,
-            inputs
+            state, operand, LibOpMaxUint256NP.referenceFn, LibOpMaxUint256NP.integrity, LibOpMaxUint256NP.run, inputs
         );
     }
 

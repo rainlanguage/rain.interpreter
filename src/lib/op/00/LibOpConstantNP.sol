@@ -33,7 +33,11 @@ library LibOpConstantNP {
         return stackTop;
     }
 
-    function referenceFn(InterpreterStateNP memory state, Operand operand, uint256[] memory) internal pure returns (uint256[] memory outputs) {
+    function referenceFn(InterpreterStateNP memory state, Operand operand, uint256[] memory)
+        internal
+        pure
+        returns (uint256[] memory outputs)
+    {
         uint256 index = Operand.unwrap(operand);
         outputs = new uint256[](1);
         outputs[0] = state.constants[index];

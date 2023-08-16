@@ -25,9 +25,7 @@ contract LibOpIsZeroNPTest is OpTest {
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = input;
         Operand operand = Operand.wrap(inputs.length << 0x10);
-        opReferenceCheck(
-            state, operand, LibOpIsZeroNP.referenceFn, LibOpIsZeroNP.integrity, LibOpIsZeroNP.run, inputs
-        );
+        opReferenceCheck(state, operand, LibOpIsZeroNP.referenceFn, LibOpIsZeroNP.integrity, LibOpIsZeroNP.run, inputs);
     }
 
     /// Test the eval of isZero opcode parsed from a string. Tests 1 nonzero input.

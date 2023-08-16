@@ -6,7 +6,11 @@ import "rain.lib.typecast/LibConvert.sol";
 import "../integrity/LibIntegrityCheckNP.sol";
 import "../state/LibInterpreterStateNP.sol";
 import {AuthoringMeta} from "../parse/LibParseMeta.sol";
-import {OPERAND_PARSER_OFFSET_DISALLOWED, OPERAND_PARSER_OFFSET_SINGLE_FULL, OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE} from "../parse/LibParseOperand.sol";
+import {
+    OPERAND_PARSER_OFFSET_DISALLOWED,
+    OPERAND_PARSER_OFFSET_SINGLE_FULL,
+    OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT
+} from "../parse/LibParseOperand.sol";
 
 import "./00/LibOpStackNP.sol";
 import "./00/LibOpConstantNP.sol";
@@ -46,15 +50,13 @@ library LibAllStandardOpsNP {
         AuthoringMeta memory lengthPlaceholder;
         AuthoringMeta[ALL_STANDARD_OPS_LENGTH + 1] memory wordsFixed = [
             lengthPlaceholder,
-
             // Stack and constant MUST be in this order for parsing to work.
             AuthoringMeta("stack", OPERAND_PARSER_OFFSET_SINGLE_FULL, "Copies an existing value from the stack."),
             AuthoringMeta("constant", OPERAND_PARSER_OFFSET_SINGLE_FULL, "Copies a constant value onto the stack."),
-
             // These are all ordered according to how they appear in the file system.
             AuthoringMeta(
                 "context",
-                OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE,
+                OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT,
                 "Copies a value from the context. The first operand is the context column and second is the context row."
             ),
             AuthoringMeta(

@@ -8,9 +8,11 @@ import "./LibParseLiteral.sol";
 
 uint8 constant OPERAND_PARSER_OFFSET_DISALLOWED = 0;
 uint8 constant OPERAND_PARSER_OFFSET_SINGLE_FULL = 0x10;
-uint8 constant OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE = 0x20;
+uint8 constant OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT = 0x20;
 
 error UnexpectedOperand(uint256 offset);
+
+error ExpectedOperand(uint256 offset);
 
 error OperandOverflow(uint256 offset);
 
@@ -30,6 +32,41 @@ library LibParseOperand {
         assembly {
             operandParsers := or(operandParsers, shl(parseOperandSingleFullOffset, operandParserSingleFull))
         }
+        function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParserDoublePerByteNoDefault =
+            LibParseOperand.parseOperandDoublePerByteNoDefault;
+        uint256 parseOperandDoublePerByteNoDefaultOffset = OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT;
+        assembly {
+            operandParsers :=
+                or(operandParsers, shl(parseOperandDoublePerByteNoDefaultOffset, operandParserDoublePerByteNoDefault))
+        }
+    }
+
+    /// Parse a literal for an operand.
+    function parseOperandLiteral(uint256 literalParsers, bytes memory data, uint256 max, uint256 cursor)
+        internal
+        pure
+        returns (uint256, uint256)
+    {
+        uint256 char;
+        assembly {
+            //slither-disable-next-line incorrect-shift
+            char := shl(byte(0, mload(cursor)), 1)
+        }
+        if (char == CMASK_OPERAND_END) {
+            revert ExpectedOperand(LibParse.parseErrorOffset(data, cursor));
+        }
+        (
+            function(bytes memory, uint256, uint256) pure returns (uint256) literalParser,
+            uint256 innerStart,
+            uint256 innerEnd,
+            uint256 outerEnd
+        ) = LibParseLiteral.boundLiteral(literalParsers, data, cursor);
+        uint256 value = literalParser(data, innerStart, innerEnd);
+        if (value > max) {
+            revert OperandOverflow(LibParse.parseErrorOffset(data, cursor));
+        }
+        cursor = outerEnd;
+        return (cursor, value);
     }
 
     /// Operand is disallowed for this word.
@@ -66,17 +103,10 @@ library LibParseOperand {
             }
             if (char == CMASK_OPERAND_START) {
                 cursor = LibParse.skipMask(cursor + 1, end, CMASK_WHITESPACE);
-                (
-                    function(bytes memory, uint256, uint256) pure returns (uint256) literalParser,
-                    uint256 innerStart,
-                    uint256 innerEnd,
-                    uint256 outerEnd
-                ) = LibParseLiteral.boundLiteral(literalParsers, data, cursor);
-                uint256 value = literalParser(data, innerStart, innerEnd);
-                if (value > type(uint16).max) {
-                    revert OperandOverflow(LibParse.parseErrorOffset(data, cursor));
-                }
-                cursor = outerEnd;
+
+                uint256 value;
+                (cursor, value) = parseOperandLiteral(literalParsers, data, type(uint16).max, cursor);
+
                 cursor = LibParse.skipMask(cursor, end, CMASK_WHITESPACE);
                 assembly ("memory-safe") {
                     //slither-disable-next-line incorrect-shift
@@ -90,6 +120,51 @@ library LibParseOperand {
             // Default is 0.
             else {
                 return (cursor, Operand.wrap(0));
+            }
+        }
+    }
+
+    /// Operand is two bytes.
+    function parseOperandDoublePerByteNoDefault(uint256 literalParsers, bytes memory data, uint256 cursor)
+        internal
+        pure
+        returns (uint256, Operand)
+    {
+        unchecked {
+            uint256 char;
+            uint256 end;
+            assembly {
+                end := add(data, add(mload(data), 0x20))
+                //slither-disable-next-line incorrect-shift
+                char := shl(byte(0, mload(cursor)), 1)
+            }
+            if (char == CMASK_OPERAND_START) {
+                cursor = LibParse.skipMask(cursor + 1, end, CMASK_WHITESPACE);
+
+                uint256 a;
+                (cursor, a) = parseOperandLiteral(literalParsers, data, type(uint8).max, cursor);
+                Operand operand = Operand.wrap(a);
+
+                cursor = LibParse.skipMask(cursor, end, CMASK_WHITESPACE);
+
+                uint256 b;
+                (cursor, b) = parseOperandLiteral(literalParsers, data, type(uint8).max, cursor);
+                operand = Operand.wrap(Operand.unwrap(operand) | (b << 8));
+
+                cursor = LibParse.skipMask(cursor, end, CMASK_WHITESPACE);
+
+                assembly {
+                    //slither-disable-next-line incorrect-shift
+                    char := shl(byte(0, mload(cursor)), 1)
+                }
+                if (char != CMASK_OPERAND_END) {
+                    revert UnclosedOperand(LibParse.parseErrorOffset(data, cursor));
+                }
+                return (cursor + 1, operand);
+            }
+            // There is no default fallback value.
+            else {
+                revert ExpectedOperand(LibParse.parseErrorOffset(data, cursor));
             }
         }
     }

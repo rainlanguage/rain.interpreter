@@ -36,12 +36,7 @@ contract LibOpBlockNumberNPTest is OpTest {
         uint256[] memory inputs = new uint256[](0);
         Operand operand = Operand.wrap(0);
         opReferenceCheck(
-            state,
-            operand,
-            LibOpBlockNumberNP.referenceFn,
-            LibOpBlockNumberNP.integrity,
-            LibOpBlockNumberNP.run,
-            inputs
+            state, operand, LibOpBlockNumberNP.referenceFn, LibOpBlockNumberNP.integrity, LibOpBlockNumberNP.run, inputs
         );
     }
 

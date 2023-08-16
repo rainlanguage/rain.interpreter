@@ -24,7 +24,11 @@ library LibOpLessThanNP {
     }
 
     /// Gas intensive reference implementation of LT for testing.
-    function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs) internal pure returns (uint256[] memory outputs) {
+    function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
+        internal
+        pure
+        returns (uint256[] memory outputs)
+    {
         outputs = new uint256[](1);
         outputs[0] = inputs[0] < inputs[1] ? 1 : 0;
     }
