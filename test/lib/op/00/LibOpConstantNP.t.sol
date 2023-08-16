@@ -1,30 +1,30 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
+import "test/util/abstract/OpTest.sol";
 
 import "src/lib/caller/LibContext.sol";
 import "src/lib/bytecode/LibBytecode.sol";
 
-/// @title LibOpConstantTest
-/// @notice Test the runtime and integrity time logic of LibOpConstant.
-contract LibOpConstantTest is RainterpreterExpressionDeployerDeploymentTest {
+/// @title LibOpConstantNPTest
+/// @notice Test the runtime and integrity time logic of LibOpConstantNP.
+contract LibOpConstantNPTest is OpTest {
     using LibInterpreterStateNP for InterpreterStateNP;
 
-    /// Directly test the integrity logic of LibOpConstant. The operand always
+    /// Directly test the integrity logic of LibOpConstantNP. The operand always
     /// puts a single value on the stack. This tests the happy path where the
     /// operand points to a value in the constants array.
     function testOpConstantNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
         state.constantsLength = bound(state.constantsLength, 1, type(uint256).max);
         operand = Operand.wrap(bound(Operand.unwrap(operand), 0, state.constantsLength - 1));
 
-        (uint256 inputs, uint256 outputs) = LibOpConstantNP.integrity(state, operand);
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpConstantNP.integrity(state, operand);
 
-        assertEq(inputs, 0);
-        assertEq(outputs, 1);
+        assertEq(calcInputs, 0, "inputs");
+        assertEq(calcOutputs, 1, "outputs");
     }
 
-    /// Directly test the integrity logic of LibOpConstant. This tests the case
+    /// Directly test the integrity logic of LibOpConstantNP. This tests the case
     /// where the operand points past the end of the constants array, which MUST
     /// always error as an OOB read.
     function testOpConstantNPIntegrityOOBConstants(IntegrityCheckStateNP memory state, Operand operand) external {
@@ -38,64 +38,21 @@ contract LibOpConstantTest is RainterpreterExpressionDeployerDeploymentTest {
         LibOpConstantNP.integrity(state, operand);
     }
 
-    /// Directly test the runtime logic of LibOpConstant. This tests that the
+    /// Directly test the runtime logic of LibOpConstantNP. This tests that the
     /// operand always puts a single value on the stack.
-    function testOpConstantNPRun(
-        InterpreterStateNP memory state,
-        uint256 pre,
-        uint256 post,
-        uint256[] memory constants,
-        uint256 constantIndex
-    ) external {
-        vm.assume(constants.length > 0);
-        constantIndex = bound(constantIndex, 0, constants.length - 1);
+    function testOpConstantNPRun(InterpreterStateNP memory state, uint256 constantIndex) external {
+        vm.assume(state.constants.length > 0);
+        constantIndex = bound(constantIndex, 0, state.constants.length - 1);
 
-        Pointer firstConstant;
-        assembly {
-            firstConstant := add(constants, 0x20)
-        }
-        state.firstConstant = firstConstant;
-
-        Pointer stackBottom;
-        Pointer stackTop;
-        Pointer expectedStackTopAfter;
-        Pointer end;
-        assembly {
-            end := mload(0x40)
-            mstore(end, post)
-            expectedStackTopAfter := add(end, 0x20)
-            mstore(expectedStackTopAfter, 0)
-            stackTop := add(expectedStackTopAfter, 0x20)
-            mstore(stackTop, pre)
-            stackBottom := add(stackTop, 0x20)
-            mstore(0x40, stackBottom)
-        }
-
-        // Constants don't modify the state.
-        bytes32 stateFingerprintBefore = state.fingerprint();
-
-        // Run the opcode.
-        Pointer stackTopAfter = LibOpConstantNP.run(state, Operand.wrap(constantIndex), stackTop);
-
-        // Check that the opcode didn't modify the state.
-        assertEq(state.fingerprint(), stateFingerprintBefore);
-
-        assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(expectedStackTopAfter));
-
-        // The constant should be on the stack without modifying any other
-        // data.
-        uint256 actualPost;
-        uint256 actualConstant;
-        uint256 actualPre;
-        assembly {
-            actualPost := mload(end)
-            actualConstant := mload(add(end, 0x20))
-            actualPre := mload(add(end, 0x40))
-        }
-
-        assertEq(actualPost, post);
-        assertEq(actualConstant, constants[constantIndex]);
-        assertEq(actualPre, pre);
+        uint256[] memory inputs = new uint256[](0);
+        opReferenceCheck(
+            state,
+            Operand.wrap(constantIndex),
+            LibOpConstantNP.referenceFn,
+            LibOpConstantNP.integrity,
+            LibOpConstantNP.run,
+            inputs
+        );
     }
 
     /// Test the case of an empty constants array via. an end to end test. We

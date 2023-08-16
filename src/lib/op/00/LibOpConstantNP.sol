@@ -23,11 +23,23 @@ library LibOpConstantNP {
     }
 
     function run(InterpreterStateNP memory state, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
+        uint256[] memory constants = state.constants;
+        // Skip index OOB check and rely on integrity check for that.
         assembly ("memory-safe") {
-            let constantValue := mload(add(mload(add(state, 0x20)), mul(operand, 0x20)))
+            let value := mload(add(constants, mul(add(operand, 1), 0x20)))
             stackTop := sub(stackTop, 0x20)
-            mstore(stackTop, constantValue)
+            mstore(stackTop, value)
         }
         return stackTop;
+    }
+
+    function referenceFn(InterpreterStateNP memory state, Operand operand, uint256[] memory)
+        internal
+        pure
+        returns (uint256[] memory outputs)
+    {
+        uint256 index = Operand.unwrap(operand);
+        outputs = new uint256[](1);
+        outputs[0] = state.constants[index];
     }
 }

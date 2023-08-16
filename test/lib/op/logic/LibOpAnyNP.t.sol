@@ -41,10 +41,10 @@ contract LibOpAnyNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpAnyNP.
-    function testOpAnyNPRun(InterpreterStateNP memory state, uint256 seed, uint256[] memory inputs) external {
+    function testOpAnyNPRun(InterpreterStateNP memory state, uint256[] memory inputs) external {
         vm.assume(inputs.length != 0);
         Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
-        opReferenceCheck(state, seed, operand, LibOpAnyNP.referenceFn, LibOpAnyNP.integrity, LibOpAnyNP.run, inputs);
+        opReferenceCheck(state, operand, LibOpAnyNP.referenceFn, LibOpAnyNP.integrity, LibOpAnyNP.run, inputs);
     }
 
     /// Sample the gas cost of the run function.
@@ -55,7 +55,7 @@ contract LibOpAnyNPTest is OpTest {
         Pointer stackTop = stacks[0].dataPointer();
         InterpreterStateNP memory state = InterpreterStateNP(
             LibInterpreterStateNP.stackBottoms(stacks),
-            Pointer.wrap(0),
+            new uint256[](0),
             0,
             MemoryKV.wrap(0),
             FullyQualifiedNamespace.wrap(0),

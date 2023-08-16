@@ -18,15 +18,13 @@ contract LibOpEqualToNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpEqualToNP.
-    function testOpEqualToNPRun(InterpreterStateNP memory state, uint256 seed, uint256 input1, uint256 input2)
-        external
-    {
+    function testOpEqualToNPRun(InterpreterStateNP memory state, uint256 input1, uint256 input2) external {
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = input1;
         inputs[1] = input2;
         Operand operand = Operand.wrap(inputs.length << 0x10);
         opReferenceCheck(
-            state, seed, operand, LibOpEqualToNP.referenceFn, LibOpEqualToNP.integrity, LibOpEqualToNP.run, inputs
+            state, operand, LibOpEqualToNP.referenceFn, LibOpEqualToNP.integrity, LibOpEqualToNP.run, inputs
         );
     }
 

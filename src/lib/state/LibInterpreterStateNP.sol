@@ -7,7 +7,7 @@ import "../ns/LibNamespace.sol";
 
 struct InterpreterStateNP {
     Pointer[] stackBottoms;
-    Pointer firstConstant;
+    uint256[] constants;
     uint256 sourceIndex;
     MemoryKV stateKV;
     FullyQualifiedNamespace namespace;

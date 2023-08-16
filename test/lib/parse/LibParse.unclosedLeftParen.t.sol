@@ -17,26 +17,26 @@ contract LibParseUnclosedLeftParenTest is Test {
 
     /// Multiple unclosed left parens should be reported.
     function testParseUnclosedLeftParenNested() external {
-        vm.expectRevert(abi.encodeWithSelector(UnclosedLeftParen.selector, 12));
-        LibParse.parse("_:a(b(c(d(e(;", LibMetaFixture.parseMeta());
+        vm.expectRevert(abi.encodeWithSelector(UnclosedLeftParen.selector, 17));
+        LibParse.parse("_:a(b(c<0 0>(d(e(;", LibMetaFixture.parseMeta());
     }
 
     /// The parser should track the paren depth as it encounters left parens
     /// and report if there are any unclosed parens.
     function testParseUnclosedLeftParenNested2() external {
-        vm.expectRevert(abi.encodeWithSelector(UnclosedLeftParen.selector, 16));
-        LibParse.parse("_:a(b(c(d(e())));", LibMetaFixture.parseMeta());
+        vm.expectRevert(abi.encodeWithSelector(UnclosedLeftParen.selector, 21));
+        LibParse.parse("_:a(b(c<0 0>(d(e())));", LibMetaFixture.parseMeta());
     }
 
     /// If there are multiple RHS nestings, the parser should still report the
     /// unclosed left parens.
     function testParseUnclosedLeftParenNested3() external {
         // Second nesting is unclosed.
-        vm.expectRevert(abi.encodeWithSelector(UnclosedLeftParen.selector, 23));
-        LibParse.parse("_:a(b(c(d(e())))) e(a();", LibMetaFixture.parseMeta());
+        vm.expectRevert(abi.encodeWithSelector(UnclosedLeftParen.selector, 28));
+        LibParse.parse("_:a(b(c<0 0>(d(e())))) e(a();", LibMetaFixture.parseMeta());
 
         // First nesting is unclosed.
         vm.expectRevert(abi.encodeWithSelector(UnclosedLeftParen.selector, 23));
-        LibParse.parse("_:a(b(c(d(e()))) e(a());", LibMetaFixture.parseMeta());
+        LibParse.parse("_:a(b(c<0 0>(d(e()))) e(a());", LibMetaFixture.parseMeta());
     }
 }

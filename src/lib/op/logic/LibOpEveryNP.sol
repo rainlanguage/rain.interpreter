@@ -37,7 +37,11 @@ library LibOpEveryNP {
     }
 
     /// Gas intensive reference implementation of EVERY for testing.
-    function referenceFn(Operand, uint256[] memory inputs) internal pure returns (uint256[] memory outputs) {
+    function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
+        internal
+        pure
+        returns (uint256[] memory outputs)
+    {
         // Zero length inputs is not supported so this 0 will always be written
         // over.
         uint256 value = 0;
