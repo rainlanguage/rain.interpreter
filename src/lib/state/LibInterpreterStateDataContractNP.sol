@@ -49,11 +49,10 @@ library LibInterpreterStateDataContractNP {
             }
 
             // Reference the constants array as-is and move cursor past it.
-            Pointer firstConstant;
+            uint256[] memory constants;
             assembly ("memory-safe") {
-                let constantsLength := mload(cursor)
-                firstConstant := add(cursor, 0x20)
-                cursor := add(firstConstant, mul(constantsLength, 0x20))
+                constants := cursor
+                cursor := add(cursor, mul(0x20, add(mload(cursor), 1)))
             }
 
             // Reference the bytecode array as-is.
@@ -105,7 +104,7 @@ library LibInterpreterStateDataContractNP {
             }
 
             return InterpreterStateNP(
-                stackBottoms, firstConstant, sourceIndex, MemoryKV.wrap(0), namespace, store, context, bytecode, fs
+                stackBottoms, constants, sourceIndex, MemoryKV.wrap(0), namespace, store, context, bytecode, fs
             );
         }
     }

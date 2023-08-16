@@ -9,7 +9,7 @@ struct InterpreterStateNP {
     Pointer[] stackBottoms;
     // This is referenced directly in assembly by offset, don't move the constant
     // field.
-    Pointer firstConstant;
+    uint256[] constants;
     uint256 sourceIndex;
     MemoryKV stateKV;
     FullyQualifiedNamespace namespace;

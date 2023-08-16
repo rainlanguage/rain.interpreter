@@ -42,17 +42,11 @@ contract LibOpConstantNPTest is OpTest {
     /// operand always puts a single value on the stack.
     function testOpConstantNPRun(
         InterpreterStateNP memory state,
-        uint256[] memory constants,
         uint256 constantIndex
     ) external {
-        vm.assume(constants.length > 0);
-        constantIndex = bound(constantIndex, 0, constants.length - 1);
+        vm.assume(state.constants.length > 0);
+        constantIndex = bound(constantIndex, 0, state.constants.length - 1);
 
-        Pointer firstConstant;
-        assembly {
-            firstConstant := add(constants, 0x20)
-        }
-        state.firstConstant = firstConstant;
         uint256[] memory inputs = new uint256[](0);
         opReferenceCheck(state, Operand.wrap(constantIndex), LibOpConstantNP.referenceFn, LibOpConstantNP.integrity, LibOpConstantNP.run, inputs);
     }

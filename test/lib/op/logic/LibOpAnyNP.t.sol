@@ -55,7 +55,7 @@ contract LibOpAnyNPTest is OpTest {
         Pointer stackTop = stacks[0].dataPointer();
         InterpreterStateNP memory state = InterpreterStateNP(
             LibInterpreterStateNP.stackBottoms(stacks),
-            Pointer.wrap(0),
+            new uint256[](0),
             0,
             MemoryKV.wrap(0),
             FullyQualifiedNamespace.wrap(0),

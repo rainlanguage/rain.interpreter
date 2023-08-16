@@ -147,7 +147,7 @@ contract LibOpConditionsNPTest is OpTest {
             // constant 0
             hex"01000000"
             // conditions 2 inputs
-            hex"08020000"
+            hex"09020000"
         );
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 0;

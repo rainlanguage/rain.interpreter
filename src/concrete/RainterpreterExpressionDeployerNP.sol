@@ -45,7 +45,7 @@ error UnexpectedOpMetaHash(bytes32 actualOpMeta);
 bytes constant INTEGRITY_FUNCTION_POINTERS = hex"1a961b101b771b811b771b771b771b771b8b1bad1bd71b8b1bd71bd71be11beb1bd71bd7";
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x1e1db69ce6ab5d94173335894049c5b8d6a01e176927478a1bff32de23611f14);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x3ac604a627016c40c055eaca0af3095d6ceaf05fef405145045ba65646c94514);
 
 /// @dev Hash of the known store bytecode.
 bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);
