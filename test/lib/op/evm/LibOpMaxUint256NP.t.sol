@@ -31,7 +31,7 @@ contract LibOpMaxUint256NPTest is OpTest {
 
     /// Test the eval of LibOpMaxUint256NP parsed from a string.
     function testOpMaxUint256NPEval(StateNamespace namespace) external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: max-uint-256();");
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: max-integer-value();");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
@@ -49,9 +49,9 @@ contract LibOpMaxUint256NPTest is OpTest {
         assertEq(kvs.length, 0);
     }
 
-    /// Test that a max-uint-256 with inputs fails integrity check.
+    /// Test that a max-integer-value with inputs fails integrity check.
     function testOpMaxUint256NPEvalFail() public {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: max-uint-256(0x00);");
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: max-integer-value(0x00);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
