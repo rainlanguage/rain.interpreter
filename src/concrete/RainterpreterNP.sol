@@ -28,7 +28,8 @@ error InvalidSourceIndex(SourceIndex sourceIndex);
 /// By setting these as a constant they can be inlined into the interpreter
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"0b480b900bcb0caf0ce90d180d470d960dc50e270eaf0ec30f190f2d0f420f5c0f670f7b";
+bytes constant OPCODE_FUNCTION_POINTERS =
+    hex"0bb80c000c3b0d1f0d590d880db70db70e060e350e970f1f0f330f890f9d0fb20fcc0fd70feb10001000107d10c811131113115e115e11a911f4123f123f";
 
 /// @title RainterpreterNP
 /// @notice !!EXPERIMENTAL!! implementation of a Rainlang interpreter that is

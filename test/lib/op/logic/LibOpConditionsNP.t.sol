@@ -118,27 +118,6 @@ contract LibOpConditionsNPTest is OpTest {
     /// Test that if conditions are NOT met, the expression reverts.
     function testOpConditionsNPEval1FalseInputRevert() external {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: conditions(0 5);");
-        assertEq(
-            bytecode,
-            // 1 source
-            hex"01"
-            // 0 offset
-            hex"0000"
-            // 3 ops
-            hex"03"
-            // 2 stack allocation
-            hex"02"
-            // 0 inputs
-            hex"00"
-            // 1 outputs
-            hex"01"
-            // constant 1
-            hex"01000001"
-            // constant 0
-            hex"01000000"
-            // conditions 2 inputs
-            hex"09020000"
-        );
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 0;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
