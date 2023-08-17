@@ -8,6 +8,9 @@ import "rain.solmem/lib/LibPointer.sol";
 import "./RainterpreterExpressionDeployerDeploymentTest.sol";
 import "../../../src/lib/state/LibInterpreterStateNP.sol";
 
+import "src/lib/caller/LibContext.sol";
+import {UnexpectedOperand} from "src/lib/parse/LibParseOperand.sol";
+
 uint256 constant PRE = uint256(keccak256(abi.encodePacked("pre")));
 uint256 constant POST = uint256(keccak256(abi.encodePacked("post")));
 
@@ -97,5 +100,64 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
             }
             assertEq(POST, pointers.post.unsafeReadWord(), "post");
         }
+    }
+
+    function checkHappy(bytes memory rainString, uint256 expectedValue, string memory errString) internal {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(rainString);
+        uint256[] memory minOutputs = new uint256[](1);
+        minOutputs[0] = 1;
+        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+            iDeployer.deployExpression(bytecode, constants, minOutputs);
+
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            storeDeployer,
+            StateNamespace.wrap(0),
+            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+        );
+
+        assertEq(stack.length, 1);
+        assertEq(stack[0], expectedValue, errString);
+        assertEq(kvs.length, 0);
+    }
+
+    function checkUnhappyOverflow(bytes memory rainString) internal {
+        checkUnhappyStdError(rainString, stdError.arithmeticError);
+    }
+
+    function checkUnhappyStdError(bytes memory rainString, bytes memory err) internal {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(rainString);
+        uint256[] memory minOutputs = new uint256[](1);
+        minOutputs[0] = 1;
+        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+            iDeployer.deployExpression(bytecode, constants, minOutputs);
+        vm.expectRevert(err);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            storeDeployer,
+            StateNamespace.wrap(0),
+            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+        );
+        (stack);
+        (kvs);
+    }
+
+    function checkBadInputs(bytes memory rainString, uint256 opIndex, uint256 calcInputs, uint256 bytecodeInputs) internal {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(rainString);
+        uint256[] memory minOutputs = new uint256[](1);
+        minOutputs[0] = 1;
+        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, opIndex, calcInputs, bytecodeInputs));
+        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+            iDeployer.deployExpression(bytecode, constants, minOutputs);
+        (interpreterDeployer);
+        (storeDeployer);
+        (expression);
+    }
+
+    function checkDisallowedOperand(bytes memory rainString, uint256 offset) internal {
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector, offset));
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(rainString);
+        (bytecode);
+        (constants);
     }
 }

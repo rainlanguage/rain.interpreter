@@ -36,13 +36,20 @@ import "./logic/LibOpLessThanNP.sol";
 import "./logic/LibOpLessThanOrEqualToNP.sol";
 
 import "./math/LibOpIntAddNP.sol";
+import "./math/LibOpIntDivNP.sol";
+import "./math/LibOpIntExpNP.sol";
+import "./math/LibOpIntMaxNP.sol";
+import "./math/LibOpIntMinNP.sol";
+import "./math/LibOpIntModNP.sol";
+import "./math/LibOpIntMulNP.sol";
+import "./math/LibOpIntSubNP.sol";
 
 /// Thrown when a dynamic length array is NOT 1 more than a fixed length array.
 /// Should never happen outside a major breaking change to memory layouts.
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 20;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 28;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -123,6 +130,48 @@ library LibAllStandardOpsNP {
                 "decimal18-add",
                 OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Adds all inputs together as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Errors if the addition exceeds the maximum value (roughly 1.15e77)."
+            ),
+            AuthoringMeta(
+                "int-div",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Divides the first input by all other inputs as non-negative integers. Errors if any divisor is zero."
+            ),
+            AuthoringMeta(
+                "int-exp",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Raises the first input to the power of all other inputs as non-negative integers. Errors if the exponentiation would exceed the maximum value (roughly 1.15e77)."
+            ),
+            AuthoringMeta(
+                "int-max",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Finds the maximum value from all inputs as non-negative integers."
+            ),
+            AuthoringMeta(
+                "int-min",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Finds the minimum value from all inputs as non-negative integers."
+            ),
+            AuthoringMeta(
+                "int-mod",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Modulos the first input by all other inputs as non-negative integers. Errors if any divisor is zero."
+            ),
+            AuthoringMeta(
+                "int-mul",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Multiplies all inputs together as non-negative integers. Errors if the multiplication exceeds the maximum value (roughly 1.15e77)."
+            ),
+            // int and decimal18 sub have identical implementations and point to
+            // the same function pointer. This is intentional.
+            AuthoringMeta(
+                "int-sub",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Subtracts all inputs from the first input as non-negative integers. Errors if the subtraction would result in a negative value."
+            ),
+            AuthoringMeta(
+                "decimal18-sub",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Subtracts all inputs from the first input as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Errors if the subtraction would result in a negative value."
             )
         ];
         AuthoringMeta[] memory wordsDynamic;
@@ -173,7 +222,18 @@ library LibAllStandardOpsNP {
                     // point to the same function pointer. This is intentional.
                     LibOpIntAddNP.integrity,
                     // decimal18 add.
-                    LibOpIntAddNP.integrity
+                    LibOpIntAddNP.integrity,
+                    LibOpIntDivNP.integrity,
+                    LibOpIntExpNP.integrity,
+                    LibOpIntMaxNP.integrity,
+                    LibOpIntMinNP.integrity,
+                    LibOpIntModNP.integrity,
+                    LibOpIntMulNP.integrity,
+                    // int and decimal18 sub have identical implementations and
+                    // point to the same function pointer. This is intentional.
+                    LibOpIntSubNP.integrity,
+                    // decimal18 sub.
+                    LibOpIntSubNP.integrity
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
@@ -230,7 +290,18 @@ library LibAllStandardOpsNP {
                     // point to the same function pointer. This is intentional.
                     LibOpIntAddNP.run,
                     // decimal18 add.
-                    LibOpIntAddNP.run
+                    LibOpIntAddNP.run,
+                    LibOpIntDivNP.run,
+                    LibOpIntExpNP.run,
+                    LibOpIntMaxNP.run,
+                    LibOpIntMinNP.run,
+                    LibOpIntModNP.run,
+                    LibOpIntMulNP.run,
+                    // int and decimal18 sub have identical implementations and
+                    // point to the same function pointer. This is intentional.
+                    LibOpIntSubNP.run,
+                    // decimal18 sub.
+                    LibOpIntSubNP.run
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
