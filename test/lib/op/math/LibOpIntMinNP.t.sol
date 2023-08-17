@@ -86,7 +86,11 @@ contract LibOpIntMinNPTest is OpTest {
         checkHappy("_: int-min(0 max-int-value());", 0, "0 > max-int-value() ? 0 : max-int-value()");
         checkHappy("_: int-min(1 max-int-value());", 1, "1 > max-int-value() ? 1 : max-int-value()");
         checkHappy("_: int-min(max-int-value() 1);", 1, "1 > max-int-value() ? 1 : max-int-value()");
-        checkHappy("_: int-min(max-int-value() max-int-value());", type(uint256).max, "max-int-value() > max-int-value() ? max-int-value() : max-int-value()");
+        checkHappy(
+            "_: int-min(max-int-value() max-int-value());",
+            type(uint256).max,
+            "max-int-value() > max-int-value() ? max-int-value() : max-int-value()"
+        );
         checkHappy("_: int-min(0 2);", 0, "0 > 2 ? 0 : 2");
         checkHappy("_: int-min(1 2);", 1, "1 > 2 ? 1 : 2");
         checkHappy("_: int-min(2 2);", 2, "2 > 2 ? 2 : 2");
@@ -98,13 +102,25 @@ contract LibOpIntMinNPTest is OpTest {
     function testOpDecimal18MaxNPEval2InputsHappy() external {
         checkHappy("_: decimal18-min(0 0);", 0, "0 > 0 ? 0 : 1");
         checkHappy("_: decimal18-min(1 0);", 0, "1 > 0 ? 1 : 0");
-        checkHappy("_: decimal18-min(max-decimal18-value() 0);", 0, "max-decimal18-value() > 0 ? max-decimal18-value() : 0");
+        checkHappy(
+            "_: decimal18-min(max-decimal18-value() 0);", 0, "max-decimal18-value() > 0 ? max-decimal18-value() : 0"
+        );
         checkHappy("_: decimal18-min(0 1);", 0, "0 > 1 ? 0 : 1");
         checkHappy("_: decimal18-min(1 1);", 1, "1 > 1 ? 1 : 1");
-        checkHappy("_: decimal18-min(0 max-decimal18-value());", 0, "0 > max-decimal18-value() ? 0 : max-decimal18-value()");
-        checkHappy("_: decimal18-min(1 max-decimal18-value());", 1, "1 > max-decimal18-value() ? 1 : max-decimal18-value()");
-        checkHappy("_: decimal18-min(max-decimal18-value() 1);", 1, "1 > max-decimal18-value() ? 1 : max-decimal18-value()");
-        checkHappy("_: decimal18-min(max-decimal18-value() max-decimal18-value());", type(uint256).max, "max-decimal18-value() > max-decimal18-value() ? max-decimal18-value() : max-decimal18-value()");
+        checkHappy(
+            "_: decimal18-min(0 max-decimal18-value());", 0, "0 > max-decimal18-value() ? 0 : max-decimal18-value()"
+        );
+        checkHappy(
+            "_: decimal18-min(1 max-decimal18-value());", 1, "1 > max-decimal18-value() ? 1 : max-decimal18-value()"
+        );
+        checkHappy(
+            "_: decimal18-min(max-decimal18-value() 1);", 1, "1 > max-decimal18-value() ? 1 : max-decimal18-value()"
+        );
+        checkHappy(
+            "_: decimal18-min(max-decimal18-value() max-decimal18-value());",
+            type(uint256).max,
+            "max-decimal18-value() > max-decimal18-value() ? max-decimal18-value() : max-decimal18-value()"
+        );
         checkHappy("_: decimal18-min(0 2);", 0, "0 > 2 ? 0 : 2");
         checkHappy("_: decimal18-min(1 2);", 1, "1 > 2 ? 1 : 2");
         checkHappy("_: decimal18-min(2 2);", 2, "2 > 2 ? 2 : 2");
@@ -175,7 +191,11 @@ contract LibOpIntMinNPTest is OpTest {
         checkHappy("_: int-min(max-int-value() max-int-value() 0);", 0, "max-int-value() max-int-value() 0");
         checkHappy("_: int-min(max-int-value() max-int-value() 1);", 1, "max-int-value() max-int-value() 1");
         checkHappy("_: int-min(max-int-value() max-int-value() 2);", 2, "max-int-value() max-int-value() 2");
-        checkHappy("_: int-min(max-int-value() max-int-value() max-int-value());", type(uint256).max, "max-int-value() max-int-value() max-int-value()");
+        checkHappy(
+            "_: int-min(max-int-value() max-int-value() max-int-value());",
+            type(uint256).max,
+            "max-int-value() max-int-value() max-int-value()"
+        );
     }
 
     /// Test the eval of `decimal18-min` opcode parsed from a string.
@@ -227,9 +247,21 @@ contract LibOpIntMinNPTest is OpTest {
         checkHappy("_: decimal18-min(0 max-decimal18-value() 2);", 0, "0 max-decimal18-value() 2");
         checkHappy("_: decimal18-min(1 max-decimal18-value() 2);", 1, "1 max-decimal18-value() 2");
         checkHappy("_: decimal18-min(2 max-decimal18-value() 2);", 2, "2 max-decimal18-value() 2");
-        checkHappy("_: decimal18-min(0 max-decimal18-value() max-decimal18-value());", 0, "0 max-decimal18-value() max-decimal18-value()");
-        checkHappy("_: decimal18-min(1 max-decimal18-value() max-decimal18-value());", 1, "1 max-decimal18-value() max-decimal18-value()");
-        checkHappy("_: decimal18-min(2 max-decimal18-value() max-decimal18-value());", 2, "2 max-decimal18-value() max-decimal18-value()");
+        checkHappy(
+            "_: decimal18-min(0 max-decimal18-value() max-decimal18-value());",
+            0,
+            "0 max-decimal18-value() max-decimal18-value()"
+        );
+        checkHappy(
+            "_: decimal18-min(1 max-decimal18-value() max-decimal18-value());",
+            1,
+            "1 max-decimal18-value() max-decimal18-value()"
+        );
+        checkHappy(
+            "_: decimal18-min(2 max-decimal18-value() max-decimal18-value());",
+            2,
+            "2 max-decimal18-value() max-decimal18-value()"
+        );
         checkHappy("_: decimal18-min(max-decimal18-value() 0 0);", 0, "max-decimal18-value() 0 0");
         checkHappy("_: decimal18-min(max-decimal18-value() 1 0);", 0, "max-decimal18-value() 1 0");
         checkHappy("_: decimal18-min(max-decimal18-value() 2 0);", 0, "max-decimal18-value() 2 0");
@@ -239,15 +271,42 @@ contract LibOpIntMinNPTest is OpTest {
         checkHappy("_: decimal18-min(max-decimal18-value() 0 2);", 0, "max-decimal18-value() 0 2");
         checkHappy("_: decimal18-min(max-decimal18-value() 1 2);", 1, "max-decimal18-value() 1 2");
         checkHappy("_: decimal18-min(max-decimal18-value() 2 2);", 2, "max-decimal18-value() 2 2");
-        checkHappy("_: decimal18-min(max-decimal18-value() 0 max-decimal18-value());", 0, "max-decimal18-value() 0 max-decimal18-value()");
-        checkHappy("_: decimal18-min(max-decimal18-value() 1 max-decimal18-value());", 1, "max-decimal18-value() 1 max-decimal18-value()");
-        checkHappy("_: decimal18-min(max-decimal18-value() 2 max-decimal18-value());", 2, "max-decimal18-value() 2 max-decimal18-value()");
-        checkHappy("_: decimal18-min(max-decimal18-value() max-decimal18-value() 0);", 0, "max-decimal18-value() max-decimal18-value() 0");
-        checkHappy("_: decimal18-min(max-decimal18-value() max-decimal18-value() 1);", 1, "max-decimal18-value() max-decimal18-value() 1");
-        checkHappy("_: decimal18-min(max-decimal18-value() max-decimal18-value() 2);", 2, "max-decimal18-value() max-decimal18-value() 2");
-        checkHappy("_: decimal18-min(max-decimal18-value() max-decimal18-value() max-decimal18-value());", type(uint256).max, "max-decimal18-value() max-decimal18-value() max-decimal18-value()");
+        checkHappy(
+            "_: decimal18-min(max-decimal18-value() 0 max-decimal18-value());",
+            0,
+            "max-decimal18-value() 0 max-decimal18-value()"
+        );
+        checkHappy(
+            "_: decimal18-min(max-decimal18-value() 1 max-decimal18-value());",
+            1,
+            "max-decimal18-value() 1 max-decimal18-value()"
+        );
+        checkHappy(
+            "_: decimal18-min(max-decimal18-value() 2 max-decimal18-value());",
+            2,
+            "max-decimal18-value() 2 max-decimal18-value()"
+        );
+        checkHappy(
+            "_: decimal18-min(max-decimal18-value() max-decimal18-value() 0);",
+            0,
+            "max-decimal18-value() max-decimal18-value() 0"
+        );
+        checkHappy(
+            "_: decimal18-min(max-decimal18-value() max-decimal18-value() 1);",
+            1,
+            "max-decimal18-value() max-decimal18-value() 1"
+        );
+        checkHappy(
+            "_: decimal18-min(max-decimal18-value() max-decimal18-value() 2);",
+            2,
+            "max-decimal18-value() max-decimal18-value() 2"
+        );
+        checkHappy(
+            "_: decimal18-min(max-decimal18-value() max-decimal18-value() max-decimal18-value());",
+            type(uint256).max,
+            "max-decimal18-value() max-decimal18-value() max-decimal18-value()"
+        );
     }
-
 
     /// Test the eval of `int-min` opcode parsed from a string.
     /// Tests that operands are disallowed.

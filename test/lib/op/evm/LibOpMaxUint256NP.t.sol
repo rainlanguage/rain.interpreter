@@ -49,9 +49,9 @@ contract LibOpMaxUint256NPTest is OpTest {
         assertEq(kvs.length, 0);
     }
 
-    /// Test that a max-integer-value with inputs fails integrity check.
+    /// Test that a max-int-value with inputs fails integrity check.
     function testOpMaxUint256NPEvalFail() public {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: max-integer-value(0x00);");
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: max-int-value(0x00);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));

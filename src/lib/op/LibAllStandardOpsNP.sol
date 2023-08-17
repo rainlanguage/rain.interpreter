@@ -74,10 +74,14 @@ library LibAllStandardOpsNP {
             AuthoringMeta("block-number", OPERAND_PARSER_OFFSET_DISALLOWED, "The current block number."),
             AuthoringMeta("chain-id", OPERAND_PARSER_OFFSET_DISALLOWED, "The current chain id."),
             AuthoringMeta(
-                "max-int-value", OPERAND_PARSER_OFFSET_DISALLOWED, "The maximum possible non-negative integer value. 2^256 - 1."
+                "max-int-value",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "The maximum possible non-negative integer value. 2^256 - 1."
             ),
             AuthoringMeta(
-                "max-decimal18-value", OPERAND_PARSER_OFFSET_DISALLOWED, "The maximum possible 18 decimal fixed point value. roughly 1.15e77."
+                "max-decimal18-value",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "The maximum possible 18 decimal fixed point value. roughly 1.15e77."
             ),
             AuthoringMeta("block-timestamp", OPERAND_PARSER_OFFSET_DISALLOWED, "The current block timestamp."),
             AuthoringMeta(

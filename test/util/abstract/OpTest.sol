@@ -142,7 +142,9 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
         (kvs);
     }
 
-    function checkBadInputs(bytes memory rainString, uint256 opIndex, uint256 calcInputs, uint256 bytecodeInputs) internal {
+    function checkBadInputs(bytes memory rainString, uint256 opIndex, uint256 calcInputs, uint256 bytecodeInputs)
+        internal
+    {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(rainString);
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;

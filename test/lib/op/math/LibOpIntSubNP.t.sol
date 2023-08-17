@@ -170,5 +170,4 @@ contract LibOpIntSubNPTest is OpTest {
         checkUnhappyOverflow("_: decimal18-sub(3 4 5);");
         checkUnhappyOverflow("_: decimal18-sub(2 2 1);");
     }
-
 }

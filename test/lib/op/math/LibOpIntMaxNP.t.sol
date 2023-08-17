@@ -86,7 +86,11 @@ contract LibOpIntMaxNPTest is OpTest {
         checkHappy("_: int-max(0 max-int-value());", type(uint256).max, "0 > max-int-value() ? 0 : max-int-value()");
         checkHappy("_: int-max(1 max-int-value());", type(uint256).max, "1 > max-int-value() ? 1 : max-int-value()");
         checkHappy("_: int-max(max-int-value() 1);", type(uint256).max, "1 > max-int-value() ? 1 : max-int-value()");
-        checkHappy("_: int-max(max-int-value() max-int-value());", type(uint256).max, "max-int-value() > max-int-value() ? max-int-value() : max-int-value()");
+        checkHappy(
+            "_: int-max(max-int-value() max-int-value());",
+            type(uint256).max,
+            "max-int-value() > max-int-value() ? max-int-value() : max-int-value()"
+        );
         checkHappy("_: int-max(0 2);", 2, "0 > 2 ? 0 : 2");
         checkHappy("_: int-max(1 2);", 2, "1 > 2 ? 1 : 2");
         checkHappy("_: int-max(2 2);", 2, "2 > 2 ? 2 : 2");
@@ -98,13 +102,25 @@ contract LibOpIntMaxNPTest is OpTest {
     function testOpDecimal18MaxNPEval2InputsHappy() external {
         checkHappy("_: decimal18-max(0 0);", 0, "0 > 0 ? 0 : 1");
         checkHappy("_: decimal18-max(1 0);", 1, "1 > 0 ? 1 : 0");
-        checkHappy("_: decimal18-max(max-int-value() 0);", type(uint256).max, "max-int-value() > 0 ? max-int-value() : 0");
+        checkHappy(
+            "_: decimal18-max(max-int-value() 0);", type(uint256).max, "max-int-value() > 0 ? max-int-value() : 0"
+        );
         checkHappy("_: decimal18-max(0 1);", 1, "0 > 1 ? 0 : 1");
         checkHappy("_: decimal18-max(1 1);", 1, "1 > 1 ? 1 : 1");
-        checkHappy("_: decimal18-max(0 max-int-value());", type(uint256).max, "0 > max-int-value() ? 0 : max-int-value()");
-        checkHappy("_: decimal18-max(1 max-int-value());", type(uint256).max, "1 > max-int-value() ? 1 : max-int-value()");
-        checkHappy("_: decimal18-max(max-int-value() 1);", type(uint256).max, "1 > max-int-value() ? 1 : max-int-value()");
-        checkHappy("_: decimal18-max(max-int-value() max-int-value());", type(uint256).max, "max-int-value() > max-int-value() ? max-int-value() : max-int-value()");
+        checkHappy(
+            "_: decimal18-max(0 max-int-value());", type(uint256).max, "0 > max-int-value() ? 0 : max-int-value()"
+        );
+        checkHappy(
+            "_: decimal18-max(1 max-int-value());", type(uint256).max, "1 > max-int-value() ? 1 : max-int-value()"
+        );
+        checkHappy(
+            "_: decimal18-max(max-int-value() 1);", type(uint256).max, "1 > max-int-value() ? 1 : max-int-value()"
+        );
+        checkHappy(
+            "_: decimal18-max(max-int-value() max-int-value());",
+            type(uint256).max,
+            "max-int-value() > max-int-value() ? max-int-value() : max-int-value()"
+        );
         checkHappy("_: decimal18-max(0 2);", 2, "0 > 2 ? 0 : 2");
         checkHappy("_: decimal18-max(1 2);", 2, "1 > 2 ? 1 : 2");
         checkHappy("_: decimal18-max(2 2);", 2, "2 > 2 ? 2 : 2");
@@ -191,7 +207,6 @@ contract LibOpIntMaxNPTest is OpTest {
         checkHappy("_: decimal18-max(1 2 max-int-value());", type(uint256).max, "1 2 max-int-value()");
         checkHappy("_: decimal18-max(2 2 max-int-value());", type(uint256).max, "2 2 max-int-value()");
     }
-
 
     /// Test the eval of `int-max` opcode parsed from a string.
     /// Tests that operands are disallowed.

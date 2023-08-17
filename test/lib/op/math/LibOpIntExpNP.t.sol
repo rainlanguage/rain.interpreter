@@ -53,8 +53,7 @@ contract LibOpIntExpNPTest is OpTest {
                     continue;
                 } else if (b == 1 || a == 0) {
                     continue;
-                }
-                else {
+                } else {
                     uint256 c = a;
                     for (uint256 j = 1; j < b; j++) {
                         uint256 d = a * c;

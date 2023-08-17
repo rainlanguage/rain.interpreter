@@ -4,7 +4,6 @@ pragma solidity =0.8.19;
 import "test/util/abstract/OpTest.sol";
 
 contract LibOpIntAddNPTest is OpTest {
-
     /// Directly test the integrity logic of LibOpIntAddNP. This tests the happy
     /// path where the inputs and calc match.
     function testOpIntAddNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external {
