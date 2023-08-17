@@ -65,7 +65,7 @@ contract LibOpIntDivNPTest is OpTest {
         checkBadInputs("_: int-div(5);", 1, 2, 1);
         checkBadInputs("_: int-div(0);", 1, 2, 1);
         checkBadInputs("_: int-div(1);", 1, 2, 1);
-        checkBadInputs("_: int-div(max-integer-value());", 1, 2, 1);
+        checkBadInputs("_: int-div(max-int-value());", 1, 2, 1);
     }
 
     /// Test the eval of `int-div` opcode parsed from a string. Tests two inputs.
@@ -80,20 +80,20 @@ contract LibOpIntDivNPTest is OpTest {
         checkHappy("_: int-div(6 5);", 1, "6 / 5");
         checkHappy("_: int-div(6 6);", 1, "6 / 6");
         checkHappy("_: int-div(6 7);", 0, "6 / 7");
-        checkHappy("_: int-div(6 max-integer-value());", 0, "6 / max-integer-value()");
+        checkHappy("_: int-div(6 max-int-value());", 0, "6 / max-int-value()");
 
         // Anything divided by 1 is itself.
         checkHappy("_: int-div(0 1);", 0, "0 / 1");
         checkHappy("_: int-div(1 1);", 1, "1 / 1");
         checkHappy("_: int-div(2 1);", 2, "2 / 1");
         checkHappy("_: int-div(3 1);", 3, "3 / 1");
-        checkHappy("_: int-div(max-integer-value() 1);", type(uint256).max, "max-integer-value() / 1");
+        checkHappy("_: int-div(max-int-value() 1);", type(uint256).max, "max-int-value() / 1");
 
         // Anything divided by itself is 1 (except 0).
         checkHappy("_: int-div(1 1);", 1, "1 / 1");
         checkHappy("_: int-div(2 2);", 1, "2 / 2");
         checkHappy("_: int-div(3 3);", 1, "3 / 3");
-        checkHappy("_: int-div(max-integer-value() max-integer-value());", 1, "max-integer-value() / max-integer-value()");
+        checkHappy("_: int-div(max-int-value() max-int-value());", 1, "max-int-value() / max-int-value()");
     }
 
     /// Test the eval of `int-div` opcode parsed from a string. Tests two inputs.
@@ -101,7 +101,7 @@ contract LibOpIntDivNPTest is OpTest {
     function testOpIntDivNPEval2InputsUnhappy() external {
         checkUnhappyStdError("_: int-div(0 0);", stdError.divisionError);
         checkUnhappyStdError("_: int-div(1 0);", stdError.divisionError);
-        checkUnhappyStdError("_: int-div(max-integer-value() 0);", stdError.divisionError);
+        checkUnhappyStdError("_: int-div(max-int-value() 0);", stdError.divisionError);
     }
 
     /// Test the eval of `int-div` opcode parsed from a string. Tests three inputs.
@@ -115,7 +115,7 @@ contract LibOpIntDivNPTest is OpTest {
         checkHappy("_: int-div(6 5 1);", 1, "6 / 5 / 1");
         checkHappy("_: int-div(6 6 1);", 1, "6 / 6 / 1");
         checkHappy("_: int-div(6 7 1);", 0, "6 / 7 / 1");
-        checkHappy("_: int-div(6 max-integer-value() 1);", 0, "6 / max-integer-value() / 1");
+        checkHappy("_: int-div(6 max-int-value() 1);", 0, "6 / max-int-value() / 1");
         checkHappy("_: int-div(6 1 2);", 3, "6 / 1 / 2");
         checkHappy("_: int-div(6 2 2);", 1, "6 / 2 / 2");
         checkHappy("_: int-div(6 3 2);", 1, "6 / 3 / 2");
@@ -123,14 +123,14 @@ contract LibOpIntDivNPTest is OpTest {
         checkHappy("_: int-div(6 5 2);", 0, "6 / 5 / 2");
         checkHappy("_: int-div(6 6 2);", 0, "6 / 6 / 2");
         checkHappy("_: int-div(6 7 2);", 0, "6 / 7 / 2");
-        checkHappy("_: int-div(6 max-integer-value() 2);", 0, "6 / max-integer-value() / 2");
+        checkHappy("_: int-div(6 max-int-value() 2);", 0, "6 / max-int-value() / 2");
 
         // Anything divided by 1 is itself.
         checkHappy("_: int-div(0 1 1);", 0, "0 / 1 / 1");
         checkHappy("_: int-div(1 1 1);", 1, "1 / 1 / 1");
         checkHappy("_: int-div(2 1 1);", 2, "2 / 1 / 1");
         checkHappy("_: int-div(3 1 1);", 3, "3 / 1 / 1");
-        checkHappy("_: int-div(max-integer-value() 1 1);", type(uint256).max, "max-integer-value() / 1 / 1");
+        checkHappy("_: int-div(max-int-value() 1 1);", type(uint256).max, "max-int-value() / 1 / 1");
 
         // Anything divided by itself is 1 (except 0).
         checkHappy("_: int-div(1 1 1);", 1, "1 / 1 / 1");
@@ -138,8 +138,8 @@ contract LibOpIntDivNPTest is OpTest {
         checkHappy("_: int-div(2 1 2);", 1, "2 / 1 / 2");
         checkHappy("_: int-div(3 3 1);", 1, "3 / 3 / 1");
         checkHappy("_: int-div(3 1 3);", 1, "3 / 1 / 3");
-        checkHappy("_: int-div(max-integer-value() max-integer-value() 1);", 1, "max-integer-value() / max-integer-value() / 1");
-        checkHappy("_: int-div(max-integer-value() 1 max-integer-value());", 1, "max-integer-value() / 1 / max-integer-value()");
+        checkHappy("_: int-div(max-int-value() max-int-value() 1);", 1, "max-int-value() / max-int-value() / 1");
+        checkHappy("_: int-div(max-int-value() 1 max-int-value());", 1, "max-int-value() / 1 / max-int-value()");
     }
 
     /// Test the eval of `int-div` opcode parsed from a string. Tests three inputs.
@@ -147,13 +147,13 @@ contract LibOpIntDivNPTest is OpTest {
     function testOpIntDivNPEval3InputsUnhappy() external {
         checkUnhappyStdError("_: int-div(0 0 0);", stdError.divisionError);
         checkUnhappyStdError("_: int-div(1 0 0);", stdError.divisionError);
-        checkUnhappyStdError("_: int-div(max-integer-value() 0 0);", stdError.divisionError);
+        checkUnhappyStdError("_: int-div(max-int-value() 0 0);", stdError.divisionError);
         checkUnhappyStdError("_: int-div(0 1 0);", stdError.divisionError);
         checkUnhappyStdError("_: int-div(1 1 0);", stdError.divisionError);
-        checkUnhappyStdError("_: int-div(max-integer-value() max-integer-value() 0);", stdError.divisionError);
+        checkUnhappyStdError("_: int-div(max-int-value() max-int-value() 0);", stdError.divisionError);
         checkUnhappyStdError("_: int-div(0 0 1);", stdError.divisionError);
         checkUnhappyStdError("_: int-div(1 0 1);", stdError.divisionError);
-        checkUnhappyStdError("_: int-div(max-integer-value() 0 1);", stdError.divisionError);
+        checkUnhappyStdError("_: int-div(max-int-value() 0 1);", stdError.divisionError);
     }
 
     /// Test the eval of `int-div` opcode parsed from a string.

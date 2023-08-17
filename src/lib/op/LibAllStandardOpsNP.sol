@@ -49,7 +49,7 @@ import "./math/LibOpIntSubNP.sol";
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 28;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 31;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -74,7 +74,10 @@ library LibAllStandardOpsNP {
             AuthoringMeta("block-number", OPERAND_PARSER_OFFSET_DISALLOWED, "The current block number."),
             AuthoringMeta("chain-id", OPERAND_PARSER_OFFSET_DISALLOWED, "The current chain id."),
             AuthoringMeta(
-                "max-integer-value", OPERAND_PARSER_OFFSET_DISALLOWED, "The maximum possible non-negative integer value."
+                "max-int-value", OPERAND_PARSER_OFFSET_DISALLOWED, "The maximum possible non-negative integer value. 2^256 - 1."
+            ),
+            AuthoringMeta(
+                "max-decimal18-value", OPERAND_PARSER_OFFSET_DISALLOWED, "The maximum possible 18 decimal fixed point value. roughly 1.15e77."
             ),
             AuthoringMeta("block-timestamp", OPERAND_PARSER_OFFSET_DISALLOWED, "The current block timestamp."),
             AuthoringMeta(
@@ -141,15 +144,29 @@ library LibAllStandardOpsNP {
                 OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Raises the first input to the power of all other inputs as non-negative integers. Errors if the exponentiation would exceed the maximum value (roughly 1.15e77)."
             ),
+            // int and decimal18 max have identical implementations and point to
+            // the same function pointer. This is intentional.
             AuthoringMeta(
                 "int-max",
                 OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Finds the maximum value from all inputs as non-negative integers."
             ),
             AuthoringMeta(
+                "decimal18-max",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Finds the maximum value from all inputs as fixed point 18 decimal numbers (i.e. 'one' is 1e18)."
+            ),
+            // int and decimal18 min have identical implementations and point to
+            // the same function pointer. This is intentional.
+            AuthoringMeta(
                 "int-min",
                 OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Finds the minimum value from all inputs as non-negative integers."
+            ),
+            AuthoringMeta(
+                "decimal18-min",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Finds the minimum value from all inputs as fixed point 18 decimal numbers (i.e. 'one' is 1e18)."
             ),
             AuthoringMeta(
                 "int-mod",
@@ -206,6 +223,10 @@ library LibAllStandardOpsNP {
                     LibOpHashNP.integrity,
                     LibOpBlockNumberNP.integrity,
                     LibOpChainIdNP.integrity,
+                    // int and decimal18 max have identical implementations and
+                    // point to the same function pointer. This is intentional.
+                    LibOpMaxUint256NP.integrity,
+                    // decimal18 max.
                     LibOpMaxUint256NP.integrity,
                     LibOpTimestampNP.integrity,
                     LibOpAnyNP.integrity,
@@ -225,7 +246,15 @@ library LibAllStandardOpsNP {
                     LibOpIntAddNP.integrity,
                     LibOpIntDivNP.integrity,
                     LibOpIntExpNP.integrity,
+                    // int and decimal18 max have identical implementations and
+                    // point to the same function pointer. This is intentional.
                     LibOpIntMaxNP.integrity,
+                    // decimal18 max.
+                    LibOpIntMaxNP.integrity,
+                    // int and decimal18 min have identical implementations and
+                    // point to the same function pointer. This is intentional.
+                    LibOpIntMinNP.integrity,
+                    // decimal18 min.
                     LibOpIntMinNP.integrity,
                     LibOpIntModNP.integrity,
                     LibOpIntMulNP.integrity,
@@ -274,6 +303,10 @@ library LibAllStandardOpsNP {
                     LibOpHashNP.run,
                     LibOpBlockNumberNP.run,
                     LibOpChainIdNP.run,
+                    // int and decimal18 max have identical implementations and
+                    // point to the same function pointer. This is intentional.
+                    LibOpMaxUint256NP.run,
+                    // decimal18 max.
                     LibOpMaxUint256NP.run,
                     LibOpTimestampNP.run,
                     LibOpAnyNP.run,
@@ -293,7 +326,15 @@ library LibAllStandardOpsNP {
                     LibOpIntAddNP.run,
                     LibOpIntDivNP.run,
                     LibOpIntExpNP.run,
+                    // int and decimal18 max have identical implementations and
+                    // point to the same function pointer. This is intentional.
                     LibOpIntMaxNP.run,
+                    // decimal18 max.
+                    LibOpIntMaxNP.run,
+                    // int and decimal18 min have identical implementations and
+                    // point to the same function pointer. This is intentional.
+                    LibOpIntMinNP.run,
+                    // decimal18 min.
                     LibOpIntMinNP.run,
                     LibOpIntModNP.run,
                     LibOpIntMulNP.run,

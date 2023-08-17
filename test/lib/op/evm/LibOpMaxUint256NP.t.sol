@@ -31,7 +31,7 @@ contract LibOpMaxUint256NPTest is OpTest {
 
     /// Test the eval of LibOpMaxUint256NP parsed from a string.
     function testOpMaxUint256NPEval(StateNamespace namespace) external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: max-integer-value();");
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: max-int-value();");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
