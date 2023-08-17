@@ -1,17 +1,12 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "rain.solmem/lib/LibUint256Array.sol";
-
 import "test/util/abstract/OpTest.sol";
-import "src/lib/caller/LibContext.sol";
-import {UnexpectedOperand} from "src/lib/parse/LibParseOperand.sol";
 
 contract LibOpIntAddNPTest is OpTest {
-    using LibUint256Array for uint256[];
 
     /// Directly test the integrity logic of LibOpIntAddNP. This tests the happy
-    /// path where the inputs input and calc match.
+    /// path where the inputs and calc match.
     function testOpIntAddNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external {
         inputs = uint8(bound(inputs, 2, type(uint8).max));
         (uint256 calcInputs, uint256 calcOutputs) =
@@ -227,19 +222,25 @@ contract LibOpIntAddNPTest is OpTest {
     /// Test the eval of `int-add` opcode parsed from a string.
     /// Tests that operands are disallowed.
     function testOpIntAddNPEvalOperandDisallowed() external {
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector, 10));
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: int-add<0>();");
-        (bytecode);
-        (constants);
+        checkDisallowedOperand("_: int-add<>(0 0);", 10);
+        checkDisallowedOperand("_: int-add<0>(0 0 0);", 10);
+        checkDisallowedOperand("_: int-add<1>(0 0 0);", 10);
+        checkDisallowedOperand("_: int-add<2>(0 0 0);", 10);
+        checkDisallowedOperand("_: int-add<0 0>(0 0 0);", 10);
+        checkDisallowedOperand("_: int-add<0 1>(0 0 0);", 10);
+        checkDisallowedOperand("_: int-add<1 0>(0 0 0);", 10);
     }
 
     /// Test the eval of `decimal18-add` opcode parsed from a string.
     /// MUST behave identically to `int-add`.
     /// Tests that operands are disallowed.
     function testOpDecimal18AddNPEvalOperandDisallowed() external {
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector, 16));
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: decimal18-add<0>();");
-        (bytecode);
-        (constants);
+        checkDisallowedOperand("_: decimal18-add<>(0 0);", 16);
+        checkDisallowedOperand("_: decimal18-add<0>(0 0 0);", 16);
+        checkDisallowedOperand("_: decimal18-add<1>(0 0 0);", 16);
+        checkDisallowedOperand("_: decimal18-add<2>(0 0 0);", 16);
+        checkDisallowedOperand("_: decimal18-add<0 0>(0 0 0);", 16);
+        checkDisallowedOperand("_: decimal18-add<0 1>(0 0 0);", 16);
+        checkDisallowedOperand("_: decimal18-add<1 0>(0 0 0);", 16);
     }
 }
