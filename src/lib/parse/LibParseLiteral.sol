@@ -277,7 +277,7 @@ library LibParseLiteral {
                         cursor = end - 1;
                         exponent = 0;
                     } else {
-                        revert ZeroLengthDecimal(LibParse.parseErrorOffset(data, cursor));
+                        revert ZeroLengthDecimal(LibParse.parseErrorOffset(data, start));
                     }
                 }
             }
