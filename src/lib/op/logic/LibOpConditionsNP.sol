@@ -63,6 +63,8 @@ library LibOpConditionsNP {
         pure
         returns (uint256[] memory outputs)
     {
+        // Unchecked so that any overflow errors come from the real
+        // implementation.
         unchecked {
             uint256 length = inputs.length;
             require(length % 2 == 0, "Odd number of inputs");

@@ -26,6 +26,9 @@ error DecimalLiteralOverflow(uint256 offset);
 /// digits.
 error MalformedExponentDigits(uint256 offset);
 
+/// Encountered a zero length decimal literal.
+error ZeroLengthDecimal(uint256 offset);
+
 /// @dev The type of a literal is both a unique value and a literal offset used
 /// to index into the literal parser array as a uint256.
 uint256 constant LITERAL_TYPE_INTEGER_HEX = 0;
@@ -242,6 +245,7 @@ library LibParseLiteral {
                 uint256 word;
                 //slither-disable-next-line similar-names
                 uint256 decimalCharByte;
+                uint256 length = end - start;
                 assembly ("memory-safe") {
                     word := mload(sub(end, 3))
                     decimalCharByte := byte(0, word)
@@ -249,7 +253,7 @@ library LibParseLiteral {
                 // If the last 3 bytes are e notation, then we need to parse
                 // the exponent as a 2 digit number.
                 //slither-disable-next-line incorrect-shift
-                if (((1 << decimalCharByte) & CMASK_E_NOTATION) != 0) {
+                if (length > 3 && ((1 << decimalCharByte) & CMASK_E_NOTATION) != 0) {
                     cursor = end - 4;
                     assembly ("memory-safe") {
                         exponent := add(sub(byte(2, word), digitOffset), mul(sub(byte(1, word), digitOffset), 10))
@@ -261,7 +265,7 @@ library LibParseLiteral {
                     // If the last 2 bytes are e notation, then we need to parse
                     // the exponent as a 1 digit number.
                     //slither-disable-next-line incorrect-shift
-                    if (((1 << decimalCharByte) & CMASK_E_NOTATION) != 0) {
+                    if (length > 2 && ((1 << decimalCharByte) & CMASK_E_NOTATION) != 0) {
                         cursor = end - 3;
                         assembly ("memory-safe") {
                             exponent := sub(byte(2, word), digitOffset)
@@ -269,9 +273,11 @@ library LibParseLiteral {
                     }
                     // Otherwise, we're not in e notation and we can start at the
                     // end of the literal with 0 starting exponent.
-                    else {
+                    else if (length > 0) {
                         cursor = end - 1;
                         exponent = 0;
+                    } else {
+                        revert ZeroLengthDecimal(LibParse.parseErrorOffset(data, cursor));
                     }
                 }
             }

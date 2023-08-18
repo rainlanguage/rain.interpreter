@@ -98,9 +98,9 @@ contract LibOpIntModNPTest is OpTest {
     /// Test the eval of `int-mod` opcode parsed from a string. Tests two inputs.
     /// Tests the unhappy path where we modulo by zero.
     function testOpIntModNPEval2InputsUnhappy() external {
-        checkUnhappyStdError("_: int-mod(0 0);", stdError.divisionError);
-        checkUnhappyStdError("_: int-mod(1 0);", stdError.divisionError);
-        checkUnhappyStdError("_: int-mod(max-int-value() 0);", stdError.divisionError);
+        checkUnhappy("_: int-mod(0 0);", stdError.divisionError);
+        checkUnhappy("_: int-mod(1 0);", stdError.divisionError);
+        checkUnhappy("_: int-mod(max-int-value() 0);", stdError.divisionError);
     }
 
     /// Test the eval of `int-mod` opcode parsed from a string. Tests three inputs.
@@ -145,15 +145,15 @@ contract LibOpIntModNPTest is OpTest {
     /// Test the eval of `int-mod` opcode parsed from a string. Tests three inputs.
     /// Tests the unhappy path where we modulo by zero.
     function testOpIntModNPEval3InputsUnhappy() external {
-        checkUnhappyStdError("_: int-mod(0 0 0);", stdError.divisionError);
-        checkUnhappyStdError("_: int-mod(1 0 0);", stdError.divisionError);
-        checkUnhappyStdError("_: int-mod(max-int-value() 0 0);", stdError.divisionError);
-        checkUnhappyStdError("_: int-mod(0 1 0);", stdError.divisionError);
-        checkUnhappyStdError("_: int-mod(1 1 0);", stdError.divisionError);
-        checkUnhappyStdError("_: int-mod(max-int-value() max-int-value() 0);", stdError.divisionError);
-        checkUnhappyStdError("_: int-mod(0 0 1);", stdError.divisionError);
-        checkUnhappyStdError("_: int-mod(1 0 1);", stdError.divisionError);
-        checkUnhappyStdError("_: int-mod(max-int-value() 0 1);", stdError.divisionError);
+        checkUnhappy("_: int-mod(0 0 0);", stdError.divisionError);
+        checkUnhappy("_: int-mod(1 0 0);", stdError.divisionError);
+        checkUnhappy("_: int-mod(max-int-value() 0 0);", stdError.divisionError);
+        checkUnhappy("_: int-mod(0 1 0);", stdError.divisionError);
+        checkUnhappy("_: int-mod(1 1 0);", stdError.divisionError);
+        checkUnhappy("_: int-mod(max-int-value() max-int-value() 0);", stdError.divisionError);
+        checkUnhappy("_: int-mod(0 0 1);", stdError.divisionError);
+        checkUnhappy("_: int-mod(1 0 1);", stdError.divisionError);
+        checkUnhappy("_: int-mod(max-int-value() 0 1);", stdError.divisionError);
     }
 
     /// Test the eval of `int-mod` opcode parsed from a string.
