@@ -48,12 +48,15 @@ import "./math/int/LibOpIntModNP.sol";
 import "./math/int/LibOpIntMulNP.sol";
 import "./math/int/LibOpIntSubNP.sol";
 
+import "./store/LibOpGetNP.sol";
+import "./store/LibOpSetNP.sol";
+
 /// Thrown when a dynamic length array is NOT 1 more than a fixed length array.
 /// Should never happen outside a major breaking change to memory layouts.
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 34;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 36;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -212,6 +215,16 @@ library LibAllStandardOpsNP {
                 "decimal18-sub",
                 OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Subtracts all inputs from the first input as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Errors if the subtraction would result in a negative value."
+            ),
+            AuthoringMeta(
+                "get",
+                OPERAND_PARSER_OFFSET_SINGLE_FULL,
+                "Gets a value from storage. The first operand is the key to lookup."
+            ),
+            AuthoringMeta(
+                "set",
+                OPERAND_PARSER_OFFSET_SINGLE_FULL,
+                "Sets a value in storage. The first operand is the key to set and the second operand is the value to set."
             )
         ];
         AuthoringMeta[] memory wordsDynamic;
@@ -288,7 +301,9 @@ library LibAllStandardOpsNP {
                     // point to the same function pointer. This is intentional.
                     LibOpIntSubNP.integrity,
                     // decimal18 sub.
-                    LibOpIntSubNP.integrity
+                    LibOpIntSubNP.integrity,
+                    LibOpGetNP.integrity,
+                    LibOpSetNP.integrity
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
@@ -371,7 +386,9 @@ library LibAllStandardOpsNP {
                     // point to the same function pointer. This is intentional.
                     LibOpIntSubNP.run,
                     // decimal18 sub.
-                    LibOpIntSubNP.run
+                    LibOpIntSubNP.run,
+                    LibOpGetNP.run,
+                    LibOpSetNP.run
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {

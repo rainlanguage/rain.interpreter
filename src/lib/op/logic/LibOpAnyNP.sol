@@ -10,7 +10,6 @@ import "../../integrity/LibIntegrityCheckNP.sol";
 /// @notice Opcode to return the first nonzero item on the stack up to the inputs
 /// limit.
 library LibOpAnyNP {
-    using LibPointer for Pointer;
 
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
         // There must be at least one input.
