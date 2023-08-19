@@ -4,6 +4,10 @@ pragma solidity ^0.8.18;
 import "rain.solmem/lib/LibPointer.sol";
 
 import "prb-math/UD60x18.sol";
+/// Used for reference implementation so that we have two independent
+/// upstreams to compare against.
+import {Math as OZMath} from "openzeppelin-contracts/contracts/utils/math/Math.sol";
+import "rain.math.fixedpoint/../test/WillOverflow.sol";
 
 import "../../../state/LibInterpreterStateNP.sol";
 import "../../../integrity/LibIntegrityCheckNP.sol";
@@ -63,12 +67,17 @@ library LibOpDecimal18MulNP {
         // Unchecked so that when we assert that an overflow error is thrown, we
         // see the revert from the real function and not the reference function.
         unchecked {
-            uint256 acc = inputs[0];
+            uint256 a = inputs[0];
             for (uint256 i = 1; i < inputs.length; i++) {
-                acc = UD60x18.unwrap(mul(UD60x18.wrap(acc), UD60x18.wrap(inputs[i])));
+                uint256 b = inputs[i];
+                if (WillOverflow.mulDivWillOverflow(a, b, 1e18)) {
+                    a = uint256(keccak256(abi.encodePacked("overflow sentinel")));
+                    break;
+                }
+                a = OZMath.mulDiv(a, b, 1e18);
             }
             outputs = new uint256[](1);
-            outputs[0] = acc;
+            outputs[0] = a;
         }
     }
 }
