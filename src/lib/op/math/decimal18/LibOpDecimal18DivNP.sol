@@ -4,6 +4,10 @@ pragma solidity ^0.8.18;
 import "rain.solmem/lib/LibPointer.sol";
 
 import "prb-math/UD60x18.sol";
+/// Used for reference implementation so that we have two independent
+/// upstreams to compare against.
+import {Math as OZMath} from "openzeppelin-contracts/contracts/utils/math/Math.sol";
+import "rain.math.fixedpoint/../test/WillOverflow.sol";
 
 import "../../../state/LibInterpreterStateNP.sol";
 import "../../../integrity/LibIntegrityCheckNP.sol";
@@ -63,12 +67,23 @@ library LibOpDecimal18DivNP {
         // Unchecked so that when we assert that an overflow error is thrown, we
         // see the revert from the real function and not the reference function.
         unchecked {
-            uint256 acc = inputs[0];
+            uint256 a = inputs[0];
             for (uint256 i = 1; i < inputs.length; i++) {
-                acc = UD60x18.unwrap(div(UD60x18.wrap(acc), UD60x18.wrap(inputs[i])));
+                uint256 b = inputs[i];
+                // Just bail out with a = some sentinel value if we're going to
+                // overflow or divide by zero. This gives the real implementation
+                // space to throw its own error that the test harness is expecting.
+                // We don't want the real implementation to fail to throw the
+                // error and also produce the same result, so a needs to have
+                // some collision resistant value.
+                if (b == 0 || WillOverflow.mulDivWillOverflow(a, 1e18, b)) {
+                    a = uint256(keccak256(abi.encodePacked("overflow sentinel")));
+                    break;
+                }
+                a = OZMath.mulDiv(a, 1e18, b);
             }
             outputs = new uint256[](1);
-            outputs[0] = acc;
+            outputs[0] = a;
         }
     }
 }
