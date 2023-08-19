@@ -36,21 +36,24 @@ import "./logic/LibOpIsZeroNP.sol";
 import "./logic/LibOpLessThanNP.sol";
 import "./logic/LibOpLessThanOrEqualToNP.sol";
 
-import "./math/LibOpIntAddNP.sol";
-import "./math/LibOpIntDivNP.sol";
-import "./math/LibOpIntExpNP.sol";
-import "./math/LibOpIntMaxNP.sol";
-import "./math/LibOpIntMinNP.sol";
-import "./math/LibOpIntModNP.sol";
-import "./math/LibOpIntMulNP.sol";
-import "./math/LibOpIntSubNP.sol";
+import "./math/decimal18/LibOpDecimal18MulNP.sol";
+import "./math/decimal18/LibOpDecimal18DivNP.sol";
+
+import "./math/int/LibOpIntAddNP.sol";
+import "./math/int/LibOpIntDivNP.sol";
+import "./math/int/LibOpIntExpNP.sol";
+import "./math/int/LibOpIntMaxNP.sol";
+import "./math/int/LibOpIntMinNP.sol";
+import "./math/int/LibOpIntModNP.sol";
+import "./math/int/LibOpIntMulNP.sol";
+import "./math/int/LibOpIntSubNP.sol";
 
 /// Thrown when a dynamic length array is NOT 1 more than a fixed length array.
 /// Should never happen outside a major breaking change to memory layouts.
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 32;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 34;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -131,6 +134,16 @@ library LibAllStandardOpsNP {
                 "less-than-or-equal-to",
                 OPERAND_PARSER_OFFSET_DISALLOWED,
                 "1 if the first input is less than or equal to the second input, 0 otherwise."
+            ),
+            AuthoringMeta(
+                "decimal18-mul",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Multiplies all inputs together as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Errors if the multiplication exceeds the maximum value (roughly 1.15e77)."
+            ),
+            AuthoringMeta(
+                "decimal18-div",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Divides the first input by all other inputs as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Errors if any divisor is zero."
             ),
             // int and decimal18 add have identical implementations and point to
             // the same function pointer. This is intentional.
@@ -250,6 +263,8 @@ library LibAllStandardOpsNP {
                     LibOpIsZeroNP.integrity,
                     LibOpLessThanNP.integrity,
                     LibOpLessThanOrEqualToNP.integrity,
+                    LibOpDecimal18MulNP.integrity,
+                    LibOpDecimal18DivNP.integrity,
                     // int and decimal18 add have identical implementations and
                     // point to the same function pointer. This is intentional.
                     LibOpIntAddNP.integrity,
@@ -331,6 +346,8 @@ library LibAllStandardOpsNP {
                     LibOpIsZeroNP.run,
                     LibOpLessThanNP.run,
                     LibOpLessThanOrEqualToNP.run,
+                    LibOpDecimal18MulNP.run,
+                    LibOpDecimal18DivNP.run,
                     // int and decimal18 add have identical implementations and
                     // point to the same function pointer. This is intentional.
                     LibOpIntAddNP.run,

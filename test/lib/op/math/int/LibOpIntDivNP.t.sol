@@ -1,15 +1,11 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "rain.solmem/lib/LibUint256Array.sol";
-
 import "test/util/abstract/OpTest.sol";
 import "src/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "src/lib/parse/LibParseOperand.sol";
 
 contract LibOpIntDivNPTest is OpTest {
-    using LibUint256Array for uint256[];
-
     /// Directly test the integrity logic of LibOpIntDivNP. This tests the happy
     /// path where the inputs input and calc match.
     function testOpIntDivNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external {

@@ -3,12 +3,14 @@ pragma solidity ^0.8.18;
 
 import "rain.solmem/lib/LibPointer.sol";
 
-import "../../state/LibInterpreterStateNP.sol";
-import "../../integrity/LibIntegrityCheckNP.sol";
+import "prb-math/UD60x18.sol";
 
-/// @title LibOpIntMaxNP
-/// @notice Opcode to find the max from N integers.
-library LibOpIntMaxNP {
+import "../../../state/LibInterpreterStateNP.sol";
+import "../../../integrity/LibIntegrityCheckNP.sol";
+
+/// @title LibOpDecimal18DivNP
+/// @notice Opcode to div N 18 decimal fixed point values. Errors on overflow.
+library LibOpDecimal18DivNP {
     using LibPointer for Pointer;
 
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
@@ -18,8 +20,9 @@ library LibOpIntMaxNP {
         return (inputs, 1);
     }
 
-    /// int-max
-    /// Finds the maximum value from N integers.
+    /// decimal18-div
+    /// 18 decimal fixed point division with implied overflow checks from PRB
+    /// Math.
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;
         uint256 b;
@@ -28,9 +31,7 @@ library LibOpIntMaxNP {
             b := mload(add(stackTop, 0x20))
             stackTop := add(stackTop, 0x40)
         }
-        if (a < b) {
-            a = b;
-        }
+        a = UD60x18.unwrap(div(UD60x18.wrap(a), UD60x18.wrap(b)));
 
         {
             uint256 inputs = Operand.unwrap(operand) >> 0x10;
@@ -40,15 +41,12 @@ library LibOpIntMaxNP {
                     b := mload(stackTop)
                     stackTop := add(stackTop, 0x20)
                 }
-                if (a < b) {
-                    a = b;
-                }
+                a = UD60x18.unwrap(div(UD60x18.wrap(a), UD60x18.wrap(b)));
                 unchecked {
                     i++;
                 }
             }
         }
-
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
             mstore(stackTop, a)
@@ -56,7 +54,7 @@ library LibOpIntMaxNP {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of maximum for testing.
+    /// Gas intensive reference implementation of division for testing.
     function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
         internal
         pure
@@ -67,7 +65,7 @@ library LibOpIntMaxNP {
         unchecked {
             uint256 acc = inputs[0];
             for (uint256 i = 1; i < inputs.length; i++) {
-                acc = acc < inputs[i] ? inputs[i] : acc;
+                acc = UD60x18.unwrap(div(UD60x18.wrap(acc), UD60x18.wrap(inputs[i])));
             }
             outputs = new uint256[](1);
             outputs[0] = acc;

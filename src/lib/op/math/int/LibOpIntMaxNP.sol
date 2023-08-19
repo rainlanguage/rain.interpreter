@@ -3,12 +3,12 @@ pragma solidity ^0.8.18;
 
 import "rain.solmem/lib/LibPointer.sol";
 
-import "../../state/LibInterpreterStateNP.sol";
-import "../../integrity/LibIntegrityCheckNP.sol";
+import "../../../state/LibInterpreterStateNP.sol";
+import "../../../integrity/LibIntegrityCheckNP.sol";
 
-/// @title LibOpIntModNP
-/// @notice Opcode to modulo N integers. Errors on modulo by zero.
-library LibOpIntModNP {
+/// @title LibOpIntMaxNP
+/// @notice Opcode to find the max from N integers.
+library LibOpIntMaxNP {
     using LibPointer for Pointer;
 
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
@@ -18,8 +18,8 @@ library LibOpIntModNP {
         return (inputs, 1);
     }
 
-    /// int-mod
-    /// Modulo with implied checks from the Solidity 0.8.x compiler.
+    /// int-max
+    /// Finds the maximum value from N integers.
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;
         uint256 b;
@@ -28,7 +28,9 @@ library LibOpIntModNP {
             b := mload(add(stackTop, 0x20))
             stackTop := add(stackTop, 0x40)
         }
-        a %= b;
+        if (a < b) {
+            a = b;
+        }
 
         {
             uint256 inputs = Operand.unwrap(operand) >> 0x10;
@@ -38,7 +40,9 @@ library LibOpIntModNP {
                     b := mload(stackTop)
                     stackTop := add(stackTop, 0x20)
                 }
-                a %= b;
+                if (a < b) {
+                    a = b;
+                }
                 unchecked {
                     i++;
                 }
@@ -52,7 +56,7 @@ library LibOpIntModNP {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of modulo for testing.
+    /// Gas intensive reference implementation of maximum for testing.
     function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
         internal
         pure
@@ -63,7 +67,7 @@ library LibOpIntModNP {
         unchecked {
             uint256 acc = inputs[0];
             for (uint256 i = 1; i < inputs.length; i++) {
-                acc %= inputs[i];
+                acc = acc < inputs[i] ? inputs[i] : acc;
             }
             outputs = new uint256[](1);
             outputs[0] = acc;
