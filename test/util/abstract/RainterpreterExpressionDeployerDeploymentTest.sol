@@ -77,14 +77,6 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
             authoringMeta
         ));
 
-        // Sanity check the deployer's integrity function pointers.
-        bytes memory integrityFunctionPointers = iDeployer.integrityFunctionPointers();
-        if (keccak256(integrityFunctionPointers) != keccak256(INTEGRITY_FUNCTION_POINTERS)) {
-            console2.log("current deployer integrity function pointers:");
-            console2.logBytes(integrityFunctionPointers);
-            revert("unexpected deployer integrity function pointers");
-        }
-
         // Sanity check the deployer's parse meta.
         bytes memory parseMeta = iDeployer.parseMeta();
         bytes memory builtParseMeta = iDeployer.buildParseMeta(authoringMeta);
@@ -92,6 +84,14 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
             console2.log("current deployer parse meta:");
             console2.logBytes(builtParseMeta);
             revert("unexpected deployer parse meta");
+        }
+
+        // Sanity check the deployer's integrity function pointers.
+        bytes memory integrityFunctionPointers = iDeployer.integrityFunctionPointers();
+        if (keccak256(integrityFunctionPointers) != keccak256(INTEGRITY_FUNCTION_POINTERS)) {
+            console2.log("current deployer integrity function pointers:");
+            console2.logBytes(integrityFunctionPointers);
+            revert("unexpected deployer integrity function pointers");
         }
     }
 }

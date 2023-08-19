@@ -99,9 +99,9 @@ contract LibOpIntDivNPTest is OpTest {
     /// Test the eval of `int-div` opcode parsed from a string. Tests two inputs.
     /// Tests the unhappy path where we divide by zero.
     function testOpIntDivNPEval2InputsUnhappy() external {
-        checkUnhappyStdError("_: int-div(0 0);", stdError.divisionError);
-        checkUnhappyStdError("_: int-div(1 0);", stdError.divisionError);
-        checkUnhappyStdError("_: int-div(max-int-value() 0);", stdError.divisionError);
+        checkUnhappy("_: int-div(0 0);", stdError.divisionError);
+        checkUnhappy("_: int-div(1 0);", stdError.divisionError);
+        checkUnhappy("_: int-div(max-int-value() 0);", stdError.divisionError);
     }
 
     /// Test the eval of `int-div` opcode parsed from a string. Tests three inputs.
@@ -145,15 +145,15 @@ contract LibOpIntDivNPTest is OpTest {
     /// Test the eval of `int-div` opcode parsed from a string. Tests three inputs.
     /// Tests the unhappy path where we divide by zero.
     function testOpIntDivNPEval3InputsUnhappy() external {
-        checkUnhappyStdError("_: int-div(0 0 0);", stdError.divisionError);
-        checkUnhappyStdError("_: int-div(1 0 0);", stdError.divisionError);
-        checkUnhappyStdError("_: int-div(max-int-value() 0 0);", stdError.divisionError);
-        checkUnhappyStdError("_: int-div(0 1 0);", stdError.divisionError);
-        checkUnhappyStdError("_: int-div(1 1 0);", stdError.divisionError);
-        checkUnhappyStdError("_: int-div(max-int-value() max-int-value() 0);", stdError.divisionError);
-        checkUnhappyStdError("_: int-div(0 0 1);", stdError.divisionError);
-        checkUnhappyStdError("_: int-div(1 0 1);", stdError.divisionError);
-        checkUnhappyStdError("_: int-div(max-int-value() 0 1);", stdError.divisionError);
+        checkUnhappy("_: int-div(0 0 0);", stdError.divisionError);
+        checkUnhappy("_: int-div(1 0 0);", stdError.divisionError);
+        checkUnhappy("_: int-div(max-int-value() 0 0);", stdError.divisionError);
+        checkUnhappy("_: int-div(0 1 0);", stdError.divisionError);
+        checkUnhappy("_: int-div(1 1 0);", stdError.divisionError);
+        checkUnhappy("_: int-div(max-int-value() max-int-value() 0);", stdError.divisionError);
+        checkUnhappy("_: int-div(0 0 1);", stdError.divisionError);
+        checkUnhappy("_: int-div(1 0 1);", stdError.divisionError);
+        checkUnhappy("_: int-div(max-int-value() 0 1);", stdError.divisionError);
     }
 
     /// Test the eval of `int-div` opcode parsed from a string.

@@ -12,13 +12,14 @@ import "src/lib/parse/LibParseLiteral.sol";
 contract LibParseLiteralDecimalTest is Test {
     using LibBytes for bytes;
 
-    /// Check that an empty string literal parses to 0.
+    /// Check that an empty string literal is an error.
     function testParseLiteralDecimalEmpty() external {
+        vm.expectRevert(abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
         bytes memory data = "";
         (uint256 value) = LibParseLiteral.parseLiteralDecimal(
             data, Pointer.unwrap(data.dataPointer()), Pointer.unwrap(data.endDataPointer())
         );
-        assertEq(value, 0);
+        (value);
     }
 
     /// Check that a "0" parses to the correct value.

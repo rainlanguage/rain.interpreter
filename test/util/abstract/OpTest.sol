@@ -122,10 +122,10 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
     }
 
     function checkUnhappyOverflow(bytes memory rainString) internal {
-        checkUnhappyStdError(rainString, stdError.arithmeticError);
+        checkUnhappy(rainString, stdError.arithmeticError);
     }
 
-    function checkUnhappyStdError(bytes memory rainString, bytes memory err) internal {
+    function checkUnhappy(bytes memory rainString, bytes memory err) internal {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(rainString);
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
