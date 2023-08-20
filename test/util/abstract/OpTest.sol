@@ -39,7 +39,9 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
             new uint256[](0),
             0,
             MemoryKV.wrap(0),
-            FullyQualifiedNamespace.wrap(0),
+            // Treat ourselves as the sender as we eval internally to directly
+            // test the opcode logic.
+            LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
             iStore,
             new uint256[][](0),
             "",
@@ -156,7 +158,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
     function parseAndEval(bytes memory rainString) internal returns (uint256[] memory, uint256[] memory) {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(rainString);
         uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
+        minOutputs[0] = 0;
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
 

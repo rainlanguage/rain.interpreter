@@ -50,4 +50,30 @@ library LibOpGetNP {
 
         return stackTop;
     }
+
+    function referenceFn(InterpreterStateNP memory state, Operand, uint256[] memory inputs)
+        internal
+        view
+        returns (uint256[] memory)
+    {
+        uint256 key = inputs[0];
+        (uint256 exists, MemoryKVVal value) = state.stateKV.get(MemoryKVKey.wrap(key));
+        uint256[] memory outputs = new uint256[](1);
+        // Cache MISS, get from external store.
+        if (exists == 0) {
+            uint256 storeValue = state.store.get(state.namespace, key);
+
+            // Push fetched value to memory to make subsequent lookups on the
+            // same key find a cache HIT.
+            state.stateKV = state.stateKV.set(MemoryKVKey.wrap(key), MemoryKVVal.wrap(storeValue));
+
+            outputs[0] = storeValue;
+        }
+        // Cache HIT.
+        else {
+            outputs[0] = MemoryKVVal.unwrap(value);
+        }
+
+        return outputs;
+    }
 }
