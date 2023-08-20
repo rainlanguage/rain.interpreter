@@ -3,12 +3,18 @@ pragma solidity ^0.8.18;
 
 import "rain.solmem/lib/LibPointer.sol";
 
-import "../../state/LibInterpreterStateNP.sol";
-import "../../integrity/LibIntegrityCheckNP.sol";
+import "prb-math/UD60x18.sol";
+/// Used for reference implementation so that we have two independent
+/// upstreams to compare against.
+import {Math as OZMath} from "openzeppelin-contracts/contracts/utils/math/Math.sol";
+import "rain.math.fixedpoint/../test/WillOverflow.sol";
 
-/// @title LibOpIntExpNP
-/// @notice Opcode to raise x successively to N integers. Errors on overflow.
-library LibOpIntExpNP {
+import "../../../state/LibInterpreterStateNP.sol";
+import "../../../integrity/LibIntegrityCheckNP.sol";
+
+/// @title LibOpDecimal18DivNP
+/// @notice Opcode to div N 18 decimal fixed point values. Errors on overflow.
+library LibOpDecimal18DivNP {
     using LibPointer for Pointer;
 
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
@@ -18,9 +24,9 @@ library LibOpIntExpNP {
         return (inputs, 1);
     }
 
-    /// int-exp
-    /// Exponentiation with implied overflow checks from the Solidity 0.8.x
-    /// compiler.
+    /// decimal18-div
+    /// 18 decimal fixed point division with implied overflow checks from PRB
+    /// Math.
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;
         uint256 b;
@@ -29,7 +35,7 @@ library LibOpIntExpNP {
             b := mload(add(stackTop, 0x20))
             stackTop := add(stackTop, 0x40)
         }
-        a = a ** b;
+        a = UD60x18.unwrap(div(UD60x18.wrap(a), UD60x18.wrap(b)));
 
         {
             uint256 inputs = Operand.unwrap(operand) >> 0x10;
@@ -39,7 +45,7 @@ library LibOpIntExpNP {
                     b := mload(stackTop)
                     stackTop := add(stackTop, 0x20)
                 }
-                a = a ** b;
+                a = UD60x18.unwrap(div(UD60x18.wrap(a), UD60x18.wrap(b)));
                 unchecked {
                     i++;
                 }
@@ -52,7 +58,7 @@ library LibOpIntExpNP {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of exponentiation for testing.
+    /// Gas intensive reference implementation of division for testing.
     function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
         internal
         pure
@@ -61,12 +67,23 @@ library LibOpIntExpNP {
         // Unchecked so that when we assert that an overflow error is thrown, we
         // see the revert from the real function and not the reference function.
         unchecked {
-            uint256 acc = inputs[0];
+            uint256 a = inputs[0];
             for (uint256 i = 1; i < inputs.length; i++) {
-                acc = acc ** inputs[i];
+                uint256 b = inputs[i];
+                // Just bail out with a = some sentinel value if we're going to
+                // overflow or divide by zero. This gives the real implementation
+                // space to throw its own error that the test harness is expecting.
+                // We don't want the real implementation to fail to throw the
+                // error and also produce the same result, so a needs to have
+                // some collision resistant value.
+                if (b == 0 || WillOverflow.mulDivWillOverflow(a, 1e18, b)) {
+                    a = uint256(keccak256(abi.encodePacked("overflow sentinel")));
+                    break;
+                }
+                a = OZMath.mulDiv(a, 1e18, b);
             }
             outputs = new uint256[](1);
-            outputs[0] = acc;
+            outputs[0] = a;
         }
     }
 }

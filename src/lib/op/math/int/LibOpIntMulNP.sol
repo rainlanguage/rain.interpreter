@@ -3,12 +3,12 @@ pragma solidity ^0.8.18;
 
 import "rain.solmem/lib/LibPointer.sol";
 
-import "../../state/LibInterpreterStateNP.sol";
-import "../../integrity/LibIntegrityCheckNP.sol";
+import "../../../state/LibInterpreterStateNP.sol";
+import "../../../integrity/LibIntegrityCheckNP.sol";
 
-/// @title LibOpIntMaxNP
-/// @notice Opcode to find the max from N integers.
-library LibOpIntMaxNP {
+/// @title LibOpIntMulNP
+/// @notice Opcode to mul N integers. Errors on overflow.
+library LibOpIntMulNP {
     using LibPointer for Pointer;
 
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
@@ -18,8 +18,9 @@ library LibOpIntMaxNP {
         return (inputs, 1);
     }
 
-    /// int-max
-    /// Finds the maximum value from N integers.
+    /// int-mul
+    /// Multiplication with implied overflow checks from the Solidity 0.8.x
+    /// compiler.
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;
         uint256 b;
@@ -28,9 +29,7 @@ library LibOpIntMaxNP {
             b := mload(add(stackTop, 0x20))
             stackTop := add(stackTop, 0x40)
         }
-        if (a < b) {
-            a = b;
-        }
+        a *= b;
 
         {
             uint256 inputs = Operand.unwrap(operand) >> 0x10;
@@ -40,15 +39,12 @@ library LibOpIntMaxNP {
                     b := mload(stackTop)
                     stackTop := add(stackTop, 0x20)
                 }
-                if (a < b) {
-                    a = b;
-                }
+                a *= b;
                 unchecked {
                     i++;
                 }
             }
         }
-
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
             mstore(stackTop, a)
@@ -56,7 +52,7 @@ library LibOpIntMaxNP {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of maximum for testing.
+    /// Gas intensive reference implementation of multiplication for testing.
     function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
         internal
         pure
@@ -67,7 +63,7 @@ library LibOpIntMaxNP {
         unchecked {
             uint256 acc = inputs[0];
             for (uint256 i = 1; i < inputs.length; i++) {
-                acc = acc < inputs[i] ? inputs[i] : acc;
+                acc *= inputs[i];
             }
             outputs = new uint256[](1);
             outputs[0] = acc;

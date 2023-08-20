@@ -3,12 +3,18 @@ pragma solidity ^0.8.18;
 
 import "rain.solmem/lib/LibPointer.sol";
 
-import "../../state/LibInterpreterStateNP.sol";
-import "../../integrity/LibIntegrityCheckNP.sol";
+import "prb-math/UD60x18.sol";
+/// Used for reference implementation so that we have two independent
+/// upstreams to compare against.
+import {Math as OZMath} from "openzeppelin-contracts/contracts/utils/math/Math.sol";
+import "rain.math.fixedpoint/../test/WillOverflow.sol";
 
-/// @title LibOpIntSubNP
-/// @notice Opcode to subtract N integers.
-library LibOpIntSubNP {
+import "../../../state/LibInterpreterStateNP.sol";
+import "../../../integrity/LibIntegrityCheckNP.sol";
+
+/// @title LibOpDecimal18MulNP
+/// @notice Opcode to mul N 18 decimal fixed point values. Errors on overflow.
+library LibOpDecimal18MulNP {
     using LibPointer for Pointer;
 
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
@@ -18,8 +24,9 @@ library LibOpIntSubNP {
         return (inputs, 1);
     }
 
-    /// int-sub
-    /// Subtraction with implied overflow checks from the Solidity 0.8.x compiler.
+    /// decimal18-mul
+    /// 18 decimal fixed point multiplication with implied overflow checks from
+    /// PRB Math.
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;
         uint256 b;
@@ -28,7 +35,7 @@ library LibOpIntSubNP {
             b := mload(add(stackTop, 0x20))
             stackTop := add(stackTop, 0x40)
         }
-        a -= b;
+        a = UD60x18.unwrap(mul(UD60x18.wrap(a), UD60x18.wrap(b)));
 
         {
             uint256 inputs = Operand.unwrap(operand) >> 0x10;
@@ -38,13 +45,12 @@ library LibOpIntSubNP {
                     b := mload(stackTop)
                     stackTop := add(stackTop, 0x20)
                 }
-                a -= b;
+                a = UD60x18.unwrap(mul(UD60x18.wrap(a), UD60x18.wrap(b)));
                 unchecked {
                     i++;
                 }
             }
         }
-
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
             mstore(stackTop, a)
@@ -52,7 +58,7 @@ library LibOpIntSubNP {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of subtraction for testing.
+    /// Gas intensive reference implementation of multiplication for testing.
     function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
         internal
         pure
@@ -61,12 +67,17 @@ library LibOpIntSubNP {
         // Unchecked so that when we assert that an overflow error is thrown, we
         // see the revert from the real function and not the reference function.
         unchecked {
-            uint256 acc = inputs[0];
+            uint256 a = inputs[0];
             for (uint256 i = 1; i < inputs.length; i++) {
-                acc -= inputs[i];
+                uint256 b = inputs[i];
+                if (WillOverflow.mulDivWillOverflow(a, b, 1e18)) {
+                    a = uint256(keccak256(abi.encodePacked("overflow sentinel")));
+                    break;
+                }
+                a = OZMath.mulDiv(a, b, 1e18);
             }
             outputs = new uint256[](1);
-            outputs[0] = acc;
+            outputs[0] = a;
         }
     }
 }

@@ -3,12 +3,12 @@ pragma solidity ^0.8.18;
 
 import "rain.solmem/lib/LibPointer.sol";
 
-import "../../state/LibInterpreterStateNP.sol";
-import "../../integrity/LibIntegrityCheckNP.sol";
+import "../../../state/LibInterpreterStateNP.sol";
+import "../../../integrity/LibIntegrityCheckNP.sol";
 
-/// @title LibOpIntMinNP
-/// @notice Opcode to find the min from N integers.
-library LibOpIntMinNP {
+/// @title LibOpIntMaxNP
+/// @notice Opcode to find the max from N integers.
+library LibOpIntMaxNP {
     using LibPointer for Pointer;
 
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
@@ -18,8 +18,8 @@ library LibOpIntMinNP {
         return (inputs, 1);
     }
 
-    /// int-min
-    /// Finds the minimum value from N integers.
+    /// int-max
+    /// Finds the maximum value from N integers.
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;
         uint256 b;
@@ -28,7 +28,7 @@ library LibOpIntMinNP {
             b := mload(add(stackTop, 0x20))
             stackTop := add(stackTop, 0x40)
         }
-        if (a > b) {
+        if (a < b) {
             a = b;
         }
 
@@ -40,7 +40,7 @@ library LibOpIntMinNP {
                     b := mload(stackTop)
                     stackTop := add(stackTop, 0x20)
                 }
-                if (a > b) {
+                if (a < b) {
                     a = b;
                 }
                 unchecked {
@@ -56,7 +56,7 @@ library LibOpIntMinNP {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of minimum for testing.
+    /// Gas intensive reference implementation of maximum for testing.
     function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
         internal
         pure
@@ -67,7 +67,7 @@ library LibOpIntMinNP {
         unchecked {
             uint256 acc = inputs[0];
             for (uint256 i = 1; i < inputs.length; i++) {
-                acc = acc > inputs[i] ? inputs[i] : acc;
+                acc = acc < inputs[i] ? inputs[i] : acc;
             }
             outputs = new uint256[](1);
             outputs[0] = acc;

@@ -3,13 +3,12 @@ pragma solidity ^0.8.18;
 
 import "rain.solmem/lib/LibPointer.sol";
 
-import "../../state/LibInterpreterStateNP.sol";
-import "../../integrity/LibIntegrityCheckNP.sol";
+import "../../../state/LibInterpreterStateNP.sol";
+import "../../../integrity/LibIntegrityCheckNP.sol";
 
-/// @title LibOpIntDivNP
-/// @notice Opcode to divide N integers. Errors on divide by zero. Truncates
-/// towards zero.
-library LibOpIntDivNP {
+/// @title LibOpIntExpNP
+/// @notice Opcode to raise x successively to N integers. Errors on overflow.
+library LibOpIntExpNP {
     using LibPointer for Pointer;
 
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
@@ -19,8 +18,9 @@ library LibOpIntDivNP {
         return (inputs, 1);
     }
 
-    /// int-div
-    /// Division with implied checks from the Solidity 0.8.x compiler.
+    /// int-exp
+    /// Exponentiation with implied overflow checks from the Solidity 0.8.x
+    /// compiler.
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;
         uint256 b;
@@ -29,7 +29,7 @@ library LibOpIntDivNP {
             b := mload(add(stackTop, 0x20))
             stackTop := add(stackTop, 0x40)
         }
-        a /= b;
+        a = a ** b;
 
         {
             uint256 inputs = Operand.unwrap(operand) >> 0x10;
@@ -39,13 +39,12 @@ library LibOpIntDivNP {
                     b := mload(stackTop)
                     stackTop := add(stackTop, 0x20)
                 }
-                a /= b;
+                a = a ** b;
                 unchecked {
                     i++;
                 }
             }
         }
-
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
             mstore(stackTop, a)
@@ -53,7 +52,7 @@ library LibOpIntDivNP {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of division for testing.
+    /// Gas intensive reference implementation of exponentiation for testing.
     function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
         internal
         pure
@@ -64,7 +63,7 @@ library LibOpIntDivNP {
         unchecked {
             uint256 acc = inputs[0];
             for (uint256 i = 1; i < inputs.length; i++) {
-                acc /= inputs[i];
+                acc = acc ** inputs[i];
             }
             outputs = new uint256[](1);
             outputs[0] = acc;
