@@ -153,7 +153,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
         opReferenceCheckExpectations(state, operand, referenceFn, pointers, inputs, calcOutputs);
     }
 
-    function checkHappy(bytes memory rainString, uint256 expectedValue, string memory errString) internal {
+    function parseAndEval(bytes memory rainString) internal returns (uint256[] memory, uint256[] memory) {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(rainString);
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
@@ -163,9 +163,14 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
+            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), type(uint16).max),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
+        return (stack, kvs);
+    }
+
+    function checkHappy(bytes memory rainString, uint256 expectedValue, string memory errString) internal {
+        (uint256[] memory stack, uint256[] memory kvs) = parseAndEval(rainString);
 
         assertEq(stack.length, 1);
         assertEq(stack[0], expectedValue, errString);
@@ -173,18 +178,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
     }
 
     function checkHappyKVs(bytes memory rainString, uint256[] memory expectedKVs, string memory errString) internal {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(rainString);
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 0;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
-            storeDeployer,
-            StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
-        );
+        (uint256[] memory stack, uint256[] memory kvs) = parseAndEval(rainString);
 
         assertEq(stack.length, 0);
         assertEq(kvs.length, expectedKVs.length, errString);
