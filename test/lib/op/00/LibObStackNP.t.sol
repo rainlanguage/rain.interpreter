@@ -50,10 +50,7 @@ contract LibOpStackNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpStackNP. This tests that the
     /// operand always puts a single value on the stack.
-    function testOpStackNPRun(
-        uint256[][] memory stacks,
-        uint256 stackIndex
-    ) external {
+    function testOpStackNPRun(uint256[][] memory stacks, uint256 stackIndex) external {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256 stackValue;
         {
@@ -84,7 +81,6 @@ contract LibOpStackNPTest is OpTest {
                 mstore(0x40, stackBottom)
             }
         }
-
 
         // Stack doesn't modify the state.
         bytes32 stateFingerprintBefore = state.fingerprint();

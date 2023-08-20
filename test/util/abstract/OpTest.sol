@@ -104,16 +104,13 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
         InterpreterStateNP memory state,
         Operand operand,
         ReferenceCheckPointers memory pointers,
-        function(InterpreterStateNP memory, Operand, Pointer) view returns (Pointer) runFn,
-        bool allowStateMutations
+        function(InterpreterStateNP memory, Operand, Pointer) view returns (Pointer) runFn
     ) internal {
         bytes32 stateFingerprintBefore = state.fingerprint();
         pointers.actualStackTopAfter = runFn(state, operand, pointers.stackTop);
         bytes32 stateFingerprintAfter = state.fingerprint();
 
-        if (!allowStateMutations) {
-            assertEq(stateFingerprintBefore, stateFingerprintAfter, "state fingerprint");
-        }
+        assertEq(stateFingerprintBefore, stateFingerprintAfter, "state fingerprint");
     }
 
     function opReferenceCheckExpectations(
@@ -147,25 +144,13 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
         function(InterpreterStateNP memory, Operand, uint256[] memory) view returns (uint256[] memory) referenceFn,
         function(IntegrityCheckStateNP memory, Operand) pure returns (uint256, uint256) integrityFn,
         function(InterpreterStateNP memory, Operand, Pointer) view returns (Pointer) runFn,
-        uint256[] memory inputs,
-        bool allowStateMutations
+        uint256[] memory inputs
     ) internal {
         uint256 calcOutputs = opReferenceCheckIntegrity(integrityFn, operand, state.constants, inputs);
         ReferenceCheckPointers memory pointers = opReferenceCheckPointers(inputs, calcOutputs);
 
-        opReferenceCheckActual(state, operand, pointers, runFn, allowStateMutations);
+        opReferenceCheckActual(state, operand, pointers, runFn);
         opReferenceCheckExpectations(state, operand, referenceFn, pointers, inputs, calcOutputs);
-    }
-
-    function opReferenceCheck(
-        InterpreterStateNP memory state,
-        Operand operand,
-        function(InterpreterStateNP memory, Operand, uint256[] memory) view returns (uint256[] memory) referenceFn,
-        function(IntegrityCheckStateNP memory, Operand) pure returns (uint256, uint256) integrityFn,
-        function(InterpreterStateNP memory, Operand, Pointer) view returns (Pointer) runFn,
-        uint256[] memory inputs
-    ) internal {
-        opReferenceCheck(state, operand, referenceFn, integrityFn, runFn, inputs, false);
     }
 
     function checkHappy(bytes memory rainString, uint256 expectedValue, string memory errString) internal {
@@ -185,6 +170,27 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
         assertEq(stack.length, 1);
         assertEq(stack[0], expectedValue, errString);
         assertEq(kvs.length, 0);
+    }
+
+    function checkHappyKVs(bytes memory rainString, uint256[] memory expectedKVs, string memory errString) internal {
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(rainString);
+        uint256[] memory minOutputs = new uint256[](1);
+        minOutputs[0] = 0;
+        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+            iDeployer.deployExpression(bytecode, constants, minOutputs);
+
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            storeDeployer,
+            StateNamespace.wrap(0),
+            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+        );
+
+        assertEq(stack.length, 0);
+        assertEq(kvs.length, expectedKVs.length, errString);
+        for (uint256 i = 0; i < expectedKVs.length; i++) {
+            assertEq(kvs[i], expectedKVs[i], errString);
+        }
     }
 
     function checkUnhappyOverflow(bytes memory rainString) internal {

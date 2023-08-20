@@ -218,12 +218,12 @@ library LibAllStandardOpsNP {
             ),
             AuthoringMeta(
                 "get",
-                OPERAND_PARSER_OFFSET_SINGLE_FULL,
+                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Gets a value from storage. The first operand is the key to lookup."
             ),
             AuthoringMeta(
                 "set",
-                OPERAND_PARSER_OFFSET_SINGLE_FULL,
+                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Sets a value in storage. The first operand is the key to set and the second operand is the value to set."
             )
         ];
