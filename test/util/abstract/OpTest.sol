@@ -24,6 +24,119 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
         Pointer post;
         Pointer stackTop;
         Pointer expectedStackTopAfter;
+        // Initially this won't be populated. It will be populated by the
+        // real function call.
+        Pointer actualStackTopAfter;
+    }
+
+    function opReferenceCheckIntegrity(
+        function(IntegrityCheckStateNP memory, Operand) pure returns (uint256, uint256) integrityFn,
+        Operand operand,
+        uint256[] memory constants,
+        uint256[] memory inputs
+    ) internal returns (uint256) {
+        IntegrityCheckStateNP memory integrityState = LibIntegrityCheckNP.newState("", 0, constants.length);
+        (uint256 calcInputs, uint256 calcOutputs) = integrityFn(integrityState, operand);
+        assertEq(calcInputs, inputs.length, "inputs length");
+        assertEq(calcInputs, Operand.unwrap(operand) >> 0x10, "operand inputs");
+        return calcOutputs;
+    }
+
+    function opReferenceCheckPointers(uint256[] memory inputs, uint256 calcOutputs)
+        internal
+        pure
+        returns (ReferenceCheckPointers memory pointers)
+    {
+        {
+            uint256 inputsLength = inputs.length;
+            Pointer prePointer;
+            Pointer postPointer;
+            Pointer stackTop;
+            Pointer expectedStackTopAfter;
+            assembly ("memory-safe") {
+                let headroom := 0x20
+                if gt(calcOutputs, inputsLength) {
+                    headroom := add(headroom, mul(sub(calcOutputs, inputsLength), 0x20))
+                }
+                postPointer := mload(0x40)
+                stackTop := add(postPointer, headroom)
+                // Copy the inputs to the stack.
+                let readCursor := add(inputs, 0x20)
+                let writeCursor := stackTop
+                prePointer := add(stackTop, mul(inputsLength, 0x20))
+                for {} lt(writeCursor, prePointer) {
+                    writeCursor := add(writeCursor, 0x20)
+                    readCursor := add(readCursor, 0x20)
+                } { mstore(writeCursor, mload(readCursor)) }
+
+                expectedStackTopAfter := sub(add(stackTop, mul(inputsLength, 0x20)), mul(calcOutputs, 0x20))
+                mstore(0x40, add(prePointer, 0x20))
+            }
+            pointers.pre = prePointer;
+            pointers.pre.unsafeWriteWord(PRE);
+            pointers.post = postPointer;
+            pointers.post.unsafeWriteWord(POST);
+            pointers.stackTop = stackTop;
+            pointers.expectedStackTopAfter = expectedStackTopAfter;
+            LibMemCpy.unsafeCopyWordsTo(inputs.dataPointer(), pointers.stackTop, inputs.length);
+        }
+    }
+
+    function opReferenceCheckActual(
+        InterpreterStateNP memory state,
+        Operand operand,
+        ReferenceCheckPointers memory pointers,
+        function(InterpreterStateNP memory, Operand, Pointer) view returns (Pointer) runFn,
+        bool allowStateMutations
+    ) internal {
+        bytes32 stateFingerprintBefore = state.fingerprint();
+        pointers.actualStackTopAfter = runFn(state, operand, pointers.stackTop);
+        bytes32 stateFingerprintAfter = state.fingerprint();
+
+        if (!allowStateMutations) {
+            assertEq(stateFingerprintBefore, stateFingerprintAfter, "state fingerprint");
+        }
+    }
+
+    function opReferenceCheckExpectations(
+        InterpreterStateNP memory state,
+        Operand operand,
+        function(InterpreterStateNP memory, Operand, uint256[] memory) view returns (uint256[] memory) referenceFn,
+        ReferenceCheckPointers memory pointers,
+        uint256[] memory inputs,
+        uint256 calcOutputs
+    ) internal {
+        uint256[] memory expectedOutputs = referenceFn(state, operand, inputs);
+        assertEq(expectedOutputs.length, calcOutputs, "expected outputs length");
+
+        assertEq(
+            Pointer.unwrap(pointers.actualStackTopAfter),
+            Pointer.unwrap(pointers.expectedStackTopAfter),
+            "stack top after"
+        );
+        assertEq(PRE, pointers.pre.unsafeReadWord(), "pre");
+        for (uint256 i = 0; i < expectedOutputs.length; i++) {
+            console2.log("expectedOutputs[i]", expectedOutputs[i]);
+            assertEq(expectedOutputs[i], pointers.expectedStackTopAfter.unsafeReadWord(), "value");
+            pointers.expectedStackTopAfter = pointers.expectedStackTopAfter.unsafeAddWord();
+        }
+        assertEq(POST, pointers.post.unsafeReadWord(), "post");
+    }
+
+    function opReferenceCheck(
+        InterpreterStateNP memory state,
+        Operand operand,
+        function(InterpreterStateNP memory, Operand, uint256[] memory) view returns (uint256[] memory) referenceFn,
+        function(IntegrityCheckStateNP memory, Operand) pure returns (uint256, uint256) integrityFn,
+        function(InterpreterStateNP memory, Operand, Pointer) view returns (Pointer) runFn,
+        uint256[] memory inputs,
+        bool allowStateMutations
+    ) internal {
+        uint256 calcOutputs = opReferenceCheckIntegrity(integrityFn, operand, state.constants, inputs);
+        ReferenceCheckPointers memory pointers = opReferenceCheckPointers(inputs, calcOutputs);
+
+        opReferenceCheckActual(state, operand, pointers, runFn, allowStateMutations);
+        opReferenceCheckExpectations(state, operand, referenceFn, pointers, inputs, calcOutputs);
     }
 
     function opReferenceCheck(
@@ -34,72 +147,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
         function(InterpreterStateNP memory, Operand, Pointer) view returns (Pointer) runFn,
         uint256[] memory inputs
     ) internal {
-        uint256[] memory expectedOutputs;
-        ReferenceCheckPointers memory pointers;
-
-        {
-            uint256 calcInputs;
-            uint256 calcOutputs;
-            {
-                IntegrityCheckStateNP memory integrityState =
-                    LibIntegrityCheckNP.newState("", 0, state.constants.length);
-                (calcInputs, calcOutputs) = integrityFn(integrityState, operand);
-                assertEq(calcInputs, inputs.length, "inputs length");
-                assertEq(calcInputs, Operand.unwrap(operand) >> 0x10, "operand inputs");
-
-                // Make a copy of the inputs so that the reference function can't
-                // modify what the real function sees.
-                uint256[] memory inputsClone = new uint256[](inputs.length);
-                LibMemCpy.unsafeCopyWordsTo(inputs.dataPointer(), inputsClone.dataPointer(), inputs.length);
-                expectedOutputs = referenceFn(state, operand, inputsClone);
-                assertEq(expectedOutputs.length, calcOutputs, "expected outputs length");
-            }
-
-            Pointer prePointer;
-            Pointer postPointer;
-            Pointer stackTop;
-            Pointer expectedStackTopAfter;
-            assembly ("memory-safe") {
-                let headroom := 0x20
-                if gt(calcOutputs, calcInputs) { headroom := add(headroom, mul(sub(calcOutputs, calcInputs), 0x20)) }
-                postPointer := mload(0x40)
-                stackTop := add(postPointer, headroom)
-                // Write the pre after the integrity check's inputs.
-                prePointer := add(stackTop, mul(calcInputs, 0x20))
-                expectedStackTopAfter := sub(add(stackTop, mul(calcInputs, 0x20)), mul(calcOutputs, 0x20))
-                mstore(0x40, add(prePointer, 0x20))
-            }
-            pointers.pre = prePointer;
-            pointers.post = postPointer;
-            pointers.stackTop = stackTop;
-            pointers.expectedStackTopAfter = expectedStackTopAfter;
-            LibMemCpy.unsafeCopyWordsTo(inputs.dataPointer(), pointers.stackTop, inputs.length);
-        }
-
-        {
-            // Pure reference functions don't modify the state.
-            bytes32 stateFingerprintBefore = state.fingerprint();
-            {
-                pointers.pre.unsafeWriteWord(PRE);
-                pointers.post.unsafeWriteWord(POST);
-            }
-            Pointer stackTopAfter = runFn(state, operand, pointers.stackTop);
-            bytes32 stateFingerprintAfter = state.fingerprint();
-
-            assertEq(stateFingerprintBefore, stateFingerprintAfter, "state fingerprint");
-            assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(pointers.expectedStackTopAfter), "stack top after");
-        }
-
-        // Compare against reference values.
-        {
-            assertEq(PRE, pointers.pre.unsafeReadWord(), "pre");
-            for (uint256 i = 0; i < expectedOutputs.length; i++) {
-                console2.log("expectedOutputs[i]", expectedOutputs[i]);
-                assertEq(expectedOutputs[i], pointers.expectedStackTopAfter.unsafeReadWord(), "value");
-                pointers.expectedStackTopAfter = pointers.expectedStackTopAfter.unsafeAddWord();
-            }
-            assertEq(POST, pointers.post.unsafeReadWord(), "post");
-        }
+        opReferenceCheck(state, operand, referenceFn, integrityFn, runFn, inputs, false);
     }
 
     function checkHappy(bytes memory rainString, uint256 expectedValue, string memory errString) internal {
