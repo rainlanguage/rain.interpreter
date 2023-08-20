@@ -40,7 +40,8 @@ contract LibOpIntModNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpIntModNP.
-    function testOpIntModNPRun(InterpreterStateNP memory state, uint256[] memory inputs) external {
+    function testOpIntModNPRun(uint256[] memory inputs) external {
+        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
         Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
         uint256 modZeros = 0;

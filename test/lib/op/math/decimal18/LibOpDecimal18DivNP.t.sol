@@ -39,7 +39,8 @@ contract LibOpDecimal18DivNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpDecimal18DivNP.
-    function testOpDecimal18DivNPRun(InterpreterStateNP memory state, uint256[] memory inputs) public {
+    function testOpDecimal18DivNPRun(uint256[] memory inputs) public {
+        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
         Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
         // This is kinda shitty because it just duplicates what the reference
@@ -85,10 +86,9 @@ contract LibOpDecimal18DivNPTest is OpTest {
     }
 
     function testDebugOpDecimal18DivNPRun() external {
-        InterpreterStateNP memory state;
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = 115792089237316195423570985008687907853269984665640564039458;
-        testOpDecimal18DivNPRun(state, inputs);
+        testOpDecimal18DivNPRun(inputs);
     }
 
     /// Test the eval of `decimal18-div` opcode parsed from a string.

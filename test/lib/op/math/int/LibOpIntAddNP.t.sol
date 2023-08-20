@@ -34,7 +34,8 @@ contract LibOpIntAddNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpIntAddNP.
-    function testOpIntAddNPRun(InterpreterStateNP memory state, uint256[] memory inputs) external {
+    function testOpIntAddNPRun(uint256[] memory inputs) external {
+        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
         Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
         uint256 overflows = 0;

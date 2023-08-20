@@ -21,7 +21,8 @@ contract LibOpMaxUint256NPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpMaxUint256NP. This tests that the
     /// opcode correctly pushes the max uint256 onto the stack.
-    function testOpMaxUint256NPRun(InterpreterStateNP memory state) external {
+    function testOpMaxUint256NPRun() external {
+        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](0);
         Operand operand = Operand.wrap(0);
         opReferenceCheck(

@@ -29,6 +29,24 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
         Pointer actualStackTopAfter;
     }
 
+    function opTestDefaultIngegrityCheckState() internal pure returns (IntegrityCheckStateNP memory) {
+        return IntegrityCheckStateNP(0, 0, 0, 0, 0, "");
+    }
+
+    function opTestDefaultInterpreterState() internal view returns (InterpreterStateNP memory) {
+        return InterpreterStateNP(
+            new Pointer[](0),
+            new uint256[](0),
+            0,
+            MemoryKV.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
+            iStore,
+            new uint256[][](0),
+            "",
+            ""
+        );
+    }
+
     function opReferenceCheckIntegrity(
         function(IntegrityCheckStateNP memory, Operand) pure returns (uint256, uint256) integrityFn,
         Operand operand,

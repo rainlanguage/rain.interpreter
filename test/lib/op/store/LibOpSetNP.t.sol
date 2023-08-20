@@ -13,8 +13,23 @@ contract LibOpSetNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpSetNP.
-    function testLibOpSetNP(InterpreterStateNP memory state, uint8 inputs) public {
-        // todo
+    function testLibOpSetNP(uint256 key, uint256 value) public {
+        InterpreterStateNP memory state = opTestDefaultInterpreterState();
+        Operand operand = Operand.wrap(uint256(2) << 0x10);
+        uint256[] memory inputs = new uint256[](2);
+        inputs[0] = key;
+        inputs[1] = value;
+        state.stateKV = MemoryKV.wrap(0);
+        opReferenceCheck(
+            state,
+            operand,
+            LibOpSetNP.referenceFn,
+            LibOpSetNP.integrity,
+            LibOpSetNP.run,
+            inputs,
+            // kv modifies the state.
+            true
+        );
     }
 
     /// Test the eval of `set` opcode parsed from a string. Tests zero inputs.

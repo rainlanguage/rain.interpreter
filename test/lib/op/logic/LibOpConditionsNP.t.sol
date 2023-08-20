@@ -32,11 +32,12 @@ contract LibOpConditionsNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpConditionsNP.
     function testOpConditionsNPRun(
-        InterpreterStateNP memory state,
         uint256[] memory inputs,
         uint16 conditionCode,
         uint256 finalNonZero
     ) external {
+        InterpreterStateNP memory state = opTestDefaultInterpreterState();
+
         // Ensure that we have inputs that are a valid pairwise conditions.
         vm.assume(inputs.length > 1);
         if (inputs.length % 2 != 0) {
@@ -55,10 +56,11 @@ contract LibOpConditionsNPTest is OpTest {
 
     /// Test the error case where no conditions are met.
     function testOpConditionsNPRunNoConditionsMet(
-        InterpreterStateNP memory state,
         uint256[] memory inputs,
         uint16 conditionCode
     ) external {
+        InterpreterStateNP memory state = opTestDefaultInterpreterState();
+
         Operand operand = Operand.wrap(uint256(inputs.length) << 0x10 | uint256(conditionCode));
         // Ensure that we have inputs that are a valid pairwise conditions.
         vm.assume(inputs.length > 1);

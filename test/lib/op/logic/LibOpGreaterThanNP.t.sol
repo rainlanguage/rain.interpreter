@@ -18,7 +18,8 @@ contract LibOpGreaterThanNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpGreaterThanNP.
-    function testOpGreaterThanNPRun(InterpreterStateNP memory state, uint256 input1, uint256 input2) external {
+    function testOpGreaterThanNPRun(uint256 input1, uint256 input2) external {
+        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = input1;
         inputs[1] = input2;

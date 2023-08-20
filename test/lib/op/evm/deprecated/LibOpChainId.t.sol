@@ -44,9 +44,10 @@ contract LibOpChainIdTest is RainterpreterExpressionDeployerDeploymentTest {
 
     /// Directly test the runtime logic of LibOpChainId. This tests that the
     /// opcode correctly pushes the chain ID onto the stack.
-    function testOpChainIDRun(InterpreterState memory state, Operand operand, uint256 pre, uint256 post, uint64 chainId)
+    function testOpChainIDRun(Operand operand, uint256 pre, uint256 post, uint64 chainId)
         external
     {
+        InterpreterState memory state;
         vm.chainId(chainId);
         // Build a stack with two zeros on it. The first zero will be overridden
         // by the opcode. The second zero will be used to check that the opcode

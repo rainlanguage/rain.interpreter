@@ -43,12 +43,12 @@ contract LibOpTimestampTest is RainterpreterExpressionDeployerDeploymentTest {
     /// Directly test the runtime logic of LibOpTimestamp. This tests that the
     /// opcode correctly pushes the timestamp onto the stack.
     function testOpTimestampRun(
-        InterpreterState memory state,
         Operand operand,
         uint256 pre,
         uint256 post,
         uint256 blockTimestamp
     ) external {
+        InterpreterState memory state;
         vm.warp(blockTimestamp);
         // Build a stack with two zeros on it. The first zero will be overridden
         // by the opcode. The second zero will be used to check that the opcode

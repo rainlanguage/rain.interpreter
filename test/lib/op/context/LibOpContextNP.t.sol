@@ -18,7 +18,9 @@ contract LibOpContextNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpContextNP. This tests that the
     /// values in the context matrix can be pushed to the stack via. the operand.
-    function testOpContextNPRun(InterpreterStateNP memory state, uint256 i, uint256 j) external {
+    function testOpContextNPRun(uint256[][] memory context, uint256 i, uint256 j) external {
+        InterpreterStateNP memory state = opTestDefaultInterpreterState();
+        state.context = context;
         vm.assume(state.context.length > 0);
         vm.assume(state.context.length < type(uint8).max);
         i = bound(i, 0, state.context.length - 1);
@@ -34,7 +36,9 @@ contract LibOpContextNPTest is OpTest {
 
     /// Directly test the reference logic of LibOpContextNP. This tests that the
     /// runtime logic will revert if the indexes are OOB. Tests that i is OOB.
-    function testOpContextNPRunOOBi(InterpreterStateNP memory state, uint256 i, uint256 j) external {
+    function testOpContextNPRunOOBi(uint256[][] memory context, uint256 i, uint256 j) external {
+        InterpreterStateNP memory state = opTestDefaultInterpreterState();
+        state.context = context;
         vm.assume(state.context.length < type(uint8).max);
         i = bound(i, state.context.length, type(uint8).max);
         j = bound(j, 0, type(uint8).max);
@@ -48,7 +52,9 @@ contract LibOpContextNPTest is OpTest {
 
     /// Directly test the reference logic of LibOpContextNP. This tests that the
     /// runtime logic will revert if the indexes are OOB. Tests that j is OOB.
-    function testOpContextNPRunOOBj(InterpreterStateNP memory state, uint256 i, uint256 j) external {
+    function testOpContextNPRunOOBj(uint256[][] memory context, uint256 i, uint256 j) external {
+        InterpreterStateNP memory state = opTestDefaultInterpreterState();
+        state.context = context;
         vm.assume(state.context.length > 0);
         vm.assume(state.context.length < type(uint8).max);
         i = bound(i, 0, state.context.length - 1);
