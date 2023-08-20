@@ -36,7 +36,8 @@ contract LibOpIntDivNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpIntDivNP.
-    function testOpIntDivNPRun(InterpreterStateNP memory state, uint256[] memory inputs) external {
+    function testOpIntDivNPRun(uint256[] memory inputs) external {
+        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
         Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
         uint256 divZeros = 0;

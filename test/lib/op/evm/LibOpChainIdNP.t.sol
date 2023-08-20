@@ -32,7 +32,8 @@ contract LibOpChainIdNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpChainId. This tests that the
     /// opcode correctly pushes the chain ID onto the stack.
-    function testOpChainIdNPRun(InterpreterStateNP memory state, uint64 chainId) external {
+    function testOpChainIdNPRun(uint64 chainId) external {
+        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.chainId(chainId);
         uint256[] memory inputs = new uint256[](0);
         Operand operand = Operand.wrap(0);

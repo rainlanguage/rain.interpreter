@@ -25,7 +25,8 @@ contract LibOpEnsureNPTest is OpTest {
     }
 
     /// Directly test the run logic of LibOpEnsureNP.
-    function testOpEnsureNPRun(InterpreterStateNP memory state, uint256[] memory inputs, uint16 errorCode) external {
+    function testOpEnsureNPRun(uint256[] memory inputs, uint16 errorCode) external {
+        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length > 0);
         vm.assume(inputs.length <= type(uint8).max);
         Operand operand = Operand.wrap(uint256(inputs.length) << 0x10 | uint256(errorCode));
@@ -40,9 +41,7 @@ contract LibOpEnsureNPTest is OpTest {
 
     /// Test the eval of `ensure` parsed from a string. Tests zero inputs.
     function testOpEnsureNPEvalZero() external {
-        // Include the add here so we hit the min outputs expected by
-        // `checkBadInputs`.
-        checkBadInputs(":ensure(), _: int-add(1 1);", 0, 1, 0);
+        checkBadInputs(":ensure();", 0, 1, 0);
     }
 
     /// Test the eval of `ensure` parsed from a string. Tests that ensure cannot

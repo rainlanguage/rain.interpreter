@@ -17,7 +17,8 @@ contract LibOpIfNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpIfNP.
-    function testOpIfNPRun(InterpreterStateNP memory state, uint256 a, uint256 b, uint256 c) external {
+    function testOpIfNPRun(uint256 a, uint256 b, uint256 c) external {
+        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](3);
         inputs[0] = a;
         inputs[1] = b;

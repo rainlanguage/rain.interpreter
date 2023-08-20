@@ -28,7 +28,8 @@ contract LibOpHashNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpHashNP.
-    function testOpHashNPRun(InterpreterStateNP memory state, uint256[] memory inputs) external {
+    function testOpHashNPRun(uint256[] memory inputs) external {
+        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
         opReferenceCheck(state, operand, LibOpHashNP.referenceFn, LibOpHashNP.integrity, LibOpHashNP.run, inputs);
     }

@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
+import "test/util/abstract/OpTest.sol";
 
 import "src/lib/caller/LibContext.sol";
 import "src/lib/bytecode/LibBytecode.sol";
 
 /// @title LibOpStackNPTest
 /// @notice Test the runtime and integrity time logic of LibOpStackNP.
-contract LibOpStackNPTest is RainterpreterExpressionDeployerDeploymentTest {
+contract LibOpStackNPTest is OpTest {
     using LibInterpreterStateNP for InterpreterStateNP;
 
     /// Directly test the integrity logic of LibOpStackNP. The operand always
@@ -50,13 +50,8 @@ contract LibOpStackNPTest is RainterpreterExpressionDeployerDeploymentTest {
 
     /// Directly test the runtime logic of LibOpStackNP. This tests that the
     /// operand always puts a single value on the stack.
-    function testOpStackNPRun(
-        InterpreterStateNP memory state,
-        uint256 pre,
-        uint256 post,
-        uint256[][] memory stacks,
-        uint256 stackIndex
-    ) external {
+    function testOpStackNPRun(uint256[][] memory stacks, uint256 stackIndex) external {
+        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256 stackValue;
         {
             vm.assume(stacks.length > 0);
@@ -72,15 +67,19 @@ contract LibOpStackNPTest is RainterpreterExpressionDeployerDeploymentTest {
         Pointer stackTop;
         Pointer expectedStackTopAfter;
         Pointer end;
-        assembly ("memory-safe") {
-            end := mload(0x40)
-            mstore(end, post)
-            expectedStackTopAfter := add(end, 0x20)
-            mstore(expectedStackTopAfter, 0)
-            stackTop := add(expectedStackTopAfter, 0x20)
-            mstore(stackTop, pre)
-            stackBottom := add(stackTop, 0x20)
-            mstore(0x40, stackBottom)
+        {
+            uint256 pre = PRE;
+            uint256 post = POST;
+            assembly ("memory-safe") {
+                end := mload(0x40)
+                mstore(end, post)
+                expectedStackTopAfter := add(end, 0x20)
+                mstore(expectedStackTopAfter, 0)
+                stackTop := add(expectedStackTopAfter, 0x20)
+                mstore(stackTop, pre)
+                stackBottom := add(stackTop, 0x20)
+                mstore(0x40, stackBottom)
+            }
         }
 
         // Stack doesn't modify the state.
@@ -104,9 +103,9 @@ contract LibOpStackNPTest is RainterpreterExpressionDeployerDeploymentTest {
             actualPre := mload(add(end, 0x40))
         }
 
-        assertEq(actualPost, post, "post");
+        assertEq(actualPost, POST, "post");
         assertEq(actualStackValue, stackValue, "stackValue");
-        assertEq(actualPre, pre, "pre");
+        assertEq(actualPre, PRE, "pre");
     }
 
     /// Test the eval of a stack opcode parsed from a string.

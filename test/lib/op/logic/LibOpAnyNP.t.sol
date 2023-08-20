@@ -11,7 +11,8 @@ contract LibOpAnyNPTest is OpTest {
 
     /// Directly test the integrity logic of LibOpAnyNP. This tests the happy
     /// path where the operand is valid.
-    function testOpAnyNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external {
+    function testOpAnyNPIntegrityHappy(uint8 inputs) external {
+        IntegrityCheckStateNP memory state = opTestDefaultIngegrityCheckState();
         vm.assume(inputs != 0);
         (uint256 calcInputs, uint256 calcOutputs) = LibOpAnyNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
 
@@ -33,7 +34,8 @@ contract LibOpAnyNPTest is OpTest {
 
     /// Directly test the integrity logic of LibOpAnyNP. This tests the unhappy
     /// path where the operand is invalid due to 0 inputs.
-    function testOpAnyNPIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external {
+    function testOpAnyNPIntegrityUnhappyZeroInputs() external {
+        IntegrityCheckStateNP memory state = opTestDefaultIngegrityCheckState();
         (uint256 calcInputs, uint256 calcOutputs) = LibOpAnyNP.integrity(state, Operand.wrap(0));
         // Calc inputs will be minimum 1.
         assertEq(calcInputs, 1);
@@ -41,7 +43,8 @@ contract LibOpAnyNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpAnyNP.
-    function testOpAnyNPRun(InterpreterStateNP memory state, uint256[] memory inputs) external {
+    function testOpAnyNPRun(uint256[] memory inputs) external {
+        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length != 0);
         Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
         opReferenceCheck(state, operand, LibOpAnyNP.referenceFn, LibOpAnyNP.integrity, LibOpAnyNP.run, inputs);

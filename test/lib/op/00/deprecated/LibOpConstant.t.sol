@@ -68,13 +68,8 @@ contract LibOpConstantTest is RainterpreterExpressionDeployerDeploymentTest {
     ///
     /// We rely on the deployer to force the integrity check to pass, so we don't
     /// run into the unhappy path where out of bounds constants reads occur.
-    function testOpConstantRun(
-        InterpreterState memory state,
-        Operand operand,
-        uint256 pre,
-        uint256 post,
-        uint256[] memory constants
-    ) external {
+    function testOpConstantRun(Operand operand, uint256 pre, uint256 post, uint256[] memory constants) external {
+        InterpreterState memory state;
         vm.assume(constants.length > 0);
         state.constantsBottom = constants.dataPointer();
 

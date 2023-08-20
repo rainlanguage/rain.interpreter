@@ -42,13 +42,8 @@ contract LibOpBlockNumberTest is RainterpreterExpressionDeployerDeploymentTest {
 
     /// Directly test the runtime logic of LibOpBlockNumber. This tests that the
     /// opcode correctly pushes the block number onto the stack.
-    function testOpBlockNumberRun(
-        InterpreterState memory state,
-        Operand operand,
-        uint256 pre,
-        uint256 post,
-        uint256 blockNumber
-    ) external {
+    function testOpBlockNumberRun(Operand operand, uint256 pre, uint256 post, uint256 blockNumber) external {
+        InterpreterState memory state;
         vm.roll(blockNumber);
         // Build a stack with two zeros on it. The first zero will be overridden
         // by the opcode. The second zero will be used to check that the opcode
