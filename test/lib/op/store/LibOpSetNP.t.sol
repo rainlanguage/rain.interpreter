@@ -22,13 +22,13 @@ contract LibOpSetNPTest is OpTest {
         checkBadInputs(":set();", 0, 2, 0);
     }
 
-    /// Test the eval of `set` opcode parsed from a string. Tests two inputs.
-    function testLibOpSetNPEvalTwoInputs() external {
-        checkBadInputs(":set(0x1234 0x5678);", 2, 2, 0);
+    /// Test the eval of `set` opcode parsed from a string. Tests one input.
+    function testLibOpSetNPEvalOneInput() external {
+        checkBadInputs(":set(0x1234);", 1, 2, 1);
     }
 
     /// Test the eval of `set` opcode parsed from a string. Tests three inputs.
     function testLibOpSetNPEvalThreeInputs() external {
-        checkBadInputs(":set(0x1234 0x5678 0x9abc);", 3, 2, 0);
+        checkBadInputs(":set(0x1234 0x5678 0x9abc);", 3, 2, 3);
     }
 }

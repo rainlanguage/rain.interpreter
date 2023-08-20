@@ -40,9 +40,7 @@ contract LibOpEnsureNPTest is OpTest {
 
     /// Test the eval of `ensure` parsed from a string. Tests zero inputs.
     function testOpEnsureNPEvalZero() external {
-        // Include the add here so we hit the min outputs expected by
-        // `checkBadInputs`.
-        checkBadInputs(":ensure(), _: int-add(1 1);", 0, 1, 0);
+        checkBadInputs(":ensure();", 0, 1, 0);
     }
 
     /// Test the eval of `ensure` parsed from a string. Tests that ensure cannot

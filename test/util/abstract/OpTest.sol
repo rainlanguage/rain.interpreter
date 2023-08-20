@@ -195,7 +195,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
     {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(rainString);
         uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
+        minOutputs[0] = 0;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, opIndex, calcInputs, bytecodeInputs));
         (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
