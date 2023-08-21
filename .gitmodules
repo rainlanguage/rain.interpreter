@@ -31,3 +31,6 @@
 [submodule "lib/rain.math.fixedpoint"]
 	path = lib/rain.math.fixedpoint
 	url = https://github.com/rainprotocol/rain.math.fixedpoint
+[submodule "lib/sol.lib.binmaskflag"]
+	path = lib/sol.lib.binmaskflag
+	url = https://github.com/rainprotocol/sol.lib.binmaskflag

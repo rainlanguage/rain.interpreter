@@ -11,8 +11,8 @@ library LibMetaFixture {
         meta[2] = AuthoringMeta("a", OPERAND_PARSER_OFFSET_DISALLOWED, "a");
         meta[3] = AuthoringMeta("b", OPERAND_PARSER_OFFSET_SINGLE_FULL, "b");
         meta[4] = AuthoringMeta("c", OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT, "c");
-        meta[5] = AuthoringMeta("d", OPERAND_PARSER_OFFSET_DISALLOWED, "d");
-        meta[6] = AuthoringMeta("e", OPERAND_PARSER_OFFSET_DISALLOWED, "e");
+        meta[5] = AuthoringMeta("d", OPERAND_PARSER_OFFSET_M1_M1, "d");
+        meta[6] = AuthoringMeta("e", OPERAND_PARSER_OFFSET_8_M1_M1, "e");
         meta[7] = AuthoringMeta("f", OPERAND_PARSER_OFFSET_DISALLOWED, "f");
         meta[8] = AuthoringMeta("g", OPERAND_PARSER_OFFSET_DISALLOWED, "g");
         meta[9] = AuthoringMeta("h", OPERAND_PARSER_OFFSET_DISALLOWED, "h");

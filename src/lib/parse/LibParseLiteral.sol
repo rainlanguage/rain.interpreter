@@ -115,6 +115,15 @@ library LibParseLiteral {
                             parser := p
                         }
                     }
+                    {
+                        uint256 endHex;
+                        assembly ("memory-safe") {
+                            endHex := add(data, add(mload(data), 0x20))
+                        }
+                        if (innerEnd > endHex) {
+                            revert ParserOutOfBounds();
+                        }
+                    }
                     return (parser, innerStart, innerEnd, innerEnd);
                 }
                 // decimal is the fallback as continuous numeric digits 0-9.
@@ -159,11 +168,28 @@ library LibParseLiteral {
                             parser := p
                         }
                     }
+                    {
+                        uint256 endDecimal;
+                        assembly ("memory-safe") {
+                            endDecimal := add(data, add(mload(data), 0x20))
+                        }
+                        if (innerEnd > endDecimal) {
+                            revert ParserOutOfBounds();
+                        }
+                    }
                     return (parser, innerStart, innerEnd, innerEnd);
                 }
             }
 
-            revert UnsupportedLiteralType(LibParse.parseErrorOffset(data, cursor));
+            uint256 endUnknown;
+            assembly ("memory-safe") {
+                endUnknown := add(data, add(mload(data), 0x20))
+            }
+            if (cursor >= endUnknown) {
+                revert ParserOutOfBounds();
+            } else {
+                revert UnsupportedLiteralType(LibParse.parseErrorOffset(data, cursor));
+            }
         }
     }
 

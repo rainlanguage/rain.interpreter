@@ -9,7 +9,9 @@ import {AuthoringMeta} from "../parse/LibParseMeta.sol";
 import {
     OPERAND_PARSER_OFFSET_DISALLOWED,
     OPERAND_PARSER_OFFSET_SINGLE_FULL,
-    OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT
+    OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT,
+    OPERAND_PARSER_OFFSET_M1_M1,
+    OPERAND_PARSER_OFFSET_8_M1_M1
 } from "../parse/LibParseOperand.sol";
 
 import "./00/LibOpStackNP.sol";
@@ -38,6 +40,9 @@ import "./logic/LibOpLessThanOrEqualToNP.sol";
 
 import "./math/decimal18/LibOpDecimal18MulNP.sol";
 import "./math/decimal18/LibOpDecimal18DivNP.sol";
+import "./math/decimal18/LibOpDecimal18Scale18DynamicNP.sol";
+import "./math/decimal18/LibOpDecimal18Scale18NP.sol";
+import "./math/decimal18/LibOpDecimal18ScaleNNP.sol";
 
 import "./math/int/LibOpIntAddNP.sol";
 import "./math/int/LibOpIntDivNP.sol";
@@ -56,7 +61,7 @@ import "./store/LibOpSetNP.sol";
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 36;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 39;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -139,14 +144,29 @@ library LibAllStandardOpsNP {
                 "1 if the first input is less than or equal to the second input, 0 otherwise."
             ),
             AuthoringMeta(
+                "decimal18-div",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Divides the first input by all other inputs as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Errors if any divisor is zero."
+            ),
+            AuthoringMeta(
                 "decimal18-mul",
                 OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Multiplies all inputs together as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Errors if the multiplication exceeds the maximum value (roughly 1.15e77)."
             ),
             AuthoringMeta(
-                "decimal18-div",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
-                "Divides the first input by all other inputs as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Errors if any divisor is zero."
+                "decimal18-scale18-dynamic",
+                OPERAND_PARSER_OFFSET_M1_M1,
+                "Scales a value from some fixed point decimal scale to 18 decimal fixed point. The first input is the scale to scale from and the second is the value to scale. The two optional operands control rounding and saturation respectively as per `decimal18-scale18`."
+            ),
+            AuthoringMeta(
+                "decimal18-scale18",
+                OPERAND_PARSER_OFFSET_8_M1_M1,
+                "Scales an input value from some fixed point decimal scale to 18 decimal fixed point. The first operand is the scale to scale from. The second (optional) operand controls rounding where 0 (default) rounds down and 1 rounds up. The third (optional) operand controls saturation where 0 (default) errors on overflow and 1 saturates at max-decimal-value."
+            ),
+            AuthoringMeta(
+                "decimal18-scale-n",
+                OPERAND_PARSER_OFFSET_8_M1_M1,
+                "Scales an input value from 18 decimal fixed point to some other fixed point scale N. The first operand is the scale to scale to. The second (optional) operand controls rounding where 0 (default) rounds down and 1 rounds up. The third (optional) operand controls saturation where 0 (default) errors on overflow and 1 saturates at max-decimal-value."
             ),
             // int and decimal18 add have identical implementations and point to
             // the same function pointer. This is intentional.
@@ -276,8 +296,11 @@ library LibAllStandardOpsNP {
                     LibOpIsZeroNP.integrity,
                     LibOpLessThanNP.integrity,
                     LibOpLessThanOrEqualToNP.integrity,
-                    LibOpDecimal18MulNP.integrity,
                     LibOpDecimal18DivNP.integrity,
+                    LibOpDecimal18MulNP.integrity,
+                    LibOpDecimal18Scale18DynamicNP.integrity,
+                    LibOpDecimal18Scale18NP.integrity,
+                    LibOpDecimal18ScaleNNP.integrity,
                     // int and decimal18 add have identical implementations and
                     // point to the same function pointer. This is intentional.
                     LibOpIntAddNP.integrity,
@@ -361,8 +384,11 @@ library LibAllStandardOpsNP {
                     LibOpIsZeroNP.run,
                     LibOpLessThanNP.run,
                     LibOpLessThanOrEqualToNP.run,
-                    LibOpDecimal18MulNP.run,
                     LibOpDecimal18DivNP.run,
+                    LibOpDecimal18MulNP.run,
+                    LibOpDecimal18Scale18DynamicNP.run,
+                    LibOpDecimal18Scale18NP.run,
+                    LibOpDecimal18ScaleNNP.run,
                     // int and decimal18 add have identical implementations and
                     // point to the same function pointer. This is intentional.
                     LibOpIntAddNP.run,
