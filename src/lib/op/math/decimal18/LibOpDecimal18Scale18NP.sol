@@ -2,7 +2,6 @@
 pragma solidity ^0.8.18;
 
 import {FixedPointDecimalScale} from "rain.math.fixedpoint/FixedPointDecimalScale.sol";
-import "sol.lib.binmaskflag/Binary.sol";
 
 import "../../../state/LibInterpreterStateNP.sol";
 import "../../../integrity/LibIntegrityCheckNP.sol";
