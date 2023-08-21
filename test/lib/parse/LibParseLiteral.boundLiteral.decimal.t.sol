@@ -71,9 +71,24 @@ contract LibParseLiteralBoundLiteralDecimalTest is Test {
         (outerEnd);
     }
 
+    function checkParserOutOfBounds(bytes memory data) internal {
+        uint256 outerStart = Pointer.unwrap(data.dataPointer());
+        vm.expectRevert(abi.encodeWithSelector(ParserOutOfBounds.selector));
+        (
+            function(bytes memory, uint256, uint256) pure returns (uint256) parser,
+            uint256 innerStart,
+            uint256 innerEnd,
+            uint256 outerEnd
+        ) = LibParseLiteral.boundLiteral(LibParseLiteral.buildLiteralParsers(), data, outerStart);
+        (parser);
+        (innerStart);
+        (innerEnd);
+        (outerEnd);
+    }
+
     /// Check that an empty string is not treated as a literal.
     function testParseLiteralBoundLiteralDecimalEmpty() external {
-        checkUnsupportedLiteralType("", 0);
+        checkParserOutOfBounds("");
     }
 
     /// Check that a single digit is bounded as a decimal literal. Tests "0".
