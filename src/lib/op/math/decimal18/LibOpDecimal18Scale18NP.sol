@@ -36,6 +36,6 @@ library LibOpDecimal18Scale18NP {
         returns (uint256[] memory outputs)
     {
         outputs = new uint256[](1);
-        outputs[0] = inputs[0].scale18(Operand.unwrap(operand) >> 2, Operand.unwrap(operand) & MASK_2BIT);
+        outputs[0] = inputs[0].scale18(Operand.unwrap(operand) & 0xFF, Operand.unwrap(operand) >> 8);
     }
 }

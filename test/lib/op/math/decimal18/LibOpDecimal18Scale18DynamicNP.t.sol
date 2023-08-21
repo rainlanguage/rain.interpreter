@@ -3,12 +3,14 @@ pragma solidity =0.8.19;
 
 import "test/util/abstract/OpTest.sol";
 
-
 contract LibOpDecimal18Scale18DynamicNPTest is OpTest {
     /// Directly test the integrity logic of LibOpDecimal18Scale18DynamicNP.
     /// Inputs are always 2, outputs are always 1.
-    function testOpDecimal18Scale18DynamicNPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs, uint16 op) external {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpDecimal18Scale18DynamicNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10 | uint256(op)));
+    function testOpDecimal18Scale18DynamicNPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs, uint16 op)
+        external
+    {
+        (uint256 calcInputs, uint256 calcOutputs) =
+            LibOpDecimal18Scale18DynamicNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10 | uint256(op)));
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
     }
