@@ -34,3 +34,6 @@
 [submodule "lib/sol.lib.binmaskflag"]
 	path = lib/sol.lib.binmaskflag
 	url = https://github.com/rainprotocol/sol.lib.binmaskflag
+[submodule "lib/sushiswap"]
+	path = lib/sushiswap
+	url = https://github.com/sushiswap/sushiswap
