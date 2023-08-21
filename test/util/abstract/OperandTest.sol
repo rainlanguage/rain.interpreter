@@ -26,19 +26,20 @@ abstract contract OperandTest is Test {
         assertEq(
             bytecode,
             bytes.concat(
-            // 1 source
-            hex"01"
-            // 0 offset
-            hex"0000"
-            // 1 op
-            hex"01"
-            // 1 stack allocation
-            hex"01"
-            // 0 inputs
-            hex"00"
-            // 1 output
-            hex"01",
-            operand)
+                // 1 source
+                hex"01"
+                // 0 offset
+                hex"0000"
+                // 1 op
+                hex"01"
+                // 1 stack allocation
+                hex"01"
+                // 0 inputs
+                hex"00"
+                // 1 output
+                hex"01",
+                operand
+            )
         );
         assertEq(constants.length, 0);
     }
