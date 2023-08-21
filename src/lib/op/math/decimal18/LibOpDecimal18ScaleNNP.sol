@@ -12,10 +12,7 @@ import "../../../integrity/LibIntegrityCheckNP.sol";
 library LibOpDecimal18ScaleNNP {
     using FixedPointDecimalScale for uint256;
 
-    function integrity(
-        IntegrityCheckStateNP memory,
-        Operand
-    ) internal pure returns (uint256, uint256) {
+    function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
         return (1, 1);
     }
 

@@ -13,10 +13,7 @@ import "../../../integrity/LibIntegrityCheckNP.sol";
 library LibOpDecimal18Scale18DynamicNP {
     using FixedPointDecimalScale for uint256;
 
-    function integrity(
-        IntegrityCheckStateNP memory,
-        Operand
-    ) internal pure returns (uint256, uint256) {
+    function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
         return (2, 1);
     }
 
@@ -30,7 +27,7 @@ library LibOpDecimal18Scale18DynamicNP {
             stackTop := add(stackTop, 0x20)
             a := mload(stackTop)
         }
-        a = a.scale18(scale, Operand.unwrap(operand) & MASK_2BIT);
+        a = a.scale18(scale, Operand.unwrap(operand));
         assembly ("memory-safe") {
             mstore(stackTop, a)
         }
