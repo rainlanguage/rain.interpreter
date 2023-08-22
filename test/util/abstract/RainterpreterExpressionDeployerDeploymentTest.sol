@@ -2,11 +2,11 @@
 pragma solidity =0.8.19;
 
 import "forge-std/Test.sol";
-import "test/util/lib/etch/LibEtch.sol";
+import "../../util/lib/etch/LibEtch.sol";
 
-import "src/concrete/RainterpreterStore.sol";
-import "src/concrete/RainterpreterNP.sol";
-import "src/concrete/RainterpreterExpressionDeployerNP.sol";
+import "../../../src/concrete/RainterpreterStore.sol";
+import "../../../src/concrete/RainterpreterNP.sol";
+import "../../../src/concrete/RainterpreterExpressionDeployerNP.sol";
 
 /// @title RainterpreterExpressionDeployerDeploymentTest
 /// Tests that the RainterpreterExpressionDeployer meta is correct. Also tests
