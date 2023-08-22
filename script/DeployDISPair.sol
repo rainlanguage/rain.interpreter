@@ -15,8 +15,12 @@ contract DeployDISPair is Script {
         uint256 deployerPrivateKey = vm.envUint("DEPLOYMENT_KEY");
 
         vm.startBroadcast(deployerPrivateKey);
+        console2.log("Deploying DISPair");
+        console2.log("Deploy interpreter");
         RainterpreterNP interpreter = new RainterpreterNP();
+        console2.log("Deploy store");
         RainterpreterStore store = new RainterpreterStore();
+        console2.log("Deploy deployer");
         RainterpreterExpressionDeployerNP deployer = new RainterpreterExpressionDeployerNP(RainterpreterExpressionDeployerConstructionConfig(
             address(interpreter),
             address(store),
