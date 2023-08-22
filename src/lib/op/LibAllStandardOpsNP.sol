@@ -56,12 +56,14 @@ import "./math/int/LibOpIntSubNP.sol";
 import "./store/LibOpGetNP.sol";
 import "./store/LibOpSetNP.sol";
 
+import "./uniswap/LibOpUniswapV2AmountIn.sol";
+
 /// Thrown when a dynamic length array is NOT 1 more than a fixed length array.
 /// Should never happen outside a major breaking change to memory layouts.
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 39;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 40;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -245,6 +247,11 @@ library LibAllStandardOpsNP {
                 "set",
                 OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Sets a value in storage. The first operand is the key to set and the second operand is the value to set."
+            ),
+            AuthoringMeta(
+                "uniswap-v2-amount-in",
+                OPERAND_PARSER_OFFSET_SINGLE_FULL,
+                "Computes the amount of input tokens required to get a given amount of output tokens from a UniswapV2 pair. Input/output token directions are from the perspective of the Uniswap contract. The first input is the factory address, the second is the amount of output tokens, the third is the input token address, and the fourth is the output token address."
             )
         ];
         AuthoringMeta[] memory wordsDynamic;
@@ -326,7 +333,8 @@ library LibAllStandardOpsNP {
                     // decimal18 sub.
                     LibOpIntSubNP.integrity,
                     LibOpGetNP.integrity,
-                    LibOpSetNP.integrity
+                    LibOpSetNP.integrity,
+                    LibOpUniswapV2AmountIn.integrity
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
@@ -414,7 +422,8 @@ library LibAllStandardOpsNP {
                     // decimal18 sub.
                     LibOpIntSubNP.run,
                     LibOpGetNP.run,
-                    LibOpSetNP.run
+                    LibOpSetNP.run,
+                    LibOpUniswapV2AmountIn.run
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
