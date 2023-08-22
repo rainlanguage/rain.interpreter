@@ -57,13 +57,14 @@ import "./store/LibOpGetNP.sol";
 import "./store/LibOpSetNP.sol";
 
 import "./uniswap/LibOpUniswapV2AmountIn.sol";
+import "./uniswap/LibOpUniswapV2AmountOut.sol";
 
 /// Thrown when a dynamic length array is NOT 1 more than a fixed length array.
 /// Should never happen outside a major breaking change to memory layouts.
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 40;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 41;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -251,7 +252,12 @@ library LibAllStandardOpsNP {
             AuthoringMeta(
                 "uniswap-v2-amount-in",
                 OPERAND_PARSER_OFFSET_SINGLE_FULL,
-                "Computes the amount of input tokens required to get a given amount of output tokens from a UniswapV2 pair. Input/output token directions are from the perspective of the Uniswap contract. The first input is the factory address, the second is the amount of output tokens, the third is the input token address, and the fourth is the output token address."
+                "Computes the minimum amount of input tokens required to get a given amount of output tokens from a UniswapV2 pair. Input/output token directions are from the perspective of the Uniswap contract. The first input is the factory address, the second is the amount of output tokens, the third is the input token address, and the fourth is the output token address. If the operand is 1 the last time the prices changed will be returned as well."
+            ),
+            AuthoringMeta(
+                "uniswap-v2-amount-out",
+                OPERAND_PARSER_OFFSET_SINGLE_FULL,
+                "Computes the maximum amount of output tokens received from a given amount of input tokens from a UniswapV2 pair. Input/output token directions are from the perspective of the Uniswap contract. The first input is the factory address, the second is the amount of input tokens, the third is the input token address, and the fourth is the output token address. If the operand is 1 the last time the prices changed will be returned as well."
             )
         ];
         AuthoringMeta[] memory wordsDynamic;
@@ -334,7 +340,8 @@ library LibAllStandardOpsNP {
                     LibOpIntSubNP.integrity,
                     LibOpGetNP.integrity,
                     LibOpSetNP.integrity,
-                    LibOpUniswapV2AmountIn.integrity
+                    LibOpUniswapV2AmountIn.integrity,
+                    LibOpUniswapV2AmountOut.integrity
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
@@ -423,7 +430,8 @@ library LibAllStandardOpsNP {
                     LibOpIntSubNP.run,
                     LibOpGetNP.run,
                     LibOpSetNP.run,
-                    LibOpUniswapV2AmountIn.run
+                    LibOpUniswapV2AmountIn.run,
+                    LibOpUniswapV2AmountOut.run
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
