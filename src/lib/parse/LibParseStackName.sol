@@ -9,21 +9,22 @@ library LibParseStackName {
     /// @return index The new index after the word was pushed. Will be unchanged
     /// if the word already existed.
     function pushStackName(ParseState memory state, bytes32 word) internal pure returns (bool exists, uint256 index) {
-        (exists, index) = stackNameIndex(state, word);
-        if (!exists) {
-            uint256 fingerprint;
-            uint256 ptr;
-            uint256 oldStackNames = state.stackNames;
-            assembly ("memory-safe") {
-                ptr := mload(0x40)
-                mstore(ptr, word)
-                fingerprint := and(keccak256(ptr, 0x20), not(0xFFFFFFFF))
-                mstore(ptr, oldStackNames)
-                mstore(0x40, add(ptr, 0x20))
-            }
-            uint256 stackLHSIndex = state.lineTracker & 0xFF;
-            state.stackNames = fingerprint | (stackLHSIndex << 0x10) | ptr;
-            unchecked {
+        unchecked {
+            (exists, index) = stackNameIndex(state, word);
+            if (!exists) {
+                uint256 fingerprint;
+                uint256 ptr;
+                uint256 oldStackNames = state.stackNames;
+                assembly ("memory-safe") {
+                    ptr := mload(0x40)
+                    mstore(ptr, word)
+                    fingerprint := and(keccak256(ptr, 0x20), not(0xFFFFFFFF))
+                    mstore(ptr, oldStackNames)
+                    mstore(0x40, add(ptr, 0x20))
+                }
+                // Add the start of line height to the LHS line parse count.
+                uint256 stackLHSIndex = (state.lineTracker & 0xFF) + ((state.lineTracker >> 8) & 0xFF);
+                state.stackNames = fingerprint | (stackLHSIndex << 0x10) | ptr;
                 index = stackLHSIndex + 1;
             }
         }

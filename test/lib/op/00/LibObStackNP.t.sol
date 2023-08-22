@@ -156,4 +156,58 @@ contract LibOpStackNPTest is OpTest {
         assertEq(stack[1], 1);
         assertEq(kvs.length, 0);
     }
+
+    /// Test the eval of several stack opcodes parsed from a string.
+    function testOpStackEvalSeveral() external {
+        (bytes memory bytecode, uint256[] memory constants) =
+            iDeployer.parse("foo: 1, bar: foo, _ baz: bar bar, bing _:foo baz;");
+        assertEq(constants.length, 1);
+        assertEq(constants[0], 1);
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 6 ops
+            hex"06"
+            // 6 stack allocation
+            hex"06"
+            // 0 inputs
+            hex"00"
+            // 6 outputs
+            hex"06"
+            // constant 0 (1)
+            hex"01000000"
+            // stack 0 (foo)
+            hex"00000000"
+            // stack 1 (bar)
+            hex"00000001"
+            // stack 1 (bar)
+            hex"00000001"
+            // stack 0 (foo)
+            hex"00000000"
+            // stack 3 (baz)
+            hex"00000003"
+        );
+
+        uint256[] memory minOutputs = new uint256[](1);
+        minOutputs[0] = 6;
+        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+            iDeployer.deployExpression(bytecode, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            storeDeployer,
+            StateNamespace.wrap(0),
+            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 6),
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+        );
+        assertEq(stack.length, 6);
+        assertEq(stack[0], 1);
+        assertEq(stack[1], 1);
+        assertEq(stack[2], 1);
+        assertEq(stack[3], 1);
+        assertEq(stack[4], 1);
+        assertEq(stack[5], 1);
+        assertEq(kvs.length, 0);
+    }
 }
