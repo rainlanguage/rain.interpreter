@@ -12,6 +12,9 @@ library LibBytecode {
     using LibMemCpy for Pointer;
 
     function sourceCount(bytes memory bytecode) internal pure returns (uint256 count) {
+        if (bytecode.length == 0) {
+            return 0;
+        }
         assembly {
             // The first byte of rain bytecode is the count of how many sources
             // there are.
