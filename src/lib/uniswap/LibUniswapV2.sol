@@ -21,22 +21,20 @@ library LibUniswapV2 {
     /// Copy of UniswapV2Library.pairFor for solidity 0.8.x support.
     function pairFor(address factory, address tokenA, address tokenB) internal pure returns (address pair) {
         (address token0, address token1) = sortTokens(tokenA, tokenB);
-        unchecked {
-            pair = address(
-                uint160(
-                    uint256(
-                        keccak256(
-                            abi.encodePacked(
-                                hex"ff",
-                                factory,
-                                keccak256(abi.encodePacked(token0, token1)),
-                                hex"96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f" // init code hash
-                            )
+        pair = address(
+            uint160(
+                uint256(
+                    keccak256(
+                        abi.encodePacked(
+                            hex"ff",
+                            factory,
+                            keccak256(abi.encodePacked(token0, token1)),
+                            hex"96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f" // init code hash
                         )
                     )
                 )
-            );
-        }
+            )
+        );
     }
 
     /// UniswapV2Library.sol has a `getReserves` function but it discards the
@@ -67,6 +65,20 @@ library LibUniswapV2 {
         amountIn = (numerator / denominator) + 1;
     }
 
+    /// Copy of UniswapV2Library.getAmountOut for solidity 0.8.x support.
+    function getAmountOut(uint256 amountIn, uint256 reserveIn, uint256 reserveOut)
+        internal
+        pure
+        returns (uint256 amountOut)
+    {
+        require(amountIn > 0, "UniswapV2Library: INSUFFICIENT_INPUT_AMOUNT");
+        require(reserveIn > 0 && reserveOut > 0, "UniswapV2Library: INSUFFICIENT_LIQUIDITY");
+        uint256 amountInWithFee = amountIn * 997;
+        uint256 numerator = amountInWithFee * reserveOut;
+        uint256 denominator = (reserveIn * 1000) + amountInWithFee;
+        amountOut = numerator / denominator;
+    }
+
     /// Bundles the key library logic together to produce amounts based on tokens
     /// and amounts out rather than needing to handle reserves directly.
     function getAmountInByTokenWithTime(address factory, address tokenIn, address tokenOut, uint256 amountOut)
@@ -77,6 +89,19 @@ library LibUniswapV2 {
         (uint256 reserveIn, uint256 reserveOut, uint256 reserveTimestamp) =
             getReservesWithTime(factory, tokenIn, tokenOut);
         amountIn = getAmountIn(amountOut, reserveIn, reserveOut);
+        timestamp = reserveTimestamp;
+    }
+
+    /// Bundles the key library logic together to produce amounts based on tokens
+    /// and amounts in rather than needing to handle reserves directly.
+    function getAmountOutByTokenWithTime(address factory, address tokenIn, address tokenOut, uint256 amountIn)
+        internal
+        view
+        returns (uint256 amountOut, uint256 timestamp)
+    {
+        (uint256 reserveIn, uint256 reserveOut, uint256 reserveTimestamp) =
+            getReservesWithTime(factory, tokenIn, tokenOut);
+        amountOut = getAmountOut(amountIn, reserveIn, reserveOut);
         timestamp = reserveTimestamp;
     }
 }
