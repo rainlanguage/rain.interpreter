@@ -43,10 +43,10 @@ error UnexpectedOpMetaHash(bytes32 actualOpMeta);
 
 /// @dev The function pointers for the integrity check fns.
 bytes constant INTEGRITY_FUNCTION_POINTERS =
-    hex"1b471bc11c281c321c281c281c281c281c281c3c1c5e1c881caa1c3c1caa1caa1cb41cbe1caa1caa1cc71cc71caa1cbe1cbe1cc71cc71cc71cc71cc71cc71cc71cc71cc71cc71cc71cc71cbe1cde1ce8";
+    hex"1b421bbc1c231c2d1c231c231c231c231c231c371c591c831ca51c371ca51ca51caf1cb91ca51ca51cc21cc21ca51cb91cb91cc21cc21cc21cc21cc21cc21cc21cc21cc21cc21cc21cc21cb91cd91ce3";
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x2ebd0e8088786c3bc1f33e9427b20423a578c2f3e1ec5142fc1118960b8a1e5a);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x5b945ef9d83bb4de6e638869b4742df87a7fde71ad9fee64e4003a96439f219e);
 
 /// @dev Hash of the known store bytecode.
 bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);
