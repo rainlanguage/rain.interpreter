@@ -22,6 +22,7 @@ contract DeployDISPair is Script {
             address(store),
             LibAllStandardOpsNP.authoringMeta()
         ));
+        (deployer);
         vm.stopBroadcast();
     }
 }
