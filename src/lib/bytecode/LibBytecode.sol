@@ -6,6 +6,9 @@ import "rain.solmem/lib/LibPointer.sol";
 import "rain.solmem/lib/LibBytes.sol";
 import "rain.solmem/lib/LibMemCpy.sol";
 
+/// Thrown when a bytecode source offset is out of bounds.
+error SourceOffsetOutOfBounds(bytes bytecode, uint256 sourceIndex);
+
 library LibBytecode {
     using LibPointer for Pointer;
     using LibBytes for bytes;
@@ -27,6 +30,19 @@ library LibBytecode {
             // After the first byte, all the relative offset pointers are
             // stored sequentially as 16 bit values.
             offset := and(mload(add(add(bytecode, 3), mul(sourceIndex, 2))), 0xFFFF)
+        }
+        // This doesn't replace a full integrity check but gives a sanity check
+        // that the offset is within the bytecode. This also covers the functions
+        // that use this function, to generate absolute pointers and read from
+        // the source header after the offset, so they don't need to check
+        // bounds redundantly.
+        unchecked {
+            uint256 count = sourceCount(bytecode);
+            // Source count byte + 2 bytes per source offset + offset + 4 byte source header.
+            uint256 expectedMinBytes = 1 + count * 2 + offset + 4;
+            if (bytecode.length < expectedMinBytes || sourceIndex >= count) {
+                revert SourceOffsetOutOfBounds(bytecode, sourceIndex);
+            }
         }
     }
 
