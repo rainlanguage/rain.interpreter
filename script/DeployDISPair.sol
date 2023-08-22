@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import "forge-std/Script.sol";
 import "src/concrete/RainterpreterStore.sol";
 import "src/concrete/RainterpreterNP.sol";
+import "src/concrete/RainterpreterExpressionDeployerNP.sol";
 
 /// @title DeployDISPair
 /// @notice A script that deploys a DeployDISPair.
