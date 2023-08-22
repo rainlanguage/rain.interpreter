@@ -69,4 +69,63 @@ contract LibOpUniswapV2AmountInTest is OpTest {
             inputs
         );
     }
+
+    /// Test the eval of `uniswap-v2-amount-in` parsed from a string.
+    /// Test zero inputs.
+    function testOpUniswapV2AmountInZeroInputs() public {
+        checkBadInputs("_: uniswap-v2-amount-in();", 0, 4, 0);
+    }
+
+    /// Test the eval of `uniswap-v2-amount-in` parsed from a string.
+    /// Test one input.
+    function testOpUniswapV2AmountInOneInput() public {
+        checkBadInputs("_: uniswap-v2-amount-in(0);", 1, 4, 1);
+        checkBadInputs("_: uniswap-v2-amount-in(1);", 1, 4, 1);
+        checkBadInputs("_: uniswap-v2-amount-in(max-decimal18-value());", 1, 4, 1);
+    }
+
+    /// Test the eval of `uniswap-v2-amount-in` parsed from a string.
+    /// Test two inputs.
+    function testOpUniswapV2AmountInTwoInputs() public {
+        checkBadInputs("_: uniswap-v2-amount-in(0 0);", 2, 4, 2);
+        checkBadInputs("_: uniswap-v2-amount-in(0 1);", 2, 4, 2);
+        checkBadInputs("_: uniswap-v2-amount-in(1 0);", 2, 4, 2);
+        checkBadInputs("_: uniswap-v2-amount-in(1 1);", 2, 4, 2);
+        checkBadInputs("_: uniswap-v2-amount-in(1 max-decimal18-value());", 2, 4, 2);
+        checkBadInputs("_: uniswap-v2-amount-in(max-decimal18-value() 1);", 2, 4, 2);
+    }
+
+    /// Test the eval of `uniswap-v2-amount-in` parsed from a string.
+    /// Test three inputs.
+    function testOpUniswapV2AmountInThreeInputs() public {
+        checkBadInputs("_: uniswap-v2-amount-in(0 0 0);", 3, 4, 3);
+        checkBadInputs("_: uniswap-v2-amount-in(0 0 1);", 3, 4, 3);
+        checkBadInputs("_: uniswap-v2-amount-in(0 1 0);", 3, 4, 3);
+        checkBadInputs("_: uniswap-v2-amount-in(0 1 1);", 3, 4, 3);
+        checkBadInputs("_: uniswap-v2-amount-in(1 0 0);", 3, 4, 3);
+        checkBadInputs("_: uniswap-v2-amount-in(1 0 1);", 3, 4, 3);
+        checkBadInputs("_: uniswap-v2-amount-in(1 1 0);", 3, 4, 3);
+        checkBadInputs("_: uniswap-v2-amount-in(1 1 1);", 3, 4, 3);
+        checkBadInputs("_: uniswap-v2-amount-in(1 1 max-decimal18-value());", 3, 4, 3);
+        checkBadInputs("_: uniswap-v2-amount-in(1 max-decimal18-value() 1);", 3, 4, 3);
+        checkBadInputs("_: uniswap-v2-amount-in(max-decimal18-value() 1 1);", 3, 4, 3);
+    }
+
+    /// Test the eval of `uniswap-v2-amount-in` parsed from a string.
+    /// Test five inputs.
+    function testOpUniswapV2AmountInFiveInputs() public {
+        checkBadInputs("_: uniswap-v2-amount-in(0 0 0 0 0);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-amount-in(0 0 0 0 1);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-amount-in(0 0 0 1 0);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-amount-in(0 0 0 1 1);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-amount-in(0 0 1 0 0);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-amount-in(0 0 1 0 1);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-amount-in(0 0 1 1 0);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-amount-in(0 0 1 1 1);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-amount-in(0 1 0 0 0);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-amount-in(0 1 0 0 1);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-amount-in(0 1 0 1 0);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-amount-in(0 1 0 1 1);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-amount-in(0 1 1 0 0);", 5, 4, 5);
+    }
 }
