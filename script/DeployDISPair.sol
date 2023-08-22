@@ -21,7 +21,8 @@ contract DeployDISPair is Script {
         console2.log("Deploy store");
         RainterpreterStore store = new RainterpreterStore();
         console2.log("Deploy deployer");
-        RainterpreterExpressionDeployerNP deployer = new RainterpreterExpressionDeployerNP(RainterpreterExpressionDeployerConstructionConfig(
+        RainterpreterExpressionDeployerNP deployer =
+        new RainterpreterExpressionDeployerNP(RainterpreterExpressionDeployerConstructionConfig(
             address(interpreter),
             address(store),
             LibAllStandardOpsNP.authoringMeta()
