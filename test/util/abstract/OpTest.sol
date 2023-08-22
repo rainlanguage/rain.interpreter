@@ -8,8 +8,8 @@ import "rain.solmem/lib/LibPointer.sol";
 import "./RainterpreterExpressionDeployerDeploymentTest.sol";
 import "../../../src/lib/state/LibInterpreterStateNP.sol";
 
-import "src/lib/caller/LibContext.sol";
-import {UnexpectedOperand} from "src/lib/parse/LibParseOperand.sol";
+import "../../../src/lib/caller/LibContext.sol";
+import {UnexpectedOperand} from "../../../src/lib/parse/LibParseOperand.sol";
 
 uint256 constant PRE = uint256(keccak256(abi.encodePacked("pre")));
 uint256 constant POST = uint256(keccak256(abi.encodePacked("post")));
