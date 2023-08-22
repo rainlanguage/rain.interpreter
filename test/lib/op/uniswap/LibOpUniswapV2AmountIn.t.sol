@@ -34,7 +34,11 @@ contract LibOpUniswapV2AmountInTest is OpTest {
         // Anything outside these bounds is expected to revert in real use.
         reserveIn = bound(reserveIn, 2, type(uint112).max);
         reserveOut = bound(reserveOut, 2, type(uint112).max);
-        amountOut = bound(amountOut, 1, reserveOut - 1);
+        // Depending on the sort order of the tokens, the reserve amounts may
+        // be swapped internally, so "out" may be "in". Simple hack is to just
+        // bound the amount to the smaller of the two reserves. This prevents
+        // a divide by zero in the library.
+        amountOut = bound(amountOut, 1, (reserveOut < reserveIn ? reserveOut : reserveIn) - 1);
 
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](4);
@@ -64,9 +68,5 @@ contract LibOpUniswapV2AmountInTest is OpTest {
             LibOpUniswapV2AmountIn.run,
             inputs
         );
-    }
-
-    function testDebugUni() external {
-        testOpUniswapV2AmountInRun(address(0), 2, address(0x5000000000000000000000000000000000000000), address(2), 2, 1, 0, 0);
     }
 }
