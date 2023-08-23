@@ -76,6 +76,25 @@ contract LibOpUniswapV2AmountOutTest is OpTest {
         checkBadInputs("_: uniswap-v2-amount-out();", 0, 4, 0);
     }
 
+    /// Test the eval of `uniswap-v2-amount-in` parsed from a string.
+    /// Test that 0 input amount returns 0 output amount.
+    function testOpUniswapV2AmountOutZeroOutput(uint256 reserveIn, uint256 reserveOut, uint32 reserveTimestamp)
+        public
+    {
+        address factory = address(0x01);
+        address tokenIn = address(0x02);
+        address tokenOut = address(0x03);
+        reserveIn = bound(reserveIn, 2, type(uint112).max);
+        reserveOut = bound(reserveOut, 2, type(uint112).max);
+        address expectedPair = LibUniswapV2.pairFor(factory, tokenIn, tokenOut);
+        vm.mockCall(
+            expectedPair,
+            abi.encodeWithSelector(IUniswapV2Pair.getReserves.selector),
+            abi.encode(reserveIn, reserveOut, reserveTimestamp)
+        );
+        checkHappy("_: uniswap-v2-amount-out(0x01 0 0x02 0x03);", 0, "0x01 0 0x02 0x03");
+    }
+
     /// Test the eval of `uniswap-v2-amount-out` parsed from a string.
     /// Test one input.
     function testOpUniswapV2AmountOutOneInput() public {
