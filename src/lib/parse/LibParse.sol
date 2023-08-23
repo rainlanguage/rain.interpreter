@@ -138,8 +138,10 @@ type StackTracker is uint256;
 /// parsed on the RHS. The remaining 31 bytes are the word counters for each
 /// stack item, which are incremented for every op pushed to the source. This is
 /// reset to 0 for every new source.
-/// @param topLevel1 32 additional bytes of stack words, allowing for 63 top
-/// level stack items total per source.
+/// @param topLevel1 31 additional bytes of stack words, allowing for 62 top
+/// level stack items total per source. The final byte is used to count the
+/// stack height according to the LHS for the current source. This is reset to 0
+/// for every new source.
 /// @param parenTracker0 Memory region for tracking pointers to words in the
 /// source, and counters for the number of words in each paren group. The first
 /// byte is a counter/offset into the region. The second byte is a phantom
@@ -246,7 +248,11 @@ library LibParseState {
         state.activeSourcePtr = activeSourcePtr;
         state.topLevel0 = 0;
         state.topLevel1 = 0;
+        state.parenTracker0 = 0;
+        state.parenTracker1 = 0;
         state.lineTracker = 0;
+        state.stackNames = 0;
+        state.stackNameBloom = 0;
         state.stackTracker = StackTracker.wrap(0);
     }
 
@@ -651,8 +657,6 @@ library LibParseState {
     }
 
     function endSource(ParseState memory state) internal pure {
-        state.fsm &= ~FSM_ACTIVE_SOURCE_MASK;
-
         uint256 sourcesBuilder = state.sourcesBuilder;
         uint256 offset = sourcesBuilder >> 0xf0;
 
@@ -773,6 +777,7 @@ library LibParseState {
                 ((offset + 0x10) << 0xf0) | (source << offset) | (sourcesBuilder & ((1 << offset) - 1));
 
             // Reset source as we're done with this one.
+            state.fsm &= ~FSM_ACTIVE_SOURCE_MASK;
             state.resetSource();
         }
     }
@@ -1038,6 +1043,7 @@ library LibParse {
                             }
                             // Bump the index regardless of whether the stack
                             // item is named or not.
+                            state.topLevel1++;
                             state.lineTracker++;
 
                             // Set yang as we are now building a stack item.
