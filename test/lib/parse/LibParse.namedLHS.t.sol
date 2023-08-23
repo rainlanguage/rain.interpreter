@@ -90,4 +90,95 @@ contract LibParseNamedLHSTest is Test {
         // 33 chars is too long.
         LibParse.parse("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;", "");
     }
+
+    /// Stack needs to index items by name correctly across lines.
+    function testParseNamedLHSStackIndex() external {
+        AuthoringMeta[] memory meta = new AuthoringMeta[](3);
+        meta[0] = AuthoringMeta("stack", OPERAND_PARSER_OFFSET_DISALLOWED, "stack");
+        meta[1] = AuthoringMeta("constant", OPERAND_PARSER_OFFSET_DISALLOWED, "constant");
+        meta[2] = AuthoringMeta("c", OPERAND_PARSER_OFFSET_DISALLOWED, "c");
+        bytes memory parseMeta = LibParseMeta.buildParseMeta(meta, 1);
+
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("a _:1 2,b:a,:c(),d:3,e:d;", parseMeta);
+        assertEq(
+            bytecode,
+            // 2 sources.
+            hex"01"
+            // offset 0
+            hex"0000"
+            // 6 ops
+            hex"06"
+            // 5 stack allocation
+            hex"05"
+            // 0 input
+            hex"00"
+            // 5 output
+            hex"05"
+            // constant 0
+            hex"01000000"
+            // constant 1
+            hex"01000001"
+            // stack 0
+            hex"00000000"
+            // c
+            hex"02000000"
+            // constant 2
+            hex"01000002"
+            // stack 3
+            hex"00000003"
+        );
+    }
+
+    /// Duplicate names are disallowed in the same source.
+    function testParseNamedErrorDuplicateSameSource() external {
+        vm.expectRevert(abi.encodeWithSelector(DuplicateLHSItem.selector, 4));
+        LibParse.parse("a:,a:;", "");
+    }
+
+    /// Duplicate names are allowed across different sources.
+    function testParseNamedDuplicateDifferentSource() external {
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("a b:1 2, e:a;c d:3 4,e:d;", "");
+        assertEq(
+            bytecode,
+            // 2 sources.
+            hex"02"
+            // offset 0
+            hex"0000"
+            // offset 16
+            hex"0010"
+            // 3 ops
+            hex"03"
+            // 3 stack allocation
+            hex"03"
+            // 0 input
+            hex"00"
+            // 3 output
+            hex"03"
+            // constant 0
+            hex"01000000"
+            // constant 1
+            hex"01000001"
+            // stack 0
+            hex"00000000"
+            // 3 ops
+            hex"03"
+            // 1 stack allocation
+            hex"03"
+            // 0 input
+            hex"00"
+            // 3 outputs
+            hex"03"
+            // constant 2
+            hex"01000002"
+            // constant 3
+            hex"01000003"
+            // stack 1
+            hex"00000001"
+        );
+        assertEq(constants.length, 4);
+        assertEq(constants[0], 1);
+        assertEq(constants[1], 2);
+        assertEq(constants[2], 3);
+        assertEq(constants[3], 4);
+    }
 }

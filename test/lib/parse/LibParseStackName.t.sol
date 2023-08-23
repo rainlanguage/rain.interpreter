@@ -12,6 +12,7 @@ contract LibParseStackNameTest is Test {
     /// Test that we can push and retrieve a stack name.
     function testPushAndRetrieveStackNameSingle(ParseState memory state, bytes32 word) external {
         state.lineTracker = 0;
+        state.topLevel1 = 0;
         state.stackNames = 0;
 
         (bool exists, uint256 index) = LibParseStackName.pushStackName(state, word);
@@ -19,6 +20,7 @@ contract LibParseStackNameTest is Test {
         assertEq(index, 1);
 
         state.lineTracker = index;
+        state.topLevel1 = index;
 
         (exists, index) = LibParseStackName.stackNameIndex(state, word);
         assertTrue(exists);
@@ -29,17 +31,22 @@ contract LibParseStackNameTest is Test {
     function testPushAndRetrieveStackNameDouble(ParseState memory state, bytes32 word1, bytes32 word2) external {
         vm.assume(word1 != word2);
         state.lineTracker = 0;
+        state.topLevel1 = 0;
         state.stackNames = 0;
 
         (bool exists, uint256 index) = LibParseStackName.pushStackName(state, word1);
         assertFalse(exists);
         assertEq(index, 1);
+
         state.lineTracker = index;
+        state.topLevel1 = index;
 
         (exists, index) = LibParseStackName.pushStackName(state, word2);
         assertFalse(exists);
         assertEq(index, 2);
+
         state.lineTracker = index;
+        state.topLevel1 = index;
 
         (exists, index) = LibParseStackName.stackNameIndex(state, word1);
         assertTrue(exists);
@@ -53,12 +60,15 @@ contract LibParseStackNameTest is Test {
     /// Test that two identical stack names are not pushed.
     function testPushAndRetrieveStackNameDoubleIdentical(ParseState memory state, bytes32 word) external {
         state.lineTracker = 0;
+        state.topLevel1 = 0;
         state.stackNames = 0;
 
         (bool exists, uint256 index) = LibParseStackName.pushStackName(state, word);
         assertFalse(exists);
         assertEq(index, 1);
+
         state.lineTracker = index;
+        state.topLevel1 = index;
 
         (exists, index) = LibParseStackName.pushStackName(state, word);
         assertTrue(exists);
@@ -69,6 +79,7 @@ contract LibParseStackNameTest is Test {
     function testPushAndRetrieveStackNameMany(ParseState memory state, uint256 n) external {
         n = bound(n, 1, 100);
         state.lineTracker = 0;
+        state.topLevel1 = 0;
         state.stackNames = 0;
 
         // Do this sequentially to avoid dupes.
@@ -77,6 +88,7 @@ contract LibParseStackNameTest is Test {
             assertFalse(exists);
             assertEq(index, i + 1);
             state.lineTracker = index;
+            state.topLevel1 = index;
         }
 
         for (uint256 i = 0; i < n; i++) {
