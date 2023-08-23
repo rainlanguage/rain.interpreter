@@ -46,7 +46,7 @@ bytes constant INTEGRITY_FUNCTION_POINTERS =
     hex"1b581bd21c391c431c391c391c391c391c391c4d1c6f1c991cbb1c4d1cbb1cbb1cc51ccf1cbb1cbb1cd81cd81cbb1ccf1ccf1cd81cd81cd81cd81cd81cd81cd81cd81cd81cd81cd81cd81ccf1cef1cf91cf9";
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x4ad8acb587318aa2d5bd458ca2e144d6a121dd56148f392b1991f7e06ab4792f);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xfb6263e417ab9c4f4be838103072ff246ef005c365919d0ba3a8a8620cf51d5c);
 
 /// @dev Hash of the known store bytecode.
 bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);

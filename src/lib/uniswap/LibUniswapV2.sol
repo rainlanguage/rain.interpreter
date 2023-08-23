@@ -81,6 +81,8 @@ library LibUniswapV2 {
 
     /// Bundles the key library logic together to produce amounts based on tokens
     /// and amounts out rather than needing to handle reserves directly.
+    /// Also maps 0 amountOut to 0 amountIn unconditionally, which is different
+    /// to the reference implementation.
     function getAmountInByTokenWithTime(address factory, address tokenIn, address tokenOut, uint256 amountOut)
         internal
         view
@@ -88,12 +90,16 @@ library LibUniswapV2 {
     {
         (uint256 reserveIn, uint256 reserveOut, uint256 reserveTimestamp) =
             getReservesWithTime(factory, tokenIn, tokenOut);
-        amountIn = getAmountIn(amountOut, reserveIn, reserveOut);
+        // Perform the 0 amountOut to 0 amountIn mapping after getting the
+        // reserves so that we still error on invalid reserves.
+        amountIn = amountOut == 0 ? 0 : getAmountIn(amountOut, reserveIn, reserveOut);
         timestamp = reserveTimestamp;
     }
 
     /// Bundles the key library logic together to produce amounts based on tokens
     /// and amounts in rather than needing to handle reserves directly.
+    /// Also maps 0 amountIn to 0 amountOut unconditionally, which is different
+    /// to the reference implementation.
     function getAmountOutByTokenWithTime(address factory, address tokenIn, address tokenOut, uint256 amountIn)
         internal
         view
@@ -101,7 +107,9 @@ library LibUniswapV2 {
     {
         (uint256 reserveIn, uint256 reserveOut, uint256 reserveTimestamp) =
             getReservesWithTime(factory, tokenIn, tokenOut);
-        amountOut = getAmountOut(amountIn, reserveIn, reserveOut);
+        // Perform the 0 amountIn to 0 amountOut mapping after getting the
+        // reserves so that we still error on invalid reserves.
+        amountOut = amountIn == 0 ? 0 : getAmountOut(amountIn, reserveIn, reserveOut);
         timestamp = reserveTimestamp;
     }
 }
