@@ -2,6 +2,7 @@
 pragma solidity ^0.8.18;
 
 import "v2-core/interfaces/IUniswapV2Pair.sol";
+import "v2-core/interfaces/IUniswapV2Factory.sol";
 
 /// UniswapV2Library from uniswap/v2-periphery is compiled with a version of
 /// SafeMath that is locked to Solidity 0.6.x which means we can't use it in
@@ -46,8 +47,12 @@ library LibUniswapV2 {
         returns (uint256 reserveA, uint256 reserveB, uint256 timestamp)
     {
         (address token0,) = sortTokens(tokenA, tokenB);
+        // Reference implementation uses `pairFor` but for some reason this
+        // doesn't seem to work on sushi's factory. Using `getPair` instead.
+        // @todo investigate the discrepency.
+        address pair = IUniswapV2Factory(factory).getPair(tokenA, tokenB);
         (uint256 reserve0, uint256 reserve1, uint256 blockTimestampLast) =
-            IUniswapV2Pair(pairFor(factory, tokenA, tokenB)).getReserves();
+            IUniswapV2Pair(pair).getReserves();
         (reserveA, reserveB, timestamp) =
             tokenA == token0 ? (reserve0, reserve1, blockTimestampLast) : (reserve1, reserve0, blockTimestampLast);
     }
