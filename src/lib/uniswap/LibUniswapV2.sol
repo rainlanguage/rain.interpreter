@@ -51,8 +51,7 @@ library LibUniswapV2 {
         // doesn't seem to work on sushi's factory. Using `getPair` instead.
         // @todo investigate the discrepency.
         address pair = IUniswapV2Factory(factory).getPair(tokenA, tokenB);
-        (uint256 reserve0, uint256 reserve1, uint256 blockTimestampLast) =
-            IUniswapV2Pair(pair).getReserves();
+        (uint256 reserve0, uint256 reserve1, uint256 blockTimestampLast) = IUniswapV2Pair(pair).getReserves();
         (reserveA, reserveB, timestamp) =
             tokenA == token0 ? (reserve0, reserve1, blockTimestampLast) : (reserve1, reserve0, blockTimestampLast);
     }
