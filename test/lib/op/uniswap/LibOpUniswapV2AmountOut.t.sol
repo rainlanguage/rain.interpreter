@@ -20,7 +20,6 @@ contract LibOpUniswapV2AmountOutTest is OpTest {
 
     /// Directly test the runtime logic of LibOpUniswapV2AmountOut.
     function testOpUniswapV2AmountOutRun(
-        address factory,
         uint256 amountIn,
         address tokenIn,
         address tokenOut,
@@ -29,6 +28,7 @@ contract LibOpUniswapV2AmountOutTest is OpTest {
         uint32 reserveTimestamp,
         uint16 operandData
     ) public {
+        address factory = address(0x0123456789ABCDEF);
         // We can't check the error conditions for these while also mocking due
         // to the way the mock works. So we just bound them for this test.
         // Anything outside these bounds is expected to revert in real use.
@@ -54,6 +54,11 @@ contract LibOpUniswapV2AmountOutTest is OpTest {
             vm.expectRevert("UniswapV2Library: ZERO_ADDRESS");
         } else {
             address expectedPair = LibUniswapV2.pairFor(factory, tokenIn, tokenOut);
+            vm.mockCall(
+                factory,
+                abi.encodeWithSelector(IUniswapV2Factory.getPair.selector, tokenIn, tokenOut),
+                abi.encode(expectedPair)
+            );
             vm.mockCall(
                 expectedPair,
                 abi.encodeWithSelector(IUniswapV2Pair.getReserves.selector),
@@ -81,18 +86,23 @@ contract LibOpUniswapV2AmountOutTest is OpTest {
     function testOpUniswapV2AmountOutZeroOutput(uint256 reserveIn, uint256 reserveOut, uint32 reserveTimestamp)
         public
     {
-        address factory = address(0x01);
-        address tokenIn = address(0x02);
-        address tokenOut = address(0x03);
+        address factory = address(0x1234);
+        address tokenIn = address(0x2345);
+        address tokenOut = address(0x3456);
         reserveIn = bound(reserveIn, 2, type(uint112).max);
         reserveOut = bound(reserveOut, 2, type(uint112).max);
         address expectedPair = LibUniswapV2.pairFor(factory, tokenIn, tokenOut);
+        vm.mockCall(
+            factory,
+            abi.encodeWithSelector(IUniswapV2Factory.getPair.selector, tokenIn, tokenOut),
+            abi.encode(expectedPair)
+        );
         vm.mockCall(
             expectedPair,
             abi.encodeWithSelector(IUniswapV2Pair.getReserves.selector),
             abi.encode(reserveIn, reserveOut, reserveTimestamp)
         );
-        checkHappy("_: uniswap-v2-amount-out(0x01 0 0x02 0x03);", 0, "0x01 0 0x02 0x03");
+        checkHappy("_: uniswap-v2-amount-out(0x1234 0 0x2345 0x3456);", 0, "0x1234 0 0x2345 0x3456");
     }
 
     /// Test the eval of `uniswap-v2-amount-out` parsed from a string.
