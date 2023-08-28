@@ -35,9 +35,10 @@ library LibOpEnsureNP {
             for {
                 let end := add(cursor, mul(shr(0x10, operand), 0x20))
                 condition := mload(cursor)
-            } and(lt(cursor, end), gt(condition, 0)) {} {
                 cursor := add(cursor, 0x20)
+            } and(lt(cursor, end), gt(condition, 0)) {} {
                 condition := mload(cursor)
+                cursor := add(cursor, 0x20)
             }
         }
         if (condition == 0) {
@@ -46,7 +47,7 @@ library LibOpEnsureNP {
             // error.
             unchecked {
                 revert EnsureFailed(
-                    uint16(Operand.unwrap(operand)), (Pointer.unwrap(cursor) - Pointer.unwrap(stackTop)) / 0x20
+                    uint16(Operand.unwrap(operand)), (Pointer.unwrap(cursor) - Pointer.unwrap(stackTop) - 0x20) / 0x20
                 );
             }
         }
