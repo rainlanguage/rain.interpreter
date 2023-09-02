@@ -14,7 +14,7 @@ contract LibCtPopTest is Test {
     /// sequence of bits from the low bit to some mid bit.
     function testCTPOPUnshuffled(uint8 n) external {
         uint256 x = (1 << n) - 1;
-        uint256 ct = LibCtPop.ctpop(x);
+        uint256 ct = LibCtPop.ctpopD(x);
         assertEq(n, ct);
     }
 

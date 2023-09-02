@@ -6,6 +6,8 @@ import "forge-std/Test.sol";
 import "src/lib/parse/LibParseMeta.sol";
 import "test/util/lib/bloom/LibBloom.sol";
 
+import {PARSE_META} from "src/concrete/RainterpreterExpressionDeployerNP.sol";
+
 /// @title LibParseMetaFindExpanderTest
 /// Test that we can find reasonable expansions in a reasonable number of
 /// iterations for a reasonable number of words.
@@ -26,5 +28,13 @@ contract LibParseMetaFindExpanderTest is Test {
         (seed);
         assertEq(LibCtPop.ctpop(expansion), authoringMeta.length);
         assertEq(remaining.length, 0);
+    }
+
+    function testGasLookup() external {
+        bytes32 word = bytes32("hash");
+        uint256 a = gasleft();
+        LibParseMeta.lookupWord(PARSE_META, 0, word);
+        uint256 b = gasleft();
+        console2.log("gas", a - b);
     }
 }
