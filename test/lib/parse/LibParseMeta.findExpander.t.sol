@@ -6,8 +6,6 @@ import "forge-std/Test.sol";
 import "src/lib/parse/LibParseMeta.sol";
 import "test/util/lib/bloom/LibBloom.sol";
 
-import {PARSE_META} from "src/concrete/RainterpreterExpressionDeployerNP.sol";
-
 /// @title LibParseMetaFindExpanderTest
 /// Test that we can find reasonable expansions in a reasonable number of
 /// iterations for a reasonable number of words.
