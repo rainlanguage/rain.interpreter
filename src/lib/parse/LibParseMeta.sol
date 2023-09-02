@@ -282,7 +282,7 @@ library LibParseMeta {
                     function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParser;
                     assembly ("memory-safe") {
                         index := byte(27, posData)
-                        // operandParser := and(shr(byte(28, posData), operandParsers), 0xFFFF)
+                        operandParser := and(shr(byte(28, posData), operandParsers), 0xFFFF)
                     }
                     return (true, index, operandParser);
                 } else {

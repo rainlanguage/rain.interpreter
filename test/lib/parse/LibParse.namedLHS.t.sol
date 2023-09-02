@@ -127,6 +127,10 @@ contract LibParseNamedLHSTest is Test {
             // stack 3
             hex"00000003"
         );
+        assertEq(constants.length, 3);
+        assertEq(constants[0], 1);
+        assertEq(constants[1], 2);
+        assertEq(constants[2], 3);
     }
 
     /// Duplicate names are disallowed in the same source.

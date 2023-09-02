@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "forge-std/console2.sol";
-
 /// @dev 010101... for ctpop
 uint256 constant CTPOP_M1 = 0x5555555555555555555555555555555555555555555555555555555555555555;
 /// @dev 00110011.. for ctpop
@@ -21,14 +19,13 @@ uint256 constant CTPOP_M64 = 0x0000000000000000FFFFFFFFFFFFFFFF0000000000000000F
 uint256 constant CTPOP_M128 = 0x00000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
 
 library LibCtPopSlow {
-    uint256 private constant m1 = 0x5555555555555555555555555555555555555555555555555555555555555555;
-    uint256 private constant m2 = 0x3333333333333333333333333333333333333333333333333333333333333333;
-    uint256 private constant m4 = 0x0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f;
-    uint256 private constant h01 = 0x0101010101010101010101010101010101010101010101010101010101010101;
-
+    /// This is the slowest possible implementation of ctpop. It is used to
+    /// verify the correctness of the optimized implementation in LibCtPop.
+    /// It should be obviously correct by visual inspection, referencing the
+    /// wikipedia article.
+    /// https://en.wikipedia.org/wiki/Hamming_weight
     function ctpopSlow(uint256 x) internal pure returns (uint256) {
         unchecked {
-            // https://en.wikipedia.org/wiki/Hamming_weight
             x = (x & CTPOP_M1) + ((x >> 1) & CTPOP_M1);
             x = (x & CTPOP_M2) + ((x >> 2) & CTPOP_M2);
             x = (x & CTPOP_M4) + ((x >> 4) & CTPOP_M4);
