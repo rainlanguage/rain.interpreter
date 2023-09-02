@@ -19,22 +19,24 @@ uint256 constant CTPOP_M32 = 0x00000000FFFFFFFF00000000FFFFFFFF00000000FFFFFFFF0
 uint256 constant CTPOP_M64 = 0x0000000000000000FFFFFFFFFFFFFFFF0000000000000000FFFFFFFFFFFFFFFF;
 /// @dev 128 bits alternating for ctpop
 uint256 constant CTPOP_M128 = 0x00000000000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF;
-/// @dev 1 bytes for ctpop
-uint256 constant CTPOP_H01 = 0x0101010101010101010101010101010101010101010101010101010101010101;
 
-library LibCtPop {
-    // uint256 private constant m1 = 0x5555555555555555555555555555555555555555555555555555555555555555;
-    // uint256 private constant m2 = 0x3333333333333333333333333333333333333333333333333333333333333333;
-    // uint256 private constant m4 = 0x0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f;
-    // uint256 private constant h01 = 0x0101010101010101010101010101010101010101010101010101010101010101;
+library LibCtPopSlow {
+    uint256 private constant m1 = 0x5555555555555555555555555555555555555555555555555555555555555555;
+    uint256 private constant m2 = 0x3333333333333333333333333333333333333333333333333333333333333333;
+    uint256 private constant m4 = 0x0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f;
+    uint256 private constant h01 = 0x0101010101010101010101010101010101010101010101010101010101010101;
 
-    function ctpop(uint256 x) internal pure returns (uint256) {
-        // https://en.wikipedia.org/wiki/Hamming_weight
+    function ctpopSlow(uint256 x) internal pure returns (uint256) {
         unchecked {
-            x -= (x >> 1) & CTPOP_M1;
+            // https://en.wikipedia.org/wiki/Hamming_weight
+            x = (x & CTPOP_M1) + ((x >> 1) & CTPOP_M1);
             x = (x & CTPOP_M2) + ((x >> 2) & CTPOP_M2);
-            x = (x + (x >> 4)) & CTPOP_M4;
-            x = (x * CTPOP_H01) >> 248;
+            x = (x & CTPOP_M4) + ((x >> 4) & CTPOP_M4);
+            x = (x & CTPOP_M8) + ((x >> 8) & CTPOP_M8);
+            x = (x & CTPOP_M16) + ((x >> 16) & CTPOP_M16);
+            x = (x & CTPOP_M32) + ((x >> 32) & CTPOP_M32);
+            x = (x & CTPOP_M64) + ((x >> 64) & CTPOP_M64);
+            x = (x & CTPOP_M128) + ((x >> 128) & CTPOP_M128);
         }
         return x;
     }
