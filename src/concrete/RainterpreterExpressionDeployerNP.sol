@@ -43,7 +43,7 @@ error UnexpectedOpMetaHash(bytes32 actualOpMeta);
 
 /// @dev The function pointers for the integrity check fns.
 bytes constant INTEGRITY_FUNCTION_POINTERS =
-    hex"1b581bd21c391c431c391c391c391c391c391c4d1c6f1c991cbb1c4d1cbb1cbb1cc51ccf1cbb1cbb1cd81cd81cbb1ccf1ccf1cd81cd81cd81cd81cd81cd81cd81cd81cd81cd81cd81cd81ccf1cef1cf91cf9";
+    hex"192919a31a0a1a141a0a1a0a1a0a1a0a1a0a1a1e1a401a6a1a8c1a1e1a8c1a8c1a961aa01a8c1a8c1aa91aa91a8c1aa01aa01aa91aa91aa91aa91aa91aa91aa91aa91aa91aa91aa91aa91aa01ac01aca1aca";
 
 /// @dev Hash of the known interpreter bytecode.
 bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xb19d9833a371809da71da11f9893b85edbcc81592e2e43bdb3e4218cac1fb5f7);

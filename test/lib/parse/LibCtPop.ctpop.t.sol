@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import "forge-std/Test.sol";
 
 import "src/lib/parse/LibCtPop.sol";
+import {LibCtPopSlow} from "./LibCtPopSlow.sol";
 
 /// @title LibCtPopTest
 /// CTPOP (count population) is a function that counts the number of bits set in
@@ -16,6 +17,8 @@ contract LibCtPopTest is Test {
         uint256 x = (1 << n) - 1;
         uint256 ct = LibCtPop.ctpop(x);
         assertEq(n, ct);
+        uint256 ctSlow = LibCtPopSlow.ctpopSlow(x);
+        assertEq(ct, ctSlow);
     }
 
     /// The distribution of bits in the underlying `uint256` should not matter.
@@ -37,5 +40,7 @@ contract LibCtPopTest is Test {
 
         uint256 ct = LibCtPop.ctpop(y);
         assertEq(n, ct);
+        uint256 ctSlow = LibCtPopSlow.ctpopSlow(y);
+        assertEq(ct, ctSlow);
     }
 }
