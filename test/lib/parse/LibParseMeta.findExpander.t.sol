@@ -29,12 +29,4 @@ contract LibParseMetaFindExpanderTest is Test {
         assertEq(LibCtPop.ctpop(expansion), authoringMeta.length);
         assertEq(remaining.length, 0);
     }
-
-    function testGasLookup() external {
-        bytes32 word = bytes32("hash");
-        uint256 a = gasleft();
-        LibParseMeta.lookupWord(PARSE_META, 0, word);
-        uint256 b = gasleft();
-        console2.log("gas", a - b);
-    }
 }
