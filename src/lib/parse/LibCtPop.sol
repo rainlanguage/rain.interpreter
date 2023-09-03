@@ -14,6 +14,10 @@ library LibCtPop {
     /// Optimised version of ctpop.
     /// https://en.wikipedia.org/wiki/Hamming_weight
     function ctpop(uint256 x) internal pure returns (uint256) {
+        // This edge case is not handled by the algorithm below.
+        if (x == type(uint256).max) {
+            return 256;
+        }
         unchecked {
             x -= (x >> 1) & CTPOP_M1;
             x = (x & CTPOP_M2) + ((x >> 2) & CTPOP_M2);

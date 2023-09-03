@@ -43,4 +43,10 @@ contract LibCtPopTest is Test {
         uint256 ctSlow = LibCtPopSlow.ctpopSlow(y);
         assertEq(ct, ctSlow);
     }
+
+    function testCTPOPReference(uint256 x) external {
+        uint256 ct = LibCtPop.ctpop(x);
+        uint256 ctSlow = LibCtPopSlow.ctpopSlow(x);
+        assertEq(ct, ctSlow);
+    }
 }
