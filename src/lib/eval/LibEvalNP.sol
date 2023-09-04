@@ -20,6 +20,9 @@ library LibEvalNP {
             uint256 end;
             uint256 m;
             uint256 fPointersStart;
+            // We mod the indexes with the fsCount for each lookup to ensure that
+            // the indexes are in bounds. A mod is cheaper than a bounds check.
+            uint256 fsCount = state.fs.length / 2;
             {
                 bytes memory bytecode = state.bytecode;
                 bytes memory fPointers = state.fs;
@@ -69,56 +72,56 @@ library LibEvalNP {
                 // f needs to be looked up from the fn pointers table.
                 // operand is 3 bytes.
                 assembly ("memory-safe") {
-                    f := shr(0xf0, mload(add(fPointersStart, mul(byte(0, word), 2))))
+                    f := shr(0xf0, mload(add(fPointersStart, mul(mod(byte(0, word), fsCount), 2))))
                     operand := and(shr(0xe0, word), 0xFFFFFF)
                 }
                 stackTop = f(state, operand, stackTop);
 
                 // Bytes [24, 27].
                 assembly ("memory-safe") {
-                    f := shr(0xf0, mload(add(fPointersStart, mul(byte(4, word), 2))))
+                    f := shr(0xf0, mload(add(fPointersStart, mul(mod(byte(4, word), fsCount), 2))))
                     operand := and(shr(0xc0, word), 0xFFFFFF)
                 }
                 stackTop = f(state, operand, stackTop);
 
                 // Bytes [20, 23].
                 assembly ("memory-safe") {
-                    f := shr(0xf0, mload(add(fPointersStart, mul(byte(8, word), 2))))
+                    f := shr(0xf0, mload(add(fPointersStart, mul(mod(byte(8, word), fsCount), 2))))
                     operand := and(shr(0xa0, word), 0xFFFFFF)
                 }
                 stackTop = f(state, operand, stackTop);
 
                 // Bytes [16, 19].
                 assembly ("memory-safe") {
-                    f := shr(0xf0, mload(add(fPointersStart, mul(byte(12, word), 2))))
+                    f := shr(0xf0, mload(add(fPointersStart, mul(mod(byte(12, word), fsCount), 2))))
                     operand := and(shr(0x80, word), 0xFFFFFF)
                 }
                 stackTop = f(state, operand, stackTop);
 
                 // Bytes [12, 15].
                 assembly ("memory-safe") {
-                    f := shr(0xf0, mload(add(fPointersStart, mul(byte(16, word), 2))))
+                    f := shr(0xf0, mload(add(fPointersStart, mul(mod(byte(16, word), fsCount), 2))))
                     operand := and(shr(0x60, word), 0xFFFFFF)
                 }
                 stackTop = f(state, operand, stackTop);
 
                 // Bytes [8, 11].
                 assembly ("memory-safe") {
-                    f := shr(0xf0, mload(add(fPointersStart, mul(byte(20, word), 2))))
+                    f := shr(0xf0, mload(add(fPointersStart, mul(mod(byte(20, word), fsCount), 2))))
                     operand := and(shr(0x40, word), 0xFFFFFF)
                 }
                 stackTop = f(state, operand, stackTop);
 
                 // Bytes [4, 7].
                 assembly ("memory-safe") {
-                    f := shr(0xf0, mload(add(fPointersStart, mul(byte(24, word), 2))))
+                    f := shr(0xf0, mload(add(fPointersStart, mul(mod(byte(24, word), fsCount), 2))))
                     operand := and(shr(0x20, word), 0xFFFFFF)
                 }
                 stackTop = f(state, operand, stackTop);
 
                 // Bytes [0, 3].
                 assembly ("memory-safe") {
-                    f := shr(0xf0, mload(add(fPointersStart, mul(byte(28, word), 2))))
+                    f := shr(0xf0, mload(add(fPointersStart, mul(mod(byte(28, word), fsCount), 2))))
                     operand := and(word, 0xFFFFFF)
                 }
                 stackTop = f(state, operand, stackTop);
@@ -135,7 +138,7 @@ library LibEvalNP {
             while (cursor < end) {
                 assembly ("memory-safe") {
                     word := mload(cursor)
-                    f := shr(0xf0, mload(add(fPointersStart, mul(byte(28, word), 2))))
+                    f := shr(0xf0, mload(add(fPointersStart, mul(mod(byte(28, word), fsCount), 2))))
                     // 3 bytes mask.
                     operand := and(word, 0xFFFFFF)
                 }
