@@ -12,7 +12,6 @@ import "../lib/eval/LibEvalNP.sol";
 import "../lib/ns/LibNamespace.sol";
 import "../lib/state/LibInterpreterStateDataContractNP.sol";
 import "../lib/caller/LibEncodedDispatch.sol";
-import "../lib/bytecode/LibBytecode.sol";
 
 import "../lib/op/LibAllStandardOpsNP.sol";
 
@@ -29,7 +28,7 @@ error InvalidSourceIndex(SourceIndex sourceIndex);
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
 bytes constant OPCODE_FUNCTION_POINTERS =
-    hex"0c150c5d0c980d7c0db60de50e140e140e630e920ef40f7c10231037108d10a110b610d010db10ef1104118111cc11f21214122b122b127612c1130c130c1357135713a213ed143814381483156a159d15f4";
+    hex"0c590ca50ce00dc40dfe0e2d0e5c0e5c0eab0eda0f3c0fc4106b107f10d510e910fe111811231137114c11c91214123a125c1273127312be130913541354139f139f13ea14351480148014cb15b215e5163c";
 
 /// @title RainterpreterNP
 /// @notice !!EXPERIMENTAL!! implementation of a Rainlang interpreter that is
@@ -84,15 +83,10 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
             sourceIndex := and(sourceIndex16, 0xFFFF)
         }
 
-        return _eval(
-            store,
-            namespace.qualifyNamespace(msg.sender),
-            expressionData,
-            sourceIndex,
-            maxOutputs,
-            context,
-            new uint256[](0)
+        InterpreterStateNP memory state = expressionData.unsafeDeserializeNP(
+            sourceIndex, namespace.qualifyNamespace(msg.sender), store, context, OPCODE_FUNCTION_POINTERS
         );
+        return state.evalNP(new uint256[](0), maxOutputs);
     }
 
     // @inheritdoc ERC165
@@ -116,68 +110,13 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
         assembly ("memory-safe") {
             sourceIndex := and(sourceIndex16, 0xFFFF)
         }
-        return _eval(store, namespace, expressionData, sourceIndex, maxOutputs, context, inputs);
+        InterpreterStateNP memory state =
+            expressionData.unsafeDeserializeNP(sourceIndex, namespace, store, context, OPCODE_FUNCTION_POINTERS);
+        return state.evalNP(inputs, maxOutputs);
     }
 
     /// @inheritdoc IInterpreterV1
     function functionPointers() external view virtual returns (bytes memory) {
         return LibAllStandardOpsNP.opcodeFunctionPointers();
-    }
-
-    function _eval(
-        IInterpreterStoreV1 store,
-        FullyQualifiedNamespace namespace,
-        bytes memory expressionData,
-        uint256 sourceIndex,
-        uint256 maxOutputs,
-        uint256[][] memory context,
-        uint256[] memory inputs
-    ) internal view returns (uint256[] memory, uint256[] memory) {
-        InterpreterStateNP memory state =
-            expressionData.unsafeDeserializeNP(sourceIndex, namespace, store, context, OPCODE_FUNCTION_POINTERS);
-
-        Pointer stackBottom = state.stackBottoms[sourceIndex];
-        // Copy inputs into place.
-        Pointer stackTop = stackBottom.unsafeSubWords(inputs.length);
-        LibMemCpy.unsafeCopyWordsTo(inputs.dataPointer(), stackTop, inputs.length);
-
-        // Eval the source.
-        stackTop = state.evalNP(sourceIndex, stackTop);
-
-        // Use the bytecode's own definition of its outputs. Clear example of
-        // how the bytecode could accidentally or maliciously force OOB reads
-        // if the integrity check is not run.
-        uint256 outputs = LibBytecode.sourceOutputsLength(state.bytecode, sourceIndex);
-
-        // Convert the stack top pointer to an array with the correct length.
-        // If the stack top is pointing to the base of Solidity's understanding
-        // of the stack array, then this will simply write the same length over
-        // the length the stack was initialized with, otherwise a shorter array
-        // will be built within the bounds of the stack. After this point `tail`
-        // and the original stack MUST be immutable as they're both pointing to
-        // the same memory region.
-        outputs = maxOutputs < outputs ? maxOutputs : outputs;
-        uint256[] memory result;
-        assembly ("memory-safe") {
-            result := sub(stackTop, 0x20)
-            mstore(result, outputs)
-
-            // Need to reverse the result array for backwards compatibility.
-            // Ideally we'd not do this, but will need to roll a new interface
-            // for such a breaking change.
-            for {
-                let a := add(result, 0x20)
-                let b := add(result, mul(outputs, 0x20))
-            } lt(a, b) {
-                a := add(a, 0x20)
-                b := sub(b, 0x20)
-            } {
-                let tmp := mload(a)
-                mstore(a, mload(b))
-                mstore(b, tmp)
-            }
-        }
-
-        return (result, state.stateKV.toUint256Array());
     }
 }
