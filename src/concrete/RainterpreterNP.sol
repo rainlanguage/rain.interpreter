@@ -28,7 +28,7 @@ error InvalidSourceIndex(SourceIndex sourceIndex);
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
 bytes constant OPCODE_FUNCTION_POINTERS =
-    hex"099f09eb0a260b0a0b440b730ba20ba20bf10c200c820d0a0db10dc50e1b0e2f0e440e5e0e690e7d0e920f0f0f5a0f800fa20fb90fb91004104f109a109a10e510e51130117b11c611c6121112f8132b1382";
+    hex"0c590ca50ce00dc40dfe0e2d0e5c0e5c0eab0eda0f3c0fc4106b107f10d510e910fe111811231137114c11c91214123a125c1273127312be130913541354139f139f13ea14351480148014cb15b215e5163c";
 
 /// @title RainterpreterNP
 /// @notice !!EXPERIMENTAL!! implementation of a Rainlang interpreter that is
@@ -83,15 +83,10 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
             sourceIndex := and(sourceIndex16, 0xFFFF)
         }
 
-        return _eval(
-            store,
-            namespace.qualifyNamespace(msg.sender),
-            expressionData,
-            sourceIndex,
-            maxOutputs,
-            context,
-            new uint256[](0)
+        InterpreterStateNP memory state = expressionData.unsafeDeserializeNP(
+            sourceIndex, namespace.qualifyNamespace(msg.sender), store, context, OPCODE_FUNCTION_POINTERS
         );
+        return state.evalNP(new uint256[](0), maxOutputs);
     }
 
     // @inheritdoc ERC165
@@ -115,27 +110,13 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
         assembly ("memory-safe") {
             sourceIndex := and(sourceIndex16, 0xFFFF)
         }
-        return _eval(store, namespace, expressionData, sourceIndex, maxOutputs, context, inputs);
+        InterpreterStateNP memory state =
+            expressionData.unsafeDeserializeNP(sourceIndex, namespace, store, context, OPCODE_FUNCTION_POINTERS);
+        return state.evalNP(inputs, maxOutputs);
     }
 
     /// @inheritdoc IInterpreterV1
     function functionPointers() external view virtual returns (bytes memory) {
         return LibAllStandardOpsNP.opcodeFunctionPointers();
-    }
-
-    function _eval(
-        IInterpreterStoreV1 store,
-        FullyQualifiedNamespace namespace,
-        bytes memory expressionData,
-        uint256 sourceIndex,
-        uint256 maxOutputs,
-        uint256[][] memory context,
-        uint256[] memory inputs
-    ) internal view returns (uint256[] memory, uint256[] memory) {
-        InterpreterStateNP memory state =
-            expressionData.unsafeDeserializeNP(sourceIndex, namespace, store, context, OPCODE_FUNCTION_POINTERS);
-
-        // Eval the source.
-        return state.evalNP(inputs, maxOutputs);
     }
 }
