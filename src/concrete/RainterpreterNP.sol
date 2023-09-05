@@ -12,7 +12,6 @@ import "../lib/eval/LibEvalNP.sol";
 import "../lib/ns/LibNamespace.sol";
 import "../lib/state/LibInterpreterStateDataContractNP.sol";
 import "../lib/caller/LibEncodedDispatch.sol";
-import "../lib/bytecode/LibBytecode.sol";
 
 import "../lib/op/LibAllStandardOpsNP.sol";
 
@@ -29,7 +28,7 @@ error InvalidSourceIndex(SourceIndex sourceIndex);
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
 bytes constant OPCODE_FUNCTION_POINTERS =
-    hex"0c600ca80ce30dc70e010e300e5f0e5f0eae0edd0f3f0fc7106e108210d810ec1101111b1126113a114f11cc1217123d125f1276127612c1130c1357135713a213a213ed14381483148314ce15b515e8163f";
+    hex"099f09eb0a260b0a0b440b730ba20ba20bf10c200c820d0a0db10dc50e1b0e2f0e440e5e0e690e7d0e920f0f0f5a0f800fa20fb90fb91004104f109a109a10e510e51130117b11c611c6121112f8132b1382";
 
 /// @title RainterpreterNP
 /// @notice !!EXPERIMENTAL!! implementation of a Rainlang interpreter that is
@@ -136,48 +135,7 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
         InterpreterStateNP memory state =
             expressionData.unsafeDeserializeNP(sourceIndex, namespace, store, context, OPCODE_FUNCTION_POINTERS);
 
-        Pointer stackBottom = state.stackBottoms[sourceIndex];
-        // Copy inputs into place.
-        Pointer stackTop = stackBottom.unsafeSubWords(inputs.length);
-        LibMemCpy.unsafeCopyWordsTo(inputs.dataPointer(), stackTop, inputs.length);
-
         // Eval the source.
-        stackTop = state.evalNP(sourceIndex, stackTop);
-
-        // Use the bytecode's own definition of its outputs. Clear example of
-        // how the bytecode could accidentally or maliciously force OOB reads
-        // if the integrity check is not run.
-        uint256 outputs = LibBytecode.sourceOutputsLength(state.bytecode, sourceIndex);
-
-        // Convert the stack top pointer to an array with the correct length.
-        // If the stack top is pointing to the base of Solidity's understanding
-        // of the stack array, then this will simply write the same length over
-        // the length the stack was initialized with, otherwise a shorter array
-        // will be built within the bounds of the stack. After this point `tail`
-        // and the original stack MUST be immutable as they're both pointing to
-        // the same memory region.
-        outputs = maxOutputs < outputs ? maxOutputs : outputs;
-        uint256[] memory result;
-        assembly ("memory-safe") {
-            result := sub(stackTop, 0x20)
-            mstore(result, outputs)
-
-            // Need to reverse the result array for backwards compatibility.
-            // Ideally we'd not do this, but will need to roll a new interface
-            // for such a breaking change.
-            for {
-                let a := add(result, 0x20)
-                let b := add(result, mul(outputs, 0x20))
-            } lt(a, b) {
-                a := add(a, 0x20)
-                b := sub(b, 0x20)
-            } {
-                let tmp := mload(a)
-                mstore(a, mload(b))
-                mstore(b, tmp)
-            }
-        }
-
-        return (result, state.stateKV.toUint256Array());
+        return state.evalNP(inputs, maxOutputs);
     }
 }
