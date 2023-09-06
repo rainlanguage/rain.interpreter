@@ -1,19 +1,23 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
+import "lib/openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
-import "rain.lib.typecast/LibCast.sol";
-import "rain.datacontract/lib/LibDataContract.sol";
+import "lib/rain.lib.typecast/src/LibCast.sol";
+import {LibDataContract} from "lib/rain.datacontract/src/lib/LibDataContract.sol";
 
 import "../interface/unstable/IDebugInterpreterV2.sol";
 
-import "../lib/eval/LibEvalNP.sol";
+import {LibEvalNP} from "../lib/eval/LibEvalNP.sol";
 import "../lib/ns/LibNamespace.sol";
-import "../lib/state/LibInterpreterStateDataContractNP.sol";
+import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
 import "../lib/caller/LibEncodedDispatch.sol";
 
-import "../lib/op/LibAllStandardOpsNP.sol";
+import {LibAllStandardOpsNP, InterpreterStateNP} from "../lib/op/LibAllStandardOpsNP.sol";
+import {LibPointer, Pointer} from "lib/rain.solmem/src/lib/LibPointer.sol";
+import {LibStackPointer} from "lib/rain.solmem/src/lib/LibStackPointer.sol";
+import {LibUint256Array} from "lib/rain.solmem/src/lib/LibUint256Array.sol";
+import {LibMemoryKV, MemoryKV} from "lib/rain.lib.memkv/src/lib/LibMemoryKV.sol";
 
 /// Thrown when the stack length is negative during eval.
 error NegativeStackLength(int256 length);
@@ -38,15 +42,9 @@ bytes constant OPCODE_FUNCTION_POINTERS =
 /// onchain interpreter without affecting the JS interpreter, up to and including
 /// a complely different execution model and opcodes.
 contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
-    using LibStackPointer for Pointer;
-    using LibPointer for Pointer;
-    using LibStackPointer for uint256[];
-    using LibUint256Array for uint256[];
     using LibEvalNP for InterpreterStateNP;
     using LibNamespace for StateNamespace;
     using LibInterpreterStateDataContractNP for bytes;
-    using LibMemoryKV for MemoryKV;
-    using LibNamespace for StateNamespace;
 
     /// There are MANY ways that eval can be forced into undefined/corrupt
     /// behaviour by passing in invalid data. This is a deliberate design

@@ -3,9 +3,9 @@ pragma solidity =0.8.19;
 
 import "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
-import "rain.solmem/lib/LibPointer.sol";
-import "rain.solmem/lib/LibStackPointer.sol";
-import "rain.datacontract/lib/LibDataContract.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
+import {LibDataContract, DataContractMemoryContainer} from "rain.datacontract/lib/LibDataContract.sol";
 import "rain.erc1820/lib/LibIERC1820.sol";
 
 import "../interface/unstable/IExpressionDeployerV2.sol";
@@ -13,12 +13,12 @@ import "../interface/unstable/IDebugExpressionDeployerV2.sol";
 import "../interface/unstable/IDebugInterpreterV2.sol";
 import "../interface/unstable/IParserV1.sol";
 
-import "../lib/integrity/LibIntegrityCheckNP.sol";
+import {LibIntegrityCheckNP} from "../lib/integrity/LibIntegrityCheckNP.sol";
 import "../lib/state/LibInterpreterStateDataContractNP.sol";
 import "../lib/op/LibAllStandardOpsNP.sol";
 import {LibParse, LibParseMeta, AuthoringMeta} from "../lib/parse/LibParse.sol";
 
-import "./RainterpreterNP.sol";
+import {RainterpreterNP, OPCODE_FUNCTION_POINTERS} from "./RainterpreterNP.sol";
 
 /// @dev Thrown when the pointers known to the expression deployer DO NOT match
 /// the interpreter it is constructed for. This WILL cause undefined expression
