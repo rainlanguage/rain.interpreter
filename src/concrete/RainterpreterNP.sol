@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
+import "lib/openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
-import "rain.lib.typecast/LibCast.sol";
-import "rain.datacontract/lib/LibDataContract.sol";
+import "lib/rain.lib.typecast/src/LibCast.sol";
+import "lib/rain.datacontract/src/lib/LibDataContract.sol";
 
 import "../interface/unstable/IDebugInterpreterV2.sol";
 
@@ -13,7 +13,9 @@ import "../lib/ns/LibNamespace.sol";
 import "../lib/state/LibInterpreterStateDataContractNP.sol";
 import "../lib/caller/LibEncodedDispatch.sol";
 
-import "../lib/op/LibAllStandardOpsNP.sol";
+import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
+import {LibStackPointer} from "lib/rain.solmem/src/lib/LibStackPointer.sol";
+import {LibUint256Array} from "lib/rain.solmem/src/lib/LibUint256Array.sol";
 
 /// Thrown when the stack length is negative during eval.
 error NegativeStackLength(int256 length);
