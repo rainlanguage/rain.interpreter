@@ -7,7 +7,7 @@ import "prb-math/UD60x18.sol";
 /// Used for reference implementation so that we have two independent
 /// upstreams to compare against.
 import {Math as OZMath} from "openzeppelin-contracts/contracts/utils/math/Math.sol";
-import "rain.math.fixedpoint/../test/WillOverflow.sol";
+import "rain.math.fixedpoint/lib/LibWillOverflow.sol";
 
 import "../../../state/LibInterpreterStateNP.sol";
 import "../../../integrity/LibIntegrityCheckNP.sol";
@@ -70,7 +70,7 @@ library LibOpDecimal18MulNP {
             uint256 a = inputs[0];
             for (uint256 i = 1; i < inputs.length; i++) {
                 uint256 b = inputs[i];
-                if (WillOverflow.mulDivWillOverflow(a, b, 1e18)) {
+                if (LibWillOverflow.mulDivWillOverflow(a, b, 1e18)) {
                     a = uint256(keccak256(abi.encodePacked("overflow sentinel")));
                     break;
                 }

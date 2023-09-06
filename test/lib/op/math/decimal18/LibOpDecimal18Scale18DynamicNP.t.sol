@@ -27,7 +27,7 @@ contract LibOpDecimal18Scale18DynamicNPTest is OpTest {
         inputs[0] = scale;
         inputs[1] = value;
 
-        if (WillOverflow.scale18WillOverflow(value, scale, flags)) {
+        if (LibWillOverflow.scale18WillOverflow(value, scale, flags)) {
             vm.expectRevert(stdError.arithmeticError);
         }
 

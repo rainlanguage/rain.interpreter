@@ -6,7 +6,7 @@ import "rain.solmem/lib/LibPointer.sol";
 import {Math as OZMath} from "openzeppelin-contracts/contracts/utils/math/Math.sol";
 import "test/util/abstract/OpTest.sol";
 import {PRBMath_MulDiv_Overflow} from "prb-math/Common.sol";
-import "rain.math.fixedpoint/../test/WillOverflow.sol";
+import "rain.math.fixedpoint/lib/LibWillOverflow.sol";
 
 contract LibOpDecimal18DivNPTest is OpTest {
     /// Directly test the integrity logic of LibOpDecimal18DivNP. This tests the
@@ -69,7 +69,7 @@ contract LibOpDecimal18DivNPTest is OpTest {
                     vm.expectRevert(abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, a, 1e18, 0));
                     break;
                 }
-            } else if (WillOverflow.mulDivWillOverflow(a, 1e18, b)) {
+            } else if (LibWillOverflow.mulDivWillOverflow(a, 1e18, b)) {
                 vm.expectRevert(abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, a, 1e18, b));
                 break;
             }

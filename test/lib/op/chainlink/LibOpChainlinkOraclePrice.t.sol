@@ -2,7 +2,7 @@
 pragma solidity =0.8.19;
 
 import "forge-std/Test.sol";
-import {WillOverflow} from "rain.math.fixedpoint/../test/WillOverflow.sol";
+import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
 
 import "src/interface/IInterpreterV1.sol";
 import "src/lib/op/chainlink/LibOpChainlinkOraclePrice.sol";
@@ -30,7 +30,7 @@ contract LibOpChainlinkOraclePriceTest is Test {
     ) external {
         vm.warp(currentTimestamp);
         answer = bound(answer, 1, type(int256).max);
-        vm.assume(!WillOverflow.scale18WillOverflow(uint256(answer), decimals, scalingFlags));
+        vm.assume(!LibWillOverflow.scale18WillOverflow(uint256(answer), decimals, scalingFlags));
         updatedAt = bound(updatedAt, 0, currentTimestamp);
         staleAfter = bound(staleAfter, currentTimestamp - updatedAt, type(uint256).max);
         uint256 price =

@@ -25,7 +25,7 @@ contract LibOpDecimal18ScaleNNPTest is OpTest {
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = value;
 
-        if (WillOverflow.scaleNWillOverflow(value, scale, flags)) {
+        if (LibWillOverflow.scaleNWillOverflow(value, scale, flags)) {
             vm.expectRevert(stdError.arithmeticError);
         }
 
