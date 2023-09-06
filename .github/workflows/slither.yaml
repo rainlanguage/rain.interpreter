@@ -16,4 +16,4 @@ jobs:
 
       - uses: crytic/slither-action@v0.3.0
         with:
-          slither-version: refs/heads/dev
+          slither-version: refs/heads/master
