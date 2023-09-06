@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {FixedPointDecimalScale} from "rain.math.fixedpoint/FixedPointDecimalScale.sol";
+import {LibFixedPointDecimalScale} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 
 import "../../../state/LibInterpreterStateNP.sol";
 import "../../../integrity/LibIntegrityCheckNP.sol";
@@ -9,7 +9,7 @@ import "../../../integrity/LibIntegrityCheckNP.sol";
 /// @title LibOpDecimal18ScaleNNP
 /// @notice Opcode for scaling a decimal18 number to some other scale N.
 library LibOpDecimal18ScaleNNP {
-    using FixedPointDecimalScale for uint256;
+    using LibFixedPointDecimalScale for uint256;
 
     function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
         return (1, 1);

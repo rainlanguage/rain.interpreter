@@ -13,9 +13,6 @@
 [submodule "lib/rain.datacontract"]
 	path = lib/rain.datacontract
 	url = https://github.com/rainprotocol/rain.datacontract
-[submodule "lib/rain.chainlink"]
-	path = lib/rain.chainlink
-	url = https://github.com/rainprotocol/rain.chainlink
 [submodule "lib/forge-std"]
 	path = lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
@@ -37,3 +34,9 @@
 [submodule "lib/v2-core"]
 	path = lib/v2-core
 	url = https://github.com/uniswap/v2-core
+[submodule "lib/rain.chainlink"]
+	path = lib/rain.chainlink
+	url = https://github.com/rainprotocol/rain.chainlink
+[submodule "lib/rain.math.fixedpoint"]
+	path = lib/rain.math.fixedpoint
+	url = https://github.com/rainprotocol/rain.math.fixedpoint
