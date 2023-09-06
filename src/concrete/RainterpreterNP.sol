@@ -8,9 +8,9 @@ import "lib/rain.datacontract/src/lib/LibDataContract.sol";
 
 import "../interface/unstable/IDebugInterpreterV2.sol";
 
-import "../lib/eval/LibEvalNP.sol";
+import {LibEvalNP} from "../lib/eval/LibEvalNP.sol";
 import "../lib/ns/LibNamespace.sol";
-import "../lib/state/LibInterpreterStateDataContractNP.sol";
+import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
 import "../lib/caller/LibEncodedDispatch.sol";
 
 import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
