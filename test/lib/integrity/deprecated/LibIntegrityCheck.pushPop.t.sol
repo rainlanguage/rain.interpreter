@@ -344,7 +344,7 @@ contract LibIntegrityCheckPushPopTest is Test {
         );
         referenceState.stackMaxTop = stackTop;
         Pointer stackTopAfterReference = stackTop;
-        for (uint8 i = 0; i < n; i++) {
+        for (uint8 i = 0; i < n; ++i) {
             stackTopAfterReference = LibIntegrityCheck.pop(referenceState, stackTopAfterReference);
         }
         assertEq(Pointer.unwrap(stackTopAfterReference), Pointer.unwrap(stackTopAfter));

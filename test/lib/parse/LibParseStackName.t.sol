@@ -83,7 +83,7 @@ contract LibParseStackNameTest is Test {
         state.stackNames = 0;
 
         // Do this sequentially to avoid dupes.
-        for (uint256 i = 0; i < n; i++) {
+        for (uint256 i = 0; i < n; ++i) {
             (bool exists, uint256 index) = LibParseStackName.pushStackName(state, bytes32(i));
             assertFalse(exists);
             assertEq(index, i + 1);
@@ -91,7 +91,7 @@ contract LibParseStackNameTest is Test {
             state.topLevel1 = index;
         }
 
-        for (uint256 i = 0; i < n; i++) {
+        for (uint256 i = 0; i < n; ++i) {
             (bool exists, uint256 index) = LibParseStackName.stackNameIndex(state, bytes32(i));
             assertTrue(exists);
             assertEq(index, i);

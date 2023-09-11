@@ -44,7 +44,7 @@ library LibOpIntMinNP {
                     a = b;
                 }
                 unchecked {
-                    i++;
+                    ++i;
                 }
             }
         }
@@ -66,7 +66,7 @@ library LibOpIntMinNP {
         // see the revert from the real function and not the reference function.
         unchecked {
             uint256 acc = inputs[0];
-            for (uint256 i = 1; i < inputs.length; i++) {
+            for (uint256 i = 1; i < inputs.length; ++i) {
                 acc = acc > inputs[i] ? inputs[i] : acc;
             }
             outputs = new uint256[](1);

@@ -41,11 +41,11 @@ contract LibOpIntSubNPTest is OpTest {
         uint256 underflows = 0;
         unchecked {
             uint256 a = inputs[0];
-            for (uint256 i = 1; i < inputs.length; i++) {
+            for (uint256 i = 1; i < inputs.length; ++i) {
                 uint256 b = inputs[i];
                 uint256 c = a - b;
                 if (c > a) {
-                    underflows++;
+                    ++underflows;
                 }
                 a = c;
             }

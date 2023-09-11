@@ -47,7 +47,7 @@ contract LibOpDecimal18DivNPTest is OpTest {
         // fn is doing, but because neither PRB nor Open Zeppelin expose a
         // try/catch for overflow, we have to do this.
         uint256 a = inputs[0];
-        for (uint256 i = 1; i < inputs.length; i++) {
+        for (uint256 i = 1; i < inputs.length; ++i) {
             uint256 b = inputs[i];
             if (b == 0) {
                 // There's two different errors that we can get for the same

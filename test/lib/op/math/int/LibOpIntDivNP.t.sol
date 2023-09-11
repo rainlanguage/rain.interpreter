@@ -41,9 +41,9 @@ contract LibOpIntDivNPTest is OpTest {
         vm.assume(inputs.length >= 2);
         Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
         uint256 divZeros = 0;
-        for (uint256 i = 1; i < inputs.length; i++) {
+        for (uint256 i = 1; i < inputs.length; ++i) {
             if (inputs[i] == 0) {
-                divZeros++;
+                ++divZeros;
             }
         }
         if (divZeros > 0) {

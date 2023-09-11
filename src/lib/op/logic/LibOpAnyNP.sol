@@ -44,7 +44,7 @@ library LibOpAnyNP {
         // Zero length inputs is not supported so this 0 will always be written
         // over.
         uint256 value = 0;
-        for (uint256 i = 0; i < inputs.length; i++) {
+        for (uint256 i = 0; i < inputs.length; ++i) {
             value = inputs[i];
             if (value != 0) {
                 break;

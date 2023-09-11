@@ -47,7 +47,7 @@ library LibOpDecimal18DivNP {
                 }
                 a = UD60x18.unwrap(div(UD60x18.wrap(a), UD60x18.wrap(b)));
                 unchecked {
-                    i++;
+                    ++i;
                 }
             }
         }
@@ -68,7 +68,7 @@ library LibOpDecimal18DivNP {
         // see the revert from the real function and not the reference function.
         unchecked {
             uint256 a = inputs[0];
-            for (uint256 i = 1; i < inputs.length; i++) {
+            for (uint256 i = 1; i < inputs.length; ++i) {
                 uint256 b = inputs[i];
                 // Just bail out with a = some sentinel value if we're going to
                 // overflow or divide by zero. This gives the real implementation

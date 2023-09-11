@@ -152,16 +152,16 @@ library LibContext {
             uint256 offset = 0;
             context[offset] = LibContext.base();
 
-            for (uint256 i = 0; i < baseContext.length; i++) {
-                offset++;
+            for (uint256 i = 0; i < baseContext.length; ++i) {
+                ++offset;
                 context[offset] = baseContext[i];
             }
 
             if (signedContexts.length > 0) {
-                offset++;
+                ++offset;
                 context[offset] = signers;
 
-                for (uint256 i = 0; i < signedContexts.length; i++) {
+                for (uint256 i = 0; i < signedContexts.length; ++i) {
                     if (
                         // Unlike `LibContext.hash` we can only hash over
                         // the context as it's impossible for a signature
@@ -182,7 +182,7 @@ library LibContext {
                     }
 
                     signers[i] = uint256(uint160(signedContexts[i].signer));
-                    offset++;
+                    ++offset;
                     context[offset] = signedContexts[i].context;
                 }
             }

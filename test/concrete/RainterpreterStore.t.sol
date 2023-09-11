@@ -76,7 +76,7 @@ contract RainterpreterStoreTest is Test {
         }
         LibUint256Array.truncate(refs, setsLength);
 
-        for (uint256 i = 0; i < sets.length; i++) {
+        for (uint256 i = 0; i < sets.length; ++i) {
             // Truncate to even length.
             uint256 newLength = sets[i].kvs.length - (sets[i].kvs.length % 2);
             newLength = newLength >= 10 ? 10 : newLength;
@@ -88,7 +88,7 @@ contract RainterpreterStoreTest is Test {
         }
 
         RainterpreterStore store = new RainterpreterStore();
-        for (uint256 i = 0; i < sets.length; i++) {
+        for (uint256 i = 0; i < sets.length; ++i) {
             store.set(sets[i].namespace, sets[i].kvs);
             for (uint256 j = 0; j < sets[i].kvs.length; j += 2) {
                 uint256 key = sets[i].kvs[j];
@@ -116,7 +116,7 @@ contract RainterpreterStoreTest is Test {
         vm.assume(sets.length < 20);
 
         RainterpreterStore store = new RainterpreterStore();
-        for (uint256 i = 0; i < sets.length; i++) {
+        for (uint256 i = 0; i < sets.length; ++i) {
             uint256[11] memory kvsFixed = sets[i].kvs;
             uint256[] memory kvs;
             assembly ("memory-safe") {

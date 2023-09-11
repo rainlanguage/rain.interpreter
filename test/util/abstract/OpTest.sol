@@ -132,7 +132,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
             "stack top after"
         );
         assertEq(PRE, pointers.pre.unsafeReadWord(), "pre");
-        for (uint256 i = 0; i < expectedOutputs.length; i++) {
+        for (uint256 i = 0; i < expectedOutputs.length; ++i) {
             console2.log("expectedOutputs[i]", expectedOutputs[i]);
             assertEq(expectedOutputs[i], pointers.expectedStackTopAfter.unsafeReadWord(), "value");
             pointers.expectedStackTopAfter = pointers.expectedStackTopAfter.unsafeAddWord();
@@ -184,7 +184,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
 
         assertEq(stack.length, 0);
         assertEq(kvs.length, expectedKVs.length, errString);
-        for (uint256 i = 0; i < expectedKVs.length; i++) {
+        for (uint256 i = 0; i < expectedKVs.length; ++i) {
             assertEq(kvs[i], expectedKVs[i], errString);
         }
     }

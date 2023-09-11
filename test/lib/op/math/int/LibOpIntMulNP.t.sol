@@ -41,14 +41,14 @@ contract LibOpIntMulNPTest is OpTest {
         uint256 overflows = 0;
         unchecked {
             uint256 a = inputs[0];
-            for (uint256 i = 1; i < inputs.length; i++) {
+            for (uint256 i = 1; i < inputs.length; ++i) {
                 uint256 b = inputs[i];
                 if (a == 0 || b == 0) {
                     break;
                 }
                 uint256 c = a * b;
                 if (c / a != b) {
-                    overflows++;
+                    ++overflows;
                 }
                 a = c;
             }

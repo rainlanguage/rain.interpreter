@@ -47,7 +47,7 @@ contract LibOpIntExpNPTest is OpTest {
         uint256 overflows = 0;
         unchecked {
             uint256 a = inputs[0];
-            for (uint256 i = 1; i < inputs.length; i++) {
+            for (uint256 i = 1; i < inputs.length; ++i) {
                 uint256 b = inputs[i];
                 if (b == 0) {
                     a = 1;
@@ -56,10 +56,10 @@ contract LibOpIntExpNPTest is OpTest {
                     continue;
                 } else {
                     uint256 c = a;
-                    for (uint256 j = 1; j < b; j++) {
+                    for (uint256 j = 1; j < b; ++j) {
                         uint256 d = a * c;
                         if (d / c != a) {
-                            overflows++;
+                            ++overflows;
                             break;
                         }
                         if (d == a) {

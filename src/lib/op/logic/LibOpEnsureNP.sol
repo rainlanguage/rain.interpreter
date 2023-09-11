@@ -63,7 +63,7 @@ library LibOpEnsureNP {
         // Unchecked so that any overflow errors come from the real
         // implementation.
         unchecked {
-            for (uint256 i = 0; i < inputs.length; i++) {
+            for (uint256 i = 0; i < inputs.length; ++i) {
                 if (inputs[i] == 0) {
                     revert EnsureFailed(uint16(Operand.unwrap(operand)), i);
                 }

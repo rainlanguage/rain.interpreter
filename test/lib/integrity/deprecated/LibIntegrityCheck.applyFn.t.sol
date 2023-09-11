@@ -230,7 +230,7 @@ contract LibIntegrityCheckApplyFnTest is Test {
             LibIntegrityCheck.newState(new bytes[](0), new uint256[](0), pointers);
         referenceState.syncStackMaxTop(stackTop);
         Pointer referenceStackTopAfter = stackTop;
-        for (uint8 i = 0; i < n - 1; i++) {
+        for (uint8 i = 0; i < n - 1; ++i) {
             referenceStackTopAfter = referenceState.applyFn(referenceStackTopAfter, i2o1);
         }
 

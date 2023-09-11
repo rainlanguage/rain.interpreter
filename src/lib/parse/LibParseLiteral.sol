@@ -238,7 +238,7 @@ library LibParseLiteral {
 
                     value |= nybble << valueOffset;
                     valueOffset += 4;
-                    cursor--;
+                    --cursor;
                 }
             }
         }
@@ -317,8 +317,8 @@ library LibParseLiteral {
                 assembly ("memory-safe") {
                     value := add(value, mul(sub(byte(0, mload(cursor)), digitOffset), exp(10, exponent)))
                 }
-                exponent++;
-                cursor--;
+                ++exponent;
+                --cursor;
             }
 
             // If we didn't consume the entire literal, then we have
@@ -341,7 +341,7 @@ library LibParseLiteral {
                         }
                         value += scaled;
                     }
-                    cursor--;
+                    --cursor;
                 }
 
                 {
@@ -356,7 +356,7 @@ library LibParseLiteral {
                         if (decimalCharByte != uint256(uint8(bytes1("0")))) {
                             revert DecimalLiteralOverflow(LibParse.parseErrorOffset(data, cursor));
                         }
-                        cursor--;
+                        --cursor;
                     }
                 }
             }

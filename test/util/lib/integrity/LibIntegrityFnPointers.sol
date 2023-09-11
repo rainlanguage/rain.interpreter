@@ -8,7 +8,7 @@ library LibIntegrityFnPointers {
     /// 2 byte value.
     function indexPointersForWords(bytes32[] memory words) internal pure returns (bytes memory) {
         uint256[] memory ioFnPointers = new uint256[](words.length);
-        for (uint256 i = 0; i < words.length; i++) {
+        for (uint256 i = 0; i < words.length; ++i) {
             ioFnPointers[i] = i;
         }
         return LibConvert.unsafeTo16BitBytes(ioFnPointers);

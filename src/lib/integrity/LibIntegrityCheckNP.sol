@@ -92,7 +92,7 @@ library LibIntegrityCheckNP {
             }
 
             // Run the integrity check over each source.
-            for (uint256 i = 0; i < sourceCount; i++) {
+            for (uint256 i = 0; i < sourceCount; ++i) {
                 // Ensure that each entrypoint has zero source inputs.
                 uint256 inputsLength = LibBytecode.sourceInputsLength(bytecode, i);
 
@@ -160,7 +160,7 @@ library LibIntegrityCheckNP {
                         state.readHighwater = state.stackIndex;
                     }
 
-                    state.opIndex++;
+                    ++state.opIndex;
                     cursor += 4;
                 }
 

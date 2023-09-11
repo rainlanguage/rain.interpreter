@@ -307,7 +307,7 @@ contract LibEvalTest is Test {
         vm.assume(SourceIndex.unwrap(sourceIndex) < sources.length);
 
         bytes memory pointers = opcodeFunctionPointers();
-        for (uint256 i = 0; i < sources.length; i++) {
+        for (uint256 i = 0; i < sources.length; ++i) {
             vm.assume(sources[i].length % 4 == 0);
             LibCompileSlow.convertToOps(sources[i], pointers);
             LibCompile.unsafeCompile(sources[i], pointers);

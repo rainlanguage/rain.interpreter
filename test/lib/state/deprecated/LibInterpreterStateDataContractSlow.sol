@@ -35,8 +35,8 @@ library LibInterpreterStateDataContractSlow {
         uint256 totalSize = 0;
         totalSize += size(stackLength);
         totalSize += size(constants);
-        for (uint256 i_ = 0; i_ < sources.length; i_++) {
-            totalSize += size(sources[i_]);
+        for (uint256 i = 0; i < sources.length; ++i) {
+            totalSize += size(sources[i]);
         }
         return totalSize;
     }
@@ -54,13 +54,13 @@ library LibInterpreterStateDataContractSlow {
 
             // Then the constants.
             pointer = pointer.unsafePush(constants.length);
-            for (uint256 i = 0; i < constants.length; i++) {
+            for (uint256 i = 0; i < constants.length; ++i) {
                 pointer = pointer.unsafePush(constants[i]);
             }
 
             // Last the sources.
             bytes memory source;
-            for (uint256 i = 0; i < sources.length; i++) {
+            for (uint256 i = 0; i < sources.length; ++i) {
                 source = sources[i];
                 LibCompile.unsafeCompile(source, opcodeFunctionPointers);
                 pointer = pointer.unsafePush(source.length);
@@ -101,16 +101,16 @@ library LibInterpreterStateDataContractSlow {
             // Rebuild the sources array.
             uint256 i = 0;
             Pointer lengthCursor = cursor;
-            uint256 sourcesLength_ = 0;
+            uint256 sourcesLength = 0;
             while (Pointer.unwrap(lengthCursor) < Pointer.unwrap(end)) {
                 lengthCursor = lengthCursor.unsafeAddBytes(lengthCursor.unsafeReadWord()).unsafeAddWord();
-                sourcesLength_++;
+                ++sourcesLength;
             }
-            state.compiledSources = new bytes[](sourcesLength_);
+            state.compiledSources = new bytes[](sourcesLength);
             while (Pointer.unwrap(cursor) < Pointer.unwrap(end)) {
                 state.compiledSources[i] = cursor.unsafeAsBytes();
                 cursor = cursor.unsafeAddBytes(cursor.unsafeReadWord()).unsafeAddWord();
-                i++;
+                ++i;
             }
             return state;
         }

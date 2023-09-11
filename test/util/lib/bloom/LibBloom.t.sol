@@ -32,9 +32,9 @@ contract LibBloomTest is Test {
         len = uint8(bound(len, 0, 180));
         bool offsetFound = false;
         while (!offsetFound) {
-            start++;
+            ++start;
             bytes32[] memory words = new bytes32[](len);
-            for (uint256 i = 0; i < len; i++) {
+            for (uint256 i = 0; i < len; ++i) {
                 // Do a keccak256 here to avoid the trivial case of the bloom filter
                 // just mapping every sequential value to a bit in the filter.
                 words[i] = keccak256(abi.encodePacked(bytes32(start + i)));

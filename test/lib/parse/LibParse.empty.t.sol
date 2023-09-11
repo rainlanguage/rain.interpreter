@@ -88,7 +88,7 @@ contract LibParseEmptyTest is Test {
             hex"00"
         );
 
-        for (uint256 i = 0; i < 2; i++) {
+        for (uint256 i = 0; i < 2; ++i) {
             assertEq(LibBytecode.sourceRelativeOffset(bytecode, i), i * 4);
             assertEq(LibBytecode.sourceOpsLength(bytecode, i), 0);
             assertEq(LibBytecode.sourceStackAllocation(bytecode, i), 0);
@@ -140,7 +140,7 @@ contract LibParseEmptyTest is Test {
             hex"00"
         );
 
-        for (uint256 i = 0; i < 3; i++) {
+        for (uint256 i = 0; i < 3; ++i) {
             assertEq(LibBytecode.sourceRelativeOffset(bytecode, i), i * 4);
             assertEq(LibBytecode.sourceOpsLength(bytecode, i), 0);
             assertEq(LibBytecode.sourceStackAllocation(bytecode, i), 0);
@@ -202,7 +202,7 @@ contract LibParseEmptyTest is Test {
             hex"00"
         );
 
-        for (uint256 i = 0; i < 4; i++) {
+        for (uint256 i = 0; i < 4; ++i) {
             assertEq(LibBytecode.sourceRelativeOffset(bytecode, i), i * 4);
             assertEq(LibBytecode.sourceOpsLength(bytecode, i), 0);
             assertEq(LibBytecode.sourceStackAllocation(bytecode, i), 0);
@@ -304,7 +304,7 @@ contract LibParseEmptyTest is Test {
             hex"00"
         );
 
-        for (uint256 i = 0; i < 8; i++) {
+        for (uint256 i = 0; i < 8; ++i) {
             assertEq(LibBytecode.sourceRelativeOffset(bytecode, i), i * 4);
             assertEq(LibBytecode.sourceOpsLength(bytecode, i), 0);
             assertEq(LibBytecode.sourceStackAllocation(bytecode, i), 0);
@@ -476,7 +476,7 @@ contract LibParseEmptyTest is Test {
             hex"00"
         );
 
-        for (uint256 i = 0; i < 15; i++) {
+        for (uint256 i = 0; i < 15; ++i) {
             assertEq(LibBytecode.sourceRelativeOffset(bytecode, i), i * 4);
             assertEq(LibBytecode.sourceOpsLength(bytecode, i), 0);
             assertEq(LibBytecode.sourceStackAllocation(bytecode, i), 0);

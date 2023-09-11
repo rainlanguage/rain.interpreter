@@ -35,7 +35,7 @@ contract LibInterpreterStateDataContractTest is Test {
         uint8 stackLength,
         bytes memory opcodeFunctionPointers
     ) internal {
-        for (uint256 i = 0; i < sources.length; i++) {
+        for (uint256 i = 0; i < sources.length; ++i) {
             LibCompileSlow.convertToOps(sources[i], opcodeFunctionPointers);
         }
 
@@ -46,7 +46,7 @@ contract LibInterpreterStateDataContractTest is Test {
 
         bytes[] memory sourcesCopy = new bytes[](sources.length);
         bytes[] memory sourcesCompiled = new bytes[](sources.length);
-        for (uint256 i = 0; i < sources.length; i++) {
+        for (uint256 i = 0; i < sources.length; ++i) {
             bytes memory sourceCopy = new bytes(sources[i].length);
             LibMemCpy.unsafeCopyBytesTo(sources[i].dataPointer(), sourceCopy.dataPointer(), sources[i].length);
             sourcesCopy[i] = sourceCopy;
@@ -93,19 +93,19 @@ contract LibInterpreterStateDataContractTest is Test {
         assertEq(address(0), address(deserialized.store));
 
         assertEq(deserialized.context.length, deserializedSlow.context.length);
-        for (uint256 i = 0; i < deserialized.context.length; i++) {
+        for (uint256 i = 0; i < deserialized.context.length; ++i) {
             assertEq(deserialized.context[i], deserializedSlow.context[i]);
         }
         assertEq(0, deserialized.context.length);
 
         assertEq(deserialized.compiledSources.length, deserializedSlow.compiledSources.length);
-        for (uint256 i = 0; i < deserialized.compiledSources.length; i++) {
+        for (uint256 i = 0; i < deserialized.compiledSources.length; ++i) {
             assertEq(deserialized.compiledSources[i], deserializedSlow.compiledSources[i]);
         }
 
         assertEq(sources.length, sourcesCompiled.length);
         assertEq(deserialized.compiledSources.length, sourcesCompiled.length);
-        for (uint256 i = 0; i < sourcesCompiled.length; i++) {
+        for (uint256 i = 0; i < sourcesCompiled.length; ++i) {
             assertEq(deserialized.compiledSources[i], sourcesCompiled[i]);
         }
     }
@@ -158,7 +158,7 @@ contract LibInterpreterStateDataContractTest is Test {
     ) public {
         vm.assume(opcodeFunctionPointers.length > 0);
         vm.assume(opcodeFunctionPointers.length <= type(uint8).max);
-        for (uint256 i = 0; i < sources.length; i++) {
+        for (uint256 i = 0; i < sources.length; ++i) {
             vm.assume(sources[i].length % 2 == 0);
         }
         vm.assume(opcodeFunctionPointers.length % 2 == 0);

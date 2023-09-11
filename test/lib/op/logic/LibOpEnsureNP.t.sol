@@ -30,7 +30,7 @@ contract LibOpEnsureNPTest is OpTest {
         vm.assume(inputs.length > 0);
         vm.assume(inputs.length <= type(uint8).max);
         Operand operand = Operand.wrap(uint256(inputs.length) << 0x10 | uint256(errorCode));
-        for (uint256 i = 0; i < inputs.length; i++) {
+        for (uint256 i = 0; i < inputs.length; ++i) {
             if (inputs[i] == 0) {
                 vm.expectRevert(abi.encodeWithSelector(EnsureFailed.selector, errorCode, i));
                 break;

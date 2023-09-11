@@ -30,7 +30,7 @@ contract LibParseMetaBuildMetaTest is Test {
     ) external {
         vm.assume(authoringMeta.length > 0);
         vm.assume(!LibBloom.bloomFindsDupes(LibParseMeta.copyWordsFromAuthoringMeta(authoringMeta)));
-        for (uint256 i = 0; i < authoringMeta.length; i++) {
+        for (uint256 i = 0; i < authoringMeta.length; ++i) {
             vm.assume(authoringMeta[i].word != notFound);
         }
         j = uint8(bound(j, uint8(0), uint8(authoringMeta.length) - 1));
@@ -71,7 +71,7 @@ contract LibParseMetaBuildMetaTest is Test {
     function testRoundMetaExpanderDeeper(AuthoringMeta[] memory authoringMeta, uint8 j, bytes32 notFound) external {
         vm.assume(authoringMeta.length > 50);
         vm.assume(!LibBloom.bloomFindsDupes(LibParseMeta.copyWordsFromAuthoringMeta(authoringMeta)));
-        for (uint256 i = 0; i < authoringMeta.length; i++) {
+        for (uint256 i = 0; i < authoringMeta.length; ++i) {
             vm.assume(authoringMeta[i].word != notFound);
         }
         j = uint8(bound(j, uint8(0), uint8(authoringMeta.length) - 1));

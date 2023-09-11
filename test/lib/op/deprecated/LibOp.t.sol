@@ -116,7 +116,7 @@ contract LibOpTest is Test {
         require(xs.length == ys.length);
         zs = new uint256[](xs.length);
         uint256[] memory toHash = new uint256[](3);
-        for (uint256 i = 0; i < xs.length; i++) {
+        for (uint256 i = 0; i < xs.length; ++i) {
             toHash[0] = a;
             toHash[1] = xs[i];
             toHash[2] = ys[i];
@@ -411,7 +411,7 @@ contract LibOpTest is Test {
             expectedOutput = slice[slice.length - 1];
         } else {
             expectedOutput = slice[0];
-            for (uint256 i = 1; i < slice.length; i++) {
+            for (uint256 i = 1; i < slice.length; ++i) {
                 expectedOutput = uint256(LibHashNoAlloc.combineHashes(bytes32(expectedOutput), bytes32(slice[i])));
             }
         }

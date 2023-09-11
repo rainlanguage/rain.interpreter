@@ -27,7 +27,7 @@ contract LibCtPopTest is Test {
         uint256 y = 0;
 
         // Fisher-yates to show pop count can handle any distribution of bits.
-        for (uint256 i = 256; i > 0; i--) {
+        for (uint256 i = 256; i > 0; --i) {
             rand = keccak256(bytes.concat(rand));
             uint256 offset = uint256(rand) % i;
             uint256 lowMask = (1 << offset) - 1;

@@ -41,10 +41,10 @@ contract LibOpIntAddNPTest is OpTest {
         uint256 overflows = 0;
         unchecked {
             uint256 a = inputs[0];
-            for (uint256 i = 1; i < inputs.length; i++) {
+            for (uint256 i = 1; i < inputs.length; ++i) {
                 uint256 c = a + inputs[i];
                 if (c < a) {
-                    overflows++;
+                    ++overflows;
                 }
                 a = c;
             }

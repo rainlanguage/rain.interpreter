@@ -59,7 +59,7 @@ library LibParseMeta {
         returns (bytes32[] memory)
     {
         bytes32[] memory words = new bytes32[](authoringMeta.length);
-        for (uint256 i = 0; i < authoringMeta.length; i++) {
+        for (uint256 i = 0; i < authoringMeta.length; ++i) {
             words[i] = authoringMeta[i].word;
         }
         return words;
@@ -73,9 +73,9 @@ library LibParseMeta {
         unchecked {
             {
                 uint256 bestCt = 0;
-                for (uint256 seed = 0; seed < type(uint8).max; seed++) {
+                for (uint256 seed = 0; seed < type(uint8).max; ++seed) {
                     uint256 expansion = 0;
-                    for (uint256 i = 0; i < metas.length; i++) {
+                    for (uint256 i = 0; i < metas.length; ++i) {
                         (uint256 shifted, uint256 hashed) = wordBitmapped(seed, metas[i].word);
                         (hashed);
                         expansion = shifted | expansion;
@@ -101,14 +101,14 @@ library LibParseMeta {
             }
             uint256 usedExpansion = 0;
             uint256 j = 0;
-            for (uint256 i = 0; i < metas.length; i++) {
+            for (uint256 i = 0; i < metas.length; ++i) {
                 (uint256 shifted, uint256 hashed) = wordBitmapped(bestSeed, metas[i].word);
                 (hashed);
                 if ((shifted & usedExpansion) == 0) {
                     usedExpansion = shifted | usedExpansion;
                 } else {
                     remaining[j] = metas[i];
-                    j++;
+                    ++j;
                 }
             }
         }
@@ -136,7 +136,7 @@ library LibParseMeta {
                         (seed, expansion, remainingAuthoringMeta) = findBestExpander(remainingAuthoringMeta);
                         seeds[depth] = seed;
                         expansions[depth] = expansion;
-                        depth++;
+                        ++depth;
                     }
                 }
 
@@ -146,7 +146,7 @@ library LibParseMeta {
                 assembly ("memory-safe") {
                     mstore8(add(parseMeta, 0x20), depth)
                 }
-                for (uint256 j = 0; j < depth; j++) {
+                for (uint256 j = 0; j < depth; ++j) {
                     assembly ("memory-safe") {
                         // Write each seed immediately before its expansion.
                         let seedWriteAt := add(add(parseMeta, 0x21), mul(0x21, j))
@@ -164,7 +164,7 @@ library LibParseMeta {
             }
 
             // Write words.
-            for (uint256 k = 0; k < authoringMeta.length; k++) {
+            for (uint256 k = 0; k < authoringMeta.length; ++k) {
                 uint256 s = 0;
                 uint256 cumulativePos = 0;
                 while (true) {
@@ -199,7 +199,7 @@ library LibParseMeta {
                                     revert DuplicateFingerprint();
                                 }
                                 // Collision, try next expansion.
-                                s++;
+                                ++s;
                                 cumulativePos = cumulativePos + LibCtPop.ctpop(expansion);
                                 continue;
                             }

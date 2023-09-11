@@ -47,7 +47,7 @@ library LibOpDecimal18MulNP {
                 }
                 a = UD60x18.unwrap(mul(UD60x18.wrap(a), UD60x18.wrap(b)));
                 unchecked {
-                    i++;
+                    ++i;
                 }
             }
         }
@@ -68,7 +68,7 @@ library LibOpDecimal18MulNP {
         // see the revert from the real function and not the reference function.
         unchecked {
             uint256 a = inputs[0];
-            for (uint256 i = 1; i < inputs.length; i++) {
+            for (uint256 i = 1; i < inputs.length; ++i) {
                 uint256 b = inputs[i];
                 if (LibWillOverflow.mulDivWillOverflow(a, b, 1e18)) {
                     a = uint256(keccak256(abi.encodePacked("overflow sentinel")));

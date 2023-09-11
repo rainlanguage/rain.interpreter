@@ -24,7 +24,7 @@ contract LibContextTest is Test {
         uint256[][] memory actual = LibContext.build(base, signedContexts);
         assertEq(expected.length, actual.length);
 
-        for (uint256 i = 0; i < expected.length; i++) {
+        for (uint256 i = 0; i < expected.length; ++i) {
             assertEq(expected[i], actual[i]);
         }
     }
@@ -36,7 +36,7 @@ contract LibContextTest is Test {
         uint256[][] memory built = LibContext.build(new uint256[][](0), new SignedContextV1[](0));
         assertEq(expected.length, built.length);
 
-        for (uint256 i = 0; i < expected.length; i++) {
+        for (uint256 i = 0; i < expected.length; ++i) {
             assertEq(expected[i], built[i]);
         }
     }

@@ -390,7 +390,7 @@ library LibParseState {
                 assembly ("memory-safe") {
                     opsDepth := byte(0, mload(add(state, add(0x20, topLevelOffset))))
                 }
-                for (uint256 i = 1; i <= opsDepth; i++) {
+                for (uint256 i = 1; i <= opsDepth; ++i) {
                     {
                         // We've hit the end of a LL item so have to jump towards the
                         // tail to keep going.
@@ -415,7 +415,7 @@ library LibParseState {
                     }
                     itemSourceHead += 4;
                 }
-                topLevelOffset++;
+                ++topLevelOffset;
             }
 
             state.lineTracker = totalRHSTopLevel << 8;
@@ -500,7 +500,7 @@ library LibParseState {
                         // Tail pointer is the low 16 bits of the key.
                         tailPtr := and(mload(tailPtr), 0xFFFF)
                     }
-                    t++;
+                    ++t;
                 }
             }
 
@@ -850,7 +850,7 @@ library LibParseState {
             // Loop over the sources and write them into the bytecode. Perhaps
             // there is a more efficient way to do this in the future that won't
             // cause each source to be written twice in memory.
-            for (uint256 i = 0; i < sourcesCount; i++) {
+            for (uint256 i = 0; i < sourcesCount; ++i) {
                 Pointer sourcePointer;
                 uint256 length;
                 Pointer targetPointer;
@@ -1043,8 +1043,8 @@ library LibParse {
                             }
                             // Bump the index regardless of whether the stack
                             // item is named or not.
-                            state.topLevel1++;
-                            state.lineTracker++;
+                            ++state.topLevel1;
+                            ++state.lineTracker;
 
                             // Set yang as we are now building a stack item.
                             // We are also no longer interstitial
@@ -1058,7 +1058,7 @@ library LibParse {
                             // we haven't already.
                             state.fsm = (state.fsm | FSM_RHS_MASK | FSM_ACTIVE_SOURCE_MASK)
                                 & ~(FSM_YANG_MASK | FSM_INTERSTITIAL_MASK);
-                            cursor++;
+                            ++cursor;
                         } else if (char & CMASK_COMMENT_HEAD != 0) {
                             if (state.fsm & FSM_INTERSTITIAL_MASK == 0) {
                                 revert UnexpectedComment(parseErrorOffset(data, cursor));
@@ -1134,7 +1134,7 @@ library LibParse {
                             if (newParenOffset > 59) {
                                 revert ParenOverflow();
                             }
-                            cursor++;
+                            ++cursor;
 
                             // We've moved past the paren, so we are no longer at
                             // the end of a word and are yin.
@@ -1170,7 +1170,7 @@ library LibParse {
                                 )
                             }
                             state.highwater();
-                            cursor++;
+                            ++cursor;
                         } else if (char & CMASK_WHITESPACE > 0) {
                             cursor = skipMask(cursor + 1, end, CMASK_WHITESPACE);
                             // Set yin as we now open to possibilities.
@@ -1185,13 +1185,13 @@ library LibParse {
                             state.fsm |= FSM_YANG_MASK;
                         } else if (char & CMASK_EOL > 0) {
                             state.endLine(data, cursor);
-                            cursor++;
+                            ++cursor;
                         }
                         // End of source.
                         else if (char & CMASK_EOS > 0) {
                             state.endLine(data, cursor);
                             state.endSource();
-                            cursor++;
+                            ++cursor;
 
                             state.fsm = FSM_DEFAULT;
                         }

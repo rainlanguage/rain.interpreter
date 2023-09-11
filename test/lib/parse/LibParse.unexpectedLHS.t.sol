@@ -77,7 +77,7 @@ contract LibParseUnexpectedLHSTest is Test {
 
         bool hasInvalidChar = false;
         uint256 i = 0;
-        for (; i < b.length; i++) {
+        for (; i < b.length; ++i) {
             bytes1 c = b[i];
             vm.assume(
                 1 << uint256(uint8(c)) & (CMASK_LHS_STACK_DELIMITER | CMASK_LHS_RHS_DELIMITER | CMASK_COMMENT_HEAD) == 0

@@ -23,7 +23,7 @@ library LibContextSlow {
     function hashSlow(SignedContextV1[] memory signedContexts) internal pure returns (bytes32) {
         bytes32 hashed = HASH_NIL;
 
-        for (uint256 i = 0; i < signedContexts.length; i++) {
+        for (uint256 i = 0; i < signedContexts.length; ++i) {
             hashed = LibHashNoAlloc.combineHashes(hashed, hashSlow(signedContexts[i]));
         }
 
@@ -42,13 +42,13 @@ library LibContextSlow {
 
         uint256 offset = 1;
         uint256 i = 0;
-        for (; i < baseContext.length; i++) {
+        for (; i < baseContext.length; ++i) {
             context[i + offset] = baseContext[i];
         }
         offset = offset + i;
 
         i = 0;
-        for (; i < signedContexts.length; i++) {
+        for (; i < signedContexts.length; ++i) {
             context[i + offset] = signedContexts[i].context;
         }
 

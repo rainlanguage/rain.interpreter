@@ -11,7 +11,7 @@ contract LibParseNamedLHSTest is Test {
     /// A few simple examples that should create some empty sources.
     function testParseNamedLHSEmptySourceExamples() external {
         string[3] memory examples0 = ["a _:;", "a b:;", "foo bar:;"];
-        for (uint256 i = 0; i < examples0.length; i++) {
+        for (uint256 i = 0; i < examples0.length; ++i) {
             (bytes memory bytecode0, uint256[] memory constants0) = LibParse.parse(bytes(examples0[i]), "");
             assertEq(LibBytecode.sourceCount(bytecode0), 1);
             uint256 sourceIndex0 = 0;
