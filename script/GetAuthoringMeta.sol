@@ -11,6 +11,6 @@ import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 /// when deploying.
 contract GetAuthoringMeta is Script {
     function run() external {
-        vm.writeFileBinary("meta/authoringMeta.rain.meta", LibAllStandardOpsNP.authoringMeta());
+        vm.writeFileBinary("meta/AuthoringMeta.rain.meta", LibAllStandardOpsNP.authoringMeta());
     }
 }
