@@ -21,6 +21,8 @@ optimizer_runs = 1000000
 bytecode_hash = "none"
 cbor_metadata = false
 
+fs_permissions = [{ access = "read-write", path = "./meta"}]
+
 # These tests have some issue with the encoding of mocked return data.
 # https://github.com/foundry-rs/foundry/issues/5359
 # https://github.com/foundry-rs/foundry/issues/5367

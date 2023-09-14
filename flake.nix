@@ -19,7 +19,7 @@
           build-dispair-meta-cmd = ''
             ${rain-cli} meta build \
               -i <(${rain-cli} meta solc artifact -c abi -i out/RainterpreterExpressionDeployerNP.sol/RainterpreterExpressionDeployerNP.json) -m solidity-abi-v2 -t json -e deflate -l en \
-              -i <(forge script ./script/GetAuthoringMeta.sol) -m authoring-meta-v1 -t cbor -e deflate -l en \
+              -i <(forge script --silent ./script/GetAuthoringMeta.sol && cat ./meta/authoringMeta.rain.meta) -m authoring-meta-v1 -t cbor -e deflate -l en \
           '';
 
           output-dispair-meta = pkgs.writeShellScriptBin "output-dispair-meta" ''

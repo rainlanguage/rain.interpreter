@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
+import "forge-std/Script.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 
 /// @title Native Parser Authoring Meta
@@ -8,8 +9,8 @@ import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 /// directly from the lib. This is intended to be packed with ExpressionDeployerNP
 /// ABI, deflated, cbor encoded and then passed to ExpressionDeployerNP constructor
 /// when deploying.
-contract GetAuthoringMeta {
-    function run() external pure returns (bytes memory) {
-        return LibAllStandardOpsNP.authoringMeta();
+contract GetAuthoringMeta is Script {
+    function run() external {
+        vm.writeFileBinary("meta/authoringMeta.rain.meta", LibAllStandardOpsNP.authoringMeta());
     }
 }
