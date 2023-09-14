@@ -11,7 +11,7 @@ import "src/concrete/RainterpreterExpressionDeployerNP.sol";
 /// This is intended to be run on every commit by CI to a testnet such as mumbai,
 /// then cross chain deployed to whatever mainnet is required, by users.
 contract DeployDISPair is Script {
-    function run() external {
+    function run(bytes memory authoringMeta) external {
         uint256 deployerPrivateKey = vm.envUint("DEPLOYMENT_KEY");
 
         vm.startBroadcast(deployerPrivateKey);
@@ -25,7 +25,7 @@ contract DeployDISPair is Script {
         new RainterpreterExpressionDeployerNP(RainterpreterExpressionDeployerConstructionConfig(
             address(interpreter),
             address(store),
-            LibAllStandardOpsNP.authoringMeta()
+            authoringMeta
         ));
         (deployer);
         vm.stopBroadcast();

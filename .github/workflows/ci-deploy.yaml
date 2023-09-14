@@ -8,21 +8,19 @@ jobs:
       DEPLOYMENT_KEY: ${{ github.ref == 'refs/heads/main' && secrets.PRIVATE_KEY || secrets.PRIVATE_KEY_DEV }}
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      # - name: Install Nix
-      #   uses: DeterminateSystems/nix-installer-action@v4
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v4
+      - uses: DeterminateSystems/magic-nix-cache-action@v2
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
       - name: Report public key to make it easy to send funds for deployments
         run: cast wallet address "${DEPLOYMENT_KEY}"
-      # - name: Install rain
-      #   run: nix profile install github:rainprotocol/rain.cli
-      # - run: rain --version
-      - name: Forge deploy contract to mumbai
+      - name: Forge shallow install
+        run: forge install --shallow
+      - name: Forge deploy contracts to mumbai
         env:
           CI_DEPLOY_RPC_URL: ${{ secrets.CI_DEPLOY_RPC_URL }}
           EXPLORER_VERIFICATION_KEY: ${{ secrets.EXPLORER_VERIFICATION_KEY }}
-        run: forge build && forge script -vvvvv script/DeployDISPair.sol:DeployDISPair --verify --broadcast --rpc-url "${CI_DEPLOY_RPC_URL}" --etherscan-api-key "${EXPLORER_VERIFICATION_KEY}" --sig='run()'
+        run: nix run .#deploy-dispair
