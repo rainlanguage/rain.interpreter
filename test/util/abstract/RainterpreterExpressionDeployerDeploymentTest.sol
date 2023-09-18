@@ -79,13 +79,13 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
         ));
 
         // Sanity check the deployer's parse meta.
-        // bytes memory parseMeta = iDeployer.parseMeta();
-        // bytes memory builtParseMeta = iDeployer.buildParseMeta(authoringMeta);
-        // if (keccak256(parseMeta) != keccak256(builtParseMeta)) {
-        //     console2.log("current deployer parse meta:");
-        //     console2.logBytes(builtParseMeta);
-        //     revert("unexpected deployer parse meta");
-        // }
+        bytes memory parseMeta = iDeployer.parseMeta();
+        bytes memory builtParseMeta = iDeployer.buildParseMeta(authoringMeta);
+        if (keccak256(parseMeta) != keccak256(builtParseMeta)) {
+            console2.log("current deployer parse meta:");
+            console2.logBytes(builtParseMeta);
+            revert("unexpected deployer parse meta");
+        }
 
         // Sanity check the deployer's integrity function pointers.
         bytes memory integrityFunctionPointers = iDeployer.integrityFunctionPointers();
