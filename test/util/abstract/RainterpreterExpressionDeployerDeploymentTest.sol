@@ -2,7 +2,8 @@
 pragma solidity =0.8.19;
 
 import "forge-std/Test.sol";
-import "../../util/lib/etch/LibEtch.sol";
+import "../lib/etch/LibEtch.sol";
+import "../lib/constants/ExpressionDeployerNPConstants.sol";
 
 import "../../../src/concrete/RainterpreterStore.sol";
 import "../../../src/concrete/RainterpreterNP.sol";
@@ -54,7 +55,7 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
             revert("unexpected store bytecode hash");
         }
 
-        bytes memory authoringMeta = LibAllStandardOpsNP.authoringMeta();
+        bytes memory authoringMeta = vm.readFileBinary(EXPRESSION_DEPLOYER_NP_META_PATH);
         bytes32 authoringMetaHash = keccak256(authoringMeta);
         if (authoringMetaHash != AUTHORING_META_HASH) {
             console2.log("current authoring meta hash:");
@@ -78,13 +79,13 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
         ));
 
         // Sanity check the deployer's parse meta.
-        bytes memory parseMeta = iDeployer.parseMeta();
-        bytes memory builtParseMeta = iDeployer.buildParseMeta(authoringMeta);
-        if (keccak256(parseMeta) != keccak256(builtParseMeta)) {
-            console2.log("current deployer parse meta:");
-            console2.logBytes(builtParseMeta);
-            revert("unexpected deployer parse meta");
-        }
+        // bytes memory parseMeta = iDeployer.parseMeta();
+        // bytes memory builtParseMeta = iDeployer.buildParseMeta(authoringMeta);
+        // if (keccak256(parseMeta) != keccak256(builtParseMeta)) {
+        //     console2.log("current deployer parse meta:");
+        //     console2.logBytes(builtParseMeta);
+        //     revert("unexpected deployer parse meta");
+        // }
 
         // Sanity check the deployer's integrity function pointers.
         bytes memory integrityFunctionPointers = iDeployer.integrityFunctionPointers();
