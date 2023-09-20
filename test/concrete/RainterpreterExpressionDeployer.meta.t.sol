@@ -16,8 +16,7 @@ import "src/concrete/RainterpreterExpressionDeployerNP.sol";
 contract RainterpreterExpressionDeployerMetaTest is RainterpreterExpressionDeployerDeploymentTest {
     /// Test that the authoring meta hash is correct.
     function testRainterpreterExpressionDeployerAuthoringMetaHash() external {
-        bytes memory authoringMeta = vm.readFileBinary(EXPRESSION_DEPLOYER_NP_META_PATH);
-        bytes32 expectedHash = keccak256(authoringMeta);
+        bytes32 expectedHash = keccak256(LibAllStandardOpsNP.authoringMeta());
         bytes32 actualHash = iDeployer.authoringMetaHash();
         assertEq(actualHash, expectedHash);
     }

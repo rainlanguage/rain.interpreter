@@ -38,8 +38,8 @@ error UnexpectedInterpreterBytecodeHash(bytes32 actualBytecodeHash);
 /// address upon construction.
 error UnexpectedStoreBytecodeHash(bytes32 actualBytecodeHash);
 
-/// Thrown when the `Rainterpreter` is constructed with unknown opMeta.
-error UnexpectedOpMetaHash(bytes32 actualOpMeta);
+/// Thrown when the `Rainterpreter` is constructed with unknown meta.
+error UnexpectedConstructionMetaHash(bytes32 actualOpMeta);
 
 /// @dev The function pointers for the integrity check fns.
 bytes constant INTEGRITY_FUNCTION_POINTERS =
@@ -52,7 +52,10 @@ bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xaa8f18bb20fc23e48b3d51bcb
 bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);
 
 /// @dev Hash of the known authoring meta.
-bytes32 constant AUTHORING_META_HASH = bytes32(0xd1619baccc0e5e65ae0327b400ade9cddd9915792c382f545c970c0c6e7acc93);
+bytes32 constant AUTHORING_META_HASH = bytes32(0xa4d558de3cab056effa790499ea313ff3d962d95513646614a9a29073f44aeb1);
+
+/// @dev Hash of the known construction meta.
+bytes32 constant CONSTRUCTION_META_HASH = bytes32(0xd1619baccc0e5e65ae0327b400ade9cddd9915792c382f545c970c0c6e7acc93);
 
 bytes constant PARSE_META =
     hex"010f00c20804b001180500014014144080040101008082020092020040a100148024163082aae700108f616d2200e3c6181b0025fdfc2100a1cef21c00e7762b2500229a7e0b103e260a0600ce656d0220f12be70c0035f0270900da2bcc14001874cb0700319e1e2300c17cd61100d0684c05007c4b951f000859681e00ce62340d0021f48512009046c219008710c503002c340815002eaa701740b3357a1a00e6d3420800f0dfe2040080a95b0e004e5b480a107012321840438b4b24008a3266281043e2f6011056328a1d00ec53cd0f006e69fa1000ac8cde2600f2c1681300b8577627103fa0c82000c6ff51";
@@ -61,11 +64,11 @@ bytes constant PARSE_META =
 /// @param interpreter The `IInterpreterV1` to use for evaluation. MUST match
 /// known bytecode.
 /// @param store The `IInterpreterStoreV1`. MUST match known bytecode.
-/// @param authoringMeta The authoring meta as per `IParserV1`.
+/// @param meta Contract meta for tooling.
 struct RainterpreterExpressionDeployerConstructionConfig {
     address interpreter;
     address store;
-    bytes authoringMeta;
+    bytes meta;
 }
 
 /// @title RainterpreterExpressionDeployer
@@ -136,12 +139,12 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
         /// This IS a security check. This prevents someone making an exact
         /// bytecode copy of the interpreter and shipping different meta for
         /// the copy to lie about what each op does in the interpreter.
-        bytes32 configAuthoringMetaHash = keccak256(config.authoringMeta);
-        if (configAuthoringMetaHash != AUTHORING_META_HASH) {
-            revert UnexpectedOpMetaHash(configAuthoringMetaHash);
+        bytes32 constructionMetaHash = keccak256(config.meta);
+        if (constructionMetaHash != CONSTRUCTION_META_HASH) {
+            revert UnexpectedConstructionMetaHash(constructionMetaHash);
         }
 
-        emit DISpair(msg.sender, address(this), address(interpreter), address(store), config.authoringMeta);
+        emit DISpair(msg.sender, address(this), address(interpreter), address(store), config.meta);
 
         IERC1820_REGISTRY.setInterfaceImplementer(
             address(this), IERC1820_REGISTRY.interfaceHash(IERC1820_NAME_IEXPRESSION_DEPLOYER_V2), address(this)
