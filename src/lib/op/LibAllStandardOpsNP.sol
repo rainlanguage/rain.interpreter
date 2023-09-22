@@ -17,6 +17,8 @@ import {
 import "./00/LibOpStackNP.sol";
 import "./00/LibOpConstantNP.sol";
 
+import "./call/LibOpCallNP.sol";
+
 import "./context/LibOpContextNP.sol";
 
 import "./crypto/LibOpHashNP.sol";
@@ -64,7 +66,7 @@ import "./uniswap/LibOpUniswapV2AmountOut.sol";
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 41;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 42;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -78,6 +80,11 @@ library LibAllStandardOpsNP {
             AuthoringMeta("stack", OPERAND_PARSER_OFFSET_SINGLE_FULL, "Copies an existing value from the stack."),
             AuthoringMeta("constant", OPERAND_PARSER_OFFSET_SINGLE_FULL, "Copies a constant value onto the stack."),
             // These are all ordered according to how they appear in the file system.
+            AuthoringMeta(
+                "call",
+                OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT,
+                "Calls a source by index in the same Rain bytecode. The inputs to call are copied to the top of the called stack and the outputs specified in the operand are copied back to the calling stack. The first operand is the source index and the second is the number of outputs."
+            ),
             AuthoringMeta(
                 "context",
                 OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT,
@@ -288,6 +295,7 @@ library LibAllStandardOpsNP {
                     LibOpStackNP.integrity,
                     LibOpConstantNP.integrity,
                     // Everything else is alphabetical, including folders.
+                    LibOpCallNP.integrity,
                     LibOpContextNP.integrity,
                     LibOpHashNP.integrity,
                     LibOpBlockNumberNP.integrity,
@@ -378,6 +386,7 @@ library LibAllStandardOpsNP {
                     LibOpStackNP.run,
                     LibOpConstantNP.run,
                     // Everything else is alphabetical, including folders.
+                    LibOpCallNP.run,
                     LibOpContextNP.run,
                     LibOpHashNP.run,
                     LibOpBlockNumberNP.run,

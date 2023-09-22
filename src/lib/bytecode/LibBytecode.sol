@@ -96,6 +96,21 @@ library LibBytecode {
         }
     }
 
+    function sourceInputsOutputsLength(bytes memory bytecode, uint256 sourceIndex)
+        internal
+        pure
+        returns (uint256 inputs, uint256 outputs)
+    {
+        unchecked {
+            Pointer pointer = sourcePointer(bytecode, sourceIndex);
+            assembly ("memory-safe") {
+                let data := mload(pointer)
+                inputs := byte(2, data)
+                outputs := byte(3, data)
+            }
+        }
+    }
+
     /// Backwards compatibility with the old way of representing sources.
     /// Requires allocation and copying so it isn't particularly efficient, but
     /// allows us to use the new bytecode format with old interpreter code. Not
