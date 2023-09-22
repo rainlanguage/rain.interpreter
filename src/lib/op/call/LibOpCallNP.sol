@@ -34,11 +34,7 @@ library LibOpCallNP {
             let end := evalStackTop
             evalStackTop := sub(evalStackTop, mul(inputs, 0x20))
             let cursor := evalStackTop
-            for {
-
-            } lt(cursor, end) {
-                cursor := add(cursor, 0x20)
-            } {
+            for {} lt(cursor, end) { cursor := add(cursor, 0x20) } {
                 mstore(cursor, mload(stackTop))
                 stackTop := add(stackTop, 0x20)
             }
@@ -49,12 +45,10 @@ library LibOpCallNP {
         // Copy outputs out.
         assembly ("memory-safe") {
             let cursor := add(evalStackTop, mul(outputs, 0x20))
-            for { } gt(cursor, evalStackTop) {
+            for {} gt(cursor, evalStackTop) {
                 cursor := sub(cursor, 0x20)
                 stackTop := sub(stackTop, 0x20)
-            } {
-                mstore(stackTop, mload(cursor))
-            }
+            } { mstore(stackTop, mload(cursor)) }
         }
 
         return stackTop;
