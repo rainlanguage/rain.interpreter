@@ -18,7 +18,7 @@ import "../lib/state/LibInterpreterStateDataContractNP.sol";
 import "../lib/op/LibAllStandardOpsNP.sol";
 import {LibParse, LibParseMeta, AuthoringMeta} from "../lib/parse/LibParse.sol";
 
-import {RainterpreterNP, OPCODE_FUNCTION_POINTERS} from "./RainterpreterNP.sol";
+import {RainterpreterNP, OPCODE_FUNCTION_POINTERS, INTERPRETER_BYTECODE_HASH} from "./RainterpreterNP.sol";
 
 /// @dev Thrown when the pointers known to the expression deployer DO NOT match
 /// the interpreter it is constructed for. This WILL cause undefined expression
@@ -44,9 +44,6 @@ error UnexpectedOpMetaHash(bytes32 actualOpMeta);
 /// @dev The function pointers for the integrity check fns.
 bytes constant INTEGRITY_FUNCTION_POINTERS =
     hex"17f9187318da1925192f192519251925192519251939195b198519a7193919a719a719b119bb19a719a719c419c419a719bb19bb19c419c419c419c419c419c419c419c419c419c419c419c419bb19db19e519e5";
-
-/// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xc2615fa7fb5712224f4d4d5dd1f51869057442f135d20bc92a8d806fac8ac115);
 
 /// @dev Hash of the known store bytecode.
 bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);
