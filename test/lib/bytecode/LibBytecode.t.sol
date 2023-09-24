@@ -29,7 +29,7 @@ contract LibBytecodeTest is Test {
         assertEq(LibBytecode.sourceRelativeOffset(hex"0200000008ffffffff01020304ffffffff", 1), 8);
     }
 
-    function checkSourceOffsetOutOfBoundsExternal(bytes memory bytecode, uint256 sourceIndex)
+    function checkSourceRelativeOffsetIndexOutOfBoundsExternal(bytes memory bytecode, uint256 sourceIndex)
         external
         pure
         returns (uint256 offset)
@@ -37,45 +37,38 @@ contract LibBytecodeTest is Test {
         return LibBytecode.sourceRelativeOffset(bytecode, sourceIndex);
     }
 
-    function checkSourceOffsetOutOfBounds(bytes memory bytecode, uint256 sourceIndex) internal {
-        vm.expectRevert(abi.encodeWithSelector(SourceOffsetOutOfBounds.selector, bytecode, sourceIndex));
-        this.checkSourceOffsetOutOfBoundsExternal(bytecode, sourceIndex);
+    function checkSourceRelativeOffsetIndexOutOfBounds(bytes memory bytecode, uint256 sourceIndex) internal {
+        vm.expectRevert(abi.encodeWithSelector(SourceIndexOutOfBounds.selector, bytecode, sourceIndex));
+        this.checkSourceRelativeOffsetIndexOutOfBoundsExternal(bytecode, sourceIndex);
     }
 
     /// Test some examples of source relative offset errors.
-    function testSourceRelativeOffsetError() external {
+    function testSourceRelativeOffsetIndexError() external {
         // 0 source 0 offset 0 header
         // index 0
-        checkSourceOffsetOutOfBounds("", 0);
-        checkSourceOffsetOutOfBounds(hex"00", 0);
-        checkSourceOffsetOutOfBounds(hex"0000", 0);
-        checkSourceOffsetOutOfBounds(hex"000000", 0);
+        checkSourceRelativeOffsetIndexOutOfBounds("", 0);
+        checkSourceRelativeOffsetIndexOutOfBounds(hex"00", 0);
+        checkSourceRelativeOffsetIndexOutOfBounds(hex"0000", 0);
+        checkSourceRelativeOffsetIndexOutOfBounds(hex"000000", 0);
         // index 1
-        checkSourceOffsetOutOfBounds(hex"", 1);
-        checkSourceOffsetOutOfBounds(hex"00", 1);
-        checkSourceOffsetOutOfBounds(hex"0000", 1);
-        checkSourceOffsetOutOfBounds(hex"000000", 1);
+        checkSourceRelativeOffsetIndexOutOfBounds(hex"", 1);
+        checkSourceRelativeOffsetIndexOutOfBounds(hex"00", 1);
+        checkSourceRelativeOffsetIndexOutOfBounds(hex"0000", 1);
+        checkSourceRelativeOffsetIndexOutOfBounds(hex"000000", 1);
         // index 2
-        checkSourceOffsetOutOfBounds(hex"", 2);
-        checkSourceOffsetOutOfBounds(hex"00", 2);
-        checkSourceOffsetOutOfBounds(hex"0000", 2);
-        checkSourceOffsetOutOfBounds(hex"000000", 2);
+        checkSourceRelativeOffsetIndexOutOfBounds(hex"", 2);
+        checkSourceRelativeOffsetIndexOutOfBounds(hex"00", 2);
+        checkSourceRelativeOffsetIndexOutOfBounds(hex"0000", 2);
+        checkSourceRelativeOffsetIndexOutOfBounds(hex"000000", 2);
 
         // 1 source 0 offset 0 header
-        // index 0
-        // only has count
-        checkSourceOffsetOutOfBounds(hex"01", 0);
-        // has count and offset but not header
-        checkSourceOffsetOutOfBounds(hex"010000", 0);
-        // has count and offset but header is only 3 bytes
-        checkSourceOffsetOutOfBounds(hex"010000010203", 0);
         // index 1
-        checkSourceOffsetOutOfBounds(hex"01", 1);
-        checkSourceOffsetOutOfBounds(hex"0100", 1);
+        checkSourceRelativeOffsetIndexOutOfBounds(hex"01", 1);
+        checkSourceRelativeOffsetIndexOutOfBounds(hex"0100", 1);
         // has offset but not header
-        checkSourceOffsetOutOfBounds(hex"010000", 1);
+        checkSourceRelativeOffsetIndexOutOfBounds(hex"010000", 1);
         // with header
-        checkSourceOffsetOutOfBounds(hex"01000000000000", 1);
+        checkSourceRelativeOffsetIndexOutOfBounds(hex"01000000000000", 1);
     }
 
     function testSourceOpsLength() external {

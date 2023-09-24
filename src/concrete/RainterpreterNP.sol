@@ -28,7 +28,7 @@ error NegativeStackLength(int256 length);
 error InvalidSourceIndex(SourceIndex sourceIndex);
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x84cc9d545149683e145a90cda1ba6b95d0b7243f1672ef6a5f9d1c327a295f3e);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xc0ba6123bc5983f74123d5c7f5936c9350404292297a11ac097cf62d6909995a);
 
 /// @dev The function pointers known to the interpreter for dynamic dispatch.
 /// By setting these as a constant they can be inlined into the interpreter

@@ -91,13 +91,13 @@ library LibIntegrityCheckNP {
                 fPointersStart := add(fPointers, 0x20)
             }
 
+            // Ensure that the bytecode has no out of bounds pointers BEFORE we
+            // start attempting to iterate over opcodes.
+            LibBytecode.checkNoOOBPointers(bytecode);
+
             // Run the integrity check over each source.
             for (uint256 i = 0; i < sourceCount; i++) {
-                // Ensure that each entrypoint has zero source inputs.
-                uint256 inputsLength = LibBytecode.sourceInputsLength(bytecode, i);
-
-                // Ensure that each entrypoint has the minimum number of outputs.
-                uint256 outputsLength = LibBytecode.sourceOutputsLength(bytecode, i);
+                (uint256 inputsLength, uint256 outputsLength) = LibBytecode.sourceInputsOutputsLength(bytecode, i);
 
                 // This is an entrypoint so has additional restrictions.
                 if (i < minOutputs.length) {

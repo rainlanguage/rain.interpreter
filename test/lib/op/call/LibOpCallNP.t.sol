@@ -6,6 +6,8 @@ import "test/util/abstract/OpTest.sol";
 /// @title LibOpCallNPTest
 /// @notice Test the LibOpCallNP library that includes the "call" word.
 contract LibOpCallNPTest is OpTest {
+    /// Directly test the integrity logic of LibOpCallNP.
+
     /// Test the eval of some call that has order dependent inputs and outputs
     /// so we can sanity check the stacks.
     function testOpCallNPRunOrdering() external {
