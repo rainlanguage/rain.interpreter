@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.19;
 
-import "../../interface/IInterpreterV1.sol";
-import "rain.solmem/lib/LibPointer.sol";
-import "rain.solmem/lib/LibBytes.sol";
-import "rain.solmem/lib/LibMemCpy.sol";
+import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
+import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 
 /// Thrown when a bytecode source index is out of bounds.
 /// @param bytecode The bytecode that was inspected.

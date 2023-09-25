@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
-import "src/lib/bytecode/LibBytecode.sol";
+import {Test} from "forge-std/Test.sol";
+import {LibBytecode, SourceIndexOutOfBounds} from "src/lib/bytecode/LibBytecode.sol";
 
 contract LibBytecodeTest is Test {
     /// Test that a zero length bytecode returns zero sources.
