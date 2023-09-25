@@ -3,7 +3,12 @@ pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 import {
-    LibBytecode, UnexpectedSources, TruncatedHeaderOffsets, TruncatedHeader
+    LibBytecode,
+    UnexpectedSources,
+    TruncatedHeaderOffsets,
+    TruncatedHeader,
+    UnexpectedTrailingOffsetBytes,
+    TruncatedSource
 } from "src/lib/bytecode/LibBytecode.sol";
 
 import {console2} from "forge-std/console2.sol";
@@ -165,5 +170,84 @@ contract LibBytecodeCheckNoOOBPointersTest is Test {
 
         vm.expectRevert(abi.encodeWithSelector(TruncatedHeader.selector, bytecode));
         this.checkNoOOBPointersExternal(bytecode);
+    }
+
+    /// Any corruption of the ops count for a given source header fails as
+    /// `TruncatedSource`.
+    function testCheckNoOOBPointersSourceTruncated(
+        bytes memory bytecode,
+        uint8 sourceCount,
+        bytes32 seed,
+        bytes1 corruptOpCount
+    ) external {
+        conformBytecode(bytecode, sourceCount, seed);
+        // The case of empty sources is not relevant.
+        vm.assume(bytecode.length > 1);
+        sourceCount = uint8(bytecode[0]);
+
+        // Randomly corrupt an ops count.
+        uint256 sourceRelativeStart = 1 + uint256(sourceCount) * 2;
+        seed = keccak256(abi.encodePacked(seed, uint256(0)));
+        uint256 offsetIndex = uint256(seed) % sourceCount;
+        uint256 offsetPosition = offsetIndex * 2 + 1;
+        uint256 offset = (uint256(uint8(bytecode[offsetPosition])) << 8) | uint256(uint8(bytecode[offsetPosition + 1]));
+        uint256 opsCount = uint256(uint8(bytecode[sourceRelativeStart + offset]));
+        vm.assume(opsCount != uint8(corruptOpCount));
+        bytecode[sourceRelativeStart + offset] = corruptOpCount;
+
+        vm.expectRevert(abi.encodeWithSelector(TruncatedSource.selector, bytecode));
+        this.checkNoOOBPointersExternal(bytecode);
+    }
+
+    /// If the initial offset is anything other than 0 the bytecode fails as
+    /// `UnexpectedTrailingOffsetBytes`.
+    function testCheckNoOOBPointersTrailingOffsetBytes(
+        bytes memory bytecode,
+        bytes memory garbage,
+        uint8 sourceCount,
+        bytes32 seed
+    ) external {
+        vm.assume(garbage.length > 0);
+        conformBytecode(bytecode, sourceCount, seed);
+        // The case of empty sources is not relevant.
+        vm.assume(bytecode.length > 1);
+        sourceCount = uint8(bytecode[0]);
+
+        // Split the bytecode into two parts at the end of the offset pointers.
+        uint256 sourceRelativeStart = 1 + sourceCount * 2;
+        uint256 sourceAbsoluteStart;
+        assembly ("memory-safe") {
+            sourceAbsoluteStart := add(bytecode, add(0x20, sourceRelativeStart))
+        }
+
+        uint256 originalLength = bytecode.length;
+
+        // Truncate the bytecode down to the source relative start.
+        assembly ("memory-safe") {
+            mstore(bytecode, sourceRelativeStart)
+        }
+
+        bytes memory bytecodeCorrupted = abi.encodePacked(bytecode, garbage);
+
+        // Need to add the garbage length to every offset.
+        for (uint256 i = 0; i < sourceCount; i++) {
+            uint256 offsetPosition = i * 2 + 1;
+            uint256 offset = (uint256(uint8(bytecodeCorrupted[offsetPosition])) << 8)
+                | uint256(uint8(bytecodeCorrupted[offsetPosition + 1]));
+            offset += garbage.length;
+            bytecodeCorrupted[offsetPosition] = bytes1(uint8(offset >> 8));
+            bytecodeCorrupted[offsetPosition + 1] = bytes1(uint8(offset));
+        }
+
+        // Restore the suffix of the bytecode.
+        uint256 suffixLength = originalLength - sourceRelativeStart;
+        assembly ("memory-safe") {
+            bytecode := add(bytecode, sourceRelativeStart)
+            mstore(bytecode, suffixLength)
+        }
+        bytecodeCorrupted = abi.encodePacked(bytecodeCorrupted, bytecode);
+
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedTrailingOffsetBytes.selector, bytecodeCorrupted));
+        this.checkNoOOBPointersExternal(bytecodeCorrupted);
     }
 }
