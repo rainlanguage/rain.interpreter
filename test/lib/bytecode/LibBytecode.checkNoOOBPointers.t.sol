@@ -11,8 +11,6 @@ import {
     TruncatedSource
 } from "src/lib/bytecode/LibBytecode.sol";
 
-import {console2} from "forge-std/console2.sol";
-
 contract LibBytecodeCheckNoOOBPointersTest is Test {
     function conformBytecode(bytes memory bytecode, uint256 sourceCount, bytes32 seed) internal view {
         unchecked {

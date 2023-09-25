@@ -18,10 +18,11 @@ contract LibParseNamedRHSTest is Test {
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        (uint256 inputs, uint256 outputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(inputs, 0);
+        assertEq(outputs, 1);
         // a
         assertEq(bytecode, hex"0100000101000102000000");
         assertEq(constants.length, 0);
@@ -34,10 +35,11 @@ contract LibParseNamedRHSTest is Test {
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
+        (uint256 inputs, uint256 outputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(inputs, 0);
+        assertEq(outputs, 2);
         // a b
         assertEq(
             bytecode,
@@ -68,10 +70,11 @@ contract LibParseNamedRHSTest is Test {
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 4);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 4);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
+        (uint256 inputs, uint256 outputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(inputs, 0);
+        assertEq(outputs, 2);
         // b a c b
         assertEq(
             bytecode,
@@ -106,10 +109,11 @@ contract LibParseNamedRHSTest is Test {
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        (uint256 inputs, uint256 outputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(inputs, 0);
+        assertEq(outputs, 1);
         // b a
         assertEq(
             bytecode,
@@ -140,10 +144,11 @@ contract LibParseNamedRHSTest is Test {
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 3);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 3);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        (uint256 inputs, uint256 outputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(inputs, 0);
+        assertEq(outputs, 1);
         // c b a
         assertEq(
             bytecode,
@@ -177,10 +182,11 @@ contract LibParseNamedRHSTest is Test {
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 5);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 5);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        (uint256 inputs, uint256 outputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(inputs, 0);
+        assertEq(outputs, 1);
         assertEq(constants.length, 0);
         // Nested words compile RTL so that they execute LTR.
         // e d c b a
@@ -219,10 +225,11 @@ contract LibParseNamedRHSTest is Test {
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 9);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 9);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 4);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        (uint256 inputs, uint256 outputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(inputs, 0);
+        assertEq(outputs, 1);
         assertEq(constants.length, 0);
         // Nested words compile RTL so that they execute LTR.
         // i h g f e d c b a
@@ -298,10 +305,11 @@ contract LibParseNamedRHSTest is Test {
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 7);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 7);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 3);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 3);
+        (uint256 inputs, uint256 outputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(inputs, 0);
+        assertEq(outputs, 3);
         assertEq(constants.length, 0);
     }
 
@@ -314,12 +322,13 @@ contract LibParseNamedRHSTest is Test {
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0x20);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 0x20);
         // High point is 13 for the second top level item + 1 for the first top
         // level item = 14.
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 14);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
+        (uint256 inputs, uint256 outputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(inputs, 0);
+        assertEq(outputs, 2);
         assertEq(constants.length, 0);
         // Nested words compile RTL so that they execute LTR.
         // p o n m l k j i h g f e d c b a a b c d e f g h i j k l m n o p
@@ -412,10 +421,11 @@ contract LibParseNamedRHSTest is Test {
 
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 4);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 4);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 3);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 3);
+        (uint256 inputs, uint256 outputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(inputs, 0);
+        assertEq(outputs, 3);
 
         assertEq(constants.length, 0);
         // a b d c
@@ -452,17 +462,19 @@ contract LibParseNamedRHSTest is Test {
 
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        (uint256 inputs, uint256 outputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(inputs, 0);
+        assertEq(outputs, 1);
 
         sourceIndex = 1;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 8);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        (inputs, outputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(inputs, 0);
+        assertEq(outputs, 1);
 
         assertEq(constants.length, 0);
         // a ; b

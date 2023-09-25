@@ -7,6 +7,11 @@ import "rain.solmem/lib/LibMemCpy.sol";
 import "rain.lib.memkv/lib/LibMemoryKV.sol";
 import "../bytecode/LibBytecode.sol";
 
+/// Thrown when the inputs length does not match the expected inputs length.
+/// @param expected The expected number of inputs.
+/// @param actual The actual number of inputs.
+error InputsLengthMismatch(uint256 expected, uint256 actual);
+
 library LibEvalNP {
     using LibMemoryKV for MemoryKV;
 
@@ -151,6 +156,12 @@ library LibEvalNP {
         returns (uint256[] memory, uint256[] memory)
     {
         unchecked {
+            // Use the bytecode's own definition of its IO. Clear example of
+            // how the bytecode could accidentally or maliciously force OOB reads
+            // if the integrity check is not run.
+            (uint256 sourceInputs, uint256 sourceOutputs) =
+                LibBytecode.sourceInputsOutputsLength(state.bytecode, state.sourceIndex);
+
             Pointer stackTop;
             {
                 stackTop = state.stackBottoms[state.sourceIndex];
@@ -165,16 +176,13 @@ library LibEvalNP {
                         inputsDataPointer := add(inputs, 0x20)
                     }
                     LibMemCpy.unsafeCopyWordsTo(inputsDataPointer, stackTop, inputs.length);
+                } else if (inputs.length != sourceInputs) {
+                    revert InputsLengthMismatch(sourceInputs, inputs.length);
                 }
             }
 
             // Run the loop.
             stackTop = evalLoopNP(state, stackTop);
-
-            // Use the bytecode's own definition of its outputs. Clear example of
-            // how the bytecode could accidentally or maliciously force OOB reads
-            // if the integrity check is not run.
-            uint256 outputs = LibBytecode.sourceOutputsLength(state.bytecode, state.sourceIndex);
 
             // Convert the stack top pointer to an array with the correct length.
             // If the stack top is pointing to the base of Solidity's understanding
@@ -183,7 +191,7 @@ library LibEvalNP {
             // will be built within the bounds of the stack. After this point `tail`
             // and the original stack MUST be immutable as they're both pointing to
             // the same memory region.
-            outputs = maxOutputs < outputs ? maxOutputs : outputs;
+            uint256 outputs = maxOutputs < sourceOutputs ? maxOutputs : sourceOutputs;
             uint256[] memory result;
             assembly ("memory-safe") {
                 result := sub(stackTop, 0x20)

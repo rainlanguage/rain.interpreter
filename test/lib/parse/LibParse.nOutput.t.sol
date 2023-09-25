@@ -112,9 +112,10 @@ contract LibParseNOutputTest is Test {
 
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 3);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 3);
+        (uint256 inputs, uint256 outputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(inputs, 0);
+        assertEq(outputs, 3);
     }
 }

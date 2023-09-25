@@ -116,7 +116,7 @@ library LibIntegrityCheckNP {
                 // Have low 4 bytes of cursor overlap the first op, skipping the
                 // prefix.
                 uint256 cursor = Pointer.unwrap(LibBytecode.sourcePointer(bytecode, i)) - 0x18;
-                uint256 end = cursor + LibBytecode.sourceOpsLength(bytecode, i) * 4;
+                uint256 end = cursor + LibBytecode.sourceOpsCount(bytecode, i) * 4;
 
                 while (cursor < end) {
                     Operand operand;

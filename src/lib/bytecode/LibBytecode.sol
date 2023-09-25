@@ -177,6 +177,9 @@ library LibBytecode {
     /// bounds of the bytecode. Callers MUST `checkNoOOBPointers` BEFORE
     /// attempting to traverse the bytecode, otherwise the relative offset MAY
     /// point to memory outside the bytecode `bytes`.
+    /// @param bytecode The bytecode to inspect.
+    /// @param sourceIndex The index of the source to inspect.
+    /// @return offset The relative byte offset of the source in the bytecode.
     function sourceRelativeOffset(bytes memory bytecode, uint256 sourceIndex) internal pure returns (uint256 offset) {
         // If the source index requested is out of bounds, revert.
         if (sourceIndex >= sourceCount(bytecode)) {
@@ -189,6 +192,14 @@ library LibBytecode {
         }
     }
 
+    /// The absolute byte pointer of a source in the bytecode.
+    /// This function DOES NOT check that the source index is within the bounds
+    /// of the bytecode. Callers MUST `checkNoOOBPointers` BEFORE attempting to
+    /// traverse the bytecode, otherwise the relative offset MAY point to memory
+    /// outside the bytecode `bytes`.
+    /// @param bytecode The bytecode to inspect.
+    /// @param sourceIndex The index of the source to inspect.
+    /// @return pointer The absolute byte pointer of the source in the bytecode.
     function sourcePointer(bytes memory bytecode, uint256 sourceIndex) internal pure returns (Pointer pointer) {
         unchecked {
             uint256 sourcesStartOffset = 1 + sourceCount(bytecode) * 2;
@@ -199,15 +210,33 @@ library LibBytecode {
         }
     }
 
-    function sourceOpsLength(bytes memory bytecode, uint256 sourceIndex) internal pure returns (uint256 length) {
+    /// The number of opcodes in a source.
+    /// This function DOES NOT check that the source index is within the bounds
+    /// of the bytecode. Callers MUST `checkNoOOBPointers` BEFORE attempting to
+    /// traverse the bytecode, otherwise the relative offset MAY point to memory
+    /// outside the bytecode `bytes`.
+    /// @param bytecode The bytecode to inspect.
+    /// @param sourceIndex The index of the source to inspect.
+    /// @return opsCount The number of opcodes in the source.
+    function sourceOpsCount(bytes memory bytecode, uint256 sourceIndex) internal pure returns (uint256 opsCount) {
         unchecked {
             Pointer pointer = sourcePointer(bytecode, sourceIndex);
             assembly ("memory-safe") {
-                length := byte(0, mload(pointer))
+                opsCount := byte(0, mload(pointer))
             }
         }
     }
 
+    /// The number of stack slots allocated by a source. This is the number of
+    /// 32 byte words that MUST be allocated for the stack for the given source
+    /// index to avoid memory corruption when executing the source.
+    /// This function DOES NOT check that the source index is within the bounds
+    /// of the bytecode. Callers MUST `checkNoOOBPointers` BEFORE attempting to
+    /// traverse the bytecode, otherwise the relative offset MAY point to memory
+    /// outside the bytecode `bytes`.
+    /// @param bytecode The bytecode to inspect.
+    /// @param sourceIndex The index of the source to inspect.
+    /// @return allocation The number of stack slots allocated by the source.
     function sourceStackAllocation(bytes memory bytecode, uint256 sourceIndex)
         internal
         pure
@@ -221,24 +250,19 @@ library LibBytecode {
         }
     }
 
-    function sourceInputsLength(bytes memory bytecode, uint256 sourceIndex) internal pure returns (uint256 length) {
-        unchecked {
-            Pointer pointer = sourcePointer(bytecode, sourceIndex);
-            assembly ("memory-safe") {
-                length := byte(2, mload(pointer))
-            }
-        }
-    }
-
-    function sourceOutputsLength(bytes memory bytecode, uint256 sourceIndex) internal pure returns (uint256 length) {
-        unchecked {
-            Pointer pointer = sourcePointer(bytecode, sourceIndex);
-            assembly ("memory-safe") {
-                length := byte(3, mload(pointer))
-            }
-        }
-    }
-
+    /// The number of inputs and outputs of a source.
+    /// This function DOES NOT check that the source index is within the bounds
+    /// of the bytecode. Callers MUST `checkNoOOBPointers` BEFORE attempting to
+    /// traverse the bytecode, otherwise the relative offset MAY point to memory
+    /// outside the bytecode `bytes`.
+    /// Note that both the inputs and outputs are always returned togther, this
+    /// is because the caller SHOULD be checking both together whenever using
+    /// some bytecode. Returning two values is more efficient than two separate
+    /// function calls.
+    /// @param bytecode The bytecode to inspect.
+    /// @param sourceIndex The index of the source to inspect.
+    /// @return inputs The number of inputs of the source.
+    /// @return outputs The number of outputs of the source.
     function sourceInputsOutputsLength(bytes memory bytecode, uint256 sourceIndex)
         internal
         pure
@@ -265,7 +289,7 @@ library LibBytecode {
             for (uint256 i = 0; i < count; i++) {
                 // Skip over the prefix 4 bytes.
                 Pointer pointer = sourcePointer(bytecode, i).unsafeAddBytes(4);
-                uint256 length = sourceOpsLength(bytecode, i) * 4;
+                uint256 length = sourceOpsCount(bytecode, i) * 4;
                 bytes memory source = new bytes(length);
                 pointer.unsafeCopyBytesTo(source.dataPointer(), length);
                 // Move the opcode index one byte for each opcode, into the input

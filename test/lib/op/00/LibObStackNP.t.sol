@@ -114,10 +114,11 @@ contract LibOpStackNPTest is OpTest {
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
+        (uint256 sourceInputs, uint256 sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(sourceInputs, 0);
+        assertEq(sourceOutputs, 2);
         assertEq(
             bytecode,
             // 1 source
