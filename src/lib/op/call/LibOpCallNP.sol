@@ -8,6 +8,12 @@ import {Pointer, LibPointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibBytecode} from "../../bytecode/LibBytecode.sol";
 import {LibEvalNP} from "../../eval/LibEvalNP.sol";
 
+/// Thrown when the outputs requested by the operand exceed the outputs
+/// available from the source.
+/// @param sourceOutputs The number of outputs available from the source.
+/// @param outputs The number of outputs requested by the operand.
+error CallOutputsExceedSource(uint256 sourceOutputs, uint256 outputs);
+
 library LibOpCallNP {
     using LibPointer for Pointer;
 
@@ -18,9 +24,11 @@ library LibOpCallNP {
         (uint256 sourceInputs, uint256 sourceOutputs) =
             LibBytecode.sourceInputsOutputsLength(state.bytecode, sourceIndex);
 
-        // Defer to the source inputs for the integrity check.
-        // Outputs is the smaller of the source outputs and the call outputs.
-        return (sourceInputs, outputs < sourceOutputs ? outputs : sourceOutputs);
+        if (sourceOutputs < outputs) {
+            revert CallOutputsExceedSource(sourceOutputs, outputs);
+        }
+
+        return (sourceInputs, outputs);
     }
 
     function run(InterpreterStateNP memory state, Operand operand, Pointer stackTop) internal view returns (Pointer) {

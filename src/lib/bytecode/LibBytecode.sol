@@ -32,6 +32,12 @@ error TruncatedHeader(bytes bytecode);
 /// @param bytecode The bytecode that was inspected.
 error TruncatedHeaderOffsets(bytes bytecode);
 
+/// Thrown when the stack sizings, allocation, inputs and outputs, are not
+/// monotonically increasing.
+/// @param bytecode The bytecode that was inspected.
+/// @param relativeOffset The relative offset of the source that was inspected.
+error StackSizingsNotMonotonic(bytes bytecode, uint256 relativeOffset);
+
 /// @title LibBytecode
 /// @notice A library for inspecting the bytecode of an expression. Largely
 /// focused on reading the source headers rather than the opcodes themselves.
@@ -135,8 +141,29 @@ library LibBytecode {
 
                     // The ops count is the first byte of the header.
                     uint256 opsCount;
-                    assembly ("memory-safe") {
-                        opsCount := byte(0, mload(absoluteOffset))
+                    {
+                        // The stack allocation, inputs, and outputs are the next
+                        // 3 bytes of the header. We can't know exactly what they
+                        // need to be according to the opcodes without checking
+                        // every opcode implementation, but we can check that
+                        // they satisfy the invariant
+                        // `inputs <= outputs <= stackAllocation`.
+                        // Note that the outputs may include the inputs, as the
+                        // outputs is merely the final stack size.
+                        uint256 stackAllocation;
+                        uint256 inputs;
+                        uint256 outputs;
+                        assembly ("memory-safe") {
+                            let data := mload(absoluteOffset)
+                            opsCount := byte(0, data)
+                            stackAllocation := byte(1, data)
+                            inputs := byte(2, data)
+                            outputs := byte(3, data)
+                        }
+
+                        if (inputs > outputs || outputs > stackAllocation) {
+                            revert StackSizingsNotMonotonic(bytecode, relativeOffset);
+                        }
                     }
 
                     // The ops count is the number of 4 byte opcodes in the
