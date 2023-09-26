@@ -192,7 +192,8 @@ library LibBytecode {
         }
     }
 
-    /// The absolute byte pointer of a source in the bytecode.
+    /// The absolute byte pointer of a source in the bytecode. Points to the
+    /// header of the source, NOT the first opcode.
     /// This function DOES NOT check that the source index is within the bounds
     /// of the bytecode. Callers MUST `checkNoOOBPointers` BEFORE attempting to
     /// traverse the bytecode, otherwise the relative offset MAY point to memory

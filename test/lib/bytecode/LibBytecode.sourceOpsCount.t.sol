@@ -1,10 +1,15 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import {Test} from "forge-std/Test.sol";
-import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
+import {BytecodeTest} from "test/util/abstract/BytecodeTest.sol";
+import {LibBytecode, SourceIndexOutOfBounds} from "src/lib/bytecode/LibBytecode.sol";
+import {LibBytecodeSlow} from "test/lib/bytecode/LibBytecodeSlow.sol";
 
-contract LibBytecodeSourceOpsCountTest is Test {
+contract LibBytecodeSourceOpsCountTest is BytecodeTest {
+    function sourceOpsCountExternal(bytes memory bytecode, uint256 sourceIndex) external pure returns (uint256 count) {
+        return LibBytecode.sourceOpsCount(bytecode, sourceIndex);
+    }
+
     function testSourceOpsCount() external {
         // 1 source 0 offset 0 header
         assertEq(LibBytecode.sourceOpsCount(hex"01000000000000", 0), 0);
@@ -14,5 +19,35 @@ contract LibBytecodeSourceOpsCountTest is Test {
         assertEq(LibBytecode.sourceOpsCount(hex"010002ffff01020304", 0), 1);
         // 2 source 8 offset some header index 1
         assertEq(LibBytecode.sourceOpsCount(hex"020000000801000000ffffffff01020304ffffffff", 1), 1);
+    }
+
+    /// Getting the source ops count for an index beyond the sources should fail.
+    function testSourceOpsCountIndexOutOfBounds(
+        bytes memory bytecode,
+        uint256 sourceCount,
+        uint256 sourceIndex,
+        bytes32 seed
+    ) external {
+        conformBytecode(bytecode, sourceCount, seed);
+        sourceCount = LibBytecode.sourceCount(bytecode);
+        sourceIndex = bound(sourceIndex, sourceCount, type(uint256).max);
+        vm.expectRevert(abi.encodeWithSelector(SourceIndexOutOfBounds.selector, bytecode, sourceIndex));
+        this.sourceOpsCountExternal(bytecode, sourceIndex);
+    }
+
+    /// Test against a reference implementation.
+    function testSourceOpsCountAgainstSlow(
+        bytes memory bytecode,
+        uint256 sourceCount,
+        uint256 sourceIndex,
+        bytes32 seed
+    ) external {
+        conformBytecode(bytecode, sourceCount, seed);
+        sourceCount = LibBytecode.sourceCount(bytecode);
+        vm.assume(sourceCount > 0);
+        sourceIndex = bound(sourceIndex, 0, sourceCount - 1);
+        assertEq(
+            LibBytecode.sourceOpsCount(bytecode, sourceIndex), LibBytecodeSlow.sourceOpsCountSlow(bytecode, sourceIndex)
+        );
     }
 }

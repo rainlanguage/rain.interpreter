@@ -92,10 +92,17 @@ library LibIntegrityCheckNP {
             }
 
             // Ensure that the bytecode has no out of bounds pointers BEFORE we
-            // start attempting to iterate over opcodes.
+            // start attempting to iterate over opcodes. This ensures the
+            // integrity of the source count, relative offset pointers,
+            // ops count per source, and that there is no garbage bytes at the
+            // end or between these things. Basically everything structural about
+            // the bytecode is confirmed here.
             LibBytecode.checkNoOOBPointers(bytecode);
 
-            // Run the integrity check over each source.
+            // Run the integrity check over each source. This needs to ensure
+            // the integrity of each source's inputs, outputs, and stack
+            // allocation, as well as the integrity of the bytecode itself on
+            // a per-opcode basis, according to each opcode's implementation.
             for (uint256 i = 0; i < sourceCount; i++) {
                 (uint256 inputsLength, uint256 outputsLength) = LibBytecode.sourceInputsOutputsLength(bytecode, i);
 

@@ -3,6 +3,7 @@ pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
+import {LibBytecodeSlow} from "test/lib/bytecode/LibBytecodeSlow.sol";
 
 contract LibBytecodeSourceCountTest is Test {
     /// Test that a zero length bytecode returns zero sources.
@@ -15,5 +16,10 @@ contract LibBytecodeSourceCountTest is Test {
     function testSourceCount1(bytes memory bytecode) external {
         vm.assume(bytecode.length > 0);
         assertEq(LibBytecode.sourceCount(bytecode), uint256(uint8(bytecode[0])));
+    }
+
+    /// Test against a reference implementation.
+    function testSourceCountReference(bytes memory bytecode) external {
+        assertEq(LibBytecode.sourceCount(bytecode), LibBytecodeSlow.sourceCountSlow(bytecode));
     }
 }

@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import {Test} from "forge-std/Test.sol";
+import {BytecodeTest} from "test/util/abstract/BytecodeTest.sol";
 import {LibBytecode, SourceIndexOutOfBounds} from "src/lib/bytecode/LibBytecode.sol";
+import {LibBytecodeSlow} from "test/lib/bytecode/LibBytecodeSlow.sol";
 
-contract LibBytecodeTest is Test {
+contract LibBytecodeSourceRelativeOffsetTest is BytecodeTest {
     /// Test some examples of source relative offsets.
     function testSourceRelativeOffsetHappy() external {
         // 1 source 0 offset 0 header
@@ -17,7 +18,7 @@ contract LibBytecodeTest is Test {
         assertEq(LibBytecode.sourceRelativeOffset(hex"0200000008ffffffff01020304ffffffff", 1), 8);
     }
 
-    function checkSourceRelativeOffsetIndexOutOfBoundsExternal(bytes memory bytecode, uint256 sourceIndex)
+    function sourceRelativeOffsetExternal(bytes memory bytecode, uint256 sourceIndex)
         external
         pure
         returns (uint256 offset)
@@ -27,7 +28,7 @@ contract LibBytecodeTest is Test {
 
     function checkSourceRelativeOffsetIndexOutOfBounds(bytes memory bytecode, uint256 sourceIndex) internal {
         vm.expectRevert(abi.encodeWithSelector(SourceIndexOutOfBounds.selector, bytecode, sourceIndex));
-        this.checkSourceRelativeOffsetIndexOutOfBoundsExternal(bytecode, sourceIndex);
+        this.sourceRelativeOffsetExternal(bytecode, sourceIndex);
     }
 
     /// Test some examples of source relative offset errors.
@@ -57,5 +58,22 @@ contract LibBytecodeTest is Test {
         checkSourceRelativeOffsetIndexOutOfBounds(hex"010000", 1);
         // with header
         checkSourceRelativeOffsetIndexOutOfBounds(hex"01000000000000", 1);
+    }
+
+    /// Test against a reference implementation.
+    function testSourceRelativeOffsetReference(
+        bytes memory bytecode,
+        uint256 sourceCount,
+        uint256 sourceIndex,
+        bytes32 seed
+    ) external {
+        conformBytecode(bytecode, sourceCount, seed);
+        sourceCount = LibBytecode.sourceCount(bytecode);
+        vm.assume(sourceCount > 0);
+        sourceIndex = bound(sourceIndex, 0, sourceCount - 1);
+        assertEq(
+            LibBytecode.sourceRelativeOffset(bytecode, sourceIndex),
+            LibBytecodeSlow.sourceRelativeOffsetSlow(bytecode, sourceIndex)
+        );
     }
 }
