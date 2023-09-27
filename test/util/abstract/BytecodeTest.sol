@@ -63,7 +63,21 @@ abstract contract BytecodeTest is Test {
                     cursor += 2;
 
                     // Set the ops count for the source in the header.
-                    bytecode[sourcesRelativeStart + offset] = bytes1(uint8(opsPerSource[i]));
+                    uint256 headerPosition = sourcesRelativeStart + offset;
+                    bytecode[headerPosition] = bytes1(uint8(opsPerSource[i]));
+                    // allocation is the 2nd header byte.
+                    uint256 allocation = uint8(bytecode[headerPosition + 1]);
+                    // inputs is the 3rd header byte.
+                    uint256 inputs = uint8(bytecode[headerPosition + 2]);
+                    // outputs is the 4th header byte.
+                    uint256 outputs = uint8(bytecode[headerPosition + 3]);
+
+                    // inputs can't exceed outputs.
+                    inputs = bound(inputs, 0, outputs);
+                    bytecode[headerPosition + 2] = bytes1(uint8(inputs));
+                    // allocation can't be less than outputs.
+                    allocation = bound(allocation, outputs, type(uint8).max);
+                    bytecode[headerPosition + 1] = bytes1(uint8(allocation));
 
                     offset += opsPerSource[i] * 4 + 4;
                 }

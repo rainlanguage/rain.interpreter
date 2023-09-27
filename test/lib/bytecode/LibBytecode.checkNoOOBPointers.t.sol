@@ -8,7 +8,8 @@ import {
     TruncatedHeaderOffsets,
     TruncatedHeader,
     UnexpectedTrailingOffsetBytes,
-    TruncatedSource
+    TruncatedSource,
+    StackSizingsNotMonotonic
 } from "src/lib/bytecode/LibBytecode.sol";
 
 contract LibBytecodeCheckNoOOBPointersTest is BytecodeTest {
@@ -261,6 +262,104 @@ contract LibBytecodeCheckNoOOBPointersTest is BytecodeTest {
         bytecode = abi.encodePacked(bytecode, garbage);
 
         vm.expectRevert();
+        this.checkNoOOBPointersExternal(bytecode);
+    }
+
+    /// If the inputs count is greater than the outputs count for some source
+    /// the bytecode MUST error as `StackSizingsNotMonotonic`.
+    function testCheckNoOOBPointersInputsNotMonotonic(
+        bytes memory bytecode,
+        uint8 sourceCount,
+        bytes32 seed,
+        uint256 corruptInputs,
+        uint256 corruptOutputs
+    ) external {
+        conformBytecode(bytecode, sourceCount, seed);
+        vm.assume(bytecode.length > 0);
+        sourceCount = uint8(bytecode[0]);
+        vm.assume(sourceCount > 0);
+
+        uint256 sourceRelativeStart = 1 + sourceCount * 2;
+
+        // Pick an offset pointer.
+        seed = keccak256(abi.encodePacked(seed, uint256(0)));
+        uint256 offsetIndex = uint256(seed) % sourceCount;
+        uint256 offsetPosition = offsetIndex * 2 + 1;
+        uint256 offset = (uint256(uint8(bytecode[offsetPosition])) << 8) | uint256(uint8(bytecode[offsetPosition + 1]));
+
+        {
+            // Corrupt the inputs count. This is the third byte of the header.
+            uint256 headerPosition = sourceRelativeStart + offset;
+            uint256 inputsPosition = headerPosition + 2;
+            uint256 outputsPosition = headerPosition + 3;
+
+            uint256 inputs = uint256(uint8(bytecode[inputsPosition]));
+            uint256 outputs = uint256(uint8(bytecode[outputsPosition]));
+            if (outputs < type(uint8).max) {
+                inputs = bound(corruptInputs, outputs + 1, type(uint8).max);
+            } else {
+                inputs = bound(corruptInputs, 1, type(uint8).max);
+                outputs = bound(corruptOutputs, 0, inputs - 1);
+            }
+            bytecode[inputsPosition] = bytes1(uint8(inputs));
+            bytecode[outputsPosition] = bytes1(uint8(outputs));
+
+            // Ensure the allocation is valid so we don't get false positives.
+            uint256 allocation = uint256(uint8(bytecode[headerPosition + 1]));
+            allocation = bound(allocation, outputs, type(uint8).max);
+            bytecode[headerPosition + 1] = bytes1(uint8(allocation));
+        }
+
+        vm.expectRevert(abi.encodeWithSelector(StackSizingsNotMonotonic.selector, bytecode, offset));
+        this.checkNoOOBPointersExternal(bytecode);
+    }
+
+    /// If the outputs count is greater than the allocation for some source
+    /// the bytecode MUST error as `StackSizingsNotMonotonic`.
+    function testCheckNoOOBPointersOutputsNotMonotonic(
+        bytes memory bytecode,
+        uint8 sourceCount,
+        bytes32 seed,
+        uint256 corruptOutputs,
+        uint256 corruptAllocation
+    ) external {
+        conformBytecode(bytecode, sourceCount, seed);
+        vm.assume(bytecode.length > 0);
+        sourceCount = uint8(bytecode[0]);
+        vm.assume(sourceCount > 0);
+
+        uint256 sourceRelativeStart = 1 + sourceCount * 2;
+
+        // Pick an offset pointer.
+        seed = keccak256(abi.encodePacked(seed, uint256(0)));
+        uint256 offsetIndex = uint256(seed) % sourceCount;
+        uint256 offsetPosition = offsetIndex * 2 + 1;
+        uint256 offset = (uint256(uint8(bytecode[offsetPosition])) << 8) | uint256(uint8(bytecode[offsetPosition + 1]));
+
+        {
+            // Corrupt the outputs count. This is the fourth byte of the header.
+            uint256 headerPosition = sourceRelativeStart + offset;
+            uint256 allocationPosition = headerPosition + 1;
+            uint256 outputsPosition = headerPosition + 3;
+
+            uint256 outputs = uint256(uint8(bytecode[outputsPosition]));
+            uint256 allocation = uint256(uint8(bytecode[allocationPosition]));
+            if (allocation < type(uint8).max) {
+                outputs = bound(corruptOutputs, allocation + 1, type(uint8).max);
+            } else {
+                outputs = bound(corruptOutputs, 1, type(uint8).max);
+                allocation = bound(corruptAllocation, 0, outputs - 1);
+            }
+            bytecode[outputsPosition] = bytes1(uint8(outputs));
+            bytecode[allocationPosition] = bytes1(uint8(allocation));
+
+            // Ensure the inputs is valid so we don't get false positives.
+            uint256 inputs = uint256(uint8(bytecode[headerPosition + 2]));
+            inputs = bound(inputs, 0, outputs);
+            bytecode[headerPosition + 2] = bytes1(uint8(inputs));
+        }
+
+        vm.expectRevert(abi.encodeWithSelector(StackSizingsNotMonotonic.selector, bytecode, offset));
         this.checkNoOOBPointersExternal(bytecode);
     }
 }
