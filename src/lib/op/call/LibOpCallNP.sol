@@ -25,6 +25,7 @@ error CallOutputsExceedSource(uint256 sourceOutputs, uint256 outputs);
 /// - The source returns a set of 0+ outputs.
 /// - The source has a fixed number of inputs and outputs.
 /// - When the source executes it has its own stack/scope.
+/// - Sources use lexical scoping rules for named LHS items.
 /// - The source can be called from multiple places.
 /// - The source can `call` other sources.
 /// - The source is stateless across calls
