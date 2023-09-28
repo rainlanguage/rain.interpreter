@@ -55,6 +55,7 @@ error CallOutputsExceedSource(uint256 sourceOutputs, uint256 outputs);
 ///   unconditionally (even when wrapped in an `if`). This may change in the
 ///   future.
 /// - The memory allocation for a source must be known at compile time.
+/// - There's no way to return early from a source.
 ///
 /// The order of inputs and outputs is designed so that the visual representation
 /// of a source call matches the visual representation of a function call. This
