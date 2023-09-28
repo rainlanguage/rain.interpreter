@@ -86,4 +86,25 @@ abstract contract BytecodeTest is Test {
             }
         }
     }
+
+    function randomSourceIndex(bytes memory bytecode, bytes32 seed) internal pure returns (uint256 sourceIndex) {
+        // The case of empty sources means we can't select a source.
+        vm.assume(bytecode.length > 1);
+        uint256 sourceCount = uint8(bytecode[0]);
+
+        // Pick a random source. Salt the seed to ensure we don't correlate with
+        // usages of the seed elsewhere.
+        seed = keccak256(abi.encodePacked(seed, "sourceIndex"));
+        sourceIndex = uint256(seed) % sourceCount;
+    }
+
+    function randomSourcePosition(bytes memory bytecode, bytes32 seed) internal pure returns (uint256 sourcePosition) {
+        uint256 sourceIndex = randomSourceIndex(bytecode, seed);
+        uint256 sourceCount = uint8(bytecode[0]);
+        uint256 sourceRelativeStart = 1 + sourceCount * 2;
+        uint256 offsetPosition = sourceIndex * 2 + 1;
+        uint256 offset = (uint256(uint8(bytecode[offsetPosition])) << 8) | uint256(uint8(bytecode[offsetPosition + 1]));
+
+        sourcePosition = sourceRelativeStart + offset;
+    }
 }
