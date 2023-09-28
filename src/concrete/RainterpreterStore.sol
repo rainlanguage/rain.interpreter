@@ -30,7 +30,7 @@ contract RainterpreterStore is IInterpreterStoreV1, ERC165 {
     /// tiers 0 and 1 are both embodied in the `FullyQualifiedNamespace`.
     // Slither doesn't like the leading underscore.
     //solhint-disable-next-line private-vars-leading-underscore
-    mapping(FullyQualifiedNamespace => mapping(uint256 => uint256)) internal sStore;
+    mapping(FullyQualifiedNamespace fullyQualifiedNamespace => mapping(uint256 key => uint256 value)) internal sStore;
 
     // @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {

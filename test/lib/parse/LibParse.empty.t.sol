@@ -49,10 +49,11 @@ contract LibParseEmptyTest is Test {
 
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 0);
+        (uint256 sourceInputs, uint256 sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(sourceInputs, 0);
+        assertEq(sourceOutputs, 0);
 
         assertEq(constants.length, 0);
     }
@@ -90,10 +91,11 @@ contract LibParseEmptyTest is Test {
 
         for (uint256 i = 0; i < 2; i++) {
             assertEq(LibBytecode.sourceRelativeOffset(bytecode, i), i * 4);
-            assertEq(LibBytecode.sourceOpsLength(bytecode, i), 0);
+            assertEq(LibBytecode.sourceOpsCount(bytecode, i), 0);
             assertEq(LibBytecode.sourceStackAllocation(bytecode, i), 0);
-            assertEq(LibBytecode.sourceInputsLength(bytecode, i), 0);
-            assertEq(LibBytecode.sourceOutputsLength(bytecode, i), 0);
+            (uint256 sourceInputs, uint256 sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, i);
+            assertEq(sourceInputs, 0);
+            assertEq(sourceOutputs, 0);
         }
 
         assertEq(constants.length, 0);
@@ -142,10 +144,11 @@ contract LibParseEmptyTest is Test {
 
         for (uint256 i = 0; i < 3; i++) {
             assertEq(LibBytecode.sourceRelativeOffset(bytecode, i), i * 4);
-            assertEq(LibBytecode.sourceOpsLength(bytecode, i), 0);
+            assertEq(LibBytecode.sourceOpsCount(bytecode, i), 0);
             assertEq(LibBytecode.sourceStackAllocation(bytecode, i), 0);
-            assertEq(LibBytecode.sourceInputsLength(bytecode, i), 0);
-            assertEq(LibBytecode.sourceOutputsLength(bytecode, i), 0);
+            (uint256 sourceInputs, uint256 sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, i);
+            assertEq(sourceInputs, 0);
+            assertEq(sourceOutputs, 0);
         }
 
         assertEq(constants.length, 0);
@@ -204,10 +207,11 @@ contract LibParseEmptyTest is Test {
 
         for (uint256 i = 0; i < 4; i++) {
             assertEq(LibBytecode.sourceRelativeOffset(bytecode, i), i * 4);
-            assertEq(LibBytecode.sourceOpsLength(bytecode, i), 0);
+            assertEq(LibBytecode.sourceOpsCount(bytecode, i), 0);
             assertEq(LibBytecode.sourceStackAllocation(bytecode, i), 0);
-            assertEq(LibBytecode.sourceInputsLength(bytecode, i), 0);
-            assertEq(LibBytecode.sourceOutputsLength(bytecode, i), 0);
+            (uint256 sourceInputs, uint256 sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, i);
+            assertEq(sourceInputs, 0);
+            assertEq(sourceOutputs, 0);
         }
 
         assertEq(constants.length, 0);
@@ -306,10 +310,11 @@ contract LibParseEmptyTest is Test {
 
         for (uint256 i = 0; i < 8; i++) {
             assertEq(LibBytecode.sourceRelativeOffset(bytecode, i), i * 4);
-            assertEq(LibBytecode.sourceOpsLength(bytecode, i), 0);
+            assertEq(LibBytecode.sourceOpsCount(bytecode, i), 0);
             assertEq(LibBytecode.sourceStackAllocation(bytecode, i), 0);
-            assertEq(LibBytecode.sourceInputsLength(bytecode, i), 0);
-            assertEq(LibBytecode.sourceOutputsLength(bytecode, i), 0);
+            (uint256 sourceInputs, uint256 sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, i);
+            assertEq(sourceInputs, 0);
+            assertEq(sourceOutputs, 0);
         }
 
         assertEq(constants.length, 0);
@@ -478,10 +483,11 @@ contract LibParseEmptyTest is Test {
 
         for (uint256 i = 0; i < 15; i++) {
             assertEq(LibBytecode.sourceRelativeOffset(bytecode, i), i * 4);
-            assertEq(LibBytecode.sourceOpsLength(bytecode, i), 0);
+            assertEq(LibBytecode.sourceOpsCount(bytecode, i), 0);
             assertEq(LibBytecode.sourceStackAllocation(bytecode, i), 0);
-            assertEq(LibBytecode.sourceInputsLength(bytecode, i), 0);
-            assertEq(LibBytecode.sourceOutputsLength(bytecode, i), 0);
+            (uint256 sourceInputs, uint256 sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, i);
+            assertEq(sourceInputs, 0);
+            assertEq(sourceOutputs, 0);
         }
 
         assertEq(constants.length, 0);

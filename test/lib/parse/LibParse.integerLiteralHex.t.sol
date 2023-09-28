@@ -17,10 +17,11 @@ contract LibParseIntegerLiteralHexTest is Test {
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        (uint256 inputs, uint256 outputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(inputs, 0);
+        assertEq(outputs, 1);
 
         assertEq(
             bytecode,
@@ -52,10 +53,11 @@ contract LibParseIntegerLiteralHexTest is Test {
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 2);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 2);
+        (uint256 inputs, uint256 outputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(inputs, 0);
+        assertEq(outputs, 2);
 
         assertEq(
             bytecode,
@@ -89,10 +91,11 @@ contract LibParseIntegerLiteralHexTest is Test {
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 3);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 3);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 3);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 3);
+        (uint256 inputs, uint256 outputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(inputs, 0);
+        assertEq(outputs, 3);
         // Sources represents all 3 literals, but the dupe is deduped so that the
         // operands only reference the first instance of the duped constant.
         assertEq(
@@ -130,10 +133,11 @@ contract LibParseIntegerLiteralHexTest is Test {
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        (uint256 inputs, uint256 outputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(inputs, 0);
+        assertEq(outputs, 1);
         assertEq(
             bytecode,
             // 1 source.
