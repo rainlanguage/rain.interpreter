@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
-
-import "test/util/lib/parse/LibMetaFixture.sol";
+import {Test} from "forge-std/Test.sol";
+import {LibParse} from "src/lib/parse/LibParse.sol";
+import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
 
 abstract contract OperandTest is Test {
     // External version of parse for testing. Expect revert only works properly

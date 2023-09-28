@@ -91,13 +91,20 @@ library LibIntegrityCheckNP {
                 fPointersStart := add(fPointers, 0x20)
             }
 
-            // Run the integrity check over each source.
-            for (uint256 i = 0; i < sourceCount; i++) {
-                // Ensure that each entrypoint has zero source inputs.
-                uint256 inputsLength = LibBytecode.sourceInputsLength(bytecode, i);
+            // Ensure that the bytecode has no out of bounds pointers BEFORE we
+            // start attempting to iterate over opcodes. This ensures the
+            // integrity of the source count, relative offset pointers,
+            // ops count per source, and that there is no garbage bytes at the
+            // end or between these things. Basically everything structural about
+            // the bytecode is confirmed here.
+            LibBytecode.checkNoOOBPointers(bytecode);
 
-                // Ensure that each entrypoint has the minimum number of outputs.
-                uint256 outputsLength = LibBytecode.sourceOutputsLength(bytecode, i);
+            // Run the integrity check over each source. This needs to ensure
+            // the integrity of each source's inputs, outputs, and stack
+            // allocation, as well as the integrity of the bytecode itself on
+            // a per-opcode basis, according to each opcode's implementation.
+            for (uint256 i = 0; i < sourceCount; i++) {
+                (uint256 inputsLength, uint256 outputsLength) = LibBytecode.sourceInputsOutputsLength(bytecode, i);
 
                 // This is an entrypoint so has additional restrictions.
                 if (i < minOutputs.length) {
@@ -116,7 +123,7 @@ library LibIntegrityCheckNP {
                 // Have low 4 bytes of cursor overlap the first op, skipping the
                 // prefix.
                 uint256 cursor = Pointer.unwrap(LibBytecode.sourcePointer(bytecode, i)) - 0x18;
-                uint256 end = cursor + LibBytecode.sourceOpsLength(bytecode, i) * 4;
+                uint256 end = cursor + LibBytecode.sourceOpsCount(bytecode, i) * 4;
 
                 while (cursor < end) {
                     Operand operand;

@@ -34,10 +34,11 @@ contract LibParseCommentsTest is Test {
         );
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 0);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 0);
+        (uint256 sourceInputs, uint256 sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(sourceInputs, 0);
+        assertEq(sourceOutputs, 0);
     }
 
     /// A single comment with a single word in the bytecode.
@@ -67,10 +68,11 @@ contract LibParseCommentsTest is Test {
         );
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        (uint256 sourceInputs, uint256 sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(sourceInputs, 0);
+        assertEq(sourceOutputs, 1);
     }
 
     /// Comments can be on the same line as source if there is some whitespace.
@@ -100,10 +102,11 @@ contract LibParseCommentsTest is Test {
         );
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        (uint256 sourceInputs, uint256 sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(sourceInputs, 0);
+        assertEq(sourceOutputs, 1);
     }
 
     /// Comments can appear between sources.
@@ -146,18 +149,20 @@ contract LibParseCommentsTest is Test {
         // a
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        (uint256 sourceInputs, uint256 sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(sourceInputs, 0);
+        assertEq(sourceOutputs, 1);
 
         // b
         sourceIndex = 1;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 8);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        (sourceInputs, sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(sourceInputs, 0);
+        assertEq(sourceOutputs, 1);
     }
 
     /// Comments can appear after sources.
@@ -200,18 +205,20 @@ contract LibParseCommentsTest is Test {
         // a
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        (uint256 sourceInputs, uint256 sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(sourceInputs, 0);
+        assertEq(sourceOutputs, 1);
 
         // b
         sourceIndex = 1;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 8);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        (sourceInputs, sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(sourceInputs, 0);
+        assertEq(sourceOutputs, 1);
     }
 
     /// Multiple comments can appear in a row.
@@ -254,18 +261,20 @@ contract LibParseCommentsTest is Test {
         // a
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        (uint256 sourceInputs, uint256 sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(sourceInputs, 0);
+        assertEq(sourceOutputs, 1);
 
         // b
         sourceIndex = 1;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 8);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        (sourceInputs, sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(sourceInputs, 0);
+        assertEq(sourceOutputs, 1);
     }
 
     /// Comments can have many astericks within them without breaking out of the
@@ -297,10 +306,11 @@ contract LibParseCommentsTest is Test {
 
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        (uint256 sourceInputs, uint256 sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(sourceInputs, 0);
+        assertEq(sourceOutputs, 1);
     }
 
     /// Comments can have many astericks within them without breaking out of the
@@ -332,10 +342,11 @@ contract LibParseCommentsTest is Test {
 
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        (uint256 sourceInputs, uint256 sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(sourceInputs, 0);
+        assertEq(sourceOutputs, 1);
     }
 
     /// Comments can be very long and span multiple lines.
@@ -368,10 +379,11 @@ contract LibParseCommentsTest is Test {
 
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 1);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 1);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 1);
+        (uint256 sourceInputs, uint256 sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(sourceInputs, 0);
+        assertEq(sourceOutputs, 1);
     }
 
     /// Comments cause yang so cannot be without trailing whitespace.

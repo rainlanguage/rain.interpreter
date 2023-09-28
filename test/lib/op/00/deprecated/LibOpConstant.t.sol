@@ -108,10 +108,11 @@ contract LibOpConstantTest is RainterpreterExpressionDeployerDeploymentTest {
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsLength(bytecode, sourceIndex), 3);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 3);
         assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 3);
-        assertEq(LibBytecode.sourceInputsLength(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOutputsLength(bytecode, sourceIndex), 3);
+        (uint256 sourceInputs, uint256 sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(sourceInputs, 0);
+        assertEq(sourceOutputs, 3);
 
         assertEq(
             bytecode,
