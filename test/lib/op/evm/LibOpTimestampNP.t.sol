@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/OpTest.sol";
-
-import "rain.solmem/lib/LibPointer.sol";
-import "rain.solmem/lib/LibStackPointer.sol";
+import {OpTest} from "test/util/abstract/OpTest.sol";
+import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import "rain.metadata/IMetaV1.sol";
 
-import "src/lib/state/LibInterpreterStateNP.sol";
+import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import "src/lib/integrity/LibIntegrityCheckNP.sol";
 import "src/lib/caller/LibContext.sol";
 

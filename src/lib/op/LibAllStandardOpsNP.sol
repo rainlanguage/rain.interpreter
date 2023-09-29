@@ -83,9 +83,9 @@ library LibAllStandardOpsNP {
             AuthoringMeta("constant", OPERAND_PARSER_OFFSET_SINGLE_FULL, "Copies a constant value onto the stack."),
             // These are all ordered according to how they appear in the file system.
             AuthoringMeta(
-                "bitwise-ctpop",
+                "bitwise-count-ones",
                 OPERAND_PARSER_OFFSET_DISALLOWED,
-                "Counts the number of bits set to 1 in the input."
+                "Counts the number of binary bits set to 1 in the input."
             ),
             AuthoringMeta(
                 "call",

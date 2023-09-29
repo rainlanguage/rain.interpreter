@@ -8,11 +8,21 @@ import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 import {LibCtPop} from "src/lib/bitwise/LibCtPop.sol";
 import {LibCtPopSlow} from "test/lib/bitwise/LibCtPopSlow.sol";
 
+/// @title LibOpCtPopNP
+/// @notice An opcode that counts the number of bits set in a word. This is
+/// called ctpop because that's the name of this kind of thing elsewhere, but
+/// the more common name is "population count" or "Hamming weight". The word
+/// in the standard ops lib is called `bitwise-count-ones`, which follows the
+/// Rust naming convention.
+/// There is no evm opcode for this, so we have to implement it ourselves.
 library LibOpCtPopNP {
+    /// ctpop unconditionally takes one value and returns one value.
     function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
         return (1, 1);
     }
 
+    /// Output is the number of bits set to one in the input. Thin wrapper around
+    /// `LibCtPop.ctpop`.
     function run(InterpreterStateNP memory, Operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 value;
         assembly ("memory-safe") {
@@ -25,13 +35,13 @@ library LibOpCtPopNP {
         return stackTop;
     }
 
+    /// The reference implementation of ctpop.
     function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
         internal
         pure
         returns (uint256[] memory)
     {
-        uint256[] memory outputs = new uint256[](1);
-        outputs[0] = LibCtPopSlow.ctpopSlow(inputs[0]);
-        return outputs;
+        inputs[0] = LibCtPopSlow.ctpopSlow(inputs[0]);
+        return inputs;
     }
 }
