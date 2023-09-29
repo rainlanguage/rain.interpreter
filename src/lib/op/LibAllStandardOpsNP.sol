@@ -17,6 +17,8 @@ import {
 import "./00/LibOpStackNP.sol";
 import "./00/LibOpConstantNP.sol";
 
+import "./bitwise/LibOpCtPopNP.sol";
+
 import "./call/LibOpCallNP.sol";
 
 import "./context/LibOpContextNP.sol";
@@ -66,7 +68,7 @@ import "./uniswap/LibOpUniswapV2AmountOut.sol";
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 42;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 43;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -80,6 +82,11 @@ library LibAllStandardOpsNP {
             AuthoringMeta("stack", OPERAND_PARSER_OFFSET_SINGLE_FULL, "Copies an existing value from the stack."),
             AuthoringMeta("constant", OPERAND_PARSER_OFFSET_SINGLE_FULL, "Copies a constant value onto the stack."),
             // These are all ordered according to how they appear in the file system.
+            AuthoringMeta(
+                "bitwise-ctpop",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Counts the number of bits set to 1 in the input."
+            ),
             AuthoringMeta(
                 "call",
                 OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT,
@@ -295,6 +302,7 @@ library LibAllStandardOpsNP {
                     LibOpStackNP.integrity,
                     LibOpConstantNP.integrity,
                     // Everything else is alphabetical, including folders.
+                    LibOpCtPopNP.integrity,
                     LibOpCallNP.integrity,
                     LibOpContextNP.integrity,
                     LibOpHashNP.integrity,
@@ -386,6 +394,7 @@ library LibAllStandardOpsNP {
                     LibOpStackNP.run,
                     LibOpConstantNP.run,
                     // Everything else is alphabetical, including folders.
+                    LibOpCtPopNP.run,
                     LibOpCallNP.run,
                     LibOpContextNP.run,
                     LibOpHashNP.run,
