@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "../../state/LibInterpreterStateNP.sol";
-import "../../integrity/LibIntegrityCheckNP.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {Operand} from "src/interface/IInterpreterV1.sol";
+import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
+import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 
 /// @title LibOpBlockNumberNP
 /// Implementation of the EVM `BLOCKNUMBER` opcode as a standard Rainlang opcode.

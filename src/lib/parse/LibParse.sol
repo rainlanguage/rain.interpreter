@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 import "rain.solmem/lib/LibPointer.sol";
 import "rain.solmem/lib/LibMemCpy.sol";
 
-import "./LibCtPop.sol";
+import "../bitwise/LibCtPop.sol";
 import "./LibParseMeta.sol";
 import "./LibParseCMask.sol";
 import "./LibParseLiteral.sol";
