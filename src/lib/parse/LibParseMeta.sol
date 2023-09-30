@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "./LibCtPop.sol";
+import "../bitwise/LibCtPop.sol";
 import "../../interface/IInterpreterV1.sol";
 import "./LibParseOperand.sol";
 

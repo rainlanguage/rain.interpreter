@@ -3,7 +3,7 @@ pragma solidity =0.8.19;
 
 import "forge-std/Test.sol";
 
-import "src/lib/parse/LibCtPop.sol";
+import "src/lib/bitwise/LibCtPop.sol";
 import {LibCtPopSlow} from "./LibCtPopSlow.sol";
 
 /// @title LibCtPopTest
