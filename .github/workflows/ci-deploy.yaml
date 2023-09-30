@@ -23,5 +23,4 @@ jobs:
         env:
           CI_DEPLOY_RPC_URL: ${{ secrets.CI_DEPLOY_RPC_URL }}
           EXPLORER_VERIFICATION_KEY: ${{ secrets.EXPLORER_VERIFICATION_KEY }}
-          DEPLOYMENT_KEY: ${{ secrets.DEPLOYMENT_KEY }}
         run: nix run .#deploy-dispair
