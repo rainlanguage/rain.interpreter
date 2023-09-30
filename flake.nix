@@ -37,7 +37,6 @@
             forge build --force;
             forge script -vvvvv script/DeployDISPair.sol --legacy --verify --broadcast --rpc-url "''${CI_DEPLOY_RPC_URL}" --etherscan-api-key "''${EXPLORER_VERIFICATION_KEY}" \
               --sig='run(bytes)' \
-              --private-key "''${DEPLOYMENT_KEY}" \
               "$( ${(build-dispair-meta-cmd)} -E hex )" \
             ;
           '');
