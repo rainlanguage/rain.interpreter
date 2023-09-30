@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import "forge-std/Test.sol";
 import "test/util/lib/etch/LibEtch.sol";
 import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
+import "test/util/lib/constants/ExpressionDeployerNPConstants.sol";
 
 import "src/concrete/RainterpreterStore.sol";
 import "src/concrete/RainterpreterNP.sol";
@@ -15,8 +16,7 @@ import "src/concrete/RainterpreterExpressionDeployerNP.sol";
 contract RainterpreterExpressionDeployerMetaTest is RainterpreterExpressionDeployerDeploymentTest {
     /// Test that the authoring meta hash is correct.
     function testRainterpreterExpressionDeployerAuthoringMetaHash() external {
-        bytes memory authoringMeta = LibAllStandardOpsNP.authoringMeta();
-        bytes32 expectedHash = keccak256(authoringMeta);
+        bytes32 expectedHash = keccak256(LibAllStandardOpsNP.authoringMeta());
         bytes32 actualHash = iDeployer.authoringMetaHash();
         assertEq(actualHash, expectedHash);
     }

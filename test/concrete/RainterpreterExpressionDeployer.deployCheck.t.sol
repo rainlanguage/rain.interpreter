@@ -3,6 +3,7 @@ pragma solidity =0.8.19;
 
 import "forge-std/Test.sol";
 import "test/util/lib/etch/LibEtch.sol";
+import "test/util/lib/constants/ExpressionDeployerNPConstants.sol";
 
 import "src/interface/IInterpreterV1.sol";
 
@@ -45,7 +46,7 @@ contract RainterpreterExpressionDeployerDeployCheckTest is Test {
         vm.mockCall(
             address(IERC1820_REGISTRY), abi.encodeWithSelector(IERC1820Registry.setInterfaceImplementer.selector), ""
         );
-        bytes memory authoringMeta = LibAllStandardOpsNP.authoringMeta();
+        bytes memory authoringMeta = vm.readFileBinary(EXPRESSION_DEPLOYER_NP_META_PATH);
         new RainterpreterExpressionDeployerNP(RainterpreterExpressionDeployerConstructionConfig(
             address(new RainterpreterNP()),
             address(new RainterpreterStore()),

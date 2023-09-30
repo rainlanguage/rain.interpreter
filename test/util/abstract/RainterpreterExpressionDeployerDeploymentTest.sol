@@ -2,7 +2,8 @@
 pragma solidity =0.8.19;
 
 import "forge-std/Test.sol";
-import "../../util/lib/etch/LibEtch.sol";
+import "../lib/etch/LibEtch.sol";
+import "../lib/constants/ExpressionDeployerNPConstants.sol";
 
 import "../../../src/concrete/RainterpreterStore.sol";
 import "../../../src/concrete/RainterpreterNP.sol";
@@ -54,12 +55,12 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
             revert("unexpected store bytecode hash");
         }
 
-        bytes memory authoringMeta = LibAllStandardOpsNP.authoringMeta();
-        bytes32 authoringMetaHash = keccak256(authoringMeta);
-        if (authoringMetaHash != AUTHORING_META_HASH) {
-            console2.log("current authoring meta hash:");
-            console2.logBytes32(authoringMetaHash);
-            revert("unexpected authoring meta hash");
+        bytes memory constructionMeta = vm.readFileBinary(EXPRESSION_DEPLOYER_NP_META_PATH);
+        bytes32 constructionMetaHash = keccak256(constructionMeta);
+        if (constructionMetaHash != CONSTRUCTION_META_HASH) {
+            console2.log("current construction meta hash:");
+            console2.logBytes32(constructionMetaHash);
+            revert("unexpected construction meta hash");
         }
 
         vm.etch(address(IERC1820_REGISTRY), REVERT_BYTECODE);
@@ -74,10 +75,18 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
         iDeployer = new RainterpreterExpressionDeployerNP(RainterpreterExpressionDeployerConstructionConfig(
             address(iInterpreter),
             address(iStore),
-            authoringMeta
+            constructionMeta
         ));
 
         // Sanity check the deployer's parse meta.
+        bytes memory authoringMeta = LibAllStandardOpsNP.authoringMeta();
+        bytes32 authoringMetaHash = keccak256(authoringMeta);
+        if (authoringMetaHash != AUTHORING_META_HASH) {
+            console2.log("current authoring meta hash:");
+            console2.logBytes32(authoringMetaHash);
+            revert("unexpected authoring meta hash");
+        }
+
         bytes memory parseMeta = iDeployer.parseMeta();
         bytes memory builtParseMeta = iDeployer.buildParseMeta(authoringMeta);
         if (keccak256(parseMeta) != keccak256(builtParseMeta)) {
