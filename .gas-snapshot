@@ -852,7 +852,7 @@ LibParseUnexpectedRHSTest:testParseUnexpectedRHS(bytes1) (runs: 2048, μ: 5751, 
 LibParseUnexpectedRHSTest:testParseUnexpectedRHSLeftParen() (gas: 5215)
 LibParseUnexpectedRightParenTest:testParseUnexpectedRightParen() (gas: 5113)
 LibParseUnexpectedRightParenTest:testParseUnexpectedRightParenNested() (gas: 43534)
-RainterpreterExpressionDeployerDeployCheckTest:testRainterpreterExpressionDeployerDeployValidFunctionPointers() (gas: 6340189)
+RainterpreterExpressionDeployerDeployCheckTest:testRainterpreterExpressionDeployerDeployValidFunctionPointers() (gas: 6340310)
 RainterpreterExpressionDeployerMetaTest:testRainterpreterExpressionDeployerAuthoringMetaHash() (gas: 44651)
 RainterpreterExpressionDeployerMetaTest:testRainterpreterExpressionDeployerBuildAndParse() (gas: 599449)
 RainterpreterExpressionDeployerMetaTest:testRainterpreterExpressionDeployerBuildParseMetaReverts(bytes) (runs: 2048, μ: 11163, ~: 11105)
