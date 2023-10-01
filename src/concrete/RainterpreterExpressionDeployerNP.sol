@@ -113,6 +113,14 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
         iInterpreter = interpreter;
         iStore = store;
 
+        /// This IS a security check. This prevents someone making an exact
+        /// bytecode copy of the interpreter and shipping different meta for
+        /// the copy to lie about what each op does in the interpreter.
+        bytes32 constructionMetaHash = keccak256(config.meta);
+        if (constructionMetaHash != CONSTRUCTION_META_HASH) {
+            revert UnexpectedConstructionMetaHash(CONSTRUCTION_META_HASH, constructionMetaHash);
+        }
+
         // Guard against serializing incorrect function pointers, which would
         // cause undefined runtime behaviour for corrupted opcodes.
         bytes memory functionPointers = interpreter.functionPointers();
@@ -141,24 +149,22 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
             revert UnexpectedStoreBytecodeHash(STORE_BYTECODE_HASH, storeHash);
         }
 
-        /// This IS a security check. This prevents someone making an exact
-        /// bytecode copy of the interpreter and shipping different meta for
-        /// the copy to lie about what each op does in the interpreter.
-        bytes32 constructionMetaHash = keccak256(config.meta);
-        if (constructionMetaHash != CONSTRUCTION_META_HASH) {
-            revert UnexpectedConstructionMetaHash(CONSTRUCTION_META_HASH, constructionMetaHash);
-        }
-
         emit DISpair(msg.sender, address(this), address(interpreter), address(store), config.meta);
 
-        IERC1820_REGISTRY.setInterfaceImplementer(
-            address(this), IERC1820_REGISTRY.interfaceHash(IERC1820_NAME_IEXPRESSION_DEPLOYER_V2), address(this)
-        );
+        // Register the interface for the deployer.
+        // We have to check that the 1820 registry has bytecode at the address
+        // before we can register the interface. We can't assume that the chain
+        // we are deploying to has 1820 deployed.
+        if (address(IERC1820_REGISTRY).code.length > 0) {
+            IERC1820_REGISTRY.setInterfaceImplementer(
+                address(this), IERC1820_REGISTRY.interfaceHash(IERC1820_NAME_IEXPRESSION_DEPLOYER_V2), address(this)
+            );
+        }
     }
 
     // @inheritdoc IERC165
-    function supportsInterface(bytes4 interfaceId_) public view virtual override returns (bool) {
-        return interfaceId_ == type(IExpressionDeployerV2).interfaceId || interfaceId_ == type(IERC165).interfaceId;
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return interfaceId == type(IExpressionDeployerV2).interfaceId || interfaceId == type(IERC165).interfaceId;
     }
 
     /// @inheritdoc IParserV1
