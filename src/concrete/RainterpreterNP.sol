@@ -13,7 +13,8 @@ import "../lib/ns/LibNamespace.sol";
 import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
 import "../lib/caller/LibEncodedDispatch.sol";
 
-import {LibAllStandardOpsNP, InterpreterStateNP} from "../lib/op/LibAllStandardOpsNP.sol";
+import {InterpreterStateNP} from "../lib/state/LibInterpreterStateNP.sol";
+import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
 import {LibPointer, Pointer} from "lib/rain.solmem/src/lib/LibPointer.sol";
 import {LibStackPointer} from "lib/rain.solmem/src/lib/LibStackPointer.sol";
 import {LibUint256Array} from "lib/rain.solmem/src/lib/LibUint256Array.sol";

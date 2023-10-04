@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.19;
 
-import "rain.lib.typecast/LibConvert.sol";
-
-import "../integrity/LibIntegrityCheckNP.sol";
-import "../state/LibInterpreterStateNP.sol";
+import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {Operand} from "../../interface/IInterpreterV1.sol";
+import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "../integrity/LibIntegrityCheckNP.sol";
+import {LibInterpreterStateNP, InterpreterStateNP} from "../state/LibInterpreterStateNP.sol";
 import {AuthoringMeta} from "../parse/LibParseMeta.sol";
 import {
     OPERAND_PARSER_OFFSET_DISALLOWED,
@@ -13,55 +14,55 @@ import {
     OPERAND_PARSER_OFFSET_M1_M1,
     OPERAND_PARSER_OFFSET_8_M1_M1
 } from "../parse/LibParseOperand.sol";
+import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
+import {LibOpStackNP} from "./00/LibOpStackNP.sol";
+import {LibOpConstantNP} from "./00/LibOpConstantNP.sol";
 
-import "./00/LibOpStackNP.sol";
-import "./00/LibOpConstantNP.sol";
+import {LibOpCtPopNP} from "./bitwise/LibOpCtPopNP.sol";
 
-import "./bitwise/LibOpCtPopNP.sol";
+import {LibOpCallNP} from "./call/LibOpCallNP.sol";
 
-import "./call/LibOpCallNP.sol";
+import {LibOpContextNP} from "./context/LibOpContextNP.sol";
 
-import "./context/LibOpContextNP.sol";
+import {LibOpHashNP} from "./crypto/LibOpHashNP.sol";
 
-import "./crypto/LibOpHashNP.sol";
+import {LibOpBlockNumberNP} from "./evm/LibOpBlockNumberNP.sol";
+import {LibOpChainIdNP} from "./evm/LibOpChainIdNP.sol";
+import {LibOpMaxUint256NP} from "./evm/LibOpMaxUint256NP.sol";
+import {LibOpTimestampNP} from "./evm/LibOpTimestampNP.sol";
 
-import "./evm/LibOpBlockNumberNP.sol";
-import "./evm/LibOpChainIdNP.sol";
-import "./evm/LibOpMaxUint256NP.sol";
-import "./evm/LibOpTimestampNP.sol";
+import {LibOpAnyNP} from "./logic/LibOpAnyNP.sol";
+import {LibOpConditionsNP} from "./logic/LibOpConditionsNP.sol";
+import {EnsureFailed, LibOpEnsureNP} from "./logic/LibOpEnsureNP.sol";
+import {LibOpEqualToNP} from "./logic/LibOpEqualToNP.sol";
+import {LibOpEveryNP} from "./logic/LibOpEveryNP.sol";
+import {LibOpGreaterThanNP} from "./logic/LibOpGreaterThanNP.sol";
+import {LibOpGreaterThanOrEqualToNP} from "./logic/LibOpGreaterThanOrEqualToNP.sol";
+import {LibOpIfNP} from "./logic/LibOpIfNP.sol";
+import {LibOpIsZeroNP} from "./logic/LibOpIsZeroNP.sol";
+import {LibOpLessThanNP} from "./logic/LibOpLessThanNP.sol";
+import {LibOpLessThanOrEqualToNP} from "./logic/LibOpLessThanOrEqualToNP.sol";
 
-import "./logic/LibOpAnyNP.sol";
-import "./logic/LibOpConditionsNP.sol";
-import "./logic/LibOpEnsureNP.sol";
-import "./logic/LibOpEqualToNP.sol";
-import "./logic/LibOpEveryNP.sol";
-import "./logic/LibOpGreaterThanNP.sol";
-import "./logic/LibOpGreaterThanOrEqualToNP.sol";
-import "./logic/LibOpIfNP.sol";
-import "./logic/LibOpIsZeroNP.sol";
-import "./logic/LibOpLessThanNP.sol";
-import "./logic/LibOpLessThanOrEqualToNP.sol";
+import {LibOpDecimal18MulNP} from "./math/decimal18/LibOpDecimal18MulNP.sol";
+import {LibOpDecimal18DivNP} from "./math/decimal18/LibOpDecimal18DivNP.sol";
+import {LibOpDecimal18Scale18DynamicNP} from "./math/decimal18/LibOpDecimal18Scale18DynamicNP.sol";
+import {LibOpDecimal18Scale18NP} from "./math/decimal18/LibOpDecimal18Scale18NP.sol";
+import {LibOpDecimal18ScaleNNP} from "./math/decimal18/LibOpDecimal18ScaleNNP.sol";
 
-import "./math/decimal18/LibOpDecimal18MulNP.sol";
-import "./math/decimal18/LibOpDecimal18DivNP.sol";
-import "./math/decimal18/LibOpDecimal18Scale18DynamicNP.sol";
-import "./math/decimal18/LibOpDecimal18Scale18NP.sol";
-import "./math/decimal18/LibOpDecimal18ScaleNNP.sol";
+import {LibOpIntAddNP} from "./math/int/LibOpIntAddNP.sol";
+import {LibOpIntDivNP} from "./math/int/LibOpIntDivNP.sol";
+import {LibOpIntExpNP} from "./math/int/LibOpIntExpNP.sol";
+import {LibOpIntMaxNP} from "./math/int/LibOpIntMaxNP.sol";
+import {LibOpIntMinNP} from "./math/int/LibOpIntMinNP.sol";
+import {LibOpIntModNP} from "./math/int/LibOpIntModNP.sol";
+import {LibOpIntMulNP} from "./math/int/LibOpIntMulNP.sol";
+import {LibOpIntSubNP} from "./math/int/LibOpIntSubNP.sol";
 
-import "./math/int/LibOpIntAddNP.sol";
-import "./math/int/LibOpIntDivNP.sol";
-import "./math/int/LibOpIntExpNP.sol";
-import "./math/int/LibOpIntMaxNP.sol";
-import "./math/int/LibOpIntMinNP.sol";
-import "./math/int/LibOpIntModNP.sol";
-import "./math/int/LibOpIntMulNP.sol";
-import "./math/int/LibOpIntSubNP.sol";
+import {LibOpGetNP} from "./store/LibOpGetNP.sol";
+import {LibOpSetNP} from "./store/LibOpSetNP.sol";
 
-import "./store/LibOpGetNP.sol";
-import "./store/LibOpSetNP.sol";
-
-import "./uniswap/LibOpUniswapV2AmountIn.sol";
-import "./uniswap/LibOpUniswapV2AmountOut.sol";
+import {LibOpUniswapV2AmountIn} from "./uniswap/LibOpUniswapV2AmountIn.sol";
+import {LibOpUniswapV2AmountOut} from "./uniswap/LibOpUniswapV2AmountOut.sol";
 
 /// Thrown when a dynamic length array is NOT 1 more than a fixed length array.
 /// Should never happen outside a major breaking change to memory layouts.
