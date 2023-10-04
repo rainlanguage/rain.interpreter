@@ -2,6 +2,7 @@
 pragma solidity =0.8.19;
 
 import "test/util/abstract/OpTest.sol";
+import {LibOpSetNP} from "src/lib/op/store/LibOpSetNP.sol";
 
 contract LibOpSetNPTest is OpTest {
     using LibMemoryKV for MemoryKV;

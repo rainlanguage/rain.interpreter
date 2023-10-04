@@ -7,6 +7,7 @@ import "rain.solmem/lib/LibPointer.sol";
 
 import "./RainterpreterExpressionDeployerDeploymentTest.sol";
 import "../../../src/lib/state/LibInterpreterStateNP.sol";
+import {IntegrityCheckStateNP, LibIntegrityCheckNP} from "../../../src/lib/integrity/LibIntegrityCheckNP.sol";
 
 import "../../../src/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "../../../src/lib/parse/LibParseOperand.sol";

@@ -3,6 +3,7 @@ pragma solidity =0.8.19;
 
 import "src/lib/uniswap/LibUniswapV2.sol";
 import "test/util/abstract/OpTest.sol";
+import {LibOpUniswapV2AmountIn} from "src/lib/op/uniswap/LibOpUniswapV2AmountIn.sol";
 
 contract LibOpUniswapV2AmountInTest is OpTest {
     /// Directly test the integrity logic of LibOpUniswapV2AmountIn. The inputs

@@ -24,7 +24,7 @@ contract RainterpreterExpressionDeployerDeployCheckTest is Test {
 
         assumeNotPrecompile(address(uint160(config.interpreter)));
         assumeNotPrecompile(address(uint160(config.store)));
-        vm.etch(address(uint160(config.interpreter)), REVERT_BYTECODE);
+        vm.etch(address(uint160(config.interpreter)), INVALID_BYTECODE);
         vm.mockCall(
             address(uint160(config.interpreter)),
             abi.encodeWithSelector(IInterpreterV1.functionPointers.selector),
@@ -37,7 +37,7 @@ contract RainterpreterExpressionDeployerDeployCheckTest is Test {
 
     /// Test the deployer can deploy if everything is valid.
     function testRainterpreterExpressionDeployerDeployValidFunctionPointers() external {
-        vm.etch(address(IERC1820_REGISTRY), REVERT_BYTECODE);
+        vm.etch(address(IERC1820_REGISTRY), INVALID_BYTECODE);
         vm.mockCall(
             address(IERC1820_REGISTRY),
             abi.encodeWithSelector(IERC1820Registry.interfaceHash.selector),

@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import "test/util/abstract/OpTest.sol";
 import "src/lib/caller/LibContext.sol";
 import {ExcessRHSItems} from "src/lib/parse/LibParse.sol";
+import {LibOpEnsureNP, EnsureFailed} from "src/lib/op/logic/LibOpEnsureNP.sol";
 
 contract LibOpEnsureNPTest is OpTest {
     /// Directly test the integrity logic of LibOpEnsureNP. This tests the

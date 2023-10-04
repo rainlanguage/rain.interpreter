@@ -2,6 +2,7 @@
 pragma solidity =0.8.19;
 
 import "test/util/abstract/OpTest.sol";
+import {LibOpMaxUint256NP} from "src/lib/op/evm/LibOpMaxUint256NP.sol";
 
 import "src/lib/caller/LibContext.sol";
 

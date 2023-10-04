@@ -3,6 +3,7 @@ pragma solidity =0.8.19;
 
 import "test/util/abstract/OpTest.sol";
 import "src/lib/caller/LibContext.sol";
+import {LibOpGreaterThanNP} from "src/lib/op/logic/LibOpGreaterThanNP.sol";
 
 contract LibOpGreaterThanNPTest is OpTest {
     /// Directly test the integrity logic of LibOpGreaterThanNP. No matter the

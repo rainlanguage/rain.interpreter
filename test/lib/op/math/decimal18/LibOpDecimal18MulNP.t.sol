@@ -2,7 +2,7 @@
 pragma solidity =0.8.19;
 
 import "rain.solmem/lib/LibPointer.sol";
-
+import {LibOpDecimal18MulNP} from "src/lib/op/math/decimal18/LibOpDecimal18MulNP.sol";
 import {Math as OZMath} from "openzeppelin-contracts/contracts/utils/math/Math.sol";
 import "test/util/abstract/OpTest.sol";
 import {PRBMath_MulDiv18_Overflow} from "prb-math/Common.sol";

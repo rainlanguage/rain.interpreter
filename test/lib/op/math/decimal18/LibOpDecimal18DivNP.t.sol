@@ -7,6 +7,7 @@ import {Math as OZMath} from "openzeppelin-contracts/contracts/utils/math/Math.s
 import "test/util/abstract/OpTest.sol";
 import {PRBMath_MulDiv_Overflow} from "prb-math/Common.sol";
 import "rain.math.fixedpoint/lib/LibWillOverflow.sol";
+import {LibOpDecimal18DivNP} from "src/lib/op/math/decimal18/LibOpDecimal18DivNP.sol";
 
 contract LibOpDecimal18DivNPTest is OpTest {
     /// Directly test the integrity logic of LibOpDecimal18DivNP. This tests the
