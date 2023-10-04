@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
+import {LibOpContextNP} from "src/lib/op/context/LibOpContextNP.sol";
 import "test/util/abstract/OpTest.sol";
 
 /// @title LibOpContextNPTest

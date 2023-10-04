@@ -5,7 +5,7 @@ import "rain.solmem/lib/LibUint256Array.sol";
 
 import "test/util/abstract/OpTest.sol";
 import "src/lib/caller/LibContext.sol";
-import {NoConditionsMet} from "src/lib/op/logic/LibOpConditionsNP.sol";
+import {NoConditionsMet, LibOpConditionsNP} from "src/lib/op/logic/LibOpConditionsNP.sol";
 
 contract LibOpConditionsNPTest is OpTest {
     using LibUint256Array for uint256[];

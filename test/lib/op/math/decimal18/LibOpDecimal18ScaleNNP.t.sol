@@ -3,6 +3,7 @@ pragma solidity =0.8.19;
 
 import "test/util/abstract/OpTest.sol";
 import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
+import {LibOpDecimal18ScaleNNP} from "src/lib/op/math/decimal18/LibOpDecimal18ScaleNNP.sol";
 
 contract LibOpDecimal18ScaleNNPTest is OpTest {
     /// Directly test the integrity logic of LibOpDecimal18ScaleNNP.

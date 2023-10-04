@@ -5,6 +5,7 @@ import "test/util/abstract/OpTest.sol";
 import "src/lib/caller/LibContext.sol";
 
 import "rain.solmem/lib/LibUint256Array.sol";
+import {LibOpIsZeroNP} from "src/lib/op/logic/LibOpIsZeroNP.sol";
 
 contract LibOpIsZeroNPTest is OpTest {
     using LibUint256Array for uint256[];

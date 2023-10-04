@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import "test/util/abstract/OpTest.sol";
 import "src/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "src/lib/parse/LibParseOperand.sol";
+import {LibOpIntDivNP} from "src/lib/op/math/int/LibOpIntDivNP.sol";
 
 contract LibOpIntDivNPTest is OpTest {
     /// Directly test the integrity logic of LibOpIntDivNP. This tests the happy

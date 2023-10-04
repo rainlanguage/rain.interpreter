@@ -3,6 +3,7 @@ pragma solidity =0.8.19;
 
 import "test/util/abstract/OpTest.sol";
 import "src/lib/caller/LibContext.sol";
+import {LibOpIfNP} from "src/lib/op/logic/LibOpIfNP.sol";
 
 contract LibOpIfNPTest is OpTest {
     /// Directly test the integrity logic of LibOpIfNP. No matter the
