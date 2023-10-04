@@ -5,6 +5,7 @@ import "test/util/abstract/OpTest.sol";
 
 import "src/lib/caller/LibContext.sol";
 import "src/lib/bytecode/LibBytecode.sol";
+import {OutOfBoundsStackRead} from "src/lib/op/00/LibOpStackNP.sol";
 
 /// @title LibOpStackNPTest
 /// @notice Test the runtime and integrity time logic of LibOpStackNP.
