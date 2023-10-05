@@ -3,6 +3,7 @@ pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
+import {AggregatorV3Interface} from "rain.chainlink/interface/AggregatorV3Interface.sol";
 
 import "src/interface/IInterpreterV1.sol";
 import "src/lib/extern/LibExtern.sol";

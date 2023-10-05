@@ -1,17 +1,15 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "rain.solmem/lib/LibPointer.sol";
-
-import "../../state/LibInterpreterStateNP.sol";
-import "../../integrity/LibIntegrityCheckNP.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {Operand} from "../../../interface/IInterpreterV1.sol";
+import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
+import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 
 /// @title LibOpEveryNP
 /// @notice Opcode to return the last item out of N items if they are all true,
 /// else 0.
 library LibOpEveryNP {
-    using LibPointer for Pointer;
-
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
         // There must be at least one input.
         uint256 inputs = Operand.unwrap(operand) >> 0x10;

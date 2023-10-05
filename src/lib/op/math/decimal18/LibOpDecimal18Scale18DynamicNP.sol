@@ -2,10 +2,11 @@
 pragma solidity ^0.8.18;
 
 import {LibFixedPointDecimalScale} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
-import "sol.lib.binmaskflag/Binary.sol";
-
-import "../../../state/LibInterpreterStateNP.sol";
-import "../../../integrity/LibIntegrityCheckNP.sol";
+import {MASK_2BIT} from "sol.lib.binmaskflag/Binary.sol";
+import {Operand} from "../../../../interface/IInterpreterV1.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
+import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
 
 /// @title LibOpDecimal18Scale18DynamicNP
 /// @notice Opcode for scaling a number to 18 decimal fixed point based on

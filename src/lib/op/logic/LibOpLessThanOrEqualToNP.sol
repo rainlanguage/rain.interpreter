@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "../../state/LibInterpreterStateNP.sol";
-import "../../integrity/LibIntegrityCheckNP.sol";
+import {Operand} from "../../../interface/IInterpreterV1.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
+import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 
 /// @title LibOpLessThanOrEqualToNP
 /// @notice Opcode to return 1 if the first item on the stack is less than or

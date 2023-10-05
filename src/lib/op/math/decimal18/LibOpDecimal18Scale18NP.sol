@@ -2,9 +2,10 @@
 pragma solidity ^0.8.18;
 
 import {LibFixedPointDecimalScale} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
-
-import "../../../state/LibInterpreterStateNP.sol";
-import "../../../integrity/LibIntegrityCheckNP.sol";
+import {Operand} from "../../../../interface/IInterpreterV1.sol";
+import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
+import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
 /// @title LibOpDecimal18Scale18NP
 /// @notice Opcode for scaling a number to 18 decimal fixed point.
