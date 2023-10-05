@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "../../state/LibInterpreterStateNP.sol";
-import "../../integrity/LibIntegrityCheckNP.sol";
-import "rain.lib.memkv/lib/LibMemoryKV.sol";
+import {MemoryKV, MemoryKVKey, MemoryKVVal, LibMemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
+import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
+import {Operand} from "../../../interface/IInterpreterV1.sol";
+import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
 /// @title LibOpSetNP
 /// @notice Opcode for recording k/v state changes to be set in storage.

@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "rain.chainlink/lib/LibChainlink.sol";
-
-import "../../../interface/IInterpreterV1.sol";
+import {LibChainlink} from "rain.chainlink/lib/LibChainlink.sol";
+import {Operand} from "../../../interface/IInterpreterV1.sol";
 
 /// @title LibOpChainlinkOraclePrice
 /// An opcode which pushes the current price of a Chainlink oracle to the stack.

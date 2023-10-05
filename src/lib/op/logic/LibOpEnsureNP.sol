@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "rain.solmem/lib/LibPointer.sol";
-
-import "../../state/LibInterpreterStateNP.sol";
-import "../../integrity/LibIntegrityCheckNP.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {Operand} from "../../../interface/IInterpreterV1.sol";
+import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
+import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 
 /// Thrown if a zero condition is found.
 /// @param ensureCode The ensure code that was evaluated. This is the low 16
@@ -16,8 +16,6 @@ error EnsureFailed(uint256 ensureCode, uint256 errorIndex);
 /// @title LibOpEnsureNP
 /// @notice Opcode to revert if any condition is zero.
 library LibOpEnsureNP {
-    using LibPointer for Pointer;
-
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
         // There must be at least one input.
         uint256 inputs = Operand.unwrap(operand) >> 0x10;

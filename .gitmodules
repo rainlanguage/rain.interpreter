@@ -31,12 +31,12 @@
 [submodule "lib/v2-core"]
 	path = lib/v2-core
 	url = https://github.com/uniswap/v2-core
-[submodule "lib/rain.chainlink"]
-	path = lib/rain.chainlink
-	url = https://github.com/rainprotocol/rain.chainlink
 [submodule "lib/rain.math.fixedpoint"]
 	path = lib/rain.math.fixedpoint
 	url = https://github.com/rainprotocol/rain.math.fixedpoint
 [submodule "lib/openzeppelin-contracts"]
 	path = lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "lib/rain.chainlink"]
+	path = lib/rain.chainlink
+	url = https://github.com/rainprotocol/rain.chainlink
