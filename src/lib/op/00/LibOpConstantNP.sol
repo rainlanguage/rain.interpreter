@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "../../state/LibInterpreterStateNP.sol";
-import "../../integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
+import {Operand} from "../../../interface/IInterpreterV1.sol";
+import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
 /// Thrown when a constant read index is outside the constants array.
 error OutOfBoundsConstantRead(uint256 opIndex, uint256 constantsLength, uint256 constantRead);
