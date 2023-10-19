@@ -118,7 +118,7 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
         }
     }
 
-    function constructionMetaPath() internal virtual view returns (string memory) {
+    function constructionMetaPath() internal view virtual returns (string memory) {
         return EXPRESSION_DEPLOYER_NP_META_PATH;
     }
 }
