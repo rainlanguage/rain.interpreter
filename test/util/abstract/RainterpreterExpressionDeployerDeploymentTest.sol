@@ -69,7 +69,7 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
             revert("unexpected store bytecode hash");
         }
 
-        bytes memory constructionMeta = vm.readFileBinary(EXPRESSION_DEPLOYER_NP_META_PATH);
+        bytes memory constructionMeta = vm.readFileBinary(constructionMetaPath());
         bytes32 constructionMetaHash = keccak256(constructionMeta);
         if (constructionMetaHash != CONSTRUCTION_META_HASH) {
             console2.log("current construction meta hash:");
@@ -116,5 +116,9 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
             console2.logBytes(integrityFunctionPointers);
             revert("unexpected deployer integrity function pointers");
         }
+    }
+
+    function constructionMetaPath() internal view virtual returns (string memory) {
+        return EXPRESSION_DEPLOYER_NP_META_PATH;
     }
 }

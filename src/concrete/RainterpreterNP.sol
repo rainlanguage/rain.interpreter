@@ -88,6 +88,8 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
         InterpreterStateNP memory state = expressionData.unsafeDeserializeNP(
             sourceIndex, namespace.qualifyNamespace(msg.sender), store, context, OPCODE_FUNCTION_POINTERS
         );
+        // We use the return by returning it. Slither false positive.
+        //slither-disable-next-line unused-return
         return state.evalNP(new uint256[](0), maxOutputs);
     }
 
@@ -114,6 +116,8 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
         }
         InterpreterStateNP memory state =
             expressionData.unsafeDeserializeNP(sourceIndex, namespace, store, context, OPCODE_FUNCTION_POINTERS);
+        // We use the return by returning it. Slither false positive.
+        //slither-disable-next-line unused-return
         return state.evalNP(inputs, maxOutputs);
     }
 

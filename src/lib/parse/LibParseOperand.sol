@@ -42,13 +42,13 @@ library LibParseOperand {
                 or(operandParsers, shl(parseOperandDoublePerByteNoDefaultOffset, operandParserDoublePerByteNoDefault))
         }
         function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParser_m1_m1 =
-            LibParseOperand.parseOperand_m1_m1;
+            LibParseOperand.parseOperandM1M1;
         uint256 parseOperand_m1_m1Offset = OPERAND_PARSER_OFFSET_M1_M1;
         assembly {
             operandParsers := or(operandParsers, shl(parseOperand_m1_m1Offset, operandParser_m1_m1))
         }
         function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParser_8_m1_m1 =
-            LibParseOperand.parseOperand_8_m1_m1;
+            LibParseOperand.parseOperand8M1M1;
         uint256 parseOperand_8_m1_m1Offset = OPERAND_PARSER_OFFSET_8_M1_M1;
         assembly {
             operandParsers := or(operandParsers, shl(parseOperand_8_m1_m1Offset, operandParser_8_m1_m1))
@@ -184,7 +184,7 @@ library LibParseOperand {
     }
 
     /// 8 bit value, maybe 1 bit flag, maybe 1 big flag.
-    function parseOperand_8_m1_m1(uint256 literalParsers, bytes memory data, uint256 cursor)
+    function parseOperand8M1M1(uint256 literalParsers, bytes memory data, uint256 cursor)
         internal
         pure
         returns (uint256, Operand)
@@ -251,7 +251,7 @@ library LibParseOperand {
     }
 
     /// 2x maybe 1 bit flags.
-    function parseOperand_m1_m1(uint256 literalParsers, bytes memory data, uint256 cursor)
+    function parseOperandM1M1(uint256 literalParsers, bytes memory data, uint256 cursor)
         internal
         pure
         returns (uint256, Operand)
