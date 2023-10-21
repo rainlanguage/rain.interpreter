@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "src/lib/bitwise/LibCtPop.sol";
-import {LibCtPopSlow} from "./LibCtPopSlow.sol";
+import {LibCtPop} from "src/lib/bitwise/LibCtPop.sol";
 
 /// @title LibCtPopTest
 /// CTPOP (count population) is a function that counts the number of bits set in
@@ -17,7 +16,7 @@ contract LibCtPopTest is Test {
         uint256 x = (1 << n) - 1;
         uint256 ct = LibCtPop.ctpop(x);
         assertEq(n, ct);
-        uint256 ctSlow = LibCtPopSlow.ctpopSlow(x);
+        uint256 ctSlow = LibCtPop.ctpopSlow(x);
         assertEq(ct, ctSlow);
     }
 
@@ -40,13 +39,13 @@ contract LibCtPopTest is Test {
 
         uint256 ct = LibCtPop.ctpop(y);
         assertEq(n, ct);
-        uint256 ctSlow = LibCtPopSlow.ctpopSlow(y);
+        uint256 ctSlow = LibCtPop.ctpopSlow(y);
         assertEq(ct, ctSlow);
     }
 
     function testCTPOPReference(uint256 x) external {
         uint256 ct = LibCtPop.ctpop(x);
-        uint256 ctSlow = LibCtPopSlow.ctpopSlow(x);
+        uint256 ctSlow = LibCtPop.ctpopSlow(x);
         assertEq(ct, ctSlow);
     }
 }
