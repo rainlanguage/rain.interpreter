@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "lib/openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
+import "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
-import "lib/rain.lib.typecast/src/LibCast.sol";
-import {LibDataContract} from "lib/rain.datacontract/src/lib/LibDataContract.sol";
+import "rain.lib.typecast/LibCast.sol";
+import {LibDataContract} from "rain.datacontract/lib/LibDataContract.sol";
 
 import "../interface/unstable/IDebugInterpreterV2.sol";
 
@@ -13,11 +13,12 @@ import "../lib/ns/LibNamespace.sol";
 import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
 import "../lib/caller/LibEncodedDispatch.sol";
 
-import {LibAllStandardOpsNP, InterpreterStateNP} from "../lib/op/LibAllStandardOpsNP.sol";
-import {LibPointer, Pointer} from "lib/rain.solmem/src/lib/LibPointer.sol";
-import {LibStackPointer} from "lib/rain.solmem/src/lib/LibStackPointer.sol";
-import {LibUint256Array} from "lib/rain.solmem/src/lib/LibUint256Array.sol";
-import {LibMemoryKV, MemoryKV} from "lib/rain.lib.memkv/src/lib/LibMemoryKV.sol";
+import {InterpreterStateNP} from "../lib/state/LibInterpreterStateNP.sol";
+import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
+import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
+import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
+import {LibMemoryKV, MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 
 /// Thrown when the stack length is negative during eval.
 error NegativeStackLength(int256 length);
@@ -87,6 +88,8 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
         InterpreterStateNP memory state = expressionData.unsafeDeserializeNP(
             sourceIndex, namespace.qualifyNamespace(msg.sender), store, context, OPCODE_FUNCTION_POINTERS
         );
+        // We use the return by returning it. Slither false positive.
+        //slither-disable-next-line unused-return
         return state.evalNP(new uint256[](0), maxOutputs);
     }
 
@@ -113,6 +116,8 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
         }
         InterpreterStateNP memory state =
             expressionData.unsafeDeserializeNP(sourceIndex, namespace, store, context, OPCODE_FUNCTION_POINTERS);
+        // We use the return by returning it. Slither false positive.
+        //slither-disable-next-line unused-return
         return state.evalNP(inputs, maxOutputs);
     }
 

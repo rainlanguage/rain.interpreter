@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "rain.solmem/lib/LibPointer.sol";
-
-import "../../state/LibInterpreterStateNP.sol";
-import "../../integrity/LibIntegrityCheckNP.sol";
+import {Operand} from "../../../interface/IInterpreterV1.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
+import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 
 /// Thrown if no nonzero condition is found.
 /// @param condCode The condition code that was evaluated. This is the low 16
@@ -16,8 +16,6 @@ error NoConditionsMet(uint256 condCode);
 /// @notice Opcode to return the first nonzero item on the stack up to the inputs
 /// limit.
 library LibOpConditionsNP {
-    using LibPointer for Pointer;
-
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
         uint256 inputs = Operand.unwrap(operand) >> 0x10;

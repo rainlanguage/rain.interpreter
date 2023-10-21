@@ -6,6 +6,7 @@ import "rain.solmem/lib/LibUint256Array.sol";
 import "test/util/abstract/OpTest.sol";
 import "src/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "src/lib/parse/LibParseOperand.sol";
+import {LibOpIntMinNP} from "src/lib/op/math/int/LibOpIntMinNP.sol";
 
 contract LibOpIntMinNPTest is OpTest {
     using LibUint256Array for uint256[];

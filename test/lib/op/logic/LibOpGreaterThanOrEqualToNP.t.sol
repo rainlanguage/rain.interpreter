@@ -3,6 +3,7 @@ pragma solidity =0.8.19;
 
 import "test/util/abstract/OpTest.sol";
 import "src/lib/caller/LibContext.sol";
+import {LibOpGreaterThanOrEqualToNP} from "src/lib/op/logic/LibOpGreaterThanOrEqualToNP.sol";
 
 contract LibOpGreaterThanOrEqualToNPTest is OpTest {
     /// Directly test the integrity logic of LibOpGreaterThanOrEqualToNP. No matter the

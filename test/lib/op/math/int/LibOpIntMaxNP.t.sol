@@ -6,6 +6,7 @@ import "rain.solmem/lib/LibUint256Array.sol";
 import "test/util/abstract/OpTest.sol";
 import "src/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "src/lib/parse/LibParseOperand.sol";
+import {LibOpIntMaxNP} from "src/lib/op/math/int/LibOpIntMaxNP.sol";
 
 contract LibOpIntMaxNPTest is OpTest {
     using LibUint256Array for uint256[];

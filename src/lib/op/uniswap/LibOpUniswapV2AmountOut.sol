@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "../../uniswap/LibUniswapV2.sol";
-
-import "../../integrity/LibIntegrityCheckNP.sol";
-import "../../state/LibInterpreterStateNP.sol";
+import {LibUniswapV2} from "../../uniswap/LibUniswapV2.sol";
+import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
+import {Operand} from "../../../interface/IInterpreterV1.sol";
+import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
 /// @title LibOpUniswapV2AmountOut
 /// @notice Opcode to calculate the amount out for a Uniswap V2 pair.

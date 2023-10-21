@@ -9,6 +9,7 @@ import "src/lib/bytecode/LibBytecode.sol";
 import "src/lib/state/deprecated/LibInterpreterState.sol";
 import "src/lib/integrity/deprecated/LibIntegrityCheck.sol";
 import "src/lib/op/00/deprecated/LibOpConstant.sol";
+import {OutOfBoundsConstantRead} from "src/lib/op/00/LibOpConstantNP.sol";
 
 /// @title LibOpConstantTest
 /// @notice Test the runtime and integrity time logic of LibOpConstant.

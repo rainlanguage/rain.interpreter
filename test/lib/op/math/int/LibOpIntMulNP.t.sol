@@ -2,6 +2,7 @@
 pragma solidity =0.8.19;
 
 import "test/util/abstract/OpTest.sol";
+import {LibOpIntMulNP} from "src/lib/op/math/int/LibOpIntMulNP.sol";
 
 contract LibOpIntMulNPTest is OpTest {
     /// Directly test the integrity logic of LibOpIntMulNP. This tests the happy

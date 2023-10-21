@@ -1,22 +1,19 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "rain.solmem/lib/LibPointer.sol";
-
-import "prb-math/UD60x18.sol";
 /// Used for reference implementation so that we have two independent
 /// upstreams to compare against.
 import {Math as OZMath} from "openzeppelin-contracts/contracts/utils/math/Math.sol";
-import "rain.math.fixedpoint/lib/LibWillOverflow.sol";
-
-import "../../../state/LibInterpreterStateNP.sol";
-import "../../../integrity/LibIntegrityCheckNP.sol";
+import {UD60x18, mul} from "prb-math/UD60x18.sol";
+import {Operand} from "../../../../interface/IInterpreterV1.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
+import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
+import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
 
 /// @title LibOpDecimal18MulNP
 /// @notice Opcode to mul N 18 decimal fixed point values. Errors on overflow.
 library LibOpDecimal18MulNP {
-    using LibPointer for Pointer;
-
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
         uint256 inputs = Operand.unwrap(operand) >> 0x10;
