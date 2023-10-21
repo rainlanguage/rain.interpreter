@@ -43,14 +43,45 @@ contract RainterpreterExpressionDeployerDeployCheckTest is Test {
             abi.encodeWithSelector(IERC1820Registry.interfaceHash.selector),
             abi.encode(bytes32(uint256(0)))
         );
+        vm.expectCall(address(IERC1820_REGISTRY), abi.encodeWithSelector(IERC1820Registry.interfaceHash.selector), 1);
         vm.mockCall(
             address(IERC1820_REGISTRY), abi.encodeWithSelector(IERC1820Registry.setInterfaceImplementer.selector), ""
+        );
+        vm.expectCall(
+            address(IERC1820_REGISTRY), abi.encodeWithSelector(IERC1820Registry.setInterfaceImplementer.selector), 1
         );
         bytes memory authoringMeta = vm.readFileBinary(EXPRESSION_DEPLOYER_NP_META_PATH);
         new RainterpreterExpressionDeployerNP(RainterpreterExpressionDeployerConstructionConfig(
             address(new RainterpreterNP()),
             address(new RainterpreterStore()),
             authoringMeta
+        ));
+    }
+
+    /// Test the deployer can deploy to a chain that does not support EIP-1820.
+    function testRainterpreterExpressionDeployerDeployNoEIP1820() external {
+        bytes memory authoringMeta = vm.readFileBinary(EXPRESSION_DEPLOYER_NP_META_PATH);
+        new RainterpreterExpressionDeployerNP(RainterpreterExpressionDeployerConstructionConfig(
+            address(new RainterpreterNP()),
+            address(new RainterpreterStore()),
+            authoringMeta
+        ));
+    }
+
+    /// If everything is invalid the construction meta hash should be the error
+    /// as this makes it easier to implement tooling that needs to access the
+    /// meta hash but may not have access to the dependencies.
+    function testRainterpreterExpressionDeployerDeployInvalidEverything() external {
+        bytes memory badAuthoringMeta = hex"DEADBEEF";
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                UnexpectedConstructionMetaHash.selector, CONSTRUCTION_META_HASH, keccak256(badAuthoringMeta)
+            )
+        );
+        new RainterpreterExpressionDeployerNP(RainterpreterExpressionDeployerConstructionConfig(
+            address(0),
+            address(0),
+            badAuthoringMeta
         ));
     }
 }
