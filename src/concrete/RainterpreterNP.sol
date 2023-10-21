@@ -74,7 +74,7 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
         StateNamespace namespace,
         EncodedDispatch dispatch,
         uint256[][] memory context
-    ) external view returns (uint256[] memory, uint256[] memory) {
+    ) external view virtual returns (uint256[] memory, uint256[] memory) {
         // Decode the dispatch.
         (address expression, SourceIndex sourceIndex16, uint256 maxOutputs) = LibEncodedDispatch.decode(dispatch);
         bytes memory expressionData = LibDataContract.read(expression);
@@ -108,7 +108,7 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
         uint256 maxOutputs,
         uint256[][] memory context,
         uint256[] memory inputs
-    ) external view returns (uint256[] memory, uint256[] memory) {
+    ) external view virtual returns (uint256[] memory, uint256[] memory) {
         // Need to clean source index as it is a uint16.
         uint256 sourceIndex;
         assembly ("memory-safe") {
