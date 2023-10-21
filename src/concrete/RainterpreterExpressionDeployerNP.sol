@@ -51,7 +51,7 @@ error UnexpectedConstructionMetaHash(bytes32 expectedConstructionMetaHash, bytes
 
 /// @dev The function pointers for the integrity check fns.
 bytes constant INTEGRITY_FUNCTION_POINTERS =
-    hex"183118ab1912191b199719a11997199719971997199719ab19cd19f71a1919ab1a191a191a2319121a191a191a2d1a2d1a19191219121a2d1a2d1a2d1a2d1a2d1a2d1a2d1a2d1a2d1a2d1a2d1a2d19121a441a4e1a4e";
+    hex"13ba1434149b14a41520152a1520152015201520152015341556158015a2153415a215a215ac149b15a215a215b615b615a2149b149b15b615b615b615b615b615b615b615b615b615b615b615b6149b15cd15d715d7";
 
 /// @dev Hash of the known store bytecode.
 bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);
@@ -168,30 +168,10 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
     }
 
     /// @inheritdoc IParserV1
-    function authoringMetaHash() external pure virtual override returns (bytes32) {
-        return AUTHORING_META_HASH;
-    }
-
-    /// @inheritdoc IParserV1
-    function buildParseMeta(bytes memory authoringMeta) external pure virtual override returns (bytes memory) {
-        bytes32 inputAuthoringMetaHash = keccak256(authoringMeta);
-        if (inputAuthoringMetaHash != AUTHORING_META_HASH) {
-            revert AuthoringMetaHashMismatch(AUTHORING_META_HASH, inputAuthoringMetaHash);
-        }
-        AuthoringMeta[] memory words = abi.decode(authoringMeta, (AuthoringMeta[]));
-        return LibParseMeta.buildParseMeta(words, 2);
-    }
-
-    /// @inheritdoc IParserV1
-    function parseMeta() public pure virtual override returns (bytes memory) {
-        return PARSE_META;
-    }
-
-    /// @inheritdoc IParserV1
     function parse(bytes memory data) external pure virtual override returns (bytes memory, uint256[] memory) {
         // The return is used by returning it, so this is a false positive.
         //slither-disable-next-line unused-return
-        return LibParse.parse(data, parseMeta());
+        return LibParse.parse(data, PARSE_META);
     }
 
     /// @inheritdoc IExpressionDeployerV2
