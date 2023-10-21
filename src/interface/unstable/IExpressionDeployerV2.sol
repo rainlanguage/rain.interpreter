@@ -38,9 +38,9 @@ interface IExpressionDeployerV2 {
     /// formats like json that make heavy use of boilerplate, repetition and
     /// whitespace, some kind of compression is recommended.
     /// @param sender The `msg.sender` providing the op meta.
-    /// @param opMeta The raw binary data of the op meta. Maybe compressed data
-    /// etc. and is intended for offchain consumption.
-    event DISpair(address sender, address deployer, address interpreter, address store, bytes opMeta);
+    /// @param meta The raw binary data of the construction meta. Maybe
+    /// compressed data etc. and is intended for offchain consumption.
+    event DISpair(address sender, address deployer, address interpreter, address store, bytes meta);
 
     /// Expressions are expected to be deployed onchain as immutable contract
     /// code with a first class address like any other contract or account.

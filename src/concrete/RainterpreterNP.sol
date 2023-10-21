@@ -38,6 +38,9 @@ bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x82d2936887e99243de0c103da
 bytes constant OPCODE_FUNCTION_POINTERS =
     hex"0cf70d430d7e0d970e350f190f530f820fb10fb11000102f1091111911c011d4122a123e1253126d1278128c12a1131e1369138f13a613bd13bd14081453149e149e14e914e91534157f15ca15ca161516fc172f1786";
 
+/// @dev compile time computed hash of the function pointers.
+bytes32 constant OPCODE_FUNCTION_POINTERS_HASH = keccak256(OPCODE_FUNCTION_POINTERS);
+
 /// @title RainterpreterNP
 /// @notice !!EXPERIMENTAL!! implementation of a Rainlang interpreter that is
 /// compatible with native onchain Rainlang parsing. Initially copied verbatim

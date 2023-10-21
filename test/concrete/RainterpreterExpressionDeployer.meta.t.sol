@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
-import "test/util/lib/etch/LibEtch.sol";
-import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
-import "test/util/lib/constants/ExpressionDeployerNPConstants.sol";
+// import "forge-std/Test.sol";
+// import "test/util/lib/etch/LibEtch.sol";
+import {RainterpreterExpressionDeployerDeploymentTest} from
+    "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
+// import "test/util/lib/constants/ExpressionDeployerNPConstants.sol";
+import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 
-import "src/concrete/RainterpreterStore.sol";
-import "src/concrete/RainterpreterNP.sol";
-import "src/concrete/RainterpreterExpressionDeployerNP.sol";
+// import "src/concrete/RainterpreterStore.sol";
+// import "src/concrete/RainterpreterNP.sol";
+import {AuthoringMetaHashMismatch, CONSTRUCTION_META_HASH} from "src/concrete/RainterpreterExpressionDeployerNP.sol";
 
 /// @title RainterpreterExpressionDeployerMetaTest
 /// Tests that the RainterpreterExpressionDeployer meta is correct. Also tests
@@ -36,5 +38,12 @@ contract RainterpreterExpressionDeployerMetaTest is RainterpreterExpressionDeplo
         vm.assume(actualHash != expectedHash);
         vm.expectRevert(abi.encodeWithSelector(AuthoringMetaHashMismatch.selector, expectedHash, actualHash));
         iDeployer.buildParseMeta(authoringMeta);
+    }
+
+    /// Test that the expected construction meta hash can be read from the
+    /// deployer.
+    function testRainterpreterExpressionDeployerConstructionMetaHash() external {
+        bytes32 actualConstructionMetaHash = iDeployer.expectedConstructionMetaHash();
+        assertEq(actualConstructionMetaHash, CONSTRUCTION_META_HASH);
     }
 }

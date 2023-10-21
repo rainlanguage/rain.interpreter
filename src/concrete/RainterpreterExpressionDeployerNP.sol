@@ -18,7 +18,7 @@ import "../lib/state/LibInterpreterStateDataContractNP.sol";
 import "../lib/op/LibAllStandardOpsNP.sol";
 import {LibParse, LibParseMeta, AuthoringMeta} from "../lib/parse/LibParse.sol";
 
-import {RainterpreterNP, OPCODE_FUNCTION_POINTERS, INTERPRETER_BYTECODE_HASH} from "./RainterpreterNP.sol";
+import {RainterpreterNP, OPCODE_FUNCTION_POINTERS_HASH, INTERPRETER_BYTECODE_HASH} from "./RainterpreterNP.sol";
 
 /// @dev Thrown when the pointers known to the expression deployer DO NOT match
 /// the interpreter it is constructed for. This WILL cause undefined expression
@@ -51,7 +51,7 @@ error UnexpectedConstructionMetaHash(bytes32 expectedConstructionMetaHash, bytes
 
 /// @dev The function pointers for the integrity check fns.
 bytes constant INTEGRITY_FUNCTION_POINTERS =
-    hex"17ff187918e018e91965196f196519651965196519651979199b19c519e7197919e719e719f118e019e719e719fb19fb19e718e018e019fb19fb19fb19fb19fb19fb19fb19fb19fb19fb19fb19fb18e01a121a1c1a1c";
+    hex"183118ab1912191b199719a11997199719971997199719ab19cd19f71a1919ab1a191a191a2319121a191a191a2d1a2d1a19191219121a2d1a2d1a2d1a2d1a2d1a2d1a2d1a2d1a2d1a2d1a2d1a2d19121a441a4e1a4e";
 
 /// @dev Hash of the known store bytecode.
 bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);
@@ -60,7 +60,7 @@ bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd
 bytes32 constant AUTHORING_META_HASH = bytes32(0xbabd99fa692b9bd4c768a0712f8a01d71a98a131b12e1313d35e4bee2175d72c);
 
 /// @dev Hash of the known construction meta.
-bytes32 constant CONSTRUCTION_META_HASH = bytes32(0xe3035aa2e0beed9803be8737be4058602335fcc2ebdb5fb2c3142af41964a72b);
+bytes32 constant CONSTRUCTION_META_HASH = bytes32(0x0168c77dfbd2a32015a6a22eb15b231f5c1b90a22fb310befee19be2360082c9);
 
 bytes constant PARSE_META =
     hex"0122d4160000811000000014000103000410460090880c8810388060400c014422002000a0f0311940d3fd001f00a32df126001c443b1d00fa41192700d411ac1e0050a9421b00b3287215003d58be2a10ec005514009c1bc52400d45a151600cb67e91700aaf4b02500f9f6690b00adfb440320f11ddd0d105871550700e0a549080081cf491c005c0bf40f009582882800d3840e29106582541300f2f4320c1086ea3902009816c90a004906430010ed7881011054d5ee0900f22c5d110073413d22009e46052300a1a1e01830a6fe9e1a40850fc5042096fe321000ffaa8006003a46d20500bee2410e009809002100a9bd60120049683a";
@@ -117,14 +117,14 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
         /// bytecode copy of the interpreter and shipping different meta for
         /// the copy to lie about what each op does in the interpreter.
         bytes32 constructionMetaHash = keccak256(config.meta);
-        if (constructionMetaHash != CONSTRUCTION_META_HASH) {
-            revert UnexpectedConstructionMetaHash(CONSTRUCTION_META_HASH, constructionMetaHash);
+        if (constructionMetaHash != expectedConstructionMetaHash()) {
+            revert UnexpectedConstructionMetaHash(expectedConstructionMetaHash(), constructionMetaHash);
         }
 
         // Guard against serializing incorrect function pointers, which would
         // cause undefined runtime behaviour for corrupted opcodes.
         bytes memory functionPointers = interpreter.functionPointers();
-        if (keccak256(functionPointers) != keccak256(OPCODE_FUNCTION_POINTERS)) {
+        if (keccak256(functionPointers) != expectedInterpreterFunctionPointersHash()) {
             revert UnexpectedPointers(functionPointers);
         }
         // Guard against an interpreter with unknown bytecode.
@@ -132,10 +132,10 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
         assembly ("memory-safe") {
             interpreterHash := extcodehash(interpreter)
         }
-        if (interpreterHash != INTERPRETER_BYTECODE_HASH) {
+        if (interpreterHash != expectedInterpreterBytecodeHash()) {
             /// THIS IS NOT A SECURITY CHECK. IT IS AN INTEGRITY CHECK TO PREVENT
             /// HONEST MISTAKES.
-            revert UnexpectedInterpreterBytecodeHash(INTERPRETER_BYTECODE_HASH, interpreterHash);
+            revert UnexpectedInterpreterBytecodeHash(expectedInterpreterBytecodeHash(), interpreterHash);
         }
 
         // Guard against an store with unknown bytecode.
@@ -143,10 +143,10 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
         assembly ("memory-safe") {
             storeHash := extcodehash(store)
         }
-        if (storeHash != STORE_BYTECODE_HASH) {
+        if (storeHash != expectedStoreBytecodeHash()) {
             /// THIS IS NOT A SECURITY CHECK. IT IS AN INTEGRITY CHECK TO PREVENT
             /// HONEST MISTAKES.
-            revert UnexpectedStoreBytecodeHash(STORE_BYTECODE_HASH, storeHash);
+            revert UnexpectedStoreBytecodeHash(expectedStoreBytecodeHash(), storeHash);
         }
 
         emit DISpair(msg.sender, address(this), address(interpreter), address(store), config.meta);
@@ -239,5 +239,28 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
     /// @return The list of integrity function pointers.
     function integrityFunctionPointers() external view virtual returns (bytes memory) {
         return LibAllStandardOpsNP.integrityFunctionPointers();
+    }
+
+    /// Virtual function to return the expected construction meta hash.
+    /// This is public to make it easier for tooling to lookup the expected
+    /// construction meta by its hash, e.g. from a CAS data store.
+    function expectedConstructionMetaHash() public pure virtual returns (bytes32) {
+        return CONSTRUCTION_META_HASH;
+    }
+
+    /// Virtual function to return the expected interpreter function pointers
+    /// hash.
+    function expectedInterpreterFunctionPointersHash() internal pure virtual returns (bytes32) {
+        return OPCODE_FUNCTION_POINTERS_HASH;
+    }
+
+    /// Virtual function to return the expected interpreter bytecode hash.
+    function expectedInterpreterBytecodeHash() internal pure virtual returns (bytes32) {
+        return INTERPRETER_BYTECODE_HASH;
+    }
+
+    /// Virtual function to return the expected store bytecode hash.
+    function expectedStoreBytecodeHash() internal pure virtual returns (bytes32) {
+        return STORE_BYTECODE_HASH;
     }
 }
