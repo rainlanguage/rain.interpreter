@@ -11,6 +11,7 @@ import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+import {UnexpectedOperand} from "src/lib/parse/LibParseOperand.sol";
 
 /// @title LibOpERC721OwnerOfNPTest
 /// @notice Test the opcode for getting the owner of an erc721 token.
@@ -107,5 +108,12 @@ contract LibOpERC721OwnerOfNPTest is OpTest {
         minOutputs[0] = 1;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
         iDeployer.integrityCheck(bytecode, constants, minOutputs);
+    }
+
+    /// Test that operand fails integrity check.
+    function testOpERC721OwnerOfNPEvalFailOperand() public {
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector, 18));
+        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: erc721-owner-of<0>(0x00 0x01);");
+        (bytecode, constants);
     }
 }
