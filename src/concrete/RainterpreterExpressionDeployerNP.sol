@@ -221,10 +221,17 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
         return LibAllStandardOpsNP.integrityFunctionPointers();
     }
 
+    /// Virtual function to return the expected authoring meta hash.
+    /// Public so that external tooling can read it, although this should be
+    /// considered deprecated. The intended workflow is that tooling uses a real
+    /// evm to deploy the full dispair and reads the hashes from errors using a
+    /// trail/error approach until a full dispair is deployed.
+    function authoringMetaHash() public pure virtual returns (bytes32) {
+        return AUTHORING_META_HASH;
+    }
+
     /// Virtual function to return the expected construction meta hash.
-    /// This is public to make it easier for tooling to lookup the expected
-    /// construction meta by its hash, e.g. from a CAS data store.
-    function expectedConstructionMetaHash() public pure virtual returns (bytes32) {
+    function expectedConstructionMetaHash() internal pure virtual returns (bytes32) {
         return CONSTRUCTION_META_HASH;
     }
 

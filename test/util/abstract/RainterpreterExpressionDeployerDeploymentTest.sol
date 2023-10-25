@@ -102,7 +102,6 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
             revert("unexpected authoring meta hash");
         }
 
-        // bytes memory parseMeta = iDeployer.parseMeta();
         AuthoringMeta[] memory authoringMeta = abi.decode(authoringMetaData, (AuthoringMeta[]));
         bytes memory builtParseMeta = LibParseMeta.buildParseMeta(authoringMeta, 2);
         if (keccak256(PARSE_META) != keccak256(builtParseMeta)) {
