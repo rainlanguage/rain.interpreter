@@ -108,7 +108,7 @@ contract LibBytecodeCheckNoOOBPointersTest is BytecodeTest {
         bytes memory bytecode,
         uint8 sourceCount,
         bytes32 seed,
-        bytes1 corruptOpCount
+        uint8 corruptOpCount
     ) external {
         conformBytecode(bytecode, sourceCount, seed);
         // The case of empty sources is not relevant.
@@ -123,7 +123,7 @@ contract LibBytecodeCheckNoOOBPointersTest is BytecodeTest {
         uint256 offset = (uint256(uint8(bytecode[offsetPosition])) << 8) | uint256(uint8(bytecode[offsetPosition + 1]));
         uint256 opsCount = uint256(uint8(bytecode[sourceRelativeStart + offset]));
         vm.assume(opsCount != uint8(corruptOpCount));
-        bytecode[sourceRelativeStart + offset] = corruptOpCount;
+        bytecode[sourceRelativeStart + offset] = bytes1(corruptOpCount);
 
         vm.expectRevert(abi.encodeWithSelector(TruncatedSource.selector, bytecode));
         this.checkNoOOBPointersExternal(bytecode);

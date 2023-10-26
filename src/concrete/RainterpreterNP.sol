@@ -38,6 +38,9 @@ bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x21785780ab522520aaf1921d5
 bytes constant OPCODE_FUNCTION_POINTERS =
     hex"0d090d550d900da90e470f2b0f65101510b710e6111511151164119311f5127d13241338138e13a213b713d113dc13f01405148214cd14f3150a15211521156c15b716021602164d164d169816e3172e172e17791860189318ea";
 
+/// @dev compile time computed hash of the function pointers.
+bytes32 constant OPCODE_FUNCTION_POINTERS_HASH = keccak256(OPCODE_FUNCTION_POINTERS);
+
 /// @title RainterpreterNP
 /// @notice !!EXPERIMENTAL!! implementation of a Rainlang interpreter that is
 /// compatible with native onchain Rainlang parsing. Initially copied verbatim
@@ -74,7 +77,7 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
         StateNamespace namespace,
         EncodedDispatch dispatch,
         uint256[][] memory context
-    ) external view returns (uint256[] memory, uint256[] memory) {
+    ) external view virtual returns (uint256[] memory, uint256[] memory) {
         // Decode the dispatch.
         (address expression, SourceIndex sourceIndex16, uint256 maxOutputs) = LibEncodedDispatch.decode(dispatch);
         bytes memory expressionData = LibDataContract.read(expression);
@@ -108,7 +111,7 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
         uint256 maxOutputs,
         uint256[][] memory context,
         uint256[] memory inputs
-    ) external view returns (uint256[] memory, uint256[] memory) {
+    ) external view virtual returns (uint256[] memory, uint256[] memory) {
         // Need to clean source index as it is a uint16.
         uint256 sourceIndex;
         assembly ("memory-safe") {

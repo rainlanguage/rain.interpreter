@@ -5,7 +5,7 @@ import {Test, console2, stdError} from "forge-std/Test.sol";
 import {INVALID_BYTECODE} from "../lib/etch/LibEtch.sol";
 import {EXPRESSION_DEPLOYER_NP_META_PATH} from "../lib/constants/ExpressionDeployerNPConstants.sol";
 import {IERC1820_REGISTRY, IERC1820Registry} from "rain.erc1820/lib/LibIERC1820.sol";
-
+import {LibParseMeta, AuthoringMeta} from "../../../src/lib/parse/LibParseMeta.sol";
 import {RainterpreterStore} from "../../../src/concrete/RainterpreterStore.sol";
 import {
     RainterpreterNP,
@@ -16,6 +16,7 @@ import {
     AUTHORING_META_HASH,
     STORE_BYTECODE_HASH,
     CONSTRUCTION_META_HASH,
+    PARSE_META,
     INTEGRITY_FUNCTION_POINTERS,
     RainterpreterExpressionDeployerConstructionConfig
 } from "../../../src/concrete/RainterpreterExpressionDeployerNP.sol";
@@ -93,17 +94,17 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
         ));
 
         // Sanity check the deployer's parse meta.
-        bytes memory authoringMeta = LibAllStandardOpsNP.authoringMeta();
-        bytes32 authoringMetaHash = keccak256(authoringMeta);
+        bytes memory authoringMetaData = LibAllStandardOpsNP.authoringMeta();
+        bytes32 authoringMetaHash = keccak256(authoringMetaData);
         if (authoringMetaHash != AUTHORING_META_HASH) {
             console2.log("current authoring meta hash:");
             console2.logBytes32(authoringMetaHash);
             revert("unexpected authoring meta hash");
         }
 
-        bytes memory parseMeta = iDeployer.parseMeta();
-        bytes memory builtParseMeta = iDeployer.buildParseMeta(authoringMeta);
-        if (keccak256(parseMeta) != keccak256(builtParseMeta)) {
+        AuthoringMeta[] memory authoringMeta = abi.decode(authoringMetaData, (AuthoringMeta[]));
+        bytes memory builtParseMeta = LibParseMeta.buildParseMeta(authoringMeta, 2);
+        if (keccak256(PARSE_META) != keccak256(builtParseMeta)) {
             console2.log("current deployer parse meta:");
             console2.logBytes(builtParseMeta);
             revert("unexpected deployer parse meta");

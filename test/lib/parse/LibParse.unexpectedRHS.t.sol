@@ -10,8 +10,8 @@ import "src/lib/parse/LibParse.sol";
 contract LibParseUnexpectedRHSTest is Test {
     /// Check the parser reverts if it encounters an unexpected character as the
     /// first character on the RHS.
-    function testParseUnexpectedRHS(bytes1 unexpected) external {
-        uint256 shifted = 1 << uint8(unexpected);
+    function testParseUnexpectedRHS(uint8 unexpected) external {
+        uint256 shifted = 1 << unexpected;
         vm.assume(
             0
                 == shifted
@@ -39,7 +39,7 @@ contract LibParseUnexpectedRHSTest is Test {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 1));
         // Meta can be empty because we should revert before we even try to
         // lookup any words.
-        LibParse.parse(bytes.concat(":", unexpected, ";"), "");
+        LibParse.parse(bytes.concat(":", bytes1(unexpected), ";"), "");
     }
 
     /// Check the parser reverts on a left paren as the first character on the
