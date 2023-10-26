@@ -51,7 +51,7 @@ error UnexpectedConstructionMetaHash(bytes32 expectedConstructionMetaHash, bytes
 
 /// @dev The function pointers for the integrity check fns.
 bytes constant INTEGRITY_FUNCTION_POINTERS =
-    hex"13cd144714ae14b71533153d154715471533153315331533153315511573159d154715511547154715bf14ae1547154715c915c9154714ae14ae15c915c915c915c915c915c915c915c915c915c915c915c914ae15e015ea15ea";
+    hex"13dc145614bd14c61542154c15561556154215421542154215421560158215ac155615601556155615ce14bd1556155615d815d8155614bd14bd15d815d815d815d815d815d815d815d815d815d815d815d814bd15ef15f915f9";
 
 /// @dev Hash of the known store bytecode.
 bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);
@@ -171,7 +171,7 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
     function parse(bytes memory data) external pure virtual override returns (bytes memory, uint256[] memory) {
         // The return is used by returning it, so this is a false positive.
         //slither-disable-next-line unused-return
-        return LibParse.parse(data, PARSE_META);
+        return LibParse.parse(data, parseMeta());
     }
 
     /// @inheritdoc IExpressionDeployerV2
@@ -219,6 +219,11 @@ contract RainterpreterExpressionDeployerNP is IExpressionDeployerV2, IDebugExpre
     /// @return The list of integrity function pointers.
     function integrityFunctionPointers() external view virtual returns (bytes memory) {
         return LibAllStandardOpsNP.integrityFunctionPointers();
+    }
+
+    /// Virtual function to return the parse meta.
+    function parseMeta() internal pure virtual returns (bytes memory) {
+        return PARSE_META;
     }
 
     /// Virtual function to return the expected authoring meta hash.
