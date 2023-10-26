@@ -19,7 +19,10 @@ contract RainterpreterStoreTest is Test {
 
     /// Store should introspect support for `IERC165` and `IInterpreterStoreV1`.
     /// It should not support any other interface.
-    function testRainterpreterStoreIERC165(bytes4 badInterfaceId) external {
+    function testRainterpreterStoreIERC165(uint32 badInterfaceIdUint) external {
+        // https://github.com/foundry-rs/foundry/issues/6115
+        bytes4 badInterfaceId = bytes4(badInterfaceIdUint);
+
         vm.assume(badInterfaceId != type(IERC165).interfaceId);
         vm.assume(badInterfaceId != type(IInterpreterStoreV1).interfaceId);
 

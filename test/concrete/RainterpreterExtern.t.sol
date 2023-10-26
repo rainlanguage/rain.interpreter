@@ -12,7 +12,10 @@ import "src/concrete/RainterpreterExtern.sol";
 contract RainterpreterExternTest is Test {
     /// Test that ERC165 and IInterpreterExternV1 are supported interfaces as
     /// per ERC165.
-    function testRainterpreterExternIERC165(bytes4 badInterfaceId) external {
+    function testRainterpreterExternIERC165(uint32 badInterfaceIdUint) external {
+        // https://github.com/foundry-rs/foundry/issues/6115
+        bytes4 badInterfaceId = bytes4(badInterfaceIdUint);
+
         vm.assume(badInterfaceId != type(IERC165).interfaceId);
         vm.assume(badInterfaceId != type(IInterpreterExternV1).interfaceId);
 

@@ -47,26 +47,26 @@ contract LibParseUnexpectedLHSTest is Test {
 
     /// Check the parser reverts if it encounters an unexpected character as the
     /// head of something on the LHS.
-    function testParseUnexpectedLHSSingleChar(bytes1 a) external {
+    function testParseUnexpectedLHSSingleChar(uint8 a) external {
         vm.assume(
-            1 << uint256(uint8(a))
+            1 << uint256(a)
                 & (CMASK_LHS_RHS_DELIMITER | CMASK_LHS_STACK_HEAD | CMASK_LHS_STACK_DELIMITER | CMASK_COMMENT_HEAD) == 0
         );
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0));
-        LibParse.parse(bytes.concat(a, ":;"), "");
+        LibParse.parse(bytes.concat(bytes1(a), ":;"), "");
     }
 
     /// Check the parser reverts if it encounters an unexpected character as the
     /// first character of an anonymous identifier on the LHS.
-    function testParseUnexpectedLHSBadIgnoredTail(bytes1 a) external {
+    function testParseUnexpectedLHSBadIgnoredTail(uint8 a) external {
         vm.assume(
-            1 << uint256(uint8(a))
+            1 << uint256(a)
                 & (CMASK_LHS_RHS_DELIMITER | CMASK_IDENTIFIER_TAIL | CMASK_LHS_STACK_DELIMITER | CMASK_COMMENT_HEAD) == 0
         );
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1));
-        LibParse.parse(bytes.concat("_", a, ":;"), "");
+        LibParse.parse(bytes.concat("_", bytes1(a), ":;"), "");
     }
 
     /// Check the parser reverts if it encounters an unexpected character as the
