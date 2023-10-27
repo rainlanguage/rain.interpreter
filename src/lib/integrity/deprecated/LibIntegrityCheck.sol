@@ -4,7 +4,7 @@ pragma solidity ^0.8.19;
 import "rain.solmem/lib/LibPointer.sol";
 import "rain.solmem/lib/LibStackPointer.sol";
 
-import "../../../interface/IExpressionDeployerV1.sol";
+import "../../../interface/deprecated/IExpressionDeployerV1.sol";
 import "../../../interface/IInterpreterV1.sol";
 
 /// @dev The virtual stack pointers are never read or written so don't need to

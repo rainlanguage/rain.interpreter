@@ -2,7 +2,7 @@
 pragma solidity =0.8.19;
 
 import "forge-std/Test.sol";
-import "src/interface/unstable/IExpressionDeployerV2.sol";
+import "src/interface/IExpressionDeployerV2.sol";
 import "src/abstract/DeployerDiscoverableMetaV2.sol";
 
 contract TestDeployer is IExpressionDeployerV2 {

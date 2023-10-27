@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "../IInterpreterV1.sol";
-
 interface IDebugExpressionDeployerV2 {
     /// Drives an integrity check of the provided bytecode and constants.
     /// Unlike `IDebugExpressionDeployerV1` this version ONLY checks the
@@ -17,7 +15,7 @@ interface IDebugExpressionDeployerV2 {
     /// the sources. Only applies to sources that are entrypoints. Internal
     /// sources have their integrity checked implicitly by the use of opcodes
     /// such as `call` that have min/max outputs in their operand.
-    function integrityCheck(bytes memory bytecode, uint256[] memory constants, uint256[] memory minOutputs)
+    function integrityCheck(bytes calldata bytecode, uint256[] calldata constants, uint256[] calldata minOutputs)
         external
         view;
 }

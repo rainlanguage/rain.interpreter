@@ -6,7 +6,7 @@ import "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 import "rain.lib.typecast/LibCast.sol";
 import {LibDataContract} from "rain.datacontract/lib/LibDataContract.sol";
 
-import "../interface/unstable/IDebugInterpreterV2.sol";
+import {IDebugInterpreterV2} from "../interface/IDebugInterpreterV2.sol";
 
 import {LibEvalNP} from "../lib/eval/LibEvalNP.sol";
 import "../lib/ns/LibNamespace.sol";
