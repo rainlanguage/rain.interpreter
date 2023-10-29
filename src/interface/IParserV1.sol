@@ -1,12 +1,6 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "../IInterpreterV1.sol";
-
-/// @dev The `IParserV1` MUST revert if the authoring meta provided to a build
-/// does not match the authoring meta hash.
-error AuthoringMetaHashMismatch(bytes32 expected, bytes32 actual);
-
 interface IParserV1 {
     /// Parses a Rainlang string into an evaluable expression. MUST be
     /// deterministic and MUST NOT have side effects. The only inputs are the
@@ -16,5 +10,5 @@ interface IParserV1 {
     /// @param data The Rainlang bytes to parse.
     /// @return bytecode The expressions that can be evaluated.
     /// @return constants The constants that can be referenced by sources.
-    function parse(bytes memory data) external pure returns (bytes memory bytecode, uint256[] memory constants);
+    function parse(bytes calldata data) external pure returns (bytes calldata bytecode, uint256[] calldata constants);
 }

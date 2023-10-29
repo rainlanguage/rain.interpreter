@@ -8,10 +8,10 @@ import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {LibDataContract, DataContractMemoryContainer} from "rain.datacontract/lib/LibDataContract.sol";
 import "rain.erc1820/lib/LibIERC1820.sol";
 
-import "../interface/unstable/IExpressionDeployerV2.sol";
-import "../interface/unstable/IDebugExpressionDeployerV2.sol";
-import "../interface/unstable/IDebugInterpreterV2.sol";
-import "../interface/unstable/IParserV1.sol";
+import {IExpressionDeployerV2, IERC1820_NAME_IEXPRESSION_DEPLOYER_V2} from "../interface/IExpressionDeployerV2.sol";
+import {IDebugExpressionDeployerV2} from "../interface/IDebugExpressionDeployerV2.sol";
+import {IDebugInterpreterV2} from "../interface/IDebugInterpreterV2.sol";
+import {IParserV1} from "../interface/IParserV1.sol";
 
 import {LibIntegrityCheckNP} from "../lib/integrity/LibIntegrityCheckNP.sol";
 import "../lib/state/LibInterpreterStateDataContractNP.sol";
