@@ -8,7 +8,7 @@ import {RainterpreterExpressionDeployerNPDeploymentTest} from
     "test/util/abstract/deprecated/RainterpreterExpressionDeployerNPDeploymentTest.sol";
 import {IExpressionDeployerV2} from "src/interface/IExpressionDeployerV2.sol";
 
-contract RainterpreterExpressionDeployerTouchDeployer is RainterpreterExpressionDeployerNPDeploymentTest {
+contract RainterpreterExpressionDeployerNPTouchDeployer is RainterpreterExpressionDeployerNPDeploymentTest {
     /// MUST be possible to test a real deployer with 0 data to support discovery.
     function testTouchRealDeployer() external {
         vm.expectCall(

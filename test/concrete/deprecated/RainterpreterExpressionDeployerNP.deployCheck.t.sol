@@ -18,10 +18,10 @@ import {
 import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
 import {RainterpreterNP, OPCODE_FUNCTION_POINTERS} from "src/concrete/deprecated/RainterpreterNP.sol";
 
-/// @title RainterpreterExpressionDeployerDeployCheckTest
-/// Test that the RainterpreterExpressionDeployer deploy check reverts if the
+/// @title RainterpreterExpressionDeployerNPDeployCheckTest
+/// Test that the RainterpreterExpressionDeployerNP deploy check reverts if the
 /// passed config does not match expectations.
-contract RainterpreterExpressionDeployerDeployCheckTest is Test {
+contract RainterpreterExpressionDeployerNPDeployCheckTest is Test {
     /// Test that the deployer won't deploy if function pointers are incorrect.
     function testRainterpreterExpressionDeployerDeployInvalidFunctionPointers(
         RainterpreterExpressionDeployerConstructionConfig memory config,
