@@ -14,9 +14,9 @@ import {
     CONSTRUCTION_META_HASH,
     UnexpectedConstructionMetaHash,
     UnexpectedPointers
-} from "src/concrete/deprecated/RainterpreterExpressionDeployerNP.sol";
+} from "src/concrete/RainterpreterExpressionDeployerNP.sol";
 import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
-import {RainterpreterNP, OPCODE_FUNCTION_POINTERS} from "src/concrete/deprecated/RainterpreterNP.sol";
+import {RainterpreterNP, OPCODE_FUNCTION_POINTERS} from "src/concrete/RainterpreterNP.sol";
 
 /// @title RainterpreterExpressionDeployerNPDeployCheckTest
 /// Test that the RainterpreterExpressionDeployerNP deploy check reverts if the

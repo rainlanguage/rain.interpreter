@@ -6,7 +6,7 @@ import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 
 import {RainterpreterExpressionDeployerNPDeploymentTest} from
-    "test/util/abstract/deprecated/RainterpreterExpressionDeployerNPDeploymentTest.sol";
+    "test/util/abstract/RainterpreterExpressionDeployerNPDeploymentTest.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
 import {

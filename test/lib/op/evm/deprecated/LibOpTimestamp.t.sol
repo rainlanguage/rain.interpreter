@@ -2,17 +2,17 @@
 pragma solidity =0.8.19;
 
 import {RainterpreterExpressionDeployerNPDeploymentTest} from
-    "test/util/abstract/deprecated/RainterpreterExpressionDeployerNPDeploymentTest.sol";
+    "test/util/abstract/RainterpreterExpressionDeployerNPDeploymentTest.sol";
 
-import "rain.solmem/lib/LibPointer.sol";
-import "rain.solmem/lib/LibStackPointer.sol";
-import "rain.metadata/IMetaV1.sol";
+import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
+import {IMetaV1} from "rain.metadata/IMetaV1.sol";
 
-import "src/lib/state/deprecated/LibInterpreterState.sol";
-import "src/lib/integrity/deprecated/LibIntegrityCheck.sol";
-import "src/lib/caller/LibContext.sol";
+import {LibInterpreterState} from "src/lib/state/deprecated/LibInterpreterState.sol";
+import {LibIntegrityCheck} from "src/lib/integrity/deprecated/LibIntegrityCheck.sol";
+import {LibContext} from "src/lib/caller/LibContext.sol";
 
-import "src/lib/op/evm/deprecated/LibOpTimestamp.sol";
+import {LibOpTimestamp} from "src/lib/op/evm/deprecated/LibOpTimestamp.sol";
 
 /// @title LibOpTimestampTest
 /// @notice Test the runtime and integrity time logic of LibOpTimestamp.

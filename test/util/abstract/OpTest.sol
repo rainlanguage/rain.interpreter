@@ -7,8 +7,7 @@ import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 
-import {RainterpreterExpressionDeployerNPDeploymentTest} from
-    "./deprecated/RainterpreterExpressionDeployerNPDeploymentTest.sol";
+import {RainterpreterExpressionDeployerNPDeploymentTest} from "./RainterpreterExpressionDeployerNPDeploymentTest.sol";
 import {LibInterpreterStateNP, InterpreterStateNP} from "../../../src/lib/state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP, LibIntegrityCheckNP} from "../../../src/lib/integrity/LibIntegrityCheckNP.sol";
 

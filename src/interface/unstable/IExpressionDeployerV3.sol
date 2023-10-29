@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {IInterpreterStoreV1} from "../IInterpreterStoreV1.sol";
-import {IInterpreterV1} from "../IInterpreterV1.sol";
+import {IInterpreterV2} from "./IInterpreterV2.sol";
 
 string constant IERC1820_NAME_IEXPRESSION_DEPLOYER_V3 = "IExpressionDeployerV3";
 
@@ -34,6 +34,26 @@ string constant IERC1820_NAME_IEXPRESSION_DEPLOYER_V3 = "IExpressionDeployerV3";
 /// interpreter, and the interpreter's responsibility to handle the expression
 /// deployer completely failing to do so.
 interface IExpressionDeployerV3 {
+    /// The config of the deployed expression including uncompiled sources. MUST
+    /// be emitted after the config passes the integrity check.
+    /// @param sender The caller of `deployExpression`.
+    /// @param bytecode As per `IExpressionDeployerV2`.
+    /// @param constants As per `IExpressionDeployerV2`.
+    /// @param minOutputs As per `IExpressionDeployerV2`.
+    event NewExpression(address sender, bytes bytecode, uint256[] constants, uint256[] minOutputs);
+
+    /// The address of the deployed expression. MUST be emitted once the
+    /// expression can be loaded and deserialized into an evaluable interpreter
+    /// state.
+    /// @param sender The caller of `deployExpression2`.
+    /// @param interpreter As per `IExpressionDeployerV3.deployExpression2` return.
+    /// @param store As per `IExpressionDeployerV3.deployExpression2` return.
+    /// @param expression As per `IExpressionDeployerV3.deployExpression2` return.
+    /// @param io As per `IExpressionDeployerV3.deployExpression2` return.
+    event DeployedExpression(
+        address sender, IInterpreterV2 interpreter, IInterpreterStoreV1 store, address expression, bytes io
+    );
+
     /// This is the literal InterpreterOpMeta bytes to be used offchain to make
     /// sense of the opcodes in this interpreter deployment, as a human. For
     /// formats like json that make heavy use of boilerplate, repetition and
@@ -111,11 +131,11 @@ interface IExpressionDeployerV3 {
     /// with the interpreter.
     /// @return expression The address of the deployed onchain expression. MUST
     /// be valid according to all integrity checks the deployer is aware of.
-    /// @return io Binary data where each byte represents 4 bits of input and
-    /// output counts for each source of the bytecode. MAY simply be copied
-    /// verbatim from the relevant bytes in the bytecode if integrity checks
+    /// @return io Binary data where each 2 bytes input and output counts for
+    /// each source of the bytecode. MAY simply be copied verbatim from the
+    /// relevant bytes in the bytecode if they exist and integrity checks
     /// guarantee that the bytecode is valid.
-    function deployExpression(bytes calldata bytecode, uint256[] calldata constants)
+    function deployExpression2(bytes calldata bytecode, uint256[] calldata constants)
         external
-        returns (IInterpreterV1 interpreter, IInterpreterStoreV1 store, address expression, bytes calldata io);
+        returns (IInterpreterV2 interpreter, IInterpreterStoreV1 store, address expression, bytes calldata io);
 }

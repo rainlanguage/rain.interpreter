@@ -3,7 +3,7 @@ pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 
-import {RainterpreterNP, OPCODE_FUNCTION_POINTERS} from "src/concrete/deprecated/RainterpreterNP.sol";
+import {RainterpreterNP, OPCODE_FUNCTION_POINTERS} from "src/concrete/RainterpreterNP.sol";
 
 /// @title RainterpreterNPTest
 /// Test suite for RainterpreterNP.

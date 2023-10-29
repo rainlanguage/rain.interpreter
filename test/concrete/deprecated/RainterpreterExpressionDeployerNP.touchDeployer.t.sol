@@ -5,7 +5,7 @@ import {Test} from "forge-std/Test.sol";
 
 import {LibDeployerDiscoverable} from "src/lib/caller/LibDeployerDiscoverable.sol";
 import {RainterpreterExpressionDeployerNPDeploymentTest} from
-    "test/util/abstract/deprecated/RainterpreterExpressionDeployerNPDeploymentTest.sol";
+    "test/util/abstract/RainterpreterExpressionDeployerNPDeploymentTest.sol";
 import {IExpressionDeployerV2} from "src/interface/IExpressionDeployerV2.sol";
 
 contract RainterpreterExpressionDeployerNPTouchDeployer is RainterpreterExpressionDeployerNPDeploymentTest {

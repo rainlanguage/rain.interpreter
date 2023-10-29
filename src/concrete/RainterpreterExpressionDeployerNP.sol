@@ -8,17 +8,17 @@ import {LibDataContract, DataContractMemoryContainer} from "rain.datacontract/li
 import {IERC1820_REGISTRY} from "rain.erc1820/lib/LibIERC1820.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
-import {IExpressionDeployerV2, IERC1820_NAME_IEXPRESSION_DEPLOYER_V2} from "../../interface/IExpressionDeployerV2.sol";
-import {IDebugExpressionDeployerV2} from "../../interface/IDebugExpressionDeployerV2.sol";
-import {IDebugInterpreterV2} from "../../interface/IDebugInterpreterV2.sol";
-import {IParserV1} from "../../interface/IParserV1.sol";
-import {IInterpreterV1} from "../../interface/IInterpreterV1.sol";
-import {IInterpreterStoreV1} from "../../interface/IInterpreterStoreV1.sol";
+import {IExpressionDeployerV2, IERC1820_NAME_IEXPRESSION_DEPLOYER_V2} from "../interface/IExpressionDeployerV2.sol";
+import {IDebugExpressionDeployerV2} from "../interface/IDebugExpressionDeployerV2.sol";
+import {IDebugInterpreterV2} from "../interface/IDebugInterpreterV2.sol";
+import {IParserV1} from "../interface/IParserV1.sol";
+import {IInterpreterV1} from "../interface/IInterpreterV1.sol";
+import {IInterpreterStoreV1} from "../interface/IInterpreterStoreV1.sol";
 
-import {LibIntegrityCheckNP} from "../../lib/integrity/LibIntegrityCheckNP.sol";
-import {LibInterpreterStateDataContractNP} from "../../lib/state/LibInterpreterStateDataContractNP.sol";
-import {LibAllStandardOpsNP} from "../../lib/op/LibAllStandardOpsNP.sol";
-import {LibParse, LibParseMeta, AuthoringMeta} from "../../lib/parse/LibParse.sol";
+import {LibIntegrityCheckNP} from "../lib/integrity/LibIntegrityCheckNP.sol";
+import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
+import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
+import {LibParse, LibParseMeta, AuthoringMeta} from "../lib/parse/LibParse.sol";
 
 import {RainterpreterNP, OPCODE_FUNCTION_POINTERS_HASH, INTERPRETER_BYTECODE_HASH} from "./RainterpreterNP.sol";
 

@@ -17,12 +17,12 @@ import {LibEncodedDispatch} from "../../lib/caller/LibEncodedDispatch.sol";
 import {InterpreterStateNP} from "../../lib/state/LibInterpreterStateNP.sol";
 import {LibAllStandardOpsNP} from "../../lib/op/LibAllStandardOpsNP.sol";
 import {
-    SourceIndex,
-    IInterpreterV1,
+    SourceIndexV2,
+    IInterpreterV2,
     StateNamespace,
     EncodedDispatch,
     FullyQualifiedNamespace
-} from "../../interface/IInterpreterV1.sol";
+} from "../../interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1} from "../../interface/IInterpreterStoreV1.sol";
 
 /// Thrown when the stack length is negative during eval.
@@ -31,20 +31,21 @@ error NegativeStackLength(int256 length);
 /// Thrown when the source index is invalid during eval. This is a runtime check
 /// for the exposed external eval entrypoint. Internally recursive evals are
 /// expected to preflight check the source index.
-error InvalidSourceIndex(SourceIndex sourceIndex);
+error InvalidSourceIndex(SourceIndexV2 sourceIndex);
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x21785780ab522520aaf1921d5a177b745aa7179c67305ed963c709e79bdfbe0d);
+bytes32 constant INTERPRETER_BYTECODE_HASH_E2 =
+    bytes32(0x21785780ab522520aaf1921d5a177b745aa7179c67305ed963c709e79bdfbe0d);
 
 /// @dev The function pointers known to the interpreter for dynamic dispatch.
 /// By setting these as a constant they can be inlined into the interpreter
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
-bytes constant OPCODE_FUNCTION_POINTERS =
+bytes constant OPCODE_FUNCTION_POINTERS_E2 =
     hex"0d090d550d900da90e470f2b0f65101510b710e6111511151164119311f5127d13241338138e13a213b713d113dc13f01405148214cd14f3150a15211521156c15b716021602164d164d169816e3172e172e17791860189318ea";
 
 /// @dev compile time computed hash of the function pointers.
-bytes32 constant OPCODE_FUNCTION_POINTERS_HASH = keccak256(OPCODE_FUNCTION_POINTERS);
+bytes32 constant OPCODE_FUNCTION_POINTERS_HASH_E2 = keccak256(OPCODE_FUNCTION_POINTERS_E2);
 
 /// @title RainterpreterNP
 /// @notice !!EXPERIMENTAL!! implementation of a Rainlang interpreter that is
@@ -53,7 +54,7 @@ bytes32 constant OPCODE_FUNCTION_POINTERS_HASH = keccak256(OPCODE_FUNCTION_POINT
 /// separate from the JS Rainterpreter to allow for experimentation with the
 /// onchain interpreter without affecting the JS interpreter, up to and including
 /// a complely different execution model and opcodes.
-contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
+contract RainterpreterNPE2 is IInterpreterV2, ERC165 {
     using LibEvalNP for InterpreterStateNP;
     using LibNamespace for StateNamespace;
     using LibInterpreterStateDataContractNP for bytes;
@@ -76,60 +77,32 @@ contract RainterpreterNP is IInterpreterV1, IDebugInterpreterV2, ERC165 {
     /// put it in the most efficient internal dispatch location to save a few
     /// gas per eval call.
     ///
-    /// @inheritdoc IInterpreterV1
-    function eval(
+    /// @inheritdoc IInterpreterV2
+    function eval2(
         IInterpreterStoreV1 store,
         StateNamespace namespace,
         EncodedDispatch dispatch,
-        uint256[][] memory context
+        uint256[][] memory context,
+        uint256[] memory input
     ) external view virtual returns (uint256[] memory, uint256[] memory) {
         // Decode the dispatch.
-        (address expression, SourceIndex sourceIndex16, uint256 maxOutputs) = LibEncodedDispatch.decode(dispatch);
+        (address expression, SourceIndexV2 sourceIndex, uint256 maxOutputs) = LibEncodedDispatch.decode2(dispatch);
         bytes memory expressionData = LibDataContract.read(expression);
 
-        // Need to clean source index as it is a uint16.
-        uint256 sourceIndex;
-        assembly ("memory-safe") {
-            sourceIndex := and(sourceIndex16, 0xFFFF)
-        }
-
         InterpreterStateNP memory state = expressionData.unsafeDeserializeNP(
-            sourceIndex, namespace.qualifyNamespace(msg.sender), store, context, OPCODE_FUNCTION_POINTERS
+            sourceIndex, namespace.qualifyNamespace(msg.sender), store, context, OPCODE_FUNCTION_POINTERS_E2
         );
         // We use the return by returning it. Slither false positive.
         //slither-disable-next-line unused-return
-        return state.evalNP(new uint256[](0), maxOutputs);
+        return state.eval2(new uint256[](0), maxOutputs);
     }
 
     // @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IInterpreterV1).interfaceId || interfaceId == type(IDebugInterpreterV2).interfaceId
-            || super.supportsInterface(interfaceId);
+        return interfaceId == type(IInterpreterV2).interfaceId || super.supportsInterface(interfaceId);
     }
 
-    /// @inheritdoc IDebugInterpreterV2
-    function offchainDebugEval(
-        IInterpreterStoreV1 store,
-        FullyQualifiedNamespace namespace,
-        bytes memory expressionData,
-        SourceIndex sourceIndex16,
-        uint256 maxOutputs,
-        uint256[][] memory context,
-        uint256[] memory inputs
-    ) external view virtual returns (uint256[] memory, uint256[] memory) {
-        // Need to clean source index as it is a uint16.
-        uint256 sourceIndex;
-        assembly ("memory-safe") {
-            sourceIndex := and(sourceIndex16, 0xFFFF)
-        }
-        InterpreterStateNP memory state =
-            expressionData.unsafeDeserializeNP(sourceIndex, namespace, store, context, OPCODE_FUNCTION_POINTERS);
-        // We use the return by returning it. Slither false positive.
-        //slither-disable-next-line unused-return
-        return state.evalNP(inputs, maxOutputs);
-    }
-
-    /// @inheritdoc IInterpreterV1
+    /// @inheritdoc IInterpreterV2
     function functionPointers() external view virtual returns (bytes memory) {
         return LibAllStandardOpsNP.opcodeFunctionPointers();
     }

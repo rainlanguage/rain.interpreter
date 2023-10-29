@@ -2,8 +2,8 @@
 pragma solidity =0.8.19;
 
 import {RainterpreterExpressionDeployerNPDeploymentTest} from
-    "test/util/abstract/deprecated/RainterpreterExpressionDeployerNPDeploymentTest.sol";
-import {AUTHORING_META_HASH} from "src/concrete/deprecated/RainterpreterExpressionDeployerNP.sol";
+    "test/util/abstract/RainterpreterExpressionDeployerNPDeploymentTest.sol";
+import {AUTHORING_META_HASH} from "src/concrete/RainterpreterExpressionDeployerNP.sol";
 
 /// @title RainterpreterExpressionDeployerNPMetaTest
 /// Tests that the RainterpreterExpressionDeployerNP meta is correct. Also tests

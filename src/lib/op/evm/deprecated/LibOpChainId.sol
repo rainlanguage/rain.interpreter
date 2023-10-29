@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "rain.solmem/lib/LibStackPointer.sol";
-import "../../deprecated/LibOp.sol";
-import "../../../state/deprecated/LibInterpreterState.sol";
-import "../../../integrity/deprecated/LibIntegrityCheck.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
+import {LibOp} from "../../deprecated/LibOp.sol";
+import {InterpreterState} from "../../../state/deprecated/LibInterpreterState.sol";
+import {IntegrityCheckState} from "../../../integrity/deprecated/LibIntegrityCheck.sol";
 
 /// @title LibOpChainId
 /// Implementation of the EVM `CHAINID` opcode as a standard Rainlang opcode.
