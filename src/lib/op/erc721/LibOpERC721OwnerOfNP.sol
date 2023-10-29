@@ -19,13 +19,13 @@ library LibOpERC721OwnerOfNP {
     function run(InterpreterStateNP memory, Operand, Pointer stackTop) internal view returns (Pointer) {
         uint256 token;
         uint256 tokenId;
-        assembly {
+        assembly ("memory-safe") {
             token := mload(stackTop)
             stackTop := add(stackTop, 0x20)
             tokenId := mload(stackTop)
         }
         address tokenOwner = IERC721(address(uint160(token))).ownerOf(tokenId);
-        assembly {
+        assembly ("memory-safe") {
             mstore(stackTop, tokenOwner)
         }
         return stackTop;

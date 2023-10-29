@@ -111,7 +111,7 @@ library LibParseLiteral {
                     function(bytes memory, uint256, uint256) pure returns (uint256) parser;
                     {
                         uint256 p = (literalParsers >> LITERAL_TYPE_INTEGER_HEX) & 0xFFFF;
-                        assembly {
+                        assembly ("memory-safe") {
                             parser := p
                         }
                     }
@@ -164,7 +164,7 @@ library LibParseLiteral {
                     function(bytes memory, uint256, uint256) pure returns (uint256) parser;
                     {
                         uint256 p = (literalParsers >> LITERAL_TYPE_INTEGER_DECIMAL) & 0xFFFF;
-                        assembly {
+                        assembly ("memory-safe") {
                             parser := p
                         }
                     }

@@ -8,9 +8,14 @@ import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {IMetaV1} from "rain.metadata/IMetaV1.sol";
 
-import {LibInterpreterState} from "src/lib/state/deprecated/LibInterpreterState.sol";
-import {LibIntegrityCheck} from "src/lib/integrity/deprecated/LibIntegrityCheck.sol";
+import {LibInterpreterState, InterpreterState} from "src/lib/state/deprecated/LibInterpreterState.sol";
+import {
+    LibIntegrityCheck,
+    IntegrityCheckState,
+    INITIAL_STACK_HIGHWATER
+} from "src/lib/integrity/deprecated/LibIntegrityCheck.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
+import {Operand} from "src/interface/IInterpreterV1.sol";
 
 import {LibOpTimestamp} from "src/lib/op/evm/deprecated/LibOpTimestamp.sol";
 

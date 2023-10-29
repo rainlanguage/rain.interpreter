@@ -3,14 +3,19 @@ pragma solidity =0.8.19;
 
 import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
-import "rain.metadata/IMetaV1.sol";
+import {IMetaV1} from "rain.metadata/IMetaV1.sol";
 
 import {RainterpreterExpressionDeployerNPDeploymentTest} from
     "test/util/abstract/RainterpreterExpressionDeployerNPDeploymentTest.sol";
 
 import {LibInterpreterState, InterpreterState} from "src/lib/state/deprecated/LibInterpreterState.sol";
-import {IntegrityCheckState} from "src/lib/integrity/deprecated/LibIntegrityCheck.sol";
-// import "src/lib/caller/LibContext.sol";
+import {
+    IntegrityCheckState,
+    INITIAL_STACK_HIGHWATER,
+    LibIntegrityCheck
+} from "src/lib/integrity/deprecated/LibIntegrityCheck.sol";
+import {LibContext} from "src/lib/caller/LibContext.sol";
+import {Operand} from "src/interface/IInterpreterV1.sol";
 
 import {LibOpBlockNumber} from "src/lib/op/evm/deprecated/LibOpBlockNumber.sol";
 

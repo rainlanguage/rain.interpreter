@@ -19,13 +19,13 @@ library LibOpERC721BalanceOfNP {
     function run(InterpreterStateNP memory, Operand, Pointer stackTop) internal view returns (Pointer) {
         uint256 token;
         uint256 account;
-        assembly {
+        assembly ("memory-safe") {
             token := mload(stackTop)
             stackTop := add(stackTop, 0x20)
             account := mload(stackTop)
         }
         uint256 tokenBalance = IERC721(address(uint160(token))).balanceOf(address(uint160(account)));
-        assembly {
+        assembly ("memory-safe") {
             mstore(stackTop, tokenBalance)
         }
         return stackTop;

@@ -22,7 +22,7 @@ contract LibIntegrityCheckNPIntegrityCheckTest is Test {
             view
             returns (uint256, uint256)[INTEGRITY_POINTERS_LENGTH + 1] memory pointersFixed = [lengthPointer];
         uint256[] memory pointersDynamic;
-        assembly {
+        assembly ("memory-safe") {
             pointersDynamic := pointersFixed
         }
         return LibConvert.unsafeTo16BitBytes(pointersDynamic);

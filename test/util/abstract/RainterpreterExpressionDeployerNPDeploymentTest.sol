@@ -51,7 +51,7 @@ abstract contract RainterpreterExpressionDeployerNPDeploymentTest is Test {
         // Sanity check the interpreter's bytecode hash.
         bytes32 i9rHash;
         address interpreter = address(iInterpreter);
-        assembly {
+        assembly ("memory-safe") {
             i9rHash := extcodehash(interpreter)
         }
         if (i9rHash != INTERPRETER_BYTECODE_HASH) {
@@ -62,7 +62,7 @@ abstract contract RainterpreterExpressionDeployerNPDeploymentTest is Test {
 
         bytes32 storeHash;
         address store = address(iStore);
-        assembly {
+        assembly ("memory-safe") {
             storeHash := extcodehash(store)
         }
         if (storeHash != STORE_BYTECODE_HASH) {

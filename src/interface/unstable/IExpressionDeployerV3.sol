@@ -36,11 +36,10 @@ string constant IERC1820_NAME_IEXPRESSION_DEPLOYER_V3 = "IExpressionDeployerV3";
 interface IExpressionDeployerV3 {
     /// The config of the deployed expression including uncompiled sources. MUST
     /// be emitted after the config passes the integrity check.
-    /// @param sender The caller of `deployExpression`.
-    /// @param bytecode As per `IExpressionDeployerV2`.
-    /// @param constants As per `IExpressionDeployerV2`.
-    /// @param minOutputs As per `IExpressionDeployerV2`.
-    event NewExpression(address sender, bytes bytecode, uint256[] constants, uint256[] minOutputs);
+    /// @param sender The caller of `deployExpression2`.
+    /// @param bytecode As per `IExpressionDeployerV3.deployExpression2` inputs.
+    /// @param constants As per `IExpressionDeployerV3.deployExpression2` inputs.
+    event NewExpression(address sender, bytes bytecode, uint256[] constants);
 
     /// The address of the deployed expression. MUST be emitted once the
     /// expression can be loaded and deserialized into an evaluable interpreter

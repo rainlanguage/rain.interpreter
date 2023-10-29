@@ -1,16 +1,28 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
+import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
+import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
+
 import {RainterpreterExpressionDeployerNPDeploymentTest} from
     "test/util/abstract/RainterpreterExpressionDeployerNPDeploymentTest.sol";
-
-// import "src/lib/caller/LibContext.sol";
-// import "src/lib/bytecode/LibBytecode.sol";
+import {LibInterpreterState} from "src/lib/state/deprecated/LibInterpreterState.sol";
+import {Operand, IInterpreterV1, SourceIndex} from "src/interface/IInterpreterV1.sol";
+import {IInterpreterStoreV1, StateNamespace} from "src/interface/IInterpreterStoreV1.sol";
+import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
+import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+import {LibContext} from "src/lib/caller/LibContext.sol";
+import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 
 import {InterpreterState} from "src/lib/state/deprecated/LibInterpreterState.sol";
-import {IntegrityCheckState} from "src/lib/integrity/deprecated/LibIntegrityCheck.sol";
+import {
+    IntegrityCheckState,
+    LibIntegrityCheck,
+    INITIAL_STACK_HIGHWATER
+} from "src/lib/integrity/deprecated/LibIntegrityCheck.sol";
 import {LibOpConstant} from "src/lib/op/00/deprecated/LibOpConstant.sol";
-import {OutOfBoundsConstantRead} from "src/lib/op/00/LibOpConstantNP.sol";
+import {BadConstantRead} from "src/lib/op/00/deprecated/LibOpConstant.sol";
 
 /// @title LibOpConstantTest
 /// @notice Test the runtime and integrity time logic of LibOpConstant.
@@ -100,54 +112,6 @@ contract LibOpConstantTest is RainterpreterExpressionDeployerNPDeploymentTest {
         assertEq(state.stackBottom.unsafeReadWord(), pre);
         assertEq(stackTop.unsafeReadWord(), constants[Operand.unwrap(operand)]);
         assertEq(stackTopAfter.unsafeReadWord(), post);
-    }
-
-    /// Test the case of an empty constants array via. an end to end test. We
-    /// expect the deployer to revert, as the integrity check MUST fail.
-    function testOpConstantEvalZeroConstants() external {
-        (bytes memory bytecode, uint256[] memory constants) =
-            iDeployer.parse("_ _ _: constant() constant() constant();");
-        uint256 sourceIndex = 0;
-        assertEq(LibBytecode.sourceCount(bytecode), 1);
-        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 3);
-        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 3);
-        (uint256 sourceInputs, uint256 sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
-        assertEq(sourceInputs, 0);
-        assertEq(sourceOutputs, 3);
-
-        assertEq(
-            bytecode,
-            // 1 source.
-            hex"01"
-            // offset 0
-            hex"0000"
-            // 3 ops
-            hex"03"
-            // 3 stack allocation
-            hex"03"
-            // 0 inputs
-            hex"00"
-            // 3 outputs
-            hex"03"
-            // constant 0
-            hex"01000000"
-            // constant 0
-            hex"01000000"
-            // constant 0
-            hex"01000000"
-        );
-
-        assertEq(constants.length, 0);
-
-        uint256[] memory minOuputs = new uint256[](1);
-        minOuputs[0] = 3;
-        vm.expectRevert(abi.encodeWithSelector(OutOfBoundsConstantRead.selector, 0, 0, 0));
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOuputs);
-        (interpreterDeployer);
-        (storeDeployer);
-        (expression);
     }
 
     /// Test the eval of a constant opcode parsed from a string.

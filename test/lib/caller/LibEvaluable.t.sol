@@ -45,11 +45,11 @@ contract LibEvaluableTest is Test {
         uint256 v0 = type(uint256).max;
         uint256 v1 = 0;
         Evaluable memory d = Evaluable(IInterpreterV1(address(0)), IInterpreterStoreV1(address(0)), address(0));
-        assembly {
+        assembly ("memory-safe") {
             mstore(mload(0x40), v0)
         }
         bytes32 hash0 = d.hash();
-        assembly {
+        assembly ("memory-safe") {
             mstore(mload(0x40), v1)
         }
         bytes32 hash1 = d.hash();

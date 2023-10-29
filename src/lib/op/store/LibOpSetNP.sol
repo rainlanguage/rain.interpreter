@@ -22,7 +22,7 @@ library LibOpSetNP {
         unchecked {
             uint256 key;
             uint256 value;
-            assembly {
+            assembly ("memory-safe") {
                 key := mload(stackTop)
                 value := mload(add(stackTop, 0x20))
                 stackTop := add(stackTop, 0x40)

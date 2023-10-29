@@ -83,18 +83,22 @@ contract RainterpreterNPE2 is IInterpreterV2, ERC165 {
         StateNamespace namespace,
         EncodedDispatch dispatch,
         uint256[][] memory context,
-        uint256[] memory input
+        uint256[] memory inputs
     ) external view virtual returns (uint256[] memory, uint256[] memory) {
         // Decode the dispatch.
         (address expression, SourceIndexV2 sourceIndex, uint256 maxOutputs) = LibEncodedDispatch.decode2(dispatch);
         bytes memory expressionData = LibDataContract.read(expression);
 
         InterpreterStateNP memory state = expressionData.unsafeDeserializeNP(
-            sourceIndex, namespace.qualifyNamespace(msg.sender), store, context, OPCODE_FUNCTION_POINTERS_E2
+            SourceIndexV2.unwrap(sourceIndex),
+            namespace.qualifyNamespace(msg.sender),
+            store,
+            context,
+            OPCODE_FUNCTION_POINTERS_E2
         );
         // We use the return by returning it. Slither false positive.
         //slither-disable-next-line unused-return
-        return state.eval2(new uint256[](0), maxOutputs);
+        return state.eval2(inputs, maxOutputs);
     }
 
     // @inheritdoc ERC165

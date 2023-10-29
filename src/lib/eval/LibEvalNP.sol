@@ -156,6 +156,31 @@ library LibEvalNP {
         returns (uint256[] memory, uint256[] memory)
     {
         unchecked {
+            (uint256[] memory stack, uint256[] memory writes) = eval2(state, inputs, maxOutputs);
+            assembly ("memory-safe") {
+                // Need to reverse the stack array for `IInterpreterV1`.
+                for {
+                    let a := add(stack, 0x20)
+                    let b := add(stack, mul(mload(stack), 0x20))
+                } lt(a, b) {
+                    a := add(a, 0x20)
+                    b := sub(b, 0x20)
+                } {
+                    let tmp := mload(a)
+                    mstore(a, mload(b))
+                    mstore(b, tmp)
+                }
+            }
+            return (stack, writes);
+        }
+    }
+
+    function eval2(InterpreterStateNP memory state, uint256[] memory inputs, uint256 maxOutputs)
+        internal
+        view
+        returns (uint256[] memory, uint256[] memory)
+    {
+        unchecked {
             // Use the bytecode's own definition of its IO. Clear example of
             // how the bytecode could accidentally or maliciously force OOB reads
             // if the integrity check is not run.
@@ -192,28 +217,13 @@ library LibEvalNP {
             // and the original stack MUST be immutable as they're both pointing to
             // the same memory region.
             uint256 outputs = maxOutputs < sourceOutputs ? maxOutputs : sourceOutputs;
-            uint256[] memory result;
+            uint256[] memory stack;
             assembly ("memory-safe") {
-                result := sub(stackTop, 0x20)
-                mstore(result, outputs)
-
-                // Need to reverse the result array for backwards compatibility.
-                // Ideally we'd not do this, but will need to roll a new interface
-                // for such a breaking change.
-                for {
-                    let a := add(result, 0x20)
-                    let b := add(result, mul(outputs, 0x20))
-                } lt(a, b) {
-                    a := add(a, 0x20)
-                    b := sub(b, 0x20)
-                } {
-                    let tmp := mload(a)
-                    mstore(a, mload(b))
-                    mstore(b, tmp)
-                }
+                stack := sub(stackTop, 0x20)
+                mstore(stack, outputs)
             }
 
-            return (result, state.stateKV.toUint256Array());
+            return (stack, state.stateKV.toUint256Array());
         }
     }
 }

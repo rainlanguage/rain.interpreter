@@ -74,7 +74,7 @@ contract RainterpreterStoreTest is Test {
     function testRainterpreterStoreSetGetNoDupesMany(Set[] memory sets) external {
         uint256 setsLength = sets.length >= 10 ? 10 : sets.length;
         uint256[] memory refs;
-        assembly {
+        assembly ("memory-safe") {
             refs := sets
         }
         LibUint256Array.truncate(refs, setsLength);

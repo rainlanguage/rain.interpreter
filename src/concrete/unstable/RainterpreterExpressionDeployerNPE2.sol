@@ -139,7 +139,10 @@ contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, IParserV1
             revert UnexpectedStoreBytecodeHash(expectedStoreBytecodeHash(), storeHash);
         }
 
-        emit DISpair(msg.sender, address(this), address(interpreter), address(store), config.meta);
+        // Emit the DISPair.
+        // The parser is this contract as it implements both
+        // `IExpressionDeployerV3` and `IParserV1`.
+        emit DISPair(msg.sender, address(interpreter), address(store), address(this), config.meta);
 
         // Register the interface for the deployer.
         // We have to check that the 1820 registry has bytecode at the address
@@ -147,14 +150,14 @@ contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, IParserV1
         // we are deploying to has 1820 deployed.
         if (address(IERC1820_REGISTRY).code.length > 0) {
             IERC1820_REGISTRY.setInterfaceImplementer(
-                address(this), IERC1820_REGISTRY.interfaceHash(IERC1820_NAME_IEXPRESSION_DEPLOYER_V2), address(this)
+                address(this), IERC1820_REGISTRY.interfaceHash(IERC1820_NAME_IEXPRESSION_DEPLOYER_V3), address(this)
             );
         }
     }
 
     // @inheritdoc IERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IExpressionDeployerV2).interfaceId || interfaceId == type(IERC165).interfaceId;
+        return interfaceId == type(IExpressionDeployerV3).interfaceId || interfaceId == type(IERC165).interfaceId;
     }
 
     /// @inheritdoc IParserV1
@@ -169,7 +172,7 @@ contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, IParserV1
         external
         returns (IInterpreterV2, IInterpreterStoreV1, address, bytes memory)
     {
-        bytes memory io = integrityCheck(bytecode, constants);
+        bytes memory io = LibIntegrityCheckNP.integrityCheck2(INTEGRITY_FUNCTION_POINTERS_E2, bytecode, constants);
 
         emit NewExpression(msg.sender, bytecode, constants);
 
@@ -186,7 +189,7 @@ contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, IParserV1
         // Emit and return the address of the deployed expression.
         emit DeployedExpression(msg.sender, iInterpreter, iStore, expression, io);
 
-        return (iInterpreter, iStore, expression);
+        return (iInterpreter, iStore, expression, io);
     }
 
     /// Defines all the function pointers to integrity checks. This is the

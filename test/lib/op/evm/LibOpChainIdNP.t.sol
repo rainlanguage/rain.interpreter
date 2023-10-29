@@ -8,13 +8,18 @@ import {IMetaV1} from "rain.metadata/IMetaV1.sol";
 import {OpTest} from "test/util/abstract/OpTest.sol";
 import {INVALID_BYTECODE} from "test/util/lib/etch/LibEtch.sol";
 
-import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibOpChainIdNP} from "src/lib/op/evm/LibOpChainIdNP.sol";
-// import "src/lib/caller/LibContext.sol";
 
 import {RainterpreterNP} from "src/concrete/RainterpreterNP.sol";
-import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
+import {RainterpreterStore, StateNamespace} from "src/concrete/RainterpreterStore.sol";
 import {RainterpreterExpressionDeployerNP} from "src/concrete/RainterpreterExpressionDeployerNP.sol";
+import {Operand, IInterpreterV1, SourceIndex} from "src/interface/IInterpreterV1.sol";
+import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
+import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+import {LibContext} from "src/lib/caller/LibContext.sol";
+import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 
 /// @title LibOpChainIdNPTest
 /// @notice Test the runtime and integrity time logic of LibOpChainIdNP.
