@@ -1,17 +1,29 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
+import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
+import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 
-import "src/lib/caller/LibContext.sol";
-import "src/lib/bytecode/LibBytecode.sol";
-import "src/lib/integrity/deprecated/LibIntegrityCheck.sol";
-import "src/lib/state/deprecated/LibInterpreterState.sol";
-import "src/lib/op/00/deprecated/LibOpStack.sol";
+import {RainterpreterExpressionDeployerNPDeploymentTest} from
+    "test/util/abstract/deprecated/RainterpreterExpressionDeployerNPDeploymentTest.sol";
+import {LibContext} from "src/lib/caller/LibContext.sol";
+import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
+import {
+    LibIntegrityCheck,
+    IntegrityCheckState,
+    INITIAL_STACK_HIGHWATER
+} from "src/lib/integrity/deprecated/LibIntegrityCheck.sol";
+import {LibInterpreterState, InterpreterState} from "src/lib/state/deprecated/LibInterpreterState.sol";
+import {LibOpStack, BadStackRead} from "src/lib/op/00/deprecated/LibOpStack.sol";
+import {Operand, IInterpreterV1, SourceIndex} from "src/interface/IInterpreterV1.sol";
+import {IInterpreterStoreV1, StateNamespace, FullyQualifiedNamespace} from "src/interface/IInterpreterStoreV1.sol";
+import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 
 /// @title LibOpStackTest
 /// @notice Test the runtime and integrity time logic of LibOpStack.
-contract LibOpStackTest is RainterpreterExpressionDeployerDeploymentTest {
+contract LibOpStackTest is RainterpreterExpressionDeployerNPDeploymentTest {
     using LibPointer for Pointer;
     using LibUint256Array for uint256[];
     using LibIntegrityCheck for IntegrityCheckState;

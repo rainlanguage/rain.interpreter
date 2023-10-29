@@ -1,33 +1,34 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import {Test, console2, stdError} from "forge-std/Test.sol";
-import {INVALID_BYTECODE} from "../lib/etch/LibEtch.sol";
-import {EXPRESSION_DEPLOYER_NP_META_PATH} from "../lib/constants/ExpressionDeployerNPConstants.sol";
 import {IERC1820_REGISTRY, IERC1820Registry} from "rain.erc1820/lib/LibIERC1820.sol";
-import {LibParseMeta, AuthoringMeta} from "../../../src/lib/parse/LibParseMeta.sol";
-import {RainterpreterStore} from "../../../src/concrete/RainterpreterStore.sol";
+import {Test, console2, stdError} from "forge-std/Test.sol";
+
+import {INVALID_BYTECODE} from "../../lib/etch/LibEtch.sol";
+import {EXPRESSION_DEPLOYER_NP_META_PATH} from "../../lib/constants/ExpressionDeployerNPConstants.sol";
+import {LibParseMeta, AuthoringMeta} from "../../../../src/lib/parse/LibParseMeta.sol";
+import {RainterpreterStore} from "../../../../src/concrete/RainterpreterStore.sol";
 import {
     RainterpreterNP,
     OPCODE_FUNCTION_POINTERS,
     INTERPRETER_BYTECODE_HASH
-} from "../../../src/concrete/RainterpreterNP.sol";
+} from "../../../../src/concrete/deprecated/RainterpreterNP.sol";
 import {
     AUTHORING_META_HASH,
     STORE_BYTECODE_HASH,
     CONSTRUCTION_META_HASH,
     PARSE_META,
     INTEGRITY_FUNCTION_POINTERS,
-    RainterpreterExpressionDeployerConstructionConfig
-} from "../../../src/concrete/RainterpreterExpressionDeployerNP.sol";
-import {RainterpreterExpressionDeployerNP} from "../../../src/concrete/RainterpreterExpressionDeployerNP.sol";
-import {LibAllStandardOpsNP} from "../../../src/lib/op/LibAllStandardOpsNP.sol";
-import {LibEncodedDispatch} from "../../../src/lib/caller/LibEncodedDispatch.sol";
+    RainterpreterExpressionDeployerConstructionConfig,
+    RainterpreterExpressionDeployerNP
+} from "../../../../src/concrete/deprecated/RainterpreterExpressionDeployerNP.sol";
+import {LibAllStandardOpsNP} from "../../../../src/lib/op/LibAllStandardOpsNP.sol";
+import {LibEncodedDispatch} from "../../../../src/lib/caller/LibEncodedDispatch.sol";
 
-/// @title RainterpreterExpressionDeployerDeploymentTest
-/// Tests that the RainterpreterExpressionDeployer meta is correct. Also tests
+/// @title RainterpreterExpressionDeployerNPDeploymentTest
+/// Tests that the RainterpreterExpressionDeployerN meta is correct. Also tests
 /// basic functionality of the `IParserV1` interface implementation.
-abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
+abstract contract RainterpreterExpressionDeployerNPDeploymentTest is Test {
     //solhint-disable-next-line private-vars-leading-underscore
     RainterpreterStore internal immutable iStore;
     //solhint-disable-next-line private-vars-leading-underscore

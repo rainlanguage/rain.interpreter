@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
+import {RainterpreterExpressionDeployerNPDeploymentTest} from
+    "test/util/abstract/deprecated/RainterpreterExpressionDeployerNPDeploymentTest.sol";
 
 import "rain.solmem/lib/LibPointer.sol";
 import "rain.solmem/lib/LibStackPointer.sol";
@@ -15,7 +16,7 @@ import "src/lib/op/evm/deprecated/LibOpBlockNumber.sol";
 
 /// @title LibOpBlockNumberTest
 /// @notice Test the runtime and integrity time logic of LibOpBlockNumber.
-contract LibOpBlockNumberTest is RainterpreterExpressionDeployerDeploymentTest {
+contract LibOpBlockNumberTest is RainterpreterExpressionDeployerNPDeploymentTest {
     using LibPointer for Pointer;
     using LibStackPointer for Pointer;
     using LibInterpreterState for InterpreterState;

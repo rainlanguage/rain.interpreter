@@ -1,24 +1,29 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
-
-import "rain.lib.typecast/LibCast.sol";
-import {LibDataContract} from "rain.datacontract/lib/LibDataContract.sol";
-
-import {IDebugInterpreterV2} from "../interface/IDebugInterpreterV2.sol";
-
-import {LibEvalNP} from "../lib/eval/LibEvalNP.sol";
-import "../lib/ns/LibNamespace.sol";
-import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
-import "../lib/caller/LibEncodedDispatch.sol";
-
-import {InterpreterStateNP} from "../lib/state/LibInterpreterStateNP.sol";
-import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
+import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibMemoryKV, MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
+import {LibCast} from "rain.lib.typecast/LibCast.sol";
+import {LibDataContract} from "rain.datacontract/lib/LibDataContract.sol";
+
+import {IDebugInterpreterV2} from "../../interface/IDebugInterpreterV2.sol";
+import {LibEvalNP} from "../../lib/eval/LibEvalNP.sol";
+import {LibNamespace} from "../../lib/ns/LibNamespace.sol";
+import {LibInterpreterStateDataContractNP} from "../../lib/state/LibInterpreterStateDataContractNP.sol";
+import {LibEncodedDispatch} from "../../lib/caller/LibEncodedDispatch.sol";
+import {InterpreterStateNP} from "../../lib/state/LibInterpreterStateNP.sol";
+import {LibAllStandardOpsNP} from "../../lib/op/LibAllStandardOpsNP.sol";
+import {
+    SourceIndex,
+    IInterpreterV1,
+    StateNamespace,
+    EncodedDispatch,
+    FullyQualifiedNamespace
+} from "../../interface/IInterpreterV1.sol";
+import {IInterpreterStoreV1} from "../../interface/IInterpreterStoreV1.sol";
 
 /// Thrown when the stack length is negative during eval.
 error NegativeStackLength(int256 length);

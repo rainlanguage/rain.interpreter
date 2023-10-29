@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
+import "test/util/abstract/deprecated/RainterpreterExpressionDeployerNPDeploymentTest.sol";
 
 import "src/lib/caller/LibContext.sol";
 import "src/lib/bytecode/LibBytecode.sol";
@@ -13,7 +13,7 @@ import {OutOfBoundsConstantRead} from "src/lib/op/00/LibOpConstantNP.sol";
 
 /// @title LibOpConstantTest
 /// @notice Test the runtime and integrity time logic of LibOpConstant.
-contract LibOpConstantTest is RainterpreterExpressionDeployerDeploymentTest {
+contract LibOpConstantTest is RainterpreterExpressionDeployerNPDeploymentTest {
     using LibUint256Array for uint256[];
     using LibPointer for Pointer;
     using LibStackPointer for Pointer;

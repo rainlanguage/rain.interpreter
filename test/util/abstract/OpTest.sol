@@ -1,22 +1,30 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "rain.solmem/lib/LibMemCpy.sol";
-import "rain.solmem/lib/LibUint256Array.sol";
-import "rain.solmem/lib/LibPointer.sol";
+import {Test, console2, stdError} from "forge-std/Test.sol";
+import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
+import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
+import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
+import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 
-import "./RainterpreterExpressionDeployerDeploymentTest.sol";
-import "../../../src/lib/state/LibInterpreterStateNP.sol";
+import {RainterpreterExpressionDeployerNPDeploymentTest} from
+    "./deprecated/RainterpreterExpressionDeployerNPDeploymentTest.sol";
+import {LibInterpreterStateNP, InterpreterStateNP} from "../../../src/lib/state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP, LibIntegrityCheckNP} from "../../../src/lib/integrity/LibIntegrityCheckNP.sol";
 
-import "../../../src/lib/caller/LibContext.sol";
+import {LibContext} from "../../../src/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "../../../src/lib/parse/LibParseOperand.sol";
 import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {Operand, IInterpreterV1, SourceIndex} from "../../../src/interface/IInterpreterV1.sol";
+import {IInterpreterStoreV1, StateNamespace} from "../../../src/interface/IInterpreterStoreV1.sol";
+import {SignedContextV1} from "../../../src/interface/IInterpreterCallerV2.sol";
+import {LibEncodedDispatch} from "../../../src/lib/caller/LibEncodedDispatch.sol";
+import {LibNamespace} from "../../../src/lib/ns/LibNamespace.sol";
 
 uint256 constant PRE = uint256(keccak256(abi.encodePacked("pre")));
 uint256 constant POST = uint256(keccak256(abi.encodePacked("post")));
 
-abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
+abstract contract OpTest is RainterpreterExpressionDeployerNPDeploymentTest {
     using LibInterpreterStateNP for InterpreterStateNP;
     using LibUint256Array for uint256[];
     using LibPointer for Pointer;

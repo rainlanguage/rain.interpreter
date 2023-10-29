@@ -12,9 +12,9 @@ import "src/lib/state/LibInterpreterStateNP.sol";
 import "src/lib/op/evm/LibOpChainIdNP.sol";
 import "src/lib/caller/LibContext.sol";
 
-import "src/concrete/RainterpreterNP.sol";
+import {RainterpreterNP} from "src/concrete/deprecated/RainterpreterNP.sol";
 import "src/concrete/RainterpreterStore.sol";
-import "src/concrete/RainterpreterExpressionDeployerNP.sol";
+import {RainterpreterExpressionDeployerNP} from "src/concrete/deprecated/RainterpreterExpressionDeployerNP.sol";
 
 /// @title LibOpChainIdNPTest
 /// @notice Test the runtime and integrity time logic of LibOpChainIdNP.

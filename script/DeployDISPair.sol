@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Script.sol";
-import "src/concrete/RainterpreterStore.sol";
-import "src/concrete/RainterpreterNP.sol";
-import "src/concrete/RainterpreterExpressionDeployerNP.sol";
+import {Script} from "forge-std/Script.sol";
+import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
+import {RainterpreterNP} from "src/concrete/deprecated/RainterpreterNP.sol";
+import {
+    RainterpreterExpressionDeployerNP,
+    RainterpreterExpressionDeployerConstructionConfig
+} from "src/concrete/deprecated/RainterpreterExpressionDeployerNP.sol";
 
 /// @title DeployDISPair
 /// @notice A script that deploys a DeployDISPair.

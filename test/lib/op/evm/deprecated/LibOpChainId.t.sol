@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
+import {RainterpreterExpressionDeployerNPDeploymentTest} from
+    "test/util/abstract/deprecated/RainterpreterExpressionDeployerNPDeploymentTest.sol";
 import "test/util/lib/etch/LibEtch.sol";
 
 import "rain.solmem/lib/LibPointer.sol";
@@ -13,11 +14,11 @@ import "src/lib/op/evm/deprecated/LibOpChainId.sol";
 import "src/lib/caller/LibContext.sol";
 
 import "src/concrete/RainterpreterStore.sol";
-import "src/concrete/RainterpreterExpressionDeployerNP.sol";
+import {RainterpreterExpressionDeployerNP} from "src/concrete/deprecated/RainterpreterExpressionDeployerNP.sol";
 
 /// @title LibOpChainIdTest
 /// @notice Test the runtime and integrity time logic of LibOpChainId.
-contract LibOpChainIdTest is RainterpreterExpressionDeployerDeploymentTest {
+contract LibOpChainIdTest is RainterpreterExpressionDeployerNPDeploymentTest {
     using LibPointer for Pointer;
     using LibStackPointer for Pointer;
     using LibInterpreterState for InterpreterState;

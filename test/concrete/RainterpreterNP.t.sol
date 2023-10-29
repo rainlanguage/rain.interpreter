@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "src/concrete/RainterpreterNP.sol";
+import {RainterpreterNP, OPCODE_FUNCTION_POINTERS} from "src/concrete/deprecated/RainterpreterNP.sol";
 
 /// @title RainterpreterNPTest
 /// Test suite for RainterpreterNP.

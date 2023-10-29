@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "src/lib/caller/LibDeployerDiscoverable.sol";
-import "test/util/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
+import {LibDeployerDiscoverable} from "src/lib/caller/LibDeployerDiscoverable.sol";
+import {RainterpreterExpressionDeployerNPDeploymentTest} from
+    "test/util/abstract/deprecated/RainterpreterExpressionDeployerNPDeploymentTest.sol";
+import {IExpressionDeployerV2} from "src/interface/IExpressionDeployerV2.sol";
 
-contract RainterpreterExpressionDeployerTouchDeployer is RainterpreterExpressionDeployerDeploymentTest {
+contract RainterpreterExpressionDeployerTouchDeployer is RainterpreterExpressionDeployerNPDeploymentTest {
     /// MUST be possible to test a real deployer with 0 data to support discovery.
     function testTouchRealDeployer() external {
         vm.expectCall(

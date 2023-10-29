@@ -1,8 +1,13 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.19;
 
-import "../../interface/IInterpreterV1.sol";
-import "../../lib/bytecode/LibBytecode.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+
+import {IInterpreterV1, SourceIndex} from "../../interface/IInterpreterV1.sol";
+import {LibBytecode} from "../../lib/bytecode/LibBytecode.sol";
+import {Operand} from "../../interface/IInterpreterV1.sol";
+import {IInterpreterStoreV1, StateNamespace} from "../../interface/IInterpreterStoreV1.sol";
+import {BadOpInputsLength} from "../../lib/integrity/LibIntegrityCheckNP.sol";
 
 /// @dev There are more entrypoints defined by the minimum stack outputs than
 /// there are provided sources. This means the calling contract WILL attempt to

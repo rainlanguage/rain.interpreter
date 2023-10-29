@@ -1,8 +1,13 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/OpTest.sol";
+import {LibMemoryKV, MemoryKV, MemoryKVVal, MemoryKVKey} from "rain.lib.memkv/lib/LibMemoryKV.sol";
+
+import {OpTest} from "test/util/abstract/OpTest.sol";
 import {LibOpSetNP} from "src/lib/op/store/LibOpSetNP.sol";
+import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {Operand} from "src/interface/IInterpreterV1.sol";
 
 contract LibOpSetNPTest is OpTest {
     using LibMemoryKV for MemoryKV;

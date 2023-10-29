@@ -1,15 +1,22 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
-import "test/util/lib/etch/LibEtch.sol";
-import "test/util/lib/constants/ExpressionDeployerNPConstants.sol";
+import {Test} from "forge-std/Test.sol";
+import {INVALID_BYTECODE} from "test/util/lib/etch/LibEtch.sol";
+import {EXPRESSION_DEPLOYER_NP_META_PATH} from "test/util/lib/constants/ExpressionDeployerNPConstants.sol";
+import {IERC1820Registry} from "openzeppelin-contracts/contracts/utils/introspection/IERC1820Registry.sol";
+import {IERC1820_REGISTRY} from "rain.erc1820/lib/LibIERC1820.sol";
+import {IInterpreterV1} from "src/interface/IInterpreterV1.sol";
 
-import "src/interface/IInterpreterV1.sol";
-
-import "src/concrete/RainterpreterExpressionDeployerNP.sol";
-import "src/concrete/RainterpreterStore.sol";
-import "src/concrete/RainterpreterNP.sol";
+import {
+    RainterpreterExpressionDeployerNP,
+    RainterpreterExpressionDeployerConstructionConfig,
+    CONSTRUCTION_META_HASH,
+    UnexpectedConstructionMetaHash,
+    UnexpectedPointers
+} from "src/concrete/deprecated/RainterpreterExpressionDeployerNP.sol";
+import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
+import {RainterpreterNP, OPCODE_FUNCTION_POINTERS} from "src/concrete/deprecated/RainterpreterNP.sol";
 
 /// @title RainterpreterExpressionDeployerDeployCheckTest
 /// Test that the RainterpreterExpressionDeployer deploy check reverts if the

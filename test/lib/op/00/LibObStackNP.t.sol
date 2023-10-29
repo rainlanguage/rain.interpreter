@@ -1,11 +1,18 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/OpTest.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
-import "src/lib/caller/LibContext.sol";
-import "src/lib/bytecode/LibBytecode.sol";
+import {IInterpreterV1, Operand, SourceIndex} from "src/interface/IInterpreterV1.sol";
+import {LibContext} from "src/lib/caller/LibContext.sol";
+import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
 import {OutOfBoundsStackRead, LibOpStackNP} from "src/lib/op/00/LibOpStackNP.sol";
+import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {IInterpreterStoreV1, StateNamespace} from "src/interface/IInterpreterStoreV1.sol";
+import {OpTest, PRE, POST} from "test/util/abstract/OpTest.sol";
+import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 
 /// @title LibOpStackNPTest
 /// @notice Test the runtime and integrity time logic of LibOpStackNP.
