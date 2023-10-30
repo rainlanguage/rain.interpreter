@@ -150,31 +150,6 @@ library LibEvalNP {
         return stackTop;
     }
 
-    function evalNP(InterpreterStateNP memory state, uint256[] memory inputs, uint256 maxOutputs)
-        internal
-        view
-        returns (uint256[] memory, uint256[] memory)
-    {
-        unchecked {
-            (uint256[] memory stack, uint256[] memory writes) = eval2(state, inputs, maxOutputs);
-            assembly ("memory-safe") {
-                // Need to reverse the stack array for `IInterpreterV1`.
-                for {
-                    let a := add(stack, 0x20)
-                    let b := add(stack, mul(mload(stack), 0x20))
-                } lt(a, b) {
-                    a := add(a, 0x20)
-                    b := sub(b, 0x20)
-                } {
-                    let tmp := mload(a)
-                    mstore(a, mload(b))
-                    mstore(b, tmp)
-                }
-            }
-            return (stack, writes);
-        }
-    }
-
     function eval2(InterpreterStateNP memory state, uint256[] memory inputs, uint256 maxOutputs)
         internal
         view

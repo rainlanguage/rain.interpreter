@@ -6,8 +6,8 @@ import "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 import "rain.solmem/lib/LibStackPointer.sol";
 import "rain.solmem/lib/LibUint256Array.sol";
 
-import "../interface/IInterpreterV1.sol";
-import "../interface/IInterpreterExternV1.sol";
+import "../interface/IInterpreterV2.sol";
+import "../interface/IInterpreterExternV2.sol";
 import "../lib/op/chainlink/LibOpChainlinkOraclePrice.sol";
 import "../lib/op/deprecated/LibOp.sol";
 
@@ -20,12 +20,12 @@ error BadInputs(uint256 expected, uint256 actual);
 /// @param opcode The opcode that is not known.
 error UnknownOp(uint256 opcode);
 
-/// EXPERIMENTAL implementation of `IInterpreterExternV1`.
+/// EXPERIMENTAL implementation of `IInterpreterExternV2`.
 /// Currently only implements the Chainlink oracle price opcode as a starting
 /// point to test and flesh out externs generally.
 /// Hopefully one day the idea of there being only a single extern contract seems
 /// quaint.
-contract RainterpreterExtern is IInterpreterExternV1, ERC165 {
+contract RainterpreterExternNPE2 is IInterpreterExternV2, ERC165 {
     using LibStackPointer for uint256[];
     using LibStackPointer for Pointer;
     using LibUint256Array for uint256;
@@ -34,10 +34,10 @@ contract RainterpreterExtern is IInterpreterExternV1, ERC165 {
 
     // @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IInterpreterExternV1).interfaceId || super.supportsInterface(interfaceId);
+        return interfaceId == type(IInterpreterExternV2).interfaceId || super.supportsInterface(interfaceId);
     }
 
-    /// @inheritdoc IInterpreterExternV1
+    /// @inheritdoc IInterpreterExternV2
     function extern(ExternDispatch dispatch, uint256[] memory inputs)
         external
         view

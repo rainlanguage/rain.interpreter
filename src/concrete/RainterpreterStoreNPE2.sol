@@ -9,13 +9,16 @@ import "../lib/ns/LibNamespace.sol";
 /// Thrown when a `set` call is made with an odd number of arguments.
 error RainterpreterStoreOddSetLength(uint256 length);
 
+/// @dev Hash of the known store bytecode.
+bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);
+
 /// @title RainterpreterStore
 /// @notice Simplest possible `IInterpreterStoreV1` that could work.
 /// Takes key/value pairings from the input array and stores each in an internal
 /// mapping. `StateNamespace` is fully qualified only by `msg.sender` on set and
 /// doesn't attempt to do any deduping etc. if the same key appears twice it will
 /// be set twice.
-contract RainterpreterStore is IInterpreterStoreV1, ERC165 {
+contract RainterpreterStoreNPE2 is IInterpreterStoreV1, ERC165 {
     using LibNamespace for StateNamespace;
 
     /// Store is several tiers of sandbox.
