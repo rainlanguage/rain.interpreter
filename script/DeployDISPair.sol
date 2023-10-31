@@ -2,12 +2,13 @@
 pragma solidity =0.8.19;
 
 import {Script} from "forge-std/Script.sol";
-import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
-import {RainterpreterNP} from "src/concrete/RainterpreterNP.sol";
+import {RainterpreterStoreNPE2} from "src/concrete/RainterpreterStoreNPE2.sol";
+import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
+import {RainterpreterParserNPE2} from "src/concrete/RainterpreterParserNPE2.sol";
 import {
-    RainterpreterExpressionDeployerNP,
-    RainterpreterExpressionDeployerConstructionConfig
-} from "src/concrete/RainterpreterExpressionDeployerNP.sol";
+    RainterpreterExpressionDeployerNPE2,
+    RainterpreterExpressionDeployerNPE2ConstructionConfig
+} from "src/concrete/RainterpreterExpressionDeployerNPE2.sol";
 
 /// @title DeployDISPair
 /// @notice A script that deploys a DeployDISPair.
@@ -18,10 +19,11 @@ contract DeployDISPair is Script {
         uint256 deployerPrivateKey = vm.envUint("DEPLOYMENT_KEY");
 
         vm.startBroadcast(deployerPrivateKey);
-        RainterpreterNP interpreter = new RainterpreterNP();
-        RainterpreterStore store = new RainterpreterStore();
-        RainterpreterExpressionDeployerNP deployer =
-        new RainterpreterExpressionDeployerNP(RainterpreterExpressionDeployerConstructionConfig(
+        RainterpreterNPE2 interpreter = new RainterpreterNPE2();
+        RainterpreterStoreNPE2 store = new RainterpreterStoreNPE2();
+        RainterpreterParserNPE2 parser = new RainterpreterParserNPE2();
+        RainterpreterExpressionDeployerNPE2 deployer =
+        new RainterpreterExpressionDeployerNPE2(RainterpreterExpressionDeployerNPE2ConstructionConfig(
             address(interpreter),
             address(store),
             authoringMeta

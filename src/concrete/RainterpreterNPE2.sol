@@ -9,21 +9,20 @@ import {LibMemoryKV, MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {LibCast} from "rain.lib.typecast/LibCast.sol";
 import {LibDataContract} from "rain.datacontract/lib/LibDataContract.sol";
 
-import {IDebugInterpreterV2} from "../../interface/IDebugInterpreterV2.sol";
-import {LibEvalNP} from "../../lib/eval/LibEvalNP.sol";
-import {LibNamespace} from "../../lib/ns/LibNamespace.sol";
-import {LibInterpreterStateDataContractNP} from "../../lib/state/LibInterpreterStateDataContractNP.sol";
-import {LibEncodedDispatch} from "../../lib/caller/LibEncodedDispatch.sol";
-import {InterpreterStateNP} from "../../lib/state/LibInterpreterStateNP.sol";
-import {LibAllStandardOpsNP} from "../../lib/op/LibAllStandardOpsNP.sol";
+import {LibEvalNP} from "../lib/eval/LibEvalNP.sol";
+import {LibNamespace} from "../lib/ns/LibNamespace.sol";
+import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
+import {LibEncodedDispatch} from "../lib/caller/LibEncodedDispatch.sol";
+import {InterpreterStateNP} from "../lib/state/LibInterpreterStateNP.sol";
+import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
 import {
     SourceIndexV2,
     IInterpreterV2,
     StateNamespace,
     EncodedDispatch,
     FullyQualifiedNamespace
-} from "../../interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1} from "../../interface/IInterpreterStoreV1.sol";
+} from "../interface/unstable/IInterpreterV2.sol";
+import {IInterpreterStoreV1} from "../interface/IInterpreterStoreV1.sol";
 
 /// Thrown when the stack length is negative during eval.
 error NegativeStackLength(int256 length);
@@ -34,8 +33,7 @@ error NegativeStackLength(int256 length);
 error InvalidSourceIndex(SourceIndexV2 sourceIndex);
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH =
-    bytes32(0x21785780ab522520aaf1921d5a177b745aa7179c67305ed963c709e79bdfbe0d);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x21785780ab522520aaf1921d5a177b745aa7179c67305ed963c709e79bdfbe0d);
 
 /// @dev The function pointers known to the interpreter for dynamic dispatch.
 /// By setting these as a constant they can be inlined into the interpreter
@@ -91,7 +89,7 @@ contract RainterpreterNPE2 is IInterpreterV2, ERC165 {
             namespace.qualifyNamespace(msg.sender),
             store,
             context,
-            OPCODE_FUNCTION_POINTERS_E2
+            OPCODE_FUNCTION_POINTERS
         );
         // We use the return by returning it. Slither false positive.
         //slither-disable-next-line unused-return

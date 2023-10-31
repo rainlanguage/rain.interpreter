@@ -11,19 +11,18 @@ import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {
     IExpressionDeployerV3,
     IERC1820_NAME_IEXPRESSION_DEPLOYER_V3
-} from "../../interface/unstable/IExpressionDeployerV3.sol";
-import {IParserV1} from "../../interface/IParserV1.sol";
-import {IInterpreterV2} from "../../interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1} from "../../interface/IInterpreterStoreV1.sol";
+} from "../interface/unstable/IExpressionDeployerV3.sol";
+import {IParserV1} from "../interface/IParserV1.sol";
+import {IInterpreterV2} from "../interface/unstable/IInterpreterV2.sol";
+import {IInterpreterStoreV1} from "../interface/IInterpreterStoreV1.sol";
 
-import {LibIntegrityCheckNP} from "../../lib/integrity/LibIntegrityCheckNP.sol";
-import {LibInterpreterStateDataContractNP} from "../../lib/state/LibInterpreterStateDataContractNP.sol";
-import {LibAllStandardOpsNP} from "../../lib/op/LibAllStandardOpsNP.sol";
-import {LibParse, LibParseMeta, AuthoringMeta} from "../../lib/parse/LibParse.sol";
-
-import {
-    RainterpreterNPE2, OPCODE_FUNCTION_POINTERS_HASH_E2, INTERPRETER_BYTECODE_HASH_E2
-} from "./RainterpreterNPE2.sol";
+import {LibIntegrityCheckNP} from "../lib/integrity/LibIntegrityCheckNP.sol";
+import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
+import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
+import {LibParse, LibParseMeta} from "../lib/parse/LibParse.sol";
+import {RainterpreterNPE2, INTERPRETER_BYTECODE_HASH} from "./RainterpreterNPE2.sol";
+import {PARSER_BYTECODE_HASH} from "./RainterpreterParserNPE2.sol";
+import {STORE_BYTECODE_HASH} from "./RainterpreterStoreNPE2.sol";
 
 /// @dev Thrown when the pointers known to the expression deployer DO NOT match
 /// the interpreter it is constructed for. This WILL cause undefined expression
@@ -47,6 +46,14 @@ error UnexpectedInterpreterBytecodeHash(bytes32 expectedBytecodeHash, bytes32 ac
 /// address upon construction.
 error UnexpectedStoreBytecodeHash(bytes32 expectedBytecodeHash, bytes32 actualBytecodeHash);
 
+/// Thrown when the `RainterpreterNPE2` is constructed with unknown parser
+/// bytecode.
+/// @param expectedBytecodeHash The bytecode hash that was expected at the parser
+/// address upon construction.
+/// @param actualBytecodeHash The bytecode hash that was found at the parser
+/// address upon construction.
+error UnexpectedParserBytecodeHash(bytes32 expectedBytecodeHash, bytes32 actualBytecodeHash);
+
 /// Thrown when the `RainterpreterNPE2` is constructed with unknown meta.
 /// @param expectedConstructionMetaHash The meta hash that was expected upon
 /// construction.
@@ -59,7 +66,7 @@ bytes constant INTEGRITY_FUNCTION_POINTERS =
     hex"13dc145614bd14c61542154c15561556154215421542154215421560158215ac155615601556155615ce14bd1556155615d815d8155614bd14bd15d815d815d815d815d815d815d815d815d815d815d815d814bd15ef15f915f9";
 
 /// @dev Hash of the known construction meta.
-bytes32 constant CONSTRUCTION_META_HASH_E2 = bytes32(0x4c1b2a4b98b3aca3fdc703923ee7c428df0f0a41f52d753c3cd03c32dacfb162);
+bytes32 constant CONSTRUCTION_META_HASH = bytes32(0x4c1b2a4b98b3aca3fdc703923ee7c428df0f0a41f52d753c3cd03c32dacfb162);
 
 /// All config required to construct a `RainterpreterNPE2`.
 /// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match
@@ -159,7 +166,7 @@ contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, ERC165 {
         external
         returns (IInterpreterV2, IInterpreterStoreV1, address, bytes memory)
     {
-        bytes memory io = LibIntegrityCheckNP.integrityCheck2(INTEGRITY_FUNCTION_POINTERS_E2, bytecode, constants);
+        bytes memory io = LibIntegrityCheckNP.integrityCheck2(INTEGRITY_FUNCTION_POINTERS, bytecode, constants);
 
         emit NewExpression(msg.sender, bytecode, constants);
 

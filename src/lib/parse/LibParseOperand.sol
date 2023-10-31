@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "../../interface/IInterpreterV1.sol";
-import "./LibParseCMask.sol";
-import "./LibParse.sol";
-import "./LibParseLiteral.sol";
+import {Operand} from "../../interface/unstable/IInterpreterV2.sol";
+import {LibParse} from "./LibParse.sol";
+import {LibParseLiteral} from "./LibParseLiteral.sol";
+import {CMASK_OPERAND_END, CMASK_WHITESPACE, CMASK_OPERAND_START} from "./LibParseCMask.sol";
 
 uint8 constant OPERAND_PARSER_OFFSET_DISALLOWED = 0;
 uint8 constant OPERAND_PARSER_OFFSET_SINGLE_FULL = 0x10;

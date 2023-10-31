@@ -1,14 +1,8 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {
-    EncodedDispatch,
-    StateNamespace,
-    FullyQualifiedNamespace,
-    Operand,
-    DEFAULT_STATE_NAMESPACE
-} from "../IInterpreterV1.sol";
-import {IInterpreterStoreV1} from "../IInterpreterStoreV1.sol";
+import {EncodedDispatch, StateNamespace, Operand, DEFAULT_STATE_NAMESPACE} from "../deprecated/IInterpreterV1.sol";
+import {FullyQualifiedNamespace, IInterpreterStoreV1} from "../IInterpreterStoreV1.sol";
 
 /// @dev The index of a source within a deployed expression that can be evaluated
 /// by an `IInterpreterV2`. MAY be an entrypoint or the index of a source called

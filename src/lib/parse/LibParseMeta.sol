@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "../bitwise/LibCtPop.sol";
-import "../../interface/IInterpreterV1.sol";
-import "./LibParseOperand.sol";
+import {LibCtPop} from "../bitwise/LibCtPop.sol";
+import {Operand} from "../../interface/unstable/IInterpreterV2.sol";
+import {LibParseOperand} from "./LibParseOperand.sol";
 
 /// @dev For metadata builder.
 error DuplicateFingerprint();

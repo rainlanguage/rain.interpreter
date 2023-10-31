@@ -9,15 +9,12 @@ import {EXPRESSION_DEPLOYER_NP_META_PATH} from "../lib/constants/ExpressionDeplo
 import {LibParseMeta, AuthoringMeta} from "../../../../src/lib/parse/LibParseMeta.sol";
 import {RainterpreterStoreNPE2} from "../../../../src/concrete/RainterpreterStoreNPE2.sol";
 import {
-    RainterpreterNP,
+    RainterpreterNPE2,
     OPCODE_FUNCTION_POINTERS,
     INTERPRETER_BYTECODE_HASH
 } from "../../../../src/concrete/RainterpreterNPE2.sol";
 import {
-    AUTHORING_META_HASH,
-    STORE_BYTECODE_HASH,
     CONSTRUCTION_META_HASH,
-    PARSE_META,
     INTEGRITY_FUNCTION_POINTERS,
     RainterpreterExpressionDeployerNPE2ConstructionConfig,
     RainterpreterExpressionDeployerNPE2

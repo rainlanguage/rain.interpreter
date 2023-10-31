@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {IInterpreterStoreV1} from "../IInterpreterStoreV1.sol";
-import {IInterpreterV1} from "../IInterpreterV1.sol";
+import {IInterpreterV1} from "./IInterpreterV1.sol";
 
 string constant IERC1820_NAME_IEXPRESSION_DEPLOYER_V1 = "IExpressionDeployerV1";
 

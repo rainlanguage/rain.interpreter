@@ -7,14 +7,15 @@ import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 
-import {RainterpreterExpressionDeployerNPE2DeploymentTest} from "./RainterpreterExpressionDeployerNPE2DeploymentTest.sol";
+import {RainterpreterExpressionDeployerNPE2DeploymentTest} from
+    "./RainterpreterExpressionDeployerNPE2DeploymentTest.sol";
 import {LibInterpreterStateNP, InterpreterStateNP} from "../../../src/lib/state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP, LibIntegrityCheckNP} from "../../../src/lib/integrity/LibIntegrityCheckNP.sol";
 
 import {LibContext} from "../../../src/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "../../../src/lib/parse/LibParseOperand.sol";
 import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
-import {Operand, IInterpreterV2, SourceIndex} from "../../../src/interface/unstable/IInterpreterV2.sol";
+import {Operand, IInterpreterV2, SourceIndexV2} from "../../../src/interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1, StateNamespace} from "../../../src/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "../../../src/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "../../../src/lib/caller/LibEncodedDispatch.sol";

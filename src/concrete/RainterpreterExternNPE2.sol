@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
+import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
-import "rain.solmem/lib/LibStackPointer.sol";
-import "rain.solmem/lib/LibUint256Array.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
+import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
-import "../interface/IInterpreterV2.sol";
-import "../interface/IInterpreterExternV2.sol";
-import "../lib/op/chainlink/LibOpChainlinkOraclePrice.sol";
-import "../lib/op/deprecated/LibOp.sol";
+import {Operand} from "../interface/unstable/IInterpreterV2.sol";
+import {IInterpreterExternV2, ExternDispatch} from "../interface/IInterpreterExternV2.sol";
+import {LibOpChainlinkOraclePrice} from "../lib/op/chainlink/LibOpChainlinkOraclePrice.sol";
 
 /// Thrown when the inputs don't match the expected inputs.
 /// @param expected The expected number of inputs.
@@ -30,7 +30,6 @@ contract RainterpreterExternNPE2 is IInterpreterExternV2, ERC165 {
     using LibStackPointer for Pointer;
     using LibUint256Array for uint256;
     using LibUint256Array for uint256[];
-    using LibOp for Pointer;
 
     // @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {

@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {Operand} from "../../interface/IInterpreterV1.sol";
+import {Operand} from "../../interface/unstable/IInterpreterV2.sol";
 import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "../integrity/LibIntegrityCheckNP.sol";
 import {LibInterpreterStateNP, InterpreterStateNP} from "../state/LibInterpreterStateNP.sol";
 import {AuthoringMeta} from "../parse/LibParseMeta.sol";

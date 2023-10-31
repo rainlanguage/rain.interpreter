@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {SourceIndex, EncodedDispatch} from "../../interface/IInterpreterV1.sol";
-import {SourceIndexV2} from "../../interface/unstable/IInterpreterV2.sol";
+import {SourceIndexV2, EncodedDispatch} from "../../interface/unstable/IInterpreterV2.sol";
 
 /// @title LibEncodedDispatch
 /// @notice Establishes and implements a convention for encoding an interpreter
@@ -16,27 +15,6 @@ library LibEncodedDispatch {
     /// If the interpreter returns a larger stack than this it is merely wasting
     /// gas across the external call boundary.
     /// @return The encoded dispatch.
-    function encode(address expression, SourceIndex sourceIndex, uint16 maxOutputs)
-        internal
-        pure
-        returns (EncodedDispatch)
-    {
-        return EncodedDispatch.wrap(
-            (uint256(uint160(expression)) << 32) | (uint256(SourceIndex.unwrap(sourceIndex)) << 16) | maxOutputs
-        );
-    }
-
-    /// Decodes an `EncodedDispatch` to its constituent parts.
-    /// @param dispatch The `EncodedDispatch` to decode.
-    /// @return The expression, source index, and max outputs as per `encode`.
-    function decode(EncodedDispatch dispatch) internal pure returns (address, SourceIndex, uint16) {
-        return (
-            address(uint160(EncodedDispatch.unwrap(dispatch) >> 32)),
-            SourceIndex.wrap(uint16(EncodedDispatch.unwrap(dispatch) >> 16)),
-            uint16(EncodedDispatch.unwrap(dispatch))
-        );
-    }
-
     function encode2(address expression, SourceIndexV2 sourceIndex, uint256 maxOutputs)
         internal
         pure

@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
-import {Operand} from "../../../interface/IInterpreterV1.sol";
+import {Operand} from "../../../interface/unstable/IInterpreterV2.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 
 /// @title LibOpERC721OwnerOfNP
