@@ -5,9 +5,9 @@ import {Test} from "forge-std/Test.sol";
 import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
 import {AggregatorV3Interface} from "rain.chainlink/interface/AggregatorV3Interface.sol";
 
-import "src/interface/IInterpreterV1.sol";
-import "src/lib/extern/LibExtern.sol";
-import "src/concrete/RainterpreterExtern.sol";
+import {IInterpreterV2} from "src/interface/unstable/IInterpreterV2.sol";
+import {LibExtern} from "src/lib/extern/LibExtern.sol";
+import {RainterpreterExternNPE2} from "src/concrete/RainterpreterExternNPE2.sol";
 
 /// @title RainterpreterExternChainlinkTest
 /// Test the RainterpreterExtern implementation of the Chainlink opcode.

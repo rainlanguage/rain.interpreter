@@ -7,28 +7,28 @@ import {Test, console2, stdError} from "forge-std/Test.sol";
 import {INVALID_BYTECODE} from "../lib/etch/LibEtch.sol";
 import {EXPRESSION_DEPLOYER_NP_META_PATH} from "../lib/constants/ExpressionDeployerNPConstants.sol";
 import {LibParseMeta, AuthoringMeta} from "../../../../src/lib/parse/LibParseMeta.sol";
-import {RainterpreterStore} from "../../../../src/concrete/RainterpreterStore.sol";
+import {RainterpreterStoreNPE2} from "../../../../src/concrete/RainterpreterStoreNPE2.sol";
 import {
     RainterpreterNP,
     OPCODE_FUNCTION_POINTERS,
     INTERPRETER_BYTECODE_HASH
-} from "../../../../src/concrete/RainterpreterNP.sol";
+} from "../../../../src/concrete/RainterpreterNPE2.sol";
 import {
     AUTHORING_META_HASH,
     STORE_BYTECODE_HASH,
     CONSTRUCTION_META_HASH,
     PARSE_META,
     INTEGRITY_FUNCTION_POINTERS,
-    RainterpreterExpressionDeployerConstructionConfig,
-    RainterpreterExpressionDeployerNP
-} from "../../../src/concrete/RainterpreterExpressionDeployerNP.sol";
+    RainterpreterExpressionDeployerNPE2ConstructionConfig,
+    RainterpreterExpressionDeployerNPE2
+} from "../../../src/concrete/RainterpreterExpressionDeployerNPE2.sol";
 import {LibAllStandardOpsNP} from "../../../../src/lib/op/LibAllStandardOpsNP.sol";
 import {LibEncodedDispatch} from "../../../../src/lib/caller/LibEncodedDispatch.sol";
 
-/// @title RainterpreterExpressionDeployerNPDeploymentTest
-/// Tests that the RainterpreterExpressionDeployerN meta is correct. Also tests
-/// basic functionality of the `IParserV1` interface implementation.
-abstract contract RainterpreterExpressionDeployerNPDeploymentTest is Test {
+/// @title RainterpreterExpressionDeployerNPD2DeploymentTest
+/// Tests that the RainterpreterExpressionDeployerNPE2 meta is correct. Also
+/// tests basic functionality of the `IParserV1` interface implementation.
+abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
     //solhint-disable-next-line private-vars-leading-underscore
     RainterpreterStore internal immutable iStore;
     //solhint-disable-next-line private-vars-leading-underscore

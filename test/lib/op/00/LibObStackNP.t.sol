@@ -3,7 +3,7 @@ pragma solidity =0.8.19;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
-import {IInterpreterV1, Operand, SourceIndex} from "src/interface/IInterpreterV1.sol";
+import {IInterpreterV2, Operand, SourceIndexV2} from "src/interface/unstable/IInterpreterV2.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
 import {OutOfBoundsStackRead, LibOpStackNP} from "src/lib/op/00/LibOpStackNP.sol";

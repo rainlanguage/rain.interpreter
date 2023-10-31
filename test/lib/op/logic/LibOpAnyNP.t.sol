@@ -8,7 +8,7 @@ import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {OpTest} from "test/util/abstract/OpTest.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 import {LibOpAnyNP} from "src/lib/op/logic/LibOpAnyNP.sol";
-import {IInterpreterV1, Operand, SourceIndex} from "src/interface/IInterpreterV1.sol";
+import {IInterpreterV2, Operand, SourceIndexV2} from "src/interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1, StateNamespace, FullyQualifiedNamespace} from "src/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";

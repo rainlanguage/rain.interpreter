@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
-import "openzeppelin-contracts/contracts/utils/Address.sol";
+import {Test} from "forge-std/Test.sol";
+import {Address} from "openzeppelin-contracts/contracts/utils/Address.sol";
 
-import "rain.solmem/lib/LibUint256Array.sol";
-import "rain.lib.memkv/lib/LibMemoryKV.sol";
+import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
+import {LibMemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 
-import "src/lib/ns/LibNamespace.sol";
-import "src/concrete/RainterpreterStore.sol";
+import {LibNamespace} from "src/lib/ns/LibNamespace.sol";
+import {RainterpreterStoreNPE2} from "src/concrete/RainterpreterStoreNPE2.sol";
 
-/// @title RainterpreterStoreTest
-/// Test suite for RainterpreterStore.
-contract RainterpreterStoreTest is Test {
+/// @title RainterpreterStoreNPE2Test
+/// Test suite for RainterpreterStoreNPE2.
+contract RainterpreterStoreNPE2Test is Test {
     using LibNamespace for StateNamespace;
     using LibMemoryKV for MemoryKV;
     using Address for address;

@@ -9,7 +9,7 @@ import {OpTest} from "test/util/abstract/OpTest.sol";
 import {LibOpGetNP} from "src/lib/op/store/LibOpGetNP.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {Operand} from "src/interface/IInterpreterV1.sol";
+import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1, StateNamespace} from "src/interface/IInterpreterStoreV1.sol";
 
 contract LibOpGetNPTest is OpTest {

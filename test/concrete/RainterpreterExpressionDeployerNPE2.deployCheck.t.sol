@@ -6,25 +6,25 @@ import {INVALID_BYTECODE} from "test/util/lib/etch/LibEtch.sol";
 import {EXPRESSION_DEPLOYER_NP_META_PATH} from "test/util/lib/constants/ExpressionDeployerNPConstants.sol";
 import {IERC1820Registry} from "openzeppelin-contracts/contracts/utils/introspection/IERC1820Registry.sol";
 import {IERC1820_REGISTRY} from "rain.erc1820/lib/LibIERC1820.sol";
-import {IInterpreterV1} from "src/interface/IInterpreterV1.sol";
+import {IInterpreterV2} from "src/interface/unstable/IInterpreterV2.sol";
 
 import {
-    RainterpreterExpressionDeployerNP,
-    RainterpreterExpressionDeployerConstructionConfig,
+    RainterpreterExpressionDeployerNPE2,
+    RainterpreterExpressionDeployerNPE2ConstructionConfig,
     CONSTRUCTION_META_HASH,
     UnexpectedConstructionMetaHash,
     UnexpectedPointers
-} from "src/concrete/RainterpreterExpressionDeployerNP.sol";
-import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
-import {RainterpreterNP, OPCODE_FUNCTION_POINTERS} from "src/concrete/RainterpreterNP.sol";
+} from "src/concrete/RainterpreterExpressionDeployerNPE2.sol";
+import {RainterpreterStoreNPE2} from "src/concrete/RainterpreterStoreNPE2.sol";
+import {RainterpreterNPE2, OPCODE_FUNCTION_POINTERS} from "src/concrete/RainterpreterNPE2.sol";
 
-/// @title RainterpreterExpressionDeployerNPDeployCheckTest
-/// Test that the RainterpreterExpressionDeployerNP deploy check reverts if the
+/// @title RainterpreterExpressionDeployerNPE2DeployCheckTest
+/// Test that the RainterpreterExpressionDeployerNPE2 deploy check reverts if the
 /// passed config does not match expectations.
-contract RainterpreterExpressionDeployerNPDeployCheckTest is Test {
+contract RainterpreterExpressionDeployerNPE2DeployCheckTest is Test {
     /// Test that the deployer won't deploy if function pointers are incorrect.
-    function testRainterpreterExpressionDeployerDeployInvalidFunctionPointers(
-        RainterpreterExpressionDeployerConstructionConfig memory config,
+    function testRainterpreterExpressionDeployerNPE2DeployInvalidFunctionPointers(
+        RainterpreterExpressionDeployerNPE2ConstructionConfig memory config,
         bytes memory functionPointers
     ) external {
         vm.assume(keccak256(functionPointers) != keccak256(OPCODE_FUNCTION_POINTERS));

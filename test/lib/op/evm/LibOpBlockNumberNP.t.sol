@@ -4,7 +4,7 @@ pragma solidity =0.8.19;
 import {OpTest} from "test/util/abstract/OpTest.sol";
 
 import {LibPointer} from "rain.solmem/lib/LibPointer.sol";
-import {Operand} from "src/interface/IInterpreterV1.sol";
+import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import "rain.metadata/IMetaV1.sol";
 

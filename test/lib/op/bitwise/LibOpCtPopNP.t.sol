@@ -2,11 +2,10 @@
 pragma solidity =0.8.19;
 
 import {OpTest} from "test/util/abstract/OpTest.sol";
-import {Operand} from "src/interface/IInterpreterV1.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibOpCtPopNP} from "src/lib/op/bitwise/LibOpCtPopNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {IInterpreterV1, StateNamespace, SourceIndex} from "src/interface/IInterpreterV1.sol";
+import {IInterpreterV2, StateNamespace, Operand, SourceIndexV2} from "src/interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";

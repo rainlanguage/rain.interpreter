@@ -7,7 +7,7 @@ import {OpTest} from "test/util/abstract/OpTest.sol";
 import {LibOpSetNP} from "src/lib/op/store/LibOpSetNP.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {Operand} from "src/interface/IInterpreterV1.sol";
+import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
 
 contract LibOpSetNPTest is OpTest {
     using LibMemoryKV for MemoryKV;

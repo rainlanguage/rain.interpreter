@@ -12,10 +12,10 @@ import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterp
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibOpChainIdNP} from "src/lib/op/evm/LibOpChainIdNP.sol";
 
-import {RainterpreterNP} from "src/concrete/RainterpreterNP.sol";
-import {RainterpreterStore, StateNamespace} from "src/concrete/RainterpreterStore.sol";
-import {RainterpreterExpressionDeployerNP} from "src/concrete/RainterpreterExpressionDeployerNP.sol";
-import {Operand, IInterpreterV1, SourceIndex} from "src/interface/IInterpreterV1.sol";
+import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
+import {RainterpreterStoreNPE2, StateNamespace} from "src/concrete/RainterpreterStoreNPE2.sol";
+import {RainterpreterExpressionDeployerNPE2} from "src/concrete/RainterpreterExpressionDeployerNPE2.sol";
+import {Operand, IInterpreterV2, SourceIndexV2} from "src/interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";

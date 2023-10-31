@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "src/interface/IInterpreterExternV1.sol";
-import "src/lib/extern/LibExtern.sol";
+import {IInterpreterExternV2} from "src/interface/IInterpreterExternV2.sol";
+import {LibExtern} from "src/lib/extern/LibExtern.sol";
 
 /// @title LibExternCodecTest
 /// Tests the encoding and decoding of the types associated with extern contract
