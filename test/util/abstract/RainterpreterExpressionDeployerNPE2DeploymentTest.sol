@@ -7,7 +7,8 @@ import {Test, console2, stdError} from "forge-std/Test.sol";
 import {INVALID_BYTECODE} from "../lib/etch/LibEtch.sol";
 import {EXPRESSION_DEPLOYER_NP_META_PATH} from "../lib/constants/ExpressionDeployerNPConstants.sol";
 import {LibParseMeta, AuthoringMeta} from "../../../../src/lib/parse/LibParseMeta.sol";
-import {RainterpreterStoreNPE2} from "../../../../src/concrete/RainterpreterStoreNPE2.sol";
+import {RainterpreterStoreNPE2, STORE_BYTECODE_HASH} from "../../../../src/concrete/RainterpreterStoreNPE2.sol";
+import {RainterpreterParserNPE2, PARSE_META} from "../../../../src/concrete/RainterpreterParserNPE2.sol";
 import {
     RainterpreterNPE2,
     OPCODE_FUNCTION_POINTERS,
@@ -27,15 +28,18 @@ import {LibEncodedDispatch} from "../../../../src/lib/caller/LibEncodedDispatch.
 /// tests basic functionality of the `IParserV1` interface implementation.
 abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
     //solhint-disable-next-line private-vars-leading-underscore
-    RainterpreterStore internal immutable iStore;
+    RainterpreterExpressionDeployerNPE2 internal immutable iDeployer;
     //solhint-disable-next-line private-vars-leading-underscore
-    RainterpreterNP internal immutable iInterpreter;
+    RainterpreterNPE2 internal immutable iInterpreter;
     //solhint-disable-next-line private-vars-leading-underscore
-    RainterpreterExpressionDeployerNP internal immutable iDeployer;
+    RainterpreterStoreNPE2 internal immutable iStore;
+    //solhint-disable-next-line private-vars-leading-underscore
+    RainterpreterParserNPE2 internal immutable iParser;
 
     constructor() {
-        iStore = new RainterpreterStore();
-        iInterpreter = new RainterpreterNP();
+        iStore = new RainterpreterStoreNPE2();
+        iInterpreter = new RainterpreterNPE2();
+        iParser = new RainterpreterParserNPE2();
 
         // Sanity check the interpreter's opcode function pointers.
         bytes memory opcodeFunctionPointers = iInterpreter.functionPointers();
@@ -85,9 +89,10 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
         vm.mockCall(
             address(IERC1820_REGISTRY), abi.encodeWithSelector(IERC1820Registry.setInterfaceImplementer.selector), ""
         );
-        iDeployer = new RainterpreterExpressionDeployerNP(RainterpreterExpressionDeployerConstructionConfig(
+        iDeployer = new RainterpreterExpressionDeployerNPE2(RainterpreterExpressionDeployerNPE2ConstructionConfig(
             address(iInterpreter),
             address(iStore),
+            address(iParser),
             constructionMeta
         ));
 

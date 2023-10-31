@@ -2,19 +2,24 @@
 pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
+import {UnexpectedMetaHash, META_MAGIC_NUMBER_V1, NotRainMetaV1} from "rain.metadata/IMetaV1.sol";
+import {LibMeta} from "rain.metadata/LibMeta.sol";
+
 import {IExpressionDeployerV3} from "src/interface/unstable/IExpressionDeployerV3.sol";
-import {DeployerDiscoverableMetaV2} from "src/abstract/DeployerDiscoverableMetaV2.sol";
+import {DeployerDiscoverableMetaV3, DeployerDiscoverableMetaV3ConstructionConfig} from "src/abstract/DeployerDiscoverableMetaV3.sol";
+import {IInterpreterV2} from "src/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 
 contract TestDeployer is IExpressionDeployerV3 {
-    function deployExpression2(bytes memory, uint256[] memory, uint256[] memory)
+    function deployExpression2(bytes memory, uint256[] memory)
         external
-        returns (IInterpreterV1, IInterpreterStoreV1, address)
+        returns (IInterpreterV2, IInterpreterStoreV1, address, bytes memory)
     {}
 }
 
-contract TestDeployerDiscoverableMetaV2 is DeployerDiscoverableMetaV2 {
-    constructor(bytes32 metaHash, DeployerDiscoverableMetaV2ConstructionConfig memory config)
-        DeployerDiscoverableMetaV2(metaHash, config)
+contract TestDeployerDiscoverableMetaV3 is DeployerDiscoverableMetaV3 {
+    constructor(bytes32 metaHash, DeployerDiscoverableMetaV3ConstructionConfig memory config)
+        DeployerDiscoverableMetaV3(metaHash, config)
     {}
 }
 
@@ -22,15 +27,15 @@ contract DeployerDiscoverableMetaV2Test is Test {
     /// Copy of event from IMetaV1 interface.
     event MetaV1(address sender, uint256 subject, bytes meta);
 
-    function testDeployerDiscoverable(bytes memory baseMeta) external {
+    function testDeployerDiscoverableV3(bytes memory baseMeta) external {
         bytes memory meta = abi.encodePacked(META_MAGIC_NUMBER_V1, baseMeta);
         TestDeployer deployer = new TestDeployer();
 
         uint256 salt = 5;
 
         bytes memory bytecode = abi.encodePacked(
-            type(TestDeployerDiscoverableMetaV2).creationCode,
-            abi.encode(keccak256(meta), DeployerDiscoverableMetaV2ConstructionConfig(address(deployer), meta))
+            type(TestDeployerDiscoverableMetaV3).creationCode,
+            abi.encode(keccak256(meta), DeployerDiscoverableMetaV3ConstructionConfig(address(deployer), meta))
         );
         address expectedAddr = address(
             uint160(uint256(keccak256(abi.encodePacked(bytes1(0xFF), address(this), salt, keccak256(bytecode)))))
@@ -41,7 +46,7 @@ contract DeployerDiscoverableMetaV2Test is Test {
         vm.expectCall(
             address(deployer),
             abi.encodeWithSelector(
-                IExpressionDeployerV2.deployExpression.selector, new bytes(0), new uint256[](0), new uint256[](0)
+                IExpressionDeployerV3.deployExpression.selector, new bytes(0), new uint256[](0), new uint256[](0)
             ),
             1
         );
@@ -55,15 +60,15 @@ contract DeployerDiscoverableMetaV2Test is Test {
         assertEq(expectedAddr, addr);
     }
 
-    function testDeployerDiscoverableInvalidMeta(bytes memory baseMeta) external {
+    function testDeployerDiscoverableV3InvalidMeta(bytes memory baseMeta) external {
         TestDeployer deployer = new TestDeployer();
 
         vm.assume(!LibMeta.isRainMetaV1(baseMeta));
         vm.expectRevert(abi.encodeWithSelector(NotRainMetaV1.selector, baseMeta));
-        new TestDeployerDiscoverableMetaV2(keccak256(baseMeta), DeployerDiscoverableMetaV2ConstructionConfig(address(deployer), baseMeta));
+        new TestDeployerDiscoverableMetaV3(keccak256(baseMeta), DeployerDiscoverableMetaV3ConstructionConfig(address(deployer), baseMeta));
 
         bytes memory meta = abi.encodePacked(META_MAGIC_NUMBER_V1, baseMeta);
         vm.expectRevert(abi.encodeWithSelector(UnexpectedMetaHash.selector, bytes32(0), keccak256(meta)));
-        new TestDeployerDiscoverableMetaV2(bytes32(0), DeployerDiscoverableMetaV2ConstructionConfig(address(deployer), meta));
+        new TestDeployerDiscoverableMetaV3(bytes32(0), DeployerDiscoverableMetaV3ConstructionConfig(address(deployer), meta));
     }
 }

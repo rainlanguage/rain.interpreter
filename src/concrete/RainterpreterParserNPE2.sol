@@ -6,7 +6,6 @@ import {IERC165, ERC165} from "openzeppelin-contracts/contracts/utils/introspect
 import {LibParse} from "../lib/parse/LibParse.sol";
 import {IParserV1} from "../interface/IParserV1.sol";
 
-
 bytes32 constant PARSER_BYTECODE_HASH = bytes32(0);
 
 bytes constant PARSE_META =
