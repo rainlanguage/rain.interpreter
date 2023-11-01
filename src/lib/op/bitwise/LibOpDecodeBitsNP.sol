@@ -30,13 +30,13 @@ library LibOpDecodeBitsNP {
             // We decode as a start and length of bits. This avoids mistakes such as
             // inclusive/exclusive ranges, and makes it easier to reason about the
             // encoding.
-            uint256 startBit = (Operand.unwrap(operand) >> 8) & 0xFF;
-            uint256 length = Operand.unwrap(operand) & 0xFF;
+            uint256 startBit = Operand.unwrap(operand) & 0xFF;
+            uint256 length = (Operand.unwrap(operand) >> 8) & 0xFF;
 
             // Build a bitmask of desired length. Max length is uint8 max which
             // is 255. A 256 length doesn't really make sense as that isn't an
             // encoding anyway, it's just the value verbatim.
-            uint256 mask = (2 ** length - 1);
+            uint256 mask = (1 << length) - 1;
             value = (value >> startBit) & mask;
 
             assembly ("memory-safe") {
@@ -44,5 +44,24 @@ library LibOpDecodeBitsNP {
             }
             return stackTop;
         }
+    }
+
+    function referenceFn(InterpreterStateNP memory, Operand operand, uint256[] memory inputs)
+        internal
+        pure
+        returns (uint256[] memory outputs)
+    {
+        // We decode as a start and length of bits. This avoids mistakes such as
+        // inclusive/exclusive ranges, and makes it easier to reason about the
+        // encoding.
+        uint256 startBit = Operand.unwrap(operand) & 0xFF;
+        uint256 length = (Operand.unwrap(operand) >> 8) & 0xFF;
+
+        // Build a bitmask of desired length. Max length is uint8 max which
+        // is 255. A 256 length doesn't really make sense as that isn't an
+        // encoding anyway, it's just the value verbatim.
+        uint256 mask = (2 ** length) - 1;
+        outputs = new uint256[](1);
+        outputs[0] = (inputs[0] >> startBit) & mask;
     }
 }
