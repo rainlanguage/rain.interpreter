@@ -15,6 +15,7 @@ library LibOpDecodeBitsNP {
     function integrity(IntegrityCheckStateNP memory state, Operand operand) internal pure returns (uint256, uint256) {
         // Use exact same integrity check as encode other than the return values.
         // All we're interested in is the errors that might be thrown.
+        //slither-disable-next-line unused-return
         LibOpEncodeBitsNP.integrity(state, operand);
 
         return (1, 1);
@@ -36,6 +37,7 @@ library LibOpDecodeBitsNP {
             // Build a bitmask of desired length. Max length is uint8 max which
             // is 255. A 256 length doesn't really make sense as that isn't an
             // encoding anyway, it's just the value verbatim.
+            //slither-disable-next-line incorrect-shift
             uint256 mask = (1 << length) - 1;
             value = (value >> startBit) & mask;
 
