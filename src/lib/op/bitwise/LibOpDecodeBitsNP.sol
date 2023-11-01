@@ -5,20 +5,17 @@ import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 import {Operand} from "../../../interface/IInterpreterV1.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {TruncatedEncoding} from "./LibOpEncodeBitsNP.sol";
+import {LibOpEncodeBitsNP} from "./LibOpEncodeBitsNP.sol";
 
 /// @title LibOpDecodeBitsNP
 /// @notice Opcode for decoding binary data from a 256 bit value that was encoded
 /// with LibOpEncodeBitsNP.
 library LibOpDecodeBitsNP {
     /// Decode takes a single value and returns the decoded value.
-    function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
-        uint256 startBit_ = (Operand.unwrap(operand) >> 8) & 0xFF;
-        uint256 length_ = Operand.unwrap(operand) & 0xFF;
-
-        if (startBit_ + length_ > 256) {
-            revert TruncatedEncoding(startBit_, length_);
-        }
+    function integrity(IntegrityCheckStateNP memory state, Operand operand) internal pure returns (uint256, uint256) {
+        // Use exact same integrity check as encode other than the return values.
+        // All we're interested in is the errors that might be thrown.
+        LibOpEncodeBitsNP.integrity(state, operand);
 
         return (1, 1);
     }

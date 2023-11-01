@@ -12,6 +12,9 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 /// @param length The length of the OOB encoding.
 error TruncatedEncoding(uint256 startBit, uint256 length);
 
+/// Thrown during integrity check when the length is zero.
+error ZeroLengthEncoding();
+
 /// @title LibOpEncodeBitsNP
 /// @notice Opcode for encoding binary data into a 256 bit value.
 library LibOpEncodeBitsNP {
@@ -20,6 +23,9 @@ library LibOpEncodeBitsNP {
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
         uint256 startBit = (Operand.unwrap(operand) >> 8) & 0xFF;
         uint256 length = Operand.unwrap(operand) & 0xFF;
+        if (length == 0) {
+            revert ZeroLengthEncoding();
+        }
         if (startBit + length > 256) {
             revert TruncatedEncoding(startBit, length);
         }
