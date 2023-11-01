@@ -29,14 +29,14 @@ error NegativeStackLength(int256 length);
 error InvalidSourceIndex(SourceIndex sourceIndex);
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x21785780ab522520aaf1921d5a177b745aa7179c67305ed963c709e79bdfbe0d);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x7c92b6f8af0156483f49175f220b7f9f8349ccfdb0e9f5a46c8b54872b14c1b3);
 
 /// @dev The function pointers known to the interpreter for dynamic dispatch.
 /// By setting these as a constant they can be inlined into the interpreter
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
 bytes constant OPCODE_FUNCTION_POINTERS =
-    hex"0d090d550d900da90e470f2b0f65101510b710e6111511151164119311f5127d13241338138e13a213b713d113dc13f01405148214cd14f3150a15211521156c15b716021602164d164d169816e3172e172e17791860189318ea";
+    hex"0d1b0d670da20dbb0dfd0e4f0eed0fd1100b10bb115d118c11bb11bb120a1239129b132313ca13de14341448145d14771482149614ab15281573159915b015c715c71612165d16a816a816f316f3173e178917d417d4181f190619391990";
 
 /// @dev compile time computed hash of the function pointers.
 bytes32 constant OPCODE_FUNCTION_POINTERS_HASH = keccak256(OPCODE_FUNCTION_POINTERS);
