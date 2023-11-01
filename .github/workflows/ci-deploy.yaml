@@ -26,7 +26,7 @@ jobs:
         run: cast wallet address "${DEPLOYMENT_KEY}"
       - name: Forge shallow install
         run: forge install --shallow
-      - name: Forge deploy contracts to mumbai
+      - name: Forge deploy contracts to ${{ inputs.network }}
         env:
           CI_DEPLOY_RPC_URL: ${{ inputs.network == 'polygon' && secrets.CI_DEPLOY_POLYGON_RPC_URL || secrets.CI_DEPLOY_RPC_URL }}
           EXPLORER_VERIFICATION_KEY: ${{ secrets.EXPLORER_VERIFICATION_KEY }}
