@@ -77,12 +77,12 @@ contract LibOpConditionsNPTest is OpTest {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: conditions(5 0);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
+            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
 
@@ -97,12 +97,12 @@ contract LibOpConditionsNPTest is OpTest {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: conditions(5 6);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
+            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
 
@@ -116,13 +116,13 @@ contract LibOpConditionsNPTest is OpTest {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: conditions(0 5);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 0;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
         vm.expectRevert(abi.encodeWithSelector(NoConditionsMet.selector, 0));
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 0),
+            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         (stack);
@@ -134,13 +134,13 @@ contract LibOpConditionsNPTest is OpTest {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: conditions<7>(0x00 0x00 0x00 0x00);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
         vm.expectRevert(abi.encodeWithSelector(NoConditionsMet.selector, 7));
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
+            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         (stack);
@@ -153,12 +153,12 @@ contract LibOpConditionsNPTest is OpTest {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: conditions(0 9 3 4);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
+            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
 
@@ -173,12 +173,12 @@ contract LibOpConditionsNPTest is OpTest {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: conditions(5 6 7 8);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
+            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
 
@@ -193,12 +193,12 @@ contract LibOpConditionsNPTest is OpTest {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: conditions(5 6 0 9);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
+            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
 

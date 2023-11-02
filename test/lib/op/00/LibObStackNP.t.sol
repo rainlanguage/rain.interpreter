@@ -152,12 +152,12 @@ contract LibOpStackNPTest is OpTest {
 
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 2;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 2),
+            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 2),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         assertEq(stack.length, 2);
@@ -202,12 +202,12 @@ contract LibOpStackNPTest is OpTest {
 
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 6;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 6),
+            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 6),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         assertEq(stack.length, 6);

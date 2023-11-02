@@ -1,50 +1,52 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
-import "src/lib/caller/LibEvaluable.sol";
-import "./LibEvaluableSlow.sol";
+import {Test} from "forge-std/Test.sol";
+import {LibEvaluable, EvaluableV2} from "src/lib/caller/LibEvaluable.sol";
+import {LibEvaluableSlow} from "./LibEvaluableSlow.sol";
+import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
+import {IInterpreterV2} from "src/interface/unstable/IInterpreterV2.sol";
 
 contract LibEvaluableTest is Test {
-    using LibEvaluable for Evaluable;
+    using LibEvaluable for EvaluableV2;
 
-    function testHashDifferent(Evaluable memory a, Evaluable memory b) public {
+    function testHashDifferent(EvaluableV2 memory a, EvaluableV2 memory b) public {
         vm.assume(a.interpreter != b.interpreter || a.store != b.store || a.expression != b.expression);
         assertTrue(a.hash() != b.hash());
     }
 
-    function testHashSame(Evaluable memory a) public {
-        Evaluable memory b = Evaluable(a.interpreter, a.store, a.expression);
+    function testHashSame(EvaluableV2 memory a) public {
+        EvaluableV2 memory b = EvaluableV2(a.interpreter, a.store, a.expression);
         assertEq(a.hash(), b.hash());
     }
 
-    function testHashSensitivity(Evaluable memory a, Evaluable memory b) public {
+    function testHashSensitivity(EvaluableV2 memory a, EvaluableV2 memory b) public {
         vm.assume(a.interpreter != b.interpreter && a.store != b.store && a.expression != b.expression);
 
-        Evaluable memory c;
+        EvaluableV2 memory c;
 
         assertTrue(a.hash() != b.hash());
 
         // Check interpreter changes hash.
-        c = Evaluable(b.interpreter, a.store, a.expression);
+        c = EvaluableV2(b.interpreter, a.store, a.expression);
         assertTrue(a.hash() != c.hash());
 
         // Check store changes hash.
-        c = Evaluable(a.interpreter, b.store, a.expression);
+        c = EvaluableV2(a.interpreter, b.store, a.expression);
         assertTrue(a.hash() != c.hash());
 
         // Check expression changes hash.
-        c = Evaluable(a.interpreter, a.store, b.expression);
+        c = EvaluableV2(a.interpreter, a.store, b.expression);
         assertTrue(a.hash() != c.hash());
 
         // Check match.
-        c = Evaluable(a.interpreter, a.store, a.expression);
+        c = EvaluableV2(a.interpreter, a.store, a.expression);
         assertEq(a.hash(), c.hash());
 
         // Check hash doesn't include extraneous data
         uint256 v0 = type(uint256).max;
         uint256 v1 = 0;
-        Evaluable memory d = Evaluable(IInterpreterV1(address(0)), IInterpreterStoreV1(address(0)), address(0));
+        EvaluableV2 memory d = EvaluableV2(IInterpreterV2(address(0)), IInterpreterStoreV1(address(0)), address(0));
         assembly ("memory-safe") {
             mstore(mload(0x40), v0)
         }
@@ -57,14 +59,14 @@ contract LibEvaluableTest is Test {
     }
 
     function testEvaluableHashGas0() public pure {
-        Evaluable(IInterpreterV1(address(0)), IInterpreterStoreV1(address(0)), address(0)).hash();
+        EvaluableV2(IInterpreterV2(address(0)), IInterpreterStoreV1(address(0)), address(0)).hash();
     }
 
     function testEvaluableHashGasSlow0() public pure {
-        LibEvaluableSlow.hashSlow(Evaluable(IInterpreterV1(address(0)), IInterpreterStoreV1(address(0)), address(0)));
+        LibEvaluableSlow.hashSlow(EvaluableV2(IInterpreterV2(address(0)), IInterpreterStoreV1(address(0)), address(0)));
     }
 
-    function testEvaluableReferenceImplementation(Evaluable memory evaluable) public {
+    function testEvaluableReferenceImplementation(EvaluableV2 memory evaluable) public {
         assertEq(LibEvaluable.hash(evaluable), LibEvaluableSlow.hashSlow(evaluable));
     }
 }

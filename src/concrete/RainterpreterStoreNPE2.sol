@@ -7,7 +7,7 @@ import "../interface/IInterpreterStoreV1.sol";
 import "../lib/ns/LibNamespace.sol";
 
 /// Thrown when a `set` call is made with an odd number of arguments.
-error RainterpreterStoreOddSetLength(uint256 length);
+error OddSetLength(uint256 length);
 
 /// @dev Hash of the known store bytecode.
 bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);
@@ -45,7 +45,7 @@ contract RainterpreterStoreNPE2 is IInterpreterStoreV1, ERC165 {
         /// This would be picked up by an out of bounds index below, but it's
         /// nice to have a more specific error message.
         if (kvs.length % 2 != 0) {
-            revert RainterpreterStoreOddSetLength(kvs.length);
+            revert OddSetLength(kvs.length);
         }
         unchecked {
             FullyQualifiedNamespace fullyQualifiedNamespace = namespace.qualifyNamespace(msg.sender);

@@ -39,12 +39,12 @@ contract LibOpHashNPTest is OpTest {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: hash();");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
+            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         assertEq(stack.length, 1, "stack length");
@@ -57,12 +57,12 @@ contract LibOpHashNPTest is OpTest {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: hash(0x1234567890abcdef);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
+            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         assertEq(stack.length, 1);
@@ -77,12 +77,12 @@ contract LibOpHashNPTest is OpTest {
             iDeployer.parse("_: hash(0x1234567890abcdef 0x1234567890abcdef);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 2),
+            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 2),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         assertEq(stack.length, 1);
@@ -99,12 +99,12 @@ contract LibOpHashNPTest is OpTest {
             iDeployer.parse("_: hash(0x1234567890abcdef 0xfedcba0987654321);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 2),
+            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 2),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         assertEq(stack.length, 1);
@@ -121,12 +121,12 @@ contract LibOpHashNPTest is OpTest {
             iDeployer.parse("_ _ _: 5 hash(0x1234567890abcdef 0xfedcba0987654321) 9;");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 3;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 3),
+            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 3),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         assertEq(stack.length, 3);

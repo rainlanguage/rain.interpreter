@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "test/util/lib/parse/LibMetaFixture.sol";
+import {OPERAND_PARSER_OFFSET_DISALLOWED, ExpectedOperand, UnexpectedOperand, UnclosedOperand} from "src/lib/parse/LibParseOperand.sol";
+import {LibParse, ExpectedLeftParen} from "src/lib/parse/LibParse.sol";
+import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
 
 contract LibParseOperandDisallowedTest is Test {
     /// Opening an operand is disallowed for words that don't support it.

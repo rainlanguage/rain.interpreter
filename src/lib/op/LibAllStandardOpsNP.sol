@@ -76,7 +76,7 @@ uint256 constant ALL_STANDARD_OPS_LENGTH = 45;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
-/// array to easily build function pointers for `IInterpreterV1`.
+/// array to easily build function pointers for `IInterpreterV2`.
 library LibAllStandardOpsNP {
     function authoringMeta() internal pure returns (bytes memory) {
         AuthoringMeta memory lengthPlaceholder;
@@ -389,7 +389,7 @@ library LibAllStandardOpsNP {
     }
 
     /// All function pointers for the standard opcodes. Intended to be used to
-    /// build a `IInterpreterV1` instance, specifically the `functionPointers`
+    /// build a `IInterpreterV2` instance, specifically the `functionPointers`
     /// method can just be a thin wrapper around this function.
     function opcodeFunctionPointers() internal pure returns (bytes memory) {
         unchecked {

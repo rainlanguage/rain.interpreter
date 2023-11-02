@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
+import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {Test} from "forge-std/Test.sol";
 import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
 import {AggregatorV3Interface} from "rain.chainlink/interface/AggregatorV3Interface.sol";
+import {LibChainlink} from "rain.chainlink/lib/LibChainlink.sol";
 
-import {IInterpreterV2} from "src/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterV2, Operand} from "src/interface/unstable/IInterpreterV2.sol";
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {RainterpreterExternNPE2} from "src/concrete/RainterpreterExternNPE2.sol";
 
@@ -36,7 +38,7 @@ contract RainterpreterExternChainlinkTest is Test {
         uint256 price =
             LibChainlink.roundDataToPrice(currentTimestamp, staleAfter, scalingFlags, answer, updatedAt, decimals);
 
-        RainterpreterExtern extern = new RainterpreterExtern();
+        RainterpreterExternNPE2 extern = new RainterpreterExternNPE2();
 
         {
             vm.assume(address(uint160(feed)) != address(extern));

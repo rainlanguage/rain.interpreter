@@ -53,14 +53,14 @@ contract LibOpChainIdNPTest is OpTest {
 
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
 
         vm.chainId(chainId);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             namespace,
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
+            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         assertEq(stack.length, 1, "stack length");

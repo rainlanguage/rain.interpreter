@@ -3,8 +3,9 @@ pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
+import {LibChainlink} from "rain.chainlink/lib/LibChainlink.sol";
 
-import {IInterpreterV2} from "src/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterV2, Operand} from "src/interface/unstable/IInterpreterV2.sol";
 import {LibOpChainlinkOraclePrice} from "src/lib/op/chainlink/LibOpChainlinkOraclePrice.sol";
 import {AggregatorV3Interface} from "rain.chainlink/interface/AggregatorV3Interface.sol";
 

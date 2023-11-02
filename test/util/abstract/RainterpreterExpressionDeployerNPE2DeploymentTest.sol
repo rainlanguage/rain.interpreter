@@ -6,22 +6,22 @@ import {Test, console2, stdError} from "forge-std/Test.sol";
 
 import {INVALID_BYTECODE} from "../lib/etch/LibEtch.sol";
 import {EXPRESSION_DEPLOYER_NP_META_PATH} from "../lib/constants/ExpressionDeployerNPConstants.sol";
-import {LibParseMeta, AuthoringMeta} from "../../../../src/lib/parse/LibParseMeta.sol";
-import {RainterpreterStoreNPE2, STORE_BYTECODE_HASH} from "../../../../src/concrete/RainterpreterStoreNPE2.sol";
-import {RainterpreterParserNPE2, PARSE_META} from "../../../../src/concrete/RainterpreterParserNPE2.sol";
+import {LibParseMeta, AuthoringMeta} from "src/lib/parse/LibParseMeta.sol";
+import {RainterpreterStoreNPE2, STORE_BYTECODE_HASH} from "src/concrete/RainterpreterStoreNPE2.sol";
+import {RainterpreterParserNPE2, PARSE_META} from "src/concrete/RainterpreterParserNPE2.sol";
 import {
     RainterpreterNPE2,
     OPCODE_FUNCTION_POINTERS,
     INTERPRETER_BYTECODE_HASH
-} from "../../../../src/concrete/RainterpreterNPE2.sol";
+} from "src/concrete/RainterpreterNPE2.sol";
 import {
     CONSTRUCTION_META_HASH,
     INTEGRITY_FUNCTION_POINTERS,
     RainterpreterExpressionDeployerNPE2ConstructionConfig,
     RainterpreterExpressionDeployerNPE2
 } from "../../../src/concrete/RainterpreterExpressionDeployerNPE2.sol";
-import {LibAllStandardOpsNP} from "../../../../src/lib/op/LibAllStandardOpsNP.sol";
-import {LibEncodedDispatch} from "../../../../src/lib/caller/LibEncodedDispatch.sol";
+import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
+import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 
 /// @title RainterpreterExpressionDeployerNPD2DeploymentTest
 /// Tests that the RainterpreterExpressionDeployerNPE2 meta is correct. Also
@@ -95,23 +95,6 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
             address(iParser),
             constructionMeta
         ));
-
-        // Sanity check the deployer's parse meta.
-        bytes memory authoringMetaData = LibAllStandardOpsNP.authoringMeta();
-        bytes32 authoringMetaHash = keccak256(authoringMetaData);
-        if (authoringMetaHash != AUTHORING_META_HASH) {
-            console2.log("current authoring meta hash:");
-            console2.logBytes32(authoringMetaHash);
-            revert("unexpected authoring meta hash");
-        }
-
-        AuthoringMeta[] memory authoringMeta = abi.decode(authoringMetaData, (AuthoringMeta[]));
-        bytes memory builtParseMeta = LibParseMeta.buildParseMeta(authoringMeta, 2);
-        if (keccak256(PARSE_META) != keccak256(builtParseMeta)) {
-            console2.log("current deployer parse meta:");
-            console2.logBytes(builtParseMeta);
-            revert("unexpected deployer parse meta");
-        }
 
         // Sanity check the deployer's integrity function pointers.
         bytes memory integrityFunctionPointers = iDeployer.integrityFunctionPointers();

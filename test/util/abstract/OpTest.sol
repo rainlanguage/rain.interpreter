@@ -24,7 +24,7 @@ import {LibNamespace} from "../../../src/lib/ns/LibNamespace.sol";
 uint256 constant PRE = uint256(keccak256(abi.encodePacked("pre")));
 uint256 constant POST = uint256(keccak256(abi.encodePacked("post")));
 
-abstract contract OpTest is RainterpreterExpressionDeployerNPDeploymentTest {
+abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     using LibInterpreterStateNP for InterpreterStateNP;
     using LibUint256Array for uint256[];
     using LibPointer for Pointer;
@@ -169,13 +169,13 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPDeploymentTest {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(rainString);
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 0;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
 
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), type(uint16).max),
+            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), type(uint16).max),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         return (stack, kvs);
@@ -207,13 +207,13 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPDeploymentTest {
         (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(rainString);
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
         vm.expectRevert(err);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
+            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         (stack);
@@ -227,7 +227,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPDeploymentTest {
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 0;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, opIndex, calcInputs, bytecodeInputs));
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
         (interpreterDeployer);
         (storeDeployer);

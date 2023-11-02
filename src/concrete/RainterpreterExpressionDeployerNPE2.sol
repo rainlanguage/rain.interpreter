@@ -136,8 +136,8 @@ contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, ERC165 {
         assembly ("memory-safe") {
             parserHash := extcodehash(config.parser)
         }
-        if (parserHash != parser.expectedBytecodeHash()) {
-            revert UnexpectedParserBytecodeHash(parser.expectedBytecodeHash(), parserHash);
+        if (parserHash != expectedParserBytecodeHash()) {
+            revert UnexpectedParserBytecodeHash(expectedParserBytecodeHash(), parserHash);
         }
 
         // Emit the DISPair.

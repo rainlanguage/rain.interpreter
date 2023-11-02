@@ -66,7 +66,7 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
         constants[1] = uint256(uint160(account));
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
             iDeployer.deployExpression(bytecode, constants, minOutputs);
 
         vm.mockCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), abi.encode(balance));
@@ -74,7 +74,7 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
+            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         assertEq(stack.length, 1);

@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "src/lib/op/LibAllStandardOpsNP.sol";
-import "src/lib/eval/LibEvalNP.sol";
+import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
+import {LibEvalNP} from "src/lib/eval/LibEvalNP.sol";
+import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
+import {IInterpreterStoreV1, FullyQualifiedNamespace} from "src/interface/IInterpreterStoreV1.sol";
 
 contract LibEvalNPFBoundsTest is Test {
     /// Due to the mod of indexes to function pointers the indexes wrap at the

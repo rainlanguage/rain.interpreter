@@ -10,7 +10,7 @@ import "test/util/lib/etch/LibEtch.sol";
 contract TestDeployerV1 is IExpressionDeployerV1 {
     function deployExpression(bytes[] memory, uint256[] memory, uint256[] memory)
         external
-        returns (IInterpreterV1, IInterpreterStoreV1, address)
+        returns (IInterpreterV2, IInterpreterStoreV1, address)
     {}
 }
 
