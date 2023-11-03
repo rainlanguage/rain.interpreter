@@ -19,9 +19,6 @@ error EntrypointMissing(uint256 expectedEntrypoints, uint256 actualEntrypoints);
 /// only internal dispatches can have source level inputs.
 error EntrypointNonZeroInput(uint256 entrypointIndex, uint256 inputsLength);
 
-/// Thrown when some entrypoint has less outputs than the minimum required.
-error EntrypointMinOutputs(uint256 entrypointIndex, uint256 outputsLength, uint256 minOutputs);
-
 /// The bytecode and integrity function disagree on number of inputs.
 error BadOpInputsLength(uint256 opIndex, uint256 calculatedInputs, uint256 bytecodeInputs);
 

@@ -128,6 +128,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainlang);
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
+        (io);
         (uint256[] memory actualStack, uint256[] memory actualKVs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
@@ -197,6 +198,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         // Recursion isn't caught at deploy time.
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
+        (io);
         // But it will unconditionally happen at runtime.
         vm.expectRevert();
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(

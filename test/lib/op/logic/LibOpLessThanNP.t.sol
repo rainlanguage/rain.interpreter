@@ -122,10 +122,10 @@ contract LibOpLessThanNPTest is OpTest {
     /// Test that a less than to with 1 input fails integrity check.
     function testOpLessThanToNPEvalFail1Input() public {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: less-than(0x00);");
-        uint256[] memory minOutputs = new uint256[](1);
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 2, 1));
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
+        (io);
         (interpreterDeployer, storeDeployer, expression, io);
     }
 

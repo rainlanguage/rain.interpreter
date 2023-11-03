@@ -115,6 +115,7 @@ contract LibOpConditionsNPTest is OpTest {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: conditions(0 5);");
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
+        (io);
         vm.expectRevert(abi.encodeWithSelector(NoConditionsMet.selector, 0));
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -132,6 +133,7 @@ contract LibOpConditionsNPTest is OpTest {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: conditions<7>(0x00 0x00 0x00 0x00);");
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
+        (io);
         vm.expectRevert(abi.encodeWithSelector(NoConditionsMet.selector, 7));
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,

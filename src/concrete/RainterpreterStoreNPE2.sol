@@ -10,7 +10,7 @@ import "../lib/ns/LibNamespace.sol";
 error OddSetLength(uint256 length);
 
 /// @dev Hash of the known store bytecode.
-bytes32 constant STORE_BYTECODE_HASH = bytes32(0xd6130168250d3957ae34f8026c2bdbd7e21d35bb202e8540a9b3abcbc232ddb6);
+bytes32 constant STORE_BYTECODE_HASH = bytes32(0x164129e7cc02325a2d4a68e522b99034ade4f75e7998d75c121bb5b364d6310c);
 
 /// @title RainterpreterStore
 /// @notice Simplest possible `IInterpreterStoreV1` that could work.

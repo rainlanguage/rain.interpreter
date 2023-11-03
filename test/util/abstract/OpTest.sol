@@ -169,7 +169,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
-
+        (io);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
@@ -206,6 +206,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
+        (io);
         vm.expectRevert(err);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,

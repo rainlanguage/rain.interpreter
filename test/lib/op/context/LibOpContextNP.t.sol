@@ -160,6 +160,7 @@ contract LibOpContextNPTest is OpTest {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: context<1 0>();");
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
+        (io);
         vm.expectRevert(stdError.indexOOBError);
         interpreterDeployer.eval2(
             storeDeployer,
@@ -178,6 +179,7 @@ contract LibOpContextNPTest is OpTest {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: context<0 1>();");
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
+        (io);
         vm.expectRevert(stdError.indexOOBError);
         interpreterDeployer.eval2(
             storeDeployer,
