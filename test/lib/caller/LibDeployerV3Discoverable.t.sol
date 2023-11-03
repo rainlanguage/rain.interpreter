@@ -8,9 +8,9 @@ import {IInterpreterV2} from "src/interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 
 contract TestDeployerV3 is IExpressionDeployerV3 {
-    function deployExpression2(bytes memory, uint256[] memory, uint256[] memory)
+    function deployExpression2(bytes memory, uint256[] memory)
         external
-        returns (IInterpreterV2, IInterpreterStoreV1, address)
+        returns (IInterpreterV2, IInterpreterStoreV1, address, bytes memory)
     {}
 }
 

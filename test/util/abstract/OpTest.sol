@@ -167,16 +167,15 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
 
     function parseAndEval(bytes memory rainString) internal returns (uint256[] memory, uint256[] memory) {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 0;
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
 
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), type(uint16).max),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0)
         );
         return (stack, kvs);
     }
@@ -205,33 +204,27 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
 
     function checkUnhappy(bytes memory rainString, bytes memory err) internal {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
         vm.expectRevert(err);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0)
         );
-        (stack);
-        (kvs);
+        (stack, kvs);
     }
 
     function checkBadInputs(bytes memory rainString, uint256 opIndex, uint256 calcInputs, uint256 bytecodeInputs)
         internal
     {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 0;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, opIndex, calcInputs, bytecodeInputs));
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression2(bytecode, constants, minOutputs);
-        (interpreterDeployer);
-        (storeDeployer);
-        (expression);
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
+        (interpreterDeployer, storeDeployer, expression, io);
     }
 
     function checkDisallowedOperand(bytes memory rainString, uint256 offset) internal {

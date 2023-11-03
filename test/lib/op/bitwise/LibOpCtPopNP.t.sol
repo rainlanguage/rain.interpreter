@@ -38,20 +38,19 @@ contract LibOpCtPopNPTest is OpTest {
         // Override the constant with the value we want to test.
         constants[0] = x;
 
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
-
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0)
         );
         assertEq(stack.length, 1);
         assertEq(stack[0], LibCtPop.ctpop(x));
         assertEq(kvs.length, 0);
+        assertEq(io, hex"0001");
     }
 
     /// Test that a bitwise count with bad inputs fails integrity.

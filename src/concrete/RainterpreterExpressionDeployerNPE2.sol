@@ -98,12 +98,13 @@ contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, ERC165 {
 
     constructor(RainterpreterExpressionDeployerNPE2ConstructionConfig memory config) {
         // Set the immutables.
-        IParserV1 parser = IParserV1(config.parser);
         IInterpreterV2 interpreter = IInterpreterV2(config.interpreter);
         IInterpreterStoreV1 store = IInterpreterStoreV1(config.store);
-        iParser = parser;
+        IParserV1 parser = IParserV1(config.parser);
+
         iInterpreter = interpreter;
         iStore = store;
+        iParser = parser;
 
         /// This IS a security check. This prevents someone making an exact
         /// bytecode copy of the interpreter and shipping different meta for
@@ -134,7 +135,7 @@ contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, ERC165 {
         // Guard against a parser with unknown bytecode.
         bytes32 parserHash;
         assembly ("memory-safe") {
-            parserHash := extcodehash(config.parser)
+            parserHash := extcodehash(parser)
         }
         if (parserHash != expectedParserBytecodeHash()) {
             revert UnexpectedParserBytecodeHash(expectedParserBytecodeHash(), parserHash);

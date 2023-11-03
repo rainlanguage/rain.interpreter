@@ -64,10 +64,8 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
         assertEq(constants[1], 1);
         constants[0] = uint256(uint160(token));
         constants[1] = uint256(uint160(account));
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
 
         vm.mockCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), abi.encode(balance));
         vm.expectCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), 1);
@@ -75,18 +73,18 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
             storeDeployer,
             StateNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0)
         );
         assertEq(stack.length, 1);
         assertEq(stack[0], balance);
         assertEq(kvs.length, 0);
+        assertEq(io, hex"0001");
     }
 
     /// Test that balance of without inputs fails integrity check.
     function testOpERC721BalanceOfNPIntegrityFail0() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: erc721-balance-of();");
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));
         iDeployer.deployExpression2(bytecode, constants);
     }
@@ -94,19 +92,15 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
     /// Test that balance of with one input fails integrity check.
     function testOpERC721BalanceOfNPIntegrityFail1() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: erc721-balance-of(0x00);");
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 2, 1));
-        iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        iDeployer.deployExpression2(bytecode, constants);
     }
 
     /// Test that balance of with three inputs fails integrity check.
     function testOpERC721BalanceOfNPIntegrityFail3() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: erc721-balance-of(0x00 0x01 0x02);");
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
-        iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        iDeployer.deployExpression2(bytecode, constants);
     }
 
     /// Test that operand fails integrity check.

@@ -150,15 +150,14 @@ contract LibOpStackNPTest is OpTest {
         assertEq(constants.length, 1);
         assertEq(constants[0], 1);
 
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 2;
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 2),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0)
         );
         assertEq(stack.length, 2);
         assertEq(stack[0], 1);
@@ -200,15 +199,14 @@ contract LibOpStackNPTest is OpTest {
             hex"00000003"
         );
 
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 6;
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 6),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0)
         );
         assertEq(stack.length, 6);
         assertEq(stack[0], 1);

@@ -91,6 +91,7 @@ contract RainterpreterExpressionDeployerNPE2DeployCheckTest is Test {
         new RainterpreterExpressionDeployerNPE2(RainterpreterExpressionDeployerNPE2ConstructionConfig(
             address(0),
             address(0),
+            address(0),
             badConstructionMeta
         ));
     }

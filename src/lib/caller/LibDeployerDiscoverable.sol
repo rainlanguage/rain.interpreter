@@ -18,10 +18,8 @@ library LibDeployerDiscoverable {
     /// transaction as the caller meta, there only needs to be one expression on
     /// ANY deployer known to ERC1820.
     function touchDeployerV3(address deployer) internal {
-        (IInterpreterV2 interpreter, IInterpreterStoreV1 store, address expression) =
-            IExpressionDeployerV3(deployer).deployExpression2("", new uint256[](0), new uint256[](0));
-        (interpreter);
-        (store);
-        (expression);
+        (IInterpreterV2 interpreter, IInterpreterStoreV1 store, address expression, bytes memory io) =
+            IExpressionDeployerV3(deployer).deployExpression2("", new uint256[](0));
+        (interpreter, store, expression, io);
     }
 }

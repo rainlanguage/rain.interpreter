@@ -15,7 +15,7 @@ import {
 /// This is intended to be run on every commit by CI to a testnet such as mumbai,
 /// then cross chain deployed to whatever mainnet is required, by users.
 contract DeployDISPair is Script {
-    function run(bytes memory authoringMeta) external {
+    function run(bytes memory constructionMeta) external {
         uint256 deployerPrivateKey = vm.envUint("DEPLOYMENT_KEY");
 
         vm.startBroadcast(deployerPrivateKey);
@@ -26,7 +26,8 @@ contract DeployDISPair is Script {
         new RainterpreterExpressionDeployerNPE2(RainterpreterExpressionDeployerNPE2ConstructionConfig(
             address(interpreter),
             address(store),
-            authoringMeta
+            address(parser),
+            constructionMeta
         ));
         (deployer);
         vm.stopBroadcast();

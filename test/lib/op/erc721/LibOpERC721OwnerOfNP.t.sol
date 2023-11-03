@@ -64,10 +64,8 @@ contract LibOpERC721OwnerOfNPTest is OpTest {
         assertEq(constants[1], 1);
         constants[0] = uint256(uint160(token));
         constants[1] = tokenId;
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
 
         vm.mockCall(token, abi.encodeWithSelector(IERC721.ownerOf.selector, tokenId), abi.encode(owner));
         vm.expectCall(token, abi.encodeWithSelector(IERC721.ownerOf.selector, tokenId), 1);
@@ -75,38 +73,34 @@ contract LibOpERC721OwnerOfNPTest is OpTest {
             storeDeployer,
             StateNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0)
         );
         assertEq(stack.length, 1);
         assertEq(stack[0], uint256(uint160(owner)));
         assertEq(kvs.length, 0);
+        assertEq(io, hex"0001");
     }
 
     /// Test that owner of without inputs fails integrity check.
     function testOpERC721OwnerOfNPEvalFail0() public {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: erc721-owner-of();");
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));
-        iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        iDeployer.deployExpression2(bytecode, constants);
     }
 
     /// Test that owner of with one input fails integrity check.
     function testOpERC721OwnerOfNPEvalFail1() public {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: erc721-owner-of(0x00);");
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 2, 1));
-        iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        iDeployer.deployExpression2(bytecode, constants);
     }
 
     /// Test that owner of with too many inputs fails integrity check.
     function testOpERC721OwnerOfNPEvalFail3() public {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: erc721-owner-of(0x00 0x01 0x02);");
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
-        iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        iDeployer.deployExpression2(bytecode, constants);
     }
 
     /// Test that operand fails integrity check.

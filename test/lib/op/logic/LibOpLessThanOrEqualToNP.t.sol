@@ -131,8 +131,7 @@ contract LibOpLessThanOrEqualToNPTest is OpTest {
 
     /// Test that a less than or equal to with 3 inputs fails integrity check.
     function testOpLessThanOrEqualToNPEvalFail3Inputs() public {
-        (bytes memory bytecode, uint256[] memory constants) =
-            iParser.parse("_: less-than-or-equal-to(0x00 0x00 0x00);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: less-than-or-equal-to(0x00 0x00 0x00);");
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
         iDeployer.deployExpression2(bytecode, constants);
     }

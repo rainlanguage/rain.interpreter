@@ -114,7 +114,8 @@ contract LibOpLessThanNPTest is OpTest {
     function testOpLessThanToNPEvalFail0Inputs() public {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: less-than();");
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) = iDeployer.deployExpression2(bytecode, constants);
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
         (interpreterDeployer, storeDeployer, expression, io);
     }
 
@@ -123,7 +124,8 @@ contract LibOpLessThanNPTest is OpTest {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: less-than(0x00);");
         uint256[] memory minOutputs = new uint256[](1);
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 2, 1));
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) = iDeployer.deployExpression2(bytecode, constants);
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
         (interpreterDeployer, storeDeployer, expression, io);
     }
 
@@ -131,7 +133,8 @@ contract LibOpLessThanNPTest is OpTest {
     function testOpLessThanToNPEvalFail3Inputs() public {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: less-than(0x00 0x00 0x00);");
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) = iDeployer.deployExpression2(bytecode, constants);
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
         (interpreterDeployer, storeDeployer, expression, io);
     }
 }
