@@ -2,7 +2,13 @@
 pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
-import {CMASK_COMMENT_HEAD, CMASK_IDENTIFIER_TAIL, CMASK_LHS_RHS_DELIMITER, CMASK_LHS_STACK_DELIMITER, CMASK_LHS_STACK_HEAD} from "src/lib/parse/LibParseCMask.sol";
+import {
+    CMASK_COMMENT_HEAD,
+    CMASK_IDENTIFIER_TAIL,
+    CMASK_LHS_RHS_DELIMITER,
+    CMASK_LHS_STACK_DELIMITER,
+    CMASK_LHS_STACK_HEAD
+} from "src/lib/parse/LibParseCMask.sol";
 import {LibParse, UnexpectedLHSChar} from "src/lib/parse/LibParse.sol";
 
 /// @title LibParseUnexpectedLHSTest

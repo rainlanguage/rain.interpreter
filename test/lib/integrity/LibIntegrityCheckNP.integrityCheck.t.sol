@@ -55,6 +55,6 @@ contract LibIntegrityCheckNPIntegrityCheckTest is Test {
         bytes memory bytecode = bytes.concat(bytes1(sourcesCount), bytecodeSuffix);
 
         vm.expectRevert(abi.encodeWithSelector(EntrypointMissing.selector, minOutputs.length, sourcesCount));
-        LibIntegrityCheckNP.integrityCheck(integrityFunctionPointers(), bytecode, constants, minOutputs);
+        LibIntegrityCheckNP.integrityCheck2(integrityFunctionPointers(), bytecode, constants, minOutputs);
     }
 }

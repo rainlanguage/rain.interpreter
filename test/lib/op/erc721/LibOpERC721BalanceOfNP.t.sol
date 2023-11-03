@@ -58,7 +58,7 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
         // The console.
         vm.assume(token != address(0x000000000000000000636F6e736F6c652e6c6f67));
 
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: erc721-balance-of(0x00 0x01);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: erc721-balance-of(0x00 0x01);");
         assertEq(constants.length, 2);
         assertEq(constants[0], 0);
         assertEq(constants[1], 1);
@@ -67,14 +67,14 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
 
         vm.mockCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), abi.encode(balance));
         vm.expectCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), 1);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         assertEq(stack.length, 1);
@@ -84,35 +84,35 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
 
     /// Test that balance of without inputs fails integrity check.
     function testOpERC721BalanceOfNPIntegrityFail0() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: erc721-balance-of();");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: erc721-balance-of();");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));
-        iDeployer.integrityCheck(bytecode, constants, minOutputs);
+        iDeployer.deployExpression2(bytecode, constants);
     }
 
     /// Test that balance of with one input fails integrity check.
     function testOpERC721BalanceOfNPIntegrityFail1() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: erc721-balance-of(0x00);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: erc721-balance-of(0x00);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 2, 1));
-        iDeployer.integrityCheck(bytecode, constants, minOutputs);
+        iDeployer.deployExpression2(bytecode, constants, minOutputs);
     }
 
     /// Test that balance of with three inputs fails integrity check.
     function testOpERC721BalanceOfNPIntegrityFail3() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: erc721-balance-of(0x00 0x01 0x02);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: erc721-balance-of(0x00 0x01 0x02);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
-        iDeployer.integrityCheck(bytecode, constants, minOutputs);
+        iDeployer.deployExpression2(bytecode, constants, minOutputs);
     }
 
     /// Test that operand fails integrity check.
     function testOpERC721BalanceOfNPIntegrityFailOperand() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector, 20));
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: erc721-balance-of<0>(0x00 0x01);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: erc721-balance-of<0>(0x00 0x01);");
         (bytecode, constants);
     }
 }

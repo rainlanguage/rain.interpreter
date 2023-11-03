@@ -6,7 +6,10 @@ import {UnexpectedMetaHash, META_MAGIC_NUMBER_V1, NotRainMetaV1} from "rain.meta
 import {LibMeta} from "rain.metadata/LibMeta.sol";
 
 import {IExpressionDeployerV3} from "src/interface/unstable/IExpressionDeployerV3.sol";
-import {DeployerDiscoverableMetaV3, DeployerDiscoverableMetaV3ConstructionConfig} from "src/abstract/DeployerDiscoverableMetaV3.sol";
+import {
+    DeployerDiscoverableMetaV3,
+    DeployerDiscoverableMetaV3ConstructionConfig
+} from "src/abstract/DeployerDiscoverableMetaV3.sol";
 import {IInterpreterV2} from "src/interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 
@@ -46,7 +49,7 @@ contract DeployerDiscoverableMetaV2Test is Test {
         vm.expectCall(
             address(deployer),
             abi.encodeWithSelector(
-                IExpressionDeployerV3.deployExpression.selector, new bytes(0), new uint256[](0), new uint256[](0)
+                IExpressionDeployerV3.deployExpression2.selector, new bytes(0), new uint256[](0), new uint256[](0)
             ),
             1
         );

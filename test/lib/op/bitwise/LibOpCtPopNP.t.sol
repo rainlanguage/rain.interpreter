@@ -34,7 +34,7 @@ contract LibOpCtPopNPTest is OpTest {
     /// Test the eval of a ct pop opcode parsed from a string.
     function testOpCtPopNPEval(uint256 x) external {
         // 0 is just a placeholder that we'll override with `x`.
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: bitwise-count-ones(0);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: bitwise-count-ones(0);");
         // Override the constant with the value we want to test.
         constants[0] = x;
 
@@ -42,11 +42,11 @@ contract LibOpCtPopNPTest is OpTest {
         minOutputs[0] = 1;
 
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         assertEq(stack.length, 1);

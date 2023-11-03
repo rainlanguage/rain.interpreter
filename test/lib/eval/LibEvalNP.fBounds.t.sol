@@ -123,7 +123,7 @@ contract LibEvalNPFBoundsTest is Test {
             fs
         );
 
-        (uint256[] memory outputs, uint256[] memory kvs) = LibEvalNP.evalNP(state, new uint256[](0), type(uint256).max);
+        (uint256[] memory outputs, uint256[] memory kvs) = LibEvalNP.eval2(state, new uint256[](0), type(uint256).max);
         assertEq(outputs.length, expectedLength);
         for (uint256 i = 0; i < outputs.length; i++) {
             assertEq(outputs[i], c);
@@ -135,7 +135,7 @@ contract LibEvalNPFBoundsTest is Test {
             bytecode[i] = bytes1(uint8(uint8(fs.length / 2) + 1));
         }
 
-        (outputs, kvs) = LibEvalNP.evalNP(state, new uint256[](0), type(uint256).max);
+        (outputs, kvs) = LibEvalNP.eval2(state, new uint256[](0), type(uint256).max);
         assertEq(outputs.length, expectedLength);
         for (uint256 i = 0; i < outputs.length; i++) {
             assertEq(outputs[i], c);

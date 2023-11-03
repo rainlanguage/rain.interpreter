@@ -96,12 +96,12 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
 
     /// Boilerplate for testing that a source does not exist.
     function checkSourceDoesNotExist(bytes memory rainlang, uint256 sourceIndex) internal {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(rainlang);
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainlang);
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 0;
         vm.expectRevert(abi.encodeWithSelector(SourceIndexOutOfBounds.selector, bytecode, sourceIndex));
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
         (interpreterDeployer, storeDeployer, expression);
     }
 
@@ -127,16 +127,16 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
 
     /// Boilerplate for checking the stack and kvs of a call.
     function checkCallNPRun(bytes memory rainlang, uint256[] memory stack, uint256[] memory kvs) internal {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(rainlang);
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainlang);
         // The second source is for internal calls only, it is not an entrypoint.
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 0;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory actualStack, uint256[] memory actualKVs) = interpreterDeployer.eval(
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (uint256[] memory actualStack, uint256[] memory actualKVs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), type(uint8).max),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), type(uint8).max),
             new uint256[][](0)
         );
         assertEq(actualStack.length, stack.length, "stack length");
@@ -197,19 +197,19 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
 
     /// Boilerplate to check a generic runtime error happens upon recursion.
     function checkCallNPRunRecursive(bytes memory rainlang) internal {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(rainlang);
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainlang);
         // The second source is for internal calls only, it is not an entrypoint.
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 0;
         // Recursion isn't caught at deploy time.
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
         // But it will unconditionally happen at runtime.
         vm.expectRevert();
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), type(uint8).max),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), type(uint8).max),
             new uint256[][](0)
         );
         (stack, kvs);
@@ -228,26 +228,26 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
     /// Test a mismatch in the inputs from caller and callee.
     function testOpCallNPRunInputsMismatch() external {
         (bytes memory bytecode, uint256[] memory constants) =
-            iDeployer.parse("a: call<1 1>(10 11); ten:,a b c:ten 11 12;");
+            iParser.parse("a: call<1 1>(10 11); ten:,a b c:ten 11 12;");
         // The second source is for internal calls only, it is not an entrypoint.
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 2, 1, 2));
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
         (interpreterDeployer, storeDeployer, expression);
     }
 
     /// Test a mismatch in the outputs from caller and callee.
     function testOpCallNPRunOutputsMismatch() external {
         (bytes memory bytecode, uint256[] memory constants) =
-            iDeployer.parse("ten eleven a b: call<1 4>(10 11); ten eleven:,a:9;");
+            iParser.parse("ten eleven a b: call<1 4>(10 11); ten eleven:,a:9;");
         // The second source is for internal calls only, it is not an entrypoint.
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         vm.expectRevert(abi.encodeWithSelector(CallOutputsExceedSource.selector, 3, 4));
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
         (interpreterDeployer, storeDeployer, expression);
     }
 }

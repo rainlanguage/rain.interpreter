@@ -36,15 +36,15 @@ contract LibOpHashNPTest is OpTest {
 
     /// Test the eval of a hash opcode parsed from a string. Tests 0 inputs.
     function testOpHashNPEval0Inputs() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: hash();");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: hash();");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         assertEq(stack.length, 1, "stack length");
@@ -54,15 +54,15 @@ contract LibOpHashNPTest is OpTest {
 
     /// Test the eval of a hash opcode parsed from a string. Tests 1 input.
     function testOpHashNPEval1Input() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: hash(0x1234567890abcdef);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: hash(0x1234567890abcdef);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         assertEq(stack.length, 1);
@@ -74,15 +74,15 @@ contract LibOpHashNPTest is OpTest {
     /// are identical to each other.
     function testOpHashNPEval2Inputs() external {
         (bytes memory bytecode, uint256[] memory constants) =
-            iDeployer.parse("_: hash(0x1234567890abcdef 0x1234567890abcdef);");
+            iParser.parse("_: hash(0x1234567890abcdef 0x1234567890abcdef);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 2),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 2),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         assertEq(stack.length, 1);
@@ -96,15 +96,15 @@ contract LibOpHashNPTest is OpTest {
     /// are different from each other.
     function testOpHashNPEval2InputsDifferent() external {
         (bytes memory bytecode, uint256[] memory constants) =
-            iDeployer.parse("_: hash(0x1234567890abcdef 0xfedcba0987654321);");
+            iParser.parse("_: hash(0x1234567890abcdef 0xfedcba0987654321);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 2),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 2),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         assertEq(stack.length, 1);
@@ -118,15 +118,15 @@ contract LibOpHashNPTest is OpTest {
     /// other stack items.
     function testOpHashNPEval2InputsOtherStack() external {
         (bytes memory bytecode, uint256[] memory constants) =
-            iDeployer.parse("_ _ _: 5 hash(0x1234567890abcdef 0xfedcba0987654321) 9;");
+            iParser.parse("_ _ _: 5 hash(0x1234567890abcdef 0xfedcba0987654321) 9;");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 3;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 3),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 3),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         assertEq(stack.length, 3);

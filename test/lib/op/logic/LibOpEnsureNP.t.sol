@@ -50,7 +50,7 @@ contract LibOpEnsureNPTest is OpTest {
     /// Tests ensuring with an addition on the same line.
     function testOpEnsureNPEvalBadOutputs() external {
         vm.expectRevert(abi.encodeWithSelector(ExcessRHSItems.selector, 24));
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_:ensure(1) int-add(1 1);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_:ensure(1) int-add(1 1);");
         (bytecode);
         (constants);
     }
@@ -60,7 +60,7 @@ contract LibOpEnsureNPTest is OpTest {
     /// Tests ensuring with another ensure on the same line.
     function testOpEnsureNPEvalBadOutputs2() external {
         vm.expectRevert(abi.encodeWithSelector(ExcessRHSItems.selector, 20));
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(":ensure(1) ensure(1);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(":ensure(1) ensure(1);");
         (bytecode);
         (constants);
     }

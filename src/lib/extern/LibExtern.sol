@@ -15,12 +15,12 @@ library LibExtern {
     /// IMPORTANT: The encoding process does not check that either the opcode or
     /// operand fit within 16 bits. This is the responsibility of the caller.
     function encodeExternDispatch(uint256 opcode, Operand operand) internal pure returns (ExternDispatch) {
-        return ExternDispatch.wrap(opcode << 16 | Operand.unwrap(operand));
+        return ExternDispatch.wrap(opcode << 0x10 | Operand.unwrap(operand));
     }
 
     /// Inverse of `encodeExternDispatch`.
     function decodeExternDispatch(ExternDispatch dispatch) internal pure returns (uint256, Operand) {
-        return (ExternDispatch.unwrap(dispatch) >> 16, Operand.wrap(uint16(ExternDispatch.unwrap(dispatch))));
+        return (ExternDispatch.unwrap(dispatch) >> 0x10, Operand.wrap(uint16(ExternDispatch.unwrap(dispatch))));
     }
 
     /// Encodes an extern address and dispatch pair into a single 32-byte word.

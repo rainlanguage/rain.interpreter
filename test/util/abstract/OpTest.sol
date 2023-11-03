@@ -166,16 +166,16 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     }
 
     function parseAndEval(bytes memory rainString) internal returns (uint256[] memory, uint256[] memory) {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(rainString);
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 0;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
 
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), type(uint16).max),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), type(uint16).max),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         return (stack, kvs);
@@ -204,16 +204,16 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     }
 
     function checkUnhappy(bytes memory rainString, bytes memory err) internal {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(rainString);
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
         vm.expectRevert(err);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         (stack);
@@ -223,12 +223,12 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     function checkBadInputs(bytes memory rainString, uint256 opIndex, uint256 calcInputs, uint256 bytecodeInputs)
         internal
     {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(rainString);
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 0;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, opIndex, calcInputs, bytecodeInputs));
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
         (interpreterDeployer);
         (storeDeployer);
         (expression);
@@ -236,7 +236,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
 
     function checkDisallowedOperand(bytes memory rainString, uint256 offset) internal {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector, offset));
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse(rainString);
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
         (bytecode);
         (constants);
     }

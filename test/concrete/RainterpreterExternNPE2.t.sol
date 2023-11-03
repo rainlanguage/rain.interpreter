@@ -7,7 +7,7 @@ import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC
 import {IInterpreterExternV2, ExternDispatch} from "src/interface/IInterpreterExternV2.sol";
 import {IInterpreterV2, Operand} from "src/interface/unstable/IInterpreterV2.sol";
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
-import {RainterpreterExternNPE2, UnknownOp, BadInputs} from "src/concrete/RainterpreterExternNPE2.sol";
+import {RainterpreterExternNPE2, BadInputs} from "src/concrete/RainterpreterExternNPE2.sol";
 
 /// @title RainterpreterExternNPE2Test
 /// Test suite for RainterpreterExternNPE2.
@@ -34,16 +34,5 @@ contract RainterpreterExternNPE2Test is Test {
         RainterpreterExternNPE2 extern = new RainterpreterExternNPE2();
         vm.expectRevert(abi.encodeWithSelector(BadInputs.selector, 2, inputs.length));
         extern.extern(ExternDispatch.wrap(0), inputs);
-    }
-
-    /// There's currently only one opcode. For all opcode values other than 0,
-    /// test that UnknownOp is thrown.
-    function testRainterpreterExternNPE2UnknownOp(uint16 opcode, Operand operand, uint256 a, uint256 b) external {
-        vm.assume(opcode != 0);
-        operand = Operand.wrap(bound(Operand.unwrap(operand), 0, type(uint16).max));
-        uint256[] memory inputs = LibUint256Array.arrayFrom(a, b);
-        RainterpreterExternNPE2 extern = new RainterpreterExternNPE2();
-        vm.expectRevert(abi.encodeWithSelector(UnknownOp.selector, opcode));
-        extern.extern(LibExtern.encodeExternDispatch(opcode, operand), inputs);
     }
 }

@@ -33,15 +33,15 @@ contract LibOpGreaterThanNPTest is OpTest {
     /// Test the eval of greater than opcode parsed from a string. Tests 2
     /// inputs. Both inputs are 0.
     function testOpGreaterThanNPEval2ZeroInputs() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: greater-than(0 0);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: greater-than(0 0);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
 
@@ -53,15 +53,15 @@ contract LibOpGreaterThanNPTest is OpTest {
     /// Test the eval of greater than opcode parsed from a string. Tests 2
     /// inputs. The first input is 0, the second input is 1.
     function testOpGreaterThanNPEval2InputsFirstZeroSecondOne() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: greater-than(0 1);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: greater-than(0 1);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
 
@@ -73,15 +73,15 @@ contract LibOpGreaterThanNPTest is OpTest {
     /// Test the eval of greater than opcode parsed from a string. Tests 2
     /// inputs. The first input is 1, the second input is 0.
     function testOpGreaterThanNPEval2InputsFirstOneSecondZero() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: greater-than(1 0);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: greater-than(1 0);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
 
@@ -93,15 +93,15 @@ contract LibOpGreaterThanNPTest is OpTest {
     /// Test the eval of greater than opcode parsed from a string. Tests 2
     /// inputs. Both inputs are 1.
     function testOpGreaterThanNPEval2InputsBothOne() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: greater-than(1 1);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: greater-than(1 1);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
 
@@ -112,28 +112,28 @@ contract LibOpGreaterThanNPTest is OpTest {
 
     /// Test that a greater than without inputs fails integrity check.
     function testOpGreaterThanNPEvalFail0Inputs() public {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: greater-than();");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: greater-than();");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));
-        iDeployer.integrityCheck(bytecode, constants, minOutputs);
+        iDeployer.deployExpression2(bytecode, constants, minOutputs);
     }
 
     /// Test that a greater than with 1 input fails integrity check.
     function testOpGreaterThanNPEvalFail1Input() public {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: greater-than(0x00);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: greater-than(0x00);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 2, 1));
-        iDeployer.integrityCheck(bytecode, constants, minOutputs);
+        iDeployer.deployExpression2(bytecode, constants, minOutputs);
     }
 
     /// Test that a greater than with 3 inputs fails integrity check.
     function testOpGreaterThanNPEvalFail3Inputs() public {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: greater-than(0x00 0x00 0x00);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: greater-than(0x00 0x00 0x00);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
-        iDeployer.integrityCheck(bytecode, constants, minOutputs);
+        iDeployer.deployExpression2(bytecode, constants, minOutputs);
     }
 }

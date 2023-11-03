@@ -1,7 +1,13 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {OPERAND_PARSER_OFFSET_DISALLOWED, OPERAND_PARSER_OFFSET_SINGLE_FULL, OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT, OPERAND_PARSER_OFFSET_M1_M1, OPERAND_PARSER_OFFSET_8_M1_M1} from "src/lib/parse/LibParseOperand.sol";
+import {
+    OPERAND_PARSER_OFFSET_DISALLOWED,
+    OPERAND_PARSER_OFFSET_SINGLE_FULL,
+    OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT,
+    OPERAND_PARSER_OFFSET_M1_M1,
+    OPERAND_PARSER_OFFSET_8_M1_M1
+} from "src/lib/parse/LibParseOperand.sol";
 import {LibParseMeta, AuthoringMeta} from "src/lib/parse/LibParseMeta.sol";
 
 library LibMetaFixture {

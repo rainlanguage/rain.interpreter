@@ -85,15 +85,15 @@ contract LibOpAnyNPTest is OpTest {
 
     /// Test the eval of any opcode parsed from a string. Tests 1 true input.
     function testOpAnyNPEval1TrueInput() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: any(5);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: any(5);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
 
@@ -104,15 +104,15 @@ contract LibOpAnyNPTest is OpTest {
 
     /// Test the eval of any opcode parsed from a string. Tests 1 false input.
     function testOpAnyNPEval1FalseInput() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: any(0);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: any(0);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
 
@@ -124,15 +124,15 @@ contract LibOpAnyNPTest is OpTest {
     /// Test the eval of any opcode parsed from a string. Tests 2 true inputs.
     /// The first true input should be the overall result.
     function testOpAnyNPEval2TrueInputs() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: any(5 6);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: any(5 6);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
 
@@ -143,15 +143,15 @@ contract LibOpAnyNPTest is OpTest {
 
     /// Test the eval of any opcode parsed from a string. Tests 2 false inputs.
     function testOpAnyNPEval2FalseInputs() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: any(0 0);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: any(0 0);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
 
@@ -164,15 +164,15 @@ contract LibOpAnyNPTest is OpTest {
     /// true and one false. The first true input should be the overall result.
     /// The first value is the true value.
     function testOpAnyNPEval2MixedInputs() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: any(5 0);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: any(5 0);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
 
@@ -185,15 +185,15 @@ contract LibOpAnyNPTest is OpTest {
     /// true and one false. The first true input should be the overall result.
     /// The first value is the false value.
     function testOpAnyNPEval2MixedInputs2() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: any(0 5);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: any(0 5);");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 1),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
 
@@ -204,10 +204,10 @@ contract LibOpAnyNPTest is OpTest {
 
     /// Test that any without inputs fails integrity check.
     function testOpAnyNPEvalFail() public {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: any();");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: any();");
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 1;
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 1, 0));
-        iDeployer.integrityCheck(bytecode, constants, minOutputs);
+        iDeployer.deployExpression2(bytecode, constants, minOutputs);
     }
 }

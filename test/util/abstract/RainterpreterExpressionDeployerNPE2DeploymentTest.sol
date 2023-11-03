@@ -10,9 +10,7 @@ import {LibParseMeta, AuthoringMeta} from "src/lib/parse/LibParseMeta.sol";
 import {RainterpreterStoreNPE2, STORE_BYTECODE_HASH} from "src/concrete/RainterpreterStoreNPE2.sol";
 import {RainterpreterParserNPE2, PARSE_META} from "src/concrete/RainterpreterParserNPE2.sol";
 import {
-    RainterpreterNPE2,
-    OPCODE_FUNCTION_POINTERS,
-    INTERPRETER_BYTECODE_HASH
+    RainterpreterNPE2, OPCODE_FUNCTION_POINTERS, INTERPRETER_BYTECODE_HASH
 } from "src/concrete/RainterpreterNPE2.sol";
 import {
     CONSTRUCTION_META_HASH,

@@ -118,7 +118,7 @@ contract LibOpStackNPTest is OpTest {
 
     /// Test the eval of a stack opcode parsed from a string.
     function testOpStackEval() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("foo: 1, bar: foo;");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("foo: 1, bar: foo;");
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -153,11 +153,11 @@ contract LibOpStackNPTest is OpTest {
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 2;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 2),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 2),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         assertEq(stack.length, 2);
@@ -169,7 +169,7 @@ contract LibOpStackNPTest is OpTest {
     /// Test the eval of several stack opcodes parsed from a string.
     function testOpStackEvalSeveral() external {
         (bytes memory bytecode, uint256[] memory constants) =
-            iDeployer.parse("foo: 1, bar: foo, _ baz: bar bar, bing _:foo baz;");
+            iParser.parse("foo: 1, bar: foo, _ baz: bar bar, bing _:foo baz;");
         assertEq(constants.length, 1);
         assertEq(constants[0], 1);
         assertEq(
@@ -203,11 +203,11 @@ contract LibOpStackNPTest is OpTest {
         uint256[] memory minOutputs = new uint256[](1);
         minOutputs[0] = 6;
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+            iDeployer.deployExpression2(bytecode, constants, minOutputs);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndexV2.wrap(0), 6),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 6),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0))
         );
         assertEq(stack.length, 6);

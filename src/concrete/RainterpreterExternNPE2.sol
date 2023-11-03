@@ -16,9 +16,7 @@ import {LibOpChainlinkOraclePrice} from "../lib/op/chainlink/LibOpChainlinkOracl
 /// @param actual The actual number of inputs.
 error BadInputs(uint256 expected, uint256 actual);
 
-/// Thrown when the opcode is not known.
-/// @param opcode The opcode that is not known.
-error UnknownOp(uint256 opcode);
+bytes constant OPCODE_FUNCTION_POINTERS = hex"";
 
 /// EXPERIMENTAL implementation of `IInterpreterExternV2`.
 /// Currently only implements the Chainlink oracle price opcode as a starting
@@ -42,20 +40,21 @@ contract RainterpreterExternNPE2 is IInterpreterExternV2, ERC165 {
         view
         returns (uint256[] memory outputs)
     {
-        if (inputs.length != 2) {
-            revert BadInputs(2, inputs.length);
-        }
-        Pointer stackTop = inputs.endPointer();
+        unchecked {
+            bytes memory fPointers = OPCODE_FUNCTION_POINTERS;
+            uint256 fsCount = fPointers.length / 2;
+            uint256 fPointersStart;
+            assembly ("memory-safe") {
+                fPointersStart := add(fPointers, 0x20)
+            }
+            uint256 opcode = (ExternDispatch.unwrap(dispatch) >> 0x10) & type(uint16).max;
+            Operand operand = Operand.wrap(ExternDispatch.unwrap(dispatch) & type(uint16).max);
 
-        uint256 opcode = (ExternDispatch.unwrap(dispatch) >> 16) & type(uint16).max;
-        Operand operand = Operand.wrap(ExternDispatch.unwrap(dispatch) & type(uint16).max);
-
-        // This is an O(n) approach to dispatch so it doesn't scale. This should
-        // be replaced with an O(1) dispatch.
-        if (opcode == 0) {
-            outputs = stackTop.applyFn(LibOpChainlinkOraclePrice.f, operand).unsafePeek().arrayFrom();
-        } else {
-            revert UnknownOp(opcode);
+            function(Operand, uint256[] memory) internal view returns (uint256[] memory) f;
+            assembly {
+                f := shr(0xf0, mload(add(fPointersStart, mul(mod(opcode, fsCount), 2))))
+            }
+            return f(operand, inputs);
         }
     }
 }
