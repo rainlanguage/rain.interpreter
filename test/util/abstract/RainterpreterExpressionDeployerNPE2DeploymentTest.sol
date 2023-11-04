@@ -8,7 +8,7 @@ import {INVALID_BYTECODE} from "../lib/etch/LibEtch.sol";
 import {EXPRESSION_DEPLOYER_NP_META_PATH} from "../lib/constants/ExpressionDeployerNPConstants.sol";
 import {LibParseMeta, AuthoringMeta} from "src/lib/parse/LibParseMeta.sol";
 import {RainterpreterStoreNPE2, STORE_BYTECODE_HASH} from "src/concrete/RainterpreterStoreNPE2.sol";
-import {RainterpreterParserNPE2, PARSE_META} from "src/concrete/RainterpreterParserNPE2.sol";
+import {RainterpreterParserNPE2, PARSE_META, PARSE_META_BUILD_DEPTH} from "src/concrete/RainterpreterParserNPE2.sol";
 import {
     RainterpreterNPE2, OPCODE_FUNCTION_POINTERS, INTERPRETER_BYTECODE_HASH
 } from "src/concrete/RainterpreterNPE2.sol";
@@ -76,6 +76,17 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
             console2.log("current construction meta hash:");
             console2.logBytes32(constructionMetaHash);
             revert("unexpected construction meta hash");
+        }
+
+        AuthoringMeta[] memory authoringMeta = abi.decode(LibAllStandardOpsNP.authoringMeta(), (AuthoringMeta[]));
+        bytes memory parseMeta = LibParseMeta.buildParseMeta(
+            authoringMeta,
+            PARSE_META_BUILD_DEPTH
+        );
+        if (keccak256(parseMeta) != keccak256(PARSE_META)) {
+            console2.log("current parse meta:");
+            console2.logBytes(parseMeta);
+            revert("unexpected parse meta");
         }
 
         vm.etch(address(IERC1820_REGISTRY), INVALID_BYTECODE);
