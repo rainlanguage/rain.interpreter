@@ -157,7 +157,7 @@ contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, ERC165 {
         }
     }
 
-    // @inheritdoc IERC165
+    /// @inheritdoc IERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(IExpressionDeployerV3).interfaceId || interfaceId == type(IERC165).interfaceId;
     }

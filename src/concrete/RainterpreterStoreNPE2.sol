@@ -35,7 +35,7 @@ contract RainterpreterStoreNPE2 is IInterpreterStoreV1, ERC165 {
     //solhint-disable-next-line private-vars-leading-underscore
     mapping(FullyQualifiedNamespace fullyQualifiedNamespace => mapping(uint256 key => uint256 value)) internal sStore;
 
-    // @inheritdoc ERC165
+    /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(IInterpreterStoreV1).interfaceId || super.supportsInterface(interfaceId);
     }

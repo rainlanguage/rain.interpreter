@@ -29,7 +29,7 @@ contract RainterpreterExternNPE2 is IInterpreterExternV2, ERC165 {
     using LibUint256Array for uint256;
     using LibUint256Array for uint256[];
 
-    // @inheritdoc ERC165
+    /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(IInterpreterExternV2).interfaceId || super.supportsInterface(interfaceId);
     }

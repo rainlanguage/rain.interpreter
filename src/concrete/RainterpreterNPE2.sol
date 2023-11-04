@@ -96,7 +96,7 @@ contract RainterpreterNPE2 is IInterpreterV2, ERC165 {
         return state.eval2(inputs, maxOutputs);
     }
 
-    // @inheritdoc ERC165
+    /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(IInterpreterV2).interfaceId || super.supportsInterface(interfaceId);
     }

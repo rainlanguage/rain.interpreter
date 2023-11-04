@@ -14,6 +14,7 @@ bytes constant PARSE_META =
 uint8 constant PARSE_META_BUILD_DEPTH = 2;
 
 contract RainterpreterParserNPE2 is IParserV1, ERC165 {
+    /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
         return interfaceId == type(IParserV1).interfaceId || super.supportsInterface(interfaceId);
     }
