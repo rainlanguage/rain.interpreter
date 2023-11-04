@@ -8,7 +8,7 @@ import {INVALID_BYTECODE} from "../lib/etch/LibEtch.sol";
 import {EXPRESSION_DEPLOYER_NP_META_PATH} from "../lib/constants/ExpressionDeployerNPConstants.sol";
 import {LibParseMeta, AuthoringMeta} from "src/lib/parse/LibParseMeta.sol";
 import {RainterpreterStoreNPE2, STORE_BYTECODE_HASH} from "src/concrete/RainterpreterStoreNPE2.sol";
-import {RainterpreterParserNPE2, PARSE_META, PARSE_META_BUILD_DEPTH} from "src/concrete/RainterpreterParserNPE2.sol";
+import {RainterpreterParserNPE2, PARSE_META, PARSE_META_BUILD_DEPTH, PARSER_BYTECODE_HASH} from "src/concrete/RainterpreterParserNPE2.sol";
 import {
     RainterpreterNPE2, OPCODE_FUNCTION_POINTERS, INTERPRETER_BYTECODE_HASH
 } from "src/concrete/RainterpreterNPE2.sol";
@@ -68,6 +68,17 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
             console2.log("current store bytecode hash:");
             console2.logBytes32(storeHash);
             revert("unexpected store bytecode hash");
+        }
+
+        bytes32 parserHash;
+        address parser = address(iParser);
+        assembly ("memory-safe") {
+            parserHash := extcodehash(parser)
+        }
+        if (parserHash != PARSER_BYTECODE_HASH) {
+            console2.log("current parser bytecode hash:");
+            console2.logBytes32(parserHash);
+            revert("unexpected parser bytecode hash");
         }
 
         bytes memory constructionMeta = vm.readFileBinary(constructionMetaPath());

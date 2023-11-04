@@ -63,10 +63,10 @@ error UnexpectedConstructionMetaHash(bytes32 expectedConstructionMetaHash, bytes
 
 /// @dev The function pointers for the integrity check fns.
 bytes constant INTEGRITY_FUNCTION_POINTERS =
-    hex"13dc145614bd14c61542154c15561556154215421542154215421560158215ac155615601556155615ce14bd1556155615d815d8155614bd14bd15d815d815d815d815d815d815d815d815d815d815d815d814bd15ef15f915f9";
+    hex"09fe0a780adf0ae80b640b6e0b780b780b640b640b640b640b640b820ba40bce0b780b820b780b780bf00adf0b780b780bfa0bfa0b780adf0adf0bfa0bfa0bfa0bfa0bfa0bfa0bfa0bfa0bfa0bfa0bfa0bfa0adf0c110c1b0c1b";
 
 /// @dev Hash of the known construction meta.
-bytes32 constant CONSTRUCTION_META_HASH = bytes32(0x4c1b2a4b98b3aca3fdc703923ee7c428df0f0a41f52d753c3cd03c32dacfb162);
+bytes32 constant CONSTRUCTION_META_HASH = bytes32(0xdb68c0f2dc8a196d1c1fdae1ab476a09520790d22979979511ab26983f86b51b);
 
 /// All config required to construct a `RainterpreterNPE2`.
 /// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match
