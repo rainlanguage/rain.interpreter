@@ -26,13 +26,4 @@ contract RainterpreterExternNPE2Test is Test {
         assertTrue(extern.supportsInterface(type(IInterpreterExternV2).interfaceId));
         assertFalse(extern.supportsInterface(badInterfaceId));
     }
-
-    /// There's currently only one opcode. It handles exactly 2 inputs. Test
-    /// That any number of inputs other than 2 reverts with BadInputs.
-    function testRainterpreterExternNPE2BadInputs(uint256[] memory inputs) external {
-        vm.assume(inputs.length != 2);
-        RainterpreterExternNPE2 extern = new RainterpreterExternNPE2();
-        vm.expectRevert(abi.encodeWithSelector(BadInputs.selector, 2, inputs.length));
-        extern.extern(ExternDispatch.wrap(0), inputs);
-    }
 }

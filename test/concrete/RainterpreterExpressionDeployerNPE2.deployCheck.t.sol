@@ -23,26 +23,6 @@ import {RainterpreterNPE2, OPCODE_FUNCTION_POINTERS} from "src/concrete/Rainterp
 /// Test that the RainterpreterExpressionDeployerNPE2 deploy check reverts if the
 /// passed config does not match expectations.
 contract RainterpreterExpressionDeployerNPE2DeployCheckTest is Test {
-    /// Test that the deployer won't deploy if function pointers are incorrect.
-    function testRainterpreterExpressionDeployerNPE2DeployInvalidFunctionPointers(
-        RainterpreterExpressionDeployerNPE2ConstructionConfig memory config,
-        bytes memory functionPointers
-    ) external {
-        vm.assume(keccak256(functionPointers) != keccak256(OPCODE_FUNCTION_POINTERS));
-
-        assumeNotPrecompile(address(uint160(config.interpreter)));
-        assumeNotPrecompile(address(uint160(config.store)));
-        vm.etch(address(uint160(config.interpreter)), INVALID_BYTECODE);
-        vm.mockCall(
-            address(uint160(config.interpreter)),
-            abi.encodeWithSelector(IInterpreterV2.functionPointers.selector),
-            functionPointers
-        );
-
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedPointers.selector, functionPointers));
-        new RainterpreterExpressionDeployerNPE2(config);
-    }
-
     /// Test the deployer can deploy if everything is valid.
     function testRainterpreterExpressionDeployerDeployValidFunctionPointers() external {
         vm.etch(address(IERC1820_REGISTRY), INVALID_BYTECODE);

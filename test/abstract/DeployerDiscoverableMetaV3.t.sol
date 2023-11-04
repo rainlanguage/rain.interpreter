@@ -48,9 +48,7 @@ contract DeployerDiscoverableMetaV2Test is Test {
         emit MetaV1(address(this), uint256(uint160(expectedAddr)), meta);
         vm.expectCall(
             address(deployer),
-            abi.encodeWithSelector(
-                IExpressionDeployerV3.deployExpression2.selector, new bytes(0), new uint256[](0), new uint256[](0)
-            ),
+            abi.encodeWithSelector(IExpressionDeployerV3.deployExpression2.selector, new bytes(0), new uint256[](0)),
             1
         );
 

@@ -20,9 +20,7 @@ contract LibDeployerV3DiscoverableTest is Test {
         TestDeployerV3 deployer = new TestDeployerV3();
         vm.expectCall(
             address(deployer),
-            abi.encodeWithSelector(
-                IExpressionDeployerV3.deployExpression2.selector, "", new uint256[](0)
-            ),
+            abi.encodeWithSelector(IExpressionDeployerV3.deployExpression2.selector, "", new uint256[](0)),
             1
         );
         LibDeployerDiscoverable.touchDeployerV3(address(deployer));

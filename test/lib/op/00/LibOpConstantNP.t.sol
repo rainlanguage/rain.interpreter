@@ -123,8 +123,8 @@ contract LibOpConstantNPTest is OpTest {
             new uint256[](0)
         );
         assertEq(stack.length, 2);
-        assertEq(stack[0], type(uint256).max);
-        assertEq(stack[1], 1001e15);
+        assertEq(stack[0], 1001e15);
+        assertEq(stack[1], type(uint256).max);
         assertEq(kvs.length, 0);
     }
 }

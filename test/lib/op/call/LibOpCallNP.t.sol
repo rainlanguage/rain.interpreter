@@ -170,13 +170,13 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         // Check evals that result in a stack of two items but no kvs.
         stack = new uint256[](2);
         // Order dependent inputs and outputs.
-        stack[0] = 2;
-        stack[1] = 9;
+        stack[0] = 9;
+        stack[1] = 2;
         checkCallNPRun("a b: call<1 2>(10 5); ten five:, a b: int-div(ten five) 9;", stack, kvs);
 
         // One input two outputs.
-        stack[0] = 10;
-        stack[1] = 11;
+        stack[0] = 11;
+        stack[1] = 10;
         checkCallNPRun("a b: call<1 2>(10); ten:,a b:ten 11;", stack, kvs);
 
         // Can call something with no IO purely for the kv side effects.

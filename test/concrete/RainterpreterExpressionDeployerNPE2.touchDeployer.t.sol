@@ -13,9 +13,7 @@ contract RainterpreterExpressionDeployerNPE2TouchDeployer is RainterpreterExpres
     function testTouchRealDeployer() external {
         vm.expectCall(
             address(iDeployer),
-            abi.encodeWithSelector(
-                IExpressionDeployerV3.deployExpression2.selector, "", new uint256[](0), new uint256[](0)
-            ),
+            abi.encodeWithSelector(IExpressionDeployerV3.deployExpression2.selector, "", new uint256[](0)),
             1
         );
         LibDeployerDiscoverable.touchDeployerV3(address(iDeployer));
