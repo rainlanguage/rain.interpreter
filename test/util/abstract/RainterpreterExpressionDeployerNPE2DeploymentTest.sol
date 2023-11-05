@@ -40,8 +40,8 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
     RainterpreterParserNPE2 internal immutable iParser;
 
     constructor() {
-        iStore = new RainterpreterStoreNPE2();
         iInterpreter = new RainterpreterNPE2();
+        iStore = new RainterpreterStoreNPE2();
         iParser = new RainterpreterParserNPE2();
 
         // Sanity check the interpreter's opcode function pointers.
@@ -86,20 +86,20 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
             revert("unexpected parser bytecode hash");
         }
 
-        bytes memory constructionMeta = vm.readFileBinary(constructionMetaPath());
-        bytes32 constructionMetaHash = keccak256(constructionMeta);
-        if (constructionMetaHash != CONSTRUCTION_META_HASH) {
-            console2.log("current construction meta hash:");
-            console2.logBytes32(constructionMetaHash);
-            revert("unexpected construction meta hash");
-        }
-
         AuthoringMeta[] memory authoringMeta = abi.decode(LibAllStandardOpsNP.authoringMeta(), (AuthoringMeta[]));
         bytes memory parseMeta = LibParseMeta.buildParseMeta(authoringMeta, PARSE_META_BUILD_DEPTH);
         if (keccak256(parseMeta) != keccak256(PARSE_META)) {
             console2.log("current parse meta:");
             console2.logBytes(parseMeta);
             revert("unexpected parse meta");
+        }
+
+        bytes memory constructionMeta = vm.readFileBinary(constructionMetaPath());
+        bytes32 constructionMetaHash = keccak256(constructionMeta);
+        if (constructionMetaHash != CONSTRUCTION_META_HASH) {
+            console2.log("current construction meta hash:");
+            console2.logBytes32(constructionMetaHash);
+            revert("unexpected construction meta hash");
         }
 
         vm.etch(address(IERC1820_REGISTRY), INVALID_BYTECODE);
