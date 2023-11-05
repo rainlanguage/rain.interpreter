@@ -63,7 +63,7 @@ error UnexpectedConstructionMetaHash(bytes32 expectedConstructionMetaHash, bytes
 
 /// @dev The function pointers for the integrity check fns.
 bytes constant INTEGRITY_FUNCTION_POINTERS =
-    hex"09fe0a780adf0ae80b640b6e0b780b780b640b640b640b640b640b820ba40bce0b780b820b780b780bf00adf0b780b780bfa0bfa0b780adf0adf0bfa0bfa0bfa0bfa0bfa0bfa0bfa0bfa0bfa0bfa0bfa0bfa0adf0c110c1b0c1b";
+    hex"0a0e0a880aef0af80b130bb90c350c3f0c490c490c350c350c350c350c350c530c750c9f0c490c530c490c490cc10aef0c490c490ccb0ccb0c490aef0aef0ccb0ccb0ccb0ccb0ccb0ccb0ccb0ccb0ccb0ccb0ccb0ccb0aef0ce20cec0cec";
 
 /// @dev Hash of the known construction meta.
 bytes32 constant CONSTRUCTION_META_HASH = bytes32(0xdb68c0f2dc8a196d1c1fdae1ab476a09520790d22979979511ab26983f86b51b);
