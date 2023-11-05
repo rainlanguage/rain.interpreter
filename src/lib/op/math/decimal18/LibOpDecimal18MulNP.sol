@@ -5,7 +5,7 @@ pragma solidity ^0.8.18;
 /// upstreams to compare against.
 import {Math as OZMath} from "openzeppelin-contracts/contracts/utils/math/Math.sol";
 import {UD60x18, mul} from "prb-math/UD60x18.sol";
-import {Operand} from "../../../../interface/IInterpreterV1.sol";
+import {Operand} from "../../../../interface/unstable/IInterpreterV2.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";

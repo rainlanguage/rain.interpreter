@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/OperandTest.sol";
+import {UnsupportedLiteralType} from "src/lib/parse/LibParseLiteral.sol";
+import {ParserOutOfBounds} from "src/lib/parse/LibParse.sol";
+import {ExpectedOperand, OperandOverflow, UnclosedOperand} from "src/lib/parse/LibParseOperand.sol";
+import {OperandTest} from "test/util/abstract/OperandTest.sol";
 
-import "test/util/lib/parse/LibMetaFixture.sol";
+import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
 
 contract LibParseOperand8M1M1Test is OperandTest {
     /// Default is disallowed.

@@ -1,9 +1,15 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
-
-import "src/lib/parse/LibParse.sol";
+import {Test} from "forge-std/Test.sol";
+import {
+    CMASK_COMMENT_HEAD,
+    CMASK_IDENTIFIER_TAIL,
+    CMASK_LHS_RHS_DELIMITER,
+    CMASK_LHS_STACK_DELIMITER,
+    CMASK_LHS_STACK_HEAD
+} from "src/lib/parse/LibParseCMask.sol";
+import {LibParse, UnexpectedLHSChar} from "src/lib/parse/LibParse.sol";
 
 /// @title LibParseUnexpectedLHSTest
 /// The parser should revert if it encounters an unexpected character on the LHS.

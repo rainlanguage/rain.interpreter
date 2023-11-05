@@ -2,11 +2,10 @@
 pragma solidity =0.8.19;
 
 import {OpTest} from "test/util/abstract/OpTest.sol";
-import {Operand} from "src/interface/IInterpreterV1.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibOpCtPopNP} from "src/lib/op/bitwise/LibOpCtPopNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {IInterpreterV1, StateNamespace, SourceIndex} from "src/interface/IInterpreterV1.sol";
+import {IInterpreterV2, StateNamespace, Operand, SourceIndexV2} from "src/interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
@@ -35,24 +34,23 @@ contract LibOpCtPopNPTest is OpTest {
     /// Test the eval of a ct pop opcode parsed from a string.
     function testOpCtPopNPEval(uint256 x) external {
         // 0 is just a placeholder that we'll override with `x`.
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: bitwise-count-ones(0);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: bitwise-count-ones(0);");
         // Override the constant with the value we want to test.
         constants[0] = x;
 
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
-
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0)
         );
         assertEq(stack.length, 1);
         assertEq(stack[0], LibCtPop.ctpop(x));
         assertEq(kvs.length, 0);
+        assertEq(io, hex"0001");
     }
 
     /// Test that a bitwise count with bad inputs fails integrity.

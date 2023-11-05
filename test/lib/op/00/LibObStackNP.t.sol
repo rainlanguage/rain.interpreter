@@ -1,11 +1,18 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/OpTest.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
-import "src/lib/caller/LibContext.sol";
-import "src/lib/bytecode/LibBytecode.sol";
+import {IInterpreterV2, Operand, SourceIndexV2} from "src/interface/unstable/IInterpreterV2.sol";
+import {LibContext} from "src/lib/caller/LibContext.sol";
+import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
 import {OutOfBoundsStackRead, LibOpStackNP} from "src/lib/op/00/LibOpStackNP.sol";
+import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {IInterpreterStoreV1, StateNamespace} from "src/interface/IInterpreterStoreV1.sol";
+import {OpTest, PRE, POST} from "test/util/abstract/OpTest.sol";
+import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 
 /// @title LibOpStackNPTest
 /// @notice Test the runtime and integrity time logic of LibOpStackNP.
@@ -111,7 +118,7 @@ contract LibOpStackNPTest is OpTest {
 
     /// Test the eval of a stack opcode parsed from a string.
     function testOpStackEval() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("foo: 1, bar: foo;");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("foo: 1, bar: foo;");
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -143,15 +150,15 @@ contract LibOpStackNPTest is OpTest {
         assertEq(constants.length, 1);
         assertEq(constants[0], 1);
 
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 2;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
+        (io);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 2),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 2),
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0)
         );
         assertEq(stack.length, 2);
         assertEq(stack[0], 1);
@@ -162,7 +169,7 @@ contract LibOpStackNPTest is OpTest {
     /// Test the eval of several stack opcodes parsed from a string.
     function testOpStackEvalSeveral() external {
         (bytes memory bytecode, uint256[] memory constants) =
-            iDeployer.parse("foo: 1, bar: foo, _ baz: bar bar, bing _:foo baz;");
+            iParser.parse("foo: 1, bar: foo, _ baz: bar bar, bing _:foo baz;");
         assertEq(constants.length, 1);
         assertEq(constants[0], 1);
         assertEq(
@@ -193,15 +200,15 @@ contract LibOpStackNPTest is OpTest {
             hex"00000003"
         );
 
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 6;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
+        (io);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 6),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 6),
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0)
         );
         assertEq(stack.length, 6);
         assertEq(stack[0], 1);

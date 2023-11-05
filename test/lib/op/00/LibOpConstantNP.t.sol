@@ -61,8 +61,7 @@ contract LibOpConstantNPTest is OpTest {
     /// Test the case of an empty constants array via. an end to end test. We
     /// expect the deployer to revert, as the integrity check MUST fail.
     function testOpConstantEvalZeroConstants() external {
-        (bytes memory bytecode, uint256[] memory constants) =
-            iDeployer.parse("_ _ _: constant() constant() constant();");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_ _ _: constant() constant() constant();");
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -96,37 +95,36 @@ contract LibOpConstantNPTest is OpTest {
 
         assertEq(constants.length, 0);
 
-        uint256[] memory minOuputs = new uint256[](1);
-        minOuputs[0] = 3;
         vm.expectRevert(abi.encodeWithSelector(OutOfBoundsConstantRead.selector, 0, 0, 0));
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOuputs);
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
         (interpreterDeployer);
         (storeDeployer);
         (expression);
+        (io);
     }
 
     /// Test the eval of a constant opcode parsed from a string.
     function testOpConstantEvalNPE2E() external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_ _: max-int-value() 1001e15;");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_ _: max-int-value() 1001e15;");
 
         assertEq(constants.length, 1);
         assertEq(constants[0], 1001e15);
 
-        uint256[] memory minOuputs = new uint256[](1);
-        minOuputs[0] = 2;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOuputs);
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
+        (io);
 
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 2),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 2),
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0)
         );
         assertEq(stack.length, 2);
-        assertEq(stack[0], type(uint256).max);
-        assertEq(stack[1], 1001e15);
+        assertEq(stack[0], 1001e15);
+        assertEq(stack[1], type(uint256).max);
         assertEq(kvs.length, 0);
     }
 }

@@ -1,8 +1,13 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.19;
 
-import "../../interface/IInterpreterV1.sol";
-import "../../lib/bytecode/LibBytecode.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+
+import {IInterpreterV2, SourceIndexV2} from "../../interface/unstable/IInterpreterV2.sol";
+import {LibBytecode} from "../../lib/bytecode/LibBytecode.sol";
+import {Operand} from "../../interface/unstable/IInterpreterV2.sol";
+import {IInterpreterStoreV1, StateNamespace} from "../../interface/IInterpreterStoreV1.sol";
+import {BadOpInputsLength} from "../../lib/integrity/LibIntegrityCheckNP.sol";
 
 /// @dev There are more entrypoints defined by the minimum stack outputs than
 /// there are provided sources. This means the calling contract WILL attempt to
@@ -13,9 +18,6 @@ error EntrypointMissing(uint256 expectedEntrypoints, uint256 actualEntrypoints);
 /// Thrown when some entrypoint has non-zero inputs. This is not allowed as
 /// only internal dispatches can have source level inputs.
 error EntrypointNonZeroInput(uint256 entrypointIndex, uint256 inputsLength);
-
-/// Thrown when some entrypoint has less outputs than the minimum required.
-error EntrypointMinOutputs(uint256 entrypointIndex, uint256 outputsLength, uint256 minOutputs);
 
 /// The bytecode and integrity function disagree on number of inputs.
 error BadOpInputsLength(uint256 opIndex, uint256 calculatedInputs, uint256 bytecodeInputs);
@@ -66,28 +68,16 @@ library LibIntegrityCheckNP {
         );
     }
 
-    // The cyclomatic complexity here comes from all the `if` checks for each
-    // integrity check. While the scanner isn't wrong, if we broke the checks
-    // out into functions it would be a mostly superficial reduction in
-    // complexity, and would make the code harder to read, as well as cost gas.
-    //slither-disable-next-line cyclomatic-complexity
-    function integrityCheck(
-        bytes memory fPointers,
-        bytes memory bytecode,
-        uint256[] memory constants,
-        uint256[] memory minOutputs
-    ) internal view {
+    function integrityCheck2(bytes memory fPointers, bytes memory bytecode, uint256[] memory constants)
+        internal
+        view
+        returns (bytes memory io)
+    {
         unchecked {
             uint256 sourceCount = LibBytecode.sourceCount(bytecode);
 
-            // Ensure that we are not missing any entrypoints expected by the calling
-            // contract.
-            if (minOutputs.length > sourceCount) {
-                revert EntrypointMissing(minOutputs.length, sourceCount);
-            }
-
             uint256 fPointersStart;
-            assembly {
+            assembly ("memory-safe") {
                 fPointersStart := add(fPointers, 0x20)
             }
 
@@ -99,22 +89,24 @@ library LibIntegrityCheckNP {
             // the bytecode is confirmed here.
             LibBytecode.checkNoOOBPointers(bytecode);
 
+            io = new bytes(sourceCount * 2);
+            uint256 ioCursor;
+            assembly ("memory-safe") {
+                ioCursor := add(io, 0x20)
+            }
+
             // Run the integrity check over each source. This needs to ensure
             // the integrity of each source's inputs, outputs, and stack
             // allocation, as well as the integrity of the bytecode itself on
             // a per-opcode basis, according to each opcode's implementation.
             for (uint256 i = 0; i < sourceCount; i++) {
                 (uint256 inputsLength, uint256 outputsLength) = LibBytecode.sourceInputsOutputsLength(bytecode, i);
-
-                // This is an entrypoint so has additional restrictions.
-                if (i < minOutputs.length) {
-                    if (inputsLength != 0) {
-                        revert EntrypointNonZeroInput(i, inputsLength);
-                    }
-
-                    if (outputsLength < minOutputs[i]) {
-                        revert EntrypointMinOutputs(i, outputsLength, minOutputs[i]);
-                    }
+                // Inputs and outputs are 1 byte each. This is enforced by the
+                // structure of the bytecode itself.
+                assembly ("memory-safe") {
+                    mstore8(ioCursor, inputsLength)
+                    mstore8(add(ioCursor, 1), outputsLength)
+                    ioCursor := add(ioCursor, 2)
                 }
 
                 IntegrityCheckStateNP memory state =

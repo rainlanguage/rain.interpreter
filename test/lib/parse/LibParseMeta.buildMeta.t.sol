@@ -42,12 +42,12 @@ contract LibParseMetaBuildMetaTest is Test {
             function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParserK
         ) = LibParseMeta.lookupWord(meta, operandParsers, authoringMeta[j].word);
         uint256 operandParserKActual;
-        assembly {
+        assembly ("memory-safe") {
             operandParserKActual := operandParserK
         }
         uint256 operandParserKExpected;
         uint256 operandParserKOffset = authoringMeta[j].operandParserOffset;
-        assembly {
+        assembly ("memory-safe") {
             operandParserKExpected := and(shr(operandParserKOffset, operandParsers), 0xFFFF)
         }
         assertEq(operandParserKExpected, operandParserKActual, "operandParserK");
@@ -60,7 +60,7 @@ contract LibParseMetaBuildMetaTest is Test {
             function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParserL
         ) = LibParseMeta.lookupWord(meta, operandParsers, notFound);
         uint256 operandParserLActual;
-        assembly {
+        assembly ("memory-safe") {
             operandParserLActual := operandParserL
         }
         assertEq(0, operandParserLActual, "operandParserL");
@@ -84,12 +84,12 @@ contract LibParseMetaBuildMetaTest is Test {
             function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParserK
         ) = LibParseMeta.lookupWord(meta, operandParsers, authoringMeta[j].word);
         uint256 operandParserKActual;
-        assembly {
+        assembly ("memory-safe") {
             operandParserKActual := operandParserK
         }
         uint256 operandParserKExpected;
         uint256 operandParserKOffset = authoringMeta[j].operandParserOffset;
-        assembly {
+        assembly ("memory-safe") {
             operandParserKExpected := and(shr(operandParserKOffset, operandParsers), 0xFFFF)
         }
         assertEq(operandParserKExpected, operandParserKActual, "operandParserK");
@@ -102,7 +102,7 @@ contract LibParseMetaBuildMetaTest is Test {
             function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParserL
         ) = LibParseMeta.lookupWord(meta, operandParsers, notFound);
         uint256 operandParserLActual;
-        assembly {
+        assembly ("memory-safe") {
             operandParserLActual := operandParserL
         }
         assertEq(0, operandParserLActual, "operandParserL");

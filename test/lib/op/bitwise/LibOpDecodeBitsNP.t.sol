@@ -4,7 +4,7 @@ pragma solidity =0.8.19;
 import {OpTest} from "test/util/abstract/OpTest.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {Operand} from "src/interface/IInterpreterV1.sol";
+import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
 import {TruncatedEncoding, ZeroLengthEncoding} from "src/lib/op/bitwise/LibOpEncodeBitsNP.sol";
 import {LibOpDecodeBitsNP} from "src/lib/op/bitwise/LibOpDecodeBitsNP.sol";
 

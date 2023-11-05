@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
-
-import "src/lib/parse/LibParse.sol";
+import {Test} from "forge-std/Test.sol";
+import {AuthoringMeta, LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
+import {LibParse} from "src/lib/parse/LibParse.sol";
 
 /// @title LibParseSingleRHSNamedGasTest
 /// Parse a single RHS name for many different sized RHS names just to include

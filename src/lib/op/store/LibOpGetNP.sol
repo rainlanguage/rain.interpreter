@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {MemoryKVKey, MemoryKVVal, MemoryKV, LibMemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
-import {Operand} from "../../../interface/IInterpreterV1.sol";
+import {Operand} from "../../../interface/unstable/IInterpreterV2.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";

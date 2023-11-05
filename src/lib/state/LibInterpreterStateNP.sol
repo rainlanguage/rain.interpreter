@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "rain.solmem/lib/LibPointer.sol";
-import "rain.lib.memkv/lib/LibMemoryKV.sol";
-import "../ns/LibNamespace.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
+import {FullyQualifiedNamespace, IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 
 struct InterpreterStateNP {
     Pointer[] stackBottoms;

@@ -1,8 +1,16 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/OpTest.sol";
+import {LibMemoryKV, MemoryKV, MemoryKVVal, MemoryKVKey} from "rain.lib.memkv/lib/LibMemoryKV.sol";
+import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
+
+import {OpTest} from "test/util/abstract/OpTest.sol";
 import {LibOpGetNP} from "src/lib/op/store/LibOpGetNP.sol";
+import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterStoreV1, StateNamespace} from "src/interface/IInterpreterStoreV1.sol";
 
 contract LibOpGetNPTest is OpTest {
     using LibMemoryKV for MemoryKV;
@@ -263,8 +271,8 @@ contract LibOpGetNPTest is OpTest {
         // Set some value then get it and also get something unset.
         (stack, kvs) = parseAndEval(":set(0x1234 0x5678),_:get(0x1234),_:get(0x5678);");
         assertEq(stack.length, 2, "stack.length");
-        assertEq(stack[0], 0x5678, "stack[0]");
-        assertEq(stack[1], 0, "stack[1]");
+        assertEq(stack[0], 0, "stack[0]");
+        assertEq(stack[1], 0x5678, "stack[1]");
         assertEq(kvs.length, 4, "kvs.length");
         assertEq(kvs[2], 0x1234, "kvs[0]");
         assertEq(kvs[3], 0x5678, "kvs[1]");
@@ -437,8 +445,8 @@ contract LibOpGetNPTest is OpTest {
         iStore.set(StateNamespace.wrap(0), LibUint256Array.arrayFrom(0x1234, 0x5678));
         (stack, kvs) = parseAndEval("_:get(0x1234),:set(0x1234 0x9abc),_:get(0x1234);");
         assertEq(stack.length, 2, "stack.length");
-        assertEq(stack[0], 0x5678, "stack[0]");
-        assertEq(stack[1], 0x9abc, "stack[1]");
+        assertEq(stack[0], 0x9abc, "stack[0]");
+        assertEq(stack[1], 0x5678, "stack[1]");
         assertEq(kvs.length, 2, "kvs.length");
         assertEq(kvs[0], 0x1234, "kvs[0]");
         assertEq(kvs[1], 0x9abc, "kvs[1]");
@@ -447,8 +455,8 @@ contract LibOpGetNPTest is OpTest {
         iStore.set(StateNamespace.wrap(0), LibUint256Array.arrayFrom(0x1234, 0x5678));
         (stack, kvs) = parseAndEval(":set(0x9abc 0xdef0),_:get(0x1234),_:get(0x9abc);");
         assertEq(stack.length, 2, "stack.length");
-        assertEq(stack[0], 0x5678, "stack[0]");
-        assertEq(stack[1], 0xdef0, "stack[1]");
+        assertEq(stack[0], 0xdef0, "stack[0]");
+        assertEq(stack[1], 0x5678, "stack[1]");
         assertEq(kvs.length, 4, "kvs.length");
         assertEq(kvs[0], 0x1234, "kvs[0]");
         assertEq(kvs[1], 0x5678, "kvs[1]");

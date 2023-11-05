@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
-import {Operand} from "../../../interface/IInterpreterV1.sol";
+import {Operand} from "../../../interface/unstable/IInterpreterV2.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 
 /// @title OpERC721BalanceOfNP
@@ -19,13 +19,13 @@ library LibOpERC721BalanceOfNP {
     function run(InterpreterStateNP memory, Operand, Pointer stackTop) internal view returns (Pointer) {
         uint256 token;
         uint256 account;
-        assembly {
+        assembly ("memory-safe") {
             token := mload(stackTop)
             stackTop := add(stackTop, 0x20)
             account := mload(stackTop)
         }
         uint256 tokenBalance = IERC721(address(uint160(token))).balanceOf(address(uint160(account)));
-        assembly {
+        assembly ("memory-safe") {
             mstore(stackTop, tokenBalance)
         }
         return stackTop;

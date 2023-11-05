@@ -68,7 +68,7 @@ library LibBytecode {
         if (bytecode.length == 0) {
             return 0;
         }
-        assembly {
+        assembly ("memory-safe") {
             // The first byte of rain bytecode is the count of how many sources
             // there are.
             count := byte(0, mload(add(bytecode, 0x20)))
@@ -212,7 +212,7 @@ library LibBytecode {
         if (sourceIndex >= sourceCount(bytecode)) {
             revert SourceIndexOutOfBounds(bytecode, sourceIndex);
         }
-        assembly {
+        assembly ("memory-safe") {
             // After the first byte, all the relative offset pointers are
             // stored sequentially as 16 bit values.
             offset := and(mload(add(add(bytecode, 3), mul(sourceIndex, 2))), 0xFFFF)
@@ -232,7 +232,7 @@ library LibBytecode {
         unchecked {
             uint256 sourcesStartOffset = 1 + sourceCount(bytecode) * 2;
             uint256 offset = sourceRelativeOffset(bytecode, sourceIndex);
-            assembly {
+            assembly ("memory-safe") {
                 pointer := add(add(add(bytecode, 0x20), sourcesStartOffset), offset)
             }
         }

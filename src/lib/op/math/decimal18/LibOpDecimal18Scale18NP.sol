@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {LibFixedPointDecimalScale} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
-import {Operand} from "../../../../interface/IInterpreterV1.sol";
+import {Operand} from "../../../../interface/unstable/IInterpreterV2.sol";
 import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";

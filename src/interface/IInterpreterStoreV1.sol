@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "./IInterpreterV1.sol";
+import {StateNamespace} from "./deprecated/IInterpreterV1.sol";
 
 /// A fully qualified namespace includes the interpreter's own namespacing logic
 /// IN ADDITION to the calling contract's requested `StateNamespace`. Typically

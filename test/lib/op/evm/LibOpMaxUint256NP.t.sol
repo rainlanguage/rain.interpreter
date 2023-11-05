@@ -33,30 +33,28 @@ contract LibOpMaxUint256NPTest is OpTest {
 
     /// Test the eval of LibOpMaxUint256NP parsed from a string.
     function testOpMaxUint256NPEval(StateNamespace namespace) external {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: max-int-value();");
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: max-int-value();");
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
 
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             namespace,
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0)
         );
 
         assertEq(stack.length, 1);
         assertEq(stack[0], type(uint256).max);
         assertEq(kvs.length, 0);
+        assertEq(io, hex"0001");
     }
 
     /// Test that a max-int-value with inputs fails integrity check.
     function testOpMaxUint256NPEvalFail() public {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: max-int-value(0x00);");
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: max-int-value(0x00);");
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
-        iDeployer.integrityCheck(bytecode, constants, minOutputs);
+        iDeployer.deployExpression2(bytecode, constants);
     }
 }

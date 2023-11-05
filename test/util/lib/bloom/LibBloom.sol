@@ -55,7 +55,7 @@ library LibBloom {
     /// Overloaded version of bloomFindsDupes that takes `uint256[]`.
     function bloomFindsDupes(uint256[] memory us) internal pure returns (bool) {
         bytes32[] memory kvs;
-        assembly {
+        assembly ("memory-safe") {
             kvs := us
         }
         return bloomFindsDupes(kvs);

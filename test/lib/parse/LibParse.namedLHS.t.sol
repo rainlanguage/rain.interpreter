@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "src/lib/parse/LibParse.sol";
-import "src/lib/bytecode/LibBytecode.sol";
+import {OPERAND_PARSER_OFFSET_DISALLOWED, ExpectedOperand, UnclosedOperand} from "src/lib/parse/LibParseOperand.sol";
+import {AuthoringMeta, LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
+import {LibParse, DuplicateLHSItem, WordSize} from "src/lib/parse/LibParse.sol";
+import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
 
 /// @title LibParseNamedLHSTest
 contract LibParseNamedLHSTest is Test {

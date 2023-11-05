@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "../state/LibInterpreterStateNP.sol";
+import {InterpreterStateNP} from "../state/LibInterpreterStateNP.sol";
 
-import "rain.solmem/lib/LibMemCpy.sol";
-import "rain.lib.memkv/lib/LibMemoryKV.sol";
-import "../bytecode/LibBytecode.sol";
+import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
+import {LibMemoryKV, MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
+import {LibBytecode} from "../bytecode/LibBytecode.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
 
 /// Thrown when the inputs length does not match the expected inputs length.
 /// @param expected The expected number of inputs.
@@ -150,7 +152,7 @@ library LibEvalNP {
         return stackTop;
     }
 
-    function evalNP(InterpreterStateNP memory state, uint256[] memory inputs, uint256 maxOutputs)
+    function eval2(InterpreterStateNP memory state, uint256[] memory inputs, uint256 maxOutputs)
         internal
         view
         returns (uint256[] memory, uint256[] memory)
@@ -192,28 +194,13 @@ library LibEvalNP {
             // and the original stack MUST be immutable as they're both pointing to
             // the same memory region.
             uint256 outputs = maxOutputs < sourceOutputs ? maxOutputs : sourceOutputs;
-            uint256[] memory result;
+            uint256[] memory stack;
             assembly ("memory-safe") {
-                result := sub(stackTop, 0x20)
-                mstore(result, outputs)
-
-                // Need to reverse the result array for backwards compatibility.
-                // Ideally we'd not do this, but will need to roll a new interface
-                // for such a breaking change.
-                for {
-                    let a := add(result, 0x20)
-                    let b := add(result, mul(outputs, 0x20))
-                } lt(a, b) {
-                    a := add(a, 0x20)
-                    b := sub(b, 0x20)
-                } {
-                    let tmp := mload(a)
-                    mstore(a, mload(b))
-                    mstore(b, tmp)
-                }
+                stack := sub(stackTop, 0x20)
+                mstore(stack, outputs)
             }
 
-            return (result, state.stateKV.toUint256Array());
+            return (stack, state.stateKV.toUint256Array());
         }
     }
 }

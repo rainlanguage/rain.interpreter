@@ -43,11 +43,11 @@ contract LibParseLiteralBoundLiteralDecimalTest is Test {
         uint256 expectedParser;
         function(bytes memory, uint256, uint256) pure returns (uint256) parseLiteralDecimal =
             LibParseLiteral.parseLiteralDecimal;
-        assembly {
+        assembly ("memory-safe") {
             expectedParser := parseLiteralDecimal
         }
         uint256 actualParser;
-        assembly {
+        assembly ("memory-safe") {
             actualParser := parser
         }
         assertEq(actualParser, expectedParser, "parser");

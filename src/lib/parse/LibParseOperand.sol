@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "../../interface/IInterpreterV1.sol";
-import "./LibParseCMask.sol";
-import "./LibParse.sol";
-import "./LibParseLiteral.sol";
+import {Operand} from "../../interface/unstable/IInterpreterV2.sol";
+import {LibParse} from "./LibParse.sol";
+import {LibParseLiteral} from "./LibParseLiteral.sol";
+import {CMASK_OPERAND_END, CMASK_WHITESPACE, CMASK_OPERAND_START} from "./LibParseCMask.sol";
 
 uint8 constant OPERAND_PARSER_OFFSET_DISALLOWED = 0;
 uint8 constant OPERAND_PARSER_OFFSET_SINGLE_FULL = 0x10;
@@ -25,32 +25,32 @@ library LibParseOperand {
         function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParserDisallowed =
             LibParseOperand.parseOperandDisallowed;
         uint256 parseOperandDisallowedOffset = OPERAND_PARSER_OFFSET_DISALLOWED;
-        assembly {
+        assembly ("memory-safe") {
             operandParsers := or(operandParsers, shl(parseOperandDisallowedOffset, operandParserDisallowed))
         }
         function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParserSingleFull =
             LibParseOperand.parseOperandSingleFull;
         uint256 parseOperandSingleFullOffset = OPERAND_PARSER_OFFSET_SINGLE_FULL;
-        assembly {
+        assembly ("memory-safe") {
             operandParsers := or(operandParsers, shl(parseOperandSingleFullOffset, operandParserSingleFull))
         }
         function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParserDoublePerByteNoDefault =
             LibParseOperand.parseOperandDoublePerByteNoDefault;
         uint256 parseOperandDoublePerByteNoDefaultOffset = OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT;
-        assembly {
+        assembly ("memory-safe") {
             operandParsers :=
                 or(operandParsers, shl(parseOperandDoublePerByteNoDefaultOffset, operandParserDoublePerByteNoDefault))
         }
         function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParser_m1_m1 =
             LibParseOperand.parseOperandM1M1;
         uint256 parseOperand_m1_m1Offset = OPERAND_PARSER_OFFSET_M1_M1;
-        assembly {
+        assembly ("memory-safe") {
             operandParsers := or(operandParsers, shl(parseOperand_m1_m1Offset, operandParser_m1_m1))
         }
         function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParser_8_m1_m1 =
             LibParseOperand.parseOperand8M1M1;
         uint256 parseOperand_8_m1_m1Offset = OPERAND_PARSER_OFFSET_8_M1_M1;
-        assembly {
+        assembly ("memory-safe") {
             operandParsers := or(operandParsers, shl(parseOperand_8_m1_m1Offset, operandParser_8_m1_m1))
         }
     }
@@ -62,7 +62,7 @@ library LibParseOperand {
         returns (uint256, uint256)
     {
         uint256 char;
-        assembly {
+        assembly ("memory-safe") {
             //slither-disable-next-line incorrect-shift
             char := shl(byte(0, mload(cursor)), 1)
         }
@@ -90,7 +90,7 @@ library LibParseOperand {
         returns (uint256, Operand)
     {
         uint256 char;
-        assembly {
+        assembly ("memory-safe") {
             //slither-disable-next-line incorrect-shift
             char := shl(byte(0, mload(cursor)), 1)
         }
@@ -110,7 +110,7 @@ library LibParseOperand {
         unchecked {
             uint256 char;
             uint256 end;
-            assembly {
+            assembly ("memory-safe") {
                 end := add(data, add(mload(data), 0x20))
                 //slither-disable-next-line incorrect-shift
                 char := shl(byte(0, mload(cursor)), 1)
@@ -192,7 +192,7 @@ library LibParseOperand {
         unchecked {
             uint256 char;
             uint256 end;
-            assembly {
+            assembly ("memory-safe") {
                 end := add(data, add(mload(data), 0x20))
                 //slither-disable-next-line incorrect-shift
                 char := shl(byte(0, mload(cursor)), 1)
@@ -259,7 +259,7 @@ library LibParseOperand {
         unchecked {
             uint256 char;
             uint256 end;
-            assembly {
+            assembly ("memory-safe") {
                 end := add(data, add(mload(data), 0x20))
                 //slither-disable-next-line incorrect-shift
                 char := shl(byte(0, mload(cursor)), 1)

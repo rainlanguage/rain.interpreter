@@ -1,20 +1,25 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/OpTest.sol";
-import "test/util/lib/etch/LibEtch.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
+import {IMetaV1} from "rain.metadata/IMetaV1.sol";
 
-import "rain.solmem/lib/LibPointer.sol";
-import "rain.solmem/lib/LibStackPointer.sol";
-import "rain.metadata/IMetaV1.sol";
+import {OpTest} from "test/util/abstract/OpTest.sol";
+import {INVALID_BYTECODE} from "test/util/lib/etch/LibEtch.sol";
 
-import "src/lib/state/LibInterpreterStateNP.sol";
-import "src/lib/op/evm/LibOpChainIdNP.sol";
-import "src/lib/caller/LibContext.sol";
+import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {LibOpChainIdNP} from "src/lib/op/evm/LibOpChainIdNP.sol";
 
-import "src/concrete/RainterpreterNP.sol";
-import "src/concrete/RainterpreterStore.sol";
-import "src/concrete/RainterpreterExpressionDeployerNP.sol";
+import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
+import {RainterpreterStoreNPE2, StateNamespace} from "src/concrete/RainterpreterStoreNPE2.sol";
+import {RainterpreterExpressionDeployerNPE2} from "src/concrete/RainterpreterExpressionDeployerNPE2.sol";
+import {Operand, IInterpreterV2, SourceIndexV2} from "src/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
+import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+import {LibContext} from "src/lib/caller/LibContext.sol";
+import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 
 /// @title LibOpChainIdNPTest
 /// @notice Test the runtime and integrity time logic of LibOpChainIdNP.
@@ -44,31 +49,29 @@ contract LibOpChainIdNPTest is OpTest {
 
     /// Test the eval of a chain ID opcode parsed from a string.
     function testOpChainIDNPEval(uint64 chainId, StateNamespace namespace) public {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: chain-id();");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: chain-id();");
 
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
 
         vm.chainId(chainId);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             namespace,
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0))
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0)
         );
         assertEq(stack.length, 1, "stack length");
         assertEq(stack[0], chainId, "stack item");
         assertEq(kvs.length, 0, "kvs length");
+        assertEq(io, hex"0001", "io");
     }
 
     /// Test that a chain ID with inputs fails integrity check.
     function testOpChainIdNPEvalFail() public {
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: chain-id(0x00);");
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: chain-id(0x00);");
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
-        iDeployer.integrityCheck(bytecode, constants, minOutputs);
+        iDeployer.deployExpression2(bytecode, constants);
     }
 }

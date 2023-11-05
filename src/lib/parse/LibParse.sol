@@ -1,16 +1,31 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "rain.solmem/lib/LibPointer.sol";
-import "rain.solmem/lib/LibMemCpy.sol";
-
-import "../bitwise/LibCtPop.sol";
-import "./LibParseMeta.sol";
-import "./LibParseCMask.sol";
-import "./LibParseLiteral.sol";
-import "./LibParseOperand.sol";
-import "../../interface/IInterpreterV1.sol";
-import "./LibParseStackName.sol";
+import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
+import {
+    CMASK_COMMENT_HEAD,
+    CMASK_EOS,
+    CMASK_EOL,
+    CMASK_LITERAL_HEAD,
+    CMASK_WHITESPACE,
+    CMASK_RIGHT_PAREN,
+    CMASK_LEFT_PAREN,
+    CMASK_RHS_WORD_TAIL,
+    CMASK_RHS_WORD_HEAD,
+    CMASK_LHS_RHS_DELIMITER,
+    CMASK_LHS_STACK_TAIL,
+    CMASK_LHS_STACK_HEAD,
+    COMMENT_START_SEQUENCE,
+    COMMENT_END_SEQUENCE,
+    CMASK_IDENTIFIER_HEAD
+} from "./LibParseCMask.sol";
+import {LibCtPop} from "../bitwise/LibCtPop.sol";
+import {LibParseMeta} from "./LibParseMeta.sol";
+import {LibParseLiteral} from "./LibParseLiteral.sol";
+import {LibParseOperand} from "./LibParseOperand.sol";
+import {Operand} from "../../interface/unstable/IInterpreterV2.sol";
+import {LibParseStackName} from "./LibParseStackName.sol";
 
 /// The expression does not finish with a semicolon (EOF).
 error MissingFinalSemi(uint256 offset);

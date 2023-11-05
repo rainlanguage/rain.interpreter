@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {Operand} from "../../interface/IInterpreterV1.sol";
+import {Operand} from "../../interface/unstable/IInterpreterV2.sol";
 import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "../integrity/LibIntegrityCheckNP.sol";
 import {LibInterpreterStateNP, InterpreterStateNP} from "../state/LibInterpreterStateNP.sol";
 import {AuthoringMeta} from "../parse/LibParseMeta.sol";
@@ -78,7 +78,7 @@ uint256 constant ALL_STANDARD_OPS_LENGTH = 47;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
-/// array to easily build function pointers for `IInterpreterV1`.
+/// array to easily build function pointers for `IInterpreterV2`.
 library LibAllStandardOpsNP {
     function authoringMeta() internal pure returns (bytes memory) {
         AuthoringMeta memory lengthPlaceholder;
@@ -403,7 +403,7 @@ library LibAllStandardOpsNP {
     }
 
     /// All function pointers for the standard opcodes. Intended to be used to
-    /// build a `IInterpreterV1` instance, specifically the `functionPointers`
+    /// build a `IInterpreterV2` instance, specifically the `functionPointers`
     /// method can just be a thin wrapper around this function.
     function opcodeFunctionPointers() internal pure returns (bytes memory) {
         unchecked {

@@ -73,101 +73,101 @@ contract LibOpContextNPTest is OpTest {
     function testOpContextNPEval00(uint256[][] memory context) external {
         vm.assume(context.length > 0);
         vm.assume(context[0].length > 0);
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: context<0 0>();");
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: context<0 0>();");
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
-            context
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
+            context,
+            new uint256[](0)
         );
 
         assertEq(stack.length, 1, "stack length");
         assertEq(stack[0], context[0][0], "stack[0]");
         assertEq(kvs.length, 0, "kvs length");
+        assertEq(io, hex"0001", "io");
     }
 
     /// Test the eval of context opcode parsed from a string. This tests 0 1.
     function testOpContextNPEval01(uint256[][] memory context) external {
         vm.assume(context.length > 0);
         vm.assume(context[0].length > 1);
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: context<0 1>();");
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: context<0 1>();");
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
-            context
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
+            context,
+            new uint256[](0)
         );
 
         assertEq(stack.length, 1, "stack length");
         assertEq(stack[0], context[0][1], "stack[0]");
         assertEq(kvs.length, 0, "kvs length");
+        assertEq(io, hex"0001", "io");
     }
 
     /// Test the eval of context opcode parsed from a string. This tests 1 0.
     function testOpContextNPEval10(uint256[][] memory context) external {
         vm.assume(context.length > 1);
         vm.assume(context[1].length > 0);
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: context<1 0>();");
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: context<1 0>();");
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
-            context
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
+            context,
+            new uint256[](0)
         );
 
         assertEq(stack.length, 1, "stack length");
         assertEq(stack[0], context[1][0], "stack[0]");
         assertEq(kvs.length, 0, "kvs length");
+        assertEq(io, hex"0001", "io");
     }
 
     /// Test the eval of context opcode parsed from a string. This tests 1 1.
     function testOpContextNPEval11(uint256[][] memory context) external {
         vm.assume(context.length > 1);
         vm.assume(context[1].length > 1);
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: context<1 1>();");
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval(
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: context<1 1>();");
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
-            context
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
+            context,
+            new uint256[](0)
         );
 
         assertEq(stack.length, 1, "stack length");
         assertEq(stack[0], context[1][1], "stack[0]");
         assertEq(kvs.length, 0, "kvs length");
+        assertEq(io, hex"0001", "io");
     }
 
     /// Test the eval of context opcode parsed from a string. This tests OOB i.
     function testOpContextNPEvalOOBi(uint256[] memory context0) external {
         uint256[][] memory context = new uint256[][](1);
         context[0] = context0;
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: context<1 0>();");
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: context<1 0>();");
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
+        (io);
         vm.expectRevert(stdError.indexOOBError);
-        interpreterDeployer.eval(
+        interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
-            context
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
+            context,
+            new uint256[](0)
         );
     }
 
@@ -176,17 +176,17 @@ contract LibOpContextNPTest is OpTest {
         uint256[][] memory context = new uint256[][](1);
         uint256[] memory context0 = new uint256[](1);
         context0[0] = v;
-        (bytes memory bytecode, uint256[] memory constants) = iDeployer.parse("_: context<0 1>();");
-        uint256[] memory minOutputs = new uint256[](1);
-        minOutputs[0] = 1;
-        (IInterpreterV1 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression) =
-            iDeployer.deployExpression(bytecode, constants, minOutputs);
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: context<0 1>();");
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
+        (io);
         vm.expectRevert(stdError.indexOOBError);
-        interpreterDeployer.eval(
+        interpreterDeployer.eval2(
             storeDeployer,
             StateNamespace.wrap(0),
-            LibEncodedDispatch.encode(expression, SourceIndex.wrap(0), 1),
-            context
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
+            context,
+            new uint256[](0)
         );
     }
 }
