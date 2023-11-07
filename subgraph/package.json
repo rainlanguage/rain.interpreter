@@ -1,0 +1,39 @@
+{
+  "name": "interpreter-subgraph",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ vishalkale151071/blocks",
+    "deploy-subgraph": "ts-node scripts/index.ts",
+    "generate-schema": "cat subgraph-schema/* > schema.graphql",
+    "hardhat-node": "hardhat node",
+    "graph-node": "docker-compose -f \"docker/docker-compose.yml\" up",
+    "graph-node-up": "docker-compose -f \"docker/docker-compose.yml\" up --build -d",
+    "graph-node-down": "docker-compose -f \"docker/docker-compose.yml\" down",
+    "lint": "eslint .",
+    "lint-fix": "eslint . --fix",
+    "prettier": "prettier . '!./docker' --check",
+    "prettier-write": "prettier . '!./docker' --write"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beehive-innovation/interpreter-subgraph.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/beehive-innovation/interpreter-subgraph/issues"
+  },
+  "homepage": "https://github.com/beehive-innovation/interpreter-subgraph#readme",
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.46.1",
+    "@graphprotocol/graph-ts": "0.28.1",
+    "@rainprotocol/assemblyscript-cbor": "0.0.6",
+    "mustache": "3.2.1"
+  }
+}

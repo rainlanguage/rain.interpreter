@@ -1,0 +1,210 @@
+type Account @entity {
+  id: ID!
+  "Events emitted by this account"
+  events: [Event!]! @derivedFrom(field: "emitter")
+  "Expressions deployed by this account"
+  expressions: [Expression!] @derivedFrom(field: "account")
+}
+
+interface RainContract {
+  "The address of the contract"
+  id: ID!
+  "Bytecode hash of this contract"
+  bytecodeHash: String
+  deployTransaction: Transaction
+  "All the meta items that emitted by this contract"
+  meta: [Meta!]!
+}
+
+type Contract implements RainContract @entity {
+  "Address of this contract"
+  id: ID!
+  "Bytecode hash of this contract"
+  bytecodeHash: String
+  deployTransaction: Transaction
+  "All the meta items that emitted by this contract"
+  meta: [Meta!]!
+  "All the expression this contract has ever deployed"
+  expressions: [Expression!]! @derivedFrom(field: "contract")
+  "The deployer used when added/deployed the contract"
+  initialDeployer: ExpressionDeployer
+  "The raw bytes of the emitted meta"
+  constructorMeta: Bytes!
+  "The hash of the emitted meta"
+  constructorMetaHash: Bytes!
+  "The type of this contract. Eg: contract or proxy"
+  type: String!
+  "Optional implementation contract if the contract type is an implementation"
+  implementation: Contract
+}
+
+type ExpressionDeployer implements RainContract @entity {
+  "The address of this deployer."
+  id: ID!
+  "Bytecode hash of this Deployer"
+  bytecodeHash: String
+  deployTransaction: Transaction
+  "All the meta items that emitted by this contract"
+  meta: [Meta!]!
+  "All the expression this expression deployer contract has ever deployed"
+  expressions: [Expression!]! @derivedFrom(field: "deployer")
+  "The interpreter instance this deployer uses."
+  interpreter: InterpreterInstance # get from ValidInterpreter.interpreter
+  "The RainterpreterStore instance being used by the deployer"
+  store: RainterpreterStoreInstance
+  "The account that deployed this IExpressionDeployerV1"
+  account: Account
+  "functionPointers"
+  functionPointers: String
+  "Raw authoringMeta"
+  constructorMeta: Bytes!
+  "Raw authoringMeta hash"
+  constructorMetaHash: Bytes!
+  "The deployed bytecode of the expressionDeployer contract that is being deployed"
+  deployedBytecode: Bytes
+  "The bytecode of the expressionDeployer"
+  bytecode: Bytes
+}
+
+type Interpreter @entity {
+  "Hash of the deployed bytecode for this interpreter."
+  id: ID!
+  "Instances of this interpreter"
+  instances: [InterpreterInstance!]! @derivedFrom(field: "interpreter")
+  "Expressions deployed by this interpreter"
+  expressions: [Expression!] @derivedFrom(field: "interpreter")
+}
+
+type InterpreterInstance @entity {
+  "Address of this interpreter instance"
+  id: ID!
+  interpreter: Interpreter!
+  "Expressions deployed by this interpreter instance"
+  expressions: [Expression!] @derivedFrom(field: "interpreterInstance")
+}
+
+type RainterpreterStore @entity {
+  "Hash of the deployed bytecode for this RainterpreterStore."
+  id: ID!
+  "Instances of this store"
+  instances: [RainterpreterStoreInstance!]! @derivedFrom(field: "store")
+}
+
+type RainterpreterStoreInstance @entity {
+  "Address of the RainterpreterStore instance"
+  id: ID!
+  store: RainterpreterStore!
+  "ExpressionDeployers using this store"
+  deployers: [ExpressionDeployer!] @derivedFrom(field: "store")
+}
+
+type Expression @entity(immutable: true) {
+  "Address for this expression"
+  id: ID!
+  event: DeployExpressionEvent!
+  "Account that deployed this expression"
+  account: Account!
+  "The contract that this expression was deployed via"
+  contract: Contract!
+  "The expression deployer that this expression was deployed via"
+  deployer: ExpressionDeployer!
+  interpreter: Interpreter!
+  interpreterInstance: InterpreterInstance!
+  config: StateConfig!
+}
+
+type DeployExpressionEvent implements Event @entity(immutable: true) {
+  id: ID!
+  "Transaction this event was emitted in."
+  transaction: Transaction!
+  "Account that sent the transaction this event was emitted in."
+  emitter: Account!
+  timestamp: BigInt!
+  "Expression"
+  expression: Expression! #map by DeployExpression.expressionAddress
+}
+
+interface Event {
+  id: ID!
+  "Transaction this event was emitted in."
+  transaction: Transaction!
+  "Account that sent the transaction this event was emitted in."
+  emitter: Account!
+  timestamp: BigInt!
+}
+
+type Transaction @entity(immutable: true) {
+  id: ID!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  events: [Event!] @derivedFrom(field: "transaction")
+}
+
+type StateConfig @entity {
+  id: ID!
+  bytecode: Bytes!
+  constants: [BigInt!]!
+  minOutputs: [BigInt!]!
+}
+
+interface Meta {
+  "The hash of this meta, this basically is the hash of 'rawBytes' field"
+  id: Bytes!
+  "The raw bytes, hash of this field is basically the 'id'"
+  rawBytes: Bytes!
+  "The contract address that emitted this Meta"
+  contracts: [RainContract!]!
+  "The magic number associated with this meta"
+  magicNumber: BigInt!
+}
+
+type RainMetaV1 implements Meta @entity {
+  "The hash of the raw bytes"
+  id: Bytes!
+  "The raw bytes, hash of this field is basically the 'id'"
+  rawBytes: Bytes!
+  "The contract addresses that emitted this RainMeta"
+  contracts: [RainContract!]!
+  "The magic number associated with this meta"
+  magicNumber: BigInt!
+  "The unordered cbor maps (sequence of metas) of this RainMeta"
+  sequence: [ContentMetaV1!]!
+}
+
+type ContentMetaV1 implements Meta @entity {
+  "The hash of this meta, this basically is the hash of 'rawBytes' field"
+  id: Bytes!
+  "The cbor map item bytes."
+  rawBytes: Bytes!
+  "The contract addresses that emitted this MetaContent as part of the parent RainMeta sequence"
+  contracts: [RainContract!]!
+  "The magic number associated with this meta"
+  magicNumber: BigInt!
+  "The payload of this content"
+  payload: Bytes!
+  "The RainMeta records that have this cbor map as part of their sequence"
+  parents: [RainMetaV1!]!
+  "The header name info for Content-Type"
+  contentType: String
+  "The header name info for Content-Encoding. It's optional"
+  contentEncoding: String
+  "The header name info for Content-Language. It's optional"
+  contentLanguage: String
+}
+
+type DeployerBytecodeMetaV1 implements Meta @entity {
+  "The hash of this meta, this basically is the hash of 'rawBytes' field"
+  id: Bytes!
+  "The cbor map item bytes."
+  rawBytes: Bytes!
+  "The contract addresses that their cbor encoded deployed bytecode matches this record"
+  contracts: [RainContract!]!
+  "The magic number associated with this meta"
+  magicNumber: BigInt!
+  "The payload, this is the deployed bytecode"
+  payload: Bytes!
+  "The RainMeta records that have this cbor map as part of their sequence"
+  parents: [RainMetaV1!]!
+  "The header name info for Content-Type"
+  contentType: String!
+}
