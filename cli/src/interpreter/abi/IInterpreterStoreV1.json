@@ -1,0 +1,692 @@
+{
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "FullyQualifiedNamespace",
+          "name": "namespace",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "key",
+          "type": "uint256"
+        }
+      ],
+      "name": "get",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "StateNamespace",
+          "name": "namespace",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "kvs",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "set",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": {
+    "object": "0x",
+    "sourceMap": "",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x",
+    "sourceMap": "",
+    "linkReferences": {}
+  },
+  "methodIdentifiers": {
+    "get(uint256,uint256)": "669e48aa",
+    "set(uint256,uint256[])": "946aadc6"
+  },
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.19+commit.7dd6d404\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"FullyQualifiedNamespace\",\"name\":\"namespace\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"key\",\"type\":\"uint256\"}],\"name\":\"get\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"StateNamespace\",\"name\":\"namespace\",\"type\":\"uint256\"},{\"internalType\":\"uint256[]\",\"name\":\"kvs\",\"type\":\"uint256[]\"}],\"name\":\"set\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"get(uint256,uint256)\":{\"params\":{\"key\":\"The key to get the value for within the namespace.\",\"namespace\":\"The fully qualified namespace to get a single value for.\"},\"returns\":{\"_0\":\"The value OR ZERO IF NOT SET.\"}},\"set(uint256,uint256[])\":{\"params\":{\"kvs\":\"The list of changes to apply to the store's internal state.\",\"namespace\":\"The unqualified namespace for the set that MUST be fully qualified by the `IInterpreterStoreV1` to prevent key collisions between callers. The fully qualified namespace forms a compound key with the keys for each value to set.\"}}},\"title\":\"IInterpreterStoreV1\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"get(uint256,uint256)\":{\"notice\":\"Given a fully qualified namespace and key, return the associated value. Ostensibly the interpreter can use this to implement opcodes that read previously set values. The interpreter MUST apply the same qualification logic as the store that it uses to guarantee consistent round tripping of data and prevent malicious behaviours. Technically also allows onchain reads of any set value from any contract, not just interpreters, but in this case readers MUST be aware and handle inconsistencies between get and set while the state changes are still in memory in the calling context and haven't yet been persisted to the store. `IInterpreterStoreV1` uses the same fallback behaviour for unset keys as Solidity. Specifically, any UNSET VALUES SILENTLY FALLBACK TO `0`.\"},\"set(uint256,uint256[])\":{\"notice\":\"Mutates the interpreter store in bulk. The bulk values are provided in the form of a `uint256[]` which can be treated e.g. as pairwise keys and values to be stored in a Solidity mapping. The `IInterpreterStoreV1` defines the meaning of the `uint256[]` for its own storage logic.\"}},\"notice\":\"Tracks state changes on behalf of an interpreter. A single store can handle state changes for many calling contracts, many interpreters and many expressions. The store is responsible for ensuring that applying these state changes is safe from key collisions with calls to `set` from different `msg.sender` callers. I.e. it MUST NOT be possible for a caller to modify the state changes associated with some other caller. The store defines the shape of its own state changes, which is opaque to the calling contract. For example, some store may treat the list of state changes as a pairwise key/value set, and some other store may treat it as a literal list to be stored as-is. Each interpreter decides for itself which store to use based on the compatibility of its own opcodes. The store MUST assume the state changes have been corrupted by the calling contract due to bugs or malicious intent, and enforce state isolation between callers despite arbitrarily invalid state changes. The store MUST revert if it can detect invalid state changes, such as a key/value list having an odd number of items, but this MAY NOT be possible if the corruption is undetectable.\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"src/interface/IInterpreterStoreV1.sol\":\"IInterpreterStoreV1\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"appendCBOR\":false,\"bytecodeHash\":\"none\"},\"optimizer\":{\"enabled\":true,\"runs\":1000000},\"remappings\":[\":@prb/test/=lib/rain.interpreter/lib/prb-math/lib/prb-test/src/\",\":bitwise/=lib/rain.interpreter/src/lib/bitwise/\",\":bytecode/=lib/rain.interpreter/src/lib/bytecode/\",\":caller/=lib/rain.interpreter/src/lib/caller/\",\":compile/=lib/rain.interpreter/src/lib/compile/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":erc4626-tests/=lib/rain.interpreter/lib/openzeppelin-contracts/lib/erc4626-tests/\",\":eval/=lib/rain.interpreter/src/lib/eval/\",\":extern/=lib/rain.interpreter/src/lib/extern/\",\":forge-std/=lib/forge-std/src/\",\":integrity/=lib/rain.interpreter/src/lib/integrity/\",\":ns/=lib/rain.interpreter/src/lib/ns/\",\":op/=lib/rain.interpreter/src/lib/op/\",\":openzeppelin-contracts/=lib/rain.interpreter/lib/openzeppelin-contracts/\",\":openzeppelin/=lib/rain.interpreter/lib/openzeppelin-contracts/contracts/\",\":parse/=lib/rain.interpreter/src/lib/parse/\",\":prb-math/=lib/rain.interpreter/lib/prb-math/src/\",\":prb-test/=lib/rain.interpreter/lib/prb-math/lib/prb-test/src/\",\":rain.chainlink/=lib/rain.interpreter/lib/rain.chainlink/src/\",\":rain.datacontract/=lib/rain.interpreter/lib/rain.datacontract/src/\",\":rain.erc1820/=lib/rain.interpreter/lib/rain.erc1820/src/\",\":rain.interpreter/=lib/rain.interpreter/\",\":rain.lib.hash/=lib/rain.interpreter/lib/rain.lib.memkv/lib/rain.lib.hash/src/\",\":rain.lib.memkv/=lib/rain.interpreter/lib/rain.lib.memkv/src/\",\":rain.lib.typecast/=lib/rain.interpreter/lib/rain.lib.typecast/src/\",\":rain.math.fixedpoint/=lib/rain.interpreter/lib/rain.math.fixedpoint/src/\",\":rain.math.saturating/=lib/rain.interpreter/lib/rain.math.fixedpoint/lib/rain.math.saturating/src/\",\":rain.metadata/=lib/rain.interpreter/lib/rain.metadata/src/\",\":rain.solmem/=lib/rain.interpreter/lib/rain.solmem/src/\",\":sol.lib.binmaskflag/=lib/rain.interpreter/lib/sol.lib.binmaskflag/src/\",\":state/=lib/rain.interpreter/src/lib/state/\",\":uniswap/=lib/rain.interpreter/src/lib/uniswap/\",\":v2-core/=lib/rain.interpreter/lib/v2-core/contracts/\",\":v2-periphery/=lib/rain.interpreter/lib/v2-periphery/contracts/\"]},\"sources\":{\"src/interface/IInterpreterStoreV1.sol\":{\"keccak256\":\"0x2c059999b6afdda7bbdbdcf9301e2792a10c28184f7cb87ebaadd64a2b6667d1\",\"license\":\"CAL\",\"urls\":[\"bzz-raw://3459b6d6dc286a3f5a30d6ab611b80a699f6139604344e69c2c7d4f336be9324\",\"dweb:/ipfs/QmfXquhoakG17E1sNp2NRQDj5Z2FvYwvZW8AJe8JEf8VQh\"]},\"src/interface/IInterpreterV1.sol\":{\"keccak256\":\"0xbecedb6debc0eeba7a1994081e7d547cdaf92cac84ef2bcddb8068d29f587969\",\"license\":\"CAL\",\"urls\":[\"bzz-raw://d1030b1eb4d25eb0a76d2da38f817d4ca66d2800bfa5b73d909b000757be5fac\",\"dweb:/ipfs/QmdMgVDq6pbgvz28dA14iFN14T1dDzP7e8886e5xACPsxF\"]}},\"version\":1}",
+  "metadata": {
+    "compiler": {
+      "version": "0.8.19+commit.7dd6d404"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "FullyQualifiedNamespace",
+              "name": "namespace",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "key",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function",
+          "name": "get",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ]
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "StateNamespace",
+              "name": "namespace",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256[]",
+              "name": "kvs",
+              "type": "uint256[]"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function",
+          "name": "set"
+        }
+      ],
+      "devdoc": {
+        "kind": "dev",
+        "methods": {
+          "get(uint256,uint256)": {
+            "params": {
+              "key": "The key to get the value for within the namespace.",
+              "namespace": "The fully qualified namespace to get a single value for."
+            },
+            "returns": {
+              "_0": "The value OR ZERO IF NOT SET."
+            }
+          },
+          "set(uint256,uint256[])": {
+            "params": {
+              "kvs": "The list of changes to apply to the store's internal state.",
+              "namespace": "The unqualified namespace for the set that MUST be fully qualified by the `IInterpreterStoreV1` to prevent key collisions between callers. The fully qualified namespace forms a compound key with the keys for each value to set."
+            }
+          }
+        },
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {
+          "get(uint256,uint256)": {
+            "notice": "Given a fully qualified namespace and key, return the associated value. Ostensibly the interpreter can use this to implement opcodes that read previously set values. The interpreter MUST apply the same qualification logic as the store that it uses to guarantee consistent round tripping of data and prevent malicious behaviours. Technically also allows onchain reads of any set value from any contract, not just interpreters, but in this case readers MUST be aware and handle inconsistencies between get and set while the state changes are still in memory in the calling context and haven't yet been persisted to the store. `IInterpreterStoreV1` uses the same fallback behaviour for unset keys as Solidity. Specifically, any UNSET VALUES SILENTLY FALLBACK TO `0`."
+          },
+          "set(uint256,uint256[])": {
+            "notice": "Mutates the interpreter store in bulk. The bulk values are provided in the form of a `uint256[]` which can be treated e.g. as pairwise keys and values to be stored in a Solidity mapping. The `IInterpreterStoreV1` defines the meaning of the `uint256[]` for its own storage logic."
+          }
+        },
+        "version": 1
+      }
+    },
+    "settings": {
+      "remappings": [
+        "@prb/test/=lib/rain.interpreter/lib/prb-math/lib/prb-test/src/",
+        "bitwise/=lib/rain.interpreter/src/lib/bitwise/",
+        "bytecode/=lib/rain.interpreter/src/lib/bytecode/",
+        "caller/=lib/rain.interpreter/src/lib/caller/",
+        "compile/=lib/rain.interpreter/src/lib/compile/",
+        "ds-test/=lib/forge-std/lib/ds-test/src/",
+        "erc4626-tests/=lib/rain.interpreter/lib/openzeppelin-contracts/lib/erc4626-tests/",
+        "eval/=lib/rain.interpreter/src/lib/eval/",
+        "extern/=lib/rain.interpreter/src/lib/extern/",
+        "forge-std/=lib/forge-std/src/",
+        "integrity/=lib/rain.interpreter/src/lib/integrity/",
+        "ns/=lib/rain.interpreter/src/lib/ns/",
+        "op/=lib/rain.interpreter/src/lib/op/",
+        "openzeppelin-contracts/=lib/rain.interpreter/lib/openzeppelin-contracts/",
+        "openzeppelin/=lib/rain.interpreter/lib/openzeppelin-contracts/contracts/",
+        "parse/=lib/rain.interpreter/src/lib/parse/",
+        "prb-math/=lib/rain.interpreter/lib/prb-math/src/",
+        "prb-test/=lib/rain.interpreter/lib/prb-math/lib/prb-test/src/",
+        "rain.chainlink/=lib/rain.interpreter/lib/rain.chainlink/src/",
+        "rain.datacontract/=lib/rain.interpreter/lib/rain.datacontract/src/",
+        "rain.erc1820/=lib/rain.interpreter/lib/rain.erc1820/src/",
+        "rain.interpreter/=lib/rain.interpreter/",
+        "rain.lib.hash/=lib/rain.interpreter/lib/rain.lib.memkv/lib/rain.lib.hash/src/",
+        "rain.lib.memkv/=lib/rain.interpreter/lib/rain.lib.memkv/src/",
+        "rain.lib.typecast/=lib/rain.interpreter/lib/rain.lib.typecast/src/",
+        "rain.math.fixedpoint/=lib/rain.interpreter/lib/rain.math.fixedpoint/src/",
+        "rain.math.saturating/=lib/rain.interpreter/lib/rain.math.fixedpoint/lib/rain.math.saturating/src/",
+        "rain.metadata/=lib/rain.interpreter/lib/rain.metadata/src/",
+        "rain.solmem/=lib/rain.interpreter/lib/rain.solmem/src/",
+        "sol.lib.binmaskflag/=lib/rain.interpreter/lib/sol.lib.binmaskflag/src/",
+        "state/=lib/rain.interpreter/src/lib/state/",
+        "uniswap/=lib/rain.interpreter/src/lib/uniswap/",
+        "v2-core/=lib/rain.interpreter/lib/v2-core/contracts/",
+        "v2-periphery/=lib/rain.interpreter/lib/v2-periphery/contracts/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 1000000
+      },
+      "metadata": {
+        "bytecodeHash": "none",
+        "appendCBOR": false
+      },
+      "compilationTarget": {
+        "src/interface/IInterpreterStoreV1.sol": "IInterpreterStoreV1"
+      },
+      "libraries": {}
+    },
+    "sources": {
+      "src/interface/IInterpreterStoreV1.sol": {
+        "keccak256": "0x2c059999b6afdda7bbdbdcf9301e2792a10c28184f7cb87ebaadd64a2b6667d1",
+        "urls": [
+          "bzz-raw://3459b6d6dc286a3f5a30d6ab611b80a699f6139604344e69c2c7d4f336be9324",
+          "dweb:/ipfs/QmfXquhoakG17E1sNp2NRQDj5Z2FvYwvZW8AJe8JEf8VQh"
+        ],
+        "license": "CAL"
+      },
+      "src/interface/IInterpreterV1.sol": {
+        "keccak256": "0xbecedb6debc0eeba7a1994081e7d547cdaf92cac84ef2bcddb8068d29f587969",
+        "urls": [
+          "bzz-raw://d1030b1eb4d25eb0a76d2da38f817d4ca66d2800bfa5b73d909b000757be5fac",
+          "dweb:/ipfs/QmdMgVDq6pbgvz28dA14iFN14T1dDzP7e8886e5xACPsxF"
+        ],
+        "license": "CAL"
+      }
+    },
+    "version": 1
+  },
+  "ast": {
+    "absolutePath": "src/interface/IInterpreterStoreV1.sol",
+    "id": 73552,
+    "exportedSymbols": {
+      "FullyQualifiedNamespace": [
+        73519
+      ],
+      "IInterpreterStoreV1": [
+        73551
+      ],
+      "NO_STORE": [
+        73528
+      ],
+      "StateNamespace": [
+        73561
+      ]
+    },
+    "nodeType": "SourceUnit",
+    "src": "32:3908:150",
+    "nodes": [
+      {
+        "id": 73515,
+        "nodeType": "PragmaDirective",
+        "src": "32:24:150",
+        "nodes": [],
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".18"
+        ]
+      },
+      {
+        "id": 73517,
+        "nodeType": "ImportDirective",
+        "src": "58:52:150",
+        "nodes": [],
+        "absolutePath": "src/interface/IInterpreterV1.sol",
+        "file": "./IInterpreterV1.sol",
+        "nameLocation": "-1:-1:-1",
+        "scope": 73552,
+        "sourceUnit": 73603,
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 73516,
+              "name": "StateNamespace",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 73561,
+              "src": "66:14:150",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "id": 73519,
+        "nodeType": "UserDefinedValueTypeDefinition",
+        "src": "596:40:150",
+        "nodes": [],
+        "canonicalName": "FullyQualifiedNamespace",
+        "name": "FullyQualifiedNamespace",
+        "nameLocation": "601:23:150",
+        "underlyingType": {
+          "id": 73518,
+          "name": "uint256",
+          "nodeType": "ElementaryTypeName",
+          "src": "628:7:150",
+          "typeDescriptions": {
+            "typeIdentifier": "t_uint256",
+            "typeString": "uint256"
+          }
+        }
+      },
+      {
+        "id": 73528,
+        "nodeType": "VariableDeclaration",
+        "src": "638:71:150",
+        "nodes": [],
+        "constant": true,
+        "mutability": "constant",
+        "name": "NO_STORE",
+        "nameLocation": "667:8:150",
+        "scope": 73552,
+        "stateVariable": false,
+        "storageLocation": "default",
+        "typeDescriptions": {
+          "typeIdentifier": "t_contract$_IInterpreterStoreV1_$73551",
+          "typeString": "contract IInterpreterStoreV1"
+        },
+        "typeName": {
+          "id": 73521,
+          "nodeType": "UserDefinedTypeName",
+          "pathNode": {
+            "id": 73520,
+            "name": "IInterpreterStoreV1",
+            "nameLocations": [
+              "638:19:150"
+            ],
+            "nodeType": "IdentifierPath",
+            "referencedDeclaration": 73551,
+            "src": "638:19:150"
+          },
+          "referencedDeclaration": 73551,
+          "src": "638:19:150",
+          "typeDescriptions": {
+            "typeIdentifier": "t_contract$_IInterpreterStoreV1_$73551",
+            "typeString": "contract IInterpreterStoreV1"
+          }
+        },
+        "value": {
+          "arguments": [
+            {
+              "arguments": [
+                {
+                  "hexValue": "30",
+                  "id": 73525,
+                  "isConstant": false,
+                  "isLValue": false,
+                  "isPure": true,
+                  "kind": "number",
+                  "lValueRequested": false,
+                  "nodeType": "Literal",
+                  "src": "706:1:150",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_rational_0_by_1",
+                    "typeString": "int_const 0"
+                  },
+                  "value": "0"
+                }
+              ],
+              "expression": {
+                "argumentTypes": [
+                  {
+                    "typeIdentifier": "t_rational_0_by_1",
+                    "typeString": "int_const 0"
+                  }
+                ],
+                "id": 73524,
+                "isConstant": false,
+                "isLValue": false,
+                "isPure": true,
+                "lValueRequested": false,
+                "nodeType": "ElementaryTypeNameExpression",
+                "src": "698:7:150",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_type$_t_address_$",
+                  "typeString": "type(address)"
+                },
+                "typeName": {
+                  "id": 73523,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "698:7:150",
+                  "typeDescriptions": {}
+                }
+              },
+              "id": 73526,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "typeConversion",
+              "lValueRequested": false,
+              "nameLocations": [],
+              "names": [],
+              "nodeType": "FunctionCall",
+              "src": "698:10:150",
+              "tryCall": false,
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            }
+          ],
+          "expression": {
+            "argumentTypes": [
+              {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            ],
+            "id": 73522,
+            "name": "IInterpreterStoreV1",
+            "nodeType": "Identifier",
+            "overloadedDeclarations": [],
+            "referencedDeclaration": 73551,
+            "src": "678:19:150",
+            "typeDescriptions": {
+              "typeIdentifier": "t_type$_t_contract$_IInterpreterStoreV1_$73551_$",
+              "typeString": "type(contract IInterpreterStoreV1)"
+            }
+          },
+          "id": 73527,
+          "isConstant": false,
+          "isLValue": false,
+          "isPure": true,
+          "kind": "typeConversion",
+          "lValueRequested": false,
+          "nameLocations": [],
+          "names": [],
+          "nodeType": "FunctionCall",
+          "src": "678:31:150",
+          "tryCall": false,
+          "typeDescriptions": {
+            "typeIdentifier": "t_contract$_IInterpreterStoreV1_$73551",
+            "typeString": "contract IInterpreterStoreV1"
+          }
+        },
+        "visibility": "internal"
+      },
+      {
+        "id": 73551,
+        "nodeType": "ContractDefinition",
+        "src": "1999:1941:150",
+        "nodes": [
+          {
+            "id": 73539,
+            "nodeType": "FunctionDefinition",
+            "src": "2709:72:150",
+            "nodes": [],
+            "documentation": {
+              "id": 73530,
+              "nodeType": "StructuredDocumentation",
+              "src": "2035:669:150",
+              "text": "Mutates the interpreter store in bulk. The bulk values are provided in\n the form of a `uint256[]` which can be treated e.g. as pairwise keys and\n values to be stored in a Solidity mapping. The `IInterpreterStoreV1`\n defines the meaning of the `uint256[]` for its own storage logic.\n @param namespace The unqualified namespace for the set that MUST be\n fully qualified by the `IInterpreterStoreV1` to prevent key collisions\n between callers. The fully qualified namespace forms a compound key with\n the keys for each value to set.\n @param kvs The list of changes to apply to the store's internal state."
+            },
+            "functionSelector": "946aadc6",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "set",
+            "nameLocation": "2718:3:150",
+            "parameters": {
+              "id": 73537,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 73533,
+                  "mutability": "mutable",
+                  "name": "namespace",
+                  "nameLocation": "2737:9:150",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 73539,
+                  "src": "2722:24:150",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_userDefinedValueType$_StateNamespace_$73561",
+                    "typeString": "StateNamespace"
+                  },
+                  "typeName": {
+                    "id": 73532,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 73531,
+                      "name": "StateNamespace",
+                      "nameLocations": [
+                        "2722:14:150"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 73561,
+                      "src": "2722:14:150"
+                    },
+                    "referencedDeclaration": 73561,
+                    "src": "2722:14:150",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_userDefinedValueType$_StateNamespace_$73561",
+                      "typeString": "StateNamespace"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 73536,
+                  "mutability": "mutable",
+                  "name": "kvs",
+                  "nameLocation": "2767:3:150",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 73539,
+                  "src": "2748:22:150",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_uint256_$dyn_calldata_ptr",
+                    "typeString": "uint256[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 73534,
+                      "name": "uint256",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "2748:7:150",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 73535,
+                    "nodeType": "ArrayTypeName",
+                    "src": "2748:9:150",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
+                      "typeString": "uint256[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2721:50:150"
+            },
+            "returnParameters": {
+              "id": 73538,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2780:0:150"
+            },
+            "scope": 73551,
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "id": 73550,
+            "nodeType": "FunctionDefinition",
+            "src": "3845:93:150",
+            "nodes": [],
+            "documentation": {
+              "id": 73540,
+              "nodeType": "StructuredDocumentation",
+              "src": "2787:1053:150",
+              "text": "Given a fully qualified namespace and key, return the associated value.\n Ostensibly the interpreter can use this to implement opcodes that read\n previously set values. The interpreter MUST apply the same qualification\n logic as the store that it uses to guarantee consistent round tripping of\n data and prevent malicious behaviours. Technically also allows onchain\n reads of any set value from any contract, not just interpreters, but in\n this case readers MUST be aware and handle inconsistencies between get\n and set while the state changes are still in memory in the calling\n context and haven't yet been persisted to the store.\n `IInterpreterStoreV1` uses the same fallback behaviour for unset keys as\n Solidity. Specifically, any UNSET VALUES SILENTLY FALLBACK TO `0`.\n @param namespace The fully qualified namespace to get a single value for.\n @param key The key to get the value for within the namespace.\n @return The value OR ZERO IF NOT SET."
+            },
+            "functionSelector": "669e48aa",
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "get",
+            "nameLocation": "3854:3:150",
+            "parameters": {
+              "id": 73546,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 73543,
+                  "mutability": "mutable",
+                  "name": "namespace",
+                  "nameLocation": "3882:9:150",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 73550,
+                  "src": "3858:33:150",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_userDefinedValueType$_FullyQualifiedNamespace_$73519",
+                    "typeString": "FullyQualifiedNamespace"
+                  },
+                  "typeName": {
+                    "id": 73542,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 73541,
+                      "name": "FullyQualifiedNamespace",
+                      "nameLocations": [
+                        "3858:23:150"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 73519,
+                      "src": "3858:23:150"
+                    },
+                    "referencedDeclaration": 73519,
+                    "src": "3858:23:150",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_userDefinedValueType$_FullyQualifiedNamespace_$73519",
+                      "typeString": "FullyQualifiedNamespace"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 73545,
+                  "mutability": "mutable",
+                  "name": "key",
+                  "nameLocation": "3901:3:150",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 73550,
+                  "src": "3893:11:150",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 73544,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3893:7:150",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3857:48:150"
+            },
+            "returnParameters": {
+              "id": 73549,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 73548,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 73550,
+                  "src": "3929:7:150",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 73547,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3929:7:150",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3928:9:150"
+            },
+            "scope": 73551,
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IInterpreterStoreV1",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 73529,
+          "nodeType": "StructuredDocumentation",
+          "src": "712:1287:150",
+          "text": "@title IInterpreterStoreV1\n @notice Tracks state changes on behalf of an interpreter. A single store can\n handle state changes for many calling contracts, many interpreters and many\n expressions. The store is responsible for ensuring that applying these state\n changes is safe from key collisions with calls to `set` from different\n `msg.sender` callers. I.e. it MUST NOT be possible for a caller to modify the\n state changes associated with some other caller.\n The store defines the shape of its own state changes, which is opaque to the\n calling contract. For example, some store may treat the list of state changes\n as a pairwise key/value set, and some other store may treat it as a literal\n list to be stored as-is.\n Each interpreter decides for itself which store to use based on the\n compatibility of its own opcodes.\n The store MUST assume the state changes have been corrupted by the calling\n contract due to bugs or malicious intent, and enforce state isolation between\n callers despite arbitrarily invalid state changes. The store MUST revert if\n it can detect invalid state changes, such as a key/value list having an odd\n number of items, but this MAY NOT be possible if the corruption is\n undetectable."
+        },
+        "fullyImplemented": false,
+        "linearizedBaseContracts": [
+          73551
+        ],
+        "name": "IInterpreterStoreV1",
+        "nameLocation": "2009:19:150",
+        "scope": 73552,
+        "usedErrors": []
+      }
+    ],
+    "license": "CAL"
+  },
+  "id": 150
+}
