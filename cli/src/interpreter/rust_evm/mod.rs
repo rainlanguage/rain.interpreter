@@ -1,17 +1,16 @@
-use ethers::providers::{Http, Provider}; 
-use std::sync::Arc;
+use ethers::providers::{Http, Provider};
 use revm::{
     db::{CacheDB, EthersDB},
-    primitives::{address, ExecutionResult, TransactTo, U256, Address},
+    primitives::{address, Address, ExecutionResult, TransactTo, U256},
     Database, EVM,
 };
+use std::sync::Arc;
 
 pub async fn commit_transaction(
     to: Address,
     data: ethers::types::Bytes,
     evm: &mut EVM<CacheDB<revm::db::EmptyDBTyped<std::convert::Infallible>>>,
 ) -> anyhow::Result<ExecutionResult> {
-
     // Fill in missing bits of env struct
     // change that to whatever caller you want to be
     evm.env.tx.caller = address!("0000000000000000000000000000000000000000");
@@ -27,15 +26,13 @@ pub async fn commit_transaction(
     // select ExecutionResult struct
     let result: ExecutionResult = ref_tx;
     Ok(result)
-} 
-
+}
 
 pub async fn write_account_info(
-    cache_db : &mut CacheDB<revm::db::EmptyDBTyped<std::convert::Infallible>>,
-    account : Address,
-    client : Arc<Provider<Http>>
-) -> anyhow::Result<()> { 
-
+    cache_db: &mut CacheDB<revm::db::EmptyDBTyped<std::convert::Infallible>>,
+    account: Address,
+    client: Arc<Provider<Http>>,
+) -> anyhow::Result<()> {
     // initialize new EthersDB
     let mut ethersdb = EthersDB::new(client, None).unwrap();
 
@@ -43,7 +40,7 @@ pub async fn write_account_info(
     let account_info = ethersdb.basic(account).unwrap().unwrap();
 
     // insert basic account info which was generated via Web3DB with the corresponding address
-    cache_db.insert_account_info(account, account_info); 
+    cache_db.insert_account_info(account, account_info);
 
     Ok(())
 }

@@ -1,18 +1,18 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 
-pub mod eval2; 
+pub mod eval2;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 pub struct Cli {
     #[command(subcommand)]
     interpreter: Interpreter,
-} 
+}
 
 #[derive(Subcommand)]
 pub enum Interpreter {
-     Eval2(eval2::Eval2),
+    Eval2(eval2::Eval2),
 }
 
 pub async fn dispatch(interpreter: Interpreter) -> Result<()> {
@@ -25,6 +25,6 @@ pub async fn dispatch(interpreter: Interpreter) -> Result<()> {
 }
 
 pub async fn main() -> Result<()> {
-    let cli = Cli::parse(); 
-    dispatch(cli.interpreter).await    
+    let cli = Cli::parse();
+    dispatch(cli.interpreter).await
 }
