@@ -26,6 +26,28 @@ pub async fn commit_transaction(
     // select ExecutionResult struct
     let result: ExecutionResult = ref_tx;
     Ok(result)
+} 
+
+pub async fn exec_transaction(
+    to: Address,
+    data: ethers::types::Bytes,
+    evm: &mut EVM<CacheDB<revm::db::EmptyDBTyped<std::convert::Infallible>>>,
+) -> anyhow::Result<ExecutionResult> {
+    // Fill in missing bits of env struct
+    // change that to whatever caller you want to be
+    evm.env.tx.caller = address!("0000000000000000000000000000000000000000");
+    // account you want to transact with
+    evm.env.tx.transact_to = TransactTo::Call(to);
+    // calldata formed via abigen
+    evm.env.tx.data = data.0.into();
+    // transaction value in wei
+    evm.env.tx.value = U256::from(0);
+
+    // execute transaction and write it to the DB
+    let ref_tx = evm.transact_ref().unwrap();
+    // select ExecutionResult struct
+    let result: ExecutionResult = ref_tx.result;
+    Ok(result)
 }
 
 pub async fn write_account_info(

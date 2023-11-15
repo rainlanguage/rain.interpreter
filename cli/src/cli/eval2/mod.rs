@@ -25,8 +25,8 @@ pub struct Eval2 {
     pub source_index: u8,
 
     /// inputs to the eval2 call
-    #[arg(short,long,num_args = 0.. )]
-    pub inputs: Vec<String>,
+    #[arg(short,long,num_args = 1.. )]
+    pub inputs: Option<Vec<String>>,
 
     /// mumbai rpc url, default read from env varibales
     #[arg(long, env)]
@@ -56,11 +56,18 @@ pub async fn handle_eval2(eval2: Eval2) -> anyhow::Result<()> {
         }
     };
 
-    let inputs = eval2
-        .inputs
-        .iter()
-        .map(|t| U256::from_dec_str(t).unwrap())
-        .collect::<Vec<U256>>();
+    let inputs = match eval2.inputs {
+        Some(inputs) => {
+            inputs
+            .iter()
+            .map(|t| U256::from_dec_str(t).unwrap())
+            .collect::<Vec<U256>>()
+        },
+        None => {
+            vec![]
+        }
+    };
+        
 
     let source_index = U256::from(eval2.source_index);
 

@@ -1,6 +1,7 @@
 use crate::interpreter::deployer::{deploy_expression, get_sip_addresses};
 use crate::interpreter::registry::IInterpreterV2;
-use crate::interpreter::rust_evm::{commit_transaction, write_account_info};
+use crate::interpreter::rust_evm::{exec_transaction, write_account_info};
+use crate::interpreter::store::setKeys;
 use ethers::{
     abi::{ParamType, Token},
     providers::{Http, Provider},
@@ -14,6 +15,7 @@ use revm::{
 };
 use std::str::FromStr;
 use std::sync::Arc;
+
 
 pub mod deployer;
 pub mod store;
@@ -83,6 +85,8 @@ pub async fn compute_eval2(
     println!("stack : {:#?}", stack);
     println!("kvs : {:#?}", kvs);
 
+    setKeys(store,kvs,&mut evm, arc_client.clone()).await?;
+
     Ok(())
 }
 
@@ -108,7 +112,7 @@ pub async fn eval_expression(
     );
     let eval_tx_bytes = eval_tx.calldata().unwrap();
 
-    let result = commit_transaction(interpreter, eval_tx_bytes, evm).await?;
+    let result = exec_transaction(interpreter, eval_tx_bytes, evm).await?;
 
     // unpack output call enum into raw bytes
     let value = match result {
