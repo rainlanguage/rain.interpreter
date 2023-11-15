@@ -59,9 +59,9 @@ pub async fn compute_eval2(
     )
     .await?;
 
-    let expression_uint = ethers::types::U256::from(expression_address.as_slice()) << 32 ; 
-    let max_output = ethers::types::U256::from(65535) ; 
-    let encode_dispatch = expression_uint | (source_index << 10) | max_output ; 
+    let expression_uint = ethers::types::U256::from(expression_address.as_slice()) << 32;
+    let max_output = ethers::types::U256::from(65535);
+    let encode_dispatch = expression_uint | (source_index << 10) | max_output;
 
     let statenamespace = ethers::types::U256::from_dec_str("0").unwrap();
 
