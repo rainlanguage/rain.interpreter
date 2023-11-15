@@ -22,6 +22,8 @@ pub mod rust_evm;
 pub async fn compute_eval2(
     raininterpreter_deployer_npe2_address: Address,
     rainlang_expression: String,
+    source_index: ethers::types::U256,
+    inputs: Vec<ethers::types::U256>,
     client: Provider<Http>,
 ) -> anyhow::Result<()> {
     let arc_client: Arc<Provider<Http>> = Arc::new(client.clone());
@@ -57,18 +59,13 @@ pub async fn compute_eval2(
     )
     .await?;
 
-    println!("expression_address : {:#?}", expression_address);
+    let expression_uint = ethers::types::U256::from(expression_address.as_slice()) << 32 ; 
+    let max_output = ethers::types::U256::from(65535) ; 
+    let encode_dispatch = expression_uint | (source_index << 10) | max_output ; 
 
-    let encode_dispatch = ethers::types::U256::from_dec_str(
-        "4501898752799015415754650127604722314397366187185745756159",
-    )
-    .unwrap();
     let statenamespace = ethers::types::U256::from_dec_str("0").unwrap();
 
     let context: Vec<Vec<ethers::types::U256>> = vec![];
-
-    let inputs: Vec<ethers::types::U256> =
-        vec![ethers::types::U256::from_dec_str("123456").unwrap()];
 
     let (stack, kvs) = eval_expression(
         store,

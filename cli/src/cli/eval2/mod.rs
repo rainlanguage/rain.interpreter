@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use clap::Parser;
-use ethers::providers::{Http, Provider};
+use ethers::{providers::{Http, Provider}, types::U256};
 use revm::primitives::Address;
 use std::convert::TryFrom;
 use tracing::error;
@@ -15,7 +15,15 @@ pub struct Eval2 {
 
     /// rainlang expression string
     #[arg(short, long)]
-    pub expression: String,
+    pub expression: String, 
+
+    /// index of source
+    #[arg(short, long)]
+    pub source_index: u8,
+
+    /// inputs to the eval2 call
+    #[arg(short,long,num_args = 0.. )]
+    pub inputs: Vec<String>,
 
     /// mumbai rpc url, default read from env varibales
     #[arg(long, env)]
@@ -43,8 +51,18 @@ pub async fn handle_eval2(eval2: Eval2) -> anyhow::Result<()> {
             error!("{}", err);
             return Err(anyhow!(err));
         }
-    };
-    let _ = compute_eval2(deployer, eval2.expression, client).await;
+    }; 
+
+    let inputs = eval2
+        .inputs
+        .iter()
+        .map(|t| U256::from_dec_str(t).unwrap())
+        .collect::<Vec<U256>>(); 
+
+    let source_index = U256::from(eval2.source_index); 
+
+
+    let _ = compute_eval2(deployer, eval2.expression,source_index,inputs, client).await;
 
     // println!("{:#?}",eval2);
     Ok(())
