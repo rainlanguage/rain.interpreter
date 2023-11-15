@@ -16,6 +16,7 @@ use std::str::FromStr;
 use std::sync::Arc;
 
 pub mod deployer;
+pub mod store;
 pub mod registry;
 pub mod rust_evm;
 
