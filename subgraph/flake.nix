@@ -18,12 +18,22 @@
           test-contracts = ["RainterpreterExpressionDeployerNP" "RainterpreterNP" "RainterpreterStore"];
           subgraph-contracts = ["IMetaV1" "IERC1820Registry" "RainterpreterExpressionDeployerNP" "RainterpreterNP" "RainterpreterStore"];
 
-          copy-test-abis = contract: ''
+          copy-root-test-abis = contract: ''
             cp ../out/${contract}.sol/${contract}.json ./tests/generated/
           '';
 
-          copy-subgraph-abis = contract: ''
+          copy-root-sg-abis = contract: ''
             cp ../out/${contract}.sol/${contract}.json ./abis/
+          '';
+
+          copy-test-abis = ''
+            ${pkgs.lib.concatStrings (map copy-root-test-abis test-contracts)}
+            cp ./rain.extrospection/out/Extrospection.sol/Extrospection.json ./tests/generated/
+          '';
+
+          copy-subgraph-abis = ''
+            ${pkgs.lib.concatStrings (map copy-root-sg-abis subgraph-contracts)}
+            cp ./rain.extrospection/out/Extrospection.sol/Extrospection.json ./abis/
           '';
 
           remove-duplicate-component = ''
@@ -33,16 +43,22 @@
             mv updated_contract.json $contract_path
           '';
 
+          initialize-contracts = pkgs.writeShellScriptBin " initialize-contracts" (''
+            forge install --root ../ --shallow
+            git submodule update && forge install --root ./rain.extrospection/ --shallow
+          '');
+
           init-setup =  pkgs.writeShellScriptBin "init-setup" (''
             forge build --root ../
+            forge build --root ./rain.extrospection/
 
             rm -rf ./abis ./tests/generated
             mkdir ./abis ./tests/generated
-          '' 
-            + pkgs.lib.concatStrings (map copy-test-abis test-contracts)
-            + pkgs.lib.concatStrings (map copy-subgraph-abis subgraph-contracts)
-            + (remove-duplicate-component)
-          );
+
+            ${copy-test-abis}
+            ${copy-subgraph-abis}
+            ${remove-duplicate-component}
+          '');
 
           default = init-setup;
         };
