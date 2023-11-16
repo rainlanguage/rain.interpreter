@@ -1,0 +1,77 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+
+dataSources:
+  - kind: ethereum/contract
+    name: ERC1820Registry
+    network: localhost
+    source:
+      address: "0x0000000000000000000000000000000000000000"
+      abi: ERC1820Registry
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ERC1820Registry
+        - RainterpreterExpressionDeployer
+      abis:
+        - name: ERC1820Registry
+          file: ./abis/ERC1820Registry.json
+        - name: RainterpreterExpressionDeployer
+          file: ./abis/RainterpreterExpressionDeployerNP.json
+        - name: Extrospection
+          file: ./abis/Extrospection.json
+      eventHandlers:
+        - event: InterfaceImplementerSet(indexed address,indexed bytes32,indexed address)
+          handler: handleInterfaceImplementerSet
+      file: ./src/erc1820Registry.ts
+templates:
+  - kind: ethereum/contract
+    name: RainterpreterExpressionDeployerTemplate
+    network: localhost
+    source:
+      abi: RainterpreterExpressionDeployer
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - RainterpreterExpressionDeployer
+      abis:
+        - name: RainterpreterExpressionDeployer
+          file: ./abis/RainterpreterExpressionDeployerNP.json
+        - name: Rainterpreter
+          file: ./abis/Rainterpreter.json
+        - name: Extrospection
+          file: ./abis/Extrospection.json
+      eventHandlers:
+        - event: DISpair(address,address,address,address,bytes)
+          handler: handleDISpair
+        - event: ExpressionAddress(address,address)
+          handler: handleExpressionAddress
+        - event: NewExpression(address,bytes,uint256[],uint256[])
+          handler: handleNewExpression
+          receipt: true
+      file: ./src/rainterpreterExpressionDeployer.ts
+  - kind: ethereum/contract
+    name: InterpreterCallerV1
+    network: localhost
+    source:
+      abi: InterpreterCallerV1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - InterpreterCallerV1
+      abis:
+        - name: InterpreterCallerV1
+          file: ./abis/InterpreterCallerV1.json
+      eventHandlers:
+        - event: MetaV1(address,uint256,bytes)
+          handler: handleMetaV1
+          receipt: true
+      file: ./src/InterpreterCallerV1.ts
