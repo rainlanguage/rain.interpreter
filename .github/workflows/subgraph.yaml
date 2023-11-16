@@ -23,7 +23,7 @@ jobs:
         with:
           toolchain: stable
 
-      - name: Forge shallow install all contract dependecies
+      - name: Forge shallow install all contracts dependecies
         working-directory: ./subgraph
         run: nix run .#initialize-contracts
 
