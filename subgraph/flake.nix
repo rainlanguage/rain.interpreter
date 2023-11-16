@@ -15,10 +15,15 @@
 
       in rec {
         packages = rec {
-          concrete-contracts = ["RainterpreterExpressionDeployerNP" "RainterpreterNP" "RainterpreterStore"];
+          test-contracts = ["RainterpreterExpressionDeployerNP" "RainterpreterNP" "RainterpreterStore"];
+          subgraph-contracts = ["IMetaV1" "IERC1820Registry" "RainterpreterExpressionDeployerNP" "RainterpreterNP" "RainterpreterStore"];
 
-          copy-abis = contract: ''
+          copy-test-abis = contract: ''
             cp ../out/${contract}.sol/${contract}.json ./tests/generated/
+          '';
+
+          copy-subgraph-abis = contract: ''
+            cp ../out/${contract}.sol/${contract}.json ./abis/
           '';
 
           remove-duplicate-component = ''
@@ -33,10 +38,11 @@
 
             rm -rf ./abis ./tests/generated
             mkdir ./abis ./tests/generated
-
-            cp ../out/IMetaV1.sol/IMetaV1.json ./abis/
-            cp ../out/IERC1820Registry.sol/IERC1820Registry.json ./abis/
-          '');
+          '' 
+            + pkgs.lib.concatStrings (map copy-test-abis test-contracts)
+            + pkgs.lib.concatStrings (map copy-subgraph-abis subgraph-contracts)
+            + (remove-duplicate-component)
+          );
 
           default = init-setup;
         };
