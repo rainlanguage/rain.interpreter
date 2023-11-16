@@ -45,7 +45,7 @@
 
           initialize-contracts = pkgs.writeShellScriptBin " initialize-contracts" (''
             forge install --root ../ --shallow
-            git submodule update && forge install --root ./rain.extrospection/ --shallow
+            git submodule update && echo here_1 &&forge install --root ./rain.extrospection/ --shallow
           '');
 
           init-setup =  pkgs.writeShellScriptBin "init-setup" (''
