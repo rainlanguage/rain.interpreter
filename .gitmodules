@@ -40,3 +40,6 @@
 [submodule "lib/rain.chainlink"]
 	path = lib/rain.chainlink
 	url = https://github.com/rainprotocol/rain.chainlink
+[submodule "subgraph/rain.extrospection"]
+	path = subgraph/rain.extrospection
+	url = git@github.com:rainprotocol/rain.extrospection.git
