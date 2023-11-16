@@ -19,7 +19,7 @@ dataSources:
         - RainterpreterExpressionDeployer
       abis:
         - name: ERC1820Registry
-          file: ./abis/ERC1820Registry.json
+          file: ./abis/IERC1820Registry.json
         - name: RainterpreterExpressionDeployer
           file: ./abis/RainterpreterExpressionDeployerNP.json
         - name: Extrospection
@@ -43,8 +43,8 @@ templates:
       abis:
         - name: RainterpreterExpressionDeployer
           file: ./abis/RainterpreterExpressionDeployerNP.json
-        - name: Rainterpreter
-          file: ./abis/Rainterpreter.json
+        - name: RainterpreterNP
+          file: ./abis/RainterpreterNP.json
         - name: Extrospection
           file: ./abis/Extrospection.json
       eventHandlers:
