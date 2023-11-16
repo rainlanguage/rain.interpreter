@@ -43,3 +43,5 @@
 [submodule "subgraph/rain.extrospection"]
 	path = subgraph/rain.extrospection
 	url = git@github.com:rainprotocol/rain.extrospection.git
+[submodule "rain.extrospection"]
+	url = https://github.com/rainprotocol/rain.extrospection
