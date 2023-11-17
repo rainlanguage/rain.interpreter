@@ -15,7 +15,8 @@
       in rec {
         packages = rec {
           init-setup =  pkgs.writeShellScriptBin "init-setup" (''
-            git submodule update --init --recursive
+            git submodule update --init --recursive --depth 1 rain.extrospection/
+
           '');
 
           default = init-setup;
