@@ -1,0 +1,18 @@
+name: OrderBook Subgraph CI
+on: [push]
+
+jobs:
+  subgraph-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v4
+
+      - uses: DeterminateSystems/magic-nix-cache-action@v2
+
+      - name: Initialize setup
+        working-directory: ./subgraph
+        run: nix run .#init-setup
