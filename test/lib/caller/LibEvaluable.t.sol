@@ -2,7 +2,8 @@
 pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
-import {LibEvaluable, EvaluableV2} from "src/lib/caller/LibEvaluable.sol";
+import {EvaluableV2} from "src/interface/IInterpreterCallerV2.sol";
+import {LibEvaluable} from "src/lib/caller/LibEvaluable.sol";
 import {LibEvaluableSlow} from "./LibEvaluableSlow.sol";
 import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {IInterpreterV2} from "src/interface/unstable/IInterpreterV2.sol";
