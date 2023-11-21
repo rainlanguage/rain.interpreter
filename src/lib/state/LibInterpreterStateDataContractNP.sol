@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "rain.solmem/lib/LibPointer.sol";
-import "rain.solmem/lib/LibMemCpy.sol";
-import "rain.solmem/lib/LibBytes.sol";
+import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
+import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
+import {FullyQualifiedNamespace} from "../../interface/unstable/IInterpreterV2.sol";
+import {IInterpreterStoreV1} from "../../interface/IInterpreterStoreV1.sol";
 
-import "../ns/LibNamespace.sol";
-import "./LibInterpreterStateNP.sol";
+import {InterpreterStateNP} from "./LibInterpreterStateNP.sol";
 
 library LibInterpreterStateDataContractNP {
     using LibBytes for bytes;
