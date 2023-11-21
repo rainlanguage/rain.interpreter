@@ -4,30 +4,7 @@ pragma solidity ^0.8.18;
 import {IExpressionDeployerV3} from "../../interface/unstable/IExpressionDeployerV3.sol";
 import {IInterpreterStoreV1} from "../../interface/IInterpreterStoreV1.sol";
 import {IInterpreterV2} from "../../interface/unstable/IInterpreterV2.sol";
-
-/// Standard struct that can be embedded in ABIs in a consistent format for
-/// tooling to read/write. MAY be useful to bundle up the data required to call
-/// `IExpressionDeployerV3` but is NOT mandatory.
-/// @param deployer Will deploy the expression from sources and constants.
-/// @param bytecode Will be deployed to an expression address for use in
-/// `Evaluable`.
-/// @param constants Will be available to the expression at runtime.
-struct EvaluableConfigV3 {
-    IExpressionDeployerV3 deployer;
-    bytes bytecode;
-    uint256[] constants;
-}
-
-/// Struct over the return of `IExpressionDeployerV3.deployExpression2`
-/// which MAY be more convenient to work with than raw addresses.
-/// @param interpreter Will evaluate the expression.
-/// @param store Will store state changes due to evaluation of the expression.
-/// @param expression Will be evaluated by the interpreter.
-struct EvaluableV2 {
-    IInterpreterV2 interpreter;
-    IInterpreterStoreV1 store;
-    address expression;
-}
+import {EvaluableV2} from "../../interface/IInterpreterCallerV2.sol";
 
 /// @title LibEvaluable
 /// @notice Common logic to provide consistent implementations of common tasks
