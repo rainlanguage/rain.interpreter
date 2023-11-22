@@ -79,11 +79,7 @@ contract RainterpreterNPE2 is IInterpreterV2, ERC165 {
         bytes memory expressionData = LibDataContract.read(expression);
 
         InterpreterStateNP memory state = expressionData.unsafeDeserializeNP(
-            SourceIndexV2.unwrap(sourceIndex),
-            namespace,
-            store,
-            context,
-            OPCODE_FUNCTION_POINTERS
+            SourceIndexV2.unwrap(sourceIndex), namespace, store, context, OPCODE_FUNCTION_POINTERS
         );
         // We use the return by returning it. Slither false positive.
         //slither-disable-next-line unused-return

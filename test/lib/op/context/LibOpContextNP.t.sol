@@ -6,7 +6,9 @@ import {stdError} from "forge-std/Test.sol";
 import {LibOpContextNP} from "src/lib/op/context/LibOpContextNP.sol";
 import {OpTest} from "test/util/abstract/OpTest.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
-import {IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace} from "src/interface/unstable/IInterpreterV2.sol";
+import {
+    IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace
+} from "src/interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";

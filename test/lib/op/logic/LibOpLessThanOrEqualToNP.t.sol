@@ -4,7 +4,9 @@ pragma solidity =0.8.19;
 import {OpTest} from "test/util/abstract/OpTest.sol";
 import {LibOpLessThanOrEqualToNP} from "src/lib/op/logic/LibOpLessThanOrEqualToNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
-import {IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace} from "src/interface/unstable/IInterpreterV2.sol";
+import {
+    IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace
+} from "src/interface/unstable/IInterpreterV2.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";

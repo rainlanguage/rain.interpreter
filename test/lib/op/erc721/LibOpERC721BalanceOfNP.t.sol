@@ -5,7 +5,9 @@ import {OpTest} from "test/util/abstract/OpTest.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibOpERC721BalanceOfNP} from "src/lib/op/erc721/LibOpERC721BalanceOfNP.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
-import {IInterpreterV2, FullyQualifiedNamespace, Operand, SourceIndexV2} from "src/interface/unstable/IInterpreterV2.sol";
+import {
+    IInterpreterV2, FullyQualifiedNamespace, Operand, SourceIndexV2
+} from "src/interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";

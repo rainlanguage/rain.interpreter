@@ -2,7 +2,9 @@
 pragma solidity =0.8.19;
 
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
-import {IInterpreterV2, FullyQualifiedNamespace, Operand, SourceIndexV2} from "src/interface/unstable/IInterpreterV2.sol";
+import {
+    IInterpreterV2, FullyQualifiedNamespace, Operand, SourceIndexV2
+} from "src/interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {OpTest} from "test/util/abstract/OpTest.sol";
 import {BytecodeTest} from "test/util/abstract/BytecodeTest.sol";

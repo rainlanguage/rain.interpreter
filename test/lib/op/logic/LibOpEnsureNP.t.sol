@@ -6,7 +6,9 @@ import {LibContext} from "src/lib/caller/LibContext.sol";
 import {ExcessRHSItems} from "src/lib/parse/LibParse.sol";
 import {LibOpEnsureNP, EnsureFailed} from "src/lib/op/logic/LibOpEnsureNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
-import {IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace} from "src/interface/unstable/IInterpreterV2.sol";
+import {
+    IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace
+} from "src/interface/unstable/IInterpreterV2.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 
 contract LibOpEnsureNPTest is OpTest {
