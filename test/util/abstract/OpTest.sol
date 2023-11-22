@@ -16,7 +16,11 @@ import {LibContext} from "../../../src/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "../../../src/lib/parse/LibParseOperand.sol";
 import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {Operand, IInterpreterV2, SourceIndexV2} from "../../../src/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1, StateNamespace} from "../../../src/interface/IInterpreterStoreV1.sol";
+import {
+    IInterpreterStoreV1,
+    FullyQualifiedNamespace,
+    StateNamespace
+} from "../../../src/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "../../../src/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "../../../src/lib/caller/LibEncodedDispatch.sol";
 import {LibNamespace} from "../../../src/lib/ns/LibNamespace.sol";
@@ -172,7 +176,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         (io);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), type(uint16).max),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)
@@ -210,7 +214,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         vm.expectRevert(err);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)

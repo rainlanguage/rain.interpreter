@@ -1,10 +1,17 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/OpTest.sol";
+import {OpTest} from "test/util/abstract/OpTest.sol";
 import {LibOpMaxUint256NP} from "src/lib/op/evm/LibOpMaxUint256NP.sol";
-
-import "src/lib/caller/LibContext.sol";
+import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {
+    IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace
+} from "src/interface/unstable/IInterpreterV2.sol";
+import {InterpreterStateNP, LibInterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {LibContext} from "src/lib/caller/LibContext.sol";
+import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
+import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
+import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 
 /// @title LibOpMaxUint256NPTest
 /// @notice Test the runtime and integrity time logic of LibOpMaxUint256NP.
@@ -32,7 +39,7 @@ contract LibOpMaxUint256NPTest is OpTest {
     }
 
     /// Test the eval of LibOpMaxUint256NP parsed from a string.
-    function testOpMaxUint256NPEval(StateNamespace namespace) external {
+    function testOpMaxUint256NPEval(FullyQualifiedNamespace namespace) external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: max-int-value();");
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);

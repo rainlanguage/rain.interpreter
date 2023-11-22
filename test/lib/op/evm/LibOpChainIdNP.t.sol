@@ -13,7 +13,7 @@ import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibInt
 import {LibOpChainIdNP} from "src/lib/op/evm/LibOpChainIdNP.sol";
 
 import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
-import {RainterpreterStoreNPE2, StateNamespace} from "src/concrete/RainterpreterStoreNPE2.sol";
+import {RainterpreterStoreNPE2, FullyQualifiedNamespace} from "src/concrete/RainterpreterStoreNPE2.sol";
 import {RainterpreterExpressionDeployerNPE2} from "src/concrete/RainterpreterExpressionDeployerNPE2.sol";
 import {Operand, IInterpreterV2, SourceIndexV2} from "src/interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
@@ -48,7 +48,7 @@ contract LibOpChainIdNPTest is OpTest {
     }
 
     /// Test the eval of a chain ID opcode parsed from a string.
-    function testOpChainIDNPEval(uint64 chainId, StateNamespace namespace) public {
+    function testOpChainIDNPEval(uint64 chainId, FullyQualifiedNamespace namespace) public {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: chain-id();");
 
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =

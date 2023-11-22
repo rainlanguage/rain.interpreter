@@ -9,7 +9,7 @@ import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
 import {OutOfBoundsStackRead, LibOpStackNP} from "src/lib/op/00/LibOpStackNP.sol";
 import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {IInterpreterStoreV1, StateNamespace} from "src/interface/IInterpreterStoreV1.sol";
+import {IInterpreterStoreV1, FullyQualifiedNamespace} from "src/interface/IInterpreterStoreV1.sol";
 import {OpTest, PRE, POST} from "test/util/abstract/OpTest.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
@@ -155,7 +155,7 @@ contract LibOpStackNPTest is OpTest {
         (io);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 2),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)
@@ -205,7 +205,7 @@ contract LibOpStackNPTest is OpTest {
         (io);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 6),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)
