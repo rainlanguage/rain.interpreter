@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/OpTest.sol";
-import "src/lib/caller/LibContext.sol";
+import {OpTest} from "test/util/abstract/OpTest.sol";
+import {LibContext} from "src/lib/caller/LibContext.sol";
 import {ExcessRHSItems} from "src/lib/parse/LibParse.sol";
 import {LibOpEnsureNP, EnsureFailed} from "src/lib/op/logic/LibOpEnsureNP.sol";
+import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace} from "src/interface/unstable/IInterpreterV2.sol";
+import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 
 contract LibOpEnsureNPTest is OpTest {
     /// Directly test the integrity logic of LibOpEnsureNP. This tests the

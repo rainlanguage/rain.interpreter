@@ -9,7 +9,7 @@ import {OpTest} from "test/util/abstract/OpTest.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 import {LibOpAnyNP} from "src/lib/op/logic/LibOpAnyNP.sol";
 import {IInterpreterV2, Operand, SourceIndexV2} from "src/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1, StateNamespace, FullyQualifiedNamespace} from "src/interface/IInterpreterStoreV1.sol";
+import {IInterpreterStoreV1, FullyQualifiedNamespace} from "src/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
@@ -90,7 +90,7 @@ contract LibOpAnyNPTest is OpTest {
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)
@@ -109,7 +109,7 @@ contract LibOpAnyNPTest is OpTest {
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)
@@ -129,7 +129,7 @@ contract LibOpAnyNPTest is OpTest {
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)
@@ -148,7 +148,7 @@ contract LibOpAnyNPTest is OpTest {
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)
@@ -169,7 +169,7 @@ contract LibOpAnyNPTest is OpTest {
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)
@@ -190,7 +190,7 @@ contract LibOpAnyNPTest is OpTest {
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)

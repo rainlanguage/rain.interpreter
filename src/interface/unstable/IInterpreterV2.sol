@@ -101,10 +101,8 @@ interface IInterpreterV2 {
     /// @param store The storage contract that the returned key/value pairs
     /// MUST be passed to IF the calling contract is in a non-static calling
     /// context. Static calling contexts MUST pass `address(0)`.
-    /// @param namespace The state namespace that will be fully qualified by the
+    /// @param namespace The fully qualified namespace that will be used by the
     /// interpreter at runtime in order to perform gets on the underlying store.
-    /// MUST be the same namespace passed to the store by the calling contract
-    /// when sending the resulting key/value items to storage.
     /// @param dispatch All the information required for the interpreter to load
     /// an expression, select an entrypoint and return the values expected by the
     /// caller. The interpreter MAY encode dispatches differently to
@@ -129,7 +127,7 @@ interface IInterpreterV2 {
     /// some store expects some other format.
     function eval2(
         IInterpreterStoreV1 store,
-        StateNamespace namespace,
+        FullyQualifiedNamespace namespace,
         EncodedDispatch dispatch,
         uint256[][] calldata context,
         uint256[] calldata inputs

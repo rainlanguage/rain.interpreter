@@ -4,7 +4,7 @@ pragma solidity =0.8.19;
 import {OpTest} from "test/util/abstract/OpTest.sol";
 
 import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {IInterpreterV2, Operand, SourceIndexV2, StateNamespace} from "src/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace} from "src/interface/unstable/IInterpreterV2.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {IMetaV1} from "rain.metadata/IMetaV1.sol";
 import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
@@ -52,7 +52,7 @@ contract LibOpBlockNumberNPTest is OpTest {
         vm.roll(blockNumber);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)

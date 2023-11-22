@@ -5,7 +5,7 @@ import {OpTest} from "test/util/abstract/OpTest.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibOpERC721OwnerOfNP} from "src/lib/op/erc721/LibOpERC721OwnerOfNP.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
-import {IInterpreterV2, StateNamespace, SourceIndexV2, Operand} from "src/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterV2, FullyQualifiedNamespace, SourceIndexV2, Operand} from "src/interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
@@ -71,7 +71,7 @@ contract LibOpERC721OwnerOfNPTest is OpTest {
         vm.expectCall(token, abi.encodeWithSelector(IERC721.ownerOf.selector, tokenId), 1);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)

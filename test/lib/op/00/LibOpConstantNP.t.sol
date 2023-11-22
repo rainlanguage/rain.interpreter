@@ -1,11 +1,17 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/OpTest.sol";
+import {OpTest} from "test/util/abstract/OpTest.sol";
 
-import "src/lib/caller/LibContext.sol";
-import "src/lib/bytecode/LibBytecode.sol";
+import {LibContext} from "src/lib/caller/LibContext.sol";
+import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
 import {OutOfBoundsConstantRead, LibOpConstantNP} from "src/lib/op/00/LibOpConstantNP.sol";
+import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace} from "src/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
+import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 
 /// @title LibOpConstantNPTest
 /// @notice Test the runtime and integrity time logic of LibOpConstantNP.
@@ -117,7 +123,7 @@ contract LibOpConstantNPTest is OpTest {
 
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 2),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)

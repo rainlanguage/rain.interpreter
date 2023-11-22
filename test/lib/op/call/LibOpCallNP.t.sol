@@ -2,7 +2,7 @@
 pragma solidity =0.8.19;
 
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
-import {IInterpreterV2, StateNamespace, Operand, SourceIndexV2} from "src/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterV2, FullyQualifiedNamespace, Operand, SourceIndexV2} from "src/interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {OpTest} from "test/util/abstract/OpTest.sol";
 import {BytecodeTest} from "test/util/abstract/BytecodeTest.sol";
@@ -131,7 +131,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         (io);
         (uint256[] memory actualStack, uint256[] memory actualKVs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), type(uint8).max),
             new uint256[][](0),
             new uint256[](0)
@@ -203,7 +203,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         vm.expectRevert();
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), type(uint8).max),
             new uint256[][](0),
             new uint256[](0)
