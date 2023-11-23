@@ -1,13 +1,12 @@
 use crate::interpreter::deployer::{deploy_expression, get_sip_addresses};
 use crate::interpreter::registry::IInterpreterV2;
 use crate::interpreter::rust_evm::{exec_transaction, write_account_info};
-use crate::interpreter::store::setKeys;
 use ethers::{
     abi::{ParamType, Token},
-    providers::{Http, Provider},
+    providers::{Http, Provider, Middleware},
     types::H160,
 };
-use revm::primitives::Address;
+use revm::primitives::{Address, U256};
 use revm::{
     db::{CacheDB, EmptyDB},
     primitives::{ExecutionResult, Output},
@@ -16,22 +15,26 @@ use revm::{
 use std::str::FromStr;
 use std::sync::Arc;
 
-
 pub mod deployer;
 pub mod store;
 pub mod registry;
 pub mod rust_evm;
 
-pub async fn compute_eval2(
+pub async fn deploy_and_eval2(
     raininterpreter_deployer_npe2_address: Address,
     rainlang_expression: String,
     source_index: ethers::types::U256,
     inputs: Vec<ethers::types::U256>,
     client: Provider<Http>,
-) -> anyhow::Result<()> {
+) -> anyhow::Result<(Vec<ethers::types::U256>, Vec<ethers::types::U256>)> {
+
     let arc_client: Arc<Provider<Http>> = Arc::new(client.clone());
+ 
+    let recent_block = client.get_block_number().await?;
+    let block_timestamp = client.get_block(recent_block).await?.unwrap().timestamp.as_u128() ; 
+
     let (store, interpreter, parser) =
-        get_sip_addresses(raininterpreter_deployer_npe2_address, client.clone()).await?;
+        get_sip_addresses(raininterpreter_deployer_npe2_address, arc_client.clone()).await?;
 
     // initialise empty in-memory-db
     let mut cache_db: CacheDB<revm::db::EmptyDBTyped<std::convert::Infallible>> =
@@ -68,29 +71,26 @@ pub async fn compute_eval2(
 
     let statenamespace = ethers::types::U256::from_dec_str("0").unwrap();
 
-    let context: Vec<Vec<ethers::types::U256>> = vec![];
+    let context: Vec<Vec<ethers::types::U256>> = vec![]; 
 
-    let (stack, kvs) = eval_expression(
+    evm.env.block.timestamp = U256::from(block_timestamp);
+
+    let (stack, kvs) = eval2_expression(
         store,
         encode_dispatch,
         statenamespace,
-        context,
-        inputs,
+        context.clone(),
+        inputs.clone(),
         interpreter,
         &mut evm,
         arc_client.clone(),
     )
     .await?;
-
-    println!("stack : {:#?}", stack);
-    println!("kvs : {:#?}", kvs);
-
-    setKeys(store,kvs,&mut evm, arc_client.clone()).await?;
-
-    Ok(())
+    
+    Ok((stack,kvs))
 }
 
-pub async fn eval_expression(
+pub async fn eval2_expression(
     store: Address,
     encode_dispatch: ethers::types::U256,
     statenamespace: ethers::types::U256,
@@ -99,7 +99,8 @@ pub async fn eval_expression(
     interpreter: Address,
     evm: &mut EVM<CacheDB<revm::db::EmptyDBTyped<std::convert::Infallible>>>,
     client: Arc<Provider<Http>>,
-) -> anyhow::Result<(Vec<ethers::types::U256>, Vec<ethers::types::U256>)> {
+) -> anyhow::Result<(Vec<ethers::types::U256>, Vec<ethers::types::U256>)> { 
+
     let rain_interpreter =
         IInterpreterV2::new(H160::from_str(&interpreter.to_string())?, client.clone());
 

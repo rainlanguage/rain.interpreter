@@ -18,9 +18,11 @@ pub async fn deploy_expression(
     evm: &mut EVM<CacheDB<revm::db::EmptyDBTyped<std::convert::Infallible>>>,
     client: Arc<Provider<Http>>,
 ) -> anyhow::Result<Address> {
+
     let rain_expression_deployer =
         IExpressionDeployerV3::new(H160::from_str(&deployer.to_string())?, client.clone());
-    let rain_parser = IParserV1::new(H160::from_str(&parser.to_string())?, client.clone());
+    let rain_parser = IParserV1::new(H160::from_str(&parser.to_string())?, client.clone()); 
+  
 
     let (sources, constants) = rain_parser
         .parse(ethers::types::Bytes::from(
@@ -61,12 +63,14 @@ pub async fn deploy_expression(
     };
 
     Ok(Address::new(expression_address.to_fixed_bytes()))
-}
+} 
+
 
 pub async fn get_sip_addresses(
     deployer_address: Address,
-    client: Provider<Http>,
-) -> anyhow::Result<(Address, Address, Address)> {
+    client: Arc<Provider<Http>>,
+) -> anyhow::Result<(Address, Address, Address)> { 
+
     let abi: Abi = serde_json::from_str(
         r#"[{
         "inputs": [],
@@ -111,9 +115,10 @@ pub async fn get_sip_addresses(
 
     let deployer = H160::from_str(&deployer_address.to_string()).unwrap();
     // create the contract object at the address
-    let contract = Contract::new(deployer, abi, Arc::new(client));
+    let contract = Contract::new(deployer, abi, Arc::new(client)); 
 
-    let store: H160 = contract.method::<_, H160>("iStore", ())?.call().await?;
+    let store: H160 = contract.method::<_, H160>("iStore", ())?.call().await?; 
+   
     let intepreter: H160 = contract
         .method::<_, H160>("iInterpreter", ())?
         .call()

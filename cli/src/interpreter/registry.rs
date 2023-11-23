@@ -14,4 +14,7 @@ abigen!(
     IInterpreterStoreV1,
     "src/interpreter/abi/IInterpreterStoreV1.json"
 );
-abigen!(IParserV1, "src/interpreter/abi/IParserV1.json");
+abigen!(
+    IParserV1, "src/interpreter/abi/IParserV1.json",
+    derives(serde::Deserialize, serde::Serialize),
+);
