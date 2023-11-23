@@ -6,7 +6,7 @@ use std::sync::Arc;
 
 use super::{registry::IInterpreterStoreV1, rust_evm::commit_transaction}; 
 
-pub async fn setKeys(
+pub async fn set_keys(
     store: Address,
     kvs: Vec<ethers::types::U256>,
     evm: &mut EVM<CacheDB<revm::db::EmptyDBTyped<std::convert::Infallible>>>,
