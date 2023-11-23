@@ -1,6 +1,6 @@
 use ethers::{
     abi::{ParamType, Token},
-    providers::{Http, Provider, Middleware},
+    providers::{Http, Middleware, Provider},
     types::H160,
 };
 use revm::primitives::{Address, U256};
@@ -12,40 +12,44 @@ use revm::{
 use std::str::FromStr;
 use std::sync::Arc;
 
-use crate::{deployer::{get_sip_addresses, deploy_expression}, rust_evm::{write_account_info, exec_transaction}, registry::IInterpreterV2};
+use crate::{
+    deployer::{deploy_expression, get_sip_addresses},
+    registry::IInterpreterV2,
+    rust_evm::{exec_transaction, write_account_info},
+};
 
 /// # Deploy Expression and Eval2
-/// 
+///
 /// Function to deploy and eval2 rainlang expression.
 /// The function fetchs the current on chain state of the `RainterpreterExpressionDeployerNPE2` contract passed as an argument  
 /// and saves the contract account info to the in-memory db, along with `RainterpreterNPE2`, `RainterpreterParserNPE2` and `RainterpreterStoreNPE2`
 /// contracts associated with it. This is a crucial step which needs to happen before any expression is evaluated. The function then parses and deploys
 /// the expression and the result is committed to the db. Finally eval2 is called on the expression and resultant stack and key-values are returned.
 /// Optionally one can save the key-value pairs generated to the in memory db.
-/// 
+///
 /// # Arguments
 /// * `raininterpreter_deployer_npe2_address` - `RainterpreterExpressionDeployerNPE2` contract address.
 /// * `rainlang_expression` - Rainlang Expression to eval2.
 /// * `source_index` - Index of source.
 /// * `inputs` - Inputs to expression.
 /// * `client` - Provider Instance.
-/// 
-/// # Example 
-/// 
+///
+/// # Example
+///
 /// ```
 /// use ethers::providers::{Http, Provider};
 /// use rain_interpreter::interpreter::deploy_and_eval2;
 /// use revm::primitives::address;
-/// 
-/// async fn deploy_eval2() { 
-/// 
+///
+/// async fn deploy_eval2() {
+///
 ///     // RPC URL of the network
 ///     let rpc_url = String::from("https://polygon.llamarpc.com");
-///     let client = Provider::<Http>::try_from(rpc_url)?; 
+///     let client = Provider::<Http>::try_from(rpc_url)?;
 ///  
 ///     // Address of RainterpreterExpressionDeployerNPE2
 ///     let deployer_npe2 = address!("1b21dfA0107920F23D27a5891dEd65101302314D");
-/// 
+///
 ///     // Expression to eval2
 ///     let rainlang_expression = String::from("val1: ,val2: ,sum: int-add(val1 val2);");
 ///  
@@ -55,7 +59,7 @@ use crate::{deployer::{get_sip_addresses, deploy_expression}, rust_evm::{write_a
 ///     let inputs:Vec<ethers::types::U256> = vec![
 ///         ethers::types::U256::from(3),
 ///         ethers::types::U256::from(6)
-///     ]; 
+///     ];
 ///     // Deploy and Eval Expression
 ///     let (stack,kvs) = deploy_and_eval2(
 ///         deployer_npe2,
@@ -63,8 +67,8 @@ use crate::{deployer::{get_sip_addresses, deploy_expression}, rust_evm::{write_a
 ///         source_index,
 ///         inputs,
 ///         client
-///     ).await?; 
-/// 
+///     ).await?;
+///
 ///     // Log stack and kvs
 ///     println!("stack: {:#?}",stack);
 ///     println!("kvs: {:#?}",kvs);
@@ -77,11 +81,15 @@ pub async fn deploy_and_eval2(
     inputs: Vec<ethers::types::U256>,
     client: Provider<Http>,
 ) -> anyhow::Result<(Vec<ethers::types::U256>, Vec<ethers::types::U256>)> {
-
     let arc_client: Arc<Provider<Http>> = Arc::new(client.clone());
- 
+
     let recent_block = client.get_block_number().await?;
-    let block_timestamp = client.get_block(recent_block).await?.unwrap().timestamp.as_u128() ; 
+    let block_timestamp = client
+        .get_block(recent_block)
+        .await?
+        .unwrap()
+        .timestamp
+        .as_u128();
 
     let (store, interpreter, parser) =
         get_sip_addresses(raininterpreter_deployer_npe2_address, arc_client.clone()).await?;
@@ -121,7 +129,7 @@ pub async fn deploy_and_eval2(
 
     let statenamespace = ethers::types::U256::from_dec_str("0").unwrap();
 
-    let context: Vec<Vec<ethers::types::U256>> = vec![]; 
+    let context: Vec<Vec<ethers::types::U256>> = vec![];
 
     evm.env.block.timestamp = U256::from(block_timestamp);
 
@@ -136,16 +144,16 @@ pub async fn deploy_and_eval2(
         arc_client.clone(),
     )
     .await?;
-    
-    Ok((stack,kvs))
+
+    Ok((stack, kvs))
 }
 
 /// # Eval2 Expression
-/// 
+///
 /// Function to eval2 rainlang expression.
 /// The function executes eval2 on the rainlang expression that is already parsed, deployed and committed to the in-memory db and
-/// returns the generated stack and key-value pairs, which are NOT committed to the db. 
-/// 
+/// returns the generated stack and key-value pairs, which are NOT committed to the db.
+///
 /// # Arguments
 /// * `raininterpreter_store_npe2_address` - `RainterpreterStoreNPE2` contract address.
 /// * `encode_dispatch` - Encoded Dispatch for expression.
@@ -155,7 +163,7 @@ pub async fn deploy_and_eval2(
 /// * `raininterpreter_npe2_address` - `RainterpreterNPE2` contract address.
 /// * `evm` - EVM instance with inserted contract info and deployed expression result.
 /// * `client` - Provider Instance.
-/// 
+///
 pub async fn eval2_expression(
     raininterpreter_store_npe2_address: Address,
     encode_dispatch: ethers::types::U256,
@@ -165,10 +173,11 @@ pub async fn eval2_expression(
     raininterpreter_npe2_address: Address,
     evm: &mut EVM<CacheDB<revm::db::EmptyDBTyped<std::convert::Infallible>>>,
     client: Arc<Provider<Http>>,
-) -> anyhow::Result<(Vec<ethers::types::U256>, Vec<ethers::types::U256>)> { 
-
-    let rain_interpreter =
-        IInterpreterV2::new(H160::from_str(&raininterpreter_npe2_address.to_string())?, client.clone());
+) -> anyhow::Result<(Vec<ethers::types::U256>, Vec<ethers::types::U256>)> {
+    let rain_interpreter = IInterpreterV2::new(
+        H160::from_str(&raininterpreter_npe2_address.to_string())?,
+        client.clone(),
+    );
 
     let eval_tx = rain_interpreter.eval_2(
         H160::from_str(&raininterpreter_store_npe2_address.to_string())?,
