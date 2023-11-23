@@ -11,17 +11,29 @@ use std::sync::Arc;
 use super::registry::{IExpressionDeployerV3, IParserV1};
 use super::rust_evm::commit_transaction;
 
+/// # Deploy Expression
+/// 
+/// Parses the give rainlang expression, deploys the expression and commits result to in memory revm db.
+/// Note that `RainterpreterExpressionDeployerNPE2` and `RainterpreterParserNPE2` contracts account info 
+/// should already be present in the in-memory db, indexed by the `deployer` and `parser` feild. 
+/// 
+/// # Arguments
+/// * `raininterpreter_deployer_npe2_address` - Address of the `RainterpreterExpressionDeployerNPE2` contract.
+/// * `raininterpreter_parser_npe2_address` - Address of the `RainterpreterParserNPE2` contract.
+/// * `evm` - EVM instance with contract data inserted.
+/// * `client` - Provider Instance 
+///
 pub async fn deploy_expression(
-    deployer: Address,
-    parser: Address,
+    raininterpreter_deployer_npe2_address: Address,
+    raininterpreter_parser_npe2_address: Address,
     rainlang_expression: String,
     evm: &mut EVM<CacheDB<revm::db::EmptyDBTyped<std::convert::Infallible>>>,
     client: Arc<Provider<Http>>,
 ) -> anyhow::Result<Address> {
 
     let rain_expression_deployer =
-        IExpressionDeployerV3::new(H160::from_str(&deployer.to_string())?, client.clone());
-    let rain_parser = IParserV1::new(H160::from_str(&parser.to_string())?, client.clone()); 
+        IExpressionDeployerV3::new(H160::from_str(&raininterpreter_deployer_npe2_address.to_string())?, client.clone());
+    let rain_parser = IParserV1::new(H160::from_str(&raininterpreter_parser_npe2_address.to_string())?, client.clone()); 
   
 
     let (sources, constants) = rain_parser
@@ -35,7 +47,7 @@ pub async fn deploy_expression(
     let deploy_expression = rain_expression_deployer.deploy_expression_2(sources, constants);
     let deploy_expression_bytes = deploy_expression.calldata().unwrap();
 
-    let result = commit_transaction(deployer, deploy_expression_bytes, evm).await?;
+    let result = commit_transaction(raininterpreter_deployer_npe2_address, deploy_expression_bytes, evm).await?;
 
     // unpack output call enum into raw bytes
     let value = match result {
@@ -65,9 +77,16 @@ pub async fn deploy_expression(
     Ok(Address::new(expression_address.to_fixed_bytes()))
 } 
 
-
+/// Gets `RainterpreterStoreNPE2`, `RainterpreterNPE2` and `RainterpreterParserNPE2` addresses
+/// associated with the passed `RainterpreterExpressionDeployerNPE2` contract. 
+/// 
+/// # Arguments
+/// 
+/// * `raininterpreter_deployer_npe2_address` - Address of the `RainterpreterExpressionDeployerNPE2` contract.
+/// * `client` - Network Provider
+///  
 pub async fn get_sip_addresses(
-    deployer_address: Address,
+    raininterpreter_deployer_npe2_address: Address,
     client: Arc<Provider<Http>>,
 ) -> anyhow::Result<(Address, Address, Address)> { 
 
@@ -113,7 +132,7 @@ pub async fn get_sip_addresses(
       }]"#,
     )?;
 
-    let deployer = H160::from_str(&deployer_address.to_string()).unwrap();
+    let deployer = H160::from_str(&raininterpreter_deployer_npe2_address.to_string()).unwrap();
     // create the contract object at the address
     let contract = Contract::new(deployer, abi, Arc::new(client)); 
 

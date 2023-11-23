@@ -5,12 +5,10 @@ use revm::primitives::address;
 
 #[tokio::main]
 pub async fn main() -> anyhow::Result<()> {  
-
+    
     // RPC URL of the network
     let rpc_url = String::from("https://polygon.llamarpc.com");
-
     let client = Provider::<Http>::try_from(rpc_url)?; 
-
     // Address of RainterpreterExpressionDeployerNPE2
     let deployer_npe2 = address!("1b21dfA0107920F23D27a5891dEd65101302314D");
     // Expression to eval2

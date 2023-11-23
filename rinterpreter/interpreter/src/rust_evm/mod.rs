@@ -6,7 +6,17 @@ use revm::{
 };
 use std::sync::Arc;
 
-
+/// # Execute and Commit Transaction
+/// 
+/// Executes and commits the state transition to the in-memory db.
+/// The caller for the transaction is set as zero address, and if `tx.transact_to` feild is a contract,
+/// then the contract account info should already be present in the db.
+/// 
+/// # Arguments
+/// * `to` - Address to trasact to.
+/// * `data` - Bytes representing the transaction data.
+/// * `evm` - EVM instance with contract data inserted.
+///
 pub async fn commit_transaction(
     to: Address,
     data: ethers::types::Bytes,
@@ -30,6 +40,17 @@ pub async fn commit_transaction(
     Ok(result)
 } 
 
+/// # Execute Transaction
+/// 
+/// Executes transaction with the current state of in memory db, result is not committed
+/// The caller for the transaction is set as zero address, and if `tx.transact_to` feild is a contract,
+/// then the contract account info should already be present in the db.
+/// 
+/// # Arguments
+/// * `to` - Address to trasact to.
+/// * `data` - Bytes representing the transaction data.
+/// * `evm` - EVM instance with contract data inserted.
+///
 pub async fn exec_transaction(
     to: Address,
     data: ethers::types::Bytes,
@@ -48,6 +69,17 @@ pub async fn exec_transaction(
     Ok(result)
 }
 
+/// # Write Account Info
+/// 
+/// Save an account's info to in-memory db.
+/// This function is used to save contract state from on chain to the in memory.
+/// Revm saves contract runtime bytecode to in-memory db, so any contract variables associated are also accessible.
+/// 
+/// # Arguments
+/// * `cache_db` - CacheDB instance to write data to.
+/// * `account` - Address of account to save.
+/// * `client` - Provider Instance.
+///
 pub async fn write_account_info(
     cache_db: &mut CacheDB<revm::db::EmptyDBTyped<std::convert::Infallible>>,
     account: Address,
@@ -66,6 +98,17 @@ pub async fn write_account_info(
     Ok(())
 }
 
+/// # Write Account Info from bytecode
+/// 
+/// Save an account info to in-memory db.
+/// This function is used to save contract state from the deployed bytecode passed as an argument to in memory db.
+/// Revm saves contract runtime bytecode to in-memory db, so any contract variables associated are also accessible.
+/// 
+/// # Arguments
+/// * `cache_db` - CacheDB instance to write data to.
+/// * `account` - Address of account to save info to the db.
+/// * `deployed_bytecode` - String representing the deployed bytecode of the contract.
+///
 pub async fn write_account_info_from_bytecode(
     cache_db: &mut CacheDB<revm::db::EmptyDBTyped<std::convert::Infallible>>,
     address: Address,
@@ -77,7 +120,7 @@ pub async fn write_account_info_from_bytecode(
     let contrac_account_info = AccountInfo::new(
         U256::from(0),
         0,
-       contract_bytecode.hash_slow(),
+        contract_bytecode.hash_slow(),
         contract_bytecode
     ); 
 
