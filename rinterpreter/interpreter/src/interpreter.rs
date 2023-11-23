@@ -1,0 +1,163 @@
+use ethers::{
+    abi::{ParamType, Token},
+    providers::{Http, Provider, Middleware},
+    types::H160,
+};
+use revm::primitives::{Address, U256};
+use revm::{
+    db::{CacheDB, EmptyDB},
+    primitives::{ExecutionResult, Output},
+    EVM,
+};
+use std::str::FromStr;
+use std::sync::Arc;
+
+use crate::{deployer::{get_sip_addresses, deploy_expression}, rust_evm::{write_account_info, exec_transaction}, registry::IInterpreterV2};
+
+
+pub async fn deploy_and_eval2(
+    raininterpreter_deployer_npe2_address: Address,
+    rainlang_expression: String,
+    source_index: ethers::types::U256,
+    inputs: Vec<ethers::types::U256>,
+    client: Provider<Http>,
+) -> anyhow::Result<(Vec<ethers::types::U256>, Vec<ethers::types::U256>)> {
+
+    let arc_client: Arc<Provider<Http>> = Arc::new(client.clone());
+ 
+    let recent_block = client.get_block_number().await?;
+    let block_timestamp = client.get_block(recent_block).await?.unwrap().timestamp.as_u128() ; 
+
+    let (store, interpreter, parser) =
+        get_sip_addresses(raininterpreter_deployer_npe2_address, arc_client.clone()).await?;
+
+    // initialise empty in-memory-db
+    let mut cache_db: CacheDB<revm::db::EmptyDBTyped<std::convert::Infallible>> =
+        CacheDB::new(EmptyDB::default());
+
+    let _ = write_account_info(
+        &mut cache_db,
+        raininterpreter_deployer_npe2_address,
+        arc_client.clone(),
+    )
+    .await;
+    let _ = write_account_info(&mut cache_db, store, arc_client.clone()).await;
+    let _ = write_account_info(&mut cache_db, interpreter, arc_client.clone()).await;
+    let _ = write_account_info(&mut cache_db, parser, arc_client.clone()).await;
+
+    // initialise an empty (default) EVM
+    let mut evm: EVM<CacheDB<revm::db::EmptyDBTyped<std::convert::Infallible>>> = EVM::new();
+
+    // insert pre-built database from above
+    evm.database(cache_db);
+
+    let expression_address = deploy_expression(
+        raininterpreter_deployer_npe2_address,
+        parser,
+        rainlang_expression,
+        &mut evm,
+        arc_client.clone(),
+    )
+    .await?;
+
+    let expression_uint = ethers::types::U256::from(expression_address.as_slice()) << 32;
+    let max_output = ethers::types::U256::from(65535);
+    let encode_dispatch = expression_uint | (source_index << 10) | max_output;
+
+    let statenamespace = ethers::types::U256::from_dec_str("0").unwrap();
+
+    let context: Vec<Vec<ethers::types::U256>> = vec![]; 
+
+    evm.env.block.timestamp = U256::from(block_timestamp);
+
+    let (stack, kvs) = eval2_expression(
+        store,
+        encode_dispatch,
+        statenamespace,
+        context.clone(),
+        inputs.clone(),
+        interpreter,
+        &mut evm,
+        arc_client.clone(),
+    )
+    .await?;
+    
+    Ok((stack,kvs))
+}
+
+pub async fn eval2_expression(
+    store: Address,
+    encode_dispatch: ethers::types::U256,
+    statenamespace: ethers::types::U256,
+    context: Vec<Vec<ethers::types::U256>>,
+    inputs: Vec<ethers::types::U256>,
+    interpreter: Address,
+    evm: &mut EVM<CacheDB<revm::db::EmptyDBTyped<std::convert::Infallible>>>,
+    client: Arc<Provider<Http>>,
+) -> anyhow::Result<(Vec<ethers::types::U256>, Vec<ethers::types::U256>)> { 
+
+    let rain_interpreter =
+        IInterpreterV2::new(H160::from_str(&interpreter.to_string())?, client.clone());
+
+    let eval_tx = rain_interpreter.eval_2(
+        H160::from_str(&store.to_string())?,
+        statenamespace,
+        encode_dispatch,
+        context,
+        inputs,
+    );
+    let eval_tx_bytes = eval_tx.calldata().unwrap();
+
+    let result = exec_transaction(interpreter, eval_tx_bytes, evm).await?;
+
+    // unpack output call enum into raw bytes
+    let value = match result {
+        ExecutionResult::Success {
+            output: Output::Call(value),
+            ..
+        } => value,
+        result => panic!("Execution failed: {result:?}"),
+    };
+
+    let decoded_data = ethers::abi::decode(
+        &[
+            ParamType::Array(Box::new(ParamType::Uint(256))),
+            ParamType::Array(Box::new(ParamType::Uint(256))),
+        ],
+        &value,
+    )
+    .unwrap();
+
+    let mut resolved_stack: Vec<ethers::types::U256> = vec![];
+    let mut resolved_kvs: Vec<ethers::types::U256> = vec![];
+
+    match &decoded_data[0] {
+        Token::Array(stack) => {
+            for e in stack {
+                match e {
+                    Token::Uint(value) => {
+                        resolved_stack.push(*value);
+                    }
+                    _ => {}
+                }
+            }
+        }
+        _ => panic!("EVAL FAILED"),
+    };
+
+    match &decoded_data[1] {
+        Token::Array(kvs) => {
+            for e in kvs {
+                match e {
+                    Token::Uint(value) => {
+                        resolved_kvs.push(*value);
+                    }
+                    _ => {}
+                }
+            }
+        }
+        _ => panic!("EVAL FAILED"),
+    };
+
+    Ok((resolved_stack, resolved_kvs))
+}
