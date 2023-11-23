@@ -24,8 +24,8 @@ use crate::{
 /// The function fetchs the current on chain state of the `RainterpreterExpressionDeployerNPE2` contract passed as an argument  
 /// and saves the contract account info to the in-memory db, along with `RainterpreterNPE2`, `RainterpreterParserNPE2` and `RainterpreterStoreNPE2`
 /// contracts associated with it. This is a crucial step which needs to happen before any expression is evaluated. The function then parses and deploys
-/// the expression and the result is committed to the db. Finally eval2 is called on the expression and resultant stack and key-values are returned.
-/// Optionally one can save the key-value pairs generated to the in memory db.
+/// the expression and the result is committed to the db. Finally `eval2` is called on the expression and resultant stack and key-values are returned.
+/// Optionally one can save the key-value pairs generated to the in-memory db.
 ///
 /// # Arguments
 /// * `raininterpreter_deployer_npe2_address` - `RainterpreterExpressionDeployerNPE2` contract address.
@@ -150,7 +150,7 @@ pub async fn deploy_and_eval2(
 
 /// # Eval2 Expression
 ///
-/// Function to eval2 rainlang expression.
+/// Function to `eval2` rainlang expression.
 /// The function executes eval2 on the rainlang expression that is already parsed, deployed and committed to the in-memory db and
 /// returns the generated stack and key-value pairs, which are NOT committed to the db.
 ///

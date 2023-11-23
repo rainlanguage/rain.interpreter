@@ -9,9 +9,9 @@ use std::sync::Arc;
 
 use super::{registry::IInterpreterStoreV1, rust_evm::commit_transaction};
 
-/// # Set Keys
+/// # Set Key-Value pairs
 ///
-/// Commit `RainterpreterStoreNPE2` keys-value pairs to in-memory db.
+/// Commit `RainterpreterStoreNPE2` keys-value pairs to the in-memory db.
 /// The contract info should already by present in the in-memory db.
 ///
 /// # Arguments

@@ -13,15 +13,15 @@ use super::rust_evm::commit_transaction;
 
 /// # Deploy Expression
 ///
-/// Parses the give rainlang expression, deploys the expression and commits result to in memory revm db.
+/// Parses the give rainlang expression, deploys the expression and commits result to the in-memory db.
 /// Note that `RainterpreterExpressionDeployerNPE2` and `RainterpreterParserNPE2` contracts account info
-/// should already be present in the in-memory db, indexed by the `deployer` and `parser` feild.
+/// should already be present in the in-memory db, indexed by the `raininterpreter_deployer_npe2_address` and `raininterpreter_parser_npe2_address` feild.
 ///
 /// # Arguments
 /// * `raininterpreter_deployer_npe2_address` - Address of the `RainterpreterExpressionDeployerNPE2` contract.
 /// * `raininterpreter_parser_npe2_address` - Address of the `RainterpreterParserNPE2` contract.
 /// * `evm` - EVM instance with contract data inserted.
-/// * `client` - Provider Instance
+/// * `client` - Provider Instance.
 ///
 pub async fn deploy_expression(
     raininterpreter_deployer_npe2_address: Address,
@@ -86,12 +86,12 @@ pub async fn deploy_expression(
 }
 
 /// Gets `RainterpreterStoreNPE2`, `RainterpreterNPE2` and `RainterpreterParserNPE2` addresses
-/// associated with the passed `RainterpreterExpressionDeployerNPE2` contract.
+/// associated with the passed `RainterpreterExpressionDeployerNPE2` contract argument.
 ///
 /// # Arguments
 ///
 /// * `raininterpreter_deployer_npe2_address` - Address of the `RainterpreterExpressionDeployerNPE2` contract.
-/// * `client` - Network Provider
+/// * `client` - Network Provider.
 ///  
 pub async fn get_sip_addresses(
     raininterpreter_deployer_npe2_address: Address,

@@ -43,7 +43,7 @@ pub async fn commit_transaction(
 
 /// # Execute Transaction
 ///
-/// Executes transaction with the current state of in memory db, result is not committed
+/// Executes transaction with the current state of the in-memory db, result is not committed.
 /// The caller for the transaction is set as zero address, and if `tx.transact_to` feild is a contract,
 /// then the contract account info should already be present in the db.
 ///
@@ -71,8 +71,8 @@ pub async fn exec_transaction(
 
 /// # Write Account Info
 ///
-/// Save an account's info to in-memory db.
-/// This function is used to save contract state from on chain to the in memory.
+/// Save an account's info to the in-memory db.
+/// This function is used to save contract state from on chain to the in-memory db.
 /// Revm saves contract runtime bytecode to in-memory db, so any contract variables associated are also accessible.
 ///
 /// # Arguments
@@ -99,9 +99,9 @@ pub async fn write_account_info(
 
 /// # Write Account Info from bytecode
 ///
-/// Save an account info to in-memory db.
-/// This function is used to save contract state from the deployed bytecode passed as an argument to in memory db.
-/// Revm saves contract runtime bytecode to in-memory db, so any contract variables associated are also accessible.
+/// Save an account info to the in-memory db.
+/// This function is used to save contract state from the deployed bytecode passed as an argument to the in-memory db.
+/// Revm saves contract runtime bytecode to the in-memory db, so any contract variables associated are also accessible.
 ///
 /// # Arguments
 /// * `cache_db` - CacheDB instance to write data to.
