@@ -17,7 +17,7 @@ library LibOpShiftBitsLeftNP {
 
         if (
             // Shift amount must not result in the output always being 0.
-            shiftAmount >= type(uint8).max
+            shiftAmount > uint256(type(uint8).max)
             // Shift amount must not result in a noop.
             || shiftAmount == 0
         ) {

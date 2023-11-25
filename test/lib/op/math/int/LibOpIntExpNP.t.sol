@@ -1,12 +1,17 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "rain.solmem/lib/LibUint256Array.sol";
+import {stdError} from "forge-std/Test.sol";
 
-import "test/util/abstract/OpTest.sol";
-import "src/lib/caller/LibContext.sol";
-import {UnexpectedOperand} from "src/lib/parse/LibParseOperand.sol";
+import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
+
+import {OpTest} from "test/util/abstract/OpTest.sol";
+import {LibContext} from "src/lib/caller/LibContext.sol";
+import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOpIntExpNP} from "src/lib/op/math/int/LibOpIntExpNP.sol";
+import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
 
 contract LibOpIntExpNPTest is OpTest {
     using LibUint256Array for uint256[];

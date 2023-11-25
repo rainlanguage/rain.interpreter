@@ -13,7 +13,7 @@ import {LibInterpreterStateNP, InterpreterStateNP} from "../../../src/lib/state/
 import {IntegrityCheckStateNP, LibIntegrityCheckNP} from "../../../src/lib/integrity/LibIntegrityCheckNP.sol";
 
 import {LibContext} from "../../../src/lib/caller/LibContext.sol";
-import {UnexpectedOperand} from "../../../src/lib/parse/LibParseOperand.sol";
+import {UnexpectedOperand} from "../../../src/error/ErrParse.sol";
 import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {Operand, IInterpreterV2, SourceIndexV2} from "../../../src/interface/unstable/IInterpreterV2.sol";
 import {
@@ -220,6 +220,21 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
             new uint256[](0)
         );
         (stack, kvs);
+    }
+
+    function checkUnhappyDeploy(bytes memory rainString, bytes memory err) internal {
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
+        vm.expectRevert(err);
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
+        (interpreterDeployer, storeDeployer, expression, io);
+    }
+
+    function checkUnhappyParse(bytes memory rainString, bytes memory err) internal {
+        vm.expectRevert(err);
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
+        (bytecode);
+        (constants);
     }
 
     function checkBadInputs(bytes memory rainString, uint256 opIndex, uint256 calcInputs, uint256 bytecodeInputs)

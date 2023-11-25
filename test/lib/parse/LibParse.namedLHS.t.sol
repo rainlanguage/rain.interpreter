@@ -3,7 +3,8 @@ pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 
-import {OPERAND_PARSER_OFFSET_DISALLOWED, ExpectedOperand, UnclosedOperand} from "src/lib/parse/LibParseOperand.sol";
+import {ExpectedOperand, UnclosedOperand} from "src/error/ErrParse.sol";
+import {OPERAND_PARSER_OFFSET_DISALLOWED} from "src/lib/parse/LibParseOperand.sol";
 import {AuthoringMeta, LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 import {LibParse, DuplicateLHSItem, WordSize} from "src/lib/parse/LibParse.sol";
 import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
