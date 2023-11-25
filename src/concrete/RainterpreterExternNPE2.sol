@@ -9,7 +9,6 @@ import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
 import {Operand} from "../interface/unstable/IInterpreterV2.sol";
 import {IInterpreterExternV2, ExternDispatch} from "../interface/IInterpreterExternV2.sol";
-import {LibOpChainlinkOraclePrice} from "../lib/op/chainlink/LibOpChainlinkOraclePrice.sol";
 
 /// Thrown when the inputs don't match the expected inputs.
 /// @param expected The expected number of inputs.
