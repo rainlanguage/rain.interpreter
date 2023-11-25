@@ -5,7 +5,8 @@ import {OpTest} from "test/util/abstract/OpTest.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
-import {LibOpEncodeBitsNP, TruncatedEncoding, ZeroLengthEncoding} from "src/lib/op/bitwise/LibOpEncodeBitsNP.sol";
+import {TruncatedBitwiseEncoding, ZeroLengthBitwiseEncoding} from "src/error/ErrBitwise.sol";
+import {LibOpEncodeBitsNP} from "src/lib/op/bitwise/LibOpEncodeBitsNP.sol";
 
 contract LibOpEncodeBitsNPTest is OpTest {
     /// Directly test the integrity logic of LibOpEncodeBitsNP. All possible
@@ -32,7 +33,7 @@ contract LibOpEncodeBitsNPTest is OpTest {
         uint256 start = bound(uint256(start8Bit), 2, type(uint8).max);
         uint256 length = bound(uint256(length8Bit), uint256(type(uint8).max) - start + 2, uint256(type(uint8).max));
         Operand operand = Operand.wrap(2 << 0x10 | (uint256(length) << 8) | uint256(start));
-        vm.expectRevert(abi.encodeWithSelector(TruncatedEncoding.selector, start, length));
+        vm.expectRevert(abi.encodeWithSelector(TruncatedBitwiseEncoding.selector, start, length));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpEncodeBitsNP.integrity(state, operand);
         (calcInputs, calcOutputs);
     }
@@ -41,7 +42,7 @@ contract LibOpEncodeBitsNPTest is OpTest {
     /// error when the length is zero.
     function testOpEncodeBitsNPIntegrityFailZeroLength(IntegrityCheckStateNP memory state, uint8 start) external {
         Operand operand = Operand.wrap(2 << 0x10 | 0 << 8 | uint256(start));
-        vm.expectRevert(abi.encodeWithSelector(ZeroLengthEncoding.selector));
+        vm.expectRevert(abi.encodeWithSelector(ZeroLengthBitwiseEncoding.selector));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpEncodeBitsNP.integrity(state, operand);
         (calcInputs, calcOutputs);
     }

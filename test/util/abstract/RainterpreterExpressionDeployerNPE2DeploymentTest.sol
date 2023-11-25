@@ -111,12 +111,11 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
         vm.mockCall(
             address(IERC1820_REGISTRY), abi.encodeWithSelector(IERC1820Registry.setInterfaceImplementer.selector), ""
         );
-        iDeployer = new RainterpreterExpressionDeployerNPE2(RainterpreterExpressionDeployerNPE2ConstructionConfig(
-            address(iInterpreter),
-            address(iStore),
-            address(iParser),
-            constructionMeta
-        ));
+        iDeployer = new RainterpreterExpressionDeployerNPE2(
+            RainterpreterExpressionDeployerNPE2ConstructionConfig(
+                address(iInterpreter), address(iStore), address(iParser), constructionMeta
+            )
+        );
 
         // Sanity check the deployer's integrity function pointers.
         bytes memory integrityFunctionPointers = iDeployer.integrityFunctionPointers();
