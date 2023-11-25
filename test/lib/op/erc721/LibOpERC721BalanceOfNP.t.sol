@@ -12,7 +12,7 @@ import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
-import {UnexpectedOperand} from "src/lib/parse/LibParseOperand.sol";
+import {UnexpectedOperand} from "src/error/ErrParse.sol";
 
 /// @title LibOpERC721BalanceOfNPTest
 /// @notice Test the opcode for getting the balance of an erc721 token.

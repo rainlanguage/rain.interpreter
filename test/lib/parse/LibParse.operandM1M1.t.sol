@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import {OperandOverflow, UnclosedOperand} from "src/lib/parse/LibParseOperand.sol";
+import {OperandOverflow, UnclosedOperand} from "src/error/ErrParse.sol";
 import {ParserOutOfBounds, LibParse, ExpectedLeftParen} from "src/lib/parse/LibParse.sol";
 import {OperandTest} from "test/util/abstract/OperandTest.sol";
 import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";

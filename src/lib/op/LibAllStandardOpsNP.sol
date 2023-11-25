@@ -21,6 +21,8 @@ import {LibOpConstantNP} from "./00/LibOpConstantNP.sol";
 import {LibOpCtPopNP} from "./bitwise/LibOpCtPopNP.sol";
 import {LibOpDecodeBitsNP} from "./bitwise/LibOpDecodeBitsNP.sol";
 import {LibOpEncodeBitsNP} from "./bitwise/LibOpEncodeBitsNP.sol";
+import {LibOpShiftBitsLeftNP} from "./bitwise/LibOpShiftBitsLeftNP.sol";
+import {LibOpShiftBitsRightNP} from "./bitwise/LibOpShiftBitsRightNP.sol";
 
 import {LibOpCallNP} from "./call/LibOpCallNP.sol";
 
@@ -74,7 +76,7 @@ import {LibOpUniswapV2AmountOut} from "./uniswap/LibOpUniswapV2AmountOut.sol";
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 47;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 49;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -102,6 +104,16 @@ library LibAllStandardOpsNP {
                 "bitwise-encode",
                 OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT,
                 "Encodes a value into a 256 bit value. The first operand is the start bit and the second is the length."
+            ),
+            AuthoringMeta(
+                "bitwise-shift-left",
+                OPERAND_PARSER_OFFSET_SINGLE_FULL,
+                "Shifts the input left by the number of bits specified in the operand."
+            ),
+            AuthoringMeta(
+                "bitwise-shift-right",
+                OPERAND_PARSER_OFFSET_SINGLE_FULL,
+                "Shifts the input right by the number of bits specified in the operand."
             ),
             AuthoringMeta(
                 "call",
@@ -331,6 +343,8 @@ library LibAllStandardOpsNP {
                     LibOpCtPopNP.integrity,
                     LibOpDecodeBitsNP.integrity,
                     LibOpEncodeBitsNP.integrity,
+                    LibOpShiftBitsLeftNP.integrity,
+                    LibOpShiftBitsRightNP.integrity,
                     LibOpCallNP.integrity,
                     LibOpContextNP.integrity,
                     LibOpHashNP.integrity,
@@ -427,6 +441,8 @@ library LibAllStandardOpsNP {
                     LibOpCtPopNP.run,
                     LibOpDecodeBitsNP.run,
                     LibOpEncodeBitsNP.run,
+                    LibOpShiftBitsLeftNP.run,
+                    LibOpShiftBitsRightNP.run,
                     LibOpCallNP.run,
                     LibOpContextNP.run,
                     LibOpHashNP.run,

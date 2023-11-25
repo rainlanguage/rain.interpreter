@@ -9,6 +9,13 @@ import {IERC1820_REGISTRY} from "rain.erc1820/lib/LibIERC1820.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
 import {
+    UnexpectedConstructionMetaHash,
+    UnexpectedInterpreterBytecodeHash,
+    UnexpectedStoreBytecodeHash,
+    UnexpectedParserBytecodeHash,
+    UnexpectedPointers
+} from "../error/ErrDeploy.sol";
+import {
     IExpressionDeployerV3,
     IERC1820_NAME_IEXPRESSION_DEPLOYER_V3
 } from "../interface/unstable/IExpressionDeployerV3.sol";
@@ -24,49 +31,12 @@ import {RainterpreterNPE2, INTERPRETER_BYTECODE_HASH} from "./RainterpreterNPE2.
 import {PARSER_BYTECODE_HASH} from "./RainterpreterParserNPE2.sol";
 import {STORE_BYTECODE_HASH} from "./RainterpreterStoreNPE2.sol";
 
-/// @dev Thrown when the pointers known to the expression deployer DO NOT match
-/// the interpreter it is constructed for. This WILL cause undefined expression
-/// behaviour so MUST REVERT.
-/// @param actualPointers The actual function pointers found at the interpreter
-/// address upon construction.
-error UnexpectedPointers(bytes actualPointers);
-
-/// Thrown when the `RainterpreterExpressionDeployerNPE2` is constructed with
-/// unknown interpreter bytecode.
-/// @param expectedBytecodeHash The bytecode hash that was expected at the
-/// interpreter address upon construction.
-/// @param actualBytecodeHash The bytecode hash that was found at the interpreter
-/// address upon construction.
-error UnexpectedInterpreterBytecodeHash(bytes32 expectedBytecodeHash, bytes32 actualBytecodeHash);
-
-/// Thrown when the `RainterpreterNPE2` is constructed with unknown store bytecode.
-/// @param expectedBytecodeHash The bytecode hash that was expected at the store
-/// address upon construction.
-/// @param actualBytecodeHash The bytecode hash that was found at the store
-/// address upon construction.
-error UnexpectedStoreBytecodeHash(bytes32 expectedBytecodeHash, bytes32 actualBytecodeHash);
-
-/// Thrown when the `RainterpreterNPE2` is constructed with unknown parser
-/// bytecode.
-/// @param expectedBytecodeHash The bytecode hash that was expected at the parser
-/// address upon construction.
-/// @param actualBytecodeHash The bytecode hash that was found at the parser
-/// address upon construction.
-error UnexpectedParserBytecodeHash(bytes32 expectedBytecodeHash, bytes32 actualBytecodeHash);
-
-/// Thrown when the `RainterpreterNPE2` is constructed with unknown meta.
-/// @param expectedConstructionMetaHash The meta hash that was expected upon
-/// construction.
-/// @param actualConstructionMetaHash The meta hash that was found upon
-/// construction.
-error UnexpectedConstructionMetaHash(bytes32 expectedConstructionMetaHash, bytes32 actualConstructionMetaHash);
-
 /// @dev The function pointers for the integrity check fns.
 bytes constant INTEGRITY_FUNCTION_POINTERS =
-    hex"0a0e0a880aef0af80b130bb90c350c3f0c490c490c350c350c350c350c350c530c750c9f0c490c530c490c490cc10aef0c490c490ccb0ccb0c490aef0aef0ccb0ccb0ccb0ccb0ccb0ccb0ccb0ccb0ccb0ccb0ccb0ccb0aef0ce20cec0cec";
+    hex"0a1e0a980aff0b080b230bc90bc90c250ca10cab0cb50cb50ca10ca10ca10ca10ca10cbf0ce10d0b0cb50cbf0cb50cb50d2d0aff0cb50cb50d370d370cb50aff0aff0d370d370d370d370d370d370d370d370d370d370d370d370aff0d4e0d580d58";
 
 /// @dev Hash of the known construction meta.
-bytes32 constant CONSTRUCTION_META_HASH = bytes32(0xc5b5f17bb1f96d0b93d05de4e96f2b5721472727b5213b4bcd4099d53e64a3ee);
+bytes32 constant CONSTRUCTION_META_HASH = bytes32(0x35f955a7e5b76876c35106c31c5c1adf64260bb5bbc9222427da350a8988626d);
 
 /// All config required to construct a `RainterpreterNPE2`.
 /// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match
