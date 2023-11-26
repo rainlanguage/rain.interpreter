@@ -18,6 +18,8 @@ import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibOpStackNP} from "./00/LibOpStackNP.sol";
 import {LibOpConstantNP} from "./00/LibOpConstantNP.sol";
 
+import {LibOpBitwiseAndNP} from "./bitwise/LibOpBitwiseAndNP.sol";
+import {LibOpBitwiseOrNP} from "./bitwise/LibOpBitwiseOrNP.sol";
 import {LibOpCtPopNP} from "./bitwise/LibOpCtPopNP.sol";
 import {LibOpDecodeBitsNP} from "./bitwise/LibOpDecodeBitsNP.sol";
 import {LibOpEncodeBitsNP} from "./bitwise/LibOpEncodeBitsNP.sol";
@@ -76,7 +78,7 @@ import {LibOpUniswapV2AmountOut} from "./uniswap/LibOpUniswapV2AmountOut.sol";
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 49;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 51;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -90,6 +92,8 @@ library LibAllStandardOpsNP {
             AuthoringMeta("stack", OPERAND_PARSER_OFFSET_SINGLE_FULL, "Copies an existing value from the stack."),
             AuthoringMeta("constant", OPERAND_PARSER_OFFSET_SINGLE_FULL, "Copies a constant value onto the stack."),
             // These are all ordered according to how they appear in the file system.
+            AuthoringMeta("bitwise-and", OPERAND_PARSER_OFFSET_DISALLOWED, "Bitwise AND the top two items on the stack."),
+            AuthoringMeta("bitwise-or", OPERAND_PARSER_OFFSET_DISALLOWED, "Bitwise OR the top two items on the stack."),
             AuthoringMeta(
                 "bitwise-count-ones",
                 OPERAND_PARSER_OFFSET_DISALLOWED,
@@ -340,6 +344,8 @@ library LibAllStandardOpsNP {
                     LibOpStackNP.integrity,
                     LibOpConstantNP.integrity,
                     // Everything else is alphabetical, including folders.
+                    LibOpBitwiseAndNP.integrity,
+                    LibOpBitwiseOrNP.integrity,
                     LibOpCtPopNP.integrity,
                     LibOpDecodeBitsNP.integrity,
                     LibOpEncodeBitsNP.integrity,
@@ -438,6 +444,8 @@ library LibAllStandardOpsNP {
                     LibOpStackNP.run,
                     LibOpConstantNP.run,
                     // Everything else is alphabetical, including folders.
+                    LibOpBitwiseAndNP.run,
+                    LibOpBitwiseOrNP.run,
                     LibOpCtPopNP.run,
                     LibOpDecodeBitsNP.run,
                     LibOpEncodeBitsNP.run,
