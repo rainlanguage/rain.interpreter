@@ -116,4 +116,20 @@ library LibUniswapV2 {
         amountOut = amountIn == 0 ? 0 : getAmountOut(amountIn, reserveIn, reserveOut);
         timestamp = reserveTimestamp;
     }
+
+    /// Bundles the key library logic together to produce amounts based on tokens
+    /// and amounts out rather than needing to handle reserves directly.
+    /// Also maps 0 amountOut to 0 amountIn unconditionally, which is different
+    /// to the reference implementation.
+    function getQuoteWithTime(address factory, address tokenA, address tokenB, uint256 amountA)
+        internal
+        view
+        returns (uint256 amountB, uint256 timestamp)
+    {
+        (uint256 reserveA, uint256 reserveB, uint256 reserveTimestamp) = getReservesWithTime(factory, tokenA, tokenB);
+        // Perform the 0 amountOut to 0 amountIn mapping after getting the
+        // reserves so that we still error on invalid reserves.
+        amountB = amountA == 0 ? 0 : (amountA * reserveB) / reserveA;
+        timestamp = reserveTimestamp;
+    }
 }
