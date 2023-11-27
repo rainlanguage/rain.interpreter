@@ -33,10 +33,10 @@ import {STORE_BYTECODE_HASH} from "./RainterpreterStoreNPE2.sol";
 
 /// @dev The function pointers for the integrity check fns.
 bytes constant INTEGRITY_FUNCTION_POINTERS =
-    hex"0a2e0aa80b0f0b0f0b190b220b3d0be30be30c3f0cbb0cc50b0f0b0f0cbb0cbb0cbb0cbb0cbb0ccf0cf10d1b0b0f0ccf0b0f0b0f0d3d0b190b0f0b0f0d470d470b0f0b190b190d470d470d470d470d470d470d470d470d470d470d470d470b190d5e0d680d68";
+    hex"0a360ab00b170b170b210b2a0b450beb0beb0c470cc30ccd0b170b170cc30cc30cc30cc30cc30cd70cf90d230b170cd70b170b170d450b210b170b170d4f0d4f0b170b210b210d4f0d4f0d4f0d4f0d4f0d4f0d4f0d4f0d4f0d4f0d4f0d4f0b210d660d700d700d70";
 
 /// @dev Hash of the known construction meta.
-bytes32 constant CONSTRUCTION_META_HASH = bytes32(0xa0156a2e59ef0c77ec66c86ae64365f98b5e01901fd10eeac563e86ede7a4baf);
+bytes32 constant CONSTRUCTION_META_HASH = bytes32(0xd45b2112e28ddf61a76ab79de038faad9d077b918ddad5070ac9071806106292);
 
 /// All config required to construct a `RainterpreterNPE2`.
 /// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match
