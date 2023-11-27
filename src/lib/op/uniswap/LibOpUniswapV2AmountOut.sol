@@ -24,12 +24,14 @@ library LibOpUniswapV2AmountOut {
         uint256 amountIn;
         uint256 tokenIn;
         uint256 tokenOut;
+        uint256 withTime;
         assembly ("memory-safe") {
             factory := mload(stackTop)
             amountIn := mload(add(stackTop, 0x20))
             tokenIn := mload(add(stackTop, 0x40))
             tokenOut := mload(add(stackTop, 0x60))
-            stackTop := add(stackTop, add(0x40, mul(0x20, iszero(and(operand, 1)))))
+            withTime := and(operand, 1)
+            stackTop := add(stackTop, add(0x40, mul(0x20, iszero(withTime))))
         }
         (uint256 amountOut, uint256 reserveTimestamp) = LibUniswapV2.getAmountOutByTokenWithTime(
             address(uint160(factory)), address(uint160(tokenIn)), address(uint160(tokenOut)), amountIn
@@ -37,7 +39,7 @@ library LibOpUniswapV2AmountOut {
 
         assembly ("memory-safe") {
             mstore(stackTop, amountOut)
-            if and(operand, 1) { mstore(add(stackTop, 0x20), reserveTimestamp) }
+            if withTime { mstore(add(stackTop, 0x20), reserveTimestamp) }
         }
         return stackTop;
     }
