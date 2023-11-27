@@ -5,7 +5,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Operand} from "../../../interface/unstable/IInterpreterV2.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
-import {LibUniswapV2} from "../../uniswap/LibUniswapV2.sol";
+import {LibUniswapV2} from "rain.uniswapv2/src/lib/LibUniswapV2.sol";
 
 /// @title LibOpUniswapV2Quote
 /// @notice Opcode to calculate the quote for a Uniswap V2 pair.

@@ -1,9 +1,15 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "src/lib/uniswap/LibUniswapV2.sol";
-import "test/util/abstract/OpTest.sol";
+import {LibUniswapV2} from "rain.uniswapv2/src/lib/LibUniswapV2.sol";
+import {OpTest} from "test/util/abstract/OpTest.sol";
 import {LibOpUniswapV2AmountIn} from "src/lib/op/uniswap/LibOpUniswapV2AmountIn.sol";
+import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
+import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {IUniswapV2Factory} from "rain.uniswapv2/src/interface/IUniswapV2Factory.sol";
+import {IUniswapV2Pair} from "rain.uniswapv2/src/interface/IUniswapV2Pair.sol";
+import {UniswapV2IdenticalAddresses, UniswapV2ZeroAddress} from "rain.uniswapv2/src/error/ErrUniswapV2.sol";
 
 contract LibOpUniswapV2AmountInTest is OpTest {
     /// Directly test the integrity logic of LibOpUniswapV2AmountIn. The inputs
@@ -50,9 +56,9 @@ contract LibOpUniswapV2AmountInTest is OpTest {
         Operand operand = Operand.wrap((4 << 0x10) | uint256(operandData));
 
         if (tokenIn == tokenOut) {
-            vm.expectRevert("UniswapV2Library: IDENTICAL_ADDRESSES");
+            vm.expectRevert(abi.encodeWithSelector(UniswapV2IdenticalAddresses.selector));
         } else if (tokenIn == address(0) || tokenOut == address(0)) {
-            vm.expectRevert("UniswapV2Library: ZERO_ADDRESS");
+            vm.expectRevert(abi.encodeWithSelector(UniswapV2ZeroAddress.selector));
         } else {
             address expectedPair = LibUniswapV2.pairFor(factory, tokenIn, tokenOut);
             vm.mockCall(

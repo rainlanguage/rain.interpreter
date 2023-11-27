@@ -1,9 +1,15 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "src/lib/uniswap/LibUniswapV2.sol";
-import "test/util/abstract/OpTest.sol";
+import {LibUniswapV2} from "rain.uniswapv2/src/lib/LibUniswapV2.sol";
+import {OpTest} from "test/util/abstract/OpTest.sol";
 import {LibOpUniswapV2Quote} from "src/lib/op/uniswap/LibOpUniswapV2Quote.sol";
+import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
+import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {IUniswapV2Factory} from "rain.uniswapv2/src/interface/IUniswapV2Factory.sol";
+import {IUniswapV2Pair} from "rain.uniswapv2/src/interface/IUniswapV2Pair.sol";
+import {UniswapV2IdenticalAddresses, UniswapV2ZeroAddress} from "rain.uniswapv2/src/error/ErrUniswapV2.sol";
 
 contract LibOpUniswapV2QuoteTest is OpTest {
     /// Directly test the integrity logic of LibOpUniswapV2Quote. The inputs
@@ -19,81 +25,68 @@ contract LibOpUniswapV2QuoteTest is OpTest {
         assertEq(calcOutputs, outputs, "outputs");
     }
 
-    // /// Directly test the integrity logic of LibOpUniswapV2AmountIn. The inputs
-    // /// are always 4 but the outputs depend on the low bit of the operand.
-    // function testIntegrity(IntegrityCheckStateNP memory state, Operand operand) public {
-    //     // The low bit of the operand determines whether we want the timestamp
-    //     // or not.
-    //     uint256 outputs = 1 + (Operand.unwrap(operand) & 1);
+    /// Directly test the runtime logic of LibOpUniswapV2AmountIn.
+    function testOpUniswapV2QuoteRun(
+        uint256 amountOut,
+        address tokenIn,
+        address tokenOut,
+        uint256 reserveIn,
+        uint256 reserveOut,
+        uint32 reserveTimestamp,
+        uint16 operandData
+    ) public {
+        address factory = address(0x0123456789ABCDEF);
+        // We can't check the error conditions for these while also mocking due
+        // to the way the mock works. So we just bound them for this test.
+        // Anything outside these bounds is expected to revert in real use.
+        reserveIn = bound(reserveIn, 2, type(uint112).max);
+        reserveOut = bound(reserveOut, 2, type(uint112).max);
+        // Depending on the sort order of the tokens, the reserve amounts may
+        // be swapped internally, so "out" may be "in". Simple hack is to just
+        // bound the amount to the smaller of the two reserves. This prevents
+        // a divide by zero in the library.
+        amountOut = bound(amountOut, 1, (reserveOut < reserveIn ? reserveOut : reserveIn) - 1);
 
-    //     (uint256 calcInputs, uint256 calcOutputs) = LibOpUniswapV2AmountIn.integrity(state, operand);
+        InterpreterStateNP memory state = opTestDefaultInterpreterState();
+        uint256[] memory inputs = new uint256[](4);
+        inputs[0] = uint256(uint160(factory));
+        inputs[1] = amountOut;
+        inputs[2] = uint256(uint160(tokenIn));
+        inputs[3] = uint256(uint160(tokenOut));
+        Operand operand = Operand.wrap((4 << 0x10) | uint256(operandData));
 
-    //     assertEq(calcInputs, 4, "inputs");
-    //     assertEq(calcOutputs, outputs, "outputs");
-    // }
+        if (tokenIn == tokenOut) {
+            vm.expectRevert(abi.encodeWithSelector(UniswapV2IdenticalAddresses.selector));
+        } else if (tokenIn == address(0) || tokenOut == address(0)) {
+            vm.expectRevert(abi.encodeWithSelector(UniswapV2ZeroAddress.selector));
+        } else {
+            address expectedPair = LibUniswapV2.pairFor(factory, tokenIn, tokenOut);
+            vm.mockCall(
+                factory,
+                abi.encodeWithSelector(IUniswapV2Factory.getPair.selector, tokenIn, tokenOut),
+                abi.encode(expectedPair)
+            );
+            vm.mockCall(
+                expectedPair,
+                abi.encodeWithSelector(IUniswapV2Pair.getReserves.selector),
+                abi.encode(reserveIn, reserveOut, reserveTimestamp)
+            );
+        }
+        opReferenceCheck(
+            state,
+            operand,
+            LibOpUniswapV2Quote.referenceFn,
+            LibOpUniswapV2Quote.integrity,
+            LibOpUniswapV2Quote.run,
+            inputs
+        );
+    }
 
-    // /// Directly test the runtime logic of LibOpUniswapV2AmountIn.
-    // function testOpUniswapV2AmountInRun(
-    //     uint256 amountOut,
-    //     address tokenIn,
-    //     address tokenOut,
-    //     uint256 reserveIn,
-    //     uint256 reserveOut,
-    //     uint32 reserveTimestamp,
-    //     uint16 operandData
-    // ) public {
-    //     address factory = address(0x0123456789ABCDEF);
-    //     // We can't check the error conditions for these while also mocking due
-    //     // to the way the mock works. So we just bound them for this test.
-    //     // Anything outside these bounds is expected to revert in real use.
-    //     reserveIn = bound(reserveIn, 2, type(uint112).max);
-    //     reserveOut = bound(reserveOut, 2, type(uint112).max);
-    //     // Depending on the sort order of the tokens, the reserve amounts may
-    //     // be swapped internally, so "out" may be "in". Simple hack is to just
-    //     // bound the amount to the smaller of the two reserves. This prevents
-    //     // a divide by zero in the library.
-    //     amountOut = bound(amountOut, 1, (reserveOut < reserveIn ? reserveOut : reserveIn) - 1);
-
-    //     InterpreterStateNP memory state = opTestDefaultInterpreterState();
-    //     uint256[] memory inputs = new uint256[](4);
-    //     inputs[0] = uint256(uint160(factory));
-    //     inputs[1] = amountOut;
-    //     inputs[2] = uint256(uint160(tokenIn));
-    //     inputs[3] = uint256(uint160(tokenOut));
-    //     Operand operand = Operand.wrap((4 << 0x10) | uint256(operandData));
-
-    //     if (tokenIn == tokenOut) {
-    //         vm.expectRevert("UniswapV2Library: IDENTICAL_ADDRESSES");
-    //     } else if (tokenIn == address(0) || tokenOut == address(0)) {
-    //         vm.expectRevert("UniswapV2Library: ZERO_ADDRESS");
-    //     } else {
-    //         address expectedPair = LibUniswapV2.pairFor(factory, tokenIn, tokenOut);
-    //         vm.mockCall(
-    //             factory,
-    //             abi.encodeWithSelector(IUniswapV2Factory.getPair.selector, tokenIn, tokenOut),
-    //             abi.encode(expectedPair)
-    //         );
-    //         vm.mockCall(
-    //             expectedPair,
-    //             abi.encodeWithSelector(IUniswapV2Pair.getReserves.selector),
-    //             abi.encode(reserveIn, reserveOut, reserveTimestamp)
-    //         );
-    //     }
-    //     opReferenceCheck(
-    //         state,
-    //         operand,
-    //         LibOpUniswapV2AmountIn.referenceFn,
-    //         LibOpUniswapV2AmountIn.integrity,
-    //         LibOpUniswapV2AmountIn.run,
-    //         inputs
-    //     );
-    // }
-
-    // /// Test the eval of `uniswap-v2-amount-in` parsed from a string.
-    // /// Test zero inputs.
-    // function testOpUniswapV2AmountInZeroInputs() public {
-    //     checkBadInputs("_: uniswap-v2-amount-in();", 0, 4, 0);
-    // }
+    /// Test the eval of `uniswap-v2-quote` parsed from a string.
+    /// Test zero inputs.
+    function testOpUniswapV2QuoteZeroInputs() public {
+        checkBadInputs("_: uniswap-v2-quote();", 0, 4, 0);
+    }
 
     // /// Test the eval of `uniswap-v2-amount-in` parsed from a string.
     // /// Test that 0 output amount returns 0 input amount.

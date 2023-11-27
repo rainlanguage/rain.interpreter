@@ -32,14 +32,14 @@ error NegativeStackLength(int256 length);
 error InvalidSourceIndex(SourceIndexV2 sourceIndex);
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xe86a8ddd83e6e00c8256bdfd5d9dfbbd42e39fc3bb8f57bf363c125030775238);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x08674f10583b04bd1b40fabb3717d8b3f8e706cdf2593bcdeb9d096bd34cd2d5);
 
 /// @dev The function pointers known to the interpreter for dynamic dispatch.
 /// By setting these as a constant they can be inlined into the interpreter
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
 bytes constant OPCODE_FUNCTION_POINTERS =
-    hex"0bf10c3d0c780c8a0c9c0cb50cf70d490d5a0d6b0e090eed0f270fd7107910a810d710d71126115511b7123f12e612fa1350136413791393139e13b213c71444148f14b514cc14e314e3152e157915c415c4160f160f165a16a516f016f0173b1822185518ad";
+    hex"0bfa0c460c810c930ca50cbe0d000d520d630d740e120ef60f300fe0108210b110e010e0112f115e11c0124812ef13031359136d1382139c13a713bb13d0144d149814be14d514ec14ec1537158215cd15cd16181618166316ae16f916f91744182b185e18b6190d";
 
 /// @title RainterpreterNPE2
 /// @notice Implementation of a Rainlang interpreter that is compatible with

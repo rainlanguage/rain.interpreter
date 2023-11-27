@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {LibUniswapV2} from "../../uniswap/LibUniswapV2.sol";
+import {LibUniswapV2} from "rain.uniswapv2/src/lib/LibUniswapV2.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 import {Operand} from "../../../interface/unstable/IInterpreterV2.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
