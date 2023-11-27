@@ -28,10 +28,10 @@ contract LibOpUniswapV2QuoteTest is OpTest {
     /// Directly test the runtime logic of LibOpUniswapV2AmountIn.
     function testOpUniswapV2QuoteRun(
         uint256 amountOut,
-        address tokenIn,
-        address tokenOut,
-        uint256 reserveIn,
-        uint256 reserveOut,
+        address tokenA,
+        address tokenB,
+        uint256 reserveA,
+        uint256 reserveB,
         uint32 reserveTimestamp,
         uint16 operandData
     ) public {
@@ -39,37 +39,37 @@ contract LibOpUniswapV2QuoteTest is OpTest {
         // We can't check the error conditions for these while also mocking due
         // to the way the mock works. So we just bound them for this test.
         // Anything outside these bounds is expected to revert in real use.
-        reserveIn = bound(reserveIn, 2, type(uint112).max);
-        reserveOut = bound(reserveOut, 2, type(uint112).max);
+        reserveA = bound(reserveA, 2, type(uint112).max);
+        reserveB = bound(reserveB, 2, type(uint112).max);
         // Depending on the sort order of the tokens, the reserve amounts may
         // be swapped internally, so "out" may be "in". Simple hack is to just
         // bound the amount to the smaller of the two reserves. This prevents
         // a divide by zero in the library.
-        amountOut = bound(amountOut, 1, (reserveOut < reserveIn ? reserveOut : reserveIn) - 1);
+        amountOut = bound(amountOut, 1, (reserveB < reserveA ? reserveB : reserveA) - 1);
 
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](4);
         inputs[0] = uint256(uint160(factory));
         inputs[1] = amountOut;
-        inputs[2] = uint256(uint160(tokenIn));
-        inputs[3] = uint256(uint160(tokenOut));
+        inputs[2] = uint256(uint160(tokenA));
+        inputs[3] = uint256(uint160(tokenB));
         Operand operand = Operand.wrap((4 << 0x10) | uint256(operandData));
 
-        if (tokenIn == tokenOut) {
+        if (tokenA == tokenB) {
             vm.expectRevert(abi.encodeWithSelector(UniswapV2IdenticalAddresses.selector));
-        } else if (tokenIn == address(0) || tokenOut == address(0)) {
+        } else if (tokenA == address(0) || tokenB == address(0)) {
             vm.expectRevert(abi.encodeWithSelector(UniswapV2ZeroAddress.selector));
         } else {
-            address expectedPair = LibUniswapV2.pairFor(factory, tokenIn, tokenOut);
+            address expectedPair = LibUniswapV2.pairFor(factory, tokenA, tokenB);
             vm.mockCall(
                 factory,
-                abi.encodeWithSelector(IUniswapV2Factory.getPair.selector, tokenIn, tokenOut),
+                abi.encodeWithSelector(IUniswapV2Factory.getPair.selector, tokenA, tokenB),
                 abi.encode(expectedPair)
             );
             vm.mockCall(
                 expectedPair,
                 abi.encodeWithSelector(IUniswapV2Pair.getReserves.selector),
-                abi.encode(reserveIn, reserveOut, reserveTimestamp)
+                abi.encode(reserveA, reserveB, reserveTimestamp)
             );
         }
         opReferenceCheck(
@@ -88,78 +88,78 @@ contract LibOpUniswapV2QuoteTest is OpTest {
         checkBadInputs("_: uniswap-v2-quote();", 0, 4, 0);
     }
 
-    // /// Test the eval of `uniswap-v2-amount-in` parsed from a string.
-    // /// Test that 0 output amount returns 0 input amount.
-    // function testOpUniswapV2AmountInZeroOutput(uint256 reserveIn, uint256 reserveOut, uint32 reserveTimestamp) public {
-    //     address factory = address(0x1234);
-    //     address tokenIn = address(0x2345);
-    //     address tokenOut = address(0x3456);
-    //     reserveIn = bound(reserveIn, 2, type(uint112).max);
-    //     reserveOut = bound(reserveOut, 2, type(uint112).max);
-    //     address expectedPair = LibUniswapV2.pairFor(factory, tokenIn, tokenOut);
-    //     vm.mockCall(
-    //         factory,
-    //         abi.encodeWithSelector(IUniswapV2Factory.getPair.selector, tokenIn, tokenOut),
-    //         abi.encode(expectedPair)
-    //     );
-    //     vm.mockCall(
-    //         expectedPair,
-    //         abi.encodeWithSelector(IUniswapV2Pair.getReserves.selector),
-    //         abi.encode(reserveIn, reserveOut, reserveTimestamp)
-    //     );
-    //     checkHappy("_: uniswap-v2-amount-in(0x1234 0 0x2345 0x3456);", 0, "0x1234 0 0x2345 0x3456");
-    // }
+    /// Test the eval of `uniswap-v2-quote` parsed from a string.
+    /// Test that 0 output amount returns 0 input amount.
+    function testOpUniswapV2QuoteZeroOutput(uint256 reserveA, uint256 reserveB, uint32 reserveTimestamp) public {
+        address factory = address(0x1234);
+        address tokenA = address(0x2345);
+        address tokenB = address(0x3456);
+        reserveA = bound(reserveA, 2, type(uint112).max);
+        reserveB = bound(reserveB, 2, type(uint112).max);
+        address expectedPair = LibUniswapV2.pairFor(factory, tokenA, tokenB);
+        vm.mockCall(
+            factory,
+            abi.encodeWithSelector(IUniswapV2Factory.getPair.selector, tokenA, tokenB),
+            abi.encode(expectedPair)
+        );
+        vm.mockCall(
+            expectedPair,
+            abi.encodeWithSelector(IUniswapV2Pair.getReserves.selector),
+            abi.encode(reserveA, reserveB, reserveTimestamp)
+        );
+        checkHappy("_: uniswap-v2-quote(0x1234 0 0x2345 0x3456);", 0, "0x1234 0 0x2345 0x3456");
+    }
 
-    // /// Test the eval of `uniswap-v2-amount-in` parsed from a string.
-    // /// Test one input.
-    // function testOpUniswapV2AmountInOneInput() public {
-    //     checkBadInputs("_: uniswap-v2-amount-in(0);", 1, 4, 1);
-    //     checkBadInputs("_: uniswap-v2-amount-in(1);", 1, 4, 1);
-    //     checkBadInputs("_: uniswap-v2-amount-in(max-decimal18-value());", 1, 4, 1);
-    // }
+    /// Test the eval of `uniswap-v2-quote` parsed from a string.
+    /// Test one input.
+    function testOpUniswapV2QuoteOneInput() public {
+        checkBadInputs("_: uniswap-v2-quote(0);", 1, 4, 1);
+        checkBadInputs("_: uniswap-v2-quote(1);", 1, 4, 1);
+        checkBadInputs("_: uniswap-v2-quote(max-decimal18-value());", 1, 4, 1);
+    }
 
-    // /// Test the eval of `uniswap-v2-amount-in` parsed from a string.
-    // /// Test two inputs.
-    // function testOpUniswapV2AmountInTwoInputs() public {
-    //     checkBadInputs("_: uniswap-v2-amount-in(0 0);", 2, 4, 2);
-    //     checkBadInputs("_: uniswap-v2-amount-in(0 1);", 2, 4, 2);
-    //     checkBadInputs("_: uniswap-v2-amount-in(1 0);", 2, 4, 2);
-    //     checkBadInputs("_: uniswap-v2-amount-in(1 1);", 2, 4, 2);
-    //     checkBadInputs("_: uniswap-v2-amount-in(1 max-decimal18-value());", 2, 4, 2);
-    //     checkBadInputs("_: uniswap-v2-amount-in(max-decimal18-value() 1);", 2, 4, 2);
-    // }
+    /// Test the eval of `uniswap-v2-quote` parsed from a string.
+    /// Test two inputs.
+    function testOpUniswapV2AmountInTwoInputs() public {
+        checkBadInputs("_: uniswap-v2-quote(0 0);", 2, 4, 2);
+        checkBadInputs("_: uniswap-v2-quote(0 1);", 2, 4, 2);
+        checkBadInputs("_: uniswap-v2-quote(1 0);", 2, 4, 2);
+        checkBadInputs("_: uniswap-v2-quote(1 1);", 2, 4, 2);
+        checkBadInputs("_: uniswap-v2-quote(1 max-decimal18-value());", 2, 4, 2);
+        checkBadInputs("_: uniswap-v2-quote(max-decimal18-value() 1);", 2, 4, 2);
+    }
 
-    // /// Test the eval of `uniswap-v2-amount-in` parsed from a string.
-    // /// Test three inputs.
-    // function testOpUniswapV2AmountInThreeInputs() public {
-    //     checkBadInputs("_: uniswap-v2-amount-in(0 0 0);", 3, 4, 3);
-    //     checkBadInputs("_: uniswap-v2-amount-in(0 0 1);", 3, 4, 3);
-    //     checkBadInputs("_: uniswap-v2-amount-in(0 1 0);", 3, 4, 3);
-    //     checkBadInputs("_: uniswap-v2-amount-in(0 1 1);", 3, 4, 3);
-    //     checkBadInputs("_: uniswap-v2-amount-in(1 0 0);", 3, 4, 3);
-    //     checkBadInputs("_: uniswap-v2-amount-in(1 0 1);", 3, 4, 3);
-    //     checkBadInputs("_: uniswap-v2-amount-in(1 1 0);", 3, 4, 3);
-    //     checkBadInputs("_: uniswap-v2-amount-in(1 1 1);", 3, 4, 3);
-    //     checkBadInputs("_: uniswap-v2-amount-in(1 1 max-decimal18-value());", 3, 4, 3);
-    //     checkBadInputs("_: uniswap-v2-amount-in(1 max-decimal18-value() 1);", 3, 4, 3);
-    //     checkBadInputs("_: uniswap-v2-amount-in(max-decimal18-value() 1 1);", 3, 4, 3);
-    // }
+    /// Test the eval of `uniswap-v2-quote` parsed from a string.
+    /// Test three inputs.
+    function testOpUniswapV2AmountInThreeInputs() public {
+        checkBadInputs("_: uniswap-v2-quote(0 0 0);", 3, 4, 3);
+        checkBadInputs("_: uniswap-v2-quote(0 0 1);", 3, 4, 3);
+        checkBadInputs("_: uniswap-v2-quote(0 1 0);", 3, 4, 3);
+        checkBadInputs("_: uniswap-v2-quote(0 1 1);", 3, 4, 3);
+        checkBadInputs("_: uniswap-v2-quote(1 0 0);", 3, 4, 3);
+        checkBadInputs("_: uniswap-v2-quote(1 0 1);", 3, 4, 3);
+        checkBadInputs("_: uniswap-v2-quote(1 1 0);", 3, 4, 3);
+        checkBadInputs("_: uniswap-v2-quote(1 1 1);", 3, 4, 3);
+        checkBadInputs("_: uniswap-v2-quote(1 1 max-decimal18-value());", 3, 4, 3);
+        checkBadInputs("_: uniswap-v2-quote(1 max-decimal18-value() 1);", 3, 4, 3);
+        checkBadInputs("_: uniswap-v2-quote(max-decimal18-value() 1 1);", 3, 4, 3);
+    }
 
-    // /// Test the eval of `uniswap-v2-amount-in` parsed from a string.
-    // /// Test five inputs.
-    // function testOpUniswapV2AmountInFiveInputs() public {
-    //     checkBadInputs("_: uniswap-v2-amount-in(0 0 0 0 0);", 5, 4, 5);
-    //     checkBadInputs("_: uniswap-v2-amount-in(0 0 0 0 1);", 5, 4, 5);
-    //     checkBadInputs("_: uniswap-v2-amount-in(0 0 0 1 0);", 5, 4, 5);
-    //     checkBadInputs("_: uniswap-v2-amount-in(0 0 0 1 1);", 5, 4, 5);
-    //     checkBadInputs("_: uniswap-v2-amount-in(0 0 1 0 0);", 5, 4, 5);
-    //     checkBadInputs("_: uniswap-v2-amount-in(0 0 1 0 1);", 5, 4, 5);
-    //     checkBadInputs("_: uniswap-v2-amount-in(0 0 1 1 0);", 5, 4, 5);
-    //     checkBadInputs("_: uniswap-v2-amount-in(0 0 1 1 1);", 5, 4, 5);
-    //     checkBadInputs("_: uniswap-v2-amount-in(0 1 0 0 0);", 5, 4, 5);
-    //     checkBadInputs("_: uniswap-v2-amount-in(0 1 0 0 1);", 5, 4, 5);
-    //     checkBadInputs("_: uniswap-v2-amount-in(0 1 0 1 0);", 5, 4, 5);
-    //     checkBadInputs("_: uniswap-v2-amount-in(0 1 0 1 1);", 5, 4, 5);
-    //     checkBadInputs("_: uniswap-v2-amount-in(0 1 1 0 0);", 5, 4, 5);
-    // }
+    /// Test the eval of `uniswap-v2-quote` parsed from a string.
+    /// Test five inputs.
+    function testOpUniswapV2AmountInFiveInputs() public {
+        checkBadInputs("_: uniswap-v2-quote(0 0 0 0 0);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-quote(0 0 0 0 1);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-quote(0 0 0 1 0);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-quote(0 0 0 1 1);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-quote(0 0 1 0 0);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-quote(0 0 1 0 1);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-quote(0 0 1 1 0);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-quote(0 0 1 1 1);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-quote(0 1 0 0 0);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-quote(0 1 0 0 1);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-quote(0 1 0 1 0);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-quote(0 1 0 1 1);", 5, 4, 5);
+        checkBadInputs("_: uniswap-v2-quote(0 1 1 0 0);", 5, 4, 5);
+    }
 }
