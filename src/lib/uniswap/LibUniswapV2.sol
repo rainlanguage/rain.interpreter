@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "v2-core/interfaces/IUniswapV2Pair.sol";
-import "v2-core/interfaces/IUniswapV2Factory.sol";
+import {IUniswapV2Pair} from "v2-core/interfaces/IUniswapV2Pair.sol";
+import {IUniswapV2Factory} from "v2-core/interfaces/IUniswapV2Factory.sol";
 
 /// UniswapV2Library from uniswap/v2-periphery is compiled with a version of
 /// SafeMath that is locked to Solidity 0.6.x which means we can't use it in
@@ -83,6 +83,13 @@ library LibUniswapV2 {
         amountOut = numerator / denominator;
     }
 
+    /// Copy of UniswapV2Library.quote for solidity 0.8.x support.
+    function quote(uint256 amountA, uint256 reserveA, uint256 reserveB) internal pure returns (uint256 amountB) {
+        require(amountA > 0, "UniswapV2Library: INSUFFICIENT_AMOUNT");
+        require(reserveA > 0 && reserveB > 0, "UniswapV2Library: INSUFFICIENT_LIQUIDITY");
+        amountB = (amountA * reserveB) / reserveA;
+    }
+
     /// Bundles the key library logic together to produce amounts based on tokens
     /// and amounts out rather than needing to handle reserves directly.
     /// Also maps 0 amountOut to 0 amountIn unconditionally, which is different
@@ -129,7 +136,7 @@ library LibUniswapV2 {
         (uint256 reserveA, uint256 reserveB, uint256 reserveTimestamp) = getReservesWithTime(factory, tokenA, tokenB);
         // Perform the 0 amountOut to 0 amountIn mapping after getting the
         // reserves so that we still error on invalid reserves.
-        amountB = amountA == 0 ? 0 : (amountA * reserveB) / reserveA;
+        amountB = amountA == 0 ? 0 : quote(amountA, reserveA, reserveB);
         timestamp = reserveTimestamp;
     }
 }

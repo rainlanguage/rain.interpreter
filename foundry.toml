@@ -21,7 +21,7 @@ optimizer_runs = 1000000
 bytecode_hash = "none"
 cbor_metadata = false
 
-fs_permissions = [{ access = "read-write", path = "./meta"}]
+fs_permissions = [{ access = "read-write", path = "./meta"}, { access = "read", path = "out/reference/uniswapv2/UniswapV2LibraryConcrete.sol/UniswapV2LibraryConcrete.json"}]
 
 # These tests have some issue with the encoding of mocked return data.
 # https://github.com/foundry-rs/foundry/issues/5359
@@ -30,3 +30,18 @@ no_match_test = "testOpChainlinkOraclePriceF|testRainterpreterExternChainlinkOra
 
 [fuzz]
 runs = 2048
+
+[profile.uniswapv2]
+
+solc = "0.6.6"
+src = "reference/uniswapv2/src"
+test = 'reference/uniswapv2/test'
+script = 'reference/uniswapv2/script'
+out = "out/reference/uniswapv2"
+libs = ["reference/uniswapv2/lib"]
+remappings = [
+    "v2-core/=/Users/thedavidmeister/Code/rain.interpreter/reference/uniswapv2/lib/v2-core/",
+    "v2-periphery/=/Users/thedavidmeister/Code/rain.interpreter/reference/uniswapv2/lib/v2-periphery/",
+    "@uniswap/v2-core/=/Users/thedavidmeister/Code/rain.interpreter/reference/uniswapv2/lib/v2-core/",
+    "@uniswap/v2-periphery/=/Users/thedavidmeister/Code/rain.interpreter/reference/uniswapv2/lib/v2-periphery/",
+]
