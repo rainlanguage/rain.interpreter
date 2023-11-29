@@ -56,7 +56,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
             // Treat ourselves as the sender as we eval internally to directly
             // test the opcode logic.
             LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
-            iStore,
+            IInterpreterStoreV1(address(iStore)),
             new uint256[][](0),
             "",
             ""
