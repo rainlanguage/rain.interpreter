@@ -23,13 +23,14 @@
           '';
 
           build-meta = pkgs.writeShellScriptBin "build-meta" ''
-            mkdir -p meta
+            mkdir -p meta;
             forge build --force;
             ${(build-dispair-meta-cmd)} -o meta/RainterpreterExpressionDeployerNPE2.rain.meta;
           '';
 
           deploy-dispair = pkgs.writeShellScriptBin "deploy-dispair" (''
             set -euo pipefail;
+            mkdir -p meta;
             forge build --force;
             forge script -vvvvv script/DeployDISPair.sol --legacy --verify --broadcast --rpc-url "''${CI_DEPLOY_RPC_URL}" --etherscan-api-key "''${EXPLORER_VERIFICATION_KEY}" \
               --sig='run(bytes)' \
