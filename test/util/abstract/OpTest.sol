@@ -43,6 +43,14 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         Pointer actualStackTopAfter;
     }
 
+    function assumeEtchable(address account) internal view {
+        assumeNotPrecompile(account);
+        vm.assume(account != address(this));
+        vm.assume(account != address(vm));
+        // The console.
+        vm.assume(account != address(0x000000000000000000636F6e736F6c652e6c6f67));
+    }
+
     function opTestDefaultIngegrityCheckState() internal pure returns (IntegrityCheckStateNP memory) {
         return IntegrityCheckStateNP(0, 0, 0, 0, 0, "");
     }

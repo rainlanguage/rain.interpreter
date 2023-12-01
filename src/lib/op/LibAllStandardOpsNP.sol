@@ -35,6 +35,8 @@ import {LibOpHashNP} from "./crypto/LibOpHashNP.sol";
 import {LibOpERC721BalanceOfNP} from "./erc721/LibOpERC721BalanceOfNP.sol";
 import {LibOpERC721OwnerOfNP} from "./erc721/LibOpERC721OwnerOfNP.sol";
 
+import {LibOpERC5313OwnerNP} from "./erc5313/LibOpERC5313OwnerNP.sol";
+
 import {LibOpBlockNumberNP} from "./evm/LibOpBlockNumberNP.sol";
 import {LibOpChainIdNP} from "./evm/LibOpChainIdNP.sol";
 import {LibOpMaxUint256NP} from "./evm/LibOpMaxUint256NP.sol";
@@ -79,7 +81,7 @@ import {LibOpUniswapV2Quote} from "./uniswap/LibOpUniswapV2Quote.sol";
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 52;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 53;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -142,6 +144,11 @@ library LibAllStandardOpsNP {
                 "erc721-owner-of",
                 OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Gets the owner of an erc721 token. The first input is the token address and the second is the token id."
+            ),
+            AuthoringMeta(
+                "erc5313-owner",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Gets the owner of an erc5313 compatible contract. Note that erc5313 specifically DOES NOT do any onchain compatibility checks, so the expression author is responsible for ensuring the contract is compatible. The input is the contract address to get the owner of."
             ),
             AuthoringMeta("block-number", OPERAND_PARSER_OFFSET_DISALLOWED, "The current block number."),
             AuthoringMeta("chain-id", OPERAND_PARSER_OFFSET_DISALLOWED, "The current chain id."),
@@ -362,6 +369,7 @@ library LibAllStandardOpsNP {
                     LibOpHashNP.integrity,
                     LibOpERC721BalanceOfNP.integrity,
                     LibOpERC721OwnerOfNP.integrity,
+                    LibOpERC5313OwnerNP.integrity,
                     LibOpBlockNumberNP.integrity,
                     LibOpChainIdNP.integrity,
                     // int and decimal18 max have identical implementations and
@@ -463,6 +471,7 @@ library LibAllStandardOpsNP {
                     LibOpHashNP.run,
                     LibOpERC721BalanceOfNP.run,
                     LibOpERC721OwnerOfNP.run,
+                    LibOpERC5313OwnerNP.run,
                     LibOpBlockNumberNP.run,
                     LibOpChainIdNP.run,
                     // int and decimal18 max have identical implementations and

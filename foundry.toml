@@ -23,5 +23,7 @@ cbor_metadata = false
 
 fs_permissions = [{ access = "read-write", path = "./meta"}]
 
+evm_version = "shanghai"
+
 [fuzz]
 runs = 2048

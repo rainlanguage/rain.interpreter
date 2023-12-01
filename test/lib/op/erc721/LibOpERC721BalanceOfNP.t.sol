@@ -26,11 +26,8 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
     }
 
     function testOpERC721BalanceOfNPRun(address token, address account, uint256 balance) external {
-        assumeNotPrecompile(token);
-        vm.assume(token != address(this));
-        vm.assume(token != address(vm));
-        // The console.
-        vm.assume(token != address(0x000000000000000000636F6e736F6c652e6c6f67));
+        assumeEtchable(token);
+        vm.etch(token, hex"fe");
 
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = uint256(uint160(token));
@@ -38,7 +35,6 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
         Operand operand = Operand.wrap(uint256(2) << 0x10);
 
         // invalid token
-        vm.etch(token, hex"fe");
         vm.mockCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), abi.encode(balance));
         // called once for reference, once for run
         vm.expectCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), 2);
@@ -54,11 +50,8 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
     }
 
     function testOpERC721BalanceOfNPEval(address token, address account, uint256 balance) public {
-        assumeNotPrecompile(token);
-        vm.assume(token != address(this));
-        vm.assume(token != address(vm));
-        // The console.
-        vm.assume(token != address(0x000000000000000000636F6e736F6c652e6c6f67));
+        assumeEtchable(token);
+        vm.etch(token, hex"fe");
 
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: erc721-balance-of(0x00 0x01);");
         assertEq(constants.length, 2);
