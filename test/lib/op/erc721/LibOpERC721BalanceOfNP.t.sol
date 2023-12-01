@@ -50,9 +50,6 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
     }
 
     function testOpERC721BalanceOfNPEval(address token, address account, uint256 balance) public {
-        assumeEtchable(token);
-        vm.etch(token, hex"fe");
-
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: erc721-balance-of(0x00 0x01);");
         assertEq(constants.length, 2);
         assertEq(constants[0], 0);
@@ -62,8 +59,11 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
 
+        assumeEtchable(token, expression);
+        vm.etch(token, hex"fe");
         vm.mockCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), abi.encode(balance));
         vm.expectCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), 1);
+
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             FullyQualifiedNamespace.wrap(0),

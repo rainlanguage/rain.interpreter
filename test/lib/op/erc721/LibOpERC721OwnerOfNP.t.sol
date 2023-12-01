@@ -28,17 +28,14 @@ contract LibOpERC721OwnerOfNPTest is OpTest {
     function testOpERC721OwnerOfNPRun(address token, uint256 tokenId, address owner) external {
         assumeEtchable(token);
         vm.etch(token, hex"fe");
+        vm.mockCall(token, abi.encodeWithSelector(IERC721.ownerOf.selector, tokenId), abi.encode(owner));
+        // called once for reference, once for run
+        vm.expectCall(token, abi.encodeWithSelector(IERC721.ownerOf.selector, tokenId), 2);
 
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = uint256(uint160(token));
         inputs[1] = tokenId;
         Operand operand = Operand.wrap(uint256(2) << 0x10);
-
-        // invalid token
-        vm.etch(token, hex"fe");
-        vm.mockCall(token, abi.encodeWithSelector(IERC721.ownerOf.selector, tokenId), abi.encode(owner));
-        // called once for reference, once for run
-        vm.expectCall(token, abi.encodeWithSelector(IERC721.ownerOf.selector, tokenId), 2);
 
         opReferenceCheck(
             opTestDefaultInterpreterState(),
@@ -51,9 +48,6 @@ contract LibOpERC721OwnerOfNPTest is OpTest {
     }
 
     function testOpERC721OwnerOfNPEval(address token, uint256 tokenId, address owner) public {
-        assumeEtchable(token);
-        vm.etch(token, hex"fe");
-
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: erc721-owner-of(0x00 0x01);");
         assertEq(constants.length, 2);
         assertEq(constants[0], 0);
@@ -63,8 +57,11 @@ contract LibOpERC721OwnerOfNPTest is OpTest {
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
 
+        assumeEtchable(token, expression);
+        vm.etch(token, hex"fe");
         vm.mockCall(token, abi.encodeWithSelector(IERC721.ownerOf.selector, tokenId), abi.encode(owner));
         vm.expectCall(token, abi.encodeWithSelector(IERC721.ownerOf.selector, tokenId), 1);
+
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             FullyQualifiedNamespace.wrap(0),

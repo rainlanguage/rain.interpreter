@@ -44,9 +44,18 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     }
 
     function assumeEtchable(address account) internal view {
+        assumeEtchable(account, address(0));
+    }
+
+    function assumeEtchable(address account, address expression) internal view {
         assumeNotPrecompile(account);
+        vm.assume(account != address(iDeployer));
+        vm.assume(account != address(iInterpreter));
+        vm.assume(account != address(iStore));
+        vm.assume(account != address(iParser));
         vm.assume(account != address(this));
         vm.assume(account != address(vm));
+        vm.assume(account != address(expression));
         // The console.
         vm.assume(account != address(0x000000000000000000636F6e736F6c652e6c6f67));
     }
