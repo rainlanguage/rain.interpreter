@@ -23,6 +23,7 @@
           '';
 
           build-meta = pkgs.writeShellScriptBin "build-meta" ''
+            mkdir -p meta
             forge build --force;
             ${(build-dispair-meta-cmd)} -o meta/RainterpreterExpressionDeployerNPE2.rain.meta;
           '';
