@@ -135,6 +135,7 @@ contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, ERC165 {
     /// @inheritdoc IExpressionDeployerV3
     function deployExpression2(bytes memory bytecode, uint256[] memory constants)
         external
+        virtual
         returns (IInterpreterV2, IInterpreterStoreV1, address, bytes memory)
     {
         bytes memory io = LibIntegrityCheckNP.integrityCheck2(INTEGRITY_FUNCTION_POINTERS, bytecode, constants);
