@@ -32,6 +32,8 @@ import {LibOpContextNP} from "./context/LibOpContextNP.sol";
 
 import {LibOpHashNP} from "./crypto/LibOpHashNP.sol";
 
+import {LibOpERC20TotalSupplyNP} from "./erc20/LibOpERC20TotalSupplyNP.sol";
+
 import {LibOpERC721BalanceOfNP} from "./erc721/LibOpERC721BalanceOfNP.sol";
 import {LibOpERC721OwnerOfNP} from "./erc721/LibOpERC721OwnerOfNP.sol";
 
@@ -81,7 +83,7 @@ import {LibOpUniswapV2Quote} from "./uniswap/LibOpUniswapV2Quote.sol";
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 53;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 54;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -134,6 +136,11 @@ library LibAllStandardOpsNP {
             ),
             AuthoringMeta(
                 "hash", OPERAND_PARSER_OFFSET_DISALLOWED, "Hashes all inputs into a single 32 byte value using keccak256."
+            ),
+            AuthoringMeta(
+                "erc20-total-supply",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Gets the total supply of an erc20 token. The input is the token address."
             ),
             AuthoringMeta(
                 "erc721-balance-of",
@@ -367,6 +374,7 @@ library LibAllStandardOpsNP {
                     LibOpCallNP.integrity,
                     LibOpContextNP.integrity,
                     LibOpHashNP.integrity,
+                    LibOpERC20TotalSupplyNP.integrity,
                     LibOpERC721BalanceOfNP.integrity,
                     LibOpERC721OwnerOfNP.integrity,
                     LibOpERC5313OwnerNP.integrity,
@@ -469,6 +477,7 @@ library LibAllStandardOpsNP {
                     LibOpCallNP.run,
                     LibOpContextNP.run,
                     LibOpHashNP.run,
+                    LibOpERC20TotalSupplyNP.run,
                     LibOpERC721BalanceOfNP.run,
                     LibOpERC721OwnerOfNP.run,
                     LibOpERC5313OwnerNP.run,
