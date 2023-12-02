@@ -27,7 +27,6 @@ contract LibOpERC20BalanceOfNPTest is OpTest {
         inputs[1] = uint256(uint160(account));
         Operand operand = Operand.wrap(uint256(2) << 0x10);
 
-        // invalid token
         vm.mockCall(token, abi.encodeWithSelector(IERC20.balanceOf.selector, account), abi.encode(balance));
         // called once for reference, once for run
         vm.expectCall(token, abi.encodeWithSelector(IERC20.balanceOf.selector, account), 2);

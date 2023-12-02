@@ -28,7 +28,6 @@ contract LibOpERC20AllowanceNPTest is OpTest {
         inputs[2] = uint256(uint160(spender));
         Operand operand = Operand.wrap(uint256(3) << 0x10);
 
-        // invalid token
         vm.mockCall(token, abi.encodeWithSelector(IERC20.allowance.selector, owner, spender), abi.encode(allowance));
         // called once for reference, once for run
         vm.expectCall(token, abi.encodeWithSelector(IERC20.allowance.selector, owner, spender), 2);
