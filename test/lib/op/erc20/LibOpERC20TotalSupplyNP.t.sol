@@ -42,9 +42,7 @@ contract LibOpERC20TotalSupplyNPTest is OpTest {
 
     /// Test the eval of totalSupply parsed from a string.
     function testOpERC20TotalSupplyNPEvalHappy(uint256 totalSupply) external {
-        vm.mockCall(
-            address(0xdeadbeef), abi.encodeWithSelector(IERC20.totalSupply.selector), abi.encode(totalSupply)
-        );
+        vm.mockCall(address(0xdeadbeef), abi.encodeWithSelector(IERC20.totalSupply.selector), abi.encode(totalSupply));
         checkHappy("_: erc20-total-supply(0xdeadbeef);", totalSupply, "0xdeadbeef 0xdeadc0de");
     }
 
@@ -56,7 +54,8 @@ contract LibOpERC20TotalSupplyNPTest is OpTest {
 
     /// Test that operand is disallowed.
     function testOpERC20TotalSupplyNPEvalOperandDisallowed() external {
-        checkUnhappyParse("_: erc20-total-supply<0>(0xdeadbeef);", abi.encodeWithSelector(UnexpectedOperand.selector, 21));
+        checkUnhappyParse(
+            "_: erc20-total-supply<0>(0xdeadbeef);", abi.encodeWithSelector(UnexpectedOperand.selector, 21)
+        );
     }
-
 }
