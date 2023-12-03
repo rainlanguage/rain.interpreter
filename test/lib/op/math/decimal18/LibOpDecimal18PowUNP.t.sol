@@ -52,6 +52,12 @@ contract LibOpDecimal18PowUNPTest is OpTest {
         checkHappy("_: decimal18-power-int(1e18 1);", 1e18, "1e18 1");
         // 1 ^ 2
         checkHappy("_: decimal18-power-int(1e18 2);", 1e18, "1e18 2");
+        // 2 ^ 2
+        checkHappy("_: decimal18-power-int(2e18 2);", 4e18, "2e18 2");
+        // 2 ^ 3
+        checkHappy("_: decimal18-power-int(2e18 3);", 8e18, "2e18 3");
+        // 2 ^ 4
+        checkHappy("_: decimal18-power-int(2e18 4);", 16e18, "2e18 4");
     }
 
     /// Test the eval of `decimal18-power-int` for bad inputs.
