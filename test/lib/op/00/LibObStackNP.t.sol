@@ -22,12 +22,15 @@ contract LibOpStackNPTest is OpTest {
     /// Directly test the integrity logic of LibOpStackNP. The operand always
     /// puts a single value on the stack. This tests the happy path where the
     /// operand points to a value in the stack.
-    function testOpStackNPIntegrity(bytes memory bytecode, uint256 stackIndex, uint256 constantsLength, Operand operand)
-        external
-    {
+    function testOpStackNPIntegrity(
+        bytes memory bytecode,
+        uint256 stackIndex,
+        uint256[] memory constants,
+        Operand operand
+    ) external {
         stackIndex = bound(stackIndex, 1, type(uint256).max);
         operand = Operand.wrap(bound(Operand.unwrap(operand), 0, stackIndex - 1));
-        IntegrityCheckStateNP memory state = LibIntegrityCheckNP.newState(bytecode, stackIndex, constantsLength);
+        IntegrityCheckStateNP memory state = LibIntegrityCheckNP.newState(bytecode, stackIndex, constants);
 
         (uint256 inputs, uint256 outputs) = LibOpStackNP.integrity(state, operand);
 
@@ -41,13 +44,13 @@ contract LibOpStackNPTest is OpTest {
     function testOpStackNPIntegrityOOBStack(
         bytes memory bytecode,
         uint256 stackIndex,
-        uint256 constantsLength,
+        uint256[] memory constants,
         Operand operand,
         uint256 opIndex
     ) external {
         stackIndex = bound(stackIndex, 1, type(uint256).max);
         operand = Operand.wrap(bound(Operand.unwrap(operand), stackIndex, type(uint256).max));
-        IntegrityCheckStateNP memory state = LibIntegrityCheckNP.newState(bytecode, stackIndex, constantsLength);
+        IntegrityCheckStateNP memory state = LibIntegrityCheckNP.newState(bytecode, stackIndex, constants);
         state.opIndex = opIndex;
 
         vm.expectRevert(

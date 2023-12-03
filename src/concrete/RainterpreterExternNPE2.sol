@@ -8,7 +8,7 @@ import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
 import {Operand} from "../interface/unstable/IInterpreterV2.sol";
-import {IInterpreterExternV2, ExternDispatch} from "../interface/IInterpreterExternV2.sol";
+import {IInterpreterExternV3, ExternDispatch} from "../interface/unstable/IInterpreterExternV3.sol";
 
 /// Thrown when the inputs don't match the expected inputs.
 /// @param expected The expected number of inputs.
@@ -17,12 +17,12 @@ error BadInputs(uint256 expected, uint256 actual);
 
 bytes constant OPCODE_FUNCTION_POINTERS = hex"";
 
-/// EXPERIMENTAL implementation of `IInterpreterExternV2`.
+/// EXPERIMENTAL implementation of `IInterpreterExternV3`.
 /// Currently only implements the Chainlink oracle price opcode as a starting
 /// point to test and flesh out externs generally.
 /// Hopefully one day the idea of there being only a single extern contract seems
 /// quaint.
-contract RainterpreterExternNPE2 is IInterpreterExternV2, ERC165 {
+contract RainterpreterExternNPE2 is IInterpreterExternV3, ERC165 {
     using LibStackPointer for uint256[];
     using LibStackPointer for Pointer;
     using LibUint256Array for uint256;
@@ -30,10 +30,10 @@ contract RainterpreterExternNPE2 is IInterpreterExternV2, ERC165 {
 
     /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IInterpreterExternV2).interfaceId || super.supportsInterface(interfaceId);
+        return interfaceId == type(IInterpreterExternV3).interfaceId || super.supportsInterface(interfaceId);
     }
 
-    /// @inheritdoc IInterpreterExternV2
+    /// @inheritdoc IInterpreterExternV3
     function extern(ExternDispatch dispatch, uint256[] memory inputs)
         external
         view
@@ -55,5 +55,15 @@ contract RainterpreterExternNPE2 is IInterpreterExternV2, ERC165 {
             }
             return f(operand, inputs);
         }
+    }
+
+    /// @inheritdoc IInterpreterExternV3
+    function externIntegrity(ExternDispatch, uint256 expectedInputs, uint256 expectedOutputs)
+        external
+        pure
+        returns (uint256 actualInputs, uint256 actualOutputs)
+    {
+        // @TODO
+        return (expectedInputs, expectedOutputs);
     }
 }

@@ -33,7 +33,7 @@ contract LibOpAnyNPTest is OpTest {
     /// Sample the gas cost of the integrity check.
     function testOpAnyNPIntegrityGas0() external {
         vm.pauseGasMetering();
-        IntegrityCheckStateNP memory state = IntegrityCheckStateNP(6, 6, 6, 3, 9, "");
+        IntegrityCheckStateNP memory state = IntegrityCheckStateNP(6, 6, 6, new uint256[](3), 9, "");
         Operand operand = Operand.wrap(0x50000);
         vm.resumeGasMetering();
         // 5 inputs. Any stack index above this is fine for the state.

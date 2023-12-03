@@ -17,6 +17,7 @@ import {
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibOpStackNP} from "./00/LibOpStackNP.sol";
 import {LibOpConstantNP} from "./00/LibOpConstantNP.sol";
+import {LibOpExternNP} from "./00/LibOpExternNP.sol";
 
 import {LibOpBitwiseAndNP} from "./bitwise/LibOpBitwiseAndNP.sol";
 import {LibOpBitwiseOrNP} from "./bitwise/LibOpBitwiseOrNP.sol";
@@ -85,7 +86,7 @@ import {LibOpUniswapV2Quote} from "./uniswap/LibOpUniswapV2Quote.sol";
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 56;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 57;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -95,9 +96,14 @@ library LibAllStandardOpsNP {
         AuthoringMeta memory lengthPlaceholder;
         AuthoringMeta[ALL_STANDARD_OPS_LENGTH + 1] memory wordsFixed = [
             lengthPlaceholder,
-            // Stack and constant MUST be in this order for parsing to work.
+            // Stack, constant and extern MUST be in this order for parsing to work.
             AuthoringMeta("stack", OPERAND_PARSER_OFFSET_SINGLE_FULL, "Copies an existing value from the stack."),
             AuthoringMeta("constant", OPERAND_PARSER_OFFSET_SINGLE_FULL, "Copies a constant value onto the stack."),
+            AuthoringMeta(
+                "extern",
+                OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT,
+                "Calls an external contract. The first operand is the index of the encoded dispatch in the constants array, the second is the number of outputs."
+            ),
             // These are all ordered according to how they appear in the file system.
             AuthoringMeta("bitwise-and", OPERAND_PARSER_OFFSET_DISALLOWED, "Bitwise AND the top two items on the stack."),
             AuthoringMeta("bitwise-or", OPERAND_PARSER_OFFSET_DISALLOWED, "Bitwise OR the top two items on the stack."),
@@ -372,9 +378,11 @@ library LibAllStandardOpsNP {
                     lengthPointer,
                     // Stack then constant are the first two ops to match the
                     // field ordering in the interpreter state NOT the lexical
-                    // ordering of the file system.
+                    // ordering of the file system. Extern is also out of lexical
+                    // order to fit these two in.
                     LibOpStackNP.integrity,
                     LibOpConstantNP.integrity,
+                    LibOpExternNP.integrity,
                     // Everything else is alphabetical, including folders.
                     LibOpBitwiseAndNP.integrity,
                     LibOpBitwiseOrNP.integrity,
@@ -477,9 +485,11 @@ library LibAllStandardOpsNP {
                     lengthPointer,
                     // Stack then constant are the first two ops to match the
                     // field ordering in the interpreter state NOT the lexical
-                    // ordering of the file system.
+                    // ordering of the file system. Extern is also out of lexical
+                    // order to fit these two in.
                     LibOpStackNP.run,
                     LibOpConstantNP.run,
+                    LibOpExternNP.run,
                     // Everything else is alphabetical, including folders.
                     LibOpBitwiseAndNP.run,
                     LibOpBitwiseOrNP.run,

@@ -61,7 +61,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     }
 
     function opTestDefaultIngegrityCheckState() internal pure returns (IntegrityCheckStateNP memory) {
-        return IntegrityCheckStateNP(0, 0, 0, 0, 0, "");
+        return IntegrityCheckStateNP(0, 0, 0, new uint256[](0), 0, "");
     }
 
     function opTestDefaultInterpreterState() internal view returns (InterpreterStateNP memory) {
@@ -86,7 +86,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         uint256[] memory constants,
         uint256[] memory inputs
     ) internal returns (uint256) {
-        IntegrityCheckStateNP memory integrityState = LibIntegrityCheckNP.newState("", 0, constants.length);
+        IntegrityCheckStateNP memory integrityState = LibIntegrityCheckNP.newState("", 0, constants);
         (uint256 calcInputs, uint256 calcOutputs) = integrityFn(integrityState, operand);
         assertEq(calcInputs, inputs.length, "inputs length");
         assertEq(calcInputs, Operand.unwrap(operand) >> 0x10, "operand inputs");

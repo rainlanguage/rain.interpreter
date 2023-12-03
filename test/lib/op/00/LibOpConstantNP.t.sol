@@ -24,8 +24,8 @@ contract LibOpConstantNPTest is OpTest {
     /// puts a single value on the stack. This tests the happy path where the
     /// operand points to a value in the constants array.
     function testOpConstantNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
-        state.constantsLength = bound(state.constantsLength, 1, type(uint256).max);
-        operand = Operand.wrap(bound(Operand.unwrap(operand), 0, state.constantsLength - 1));
+        vm.assume(state.constants.length > 0);
+        operand = Operand.wrap(bound(Operand.unwrap(operand), 0, state.constants.length - 1));
 
         (uint256 calcInputs, uint256 calcOutputs) = LibOpConstantNP.integrity(state, operand);
 
@@ -37,11 +37,11 @@ contract LibOpConstantNPTest is OpTest {
     /// where the operand points past the end of the constants array, which MUST
     /// always error as an OOB read.
     function testOpConstantNPIntegrityOOBConstants(IntegrityCheckStateNP memory state, Operand operand) external {
-        operand = Operand.wrap(bound(Operand.unwrap(operand), state.constantsLength, type(uint256).max));
+        operand = Operand.wrap(bound(Operand.unwrap(operand), state.constants.length, type(uint256).max));
 
         vm.expectRevert(
             abi.encodeWithSelector(
-                OutOfBoundsConstantRead.selector, state.opIndex, state.constantsLength, Operand.unwrap(operand)
+                OutOfBoundsConstantRead.selector, state.opIndex, state.constants.length, Operand.unwrap(operand)
             )
         );
         LibOpConstantNP.integrity(state, operand);
