@@ -61,6 +61,7 @@ import {LibOpLessThanOrEqualToNP} from "./logic/LibOpLessThanOrEqualToNP.sol";
 
 import {LibOpDecimal18MulNP} from "./math/decimal18/LibOpDecimal18MulNP.sol";
 import {LibOpDecimal18DivNP} from "./math/decimal18/LibOpDecimal18DivNP.sol";
+import {LibOpDecimal18PowUNP} from "./math/decimal18/LibOpDecimal18PowUNP.sol";
 import {LibOpDecimal18Scale18DynamicNP} from "./math/decimal18/LibOpDecimal18Scale18DynamicNP.sol";
 import {LibOpDecimal18Scale18NP} from "./math/decimal18/LibOpDecimal18Scale18NP.sol";
 import {LibOpDecimal18ScaleNNP} from "./math/decimal18/LibOpDecimal18ScaleNNP.sol";
@@ -86,7 +87,7 @@ import {LibOpUniswapV2Quote} from "./uniswap/LibOpUniswapV2Quote.sol";
 error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 57;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 58;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -244,6 +245,11 @@ library LibAllStandardOpsNP {
                 "decimal18-mul",
                 OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Multiplies all inputs together as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Errors if the multiplication exceeds the maximum value (roughly 1.15e77)."
+            ),
+            AuthoringMeta(
+                "decimal18-power-int",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Raises the first input as a fixed point 18 decimal value to the power of the second input as an integer."
             ),
             AuthoringMeta(
                 "decimal18-scale18-dynamic",
@@ -421,6 +427,7 @@ library LibAllStandardOpsNP {
                     LibOpLessThanOrEqualToNP.integrity,
                     LibOpDecimal18DivNP.integrity,
                     LibOpDecimal18MulNP.integrity,
+                    LibOpDecimal18PowUNP.integrity,
                     LibOpDecimal18Scale18DynamicNP.integrity,
                     LibOpDecimal18Scale18NP.integrity,
                     LibOpDecimal18ScaleNNP.integrity,
@@ -528,6 +535,7 @@ library LibAllStandardOpsNP {
                     LibOpLessThanOrEqualToNP.run,
                     LibOpDecimal18DivNP.run,
                     LibOpDecimal18MulNP.run,
+                    LibOpDecimal18PowUNP.run,
                     LibOpDecimal18Scale18DynamicNP.run,
                     LibOpDecimal18Scale18NP.run,
                     LibOpDecimal18ScaleNNP.run,
