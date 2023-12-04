@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
+import {NotAnExternContract} from "../../../error/ErrExtern.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 import {Operand} from "../../../interface/unstable/IInterpreterV2.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
@@ -20,9 +21,6 @@ error OutOfBoundsConstantRead(uint256 opIndex, uint256 constantsLength, uint256 
 
 /// Thrown when the outputs length is not equal to the expected length.
 error BadOutputsLength(uint256 expectedLength, uint256 actualLength);
-
-/// Thrown when the extern interface is not supported.
-error NotAnExternContract(address extern);
 
 /// @title LibOpExternNP
 /// @notice Implementation of calling an external contract.
@@ -79,22 +77,17 @@ library LibOpExternNP {
         return stackTop;
     }
 
-    function referenceFn(InterpreterStateNP memory state, Operand operand, uint256[] memory)
+    function referenceFn(InterpreterStateNP memory state, Operand operand, uint256[] memory inputs)
         internal
         view
         returns (uint256[] memory outputs)
     {
         uint256 encodedExternDispatchIndex = Operand.unwrap(operand) & 0xFF;
         uint256 outputsLength = (Operand.unwrap(operand) >> 0x08) & 0xFF;
-        uint256 inputsLength = (Operand.unwrap(operand) >> 0x10) & 0xFF;
 
         uint256 encodedExternDispatch = state.constants[encodedExternDispatchIndex];
         (IInterpreterExternV3 extern, ExternDispatch dispatch) =
             LibExtern.decodeExternCall(EncodedExternDispatch.wrap(encodedExternDispatch));
-        uint256[] memory inputs = new uint256[](inputsLength);
-        for (uint256 i = 0; i < inputsLength; i++) {
-            inputs[i] = state.stack[state.stack.length - inputsLength + i];
-        }
         outputs = extern.extern(dispatch, inputs);
         if (outputs.length != outputsLength) {
             revert BadOutputsLength(outputsLength, outputs.length);
