@@ -37,15 +37,15 @@ library LibOpExternNP {
         if (!ERC165Checker.supportsInterface(address(extern), type(IInterpreterExternV3).interfaceId)) {
             revert NotAnExternContract(address(extern));
         }
-        uint256 expectedOutputsLength = Operand.unwrap(operand) >> 0x08 & 0xFF;
-        uint256 expectedInputsLength = Operand.unwrap(operand) >> 0x10 & 0xFF;
+        uint256 expectedOutputsLength = (Operand.unwrap(operand) >> 0x08) & 0xFF;
+        uint256 expectedInputsLength = (Operand.unwrap(operand) >> 0x10) & 0xFF;
         return extern.externIntegrity(dispatch, expectedInputsLength, expectedOutputsLength);
     }
 
     function run(InterpreterStateNP memory state, Operand operand, Pointer stackTop) internal view returns (Pointer) {
         uint256 encodedExternDispatchIndex = Operand.unwrap(operand) & 0xFF;
-        uint256 outputsLength = Operand.unwrap(operand) >> 0x8 & 0xFF;
-        uint256 inputsLength = Operand.unwrap(operand) >> 0x10 & 0xFF;
+        uint256 outputsLength = (Operand.unwrap(operand) >> 0x08) & 0xFF;
+        uint256 inputsLength = (Operand.unwrap(operand) >> 0x10) & 0xFF;
 
         uint256 encodedExternDispatch = state.constants[encodedExternDispatchIndex];
         (IInterpreterExternV3 extern, ExternDispatch dispatch) =
@@ -77,5 +77,27 @@ library LibOpExternNP {
         }
         LibMemCpy.unsafeCopyWordsTo(outputs.dataPointer(), stackTop, outputs.length);
         return stackTop;
+    }
+
+    function referenceFn(InterpreterStateNP memory state, Operand operand, uint256[] memory)
+        internal
+        view
+        returns (uint256[] memory outputs)
+    {
+        uint256 encodedExternDispatchIndex = Operand.unwrap(operand) & 0xFF;
+        uint256 outputsLength = (Operand.unwrap(operand) >> 0x08) & 0xFF;
+        uint256 inputsLength = (Operand.unwrap(operand) >> 0x10) & 0xFF;
+
+        uint256 encodedExternDispatch = state.constants[encodedExternDispatchIndex];
+        (IInterpreterExternV3 extern, ExternDispatch dispatch) =
+            LibExtern.decodeExternCall(EncodedExternDispatch.wrap(encodedExternDispatch));
+        uint256[] memory inputs = new uint256[](inputsLength);
+        for (uint256 i = 0; i < inputsLength; i++) {
+            inputs[i] = state.stack[state.stack.length - inputsLength + i];
+        }
+        outputs = extern.extern(dispatch, inputs);
+        if (outputs.length != outputsLength) {
+            revert BadOutputsLength(outputsLength, outputs.length);
+        }
     }
 }
