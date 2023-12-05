@@ -56,17 +56,13 @@ library LibOpIntAddNP {
     }
 
     function runExtern(Operand, uint256[] memory inputs) internal pure returns (uint256[] memory) {
-        assembly ("memory-safe") {
-            for {
-                let cursor := add(inputs, 0x20)
-                let end := add(cursor, mul(mload(inputs), 0x20))
-            } lt(cursor, end) {
-                cursor := add(cursor, 0x20)
-            } {
-                mstore(cursor, add(mload(cursor), mload(add(cursor, 0x20))))
-            }
-
+        uint256 acc = inputs[0];
+        for (uint256 i = 1; i < inputs.length; i++) {
+            acc += inputs[i];
         }
+        uint256[] memory outputs = new uint256[](1);
+        outputs[0] = acc;
+        return outputs;
     }
 
     /// Gas intensive reference implementation of addition for testing.

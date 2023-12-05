@@ -9,7 +9,7 @@ import {LibOpIntAddNP} from "../lib/op/math/int/LibOpIntAddNP.sol";
 
 bytes constant OPCODE_FUNCTION_POINTERS = hex"030b";
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0427";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0450";
 
 contract RainterpreterExternNPE2 is BaseRainterpreterExternNPE2 {
     function opcodeFunctionPointers() internal pure override returns (bytes memory) {
