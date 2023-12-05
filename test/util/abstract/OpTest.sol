@@ -209,6 +209,16 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         assertEq(kvs.length, 0);
     }
 
+    function checkHappy(bytes memory rainString, uint256[] memory expectedStack, string memory errString) internal {
+        (uint256[] memory stack, uint256[] memory kvs) = parseAndEval(rainString);
+
+        assertEq(stack.length, expectedStack.length, errString);
+        for (uint256 i = 0; i < expectedStack.length; i++) {
+            assertEq(stack[i], expectedStack[i], errString);
+        }
+        assertEq(kvs.length, 0);
+    }
+
     function checkHappyKVs(bytes memory rainString, uint256[] memory expectedKVs, string memory errString) internal {
         (uint256[] memory stack, uint256[] memory kvs) = parseAndEval(rainString);
 

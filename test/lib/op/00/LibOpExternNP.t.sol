@@ -19,18 +19,7 @@ import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC
 /// @title LibOpExternNPTest
 /// @notice Test the runtime and integrity time logic of LibOpExternNP.
 contract LibOpExternNPTest is OpTest {
-    function testOpExternNPIntegrityHappy(
-        IntegrityCheckStateNP memory state,
-        IInterpreterExternV3 extern,
-        uint256 constantIndex,
-        uint256 inputs,
-        uint256 outputs
-    ) external {
-        inputs = bound(inputs, 0, 0xFF);
-        outputs = bound(outputs, 0, 0xFF);
-
-        assumeEtchable(address(extern));
-        vm.etch(address(extern), hex"fe");
+    function mockImplementsERC165IInterpreterExternV3(IInterpreterExternV3 extern) internal {
         // Extern needs to implement ERC165 for the interface.
         vm.mockCall(
             address(extern),
@@ -47,6 +36,21 @@ contract LibOpExternNPTest is OpTest {
             abi.encodeWithSelector(IERC165.supportsInterface.selector, bytes4(0xFFFFFFFF)),
             abi.encode(false)
         );
+    }
+
+    function testOpExternNPIntegrityHappy(
+        IntegrityCheckStateNP memory state,
+        IInterpreterExternV3 extern,
+        uint256 constantIndex,
+        uint256 inputs,
+        uint256 outputs
+    ) external {
+        inputs = bound(inputs, 0, 0xFF);
+        outputs = bound(outputs, 0, 0xFF);
+
+        assumeEtchable(address(extern));
+        vm.etch(address(extern), hex"fe");
+        mockImplementsERC165IInterpreterExternV3(extern);
 
         vm.assume(state.constants.length > 0);
         constantIndex = bound(constantIndex, 0, state.constants.length - 1);
@@ -143,23 +147,7 @@ contract LibOpExternNPTest is OpTest {
 
         assumeEtchable(address(extern));
         vm.etch(address(extern), hex"fe");
-        // Extern needs to implement ERC165 for the interface.
-        vm.mockCall(
-            address(extern),
-            abi.encodeWithSelector(IERC165.supportsInterface.selector, type(IInterpreterExternV3).interfaceId),
-            // If this is false then the contract is not an extern.
-            abi.encode(true)
-        );
-        vm.mockCall(
-            address(extern),
-            abi.encodeWithSelector(IERC165.supportsInterface.selector, type(IERC165).interfaceId),
-            abi.encode(true)
-        );
-        vm.mockCall(
-            address(extern),
-            abi.encodeWithSelector(IERC165.supportsInterface.selector, bytes4(0xFFFFFFFF)),
-            abi.encode(false)
-        );
+        mockImplementsERC165IInterpreterExternV3(extern);
 
         constantIndex = bound(constantIndex, 0, state.constants.length - 1);
 
@@ -187,5 +175,57 @@ contract LibOpExternNPTest is OpTest {
         );
 
         opReferenceCheck(state, operand, LibOpExternNP.referenceFn, LibOpExternNP.integrity, LibOpExternNP.run, inputs);
+    }
+
+    /// Test the eval of extern parsed from a string.
+    function testOpExternNPEvalHappy() external {
+        IInterpreterExternV3 extern = IInterpreterExternV3(address(0xdeadbeef));
+        vm.etch(address(extern), hex"fe");
+        uint256 opcode = 5;
+        Operand operand = Operand.wrap(0x10);
+
+        ExternDispatch externDispatch = LibExtern.encodeExternDispatch(opcode, operand);
+        assertEq(
+            ExternDispatch.unwrap(externDispatch), 0x0000000000000000000000000000000000000000000000000000000000050010
+        );
+
+        EncodedExternDispatch encodedExternDispatch = LibExtern.encodeExternCall(extern, externDispatch);
+        assertEq(
+            EncodedExternDispatch.unwrap(encodedExternDispatch),
+            0x00000000000000000005001000000000000000000000000000000000deadbeef
+        );
+
+        mockImplementsERC165IInterpreterExternV3(extern);
+        // Extern integrity needs to match the inputs and outputs.
+        vm.mockCall(
+            address(extern),
+            abi.encodeWithSelector(IInterpreterExternV3.externIntegrity.selector, externDispatch),
+            abi.encode(2, 1)
+        );
+
+        uint256[] memory externInputs = new uint256[](2);
+        externInputs[0] = 20;
+        externInputs[1] = 83;
+        uint256[] memory externOutputs = new uint256[](1);
+        externOutputs[0] = 99;
+        vm.mockCall(
+            address(extern),
+            abi.encodeWithSelector(IInterpreterExternV3.extern.selector, externDispatch, externInputs),
+            abi.encode(externOutputs)
+        );
+
+        uint256[] memory expectedStack = new uint256[](2);
+        expectedStack[0] = 99;
+        expectedStack[1] = 0x00000000000000000005001000000000000000000000000000000000deadbeef;
+
+        checkHappy(
+            // Need the constant in the constant array to be indexable in the operand.
+            "_: 0x00000000000000000005001000000000000000000000000000000000deadbeef,"
+            // Operand is the constant index of the dispatch then the number of outputs.
+            // 2 inputs and 1 output matches the mocked integrity check.
+            "_: extern<0 1>(20 83);",
+            expectedStack,
+            "0xdeadbeef 20 83 99"
+        );
     }
 }
