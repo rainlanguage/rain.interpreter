@@ -1,0 +1,93 @@
+// SPDX-License-Identifier: CAL
+pragma solidity =0.8.19;
+
+import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
+
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
+import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
+
+import {Operand} from "../interface/unstable/IInterpreterV2.sol";
+import {IInterpreterExternV3, ExternDispatch} from "../interface/unstable/IInterpreterExternV3.sol";
+
+/// Thrown when the inputs don't match the expected inputs.
+/// @param expected The expected number of inputs.
+/// @param actual The actual number of inputs.
+error BadInputs(uint256 expected, uint256 actual);
+
+bytes constant OPCODE_FUNCTION_POINTERS = hex"";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"";
+
+/// Base implementation of `IInterpreterExternV3`. Inherit from this contract,
+/// and override `functionPointers` to provide a list of function pointers.
+contract BaseRainterpreterExternNPE2 is IInterpreterExternV3, ERC165 {
+    using LibStackPointer for uint256[];
+    using LibStackPointer for Pointer;
+    using LibUint256Array for uint256;
+    using LibUint256Array for uint256[];
+
+    /// @inheritdoc IInterpreterExternV3
+    function extern(ExternDispatch dispatch, uint256[] memory inputs)
+        external
+        view
+        virtual
+        override
+        returns (uint256[] memory outputs)
+    {
+        unchecked {
+            bytes memory fPointers = opcodeFunctionPointers();
+            uint256 fsCount = fPointers.length / 2;
+            uint256 fPointersStart;
+            assembly ("memory-safe") {
+                fPointersStart := add(fPointers, 0x20)
+            }
+            uint256 opcode = (ExternDispatch.unwrap(dispatch) >> 0x10) & type(uint16).max;
+            Operand operand = Operand.wrap(ExternDispatch.unwrap(dispatch) & type(uint16).max);
+
+            function(Operand, uint256[] memory) internal view returns (uint256[] memory) f;
+            assembly {
+                f := shr(0xf0, mload(add(fPointersStart, mul(mod(opcode, fsCount), 2))))
+            }
+            return f(operand, inputs);
+        }
+    }
+
+    /// @inheritdoc IInterpreterExternV3
+    function externIntegrity(ExternDispatch dispatch, uint256 expectedInputs, uint256 expectedOutputs)
+        external
+        pure
+        virtual
+        override
+        returns (uint256 actualInputs, uint256 actualOutputs)
+    {
+        unchecked {
+            bytes memory fPointers = integrityFunctionPointers();
+            uint256 fsCount = fPointers.length / 2;
+            uint256 fPointersStart;
+            assembly ("memory-safe") {
+                fPointersStart := add(fPointers, 0x20)
+            }
+            uint256 opcode = (ExternDispatch.unwrap(dispatch) >> 0x10) & type(uint16).max;
+            Operand operand = Operand.wrap(ExternDispatch.unwrap(dispatch) & type(uint16).max);
+
+            function(Operand, uint256, uint256) internal pure returns (uint256, uint256) f;
+            assembly {
+                f := shr(0xf0, mload(add(fPointersStart, mul(mod(opcode, fsCount), 2))))
+            }
+            (actualInputs, actualOutputs) = f(operand, expectedInputs, expectedOutputs);
+        }
+    }
+
+    /// @inheritdoc ERC165
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return interfaceId == type(IInterpreterExternV3).interfaceId || super.supportsInterface(interfaceId);
+    }
+
+    function opcodeFunctionPointers() internal view virtual returns (bytes memory) {
+        return OPCODE_FUNCTION_POINTERS;
+    }
+
+    function integrityFunctionPointers() internal pure virtual returns (bytes memory) {
+        return INTEGRITY_FUNCTION_POINTERS;
+    }
+}

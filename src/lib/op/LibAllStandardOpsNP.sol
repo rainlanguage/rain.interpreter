@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.19;
 
+import {BadDynamicLength} from "../../error/ErrOpList.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Operand} from "../../interface/unstable/IInterpreterV2.sol";
@@ -81,10 +82,6 @@ import {LibOpSetNP} from "./store/LibOpSetNP.sol";
 import {LibOpUniswapV2AmountIn} from "./uniswap/LibOpUniswapV2AmountIn.sol";
 import {LibOpUniswapV2AmountOut} from "./uniswap/LibOpUniswapV2AmountOut.sol";
 import {LibOpUniswapV2Quote} from "./uniswap/LibOpUniswapV2Quote.sol";
-
-/// Thrown when a dynamic length array is NOT 1 more than a fixed length array.
-/// Should never happen outside a major breaking change to memory layouts.
-error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
 uint256 constant ALL_STANDARD_OPS_LENGTH = 58;

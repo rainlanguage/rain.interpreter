@@ -64,9 +64,7 @@ contract LibOpExternNPTest is OpTest {
             abi.encode(inputs + 1, outputs + 1)
         );
         vm.expectCall(
-            address(extern),
-            abi.encodeWithSelector(IInterpreterExternV3.externIntegrity.selector, externDispatch),
-            1
+            address(extern), abi.encodeWithSelector(IInterpreterExternV3.externIntegrity.selector, externDispatch), 1
         );
         (uint256 calcInputs, uint256 calcOutputs) = LibOpExternNP.integrity(state, operand);
 
