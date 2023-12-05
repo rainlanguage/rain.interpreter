@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
+import {console2} from "forge-std/console2.sol";
+
 import {NotAnExternContract} from "../../../error/ErrExtern.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 import {Operand} from "../../../interface/unstable/IInterpreterV2.sol";
@@ -29,6 +31,8 @@ library LibOpExternNP {
 
     function integrity(IntegrityCheckStateNP memory state, Operand operand) internal view returns (uint256, uint256) {
         uint256 encodedExternDispatchIndex = Operand.unwrap(operand) & 0xFF;
+        console2.log("foo", state.constants.length, encodedExternDispatchIndex);
+
         EncodedExternDispatch encodedExternDispatch =
             EncodedExternDispatch.wrap(state.constants[encodedExternDispatchIndex]);
         (IInterpreterExternV3 extern, ExternDispatch dispatch) = LibExtern.decodeExternCall(encodedExternDispatch);

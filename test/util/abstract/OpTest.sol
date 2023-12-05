@@ -81,7 +81,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     }
 
     function opReferenceCheckIntegrity(
-        function(IntegrityCheckStateNP memory, Operand) pure returns (uint256, uint256) integrityFn,
+        function(IntegrityCheckStateNP memory, Operand) view returns (uint256, uint256) integrityFn,
         Operand operand,
         uint256[] memory constants,
         uint256[] memory inputs
@@ -175,7 +175,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         InterpreterStateNP memory state,
         Operand operand,
         function(InterpreterStateNP memory, Operand, uint256[] memory) view returns (uint256[] memory) referenceFn,
-        function(IntegrityCheckStateNP memory, Operand) pure returns (uint256, uint256) integrityFn,
+        function(IntegrityCheckStateNP memory, Operand) view returns (uint256, uint256) integrityFn,
         function(InterpreterStateNP memory, Operand, Pointer) view returns (Pointer) runFn,
         uint256[] memory inputs
     ) internal {
