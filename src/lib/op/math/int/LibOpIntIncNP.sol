@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
+import {Operand} from "../../../../interface/unstable/IInterpreterV2.sol";
+
 /// @title LibOpIntIncNP
 /// @notice Opcode to increment every integer in a list.
 /// Currently this is only really useful for testing the extern contract.

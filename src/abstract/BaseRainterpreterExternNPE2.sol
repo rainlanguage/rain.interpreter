@@ -50,7 +50,7 @@ abstract contract BaseRainterpreterExternNPE2 is IInterpreterExternV3, ERC165 {
             assembly {
                 f := shr(0xf0, mload(add(fPointersStart, mul(mod(opcode, fsCount), 2))))
             }
-            return f(operand, inputs);
+            outputs = f(operand, inputs);
         }
     }
 

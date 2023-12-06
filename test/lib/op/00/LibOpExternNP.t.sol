@@ -228,4 +228,67 @@ contract LibOpExternNPTest is OpTest {
             "0xdeadbeef 20 83 99"
         );
     }
+
+    /// Test the eval of extern parsed from a string with multiple inputs and
+    /// outputs.
+    function testOpExternNPEvalMultipleInputsOutputsHappy() external {
+        IInterpreterExternV3 extern = IInterpreterExternV3(address(0xdeadbeef));
+        vm.etch(address(extern), hex"fe");
+        uint256 opcode = 5;
+        Operand operand = Operand.wrap(0x10);
+
+        ExternDispatch externDispatch = LibExtern.encodeExternDispatch(opcode, operand);
+        assertEq(
+            ExternDispatch.unwrap(externDispatch), 0x0000000000000000000000000000000000000000000000000000000000050010
+        );
+
+        EncodedExternDispatch encodedExternDispatch = LibExtern.encodeExternCall(extern, externDispatch);
+        assertEq(
+            EncodedExternDispatch.unwrap(encodedExternDispatch),
+            0x00000000000000000005001000000000000000000000000000000000deadbeef
+        );
+
+        mockImplementsERC165IInterpreterExternV3(extern);
+        // Extern integrity needs to match the inputs and outputs.
+        vm.mockCall(
+            address(extern),
+            abi.encodeWithSelector(IInterpreterExternV3.externIntegrity.selector, externDispatch),
+            abi.encode(3, 3)
+        );
+
+        uint256[] memory externInputs = new uint256[](3);
+        externInputs[0] = 1;
+        externInputs[1] = 2;
+        externInputs[2] = 3;
+
+        uint256[] memory externOutputs = new uint256[](3);
+        externOutputs[0] = 4;
+        externOutputs[1] = 5;
+        externOutputs[2] = 6;
+
+        uint256[] memory expectedStack = new uint256[](4);
+        expectedStack[0] = 6;
+        expectedStack[1] = 5;
+        expectedStack[2] = 4;
+        expectedStack[3] = 0x00000000000000000005001000000000000000000000000000000000deadbeef;
+
+        vm.mockCall(
+            address(extern),
+            abi.encodeWithSelector(IInterpreterExternV3.extern.selector, externDispatch, externInputs),
+            abi.encode(externOutputs)
+        );
+        vm.expectCall(
+            address(extern), abi.encodeWithSelector(IInterpreterExternV3.extern.selector, externDispatch, externInputs), 1
+        );
+
+        checkHappy(
+            // Need the constant in the constant array to be indexable in the operand.
+            "_: 0x00000000000000000005001000000000000000000000000000000000deadbeef,"
+            // Operand is the constant index of the dispatch then the number of outputs.
+            // 3 inputs and 3 outputs matches the mocked integrity check.
+            "four five six: extern<0 3>(1 2 3);",
+            expectedStack,
+            "0xdeadbeef 1 2 3 4 5 6"
+        );
+    }
 }

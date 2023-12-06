@@ -6,10 +6,11 @@ import {BadDynamicLength} from "../error/ErrOpList.sol";
 import {BaseRainterpreterExternNPE2, Operand} from "../abstract/BaseRainterpreterExternNPE2.sol";
 
 import {LibOpIntAddNP} from "../lib/op/math/int/LibOpIntAddNP.sol";
+import {LibOpIntIncNP} from "../lib/op/math/int/LibOpIntIncNP.sol";
 
-bytes constant OPCODE_FUNCTION_POINTERS = hex"030b";
-uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0450";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"031f03d3";
+uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 2;
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"04b204d2";
 
 contract RainterpreterExternNPE2 is BaseRainterpreterExternNPE2 {
     function opcodeFunctionPointers() internal pure override returns (bytes memory) {
@@ -34,7 +35,7 @@ contract RainterpreterExternNPE2 is BaseRainterpreterExternNPE2 {
                 lengthPointer := length
             }
             function(Operand, uint256[] memory) internal view returns (uint256[] memory)[OPCODE_FUNCTION_POINTERS_LENGTH
-                + 1] memory pointersFixed = [lengthPointer, LibOpIntAddNP.runExtern];
+                + 1] memory pointersFixed = [lengthPointer, LibOpIntAddNP.runExtern, LibOpIntIncNP.runExtern];
             uint256[] memory pointersDynamic;
             assembly {
                 pointersDynamic := pointersFixed
@@ -59,7 +60,8 @@ contract RainterpreterExternNPE2 is BaseRainterpreterExternNPE2 {
                 lengthPointer := length
             }
             function(Operand, uint256, uint256) internal pure returns (uint256, uint256)[OPCODE_FUNCTION_POINTERS_LENGTH
-                + 1] memory pointersFixed = [lengthPointer, LibOpIntAddNP.integrityExtern];
+                + 1] memory pointersFixed =
+                    [lengthPointer, LibOpIntAddNP.integrityExtern, LibOpIntIncNP.integrityExtern];
             uint256[] memory pointersDynamic;
             assembly {
                 pointersDynamic := pointersFixed

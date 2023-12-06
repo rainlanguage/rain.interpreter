@@ -65,17 +65,28 @@ library LibOpExternNP {
             mstore(inputs, inputsLength)
         }
         uint256[] memory outputs = extern.extern(dispatch, inputs);
+        if (outputsLength != outputs.length) {
+            revert BadOutputsLength(outputsLength, outputs.length);
+        }
+
         assembly ("memory-safe") {
             // Restore whatever was in memory before we built our inputs array.
             // Inputs is no longer safe to use after this point.
             mstore(inputs, head)
-            stackTop := sub(add(stackTop, mul(inputsLength, 0x20)), mul(outputsLength, 0x20))
+            stackTop := add(stackTop, mul(inputsLength, 0x20))
+            // Copy outputs out.
+            let sourceCursor := add(outputs, 0x20)
+            let end := add(sourceCursor, mul(outputsLength, 0x20))
+            // We loop this backwards so that the 0th output is _lowest_ on the
+            // stack, which visually maps to:
+            // `a b: extern<x 2>(a b);`
+            // If the extern implementation is an identity function and has both
+            // inputs and outputs as `[a, b]`.
+            for {} lt(sourceCursor, end) { sourceCursor := add(sourceCursor, 0x20) } {
+                stackTop := sub(stackTop, 0x20)
+                mstore(stackTop, mload(sourceCursor))
+            }
         }
-
-        if (outputs.length != outputsLength) {
-            revert BadOutputsLength(outputsLength, outputs.length);
-        }
-        LibMemCpy.unsafeCopyWordsTo(outputs.dataPointer(), stackTop, outputs.length);
         return stackTop;
     }
 
@@ -94,5 +105,7 @@ library LibOpExternNP {
         if (outputs.length != outputsLength) {
             revert BadOutputsLength(outputsLength, outputs.length);
         }
+        // The stack is built backwards, so we need to reverse the outputs.
+        LibUint256Array.reverse(outputs);
     }
 }
