@@ -3,6 +3,7 @@ pragma solidity =0.8.19;
 
 import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
+import {BadInputs} from "../error/ErrExtern.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
@@ -10,12 +11,13 @@ import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {Operand} from "../interface/unstable/IInterpreterV2.sol";
 import {IInterpreterExternV3, ExternDispatch} from "../interface/unstable/IInterpreterExternV3.sol";
 
-/// Thrown when the inputs don't match the expected inputs.
-/// @param expected The expected number of inputs.
-/// @param actual The actual number of inputs.
-error BadInputs(uint256 expected, uint256 actual);
-
+/// @dev Empty opcode function pointers constant. Inheriting contracts should
+/// create their own constant and override `opcodeFunctionPointers` to use
+/// theirs.
 bytes constant OPCODE_FUNCTION_POINTERS = hex"";
+/// @dev Empty integrity function pointers constant. Inheriting contracts should
+/// create their own constant and override `integrityFunctionPointers` to use
+/// theirs.
 bytes constant INTEGRITY_FUNCTION_POINTERS = hex"";
 
 /// Base implementation of `IInterpreterExternV3`. Inherit from this contract,
@@ -83,10 +85,14 @@ contract BaseRainterpreterExternNPE2 is IInterpreterExternV3, ERC165 {
         return interfaceId == type(IInterpreterExternV3).interfaceId || super.supportsInterface(interfaceId);
     }
 
+    /// Overrideable function to provide the list of function pointers for
+    /// word dispatches.
     function opcodeFunctionPointers() internal view virtual returns (bytes memory) {
         return OPCODE_FUNCTION_POINTERS;
     }
 
+    /// Overrideable function to provide the list of function pointers for
+    /// integrity checks.
     function integrityFunctionPointers() internal pure virtual returns (bytes memory) {
         return INTEGRITY_FUNCTION_POINTERS;
     }
