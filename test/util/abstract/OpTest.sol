@@ -61,7 +61,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     }
 
     function opTestDefaultIngegrityCheckState() internal pure returns (IntegrityCheckStateNP memory) {
-        return IntegrityCheckStateNP(0, 0, 0, 0, 0, "");
+        return IntegrityCheckStateNP(0, 0, 0, new uint256[](0), 0, "");
     }
 
     function opTestDefaultInterpreterState() internal view returns (InterpreterStateNP memory) {
@@ -81,12 +81,12 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     }
 
     function opReferenceCheckIntegrity(
-        function(IntegrityCheckStateNP memory, Operand) pure returns (uint256, uint256) integrityFn,
+        function(IntegrityCheckStateNP memory, Operand) view returns (uint256, uint256) integrityFn,
         Operand operand,
         uint256[] memory constants,
         uint256[] memory inputs
     ) internal returns (uint256) {
-        IntegrityCheckStateNP memory integrityState = LibIntegrityCheckNP.newState("", 0, constants.length);
+        IntegrityCheckStateNP memory integrityState = LibIntegrityCheckNP.newState("", 0, constants);
         (uint256 calcInputs, uint256 calcOutputs) = integrityFn(integrityState, operand);
         assertEq(calcInputs, inputs.length, "inputs length");
         assertEq(calcInputs, Operand.unwrap(operand) >> 0x10, "operand inputs");
@@ -175,7 +175,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         InterpreterStateNP memory state,
         Operand operand,
         function(InterpreterStateNP memory, Operand, uint256[] memory) view returns (uint256[] memory) referenceFn,
-        function(IntegrityCheckStateNP memory, Operand) pure returns (uint256, uint256) integrityFn,
+        function(IntegrityCheckStateNP memory, Operand) view returns (uint256, uint256) integrityFn,
         function(InterpreterStateNP memory, Operand, Pointer) view returns (Pointer) runFn,
         uint256[] memory inputs
     ) internal {
@@ -206,6 +206,16 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
 
         assertEq(stack.length, 1);
         assertEq(stack[0], expectedValue, errString);
+        assertEq(kvs.length, 0);
+    }
+
+    function checkHappy(bytes memory rainString, uint256[] memory expectedStack, string memory errString) internal {
+        (uint256[] memory stack, uint256[] memory kvs) = parseAndEval(rainString);
+
+        assertEq(stack.length, expectedStack.length, errString);
+        for (uint256 i = 0; i < expectedStack.length; i++) {
+            assertEq(stack[i], expectedStack[i], errString);
+        }
         assertEq(kvs.length, 0);
     }
 
