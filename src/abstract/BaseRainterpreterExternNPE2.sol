@@ -87,12 +87,14 @@ abstract contract BaseRainterpreterExternNPE2 is IInterpreterExternV3, ERC165 {
 
     /// Overrideable function to provide the list of function pointers for
     /// word dispatches.
+    //slither-disable-next-line dead-code
     function opcodeFunctionPointers() internal view virtual returns (bytes memory) {
         return OPCODE_FUNCTION_POINTERS;
     }
 
     /// Overrideable function to provide the list of function pointers for
     /// integrity checks.
+    //slither-disable-next-line dead-code
     function integrityFunctionPointers() internal pure virtual returns (bytes memory) {
         return INTEGRITY_FUNCTION_POINTERS;
     }

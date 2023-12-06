@@ -38,6 +38,7 @@ library LibOpExternNP {
         }
         uint256 expectedOutputsLength = (Operand.unwrap(operand) >> 0x08) & 0xFF;
         uint256 expectedInputsLength = (Operand.unwrap(operand) >> 0x10) & 0xFF;
+        //slither-disable-next-line unused-return
         return extern.externIntegrity(dispatch, expectedInputsLength, expectedOutputsLength);
     }
 
