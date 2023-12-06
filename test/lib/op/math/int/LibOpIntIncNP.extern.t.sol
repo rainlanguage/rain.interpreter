@@ -10,7 +10,6 @@ import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 contract LibOpIntIncNPExternTest is Test {
     /// Check the integrity of the extern call matches the intern call.
     function testOpIntincNPIntegrityHappy(
-        IntegrityCheckStateNP memory state,
         Operand externOperand,
         uint256 inputs,
         uint256 outputs

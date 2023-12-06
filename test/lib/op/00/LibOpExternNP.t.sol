@@ -278,7 +278,9 @@ contract LibOpExternNPTest is OpTest {
             abi.encode(externOutputs)
         );
         vm.expectCall(
-            address(extern), abi.encodeWithSelector(IInterpreterExternV3.extern.selector, externDispatch, externInputs), 1
+            address(extern),
+            abi.encodeWithSelector(IInterpreterExternV3.extern.selector, externDispatch, externInputs),
+            1
         );
 
         checkHappy(
