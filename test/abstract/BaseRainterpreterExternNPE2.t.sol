@@ -9,6 +9,10 @@ import {IInterpreterV2, Operand} from "src/interface/unstable/IInterpreterV2.sol
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {BaseRainterpreterExternNPE2, BadInputs} from "src/abstract/BaseRainterpreterExternNPE2.sol";
 
+/// @dev We need a contract that is deployable in order to test the abstract
+/// base contract.
+contract ChildRainterpreterExternNPE2 is BaseRainterpreterExternNPE2 {}
+
 /// @title BaseRainterpreterExternNPE2Test
 /// Test suite for BaseRainterpreterExternNPE2.
 contract BaseRainterpreterExternNPE2Test is Test {
@@ -21,7 +25,7 @@ contract BaseRainterpreterExternNPE2Test is Test {
         vm.assume(badInterfaceId != type(IERC165).interfaceId);
         vm.assume(badInterfaceId != type(IInterpreterExternV3).interfaceId);
 
-        BaseRainterpreterExternNPE2 extern = new BaseRainterpreterExternNPE2();
+        ChildRainterpreterExternNPE2 extern = new ChildRainterpreterExternNPE2();
         assertTrue(extern.supportsInterface(type(IERC165).interfaceId));
         assertTrue(extern.supportsInterface(type(IInterpreterExternV3).interfaceId));
         assertFalse(extern.supportsInterface(badInterfaceId));
