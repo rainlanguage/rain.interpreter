@@ -22,7 +22,7 @@ bytes constant INTEGRITY_FUNCTION_POINTERS = hex"";
 
 /// Base implementation of `IInterpreterExternV3`. Inherit from this contract,
 /// and override `functionPointers` to provide a list of function pointers.
-contract BaseRainterpreterExternNPE2 is IInterpreterExternV3, ERC165 {
+abstract contract BaseRainterpreterExternNPE2 is IInterpreterExternV3, ERC165 {
     using LibStackPointer for uint256[];
     using LibStackPointer for Pointer;
     using LibUint256Array for uint256;
