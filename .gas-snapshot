@@ -366,7 +366,7 @@ LibOpIntExpNPTest:testOpIntExpNPIntegrityHappy((uint256,uint256,uint256,uint256[
 LibOpIntExpNPTest:testOpIntExpNPIntegrityUnhappyOneInput((uint256,uint256,uint256,uint256[],uint256,bytes)) (runs: 2048, μ: 10626, ~: 10469)
 LibOpIntExpNPTest:testOpIntExpNPIntegrityUnhappyZeroInputs((uint256,uint256,uint256,uint256[],uint256,bytes)) (runs: 2048, μ: 10581, ~: 10424)
 LibOpIntExpNPTest:testOpIntExpNPRun(uint256[]) (runs: 2048, μ: 96059, ~: 85615)
-LibOpIntIncNPExternTest:testOpIntincNPIntegrityHappy((uint256,uint256,uint256,uint256[],uint256,bytes),uint256,uint256,uint256) (runs: 2048, μ: 17413, ~: 17207)
+LibOpIntIncNPExternTest:testOpIntincNPIntegrityHappy(uint256,uint256,uint256) (runs: 2048, μ: 6837, ~: 7005)
 LibOpIntMaxNPTest:testOpDecimal18MaxNPEval2InputsHappy() (gas: 1214719)
 LibOpIntMaxNPTest:testOpDecimal18MaxNPEval3InputsHappy() (gas: 3978261)
 LibOpIntMaxNPTest:testOpDecimal18MaxNPEvalOneInput() (gas: 107307)
