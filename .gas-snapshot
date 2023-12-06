@@ -816,6 +816,7 @@ RainterpreterExpressionDeployerNPE2DeployCheckTest:testRainterpreterExpressionDe
 RainterpreterExpressionDeployerNPE2DeployCheckTest:testRainterpreterExpressionDeployerDeployValidFunctionPointers() (gas: 6635492)
 RainterpreterExpressionDeployerNPE2MetaTest:testRainterpreterExpressionDeployerNPE2ExpectedConstructionMetaHash() (gas: 3261)
 RainterpreterExpressionDeployerNPE2TouchDeployer:testTouchRealDeployer() (gas: 60562)
+RainterpreterExternNPE2IntAddTest:testRainterpreterExternNPE2IntAddHappy() (gas: 570386)
 RainterpreterExternNPE2Test:testIntegrityFunctionPointers() (gas: 420350)
 RainterpreterExternNPE2Test:testOpcodeFunctionPointers() (gas: 420383)
 RainterpreterNPE2Test:testRainterpreterNPE2OddFunctionPointersLength() (gas: 511)
