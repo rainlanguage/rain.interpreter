@@ -43,7 +43,7 @@ type ExpressionDeployer implements RainContract @entity {
   id: ID!
   "Bytecode hash of this Deployer"
   bytecodeHash: String
-  deployTransaction: Transaction!
+  deployTransaction: Transaction
   "All the meta items that emitted by this contract"
   meta: [Meta!]!
   "All the expression this expression deployer contract has ever deployed"
