@@ -56,7 +56,7 @@
                   destiny = test-abi-path;
                   contract = contract; 
                 })
-              []
+              ["RainterpreterNPE2" "RainterpreterStoreNPE2" "RainterpreterParserNPE2" "RainterpreterExpressionDeployerNPE2"]
             )}
           '';
 
