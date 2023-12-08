@@ -12,5 +12,9 @@ async fn test_deployer() -> anyhow::Result<()> {
 
     subgraph::wait().await?;
 
+    let response = subgraph::Query::expression_deployer(&deployer.address()).await?;
+
+    assert_eq!(response.id, deployer.address());
+
     Ok(())
 }
