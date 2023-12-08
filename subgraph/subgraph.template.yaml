@@ -5,11 +5,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: ERC1820Registry
-    network: {{ network }}
+    network: localhost
     source:
-      address: "{{ ERC1820Registry }}"
+      address: "0x0000000000000000000000000000000000000000"
       abi: ERC1820Registry
-      startBlock: {{ ERC1820RegistryBlock }}
+      startBlock: 0
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -19,9 +19,9 @@ dataSources:
         - RainterpreterExpressionDeployer
       abis:
         - name: ERC1820Registry
-          file: ./abis/ERC1820Registry.json
+          file: ./abis/IERC1820Registry.json
         - name: RainterpreterExpressionDeployer
-          file: ./abis/RainterpreterExpressionDeployerNP.json
+          file: ./abis/RainterpreterExpressionDeployerNPE2.json
         - name: Extrospection
           file: ./abis/Extrospection.json
       eventHandlers:
@@ -32,7 +32,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: RainterpreterExpressionDeployerTemplate
-    network: {{ network }}
+    network: localhost
     source:
       abi: RainterpreterExpressionDeployer
     mapping:
@@ -43,36 +43,36 @@ templates:
         - RainterpreterExpressionDeployer
       abis:
         - name: RainterpreterExpressionDeployer
-          file: ./abis/RainterpreterExpressionDeployerNP.json
+          file: ./abis/RainterpreterExpressionDeployerNPE2.json
         - name: Rainterpreter
-          file: ./abis/Rainterpreter.json
+          file: ./abis/RainterpreterNPE2.json
         - name: Extrospection
           file: ./abis/Extrospection.json
       eventHandlers:
-        - event: DISpair(address,address,address,address,bytes)
+        - event: DISPair(address,address,address,address,bytes)
           handler: handleDISpair
-        - event: ExpressionAddress(address,address)
-          handler: handleExpressionAddress
-        - event: NewExpression(address,bytes,uint256[],uint256[])
+        - event: DeployedExpression(address,address,address,address,bytes)
+          handler: handleDeployedExpression
+        - event: NewExpression(address,bytes,uint256[])
           handler: handleNewExpression
           receipt: true
       file: ./src/rainterpreterExpressionDeployer.ts
   - kind: ethereum/contract
-    name: InterpreterCallerV1
-    network: {{ network }}
+    name: InterpreterCallerV2
+    network: localhost
     source:
-      abi: InterpreterCallerV1
+      abi: DeployerDiscoverableMetaV3
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - InterpreterCallerV1
+        - InterpreterCallerV2
       abis:
-        - name: InterpreterCallerV1
-          file: ./abis/InterpreterCallerV1.json
+        - name: DeployerDiscoverableMetaV3
+          file: ./abis/DeployerDiscoverableMetaV3.json
       eventHandlers:
         - event: MetaV1(address,uint256,bytes)
           handler: handleMetaV1
           receipt: true
-      file: ./src/InterpreterCallerV1.ts
+      file: ./src/interpreterCallerV2.ts
