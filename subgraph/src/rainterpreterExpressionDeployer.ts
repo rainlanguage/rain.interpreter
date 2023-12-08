@@ -34,7 +34,7 @@ import {
   getKeccak256FromBytes,
   hexStringToArrayBuffer,
 } from "@rainprotocol/subgraph-utils";
-import { InterpreterCallerV2 } from "../generated/templates";
+import { InterpreterCaller } from "../generated/templates";
 
 export function handleDISPair(event: DISPair): void {
   const extrospection = ExtrospectionPerNetwork.get();
@@ -242,7 +242,7 @@ export function handleNewExpression(event: NewExpression): void {
 
         // Checking if the contract address was previously added or creating new one.
         contract = getContract(log_callerMeta.address.toHex());
-        InterpreterCallerV2.create(log_callerMeta.address);
+        InterpreterCaller.create(log_callerMeta.address);
 
         const constantsLength = event.params.constants.length;
         const bytecodeLength = event.params.bytecode.length;

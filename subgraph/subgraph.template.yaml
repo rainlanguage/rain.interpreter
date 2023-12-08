@@ -58,7 +58,7 @@ templates:
           receipt: true
       file: ./src/rainterpreterExpressionDeployer.ts
   - kind: ethereum/contract
-    name: InterpreterCallerV2
+    name: InterpreterCaller
     network: localhost
     source:
       abi: DeployerDiscoverableMetaV3
@@ -67,7 +67,7 @@ templates:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - InterpreterCallerV2
+        - InterpreterCaller
       abis:
         - name: DeployerDiscoverableMetaV3
           file: ./abis/DeployerDiscoverableMetaV3.json
@@ -75,4 +75,4 @@ templates:
         - event: MetaV1(address,uint256,bytes)
           handler: handleMetaV1
           receipt: true
-      file: ./src/interpreterCallerV2.ts
+      file: ./src/interpreterCaller.ts
