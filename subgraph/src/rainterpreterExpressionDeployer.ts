@@ -171,7 +171,9 @@ export function handleDISPair(event: DISPair): void {
 
   // Not authoringMeta found or just a bad encoded meta
   if (expressionDeployer.constructorMeta.equals(Bytes.empty())) {
-    removeExpressionDeployer(Address.fromHexString(expressionDeployer.id));
+    removeExpressionDeployer(
+      Address.fromBytes(Bytes.fromHexString(expressionDeployer.id))
+    );
     return;
   }
 
@@ -272,7 +274,7 @@ export function handleNewExpression(event: NewExpression): void {
       let interpreterInstanceID = expressionDeployer.interpreter;
       if (interpreterInstanceID) {
         let interpreterInstance = getInterpreterInstance(
-          Address.fromHexString(interpreterInstanceID)
+          Address.fromBytes(Bytes.fromHexString(interpreterInstanceID))
         );
 
         // Creating the deploy expression event since is one time
