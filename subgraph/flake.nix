@@ -33,7 +33,17 @@
                   destiny = sg-abi-path;
                   contract = contract; 
                 })
-              []
+              ["IERC1820Registry" "DeployerDiscoverableMetaV3" "RainterpreterNPE2" "RainterpreterStoreNPE2" "RainterpreterParserNPE2" "RainterpreterExpressionDeployerNPE2"]
+            )}
+
+            ${pkgs.lib.concatStrings (
+              map (
+                contract: copy-abi {
+                  origin_root = "./rain.extrospection";
+                  destiny = sg-abi-path;
+                  contract = contract; 
+                })
+              ["Extrospection"]
             )}
           '';
 
@@ -52,6 +62,7 @@
 
           init-setup =  pkgs.writeShellScriptBin "init-setup" (''
             forge build --root ../
+            forge build --root ./rain.extrospection/
 
             rm -rf ./abis ./tests/generated/*.json
             mkdir ./abis
