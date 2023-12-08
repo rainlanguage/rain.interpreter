@@ -56,6 +56,9 @@ jobs:
       - name: Forge shallow install
         run: forge install --shallow
 
+      - name: Update Submodule
+        run: git submodule update --init --recursive --depth 1 rain.extrospection/
+
       - name: install npm dependencies
         working-directory: ./subgraph
         run: npm install
