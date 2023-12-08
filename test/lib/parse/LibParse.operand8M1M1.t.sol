@@ -3,7 +3,7 @@ pragma solidity =0.8.19;
 
 import {UnsupportedLiteralType} from "src/lib/parse/LibParseLiteral.sol";
 import {ParserOutOfBounds} from "src/lib/parse/LibParse.sol";
-import {ExpectedOperand, OperandOverflow, UnclosedOperand} from "src/lib/parse/LibParseOperand.sol";
+import {ExpectedOperand, OperandOverflow, UnclosedOperand} from "src/error/ErrParse.sol";
 import {OperandTest} from "test/util/abstract/OperandTest.sol";
 
 import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";

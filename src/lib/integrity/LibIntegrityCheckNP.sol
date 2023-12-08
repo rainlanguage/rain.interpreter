@@ -39,7 +39,7 @@ struct IntegrityCheckStateNP {
     uint256 stackIndex;
     uint256 stackMaxIndex;
     uint256 readHighwater;
-    uint256 constantsLength;
+    uint256[] constants;
     uint256 opIndex;
     bytes bytecode;
 }
@@ -47,7 +47,7 @@ struct IntegrityCheckStateNP {
 library LibIntegrityCheckNP {
     using LibIntegrityCheckNP for IntegrityCheckStateNP;
 
-    function newState(bytes memory bytecode, uint256 stackIndex, uint256 constantsLength)
+    function newState(bytes memory bytecode, uint256 stackIndex, uint256[] memory constants)
         internal
         pure
         returns (IntegrityCheckStateNP memory)
@@ -59,8 +59,8 @@ library LibIntegrityCheckNP {
             stackIndex,
             // highwater (source inputs are always immutable)
             stackIndex,
-            // constantsLength
-            constantsLength,
+            // constants
+            constants,
             // opIndex
             0,
             // bytecode
@@ -109,8 +109,7 @@ library LibIntegrityCheckNP {
                     ioCursor := add(ioCursor, 2)
                 }
 
-                IntegrityCheckStateNP memory state =
-                    LibIntegrityCheckNP.newState(bytecode, inputsLength, constants.length);
+                IntegrityCheckStateNP memory state = LibIntegrityCheckNP.newState(bytecode, inputsLength, constants);
 
                 // Have low 4 bytes of cursor overlap the first op, skipping the
                 // prefix.

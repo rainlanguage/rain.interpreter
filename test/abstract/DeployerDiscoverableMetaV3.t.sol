@@ -66,10 +66,14 @@ contract DeployerDiscoverableMetaV2Test is Test {
 
         vm.assume(!LibMeta.isRainMetaV1(baseMeta));
         vm.expectRevert(abi.encodeWithSelector(NotRainMetaV1.selector, baseMeta));
-        new TestDeployerDiscoverableMetaV3(keccak256(baseMeta), DeployerDiscoverableMetaV3ConstructionConfig(address(deployer), baseMeta));
+        new TestDeployerDiscoverableMetaV3(
+            keccak256(baseMeta), DeployerDiscoverableMetaV3ConstructionConfig(address(deployer), baseMeta)
+        );
 
         bytes memory meta = abi.encodePacked(META_MAGIC_NUMBER_V1, baseMeta);
         vm.expectRevert(abi.encodeWithSelector(UnexpectedMetaHash.selector, bytes32(0), keccak256(meta)));
-        new TestDeployerDiscoverableMetaV3(bytes32(0), DeployerDiscoverableMetaV3ConstructionConfig(address(deployer), meta));
+        new TestDeployerDiscoverableMetaV3(
+            bytes32(0), DeployerDiscoverableMetaV3ConstructionConfig(address(deployer), meta)
+        );
     }
 }

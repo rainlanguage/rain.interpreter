@@ -5,12 +5,14 @@ import {OpTest} from "test/util/abstract/OpTest.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibOpERC721BalanceOfNP} from "src/lib/op/erc721/LibOpERC721BalanceOfNP.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
-import {IInterpreterV2, StateNamespace, Operand, SourceIndexV2} from "src/interface/unstable/IInterpreterV2.sol";
+import {
+    IInterpreterV2, FullyQualifiedNamespace, Operand, SourceIndexV2
+} from "src/interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
-import {UnexpectedOperand} from "src/lib/parse/LibParseOperand.sol";
+import {UnexpectedOperand} from "src/error/ErrParse.sol";
 
 /// @title LibOpERC721BalanceOfNPTest
 /// @notice Test the opcode for getting the balance of an erc721 token.
@@ -24,11 +26,8 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
     }
 
     function testOpERC721BalanceOfNPRun(address token, address account, uint256 balance) external {
-        assumeNotPrecompile(token);
-        vm.assume(token != address(this));
-        vm.assume(token != address(vm));
-        // The console.
-        vm.assume(token != address(0x000000000000000000636F6e736F6c652e6c6f67));
+        assumeEtchable(token);
+        vm.etch(token, hex"fe");
 
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = uint256(uint160(token));
@@ -36,7 +35,6 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
         Operand operand = Operand.wrap(uint256(2) << 0x10);
 
         // invalid token
-        vm.etch(token, hex"fe");
         vm.mockCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), abi.encode(balance));
         // called once for reference, once for run
         vm.expectCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), 2);
@@ -52,12 +50,6 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
     }
 
     function testOpERC721BalanceOfNPEval(address token, address account, uint256 balance) public {
-        assumeNotPrecompile(token);
-        vm.assume(token != address(this));
-        vm.assume(token != address(vm));
-        // The console.
-        vm.assume(token != address(0x000000000000000000636F6e736F6c652e6c6f67));
-
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: erc721-balance-of(0x00 0x01);");
         assertEq(constants.length, 2);
         assertEq(constants[0], 0);
@@ -67,11 +59,14 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
 
+        assumeEtchable(token, expression);
+        vm.etch(token, hex"fe");
         vm.mockCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), abi.encode(balance));
         vm.expectCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), 1);
+
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)

@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/ec750fd01963ab6b20ee1f0cb488754e8036d89d";
-    rain.url = "github:rainprotocol/rain.cli";
+    rain.url = "github:rainprotocol/rain.cli/6a912680be6d967fd6114aafab793ebe8503d27b";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -22,18 +22,15 @@
               -i <(forge script --silent ./script/GetAuthoringMeta.sol && cat ./meta/AuthoringMeta.rain.meta) -m authoring-meta-v1 -t cbor -e deflate -l none \
           '';
 
-          output-dispair-meta = pkgs.writeShellScriptBin "output-dispair-meta" ''
-            ${(build-dispair-meta-cmd)} -o meta/RainterpreterExpressionDeployerNPE2.rain.meta;
-          '';
-
           build-meta = pkgs.writeShellScriptBin "build-meta" ''
-          set -x;
-
-          ${(build-dispair-meta-cmd)} -o meta/RainterpreterExpressionDeployerNPE2.rain.meta;
+            mkdir -p meta;
+            forge build --force;
+            ${(build-dispair-meta-cmd)} -o meta/RainterpreterExpressionDeployerNPE2.rain.meta;
           '';
 
           deploy-dispair = pkgs.writeShellScriptBin "deploy-dispair" (''
             set -euo pipefail;
+            mkdir -p meta;
             forge build --force;
             forge script -vvvvv script/DeployDISPair.sol --legacy --verify --broadcast --rpc-url "''${CI_DEPLOY_RPC_URL}" --etherscan-api-key "''${EXPLORER_VERIFICATION_KEY}" \
               --sig='run(bytes)' \

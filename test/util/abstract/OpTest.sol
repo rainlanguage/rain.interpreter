@@ -13,10 +13,14 @@ import {LibInterpreterStateNP, InterpreterStateNP} from "../../../src/lib/state/
 import {IntegrityCheckStateNP, LibIntegrityCheckNP} from "../../../src/lib/integrity/LibIntegrityCheckNP.sol";
 
 import {LibContext} from "../../../src/lib/caller/LibContext.sol";
-import {UnexpectedOperand} from "../../../src/lib/parse/LibParseOperand.sol";
+import {UnexpectedOperand} from "../../../src/error/ErrParse.sol";
 import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {Operand, IInterpreterV2, SourceIndexV2} from "../../../src/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1, StateNamespace} from "../../../src/interface/IInterpreterStoreV1.sol";
+import {
+    IInterpreterStoreV1,
+    FullyQualifiedNamespace,
+    StateNamespace
+} from "../../../src/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "../../../src/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "../../../src/lib/caller/LibEncodedDispatch.sol";
 import {LibNamespace} from "../../../src/lib/ns/LibNamespace.sol";
@@ -39,8 +43,25 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         Pointer actualStackTopAfter;
     }
 
+    function assumeEtchable(address account) internal view {
+        assumeEtchable(account, address(0));
+    }
+
+    function assumeEtchable(address account, address expression) internal view {
+        assumeNotPrecompile(account);
+        vm.assume(account != address(iDeployer));
+        vm.assume(account != address(iInterpreter));
+        vm.assume(account != address(iStore));
+        vm.assume(account != address(iParser));
+        vm.assume(account != address(this));
+        vm.assume(account != address(vm));
+        vm.assume(account != address(expression));
+        // The console.
+        vm.assume(account != address(0x000000000000000000636F6e736F6c652e6c6f67));
+    }
+
     function opTestDefaultIngegrityCheckState() internal pure returns (IntegrityCheckStateNP memory) {
-        return IntegrityCheckStateNP(0, 0, 0, 0, 0, "");
+        return IntegrityCheckStateNP(0, 0, 0, new uint256[](0), 0, "");
     }
 
     function opTestDefaultInterpreterState() internal view returns (InterpreterStateNP memory) {
@@ -52,7 +73,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
             // Treat ourselves as the sender as we eval internally to directly
             // test the opcode logic.
             LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
-            iStore,
+            IInterpreterStoreV1(address(iStore)),
             new uint256[][](0),
             "",
             ""
@@ -60,12 +81,12 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     }
 
     function opReferenceCheckIntegrity(
-        function(IntegrityCheckStateNP memory, Operand) pure returns (uint256, uint256) integrityFn,
+        function(IntegrityCheckStateNP memory, Operand) view returns (uint256, uint256) integrityFn,
         Operand operand,
         uint256[] memory constants,
         uint256[] memory inputs
     ) internal returns (uint256) {
-        IntegrityCheckStateNP memory integrityState = LibIntegrityCheckNP.newState("", 0, constants.length);
+        IntegrityCheckStateNP memory integrityState = LibIntegrityCheckNP.newState("", 0, constants);
         (uint256 calcInputs, uint256 calcOutputs) = integrityFn(integrityState, operand);
         assertEq(calcInputs, inputs.length, "inputs length");
         assertEq(calcInputs, Operand.unwrap(operand) >> 0x10, "operand inputs");
@@ -154,7 +175,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         InterpreterStateNP memory state,
         Operand operand,
         function(InterpreterStateNP memory, Operand, uint256[] memory) view returns (uint256[] memory) referenceFn,
-        function(IntegrityCheckStateNP memory, Operand) pure returns (uint256, uint256) integrityFn,
+        function(IntegrityCheckStateNP memory, Operand) view returns (uint256, uint256) integrityFn,
         function(InterpreterStateNP memory, Operand, Pointer) view returns (Pointer) runFn,
         uint256[] memory inputs
     ) internal {
@@ -172,7 +193,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         (io);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), type(uint16).max),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)
@@ -185,6 +206,16 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
 
         assertEq(stack.length, 1);
         assertEq(stack[0], expectedValue, errString);
+        assertEq(kvs.length, 0);
+    }
+
+    function checkHappy(bytes memory rainString, uint256[] memory expectedStack, string memory errString) internal {
+        (uint256[] memory stack, uint256[] memory kvs) = parseAndEval(rainString);
+
+        assertEq(stack.length, expectedStack.length, errString);
+        for (uint256 i = 0; i < expectedStack.length; i++) {
+            assertEq(stack[i], expectedStack[i], errString);
+        }
         assertEq(kvs.length, 0);
     }
 
@@ -210,12 +241,27 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         vm.expectRevert(err);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)
         );
         (stack, kvs);
+    }
+
+    function checkUnhappyDeploy(bytes memory rainString, bytes memory err) internal {
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
+        vm.expectRevert(err);
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
+        (interpreterDeployer, storeDeployer, expression, io);
+    }
+
+    function checkUnhappyParse(bytes memory rainString, bytes memory err) internal {
+        vm.expectRevert(err);
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
+        (bytecode);
+        (constants);
     }
 
     function checkBadInputs(bytes memory rainString, uint256 opIndex, uint256 calcInputs, uint256 bytecodeInputs)

@@ -22,13 +22,11 @@ contract DeployDISPair is Script {
         RainterpreterNPE2 interpreter = new RainterpreterNPE2();
         RainterpreterStoreNPE2 store = new RainterpreterStoreNPE2();
         RainterpreterParserNPE2 parser = new RainterpreterParserNPE2();
-        RainterpreterExpressionDeployerNPE2 deployer =
-        new RainterpreterExpressionDeployerNPE2(RainterpreterExpressionDeployerNPE2ConstructionConfig(
-            address(interpreter),
-            address(store),
-            address(parser),
-            constructionMeta
-        ));
+        RainterpreterExpressionDeployerNPE2 deployer = new RainterpreterExpressionDeployerNPE2(
+            RainterpreterExpressionDeployerNPE2ConstructionConfig(
+                address(interpreter), address(store), address(parser), constructionMeta
+            )
+        );
         (deployer);
         vm.stopBroadcast();
     }

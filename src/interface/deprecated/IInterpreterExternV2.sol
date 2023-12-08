@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {EncodedExternDispatch, ExternDispatch} from "./deprecated/IInterpreterExternV1.sol";
+import {EncodedExternDispatch, ExternDispatch} from "./IInterpreterExternV1.sol";
 
 /// @title IInterpreterExternV2
 /// Handle a single dispatch from some calling contract with an array of

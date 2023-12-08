@@ -4,9 +4,6 @@
 [submodule "lib/rain.metadata"]
 	path = lib/rain.metadata
 	url = https://github.com/rainprotocol/rain.metadata
-[submodule "lib/rain.solmem"]
-	path = lib/rain.solmem
-	url = https://github.com/rainprotocol/rain.solmem
 [submodule "lib/rain.datacontract"]
 	path = lib/rain.datacontract
 	url = https://github.com/rainprotocol/rain.datacontract
@@ -25,12 +22,6 @@
 [submodule "lib/sol.lib.binmaskflag"]
 	path = lib/sol.lib.binmaskflag
 	url = https://github.com/rainprotocol/sol.lib.binmaskflag
-[submodule "lib/v2-periphery"]
-	path = lib/v2-periphery
-	url = https://github.com/uniswap/v2-periphery
-[submodule "lib/v2-core"]
-	path = lib/v2-core
-	url = https://github.com/uniswap/v2-core
 [submodule "lib/rain.math.fixedpoint"]
 	path = lib/rain.math.fixedpoint
 	url = https://github.com/rainprotocol/rain.math.fixedpoint
@@ -43,3 +34,10 @@
 [submodule "subgraph/rain.extrospection"]
 	path = subgraph/rain.extrospection
 	url = https://github.com/rainprotocol/rain.extrospection.git
+[submodule "lib/rain.uniswapv2"]
+	path = lib/rain.uniswapv2
+	url = https://github.com/rainprotocol/rain.uniswapv2
+[submodule "lib/rain.solmem"]
+	path = lib/rain.solmem
+	url = https://github.com/rainlanguage/rain.solmem
+

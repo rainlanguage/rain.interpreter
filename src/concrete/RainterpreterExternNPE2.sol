@@ -1,60 +1,77 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
+import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
+import {BadDynamicLength} from "../error/ErrOpList.sol";
+import {BaseRainterpreterExternNPE2, Operand} from "../abstract/BaseRainterpreterExternNPE2.sol";
 
-import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
-import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
+import {LibOpIntAddNP} from "../lib/op/math/int/LibOpIntAddNP.sol";
+import {LibOpIntIncNP} from "../lib/op/math/int/LibOpIntIncNP.sol";
 
-import {Operand} from "../interface/unstable/IInterpreterV2.sol";
-import {IInterpreterExternV2, ExternDispatch} from "../interface/IInterpreterExternV2.sol";
-import {LibOpChainlinkOraclePrice} from "../lib/op/chainlink/LibOpChainlinkOraclePrice.sol";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"031f03d3";
+uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 2;
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"04b204d2";
 
-/// Thrown when the inputs don't match the expected inputs.
-/// @param expected The expected number of inputs.
-/// @param actual The actual number of inputs.
-error BadInputs(uint256 expected, uint256 actual);
-
-bytes constant OPCODE_FUNCTION_POINTERS = hex"";
-
-/// EXPERIMENTAL implementation of `IInterpreterExternV2`.
-/// Currently only implements the Chainlink oracle price opcode as a starting
-/// point to test and flesh out externs generally.
-/// Hopefully one day the idea of there being only a single extern contract seems
-/// quaint.
-contract RainterpreterExternNPE2 is IInterpreterExternV2, ERC165 {
-    using LibStackPointer for uint256[];
-    using LibStackPointer for Pointer;
-    using LibUint256Array for uint256;
-    using LibUint256Array for uint256[];
-
-    /// @inheritdoc ERC165
-    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IInterpreterExternV2).interfaceId || super.supportsInterface(interfaceId);
+contract RainterpreterExternNPE2 is BaseRainterpreterExternNPE2 {
+    function opcodeFunctionPointers() internal pure override returns (bytes memory) {
+        return OPCODE_FUNCTION_POINTERS;
     }
 
-    /// @inheritdoc IInterpreterExternV2
-    function extern(ExternDispatch dispatch, uint256[] memory inputs)
-        external
-        view
-        returns (uint256[] memory outputs)
-    {
-        unchecked {
-            bytes memory fPointers = OPCODE_FUNCTION_POINTERS;
-            uint256 fsCount = fPointers.length / 2;
-            uint256 fPointersStart;
-            assembly ("memory-safe") {
-                fPointersStart := add(fPointers, 0x20)
-            }
-            uint256 opcode = (ExternDispatch.unwrap(dispatch) >> 0x10) & type(uint16).max;
-            Operand operand = Operand.wrap(ExternDispatch.unwrap(dispatch) & type(uint16).max);
+    function integrityFunctionPointers() internal pure override returns (bytes memory) {
+        return INTEGRITY_FUNCTION_POINTERS;
+    }
 
-            function(Operand, uint256[] memory) internal view returns (uint256[] memory) f;
-            assembly {
-                f := shr(0xf0, mload(add(fPointersStart, mul(mod(opcode, fsCount), 2))))
+    /// This mimics how LibAllStandardOpsNP builds function pointers for the
+    /// Rainterpreter. The same pattern applies to externs but for a different
+    /// function signature for each opcode. Call this function somehow, e.g. from
+    /// within a test, and then copy the output into the
+    /// `OPCODE_FUNCTION_POINTERS` if there is a mismatch. This makes the
+    /// function pointer lookup much more gas efficient.
+    function buildOpcodeFunctionPointers() external pure returns (bytes memory) {
+        unchecked {
+            function(Operand, uint256[] memory) internal view returns (uint256[] memory) lengthPointer;
+            uint256 length = OPCODE_FUNCTION_POINTERS_LENGTH;
+            assembly ("memory-safe") {
+                lengthPointer := length
             }
-            return f(operand, inputs);
+            function(Operand, uint256[] memory) internal view returns (uint256[] memory)[OPCODE_FUNCTION_POINTERS_LENGTH
+                + 1] memory pointersFixed = [lengthPointer, LibOpIntAddNP.runExtern, LibOpIntIncNP.runExtern];
+            uint256[] memory pointersDynamic;
+            assembly {
+                pointersDynamic := pointersFixed
+            }
+            // Sanity check that the dynamic length is correct. Should be an
+            // unreachable error.
+            if (pointersDynamic.length != length) {
+                revert BadDynamicLength(pointersDynamic.length, length);
+            }
+            return LibConvert.unsafeTo16BitBytes(pointersDynamic);
+        }
+    }
+
+    /// This is the same pattern as `buildOpcodeFunctionPointers` but for
+    /// integrity checks. Probably the AI can spit all this out for you, worked
+    /// for me.
+    function buildIntegrityFunctionPointers() external pure returns (bytes memory) {
+        unchecked {
+            function(Operand, uint256, uint256) internal pure returns (uint256, uint256) lengthPointer;
+            uint256 length = OPCODE_FUNCTION_POINTERS_LENGTH;
+            assembly ("memory-safe") {
+                lengthPointer := length
+            }
+            function(Operand, uint256, uint256) internal pure returns (uint256, uint256)[OPCODE_FUNCTION_POINTERS_LENGTH
+                + 1] memory pointersFixed =
+                    [lengthPointer, LibOpIntAddNP.integrityExtern, LibOpIntIncNP.integrityExtern];
+            uint256[] memory pointersDynamic;
+            assembly {
+                pointersDynamic := pointersFixed
+            }
+            // Sanity check that the dynamic length is correct. Should be an
+            // unreachable error.
+            if (pointersDynamic.length != length) {
+                revert BadDynamicLength(pointersDynamic.length, length);
+            }
+            return LibConvert.unsafeTo16BitBytes(pointersDynamic);
         }
     }
 }

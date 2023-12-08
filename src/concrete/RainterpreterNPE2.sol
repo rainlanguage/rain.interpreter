@@ -10,7 +10,6 @@ import {LibCast} from "rain.lib.typecast/LibCast.sol";
 import {LibDataContract} from "rain.datacontract/lib/LibDataContract.sol";
 
 import {LibEvalNP} from "../lib/eval/LibEvalNP.sol";
-import {LibNamespace} from "../lib/ns/LibNamespace.sol";
 import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
 import {LibEncodedDispatch} from "../lib/caller/LibEncodedDispatch.sol";
 import {InterpreterStateNP} from "../lib/state/LibInterpreterStateNP.sol";
@@ -24,34 +23,21 @@ import {
 } from "../interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1} from "../interface/IInterpreterStoreV1.sol";
 
-/// Thrown when the stack length is negative during eval.
-error NegativeStackLength(int256 length);
-
-/// Thrown when the source index is invalid during eval. This is a runtime check
-/// for the exposed external eval entrypoint. Internally recursive evals are
-/// expected to preflight check the source index.
-error InvalidSourceIndex(SourceIndexV2 sourceIndex);
-
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xec9bf85c3af1c00b2765312a605f4bb13a86ad44921fa2e643a99d23820d5946);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x7cbd3b90f6e0eb55adc1bfcc00113e8050457173d7fa4261314d9b140237c009);
 
 /// @dev The function pointers known to the interpreter for dynamic dispatch.
 /// By setting these as a constant they can be inlined into the interpreter
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
 bytes constant OPCODE_FUNCTION_POINTERS =
-    hex"0be00c2c0c670c800cc20d140db20e960ed00f80102210511080108010cf10fe116011e8128f12a312f9130d1322133c1347135b137013ed1438145e1475148c148c14d71522156d156d15b815b81603164e1699169916e417cb17fe1855";
+    hex"0c2f0c7b0cb60e7b0e8d0e9f0eb80efa0f4c0f5d0f6e100c10f0112a11e8129811e8131c13be143614651494149414e31512157415fc16a316b7170d172117361750175b176f17841801184c1864187e189518ac18ac18f71942198d198d19d819d81a231a6e1ab91ab91b041beb1c1e1c761cab";
 
 /// @title RainterpreterNPE2
-/// @notice !!EXPERIMENTAL!! implementation of a Rainlang interpreter that is
-/// compatible with native onchain Rainlang parsing. Initially copied verbatim
-/// from the JS compatible Rainterpreter. This interpreter is deliberately
-/// separate from the JS Rainterpreter to allow for experimentation with the
-/// onchain interpreter without affecting the JS interpreter, up to and including
-/// a complely different execution model and opcodes.
+/// @notice Implementation of a Rainlang interpreter that is compatible with
+/// native onchain Rainlang parsing.
 contract RainterpreterNPE2 is IInterpreterV2, ERC165 {
     using LibEvalNP for InterpreterStateNP;
-    using LibNamespace for StateNamespace;
     using LibInterpreterStateDataContractNP for bytes;
 
     /// There are MANY ways that eval can be forced into undefined/corrupt
@@ -75,7 +61,7 @@ contract RainterpreterNPE2 is IInterpreterV2, ERC165 {
     /// @inheritdoc IInterpreterV2
     function eval2(
         IInterpreterStoreV1 store,
-        StateNamespace namespace,
+        FullyQualifiedNamespace namespace,
         EncodedDispatch dispatch,
         uint256[][] memory context,
         uint256[] memory inputs
@@ -85,11 +71,7 @@ contract RainterpreterNPE2 is IInterpreterV2, ERC165 {
         bytes memory expressionData = LibDataContract.read(expression);
 
         InterpreterStateNP memory state = expressionData.unsafeDeserializeNP(
-            SourceIndexV2.unwrap(sourceIndex),
-            namespace.qualifyNamespace(msg.sender),
-            store,
-            context,
-            OPCODE_FUNCTION_POINTERS
+            SourceIndexV2.unwrap(sourceIndex), namespace, store, context, OPCODE_FUNCTION_POINTERS
         );
         // We use the return by returning it. Slither false positive.
         //slither-disable-next-line unused-return

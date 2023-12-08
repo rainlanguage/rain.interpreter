@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.19;
 
+import {BadDynamicLength} from "../../error/ErrOpList.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Operand} from "../../interface/unstable/IInterpreterV2.sol";
@@ -17,10 +18,15 @@ import {
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibOpStackNP} from "./00/LibOpStackNP.sol";
 import {LibOpConstantNP} from "./00/LibOpConstantNP.sol";
+import {LibOpExternNP} from "./00/LibOpExternNP.sol";
 
+import {LibOpBitwiseAndNP} from "./bitwise/LibOpBitwiseAndNP.sol";
+import {LibOpBitwiseOrNP} from "./bitwise/LibOpBitwiseOrNP.sol";
 import {LibOpCtPopNP} from "./bitwise/LibOpCtPopNP.sol";
 import {LibOpDecodeBitsNP} from "./bitwise/LibOpDecodeBitsNP.sol";
 import {LibOpEncodeBitsNP} from "./bitwise/LibOpEncodeBitsNP.sol";
+import {LibOpShiftBitsLeftNP} from "./bitwise/LibOpShiftBitsLeftNP.sol";
+import {LibOpShiftBitsRightNP} from "./bitwise/LibOpShiftBitsRightNP.sol";
 
 import {LibOpCallNP} from "./call/LibOpCallNP.sol";
 
@@ -28,8 +34,14 @@ import {LibOpContextNP} from "./context/LibOpContextNP.sol";
 
 import {LibOpHashNP} from "./crypto/LibOpHashNP.sol";
 
+import {LibOpERC20AllowanceNP} from "./erc20/LibOpERC20AllowanceNP.sol";
+import {LibOpERC20BalanceOfNP} from "./erc20/LibOpERC20BalanceOfNP.sol";
+import {LibOpERC20TotalSupplyNP} from "./erc20/LibOpERC20TotalSupplyNP.sol";
+
 import {LibOpERC721BalanceOfNP} from "./erc721/LibOpERC721BalanceOfNP.sol";
 import {LibOpERC721OwnerOfNP} from "./erc721/LibOpERC721OwnerOfNP.sol";
+
+import {LibOpERC5313OwnerNP} from "./erc5313/LibOpERC5313OwnerNP.sol";
 
 import {LibOpBlockNumberNP} from "./evm/LibOpBlockNumberNP.sol";
 import {LibOpChainIdNP} from "./evm/LibOpChainIdNP.sol";
@@ -50,6 +62,7 @@ import {LibOpLessThanOrEqualToNP} from "./logic/LibOpLessThanOrEqualToNP.sol";
 
 import {LibOpDecimal18MulNP} from "./math/decimal18/LibOpDecimal18MulNP.sol";
 import {LibOpDecimal18DivNP} from "./math/decimal18/LibOpDecimal18DivNP.sol";
+import {LibOpDecimal18PowUNP} from "./math/decimal18/LibOpDecimal18PowUNP.sol";
 import {LibOpDecimal18Scale18DynamicNP} from "./math/decimal18/LibOpDecimal18Scale18DynamicNP.sol";
 import {LibOpDecimal18Scale18NP} from "./math/decimal18/LibOpDecimal18Scale18NP.sol";
 import {LibOpDecimal18ScaleNNP} from "./math/decimal18/LibOpDecimal18ScaleNNP.sol";
@@ -68,13 +81,10 @@ import {LibOpSetNP} from "./store/LibOpSetNP.sol";
 
 import {LibOpUniswapV2AmountIn} from "./uniswap/LibOpUniswapV2AmountIn.sol";
 import {LibOpUniswapV2AmountOut} from "./uniswap/LibOpUniswapV2AmountOut.sol";
-
-/// Thrown when a dynamic length array is NOT 1 more than a fixed length array.
-/// Should never happen outside a major breaking change to memory layouts.
-error BadDynamicLength(uint256 dynamicLength, uint256 standardOpsLength);
+import {LibOpUniswapV2Quote} from "./uniswap/LibOpUniswapV2Quote.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 47;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 58;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -84,10 +94,17 @@ library LibAllStandardOpsNP {
         AuthoringMeta memory lengthPlaceholder;
         AuthoringMeta[ALL_STANDARD_OPS_LENGTH + 1] memory wordsFixed = [
             lengthPlaceholder,
-            // Stack and constant MUST be in this order for parsing to work.
+            // Stack, constant and extern MUST be in this order for parsing to work.
             AuthoringMeta("stack", OPERAND_PARSER_OFFSET_SINGLE_FULL, "Copies an existing value from the stack."),
             AuthoringMeta("constant", OPERAND_PARSER_OFFSET_SINGLE_FULL, "Copies a constant value onto the stack."),
+            AuthoringMeta(
+                "extern",
+                OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT,
+                "Calls an external contract. The first operand is the index of the encoded dispatch in the constants array, the second is the number of outputs."
+            ),
             // These are all ordered according to how they appear in the file system.
+            AuthoringMeta("bitwise-and", OPERAND_PARSER_OFFSET_DISALLOWED, "Bitwise AND the top two items on the stack."),
+            AuthoringMeta("bitwise-or", OPERAND_PARSER_OFFSET_DISALLOWED, "Bitwise OR the top two items on the stack."),
             AuthoringMeta(
                 "bitwise-count-ones",
                 OPERAND_PARSER_OFFSET_DISALLOWED,
@@ -104,6 +121,16 @@ library LibAllStandardOpsNP {
                 "Encodes a value into a 256 bit value. The first operand is the start bit and the second is the length."
             ),
             AuthoringMeta(
+                "bitwise-shift-left",
+                OPERAND_PARSER_OFFSET_SINGLE_FULL,
+                "Shifts the input left by the number of bits specified in the operand."
+            ),
+            AuthoringMeta(
+                "bitwise-shift-right",
+                OPERAND_PARSER_OFFSET_SINGLE_FULL,
+                "Shifts the input right by the number of bits specified in the operand."
+            ),
+            AuthoringMeta(
                 "call",
                 OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT,
                 "Calls a source by index in the same Rain bytecode. The inputs to call are copied to the top of the called stack and the outputs specified in the operand are copied back to the calling stack. The first operand is the source index and the second is the number of outputs."
@@ -117,6 +144,21 @@ library LibAllStandardOpsNP {
                 "hash", OPERAND_PARSER_OFFSET_DISALLOWED, "Hashes all inputs into a single 32 byte value using keccak256."
             ),
             AuthoringMeta(
+                "erc20-allowance",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Gets the allowance of an erc20 token for an account. The first input is the token address, the second is the owner address, and the third is the spender address."
+            ),
+            AuthoringMeta(
+                "erc20-balance-of",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Gets the balance of an erc20 token for an account. The first input is the token address and the second is the account address."
+            ),
+            AuthoringMeta(
+                "erc20-total-supply",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Gets the total supply of an erc20 token. The input is the token address."
+            ),
+            AuthoringMeta(
                 "erc721-balance-of",
                 OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Gets the balance of an erc721 token for an account. The first input is the token address and the second is the account address."
@@ -125,6 +167,11 @@ library LibAllStandardOpsNP {
                 "erc721-owner-of",
                 OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Gets the owner of an erc721 token. The first input is the token address and the second is the token id."
+            ),
+            AuthoringMeta(
+                "erc5313-owner",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Gets the owner of an erc5313 compatible contract. Note that erc5313 specifically DOES NOT do any onchain compatibility checks, so the expression author is responsible for ensuring the contract is compatible. The input is the contract address to get the owner of."
             ),
             AuthoringMeta("block-number", OPERAND_PARSER_OFFSET_DISALLOWED, "The current block number."),
             AuthoringMeta("chain-id", OPERAND_PARSER_OFFSET_DISALLOWED, "The current chain id."),
@@ -195,6 +242,11 @@ library LibAllStandardOpsNP {
                 "decimal18-mul",
                 OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Multiplies all inputs together as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Errors if the multiplication exceeds the maximum value (roughly 1.15e77)."
+            ),
+            AuthoringMeta(
+                "decimal18-power-int",
+                OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Raises the first input as a fixed point 18 decimal value to the power of the second input as an integer."
             ),
             AuthoringMeta(
                 "decimal18-scale18-dynamic",
@@ -298,6 +350,11 @@ library LibAllStandardOpsNP {
                 "uniswap-v2-amount-out",
                 OPERAND_PARSER_OFFSET_SINGLE_FULL,
                 "Computes the maximum amount of output tokens received from a given amount of input tokens from a UniswapV2 pair. Input/output token directions are from the perspective of the Uniswap contract. The first input is the factory address, the second is the amount of input tokens, the third is the input token address, and the fourth is the output token address. If the operand is 1 the last time the prices changed will be returned as well."
+            ),
+            AuthoringMeta(
+                "uniswap-v2-quote",
+                OPERAND_PARSER_OFFSET_SINGLE_FULL,
+                "Given an amount of token A, calculates the equivalent valued amount of token B. The first input is the factory address, the second is the amount of token A, the third is token A's address, and the fourth is token B's address. If the operand is 1 the last time the prices changed will be returned as well."
             )
         ];
         AuthoringMeta[] memory wordsDynamic;
@@ -324,18 +381,28 @@ library LibAllStandardOpsNP {
                     lengthPointer,
                     // Stack then constant are the first two ops to match the
                     // field ordering in the interpreter state NOT the lexical
-                    // ordering of the file system.
+                    // ordering of the file system. Extern is also out of lexical
+                    // order to fit these two in.
                     LibOpStackNP.integrity,
                     LibOpConstantNP.integrity,
+                    LibOpExternNP.integrity,
                     // Everything else is alphabetical, including folders.
+                    LibOpBitwiseAndNP.integrity,
+                    LibOpBitwiseOrNP.integrity,
                     LibOpCtPopNP.integrity,
                     LibOpDecodeBitsNP.integrity,
                     LibOpEncodeBitsNP.integrity,
+                    LibOpShiftBitsLeftNP.integrity,
+                    LibOpShiftBitsRightNP.integrity,
                     LibOpCallNP.integrity,
                     LibOpContextNP.integrity,
                     LibOpHashNP.integrity,
+                    LibOpERC20AllowanceNP.integrity,
+                    LibOpERC20BalanceOfNP.integrity,
+                    LibOpERC20TotalSupplyNP.integrity,
                     LibOpERC721BalanceOfNP.integrity,
                     LibOpERC721OwnerOfNP.integrity,
+                    LibOpERC5313OwnerNP.integrity,
                     LibOpBlockNumberNP.integrity,
                     LibOpChainIdNP.integrity,
                     // int and decimal18 max have identical implementations and
@@ -357,6 +424,7 @@ library LibAllStandardOpsNP {
                     LibOpLessThanOrEqualToNP.integrity,
                     LibOpDecimal18DivNP.integrity,
                     LibOpDecimal18MulNP.integrity,
+                    LibOpDecimal18PowUNP.integrity,
                     LibOpDecimal18Scale18DynamicNP.integrity,
                     LibOpDecimal18Scale18NP.integrity,
                     LibOpDecimal18ScaleNNP.integrity,
@@ -387,7 +455,8 @@ library LibAllStandardOpsNP {
                     LibOpGetNP.integrity,
                     LibOpSetNP.integrity,
                     LibOpUniswapV2AmountIn.integrity,
-                    LibOpUniswapV2AmountOut.integrity
+                    LibOpUniswapV2AmountOut.integrity,
+                    LibOpUniswapV2Quote.integrity
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
@@ -420,18 +489,28 @@ library LibAllStandardOpsNP {
                     lengthPointer,
                     // Stack then constant are the first two ops to match the
                     // field ordering in the interpreter state NOT the lexical
-                    // ordering of the file system.
+                    // ordering of the file system. Extern is also out of lexical
+                    // order to fit these two in.
                     LibOpStackNP.run,
                     LibOpConstantNP.run,
+                    LibOpExternNP.run,
                     // Everything else is alphabetical, including folders.
+                    LibOpBitwiseAndNP.run,
+                    LibOpBitwiseOrNP.run,
                     LibOpCtPopNP.run,
                     LibOpDecodeBitsNP.run,
                     LibOpEncodeBitsNP.run,
+                    LibOpShiftBitsLeftNP.run,
+                    LibOpShiftBitsRightNP.run,
                     LibOpCallNP.run,
                     LibOpContextNP.run,
                     LibOpHashNP.run,
+                    LibOpERC20AllowanceNP.run,
+                    LibOpERC20BalanceOfNP.run,
+                    LibOpERC20TotalSupplyNP.run,
                     LibOpERC721BalanceOfNP.run,
                     LibOpERC721OwnerOfNP.run,
+                    LibOpERC5313OwnerNP.run,
                     LibOpBlockNumberNP.run,
                     LibOpChainIdNP.run,
                     // int and decimal18 max have identical implementations and
@@ -453,6 +532,7 @@ library LibAllStandardOpsNP {
                     LibOpLessThanOrEqualToNP.run,
                     LibOpDecimal18DivNP.run,
                     LibOpDecimal18MulNP.run,
+                    LibOpDecimal18PowUNP.run,
                     LibOpDecimal18Scale18DynamicNP.run,
                     LibOpDecimal18Scale18NP.run,
                     LibOpDecimal18ScaleNNP.run,
@@ -483,7 +563,8 @@ library LibAllStandardOpsNP {
                     LibOpGetNP.run,
                     LibOpSetNP.run,
                     LibOpUniswapV2AmountIn.run,
-                    LibOpUniswapV2AmountOut.run
+                    LibOpUniswapV2AmountOut.run,
+                    LibOpUniswapV2Quote.run
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {

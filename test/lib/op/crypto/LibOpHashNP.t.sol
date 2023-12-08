@@ -1,14 +1,21 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/OpTest.sol";
+import {OpTest} from "test/util/abstract/OpTest.sol";
 
-import "src/lib/op/crypto/LibOpHashNP.sol";
-import "src/lib/caller/LibContext.sol";
+import {LibOpHashNP} from "src/lib/op/crypto/LibOpHashNP.sol";
+import {LibContext} from "src/lib/caller/LibContext.sol";
 
-import "rain.solmem/lib/LibPointer.sol";
-import "rain.solmem/lib/LibMemCpy.sol";
-import "rain.solmem/lib/LibUint256Array.sol";
+import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
+import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
+
+import {IInterpreterV2, Operand, SourceIndexV2} from "src/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterStoreV1, FullyQualifiedNamespace} from "src/interface/IInterpreterStoreV1.sol";
+import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
+import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {InterpreterStateNP, LibInterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 
 /// @title LibOpHashNPTest
 /// @notice Test the runtime and integrity time logic of LibOpHashNP.
@@ -41,7 +48,7 @@ contract LibOpHashNPTest is OpTest {
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)
@@ -59,7 +66,7 @@ contract LibOpHashNPTest is OpTest {
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)
@@ -79,7 +86,7 @@ contract LibOpHashNPTest is OpTest {
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 2),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)
@@ -101,7 +108,7 @@ contract LibOpHashNPTest is OpTest {
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 2),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)
@@ -123,7 +130,7 @@ contract LibOpHashNPTest is OpTest {
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 3),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)

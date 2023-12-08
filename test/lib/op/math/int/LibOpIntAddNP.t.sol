@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/OpTest.sol";
+import {stdError} from "forge-std/Test.sol";
+import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP} from "test/util/abstract/OpTest.sol";
 import {LibOpIntAddNP} from "src/lib/op/math/int/LibOpIntAddNP.sol";
 
 contract LibOpIntAddNPTest is OpTest {

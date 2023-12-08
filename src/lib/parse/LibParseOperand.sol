@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
+import {ExpectedOperand, UnclosedOperand, OperandOverflow, UnexpectedOperand} from "../../error/ErrParse.sol";
 import {Operand} from "../../interface/unstable/IInterpreterV2.sol";
 import {LibParse} from "./LibParse.sol";
 import {LibParseLiteral} from "./LibParseLiteral.sol";
@@ -11,14 +12,6 @@ uint8 constant OPERAND_PARSER_OFFSET_SINGLE_FULL = 0x10;
 uint8 constant OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT = 0x20;
 uint8 constant OPERAND_PARSER_OFFSET_M1_M1 = 0x30;
 uint8 constant OPERAND_PARSER_OFFSET_8_M1_M1 = 0x40;
-
-error UnexpectedOperand(uint256 offset);
-
-error ExpectedOperand(uint256 offset);
-
-error OperandOverflow(uint256 offset);
-
-error UnclosedOperand(uint256 offset);
 
 library LibParseOperand {
     function buildOperandParsers() internal pure returns (uint256 operandParsers) {

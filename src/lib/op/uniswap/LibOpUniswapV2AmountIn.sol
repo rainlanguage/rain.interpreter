@@ -5,7 +5,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Operand} from "../../../interface/unstable/IInterpreterV2.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
-import {LibUniswapV2} from "../../uniswap/LibUniswapV2.sol";
+import {LibUniswapV2} from "rain.uniswapv2/src/lib/LibUniswapV2.sol";
 
 /// @title LibOpUniswapV2AmountIn
 /// @notice Opcode to calculate the amount in for a Uniswap V2 pair.
@@ -24,12 +24,14 @@ library LibOpUniswapV2AmountIn {
         uint256 amountOut;
         uint256 tokenIn;
         uint256 tokenOut;
+        uint256 withTime;
         assembly ("memory-safe") {
             factory := mload(stackTop)
             amountOut := mload(add(stackTop, 0x20))
             tokenIn := mload(add(stackTop, 0x40))
             tokenOut := mload(add(stackTop, 0x60))
-            stackTop := add(stackTop, add(0x40, mul(0x20, iszero(and(operand, 1)))))
+            withTime := and(operand, 1)
+            stackTop := add(stackTop, add(0x40, mul(0x20, iszero(withTime))))
         }
         (uint256 amountIn, uint256 reserveTimestamp) = LibUniswapV2.getAmountInByTokenWithTime(
             address(uint160(factory)), address(uint160(tokenIn)), address(uint160(tokenOut)), amountOut
@@ -37,7 +39,7 @@ library LibOpUniswapV2AmountIn {
 
         assembly ("memory-safe") {
             mstore(stackTop, amountIn)
-            if and(operand, 1) { mstore(add(stackTop, 0x20), reserveTimestamp) }
+            if withTime { mstore(add(stackTop, 0x20), reserveTimestamp) }
         }
         return stackTop;
     }

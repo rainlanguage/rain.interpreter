@@ -1,11 +1,19 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/util/abstract/OpTest.sol";
+import {OpTest} from "test/util/abstract/OpTest.sol";
 
-import "src/lib/caller/LibContext.sol";
-import "src/lib/bytecode/LibBytecode.sol";
+import {LibContext} from "src/lib/caller/LibContext.sol";
+import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
 import {OutOfBoundsConstantRead, LibOpConstantNP} from "src/lib/op/00/LibOpConstantNP.sol";
+import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {
+    IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace
+} from "src/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
+import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 
 /// @title LibOpConstantNPTest
 /// @notice Test the runtime and integrity time logic of LibOpConstantNP.
@@ -16,8 +24,8 @@ contract LibOpConstantNPTest is OpTest {
     /// puts a single value on the stack. This tests the happy path where the
     /// operand points to a value in the constants array.
     function testOpConstantNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
-        state.constantsLength = bound(state.constantsLength, 1, type(uint256).max);
-        operand = Operand.wrap(bound(Operand.unwrap(operand), 0, state.constantsLength - 1));
+        vm.assume(state.constants.length > 0);
+        operand = Operand.wrap(bound(Operand.unwrap(operand), 0, state.constants.length - 1));
 
         (uint256 calcInputs, uint256 calcOutputs) = LibOpConstantNP.integrity(state, operand);
 
@@ -29,11 +37,11 @@ contract LibOpConstantNPTest is OpTest {
     /// where the operand points past the end of the constants array, which MUST
     /// always error as an OOB read.
     function testOpConstantNPIntegrityOOBConstants(IntegrityCheckStateNP memory state, Operand operand) external {
-        operand = Operand.wrap(bound(Operand.unwrap(operand), state.constantsLength, type(uint256).max));
+        operand = Operand.wrap(bound(Operand.unwrap(operand), state.constants.length, type(uint256).max));
 
         vm.expectRevert(
             abi.encodeWithSelector(
-                OutOfBoundsConstantRead.selector, state.opIndex, state.constantsLength, Operand.unwrap(operand)
+                OutOfBoundsConstantRead.selector, state.opIndex, state.constants.length, Operand.unwrap(operand)
             )
         );
         LibOpConstantNP.integrity(state, operand);
@@ -117,7 +125,7 @@ contract LibOpConstantNPTest is OpTest {
 
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
-            StateNamespace.wrap(0),
+            FullyQualifiedNamespace.wrap(0),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 2),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)

@@ -1,19 +1,11 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
+import {ZeroLengthBitwiseEncoding, TruncatedBitwiseEncoding} from "../../../error/ErrBitwise.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 import {Operand} from "../../../interface/unstable/IInterpreterV2.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-
-/// Thrown during integrity check when the encoding is truncated due to the end
-/// bit being over 256.
-/// @param startBit The start of the OOB encoding.
-/// @param length The length of the OOB encoding.
-error TruncatedEncoding(uint256 startBit, uint256 length);
-
-/// Thrown during integrity check when the length is zero.
-error ZeroLengthEncoding();
 
 /// @title LibOpEncodeBitsNP
 /// @notice Opcode for encoding binary data into a 256 bit value.
@@ -25,10 +17,10 @@ library LibOpEncodeBitsNP {
         uint256 length = (Operand.unwrap(operand) >> 8) & 0xFF;
 
         if (length == 0) {
-            revert ZeroLengthEncoding();
+            revert ZeroLengthBitwiseEncoding();
         }
         if (startBit + length > 256) {
-            revert TruncatedEncoding(startBit, length);
+            revert TruncatedBitwiseEncoding(startBit, length);
         }
         return (2, 1);
     }

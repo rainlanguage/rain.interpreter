@@ -3,7 +3,7 @@ pragma solidity ^0.8.18;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
-import {FullyQualifiedNamespace, IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
+import {FullyQualifiedNamespace, IInterpreterStoreV1} from "../../interface/IInterpreterStoreV1.sol";
 
 struct InterpreterStateNP {
     Pointer[] stackBottoms;
