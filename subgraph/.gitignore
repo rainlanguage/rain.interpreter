@@ -1,0 +1,10 @@
+/build
+/generated
+/subgraph.yaml
+/abis
+/tests/generated/*.json
+/node_modules
+/package-lock.json 
+/docker/data
+/target
+/tests/utils/subgraph/**/*.json
