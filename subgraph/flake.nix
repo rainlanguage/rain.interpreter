@@ -58,6 +58,15 @@
                 })
               ["RainterpreterNPE2" "RainterpreterStoreNPE2" "RainterpreterParserNPE2" "RainterpreterExpressionDeployerNPE2"]
             )}
+            ${pkgs.lib.concatStrings (
+              map (
+                contract: copy-abi {
+                  origin_root = "./rain.extrospection";
+                  destiny = test-abi-path;
+                  contract = contract; 
+                })
+              ["Extrospection"]
+            )}
           '';
 
           init-setup =  pkgs.writeShellScriptBin "init-setup" (''

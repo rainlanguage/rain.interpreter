@@ -13,4 +13,7 @@ abigen!(
 
   RainterpreterParser,
   "tests/generated/RainterpreterParserNPE2.json";
+
+  Extrospection,
+  "tests/generated/Extrospection.json";
 );

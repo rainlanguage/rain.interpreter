@@ -1,4 +1,7 @@
-use crate::{generated::RainterpreterExpressionDeployer, utils::deploy::deploy1820};
+use crate::{
+    generated::{Extrospection, RainterpreterExpressionDeployer},
+    utils::deploy::deploy1820,
+};
 use anyhow::Result;
 use ethers::{
     core::k256::ecdsa::SigningKey,
@@ -11,7 +14,7 @@ use rain_cli_subgraph::subgraph;
 use subgraph_rust_setup_utils::{WalletHandler, RPC};
 use tokio::sync::OnceCell;
 
-use super::deploy::touch_deployer;
+use super::deploy::{deploy_extrospection, touch_deployer};
 
 // Initialize just once
 static RPC_PROVIDER: Lazy<RPC> = Lazy::new(|| RPC::default());
@@ -19,6 +22,44 @@ static WALLETS_HANDLER: Lazy<WalletHandler> = Lazy::new(|| WalletHandler::defaul
 static DEPLOYER: Lazy<
     OnceCell<RainterpreterExpressionDeployer<SignerMiddleware<Provider<Http>, Wallet<SigningKey>>>>,
 > = Lazy::new(|| OnceCell::new());
+static EXTROSPECTION: Lazy<
+    OnceCell<Extrospection<SignerMiddleware<Provider<Http>, Wallet<SigningKey>>>>,
+> = Lazy::new(|| OnceCell::new());
+
+pub async fn get_deployer() -> Result<
+    &'static RainterpreterExpressionDeployer<SignerMiddleware<Provider<Http>, Wallet<SigningKey>>>,
+> {
+    let deployer_lazy = DEPLOYER
+        .get_or_try_init(|| async { init_deployer().await })
+        .await
+        .map_err(|err| err);
+
+    match deployer_lazy {
+        Ok(contract) => Ok(contract),
+        Err(e) => return Err(anyhow::Error::msg(e.to_string())),
+    }
+}
+
+pub async fn get_extrospection(
+) -> Result<&'static Extrospection<SignerMiddleware<Provider<Http>, Wallet<SigningKey>>>> {
+    let extrospection_lazy = EXTROSPECTION
+        .get_or_try_init(|| async { deploy_extrospection().await })
+        .await
+        .map_err(|err| err);
+
+    match extrospection_lazy {
+        Ok(contract) => Ok(contract),
+        Err(e) => return Err(anyhow::Error::msg(e.to_string())),
+    }
+}
+
+pub async fn get_rpc_provider() -> Result<&'static RPC> {
+    Ok(&*RPC_PROVIDER)
+}
+
+pub fn get_wallets_handler() -> &'static WalletHandler {
+    &*WALLETS_HANDLER
+}
 
 async fn init_deployer(
 ) -> Result<RainterpreterExpressionDeployer<SignerMiddleware<Provider<Http>, Wallet<SigningKey>>>> {
@@ -29,6 +70,8 @@ async fn init_deployer(
 
     // Always checking if the Registry1820 is deployed. Deploy it otherwise
     deploy1820(rpc_provider.get_provider()).await?;
+    // Always checking if the Extrospection is deployed. Deploy it otherwise
+    get_extrospection().await?;
 
     let deployer = touch_deployer().await?;
 
@@ -56,26 +99,4 @@ async fn init_deployer(
     }
 
     Ok(deployer)
-}
-
-pub async fn get_deployer() -> Result<
-    &'static RainterpreterExpressionDeployer<SignerMiddleware<Provider<Http>, Wallet<SigningKey>>>,
-> {
-    let deployer_lazy = DEPLOYER
-        .get_or_try_init(|| async { init_deployer().await })
-        .await
-        .map_err(|err| err);
-
-    match deployer_lazy {
-        Ok(contract) => Ok(contract),
-        Err(e) => return Err(anyhow::Error::msg(e.to_string())),
-    }
-}
-
-pub async fn get_rpc_provider() -> Result<&'static RPC> {
-    Ok(&*RPC_PROVIDER)
-}
-
-pub fn get_wallets_handler() -> &'static WalletHandler {
-    &*WALLETS_HANDLER
 }
