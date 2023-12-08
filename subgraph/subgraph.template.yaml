@@ -50,7 +50,7 @@ templates:
           file: ./abis/Extrospection.json
       eventHandlers:
         - event: DISPair(address,address,address,address,bytes)
-          handler: handleDISpair
+          handler: handleDISPair
         - event: DeployedExpression(address,address,address,address,bytes)
           handler: handleDeployedExpression
         - event: NewExpression(address,bytes,uint256[])

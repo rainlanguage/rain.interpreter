@@ -43,16 +43,18 @@ type ExpressionDeployer implements RainContract @entity {
   id: ID!
   "Bytecode hash of this Deployer"
   bytecodeHash: String
-  deployTransaction: Transaction
+  deployTransaction: Transaction!
   "All the meta items that emitted by this contract"
   meta: [Meta!]!
   "All the expression this expression deployer contract has ever deployed"
   expressions: [Expression!]! @derivedFrom(field: "deployer")
   "The interpreter instance this deployer uses."
   interpreter: InterpreterInstance # get from ValidInterpreter.interpreter
-  "The RainterpreterStore instance being used by the deployer"
+  "The RainterpreterStore instance being used by the deployer at construction"
   store: RainterpreterStoreInstance
-  "The account that deployed this IExpressionDeployerV1"
+  "The RainterpreterParser instance being used by the deployer at construction"
+  parser: RainterpreterParserInstance
+  "The account that deployed this deployer"
   account: Account
   "functionPointers"
   functionPointers: String
@@ -98,10 +100,25 @@ type RainterpreterStoreInstance @entity {
   deployers: [ExpressionDeployer!] @derivedFrom(field: "store")
 }
 
+type RainterpreterParser @entity {
+  "Hash of the deployed bytecode for this RainterpreterParser."
+  id: ID!
+  "Instances of this parser"
+  instances: [RainterpreterParserInstance!]! @derivedFrom(field: "parser")
+}
+
+type RainterpreterParserInstance @entity {
+  "Address of the RainterpreterParser instance"
+  id: ID!
+  parser: RainterpreterParser!
+  "ExpressionDeployers using this parser"
+  deployers: [ExpressionDeployer!] @derivedFrom(field: "parser")
+}
+
 type Expression @entity(immutable: true) {
   "Address for this expression"
   id: ID!
-  event: DeployExpressionEvent!
+  event: DeployedExpressionEvent!
   "Account that deployed this expression"
   account: Account!
   "The contract that this expression was deployed via"
@@ -113,7 +130,7 @@ type Expression @entity(immutable: true) {
   config: StateConfig!
 }
 
-type DeployExpressionEvent implements Event @entity(immutable: true) {
+type DeployedExpressionEvent implements Event @entity(immutable: true) {
   id: ID!
   "Transaction this event was emitted in."
   transaction: Transaction!
@@ -144,7 +161,6 @@ type StateConfig @entity {
   id: ID!
   bytecode: Bytes!
   constants: [BigInt!]!
-  minOutputs: [BigInt!]!
 }
 
 interface Meta {
