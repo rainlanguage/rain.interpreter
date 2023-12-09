@@ -147,8 +147,15 @@ library LibParseLiteral {
                     stringData := mload(innerStart)
                     for {} and(
                         lt(i, 0x20),
-                        //slither-disable-next-line incorrect-shift
-                        iszero(iszero(and(shl(byte(i, stringData), 1), stringCharMask)))
+                        iszero(
+                            iszero(
+                                and(
+                                    //slither-disable-next-line incorrect-shift
+                                    shl(byte(i, stringData), 1),
+                                    stringCharMask
+                                )
+                            )
+                        )
                     ) {} { i := add(i, 1) }
                 }
                 if (i == 0x20) {
@@ -159,6 +166,7 @@ library LibParseLiteral {
                 assembly ("memory-safe") {
                     finalChar := byte(0, mload(innerEnd))
                 }
+                //slither-disable-next-line incorrect-shift
                 if (1 << finalChar & CMASK_STRING_LITERAL_END == 0) {
                     revert UnclosedStringLiteral(LibParse.parseErrorOffset(data, cursor));
                 }
