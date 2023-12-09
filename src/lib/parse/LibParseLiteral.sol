@@ -146,18 +146,9 @@ library LibParseLiteral {
                     // The 32nd byte is the length of the string.
                     stringData := mload(innerStart)
                     //slither-disable-next-line incorrect-shift
-                    for {} and(
-                        lt(i, 0x20),
-                        iszero(
-                            iszero(
-                                and(
-                                    //slither-disable-next-line incorrect-shift
-                                    shl(byte(i, stringData), 1),
-                                    stringCharMask
-                                )
-                            )
-                        )
-                    ) {} { i := add(i, 1) }
+                    for {} and(lt(i, 0x20), iszero(iszero(and(shl(byte(i, stringData), 1), stringCharMask)))) {} {
+                        i := add(i, 1)
+                    }
                 }
                 if (i == 0x20) {
                     revert StringTooLong(LibParse.parseErrorOffset(data, cursor));
