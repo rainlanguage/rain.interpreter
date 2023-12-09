@@ -7,7 +7,7 @@ import {LibParse} from "src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
 import {IntOrAString, LibIntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
 import {CMASK_STRING_LITERAL_TAIL} from "src/lib/parse/LibParseCMask.sol";
-import {StringTooLong} from "src/error/ErrParse.sol";
+import {StringTooLong, UnclosedStringLiteral} from "src/error/ErrParse.sol";
 
 /// @title LibParseLiteralStringTest
 contract LibParseLiteralStringTest is Test {
@@ -113,9 +113,48 @@ contract LibParseLiteralStringTest is Test {
         vm.assume(bytes(str).length >= 0x20);
         conformValidPrintableStringContent(str);
 
-        console2.log("str", str, bytes(str).length);
+        vm.expectRevert(abi.encodeWithSelector(StringTooLong.selector, 3));
+        (bytes memory bytecode, uint256[] memory constants) =
+            this.externalParse(bytes(string.concat("_: \"", str, "\";")));
+        (bytecode, constants);
+    }
+
+    /// Invalid chars beyond the 31 byte valid range will not be parsed. Instead
+    /// a `StringTooLong` error will be thrown.
+    function testParseStringLiteralInvalidCharAfter(string memory strA, string memory strB) external {
+        vm.assume(bytes(strA).length >= 0x20);
+        conformValidPrintableStringContent(strA);
+        assembly ("memory-safe") {
+            // Force truncate the string to 32 bytes.
+            mstore(strA, 0x20)
+        }
 
         vm.expectRevert(abi.encodeWithSelector(StringTooLong.selector, 3));
+        (bytes memory bytecode, uint256[] memory constants) =
+            this.externalParse(bytes(string.concat("_: \"", strA, strB, "\";")));
+        (bytecode, constants);
+    }
+
+    /// Invalid chars anywhere in the parsed string will cause an unclosed
+    /// string literal error.
+    function testParseStringLiteralInvalidCharWithin(string memory str, uint256 badIndex) external {
+        vm.assume(bytes(str).length > 0);
+        conformValidPrintableStringContent(str);
+        badIndex = bound(badIndex, 0, (bytes(str).length > 0x1F ? 0x1F : bytes(str).length) - 1);
+
+        uint256 char = uint256(uint8(bytes(str)[badIndex]));
+        uint256 seed = 0;
+        while (1 << char & ~CMASK_STRING_LITERAL_TAIL == 0 || char == uint8(bytes1("\""))) {
+            assembly ("memory-safe") {
+                mstore(0, char)
+                mstore(0x20, seed)
+                seed := keccak256(0, 0x40)
+                char := byte(0, seed)
+            }
+        }
+        bytes(str)[badIndex] = bytes1(uint8(char));
+
+        vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, 3));
         (bytes memory bytecode, uint256[] memory constants) =
             this.externalParse(bytes(string.concat("_: \"", str, "\";")));
         (bytecode, constants);
