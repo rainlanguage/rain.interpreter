@@ -144,12 +144,12 @@ library LibParseLiteral {
                     // The 32nd byte is the length of the string.
                     stringData := mload(innerStart)
                     for {} and(
-                        lt(i, 0x1F),
+                        lt(i, 0x20),
                         //slither-disable-next-line incorrect-shift
                         iszero(iszero(and(shl(byte(i, stringData), 1), stringCharMask)))
                     ) {} { i := add(i, 1) }
                 }
-                if (i == 0x1F) {
+                if (i == 0x20) {
                     revert StringTooLong(LibParse.parseErrorOffset(data, cursor));
                 }
                 innerEnd += innerStart + i;

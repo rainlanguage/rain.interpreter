@@ -7,9 +7,9 @@ import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
 import {LibParse} from "src/lib/parse/LibParse.sol";
 import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
 
-/// @title LibParseIntegerLiteralHexTest
+/// @title LibParseLiteralIntegerHexTest
 /// Tests parsing integer literal hex values.
-contract LibParseIntegerLiteralHexTest is Test {
+contract LibParseLiteralIntegerHexTest is Test {
     /// Check a single hex literal. Should not revert and return length 1
     /// sources and constants.
     function testParseIntegerLiteralHex00() external {
