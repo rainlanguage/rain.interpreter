@@ -132,56 +132,7 @@ library LibParseLiteral {
                 }
                 // decimal is the fallback as continuous numeric digits 0-9.
                 else {
-                    uint256 innerStart = cursor;
-                    // We know the head is a numeric so we can move past it.
-                    uint256 innerEnd = innerStart + 1;
-                    uint256 ePosition = 0;
-
-                    {
-                        uint256 decimalCharMask = CMASK_NUMERIC_0_9;
-                        uint256 eMask = CMASK_E_NOTATION;
-                        assembly ("memory-safe") {
-                            //slither-disable-next-line incorrect-shift
-                            for {} iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), decimalCharMask))) {
-                                innerEnd := add(innerEnd, 1)
-                            } {}
-
-                            // If we're now pointing at an e notation, then we need
-                            // to move past it. Negative exponents are not supported.
-                            //slither-disable-next-line incorrect-shift
-                            if iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), eMask))) {
-                                ePosition := innerEnd
-                                innerEnd := add(innerEnd, 1)
-
-                                // Move past the exponent digits.
-                                //slither-disable-next-line incorrect-shift
-                                for {} iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), decimalCharMask))) {
-                                    innerEnd := add(innerEnd, 1)
-                                } {}
-                            }
-                        }
-                    }
-                    if (ePosition != 0 && (innerEnd > ePosition + 3 || innerEnd == ePosition + 1)) {
-                        revert MalformedExponentDigits(LibParse.parseErrorOffset(data, ePosition));
-                    }
-
-                    function(bytes memory, uint256, uint256) pure returns (uint256) parser;
-                    {
-                        uint256 p = (literalParsers >> LITERAL_TYPE_INTEGER_DECIMAL) & 0xFFFF;
-                        assembly ("memory-safe") {
-                            parser := p
-                        }
-                    }
-                    {
-                        uint256 endDecimal;
-                        assembly ("memory-safe") {
-                            endDecimal := add(data, add(mload(data), 0x20))
-                        }
-                        if (innerEnd > endDecimal) {
-                            revert ParserOutOfBounds();
-                        }
-                    }
-                    return (parser, innerStart, innerEnd, innerEnd);
+                    return boundLiteralDecimal(literalParsers, data, cursor);
                 }
             } else if (head & CMASK_STRING_LITERAL_HEAD != 0) {
                 return boundLiteralString(literalParsers, data, cursor);
@@ -219,17 +170,18 @@ library LibParseLiteral {
                     // Only up to 31 bytes of string data can be stored in a
                     // single word, so strings can't be longer than 31 bytes.
                     // The 32nd byte is the length of the string.
-                    stringData := mload(innerEnd)
+                    stringData := mload(innerStart)
                     for {} and(
                         lt(i, 0x1F),
                         //slither-disable-next-line incorrect-shift
                         iszero(iszero(and(shl(byte(i, stringData), 1), stringCharMask)))
-                    ) { i := add(i, 1) } {}
+                    ) {} { i := add(i, 1) }
                 }
                 if (i == 0x1F) {
                     revert StringTooLong(LibParse.parseErrorOffset(data, cursor));
                 }
-                innerEnd += i + 1;
+                innerEnd += innerStart + i;
+                // Outer end is after the final `"`.
                 outerEnd = innerEnd + 1;
             }
 
@@ -326,6 +278,63 @@ library LibParseLiteral {
                 }
             }
         }
+    }
+
+    function boundLiteralDecimal(uint256 literalParsers, bytes memory data, uint256 cursor)
+        internal
+        pure
+        returns (function(bytes memory, uint256, uint256) pure returns (uint256), uint256, uint256, uint256)
+    {
+        uint256 innerStart = cursor;
+        // We know the head is a numeric so we can move past it.
+        uint256 innerEnd = innerStart + 1;
+        uint256 ePosition = 0;
+
+        {
+            uint256 decimalCharMask = CMASK_NUMERIC_0_9;
+            uint256 eMask = CMASK_E_NOTATION;
+            assembly ("memory-safe") {
+                //slither-disable-next-line incorrect-shift
+                for {} iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), decimalCharMask))) {
+                    innerEnd := add(innerEnd, 1)
+                } {}
+
+                // If we're now pointing at an e notation, then we need
+                // to move past it. Negative exponents are not supported.
+                //slither-disable-next-line incorrect-shift
+                if iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), eMask))) {
+                    ePosition := innerEnd
+                    innerEnd := add(innerEnd, 1)
+
+                    // Move past the exponent digits.
+                    //slither-disable-next-line incorrect-shift
+                    for {} iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), decimalCharMask))) {
+                        innerEnd := add(innerEnd, 1)
+                    } {}
+                }
+            }
+        }
+        if (ePosition != 0 && (innerEnd > ePosition + 3 || innerEnd == ePosition + 1)) {
+            revert MalformedExponentDigits(LibParse.parseErrorOffset(data, ePosition));
+        }
+
+        function(bytes memory, uint256, uint256) pure returns (uint256) parser;
+        {
+            uint256 p = (literalParsers >> LITERAL_TYPE_INTEGER_DECIMAL) & 0xFFFF;
+            assembly ("memory-safe") {
+                parser := p
+            }
+        }
+        {
+            uint256 endDecimal;
+            assembly ("memory-safe") {
+                endDecimal := add(data, add(mload(data), 0x20))
+            }
+            if (innerEnd > endDecimal) {
+                revert ParserOutOfBounds();
+            }
+        }
+        return (parser, innerStart, innerEnd, innerEnd);
     }
 
     /// Algorithm for parsing decimal literals:
