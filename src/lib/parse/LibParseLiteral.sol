@@ -15,7 +15,9 @@ import {
     StringTooLong,
     UnsupportedLiteralType,
     ZeroLengthDecimal,
-    ZeroLengthHexLiteral
+    ZeroLengthHexLiteral,
+    UnclosedStringLiteral,
+    ParserOutOfBounds
 } from "../../error/ErrParse.sol";
 
 /// @dev The type of a literal is both a unique value and a literal offset used
@@ -153,6 +155,13 @@ library LibParseLiteral {
                     revert StringTooLong(LibParse.parseErrorOffset(data, cursor));
                 }
                 innerEnd += innerStart + i;
+                uint256 finalChar;
+                assembly ("memory-safe") {
+                    finalChar := byte(0, mload(innerEnd))
+                }
+                if (1 << finalChar & CMASK_STRING_LITERAL_END == 0) {
+                    revert UnclosedStringLiteral(LibParse.parseErrorOffset(data, cursor));
+                }
                 // Outer end is after the final `"`.
                 outerEnd = innerEnd + 1;
             }

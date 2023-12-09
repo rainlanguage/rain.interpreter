@@ -26,70 +26,28 @@ import {LibParseLiteral} from "./LibParseLiteral.sol";
 import {LibParseOperand} from "./LibParseOperand.sol";
 import {Operand} from "../../interface/unstable/IInterpreterV2.sol";
 import {LibParseStackName} from "./LibParseStackName.sol";
-
-/// The expression does not finish with a semicolon (EOF).
-error MissingFinalSemi(uint256 offset);
-
-/// Enountered an unexpected character on the LHS.
-error UnexpectedLHSChar(uint256 offset);
-
-/// Encountered an unexpected character on the RHS.
-error UnexpectedRHSChar(uint256 offset);
-
-/// More specific version of UnexpectedRHSChar where we specifically expected
-/// a left paren but got some other char.
-error ExpectedLeftParen(uint256 offset);
-
-/// Encountered a right paren without a matching left paren.
-error UnexpectedRightParen(uint256 offset);
-
-/// Encountered an unclosed left paren.
-error UnclosedLeftParen(uint256 offset);
-
-/// Encountered a comment outside the interstitial space between lines.
-error UnexpectedComment(uint256 offset);
-
-/// Encountered a comment start sequence that is malformed.
-error MalformedCommentStart(uint256 offset);
-
-/// @dev Thrown when a stack name is duplicated. Shadowing in all forms is
-/// disallowed in Rainlang.
-error DuplicateLHSItem(uint256 errorOffset);
-
-/// Encountered too many LHS items.
-error ExcessLHSItems(uint256 offset);
-
-/// Encountered inputs where they can't be handled.
-error NotAcceptingInputs(uint256 offset);
-
-/// Encountered too many RHS items.
-error ExcessRHSItems(uint256 offset);
-
-/// Encountered a word that is longer than 32 bytes.
-error WordSize(string word);
-
-/// Parsed a word that is not in the meta.
-error UnknownWord(uint256 offset);
-
-/// The parser exceeded the maximum number of sources that it can build.
-error MaxSources();
-
-/// The parser encountered a dangling source. This is a bug in the parser.
-error DanglingSource();
-
-/// The parser moved past the end of the data.
-error ParserOutOfBounds();
-
-/// The parser encountered a stack deeper than it can process in the memory
-/// region allocated for stack names.
-error StackOverflow();
-
-/// The parser encountered a stack underflow.
-error StackUnderflow();
-
-/// The parser encountered a paren group deeper than it can process in the
-/// memory region allocated for paren tracking.
-error ParenOverflow();
+import {
+    ExcessLHSItems,
+    ExcessRHSItems,
+    NotAcceptingInputs,
+    ParseStackUnderflow,
+    ParseStackOverflow,
+    UnexpectedRHSChar,
+    UnexpectedRightParen,
+    WordSize,
+    DuplicateLHSItem,
+    ParserOutOfBounds,
+    ExpectedLeftParen,
+    UnexpectedLHSChar,
+    DanglingSource,
+    MaxSources,
+    UnclosedLeftParen,
+    MissingFinalSemi,
+    UnexpectedComment,
+    ParenOverflow,
+    UnknownWord,
+    MalformedCommentStart
+} from "../../error/ErrParse.sol";
 
 uint256 constant NOT_LOW_16_BIT_MASK = ~uint256(0xFFFF);
 uint256 constant ACTIVE_SOURCE_MASK = NOT_LOW_16_BIT_MASK;
@@ -163,7 +121,7 @@ type StackTracker is uint256;
 /// counter for the root level, the remaining 30 bytes are the paren group words.
 /// @param parenTracker1 32 additional bytes of paren group words.
 /// @param lineTracker A 32 byte memory region for tracking the current line.
-/// Will be partially reset for each line when `balanceLine` is called. Fully
+/// Will be partially reset for each line when `endLine` is called. Fully
 /// reset when a new source is started.
 /// Bytes from low to high:
 /// - byte 0: Lowest byte is the number of LHS items parsed. This is the low
@@ -241,7 +199,7 @@ library LibStackTracker {
         unchecked {
             uint256 current = StackTracker.unwrap(tracker) & 0xFF;
             if (current < n) {
-                revert StackUnderflow();
+                revert ParseStackUnderflow();
             }
             return StackTracker.wrap(StackTracker.unwrap(tracker) - n);
         }
@@ -252,15 +210,25 @@ library LibParseState {
     using LibParseState for ParseState;
     using LibStackTracker for StackTracker;
 
-    function resetSource(ParseState memory state) internal pure {
+    function newActiveSourcePointer(uint256 oldActiveSourcePointer) internal pure returns (uint256) {
         uint256 activeSourcePtr;
         uint256 emptyActiveSource = EMPTY_ACTIVE_SOURCE;
         assembly ("memory-safe") {
-            activeSourcePtr := mload(0x40)
-            mstore(activeSourcePtr, emptyActiveSource)
+            // The active source pointer MUST be aligned to 32 bytes because we
+            // rely on alignment to know when we have filled a source and need
+            // to create a new one, or need to jump through the linked list.
+            activeSourcePtr := and(add(mload(0x40), 0x1F), not(0x1F))
+            mstore(activeSourcePtr, or(emptyActiveSource, shl(0x10, oldActiveSourcePointer)))
             mstore(0x40, add(activeSourcePtr, 0x20))
+
+            // The old tail head must now point back to the new tail head.
+            mstore(oldActiveSourcePointer, or(and(mload(oldActiveSourcePointer), not(0xFFFF)), activeSourcePtr))
         }
-        state.activeSourcePtr = activeSourcePtr;
+        return activeSourcePtr;
+    }
+
+    function resetSource(ParseState memory state) internal pure {
+        state.activeSourcePtr = newActiveSourcePointer(0);
         state.topLevel0 = 0;
         state.topLevel1 = 0;
         state.parenTracker0 = 0;
@@ -313,14 +281,14 @@ library LibParseState {
     // Find the pointer to the first opcode in the source LL. Put it in the line
     // tracker at the appropriate offset.
     function snapshotSourceHeadToLineTracker(ParseState memory state) internal pure {
+        uint256 activeSourcePtr = state.activeSourcePtr;
         assembly ("memory-safe") {
             let topLevel0Pointer := add(state, 0x20)
             let totalRHSTopLevel := byte(0, mload(topLevel0Pointer))
             // Only do stuff if the current word counter is zero.
             if iszero(byte(0, mload(add(topLevel0Pointer, add(totalRHSTopLevel, 1))))) {
-                let sourceHead := mload(state)
-                let byteOffset := div(and(mload(sourceHead), 0xFFFF), 8)
-                sourceHead := add(sourceHead, sub(0x20, byteOffset))
+                let byteOffset := div(and(mload(activeSourcePtr), 0xFFFF), 8)
+                let sourceHead := add(activeSourcePtr, sub(0x20, byteOffset))
 
                 let lineTracker := mload(add(state, 0xa0))
                 let lineRHSTopLevel := sub(totalRHSTopLevel, byte(30, lineTracker))
@@ -454,7 +422,7 @@ library LibParseState {
                 mstore8(stackRHSOffsetPtr, newStackRHSOffset)
             }
             if (newStackRHSOffset == 0x3f) {
-                revert StackOverflow();
+                revert ParseStackOverflow();
             }
         }
     }
@@ -591,8 +559,8 @@ library LibParseState {
 
             uint256 activeSource;
             uint256 offset;
+            uint256 activeSourcePointer = state.activeSourcePtr;
             assembly ("memory-safe") {
-                let activeSourcePointer := mload(state)
                 activeSource := mload(activeSourcePointer)
                 // The low 16 bits of the active source is the current offset.
                 offset := and(activeSource, 0xFFFF)
@@ -644,29 +612,13 @@ library LibParseState {
             // into the correct position, beyond the operand.
             | opcode << (offset + 0x18);
             assembly ("memory-safe") {
-                mstore(mload(state), activeSource)
+                mstore(activeSourcePointer, activeSource)
             }
 
             // We have filled the current source slot. Need to create a new active
             // source and fulfill the doubly linked list.
             if (offset == 0xe0) {
-                // Pointer to a newly allocated active source.
-                uint256 newTailPtr;
-                // Pointer to the old head of the LL tail.
-                uint256 oldTailPtr;
-                uint256 emptyActiveSource = EMPTY_ACTIVE_SOURCE;
-                assembly ("memory-safe") {
-                    oldTailPtr := mload(state)
-
-                    // Build the new tail head.
-                    newTailPtr := mload(0x40)
-                    mstore(state, newTailPtr)
-                    mstore(newTailPtr, or(emptyActiveSource, shl(0x10, oldTailPtr)))
-                    mstore(0x40, add(newTailPtr, 0x20))
-
-                    // The old tail head must now point back to the new tail head.
-                    mstore(oldTailPtr, or(and(mload(oldTailPtr), not(0xFFFF)), newTailPtr))
-                }
+                state.activeSourcePtr = newActiveSourcePointer(activeSourcePointer);
             }
         }
     }
@@ -694,10 +646,9 @@ library LibParseState {
         else {
             uint256 source;
             StackTracker stackTracker = state.stackTracker;
+            uint256 cursor = state.activeSourcePtr;
             assembly ("memory-safe") {
                 // find the end of the LL tail.
-                let cursor := mload(state)
-
                 let tailPointer := and(shr(0x10, mload(cursor)), 0xFFFF)
                 for {} iszero(iszero(tailPointer)) {} {
                     cursor := tailPointer
@@ -807,9 +758,13 @@ library LibParseState {
             // we are building the overall sources array while still trying to
             // build one of the individual sources. This is a bug in the parser.
             uint256 activeSource;
-            assembly ("memory-safe") {
-                activeSource := mload(mload(state))
+            {
+                uint256 activeSourcePointer = state.activeSourcePtr;
+                assembly ("memory-safe") {
+                    activeSource := mload(activeSourcePointer)
+                }
             }
+
             if (activeSource != EMPTY_ACTIVE_SOURCE) {
                 revert DanglingSource();
             }

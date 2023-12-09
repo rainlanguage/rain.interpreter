@@ -26,6 +26,10 @@ error UnsupportedLiteralType(uint256 offset);
 /// Encountered a string literal that is larger than supported.
 error StringTooLong(uint256 offset);
 
+/// Encountered a string that does not have a valid end, e.g. we found some char
+/// that was not printable ASCII and had to stop.
+error UnclosedStringLiteral(uint256 offset);
+
 /// Encountered a literal that is larger than supported.
 error HexLiteralOverflow(uint256 offset);
 
@@ -47,3 +51,67 @@ error MalformedExponentDigits(uint256 offset);
 
 /// Encountered a zero length decimal literal.
 error ZeroLengthDecimal(uint256 offset);
+
+/// The expression does not finish with a semicolon (EOF).
+error MissingFinalSemi(uint256 offset);
+
+/// Enountered an unexpected character on the LHS.
+error UnexpectedLHSChar(uint256 offset);
+
+/// Encountered an unexpected character on the RHS.
+error UnexpectedRHSChar(uint256 offset);
+
+/// More specific version of UnexpectedRHSChar where we specifically expected
+/// a left paren but got some other char.
+error ExpectedLeftParen(uint256 offset);
+
+/// Encountered a right paren without a matching left paren.
+error UnexpectedRightParen(uint256 offset);
+
+/// Encountered an unclosed left paren.
+error UnclosedLeftParen(uint256 offset);
+
+/// Encountered a comment outside the interstitial space between lines.
+error UnexpectedComment(uint256 offset);
+
+/// Encountered a comment start sequence that is malformed.
+error MalformedCommentStart(uint256 offset);
+
+/// @dev Thrown when a stack name is duplicated. Shadowing in all forms is
+/// disallowed in Rainlang.
+error DuplicateLHSItem(uint256 errorOffset);
+
+/// Encountered too many LHS items.
+error ExcessLHSItems(uint256 offset);
+
+/// Encountered inputs where they can't be handled.
+error NotAcceptingInputs(uint256 offset);
+
+/// Encountered too many RHS items.
+error ExcessRHSItems(uint256 offset);
+
+/// Encountered a word that is longer than 32 bytes.
+error WordSize(string word);
+
+/// Parsed a word that is not in the meta.
+error UnknownWord(uint256 offset);
+
+/// The parser exceeded the maximum number of sources that it can build.
+error MaxSources();
+
+/// The parser encountered a dangling source. This is a bug in the parser.
+error DanglingSource();
+
+/// The parser moved past the end of the data.
+error ParserOutOfBounds();
+
+/// The parser encountered a stack deeper than it can process in the memory
+/// region allocated for stack names.
+error ParseStackOverflow();
+
+/// The parser encountered a stack underflow.
+error ParseStackUnderflow();
+
+/// The parser encountered a paren group deeper than it can process in the
+/// memory region allocated for paren tracking.
+error ParenOverflow();
