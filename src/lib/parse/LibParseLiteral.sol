@@ -100,35 +100,7 @@ library LibParseLiteral {
                 // Hexadecimal literal dispatch is 0x. We can't accidentally
                 // match x0 because we already checked that the head is 0-9.
                 if ((head | dispatch) == CMASK_LITERAL_HEX_DISPATCH) {
-                    uint256 innerStart = cursor + 2;
-                    uint256 innerEnd = innerStart;
-                    {
-                        uint256 hexCharMask = CMASK_HEX;
-                        assembly ("memory-safe") {
-                            //slither-disable-next-line incorrect-shift
-                            for {} iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), hexCharMask))) {
-                                innerEnd := add(innerEnd, 1)
-                            } {}
-                        }
-                    }
-
-                    function(bytes memory, uint256, uint256) pure returns (uint256) parser;
-                    {
-                        uint256 p = (literalParsers >> LITERAL_TYPE_INTEGER_HEX) & 0xFFFF;
-                        assembly ("memory-safe") {
-                            parser := p
-                        }
-                    }
-                    {
-                        uint256 endHex;
-                        assembly ("memory-safe") {
-                            endHex := add(data, add(mload(data), 0x20))
-                        }
-                        if (innerEnd > endHex) {
-                            revert ParserOutOfBounds();
-                        }
-                    }
-                    return (parser, innerStart, innerEnd, innerEnd);
+                    return boundLiteralHex(literalParsers, data, cursor);
                 }
                 // decimal is the fallback as continuous numeric digits 0-9.
                 else {
@@ -227,6 +199,42 @@ library LibParseLiteral {
             mstore(str, before)
         }
         return IntOrAString.unwrap(intOrAString);
+    }
+
+    function boundLiteralHex(uint256 literalParsers, bytes memory data, uint256 cursor)
+        internal
+        pure
+        returns (function(bytes memory, uint256, uint256) pure returns (uint256), uint256, uint256, uint256)
+    {
+        uint256 innerStart = cursor + 2;
+        uint256 innerEnd = innerStart;
+        {
+            uint256 hexCharMask = CMASK_HEX;
+            assembly ("memory-safe") {
+                //slither-disable-next-line incorrect-shift
+                for {} iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), hexCharMask))) {
+                    innerEnd := add(innerEnd, 1)
+                } {}
+            }
+        }
+
+        function(bytes memory, uint256, uint256) pure returns (uint256) parser;
+        {
+            uint256 p = (literalParsers >> LITERAL_TYPE_INTEGER_HEX) & 0xFFFF;
+            assembly ("memory-safe") {
+                parser := p
+            }
+        }
+        {
+            uint256 endHex;
+            assembly ("memory-safe") {
+                endHex := add(data, add(mload(data), 0x20))
+            }
+            if (innerEnd > endHex) {
+                revert ParserOutOfBounds();
+            }
+        }
+        return (parser, innerStart, innerEnd, innerEnd);
     }
 
     /// Algorithm for parsing hexadecimal literals:
