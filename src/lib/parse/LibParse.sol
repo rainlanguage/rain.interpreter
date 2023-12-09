@@ -48,13 +48,15 @@ import {
     UnknownWord,
     MalformedCommentStart
 } from "../../error/ErrParse.sol";
-import {LibParseState, ParseState,
-FSM_YANG_MASK,
-FSM_RHS_MASK,
-FSM_DEFAULT,
-FSM_ACTIVE_SOURCE_MASK,
-FSM_WORD_END_MASK,
-FSM_INTERSTITIAL_MASK
+import {
+    LibParseState,
+    ParseState,
+    FSM_YANG_MASK,
+    FSM_RHS_MASK,
+    FSM_DEFAULT,
+    FSM_ACTIVE_SOURCE_MASK,
+    FSM_WORD_END_MASK,
+    FSM_INTERSTITIAL_MASK
 } from "./LibParseState.sol";
 
 uint256 constant NOT_LOW_16_BIT_MASK = ~uint256(0xFFFF);

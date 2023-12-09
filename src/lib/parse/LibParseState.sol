@@ -295,7 +295,9 @@ library LibParseState {
                 for (uint256 i = 1; i <= opsDepth; i++) {
                     {
                         // We've hit the end of a LL item so have to jump towards the
-                        // tail to keep going.
+                        // tail to keep going. This makes the assumption that
+                        // the relevant pointers are aligned to 32 bytes, which
+                        // is handled on allocation in `newActiveSourcePointer`.
                         if (itemSourceHead % 0x20 == 0x1c) {
                             assembly ("memory-safe") {
                                 itemSourceHead := shr(0xf0, mload(itemSourceHead))
