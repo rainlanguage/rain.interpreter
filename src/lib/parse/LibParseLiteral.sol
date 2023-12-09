@@ -145,6 +145,7 @@ library LibParseLiteral {
                     // single word, so strings can't be longer than 31 bytes.
                     // The 32nd byte is the length of the string.
                     stringData := mload(innerStart)
+                    //slither-disable-next-line incorrect-shift
                     for {} and(
                         lt(i, 0x20),
                         iszero(
