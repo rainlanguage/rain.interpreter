@@ -4,6 +4,14 @@ pragma solidity ^0.8.18;
 import {EncodedDispatch, StateNamespace, Operand, DEFAULT_STATE_NAMESPACE} from "../deprecated/IInterpreterV1.sol";
 import {FullyQualifiedNamespace, IInterpreterStoreV1} from "../IInterpreterStoreV1.sol";
 
+/// @dev For maximum compatibility with external contracts, the `IInterpreterV2`
+/// should implement an opcode that reads from the stack by index as opcode `0`.
+uint256 constant OPCODE_STACK = 0;
+
+/// @dev For maximum compatibility with external contracts, the `IInterpreterV2`
+/// should implement an opcode that reads constants by index as opcode `1`.
+uint256 constant OPCODE_CONSTANT = 1;
+
 /// @dev The index of a source within a deployed expression that can be evaluated
 /// by an `IInterpreterV2`. MAY be an entrypoint or the index of a source called
 /// internally such as by the `call` opcode.
