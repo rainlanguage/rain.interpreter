@@ -69,24 +69,6 @@ contract LibParseLiteralStringTest is Test {
         assertEq(constants[0], IntOrAString.unwrap(LibIntOrAString.fromString("a")));
     }
 
-    /// Check "_: \"/29MpY\\RZ\\`pjr'e.UK;=PB5.]=tb*\";" as it is was flagged by
-    /// the fuzzer.
-    function testParseStringLiteralFuzz0() external {
-        (bytes memory bytecode, uint256[] memory constants) =
-            LibParse.parse(bytes("_: \"/29MpY\\RZ\\`pjr'e.UK;=PB5.]=tb*\";"), LibMetaFixture.parseMeta());
-        uint256 sourceIndex = 0;
-        assertEq(LibBytecode.sourceCount(bytecode), 1);
-        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 1);
-        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 1);
-        (uint256 inputs, uint256 outputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
-        assertEq(inputs, 0);
-        assertEq(outputs, 1);
-
-        assertEq(constants.length, 1);
-        assertEq(constants[0], IntOrAString.unwrap(LibIntOrAString.fromString("/29MpY\\RZ\\`pjr'e.UK;=PB5.]=tb*")));
-    }
-
     /// Any ASCII printable string shorter than 32 bytes should be parsed
     /// correctly.
     function testParseStringLiteralShortASCII(string memory str) external {

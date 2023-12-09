@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "rain.solmem/lib/LibPointer.sol";
-import "rain.solmem/lib/LibBytes.sol";
-import "src/lib/parse/LibParseLiteral.sol";
+import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
+import {LibParseLiteral, ZeroLengthDecimal} from "src/lib/parse/LibParseLiteral.sol";
 
 /// @title LibParseLiteralDecimalTest
 /// Tests parsing decimal literal values with the LibParseLiteral library.
