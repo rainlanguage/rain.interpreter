@@ -19,3 +19,31 @@ error OperandOverflow(uint256 offset);
 /// Thrown when parsing an operand and the closing `>` paren is not found.
 /// @param offset The offset in the source string where the error occurred.
 error UnclosedOperand(uint256 offset);
+
+/// The parser tried to bound an unsupported literal that we have no type for.
+error UnsupportedLiteralType(uint256 offset);
+
+/// Encountered a string literal that is larger than supported.
+error StringTooLong(uint256 offset);
+
+/// Encountered a literal that is larger than supported.
+error HexLiteralOverflow(uint256 offset);
+
+/// Encountered a zero length hex literal.
+error ZeroLengthHexLiteral(uint256 offset);
+
+/// Encountered an odd sized hex literal.
+error OddLengthHexLiteral(uint256 offset);
+
+/// Encountered a hex literal with an invalid character.
+error MalformedHexLiteral(uint256 offset);
+
+/// Encountered a decimal literal that is larger than supported.
+error DecimalLiteralOverflow(uint256 offset);
+
+/// Encountered a decimal literal with an exponent that has too many or no
+/// digits.
+error MalformedExponentDigits(uint256 offset);
+
+/// Encountered a zero length decimal literal.
+error ZeroLengthDecimal(uint256 offset);

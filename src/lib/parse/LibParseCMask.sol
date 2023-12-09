@@ -454,6 +454,12 @@ uint128 constant CMASK_LHS_STACK_DELIMITER = CMASK_WHITESPACE;
 /// @dev Rainlang supports numeric literals as anything starting with 0-9
 uint128 constant CMASK_NUMERIC_LITERAL_HEAD = CMASK_NUMERIC_0_9;
 
+/// @dev Rainlang supports string literals as anything starting with "
+uint128 constant CMASK_STRING_LITERAL_HEAD = CMASK_QUOTATION_MARK;
+
+/// @dev Rainlang string tail is any ASCII except "
+uint128 constant CMASK_STRING_LITERAL_TAIL = ~CMASK_QUOTATION_MARK;
+
 /// @dev Rainlang literal head
 uint128 constant CMASK_LITERAL_HEAD = CMASK_NUMERIC_LITERAL_HEAD;
 

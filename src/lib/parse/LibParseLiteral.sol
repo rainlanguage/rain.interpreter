@@ -4,37 +4,31 @@ pragma solidity ^0.8.18;
 import "./LibParseCMask.sol";
 import "./LibParse.sol";
 
-/// The parser tried to bound an unsupported literal that we have no type for.
-error UnsupportedLiteralType(uint256 offset);
+import {IntOrAString, LibIntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
 
-/// Encountered a literal that is larger than supported.
-error HexLiteralOverflow(uint256 offset);
-
-/// Encountered a zero length hex literal.
-error ZeroLengthHexLiteral(uint256 offset);
-
-/// Encountered an odd sized hex literal.
-error OddLengthHexLiteral(uint256 offset);
-
-/// Encountered a hex literal with an invalid character.
-error MalformedHexLiteral(uint256 offset);
-
-/// Encountered a decimal literal that is larger than supported.
-error DecimalLiteralOverflow(uint256 offset);
-
-/// Encountered a decimal literal with an exponent that has too many or no
-/// digits.
-error MalformedExponentDigits(uint256 offset);
-
-/// Encountered a zero length decimal literal.
-error ZeroLengthDecimal(uint256 offset);
+import {
+    DecimalLiteralOverflow,
+    HexLiteralOverflow,
+    MalformedExponentDigits,
+    MalformedHexLiteral,
+    OddLengthHexLiteral,
+    StringTooLong,
+    UnsupportedLiteralType,
+    ZeroLengthDecimal,
+    ZeroLengthHexLiteral
+} from "../../error/ErrParse.sol";
 
 /// @dev The type of a literal is both a unique value and a literal offset used
 /// to index into the literal parser array as a uint256.
 uint256 constant LITERAL_TYPE_INTEGER_HEX = 0;
+
 /// @dev The type of a literal is both a unique value and a literal offset used
 /// to index into the literal parser array as a uint256.
 uint256 constant LITERAL_TYPE_INTEGER_DECIMAL = 0x10;
+
+/// @dev The type of a literal is both a unique value and a literal offset used
+/// to index into the literal parser array as a uint256.
+uint256 constant LITERAL_TYPE_STRING = 0x20;
 
 library LibParseLiteral {
     function buildLiteralParsers() internal pure returns (uint256 literalParsers) {
@@ -49,10 +43,19 @@ library LibParseLiteral {
             function(bytes memory, uint256, uint256) pure returns (uint256) literalParserDecimal =
                 LibParseLiteral.parseLiteralDecimal;
             uint256 parseLiteralDecimalOffset = LITERAL_TYPE_INTEGER_DECIMAL;
+            function(bytes memory, uint256, uint256) pure returns (uint256) literalParserString =
+                LibParseLiteral.parseLiteralString;
+            uint256 parseLiteralStringOffset = LITERAL_TYPE_STRING;
 
             assembly ("memory-safe") {
                 literalParsers :=
-                    or(shl(parseLiteralHexOffset, literalParserHex), shl(parseLiteralDecimalOffset, literalParserDecimal))
+                    or(
+                        shl(parseLiteralStringOffset, literalParserString),
+                        or(
+                            shl(parseLiteralHexOffset, literalParserHex),
+                            shl(parseLiteralDecimalOffset, literalParserDecimal)
+                        )
+                    )
             }
         }
     }
@@ -94,7 +97,8 @@ library LibParseLiteral {
                     dispatch := shl(byte(1, word), 1)
                 }
 
-                // hexadecimal literal dispatch is 0x
+                // Hexadecimal literal dispatch is 0x. We can't accidentally
+                // match x0 because we already checked that the head is 0-9.
                 if ((head | dispatch) == CMASK_LITERAL_HEX_DISPATCH) {
                     uint256 innerStart = cursor + 2;
                     uint256 innerEnd = innerStart;
@@ -179,6 +183,8 @@ library LibParseLiteral {
                     }
                     return (parser, innerStart, innerEnd, innerEnd);
                 }
+            } else if (head & CMASK_STRING_LITERAL_HEAD != 0) {
+                return boundLiteralString(literalParsers, data, cursor);
             }
 
             uint256 endUnknown;
@@ -191,6 +197,84 @@ library LibParseLiteral {
                 revert UnsupportedLiteralType(LibParse.parseErrorOffset(data, cursor));
             }
         }
+    }
+
+    /// Find the bounds for some string literal at the cursor. The caller is
+    /// responsible for checking that the cursor is at the start of a string
+    /// literal. Bounds are as per `boundLiteral`.
+    function boundLiteralString(uint256 literalParsers, bytes memory data, uint256 cursor)
+        internal
+        pure
+        returns (function(bytes memory, uint256, uint256) pure returns (uint256), uint256, uint256, uint256)
+    {
+        unchecked {
+            uint256 innerStart = cursor + 1;
+            uint256 innerEnd;
+            uint256 outerEnd;
+            {
+                uint256 stringCharMask = CMASK_STRING_LITERAL_TAIL;
+                uint256 stringData;
+                uint256 i = 0;
+                assembly ("memory-safe") {
+                    // Only up to 31 bytes of string data can be stored in a
+                    // single word, so strings can't be longer than 31 bytes.
+                    // The 32nd byte is the length of the string.
+                    stringData := mload(innerEnd)
+                    for {} and(
+                        lt(i, 0x1F),
+                        //slither-disable-next-line incorrect-shift
+                        iszero(iszero(and(shl(byte(i, stringData), 1), stringCharMask)))
+                    ) { i := add(i, 1) } {}
+                }
+                if (i == 0x1F) {
+                    revert StringTooLong(LibParse.parseErrorOffset(data, cursor));
+                }
+                innerEnd += i + 1;
+                outerEnd = innerEnd + 1;
+            }
+
+            function(bytes memory, uint256, uint256) pure returns (uint256) parser;
+            {
+                uint256 p = (literalParsers >> LITERAL_TYPE_STRING) & 0xFFFF;
+                assembly ("memory-safe") {
+                    parser := p
+                }
+            }
+            // Check the parser hasn't moved outside the bounds of the data.
+            {
+                uint256 endString;
+                assembly ("memory-safe") {
+                    endString := add(data, add(mload(data), 0x20))
+                }
+                if (innerEnd > endString) {
+                    revert ParserOutOfBounds();
+                }
+            }
+            return (parser, innerStart, innerEnd, outerEnd);
+        }
+    }
+
+    /// Algorithm for parsing string literals:
+    /// - Get the inner length of the string
+    /// - Mutate memory in place to add a length prefix, record the original data
+    /// - Use this solidity string to build an `IntOrAString`
+    /// - Restore the original data that the length prefix overwrote
+    /// - Return the `IntOrAString`
+    function parseLiteralString(bytes memory, uint256 start, uint256 end) internal pure returns (uint256) {
+        IntOrAString intOrAString;
+        uint256 before;
+        string memory str;
+        assembly ("memory-safe") {
+            let length := sub(end, start)
+            str := sub(start, 0x20)
+            before := mload(str)
+            mstore(str, length)
+        }
+        intOrAString = LibIntOrAString.fromString(str);
+        assembly ("memory-safe") {
+            mstore(str, before)
+        }
+        return IntOrAString.unwrap(intOrAString);
     }
 
     /// Algorithm for parsing hexadecimal literals:
