@@ -1,4 +1,4 @@
-name: OrderBook Subgraph CI
+name: Subgraph CI
 on: [push]
 
 jobs:
