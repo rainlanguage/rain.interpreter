@@ -17,6 +17,7 @@ contract LibParseLiteralStringTest is Test {
         (uint256 value) = LibParseLiteral.parseLiteralString(
             data, Pointer.unwrap(data.dataPointer()), Pointer.unwrap(data.endDataPointer())
         );
+        assertEq(value, 0);
     }
 
     /// The parser does not care about printable characters, or even ASCII. It
