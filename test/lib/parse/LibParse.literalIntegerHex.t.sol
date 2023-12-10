@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
-import "test/util/lib/parse/LibMetaFixture.sol";
+import {Test} from "forge-std/Test.sol";
+import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
 
-import "src/lib/parse/LibParse.sol";
-import "src/lib/bytecode/LibBytecode.sol";
+import {LibParse} from "src/lib/parse/LibParse.sol";
+import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
 
-/// @title LibParseIntegerLiteralHexTest
+/// @title LibParseLiteralIntegerHexTest
 /// Tests parsing integer literal hex values.
-contract LibParseIntegerLiteralHexTest is Test {
+contract LibParseLiteralIntegerHexTest is Test {
     /// Check a single hex literal. Should not revert and return length 1
     /// sources and constants.
     function testParseIntegerLiteralHex00() external {

@@ -72,8 +72,7 @@ library LibParseOperand {
         if (value > max) {
             revert OperandOverflow(LibParse.parseErrorOffset(data, cursor));
         }
-        cursor = outerEnd;
-        return (cursor, value);
+        return (outerEnd, value);
     }
 
     /// Operand is disallowed for this word.
