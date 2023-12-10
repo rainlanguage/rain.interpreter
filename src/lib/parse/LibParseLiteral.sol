@@ -1,8 +1,19 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "./LibParseCMask.sol";
-import "./LibParse.sol";
+import {
+    CMASK_E_NOTATION,
+    CMASK_HEX,
+    CMASK_LOWER_ALPHA_A_F,
+    CMASK_NUMERIC_0_9,
+    CMASK_STRING_LITERAL_HEAD,
+    CMASK_STRING_LITERAL_TAIL,
+    CMASK_UPPER_ALPHA_A_F,
+    CMASK_LITERAL_HEX_DISPATCH,
+    CMASK_NUMERIC_LITERAL_HEAD,
+    CMASK_STRING_LITERAL_END
+} from "./LibParseCMask.sol";
+import {LibParse} from "./LibParse.sol";
 
 import {IntOrAString, LibIntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
 
@@ -153,7 +164,7 @@ library LibParseLiteral {
                 if (i == 0x20) {
                     revert StringTooLong(LibParse.parseErrorOffset(data, cursor));
                 }
-                innerEnd += innerStart + i;
+                innerEnd = innerStart + i;
                 uint256 finalChar;
                 assembly ("memory-safe") {
                     finalChar := byte(0, mload(innerEnd))
@@ -179,7 +190,7 @@ library LibParseLiteral {
                 assembly ("memory-safe") {
                     endString := add(data, add(mload(data), 0x20))
                 }
-                if (innerEnd > endString) {
+                if (outerEnd > endString) {
                     revert ParserOutOfBounds();
                 }
             }

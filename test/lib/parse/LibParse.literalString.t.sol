@@ -71,6 +71,30 @@ contract LibParseLiteralStringTest is Test {
         assertEq(constants[0], IntOrAString.unwrap(LibIntOrAString.fromString(str)));
     }
 
+    /// Can parse 2 valid strings.
+    function testParseStringLiteralTwo(string memory strA, string memory strB) external {
+        vm.assume(bytes(strA).length < 0x20);
+        LibLiteralString.conformValidPrintableStringContent(strA);
+        vm.assume(bytes(strB).length < 0x20);
+        LibLiteralString.conformValidPrintableStringContent(strB);
+        vm.assume(keccak256(bytes(strA)) != keccak256(bytes(strB)));
+
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibParse.parse(bytes(string.concat("_ _: \"", strA, "\"\"", strB, "\";")), LibMetaFixture.parseMeta());
+        uint256 sourceIndex = 0;
+        assertEq(LibBytecode.sourceCount(bytecode), 1);
+        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
+        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 2);
+        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
+        (uint256 inputs, uint256 outputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
+        assertEq(inputs, 0);
+        assertEq(outputs, 2);
+
+        assertEq(constants.length, 2);
+        assertEq(constants[0], IntOrAString.unwrap(LibIntOrAString.fromString(strA)));
+        assertEq(constants[1], IntOrAString.unwrap(LibIntOrAString.fromString(strB)));
+    }
+
     /// Valid ASCII printable strings 32 bytes or longer should error.
     function testParseStringLiteralLongASCII(string memory str) external {
         vm.assume(bytes(str).length >= 0x20);
