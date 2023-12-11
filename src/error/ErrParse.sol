@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
+/// @dev Workaround for https://github.com/foundry-rs/foundry/issues/6572
+contract ErrParse {}
+
 /// Thrown when parsing a source string and an operand opening `<` paren is found
 /// somewhere that we don't expect it or can't handle it.
 /// @param offset The offset in the source string where the error occurred.

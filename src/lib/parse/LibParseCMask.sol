@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
+/// @dev Workaround for https://github.com/foundry-rs/foundry/issues/6572
+contract LibParseCMask {}
+
 /// @dev ASCII null
 uint128 constant CMASK_NULL = uint128(1) << uint128(uint8(bytes1("\x00")));
 
