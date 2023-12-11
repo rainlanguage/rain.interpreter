@@ -52,7 +52,6 @@ import {
     LibParseState,
     ParseState,
     FSM_YANG_MASK,
-    FSM_RHS_MASK,
     FSM_DEFAULT,
     FSM_ACTIVE_SOURCE_MASK,
     FSM_WORD_END_MASK,
@@ -152,6 +151,212 @@ library LibParse {
         return cursor;
     }
 
+    function parseLHS(ParseState memory state, bytes memory data, uint256 cursor, uint256 end) internal pure returns (uint256) {
+        while (cursor < end) {
+            bytes32 word;
+            uint256 char;
+            assembly ("memory-safe") {
+                //slither-disable-next-line incorrect-shift
+                char := shl(byte(0, mload(cursor)), 1)
+            }
+
+            if (char & CMASK_LHS_STACK_HEAD > 0) {
+                // if yang we can't start new stack item
+                if (state.fsm & FSM_YANG_MASK > 0) {
+                    revert UnexpectedLHSChar(parseErrorOffset(data, cursor));
+                }
+
+                // Named stack item.
+                if (char & CMASK_IDENTIFIER_HEAD > 0) {
+                    (cursor, word) = parseWord(cursor, CMASK_LHS_STACK_TAIL);
+                    (bool exists, uint256 index) = state.pushStackName(word);
+                    (index);
+                    // If the stack name already exists, then we
+                    // revert as shadowing is not allowed.
+                    if (exists) {
+                        revert DuplicateLHSItem(parseErrorOffset(data, cursor));
+                    }
+                }
+                // Anon stack item.
+                else {
+                    cursor = skipMask(cursor + 1, end, CMASK_LHS_STACK_TAIL);
+                }
+                // Bump the index regardless of whether the stack
+                // item is named or not.
+                state.topLevel1++;
+                state.lineTracker++;
+
+                // Set yang as we are now building a stack item.
+                // We are also no longer interstitial
+                state.fsm = (state.fsm | FSM_YANG_MASK | FSM_ACTIVE_SOURCE_MASK) & ~FSM_INTERSTITIAL_MASK;
+            } else if (char & CMASK_WHITESPACE != 0) {
+                cursor = skipMask(cursor + 1, end, CMASK_WHITESPACE);
+                // Set ying as we now open to possibilities.
+                state.fsm &= ~FSM_YANG_MASK;
+            } else if (char & CMASK_LHS_RHS_DELIMITER != 0) {
+                // Set RHS and yin. Move out of the interstitial if
+                // we haven't already.
+                state.fsm = (state.fsm | FSM_ACTIVE_SOURCE_MASK) & ~(FSM_YANG_MASK | FSM_INTERSTITIAL_MASK);
+                cursor++;
+                break;
+            } else if (char & CMASK_COMMENT_HEAD != 0) {
+                if (state.fsm & FSM_INTERSTITIAL_MASK == 0) {
+                    revert UnexpectedComment(parseErrorOffset(data, cursor));
+                }
+                cursor = skipComment(data, cursor);
+                // Set yang for comments to force a little breathing
+                // room between comments and the next item.
+                state.fsm |= FSM_YANG_MASK;
+            } else {
+                revert UnexpectedLHSChar(parseErrorOffset(data, cursor));
+            }
+        }
+        return cursor;
+    }
+
+    function parseRHS(bytes memory meta, ParseState memory state, bytes memory data, uint256 cursor, uint256 end) internal pure returns (uint256) {
+        while (cursor < end) {
+            bytes32 word;
+            uint256 char;
+            assembly ("memory-safe") {
+                char := shl(byte(0, mload(cursor)), 1)
+            }
+
+            if (char & CMASK_RHS_WORD_HEAD > 0) {
+                // If yang we can't start a new word.
+                if (state.fsm & FSM_YANG_MASK > 0) {
+                    revert UnexpectedRHSChar(parseErrorOffset(data, cursor));
+                }
+
+                (cursor, word) = parseWord(cursor, CMASK_RHS_WORD_TAIL);
+
+                // First check if this word is in meta.
+                (
+                    bool exists,
+                    uint256 opcodeIndex,
+                    function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParser
+                ) = LibParseMeta.lookupWord(meta, state.operandParsers, word);
+                if (exists) {
+                    Operand operand;
+                    (cursor, operand) = operandParser(state.literalParsers, data, cursor);
+                    state.pushOpToSource(opcodeIndex, operand);
+                    // This is a real word so we expect to see parens
+                    // after it.
+                    state.fsm |= FSM_WORD_END_MASK;
+                }
+                // Fallback to LHS items.
+                else {
+                    (exists, opcodeIndex) = LibParseStackName.stackNameIndex(state, word);
+                    if (exists) {
+                        state.pushOpToSource(OPCODE_STACK, Operand.wrap(opcodeIndex));
+                        // Need to process highwater here because we
+                        // don't have any parens to open or close.
+                        state.highwater();
+                    } else {
+                        revert UnknownWord(parseErrorOffset(data, cursor));
+                    }
+                }
+
+                state.fsm |= FSM_YANG_MASK;
+            }
+            // If this is the end of a word we MUST start a paren.
+            else if (state.fsm & FSM_WORD_END_MASK > 0) {
+                if (char & CMASK_LEFT_PAREN == 0) {
+                    revert ExpectedLeftParen(parseErrorOffset(data, cursor));
+                }
+                // Increase the paren depth by 1.
+                // i.e. move the byte offset by 3
+                // There MAY be garbage at this new offset due to
+                // a previous paren group being deallocated. The
+                // deallocation process writes the input counter
+                // to zero but leaves a garbage word in place, with
+                // the expectation that it will be overwritten by
+                // the next paren group.
+                uint256 newParenOffset;
+                assembly ("memory-safe") {
+                    newParenOffset := add(byte(0, mload(add(state, 0x60))), 3)
+                    mstore8(add(state, 0x60), newParenOffset)
+                }
+                // first 2 bytes are reserved, then remaining 62
+                // bytes are for paren groups, so the offset MUST NOT
+                // imply writing to the 63rd byte.
+                if (newParenOffset > 59) {
+                    revert ParenOverflow();
+                }
+                cursor++;
+
+                // We've moved past the paren, so we are no longer at
+                // the end of a word and are yin.
+                state.fsm &= ~(FSM_WORD_END_MASK | FSM_YANG_MASK);
+            } else if (char & CMASK_RIGHT_PAREN > 0) {
+                uint256 parenOffset;
+                assembly ("memory-safe") {
+                    parenOffset := byte(0, mload(add(state, 0x60)))
+                }
+                if (parenOffset == 0) {
+                    revert UnexpectedRightParen(parseErrorOffset(data, cursor));
+                }
+                // Decrease the paren depth by 1.
+                // i.e. move the byte offset by -3.
+                // This effectively deallocates the paren group, so
+                // write the input counter out to the operand pointed
+                // to by the pointer we deallocated.
+                assembly ("memory-safe") {
+                    // State field offset.
+                    let stateOffset := add(state, 0x60)
+                    parenOffset := sub(parenOffset, 3)
+                    mstore8(stateOffset, parenOffset)
+                    mstore8(
+                        // Add 2 for the reserved bytes to the offset
+                        // then read top 16 bits from the pointer.
+                        // Add 1 to sandwitch the inputs byte between
+                        // the opcode index byte and the operand low
+                        // bytes.
+                        add(1, shr(0xf0, mload(add(add(stateOffset, 2), parenOffset)))),
+                        // Store the input counter, which is 2 bytes
+                        // after the operand write pointer.
+                        byte(0, mload(add(add(stateOffset, 4), parenOffset)))
+                    )
+                }
+                state.highwater();
+                cursor++;
+            } else if (char & CMASK_WHITESPACE > 0) {
+                cursor = skipMask(cursor + 1, end, CMASK_WHITESPACE);
+                // Set yin as we now open to possibilities.
+                state.fsm &= ~FSM_YANG_MASK;
+            }
+            // Handle all literals.
+            else if (char & CMASK_LITERAL_HEAD > 0) {
+                cursor = state.pushLiteral(data, cursor);
+                state.highwater();
+                // We are yang now. Need the next char to release to
+                // yin.
+                state.fsm |= FSM_YANG_MASK;
+            } else if (char & CMASK_EOL > 0) {
+                state.endLine(data, cursor);
+                cursor++;
+                break;
+            }
+            // End of source.
+            else if (char & CMASK_EOS > 0) {
+                state.endLine(data, cursor);
+                state.endSource();
+                cursor++;
+
+                state.fsm = FSM_DEFAULT;
+                break;
+            }
+            // Comments aren't allowed in the RHS but we can give a
+            // nicer error message than the default.
+            else if (char & CMASK_COMMENT_HEAD != 0) {
+                revert UnexpectedComment(parseErrorOffset(data, cursor));
+            } else {
+                revert UnexpectedRHSChar(parseErrorOffset(data, cursor));
+            }
+        }
+        return cursor;
+    }
+
     //slither-disable-next-line cyclomatic-complexity
     function parse(bytes memory data, bytes memory meta)
         internal
@@ -161,205 +366,15 @@ library LibParse {
         unchecked {
             ParseState memory state = LibParseState.newState();
             if (data.length > 0) {
-                bytes32 word;
                 uint256 cursor;
                 uint256 end;
-                uint256 char;
                 assembly ("memory-safe") {
                     cursor := add(data, 0x20)
                     end := add(cursor, mload(data))
                 }
                 while (cursor < end) {
-                    assembly ("memory-safe") {
-                        //slither-disable-next-line incorrect-shift
-                        char := shl(byte(0, mload(cursor)), 1)
-                    }
-
-                    // LHS
-                    if (state.fsm & FSM_RHS_MASK == 0) {
-                        if (char & CMASK_LHS_STACK_HEAD > 0) {
-                            // if yang we can't start new stack item
-                            if (state.fsm & FSM_YANG_MASK > 0) {
-                                revert UnexpectedLHSChar(parseErrorOffset(data, cursor));
-                            }
-
-                            // Named stack item.
-                            if (char & CMASK_IDENTIFIER_HEAD > 0) {
-                                (cursor, word) = parseWord(cursor, CMASK_LHS_STACK_TAIL);
-                                (bool exists, uint256 index) = state.pushStackName(word);
-                                (index);
-                                // If the stack name already exists, then we
-                                // revert as shadowing is not allowed.
-                                if (exists) {
-                                    revert DuplicateLHSItem(parseErrorOffset(data, cursor));
-                                }
-                            }
-                            // Anon stack item.
-                            else {
-                                cursor = skipMask(cursor + 1, end, CMASK_LHS_STACK_TAIL);
-                            }
-                            // Bump the index regardless of whether the stack
-                            // item is named or not.
-                            state.topLevel1++;
-                            state.lineTracker++;
-
-                            // Set yang as we are now building a stack item.
-                            // We are also no longer interstitial
-                            state.fsm = (state.fsm | FSM_YANG_MASK | FSM_ACTIVE_SOURCE_MASK) & ~FSM_INTERSTITIAL_MASK;
-                        } else if (char & CMASK_WHITESPACE != 0) {
-                            cursor = skipMask(cursor + 1, end, CMASK_WHITESPACE);
-                            // Set ying as we now open to possibilities.
-                            state.fsm &= ~FSM_YANG_MASK;
-                        } else if (char & CMASK_LHS_RHS_DELIMITER != 0) {
-                            // Set RHS and yin. Move out of the interstitial if
-                            // we haven't already.
-                            state.fsm = (state.fsm | FSM_RHS_MASK | FSM_ACTIVE_SOURCE_MASK)
-                                & ~(FSM_YANG_MASK | FSM_INTERSTITIAL_MASK);
-                            cursor++;
-                        } else if (char & CMASK_COMMENT_HEAD != 0) {
-                            if (state.fsm & FSM_INTERSTITIAL_MASK == 0) {
-                                revert UnexpectedComment(parseErrorOffset(data, cursor));
-                            }
-                            cursor = skipComment(data, cursor);
-                            // Set yang for comments to force a little breathing
-                            // room between comments and the next item.
-                            state.fsm |= FSM_YANG_MASK;
-                        } else {
-                            revert UnexpectedLHSChar(parseErrorOffset(data, cursor));
-                        }
-                    }
-                    // RHS
-                    else {
-                        if (char & CMASK_RHS_WORD_HEAD > 0) {
-                            // If yang we can't start a new word.
-                            if (state.fsm & FSM_YANG_MASK > 0) {
-                                revert UnexpectedRHSChar(parseErrorOffset(data, cursor));
-                            }
-
-                            (cursor, word) = parseWord(cursor, CMASK_RHS_WORD_TAIL);
-
-                            // First check if this word is in meta.
-                            (
-                                bool exists,
-                                uint256 opcodeIndex,
-                                function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParser
-                            ) = LibParseMeta.lookupWord(meta, state.operandParsers, word);
-                            if (exists) {
-                                Operand operand;
-                                (cursor, operand) = operandParser(state.literalParsers, data, cursor);
-                                state.pushOpToSource(opcodeIndex, operand);
-                                // This is a real word so we expect to see parens
-                                // after it.
-                                state.fsm |= FSM_WORD_END_MASK;
-                            }
-                            // Fallback to LHS items.
-                            else {
-                                (exists, opcodeIndex) = LibParseStackName.stackNameIndex(state, word);
-                                if (exists) {
-                                    state.pushOpToSource(OPCODE_STACK, Operand.wrap(opcodeIndex));
-                                    // Need to process highwater here because we
-                                    // don't have any parens to open or close.
-                                    state.highwater();
-                                } else {
-                                    revert UnknownWord(parseErrorOffset(data, cursor));
-                                }
-                            }
-
-                            state.fsm |= FSM_YANG_MASK;
-                        }
-                        // If this is the end of a word we MUST start a paren.
-                        else if (state.fsm & FSM_WORD_END_MASK > 0) {
-                            if (char & CMASK_LEFT_PAREN == 0) {
-                                revert ExpectedLeftParen(parseErrorOffset(data, cursor));
-                            }
-                            // Increase the paren depth by 1.
-                            // i.e. move the byte offset by 3
-                            // There MAY be garbage at this new offset due to
-                            // a previous paren group being deallocated. The
-                            // deallocation process writes the input counter
-                            // to zero but leaves a garbage word in place, with
-                            // the expectation that it will be overwritten by
-                            // the next paren group.
-                            uint256 newParenOffset;
-                            assembly ("memory-safe") {
-                                newParenOffset := add(byte(0, mload(add(state, 0x60))), 3)
-                                mstore8(add(state, 0x60), newParenOffset)
-                            }
-                            // first 2 bytes are reserved, then remaining 62
-                            // bytes are for paren groups, so the offset MUST NOT
-                            // imply writing to the 63rd byte.
-                            if (newParenOffset > 59) {
-                                revert ParenOverflow();
-                            }
-                            cursor++;
-
-                            // We've moved past the paren, so we are no longer at
-                            // the end of a word and are yin.
-                            state.fsm &= ~(FSM_WORD_END_MASK | FSM_YANG_MASK);
-                        } else if (char & CMASK_RIGHT_PAREN > 0) {
-                            uint256 parenOffset;
-                            assembly ("memory-safe") {
-                                parenOffset := byte(0, mload(add(state, 0x60)))
-                            }
-                            if (parenOffset == 0) {
-                                revert UnexpectedRightParen(parseErrorOffset(data, cursor));
-                            }
-                            // Decrease the paren depth by 1.
-                            // i.e. move the byte offset by -3.
-                            // This effectively deallocates the paren group, so
-                            // write the input counter out to the operand pointed
-                            // to by the pointer we deallocated.
-                            assembly ("memory-safe") {
-                                // State field offset.
-                                let stateOffset := add(state, 0x60)
-                                parenOffset := sub(parenOffset, 3)
-                                mstore8(stateOffset, parenOffset)
-                                mstore8(
-                                    // Add 2 for the reserved bytes to the offset
-                                    // then read top 16 bits from the pointer.
-                                    // Add 1 to sandwitch the inputs byte between
-                                    // the opcode index byte and the operand low
-                                    // bytes.
-                                    add(1, shr(0xf0, mload(add(add(stateOffset, 2), parenOffset)))),
-                                    // Store the input counter, which is 2 bytes
-                                    // after the operand write pointer.
-                                    byte(0, mload(add(add(stateOffset, 4), parenOffset)))
-                                )
-                            }
-                            state.highwater();
-                            cursor++;
-                        } else if (char & CMASK_WHITESPACE > 0) {
-                            cursor = skipMask(cursor + 1, end, CMASK_WHITESPACE);
-                            // Set yin as we now open to possibilities.
-                            state.fsm &= ~FSM_YANG_MASK;
-                        }
-                        // Handle all literals.
-                        else if (char & CMASK_LITERAL_HEAD > 0) {
-                            cursor = state.pushLiteral(data, cursor);
-                            state.highwater();
-                            // We are yang now. Need the next char to release to
-                            // yin.
-                            state.fsm |= FSM_YANG_MASK;
-                        } else if (char & CMASK_EOL > 0) {
-                            state.endLine(data, cursor);
-                            cursor++;
-                        }
-                        // End of source.
-                        else if (char & CMASK_EOS > 0) {
-                            state.endLine(data, cursor);
-                            state.endSource();
-                            cursor++;
-
-                            state.fsm = FSM_DEFAULT;
-                        }
-                        // Comments aren't allowed in the RHS but we can give a
-                        // nicer error message than the default.
-                        else if (char & CMASK_COMMENT_HEAD != 0) {
-                            revert UnexpectedComment(parseErrorOffset(data, cursor));
-                        } else {
-                            revert UnexpectedRHSChar(parseErrorOffset(data, cursor));
-                        }
-                    }
+                    cursor = parseLHS(state, data, cursor, end);
+                    cursor = parseRHS(meta, state, data, cursor, end);
                 }
                 if (cursor != end) {
                     revert ParserOutOfBounds();

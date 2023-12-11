@@ -22,18 +22,17 @@ import {LibParseOperand} from "./LibParseOperand.sol";
 /// 0x20.
 uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
 
-uint256 constant FSM_RHS_MASK = 1;
-uint256 constant FSM_YANG_MASK = 1 << 1;
-uint256 constant FSM_WORD_END_MASK = 1 << 2;
-uint256 constant FSM_ACCEPTING_INPUTS_MASK = 1 << 3;
+uint256 constant FSM_YANG_MASK = 1;
+uint256 constant FSM_WORD_END_MASK = 1 << 1;
+uint256 constant FSM_ACCEPTING_INPUTS_MASK = 1 << 2;
 
 /// @dev The space between lines where comments and whitespace is allowed.
 /// The first LHS item breaks us out of the interstitial.
-uint256 constant FSM_INTERSTITIAL_MASK = 1 << 4;
+uint256 constant FSM_INTERSTITIAL_MASK = 1 << 3;
 
 /// @dev If a source is active we cannot finish parsing without a semi to trigger
 /// finalisation.
-uint256 constant FSM_ACTIVE_SOURCE_MASK = 1 << 5;
+uint256 constant FSM_ACTIVE_SOURCE_MASK = 1 << 4;
 
 /// @dev fsm default state is:
 /// - LHS
