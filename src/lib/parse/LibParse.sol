@@ -151,6 +151,28 @@ library LibParse {
         return cursor;
     }
 
+    function parseInterstitial(ParseState memory state, bytes memory data, uint256 cursor, uint256 end) internal pure returns (uint256) {
+        while (cursor < end) {
+            uint256 char;
+            assembly ("memory-safe") {
+                char := shl(byte(0, mload(cursor)), 1)
+            }
+            if (char & CMASK_WHITESPACE > 0) {
+                cursor = skipMask(cursor + 1, end, CMASK_WHITESPACE);
+                // Set ying as we now open to possibilities.
+                state.fsm &= ~FSM_YANG_MASK;
+            } else if (char & CMASK_COMMENT_HEAD > 0) {
+                cursor = skipComment(data, cursor);
+                // Set yang for comments to force a little breathing
+                // room between comments and the next item.
+                state.fsm |= FSM_YANG_MASK;
+            } else {
+                break;
+            }
+        }
+        return cursor;
+    }
+
     function parseLHS(ParseState memory state, bytes memory data, uint256 cursor, uint256 end) internal pure returns (uint256) {
         while (cursor < end) {
             bytes32 word;
@@ -194,21 +216,17 @@ library LibParse {
                 // Set ying as we now open to possibilities.
                 state.fsm &= ~FSM_YANG_MASK;
             } else if (char & CMASK_LHS_RHS_DELIMITER != 0) {
-                // Set RHS and yin. Move out of the interstitial if
-                // we haven't already.
-                state.fsm = (state.fsm | FSM_ACTIVE_SOURCE_MASK) & ~(FSM_YANG_MASK | FSM_INTERSTITIAL_MASK);
+                // Set RHS and yin.
+                state.fsm = (state.fsm | FSM_ACTIVE_SOURCE_MASK) & ~FSM_YANG_MASK;
                 cursor++;
                 break;
-            } else if (char & CMASK_COMMENT_HEAD != 0) {
-                if (state.fsm & FSM_INTERSTITIAL_MASK == 0) {
+            } else {
+                if (char & CMASK_COMMENT_HEAD != 0) {
                     revert UnexpectedComment(parseErrorOffset(data, cursor));
                 }
-                cursor = skipComment(data, cursor);
-                // Set yang for comments to force a little breathing
-                // room between comments and the next item.
-                state.fsm |= FSM_YANG_MASK;
-            } else {
-                revert UnexpectedLHSChar(parseErrorOffset(data, cursor));
+                else {
+                    revert UnexpectedLHSChar(parseErrorOffset(data, cursor));
+                }
             }
         }
         return cursor;
@@ -373,6 +391,7 @@ library LibParse {
                     end := add(cursor, mload(data))
                 }
                 while (cursor < end) {
+                    cursor = parseInterstitial(state, data, cursor, end);
                     cursor = parseLHS(state, data, cursor, end);
                     cursor = parseRHS(meta, state, data, cursor, end);
                 }
