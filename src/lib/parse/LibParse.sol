@@ -151,7 +151,11 @@ library LibParse {
         return cursor;
     }
 
-    function parseInterstitial(ParseState memory state, bytes memory data, uint256 cursor, uint256 end) internal pure returns (uint256) {
+    function parseInterstitial(ParseState memory state, bytes memory data, uint256 cursor, uint256 end)
+        internal
+        pure
+        returns (uint256)
+    {
         while (cursor < end) {
             uint256 char;
             assembly ("memory-safe") {
@@ -173,7 +177,11 @@ library LibParse {
         return cursor;
     }
 
-    function parseLHS(ParseState memory state, bytes memory data, uint256 cursor, uint256 end) internal pure returns (uint256) {
+    function parseLHS(ParseState memory state, bytes memory data, uint256 cursor, uint256 end)
+        internal
+        pure
+        returns (uint256)
+    {
         while (cursor < end) {
             bytes32 word;
             uint256 char;
@@ -223,8 +231,7 @@ library LibParse {
             } else {
                 if (char & CMASK_COMMENT_HEAD != 0) {
                     revert UnexpectedComment(parseErrorOffset(data, cursor));
-                }
-                else {
+                } else {
                     revert UnexpectedLHSChar(parseErrorOffset(data, cursor));
                 }
             }
@@ -232,7 +239,11 @@ library LibParse {
         return cursor;
     }
 
-    function parseRHS(bytes memory meta, ParseState memory state, bytes memory data, uint256 cursor, uint256 end) internal pure returns (uint256) {
+    function parseRHS(bytes memory meta, ParseState memory state, bytes memory data, uint256 cursor, uint256 end)
+        internal
+        pure
+        returns (uint256)
+    {
         while (cursor < end) {
             bytes32 word;
             uint256 char;
@@ -375,7 +386,6 @@ library LibParse {
         return cursor;
     }
 
-    //slither-disable-next-line cyclomatic-complexity
     function parse(bytes memory data, bytes memory meta)
         internal
         pure
@@ -390,6 +400,7 @@ library LibParse {
                     cursor := add(data, 0x20)
                     end := add(cursor, mload(data))
                 }
+                parseInterstitial(state, data, cursor, end);
                 while (cursor < end) {
                     cursor = parseInterstitial(state, data, cursor, end);
                     cursor = parseLHS(state, data, cursor, end);
