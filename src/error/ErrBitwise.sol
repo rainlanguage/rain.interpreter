@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
+/// @dev Workaround for https://github.com/foundry-rs/foundry/issues/6572
+contract ErrBitwise {}
+
 /// Thrown during integrity check when a bitwise shift operation is attempted
 /// with a shift amount greater than 255 or 0. As the shift amount is taken from
 /// the operand, this is a compile time error so there's no need to support
