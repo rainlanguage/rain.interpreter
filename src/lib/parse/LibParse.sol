@@ -54,8 +54,7 @@ import {
     FSM_YANG_MASK,
     FSM_DEFAULT,
     FSM_ACTIVE_SOURCE_MASK,
-    FSM_WORD_END_MASK,
-    FSM_INTERSTITIAL_MASK
+    FSM_WORD_END_MASK
 } from "./LibParseState.sol";
 
 uint256 constant NOT_LOW_16_BIT_MASK = ~uint256(0xFFFF);
@@ -217,8 +216,7 @@ library LibParse {
                 state.lineTracker++;
 
                 // Set yang as we are now building a stack item.
-                // We are also no longer interstitial
-                state.fsm = (state.fsm | FSM_YANG_MASK | FSM_ACTIVE_SOURCE_MASK) & ~FSM_INTERSTITIAL_MASK;
+                state.fsm |= FSM_YANG_MASK | FSM_ACTIVE_SOURCE_MASK;
             } else if (char & CMASK_WHITESPACE != 0) {
                 cursor = skipMask(cursor + 1, end, CMASK_WHITESPACE);
                 // Set ying as we now open to possibilities.

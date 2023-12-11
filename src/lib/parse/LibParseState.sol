@@ -26,21 +26,15 @@ uint256 constant FSM_YANG_MASK = 1;
 uint256 constant FSM_WORD_END_MASK = 1 << 1;
 uint256 constant FSM_ACCEPTING_INPUTS_MASK = 1 << 2;
 
-/// @dev The space between lines where comments and whitespace is allowed.
-/// The first LHS item breaks us out of the interstitial.
-uint256 constant FSM_INTERSTITIAL_MASK = 1 << 3;
-
 /// @dev If a source is active we cannot finish parsing without a semi to trigger
 /// finalisation.
-uint256 constant FSM_ACTIVE_SOURCE_MASK = 1 << 4;
+uint256 constant FSM_ACTIVE_SOURCE_MASK = 1 << 3;
 
 /// @dev fsm default state is:
-/// - LHS
 /// - yin
 /// - not word end
 /// - accepting inputs
-/// - interstitial
-uint256 constant FSM_DEFAULT = FSM_ACCEPTING_INPUTS_MASK | FSM_INTERSTITIAL_MASK;
+uint256 constant FSM_DEFAULT = FSM_ACCEPTING_INPUTS_MASK;
 
 /// The parser is stateful. This struct keeps track of the entire state.
 /// @param activeSourcePtr The pointer to the current source being built.
