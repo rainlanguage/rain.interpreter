@@ -56,6 +56,9 @@ import {
     FSM_ACTIVE_SOURCE_MASK,
     FSM_WORD_END_MASK
 } from "./LibParseState.sol";
+import {LibParsePragma} from "./LibParsePragma.sol";
+import {LibParseInterstitial} from "./LibParseInterstitial.sol";
+import {LibParseError} from "./LibParseError.sol";
 
 uint256 constant NOT_LOW_16_BIT_MASK = ~uint256(0xFFFF);
 uint256 constant ACTIVE_SOURCE_MASK = NOT_LOW_16_BIT_MASK;
@@ -64,12 +67,11 @@ library LibParse {
     using LibPointer for Pointer;
     using LibParseStackName for ParseState;
     using LibParseState for ParseState;
-
-    function parseErrorOffset(bytes memory data, uint256 cursor) internal pure returns (uint256 offset) {
-        assembly ("memory-safe") {
-            offset := sub(cursor, add(data, 0x20))
-        }
-    }
+    using LibParseInterstitial for ParseState;
+    using LibParseError for ParseState;
+    using LibParseMeta for ParseState;
+    using LibParsePragma for ParseState;
+    using LibParse for ParseState;
 
     function parseWord(uint256 cursor, uint256 mask) internal pure returns (uint256, bytes32) {
         bytes32 word;
@@ -100,87 +102,7 @@ library LibParse {
         return cursor;
     }
 
-    /// The cursor currently points at the head of a comment. We need to skip
-    /// over all data until we find the end of the comment. This MAY REVERT if
-    /// the comment is malformed, e.g. if the comment doesn't start with `/*`.
-    /// @param data The source data.
-    /// @param cursor The current cursor position.
-    /// @return The new cursor position.
-    function skipComment(bytes memory data, uint256 cursor) internal pure returns (uint256) {
-        // First check the comment opening sequence is not malformed.
-        uint256 startSequence;
-        assembly ("memory-safe") {
-            startSequence := shr(0xf0, mload(cursor))
-        }
-        if (startSequence != COMMENT_START_SEQUENCE) {
-            revert MalformedCommentStart(parseErrorOffset(data, cursor));
-        }
-        uint256 commentEndSequenceStart = COMMENT_END_SEQUENCE >> 8;
-        uint256 commentEndSequenceEnd = COMMENT_END_SEQUENCE & 0xFF;
-        uint256 max;
-        assembly ("memory-safe") {
-            // Move past the start sequence.
-            cursor := add(cursor, 2)
-            max := add(data, add(mload(data), 0x20))
-
-            // Loop until we find the end sequence.
-            let done := 0
-            for {} iszero(done) {} {
-                for {} and(iszero(eq(byte(0, mload(cursor)), commentEndSequenceStart)), lt(cursor, max)) {} {
-                    cursor := add(cursor, 1)
-                }
-                // We have found the start of the end sequence. Now check the
-                // end sequence is correct.
-                cursor := add(cursor, 1)
-                // Only exit the loop if the end sequence is correct. We don't
-                // move the cursor forward unless we haven exact match on the
-                // end byte. E.g. consider the sequence `/** comment **/`.
-                if or(eq(byte(0, mload(cursor)), commentEndSequenceEnd), iszero(lt(cursor, max))) {
-                    done := 1
-                    cursor := add(cursor, 1)
-                }
-            }
-        }
-        // If the cursor is past the max we either never even started an end
-        // sequence, or we started parsing an end sequence but couldn't complete
-        // it. Either way, the comment is malformed, and the parser is OOB.
-        if (cursor > max) {
-            revert ParserOutOfBounds();
-        }
-        return cursor;
-    }
-
-    function parseInterstitial(ParseState memory state, bytes memory data, uint256 cursor, uint256 end)
-        internal
-        pure
-        returns (uint256)
-    {
-        while (cursor < end) {
-            uint256 char;
-            assembly ("memory-safe") {
-                char := shl(byte(0, mload(cursor)), 1)
-            }
-            if (char & CMASK_WHITESPACE > 0) {
-                cursor = skipMask(cursor + 1, end, CMASK_WHITESPACE);
-                // Set ying as we now open to possibilities.
-                state.fsm &= ~FSM_YANG_MASK;
-            } else if (char & CMASK_COMMENT_HEAD > 0) {
-                cursor = skipComment(data, cursor);
-                // Set yang for comments to force a little breathing
-                // room between comments and the next item.
-                state.fsm |= FSM_YANG_MASK;
-            } else {
-                break;
-            }
-        }
-        return cursor;
-    }
-
-    function parseLHS(ParseState memory state, bytes memory data, uint256 cursor, uint256 end)
-        internal
-        pure
-        returns (uint256)
-    {
+    function parseLHS(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         while (cursor < end) {
             bytes32 word;
             uint256 char;
@@ -192,7 +114,7 @@ library LibParse {
             if (char & CMASK_LHS_STACK_HEAD > 0) {
                 // if yang we can't start new stack item
                 if (state.fsm & FSM_YANG_MASK > 0) {
-                    revert UnexpectedLHSChar(parseErrorOffset(data, cursor));
+                    revert UnexpectedLHSChar(state.parseErrorOffset(cursor));
                 }
 
                 // Named stack item.
@@ -203,7 +125,7 @@ library LibParse {
                     // If the stack name already exists, then we
                     // revert as shadowing is not allowed.
                     if (exists) {
-                        revert DuplicateLHSItem(parseErrorOffset(data, cursor));
+                        revert DuplicateLHSItem(state.parseErrorOffset(cursor));
                     }
                 }
                 // Anon stack item.
@@ -228,20 +150,16 @@ library LibParse {
                 break;
             } else {
                 if (char & CMASK_COMMENT_HEAD != 0) {
-                    revert UnexpectedComment(parseErrorOffset(data, cursor));
+                    revert UnexpectedComment(state.parseErrorOffset(cursor));
                 } else {
-                    revert UnexpectedLHSChar(parseErrorOffset(data, cursor));
+                    revert UnexpectedLHSChar(state.parseErrorOffset(cursor));
                 }
             }
         }
         return cursor;
     }
 
-    function parseRHS(bytes memory meta, ParseState memory state, bytes memory data, uint256 cursor, uint256 end)
-        internal
-        pure
-        returns (uint256)
-    {
+    function parseRHS(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         while (cursor < end) {
             bytes32 word;
             uint256 char;
@@ -252,7 +170,7 @@ library LibParse {
             if (char & CMASK_RHS_WORD_HEAD > 0) {
                 // If yang we can't start a new word.
                 if (state.fsm & FSM_YANG_MASK > 0) {
-                    revert UnexpectedRHSChar(parseErrorOffset(data, cursor));
+                    revert UnexpectedRHSChar(state.parseErrorOffset(cursor));
                 }
 
                 (cursor, word) = parseWord(cursor, CMASK_RHS_WORD_TAIL);
@@ -261,11 +179,11 @@ library LibParse {
                 (
                     bool exists,
                     uint256 opcodeIndex,
-                    function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParser
-                ) = LibParseMeta.lookupWord(meta, state.operandParsers, word);
+                    function(ParseState memory, uint256) pure returns (uint256, Operand) operandParser
+                ) = state.lookupWord(word);
                 if (exists) {
                     Operand operand;
-                    (cursor, operand) = operandParser(state.literalParsers, data, cursor);
+                    (cursor, operand) = operandParser(state, cursor);
                     state.pushOpToSource(opcodeIndex, operand);
                     // This is a real word so we expect to see parens
                     // after it.
@@ -273,14 +191,14 @@ library LibParse {
                 }
                 // Fallback to LHS items.
                 else {
-                    (exists, opcodeIndex) = LibParseStackName.stackNameIndex(state, word);
+                    (exists, opcodeIndex) = state.stackNameIndex(word);
                     if (exists) {
                         state.pushOpToSource(OPCODE_STACK, Operand.wrap(opcodeIndex));
                         // Need to process highwater here because we
                         // don't have any parens to open or close.
                         state.highwater();
                     } else {
-                        revert UnknownWord(parseErrorOffset(data, cursor));
+                        revert UnknownWord(state.parseErrorOffset(cursor));
                     }
                 }
 
@@ -289,7 +207,7 @@ library LibParse {
             // If this is the end of a word we MUST start a paren.
             else if (state.fsm & FSM_WORD_END_MASK > 0) {
                 if (char & CMASK_LEFT_PAREN == 0) {
-                    revert ExpectedLeftParen(parseErrorOffset(data, cursor));
+                    revert ExpectedLeftParen(state.parseErrorOffset(cursor));
                 }
                 // Increase the paren depth by 1.
                 // i.e. move the byte offset by 3
@@ -321,7 +239,7 @@ library LibParse {
                     parenOffset := byte(0, mload(add(state, 0x60)))
                 }
                 if (parenOffset == 0) {
-                    revert UnexpectedRightParen(parseErrorOffset(data, cursor));
+                    revert UnexpectedRightParen(state.parseErrorOffset(cursor));
                 }
                 // Decrease the paren depth by 1.
                 // i.e. move the byte offset by -3.
@@ -354,19 +272,19 @@ library LibParse {
             }
             // Handle all literals.
             else if (char & CMASK_LITERAL_HEAD > 0) {
-                cursor = state.pushLiteral(data, cursor);
+                cursor = state.pushLiteral(cursor);
                 state.highwater();
                 // We are yang now. Need the next char to release to
                 // yin.
                 state.fsm |= FSM_YANG_MASK;
             } else if (char & CMASK_EOL > 0) {
-                state.endLine(data, cursor);
+                state.endLine(cursor);
                 cursor++;
                 break;
             }
             // End of source.
             else if (char & CMASK_EOS > 0) {
-                state.endLine(data, cursor);
+                state.endLine(cursor);
                 state.endSource();
                 cursor++;
 
@@ -376,9 +294,9 @@ library LibParse {
             // Comments aren't allowed in the RHS but we can give a
             // nicer error message than the default.
             else if (char & CMASK_COMMENT_HEAD != 0) {
-                revert UnexpectedComment(parseErrorOffset(data, cursor));
+                revert UnexpectedComment(state.parseErrorOffset(cursor));
             } else {
-                revert UnexpectedRHSChar(parseErrorOffset(data, cursor));
+                revert UnexpectedRHSChar(state.parseErrorOffset(cursor));
             }
         }
         return cursor;
@@ -390,7 +308,7 @@ library LibParse {
         returns (bytes memory bytecode, uint256[] memory)
     {
         unchecked {
-            ParseState memory state = LibParseState.newState();
+            ParseState memory state = LibParseState.newState(data, meta);
             if (data.length > 0) {
                 uint256 cursor;
                 uint256 end;
@@ -398,17 +316,18 @@ library LibParse {
                     cursor := add(data, 0x20)
                     end := add(cursor, mload(data))
                 }
-                parseInterstitial(state, data, cursor, end);
+                cursor = state.parseInterstitial(cursor, end);
+                cursor = state.parsePragma(cursor, end);
                 while (cursor < end) {
-                    cursor = parseInterstitial(state, data, cursor, end);
-                    cursor = parseLHS(state, data, cursor, end);
-                    cursor = parseRHS(meta, state, data, cursor, end);
+                    cursor = state.parseInterstitial(cursor, end);
+                    cursor = state.parseLHS(cursor, end);
+                    cursor = state.parseRHS(cursor, end);
                 }
                 if (cursor != end) {
                     revert ParserOutOfBounds();
                 }
                 if (state.fsm & FSM_ACTIVE_SOURCE_MASK != 0) {
-                    revert MissingFinalSemi(parseErrorOffset(data, cursor));
+                    revert MissingFinalSemi(state.parseErrorOffset(cursor));
                 }
             }
             return (state.buildBytecode(), state.buildConstants());

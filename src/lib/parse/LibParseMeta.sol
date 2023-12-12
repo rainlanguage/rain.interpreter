@@ -4,6 +4,7 @@ pragma solidity ^0.8.18;
 import {LibCtPop} from "../bitwise/LibCtPop.sol";
 import {Operand} from "../../interface/unstable/IInterpreterV2.sol";
 import {LibParseOperand} from "./LibParseOperand.sol";
+import {ParseState} from "./LibParseState.sol";
 
 /// @dev For metadata builder.
 error DuplicateFingerprint();
@@ -226,14 +227,14 @@ library LibParseMeta {
     /// Given the parse meta and a word, return the index and io fn pointer for
     /// the word. If the word is not found, then `exists` will be false. The
     /// caller MUST check `exists` before using the other return values.
-    /// @param meta The parse meta.
+    /// @param state The parser state.
     /// @param word The word to lookup.
     /// @return True if the word exists in the parse meta.
     /// @return The index of the word in the parse meta.
-    function lookupWord(bytes memory meta, uint256 operandParsers, bytes32 word)
+    function lookupWord(ParseState memory state, bytes32 word)
         internal
         pure
-        returns (bool, uint256, function(uint256, bytes memory, uint256) pure returns (uint256, Operand))
+        returns (bool, uint256, function(ParseState memory, uint256) pure returns (uint256, Operand))
     {
         unchecked {
             uint256 dataStart;
@@ -242,6 +243,7 @@ library LibParseMeta {
             {
                 uint256 metaExpansionSize = META_EXPANSION_SIZE;
                 uint256 metaItemSize = META_ITEM_SIZE;
+                bytes memory meta = state.meta;
                 assembly ("memory-safe") {
                     // Read depth from first meta byte.
                     cursor := add(meta, 1)
@@ -279,7 +281,8 @@ library LibParseMeta {
                 // Match
                 if (wordFingerprint == posData & FINGERPRINT_MASK) {
                     uint256 index;
-                    function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParser;
+                    function(ParseState memory, uint256) pure returns (uint256, Operand) operandParser;
+                    uint256 operandParsers = state.operandParsers;
                     assembly ("memory-safe") {
                         index := byte(27, posData)
                         operandParser := and(shr(byte(28, posData), operandParsers), 0xFFFF)
@@ -290,7 +293,7 @@ library LibParseMeta {
                 }
             }
             // The caller MUST NOT use this operand parser as `exists` is false.
-            function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParserZero;
+            function(ParseState memory, uint256) pure returns (uint256, Operand) operandParserZero;
             assembly ("memory-safe") {
                 operandParserZero := 0
             }

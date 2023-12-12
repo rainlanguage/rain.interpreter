@@ -30,6 +30,8 @@ import {
     UnclosedStringLiteral,
     ParserOutOfBounds
 } from "../../error/ErrParse.sol";
+import {ParseState} from "./LibParseState.sol";
+import {LibParseError} from "./LibParseError.sol";
 
 /// @dev The type of a literal is both a unique value and a literal offset used
 /// to index into the literal parser array as a uint256.
@@ -44,19 +46,22 @@ uint256 constant LITERAL_TYPE_INTEGER_DECIMAL = 0x10;
 uint256 constant LITERAL_TYPE_STRING = 0x20;
 
 library LibParseLiteral {
+    using LibParseLiteral for ParseState;
+    using LibParseError for ParseState;
+
     function buildLiteralParsers() internal pure returns (uint256 literalParsers) {
         // Register all the literal parsers in the parse state. Each is a 16 bit
         // function pointer so we can have up to 16 literal types. This needs to
         // be done at runtime because the library code doesn't know the bytecode
         // offsets of the literal parsers until it is compiled into a contract.
         {
-            function(bytes memory, uint256, uint256) pure returns (uint256) literalParserHex =
+            function(ParseState memory, uint256, uint256) pure returns (uint256) literalParserHex =
                 LibParseLiteral.parseLiteralHex;
             uint256 parseLiteralHexOffset = LITERAL_TYPE_INTEGER_HEX;
-            function(bytes memory, uint256, uint256) pure returns (uint256) literalParserDecimal =
+            function(ParseState memory, uint256, uint256) pure returns (uint256) literalParserDecimal =
                 LibParseLiteral.parseLiteralDecimal;
             uint256 parseLiteralDecimalOffset = LITERAL_TYPE_INTEGER_DECIMAL;
-            function(bytes memory, uint256, uint256) pure returns (uint256) literalParserString =
+            function(ParseState memory, uint256, uint256) pure returns (uint256) literalParserString =
                 LibParseLiteral.parseLiteralString;
             uint256 parseLiteralStringOffset = LITERAL_TYPE_STRING;
 
@@ -82,16 +87,17 @@ library LibParseLiteral {
     /// - outerEnd: the end of the literal including any suffixes, MAY be the
     ///   same as innerEnd if there is no suffix.
     /// The outerStart is the cursor, so it is not returned.
+    /// @param state The parser state.
     /// @param cursor The start of the literal.
     /// @return The literal parser. This function can be called to convert the
     /// bounds into a uint256 value.
     /// @return The inner start.
     /// @return The inner end.
     /// @return The outer end.
-    function boundLiteral(uint256 literalParsers, bytes memory data, uint256 cursor)
+    function boundLiteral(ParseState memory state, uint256 cursor)
         internal
         pure
-        returns (function(bytes memory, uint256, uint256) pure returns (uint256), uint256, uint256, uint256)
+        returns (function(ParseState memory, uint256, uint256) pure returns (uint256), uint256, uint256, uint256)
     {
         unchecked {
             uint256 word;
@@ -113,24 +119,25 @@ library LibParseLiteral {
                 // Hexadecimal literal dispatch is 0x. We can't accidentally
                 // match x0 because we already checked that the head is 0-9.
                 if ((head | dispatch) == CMASK_LITERAL_HEX_DISPATCH) {
-                    return boundLiteralHex(literalParsers, data, cursor);
+                    return state.boundLiteralHex(cursor);
                 }
                 // decimal is the fallback as continuous numeric digits 0-9.
                 else {
-                    return boundLiteralDecimal(literalParsers, data, cursor);
+                    return state.boundLiteralDecimal(cursor);
                 }
             } else if (head & CMASK_STRING_LITERAL_HEAD != 0) {
-                return boundLiteralString(literalParsers, data, cursor);
+                return state.boundLiteralString(cursor);
             }
 
             uint256 endUnknown;
+            bytes memory data = state.data;
             assembly ("memory-safe") {
                 endUnknown := add(data, add(mload(data), 0x20))
             }
             if (cursor >= endUnknown) {
                 revert ParserOutOfBounds();
             } else {
-                revert UnsupportedLiteralType(LibParse.parseErrorOffset(data, cursor));
+                revert UnsupportedLiteralType(state.parseErrorOffset(cursor));
             }
         }
     }
@@ -138,10 +145,10 @@ library LibParseLiteral {
     /// Find the bounds for some string literal at the cursor. The caller is
     /// responsible for checking that the cursor is at the start of a string
     /// literal. Bounds are as per `boundLiteral`.
-    function boundLiteralString(uint256 literalParsers, bytes memory data, uint256 cursor)
+    function boundLiteralString(ParseState memory state, uint256 cursor)
         internal
         pure
-        returns (function(bytes memory, uint256, uint256) pure returns (uint256), uint256, uint256, uint256)
+        returns (function(ParseState memory, uint256, uint256) pure returns (uint256), uint256, uint256, uint256)
     {
         unchecked {
             uint256 innerStart = cursor + 1;
@@ -162,7 +169,7 @@ library LibParseLiteral {
                     }
                 }
                 if (i == 0x20) {
-                    revert StringTooLong(LibParse.parseErrorOffset(data, cursor));
+                    revert StringTooLong(state.parseErrorOffset(cursor));
                 }
                 innerEnd = innerStart + i;
                 uint256 finalChar;
@@ -171,15 +178,15 @@ library LibParseLiteral {
                 }
                 //slither-disable-next-line incorrect-shift
                 if (1 << finalChar & CMASK_STRING_LITERAL_END == 0) {
-                    revert UnclosedStringLiteral(LibParse.parseErrorOffset(data, cursor));
+                    revert UnclosedStringLiteral(state.parseErrorOffset(cursor));
                 }
                 // Outer end is after the final `"`.
                 outerEnd = innerEnd + 1;
             }
 
-            function(bytes memory, uint256, uint256) pure returns (uint256) parser;
+            function(ParseState memory, uint256, uint256) pure returns (uint256) parser;
             {
-                uint256 p = (literalParsers >> LITERAL_TYPE_STRING) & 0xFFFF;
+                uint256 p = (state.literalParsers >> LITERAL_TYPE_STRING) & 0xFFFF;
                 assembly ("memory-safe") {
                     parser := p
                 }
@@ -187,6 +194,7 @@ library LibParseLiteral {
             // Check the parser hasn't moved outside the bounds of the data.
             {
                 uint256 endString;
+                bytes memory data = state.data;
                 assembly ("memory-safe") {
                     endString := add(data, add(mload(data), 0x20))
                 }
@@ -204,7 +212,7 @@ library LibParseLiteral {
     /// - Use this solidity string to build an `IntOrAString`
     /// - Restore the original data that the length prefix overwrote
     /// - Return the `IntOrAString`
-    function parseLiteralString(bytes memory, uint256 start, uint256 end) internal pure returns (uint256) {
+    function parseLiteralString(ParseState memory, uint256 start, uint256 end) internal pure returns (uint256) {
         IntOrAString intOrAString;
         uint256 before;
         string memory str;
@@ -221,10 +229,10 @@ library LibParseLiteral {
         return IntOrAString.unwrap(intOrAString);
     }
 
-    function boundLiteralHex(uint256 literalParsers, bytes memory data, uint256 cursor)
+    function boundLiteralHex(ParseState memory state, uint256 cursor)
         internal
         pure
-        returns (function(bytes memory, uint256, uint256) pure returns (uint256), uint256, uint256, uint256)
+        returns (function(ParseState memory, uint256, uint256) pure returns (uint256), uint256, uint256, uint256)
     {
         uint256 innerStart = cursor + 2;
         uint256 innerEnd = innerStart;
@@ -238,15 +246,16 @@ library LibParseLiteral {
             }
         }
 
-        function(bytes memory, uint256, uint256) pure returns (uint256) parser;
+        function(ParseState memory, uint256, uint256) pure returns (uint256) parser;
         {
-            uint256 p = (literalParsers >> LITERAL_TYPE_INTEGER_HEX) & 0xFFFF;
+            uint256 p = (state.literalParsers >> LITERAL_TYPE_INTEGER_HEX) & 0xFFFF;
             assembly ("memory-safe") {
                 parser := p
             }
         }
         {
             uint256 endHex;
+            bytes memory data = state.data;
             assembly ("memory-safe") {
                 endHex := add(data, add(mload(data), 0x20))
             }
@@ -264,15 +273,19 @@ library LibParseLiteral {
     ///   - shift the nybble into the total at the correct position
     ///     (4 bits per nybble)
     /// - return the total
-    function parseLiteralHex(bytes memory data, uint256 start, uint256 end) internal pure returns (uint256 value) {
+    function parseLiteralHex(ParseState memory state, uint256 start, uint256 end)
+        internal
+        pure
+        returns (uint256 value)
+    {
         unchecked {
             uint256 length = end - start;
             if (length > 0x40) {
-                revert HexLiteralOverflow(LibParse.parseErrorOffset(data, start));
+                revert HexLiteralOverflow(state.parseErrorOffset(start));
             } else if (length == 0) {
-                revert ZeroLengthHexLiteral(LibParse.parseErrorOffset(data, start));
+                revert ZeroLengthHexLiteral(state.parseErrorOffset(start));
             } else if (length % 2 == 1) {
-                revert OddLengthHexLiteral(LibParse.parseErrorOffset(data, start));
+                revert OddLengthHexLiteral(state.parseErrorOffset(start));
             } else {
                 uint256 cursor = end - 1;
                 uint256 valueOffset = 0;
@@ -297,7 +310,7 @@ library LibParseLiteral {
                     else if (hexChar & CMASK_UPPER_ALPHA_A_F != 0) {
                         nybble = hexCharByte - uint256(uint8(bytes1("A"))) + 10;
                     } else {
-                        revert MalformedHexLiteral(LibParse.parseErrorOffset(data, cursor));
+                        revert MalformedHexLiteral(state.parseErrorOffset(cursor));
                     }
 
                     value |= nybble << valueOffset;
@@ -308,10 +321,10 @@ library LibParseLiteral {
         }
     }
 
-    function boundLiteralDecimal(uint256 literalParsers, bytes memory data, uint256 cursor)
+    function boundLiteralDecimal(ParseState memory state, uint256 cursor)
         internal
         pure
-        returns (function(bytes memory, uint256, uint256) pure returns (uint256), uint256, uint256, uint256)
+        returns (function(ParseState memory, uint256, uint256) pure returns (uint256), uint256, uint256, uint256)
     {
         uint256 innerStart = cursor;
         // We know the head is a numeric so we can move past it.
@@ -343,18 +356,19 @@ library LibParseLiteral {
             }
         }
         if (ePosition != 0 && (innerEnd > ePosition + 3 || innerEnd == ePosition + 1)) {
-            revert MalformedExponentDigits(LibParse.parseErrorOffset(data, ePosition));
+            revert MalformedExponentDigits(state.parseErrorOffset(ePosition));
         }
 
-        function(bytes memory, uint256, uint256) pure returns (uint256) parser;
+        function(ParseState memory, uint256, uint256) pure returns (uint256) parser;
         {
-            uint256 p = (literalParsers >> LITERAL_TYPE_INTEGER_DECIMAL) & 0xFFFF;
+            uint256 p = (state.literalParsers >> LITERAL_TYPE_INTEGER_DECIMAL) & 0xFFFF;
             assembly ("memory-safe") {
                 parser := p
             }
         }
         {
             uint256 endDecimal;
+            bytes memory data = state.data;
             assembly ("memory-safe") {
                 endDecimal := add(data, add(mload(data), 0x20))
             }
@@ -378,7 +392,11 @@ library LibParseLiteral {
     ///
     /// Unsafe behavior is undefined and can easily result in out of bounds
     /// reads as there are no checks that start/end are within `data`.
-    function parseLiteralDecimal(bytes memory data, uint256 start, uint256 end) internal pure returns (uint256 value) {
+    function parseLiteralDecimal(ParseState memory state, uint256 start, uint256 end)
+        internal
+        pure
+        returns (uint256 value)
+    {
         unchecked {
             // Tracks which digit we're on.
             uint256 cursor;
@@ -424,7 +442,7 @@ library LibParseLiteral {
                         cursor = end - 1;
                         exponent = 0;
                     } else {
-                        revert ZeroLengthDecimal(LibParse.parseErrorOffset(data, start));
+                        revert ZeroLengthDecimal(state.parseErrorOffset(start));
                     }
                 }
             }
@@ -454,11 +472,11 @@ library LibParseLiteral {
                     // If the digit is greater than 1, then we know that
                     // multiplying it by 10^77 will overflow a uint256.
                     if (digit > 1) {
-                        revert DecimalLiteralOverflow(LibParse.parseErrorOffset(data, cursor));
+                        revert DecimalLiteralOverflow(state.parseErrorOffset(cursor));
                     } else {
                         uint256 scaled = digit * (10 ** exponent);
                         if (value + scaled < value) {
-                            revert DecimalLiteralOverflow(LibParse.parseErrorOffset(data, cursor));
+                            revert DecimalLiteralOverflow(state.parseErrorOffset(cursor));
                         }
                         value += scaled;
                     }
@@ -475,7 +493,7 @@ library LibParseLiteral {
                             decimalCharByte := byte(0, mload(cursor))
                         }
                         if (decimalCharByte != uint256(uint8(bytes1("0")))) {
-                            revert DecimalLiteralOverflow(LibParse.parseErrorOffset(data, cursor));
+                            revert DecimalLiteralOverflow(state.parseErrorOffset(cursor));
                         }
                         cursor--;
                     }

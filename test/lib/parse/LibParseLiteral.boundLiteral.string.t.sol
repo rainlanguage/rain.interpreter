@@ -6,24 +6,29 @@ import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
 import {LibLiteralString} from "test/util/lib/literal/LibLiteralString.sol";
 import {StringTooLong, UnclosedStringLiteral, ParserOutOfBounds} from "src/error/ErrParse.sol";
+import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseLiteralBoundLiteralStringTest
 contract LibParseLiteralBoundLiteralStringTest is Test {
     using LibBytes for bytes;
+    using LibParseLiteral for ParseState;
 
     /// External parse function to allow us to assert reverts.
-    function externalBoundLiteral(bytes memory str)
+    function externalBoundLiteral(bytes memory data)
         external
         pure
         returns (uint256, uint256, uint256, uint256, uint256)
     {
-        uint256 outerStart = Pointer.unwrap(bytes(str).dataPointer());
+        ParseState memory state = LibParseState.newState(data, "");
+        state.literalParsers = LibParseLiteral.buildLiteralParsers();
+        uint256 outerStart = Pointer.unwrap(bytes(data).dataPointer());
+        uint256 cursor = outerStart;
         (
-            function(bytes memory, uint256, uint256) pure returns (uint256) parserFn,
+            function(ParseState memory, uint256, uint256) pure returns (uint256) parserFn,
             uint256 innerStart,
             uint256 innerEnd,
             uint256 outerEnd
-        ) = LibParseLiteral.boundLiteral(LibParseLiteral.buildLiteralParsers(), str, outerStart);
+        ) = state.boundLiteral(cursor);
         uint256 parser;
         assembly ("memory-safe") {
             parser := parserFn
@@ -33,21 +38,24 @@ contract LibParseLiteralBoundLiteralStringTest is Test {
 
     /// External parse function to allow us to assert reverts after forcing the
     /// string length. This can be used to force the parser out of bounds.
-    function externalBoundLiteralForceLength(bytes memory str, uint256 length)
+    function externalBoundLiteralForceLength(bytes memory data, uint256 length)
         external
         pure
         returns (uint256, uint256, uint256, uint256, uint256)
     {
+        ParseState memory state = LibParseState.newState(data, "");
+        state.literalParsers = LibParseLiteral.buildLiteralParsers();
         assembly ("memory-safe") {
-            mstore(str, length)
+            mstore(data, length)
         }
-        uint256 outerStart = Pointer.unwrap(bytes(str).dataPointer());
+        uint256 outerStart = Pointer.unwrap(bytes(data).dataPointer());
+        uint256 cursor = outerStart;
         (
-            function(bytes memory, uint256, uint256) pure returns (uint256) parserFn,
+            function(ParseState memory, uint256, uint256) pure returns (uint256) parserFn,
             uint256 innerStart,
             uint256 innerEnd,
             uint256 outerEnd
-        ) = LibParseLiteral.boundLiteral(LibParseLiteral.buildLiteralParsers(), str, outerStart);
+        ) = state.boundLiteral(cursor);
         uint256 parser;
         assembly ("memory-safe") {
             parser := parserFn
@@ -64,7 +72,7 @@ contract LibParseLiteralBoundLiteralStringTest is Test {
         (uint256 actualParser, uint256 outerStart, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
             this.externalBoundLiteral(bytes(str));
         uint256 expectedParser;
-        function(bytes memory, uint256, uint256) pure returns (uint256) parseLiteralString =
+        function(ParseState memory, uint256, uint256) pure returns (uint256) parseLiteralString =
             LibParseLiteral.parseLiteralString;
         assembly ("memory-safe") {
             expectedParser := parseLiteralString
