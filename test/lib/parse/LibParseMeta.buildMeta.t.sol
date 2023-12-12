@@ -1,12 +1,17 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "src/lib/parse/LibParseMeta.sol";
-import "test/util/lib/bloom/LibBloom.sol";
+import {LibParseMeta, AuthoringMeta} from "src/lib/parse/LibParseMeta.sol";
+import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
+import {LibBloom} from "test/util/lib/bloom/LibBloom.sol";
+import {LibParseOperand, Operand} from "src/lib/parse/LibParseOperand.sol";
 
 contract LibParseMetaBuildMetaTest is Test {
+    using LibParseState for ParseState;
+    using LibParseMeta for ParseState;
+
     /// This is super loose from limited empirical testing.
     function expanderDepth(uint256 n) internal pure returns (uint8) {
         // Number of fully saturated expanders
@@ -23,10 +28,10 @@ contract LibParseMetaBuildMetaTest is Test {
     }
 
     function testRoundMetaExpanderShallow(
+        ParseState memory state,
         AuthoringMeta[] memory authoringMeta,
         uint8 j,
-        bytes32 notFound,
-        uint256 operandParsers
+        bytes32 notFound
     ) external {
         vm.assume(authoringMeta.length > 0);
         vm.assume(!LibBloom.bloomFindsDupes(LibParseMeta.copyWordsFromAuthoringMeta(authoringMeta)));
@@ -35,12 +40,11 @@ contract LibParseMetaBuildMetaTest is Test {
         }
         j = uint8(bound(j, uint8(0), uint8(authoringMeta.length) - 1));
 
-        bytes memory meta = LibParseMeta.buildParseMeta(authoringMeta, expanderDepth(authoringMeta.length));
-        (
-            bool exists,
-            uint256 k,
-            function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParserK
-        ) = LibParseMeta.lookupWord(meta, operandParsers, authoringMeta[j].word);
+        // Defined for assembly blocks.
+        uint256 operandParsers = state.operandParsers;
+        state.meta = LibParseMeta.buildParseMeta(authoringMeta, expanderDepth(authoringMeta.length));
+        (bool exists, uint256 k, function(ParseState memory, uint256) pure returns (uint256, Operand) operandParserK) =
+            state.lookupWord(authoringMeta[j].word);
         uint256 operandParserKActual;
         assembly ("memory-safe") {
             operandParserKActual := operandParserK
@@ -54,11 +58,8 @@ contract LibParseMetaBuildMetaTest is Test {
         assertTrue(exists, "exists");
         assertEq(j, k, "k");
 
-        (
-            bool notExists,
-            uint256 l,
-            function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParserL
-        ) = LibParseMeta.lookupWord(meta, operandParsers, notFound);
+        (bool notExists, uint256 l, function(ParseState memory, uint256) pure returns (uint256, Operand) operandParserL)
+        = state.lookupWord(notFound);
         uint256 operandParserLActual;
         assembly ("memory-safe") {
             operandParserLActual := operandParserL
@@ -68,7 +69,12 @@ contract LibParseMetaBuildMetaTest is Test {
         assertEq(0, l, "l");
     }
 
-    function testRoundMetaExpanderDeeper(AuthoringMeta[] memory authoringMeta, uint8 j, bytes32 notFound) external {
+    function testRoundMetaExpanderDeeper(
+        ParseState memory state,
+        AuthoringMeta[] memory authoringMeta,
+        uint8 j,
+        bytes32 notFound
+    ) external {
         vm.assume(authoringMeta.length > 50);
         vm.assume(!LibBloom.bloomFindsDupes(LibParseMeta.copyWordsFromAuthoringMeta(authoringMeta)));
         for (uint256 i = 0; i < authoringMeta.length; i++) {
@@ -76,13 +82,13 @@ contract LibParseMetaBuildMetaTest is Test {
         }
         j = uint8(bound(j, uint8(0), uint8(authoringMeta.length) - 1));
 
-        uint256 operandParsers = LibParseOperand.buildOperandParsers();
-        bytes memory meta = LibParseMeta.buildParseMeta(authoringMeta, expanderDepth(authoringMeta.length));
-        (
-            bool exists,
-            uint256 k,
-            function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParserK
-        ) = LibParseMeta.lookupWord(meta, operandParsers, authoringMeta[j].word);
+        state.operandParsers = LibParseOperand.buildOperandParsers();
+        // Defined for assembly blocks.
+        uint256 operandParsers = state.operandParsers;
+        state.meta = LibParseMeta.buildParseMeta(authoringMeta, expanderDepth(authoringMeta.length));
+
+        (bool exists, uint256 k, function(ParseState memory, uint256) pure returns (uint256, Operand) operandParserK) =
+            state.lookupWord(authoringMeta[j].word);
         uint256 operandParserKActual;
         assembly ("memory-safe") {
             operandParserKActual := operandParserK
@@ -96,11 +102,8 @@ contract LibParseMetaBuildMetaTest is Test {
         assertTrue(exists, "exists");
         assertEq(j, k, "k");
 
-        (
-            bool notExists,
-            uint256 l,
-            function(uint256, bytes memory, uint256) pure returns (uint256, Operand) operandParserL
-        ) = LibParseMeta.lookupWord(meta, operandParsers, notFound);
+        (bool notExists, uint256 l, function(ParseState memory, uint256) pure returns (uint256, Operand) operandParserL)
+        = state.lookupWord(notFound);
         uint256 operandParserLActual;
         assembly ("memory-safe") {
             operandParserLActual := operandParserL

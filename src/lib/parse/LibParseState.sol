@@ -17,31 +17,25 @@ import {
 import {LibParseLiteral} from "./LibParseLiteral.sol";
 import {LibParse} from "./LibParse.sol";
 import {LibParseOperand} from "./LibParseOperand.sol";
+import {LibParseError} from "./LibParseError.sol";
 
 /// @dev Initial state of an active source is just the starting offset which is
 /// 0x20.
 uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
 
-uint256 constant FSM_RHS_MASK = 1;
-uint256 constant FSM_YANG_MASK = 1 << 1;
-uint256 constant FSM_WORD_END_MASK = 1 << 2;
-uint256 constant FSM_ACCEPTING_INPUTS_MASK = 1 << 3;
-
-/// @dev The space between lines where comments and whitespace is allowed.
-/// The first LHS item breaks us out of the interstitial.
-uint256 constant FSM_INTERSTITIAL_MASK = 1 << 4;
+uint256 constant FSM_YANG_MASK = 1;
+uint256 constant FSM_WORD_END_MASK = 1 << 1;
+uint256 constant FSM_ACCEPTING_INPUTS_MASK = 1 << 2;
 
 /// @dev If a source is active we cannot finish parsing without a semi to trigger
 /// finalisation.
-uint256 constant FSM_ACTIVE_SOURCE_MASK = 1 << 5;
+uint256 constant FSM_ACTIVE_SOURCE_MASK = 1 << 3;
 
 /// @dev fsm default state is:
-/// - LHS
 /// - yin
 /// - not word end
 /// - accepting inputs
-/// - interstitial
-uint256 constant FSM_DEFAULT = FSM_ACCEPTING_INPUTS_MASK | FSM_INTERSTITIAL_MASK;
+uint256 constant FSM_DEFAULT = FSM_ACCEPTING_INPUTS_MASK;
 
 /// The parser is stateful. This struct keeps track of the entire state.
 /// @param activeSourcePtr The pointer to the current source being built.
@@ -123,11 +117,15 @@ struct ParseState {
     uint256 literalParsers;
     uint256 operandParsers;
     ParseStackTracker stackTracker;
+    bytes data;
+    bytes meta;
 }
 
 library LibParseState {
     using LibParseState for ParseState;
     using LibParseStackTracker for ParseStackTracker;
+    using LibParseError for ParseState;
+    using LibParseLiteral for ParseState;
 
     function newActiveSourcePointer(uint256 oldActiveSourcePointer) internal pure returns (uint256) {
         uint256 activeSourcePtr;
@@ -158,7 +156,7 @@ library LibParseState {
         state.stackTracker = ParseStackTracker.wrap(0);
     }
 
-    function newState() internal pure returns (ParseState memory) {
+    function newState(bytes memory data, bytes memory meta) internal pure returns (ParseState memory) {
         ParseState memory state = ParseState(
             // activeSource
             // (will be built in `newActiveSource`)
@@ -191,7 +189,9 @@ library LibParseState {
             // operandParsers
             LibParseOperand.buildOperandParsers(),
             // stackTracker
-            ParseStackTracker.wrap(0)
+            ParseStackTracker.wrap(0),
+            data,
+            meta
         );
         state.resetSource();
         return state;
@@ -218,7 +218,7 @@ library LibParseState {
         }
     }
 
-    function endLine(ParseState memory state, bytes memory data, uint256 cursor) internal pure {
+    function endLine(ParseState memory state, uint256 cursor) internal pure {
         unchecked {
             {
                 uint256 parenOffset;
@@ -226,7 +226,7 @@ library LibParseState {
                     parenOffset := byte(0, mload(add(state, 0x60)))
                 }
                 if (parenOffset > 0) {
-                    revert UnclosedLeftParen(LibParse.parseErrorOffset(data, cursor));
+                    revert UnclosedLeftParen(state.parseErrorOffset(cursor));
                 }
             }
 
@@ -258,7 +258,7 @@ library LibParseState {
             // the FSM to not accepting inputs.
             if (lineRHSTopLevel == 0) {
                 if (state.fsm & FSM_ACCEPTING_INPUTS_MASK == 0) {
-                    revert NotAcceptingInputs(LibParse.parseErrorOffset(data, cursor));
+                    revert NotAcceptingInputs(state.parseErrorOffset(cursor));
                 } else {
                     // As there are no RHS opcodes yet we can simply set topLevel0 directly.
                     // This is the only case where we defer to the LHS to tell
@@ -277,9 +277,9 @@ library LibParseState {
             // item on that line.
             else if (lineRHSTopLevel > 1) {
                 if (lineLHSItems < lineRHSTopLevel) {
-                    revert ExcessRHSItems(LibParse.parseErrorOffset(data, cursor));
+                    revert ExcessRHSItems(state.parseErrorOffset(cursor));
                 } else if (lineLHSItems > lineRHSTopLevel) {
-                    revert ExcessLHSItems(LibParse.parseErrorOffset(data, cursor));
+                    revert ExcessLHSItems(state.parseErrorOffset(cursor));
                 }
             }
 
@@ -348,14 +348,14 @@ library LibParseState {
         }
     }
 
-    function pushLiteral(ParseState memory state, bytes memory data, uint256 cursor) internal pure returns (uint256) {
+    function pushLiteral(ParseState memory state, uint256 cursor) internal pure returns (uint256) {
         unchecked {
             (
-                function(bytes memory, uint256, uint256) pure returns (uint256) parser,
+                function(ParseState memory, uint256, uint256) pure returns (uint256) parser,
                 uint256 innerStart,
                 uint256 innerEnd,
                 uint256 outerEnd
-            ) = LibParseLiteral.boundLiteral(state.literalParsers, data, cursor);
+            ) = state.boundLiteral(cursor);
             uint256 fingerprint;
             uint256 fingerprintBloom;
             assembly ("memory-safe") {
@@ -441,7 +441,7 @@ library LibParseState {
                 }
                 // Second word is the value.
                 {
-                    uint256 tailValue = parser(data, innerStart, innerEnd);
+                    uint256 tailValue = parser(state, innerStart, innerEnd);
 
                     assembly ("memory-safe") {
                         // Second word is the value
