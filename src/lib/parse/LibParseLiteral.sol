@@ -119,13 +119,16 @@ library LibParseLiteral {
                 // Hexadecimal literal dispatch is 0x. We can't accidentally
                 // match x0 because we already checked that the head is 0-9.
                 if ((head | dispatch) == CMASK_LITERAL_HEX_DISPATCH) {
+                    //slither-disable-next-line unused-return
                     return state.boundLiteralHex(cursor);
                 }
                 // decimal is the fallback as continuous numeric digits 0-9.
                 else {
+                    //slither-disable-next-line unused-return
                     return state.boundLiteralDecimal(cursor);
                 }
             } else if (head & CMASK_STRING_LITERAL_HEAD != 0) {
+                //slither-disable-next-line unused-return
                 return state.boundLiteralString(cursor);
             }
 

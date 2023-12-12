@@ -159,10 +159,12 @@ library LibParse {
         return cursor;
     }
 
+    //slither-disable-next-line cyclomatic-complexity
     function parseRHS(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         while (cursor < end) {
             bytes32 word;
             uint256 char;
+            //slither-disable-next-line incorrect-shift
             assembly ("memory-safe") {
                 char := shl(byte(0, mload(cursor)), 1)
             }
