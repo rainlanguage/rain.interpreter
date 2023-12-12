@@ -164,8 +164,8 @@ library LibParse {
         while (cursor < end) {
             bytes32 word;
             uint256 char;
-            //slither-disable-next-line incorrect-shift
             assembly ("memory-safe") {
+                //slither-disable-next-line incorrect-shift
                 char := shl(byte(0, mload(cursor)), 1)
             }
 

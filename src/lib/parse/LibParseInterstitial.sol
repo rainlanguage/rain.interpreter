@@ -78,8 +78,8 @@ library LibParseInterstitial {
     function parseInterstitial(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         while (cursor < end) {
             uint256 char;
-            //slither-disable-next-line incorrect-shift
             assembly ("memory-safe") {
+                //slither-disable-next-line incorrect-shift
                 char := shl(byte(0, mload(cursor)), 1)
             }
             if (char & CMASK_WHITESPACE > 0) {
