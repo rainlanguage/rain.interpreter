@@ -84,7 +84,7 @@
           '');
 
           build = pkgs.writeShellScriptBin  "build" (''
-            ${rain-cli} subgraph build
+            ${rain-cli} subgraph build --address 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24
           '');
 
           rain_cli = pkgs.writeShellScriptBin "rain_cli" (''
