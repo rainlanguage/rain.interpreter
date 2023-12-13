@@ -153,6 +153,10 @@ library LibParseState {
         state.parenTracker0 = 0;
         state.parenTracker1 = 0;
         state.lineTracker = 0;
+
+        // We don't reset sub parsers because they are global and immutable to
+        // the parsing process.
+
         state.stackNames = 0;
         state.stackNameBloom = 0;
         state.stackTracker = ParseStackTracker.wrap(0);
@@ -172,7 +176,9 @@ library LibParseState {
             // parenTracker1
             0,
             // lineTracker
-            // (will be built in `newActiveSource`)
+            // (will be built in `resetSource`)
+            0,
+            // sub parsers
             0,
             // sourcesBuilder
             0,
@@ -190,8 +196,6 @@ library LibParseState {
             LibParseLiteral.buildLiteralParsers(),
             // operandParsers
             LibParseOperand.buildOperandParsers(),
-            // sub parsers
-            0,
             // stackTracker
             ParseStackTracker.wrap(0),
             // data bytes
