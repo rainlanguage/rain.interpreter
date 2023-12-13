@@ -60,6 +60,9 @@ jobs:
       - name: Forge shallow install
         run: forge install --shallow
 
+      - name: Build metas
+        run: nix run .#build-meta
+
       - name: install npm dependencies
         working-directory: ./subgraph
         run: npm install
