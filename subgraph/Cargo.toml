@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 tokio = { version = "1.28.0", features = ["full"] }
 anyhow = "1.0.70"
-rain_cli_subgraph = { git = "https://github.com/rainlanguage/rain.subgraph-cli.git", rev = "6a2ea40ec692eea35a4b618b6e664139587662f1" }
+rain_cli_subgraph = { git = "https://github.com/rainlanguage/rain.subgraph.cli.git", rev = "9f2a89a1278fc131018d68c0943e98b7a34867fd" }
 tracing = "0.1.37"
 tracing-subscriber = "0.3.17"
 graphql_client = "0.13.0"

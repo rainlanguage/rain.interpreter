@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/ec750fd01963ab6b20ee1f0cb488754e8036d89d";
     flake-utils.url = "github:numtide/flake-utils";
-    rain.url = "github:rainlanguage/rain.cli/192d5e1921ee37ba933b5ed42c9edf6f45ae6a93";
+    rain.url = "github:rainlanguage/rain.cli/5d083a449ca876c1b1736507b8e89957f0b8f6f8";
   };
 
 
