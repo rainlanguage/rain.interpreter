@@ -89,9 +89,7 @@ export function getInterpreterInstance(address: Address): InterpreterInstance {
     // This instance address
     interpreterInstance = new InterpreterInstance(address.toHex());
 
-    // This contract bytecode
-    const bytecodeHash = ExtrospectionPerNetwork.get_bytecode_hash(address);
-    let interpreter = getInterpreter(bytecodeHash);
+    let interpreter = getInterpreter(address);
 
     interpreterInstance.interpreter = interpreter.id;
     interpreterInstance.save();
@@ -108,9 +106,7 @@ export function getRainterpreterStoreInstance(
     // This instance address
     storeInstance = new RainterpreterStoreInstance(address.toHex());
 
-    // This contract bytecode
-    const bytecodeHash = ExtrospectionPerNetwork.get_bytecode_hash(address);
-    let store = getRainterpreterStore(bytecodeHash);
+    let store = getRainterpreterStore(address);
 
     storeInstance.store = store.id;
     storeInstance.save();
@@ -127,9 +123,7 @@ export function getParserInstance(
     // This instance address
     parserInstance = new RainterpreterParserInstance(address.toHex());
 
-    // This contract bytecode
-    const bytecodeHash = ExtrospectionPerNetwork.get_bytecode_hash(address);
-    let store = getParser(bytecodeHash);
+    let store = getParser(address);
 
     parserInstance.parser = store.id;
     parserInstance.save();
@@ -138,30 +132,36 @@ export function getParserInstance(
   return parserInstance;
 }
 
-function getInterpreter(hash: Bytes): Interpreter {
-  let interpreter = Interpreter.load(hash.toHex());
+function getInterpreter(address: Address): Interpreter {
+  const bytecodeHash = ExtrospectionPerNetwork.get_bytecode_hash(address);
+  let interpreter = Interpreter.load(bytecodeHash.toHex());
   if (!interpreter) {
-    interpreter = new Interpreter(hash.toHex());
+    interpreter = new Interpreter(bytecodeHash.toHex());
+    interpreter.bytecode = ExtrospectionPerNetwork.get_bytecode(address);
     interpreter.save();
   }
 
   return interpreter;
 }
 
-function getRainterpreterStore(hash: Bytes): RainterpreterStore {
-  let store = RainterpreterStore.load(hash.toHex());
+function getRainterpreterStore(address: Address): RainterpreterStore {
+  const bytecodeHash = ExtrospectionPerNetwork.get_bytecode_hash(address);
+  let store = RainterpreterStore.load(bytecodeHash.toHex());
   if (!store) {
-    store = new RainterpreterStore(hash.toHex());
+    store = new RainterpreterStore(bytecodeHash.toHex());
+    store.bytecode = ExtrospectionPerNetwork.get_bytecode(address);
     store.save();
   }
 
   return store;
 }
 
-function getParser(hash: Bytes): RainterpreterParser {
-  let store = RainterpreterParser.load(hash.toHex());
+function getParser(address: Address): RainterpreterParser {
+  const bytecodeHash = ExtrospectionPerNetwork.get_bytecode_hash(address);
+  let store = RainterpreterParser.load(bytecodeHash.toHex());
   if (!store) {
-    store = new RainterpreterParser(hash.toHex());
+    store = new RainterpreterParser(bytecodeHash.toHex());
+    store.bytecode = ExtrospectionPerNetwork.get_bytecode(address);
     store.save();
   }
 

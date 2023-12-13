@@ -69,8 +69,10 @@ type ExpressionDeployer implements RainContract @entity {
 }
 
 type Interpreter @entity {
-  "Hash of the deployed bytecode for this interpreter."
+  "Hash of the bytecode for this interpreter."
   id: ID!
+  "The bytecode of the contract"
+  bytecode: Bytes!
   "Instances of this interpreter"
   instances: [InterpreterInstance!]! @derivedFrom(field: "interpreter")
   "Expressions deployed by this interpreter"
@@ -86,8 +88,10 @@ type InterpreterInstance @entity {
 }
 
 type RainterpreterStore @entity {
-  "Hash of the deployed bytecode for this RainterpreterStore."
+  "Hash of the bytecode for this RainterpreterStore."
   id: ID!
+  "The bytecode of the contract"
+  bytecode: Bytes!
   "Instances of this store"
   instances: [RainterpreterStoreInstance!]! @derivedFrom(field: "store")
 }
@@ -101,8 +105,10 @@ type RainterpreterStoreInstance @entity {
 }
 
 type RainterpreterParser @entity {
-  "Hash of the deployed bytecode for this RainterpreterParser."
+  "Hash of the bytecode for this RainterpreterParser."
   id: ID!
+  "The bytecode of the contract"
+  bytecode: Bytes!
   "Instances of this parser"
   instances: [RainterpreterParserInstance!]! @derivedFrom(field: "parser")
 }

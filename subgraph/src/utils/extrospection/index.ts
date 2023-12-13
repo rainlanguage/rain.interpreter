@@ -27,4 +27,8 @@ export class ExtrospectionPerNetwork {
   static get_bytecode_hash(address: Address): Bytes {
     return this.get().bytecodeHash(address);
   }
+
+  static get_bytecode(address: Address): Bytes {
+    return this.get().bytecode(address);
+  }
 }
