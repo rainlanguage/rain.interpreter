@@ -106,6 +106,8 @@ struct ParseState {
     uint256 parenTracker0;
     uint256 parenTracker1;
     uint256 lineTracker;
+    /// - `pushSubParser`
+    uint256 subParsers;
     /// @dev END things that are referenced directly in assembly by hardcoded
     /// offsets.
     uint256 sourcesBuilder;
@@ -188,9 +190,13 @@ library LibParseState {
             LibParseLiteral.buildLiteralParsers(),
             // operandParsers
             LibParseOperand.buildOperandParsers(),
+            // sub parsers
+            0,
             // stackTracker
             ParseStackTracker.wrap(0),
+            // data bytes
             data,
+            // meta bytes
             meta
         );
         state.resetSource();

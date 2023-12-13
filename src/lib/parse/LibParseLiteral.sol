@@ -28,7 +28,8 @@ import {
     ZeroLengthDecimal,
     ZeroLengthHexLiteral,
     UnclosedStringLiteral,
-    ParserOutOfBounds
+    ParserOutOfBounds,
+    InvalidAddressLength
 } from "../../error/ErrParse.sol";
 import {ParseState} from "./LibParseState.sol";
 import {LibParseError} from "./LibParseError.sol";
@@ -267,6 +268,29 @@ library LibParseLiteral {
             }
         }
         return (parser, innerStart, innerEnd, innerEnd);
+    }
+
+    /// Bounding a literal hex address is just a special case of bounding a
+    /// literal hex. The only difference is that every address is the same known
+    /// length as they are 160 bits (20 bytes). This means we need exactly 42
+    /// bytes between the start and end of the literal, including the 0x prefix,
+    /// as each byte of a hex literal string = 0.5 bytes of encoded data.
+    function boundLiteralHexAddress(ParseState memory state, uint256 cursor)
+        internal
+        pure
+        returns (
+            function(ParseState memory, uint256, uint256) pure returns (uint256) parser,
+            uint256 innerStart,
+            uint256 innerEnd,
+            uint256 outerEnd
+        )
+    {
+        unchecked {
+            (parser, innerStart, innerEnd, outerEnd) = boundLiteralHex(state, cursor);
+            if (outerEnd - cursor != 42) {
+                revert InvalidAddressLength(state.parseErrorOffset(cursor));
+            }
+        }
     }
 
     /// Algorithm for parsing hexadecimal literals:

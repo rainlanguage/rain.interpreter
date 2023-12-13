@@ -494,3 +494,6 @@ uint256 constant COMMENT_END_SEQUENCE = uint256(uint16(bytes2("*/")));
 /// This is safe because the head is prefiltered to be 0-9 due to the numeric
 /// literal head, therefore the only possible match is 0x (not x0).
 uint128 constant CMASK_LITERAL_HEX_DISPATCH = CMASK_ZERO | CMASK_LOWER_X;
+
+/// @dev We may want to match the exact start of a hex literal.
+uint256 constant CMASK_LITERAL_HEX_DISPATCH_START = uint256(uint16(bytes2("0x")));
