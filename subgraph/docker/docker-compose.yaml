@@ -1,4 +1,0 @@
-version: '4'
-
-include:
-  - ../rain.subgraph.docker/docker-compose.yml

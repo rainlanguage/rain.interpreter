@@ -92,11 +92,11 @@
           '');
 
           docker-up = pkgs.writeShellScriptBin "docker-up" ''
-            docker compose -f docker/docker-compose.yaml up --build -d
+            docker compose -f rain.subgraph.docker/docker-compose.yml up --build -d
           '';
 
           docker-down = pkgs.writeShellScriptBin "docker-down" ''
-            docker compose -f docker/docker-compose.yaml down
+            docker compose -f rain.subgraph.docker/docker-compose.yml down
           '';
 
           generate-sg-schema =  pkgs.writeShellScriptBin "generate-sg-schema" (''
