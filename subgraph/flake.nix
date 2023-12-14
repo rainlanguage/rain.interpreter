@@ -100,7 +100,7 @@
           '';
 
           generate-sg-schema =  pkgs.writeShellScriptBin "generate-sg-schema" (''
-            ${rain-cli} subgraph build
+            ${rain-cli} subgraph build --network mainnet
             ${rain-cli} subgraph deploy --endpoint http://localhost:8020 --subgraph-name "test/test"
 
             # Wait for 1 second to the subgraph be totally deployed
