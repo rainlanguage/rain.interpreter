@@ -53,10 +53,6 @@ jobs:
         with:
           version: nightly
 
-      - name: Init docker submodule
-        working-directory: ./subgraph
-        run: git submodule update --init --recursive --depth 1 rain.subgraph.docker/
-
       - name: Start docker container
         working-directory: ./subgraph
         run: nix run .#docker-up
