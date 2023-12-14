@@ -10,7 +10,7 @@ export class ExtrospectionPerNetwork {
 
     // Mainnet is Ethereum
     if (currentNetwork == "mainnet")
-      address = "0xbba1972733136122f5eef820567b35c0f3e91ac9";
+      address = "0x4e6f010e1a4a51d241ea88eb01c52824e728a877";
 
     if (currentNetwork == "mumbai")
       address = "0x2c9f3204590765aefa7bee01bccb540a7d06e967";

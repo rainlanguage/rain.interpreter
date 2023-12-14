@@ -78,7 +78,7 @@ async fn init_deployer(
     let build_args = subgraph::build::BuildArgs {
         address: Some("0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24".to_string()), // The registry address
         block_number: Some(block.as_u64()),
-        network: Some("localhost".to_string()),
+        network: Some("mainnet".to_string()),
         template_path: None,
         output_path: None,
     };
