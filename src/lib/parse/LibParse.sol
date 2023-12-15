@@ -274,7 +274,7 @@ library LibParse {
             }
             // Handle all literals.
             else if (char & CMASK_LITERAL_HEAD > 0) {
-                cursor = state.pushLiteral(cursor);
+                cursor = state.pushLiteral(cursor, end);
                 state.highwater();
                 // We are yang now. Need the next char to release to
                 // yin.

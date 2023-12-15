@@ -81,7 +81,7 @@ library LibParsePragma {
                     uint256 innerStart,
                     uint256 innerEnd,
                     uint256 outerEnd
-                ) = state.boundLiteralHexAddress(cursor);
+                ) = state.boundLiteralHexAddress(cursor, end);
 
                 // Parse and push the sub parser
                 state.pushSubParser(literalHexAddressParser(state, innerStart, innerEnd));

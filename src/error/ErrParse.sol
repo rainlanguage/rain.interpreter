@@ -77,6 +77,9 @@ error UnclosedLeftParen(uint256 offset);
 /// Encountered a comment outside the interstitial space between lines.
 error UnexpectedComment(uint256 offset);
 
+/// Encountered a comment that never ends.
+error UnclosedComment(uint256 offset);
+
 /// Encountered a comment start sequence that is malformed.
 error MalformedCommentStart(uint256 offset);
 

@@ -489,6 +489,9 @@ uint256 constant COMMENT_START_SEQUENCE = uint256(uint16(bytes2("/*")));
 /// @dev Rainlang comment ending sequence is */
 uint256 constant COMMENT_END_SEQUENCE = uint256(uint16(bytes2("*/")));
 
+/// @dev Rainlang comment end sequence end byte is / */
+uint256 constant CMASK_COMMENT_END_SEQUENCE_END = COMMENT_END_SEQUENCE & 0xFF;
+
 /// @dev Rainlang literal hexadecimal dispatch is 0x
 /// We compare the head and dispatch together to avoid a second comparison.
 /// This is safe because the head is prefiltered to be 0-9 due to the numeric

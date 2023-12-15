@@ -358,14 +358,14 @@ library LibParseState {
         }
     }
 
-    function pushLiteral(ParseState memory state, uint256 cursor) internal pure returns (uint256) {
+    function pushLiteral(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
             (
                 function(ParseState memory, uint256, uint256) pure returns (uint256) parser,
                 uint256 innerStart,
                 uint256 innerEnd,
                 uint256 outerEnd
-            ) = state.boundLiteral(cursor);
+            ) = state.boundLiteral(cursor, end);
             uint256 fingerprint;
             uint256 fingerprintBloom;
             assembly ("memory-safe") {

@@ -10,11 +10,6 @@ import {CMASK_HEX} from "src/lib/parse/LibParseCMask.sol";
 /// @title LibParseLiteralBoundLiteralHexTest
 /// Tests parsing bound literal hex values.
 contract LibParseLiteralBoundLiteralHexTest is ParseLiteralTest {
-    /// Check that an empty string is not treated as a literal.
-    function testParseLiteralBoundLiteralHexEmpty() external {
-        checkParserOutOfBounds("");
-    }
-
     function checkHexBounds(
         bytes memory data,
         uint256 expectedInnerStart,

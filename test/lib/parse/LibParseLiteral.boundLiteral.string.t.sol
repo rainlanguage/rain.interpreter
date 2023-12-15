@@ -23,12 +23,13 @@ contract LibParseLiteralBoundLiteralStringTest is Test {
         state.literalParsers = LibParseLiteral.buildLiteralParsers();
         uint256 outerStart = Pointer.unwrap(bytes(data).dataPointer());
         uint256 cursor = outerStart;
+        uint256 end = outerStart + bytes(data).length;
         (
             function(ParseState memory, uint256, uint256) pure returns (uint256) parserFn,
             uint256 innerStart,
             uint256 innerEnd,
             uint256 outerEnd
-        ) = state.boundLiteral(cursor);
+        ) = state.boundLiteral(cursor, end);
         uint256 parser;
         assembly ("memory-safe") {
             parser := parserFn
@@ -50,12 +51,13 @@ contract LibParseLiteralBoundLiteralStringTest is Test {
         }
         uint256 outerStart = Pointer.unwrap(bytes(data).dataPointer());
         uint256 cursor = outerStart;
+        uint256 end = outerStart + length;
         (
             function(ParseState memory, uint256, uint256) pure returns (uint256) parserFn,
             uint256 innerStart,
             uint256 innerEnd,
             uint256 outerEnd
-        ) = state.boundLiteral(cursor);
+        ) = state.boundLiteral(cursor, end);
         uint256 parser;
         assembly ("memory-safe") {
             parser := parserFn

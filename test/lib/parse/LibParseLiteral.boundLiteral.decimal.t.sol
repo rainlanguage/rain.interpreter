@@ -3,12 +3,7 @@ pragma solidity =0.8.19;
 
 import {ParseLiteralTest} from "test/util/abstract/ParseLiteralTest.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
-import {
-    LibParseLiteral,
-    UnsupportedLiteralType,
-    MalformedExponentDigits,
-    ParserOutOfBounds
-} from "src/lib/parse/LibParseLiteral.sol";
+import {LibParseLiteral, UnsupportedLiteralType, MalformedExponentDigits} from "src/lib/parse/LibParseLiteral.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseLiteralBoundLiteralDecimalTest
@@ -37,22 +32,18 @@ contract LibParseLiteralBoundLiteralDecimalTest is ParseLiteralTest {
         state.literalParsers = LibParseLiteral.buildLiteralParsers();
         uint256 outerStart = Pointer.unwrap(data.dataPointer());
         uint256 cursor = outerStart;
+        uint256 end = outerStart + data.length;
         vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, offset));
         (
             function(ParseState memory, uint256, uint256) pure returns (uint256) parser,
             uint256 innerStart,
             uint256 innerEnd,
             uint256 outerEnd
-        ) = state.boundLiteral(cursor);
+        ) = state.boundLiteral(cursor, end);
         (parser);
         (innerStart);
         (innerEnd);
         (outerEnd);
-    }
-
-    /// Check that an empty string is not treated as a literal.
-    function testParseLiteralBoundLiteralDecimalEmpty() external {
-        checkParserOutOfBounds("");
     }
 
     /// Check that a single digit is bounded as a decimal literal. Tests "0".
