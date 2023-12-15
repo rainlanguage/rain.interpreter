@@ -181,11 +181,11 @@ library LibParse {
                 (
                     bool exists,
                     uint256 opcodeIndex,
-                    function(ParseState memory, uint256) pure returns (uint256, Operand) operandParser
+                    function(ParseState memory, uint256, uint256) pure returns (uint256, Operand) operandParser
                 ) = state.lookupWord(word);
                 if (exists) {
                     Operand operand;
-                    (cursor, operand) = operandParser(state, cursor);
+                    (cursor, operand) = operandParser(state, cursor, end);
                     state.pushOpToSource(opcodeIndex, operand);
                     // This is a real word so we expect to see parens
                     // after it.

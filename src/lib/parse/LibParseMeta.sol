@@ -234,7 +234,7 @@ library LibParseMeta {
     function lookupWord(ParseState memory state, bytes32 word)
         internal
         pure
-        returns (bool, uint256, function(ParseState memory, uint256) pure returns (uint256, Operand))
+        returns (bool, uint256, function(ParseState memory, uint256, uint256) pure returns (uint256, Operand))
     {
         unchecked {
             uint256 dataStart;
@@ -281,7 +281,7 @@ library LibParseMeta {
                 // Match
                 if (wordFingerprint == posData & FINGERPRINT_MASK) {
                     uint256 index;
-                    function(ParseState memory, uint256) pure returns (uint256, Operand) operandParser;
+                    function(ParseState memory, uint256, uint256) pure returns (uint256, Operand) operandParser;
                     uint256 operandParsers = state.operandParsers;
                     assembly ("memory-safe") {
                         index := byte(27, posData)
@@ -293,7 +293,7 @@ library LibParseMeta {
                 }
             }
             // The caller MUST NOT use this operand parser as `exists` is false.
-            function(ParseState memory, uint256) pure returns (uint256, Operand) operandParserZero;
+            function(ParseState memory, uint256, uint256) pure returns (uint256, Operand) operandParserZero;
             assembly ("memory-safe") {
                 operandParserZero := 0
             }

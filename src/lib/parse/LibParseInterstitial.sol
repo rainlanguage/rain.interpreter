@@ -2,7 +2,13 @@
 pragma solidity ^0.8.18;
 
 import {FSM_YANG_MASK, ParseState} from "./LibParseState.sol";
-import {CMASK_COMMENT_HEAD, CMASK_WHITESPACE, COMMENT_END_SEQUENCE, COMMENT_START_SEQUENCE} from "./LibParseCMask.sol";
+import {
+    CMASK_COMMENT_HEAD,
+    CMASK_WHITESPACE,
+    COMMENT_END_SEQUENCE,
+    COMMENT_START_SEQUENCE,
+    CMASK_COMMENT_END_SEQUENCE_END
+} from "./LibParseCMask.sol";
 import {ParserOutOfBounds, MalformedCommentStart, UnclosedComment} from "../../error/ErrParse.sol";
 import {LibParseError} from "./LibParseError.sol";
 import {LibParse} from "./LibParse.sol";
@@ -53,7 +59,7 @@ library LibParseInterstitial {
                 assembly ("memory-safe") {
                     charByte := byte(0, mload(cursor))
                 }
-                if (charByte == COMMENT_END_SEQUENCE) {
+                if (charByte == CMASK_COMMENT_END_SEQUENCE_END) {
                     // Maybe this is the end of the comment.
                     // Check the sequence.
                     uint256 endSequence;

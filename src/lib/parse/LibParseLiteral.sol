@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {console2} from "forge-std/console2.sol";
-
 import {
     CMASK_E_NOTATION,
     CMASK_HEX,

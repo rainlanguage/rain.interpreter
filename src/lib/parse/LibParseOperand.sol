@@ -55,7 +55,7 @@ library LibParseOperand {
     }
 
     /// Parse a literal for an operand.
-    function parseOperandLiteral(ParseState memory state, uint256 max, uint256 cursor, uint256 end)
+    function parseOperandLiteral(ParseState memory state, uint256 maxValue, uint256 cursor, uint256 end)
         internal
         pure
         returns (uint256, uint256)
@@ -75,14 +75,14 @@ library LibParseOperand {
             uint256 outerEnd
         ) = state.boundLiteral(cursor, end);
         uint256 value = literalParser(state, innerStart, innerEnd);
-        if (value > max) {
+        if (value > maxValue) {
             revert OperandOverflow(state.parseErrorOffset(cursor));
         }
         return (outerEnd, value);
     }
 
     /// Operand is disallowed for this word.
-    function parseOperandDisallowed(ParseState memory state, uint256 cursor, uint256 end)
+    function parseOperandDisallowed(ParseState memory state, uint256 cursor, uint256)
         internal
         pure
         returns (uint256, Operand)

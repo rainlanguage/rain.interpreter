@@ -53,6 +53,18 @@ contract LibParseLiteralBoundLiteralHexAddressTest is ParseLiteralTest {
             uint256 outerEnd
         ) = state.boundLiteralHexAddress(outerStart, end);
 
+        uint256 hexParser;
+        function (ParseState memory, uint256, uint256) pure returns (uint256) parseLiteralHex =
+            LibParseLiteral.parseLiteralHex;
+        assembly ("memory-safe") {
+            hexParser := parseLiteralHex
+        }
+        uint256 actualParser;
+        assembly {
+            actualParser := parser
+        }
+        assertEq(actualParser, hexParser);
+
         // 0x
         assertEq(innerStart - outerStart, 2);
         // 0x + 40 chars = 2 byte address
