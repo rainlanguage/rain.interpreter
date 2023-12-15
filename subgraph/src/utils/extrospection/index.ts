@@ -6,11 +6,9 @@ export class ExtrospectionPerNetwork {
     const currentNetwork = dataSource.network();
     let address = "";
 
-    // TODO: Implement keyless deploy + CREATE2 opcode to have the same address on all chains
-
-    // Mainnet is Ethereum
+    // TODO: Implement keyless deploy or CREATE2 opcode to have the same address on all chains
     if (currentNetwork == "mainnet")
-      address = "0xbba1972733136122f5eef820567b35c0f3e91ac9";
+      address = "0x4e6f010e1a4a51d241ea88eb01c52824e728a877";
 
     if (currentNetwork == "mumbai")
       address = "0x2c9f3204590765aefa7bee01bccb540a7d06e967";

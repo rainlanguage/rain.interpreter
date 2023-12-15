@@ -92,15 +92,15 @@
           '');
 
           docker-up = pkgs.writeShellScriptBin "docker-up" ''
-            docker-compose -f docker/docker-compose.yaml up --build -d
+            docker compose -f rain.subgraph.docker/docker-compose.yml up --build -d
           '';
 
           docker-down = pkgs.writeShellScriptBin "docker-down" ''
-            docker-compose -f docker/docker-compose.yaml down
+            docker compose -f rain.subgraph.docker/docker-compose.yml down
           '';
 
           generate-sg-schema =  pkgs.writeShellScriptBin "generate-sg-schema" (''
-            ${rain-cli} subgraph build
+            ${rain-cli} subgraph build --network mainnet
             ${rain-cli} subgraph deploy --endpoint http://localhost:8020 --subgraph-name "test/test"
 
             # Wait for 1 second to the subgraph be totally deployed
