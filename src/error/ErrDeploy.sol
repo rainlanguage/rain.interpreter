@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.19;
 
+/// @dev Workaround for https://github.com/foundry-rs/foundry/issues/6572
+contract ErrDeploy {}
+
 /// @dev Thrown when the pointers known to the expression deployer DO NOT match
 /// the interpreter it is constructed for. This WILL cause undefined expression
 /// behaviour so MUST REVERT.

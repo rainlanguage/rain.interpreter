@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import "./LibParse.sol";
+import {ParseState} from "./LibParseState.sol";
 
 library LibParseStackName {
     /// Push a word onto the stack name stack.

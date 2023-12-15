@@ -8,9 +8,9 @@ import {DecimalLiteralOverflow} from "src/lib/parse/LibParseLiteral.sol";
 import {LibParse, UnexpectedRHSChar, UnexpectedRightParen} from "src/lib/parse/LibParse.sol";
 import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
 
-/// @title LibParseIntegerLiteralDecimalTest
+/// @title LibParseLiteralIntegerDecimalTest
 /// Tests parsing integer literal decimal values.
-contract LibParseIntegerLiteralDecimalTest is Test {
+contract LibParseLiteralIntegerDecimalTest is Test {
     /// Check a single decimal literal. Should not revert and return length 1
     /// sources and constants.
     function testParseIntegerLiteralDecimal00() external {

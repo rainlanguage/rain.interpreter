@@ -2,7 +2,7 @@
 pragma solidity =0.8.19;
 
 import {Script} from "forge-std/Script.sol";
-import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
+import {LibAllStandardOpsNP} from "../src/lib/op/LibAllStandardOpsNP.sol";
 
 /// @title Native Parser Authoring Meta
 /// @notice A script that returns the AuthoringMeta raw abi encoded bytes

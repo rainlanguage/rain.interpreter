@@ -1,26 +1,35 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "rain.solmem/lib/LibPointer.sol";
-import "rain.solmem/lib/LibBytes.sol";
-import "src/lib/parse/LibParseLiteral.sol";
+import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
+import {
+    LibParseLiteral,
+    UnsupportedLiteralType,
+    MalformedExponentDigits,
+    ParserOutOfBounds
+} from "src/lib/parse/LibParseLiteral.sol";
+import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseLiteralBoundLiteralDecimalTest
 /// Tests finding bounds for literal decimal values by parsing.
 contract LibParseLiteralBoundLiteralDecimalTest is Test {
     using LibBytes for bytes;
+    using LibParseLiteral for ParseState;
 
     function checkUnsupportedLiteralType(bytes memory data, uint256 offset) internal {
+        ParseState memory state = LibParseState.newState(data, "");
+        state.literalParsers = LibParseLiteral.buildLiteralParsers();
         uint256 outerStart = Pointer.unwrap(data.dataPointer());
+        uint256 cursor = outerStart;
         vm.expectRevert(abi.encodeWithSelector(UnsupportedLiteralType.selector, offset));
         (
-            function(bytes memory, uint256, uint256) pure returns (uint256) parser,
+            function(ParseState memory, uint256, uint256) pure returns (uint256) parser,
             uint256 innerStart,
             uint256 innerEnd,
             uint256 outerEnd
-        ) = LibParseLiteral.boundLiteral(LibParseLiteral.buildLiteralParsers(), data, outerStart);
+        ) = state.boundLiteral(cursor);
         (parser);
         (innerStart);
         (innerEnd);
@@ -33,15 +42,18 @@ contract LibParseLiteralBoundLiteralDecimalTest is Test {
         uint256 expectedInnerEnd,
         uint256 expectedOuterEnd
     ) internal {
+        ParseState memory state = LibParseState.newState(data, "");
+        state.literalParsers = LibParseLiteral.buildLiteralParsers();
         uint256 outerStart = Pointer.unwrap(data.dataPointer());
+        uint256 cursor = outerStart;
         (
-            function(bytes memory, uint256, uint256) pure returns (uint256) parser,
+            function(ParseState memory, uint256, uint256) pure returns (uint256) parser,
             uint256 innerStart,
             uint256 innerEnd,
             uint256 outerEnd
-        ) = LibParseLiteral.boundLiteral(LibParseLiteral.buildLiteralParsers(), data, outerStart);
+        ) = state.boundLiteral(cursor);
         uint256 expectedParser;
-        function(bytes memory, uint256, uint256) pure returns (uint256) parseLiteralDecimal =
+        function(ParseState memory, uint256, uint256) pure returns (uint256) parseLiteralDecimal =
             LibParseLiteral.parseLiteralDecimal;
         assembly ("memory-safe") {
             expectedParser := parseLiteralDecimal
@@ -57,14 +69,17 @@ contract LibParseLiteralBoundLiteralDecimalTest is Test {
     }
 
     function checkMalformedExponentDigits(bytes memory data, uint256 offset) internal {
+        ParseState memory state = LibParseState.newState(data, "");
+        state.literalParsers = LibParseLiteral.buildLiteralParsers();
         uint256 outerStart = Pointer.unwrap(data.dataPointer());
+        uint256 cursor = outerStart;
         vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, offset));
         (
-            function(bytes memory, uint256, uint256) pure returns (uint256) parser,
+            function(ParseState memory, uint256, uint256) pure returns (uint256) parser,
             uint256 innerStart,
             uint256 innerEnd,
             uint256 outerEnd
-        ) = LibParseLiteral.boundLiteral(LibParseLiteral.buildLiteralParsers(), data, outerStart);
+        ) = state.boundLiteral(cursor);
         (parser);
         (innerStart);
         (innerEnd);
@@ -72,14 +87,17 @@ contract LibParseLiteralBoundLiteralDecimalTest is Test {
     }
 
     function checkParserOutOfBounds(bytes memory data) internal {
+        ParseState memory state = LibParseState.newState(data, "");
+        state.literalParsers = LibParseLiteral.buildLiteralParsers();
         uint256 outerStart = Pointer.unwrap(data.dataPointer());
+        uint256 cursor = outerStart;
         vm.expectRevert(abi.encodeWithSelector(ParserOutOfBounds.selector));
         (
-            function(bytes memory, uint256, uint256) pure returns (uint256) parser,
+            function(ParseState memory, uint256, uint256) pure returns (uint256) parser,
             uint256 innerStart,
             uint256 innerEnd,
             uint256 outerEnd
-        ) = LibParseLiteral.boundLiteral(LibParseLiteral.buildLiteralParsers(), data, outerStart);
+        ) = state.boundLiteral(cursor);
         (parser);
         (innerStart);
         (innerEnd);

@@ -2,13 +2,13 @@
 pragma solidity =0.8.19;
 
 import {Script} from "forge-std/Script.sol";
-import {RainterpreterStoreNPE2} from "src/concrete/RainterpreterStoreNPE2.sol";
-import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
-import {RainterpreterParserNPE2} from "src/concrete/RainterpreterParserNPE2.sol";
+import {RainterpreterStoreNPE2} from "../src/concrete/RainterpreterStoreNPE2.sol";
+import {RainterpreterNPE2} from "../src/concrete/RainterpreterNPE2.sol";
+import {RainterpreterParserNPE2} from "../src/concrete/RainterpreterParserNPE2.sol";
 import {
     RainterpreterExpressionDeployerNPE2,
     RainterpreterExpressionDeployerNPE2ConstructionConfig
-} from "src/concrete/RainterpreterExpressionDeployerNPE2.sol";
+} from "../src/concrete/RainterpreterExpressionDeployerNPE2.sol";
 
 /// @title DeployDISPair
 /// @notice A script that deploys a DeployDISPair.
