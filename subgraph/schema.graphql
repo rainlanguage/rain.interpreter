@@ -9,8 +9,9 @@ type Account @entity {
 interface RainContract {
   "The address of the contract"
   id: ID!
-  "Bytecode hash of this contract"
-  bytecodeHash: String
+  "Deployed bytecode hash of the contract"
+  deployedBytecodeHash: Bytes
+  "Transaction where was deployed the contract"
   deployTransaction: Transaction
   "All the meta items that emitted by this contract"
   meta: [Meta!]!
@@ -19,8 +20,9 @@ interface RainContract {
 type Contract implements RainContract @entity {
   "Address of this contract"
   id: ID!
-  "Bytecode hash of this contract"
-  bytecodeHash: String
+  "Deployed bytecode hash of the contract"
+  deployedBytecodeHash: Bytes
+  "Transaction where was deployed the contract"
   deployTransaction: Transaction
   "All the meta items that emitted by this contract"
   meta: [Meta!]!
@@ -41,8 +43,9 @@ type Contract implements RainContract @entity {
 type ExpressionDeployer implements RainContract @entity {
   "The address of this deployer."
   id: ID!
-  "Bytecode hash of this Deployer"
-  bytecodeHash: String
+  "Deployed bytecode hash of the contract"
+  deployedBytecodeHash: Bytes
+  "Transaction where was deployed the contract"
   deployTransaction: Transaction
   "All the meta items that emitted by this contract"
   meta: [Meta!]!
@@ -62,17 +65,19 @@ type ExpressionDeployer implements RainContract @entity {
   constructorMeta: Bytes!
   "Raw authoringMeta hash"
   constructorMetaHash: Bytes!
-  "The deployed bytecode of the expressionDeployer contract that is being deployed"
+  "The deployed bytecode of the expressionDeployer contract"
   deployedBytecode: Bytes
   "The bytecode of the expressionDeployer"
   bytecode: Bytes
+  "Bytecode hash of the expressionDeployer"
+  bytecodeHash: Bytes
 }
 
 type Interpreter @entity {
   "Hash of the bytecode for this interpreter."
   id: ID!
-  "The bytecode of the contract"
-  bytecode: Bytes!
+  "The deployed bytecode of the contract"
+  deployedBytecode: Bytes!
   "Instances of this interpreter"
   instances: [InterpreterInstance!]! @derivedFrom(field: "interpreter")
   "Expressions deployed by this interpreter"
@@ -90,8 +95,8 @@ type InterpreterInstance @entity {
 type RainterpreterStore @entity {
   "Hash of the bytecode for this RainterpreterStore."
   id: ID!
-  "The bytecode of the contract"
-  bytecode: Bytes!
+  "The deployed bytecode of the contract"
+  deployedBytecode: Bytes!
   "Instances of this store"
   instances: [RainterpreterStoreInstance!]! @derivedFrom(field: "store")
 }
@@ -107,8 +112,8 @@ type RainterpreterStoreInstance @entity {
 type RainterpreterParser @entity {
   "Hash of the bytecode for this RainterpreterParser."
   id: ID!
-  "The bytecode of the contract"
-  bytecode: Bytes!
+  "The deployed bytecode of the contract"
+  deployedBytecode: Bytes!
   "Instances of this parser"
   instances: [RainterpreterParserInstance!]! @derivedFrom(field: "parser")
 }
