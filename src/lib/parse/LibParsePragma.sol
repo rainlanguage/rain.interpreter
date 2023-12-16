@@ -55,6 +55,7 @@ library LibParsePragma {
                 // Need at least one whitespace char after the pragma keyword.
                 uint256 char;
                 assembly ("memory-safe") {
+                    //slither-disable-next-line incorrect-shift
                     char := shl(byte(0, mload(cursor)), 1)
                 }
                 if (char & CMASK_WHITESPACE == 0) {
