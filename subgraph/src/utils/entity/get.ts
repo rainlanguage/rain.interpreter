@@ -23,7 +23,7 @@ export function getContract(address: string): Contract {
     );
 
     contract = new Contract(address);
-    contract.bytecodeHash = bytecodeHash.toHexString();
+    contract.deployedBytecodeHash = bytecodeHash;
     contract.type = "contract";
     contract.constructorMeta = Bytes.empty();
     contract.constructorMetaHash = Bytes.empty();
@@ -137,7 +137,9 @@ function getInterpreter(address: Address): Interpreter {
   let interpreter = Interpreter.load(bytecodeHash.toHex());
   if (!interpreter) {
     interpreter = new Interpreter(bytecodeHash.toHex());
-    interpreter.bytecode = ExtrospectionPerNetwork.get_bytecode(address);
+    interpreter.deployedBytecode = ExtrospectionPerNetwork.get_bytecode(
+      address
+    );
     interpreter.save();
   }
 
@@ -149,7 +151,7 @@ function getRainterpreterStore(address: Address): RainterpreterStore {
   let store = RainterpreterStore.load(bytecodeHash.toHex());
   if (!store) {
     store = new RainterpreterStore(bytecodeHash.toHex());
-    store.bytecode = ExtrospectionPerNetwork.get_bytecode(address);
+    store.deployedBytecode = ExtrospectionPerNetwork.get_bytecode(address);
     store.save();
   }
 
@@ -161,7 +163,7 @@ function getParser(address: Address): RainterpreterParser {
   let store = RainterpreterParser.load(bytecodeHash.toHex());
   if (!store) {
     store = new RainterpreterParser(bytecodeHash.toHex());
-    store.bytecode = ExtrospectionPerNetwork.get_bytecode(address);
+    store.deployedBytecode = ExtrospectionPerNetwork.get_bytecode(address);
     store.save();
   }
 
