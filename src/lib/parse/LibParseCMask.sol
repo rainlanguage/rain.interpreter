@@ -483,6 +483,9 @@ uint128 constant CMASK_LITERAL_HEAD = CMASK_NUMERIC_LITERAL_HEAD | CMASK_STRING_
 /// @dev Rainlang comment head is /
 uint128 constant CMASK_COMMENT_HEAD = CMASK_SLASH;
 
+/// @dev Rainlang interstitial head could be some whitespace or a comment head.
+uint128 constant CMASK_INTERSTITIAL_HEAD = CMASK_WHITESPACE | CMASK_COMMENT_HEAD;
+
 /// @dev Rainlang comment starting sequence is /*
 uint256 constant COMMENT_START_SEQUENCE = uint256(uint16(bytes2("/*")));
 

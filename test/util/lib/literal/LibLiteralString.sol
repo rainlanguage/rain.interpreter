@@ -45,4 +45,17 @@ library LibLiteralString {
         }
         bytes(str)[index] = bytes1(uint8(char));
     }
+
+    function charFromMask(uint256 seed, uint256 mask) internal pure returns (bytes1) {
+        uint256 char = 0;
+        while (1 << char & mask == 0) {
+            assembly ("memory-safe") {
+                mstore(0, char)
+                mstore(0x20, seed)
+                seed := keccak256(0, 0x40)
+                char := byte(0, seed)
+            }
+        }
+        return bytes1(uint8(char));
+    }
 }

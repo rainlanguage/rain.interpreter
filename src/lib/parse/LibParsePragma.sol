@@ -8,10 +8,10 @@ import {LibParseError} from "./LibParseError.sol";
 import {LibParseInterstitial} from "./LibParseInterstitial.sol";
 import {LibParseLiteral} from "./LibParseLiteral.sol";
 
-bytes constant USING_WORDS_FROM_BYTES = bytes("using-words-from");
-bytes32 constant USING_WORDS_FROM_BYTES32 = bytes32(USING_WORDS_FROM_BYTES);
-uint256 constant USING_WORDS_FROM_BYTES_LENGTH = 16;
-bytes32 constant USING_WORDS_FROM_MASK = bytes32(~((1 << (32 - USING_WORDS_FROM_BYTES_LENGTH) * 8) - 1));
+bytes constant PRAGMA_KEYWORD_BYTES = bytes("using-words-from");
+bytes32 constant PRAGMA_KEYWORD_BYTES32 = bytes32(PRAGMA_KEYWORD_BYTES);
+uint256 constant PRAGMA_KEYWORD_BYTES_LENGTH = 16;
+bytes32 constant PRAGMA_KEYWORD_MASK = bytes32(~((1 << (32 - PRAGMA_KEYWORD_BYTES_LENGTH) * 8) - 1));
 
 library LibParsePragma {
     using LibParseError for ParseState;
@@ -43,14 +43,14 @@ library LibParsePragma {
                     maybePragma := mload(cursor)
                 }
                 // Bail without modifying the cursor if there's no pragma.
-                if (maybePragma & USING_WORDS_FROM_MASK != USING_WORDS_FROM_BYTES32) {
+                if (maybePragma & PRAGMA_KEYWORD_MASK != PRAGMA_KEYWORD_BYTES32) {
                     return cursor;
                 }
             }
 
             {
                 // Move past the pragma keyword.
-                cursor += USING_WORDS_FROM_BYTES_LENGTH;
+                cursor += PRAGMA_KEYWORD_BYTES_LENGTH;
 
                 // Need at least one whitespace char after the pragma keyword.
                 uint256 char;
