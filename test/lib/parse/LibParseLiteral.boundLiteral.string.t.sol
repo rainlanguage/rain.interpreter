@@ -112,7 +112,7 @@ contract LibParseLiteralBoundLiteralStringTest is Test {
         badIndex = bound(badIndex, 0, (bytes(str).length > 0x1F ? 0x1F : bytes(str).length) - 1);
         LibLiteralString.corruptSingleChar(str, badIndex);
 
-        vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, 0));
+        vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, 1 + badIndex));
         (uint256 actualParser, uint256 outerStart, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
             this.externalBoundLiteral(bytes(string.concat("\"", str, "\"")));
         (actualParser, outerStart, innerStart, innerEnd, outerEnd);

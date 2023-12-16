@@ -131,7 +131,7 @@ contract LibParseLiteralStringTest is Test {
 
         LibLiteralString.corruptSingleChar(str, badIndex);
 
-        vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, 3));
+        vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, 4 + badIndex));
         (bytes memory bytecode, uint256[] memory constants) =
             this.externalParse(bytes(string.concat("_: \"", str, "\";")));
         (bytecode, constants);
