@@ -65,6 +65,8 @@ library LibParsePragma {
 
             while (cursor < end) {
                 // It's fine to add comments for each pragma address.
+                // This also has the effect of moving past the interstitial after
+                // the last address as we don't break til just below.
                 cursor = state.parseInterstitial(cursor, end);
 
                 // If the cursor is NOT pointing at the start of a hex literal

@@ -22,6 +22,33 @@ contract LibParsePragmaKeywordTest is Test {
     using LibBytes for bytes;
     using Strings for address;
 
+    function checkPragmaParsing(string memory str, uint256 expectedCursorDiff, address[] memory values, string memory err) internal {
+        ParseState memory state = LibParseState.newState(bytes(str), "");
+        uint256 cursor = Pointer.unwrap(bytes(str).dataPointer());
+        uint256 end = Pointer.unwrap(bytes(str).endDataPointer());
+        uint256 cursorAfter = state.parsePragma(cursor, end);
+        assertEq(cursorAfter - cursor, expectedCursorDiff, err);
+
+        if (values.length > 0) {
+            uint256 j = values.length - 1;
+            uint256 deref = state.subParsers;
+            uint256 pointer = deref >> 0xF0;
+            while (deref != 0) {
+                assertEq(uint256(uint160(deref)), uint256(uint160(values[j])));
+
+                assembly ("memory-safe") {
+                    deref := mload(pointer)
+                }
+                pointer = deref >> 0xF0;
+                // This underflows exactly when deref is zero and the loop
+                // terminates.
+                unchecked {
+                    --j;
+                }
+            }
+        }
+    }
+
     function externalParsePragma(string memory str) external pure {
         ParseState memory state = LibParseState.newState(bytes(str), "");
         uint256 cursor = Pointer.unwrap(bytes(str).dataPointer());
@@ -166,5 +193,66 @@ contract LibParsePragmaKeywordTest is Test {
             deref := mload(pointer)
         }
         assertEq(deref, 0);
+    }
+
+    /// Test a specific string.
+    function testPragmaKeywordParseSubParserSpecificStrings() external {
+        string memory str = "using-words-from 0x1234567890123456789012345678901234567890 0x1234567890123456789012345678901234567891";
+        address[] memory values = new address[](2);
+        values[0] = 0x1234567890123456789012345678901234567890;
+        values[1] = 0x1234567890123456789012345678901234567891;
+
+        checkPragmaParsing(str, 102, values, "should parse two addresses");
+
+        str = "using-words-from 0x1234567890123456789012345678901234567890 0x1234567890123456789012345678901234567891 ";
+        checkPragmaParsing(str, 103, values, "should parse two addresses with trailing whitespace");
+
+        str = "using-words-from 0x1234567890123456789012345678901234567890 0x1234567890123456789012345678901234567891  ";
+        checkPragmaParsing(str, 104, values, "should parse two addresses with more trailing whitespace");
+
+        str = "using-words-from 0x1234567890123456789012345678901234567890 0x1234567890123456789012345678901234567891  \n";
+        checkPragmaParsing(str, 105, values, "should parse two addresses with trailing whitespace and newline");
+
+        str = "using-words-from 0x1234567890123456789012345678901234567890 0x1234567890123456789012345678901234567891  \n\n";
+        checkPragmaParsing(str, 106, values, "should parse two addresses with trailing whitespace and newlines");
+
+        str = "using-words-from 0x1234567890123456789012345678901234567890";
+        values = new address[](1);
+        values[0] = 0x1234567890123456789012345678901234567890;
+        checkPragmaParsing(str, 59, values, "should parse one address");
+
+        str = "using-words-from 0x1234567890123456789012345678901234567890 ";
+        checkPragmaParsing(str, 60, values, "should parse one address with trailing whitespace");
+
+        str = "using-words-from 0x1234567890123456789012345678901234567890  ";
+        checkPragmaParsing(str, 61, values, "should parse one address with more trailing whitespace");
+
+        str = "using-words-from 0x1234567890123456789012345678901234567890  \n";
+        checkPragmaParsing(str, 62, values, "should parse one address with trailing whitespace and newline");
+
+        str = "using-words-from 0x1234567890123456789012345678901234567890  \n\n";
+        checkPragmaParsing(str, 63, values, "should parse one address with trailing whitespace and newlines");
+
+        values = new address[](0);
+        str = "using-words-from ";
+        checkPragmaParsing(str, 17, values, "should parse no addresses with trailing whitespace");
+
+        str = "using-words-from  ";
+        checkPragmaParsing(str, 18, values, "should parse no addresses with more trailing whitespace");
+
+        str = "using-words-from  \n";
+        checkPragmaParsing(str, 19, values, "should parse no addresses with trailing whitespace and newline");
+
+        str = "using-words-from  \n\n";
+        checkPragmaParsing(str, 20, values, "should parse no addresses with trailing whitespace and newlines");
+
+        str = "";
+        checkPragmaParsing(str, 0, values, "should parse no addresses with empty string as noop");
+
+        str = " ";
+        checkPragmaParsing(str, 0, values, "should parse no addresses with whitespace as noop");
+
+        str = "using-words-frum ";
+        checkPragmaParsing(str, 0, values, "should parse no addresses with typo as noop");
     }
 }
