@@ -11,7 +11,13 @@ import {
   DeployedExpressionEvent,
 } from "../generated/schema";
 import { Rainterpreter } from "../generated/templates/RainterpreterExpressionDeployerTemplate/Rainterpreter";
-import { Address, Bytes, JSONValueKind, json } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  Bytes,
+  JSONValueKind,
+  ethereum,
+  json,
+} from "@graphprotocol/graph-ts";
 import { CBORDecoder } from "@rainprotocol/assemblyscript-cbor";
 import {
   ExtrospectionPerNetwork,
@@ -54,8 +60,23 @@ export function handleDISPair(event: DISPair): void {
     return;
   }
 
-  const deployerBytecode = extrospection.bytecode(event.address);
-  const deployerBytecodeHash = extrospection.bytecodeHash(event.address);
+  // Get the encoded args
+  let tupleArray: Array<ethereum.Value> = [
+    ethereum.Value.fromAddress(event.params.interpreter),
+    ethereum.Value.fromAddress(event.params.store),
+    ethereum.Value.fromAddress(event.params.parser),
+    ethereum.Value.fromBytes(event.params.meta),
+  ];
+
+  let encodedArgs = ethereum
+    .encode(ethereum.Value.fromTuple(changetype<ethereum.Tuple>(tupleArray)))!
+    .toHex()
+    .replace("0x", "");
+
+  // Bytecode without arguments
+  let deployerBytecode = Bytes.fromHexString(
+    event.transaction.input.toHex().replace(encodedArgs, "")
+  );
 
   // ExpressionDeployer
   const expressionDeployer = getExpressionDeployer(event.address);
@@ -71,9 +92,12 @@ export function handleDISPair(event: DISPair): void {
   const account = getAccount(event.transaction.from);
 
   // ExpressionDeployer fields
-  expressionDeployer.bytecodeHash = deployerBytecodeHash.toHex();
+  expressionDeployer.bytecodeHash = getKeccak256FromBytes(deployerBytecode);
   expressionDeployer.bytecode = deployerBytecode;
-  expressionDeployer.deployedBytecode = event.transaction.input;
+  expressionDeployer.deployedBytecodeHash = extrospection.bytecodeHash(
+    event.address
+  );
+  expressionDeployer.deployedBytecode = extrospection.bytecode(event.address);
   expressionDeployer.interpreter = interpreterInstance.id;
   expressionDeployer.store = storeInstance.id;
   expressionDeployer.parser = parserInstance.id;
