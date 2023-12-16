@@ -119,14 +119,14 @@ contract LibParseLiteralBoundLiteralStringTest is Test {
     }
 
     /// Valid string data beyond the bounds of the parsed data should error as
-    /// parser out of bounds.
+    /// an unclosed string.
     function testParseStringLiteralBoundsParserOutOfBounds(string memory str, uint256 length) external {
         vm.assume(bytes(str).length < 0x20);
         LibLiteralString.conformValidPrintableStringContent(str);
         str = string.concat("\"", str, "\"");
         length = bound(length, 1, bytes(str).length - 1);
 
-        vm.expectRevert(abi.encodeWithSelector(ParserOutOfBounds.selector));
+        vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, length));
         (uint256 actualParser, uint256 outerStart, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
             this.externalBoundLiteralForceLength(bytes(str), length);
         (actualParser, outerStart, innerStart, innerEnd, outerEnd);

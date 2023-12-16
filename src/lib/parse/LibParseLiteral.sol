@@ -155,15 +155,18 @@ library LibParseLiteral {
                 uint256 stringData;
                 uint256 i = 0;
                 assembly ("memory-safe") {
+                    let distanceFromEnd := sub(end, innerStart)
+                    let max := 0x20
+                    if lt(distanceFromEnd, 0x20) { max := distanceFromEnd }
+
                     // Only up to 31 bytes of string data can be stored in a
                     // single word, so strings can't be longer than 31 bytes.
                     // The 32nd byte is the length of the string.
                     stringData := mload(innerStart)
                     //slither-disable-next-line incorrect-shift
-                    for {} and(
-                        and(lt(i, 0x20), lt(cursor, end)),
-                        iszero(iszero(and(shl(byte(i, stringData), 1), stringCharMask)))
-                    ) {} { i := add(i, 1) }
+                    for {} and(lt(i, max), iszero(iszero(and(shl(byte(i, stringData), 1), stringCharMask)))) {} {
+                        i := add(i, 1)
+                    }
                 }
                 if (i == 0x20) {
                     revert StringTooLong(state.parseErrorOffset(cursor));
@@ -173,9 +176,12 @@ library LibParseLiteral {
                 assembly ("memory-safe") {
                     finalChar := byte(0, mload(innerEnd))
                 }
+
+                // End can't equal inner end, because then we would move past the
+                // end of the data considering the final " character.
                 //slither-disable-next-line incorrect-shift
-                if (1 << finalChar & CMASK_STRING_LITERAL_END == 0) {
-                    revert UnclosedStringLiteral(state.parseErrorOffset(cursor));
+                if (1 << finalChar & CMASK_STRING_LITERAL_END == 0 || end == innerEnd) {
+                    revert UnclosedStringLiteral(state.parseErrorOffset(innerEnd));
                 }
                 // Outer end is after the final `"`.
                 outerEnd = innerEnd + 1;
@@ -258,9 +264,10 @@ library LibParseLiteral {
         )
     {
         unchecked {
+            uint256 outerStart = cursor;
             (parser, innerStart, innerEnd, outerEnd) = boundLiteralHex(state, cursor, end);
-            if (outerEnd - cursor != 42) {
-                revert InvalidAddressLength(state.parseErrorOffset(cursor));
+            if (outerEnd - outerStart != 42) {
+                revert InvalidAddressLength(state.parseErrorOffset(outerEnd));
             }
         }
     }

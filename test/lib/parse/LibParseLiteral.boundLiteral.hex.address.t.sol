@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import {console2} from "forge-std/console2.sol";
-
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {ParseLiteralTest} from "test/util/abstract/ParseLiteralTest.sol";
 import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
@@ -16,7 +14,7 @@ contract LibParseLiteralBoundLiteralHexAddressTest is ParseLiteralTest {
     using LibParseLiteral for ParseState;
     using LibBytes for bytes;
 
-    function externalBoundLiteralHexAddress(string calldata value)
+    function externalBoundLiteralHexAddress(string memory value)
         external
         pure
         returns (uint256, uint256, uint256, uint256, uint256)
@@ -76,14 +74,27 @@ contract LibParseLiteralBoundLiteralHexAddressTest is ParseLiteralTest {
     // Things that aren't addresses should not parse.
     function testParseLiteralBoundLiteralHexAddressSad(string calldata garbage) external {
         vm.assume(bytes(garbage).length > 0);
-        vm.assume(bytes(garbage).length != 40);
 
         string memory value = string.concat("0x", garbage);
-        console2.log(value);
-        console2.logBytes(bytes(garbage));
-        console2.logBytes(bytes(value));
 
-        vm.expectRevert(abi.encodeWithSelector(InvalidAddressLength.selector, bytes(value).length));
+        uint256 hexLength;
+        {
+            ParseState memory state = LibParseState.newState(bytes(value), "");
+            uint256 cursor = Pointer.unwrap(bytes(value).dataPointer());
+            uint256 outerStart0 = cursor;
+            uint256 end = cursor + bytes(value).length;
+            (
+                function(ParseState memory, uint256, uint256) pure returns (uint256) parser0,
+                uint256 innerStart0,
+                uint256 innerEnd0,
+                uint256 outerEnd0
+            ) = state.boundLiteralHex(cursor, end);
+            (parser0, innerStart0, innerEnd0);
+            hexLength = outerEnd0 - outerStart0;
+        }
+        vm.assume(hexLength != 42);
+
+        vm.expectRevert(abi.encodeWithSelector(InvalidAddressLength.selector, hexLength));
         (uint256 parser, uint256 outerStart, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
             this.externalBoundLiteralHexAddress(value);
         (parser, outerStart, innerStart, innerEnd, outerEnd);

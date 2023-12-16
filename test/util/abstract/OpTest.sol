@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import {Test, console2, stdError} from "forge-std/Test.sol";
+import {Test, stdError} from "forge-std/Test.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
@@ -164,7 +164,6 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         );
         assertEq(PRE, pointers.pre.unsafeReadWord(), "pre");
         for (uint256 i = 0; i < expectedOutputs.length; i++) {
-            console2.log("expectedOutputs[i]", expectedOutputs[i]);
             assertEq(expectedOutputs[i], pointers.expectedStackTopAfter.unsafeReadWord(), "value");
             pointers.expectedStackTopAfter = pointers.expectedStackTopAfter.unsafeAddWord();
         }

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import {OperandOverflow, UnclosedOperand} from "src/error/ErrParse.sol";
+import {OperandOverflow, UnclosedOperand, UnsupportedLiteralType} from "src/error/ErrParse.sol";
 import {ParserOutOfBounds, LibParse, ExpectedLeftParen} from "src/lib/parse/LibParse.sol";
 import {OperandTest} from "test/util/abstract/OperandTest.sol";
 import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
@@ -170,8 +170,8 @@ contract LibParseOperandM1M1Test is OperandTest {
     function testOperandM1M1Unclosed() external {
         checkParseError("_:d<1 1();", abi.encodeWithSelector(UnclosedOperand.selector, 7));
         checkParseError("_:d<1 0()", abi.encodeWithSelector(UnclosedOperand.selector, 7));
-        checkParseError("_:d<1 ", abi.encodeWithSelector(ParserOutOfBounds.selector));
-        checkParseError("_:d<1", abi.encodeWithSelector(ParserOutOfBounds.selector));
+        checkParseError("_:d<1 ", abi.encodeWithSelector(UnsupportedLiteralType.selector, 6));
+        checkParseError("_:d<1", abi.encodeWithSelector(UnsupportedLiteralType.selector, 5));
         checkParseError("_:d<1 1", abi.encodeWithSelector(UnclosedOperand.selector, 7));
     }
 
