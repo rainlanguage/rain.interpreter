@@ -3,6 +3,7 @@ pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 
+import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseLiteral, ZeroLengthDecimal} from "src/lib/parse/LibParseLiteral.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
@@ -21,6 +22,16 @@ contract LibParseLiteralDecimalTest is Test {
             Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer())
         );
         (value);
+    }
+
+    /// Fuzz and round trip.
+    function testParseLiteralDecimalRoundTrip(uint256 value) external {
+        string memory valueString = Strings.toString(value);
+        ParseState memory state = LibParseState.newState(bytes(valueString), "");
+        (uint256 parsedValue) = state.parseLiteralDecimal(
+            Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer())
+        );
+        assertEq(parsedValue, value);
     }
 
     /// Check that a "0" parses to the correct value.

@@ -19,14 +19,17 @@ library LibParsePragma {
     using LibParseLiteral for ParseState;
     using LibParsePragma for ParseState;
 
-    function pushSubParser(ParseState memory state, uint256 head) internal pure {
+    function pushSubParser(ParseState memory state, uint256 subParser) internal pure {
+        uint256 tail = state.subParsers;
+        // Move the tail off to a new allocation.
         uint256 tailPointer;
         assembly ("memory-safe") {
-            tailPointer := add(state, 0xC0)
+            tailPointer := mload(0x40)
+            mstore(0x40, add(tailPointer, 0x20))
+            mstore(tailPointer, tail)
         }
         // Put the tail pointer in the high bits of the new head.
-        head |= tailPointer << 0xF0;
-        state.subParsers = head;
+        state.subParsers = subParser | tailPointer << 0xF0;
     }
 
     function parsePragma(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
