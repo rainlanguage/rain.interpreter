@@ -106,6 +106,8 @@ struct ParseState {
     uint256 parenTracker0;
     uint256 parenTracker1;
     uint256 lineTracker;
+    /// - `pushSubParser`
+    uint256 subParsers;
     /// @dev END things that are referenced directly in assembly by hardcoded
     /// offsets.
     uint256 sourcesBuilder;
@@ -151,6 +153,10 @@ library LibParseState {
         state.parenTracker0 = 0;
         state.parenTracker1 = 0;
         state.lineTracker = 0;
+
+        // We don't reset sub parsers because they are global and immutable to
+        // the parsing process.
+
         state.stackNames = 0;
         state.stackNameBloom = 0;
         state.stackTracker = ParseStackTracker.wrap(0);
@@ -170,7 +176,9 @@ library LibParseState {
             // parenTracker1
             0,
             // lineTracker
-            // (will be built in `newActiveSource`)
+            // (will be built in `resetSource`)
+            0,
+            // sub parsers
             0,
             // sourcesBuilder
             0,
@@ -190,7 +198,9 @@ library LibParseState {
             LibParseOperand.buildOperandParsers(),
             // stackTracker
             ParseStackTracker.wrap(0),
+            // data bytes
             data,
+            // meta bytes
             meta
         );
         state.resetSource();
@@ -348,14 +358,14 @@ library LibParseState {
         }
     }
 
-    function pushLiteral(ParseState memory state, uint256 cursor) internal pure returns (uint256) {
+    function pushLiteral(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
             (
                 function(ParseState memory, uint256, uint256) pure returns (uint256) parser,
                 uint256 innerStart,
                 uint256 innerEnd,
                 uint256 outerEnd
-            ) = state.boundLiteral(cursor);
+            ) = state.boundLiteral(cursor, end);
             uint256 fingerprint;
             uint256 fingerprintBloom;
             assembly ("memory-safe") {

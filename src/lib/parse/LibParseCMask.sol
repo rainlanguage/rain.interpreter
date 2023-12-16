@@ -483,14 +483,23 @@ uint128 constant CMASK_LITERAL_HEAD = CMASK_NUMERIC_LITERAL_HEAD | CMASK_STRING_
 /// @dev Rainlang comment head is /
 uint128 constant CMASK_COMMENT_HEAD = CMASK_SLASH;
 
+/// @dev Rainlang interstitial head could be some whitespace or a comment head.
+uint128 constant CMASK_INTERSTITIAL_HEAD = CMASK_WHITESPACE | CMASK_COMMENT_HEAD;
+
 /// @dev Rainlang comment starting sequence is /*
 uint256 constant COMMENT_START_SEQUENCE = uint256(uint16(bytes2("/*")));
 
 /// @dev Rainlang comment ending sequence is */
 uint256 constant COMMENT_END_SEQUENCE = uint256(uint16(bytes2("*/")));
 
+/// @dev Rainlang comment end sequence end byte is / */
+uint256 constant CMASK_COMMENT_END_SEQUENCE_END = COMMENT_END_SEQUENCE & 0xFF;
+
 /// @dev Rainlang literal hexadecimal dispatch is 0x
 /// We compare the head and dispatch together to avoid a second comparison.
 /// This is safe because the head is prefiltered to be 0-9 due to the numeric
 /// literal head, therefore the only possible match is 0x (not x0).
 uint128 constant CMASK_LITERAL_HEX_DISPATCH = CMASK_ZERO | CMASK_LOWER_X;
+
+/// @dev We may want to match the exact start of a hex literal.
+uint256 constant CMASK_LITERAL_HEX_DISPATCH_START = uint256(uint16(bytes2("0x")));

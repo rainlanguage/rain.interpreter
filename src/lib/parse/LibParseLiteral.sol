@@ -28,7 +28,7 @@ import {
     ZeroLengthDecimal,
     ZeroLengthHexLiteral,
     UnclosedStringLiteral,
-    ParserOutOfBounds
+    InvalidAddressLength
 } from "../../error/ErrParse.sol";
 import {ParseState} from "./LibParseState.sol";
 import {LibParseError} from "./LibParseError.sol";
@@ -79,9 +79,10 @@ library LibParseLiteral {
     }
 
     /// Find the bounds for some literal at the cursor. The caller is responsible
-    /// for checking that the cursor is at the start of a literal. As each
-    /// literal type has a different format, this function returns the bounds
-    /// for the literal and the type of the literal. The bounds are:
+    /// for checking that the cursor is at the start of a literal and that the
+    /// cursor is less than the end. As each literal type has a different format,
+    /// this function returns the bounds for the literal and the type of the
+    /// literal. The bounds are:
     /// - innerStart: the start of the literal, e.g. after the 0x in 0x1234
     /// - innerEnd: the end of the literal, e.g. after the 1234 in 0x1234
     /// - outerEnd: the end of the literal including any suffixes, MAY be the
@@ -89,12 +90,13 @@ library LibParseLiteral {
     /// The outerStart is the cursor, so it is not returned.
     /// @param state The parser state.
     /// @param cursor The start of the literal.
+    /// @param end The end of the data that is allowed to be parsed.
     /// @return The literal parser. This function can be called to convert the
     /// bounds into a uint256 value.
     /// @return The inner start.
     /// @return The inner end.
     /// @return The outer end.
-    function boundLiteral(ParseState memory state, uint256 cursor)
+    function boundLiteral(ParseState memory state, uint256 cursor, uint256 end)
         internal
         pure
         returns (function(ParseState memory, uint256, uint256) pure returns (uint256), uint256, uint256, uint256)
@@ -120,25 +122,16 @@ library LibParseLiteral {
                 // match x0 because we already checked that the head is 0-9.
                 if ((head | dispatch) == CMASK_LITERAL_HEX_DISPATCH) {
                     //slither-disable-next-line unused-return
-                    return state.boundLiteralHex(cursor);
+                    return state.boundLiteralHex(cursor, end);
                 }
                 // decimal is the fallback as continuous numeric digits 0-9.
                 else {
                     //slither-disable-next-line unused-return
-                    return state.boundLiteralDecimal(cursor);
+                    return state.boundLiteralDecimal(cursor, end);
                 }
             } else if (head & CMASK_STRING_LITERAL_HEAD != 0) {
                 //slither-disable-next-line unused-return
-                return state.boundLiteralString(cursor);
-            }
-
-            uint256 endUnknown;
-            bytes memory data = state.data;
-            assembly ("memory-safe") {
-                endUnknown := add(data, add(mload(data), 0x20))
-            }
-            if (cursor >= endUnknown) {
-                revert ParserOutOfBounds();
+                return state.boundLiteralString(cursor, end);
             } else {
                 revert UnsupportedLiteralType(state.parseErrorOffset(cursor));
             }
@@ -148,7 +141,7 @@ library LibParseLiteral {
     /// Find the bounds for some string literal at the cursor. The caller is
     /// responsible for checking that the cursor is at the start of a string
     /// literal. Bounds are as per `boundLiteral`.
-    function boundLiteralString(ParseState memory state, uint256 cursor)
+    function boundLiteralString(ParseState memory state, uint256 cursor, uint256 end)
         internal
         pure
         returns (function(ParseState memory, uint256, uint256) pure returns (uint256), uint256, uint256, uint256)
@@ -162,12 +155,16 @@ library LibParseLiteral {
                 uint256 stringData;
                 uint256 i = 0;
                 assembly ("memory-safe") {
+                    let distanceFromEnd := sub(end, innerStart)
+                    let max := 0x20
+                    if lt(distanceFromEnd, 0x20) { max := distanceFromEnd }
+
                     // Only up to 31 bytes of string data can be stored in a
                     // single word, so strings can't be longer than 31 bytes.
                     // The 32nd byte is the length of the string.
                     stringData := mload(innerStart)
                     //slither-disable-next-line incorrect-shift
-                    for {} and(lt(i, 0x20), iszero(iszero(and(shl(byte(i, stringData), 1), stringCharMask)))) {} {
+                    for {} and(lt(i, max), iszero(iszero(and(shl(byte(i, stringData), 1), stringCharMask)))) {} {
                         i := add(i, 1)
                     }
                 }
@@ -179,9 +176,12 @@ library LibParseLiteral {
                 assembly ("memory-safe") {
                     finalChar := byte(0, mload(innerEnd))
                 }
+
+                // End can't equal inner end, because then we would move past the
+                // end of the data considering the final " character.
                 //slither-disable-next-line incorrect-shift
-                if (1 << finalChar & CMASK_STRING_LITERAL_END == 0) {
-                    revert UnclosedStringLiteral(state.parseErrorOffset(cursor));
+                if (1 << finalChar & CMASK_STRING_LITERAL_END == 0 || end == innerEnd) {
+                    revert UnclosedStringLiteral(state.parseErrorOffset(innerEnd));
                 }
                 // Outer end is after the final `"`.
                 outerEnd = innerEnd + 1;
@@ -192,17 +192,6 @@ library LibParseLiteral {
                 uint256 p = (state.literalParsers >> LITERAL_TYPE_STRING) & 0xFFFF;
                 assembly ("memory-safe") {
                     parser := p
-                }
-            }
-            // Check the parser hasn't moved outside the bounds of the data.
-            {
-                uint256 endString;
-                bytes memory data = state.data;
-                assembly ("memory-safe") {
-                    endString := add(data, add(mload(data), 0x20))
-                }
-                if (outerEnd > endString) {
-                    revert ParserOutOfBounds();
                 }
             }
             return (parser, innerStart, innerEnd, outerEnd);
@@ -232,7 +221,7 @@ library LibParseLiteral {
         return IntOrAString.unwrap(intOrAString);
     }
 
-    function boundLiteralHex(ParseState memory state, uint256 cursor)
+    function boundLiteralHex(ParseState memory state, uint256 cursor, uint256 end)
         internal
         pure
         returns (function(ParseState memory, uint256, uint256) pure returns (uint256), uint256, uint256, uint256)
@@ -243,9 +232,9 @@ library LibParseLiteral {
             uint256 hexCharMask = CMASK_HEX;
             assembly ("memory-safe") {
                 //slither-disable-next-line incorrect-shift
-                for {} iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), hexCharMask))) {
+                for {} and(iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), hexCharMask))), lt(innerEnd, end)) {} {
                     innerEnd := add(innerEnd, 1)
-                } {}
+                }
             }
         }
 
@@ -256,17 +245,31 @@ library LibParseLiteral {
                 parser := p
             }
         }
-        {
-            uint256 endHex;
-            bytes memory data = state.data;
-            assembly ("memory-safe") {
-                endHex := add(data, add(mload(data), 0x20))
-            }
-            if (innerEnd > endHex) {
-                revert ParserOutOfBounds();
+        return (parser, innerStart, innerEnd, innerEnd);
+    }
+
+    /// Bounding a literal hex address is just a special case of bounding a
+    /// literal hex. The only difference is that every address is the same known
+    /// length as they are 160 bits (20 bytes). This means we need exactly 42
+    /// bytes between the start and end of the literal, including the 0x prefix,
+    /// as each byte of a hex literal string = 0.5 bytes of encoded data.
+    function boundLiteralHexAddress(ParseState memory state, uint256 cursor, uint256 end)
+        internal
+        pure
+        returns (
+            function(ParseState memory, uint256, uint256) pure returns (uint256) parser,
+            uint256 innerStart,
+            uint256 innerEnd,
+            uint256 outerEnd
+        )
+    {
+        unchecked {
+            uint256 outerStart = cursor;
+            (parser, innerStart, innerEnd, outerEnd) = boundLiteralHex(state, cursor, end);
+            if (outerEnd - outerStart != 42) {
+                revert InvalidAddressLength(state.parseErrorOffset(outerEnd));
             }
         }
-        return (parser, innerStart, innerEnd, innerEnd);
     }
 
     /// Algorithm for parsing hexadecimal literals:
@@ -324,7 +327,7 @@ library LibParseLiteral {
         }
     }
 
-    function boundLiteralDecimal(ParseState memory state, uint256 cursor)
+    function boundLiteralDecimal(ParseState memory state, uint256 cursor, uint256 end)
         internal
         pure
         returns (function(ParseState memory, uint256, uint256) pure returns (uint256), uint256, uint256, uint256)
@@ -339,22 +342,23 @@ library LibParseLiteral {
             uint256 eMask = CMASK_E_NOTATION;
             assembly ("memory-safe") {
                 //slither-disable-next-line incorrect-shift
-                for {} iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), decimalCharMask))) {
+                for {} and(iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), decimalCharMask))), lt(innerEnd, end)) {}
+                {
                     innerEnd := add(innerEnd, 1)
-                } {}
+                }
 
                 // If we're now pointing at an e notation, then we need
                 // to move past it. Negative exponents are not supported.
                 //slither-disable-next-line incorrect-shift
-                if iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), eMask))) {
+                if and(iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), eMask))), lt(innerEnd, end)) {
                     ePosition := innerEnd
                     innerEnd := add(innerEnd, 1)
 
                     // Move past the exponent digits.
                     //slither-disable-next-line incorrect-shift
-                    for {} iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), decimalCharMask))) {
-                        innerEnd := add(innerEnd, 1)
-                    } {}
+                    for {} and(
+                        iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), decimalCharMask))), lt(innerEnd, end)
+                    ) {} { innerEnd := add(innerEnd, 1) }
                 }
             }
         }
@@ -367,16 +371,6 @@ library LibParseLiteral {
             uint256 p = (state.literalParsers >> LITERAL_TYPE_INTEGER_DECIMAL) & 0xFFFF;
             assembly ("memory-safe") {
                 parser := p
-            }
-        }
-        {
-            uint256 endDecimal;
-            bytes memory data = state.data;
-            assembly ("memory-safe") {
-                endDecimal := add(data, add(mload(data), 0x20))
-            }
-            if (innerEnd > endDecimal) {
-                revert ParserOutOfBounds();
             }
         }
         return (parser, innerStart, innerEnd, innerEnd);

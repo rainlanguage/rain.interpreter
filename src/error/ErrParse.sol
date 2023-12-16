@@ -77,6 +77,9 @@ error UnclosedLeftParen(uint256 offset);
 /// Encountered a comment outside the interstitial space between lines.
 error UnexpectedComment(uint256 offset);
 
+/// Encountered a comment that never ends.
+error UnclosedComment(uint256 offset);
+
 /// Encountered a comment start sequence that is malformed.
 error MalformedCommentStart(uint256 offset);
 
@@ -118,3 +121,9 @@ error ParseStackUnderflow();
 /// The parser encountered a paren group deeper than it can process in the
 /// memory region allocated for paren tracking.
 error ParenOverflow();
+
+/// The parser did not find any whitespace after the pragma keyword.
+error NoWhitespaceAfterUsingWordsFrom(uint256 offset);
+
+/// The parser encountered a hex literal that is the wrong size to be an address.
+error InvalidAddressLength(uint256 offset);

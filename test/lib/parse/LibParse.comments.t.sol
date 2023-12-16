@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
-import "test/util/lib/parse/LibMetaFixture.sol";
+import {Test} from "forge-std/Test.sol";
+import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
 
-import "src/lib/parse/LibParse.sol";
-import "src/lib/bytecode/LibBytecode.sol";
+import {LibParse} from "src/lib/parse/LibParse.sol";
+import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
+
+import {UnclosedComment, UnexpectedComment, UnexpectedLHSChar} from "src/error/ErrParse.sol";
 
 /// @title LibParseCommentsTest
 /// Test that the parser correctly parses comments.
@@ -438,7 +440,7 @@ contract LibParseCommentsTest is Test {
     /// Unclosed comments don't escape the data bounds.
     function testParseCommentUnclosed() external {
         string memory s = "/* unclosed comment";
-        vm.expectRevert(abi.encodeWithSelector(ParserOutOfBounds.selector));
+        vm.expectRevert(abi.encodeWithSelector(UnclosedComment.selector, 19));
         LibParse.parse(bytes(s), LibMetaFixture.parseMeta());
     }
 
@@ -446,7 +448,7 @@ contract LibParseCommentsTest is Test {
     /// so must revert and not escape the data bounds.
     function testParseCommentUnclosed2() external {
         string memory s = "/* unclosed comment *";
-        vm.expectRevert(abi.encodeWithSelector(ParserOutOfBounds.selector));
+        vm.expectRevert(abi.encodeWithSelector(UnclosedComment.selector, 21));
         LibParse.parse(bytes(s), LibMetaFixture.parseMeta());
     }
 }

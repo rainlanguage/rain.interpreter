@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import {Test, console2} from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
 import {LibParse} from "src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
@@ -131,7 +131,7 @@ contract LibParseLiteralStringTest is Test {
 
         LibLiteralString.corruptSingleChar(str, badIndex);
 
-        vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, 3));
+        vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, 4 + badIndex));
         (bytes memory bytecode, uint256[] memory constants) =
             this.externalParse(bytes(string.concat("_: \"", str, "\";")));
         (bytecode, constants);

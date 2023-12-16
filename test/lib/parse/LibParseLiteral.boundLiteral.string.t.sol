@@ -23,12 +23,13 @@ contract LibParseLiteralBoundLiteralStringTest is Test {
         state.literalParsers = LibParseLiteral.buildLiteralParsers();
         uint256 outerStart = Pointer.unwrap(bytes(data).dataPointer());
         uint256 cursor = outerStart;
+        uint256 end = outerStart + bytes(data).length;
         (
             function(ParseState memory, uint256, uint256) pure returns (uint256) parserFn,
             uint256 innerStart,
             uint256 innerEnd,
             uint256 outerEnd
-        ) = state.boundLiteral(cursor);
+        ) = state.boundLiteral(cursor, end);
         uint256 parser;
         assembly ("memory-safe") {
             parser := parserFn
@@ -50,12 +51,13 @@ contract LibParseLiteralBoundLiteralStringTest is Test {
         }
         uint256 outerStart = Pointer.unwrap(bytes(data).dataPointer());
         uint256 cursor = outerStart;
+        uint256 end = outerStart + length;
         (
             function(ParseState memory, uint256, uint256) pure returns (uint256) parserFn,
             uint256 innerStart,
             uint256 innerEnd,
             uint256 outerEnd
-        ) = state.boundLiteral(cursor);
+        ) = state.boundLiteral(cursor, end);
         uint256 parser;
         assembly ("memory-safe") {
             parser := parserFn
@@ -110,21 +112,21 @@ contract LibParseLiteralBoundLiteralStringTest is Test {
         badIndex = bound(badIndex, 0, (bytes(str).length > 0x1F ? 0x1F : bytes(str).length) - 1);
         LibLiteralString.corruptSingleChar(str, badIndex);
 
-        vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, 0));
+        vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, 1 + badIndex));
         (uint256 actualParser, uint256 outerStart, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
             this.externalBoundLiteral(bytes(string.concat("\"", str, "\"")));
         (actualParser, outerStart, innerStart, innerEnd, outerEnd);
     }
 
     /// Valid string data beyond the bounds of the parsed data should error as
-    /// parser out of bounds.
+    /// an unclosed string.
     function testParseStringLiteralBoundsParserOutOfBounds(string memory str, uint256 length) external {
         vm.assume(bytes(str).length < 0x20);
         LibLiteralString.conformValidPrintableStringContent(str);
         str = string.concat("\"", str, "\"");
         length = bound(length, 1, bytes(str).length - 1);
 
-        vm.expectRevert(abi.encodeWithSelector(ParserOutOfBounds.selector));
+        vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, length));
         (uint256 actualParser, uint256 outerStart, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
             this.externalBoundLiteralForceLength(bytes(str), length);
         (actualParser, outerStart, innerStart, innerEnd, outerEnd);

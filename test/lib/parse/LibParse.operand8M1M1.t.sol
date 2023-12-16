@@ -80,9 +80,9 @@ contract LibParseOperand8M1M1Test is OperandTest {
     function testOperand8M1M1Unclosed() external {
         checkParseError("_:e<1 1();", abi.encodeWithSelector(UnsupportedLiteralType.selector, 7));
         checkParseError("_:e<1 0()", abi.encodeWithSelector(UnsupportedLiteralType.selector, 7));
-        checkParseError("_:e<1 ", abi.encodeWithSelector(ParserOutOfBounds.selector));
-        checkParseError("_:e<1", abi.encodeWithSelector(ParserOutOfBounds.selector));
-        checkParseError("_:e<1 1", abi.encodeWithSelector(ParserOutOfBounds.selector));
+        checkParseError("_:e<1 ", abi.encodeWithSelector(UnsupportedLiteralType.selector, 6));
+        checkParseError("_:e<1", abi.encodeWithSelector(UnsupportedLiteralType.selector, 5));
+        checkParseError("_:e<1 1", abi.encodeWithSelector(UnsupportedLiteralType.selector, 7));
         checkParseError("_:e<1 1 1", abi.encodeWithSelector(UnclosedOperand.selector, 9));
     }
 
