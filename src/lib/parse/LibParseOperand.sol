@@ -54,6 +54,27 @@ library LibParseOperand {
         }
     }
 
+    /// Move past an operand that may or may not exist.
+    function skipOperand(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
+        uint256 char;
+        assembly ("memory-safe") {
+            //slither-disable-next-line incorrect-shift
+            char := shl(byte(0, mload(cursor)), 1)
+        }
+        // If the operand is opening, skip it. Don't pretend to understand it.
+        if (char == CMASK_OPERAND_START) {
+            cursor = LibParse.skipMask(cursor + 1, end, ~CMASK_OPERAND_END);
+            // If the cursor is right at the end then it never found the operand
+            // closing character.
+            if (cursor >= end) {
+                revert UnclosedOperand(state.parseErrorOffset(cursor));
+            }
+            // Move pase the operand end.
+            ++cursor;
+        }
+        return cursor;
+    }
+
     /// Parse a literal for an operand.
     function parseOperandLiteral(ParseState memory state, uint256 maxValue, uint256 cursor, uint256 end)
         internal

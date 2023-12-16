@@ -12,6 +12,11 @@ uint256 constant OPCODE_STACK = 0;
 /// should implement an opcode that reads constants by index as opcode `1`.
 uint256 constant OPCODE_CONSTANT = 1;
 
+/// @dev For maximum compatibility with opcode lists, the `IInterpreterV2`
+/// should implement the opcode for locally unknown words that need sub parsing
+/// as opcode `255`.
+uint256 constant OPCODE_UNKNOWN = 0xFF;
+
 /// @dev The index of a source within a deployed expression that can be evaluated
 /// by an `IInterpreterV2`. MAY be an entrypoint or the index of a source called
 /// internally such as by the `call` opcode.

@@ -24,7 +24,7 @@ import {LibCtPop} from "../bitwise/LibCtPop.sol";
 import {LibParseMeta} from "./LibParseMeta.sol";
 import {LibParseLiteral} from "./LibParseLiteral.sol";
 import {LibParseOperand} from "./LibParseOperand.sol";
-import {Operand, OPCODE_STACK} from "../../interface/unstable/IInterpreterV2.sol";
+import {Operand, OPCODE_STACK, OPCODE_UNKNOWN} from "../../interface/unstable/IInterpreterV2.sol";
 import {LibParseStackName} from "./LibParseStackName.sol";
 import {
     ExcessLHSItems,
@@ -72,6 +72,7 @@ library LibParse {
     using LibParseMeta for ParseState;
     using LibParsePragma for ParseState;
     using LibParse for ParseState;
+    using LibParseOperand for ParseState;
 
     function parseWord(uint256 cursor, uint256 mask) internal pure returns (uint256, bytes32) {
         bytes32 word;
@@ -175,6 +176,7 @@ library LibParse {
                     revert UnexpectedRHSChar(state.parseErrorOffset(cursor));
                 }
 
+                uint256 cursorForUnknownWord = cursor;
                 (cursor, word) = parseWord(cursor, CMASK_RHS_WORD_TAIL);
 
                 // First check if this word is in meta.
@@ -200,7 +202,11 @@ library LibParse {
                         // don't have any parens to open or close.
                         state.highwater();
                     } else {
-                        revert UnknownWord(state.parseErrorOffset(cursor));
+                        cursor = state.skipOperand(cursor, end);
+                        state.pushOpToSource(OPCODE_UNKNOWN, Operand.wrap(cursorForUnknownWord));
+                        // We only support words with parens for unknown words
+                        // that are sent off to the sub parsers.
+                        state.fsm |= FSM_WORD_END_MASK;
                     }
                 }
 
