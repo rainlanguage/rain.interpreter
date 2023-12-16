@@ -22,7 +22,12 @@ contract LibParsePragmaKeywordTest is Test {
     using LibBytes for bytes;
     using Strings for address;
 
-    function checkPragmaParsing(string memory str, uint256 expectedCursorDiff, address[] memory values, string memory err) internal {
+    function checkPragmaParsing(
+        string memory str,
+        uint256 expectedCursorDiff,
+        address[] memory values,
+        string memory err
+    ) internal {
         ParseState memory state = LibParseState.newState(bytes(str), "");
         uint256 cursor = Pointer.unwrap(bytes(str).dataPointer());
         uint256 end = Pointer.unwrap(bytes(str).endDataPointer());
@@ -197,7 +202,8 @@ contract LibParsePragmaKeywordTest is Test {
 
     /// Test a specific string.
     function testPragmaKeywordParseSubParserSpecificStrings() external {
-        string memory str = "using-words-from 0x1234567890123456789012345678901234567890 0x1234567890123456789012345678901234567891";
+        string memory str =
+            "using-words-from 0x1234567890123456789012345678901234567890 0x1234567890123456789012345678901234567891";
         address[] memory values = new address[](2);
         values[0] = 0x1234567890123456789012345678901234567890;
         values[1] = 0x1234567890123456789012345678901234567891;
@@ -210,10 +216,12 @@ contract LibParsePragmaKeywordTest is Test {
         str = "using-words-from 0x1234567890123456789012345678901234567890 0x1234567890123456789012345678901234567891  ";
         checkPragmaParsing(str, 104, values, "should parse two addresses with more trailing whitespace");
 
-        str = "using-words-from 0x1234567890123456789012345678901234567890 0x1234567890123456789012345678901234567891  \n";
+        str =
+            "using-words-from 0x1234567890123456789012345678901234567890 0x1234567890123456789012345678901234567891  \n";
         checkPragmaParsing(str, 105, values, "should parse two addresses with trailing whitespace and newline");
 
-        str = "using-words-from 0x1234567890123456789012345678901234567890 0x1234567890123456789012345678901234567891  \n\n";
+        str =
+            "using-words-from 0x1234567890123456789012345678901234567890 0x1234567890123456789012345678901234567891  \n\n";
         checkPragmaParsing(str, 106, values, "should parse two addresses with trailing whitespace and newlines");
 
         str = "using-words-from 0x1234567890123456789012345678901234567890";
