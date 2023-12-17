@@ -92,6 +92,10 @@ uint256 constant FSM_DEFAULT = FSM_ACCEPTING_INPUTS_MASK;
 /// @param literalBloom A bloom filter of all the literals that have been
 /// encountered so far. This is used to quickly dedupe literals.
 /// @param constantsBuilder A builder for the constants array.
+/// - low 16 bits: the height (length) of the constants array.
+/// - high 240 bits: a linked list of constant values. Each constant value is
+///   stored as a 256 bit key/value pair. The key is the fingerprint of the
+///   constant value, and the value is the constant value itself.
 /// @param literalParsers A 256 bit integer where each 16 bits is a function
 /// pointer to a literal parser.
 struct ParseState {
@@ -358,6 +362,41 @@ library LibParseState {
         }
     }
 
+    /// Includes a constant value in the constants linked list so that it will
+    /// appear in the final constants array.
+    function pushConstantValue(ParseState memory state, uint256 fingerprint, uint256 value) internal pure {
+        unchecked {
+            uint256 ptr;
+            assembly ("memory-safe") {
+                // Allocate two words.
+                ptr := mload(0x40)
+                mstore(0x40, add(ptr, 0x40))
+            }
+            // First word is the key.
+            {
+                // tail key is the fingerprint with the low 16 bits set to
+                // the pointer to the next item in the linked list. If there
+                // is no next item then the pointer is 0.
+                uint256 tailKey = state.constantsBuilder >> 0x10 | fingerprint;
+                assembly ("memory-safe") {
+                    mstore(ptr, tailKey)
+                }
+            }
+            // Second word is the value.
+            {
+                assembly ("memory-safe") {
+                    // Second word is the value
+                    mstore(add(ptr, 0x20), value)
+                }
+            }
+
+            state.constantsBuilder = ((state.constantsBuilder & 0xFFFF) + 1) | (ptr << 0x10);
+            // Bloom using the high byte of the fingerprint to match the literal
+            // deduping logic.
+            state.literalBloom |= 1 << (fingerprint >> 0xf8);
+        }
+    }
+
     function pushLiteral(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
             (
@@ -433,34 +472,7 @@ library LibParseState {
             // build the constants array from the values in the linked list
             // later.
             if (!exists) {
-                uint256 ptr;
-                assembly ("memory-safe") {
-                    // Allocate two words.
-                    ptr := mload(0x40)
-                    mstore(0x40, add(ptr, 0x40))
-                }
-                // First word is the key.
-                {
-                    // tail key is the fingerprint with the low 16 bits set to
-                    // the pointer to the next item in the linked list. If there
-                    // is no next item then the pointer is 0.
-                    uint256 tailKey = state.constantsBuilder >> 0x10 | fingerprint;
-                    assembly ("memory-safe") {
-                        mstore(ptr, tailKey)
-                    }
-                }
-                // Second word is the value.
-                {
-                    uint256 tailValue = parser(state, innerStart, innerEnd);
-
-                    assembly ("memory-safe") {
-                        // Second word is the value
-                        mstore(add(ptr, 0x20), tailValue)
-                    }
-                }
-
-                state.constantsBuilder = ((state.constantsBuilder & 0xFFFF) + 1) | (ptr << 0x10);
-                state.literalBloom |= fingerprintBloom;
+                state.pushConstantValue(fingerprint, parser(state, innerStart, innerEnd));
             }
 
             return outerEnd;
