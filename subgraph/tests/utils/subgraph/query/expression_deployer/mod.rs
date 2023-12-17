@@ -22,6 +22,12 @@ pub struct QueryResponse {
     pub interpreter: Address,
     pub store: Address,
     pub parser: Address,
+    pub constructor_meta: Bytes,
+    pub constructor_meta_hash: Bytes,
+    pub deployed_bytecode: Bytes,
+    pub deployed_bytecode_hash: Bytes,
+    pub bytecode: Bytes,
+    pub bytecode_hash: Bytes,
 }
 
 impl QueryResponse {
@@ -34,6 +40,12 @@ impl QueryResponse {
                 .expect("invalid string address"),
             store: Address::from_str(&data.store.unwrap().id).expect("invalid string address"),
             parser: Address::from_str(&data.parser.unwrap().id).expect("invalid string address"),
+            constructor_meta: data.constructor_meta,
+            constructor_meta_hash: data.constructor_meta_hash,
+            deployed_bytecode: data.deployed_bytecode.unwrap(),
+            deployed_bytecode_hash: data.deployed_bytecode_hash.unwrap(),
+            bytecode: data.bytecode.unwrap(),
+            bytecode_hash: data.bytecode_hash.unwrap(),
         }
     }
 }
