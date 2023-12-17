@@ -4,6 +4,7 @@ use self::expression_deployer::{ExpressionDeployerExpressionDeployer, ResponseDa
 use super::send_request;
 use anyhow::{anyhow, Result};
 use ethers::types::Address;
+use ethers::types::Bytes;
 use graphql_client::{GraphQLQuery, Response};
 use serde::{Deserialize, Serialize};
 
@@ -18,14 +19,21 @@ pub struct ExpressionDeployer;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct QueryResponse {
     pub id: Address,
+    pub interpreter: Address,
+    pub store: Address,
+    pub parser: Address,
 }
 
 impl QueryResponse {
     pub fn from(response: ResponseData) -> QueryResponse {
-        let deployer: ExpressionDeployerExpressionDeployer = response.expression_deployer.unwrap();
+        let data: ExpressionDeployerExpressionDeployer = response.expression_deployer.unwrap();
 
         QueryResponse {
-            id: Address::from_str(&deployer.id).expect("invalid string address"),
+            id: Address::from_str(&data.id).expect("invalid string address"),
+            interpreter: Address::from_str(&data.interpreter.unwrap().id)
+                .expect("invalid string address"),
+            store: Address::from_str(&data.store.unwrap().id).expect("invalid string address"),
+            parser: Address::from_str(&data.parser.unwrap().id).expect("invalid string address"),
         }
     }
 }

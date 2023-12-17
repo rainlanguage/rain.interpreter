@@ -1,5 +1,20 @@
 query ExpressionDeployer($id: String) {
   expressionDeployer(id: $id) {
     id
+    interpreter {
+      id
+    }
+    store {
+      id
+    }
+    parser {
+      id
+    }
+    constructorMeta
+    constructorMetaHash
+    deployedBytecode
+    deployedBytecodeHash
+    bytecode
+    bytecodeHash
   }
 }
