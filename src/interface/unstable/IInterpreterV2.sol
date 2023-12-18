@@ -12,6 +12,10 @@ uint256 constant OPCODE_STACK = 0;
 /// should implement an opcode that reads constants by index as opcode `1`.
 uint256 constant OPCODE_CONSTANT = 1;
 
+/// @dev For maximum compatibility with external contracts, the `IInterpreterV2`
+/// should implement an opcode that calls externs by index as opcode `2`.
+uint256 constant OPCODE_EXTERN = 2;
+
 /// @dev For maximum compatibility with opcode lists, the `IInterpreterV2`
 /// should implement the opcode for locally unknown words that need sub parsing
 /// as opcode `255`.

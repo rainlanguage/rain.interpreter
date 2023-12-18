@@ -19,7 +19,7 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
     using LibParse for ParseState;
     using LibParseMeta for ParseState;
 
-    function subParserFunctionPointers() internal pure returns (bytes memory) {
+    function subParserFunctionPointers() internal pure virtual returns (bytes memory) {
         return SUB_PARSER_FUNCTION_POINTERS;
     }
 

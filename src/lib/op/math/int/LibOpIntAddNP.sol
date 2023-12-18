@@ -50,21 +50,6 @@ library LibOpIntAddNP {
         return stackTop;
     }
 
-    function integrityExtern(Operand, uint256 inputs, uint256) internal pure returns (uint256, uint256) {
-        inputs = inputs > 1 ? inputs : 2;
-        return (inputs, 1);
-    }
-
-    function runExtern(Operand, uint256[] memory inputs) internal pure returns (uint256[] memory) {
-        uint256 acc = inputs[0];
-        for (uint256 i = 1; i < inputs.length; i++) {
-            acc += inputs[i];
-        }
-        uint256[] memory outputs = new uint256[](1);
-        outputs[0] = acc;
-        return outputs;
-    }
-
     /// Gas intensive reference implementation of addition for testing.
     function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
         internal
