@@ -8,13 +8,19 @@ import {BaseRainterpreterSubParserNPE2} from "../abstract/BaseRainterpreterSubPa
 import {OPCODE_EXTERN} from "../interface/unstable/IInterpreterV2.sol";
 import {LibExtern, EncodedExternDispatch} from "../lib/extern/LibExtern.sol";
 import {IInterpreterExternV3} from "../interface/unstable/IInterpreterExternV3.sol";
+import {LibSubParse} from "../lib/parse/LibSubParse.sol";
+import {AuthoringMeta} from "../lib/parse/LibParseMeta.sol";
+import {ParseState} from "../lib/parse/LibParseState.sol";
+import {LibParseOperand} from "../lib/parse/LibParseOperand.sol";
 
-bytes constant OPCODE_FUNCTION_POINTERS = hex"031f03d3";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"04ef";
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"04b204d2";
-bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"05ce";
+bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"0872";
 
 uint256 constant OP_INDEX_INCREMENT = 0;
+
+uint8 constant SUB_PARSER_OPERAND_PARSER_OFFSET_DISALLOWED = 0;
 
 library LibExternOpIntIncNPE2 {
     /// int-inc
@@ -30,42 +36,42 @@ library LibExternOpIntIncNPE2 {
         return (inputs, inputs);
     }
 
-    function subParser(uint256 constantsHeight, uint256 ioByte, Operand operand)
+    function subParser(uint256 constantsHeight, uint256 inputsByte, Operand operand)
         internal
         view
         returns (bool, bytes memory, uint256[] memory)
     {
-        // Build an extern call that dials back into the current contract at eval
-        // time with the current opcode index.
-        bytes memory bytecode = new bytes(4);
-        uint256 opIndex = OPCODE_EXTERN;
-        assembly ("memory-safe") {
-            // Main opcode is extern, to call back into current contract.
-            mstore8(add(bytecode, 0x20), opIndex)
-            // Use the io byte as is for inputs.
-            mstore8(add(bytecode, 0x21), ioByte)
-            // The outputs are the same as inputs for inc.
-            mstore8(add(bytecode, 0x22), ioByte)
-            // The extern dispatch is the index to the new constant that we will
-            // add to the constants array.
-            mstore8(add(bytecode, 0x23), constantsHeight)
-        }
+        return LibSubParse.subParserExtern(constantsHeight, inputsByte, operand, OP_INDEX_INCREMENT);
+    }
+}
 
-        uint256 externDispatch = EncodedExternDispatch.unwrap(
-            LibExtern.encodeExternCall(
-                IInterpreterExternV3(address(this)), LibExtern.encodeExternDispatch(OP_INDEX_INCREMENT, operand)
+library LibRainterpreterReferenceExternNPE2 {
+    function authoringMeta() internal pure returns (bytes memory) {
+        AuthoringMeta memory lengthPlaceholder;
+        AuthoringMeta[OPCODE_FUNCTION_POINTERS_LENGTH + 1] memory wordsFixed = [
+            lengthPlaceholder,
+            AuthoringMeta(
+                "reference-extern-inc",
+                SUB_PARSER_OPERAND_PARSER_OFFSET_DISALLOWED,
+                "Demonstrates a sugared extern into the reference implementation that increments every input 1:1 with its outputs."
             )
-        );
-
-        uint256[] memory constants;
-        assembly ("memory-safe") {
-            constants := mload(0x40)
-            mstore(0x40, add(constants, 0x40))
-            mstore(constants, 1)
-            mstore(add(constants, 0x20), externDispatch)
+        ];
+        AuthoringMeta[] memory wordsDynamic;
+        uint256 length = OPCODE_FUNCTION_POINTERS_LENGTH;
+        assembly {
+            wordsDynamic := wordsFixed
+            mstore(wordsDynamic, length)
         }
+        return abi.encode(wordsDynamic);
+    }
 
-        return (true, bytecode, constants);
+    function buildOperandParsers() internal pure returns (uint256 operandParsers) {
+        function(ParseState memory, uint256, uint256) pure returns (uint256, Operand) operandParserDisallowed =
+            LibParseOperand.parseOperandDisallowed;
+        uint256 parseOperandDisallowedOffset = SUB_PARSER_OPERAND_PARSER_OFFSET_DISALLOWED;
+        assembly ("memory-safe") {
+            operandParsers := or(operandParsers, shl(parseOperandDisallowedOffset, operandParserDisallowed))
+        }
     }
 }
 

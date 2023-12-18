@@ -14,6 +14,8 @@ import {LibParseMeta} from "../lib/parse/LibParseMeta.sol";
 bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"";
 bytes constant SUB_PARSER_PARSE_META = hex"";
 
+uint256 constant SUB_PARSER_OPERAND_PARSERS = 0;
+
 abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
     using LibBytes for bytes;
     using LibParse for ParseState;
@@ -21,6 +23,10 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
 
     function subParserFunctionPointers() internal pure virtual returns (bytes memory) {
         return SUB_PARSER_FUNCTION_POINTERS;
+    }
+
+    function subParserOperandParsers() internal pure virtual returns (uint256) {
+        return SUB_PARSER_OPERAND_PARSERS;
     }
 
     function subParse(bytes32 compatibility, bytes memory data)
@@ -33,7 +39,7 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
         }
 
         (uint256 constantsHeight, uint256 ioByte, ParseState memory state) =
-            LibSubParse.consumeInputData(data, SUB_PARSER_PARSE_META);
+            LibSubParse.consumeInputData(data, SUB_PARSER_PARSE_META, subParserOperandParsers());
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         uint256 end = cursor + state.data.length;
 

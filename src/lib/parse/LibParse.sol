@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
+import {console2} from "forge-std/console2.sol";
 import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {
@@ -380,6 +381,7 @@ library LibParse {
                     revert MissingFinalSemi(state.parseErrorOffset(cursor));
                 }
             }
+            console2.log("parse end");
             return state.subParse(state.buildBytecode());
         }
     }

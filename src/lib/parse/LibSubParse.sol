@@ -1,14 +1,56 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
+import {console2} from "forge-std/console2.sol";
+
 import {LibParseState, ParseState} from "./LibParseState.sol";
-import {OPCODE_UNKNOWN} from "../../interface/unstable/IInterpreterV2.sol";
+import {OPCODE_UNKNOWN, OPCODE_EXTERN, Operand} from "../../interface/unstable/IInterpreterV2.sol";
 import {LibBytecode, Pointer} from "../bytecode/LibBytecode.sol";
 import {ISubParserV1, COMPATIBLITY_V0} from "../../interface/unstable/ISubParserV1.sol";
 import {BadSubParserResult, UnknownWord} from "../../error/ErrParse.sol";
+import {LibExtern, EncodedExternDispatch} from "../extern/LibExtern.sol";
+import {IInterpreterExternV3} from "../../interface/unstable/IInterpreterExternV3.sol";
 
 library LibSubParse {
     using LibParseState for ParseState;
+
+    function subParserExtern(uint256 constantsHeight, uint256 inputsByte, Operand operand, uint256 opcodeIndex)
+        internal
+        view
+        returns (bool, bytes memory, uint256[] memory)
+    {
+        // Build an extern call that dials back into the current contract at eval
+        // time with the current opcode index.
+        bytes memory bytecode = new bytes(4);
+        uint256 opIndex = OPCODE_EXTERN;
+        assembly ("memory-safe") {
+            // Main opcode is extern, to call back into current contract.
+            mstore8(add(bytecode, 0x20), opIndex)
+            // Use the io byte as is for inputs.
+            mstore8(add(bytecode, 0x21), inputsByte)
+            // The outputs are the same as inputs for inc.
+            mstore8(add(bytecode, 0x22), inputsByte)
+            // The extern dispatch is the index to the new constant that we will
+            // add to the constants array.
+            mstore8(add(bytecode, 0x23), constantsHeight)
+        }
+
+        uint256 externDispatch = EncodedExternDispatch.unwrap(
+            LibExtern.encodeExternCall(
+                IInterpreterExternV3(address(this)), LibExtern.encodeExternDispatch(opcodeIndex, operand)
+            )
+        );
+
+        uint256[] memory constants;
+        assembly ("memory-safe") {
+            constants := mload(0x40)
+            mstore(0x40, add(constants, 0x40))
+            mstore(constants, 1)
+            mstore(add(constants, 0x20), externDispatch)
+        }
+
+        return (true, bytecode, constants);
+    }
 
     function subParseSlice(ParseState memory state, uint256 cursor, uint256 end) internal pure {
         unchecked {
@@ -111,6 +153,7 @@ library LibSubParse {
         pure
         returns (bytes memory, uint256[] memory)
     {
+        console2.log("subParse");
         unchecked {
             uint256 sourceCount = LibBytecode.sourceCount(bytecode);
             for (uint256 sourceIndex; sourceIndex < sourceCount; ++sourceIndex) {
@@ -124,7 +167,7 @@ library LibSubParse {
         }
     }
 
-    function consumeInputData(bytes memory data, bytes memory meta)
+    function consumeInputData(bytes memory data, bytes memory meta, uint256 operandParsers)
         internal
         pure
         returns (uint256 constantsHeight, uint256 ioByte, ParseState memory state)
@@ -140,5 +183,6 @@ library LibSubParse {
             mstore(data, newLength)
         }
         state = LibParseState.newState(data, meta);
+        state.operandParsers = operandParsers;
     }
 }

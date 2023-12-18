@@ -5,7 +5,8 @@ import {Test} from "forge-std/Test.sol";
 import {
     RainterpreterReferenceExternNPE2,
     OPCODE_FUNCTION_POINTERS,
-    INTEGRITY_FUNCTION_POINTERS
+    INTEGRITY_FUNCTION_POINTERS,
+    SUB_PARSER_FUNCTION_POINTERS
 } from "src/concrete/RainterpreterReferenceExternNPE2.sol";
 
 contract RainterpreterReferenceExternNPE2Test is Test {
@@ -20,6 +21,13 @@ contract RainterpreterReferenceExternNPE2Test is Test {
         RainterpreterReferenceExternNPE2 extern = new RainterpreterReferenceExternNPE2();
         bytes memory expected = extern.buildIntegrityFunctionPointers();
         bytes memory actual = INTEGRITY_FUNCTION_POINTERS;
+        assertEq(actual, expected);
+    }
+
+    function testSubParserFunctionPointers() external {
+        RainterpreterReferenceExternNPE2 extern = new RainterpreterReferenceExternNPE2();
+        bytes memory expected = extern.buildSubParserFunctionPointers();
+        bytes memory actual = SUB_PARSER_FUNCTION_POINTERS;
         assertEq(actual, expected);
     }
 }
