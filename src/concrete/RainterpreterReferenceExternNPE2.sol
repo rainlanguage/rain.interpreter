@@ -51,12 +51,19 @@ library LibExternOpIntIncNPE2 {
             mstore8(add(bytecode, 0x23), constantsHeight)
         }
 
-        uint256[] memory constants = new uint256[](1);
-        constants[0] = EncodedExternDispatch.unwrap(
+        uint256 externDispatch = EncodedExternDispatch.unwrap(
             LibExtern.encodeExternCall(
                 IInterpreterExternV3(address(this)), LibExtern.encodeExternDispatch(OP_INDEX_INCREMENT, operand)
             )
         );
+
+        uint256[] memory constants;
+        assembly ("memory-safe") {
+            constants := mload(0x40)
+            mstore(0x40, add(constants, 0x40))
+            mstore(constants, 1)
+            mstore(add(constants, 0x20), externDispatch)
+        }
 
         return (true, bytecode, constants);
     }
