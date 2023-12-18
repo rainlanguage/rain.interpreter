@@ -3,10 +3,10 @@ pragma solidity =0.8.19;
 
 import {OpTest} from "test/util/abstract/OpTest.sol";
 import {
-    RainterpreterExternNPE2,
+    RainterpreterReferenceExternNPE2,
     OPCODE_FUNCTION_POINTERS,
     INTEGRITY_FUNCTION_POINTERS
-} from "src/concrete/RainterpreterExternNPE2.sol";
+} from "src/concrete/RainterpreterReferenceExternNPE2.sol";
 import {
     ExternDispatch,
     EncodedExternDispatch,
@@ -15,9 +15,9 @@ import {
 import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
 
-contract RainterpreterExternNPE2IntIncTest is OpTest {
-    function testRainterpreterExternNPE2IntIncHappy() external {
-        RainterpreterExternNPE2 extern = new RainterpreterExternNPE2();
+contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
+    function testRainterpreterReferenceExternNPE2IntIncHappy() external {
+        RainterpreterReferenceExternNPE2 extern = new RainterpreterReferenceExternNPE2();
 
         uint256 intIncOpcode = 1;
 

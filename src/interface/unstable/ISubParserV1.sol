@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
+/// @dev This can be anything as long as it is unique and the sub parsers
+/// can agree on it.
+bytes32 constant COMPATIBLITY_V0 = keccak256("2023.12.17 Rainlang Parser v0");
 
-interface ISubParserV1 is IERC165 {
+interface ISubParserV1 {
     function subParse(bytes32 compatibility, bytes calldata data)
         external
         pure

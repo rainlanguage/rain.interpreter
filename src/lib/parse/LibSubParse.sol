@@ -4,12 +4,8 @@ pragma solidity ^0.8.18;
 import {LibParseState, ParseState} from "./LibParseState.sol";
 import {OPCODE_UNKNOWN} from "../../interface/unstable/IInterpreterV2.sol";
 import {LibBytecode, Pointer} from "../bytecode/LibBytecode.sol";
-import {ISubParserV1} from "../../interface/unstable/ISubParserV1.sol";
+import {ISubParserV1, COMPATIBLITY_V0} from "../../interface/unstable/ISubParserV1.sol";
 import {BadSubParserResult, UnknownWord} from "../../error/ErrParse.sol";
-
-/// @dev This can be anything as long as it is unique and the sub parsers
-/// can agree on it.
-bytes32 constant COMPATIBLITY_V0 = keccak256("2023.12.17 Rainlang Parser v0");
 
 library LibSubParse {
     using LibParseState for ParseState;
@@ -126,5 +122,23 @@ library LibSubParse {
             }
             return (bytecode, state.buildConstants());
         }
+    }
+
+    function consumeInputData(bytes memory data, bytes memory meta)
+        internal
+        pure
+        returns (uint256 constantsHeight, uint256 ioByte, ParseState memory state)
+    {
+        assembly ("memory-safe") {
+            // Pull the header out into EVM stack items.
+            constantsHeight := and(mload(add(data, 2)), 0xFFFF)
+            ioByte := and(mload(add(data, 3)), 0xFF)
+
+            // Mutate the data to no longer have a header.
+            let newLength := sub(mload(data), 3)
+            data := add(data, 3)
+            mstore(data, newLength)
+        }
+        state = LibParseState.newState(data, meta);
     }
 }

@@ -78,23 +78,32 @@ library LibParse {
     using LibSubParse for ParseState;
     using LibBytes for bytes;
 
-    function parseWord(uint256 cursor, uint256 mask) internal pure returns (uint256, bytes32) {
-        bytes32 word;
-        uint256 i = 1;
-        assembly ("memory-safe") {
-            // word is head + tail
-            word := mload(cursor)
-            // loop over the tail
-            //slither-disable-next-line incorrect-shift
-            for {} and(lt(i, 0x20), iszero(and(shl(byte(i, word), 1), not(mask)))) { i := add(i, 1) } {}
-            let scrub := mul(sub(0x20, i), 8)
-            word := shl(scrub, shr(scrub, word))
-            cursor := add(cursor, i)
+    function parseWord(uint256 cursor, uint256 end, uint256 mask) internal pure returns (uint256, bytes32) {
+        unchecked {
+            bytes32 word;
+            uint256 i = 1;
+            uint256 iEnd;
+            {
+                uint256 remaining = end - cursor;
+                iEnd = remaining > 0x20 ? 0x20 : remaining;
+            }
+            assembly ("memory-safe") {
+                // word is head + tail
+                word := mload(cursor)
+                // loop over the tail
+                //slither-disable-next-line incorrect-shift
+                for {} and(lt(i, iEnd), iszero(and(shl(byte(i, word), 1), not(mask)))) { i := add(i, 1) } {}
+
+                // zero out the rightmost part of the mload that is not the word.
+                let scrub := mul(sub(0x20, i), 8)
+                word := shl(scrub, shr(scrub, word))
+                cursor := add(cursor, i)
+            }
+            if (i == 0x20) {
+                revert WordSize(string(abi.encodePacked(word)));
+            }
+            return (cursor, word);
         }
-        if (i == 0x20) {
-            revert WordSize(string(abi.encodePacked(word)));
-        }
-        return (cursor, word);
     }
 
     /// Skip an unlimited number of chars until we find one that is not in the
@@ -125,7 +134,7 @@ library LibParse {
 
                     // Named stack item.
                     if (char & CMASK_IDENTIFIER_HEAD > 0) {
-                        (cursor, word) = parseWord(cursor, CMASK_LHS_STACK_TAIL);
+                        (cursor, word) = parseWord(cursor, end, CMASK_LHS_STACK_TAIL);
                         (bool exists, uint256 index) = state.pushStackName(word);
                         (index);
                         // If the stack name already exists, then we
@@ -184,7 +193,7 @@ library LibParse {
                     }
 
                     uint256 cursorForUnknownWord = cursor;
-                    (cursor, word) = parseWord(cursor, CMASK_RHS_WORD_TAIL);
+                    (cursor, word) = parseWord(cursor, end, CMASK_RHS_WORD_TAIL);
 
                     // First check if this word is in meta.
                     (

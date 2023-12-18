@@ -4,6 +4,7 @@ pragma solidity =0.8.19;
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {BadDynamicLength} from "../error/ErrOpList.sol";
 import {BaseRainterpreterExternNPE2, Operand} from "../abstract/BaseRainterpreterExternNPE2.sol";
+import {BaseRainterpreterSubParserNPE2} from "../abstract/BaseRainterpreterSubParserNPE2.sol";
 
 import {LibOpIntAddNP} from "../lib/op/math/int/LibOpIntAddNP.sol";
 import {LibOpIntIncNP} from "../lib/op/math/int/LibOpIntIncNP.sol";
@@ -12,7 +13,17 @@ bytes constant OPCODE_FUNCTION_POINTERS = hex"031f03d3";
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 2;
 bytes constant INTEGRITY_FUNCTION_POINTERS = hex"04b204d2";
 
-contract RainterpreterExternNPE2 is BaseRainterpreterExternNPE2 {
+contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, BaseRainterpreterExternNPE2 {
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(BaseRainterpreterSubParserNPE2, BaseRainterpreterExternNPE2)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
+    }
+
     function opcodeFunctionPointers() internal pure override returns (bytes memory) {
         return OPCODE_FUNCTION_POINTERS;
     }
