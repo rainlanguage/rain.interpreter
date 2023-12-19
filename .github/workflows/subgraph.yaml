@@ -119,10 +119,6 @@ jobs:
         working-directory: ./subgraph
         run: nix run .#init-setup
 
-      - name: Build subgraph
-        working-directory: ./subgraph
-        run: nix run .#build
-
       - name: Deploy subgraph mumbai
         working-directory: ./subgraph
         run: |
