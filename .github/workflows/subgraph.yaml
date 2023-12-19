@@ -100,7 +100,8 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@v2
 
       - name: Debugging
-        run: echo "THE_GRAPH_API_TOKEN: $THE_GRAPH_API_TOKEN"
+        run: |
+          echo "THE_GRAPH_API_TOKEN: $THE_GRAPH_API_TOKEN"
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
