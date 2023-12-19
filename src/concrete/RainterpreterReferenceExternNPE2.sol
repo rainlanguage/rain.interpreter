@@ -12,11 +12,16 @@ import {LibSubParse} from "../lib/parse/LibSubParse.sol";
 import {AuthoringMeta} from "../lib/parse/LibParseMeta.sol";
 import {ParseState} from "../lib/parse/LibParseState.sol";
 import {LibParseOperand} from "../lib/parse/LibParseOperand.sol";
+import {LibParseLiteral} from "../lib/parse/LibParseLiteral.sol";
 
-bytes constant OPCODE_FUNCTION_POINTERS = hex"04ef";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"0536";
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"05ce";
-bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"0872";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0615";
+bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"08dc";
+bytes constant SUB_PARSER_PARSE_META =
+    hex"010000000000000000000000000000000000000000000000000000000000000000020000ae37f5";
+uint256 constant SUB_PARSER_OPERAND_PARSERS = 0x0000000000000000000000000000000000000000000000000000000000000994;
+uint256 constant SUB_PARSER_LITERAL_PARSERS = 0;
 
 uint256 constant OP_INDEX_INCREMENT = 0;
 
@@ -86,8 +91,20 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
         return super.supportsInterface(interfaceId);
     }
 
+    function subParserParseMeta() internal pure override returns (bytes memory) {
+        return SUB_PARSER_PARSE_META;
+    }
+
     function subParserFunctionPointers() internal pure override returns (bytes memory) {
         return SUB_PARSER_FUNCTION_POINTERS;
+    }
+
+    function subParserOperandParsers() internal pure override returns (uint256) {
+        return SUB_PARSER_OPERAND_PARSERS;
+    }
+
+    function subParserLiteralParsers() internal pure override returns (uint256) {
+        return SUB_PARSER_LITERAL_PARSERS;
     }
 
     function opcodeFunctionPointers() internal pure override returns (bytes memory) {
@@ -96,6 +113,14 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
 
     function integrityFunctionPointers() internal pure override returns (bytes memory) {
         return INTEGRITY_FUNCTION_POINTERS;
+    }
+
+    function buildSubParserLiteralParsers() external pure returns (uint256) {
+        return LibParseLiteral.buildLiteralParsers();
+    }
+
+    function buildSubParserOperandParsers() external pure returns (uint256) {
+        return LibRainterpreterReferenceExternNPE2.buildOperandParsers();
     }
 
     function buildSubParserFunctionPointers() external pure returns (bytes memory) {

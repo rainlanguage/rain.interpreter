@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {console2} from "forge-std/console2.sol";
 import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {
@@ -218,7 +217,9 @@ library LibParse {
                             // Need to process highwater here because we
                             // don't have any parens to open or close.
                             state.highwater();
-                        } else {
+                        }
+                        // Fallback to sub parsing.
+                        else {
                             cursor = state.skipOperand(cursor, end);
                             // Build the bytecode that we will be sending to the
                             // subparser. We can't yet build the 3 byte header but
@@ -232,7 +233,7 @@ library LibParse {
                                 mstore(subParserBytecode, length)
                                 // Move allocated memory past the bytes and their
                                 // length. This is NOT an aligned allocation.
-                                mstore(0x40, add(length, 0x20))
+                                mstore(0x40, add(subParserBytecode, add(length, 0x20)))
                                 // The operand of an unknown word is a pointer to
                                 // the bytecode that needs to be sub parsed.
                                 operand := subParserBytecode
@@ -359,7 +360,7 @@ library LibParse {
         returns (bytes memory bytecode, uint256[] memory)
     {
         unchecked {
-            ParseState memory state = LibParseState.newState(data, meta);
+            ParseState memory state = LibParseState.newState(data, meta, LibParseLiteral.buildLiteralParsers());
             if (data.length > 0) {
                 uint256 cursor;
                 uint256 end;
@@ -381,7 +382,6 @@ library LibParse {
                     revert MissingFinalSemi(state.parseErrorOffset(cursor));
                 }
             }
-            console2.log("parse end");
             return state.subParse(state.buildBytecode());
         }
     }

@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {console2} from "forge-std/console2.sol";
-
 import {LibParseState, ParseState} from "./LibParseState.sol";
 import {OPCODE_UNKNOWN, OPCODE_EXTERN, Operand} from "../../interface/unstable/IInterpreterV2.sol";
 import {LibBytecode, Pointer} from "../bytecode/LibBytecode.sol";
@@ -63,6 +61,9 @@ library LibSubParse {
                     uint256 deref = state.subParsers;
                     while (deref != 0) {
                         ISubParserV1 subParser = ISubParserV1(address(uint160(deref)));
+                        assembly ("memory-safe") {
+                            deref := mload(shr(0xf0, deref))
+                        }
 
                         // Subparse data is a fixed length header that provides the
                         // subparser some minimal additional contextual information
@@ -79,7 +80,7 @@ library LibSubParse {
                         // The operand of the unknown opcode directly points at the
                         // data that we need to subparse.
                         assembly ("memory-safe") {
-                            data := and(shr(0xe0, memoryAtCursor), 0xFF)
+                            data := and(shr(0xe0, memoryAtCursor), 0xFFFF)
                         }
                         // We just need to fill in the header.
                         {
@@ -153,21 +154,19 @@ library LibSubParse {
         pure
         returns (bytes memory, uint256[] memory)
     {
-        console2.log("subParse");
         unchecked {
             uint256 sourceCount = LibBytecode.sourceCount(bytecode);
             for (uint256 sourceIndex; sourceIndex < sourceCount; ++sourceIndex) {
                 // Start cursor at the pointer to the source.
                 uint256 cursor = Pointer.unwrap(LibBytecode.sourcePointer(bytecode, sourceIndex)) + 4;
                 uint256 end = cursor + (LibBytecode.sourceOpsCount(bytecode, sourceIndex) * 4);
-
                 subParseSlice(state, cursor, end);
             }
             return (bytecode, state.buildConstants());
         }
     }
 
-    function consumeInputData(bytes memory data, bytes memory meta, uint256 operandParsers)
+    function consumeInputData(bytes memory data, bytes memory meta, uint256 literalParsers, uint256 operandParsers)
         internal
         pure
         returns (uint256 constantsHeight, uint256 ioByte, ParseState memory state)
@@ -182,7 +181,7 @@ library LibSubParse {
             data := add(data, 3)
             mstore(data, newLength)
         }
-        state = LibParseState.newState(data, meta);
+        state = LibParseState.newState(data, meta, literalParsers);
         state.operandParsers = operandParsers;
     }
 }

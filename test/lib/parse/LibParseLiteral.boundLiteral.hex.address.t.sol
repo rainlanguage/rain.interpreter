@@ -19,7 +19,7 @@ contract LibParseLiteralBoundLiteralHexAddressTest is ParseLiteralTest {
         pure
         returns (uint256, uint256, uint256, uint256, uint256)
     {
-        ParseState memory state = LibParseState.newState(bytes(value), "");
+        ParseState memory state = LibParseState.newState(bytes(value), "", LibParseLiteral.buildLiteralParsers());
 
         uint256 outerStart = Pointer.unwrap(bytes(value).dataPointer());
         uint256 end = outerStart + bytes(value).length;
@@ -40,7 +40,7 @@ contract LibParseLiteralBoundLiteralHexAddressTest is ParseLiteralTest {
     function testParseLiteralBoundLiteralHexAddressHappy(address value) external {
         string memory hexAddress = Strings.toHexString(value);
 
-        ParseState memory state = LibParseState.newState(bytes(hexAddress), "");
+        ParseState memory state = LibParseState.newState(bytes(hexAddress), "", LibParseLiteral.buildLiteralParsers());
 
         uint256 outerStart = Pointer.unwrap(bytes(hexAddress).dataPointer());
         uint256 end = outerStart + bytes(hexAddress).length;
@@ -79,7 +79,7 @@ contract LibParseLiteralBoundLiteralHexAddressTest is ParseLiteralTest {
 
         uint256 hexLength;
         {
-            ParseState memory state = LibParseState.newState(bytes(value), "");
+            ParseState memory state = LibParseState.newState(bytes(value), "", LibParseLiteral.buildLiteralParsers());
             uint256 cursor = Pointer.unwrap(bytes(value).dataPointer());
             uint256 outerStart0 = cursor;
             uint256 end = cursor + bytes(value).length;

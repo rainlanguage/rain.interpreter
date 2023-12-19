@@ -6,8 +6,13 @@ import {
     RainterpreterReferenceExternNPE2,
     OPCODE_FUNCTION_POINTERS,
     INTEGRITY_FUNCTION_POINTERS,
-    SUB_PARSER_FUNCTION_POINTERS
+    SUB_PARSER_FUNCTION_POINTERS,
+    AuthoringMeta,
+    SUB_PARSER_PARSE_META,
+    SUB_PARSER_OPERAND_PARSERS,
+    LibRainterpreterReferenceExternNPE2
 } from "src/concrete/RainterpreterReferenceExternNPE2.sol";
+import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 
 contract RainterpreterReferenceExternNPE2Test is Test {
     function testOpcodeFunctionPointers() external {
@@ -24,10 +29,25 @@ contract RainterpreterReferenceExternNPE2Test is Test {
         assertEq(actual, expected);
     }
 
+    function testSubParserParseMeta() external {
+        bytes memory authoringMetaBytes = LibRainterpreterReferenceExternNPE2.authoringMeta();
+        AuthoringMeta[] memory authoringMeta = abi.decode(authoringMetaBytes, (AuthoringMeta[]));
+        bytes memory expected = LibParseMeta.buildParseMeta(authoringMeta, 2);
+        bytes memory actual = SUB_PARSER_PARSE_META;
+        assertEq(actual, expected);
+    }
+
     function testSubParserFunctionPointers() external {
         RainterpreterReferenceExternNPE2 extern = new RainterpreterReferenceExternNPE2();
         bytes memory expected = extern.buildSubParserFunctionPointers();
         bytes memory actual = SUB_PARSER_FUNCTION_POINTERS;
+        assertEq(actual, expected);
+    }
+
+    function testSubParserOperandParsers() external {
+        RainterpreterReferenceExternNPE2 extern = new RainterpreterReferenceExternNPE2();
+        uint256 expected = extern.buildSubParserOperandParsers();
+        uint256 actual = SUB_PARSER_OPERAND_PARSERS;
         assertEq(actual, expected);
     }
 }

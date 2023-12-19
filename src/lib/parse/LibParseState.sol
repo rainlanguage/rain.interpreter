@@ -166,7 +166,11 @@ library LibParseState {
         state.stackTracker = ParseStackTracker.wrap(0);
     }
 
-    function newState(bytes memory data, bytes memory meta) internal pure returns (ParseState memory) {
+    function newState(bytes memory data, bytes memory meta, uint256 literalParsers)
+        internal
+        pure
+        returns (ParseState memory)
+    {
         ParseState memory state = ParseState(
             // activeSource
             // (will be built in `newActiveSource`)
@@ -197,7 +201,7 @@ library LibParseState {
             // constantsBuilder
             0,
             // literalParsers
-            LibParseLiteral.buildLiteralParsers(),
+            literalParsers,
             // operandParsers
             LibParseOperand.buildOperandParsers(),
             // stackTracker
