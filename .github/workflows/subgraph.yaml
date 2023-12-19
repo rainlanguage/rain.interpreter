@@ -1,5 +1,7 @@
 name: Subgraph CI
 on: [push]
+env:
+  THE_GRAPH_API_TOKEN: ${{ secrets.THE_GRAPH_API_TOKEN }}
 
 jobs:
   subgraph-build:
@@ -82,3 +84,43 @@ jobs:
       - name: Stop docker container
         working-directory: ./subgraph
         run: nix run .#docker-down
+
+  subgraph-deploy:
+    runs-on: ubuntu-latest
+
+    # if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v4
+
+      - uses: DeterminateSystems/magic-nix-cache-action@v2
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Forge shallow install
+        run: forge install --shallow
+
+      - name: install npm dependencies
+        working-directory: ./subgraph
+        run: npm install
+
+      - name: Initialize setup
+        working-directory: ./subgraph
+        run: nix run .#init-setup
+
+      - name: Build subgraph
+        working-directory: ./subgraph
+        run: nix run .#build
+
+      - name: Deploy subgraph mumbai
+        working-directory: ./subgraph
+        run: |
+          nix run .#rain_cli 'subgraph build --network mumbai --address 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24 --block 43347207'
+          nix run .#rain_cli 'subgraph deploy --subgraph-name rainlanguage/interpreter-registry-npe2 --token-access $THE_GRAPH_API_TOKEN'
