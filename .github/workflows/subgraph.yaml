@@ -108,10 +108,6 @@ jobs:
         working-directory: ./subgraph
         run: npm install
 
-      - name: Graph Authentication
-        working-directory: ./subgraph
-        run: npx graph auth --product hosted-service $THE_GRAPH_API_TOKEN
-
       - name: Forge shallow install
         run: forge install --shallow
 
@@ -119,8 +115,24 @@ jobs:
         working-directory: ./subgraph
         run: nix run .#init-setup
 
-      - name: Deploy subgraph mumbai
+      - name: Graph Authentication
+        working-directory: ./subgraph
+        run: npx graph auth --product hosted-service $THE_GRAPH_API_TOKEN
+
+      - name: Deploy subgraph Mumbai
         working-directory: ./subgraph
         run: |
           nix run .#rain_cli 'subgraph build --network mumbai --address 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24 --block 43347207'
           nix run .#rain_cli 'subgraph deploy --subgraph-name rainlanguage/interpreter-registry-npe2'
+
+      - name: Deploy subgraph Polygon
+        working-directory: ./subgraph
+        run: |
+          nix run .#rain_cli 'subgraph build --network matic --address 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24 --block 50000000'
+          nix run .#rain_cli 'subgraph deploy --subgraph-name rainlanguage/interpreter-registry-npe2-mati'
+
+      - name: Deploy subgraph Ethereum
+        working-directory: ./subgraph
+        run: |
+          nix run .#rain_cli 'subgraph build --network mainnet --address 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24 --block 18700000'
+          nix run .#rain_cli 'subgraph deploy --subgraph-name rainlanguage/interpreter-registry-npe2-eth'
