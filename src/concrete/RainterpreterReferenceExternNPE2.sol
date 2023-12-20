@@ -15,22 +15,73 @@ import {LibParseOperand} from "../lib/parse/LibParseOperand.sol";
 import {LibParseLiteral} from "../lib/parse/LibParseLiteral.sol";
 import {COMPATIBLITY_V0} from "../interface/unstable/ISubParserV1.sol";
 
-bytes constant OPCODE_FUNCTION_POINTERS = hex"0536";
-uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0615";
-bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"08dc";
+/// @dev The number of subparser functions available to the parser. This is NOT
+/// 1:1 with the number of opcodes provided by the extern component of this
+/// contract. It is possible to subparse words into opcodes that run entirely
+/// within the interpreter, and do not have an associated extern dispatch.
+uint256 constant SUB_PARSER_FUNCTION_POINTERS_LENGTH = 1;
+
+/// @dev Real function pointers to the sub parser functions that produce the
+/// bytecode that this contract knows about. This is both constructing the extern
+/// bytecode that dials back into this contract at eval time, and creating
+/// to things that happen entirely on the interpreter such as well known
+/// constants and references to the context grid.
+bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"097c";
+
+/// @dev Real sub parser meta bytes that map parsed strings to the functions that
+/// know how to parse those strings into opcodes for the main parser. Structured
+/// identically to parse meta for the main parser.
 bytes constant SUB_PARSER_PARSE_META =
     hex"010000000000000000000000000000000000000000000000000000000000000000020000ae37f5";
-uint256 constant SUB_PARSER_OPERAND_PARSERS = 0x0000000000000000000000000000000000000000000000000000000000000994;
+
+/// @dev Real function pointers to the operand parsers that are available at
+/// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
+/// the rightmost position is a pointer to an operand parser function. In the
+/// future this is likely to be removed, or refactored to value handling only
+/// rather than parsing.
+uint256 constant SUB_PARSER_OPERAND_PARSERS = 0x0000000000000000000000000000000000000000000000000000000000000615;
+
+/// @dev Real function pointers to the literal parsers that are available at
+/// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
+/// the rightmost position is a pointer to a literal parser function. In the
+/// future this is likely to be removed, in favour of a dedicated literal parser
+/// feature.
 uint256 constant SUB_PARSER_LITERAL_PARSERS = 0;
 
+/// @dev Real function pointers to the opcodes for the extern component of this
+/// contract. These get run at eval time wehen the interpreter calls into the
+/// contract as an `IInterpreterExternV3`.
+bytes constant OPCODE_FUNCTION_POINTERS = hex"0536";
+
+/// @dev Number of opcode function pointers available to run at eval time.
+uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
+
+/// @dev Real function pointers to the integrity checks for the extern component
+/// of this contract. These get run at deploy time when the main integrity checks
+/// are run, the extern opcode integrity on the deployer will delegate integrity
+/// checks to the extern contract.
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"06b9";
+
+/// @dev Opcode index of the extern increment opcode. Needs to be manually kept
+/// in sync with the extern opcode function pointers. Definitely write tests for
+/// this to ensure a mismatch doesn't happen silently.
 uint256 constant OP_INDEX_INCREMENT = 0;
 
+/// @dev The offset of the operand parser for disallowed opcodes. This just
+/// happens to be the same as the main parser, but could be different in some
+/// other implementation. In the future this is likely to be removed.
 uint8 constant SUB_PARSER_OPERAND_PARSER_OFFSET_DISALLOWED = 0;
 
+/// @title LibExternOpIntIncNPE2
+/// This is a library that mimics the op libraries elsewhere in this repo, but
+/// structured to fit extern dispatching rather than internal logic. It is NOT
+/// required to use this pattern, of libs outside the implementation contract,
+/// but it MAY be convenient to do so, as the libs can be moved to dedicated
+/// files, easily tested and reviewed directly, etc.
 library LibExternOpIntIncNPE2 {
-    /// int-inc
-    /// Increment an integer.
+    /// Running the extern increments every input by 1. By allowing many inputs
+    /// we can test multi input/output logic is implemented correctly for
+    /// externs.
     function run(Operand, uint256[] memory inputs) internal pure returns (uint256[] memory) {
         for (uint256 i = 0; i < inputs.length; i++) {
             ++inputs[i];
@@ -38,23 +89,41 @@ library LibExternOpIntIncNPE2 {
         return inputs;
     }
 
+    /// The integrity check for the extern increment opcode. The inputs and
+    /// outputs are the same always.
     function integrity(Operand, uint256 inputs, uint256) internal pure returns (uint256, uint256) {
         return (inputs, inputs);
     }
 
+    /// The sub parser for the extern increment opcode. It has no special logic
+    /// so uses the default sub parser from `LibSubParse`.
     function subParser(uint256 constantsHeight, uint256 inputsByte, Operand operand)
         internal
         view
         returns (bool, bytes memory, uint256[] memory)
     {
-        return LibSubParse.subParserExtern(constantsHeight, inputsByte, operand, OP_INDEX_INCREMENT);
+        return LibSubParse.subParserExtern(
+            IInterpreterExternV3(address(this)), constantsHeight, inputsByte, operand, OP_INDEX_INCREMENT
+        );
     }
 }
 
+/// @title LibRainterpreterReferenceExternNPE2
+/// This library allows code SEPARATE FROM the implementation contract to do
+/// offchain processing of supporting data without needing to compile all this
+/// information into the implementation contract. Any tooling that supports
+/// solidity can read this data and expose it to end users.
 library LibRainterpreterReferenceExternNPE2 {
+    /// This mirrors the `authoringMeta` function in `LibAllStandardOps`. The
+    /// goal is to produce a standard encoded `AuthoringMeta[]` that tooling can
+    /// use to describe all the parseable words, that can be built directly into
+    /// a useable parse meta with the standard libs. Note that the list of
+    /// parseable words is not limited to the externs, the sub parser is free
+    /// to define words that it then parses back into bytecode that is run by
+    /// the interpreter itself.
     function authoringMeta() internal pure returns (bytes memory) {
         AuthoringMeta memory lengthPlaceholder;
-        AuthoringMeta[OPCODE_FUNCTION_POINTERS_LENGTH + 1] memory wordsFixed = [
+        AuthoringMeta[SUB_PARSER_FUNCTION_POINTERS_LENGTH + 1] memory wordsFixed = [
             lengthPlaceholder,
             AuthoringMeta(
                 "reference-extern-inc",
@@ -63,15 +132,105 @@ library LibRainterpreterReferenceExternNPE2 {
             )
         ];
         AuthoringMeta[] memory wordsDynamic;
-        uint256 length = OPCODE_FUNCTION_POINTERS_LENGTH;
+        uint256 length = SUB_PARSER_FUNCTION_POINTERS_LENGTH;
         assembly {
             wordsDynamic := wordsFixed
             mstore(wordsDynamic, length)
         }
         return abi.encode(wordsDynamic);
     }
+}
 
-    function buildOperandParsers() internal pure returns (uint256 operandParsers) {
+/// @title RainterpreterReferenceExternNPE2
+/// This is a reference implementation of BOTH the sub parser and extern
+/// interfaces. It is NOT REQUIRED that these be one and the same. It is entirely
+/// possible to implement standalone parsers and extern contracts that each
+/// implement the relevant interface. In that case, the parser could construct
+/// extern dispatches that encode the address of the extern contract, rather than
+/// using `this` as the extern address.
+///
+/// Parser implementation
+/// ---------------------
+/// The parser implementation overrides all the virtual functions of the base
+/// contracts. This is mandatory for the default implementation to work. The
+/// implementation also builds function pointers to sub parsers, literals and
+/// operands as external functions so that tooling can check that the constants
+/// compiled internally into the contract match what they would be if dynamically
+/// calculated. Any discprepancy there is definitely a critical issue that causes
+/// undefined behaviour in production, so ALWAYS test this, preferably in an
+/// automated way.
+///
+/// Extern implementation
+/// ---------------------
+/// The extern implementation overrides the virtual functions of the base
+/// contracts. This is mandatory for the default implementation to work. The
+/// implementation also builds function pointers to opcodes and integrity checks
+/// as external functions so that tooling can check that the constants compiled
+/// internally into the contract match what they would be if dynamically
+/// calculated. Any discprepancy there is definitely a critical issue that causes
+/// undefined behaviour in production, so ALWAYS test this, preferably in an
+/// automated way.
+contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, BaseRainterpreterExternNPE2 {
+    /// Overrides the base parse meta for sub parsing. Simply returns the known
+    /// constant value, which should allow the compiler to optimise the entire
+    /// function call away.
+    function subParserParseMeta() internal pure virtual override returns (bytes memory) {
+        return SUB_PARSER_PARSE_META;
+    }
+
+    /// Overrides the base function pointers for sub parsing. Simply returns the
+    /// known constant value, which should allow the compiler to optimise the
+    /// entire function call away.
+    function subParserFunctionPointers() internal pure override returns (bytes memory) {
+        return SUB_PARSER_FUNCTION_POINTERS;
+    }
+
+    /// Overrides the base operand parsers for sub parsing. Simply returns the
+    /// known constant value, which should allow the compiler to optimise the
+    /// entire function call away.
+    function subParserOperandParsers() internal pure override returns (uint256) {
+        return SUB_PARSER_OPERAND_PARSERS;
+    }
+
+    /// Overrides the base literal parsers for sub parsing. Simply returns the
+    /// known constant value, which should allow the compiler to optimise the
+    /// entire function call away.
+    function subParserLiteralParsers() internal pure override returns (uint256) {
+        return SUB_PARSER_LITERAL_PARSERS;
+    }
+
+    /// Overrides the compatibility version for sub parsing. Simply returns the
+    /// known constant value, which should allow the compiler to optimise the
+    /// entire function call away.
+    function subParserCompatibility() internal pure override returns (bytes32) {
+        return COMPATIBLITY_V0;
+    }
+
+    /// Overrides the base function pointers for opcodes. Simply returns the
+    /// known constant value, which should allow the compiler to optimise the
+    /// entire function call away.
+    function opcodeFunctionPointers() internal pure override returns (bytes memory) {
+        return OPCODE_FUNCTION_POINTERS;
+    }
+
+    /// Overrides the base function pointers for integrity checks. Simply returns
+    /// the known constant value, which should allow the compiler to optimise the
+    /// entire function call away.
+    function integrityFunctionPointers() internal pure override returns (bytes memory) {
+        return INTEGRITY_FUNCTION_POINTERS;
+    }
+
+    /// The literal parsers are the same as the main parser. In the future this
+    /// is likely to be changed so that sub parsers only have to define
+    /// _additional_ literal parsers that they provide, as it is redundant and
+    /// fragile to have to define the same literal parsers in multiple places.
+    function buildSubParserLiteralParsers() external pure returns (uint256) {
+        return LibParseLiteral.buildLiteralParsers();
+    }
+
+    /// There's only one operand parser for this implementation, the disallowed
+    /// parser. We haven't implemented any words with meaningful operands yet.
+    function buildSubParserOperandParsers() external pure returns (uint256 operandParsers) {
         function(ParseState memory, uint256, uint256) pure returns (uint256, Operand) operandParserDisallowed =
             LibParseOperand.parseOperandDisallowed;
         uint256 parseOperandDisallowedOffset = SUB_PARSER_OPERAND_PARSER_OFFSET_DISALLOWED;
@@ -79,64 +238,24 @@ library LibRainterpreterReferenceExternNPE2 {
             operandParsers := or(operandParsers, shl(parseOperandDisallowedOffset, operandParserDisallowed))
         }
     }
-}
 
-contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, BaseRainterpreterExternNPE2 {
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(BaseRainterpreterSubParserNPE2, BaseRainterpreterExternNPE2)
-        returns (bool)
-    {
-        return super.supportsInterface(interfaceId);
-    }
-
-    function subParserParseMeta() internal pure override returns (bytes memory) {
-        return SUB_PARSER_PARSE_META;
-    }
-
-    function subParserFunctionPointers() internal pure override returns (bytes memory) {
-        return SUB_PARSER_FUNCTION_POINTERS;
-    }
-
-    function subParserOperandParsers() internal pure override returns (uint256) {
-        return SUB_PARSER_OPERAND_PARSERS;
-    }
-
-    function subParserLiteralParsers() internal pure override returns (uint256) {
-        return SUB_PARSER_LITERAL_PARSERS;
-    }
-
-    function subParserCompatibility() internal pure override returns (bytes32) {
-        return COMPATIBLITY_V0;
-    }
-
-    function opcodeFunctionPointers() internal pure override returns (bytes memory) {
-        return OPCODE_FUNCTION_POINTERS;
-    }
-
-    function integrityFunctionPointers() internal pure override returns (bytes memory) {
-        return INTEGRITY_FUNCTION_POINTERS;
-    }
-
-    function buildSubParserLiteralParsers() external pure returns (uint256) {
-        return LibParseLiteral.buildLiteralParsers();
-    }
-
-    function buildSubParserOperandParsers() external pure returns (uint256) {
-        return LibRainterpreterReferenceExternNPE2.buildOperandParsers();
-    }
-
+    /// This mimics how `LibAllStandardOpsNP` builds bytes out of function
+    /// pointers, but for sub parser functions. This is NOT intended to be
+    /// called at runtime, instead tooling (e.g. the test suite) can call this
+    /// function and compare it to `subParserFunctionPointers` to ensure they
+    /// are in sync. This makes the runtime function pointer lookup much more
+    /// gas efficient by allowing it to be constant. The reason this can't be
+    /// done within the test itself is that the pointers need to be calculated
+    /// relative to the bytecode of the current contract, not the test contract.
     function buildSubParserFunctionPointers() external pure returns (bytes memory) {
         unchecked {
             function(uint256, uint256, Operand) internal view returns (bool, bytes memory, uint256[] memory)
                 lengthPointer;
-            uint256 length = OPCODE_FUNCTION_POINTERS_LENGTH;
+            uint256 length = SUB_PARSER_FUNCTION_POINTERS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(uint256, uint256, Operand) internal view returns (bool, bytes memory, uint256[] memory)[OPCODE_FUNCTION_POINTERS_LENGTH
+            function(uint256, uint256, Operand) internal view returns (bool, bytes memory, uint256[] memory)[SUB_PARSER_FUNCTION_POINTERS_LENGTH
                 + 1] memory pointersFixed = [lengthPointer, LibExternOpIntIncNPE2.subParser];
             uint256[] memory pointersDynamic;
             assembly {
@@ -156,7 +275,9 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// function signature for each opcode. Call this function somehow, e.g. from
     /// within a test, and then copy the output into the
     /// `OPCODE_FUNCTION_POINTERS` if there is a mismatch. This makes the
-    /// function pointer lookup much more gas efficient.
+    /// function pointer lookup much more gas efficient. The reason this can't be
+    /// done within the test itself is that the pointers need to be calculated
+    /// relative to the bytecode of the current contract, not the test contract.
     function buildOpcodeFunctionPointers() external pure returns (bytes memory) {
         unchecked {
             function(Operand, uint256[] memory) internal view returns (uint256[] memory) lengthPointer;
@@ -179,9 +300,14 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
         }
     }
 
-    /// This is the same pattern as `buildOpcodeFunctionPointers` but for
-    /// integrity checks. Probably the AI can spit all this out for you, worked
-    /// for me.
+    /// This applies the same pattern to integrity function pointers as the
+    /// opcode and parser function pointers on this same contract. Call this
+    /// function somehow, e.g. from within a test, and then check there is no
+    /// mismatch with the `INTEGRITY_FUNCTION_POINTERS` constant. This makes the
+    /// function pointer lookup at runtime much more gas efficient by allowing
+    /// it to be constant. The reason this can't be done within the test itself
+    /// is that the pointers need to be calculated relative to the bytecode of
+    /// the current contract, not the test contract.
     function buildIntegrityFunctionPointers() external pure returns (bytes memory) {
         unchecked {
             function(Operand, uint256, uint256) internal pure returns (uint256, uint256) lengthPointer;
@@ -202,5 +328,19 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
             }
             return LibConvert.unsafeTo16BitBytes(pointersDynamic);
         }
+    }
+
+    /// This is only needed because the parser and extern base contracts both
+    /// implement IERC165, and the compiler needs to be told how to resolve the
+    /// ambiguity.
+    /// @inheritdoc BaseRainterpreterSubParserNPE2
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(BaseRainterpreterSubParserNPE2, BaseRainterpreterExternNPE2)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
     }
 }

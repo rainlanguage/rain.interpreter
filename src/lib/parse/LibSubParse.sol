@@ -12,11 +12,18 @@ import {IInterpreterExternV3} from "../../interface/unstable/IInterpreterExternV
 library LibSubParse {
     using LibParseState for ParseState;
 
-    function subParserExtern(uint256 constantsHeight, uint256 inputsByte, Operand operand, uint256 opcodeIndex)
-        internal
-        view
-        returns (bool, bytes memory, uint256[] memory)
-    {
+    /// Sub parse a known extern opcode index into the bytecode that will run
+    /// on the interpreter to call the given extern contract. This requires the
+    /// parsing has already matched a word to the extern opcode index, so it
+    /// implies the parse meta has been traversed and the parse index has been
+    /// mapped to an extern opcode index somehow.
+    function subParserExtern(
+        IInterpreterExternV3 extern,
+        uint256 constantsHeight,
+        uint256 inputsByte,
+        Operand operand,
+        uint256 opcodeIndex
+    ) internal pure returns (bool, bytes memory, uint256[] memory) {
         // Build an extern call that dials back into the current contract at eval
         // time with the current opcode index.
         bytes memory bytecode = new bytes(4);
@@ -34,9 +41,7 @@ library LibSubParse {
         }
 
         uint256 externDispatch = EncodedExternDispatch.unwrap(
-            LibExtern.encodeExternCall(
-                IInterpreterExternV3(address(this)), LibExtern.encodeExternDispatch(opcodeIndex, operand)
-            )
+            LibExtern.encodeExternCall(extern, LibExtern.encodeExternDispatch(opcodeIndex, operand))
         );
 
         uint256[] memory constants;
