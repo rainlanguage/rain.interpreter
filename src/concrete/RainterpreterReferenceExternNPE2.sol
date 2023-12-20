@@ -13,6 +13,7 @@ import {AuthoringMeta} from "../lib/parse/LibParseMeta.sol";
 import {ParseState} from "../lib/parse/LibParseState.sol";
 import {LibParseOperand} from "../lib/parse/LibParseOperand.sol";
 import {LibParseLiteral} from "../lib/parse/LibParseLiteral.sol";
+import {COMPATIBLITY_V0} from "../interface/unstable/ISubParserV1.sol";
 
 bytes constant OPCODE_FUNCTION_POINTERS = hex"0536";
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
@@ -105,6 +106,10 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
 
     function subParserLiteralParsers() internal pure override returns (uint256) {
         return SUB_PARSER_LITERAL_PARSERS;
+    }
+
+    function subParserCompatibility() internal pure override returns (bytes32) {
+        return COMPATIBLITY_V0;
     }
 
     function opcodeFunctionPointers() internal pure override returns (bytes memory) {

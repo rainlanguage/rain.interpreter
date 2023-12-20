@@ -4,7 +4,7 @@ pragma solidity =0.8.19;
 import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 
-import {ISubParserV1, COMPATIBLITY_V0} from "../interface/unstable/ISubParserV1.sol";
+import {ISubParserV1} from "../interface/unstable/ISubParserV1.sol";
 import {IncompatibleSubParser} from "../error/ErrSubParse.sol";
 import {LibSubParse, ParseState} from "../lib/parse/LibSubParse.sol";
 import {CMASK_RHS_WORD_TAIL} from "../lib/parse/LibParseCMask.sol";
@@ -36,6 +36,10 @@ uint256 constant SUB_PARSER_OPERAND_PARSERS = 0;
 /// dedicated concepts for "sub literal" and "sub word" parsing, that should be
 /// more composable than the current approach.
 uint256 constant SUB_PARSER_LITERAL_PARSERS = 0;
+
+/// @dev This is a placeholder for compatibility version. The child contract
+/// should override this to define its own compatibility version.
+bytes32 constant SUB_PARSER_COMPATIBLITY = bytes32(0);
 
 /// Base implementation of `ISubParserV1`. Inherit from this contract and
 /// override the virtual functions to align all the relevant pointers and
@@ -105,20 +109,20 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
     /// Overrideable function to allow implementations to define their
     /// compatibility version.
     function subParserCompatibility() internal pure virtual returns (bytes32) {
-        return COMPATIBLITY_V0;
+        return SUB_PARSER_COMPATIBLITY;
     }
 
-    /// @inheritdoc ISubParserV1
     /// A basic implementation of sub parsing that uses encoded function pointers
     /// to dispatch everything necessary in O(1) and allows for the child
     /// contract to override all relevant functions with some modest boilerplate.
     /// This is virtual but the expectation is that it generally DOES NOT need
     /// to be overridden, as the function pointers and metadata bytes are all
     /// that need to be changed to implement a new subparser.
+    /// @inheritdoc ISubParserV1
     function subParse(bytes32 compatibility, bytes memory data)
         external
-        virtual
         pure
+        virtual
         returns (bool success, bytes memory bytecode, uint256[] memory constants)
     {
         if (compatibility != subParserCompatibility()) {
