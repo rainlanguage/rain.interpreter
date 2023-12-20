@@ -108,10 +108,9 @@ jobs:
         working-directory: ./subgraph
         run: npm install
 
-      - name: Graph info Authentication
-        run: npx graph
-      - name: Graph info Authentication
-        run: npx graph auth --product hosted-service ${THE_GRAPH_API_TOKEN}
+      - name: Graph Authentication
+        working-directory: ./subgraph
+        run: npx graph auth --product hosted-service $THE_GRAPH_API_TOKEN
 
       - name: Forge shallow install
         run: forge install --shallow
