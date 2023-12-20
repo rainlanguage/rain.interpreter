@@ -123,4 +123,7 @@ jobs:
         working-directory: ./subgraph
         run: |
           nix run .#rain_cli 'subgraph build --network mumbai --address 0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24 --block 43347207'
-          nix run .#rain_cli "subgraph deploy --subgraph-name rainlanguage/interpreter-registry-npe2 --token-access $THE_GRAPH_API_TOKEN"
+          nix run .#rain_cli \
+            --argstr token_access "$THE_GRAPH_API_TOKEN" \
+            --subgraph deploy --subgraph-name rainlanguage/interpreter-registry-npe2 --token-access $token_access
+          # nix run .#rain_cli "subgraph deploy --subgraph-name rainlanguage/interpreter-registry-npe2 --token-access $THE_GRAPH_API_TOKEN"
