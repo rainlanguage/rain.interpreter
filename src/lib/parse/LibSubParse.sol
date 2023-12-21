@@ -8,6 +8,7 @@ import {ISubParserV1, COMPATIBLITY_V0} from "../../interface/unstable/ISubParser
 import {BadSubParserResult, UnknownWord} from "../../error/ErrParse.sol";
 import {LibExtern, EncodedExternDispatch} from "../extern/LibExtern.sol";
 import {IInterpreterExternV3} from "../../interface/unstable/IInterpreterExternV3.sol";
+import {ExternDispatchConstantsHeightOverflow} from "../../error/ErrSubParse.sol";
 
 library LibSubParse {
     using LibParseState for ParseState;
@@ -24,6 +25,9 @@ library LibSubParse {
         Operand operand,
         uint256 opcodeIndex
     ) internal pure returns (bool, bytes memory, uint256[] memory) {
+        if (constantsHeight > 0xFF) {
+            revert ExternDispatchConstantsHeightOverflow(constantsHeight);
+        }
         // Build an extern call that dials back into the current contract at eval
         // time with the current opcode index.
         bytes memory bytecode = new bytes(4);

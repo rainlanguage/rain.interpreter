@@ -18,6 +18,7 @@ import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {COMPATIBLITY_V0} from "src/interface/unstable/ISubParserV1.sol";
 import {OPCODE_EXTERN} from "src/interface/unstable/IInterpreterV2.sol";
+import {ExternDispatchConstantsHeightOverflow} from "src/error/ErrSubParse.sol";
 
 contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
     using Strings for address;
@@ -100,5 +101,23 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
         (uint256 opcode, Operand operand) = LibExtern.decodeExternDispatch(decodedExternDispatch);
         assertEq(opcode, OP_INDEX_INCREMENT);
         assertEq(Operand.unwrap(operand), 0);
+    }
+
+    /// Test that the reference implementation errors when constants height is
+    /// outside the range of 0xFF.
+    function testRainterpreterReferenceExternNPE2IntIncSubParseConstantsHeightTooHigh(
+        uint16 constantsHeight,
+        bytes1 ioByte
+    ) external {
+        constantsHeight = uint16(bound(constantsHeight, 0x100, 0xFFFF));
+        RainterpreterReferenceExternNPE2 subParser = new RainterpreterReferenceExternNPE2();
+
+        vm.expectRevert(
+            abi.encodeWithSelector(ExternDispatchConstantsHeightOverflow.selector, uint256(constantsHeight))
+        );
+        (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParse(
+            COMPATIBLITY_V0, bytes.concat(bytes2(constantsHeight), ioByte, bytes("reference-extern-inc"))
+        );
+        (success, bytecode, constants);
     }
 }
