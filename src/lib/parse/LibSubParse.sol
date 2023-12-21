@@ -22,9 +22,13 @@ library LibSubParse {
         IInterpreterExternV3 extern,
         uint256 constantsHeight,
         uint256 inputsByte,
+        uint256 outputsByte,
         Operand operand,
         uint256 opcodeIndex
     ) internal pure returns (bool, bytes memory, uint256[] memory) {
+        // The constants height is an error check because the main parser can
+        // provide two bytes for it. Everything else is expected to be more
+        // directly controlled by the subparser itself.
         if (constantsHeight > 0xFF) {
             revert ExternDispatchConstantsHeightOverflow(constantsHeight);
         }
@@ -37,8 +41,8 @@ library LibSubParse {
             mstore8(add(bytecode, 0x20), opIndex)
             // Use the io byte as is for inputs.
             mstore8(add(bytecode, 0x21), inputsByte)
-            // The outputs are the same as inputs for inc.
-            mstore8(add(bytecode, 0x22), inputsByte)
+            // The outputs are encoded to their own byte for extern opcode.
+            mstore8(add(bytecode, 0x22), outputsByte)
             // The extern dispatch is the index to the new constant that we will
             // add to the constants array.
             mstore8(add(bytecode, 0x23), constantsHeight)

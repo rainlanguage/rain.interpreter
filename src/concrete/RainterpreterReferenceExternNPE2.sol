@@ -46,7 +46,7 @@ uint256 constant SUB_PARSER_OPERAND_PARSERS = 0x00000000000000000000000000000000
 /// the rightmost position is a pointer to a literal parser function. In the
 /// future this is likely to be removed, in favour of a dedicated literal parser
 /// feature.
-uint256 constant SUB_PARSER_LITERAL_PARSERS = 0x00000000000000000000000000000000000000000000000000000fd70d020a3a;
+uint256 constant SUB_PARSER_LITERAL_PARSERS = 0x00000000000000000000000000000000000000000000000000000fd80d030a3b;
 
 /// @dev Real function pointers to the opcodes for the extern component of this
 /// contract. These get run at eval time wehen the interpreter calls into the
@@ -103,7 +103,13 @@ library LibExternOpIntIncNPE2 {
         returns (bool, bytes memory, uint256[] memory)
     {
         return LibSubParse.subParserExtern(
-            IInterpreterExternV3(address(this)), constantsHeight, inputsByte, operand, OP_INDEX_INCREMENT
+            IInterpreterExternV3(address(this)),
+            constantsHeight,
+            inputsByte,
+            // Same number of outputs as inputs for inc.
+            inputsByte,
+            operand,
+            OP_INDEX_INCREMENT
         );
     }
 }
