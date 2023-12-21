@@ -103,6 +103,25 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
         assertEq(Operand.unwrap(operand), 0);
     }
 
+    /// Directly test the subparsing of the reference extern opcode. Check that
+    /// we get a false for success if the subparser doesn't recognize the word
+    /// but the data is otherwise valid.
+    function testRainterpreterReferenceExternNPE2IntIncSubParseUnknownWord(
+        uint16 constantsHeight,
+        bytes1 ioByte,
+        bytes memory unknownWord
+    ) external {
+        // Extern "only" supports up to constant height of 0xFF.
+        constantsHeight = uint16(bound(constantsHeight, 0, 0xFF));
+        RainterpreterReferenceExternNPE2 subParser = new RainterpreterReferenceExternNPE2();
+
+        (bool success, bytes memory bytecode, uint256[] memory constants) =
+            subParser.subParse(COMPATIBLITY_V0, bytes.concat(bytes2(constantsHeight), ioByte, unknownWord));
+        assertFalse(success);
+        assertEq(bytecode.length, 0);
+        assertEq(constants.length, 0);
+    }
+
     /// Test that the reference implementation errors when constants height is
     /// outside the range of 0xFF.
     function testRainterpreterReferenceExternNPE2IntIncSubParseConstantsHeightTooHigh(
