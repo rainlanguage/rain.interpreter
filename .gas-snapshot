@@ -852,6 +852,7 @@ RainterpreterNPE2Test:testRainterpreterNPE2OddFunctionPointersLength() (gas: 511
 RainterpreterReferenceExternNPE2IERC165Test:testRainterpreterReferenceExternNPE2IERC165(bytes4) (runs: 2048, μ: 1845916, ~: 1845916)
 RainterpreterReferenceExternNPE2IntIncTest:testRainterpreterReferenceExternNPE2IntIncHappy() (gas: 1998876)
 RainterpreterReferenceExternNPE2IntIncTest:testRainterpreterReferenceExternNPE2IntIncHappySugared() (gas: 2005829)
+RainterpreterReferenceExternNPE2IntIncTest:testRainterpreterReferenceExternNPE2IntIncSubParse(uint16,bytes1) (runs: 2048, μ: 1852717, ~: 1852985)
 RainterpreterReferenceExternNPE2Test:testIntegrityFunctionPointers() (gas: 1841224)
 RainterpreterReferenceExternNPE2Test:testOpcodeFunctionPointers() (gas: 1841201)
 RainterpreterReferenceExternNPE2Test:testSubParserFunctionPointers() (gas: 1841288)
