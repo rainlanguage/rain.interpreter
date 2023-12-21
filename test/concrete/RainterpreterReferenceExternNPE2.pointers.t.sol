@@ -10,7 +10,8 @@ import {
     AuthoringMeta,
     SUB_PARSER_PARSE_META,
     SUB_PARSER_OPERAND_PARSERS,
-    LibRainterpreterReferenceExternNPE2
+    LibRainterpreterReferenceExternNPE2,
+    SUB_PARSER_LITERAL_PARSERS
 } from "src/concrete/RainterpreterReferenceExternNPE2.sol";
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 
@@ -34,6 +35,13 @@ contract RainterpreterReferenceExternNPE2Test is Test {
         AuthoringMeta[] memory authoringMeta = abi.decode(authoringMetaBytes, (AuthoringMeta[]));
         bytes memory expected = LibParseMeta.buildParseMeta(authoringMeta, 2);
         bytes memory actual = SUB_PARSER_PARSE_META;
+        assertEq(actual, expected);
+    }
+
+    function testSubParserLiteralParsers() external {
+        RainterpreterReferenceExternNPE2 subParser = new RainterpreterReferenceExternNPE2();
+        uint256 expected = subParser.buildSubParserLiteralParsers();
+        uint256 actual = SUB_PARSER_LITERAL_PARSERS;
         assertEq(actual, expected);
     }
 
