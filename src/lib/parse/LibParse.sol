@@ -78,6 +78,18 @@ library LibParse {
     using LibSubParse for ParseState;
     using LibBytes for bytes;
 
+    /// Parses a word that matches a tail mask between cursor and end. The caller
+    /// has several responsibilities while safely using this word.
+    /// - The caller MUST ensure that the word is not zero length.
+    ///   I.e. `end - cursor > 0`.
+    /// - The caller MUST ensure the head of the word (the first character) is
+    ///   valid according to some head mask. Generally it is expected that the
+    ///   valid chars for a head and tail may be different.
+    /// This function will extract every other character from the word, starting
+    /// with the second character, and check that it is valid according to the
+    /// tail mask. If any invalid characters are found, the parsing will stop
+    /// looping as it is assumed the remaining data is valid as something else,
+    /// just not a word.
     function parseWord(uint256 cursor, uint256 end, uint256 mask) internal pure returns (uint256, bytes32) {
         unchecked {
             bytes32 word;
