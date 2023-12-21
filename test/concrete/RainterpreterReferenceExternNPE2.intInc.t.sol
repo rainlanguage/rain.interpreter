@@ -6,7 +6,8 @@ import {
     RainterpreterReferenceExternNPE2,
     OPCODE_FUNCTION_POINTERS,
     INTEGRITY_FUNCTION_POINTERS,
-    OP_INDEX_INCREMENT
+    OP_INDEX_INCREMENT,
+    LibExternOpIntIncNPE2
 } from "src/concrete/RainterpreterReferenceExternNPE2.sol";
 import {
     ExternDispatch,
@@ -111,6 +112,8 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
         bytes1 ioByte,
         bytes memory unknownWord
     ) external {
+        vm.assume(keccak256(unknownWord) != keccak256("reference-extern-inc"));
+        vm.assume(unknownWord.length < 32);
         // Extern "only" supports up to constant height of 0xFF.
         constantsHeight = uint16(bound(constantsHeight, 0, 0xFF));
         RainterpreterReferenceExternNPE2 subParser = new RainterpreterReferenceExternNPE2();
@@ -138,5 +141,31 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
             COMPATIBLITY_V0, bytes.concat(bytes2(constantsHeight), ioByte, bytes("reference-extern-inc"))
         );
         (success, bytecode, constants);
+    }
+
+    /// Test the inc library directly. The run function should increment every
+    /// value it is passed by 1.
+    function testRainterpreterReferenceExternNPE2IntIncRun(Operand operand, uint256[] memory inputs) external {
+        uint256[] memory expectedOutputs = new uint256[](inputs.length);
+        for (uint256 i = 0; i < inputs.length; i++) {
+            vm.assume(inputs[i] < type(uint256).max);
+            expectedOutputs[i] = inputs[i] + 1;
+        }
+
+        uint256[] memory actualOutputs = LibExternOpIntIncNPE2.run(operand, inputs);
+        assertEq(actualOutputs.length, expectedOutputs.length);
+        for (uint256 i = 0; i < actualOutputs.length; i++) {
+            assertEq(actualOutputs[i], expectedOutputs[i]);
+        }
+    }
+
+    /// Test the inc library directly. The integrity function should return the
+    /// same inputs and outputs.
+    function testRainterpreterReferenceExternNPE2IntIncIntegrity(Operand operand, uint256 inputs, uint256 outputs)
+        external
+    {
+        (uint256 calcInputs, uint256 calcOutputs) = LibExternOpIntIncNPE2.integrity(operand, inputs, outputs);
+        assertEq(calcInputs, inputs);
+        assertEq(calcOutputs, inputs);
     }
 }
