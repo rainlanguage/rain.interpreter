@@ -12,7 +12,7 @@ contract ChildRainterpreterExternNPE2 is BaseRainterpreterExternNPE2 {}
 
 /// @title BaseRainterpreterExternNPE2Test
 /// Test suite for BaseRainterpreterExternNPE2.
-contract BaseRainterpreterExternNPE2Test is Test {
+contract BaseRainterpreterExternNPE2IERC165Test is Test {
     /// Test that ERC165 and IInterpreterExternV3 are supported interfaces as
     /// per ERC165.
     function testRainterpreterExternNPE2IERC165(bytes4 badInterfaceId) external {

@@ -1,5 +1,6 @@
-BaseRainterpreterExternNPE2Test:testRainterpreterExternNPE2IERC165(bytes4) (runs: 2048, μ: 251803, ~: 251803)
-BaseRainterpreterSubParserNPE2Test:testRainterpreterSubParserNPE2IERC165(uint32) (runs: 2048, μ: 1167278, ~: 1167278)
+BaseRainterpreterExternNPE2IERC165Test:testRainterpreterExternNPE2IERC165(bytes4) (runs: 2048, μ: 251803, ~: 251803)
+BaseRainterpreterSubParserNPE2CompatibilityTest:testRainterpreterSubParserNPE2Compatibility(bytes32,bytes) (runs: 2048, μ: 1168969, ~: 1168919)
+BaseRainterpreterSubParserNPE2IERC165Test:testRainterpreterSubParserNPE2IERC165(uint32) (runs: 2048, μ: 1167278, ~: 1167278)
 DeployerDiscoverableMetaV2Test:testDeployerDiscoverableV3(bytes) (runs: 2048, μ: 232341, ~: 232133)
 DeployerDiscoverableMetaV2Test:testDeployerDiscoverableV3InvalidMeta(bytes) (runs: 2048, μ: 252786, ~: 252481)
 LibAllStandardOpsNPTest:testIntegrityAndOpcodeFunctionPointersLength() (gas: 73023)

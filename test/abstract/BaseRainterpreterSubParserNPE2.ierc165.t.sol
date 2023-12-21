@@ -12,8 +12,8 @@ contract ChildRainterpreterSubParserNPE2 is BaseRainterpreterSubParserNPE2 {}
 
 /// @title BaseRainterpreterSubParserNPE2Test
 /// Test suite for BaseRainterpreterSubParserNPE2.
-contract BaseRainterpreterSubParserNPE2Test is Test {
-    /// Test that ERC165 and IInterpreterExternV3 are supported interfaces as
+contract BaseRainterpreterSubParserNPE2IERC165Test is Test {
+    /// Test that ERC165 and ISubParserV1 are supported interfaces as
     /// per ERC165.
     function testRainterpreterSubParserNPE2IERC165(uint32 badInterfaceIdUint) external {
         // https://github.com/foundry-rs/foundry/issues/6115
@@ -22,9 +22,9 @@ contract BaseRainterpreterSubParserNPE2Test is Test {
         vm.assume(badInterfaceId != type(IERC165).interfaceId);
         vm.assume(badInterfaceId != type(ISubParserV1).interfaceId);
 
-        ChildRainterpreterSubParserNPE2 extern = new ChildRainterpreterSubParserNPE2();
-        assertTrue(extern.supportsInterface(type(IERC165).interfaceId));
-        assertTrue(extern.supportsInterface(type(ISubParserV1).interfaceId));
-        assertFalse(extern.supportsInterface(badInterfaceId));
+        ChildRainterpreterSubParserNPE2 subParser = new ChildRainterpreterSubParserNPE2();
+        assertTrue(subParser.supportsInterface(type(IERC165).interfaceId));
+        assertTrue(subParser.supportsInterface(type(ISubParserV1).interfaceId));
+        assertFalse(subParser.supportsInterface(badInterfaceId));
     }
 }
