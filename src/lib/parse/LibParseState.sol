@@ -381,7 +381,10 @@ library LibParseState {
                 // tail key is the fingerprint with the low 16 bits set to
                 // the pointer to the next item in the linked list. If there
                 // is no next item then the pointer is 0.
-                uint256 tailKey = state.constantsBuilder >> 0x10 | fingerprint;
+                uint256 tailKey = state.constantsBuilder >> 0x10
+                // The caller should have already masked the fingerprint but we
+                // do it here again for safety.
+                | (fingerprint & ~uint256(0xFFFF));
                 assembly ("memory-safe") {
                     mstore(ptr, tailKey)
                 }
