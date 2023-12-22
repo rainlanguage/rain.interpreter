@@ -82,6 +82,7 @@ library LibExternOpIntIncNPE2 {
     /// Running the extern increments every input by 1. By allowing many inputs
     /// we can test multi input/output logic is implemented correctly for
     /// externs.
+    //slither-disable-next-line dead-code
     function run(Operand, uint256[] memory inputs) internal pure returns (uint256[] memory) {
         for (uint256 i = 0; i < inputs.length; i++) {
             ++inputs[i];
@@ -91,17 +92,20 @@ library LibExternOpIntIncNPE2 {
 
     /// The integrity check for the extern increment opcode. The inputs and
     /// outputs are the same always.
+    //slither-disable-next-line dead-code
     function integrity(Operand, uint256 inputs, uint256) internal pure returns (uint256, uint256) {
         return (inputs, inputs);
     }
 
     /// The sub parser for the extern increment opcode. It has no special logic
     /// so uses the default sub parser from `LibSubParse`.
+    //slither-disable-next-line dead-code
     function subParser(uint256 constantsHeight, uint256 inputsByte, Operand operand)
         internal
         view
         returns (bool, bytes memory, uint256[] memory)
     {
+        //slither-disable-next-line unused-return
         return LibSubParse.subParserExtern(
             IInterpreterExternV3(address(this)),
             constantsHeight,
@@ -127,6 +131,7 @@ library LibRainterpreterReferenceExternNPE2 {
     /// parseable words is not limited to the externs, the sub parser is free
     /// to define words that it then parses back into bytecode that is run by
     /// the interpreter itself.
+    //slither-disable-next-line dead-code
     function authoringMeta() internal pure returns (bytes memory) {
         AuthoringMeta memory lengthPlaceholder;
         AuthoringMeta[SUB_PARSER_FUNCTION_POINTERS_LENGTH + 1] memory wordsFixed = [

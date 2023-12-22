@@ -84,30 +84,35 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
 
     /// Overrideable function to allow implementations to define their parse
     /// meta bytes.
+    //slither-disable-next-line dead-code
     function subParserParseMeta() internal pure virtual returns (bytes memory) {
         return SUB_PARSER_PARSE_META;
     }
 
     /// Overrideable function to allow implementations to define their function
     /// pointers to each sub parser.
+    //slither-disable-next-line dead-code
     function subParserFunctionPointers() internal pure virtual returns (bytes memory) {
         return SUB_PARSER_FUNCTION_POINTERS;
     }
 
     /// Overrideable function to allow implementations to define their operand
     /// parsers.
+    //slither-disable-next-line dead-code
     function subParserOperandParsers() internal pure virtual returns (uint256) {
         return SUB_PARSER_OPERAND_PARSERS;
     }
 
     /// Overrideable function to allow implementations to define their literal
     /// parsers.
+    //slither-disable-next-line dead-code
     function subParserLiteralParsers() internal pure virtual returns (uint256) {
         return SUB_PARSER_LITERAL_PARSERS;
     }
 
     /// Overrideable function to allow implementations to define their
     /// compatibility version.
+    //slither-disable-next-line dead-code
     function subParserCompatibility() internal pure virtual returns (bytes32) {
         return SUB_PARSER_COMPATIBLITY;
     }

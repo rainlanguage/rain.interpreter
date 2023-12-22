@@ -394,6 +394,7 @@ library LibParse {
                     revert MissingFinalSemi(state.parseErrorOffset(cursor));
                 }
             }
+            //slither-disable-next-line unused-return
             return state.subParse(state.buildBytecode());
         }
     }

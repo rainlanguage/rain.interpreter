@@ -400,6 +400,7 @@ library LibParseState {
             state.constantsBuilder = ((state.constantsBuilder & 0xFFFF) + 1) | (ptr << 0x10);
             // Bloom using the high byte of the fingerprint to match the literal
             // deduping logic.
+            //slither-disable-next-line incorrect-shift
             state.literalBloom |= 1 << (fingerprint >> 0xf8);
         }
     }
