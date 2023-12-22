@@ -15,7 +15,7 @@ contract LibParseLiteralStringTest is Test {
 
     /// Check that an empty string literal is parsed correctly.
     function testParseStringLiteralEmpty() external {
-        ParseState memory state = LibParseState.newState("", "");
+        ParseState memory state = LibParseState.newState("", "", LibParseLiteral.buildLiteralParsers());
         (uint256 value) = state.parseLiteralString(
             Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer())
         );
@@ -25,7 +25,7 @@ contract LibParseLiteralStringTest is Test {
     /// The parser does not care about printable characters, or even ASCII. It
     /// will simply do exactly what the `IntOrAString` library does.
     function testParseStringLiteralAny(bytes memory data) external {
-        ParseState memory state = LibParseState.newState(data, "");
+        ParseState memory state = LibParseState.newState(data, "", LibParseLiteral.buildLiteralParsers());
 
         uint256 expectedValue = IntOrAString.unwrap(LibIntOrAString.fromString(string(data)));
         (uint256 value) = state.parseLiteralString(

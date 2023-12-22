@@ -17,7 +17,7 @@ contract LibParseLiteralHexTest is Test {
     /// Fuzz and round trip.
     function testParseLiteralHexRoundTrip(uint256 value) external {
         string memory hexString = Strings.toHexString(value);
-        ParseState memory state = LibParseState.newState(bytes(hexString), "");
+        ParseState memory state = LibParseState.newState(bytes(hexString), "", LibParseLiteral.buildLiteralParsers());
         (uint256 parsedValue) = state.parseLiteralHex(
             // The hex parser wants only the hexadecimal digits without the
             // leading "0x".

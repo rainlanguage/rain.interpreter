@@ -100,7 +100,7 @@ error ExcessRHSItems(uint256 offset);
 error WordSize(string word);
 
 /// Parsed a word that is not in the meta.
-error UnknownWord(uint256 offset);
+error UnknownWord();
 
 /// The parser exceeded the maximum number of sources that it can build.
 error MaxSources();
@@ -127,3 +127,7 @@ error NoWhitespaceAfterUsingWordsFrom(uint256 offset);
 
 /// The parser encountered a hex literal that is the wrong size to be an address.
 error InvalidAddressLength(uint256 offset);
+
+/// The sub parser returned some bytecode that the main parser could not
+/// understand.
+error BadSubParserResult(bytes bytecode);
