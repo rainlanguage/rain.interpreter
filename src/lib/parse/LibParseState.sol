@@ -132,7 +132,7 @@ struct ParseState {
     uint256 literalBloom;
     uint256 constantsBuilder;
     uint256 literalParsers;
-    uint256 operandParsers;
+    bytes operandHandlers;
     uint256[] operandValues;
     ParseStackTracker stackTracker;
     bytes data;
@@ -178,7 +178,7 @@ library LibParseState {
         state.stackTracker = ParseStackTracker.wrap(0);
     }
 
-    function newState(bytes memory data, bytes memory meta, uint256 literalParsers)
+    function newState(bytes memory data, bytes memory meta, bytes memory operandHandlers, uint256 literalParsers)
         internal
         pure
         returns (ParseState memory)
@@ -214,8 +214,8 @@ library LibParseState {
             0,
             // literalParsers
             literalParsers,
-            // operandParsers
-            LibParseOperand.buildOperandParsers(),
+            // operandHandlers
+            operandHandlers,
             // operandValues
             new uint256[](OPERAND_VALUES_LENGTH),
             // stackTracker

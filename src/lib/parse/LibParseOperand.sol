@@ -10,12 +10,6 @@ import {ParseState, OPERAND_VALUES_LENGTH} from "./LibParseState.sol";
 import {LibParseError} from "./LibParseError.sol";
 import {LibParseInterstitial} from "./LibParseInterstitial.sol";
 
-uint8 constant OPERAND_PARSER_OFFSET_DISALLOWED = 0;
-uint8 constant OPERAND_PARSER_OFFSET_SINGLE_FULL = 0x10;
-uint8 constant OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT = 0x20;
-uint8 constant OPERAND_PARSER_OFFSET_M1_M1 = 0x30;
-uint8 constant OPERAND_PARSER_OFFSET_8_M1_M1 = 0x40;
-
 library LibParseOperand {
     using LibParseError for ParseState;
     using LibParseLiteral for ParseState;
@@ -98,6 +92,27 @@ library LibParseOperand {
         }
 
         return cursor;
+    }
+
+    /// Standard dispatch for handling an operand after it is parsed, using the
+    /// encoded function pointers on the current parse state. Requires that the
+    /// word index has been looked up by the parser, exists, and the literal
+    /// values have all been parsed out of the operand string. In the case of
+    /// the main parser this will all be done inline, but in the case of a sub
+    /// parser the literal extraction will be done first, then the word lookup
+    /// will have to be done by the sub parser, alongside the values provided
+    /// by the main parser.
+    function handleOperand(ParseState memory state, uint256[] memory values, uint256 wordIndex) internal pure returns (Operand) {
+        function (uint256[] memory) pure returns (Operand) handler;
+        bytes memory handlers = state.operandHandlers;
+        assembly ("memory-safe") {
+            // There is no bounds check here because the indexes are calcualted
+            // by the parser itself, NOT provided by the user. Therefore the
+            // scope of corrupt data is limited to a bug in the parser itself,
+            // which can and should have direct test coverage.
+            handler := shl(0xf0, mload(add(handlers, add(0x20, mul(wordIndex, 2)))))
+        }
+        return handler(values);
     }
 
     function handleOperandDisallowed(uint256[] memory values) internal pure returns (Operand) {
