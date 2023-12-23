@@ -22,40 +22,6 @@ library LibParseOperand {
     using LibParseOperand for ParseState;
     using LibParseInterstitial for ParseState;
 
-    function buildOperandParsers() internal pure returns (uint256 operandParsers) {
-        function(ParseState memory, uint256, uint256) pure returns (uint256, Operand) operandParserDisallowed =
-            LibParseOperand.parseOperandDisallowed;
-        uint256 parseOperandDisallowedOffset = OPERAND_PARSER_OFFSET_DISALLOWED;
-        assembly ("memory-safe") {
-            operandParsers := or(operandParsers, shl(parseOperandDisallowedOffset, operandParserDisallowed))
-        }
-        function(ParseState memory, uint256, uint256) pure returns (uint256, Operand) operandParserSingleFull =
-            LibParseOperand.parseOperandSingleFull;
-        uint256 parseOperandSingleFullOffset = OPERAND_PARSER_OFFSET_SINGLE_FULL;
-        assembly ("memory-safe") {
-            operandParsers := or(operandParsers, shl(parseOperandSingleFullOffset, operandParserSingleFull))
-        }
-        function(ParseState memory, uint256, uint256) pure returns (uint256, Operand)
-            operandParserDoublePerByteNoDefault = LibParseOperand.parseOperandDoublePerByteNoDefault;
-        uint256 parseOperandDoublePerByteNoDefaultOffset = OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT;
-        assembly ("memory-safe") {
-            operandParsers :=
-                or(operandParsers, shl(parseOperandDoublePerByteNoDefaultOffset, operandParserDoublePerByteNoDefault))
-        }
-        function(ParseState memory, uint256, uint256) pure returns (uint256, Operand) operandParser_m1_m1 =
-            LibParseOperand.parseOperandM1M1;
-        uint256 parseOperand_m1_m1Offset = OPERAND_PARSER_OFFSET_M1_M1;
-        assembly ("memory-safe") {
-            operandParsers := or(operandParsers, shl(parseOperand_m1_m1Offset, operandParser_m1_m1))
-        }
-        function(ParseState memory, uint256, uint256) pure returns (uint256, Operand) operandParser_8_m1_m1 =
-            LibParseOperand.parseOperand8M1M1;
-        uint256 parseOperand_8_m1_m1Offset = OPERAND_PARSER_OFFSET_8_M1_M1;
-        assembly ("memory-safe") {
-            operandParsers := or(operandParsers, shl(parseOperand_8_m1_m1Offset, operandParser_8_m1_m1))
-        }
-    }
-
     function parseOperand(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         uint256 char;
         assembly ("memory-safe") {
@@ -134,269 +100,133 @@ library LibParseOperand {
         return cursor;
     }
 
-    /// Move past an operand that may or may not exist.
-    function skipOperand(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
-        uint256 char;
-        assembly ("memory-safe") {
-            //slither-disable-next-line incorrect-shift
-            char := shl(byte(0, mload(cursor)), 1)
+    function handleOperandDisallowed(uint256[] memory values) internal pure returns (Operand) {
+        if (values.length != 0) {
+            revert UnexpectedOperand();
         }
-        // If the operand is opening, skip it. Don't pretend to understand it.
-        if (char == CMASK_OPERAND_START) {
-            cursor = LibParse.skipMask(cursor + 1, end, ~CMASK_OPERAND_END);
-            // If the cursor is right at the end then it never found the operand
-            // closing character.
-            if (cursor >= end) {
-                revert UnclosedOperand(state.parseErrorOffset(cursor));
-            }
-            // Move pase the operand end.
-            ++cursor;
-        }
-        return cursor;
+        return Operand.wrap(0);
     }
 
-    /// Parse a literal for an operand.
-    function parseOperandLiteral(ParseState memory state, uint256 maxValue, uint256 cursor, uint256 end)
-        internal
-        pure
-        returns (uint256, uint256)
-    {
-        uint256 char;
-        assembly ("memory-safe") {
-            //slither-disable-next-line incorrect-shift
-            char := shl(byte(0, mload(cursor)), 1)
-        }
-        if (char == CMASK_OPERAND_END) {
-            revert ExpectedOperand(state.parseErrorOffset(cursor));
-        }
-        (
-            function(ParseState memory, uint256, uint256) pure returns (uint256) literalParser,
-            uint256 innerStart,
-            uint256 innerEnd,
-            uint256 outerEnd
-        ) = state.boundLiteral(cursor, end);
-        uint256 value = literalParser(state, innerStart, innerEnd);
-        if (value > maxValue) {
-            revert OperandOverflow(state.parseErrorOffset(cursor));
-        }
-        return (outerEnd, value);
-    }
-
-    /// Operand is disallowed for this word.
-    function parseOperandDisallowed(ParseState memory state, uint256 cursor, uint256)
-        internal
-        pure
-        returns (uint256, Operand)
-    {
-        uint256 char;
-        assembly ("memory-safe") {
-            //slither-disable-next-line incorrect-shift
-            char := shl(byte(0, mload(cursor)), 1)
-        }
-        if (char == CMASK_OPERAND_START) {
-            revert UnexpectedOperand(state.parseErrorOffset(cursor));
-        }
-        // Don't move the cursor. This is a no-op.
-        return (cursor, Operand.wrap(0));
-    }
-
-    /// Operand is a 16-bit unsigned integer.
-    function parseOperandSingleFull(ParseState memory state, uint256 cursor, uint256 end)
-        internal
-        pure
-        returns (uint256, Operand)
-    {
-        unchecked {
-            uint256 char;
+    /// There must be one or zero values. The fallback is 0 if nothing is
+    /// provided, else the provided value MUST fit in two bytes and is used as
+    /// is.
+    function handleOperandSingleFull(uint256[] memory values) internal pure returns (Operand operand) {
+        // Happy path at the top for efficiency.
+        if (values.length == 1) {
             assembly ("memory-safe") {
-                //slither-disable-next-line incorrect-shift
-                char := shl(byte(0, mload(cursor)), 1)
+                operand := mload(add(values, 0x20))
             }
-            if (char == CMASK_OPERAND_START) {
-                cursor = LibParse.skipMask(cursor + 1, end, CMASK_WHITESPACE);
-
-                uint256 value;
-                (cursor, value) = state.parseOperandLiteral(type(uint16).max, cursor, end);
-
-                cursor = LibParse.skipMask(cursor, end, CMASK_WHITESPACE);
-                assembly ("memory-safe") {
-                    //slither-disable-next-line incorrect-shift
-                    char := shl(byte(0, mload(cursor)), 1)
-                }
-                if (char != CMASK_OPERAND_END) {
-                    revert UnclosedOperand(state.parseErrorOffset(cursor));
-                }
-                return (cursor + 1, Operand.wrap(value));
+            if (Operand.unwrap(operand) > type(uint16).max) {
+                revert OperandOverflow();
             }
-            // Default is 0.
-            else {
-                return (cursor, Operand.wrap(0));
-            }
+        }
+        else if (values.length == 0) {
+            operand = Operand.wrap(0);
+        }
+        else {
+            revert UnexpectedOperand();
         }
     }
 
-    /// Operand is two bytes.
-    function parseOperandDoublePerByteNoDefault(ParseState memory state, uint256 cursor, uint256 end)
-        internal
-        pure
-        returns (uint256, Operand)
-    {
-        unchecked {
-            uint256 char;
+    /// There must be exactly two values. There is no default fallback. Each
+    /// value MUST fit in one byte and is used as is.
+    function handleOperandDoublePerByteNoDefault(uint256[] memory values) internal pure returns (Operand operand) {
+        // Happy path at the top for efficiency.
+        if (values.length == 2) {
+            uint256 a;
+            uint256 b;
             assembly ("memory-safe") {
-                //slither-disable-next-line incorrect-shift
-                char := shl(byte(0, mload(cursor)), 1)
+                a := mload(add(values, 0x20))
+                b := mload(add(values, 0x40))
             }
-            if (char == CMASK_OPERAND_START) {
-                cursor = LibParse.skipMask(cursor + 1, end, CMASK_WHITESPACE);
-
-                uint256 a;
-                (cursor, a) = parseOperandLiteral(state, type(uint8).max, cursor, end);
-                Operand operand = Operand.wrap(a);
-
-                cursor = LibParse.skipMask(cursor, end, CMASK_WHITESPACE);
-
-                uint256 b;
-                (cursor, b) = parseOperandLiteral(state, type(uint8).max, cursor, end);
-                operand = Operand.wrap(Operand.unwrap(operand) | (b << 8));
-
-                cursor = LibParse.skipMask(cursor, end, CMASK_WHITESPACE);
-
-                assembly ("memory-safe") {
-                    //slither-disable-next-line incorrect-shift
-                    char := shl(byte(0, mload(cursor)), 1)
-                }
-                if (char != CMASK_OPERAND_END) {
-                    revert UnclosedOperand(state.parseErrorOffset(cursor));
-                }
-                return (cursor + 1, operand);
+            if (a > type(uint8).max || b > type(uint8).max) {
+                revert OperandOverflow();
             }
-            // There is no default fallback value.
-            else {
-                revert ExpectedOperand(state.parseErrorOffset(cursor));
-            }
+            operand = Operand.wrap(a | (b << 8));
+        }
+        else if (values.length < 2) {
+            revert ExpectedOperand();
+        }
+        else {
+            revert UnexpectedOperand();
         }
     }
 
-    /// 8 bit value, maybe 1 bit flag, maybe 1 big flag.
-    function parseOperand8M1M1(ParseState memory state, uint256 cursor, uint256 end)
-        internal
-        pure
-        returns (uint256, Operand)
-    {
-        unchecked {
-            uint256 char;
+    /// 8 bit value then maybe 1 bit flag then maybe 1 bit flag. Fallback to 0
+    /// for both flags if not provided.
+    function handleOperand8M1M1(uint256[] memory values) internal pure returns (Operand operand) {
+        // Happy path at the top for efficiency.
+        uint256 length = values.length;
+        if (length >= 1 && length <= 3) {
+            uint256 a;
+            uint256 b;
+            uint256 c;
             assembly ("memory-safe") {
-                //slither-disable-next-line incorrect-shift
-                char := shl(byte(0, mload(cursor)), 1)
+                a := mload(add(values, 0x20))
             }
-            if (char == CMASK_OPERAND_START) {
-                cursor = LibParse.skipMask(cursor + 1, end, CMASK_WHITESPACE);
 
-                // 8 bit value. Required.
-                uint256 a;
-                (cursor, a) = state.parseOperandLiteral(type(uint8).max, cursor, end);
-                cursor = LibParse.skipMask(cursor, end, CMASK_WHITESPACE);
-
-                // Maybe 1 bit flag.
-                uint256 b;
+            if (length >= 2) {
                 assembly ("memory-safe") {
-                    //slither-disable-next-line incorrect-shift
-                    char := shl(byte(0, mload(cursor)), 1)
+                    b := mload(add(values, 0x40))
                 }
-                if (char == CMASK_OPERAND_END) {
-                    b = 0;
-                } else {
-                    (cursor, b) = state.parseOperandLiteral(1, cursor, end);
-                    cursor = LibParse.skipMask(cursor, end, CMASK_WHITESPACE);
-                }
-
-                // Maybe 1 bit flag.
-                uint256 c;
-                assembly ("memory-safe") {
-                    //slither-disable-next-line incorrect-shift
-                    char := shl(byte(0, mload(cursor)), 1)
-                }
-                if (char == CMASK_OPERAND_END) {
-                    c = 0;
-                } else {
-                    (cursor, c) = state.parseOperandLiteral(1, cursor, end);
-                    cursor = LibParse.skipMask(cursor, end, CMASK_WHITESPACE);
-                }
-
-                Operand operand = Operand.wrap(a | (b << 8) | (c << 9));
-
-                assembly ("memory-safe") {
-                    //slither-disable-next-line incorrect-shift
-                    char := shl(byte(0, mload(cursor)), 1)
-                }
-                if (char != CMASK_OPERAND_END) {
-                    revert UnclosedOperand(state.parseErrorOffset(cursor));
-                }
-                return (cursor + 1, operand);
+            } else {
+                b = 0;
             }
-            // There is no default fallback value. The first 8 bits are
-            // required.
-            else {
-                revert ExpectedOperand(state.parseErrorOffset(cursor));
+
+            if (length == 3) {
+                assembly ("memory-safe") {
+                    c := mload(add(values, 0x60))
+                }
+            } else {
+                c = 0;
             }
+
+            if (a > type(uint8).max || b > 1 || c > 1) {
+                revert OperandOverflow();
+            }
+
+            operand = Operand.wrap(a | (b << 8) | (c << 9));
+        }
+        else if (length == 0) {
+            revert ExpectedOperand();
+        }
+        else {
+            revert UnexpectedOperand();
         }
     }
 
-    /// 2x maybe 1 bit flags.
-    function parseOperandM1M1(ParseState memory state, uint256 cursor, uint256 end)
-        internal
-        pure
-        returns (uint256, Operand)
-    {
-        unchecked {
-            uint256 char;
-            assembly ("memory-safe") {
-                //slither-disable-next-line incorrect-shift
-                char := shl(byte(0, mload(cursor)), 1)
-            }
-            if (char == CMASK_OPERAND_START) {
-                cursor = LibParse.skipMask(cursor + 1, end, CMASK_WHITESPACE);
+    /// 2x maybe 1 bit flags. Fallback to 0 for both flags if not provided.
+    function handleOperandM1M1(uint256[] memory values) internal pure returns (Operand operand) {
+        // Happy path at the top for efficiency.
+        uint256 length = values.length;
+        if (length < 3) {
+            uint256 a;
+            uint256 b;
 
-                uint256 a;
+            if (length >= 1) {
                 assembly ("memory-safe") {
-                    //slither-disable-next-line incorrect-shift
-                    char := shl(byte(0, mload(cursor)), 1)
+                    a := mload(add(values, 0x20))
                 }
-                if (char == CMASK_OPERAND_END) {
-                    a = 0;
-                } else {
-                    (cursor, a) = state.parseOperandLiteral(1, cursor, end);
-                    cursor = LibParse.skipMask(cursor, end, CMASK_WHITESPACE);
-                }
-
-                uint256 b;
-                assembly ("memory-safe") {
-                    //slither-disable-next-line incorrect-shift
-                    char := shl(byte(0, mload(cursor)), 1)
-                }
-                if (char == CMASK_OPERAND_END) {
-                    b = 0;
-                } else {
-                    (cursor, b) = state.parseOperandLiteral(1, cursor, end);
-                    cursor = LibParse.skipMask(cursor, end, CMASK_WHITESPACE);
-                }
-
-                Operand operand = Operand.wrap(a | (b << 1));
-
-                assembly ("memory-safe") {
-                    //slither-disable-next-line incorrect-shift
-                    char := shl(byte(0, mload(cursor)), 1)
-                }
-                if (char != CMASK_OPERAND_END) {
-                    revert UnclosedOperand(state.parseErrorOffset(cursor));
-                }
-                return (cursor + 1, operand);
+            } else {
+                a = 0;
             }
-            // Default is 0.
-            else {
-                return (cursor, Operand.wrap(0));
+
+            if (length == 2) {
+                assembly ("memory-safe") {
+                    b := mload(add(values, 0x40))
+                }
+            } else {
+                b = 0;
             }
+
+            if (a > 1 || b > 1) {
+                revert OperandOverflow();
+            }
+
+            operand = Operand.wrap(a | (b << 1));
+        }
+        else {
+            revert UnexpectedOperand();
         }
     }
 }
