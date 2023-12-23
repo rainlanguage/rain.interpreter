@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {ExpectedOperand, UnclosedOperand, OperandOverflow, UnexpectedOperand} from "../../error/ErrParse.sol";
+import {ExpectedOperand, UnclosedOperand, OperandOverflow, OperandValuesOverflow, UnexpectedOperand} from "../../error/ErrParse.sol";
 import {Operand} from "../../interface/unstable/IInterpreterV2.sol";
 import {LibParse} from "./LibParse.sol";
 import {LibParseLiteral} from "./LibParseLiteral.sol";
 import {CMASK_OPERAND_END, CMASK_WHITESPACE, CMASK_OPERAND_START} from "./LibParseCMask.sol";
-import {ParseState} from "./LibParseState.sol";
+import {ParseState, OPERAND_VALUES_LENGTH} from "./LibParseState.sol";
 import {LibParseError} from "./LibParseError.sol";
+import {LibParseInterstitial} from "./LibParseInterstitial.sol";
 
 uint8 constant OPERAND_PARSER_OFFSET_DISALLOWED = 0;
 uint8 constant OPERAND_PARSER_OFFSET_SINGLE_FULL = 0x10;
@@ -19,6 +20,7 @@ library LibParseOperand {
     using LibParseError for ParseState;
     using LibParseLiteral for ParseState;
     using LibParseOperand for ParseState;
+    using LibParseInterstitial for ParseState;
 
     function buildOperandParsers() internal pure returns (uint256 operandParsers) {
         function(ParseState memory, uint256, uint256) pure returns (uint256, Operand) operandParserDisallowed =
@@ -52,6 +54,84 @@ library LibParseOperand {
         assembly ("memory-safe") {
             operandParsers := or(operandParsers, shl(parseOperand_8_m1_m1Offset, operandParser_8_m1_m1))
         }
+    }
+
+    function parseOperand(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
+        uint256 char;
+        assembly ("memory-safe") {
+            //slither-disable-next-line incorrect-shift
+            char := shl(byte(0, mload(cursor)), 1)
+        }
+
+        // There may not be an operand. Only process if there is.
+        if (char == CMASK_OPERAND_START) {
+            // Move past the opening character.
+            ++cursor;
+
+            // Load the next char.
+            assembly ("memory-safe") {
+                //slither-disable-next-line incorrect-shift
+                char := shl(byte(0, mload(cursor)), 1)
+            }
+            uint256 i = 0;
+            bool success = false;
+            uint256[] memory operandValues = state.operandValues;
+            while (cursor < end) {
+                // Load the next char.
+                assembly ("memory-safe") {
+                    //slither-disable-next-line incorrect-shift
+                    char := shl(byte(0, mload(cursor)), 1)
+                }
+
+                // Handle any whitespace.
+                // We DO NOT currently support full interstitial parsing here.
+                if (char & CMASK_WHITESPACE != 0) {
+                    // Move past the whitespace.
+                    cursor = state.skipWhitespace(cursor, end);
+                }
+                // If the operand has ended break.
+                else if (char & CMASK_OPERAND_END != 0) {
+                    // Move past the operand end.
+                    ++cursor;
+                    success = true;
+                    break;
+                }
+                // Attempt to parse literals.
+                else {
+                    (
+                        function(ParseState memory, uint256, uint256) pure returns (uint256) literalParser,
+                        uint256 innerStart,
+                        uint256 innerEnd,
+                        uint256 outerEnd
+                    ) = state.boundLiteral(cursor, end);
+                    uint256 value = literalParser(state, innerStart, innerEnd);
+                    // We manipulate the operand values array directly in
+                    // assembly because if we used the Solidity indexing syntax
+                    // it would bounds check against the _current_ length of the
+                    // operand values array, not the length it was when the
+                    // parse state was created. The current length is just
+                    // whatever it happened to be for the last operand that was
+                    // parsed, so it's not useful for us here.
+                    assembly ("memory-safe") {
+                        mstore(add(operandValues, add(0x20, mul(i, 0x20))), value)
+                    }
+                    // We can't exceed the initial length of the operand values
+                    // that was allocated when the parse state was created.
+                    if (i++ == OPERAND_VALUES_LENGTH) {
+                        revert OperandValuesOverflow(state.parseErrorOffset(cursor));
+                    }
+                    cursor = outerEnd;
+                }
+            }
+            if (!success) {
+                revert UnclosedOperand(state.parseErrorOffset(cursor));
+            }
+            assembly ("memory-safe") {
+                mstore(operandValues, i)
+            }
+        }
+
+        return cursor;
     }
 
     /// Move past an operand that may or may not exist.

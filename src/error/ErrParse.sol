@@ -19,6 +19,11 @@ error ExpectedOperand(uint256 offset);
 /// @param offset The offset in the source string where the error occurred.
 error OperandOverflow(uint256 offset);
 
+/// Thrown when the number of values encountered in a single operand parsing is
+/// longer than the memory allocated to hold them.
+/// @param offset The offset in the source string where the error occurred.
+error OperandValuesOverflow(uint256 offset);
+
 /// Thrown when parsing an operand and the closing `>` paren is not found.
 /// @param offset The offset in the source string where the error occurred.
 error UnclosedOperand(uint256 offset);

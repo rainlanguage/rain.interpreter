@@ -37,6 +37,17 @@ uint256 constant FSM_ACTIVE_SOURCE_MASK = 1 << 3;
 /// - accepting inputs
 uint256 constant FSM_DEFAULT = FSM_ACCEPTING_INPUTS_MASK;
 
+/// @dev The operand values array is 4 words long. In the future we could have
+/// some kind of logic that reallocates and expands this if we discover that
+/// we need more than 4 operands for a single opcode. Currently there are no
+/// opcodes in the main parser that require more than 4 operands. Of course some
+/// sub parser could implement something that expects more than 4, in which case
+/// we will have to revisit this, but it won't be a breaking change. Consider
+/// that operands in the output are only 2 bytes, so a 4 value operand array is
+/// already only allowing for 4 bits per value on average, which is pretty tight
+/// for anything other than bit flags.
+uint256 constant OPERAND_VALUES_LENGTH = 4;
+
 /// The parser is stateful. This struct keeps track of the entire state.
 /// @param activeSourcePtr The pointer to the current source being built.
 /// The active source being pointed to is:
@@ -122,6 +133,7 @@ struct ParseState {
     uint256 constantsBuilder;
     uint256 literalParsers;
     uint256 operandParsers;
+    uint256[] operandValues;
     ParseStackTracker stackTracker;
     bytes data;
     bytes meta;
@@ -204,6 +216,8 @@ library LibParseState {
             literalParsers,
             // operandParsers
             LibParseOperand.buildOperandParsers(),
+            // operandValues
+            new uint256[](OPERAND_VALUES_LENGTH),
             // stackTracker
             ParseStackTracker.wrap(0),
             // data bytes
