@@ -2,7 +2,8 @@
 pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
-import {AuthoringMeta, LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
+import {AuthoringMetaV2} from "src/interface/IParserV1.sol";
+import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 import {LibParse} from "src/lib/parse/LibParse.sol";
 
 /// @title LibParseSingleRHSNamedGasTest
@@ -10,41 +11,41 @@ import {LibParse} from "src/lib/parse/LibParse.sol";
 /// the gas cost of the name lookup in the gas snapshot.
 contract LibParseSingleRHSNamedGasTest is Test {
     function parseMeta() internal pure returns (bytes memory) {
-        AuthoringMeta[] memory authoringMeta = new AuthoringMeta[](32);
-        authoringMeta[0] = AuthoringMeta("a", 0, "a");
-        authoringMeta[1] = AuthoringMeta("aa", 0, "aa");
-        authoringMeta[2] = AuthoringMeta("aaa", 0, "aaa");
-        authoringMeta[3] = AuthoringMeta("aaaa", 0, "aaaa");
-        authoringMeta[4] = AuthoringMeta("aaaaa", 0, "aaaaa");
-        authoringMeta[5] = AuthoringMeta("aaaaaa", 0, "aaaaaa");
-        authoringMeta[6] = AuthoringMeta("aaaaaaa", 0, "aaaaaaa");
-        authoringMeta[7] = AuthoringMeta("aaaaaaaa", 0, "aaaaaaaa");
-        authoringMeta[8] = AuthoringMeta("aaaaaaaaa", 0, "aaaaaaaaa");
-        authoringMeta[9] = AuthoringMeta("aaaaaaaaaa", 0, "aaaaaaaaaa");
-        authoringMeta[10] = AuthoringMeta("aaaaaaaaaaa", 0, "aaaaaaaaaaa");
-        authoringMeta[11] = AuthoringMeta("aaaaaaaaaaaa", 0, "aaaaaaaaaaaa");
-        authoringMeta[12] = AuthoringMeta("aaaaaaaaaaaaa", 0, "aaaaaaaaaaaaa");
-        authoringMeta[13] = AuthoringMeta("aaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaa");
-        authoringMeta[14] = AuthoringMeta("aaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaa");
-        authoringMeta[15] = AuthoringMeta("aaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaa");
-        authoringMeta[16] = AuthoringMeta("aaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaa");
-        authoringMeta[17] = AuthoringMeta("aaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaa");
-        authoringMeta[18] = AuthoringMeta("aaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaa");
-        authoringMeta[19] = AuthoringMeta("aaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaa");
-        authoringMeta[20] = AuthoringMeta("aaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaa");
-        authoringMeta[21] = AuthoringMeta("aaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaa");
-        authoringMeta[22] = AuthoringMeta("aaaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaaa");
-        authoringMeta[23] = AuthoringMeta("aaaaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaaaa");
-        authoringMeta[24] = AuthoringMeta("aaaaaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaaaaa");
-        authoringMeta[25] = AuthoringMeta("aaaaaaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaaaaaa");
-        authoringMeta[26] = AuthoringMeta("aaaaaaaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        authoringMeta[27] = AuthoringMeta("aaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        authoringMeta[28] = AuthoringMeta("aaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        authoringMeta[29] = AuthoringMeta("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        authoringMeta[30] = AuthoringMeta("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        authoringMeta[31] = AuthoringMeta("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        AuthoringMetaV2[] memory authoringMeta = new AuthoringMetaV2[](32);
+        authoringMeta[0] = AuthoringMetaV2("a", 0, "a");
+        authoringMeta[1] = AuthoringMetaV2("aa", 0, "aa");
+        authoringMeta[2] = AuthoringMetaV2("aaa", 0, "aaa");
+        authoringMeta[3] = AuthoringMetaV2("aaaa", 0, "aaaa");
+        authoringMeta[4] = AuthoringMetaV2("aaaaa", 0, "aaaaa");
+        authoringMeta[5] = AuthoringMetaV2("aaaaaa", 0, "aaaaaa");
+        authoringMeta[6] = AuthoringMetaV2("aaaaaaa", 0, "aaaaaaa");
+        authoringMeta[7] = AuthoringMetaV2("aaaaaaaa", 0, "aaaaaaaa");
+        authoringMeta[8] = AuthoringMetaV2("aaaaaaaaa", 0, "aaaaaaaaa");
+        authoringMeta[9] = AuthoringMetaV2("aaaaaaaaaa", 0, "aaaaaaaaaa");
+        authoringMeta[10] = AuthoringMetaV2("aaaaaaaaaaa", 0, "aaaaaaaaaaa");
+        authoringMeta[11] = AuthoringMetaV2("aaaaaaaaaaaa", 0, "aaaaaaaaaaaa");
+        authoringMeta[12] = AuthoringMetaV2("aaaaaaaaaaaaa", 0, "aaaaaaaaaaaaa");
+        authoringMeta[13] = AuthoringMetaV2("aaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaa");
+        authoringMeta[14] = AuthoringMetaV2("aaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaa");
+        authoringMeta[15] = AuthoringMetaV2("aaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaa");
+        authoringMeta[16] = AuthoringMetaV2("aaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaa");
+        authoringMeta[17] = AuthoringMetaV2("aaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaa");
+        authoringMeta[18] = AuthoringMetaV2("aaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaa");
+        authoringMeta[19] = AuthoringMetaV2("aaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaa");
+        authoringMeta[20] = AuthoringMetaV2("aaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaa");
+        authoringMeta[21] = AuthoringMetaV2("aaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaa");
+        authoringMeta[22] = AuthoringMetaV2("aaaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaaa");
+        authoringMeta[23] = AuthoringMetaV2("aaaaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaaaa");
+        authoringMeta[24] = AuthoringMetaV2("aaaaaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaaaaa");
+        authoringMeta[25] = AuthoringMetaV2("aaaaaaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaaaaaa");
+        authoringMeta[26] = AuthoringMetaV2("aaaaaaaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        authoringMeta[27] = AuthoringMetaV2("aaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        authoringMeta[28] = AuthoringMetaV2("aaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        authoringMeta[29] = AuthoringMetaV2("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        authoringMeta[30] = AuthoringMetaV2("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        authoringMeta[31] = AuthoringMetaV2("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 0, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
-        return LibParseMeta.buildParseMeta(authoringMeta, 2);
+        return LibParseMeta.buildParseMetaV2(authoringMeta, 2);
     }
 
     /// Test parsing "a" (1 char) as the RHS.

@@ -3,7 +3,8 @@ pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 
-import {LibParseMeta, AuthoringMeta} from "src/lib/parse/LibParseMeta.sol";
+import {AuthoringMetaV2} from "src/interface/IParserV1.sol";
+import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibBloom} from "test/util/lib/bloom/LibBloom.sol";
 import {LibParseOperand, Operand} from "src/lib/parse/LibParseOperand.sol";
@@ -21,15 +22,15 @@ contract LibParseMetaBuildMetaTest is Test {
         return uint8(n / type(uint8).max + 3);
     }
 
-    function testBuildMeta(AuthoringMeta[] memory authoringMeta) external pure {
+    function testBuildMeta(AuthoringMetaV2[] memory authoringMeta) external pure {
         vm.assume(!LibBloom.bloomFindsDupes(LibParseMeta.copyWordsFromAuthoringMeta(authoringMeta)));
-        bytes memory meta = LibParseMeta.buildParseMeta(authoringMeta, expanderDepth(authoringMeta.length));
+        bytes memory meta = LibParseMeta.buildParseMetaV2(authoringMeta, expanderDepth(authoringMeta.length));
         (meta);
     }
 
     function testRoundMetaExpanderShallow(
         ParseState memory state,
-        AuthoringMeta[] memory authoringMeta,
+        AuthoringMetaV2[] memory authoringMeta,
         uint8 j,
         bytes32 notFound
     ) external {
@@ -42,42 +43,25 @@ contract LibParseMetaBuildMetaTest is Test {
 
         // Defined for assembly blocks.
         uint256 operandParsers = state.operandParsers;
-        state.meta = LibParseMeta.buildParseMeta(authoringMeta, expanderDepth(authoringMeta.length));
+        state.meta = LibParseMeta.buildParseMetaV2(authoringMeta, expanderDepth(authoringMeta.length));
         (
             bool exists,
-            uint256 k,
-            function(ParseState memory, uint256, uint256) pure returns (uint256, Operand) operandParserK
+            uint256 k
         ) = state.lookupWord(authoringMeta[j].word);
-        uint256 operandParserKActual;
-        assembly ("memory-safe") {
-            operandParserKActual := operandParserK
-        }
-        uint256 operandParserKExpected;
-        uint256 operandParserKOffset = authoringMeta[j].operandParserOffset;
-        assembly ("memory-safe") {
-            operandParserKExpected := and(shr(operandParserKOffset, operandParsers), 0xFFFF)
-        }
-        assertEq(operandParserKExpected, operandParserKActual, "operandParserK");
         assertTrue(exists, "exists");
         assertEq(j, k, "k");
 
         (
             bool notExists,
-            uint256 l,
-            function(ParseState memory, uint256, uint256) pure returns (uint256, Operand) operandParserL
+            uint256 l
         ) = state.lookupWord(notFound);
-        uint256 operandParserLActual;
-        assembly ("memory-safe") {
-            operandParserLActual := operandParserL
-        }
-        assertEq(0, operandParserLActual, "operandParserL");
         assertTrue(!notExists, "notExists");
         assertEq(0, l, "l");
     }
 
     function testRoundMetaExpanderDeeper(
         ParseState memory state,
-        AuthoringMeta[] memory authoringMeta,
+        AuthoringMetaV2[] memory authoringMeta,
         uint8 j,
         bytes32 notFound
     ) external {
@@ -91,7 +75,7 @@ contract LibParseMetaBuildMetaTest is Test {
         state.operandParsers = LibParseOperand.buildOperandParsers();
         // Defined for assembly blocks.
         uint256 operandParsers = state.operandParsers;
-        state.meta = LibParseMeta.buildParseMeta(authoringMeta, expanderDepth(authoringMeta.length));
+        state.meta = LibParseMeta.buildParseMetaV2(authoringMeta, expanderDepth(authoringMeta.length));
 
         (
             bool exists,

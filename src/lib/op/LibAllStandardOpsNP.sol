@@ -5,16 +5,10 @@ import {BadDynamicLength} from "../../error/ErrOpList.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Operand} from "../../interface/unstable/IInterpreterV2.sol";
+import {AuthoringMetaV2} from "../../interface/IParserV1.sol";
 import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "../integrity/LibIntegrityCheckNP.sol";
 import {LibInterpreterStateNP, InterpreterStateNP} from "../state/LibInterpreterStateNP.sol";
-import {AuthoringMeta} from "../parse/LibParseMeta.sol";
-import {
-    OPERAND_PARSER_OFFSET_DISALLOWED,
-    OPERAND_PARSER_OFFSET_SINGLE_FULL,
-    OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT,
-    OPERAND_PARSER_OFFSET_M1_M1,
-    OPERAND_PARSER_OFFSET_8_M1_M1
-} from "../parse/LibParseOperand.sol";
+import {LibParseOperand} from "../parse/LibParseOperand.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibOpStackNP} from "./00/LibOpStackNP.sol";
 import {LibOpConstantNP} from "./00/LibOpConstantNP.sol";
@@ -90,280 +84,330 @@ uint256 constant ALL_STANDARD_OPS_LENGTH = 58;
 /// @notice Every opcode available from the core repository laid out as a single
 /// array to easily build function pointers for `IInterpreterV2`.
 library LibAllStandardOpsNP {
-    function authoringMeta() internal pure returns (bytes memory) {
-        AuthoringMeta memory lengthPlaceholder;
-        AuthoringMeta[ALL_STANDARD_OPS_LENGTH + 1] memory wordsFixed = [
+    function authoringMetaV2() internal pure returns (bytes memory) {
+        AuthoringMetaV2 memory lengthPlaceholder;
+        AuthoringMetaV2[ALL_STANDARD_OPS_LENGTH + 1] memory wordsFixed = [
             lengthPlaceholder,
             // Stack, constant and extern MUST be in this order for parsing to work.
-            AuthoringMeta("stack", OPERAND_PARSER_OFFSET_SINGLE_FULL, "Copies an existing value from the stack."),
-            AuthoringMeta("constant", OPERAND_PARSER_OFFSET_SINGLE_FULL, "Copies a constant value onto the stack."),
-            AuthoringMeta(
+            AuthoringMetaV2("stack", "Copies an existing value from the stack."),
+            AuthoringMetaV2("constant", "Copies a constant value onto the stack."),
+            AuthoringMetaV2(
                 "extern",
-                OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT,
                 "Calls an external contract. The first operand is the index of the encoded dispatch in the constants array, the second is the number of outputs."
             ),
             // These are all ordered according to how they appear in the file system.
-            AuthoringMeta("bitwise-and", OPERAND_PARSER_OFFSET_DISALLOWED, "Bitwise AND the top two items on the stack."),
-            AuthoringMeta("bitwise-or", OPERAND_PARSER_OFFSET_DISALLOWED, "Bitwise OR the top two items on the stack."),
-            AuthoringMeta(
-                "bitwise-count-ones",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
-                "Counts the number of binary bits set to 1 in the input."
-            ),
-            AuthoringMeta(
+            AuthoringMetaV2("bitwise-and", "Bitwise AND the top two items on the stack."),
+            AuthoringMetaV2("bitwise-or", "Bitwise OR the top two items on the stack."),
+            AuthoringMetaV2("bitwise-count-ones", "Counts the number of binary bits set to 1 in the input."),
+            AuthoringMetaV2(
                 "bitwise-decode",
-                OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT,
                 "Decodes a value from a 256 bit value that was encoded with bitwise-encode. The first operand is the start bit and the second is the length."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "bitwise-encode",
-                OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT,
                 "Encodes a value into a 256 bit value. The first operand is the start bit and the second is the length."
             ),
-            AuthoringMeta(
-                "bitwise-shift-left",
-                OPERAND_PARSER_OFFSET_SINGLE_FULL,
-                "Shifts the input left by the number of bits specified in the operand."
-            ),
-            AuthoringMeta(
-                "bitwise-shift-right",
-                OPERAND_PARSER_OFFSET_SINGLE_FULL,
-                "Shifts the input right by the number of bits specified in the operand."
-            ),
-            AuthoringMeta(
+            AuthoringMetaV2("bitwise-shift-left", "Shifts the input left by the number of bits specified in the operand."),
+            AuthoringMetaV2("bitwise-shift-right", "Shifts the input right by the number of bits specified in the operand."),
+            AuthoringMetaV2(
                 "call",
-                OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT,
                 "Calls a source by index in the same Rain bytecode. The inputs to call are copied to the top of the called stack and the outputs specified in the operand are copied back to the calling stack. The first operand is the source index and the second is the number of outputs."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "context",
-                OPERAND_PARSER_OFFSET_DOUBLE_PERBYTE_NO_DEFAULT,
                 "Copies a value from the context. The first operand is the context column and second is the context row."
             ),
-            AuthoringMeta(
-                "hash", OPERAND_PARSER_OFFSET_DISALLOWED, "Hashes all inputs into a single 32 byte value using keccak256."
-            ),
-            AuthoringMeta(
+            AuthoringMetaV2("hash", "Hashes all inputs into a single 32 byte value using keccak256."),
+            AuthoringMetaV2(
                 "erc20-allowance",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Gets the allowance of an erc20 token for an account. The first input is the token address, the second is the owner address, and the third is the spender address."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "erc20-balance-of",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Gets the balance of an erc20 token for an account. The first input is the token address and the second is the account address."
             ),
-            AuthoringMeta(
-                "erc20-total-supply",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
-                "Gets the total supply of an erc20 token. The input is the token address."
+            AuthoringMetaV2(
+                "erc20-total-supply", "Gets the total supply of an erc20 token. The input is the token address."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "erc721-balance-of",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Gets the balance of an erc721 token for an account. The first input is the token address and the second is the account address."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "erc721-owner-of",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Gets the owner of an erc721 token. The first input is the token address and the second is the token id."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "erc5313-owner",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Gets the owner of an erc5313 compatible contract. Note that erc5313 specifically DOES NOT do any onchain compatibility checks, so the expression author is responsible for ensuring the contract is compatible. The input is the contract address to get the owner of."
             ),
-            AuthoringMeta("block-number", OPERAND_PARSER_OFFSET_DISALLOWED, "The current block number."),
-            AuthoringMeta("chain-id", OPERAND_PARSER_OFFSET_DISALLOWED, "The current chain id."),
-            AuthoringMeta(
-                "max-int-value",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
-                "The maximum possible non-negative integer value. 2^256 - 1."
-            ),
-            AuthoringMeta(
-                "max-decimal18-value",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
-                "The maximum possible 18 decimal fixed point value. roughly 1.15e77."
-            ),
-            AuthoringMeta("block-timestamp", OPERAND_PARSER_OFFSET_DISALLOWED, "The current block timestamp."),
-            AuthoringMeta(
-                "any",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
-                "The first non-zero value out of all inputs, or 0 if every input is 0."
-            ),
-            AuthoringMeta(
+            AuthoringMetaV2("block-number", "The current block number."),
+            AuthoringMetaV2("chain-id", "The current chain id."),
+            AuthoringMetaV2("max-int-value", "The maximum possible non-negative integer value. 2^256 - 1."),
+            AuthoringMetaV2("max-decimal18-value", "The maximum possible 18 decimal fixed point value. roughly 1.15e77."),
+            AuthoringMetaV2("block-timestamp", "The current block timestamp."),
+            AuthoringMetaV2("any", "The first non-zero value out of all inputs, or 0 if every input is 0."),
+            AuthoringMetaV2(
                 "conditions",
-                OPERAND_PARSER_OFFSET_SINGLE_FULL,
                 "Treats inputs as pairwise condition/value pairs. The first nonzero condition's value is used. If no conditions are nonzero, the expression reverts. The operand can be used as an error code to differentiate between multiple conditions in the same expression."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "ensure",
-                OPERAND_PARSER_OFFSET_SINGLE_FULL,
                 "Reverts if any input is 0. All inputs are eagerly evaluated there are no outputs. The operand can be used as an error code to differentiate between multiple conditions in the same expression."
             ),
-            AuthoringMeta("equal-to", OPERAND_PARSER_OFFSET_DISALLOWED, "1 if all inputs are equal, 0 otherwise."),
-            AuthoringMeta(
-                "every",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
-                "The last nonzero value out of all inputs, or 0 if any input is 0."
-            ),
-            AuthoringMeta(
-                "greater-than",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
-                "1 if the first input is greater than the second input, 0 otherwise."
-            ),
-            AuthoringMeta(
+            AuthoringMetaV2("equal-to", "1 if all inputs are equal, 0 otherwise."),
+            AuthoringMetaV2("every", "The last nonzero value out of all inputs, or 0 if any input is 0."),
+            AuthoringMetaV2("greater-than", "1 if the first input is greater than the second input, 0 otherwise."),
+            AuthoringMetaV2(
                 "greater-than-or-equal-to",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "1 if the first input is greater than or equal to the second input, 0 otherwise."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "if",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "If the first input is nonzero, the second input is used. Otherwise, the third input is used. If is eagerly evaluated."
             ),
-            AuthoringMeta("is-zero", OPERAND_PARSER_OFFSET_DISALLOWED, "1 if the input is 0, 0 otherwise."),
-            AuthoringMeta(
-                "less-than",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
-                "1 if the first input is less than the second input, 0 otherwise."
+            AuthoringMetaV2("is-zero", "1 if the input is 0, 0 otherwise."),
+            AuthoringMetaV2("less-than", "1 if the first input is less than the second input, 0 otherwise."),
+            AuthoringMetaV2(
+                "less-than-or-equal-to", "1 if the first input is less than or equal to the second input, 0 otherwise."
             ),
-            AuthoringMeta(
-                "less-than-or-equal-to",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
-                "1 if the first input is less than or equal to the second input, 0 otherwise."
-            ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "decimal18-div",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Divides the first input by all other inputs as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Errors if any divisor is zero."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "decimal18-mul",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Multiplies all inputs together as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Errors if the multiplication exceeds the maximum value (roughly 1.15e77)."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "decimal18-power-int",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Raises the first input as a fixed point 18 decimal value to the power of the second input as an integer."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "decimal18-scale18-dynamic",
-                OPERAND_PARSER_OFFSET_M1_M1,
                 "Scales a value from some fixed point decimal scale to 18 decimal fixed point. The first input is the scale to scale from and the second is the value to scale. The two optional operands control rounding and saturation respectively as per `decimal18-scale18`."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "decimal18-scale18",
-                OPERAND_PARSER_OFFSET_8_M1_M1,
                 "Scales an input value from some fixed point decimal scale to 18 decimal fixed point. The first operand is the scale to scale from. The second (optional) operand controls rounding where 0 (default) rounds down and 1 rounds up. The third (optional) operand controls saturation where 0 (default) errors on overflow and 1 saturates at max-decimal-value."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "decimal18-scale-n",
-                OPERAND_PARSER_OFFSET_8_M1_M1,
                 "Scales an input value from 18 decimal fixed point to some other fixed point scale N. The first operand is the scale to scale to. The second (optional) operand controls rounding where 0 (default) rounds down and 1 rounds up. The third (optional) operand controls saturation where 0 (default) errors on overflow and 1 saturates at max-decimal-value."
             ),
             // int and decimal18 add have identical implementations and point to
             // the same function pointer. This is intentional.
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "int-add",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Adds all inputs together as non-negative integers. Errors if the addition exceeds the maximum value (roughly 1.15e77)."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "decimal18-add",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Adds all inputs together as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Errors if the addition exceeds the maximum value (roughly 1.15e77)."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "int-div",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Divides the first input by all other inputs as non-negative integers. Errors if any divisor is zero."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "int-exp",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Raises the first input to the power of all other inputs as non-negative integers. Errors if the exponentiation would exceed the maximum value (roughly 1.15e77)."
             ),
             // int and decimal18 max have identical implementations and point to
             // the same function pointer. This is intentional.
-            AuthoringMeta(
-                "int-max",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
-                "Finds the maximum value from all inputs as non-negative integers."
-            ),
-            AuthoringMeta(
+            AuthoringMetaV2("int-max", "Finds the maximum value from all inputs as non-negative integers."),
+            AuthoringMetaV2(
                 "decimal18-max",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Finds the maximum value from all inputs as fixed point 18 decimal numbers (i.e. 'one' is 1e18)."
             ),
             // int and decimal18 min have identical implementations and point to
             // the same function pointer. This is intentional.
-            AuthoringMeta(
-                "int-min",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
-                "Finds the minimum value from all inputs as non-negative integers."
-            ),
-            AuthoringMeta(
+            AuthoringMetaV2("int-min", "Finds the minimum value from all inputs as non-negative integers."),
+            AuthoringMetaV2(
                 "decimal18-min",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Finds the minimum value from all inputs as fixed point 18 decimal numbers (i.e. 'one' is 1e18)."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "int-mod",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Modulos the first input by all other inputs as non-negative integers. Errors if any divisor is zero."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "int-mul",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Multiplies all inputs together as non-negative integers. Errors if the multiplication exceeds the maximum value (roughly 1.15e77)."
             ),
             // int and decimal18 sub have identical implementations and point to
             // the same function pointer. This is intentional.
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "int-sub",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Subtracts all inputs from the first input as non-negative integers. Errors if the subtraction would result in a negative value."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "decimal18-sub",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Subtracts all inputs from the first input as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Errors if the subtraction would result in a negative value."
             ),
-            AuthoringMeta(
-                "get",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
-                "Gets a value from storage. The first operand is the key to lookup."
-            ),
-            AuthoringMeta(
+            AuthoringMetaV2("get", "Gets a value from storage. The first operand is the key to lookup."),
+            AuthoringMetaV2(
                 "set",
-                OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Sets a value in storage. The first operand is the key to set and the second operand is the value to set."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "uniswap-v2-amount-in",
-                OPERAND_PARSER_OFFSET_SINGLE_FULL,
                 "Computes the minimum amount of input tokens required to get a given amount of output tokens from a UniswapV2 pair. Input/output token directions are from the perspective of the Uniswap contract. The first input is the factory address, the second is the amount of output tokens, the third is the input token address, and the fourth is the output token address. If the operand is 1 the last time the prices changed will be returned as well."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "uniswap-v2-amount-out",
-                OPERAND_PARSER_OFFSET_SINGLE_FULL,
                 "Computes the maximum amount of output tokens received from a given amount of input tokens from a UniswapV2 pair. Input/output token directions are from the perspective of the Uniswap contract. The first input is the factory address, the second is the amount of input tokens, the third is the input token address, and the fourth is the output token address. If the operand is 1 the last time the prices changed will be returned as well."
             ),
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "uniswap-v2-quote",
-                OPERAND_PARSER_OFFSET_SINGLE_FULL,
                 "Given an amount of token A, calculates the equivalent valued amount of token B. The first input is the factory address, the second is the amount of token A, the third is token A's address, and the fourth is token B's address. If the operand is 1 the last time the prices changed will be returned as well."
             )
         ];
-        AuthoringMeta[] memory wordsDynamic;
+        AuthoringMetaV2[] memory wordsDynamic;
         uint256 length = ALL_STANDARD_OPS_LENGTH;
         assembly ("memory-safe") {
             wordsDynamic := wordsFixed
             mstore(wordsDynamic, length)
         }
         return abi.encode(wordsDynamic);
+    }
+
+    function operandHandlerFunctionPointers() internal pure returns (bytes memory) {
+        unchecked {
+            function (uint256[] memory) internal pure returns (Operand) lengthPointer;
+            uint256 length = ALL_STANDARD_OPS_LENGTH;
+            assembly ("memory-safe") {
+                lengthPointer := length
+            }
+            function (uint256[] memory) internal pure returns (Operand)[ALL_STANDARD_OPS_LENGTH + 1] memory
+                pointersFixed = [
+                    lengthPointer,
+                    // Stack
+                    LibParseOperand.handleOperandSingleFull,
+                    // Constant
+                    LibParseOperand.handleOperandSingleFull,
+                    // Extern
+                    LibParseOperand.handleOperandDoublePerByteNoDefault,
+                    // Bitwise and
+                    LibParseOperand.handleOperandDisallowed,
+                    // Bitwise or
+                    LibParseOperand.handleOperandDisallowed,
+                    // Bitwise count ones
+                    LibParseOperand.handleOperandDisallowed,
+                    // Bitwise decode
+                    LibParseOperand.handleOperandDoublePerByteNoDefault,
+                    // Bitwise encode
+                    LibParseOperand.handleOperandDoublePerByteNoDefault,
+                    // Bitwise shift left
+                    LibParseOperand.handleOperandSingleFull,
+                    // Bitwise shift right
+                    LibParseOperand.handleOperandSingleFull,
+                    // Call
+                    LibParseOperand.handleOperandDoublePerByteNoDefault,
+                    // Context
+                    LibParseOperand.handleOperandDoublePerByteNoDefault,
+                    // Hash
+                    LibParseOperand.handleOperandDisallowed,
+                    // ERC20 allowance
+                    LibParseOperand.handleOperandDisallowed,
+                    // ERC20 balance of
+                    LibParseOperand.handleOperandDisallowed,
+                    // ERC20 total supply
+                    LibParseOperand.handleOperandDisallowed,
+                    // ERC721 balance of
+                    LibParseOperand.handleOperandDisallowed,
+                    // ERC5313 owner
+                    LibParseOperand.handleOperandDisallowed,
+                    // Block number
+                    LibParseOperand.handleOperandDisallowed,
+                    // Chain id
+                    LibParseOperand.handleOperandDisallowed,
+                    // Max int value
+                    LibParseOperand.handleOperandDisallowed,
+                    // Max decimal18 value
+                    LibParseOperand.handleOperandDisallowed,
+                    // Block timestamp
+                    LibParseOperand.handleOperandDisallowed,
+                    // Any
+                    LibParseOperand.handleOperandDisallowed,
+                    // Conditions
+                    LibParseOperand.handleOperandSingleFull,
+                    // Ensure
+                    LibParseOperand.handleOperandSingleFull,
+                    // Equal to
+                    LibParseOperand.handleOperandDisallowed,
+                    // Every
+                    LibParseOperand.handleOperandDisallowed,
+                    // Greater than
+                    LibParseOperand.handleOperandDisallowed,
+                    // Greater than or equal to
+                    LibParseOperand.handleOperandDisallowed,
+                    // If
+                    LibParseOperand.handleOperandDisallowed,
+                    // Is zero
+                    LibParseOperand.handleOperandDisallowed,
+                    // Less than
+                    LibParseOperand.handleOperandDisallowed,
+                    // Less than or equal to
+                    LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 div
+                    LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 mul
+                    LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 power int
+                    LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 scale18 dynamic
+                    LibParseOperand.handleOperandM1M1,
+                    // Decimal18 scale18
+                    LibParseOperand.handleOperand8M1M1,
+                    // Decimal18 scale n
+                    LibParseOperand.handleOperand8M1M1,
+                    // Int add
+                    LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 add
+                    LibParseOperand.handleOperandDisallowed,
+                    // Int div
+                    LibParseOperand.handleOperandDisallowed,
+                    // Int exp
+                    LibParseOperand.handleOperandDisallowed,
+                    // Int max
+                    LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 max
+                    LibParseOperand.handleOperandDisallowed,
+                    // Int min
+                    LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 min
+                    LibParseOperand.handleOperandDisallowed,
+                    // Int mod
+                    LibParseOperand.handleOperandDisallowed,
+                    // Int mul
+                    LibParseOperand.handleOperandDisallowed,
+                    // Int sub
+                    LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 sub
+                    LibParseOperand.handleOperandDisallowed,
+                    // Get
+                    LibParseOperand.handleOperandDisallowed,
+                    // Set
+                    LibParseOperand.handleOperandDisallowed,
+                    // UniswapV2 amount in
+                    LibParseOperand.handleOperandSingleFull,
+                    // UniswapV2 amount out
+                    LibParseOperand.handleOperandSingleFull,
+                    // UniswapV2 quote
+                    LibParseOperand.handleOperandSingleFull
+                ];
+            function (uint256[] memory) internal pure returns (Operand)[] memory pointersDynamic;
+            assembly ("memory-safe") {
+                pointersDynamic := pointersFixed
+            }
+            // Sanity check that the dynamic length is correct. Should be an
+            // unreachable error.
+            if (pointersDynamic.length != ALL_STANDARD_OPS_LENGTH) {
+                revert BadDynamicLength(pointersDynamic.length, length);
+            }
+            return LibConvert.unsafeTo16BitBytes(pointersDynamic);
+        }
     }
 
     function integrityFunctionPointers() internal pure returns (bytes memory) {

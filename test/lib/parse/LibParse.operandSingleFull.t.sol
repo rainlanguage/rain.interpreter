@@ -9,7 +9,7 @@ import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
 contract LibParseOperandSingleFullTest is Test {
     /// Fallback is 0 for elided single full operand.
     function testOperandSingleFullElided() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b();", LibMetaFixture.parseMeta());
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b();", LibMetaFixture.parseMetaV2());
         assertEq(
             bytecode,
             // 1 source
@@ -33,7 +33,7 @@ contract LibParseOperandSingleFullTest is Test {
     /// Empty operand is disallowed.
     function testOperandSingleFullEmpty() external {
         vm.expectRevert(abi.encodeWithSelector(ExpectedOperand.selector, 4));
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b<>();", LibMetaFixture.parseMeta());
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b<>();", LibMetaFixture.parseMetaV2());
         (bytecode);
         (constants);
     }
@@ -42,14 +42,14 @@ contract LibParseOperandSingleFullTest is Test {
     function testOperandSingleFullMultiple() external {
         vm.expectRevert(abi.encodeWithSelector(UnclosedOperand.selector, 9));
         (bytes memory bytecode, uint256[] memory constants) =
-            LibParse.parse("_:b<0x00 0x01>();", LibMetaFixture.parseMeta());
+            LibParse.parse("_:b<0x00 0x01>();", LibMetaFixture.parseMetaV2());
         (bytecode);
         (constants);
     }
 
     /// Can provide decimal 0 as single full operand.
     function testOperandSingleFullZero() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b<0>();", LibMetaFixture.parseMeta());
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b<0>();", LibMetaFixture.parseMetaV2());
         assertEq(
             bytecode,
             // 1 source
@@ -72,7 +72,7 @@ contract LibParseOperandSingleFullTest is Test {
 
     /// Can provide hexadecimal 0x00 as a single full operand.
     function testOperandSingleFullHexZero() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b<0x00>();", LibMetaFixture.parseMeta());
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b<0x00>();", LibMetaFixture.parseMetaV2());
         assertEq(
             bytecode,
             // 1 source
@@ -95,7 +95,7 @@ contract LibParseOperandSingleFullTest is Test {
 
     /// Can provide decimal 1 as single full operand.
     function testOperandSingleFullOne() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b<1>();", LibMetaFixture.parseMeta());
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b<1>();", LibMetaFixture.parseMetaV2());
         assertEq(
             bytecode,
             // 1 source
@@ -118,7 +118,7 @@ contract LibParseOperandSingleFullTest is Test {
 
     /// Can provide hexadecimal 0x01 as a single full operand.
     function testOperandSingleFullHexOne() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b<0x01>();", LibMetaFixture.parseMeta());
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b<0x01>();", LibMetaFixture.parseMetaV2());
         assertEq(
             bytecode,
             // 1 source
@@ -142,7 +142,7 @@ contract LibParseOperandSingleFullTest is Test {
     /// Can provide decimal uint16 max as single full operand.
     function testOperandSingleFullUint16Max() external {
         (bytes memory bytecode, uint256[] memory constants) =
-            LibParse.parse("_:b<65535>();", LibMetaFixture.parseMeta());
+            LibParse.parse("_:b<65535>();", LibMetaFixture.parseMetaV2());
         assertEq(
             bytecode,
             // 1 source
@@ -166,7 +166,7 @@ contract LibParseOperandSingleFullTest is Test {
     /// Can provide hexadecimal uint16 max as a single full operand.
     function testOperandSingleFullHexUint16Max() external {
         (bytes memory bytecode, uint256[] memory constants) =
-            LibParse.parse("_:b<0xffff>();", LibMetaFixture.parseMeta());
+            LibParse.parse("_:b<0xffff>();", LibMetaFixture.parseMetaV2());
         assertEq(
             bytecode,
             // 1 source
@@ -191,7 +191,7 @@ contract LibParseOperandSingleFullTest is Test {
     function testOperandSingleFullUint16MaxOverflow() external {
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector, 4));
         (bytes memory bytecode, uint256[] memory constants) =
-            LibParse.parse("_:b<65536>();", LibMetaFixture.parseMeta());
+            LibParse.parse("_:b<65536>();", LibMetaFixture.parseMetaV2());
         (bytecode);
         (constants);
     }
@@ -200,7 +200,7 @@ contract LibParseOperandSingleFullTest is Test {
     function testOperandSingleFullHexUint16MaxOverflow() external {
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector, 4));
         (bytes memory bytecode, uint256[] memory constants) =
-            LibParse.parse("_:b<0x010000>();", LibMetaFixture.parseMeta());
+            LibParse.parse("_:b<0x010000>();", LibMetaFixture.parseMetaV2());
         (bytecode);
         (constants);
     }
@@ -208,7 +208,7 @@ contract LibParseOperandSingleFullTest is Test {
     /// Opening angle bracket without closing angle bracket reverts.
     function testOperandSingleFullUnclosed() external {
         vm.expectRevert(abi.encodeWithSelector(UnclosedOperand.selector, 5));
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b<0;", LibMetaFixture.parseMeta());
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b<0;", LibMetaFixture.parseMetaV2());
         (bytecode);
         (constants);
     }
@@ -216,14 +216,14 @@ contract LibParseOperandSingleFullTest is Test {
     /// Closing angle bracket without opening angle bracket reverts.
     function testOperandSingleFullUnopened() external {
         vm.expectRevert(abi.encodeWithSelector(ExpectedLeftParen.selector, 3));
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b>0>;", LibMetaFixture.parseMeta());
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b>0>;", LibMetaFixture.parseMetaV2());
         (bytecode);
         (constants);
     }
 
     /// Leading whitespace in the operand is supported.
     function testOperandSingleFullLeadingWhitespace() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b< 5>();", LibMetaFixture.parseMeta());
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b< 5>();", LibMetaFixture.parseMetaV2());
         assertEq(
             bytecode,
             // 1 source
@@ -246,7 +246,7 @@ contract LibParseOperandSingleFullTest is Test {
 
     /// Trailing whitespace in the operand is supported.
     function testOperandSingleFullTrailingWhitespace() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b<5 >();", LibMetaFixture.parseMeta());
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b<5 >();", LibMetaFixture.parseMetaV2());
         assertEq(
             bytecode,
             // 1 source
@@ -270,7 +270,7 @@ contract LibParseOperandSingleFullTest is Test {
     /// Leading and trailing whitespace in the operand is supported.
     function testOperandSingleFullLeadingAndTrailingWhitespace() external {
         (bytes memory bytecode, uint256[] memory constants) =
-            LibParse.parse("_:b< 0x05 >();", LibMetaFixture.parseMeta());
+            LibParse.parse("_:b< 0x05 >();", LibMetaFixture.parseMetaV2());
         assertEq(
             bytecode,
             // 1 source

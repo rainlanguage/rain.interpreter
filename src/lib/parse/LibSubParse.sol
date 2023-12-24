@@ -179,11 +179,12 @@ library LibSubParse {
         }
     }
 
-    function consumeInputData(bytes memory data, bytes memory meta, uint256 literalParsers, uint256 operandParsers)
-        internal
-        pure
-        returns (uint256 constantsHeight, uint256 ioByte, ParseState memory state)
-    {
+    function consumeInputData(
+        bytes memory data,
+        bytes memory meta,
+        bytes memory operandHandlers,
+        uint256 literalParsers
+    ) internal pure returns (uint256 constantsHeight, uint256 ioByte, ParseState memory state) {
         assembly ("memory-safe") {
             // Pull the header out into EVM stack items.
             constantsHeight := and(mload(add(data, 2)), 0xFFFF)
@@ -194,7 +195,6 @@ library LibSubParse {
             data := add(data, 3)
             mstore(data, newLength)
         }
-        state = LibParseState.newState(data, meta, literalParsers);
-        state.operandParsers = operandParsers;
+        state = LibParseState.newState(data, meta, operandHandlers, literalParsers);
     }
 }

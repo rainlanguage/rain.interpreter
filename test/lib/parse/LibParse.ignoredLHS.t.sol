@@ -104,7 +104,7 @@ contract LibParseIgnoredLHSTest is Test {
     /// An underscore that is NOT an input should parse to a non-empty source
     /// with no constants.
     function testParseIgnoredLHSUnderscoreNotInput() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":,_:a();", LibMetaFixture.parseMeta());
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":,_:a();", LibMetaFixture.parseMetaV2());
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);

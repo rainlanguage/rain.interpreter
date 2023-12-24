@@ -9,7 +9,7 @@ abstract contract OperandTest is Test {
     // External version of parse for testing. Expect revert only works properly
     // when called externally.
     function parse(bytes memory rainString) external pure returns (bytes memory bytecode, uint256[] memory constants) {
-        return LibParse.parse(rainString, LibMetaFixture.parseMeta());
+        return LibParse.parse(rainString, LibMetaFixture.parseMetaV2());
     }
 
     function checkParseError(bytes memory rainString, bytes memory err) internal {

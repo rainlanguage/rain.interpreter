@@ -13,7 +13,7 @@ import "src/lib/bytecode/LibBytecode.sol";
 contract LibParseNOutputTest is Test {
     /// A single RHS item MAY have 0 outputs.
     function testParseNOutputExcessRHS0() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":a();", LibMetaFixture.parseMeta());
+        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":a();", LibMetaFixture.parseMetaV2());
         assertEq(
             bytecode,
             // 1 source
@@ -38,20 +38,20 @@ contract LibParseNOutputTest is Test {
     /// LHS items.
     function testParseNOutputExcessRHS1() external {
         vm.expectRevert(abi.encodeWithSelector(ExcessRHSItems.selector, 8));
-        LibParse.parse(":a() b();", LibMetaFixture.parseMeta());
+        LibParse.parse(":a() b();", LibMetaFixture.parseMetaV2());
     }
 
     /// Multiple RHS items MUST NOT have 0 outputs. Tests two RHS items and one
     /// LHS item.
     function testParseNOutputExcessRHS2() external {
         vm.expectRevert(abi.encodeWithSelector(ExcessRHSItems.selector, 9));
-        LibParse.parse("_:a() b();", LibMetaFixture.parseMeta());
+        LibParse.parse("_:a() b();", LibMetaFixture.parseMetaV2());
     }
 
     /// A single RHS item can have multiple outputs. This RHS item has nesting.
     function testParseNOutputNestedRHS() external {
         (bytes memory bytecode, uint256[] memory constants) =
-            LibParse.parse(":,_ _:a(b());", LibMetaFixture.parseMeta());
+            LibParse.parse(":,_ _:a(b());", LibMetaFixture.parseMetaV2());
         assertEq(
             bytecode,
             // 1 source
@@ -78,14 +78,14 @@ contract LibParseNOutputTest is Test {
     /// and three LHS items.
     function testParseNOutputExcessRHS3() external {
         vm.expectRevert(abi.encodeWithSelector(ExcessLHSItems.selector, 13));
-        LibParse.parse("_ _ _:a() b();", LibMetaFixture.parseMeta());
+        LibParse.parse("_ _ _:a() b();", LibMetaFixture.parseMetaV2());
     }
 
     /// Multiple output RHS items MAY be followed by single output RHS items,
     /// on a new line.
     function testParseBalanceStackOffsetsInputs() external {
         (bytes memory bytecode, uint256[] memory constants) =
-            LibParse.parse("_ _:a(), _:b();", LibMetaFixture.parseMeta());
+            LibParse.parse("_ _:a(), _:b();", LibMetaFixture.parseMetaV2());
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(constants.length, 0);
         // a and b should be parsed and inputs are just ignored in the output

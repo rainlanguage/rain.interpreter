@@ -61,9 +61,11 @@ import {LibParseInterstitial} from "./LibParseInterstitial.sol";
 import {LibParseError} from "./LibParseError.sol";
 import {LibSubParse} from "./LibSubParse.sol";
 import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
+import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
 uint256 constant NOT_LOW_16_BIT_MASK = ~uint256(0xFFFF);
 uint256 constant ACTIVE_SOURCE_MASK = NOT_LOW_16_BIT_MASK;
+uint256 constant SUB_PARSER_BYTECODE_HEADER_SIZE = 5;
 
 library LibParse {
     using LibPointer for Pointer;
@@ -77,6 +79,7 @@ library LibParse {
     using LibParseOperand for ParseState;
     using LibSubParse for ParseState;
     using LibBytes for bytes;
+    using LibUint256Array for uint256[];
 
     /// Parses a word that matches a tail mask between cursor and end. The caller
     /// has several responsibilities while safely using this word.
@@ -204,6 +207,8 @@ library LibParse {
                         revert UnexpectedRHSChar(state.parseErrorOffset(cursor));
                     }
 
+                    // If the word is unknown we need the cursor at the start
+                    // so that we can copy it into the subparser bytecode.
                     uint256 cursorForUnknownWord = cursor;
                     (cursor, word) = parseWord(cursor, end, CMASK_RHS_WORD_TAIL);
 
@@ -232,31 +237,61 @@ library LibParse {
                         }
                         // Fallback to sub parsing.
                         else {
-                            cursor = state.skipOperand(cursor, end);
+                            uint256 subParserBytecodeLength =
+                                SUB_PARSER_BYTECODE_HEADER_SIZE + (cursor - cursorForUnknownWord);
+                            // We store the final parsed values in the sub parser
+                            // bytecode so they can be handled as operand values,
+                            // rather than needing to be parsed as literals.
+                            // We have to move the cursor to keep the main parser
+                            // moving, but the sub parser bytecode will be
+                            // populated with the values in the state array.
+                            cursor = state.parseOperand(cursor, end);
+                            // The operand values length is only known after
+                            // parsing the operand.
+                            subParserBytecodeLength += state.operandValues.length * 0x20 + 0x20;
+
                             // Build the bytecode that we will be sending to the
-                            // subparser. We can't yet build the 3 byte header but
+                            // subparser. We can't yet build the byte header but
                             // we can allocate the memory for it and move the string
-                            // tail into place.
+                            // tail and operand values into place.
                             bytes memory subParserBytecode;
                             Operand operand;
+                            uint256[] memory operandValues = state.operandValues;
+                            uint256 subParserBytecodeBytesLengthOffset = SUB_PARSER_BYTECODE_HEADER_SIZE;
                             assembly ("memory-safe") {
                                 subParserBytecode := mload(0x40)
-                                let length := add(sub(cursor, cursorForUnknownWord), 3)
-                                mstore(subParserBytecode, length)
                                 // Move allocated memory past the bytes and their
                                 // length. This is NOT an aligned allocation.
-                                mstore(0x40, add(subParserBytecode, add(length, 0x20)))
+                                mstore(0x40, add(subParserBytecode, add(subParserBytecodeLength, 0x20)))
+                                // Need to record the length of the unparsed
+                                // bytes or the structure will be ambiguous to
+                                // the sub parser.
+                                mstore(add(subParserBytecode, subParserBytecodeBytesLengthOffset), sub(cursor, cursorForUnknownWord))
+                                mstore(subParserBytecode, subParserBytecodeLength)
                                 // The operand of an unknown word is a pointer to
                                 // the bytecode that needs to be sub parsed.
                                 operand := subParserBytecode
                             }
                             // Copy the unknown word into the subparser bytecode
-                            // after the 3 header bytes.
+                            // after the header bytes.
                             LibMemCpy.unsafeCopyBytesTo(
                                 Pointer.wrap(cursorForUnknownWord),
-                                Pointer.wrap(Pointer.unwrap(subParserBytecode.dataPointer()) + 3),
+                                Pointer.wrap(
+                                    Pointer.unwrap(subParserBytecode.dataPointer()) + SUB_PARSER_BYTECODE_HEADER_SIZE
+                                ),
                                 cursor - cursorForUnknownWord
                             );
+                            // Copy the operand values into place for sub
+                            // parsing.
+                            {
+                                uint256 wordsToCopy = operandValues.length + 1;
+                                LibMemCpy.unsafeCopyWordsTo(
+                                    state.operandValues.startPointer(),
+                                    subParserBytecode.endDataPointer().unsafeSubWords(wordsToCopy),
+                                    wordsToCopy
+                                );
+                            }
+
 
                             state.pushOpToSource(OPCODE_UNKNOWN, operand);
                             // We only support words with parens for unknown words

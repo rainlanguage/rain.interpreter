@@ -20,6 +20,6 @@ contract LibParseUnexpectedRightParenTest is Test {
     /// The parser should track the paren depth as it encounters left parens.
     function testParseUnexpectedRightParenNested() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRightParen.selector, 7));
-        LibParse.parse(":a(b()));", LibMetaFixture.parseMeta());
+        LibParse.parse(":a(b()));", LibMetaFixture.parseMetaV2());
     }
 }

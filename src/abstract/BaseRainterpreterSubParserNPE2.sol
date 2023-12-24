@@ -29,7 +29,7 @@ bytes constant SUB_PARSER_PARSE_META = hex"";
 /// will handle all operand parsing, the subparser will only be responsible for
 /// checking the validity of the operand values and encoding them into the
 /// resulting bytecode.
-uint256 constant SUB_PARSER_OPERAND_PARSERS = 0;
+uint256 constant SUB_PARSER_OPERAND_HANDLERS = hex"";
 
 /// @dev This is a placeholder for the int that encodes pointers to literal
 /// parsers. In the future this will probably be removed and there will be
@@ -97,10 +97,10 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
     }
 
     /// Overrideable function to allow implementations to define their operand
-    /// parsers.
+    /// handlers.
     //slither-disable-next-line dead-code
-    function subParserOperandParsers() internal pure virtual returns (uint256) {
-        return SUB_PARSER_OPERAND_PARSERS;
+    function subParserOperandHandlers() internal pure virtual returns (bytes memory) {
+        return SUB_PARSER_OPERAND_HANDLERS;
     }
 
     /// Overrideable function to allow implementations to define their literal
@@ -135,7 +135,7 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
         }
 
         (uint256 constantsHeight, uint256 ioByte, ParseState memory state) = LibSubParse.consumeInputData(
-            data, subParserParseMeta(), subParserLiteralParsers(), subParserOperandParsers()
+            data, subParserParseMeta(), subParserOperandHandlers(), subParserLiteralParsers()
         );
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         uint256 end = cursor + state.data.length;

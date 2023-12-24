@@ -4,8 +4,8 @@ pragma solidity =0.8.19;
 import {Test} from "forge-std/Test.sol";
 
 import {ExpectedOperand, UnclosedOperand} from "src/error/ErrParse.sol";
-import {OPERAND_PARSER_OFFSET_DISALLOWED} from "src/lib/parse/LibParseOperand.sol";
-import {AuthoringMeta, LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
+import {AuthoringMetaV2} from "src/interface/IParserV1.sol";
+import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 import {LibParse, DuplicateLHSItem, WordSize} from "src/lib/parse/LibParse.sol";
 import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
 
@@ -99,11 +99,11 @@ contract LibParseNamedLHSTest is Test {
 
     /// Stack needs to index items by name correctly across lines.
     function testParseNamedLHSStackIndex() external {
-        AuthoringMeta[] memory meta = new AuthoringMeta[](3);
-        meta[0] = AuthoringMeta("stack", OPERAND_PARSER_OFFSET_DISALLOWED, "stack");
-        meta[1] = AuthoringMeta("constant", OPERAND_PARSER_OFFSET_DISALLOWED, "constant");
-        meta[2] = AuthoringMeta("c", OPERAND_PARSER_OFFSET_DISALLOWED, "c");
-        bytes memory parseMeta = LibParseMeta.buildParseMeta(meta, 1);
+        AuthoringMetaV2[] memory meta = new AuthoringMetaV2[](3);
+        meta[0] = AuthoringMetaV2("stack", "stack");
+        meta[1] = AuthoringMetaV2("constant", "constant");
+        meta[2] = AuthoringMetaV2("c", "c");
+        bytes memory parseMeta = LibParseMeta.buildParseMetaV2(meta, 1);
 
         (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("a _:1 2,b:a,:c(),d:3,e:d;", parseMeta);
         assertEq(

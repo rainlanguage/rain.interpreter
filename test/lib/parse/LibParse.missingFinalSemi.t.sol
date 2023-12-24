@@ -31,12 +31,12 @@ contract LibParseMissingFinalSemiTest is Test {
     /// A single word without a trailing semi should error as missing a semi.
     function testParseMissingFinalSemiRevertsSingleWord() external {
         vm.expectRevert(abi.encodeWithSelector(MissingFinalSemi.selector, 4));
-        LibParse.parse(":a()", LibMetaFixture.parseMeta());
+        LibParse.parse(":a()", LibMetaFixture.parseMetaV2());
     }
 
     /// Some detached LHS items should error as missing a semi.
     function testParseMissingFinalSemiRevertsLHSItems() external {
         vm.expectRevert(abi.encodeWithSelector(MissingFinalSemi.selector, 3));
-        LibParse.parse("_ _", LibMetaFixture.parseMeta());
+        LibParse.parse("_ _", LibMetaFixture.parseMetaV2());
     }
 }

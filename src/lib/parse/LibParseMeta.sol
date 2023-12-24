@@ -5,6 +5,7 @@ import {LibCtPop} from "../bitwise/LibCtPop.sol";
 import {Operand} from "../../interface/unstable/IInterpreterV2.sol";
 import {LibParseOperand} from "./LibParseOperand.sol";
 import {ParseState} from "./LibParseState.sol";
+import {AuthoringMetaV2} from "../../interface/IParserV1.sol";
 
 /// @dev For metadata builder.
 error DuplicateFingerprint();
@@ -23,20 +24,13 @@ error WordIOFnPointerMismatch(uint256 wordsLength, uint256 ioFnPointersLength);
 /// This assumes a single expander, if there are multiple expanders, then the
 /// collision resistance only improves, so this is still safe.
 uint256 constant FINGERPRINT_MASK = 0xFFFFFF;
-/// @dev 4 = 1 byte opcode index + 1 byte operand parser offset + 3 byte fingerprint
-uint256 constant META_ITEM_SIZE = 5;
+/// @dev 4 = 1 byte opcode index + 3 byte fingerprint
+uint256 constant META_ITEM_SIZE = 4;
 uint256 constant META_ITEM_MASK = (1 << META_ITEM_SIZE) - 1;
 /// @dev 33 = 32 bytes for expansion + 1 byte for seed
 uint256 constant META_EXPANSION_SIZE = 0x21;
 /// @dev 1 = 1 byte for depth
 uint256 constant META_PREFIX_SIZE = 1;
-
-struct AuthoringMeta {
-    // `word` is referenced directly in assembly so don't move the field.
-    bytes32 word;
-    uint8 operandParserOffset;
-    string description;
-}
 
 library LibParseMeta {
     function wordBitmapped(uint256 seed, bytes32 word) internal pure returns (uint256 bitmap, uint256 hashed) {
@@ -54,7 +48,7 @@ library LibParseMeta {
         }
     }
 
-    function copyWordsFromAuthoringMeta(AuthoringMeta[] memory authoringMeta)
+    function copyWordsFromAuthoringMeta(AuthoringMetaV2[] memory authoringMeta)
         internal
         pure
         returns (bytes32[] memory)
@@ -66,10 +60,10 @@ library LibParseMeta {
         return words;
     }
 
-    function findBestExpander(AuthoringMeta[] memory metas)
+    function findBestExpander(AuthoringMetaV2[] memory metas)
         internal
         pure
-        returns (uint8 bestSeed, uint256 bestExpansion, AuthoringMeta[] memory remaining)
+        returns (uint8 bestSeed, uint256 bestExpansion, AuthoringMetaV2[] memory remaining)
     {
         unchecked {
             {
@@ -115,7 +109,7 @@ library LibParseMeta {
         }
     }
 
-    function buildParseMeta(AuthoringMeta[] memory authoringMeta, uint8 maxDepth)
+    function buildParseMetaV2(AuthoringMetaV2[] memory authoringMeta, uint8 maxDepth)
         internal
         pure
         returns (bytes memory parseMeta)
@@ -130,7 +124,7 @@ library LibParseMeta {
                 seeds = new uint8[](maxDepth);
                 expansions = new uint256[](maxDepth);
                 {
-                    AuthoringMeta[] memory remainingAuthoringMeta = authoringMeta;
+                    AuthoringMetaV2[] memory remainingAuthoringMeta = authoringMeta;
                     while (remainingAuthoringMeta.length > 0) {
                         uint8 seed;
                         uint256 expansion;
@@ -204,14 +198,11 @@ library LibParseMeta {
                                 cumulativePos = cumulativePos + LibCtPop.ctpop(expansion);
                                 continue;
                             }
-                            // Not collision, start preparing the write with the
-                            // fingerprint.
-                            toWrite = wordFingerprint;
+                            // Not collision, prepare the write with the
+                            // fingerprint and index.
+                            toWrite = wordFingerprint | (k << 0x18);
                         }
                     }
-
-                    // Write the io fn pointer and index offset.
-                    toWrite |= (k << 0x20) | (uint256(authoringMeta[k].operandParserOffset) << 0x18);
 
                     uint256 mask = ~META_ITEM_MASK;
                     assembly ("memory-safe") {
@@ -234,7 +225,7 @@ library LibParseMeta {
     function lookupWord(ParseState memory state, bytes32 word)
         internal
         pure
-        returns (bool, uint256, function(ParseState memory, uint256, uint256) pure returns (uint256, Operand))
+        returns (bool, uint256)
     {
         unchecked {
             uint256 dataStart;
@@ -281,23 +272,15 @@ library LibParseMeta {
                 // Match
                 if (wordFingerprint == posData & FINGERPRINT_MASK) {
                     uint256 index;
-                    function(ParseState memory, uint256, uint256) pure returns (uint256, Operand) operandParser;
-                    uint256 operandParsers = state.operandParsers;
                     assembly ("memory-safe") {
                         index := byte(27, posData)
-                        operandParser := and(shr(byte(28, posData), operandParsers), 0xFFFF)
                     }
-                    return (true, index, operandParser);
+                    return (true, index);
                 } else {
                     cumulativeCt += LibCtPop.ctpop(expansion);
                 }
             }
-            // The caller MUST NOT use this operand parser as `exists` is false.
-            function(ParseState memory, uint256, uint256) pure returns (uint256, Operand) operandParserZero;
-            assembly ("memory-safe") {
-                operandParserZero := 0
-            }
-            return (false, 0, operandParserZero);
+            return (false, 0);
         }
     }
 }

@@ -9,7 +9,7 @@ import {OPCODE_EXTERN} from "../interface/unstable/IInterpreterV2.sol";
 import {LibExtern, EncodedExternDispatch} from "../lib/extern/LibExtern.sol";
 import {IInterpreterExternV3} from "../interface/unstable/IInterpreterExternV3.sol";
 import {LibSubParse} from "../lib/parse/LibSubParse.sol";
-import {AuthoringMeta} from "../lib/parse/LibParseMeta.sol";
+import {AuthoringMetaV2} from "../interface/IParserV1.sol";
 import {ParseState} from "../lib/parse/LibParseState.sol";
 import {LibParseOperand} from "../lib/parse/LibParseOperand.sol";
 import {LibParseLiteral} from "../lib/parse/LibParseLiteral.sol";
@@ -39,7 +39,7 @@ bytes constant SUB_PARSER_PARSE_META =
 /// the rightmost position is a pointer to an operand parser function. In the
 /// future this is likely to be removed, or refactored to value handling only
 /// rather than parsing.
-uint256 constant SUB_PARSER_OPERAND_PARSERS = 0x000000000000000000000000000000000000000000000000000000000000061a;
+uint256 constant SUB_PARSER_OPERAND_HANDLERS = hex"";
 
 /// @dev Real function pointers to the literal parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
@@ -132,17 +132,16 @@ library LibRainterpreterReferenceExternNPE2 {
     /// to define words that it then parses back into bytecode that is run by
     /// the interpreter itself.
     //slither-disable-next-line dead-code
-    function authoringMeta() internal pure returns (bytes memory) {
-        AuthoringMeta memory lengthPlaceholder;
-        AuthoringMeta[SUB_PARSER_FUNCTION_POINTERS_LENGTH + 1] memory wordsFixed = [
+    function authoringMetaV2() internal pure returns (bytes memory) {
+        AuthoringMetaV2 memory lengthPlaceholder;
+        AuthoringMetaV2[SUB_PARSER_FUNCTION_POINTERS_LENGTH + 1] memory wordsFixed = [
             lengthPlaceholder,
-            AuthoringMeta(
+            AuthoringMetaV2(
                 "reference-extern-inc",
-                SUB_PARSER_OPERAND_PARSER_OFFSET_DISALLOWED,
                 "Demonstrates a sugared extern into the reference implementation that increments every input 1:1 with its outputs."
             )
         ];
-        AuthoringMeta[] memory wordsDynamic;
+        AuthoringMetaV2[] memory wordsDynamic;
         uint256 length = SUB_PARSER_FUNCTION_POINTERS_LENGTH;
         assembly {
             wordsDynamic := wordsFixed
@@ -196,11 +195,11 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
         return SUB_PARSER_FUNCTION_POINTERS;
     }
 
-    /// Overrides the base operand parsers for sub parsing. Simply returns the
+    /// Overrides the base operand handlers for sub parsing. Simply returns the
     /// known constant value, which should allow the compiler to optimise the
     /// entire function call away.
-    function subParserOperandParsers() internal pure override returns (uint256) {
-        return SUB_PARSER_OPERAND_PARSERS;
+    function subParserOperandHandlers() internal pure override returns (bytes memory) {
+        return SUB_PARSER_OPERAND_HANDLERS;
     }
 
     /// Overrides the base literal parsers for sub parsing. Simply returns the
@@ -241,12 +240,25 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
 
     /// There's only one operand parser for this implementation, the disallowed
     /// parser. We haven't implemented any words with meaningful operands yet.
-    function buildSubParserOperandParsers() external pure returns (uint256 operandParsers) {
-        function(ParseState memory, uint256, uint256) pure returns (uint256, Operand) operandParserDisallowed =
-            LibParseOperand.parseOperandDisallowed;
-        uint256 parseOperandDisallowedOffset = SUB_PARSER_OPERAND_PARSER_OFFSET_DISALLOWED;
-        assembly ("memory-safe") {
-            operandParsers := or(operandParsers, shl(parseOperandDisallowedOffset, operandParserDisallowed))
+    function buildSubParserOperandHandlers() external pure returns (bytes memory) {
+        unchecked {
+            function(uint256[] memory) internal pure returns (Operand) lengthPointer;
+            uint256 length = SUB_PARSER_FUNCTION_POINTERS_LENGTH;
+            assembly ("memory-safe") {
+                lengthPointer := length
+            }
+            function(uint256[] memory) internal pure returns (Operand)[SUB_PARSER_FUNCTION_POINTERS_LENGTH
+                + 1] memory handlersFixed = [lengthPointer, LibParseOperand.handleOperandDisallowed];
+            uint256[] memory handlersDynamic;
+            assembly {
+                handlersDynamic := handlersFixed
+            }
+            // Sanity check that the dynamic length is correct. Should be an
+            // unreachable error.
+            if (handlersDynamic.length != length) {
+                revert BadDynamicLength(handlersDynamic.length, length);
+            }
+            return LibConvert.unsafeTo16BitBytes(handlersDynamic);
         }
     }
 

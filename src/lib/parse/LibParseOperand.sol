@@ -1,7 +1,13 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {ExpectedOperand, UnclosedOperand, OperandOverflow, OperandValuesOverflow, UnexpectedOperand} from "../../error/ErrParse.sol";
+import {
+    ExpectedOperand,
+    UnclosedOperand,
+    OperandOverflow,
+    OperandValuesOverflow,
+    UnexpectedOperand
+} from "../../error/ErrParse.sol";
 import {Operand} from "../../interface/unstable/IInterpreterV2.sol";
 import {LibParse} from "./LibParse.sol";
 import {LibParseLiteral} from "./LibParseLiteral.sol";
@@ -102,7 +108,11 @@ library LibParseOperand {
     /// parser the literal extraction will be done first, then the word lookup
     /// will have to be done by the sub parser, alongside the values provided
     /// by the main parser.
-    function handleOperand(ParseState memory state, uint256[] memory values, uint256 wordIndex) internal pure returns (Operand) {
+    function handleOperand(ParseState memory state, uint256[] memory values, uint256 wordIndex)
+        internal
+        pure
+        returns (Operand)
+    {
         function (uint256[] memory) pure returns (Operand) handler;
         bytes memory handlers = state.operandHandlers;
         assembly ("memory-safe") {
@@ -134,11 +144,9 @@ library LibParseOperand {
             if (Operand.unwrap(operand) > type(uint16).max) {
                 revert OperandOverflow();
             }
-        }
-        else if (values.length == 0) {
+        } else if (values.length == 0) {
             operand = Operand.wrap(0);
-        }
-        else {
+        } else {
             revert UnexpectedOperand();
         }
     }
@@ -158,11 +166,9 @@ library LibParseOperand {
                 revert OperandOverflow();
             }
             operand = Operand.wrap(a | (b << 8));
-        }
-        else if (values.length < 2) {
+        } else if (values.length < 2) {
             revert ExpectedOperand();
-        }
-        else {
+        } else {
             revert UnexpectedOperand();
         }
     }
@@ -201,11 +207,9 @@ library LibParseOperand {
             }
 
             operand = Operand.wrap(a | (b << 8) | (c << 9));
-        }
-        else if (length == 0) {
+        } else if (length == 0) {
             revert ExpectedOperand();
-        }
-        else {
+        } else {
             revert UnexpectedOperand();
         }
     }
@@ -239,8 +243,7 @@ library LibParseOperand {
             }
 
             operand = Operand.wrap(a | (b << 1));
-        }
-        else {
+        } else {
             revert UnexpectedOperand();
         }
     }
