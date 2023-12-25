@@ -72,7 +72,8 @@ contract LibParseOperandSingleFullTest is Test {
 
     /// Can provide hexadecimal 0x00 as a single full operand.
     function testOperandSingleFullHexZero() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b<0x00>();", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibParse.parse("_:b<0x00>();", LibMetaFixture.parseMetaV2());
         assertEq(
             bytecode,
             // 1 source
@@ -118,7 +119,8 @@ contract LibParseOperandSingleFullTest is Test {
 
     /// Can provide hexadecimal 0x01 as a single full operand.
     function testOperandSingleFullHexOne() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:b<0x01>();", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibParse.parse("_:b<0x01>();", LibMetaFixture.parseMetaV2());
         assertEq(
             bytecode,
             // 1 source

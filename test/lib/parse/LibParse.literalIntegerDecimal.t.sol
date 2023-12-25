@@ -49,7 +49,8 @@ contract LibParseLiteralIntegerDecimalTest is Test {
     /// Check 2 decimal literals. Should not revert and return one source and
     /// length 2 constants.
     function testParseIntegerLiteralDecimal01() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_ _: 10 25;", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibParse.parse("_ _: 10 25;", LibMetaFixture.parseMetaV2());
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);

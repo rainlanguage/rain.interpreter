@@ -34,7 +34,8 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
 
     /// 2 literals are expected for this operand parser. Tests 1 2.
     function testOperandDoublePerByteNoDefaultSecond() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:c<1 2>();", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibParse.parse("_:c<1 2>();", LibMetaFixture.parseMetaV2());
         assertEq(
             bytecode,
             // 1 source
@@ -57,7 +58,8 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
 
     /// 2 literals are expected for this operand parser. Tests 0 0.
     function testOperandDoublePerByteNoDefaultSecondZero() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:c<0 0>();", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibParse.parse("_:c<0 0>();", LibMetaFixture.parseMetaV2());
         assertEq(
             bytecode,
             // 1 source
@@ -195,7 +197,8 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
 
     /// Prefix whitespace is allowed.
     function testOperandDoublePerByteNoDefaultPrefixWhitespace() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:c< 1 2>();", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibParse.parse("_:c< 1 2>();", LibMetaFixture.parseMetaV2());
         assertEq(
             bytecode,
             // 1 source
@@ -218,7 +221,8 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
 
     /// Postfix whitespace is allowed.
     function testOperandDoublePerByteNoDefaultPostfixWhitespace() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:c<1 2 >();", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibParse.parse("_:c<1 2 >();", LibMetaFixture.parseMetaV2());
         assertEq(
             bytecode,
             // 1 source

@@ -316,6 +316,8 @@ library LibAllStandardOpsNP {
                     LibParseOperand.handleOperandDisallowed,
                     // ERC721 balance of
                     LibParseOperand.handleOperandDisallowed,
+                    // ERC721 owner of
+                    LibParseOperand.handleOperandDisallowed,
                     // ERC5313 owner
                     LibParseOperand.handleOperandDisallowed,
                     // Block number
@@ -397,7 +399,7 @@ library LibAllStandardOpsNP {
                     // UniswapV2 quote
                     LibParseOperand.handleOperandSingleFull
                 ];
-            function (uint256[] memory) internal pure returns (Operand)[] memory pointersDynamic;
+            uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
                 pointersDynamic := pointersFixed
             }

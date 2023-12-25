@@ -41,20 +41,12 @@ contract LibParseMetaBuildMetaTest is Test {
         }
         j = uint8(bound(j, uint8(0), uint8(authoringMeta.length) - 1));
 
-        // Defined for assembly blocks.
-        uint256 operandParsers = state.operandParsers;
         state.meta = LibParseMeta.buildParseMetaV2(authoringMeta, expanderDepth(authoringMeta.length));
-        (
-            bool exists,
-            uint256 k
-        ) = state.lookupWord(authoringMeta[j].word);
+        (bool exists, uint256 k) = state.lookupWord(authoringMeta[j].word);
         assertTrue(exists, "exists");
         assertEq(j, k, "k");
 
-        (
-            bool notExists,
-            uint256 l
-        ) = state.lookupWord(notFound);
+        (bool notExists, uint256 l) = state.lookupWord(notFound);
         assertTrue(!notExists, "notExists");
         assertEq(0, l, "l");
     }
@@ -72,39 +64,13 @@ contract LibParseMetaBuildMetaTest is Test {
         }
         j = uint8(bound(j, uint8(0), uint8(authoringMeta.length) - 1));
 
-        state.operandParsers = LibParseOperand.buildOperandParsers();
-        // Defined for assembly blocks.
-        uint256 operandParsers = state.operandParsers;
         state.meta = LibParseMeta.buildParseMetaV2(authoringMeta, expanderDepth(authoringMeta.length));
 
-        (
-            bool exists,
-            uint256 k,
-            function(ParseState memory, uint256, uint256) pure returns (uint256, Operand) operandParserK
-        ) = state.lookupWord(authoringMeta[j].word);
-        uint256 operandParserKActual;
-        assembly ("memory-safe") {
-            operandParserKActual := operandParserK
-        }
-        uint256 operandParserKExpected;
-        uint256 operandParserKOffset = authoringMeta[j].operandParserOffset;
-        assembly ("memory-safe") {
-            operandParserKExpected := and(shr(operandParserKOffset, operandParsers), 0xFFFF)
-        }
-        assertEq(operandParserKExpected, operandParserKActual, "operandParserK");
+        (bool exists, uint256 k) = state.lookupWord(authoringMeta[j].word);
         assertTrue(exists, "exists");
         assertEq(j, k, "k");
 
-        (
-            bool notExists,
-            uint256 l,
-            function(ParseState memory, uint256, uint256) pure returns (uint256, Operand) operandParserL
-        ) = state.lookupWord(notFound);
-        uint256 operandParserLActual;
-        assembly ("memory-safe") {
-            operandParserLActual := operandParserL
-        }
-        assertEq(0, operandParserLActual, "operandParserL");
+        (bool notExists, uint256 l) = state.lookupWord(notFound);
         assertTrue(!notExists, "notExists");
         assertEq(0, l, "l");
     }

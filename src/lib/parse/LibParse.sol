@@ -213,14 +213,10 @@ library LibParse {
                     (cursor, word) = parseWord(cursor, end, CMASK_RHS_WORD_TAIL);
 
                     // First check if this word is in meta.
-                    (
-                        bool exists,
-                        uint256 opcodeIndex,
-                        function(ParseState memory, uint256, uint256) pure returns (uint256, Operand) operandParser
-                    ) = state.lookupWord(word);
+                    (bool exists, uint256 opcodeIndex) = state.lookupWord(word);
                     if (exists) {
-                        Operand operand;
-                        (cursor, operand) = operandParser(state, cursor, end);
+                        cursor = state.parseOperand(cursor, end);
+                        Operand operand = state.handleOperand(opcodeIndex);
                         state.pushOpToSource(opcodeIndex, operand);
                         // This is a real word so we expect to see parens
                         // after it.
@@ -256,7 +252,6 @@ library LibParse {
                             // tail and operand values into place.
                             bytes memory subParserBytecode;
                             Operand operand;
-                            uint256[] memory operandValues = state.operandValues;
                             uint256 subParserBytecodeBytesLengthOffset = SUB_PARSER_BYTECODE_HEADER_SIZE;
                             assembly ("memory-safe") {
                                 subParserBytecode := mload(0x40)
@@ -266,7 +261,10 @@ library LibParse {
                                 // Need to record the length of the unparsed
                                 // bytes or the structure will be ambiguous to
                                 // the sub parser.
-                                mstore(add(subParserBytecode, subParserBytecodeBytesLengthOffset), sub(cursor, cursorForUnknownWord))
+                                mstore(
+                                    add(subParserBytecode, subParserBytecodeBytesLengthOffset),
+                                    sub(cursor, cursorForUnknownWord)
+                                )
                                 mstore(subParserBytecode, subParserBytecodeLength)
                                 // The operand of an unknown word is a pointer to
                                 // the bytecode that needs to be sub parsed.
@@ -284,14 +282,13 @@ library LibParse {
                             // Copy the operand values into place for sub
                             // parsing.
                             {
-                                uint256 wordsToCopy = operandValues.length + 1;
+                                uint256 wordsToCopy = state.operandValues.length + 1;
                                 LibMemCpy.unsafeCopyWordsTo(
                                     state.operandValues.startPointer(),
                                     subParserBytecode.endDataPointer().unsafeSubWords(wordsToCopy),
                                     wordsToCopy
                                 );
                             }
-
 
                             state.pushOpToSource(OPCODE_UNKNOWN, operand);
                             // We only support words with parens for unknown words
@@ -407,7 +404,7 @@ library LibParse {
         returns (bytes memory bytecode, uint256[] memory)
     {
         unchecked {
-            ParseState memory state = LibParseState.newState(data, meta, LibParseLiteral.buildLiteralParsers());
+            ParseState memory state = LibParseState.newState(data, meta, "", LibParseLiteral.buildLiteralParsers());
             if (data.length > 0) {
                 uint256 cursor;
                 uint256 end;

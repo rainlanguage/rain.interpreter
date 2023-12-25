@@ -23,7 +23,8 @@ contract LibParseMetaFindExpanderTest is Test {
         vm.assume(authoringMeta.length <= 0x20);
         vm.assume(!LibBloom.bloomFindsDupes(LibParseMeta.copyWordsFromAuthoringMeta(authoringMeta)));
 
-        (uint8 seed, uint256 expansion, AuthoringMetaV2[] memory remaining) = LibParseMeta.findBestExpander(authoringMeta);
+        (uint8 seed, uint256 expansion, AuthoringMetaV2[] memory remaining) =
+            LibParseMeta.findBestExpander(authoringMeta);
         (seed);
         assertEq(LibCtPop.ctpop(expansion), authoringMeta.length);
         assertEq(remaining.length, 0);

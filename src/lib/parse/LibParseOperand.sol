@@ -108,11 +108,7 @@ library LibParseOperand {
     /// parser the literal extraction will be done first, then the word lookup
     /// will have to be done by the sub parser, alongside the values provided
     /// by the main parser.
-    function handleOperand(ParseState memory state, uint256[] memory values, uint256 wordIndex)
-        internal
-        pure
-        returns (Operand)
-    {
+    function handleOperand(ParseState memory state, uint256 wordIndex) internal pure returns (Operand) {
         function (uint256[] memory) pure returns (Operand) handler;
         bytes memory handlers = state.operandHandlers;
         assembly ("memory-safe") {
@@ -122,7 +118,7 @@ library LibParseOperand {
             // which can and should have direct test coverage.
             handler := shl(0xf0, mload(add(handlers, add(0x20, mul(wordIndex, 2)))))
         }
-        return handler(values);
+        return handler(state.operandValues);
     }
 
     function handleOperandDisallowed(uint256[] memory values) internal pure returns (Operand) {

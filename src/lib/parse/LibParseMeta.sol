@@ -222,11 +222,7 @@ library LibParseMeta {
     /// @param word The word to lookup.
     /// @return True if the word exists in the parse meta.
     /// @return The index of the word in the parse meta.
-    function lookupWord(ParseState memory state, bytes32 word)
-        internal
-        pure
-        returns (bool, uint256)
-    {
+    function lookupWord(ParseState memory state, bytes32 word) internal pure returns (bool, uint256) {
         unchecked {
             uint256 dataStart;
             uint256 cursor;

@@ -10,6 +10,7 @@ import {LibSubParse, ParseState} from "../lib/parse/LibSubParse.sol";
 import {CMASK_RHS_WORD_TAIL} from "../lib/parse/LibParseCMask.sol";
 import {LibParse, Operand} from "../lib/parse/LibParse.sol";
 import {LibParseMeta} from "../lib/parse/LibParseMeta.sol";
+import {LibParseOperand} from "../lib/parse/LibParseOperand.sol";
 
 /// @dev This is a placeholder for the subparser function pointers.
 /// The subparser function pointers are a list of 16 bit function pointers,
@@ -29,7 +30,7 @@ bytes constant SUB_PARSER_PARSE_META = hex"";
 /// will handle all operand parsing, the subparser will only be responsible for
 /// checking the validity of the operand values and encoding them into the
 /// resulting bytecode.
-uint256 constant SUB_PARSER_OPERAND_HANDLERS = hex"";
+bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"";
 
 /// @dev This is a placeholder for the int that encodes pointers to literal
 /// parsers. In the future this will probably be removed and there will be
@@ -81,6 +82,7 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
     using LibBytes for bytes;
     using LibParse for ParseState;
     using LibParseMeta for ParseState;
+    using LibParseOperand for ParseState;
 
     /// Overrideable function to allow implementations to define their parse
     /// meta bytes.
@@ -142,18 +144,9 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
 
         bytes32 word;
         (cursor, word) = LibParse.parseWord(cursor, end, CMASK_RHS_WORD_TAIL);
-        (
-            bool exists,
-            uint256 index,
-            function(ParseState memory, uint256, uint256) pure returns (uint256, Operand) operandParser
-        ) = state.lookupWord(word);
-        uint256 op;
-        assembly ("memory-safe") {
-            op := operandParser
-        }
+        (bool exists, uint256 index) = state.lookupWord(word);
         if (exists) {
-            Operand operand;
-            (cursor, operand) = operandParser(state, cursor, end);
+            Operand operand = state.handleOperand(index);
             function (uint256, uint256, Operand) internal pure returns (bool, bytes memory, uint256[] memory) subParser;
             bytes memory localSubParserFunctionPointers = subParserFunctionPointers();
             assembly ("memory-safe") {
