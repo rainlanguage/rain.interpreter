@@ -398,14 +398,9 @@ library LibParse {
         }
     }
 
-    function parse(bytes memory data, bytes memory meta)
-        internal
-        pure
-        returns (bytes memory bytecode, uint256[] memory)
-    {
+    function parse(ParseState memory state) internal pure returns (bytes memory bytecode, uint256[] memory) {
         unchecked {
-            ParseState memory state = LibParseState.newState(data, meta, "", LibParseLiteral.buildLiteralParsers());
-            if (data.length > 0) {
+            if (state.data.length > 0) {
                 uint256 cursor;
                 uint256 end;
                 assembly ("memory-safe") {

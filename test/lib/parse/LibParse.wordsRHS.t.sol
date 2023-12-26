@@ -1,20 +1,33 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "src/lib/parse/LibParse.sol";
-import "src/lib/bytecode/LibBytecode.sol";
+import {LibParse} from "src/lib/parse/LibParse.sol";
+import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 
-import "test/util/lib/parse/LibMetaFixture.sol";
+import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
+import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
+import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
 
 /// @title LibParseNamedRHSTest
 /// Test that the parser can handle named RHS values.
 contract LibParseNamedRHSTest is Test {
+    using LibParse for ParseState;
+
     /// The simplest RHS is a single word.
     function testParseSingleWord() external {
         string memory s = "_:a();";
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), LibMetaFixture.parseMetaV2());
+
+        ParseState memory state = LibParseState.newState(
+            bytes(s),
+            LibMetaFixture.parseMetaV2(),
+            LibMetaFixture.operandHandlerFunctionPointers(),
+            LibParseLiteral.buildLiteralParsers()
+        );
+
+        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -31,7 +44,16 @@ contract LibParseNamedRHSTest is Test {
     /// Two sequential words on the RHS.
     function testParseTwoSequential() external {
         string memory s = "_ _:a() b();";
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), LibMetaFixture.parseMetaV2());
+
+        ParseState memory state = LibParseState.newState(
+            bytes(s),
+            LibMetaFixture.parseMetaV2(),
+            LibMetaFixture.operandHandlerFunctionPointers(),
+            LibParseLiteral.buildLiteralParsers()
+        );
+
+        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -66,7 +88,16 @@ contract LibParseNamedRHSTest is Test {
     /// Two sequential words on the RHS, each with a single input.
     function testParseTwoSequentialWithInputs() external {
         string memory s = "_ _:a(b()) b(c<0 0>());";
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), LibMetaFixture.parseMetaV2());
+
+        ParseState memory state = LibParseState.newState(
+            bytes(s),
+            LibMetaFixture.parseMetaV2(),
+            LibMetaFixture.operandHandlerFunctionPointers(),
+            LibParseLiteral.buildLiteralParsers()
+        );
+
+        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -105,7 +136,16 @@ contract LibParseNamedRHSTest is Test {
     /// Two words on the RHS, one nested as an input to the other.
     function testParseTwoNested() external {
         string memory s = "_:a(b());";
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), LibMetaFixture.parseMetaV2());
+
+        ParseState memory state = LibParseState.newState(
+            bytes(s),
+            LibMetaFixture.parseMetaV2(),
+            LibMetaFixture.operandHandlerFunctionPointers(),
+            LibParseLiteral.buildLiteralParsers()
+        );
+
+        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -140,7 +180,16 @@ contract LibParseNamedRHSTest is Test {
     /// Three words on the RHS, two sequential nested as an input to the other.
     function testParseTwoNestedAsThirdInput() external {
         string memory s = "_:a(b() c<0 0>());";
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), LibMetaFixture.parseMetaV2());
+
+        ParseState memory state = LibParseState.newState(
+            bytes(s),
+            LibMetaFixture.parseMetaV2(),
+            LibMetaFixture.operandHandlerFunctionPointers(),
+            LibParseLiteral.buildLiteralParsers()
+        );
+
+        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -178,7 +227,16 @@ contract LibParseNamedRHSTest is Test {
     /// several LHS items.
     function testParseSingleLHSNestingAndSequential00() external {
         string memory s = "_:a(b() c<0 0>(d() e<0>()));";
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), LibMetaFixture.parseMetaV2());
+
+        ParseState memory state = LibParseState.newState(
+            bytes(s),
+            LibMetaFixture.parseMetaV2(),
+            LibMetaFixture.operandHandlerFunctionPointers(),
+            LibParseLiteral.buildLiteralParsers()
+        );
+
+        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -221,7 +279,16 @@ contract LibParseNamedRHSTest is Test {
     /// several LHS items.
     function testParseSingleLHSNestingAndSequential01() external {
         string memory s = "_:a(b() c<0 0>(d() e<0>()) f() g(h() i()));";
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), LibMetaFixture.parseMetaV2());
+
+        ParseState memory state = LibParseState.newState(
+            bytes(s),
+            LibMetaFixture.parseMetaV2(),
+            LibMetaFixture.operandHandlerFunctionPointers(),
+            LibParseLiteral.buildLiteralParsers()
+        );
+
+        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -272,7 +339,16 @@ contract LibParseNamedRHSTest is Test {
     /// several LHS items.
     function testParseSingleLHSNestingAndSequential02() external {
         string memory s = "_ _ _:a(b() c<0 0>(d())) d() e<0>(b());";
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), LibMetaFixture.parseMetaV2());
+
+        ParseState memory state = LibParseState.newState(
+            bytes(s),
+            LibMetaFixture.parseMetaV2(),
+            LibMetaFixture.operandHandlerFunctionPointers(),
+            LibParseLiteral.buildLiteralParsers()
+        );
+
+        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+
         assertEq(
             bytecode,
             // 1 source
@@ -318,7 +394,16 @@ contract LibParseNamedRHSTest is Test {
     function testParseSingleLHSNestingAndSequential03() external {
         string memory s =
             "_ _:a(b() c<0 0>(d() e<0>() f() g() h() i() j() k() l() m() n() o() p())) p(o() n(m() l() k() j() i() h() g() f() e<0>() d() c<0 0>() b() a()));";
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), LibMetaFixture.parseMetaV2());
+
+        ParseState memory state = LibParseState.newState(
+            bytes(s),
+            LibMetaFixture.parseMetaV2(),
+            LibMetaFixture.operandHandlerFunctionPointers(),
+            LibParseLiteral.buildLiteralParsers()
+        );
+
+        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -416,7 +501,15 @@ contract LibParseNamedRHSTest is Test {
     /// Two lines, each with LHS and RHS.
     function testParseTwoFullLinesSingleRHSEach() external {
         string memory s = "_:a(),_ _:b() c<0 0>(d());";
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), LibMetaFixture.parseMetaV2());
+
+        ParseState memory state = LibParseState.newState(
+            bytes(s),
+            LibMetaFixture.parseMetaV2(),
+            LibMetaFixture.operandHandlerFunctionPointers(),
+            LibParseLiteral.buildLiteralParsers()
+        );
+
+        (bytes memory bytecode, uint256[] memory constants) = state.parse();
         assertEq(LibBytecode.sourceCount(bytecode), 1);
 
         uint256 sourceIndex = 0;
@@ -457,7 +550,15 @@ contract LibParseNamedRHSTest is Test {
     /// Two full sources, each with a single LHS and RHS.
     function testParseTwoFullSourcesSingleRHSEach() external {
         string memory s = "_:a();_:b();";
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes(s), LibMetaFixture.parseMetaV2());
+
+        ParseState memory state = LibParseState.newState(
+            bytes(s),
+            LibMetaFixture.parseMetaV2(),
+            LibMetaFixture.operandHandlerFunctionPointers(),
+            LibParseLiteral.buildLiteralParsers()
+        );
+
+        (bytes memory bytecode, uint256[] memory constants) = state.parse();
         assertEq(LibBytecode.sourceCount(bytecode), 2);
 
         uint256 sourceIndex = 0;

@@ -109,14 +109,14 @@ library LibParseOperand {
     /// will have to be done by the sub parser, alongside the values provided
     /// by the main parser.
     function handleOperand(ParseState memory state, uint256 wordIndex) internal pure returns (Operand) {
-        function (uint256[] memory) pure returns (Operand) handler;
+        function (uint256[] memory) internal pure returns (Operand) handler;
         bytes memory handlers = state.operandHandlers;
         assembly ("memory-safe") {
             // There is no bounds check here because the indexes are calcualted
             // by the parser itself, NOT provided by the user. Therefore the
             // scope of corrupt data is limited to a bug in the parser itself,
             // which can and should have direct test coverage.
-            handler := shl(0xf0, mload(add(handlers, add(0x20, mul(wordIndex, 2)))))
+            handler := and(mload(add(handlers, add(2, mul(wordIndex, 2)))), 0xFFFF)
         }
         return handler(state.operandValues);
     }

@@ -3,10 +3,22 @@ pragma solidity ^0.8.18;
 
 import {AuthoringMetaV2} from "src/interface/IParserV1.sol";
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
+import {Operand, LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
+import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
+import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
+import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
+
+uint256 constant FIXTURE_OPS_LENGTH;
 
 library LibMetaFixture {
+    function newState(string memory s) internal pure returns (ParseState memory) {
+        return LibParseState.newState(
+            bytes(s), authoringMetaV2(), operandHandlerFunctionPointers(), LibParseLiteral.buildLiteralParsers()
+        );
+    }
+
     function authoringMetaV2() internal pure returns (AuthoringMetaV2[] memory) {
-        AuthoringMetaV2[] memory meta = new AuthoringMetaV2[](18);
+        AuthoringMetaV2[] memory meta = new AuthoringMetaV2[](FIXTURE_OPS_LENGTH);
         meta[0] = AuthoringMetaV2("stack", "reads from the stack");
         meta[1] = AuthoringMetaV2("constant", "copies a constant to the stack");
         meta[2] = AuthoringMetaV2("a", "a");
@@ -30,5 +42,49 @@ library LibMetaFixture {
 
     function parseMetaV2() internal pure returns (bytes memory) {
         return LibParseMeta.buildParseMetaV2(authoringMetaV2(), 1);
+    }
+
+    function operandHandlerFunctionPointers() internal pure returns (bytes memory) {
+        function (uint256[] memory) internal pure returns (Operand)[] memory handlers =
+            new function (uint256[] memory) internal pure returns (Operand)[](FIXTURE_OPS_LENGTH);
+        handlers[0] = LibParseOperand.handleOperandSingleFull;
+        handlers[1] = LibParseOperand.handleOperandSingleFull;
+        // a
+        handlers[2] = LibParseOperand.handleOperandDisallowed;
+        // b
+        handlers[3] = LibParseOperand.handleOperandSingleFull;
+        // c
+        handlers[4] = LibParseOperand.handleOperandDoublePerByteNoDefault;
+        // d
+        handlers[5] = LibParseOperand.handleOperandM1M1;
+        // e
+        handlers[6] = LibParseOperand.handleOperand8M1M1;
+        // f
+        handlers[7] = LibParseOperand.handleOperandDisallowed;
+        // g
+        handlers[8] = LibParseOperand.handleOperandDisallowed;
+        // h
+        handlers[9] = LibParseOperand.handleOperandDisallowed;
+        // i
+        handlers[10] = LibParseOperand.handleOperandDisallowed;
+        // j
+        handlers[11] = LibParseOperand.handleOperandDisallowed;
+        // k
+        handlers[12] = LibParseOperand.handleOperandDisallowed;
+        // l
+        handlers[13] = LibParseOperand.handleOperandDisallowed;
+        // m
+        handlers[14] = LibParseOperand.handleOperandDisallowed;
+        // n
+        handlers[15] = LibParseOperand.handleOperandDisallowed;
+        // o
+        handlers[16] = LibParseOperand.handleOperandDisallowed;
+        // p
+        handlers[17] = LibParseOperand.handleOperandDisallowed;
+        bytes memory pointers;
+        assembly ("memory-safe") {
+            pointers := handlers
+        }
+        return LibConvert.unsafeTo16BitBytes(pointers);
     }
 }

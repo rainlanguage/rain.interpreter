@@ -26,7 +26,7 @@ uint256 constant SUB_PARSER_FUNCTION_POINTERS_LENGTH = 1;
 /// bytecode that dials back into this contract at eval time, and creating
 /// to things that happen entirely on the interpreter such as well known
 /// constants and references to the context grid.
-bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"097f";
+bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"0976";
 
 /// @dev Real sub parser meta bytes that map parsed strings to the functions that
 /// know how to parse those strings into opcodes for the main parser. Structured
@@ -45,7 +45,7 @@ bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"0659";
 /// the rightmost position is a pointer to a literal parser function. In the
 /// future this is likely to be removed, in favour of a dedicated literal parser
 /// feature.
-uint256 constant SUB_PARSER_LITERAL_PARSERS = 0x00000000000000000000000000000000000000000000000000000fd60d010a39;
+uint256 constant SUB_PARSER_LITERAL_PARSERS = 17373360294448;
 
 /// @dev Real function pointers to the opcodes for the extern component of this
 /// contract. These get run at eval time wehen the interpreter calls into the
