@@ -4,12 +4,15 @@ pragma solidity =0.8.19;
 import {Test} from "forge-std/Test.sol";
 import {LibParse} from "src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
+import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 abstract contract OperandTest is Test {
+    using LibParse for ParseState;
+
     // External version of parse for testing. Expect revert only works properly
     // when called externally.
     function parse(bytes memory rainString) external pure returns (bytes memory bytecode, uint256[] memory constants) {
-        return LibParse.parse(rainString, LibMetaFixture.parseMetaV2());
+        return LibMetaFixture.newState(string(rainString)).parse();
     }
 
     function checkParseError(bytes memory rainString, bytes memory err) internal {

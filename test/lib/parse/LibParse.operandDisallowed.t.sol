@@ -6,12 +6,15 @@ import {Test} from "forge-std/Test.sol";
 import {ExpectedOperand, UnclosedOperand, UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibParse, ExpectedLeftParen} from "src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
+import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 contract LibParseOperandDisallowedTest is Test {
+    using LibParse for ParseState;
+
     /// Opening an operand is disallowed for words that don't support it.
     function testOperandDisallowed() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector, 3));
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:a<;", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:a<;").parse();
         (bytecode);
         (constants);
     }
@@ -19,7 +22,7 @@ contract LibParseOperandDisallowedTest is Test {
     /// Closing an operand is disallowed for words that don't support it.
     function testOperandDisallowed1() external {
         vm.expectRevert(abi.encodeWithSelector(ExpectedLeftParen.selector, 3));
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:a>;", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:a>;").parse();
         (bytecode);
         (constants);
     }
@@ -28,7 +31,7 @@ contract LibParseOperandDisallowedTest is Test {
     /// it.
     function testOperandDisallowed2() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector, 3));
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:a<>;", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:a<>;").parse();
         (bytecode);
         (constants);
     }
@@ -37,7 +40,7 @@ contract LibParseOperandDisallowedTest is Test {
     /// that don't support it.
     function testOperandDisallowed3() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector, 3));
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:a<1>;", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:a<1>;").parse();
         (bytecode);
         (constants);
     }
@@ -46,7 +49,7 @@ contract LibParseOperandDisallowedTest is Test {
     /// disallowed for words that don't support it.
     function testOperandDisallowed4() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector, 3));
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:a<1>();", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:a<1>();").parse();
         (bytecode);
         (constants);
     }
