@@ -224,25 +224,23 @@ contract LibOpIntAddNPTest is OpTest {
     /// Test the eval of `int-add` opcode parsed from a string.
     /// Tests that operands are disallowed.
     function testOpIntAddNPEvalOperandDisallowed() external {
-        checkDisallowedOperand("_: int-add<>(0 0);", 10);
-        checkDisallowedOperand("_: int-add<0>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-add<1>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-add<2>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-add<0 0>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-add<0 1>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-add<1 0>(0 0 0);", 10);
+        checkDisallowedOperand("_: int-add<0>(0 0 0);");
+        checkDisallowedOperand("_: int-add<1>(0 0 0);");
+        checkDisallowedOperand("_: int-add<2>(0 0 0);");
+        checkDisallowedOperand("_: int-add<0 0>(0 0 0);");
+        checkDisallowedOperand("_: int-add<0 1>(0 0 0);");
+        checkDisallowedOperand("_: int-add<1 0>(0 0 0);");
     }
 
     /// Test the eval of `decimal18-add` opcode parsed from a string.
     /// MUST behave identically to `int-add`.
     /// Tests that operands are disallowed.
     function testOpDecimal18AddNPEvalOperandDisallowed() external {
-        checkDisallowedOperand("_: decimal18-add<>(0 0);", 16);
-        checkDisallowedOperand("_: decimal18-add<0>(0 0 0);", 16);
-        checkDisallowedOperand("_: decimal18-add<1>(0 0 0);", 16);
-        checkDisallowedOperand("_: decimal18-add<2>(0 0 0);", 16);
-        checkDisallowedOperand("_: decimal18-add<0 0>(0 0 0);", 16);
-        checkDisallowedOperand("_: decimal18-add<0 1>(0 0 0);", 16);
-        checkDisallowedOperand("_: decimal18-add<1 0>(0 0 0);", 16);
+        checkDisallowedOperand("_: decimal18-add<0>(0 0 0);");
+        checkDisallowedOperand("_: decimal18-add<1>(0 0 0);");
+        checkDisallowedOperand("_: decimal18-add<2>(0 0 0);");
+        checkDisallowedOperand("_: decimal18-add<0 0>(0 0 0);");
+        checkDisallowedOperand("_: decimal18-add<0 1>(0 0 0);");
+        checkDisallowedOperand("_: decimal18-add<1 0>(0 0 0);");
     }
 }

@@ -477,10 +477,9 @@ contract LibOpGetNPTest is OpTest {
     /// Test the eval of `get` opcode parsed from a string.
     /// Tests that operands are disallowed.
     function testLibOpGetNPEvalOperandDisallowed() external {
-        checkDisallowedOperand("_:get<>(0x1234);", 5);
-        checkDisallowedOperand("_:get<0>(0x1234);", 5);
-        checkDisallowedOperand("_:get<1>(0x1234);", 5);
-        checkDisallowedOperand("_:get<2>(0x1234);", 5);
-        checkDisallowedOperand("_:get<3 1>(0x1234);", 5);
+        checkDisallowedOperand("_:get<0>(0x1234);");
+        checkDisallowedOperand("_:get<1>(0x1234);");
+        checkDisallowedOperand("_:get<2>(0x1234);");
+        checkDisallowedOperand("_:get<3 1>(0x1234);");
     }
 }

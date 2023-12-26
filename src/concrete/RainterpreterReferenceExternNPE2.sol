@@ -13,7 +13,7 @@ import {AuthoringMetaV2} from "../interface/IParserV1.sol";
 import {ParseState} from "../lib/parse/LibParseState.sol";
 import {LibParseOperand} from "../lib/parse/LibParseOperand.sol";
 import {LibParseLiteral} from "../lib/parse/LibParseLiteral.sol";
-import {COMPATIBLITY_V0} from "../interface/unstable/ISubParserV1.sol";
+import {COMPATIBLITY_V1} from "../interface/unstable/ISubParserV1.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
 /// 1:1 with the number of opcodes provided by the extern component of this
@@ -26,7 +26,7 @@ uint256 constant SUB_PARSER_FUNCTION_POINTERS_LENGTH = 1;
 /// bytecode that dials back into this contract at eval time, and creating
 /// to things that happen entirely on the interpreter such as well known
 /// constants and references to the context grid.
-bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"0976";
+bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"096c";
 
 /// @dev Real sub parser meta bytes that map parsed strings to the functions that
 /// know how to parse those strings into opcodes for the main parser. Structured
@@ -45,7 +45,7 @@ bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"0659";
 /// the rightmost position is a pointer to a literal parser function. In the
 /// future this is likely to be removed, in favour of a dedicated literal parser
 /// feature.
-uint256 constant SUB_PARSER_LITERAL_PARSERS = 17373360294448;
+uint256 constant SUB_PARSER_LITERAL_PARSERS = 17330409966118;
 
 /// @dev Real function pointers to the opcodes for the extern component of this
 /// contract. These get run at eval time wehen the interpreter calls into the
@@ -65,11 +65,6 @@ bytes constant INTEGRITY_FUNCTION_POINTERS = hex"069e";
 /// in sync with the extern opcode function pointers. Definitely write tests for
 /// this to ensure a mismatch doesn't happen silently.
 uint256 constant OP_INDEX_INCREMENT = 0;
-
-/// @dev The offset of the operand parser for disallowed opcodes. This just
-/// happens to be the same as the main parser, but could be different in some
-/// other implementation. In the future this is likely to be removed.
-uint8 constant SUB_PARSER_OPERAND_PARSER_OFFSET_DISALLOWED = 0;
 
 /// @title LibExternOpIntIncNPE2
 /// This is a library that mimics the op libraries elsewhere in this repo, but
@@ -212,7 +207,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// known constant value, which should allow the compiler to optimise the
     /// entire function call away.
     function subParserCompatibility() internal pure override returns (bytes32) {
-        return COMPATIBLITY_V0;
+        return COMPATIBLITY_V1;
     }
 
     /// Overrides the base function pointers for opcodes. Simply returns the

@@ -56,6 +56,6 @@ contract LibOpERC5313OwnerNPTest is OpTest {
 
     /// Test that operand is disallowed.
     function testOpERC5313OwnerNPEvalOperandDisallowed() external {
-        checkUnhappyParse("_: erc5313-owner<0>(0xdeadbeef);", abi.encodeWithSelector(UnexpectedOperand.selector, 16));
+        checkUnhappyParse("_: erc5313-owner<0>(0xdeadbeef);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

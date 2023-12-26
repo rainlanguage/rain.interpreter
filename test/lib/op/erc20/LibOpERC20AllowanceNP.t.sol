@@ -66,7 +66,7 @@ contract LibOpERC20AllowanceNPTest is OpTest {
     function testOpERC20AllowanceNPEvalOperandDisallowed() external {
         checkUnhappyParse(
             "_: erc20-allowance<0>(0xdeadbeef 0xdeadc0de 0xdeaddead);",
-            abi.encodeWithSelector(UnexpectedOperand.selector, 18)
+            abi.encodeWithSelector(UnexpectedOperand.selector)
         );
     }
 }

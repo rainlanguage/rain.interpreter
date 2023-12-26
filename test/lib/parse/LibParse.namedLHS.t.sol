@@ -10,6 +10,9 @@ import {LibParse, DuplicateLHSItem, WordSize} from "src/lib/parse/LibParse.sol";
 import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
 import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
+import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
+import {Operand, LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
+import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 
 /// @title LibParseNamedLHSTest
 contract LibParseNamedLHSTest is Test {
@@ -109,8 +112,20 @@ contract LibParseNamedLHSTest is Test {
         meta[2] = AuthoringMetaV2("c", "c");
         bytes memory parseMeta = LibParseMeta.buildParseMetaV2(meta, 1);
 
-        (bytes memory bytecode, uint256[] memory constants) =
-            LibParseState.newState(bytes("a _:1 2,b:a,:c(),d:3,e:d;"), parseMeta, "", 0).parse();
+        function (uint256[] memory) internal pure returns (Operand)[] memory operandHandlers =
+            new function (uint256[] memory) internal pure returns (Operand)[](3);
+        operandHandlers[0] = LibParseOperand.handleOperandDisallowed;
+        operandHandlers[1] = LibParseOperand.handleOperandDisallowed;
+        operandHandlers[2] = LibParseOperand.handleOperandSingleFull;
+        uint256[] memory pointers;
+        assembly ("memory-safe") {
+            pointers := operandHandlers
+        }
+        bytes memory operandHandlerPointers = LibConvert.unsafeTo16BitBytes(pointers);
+
+        (bytes memory bytecode, uint256[] memory constants) = LibParseState.newState(
+            bytes("a _:1 2,b:a,:c(),d:3,e:d;"), parseMeta, operandHandlerPointers, LibParseLiteral.buildLiteralParsers()
+        ).parse();
         assertEq(
             bytecode,
             // 2 sources.
@@ -153,7 +168,7 @@ contract LibParseNamedLHSTest is Test {
     /// Duplicate names are allowed across different sources.
     function testParseNamedDuplicateDifferentSource() external {
         (bytes memory bytecode, uint256[] memory constants) =
-            LibMetaFixture.newState("a b:1 2, e:a;c d:3 4,e:d;").parse();
+            LibParseState.newState("a b:1 2, e:a;c d:3 4,e:d;", "", "", LibParseLiteral.buildLiteralParsers()).parse();
         assertEq(
             bytecode,
             // 2 sources.

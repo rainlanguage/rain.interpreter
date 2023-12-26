@@ -273,8 +273,8 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         (interpreterDeployer, storeDeployer, expression, io);
     }
 
-    function checkDisallowedOperand(bytes memory rainString, uint256 offset) internal {
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector, offset));
+    function checkDisallowedOperand(bytes memory rainString) internal {
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
         (bytecode);
         (constants);

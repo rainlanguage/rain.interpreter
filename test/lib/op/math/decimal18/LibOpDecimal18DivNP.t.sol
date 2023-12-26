@@ -196,12 +196,11 @@ contract LibOpDecimal18DivNPTest is OpTest {
     /// Test the eval of `decimal18-div` opcode parsed from a string.
     /// Tests that operands are disallowed.
     function testOpDecimal18DivNPEvalOperandsDisallowed() external {
-        checkDisallowedOperand("_: decimal18-div<>(1e18 1e18 1e18 1e18);", 16);
-        checkDisallowedOperand("_: decimal18-div<0>(1e18 1e18 1e18);", 16);
-        checkDisallowedOperand("_: decimal18-div<1>(1e18 1e18 1e18);", 16);
-        checkDisallowedOperand("_: decimal18-div<2>(1e18 1e18 1e18);", 16);
-        checkDisallowedOperand("_: decimal18-div<0 0>(1e18 1e18 1e18);", 16);
-        checkDisallowedOperand("_: decimal18-div<0 1>(1e18 1e18 1e18);", 16);
-        checkDisallowedOperand("_: decimal18-div<1 0>(1e18 1e18 1e18);", 16);
+        checkDisallowedOperand("_: decimal18-div<0>(1e18 1e18 1e18);");
+        checkDisallowedOperand("_: decimal18-div<1>(1e18 1e18 1e18);");
+        checkDisallowedOperand("_: decimal18-div<2>(1e18 1e18 1e18);");
+        checkDisallowedOperand("_: decimal18-div<0 0>(1e18 1e18 1e18);");
+        checkDisallowedOperand("_: decimal18-div<0 1>(1e18 1e18 1e18);");
+        checkDisallowedOperand("_: decimal18-div<1 0>(1e18 1e18 1e18);");
     }
 }

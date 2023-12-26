@@ -11,8 +11,8 @@ import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
 contract LibParseOperand8M1M1Test is OperandTest {
     /// Default is disallowed.
     function testOperand8M1M1Elided() external {
-        checkParseError("_:e();", abi.encodeWithSelector(ExpectedOperand.selector, 3));
-        checkParseError("_:e<>();", abi.encodeWithSelector(ExpectedOperand.selector, 4));
+        checkParseError("_:e();", abi.encodeWithSelector(ExpectedOperand.selector));
+        checkParseError("_:e<>();", abi.encodeWithSelector(ExpectedOperand.selector));
     }
 
     /// Single value can be provided and bits will default to zero.
@@ -24,7 +24,7 @@ contract LibParseOperand8M1M1Test is OperandTest {
         checkOperandParse("_:e<255>();", hex"060000ff");
 
         // Above uint8 max will overflow.
-        checkParseError("_:e<256>();", abi.encodeWithSelector(OperandOverflow.selector, 4));
+        checkParseError("_:e<256>();", abi.encodeWithSelector(OperandOverflow.selector));
     }
 
     /// Single value and one bit can be provided, other bit will default to zero.
@@ -37,10 +37,10 @@ contract LibParseOperand8M1M1Test is OperandTest {
         checkOperandParse("_:e<255 1>();", hex"060001ff");
 
         // Non binary bit will overflow.
-        checkParseError("_:e<1 2>();", abi.encodeWithSelector(OperandOverflow.selector, 6));
-        checkParseError("_:e<1 3>();", abi.encodeWithSelector(OperandOverflow.selector, 6));
-        checkParseError("_:e<2 2>();", abi.encodeWithSelector(OperandOverflow.selector, 6));
-        checkParseError("_:e<255 2>();", abi.encodeWithSelector(OperandOverflow.selector, 8));
+        checkParseError("_:e<1 2>();", abi.encodeWithSelector(OperandOverflow.selector));
+        checkParseError("_:e<1 3>();", abi.encodeWithSelector(OperandOverflow.selector));
+        checkParseError("_:e<2 2>();", abi.encodeWithSelector(OperandOverflow.selector));
+        checkParseError("_:e<255 2>();", abi.encodeWithSelector(OperandOverflow.selector));
     }
 
     /// Single value and two bits can be provided.
@@ -59,35 +59,35 @@ contract LibParseOperand8M1M1Test is OperandTest {
         checkOperandParse("_:e<255 1 1>();", hex"060003ff");
 
         // Non binary bit will overflow.
-        checkParseError("_:e<1 0 2>();", abi.encodeWithSelector(OperandOverflow.selector, 8));
-        checkParseError("_:e<1 1 2>();", abi.encodeWithSelector(OperandOverflow.selector, 8));
-        checkParseError("_:e<1 2 0>();", abi.encodeWithSelector(OperandOverflow.selector, 6));
-        checkParseError("_:e<1 2 1>();", abi.encodeWithSelector(OperandOverflow.selector, 6));
-        checkParseError("_:e<1 2 2>();", abi.encodeWithSelector(OperandOverflow.selector, 6));
-        checkParseError("_:e<2 0 2>();", abi.encodeWithSelector(OperandOverflow.selector, 8));
-        checkParseError("_:e<2 1 2>();", abi.encodeWithSelector(OperandOverflow.selector, 8));
-        checkParseError("_:e<2 2 0>();", abi.encodeWithSelector(OperandOverflow.selector, 6));
-        checkParseError("_:e<2 2 1>();", abi.encodeWithSelector(OperandOverflow.selector, 6));
-        checkParseError("_:e<2 2 2>();", abi.encodeWithSelector(OperandOverflow.selector, 6));
-        checkParseError("_:e<255 0 2>();", abi.encodeWithSelector(OperandOverflow.selector, 10));
-        checkParseError("_:e<255 1 2>();", abi.encodeWithSelector(OperandOverflow.selector, 10));
-        checkParseError("_:e<255 2 0>();", abi.encodeWithSelector(OperandOverflow.selector, 8));
-        checkParseError("_:e<255 2 1>();", abi.encodeWithSelector(OperandOverflow.selector, 8));
-        checkParseError("_:e<255 2 2>();", abi.encodeWithSelector(OperandOverflow.selector, 8));
+        checkParseError("_:e<1 0 2>();", abi.encodeWithSelector(OperandOverflow.selector));
+        checkParseError("_:e<1 1 2>();", abi.encodeWithSelector(OperandOverflow.selector));
+        checkParseError("_:e<1 2 0>();", abi.encodeWithSelector(OperandOverflow.selector));
+        checkParseError("_:e<1 2 1>();", abi.encodeWithSelector(OperandOverflow.selector));
+        checkParseError("_:e<1 2 2>();", abi.encodeWithSelector(OperandOverflow.selector));
+        checkParseError("_:e<2 0 2>();", abi.encodeWithSelector(OperandOverflow.selector));
+        checkParseError("_:e<2 1 2>();", abi.encodeWithSelector(OperandOverflow.selector));
+        checkParseError("_:e<2 2 0>();", abi.encodeWithSelector(OperandOverflow.selector));
+        checkParseError("_:e<2 2 1>();", abi.encodeWithSelector(OperandOverflow.selector));
+        checkParseError("_:e<2 2 2>();", abi.encodeWithSelector(OperandOverflow.selector));
+        checkParseError("_:e<255 0 2>();", abi.encodeWithSelector(OperandOverflow.selector));
+        checkParseError("_:e<255 1 2>();", abi.encodeWithSelector(OperandOverflow.selector));
+        checkParseError("_:e<255 2 0>();", abi.encodeWithSelector(OperandOverflow.selector));
+        checkParseError("_:e<255 2 1>();", abi.encodeWithSelector(OperandOverflow.selector));
+        checkParseError("_:e<255 2 2>();", abi.encodeWithSelector(OperandOverflow.selector));
     }
 
     /// Unclosed operand is disallowed.
     function testOperand8M1M1Unclosed() external {
-        checkParseError("_:e<1 1();", abi.encodeWithSelector(UnsupportedLiteralType.selector, 7));
-        checkParseError("_:e<1 0()", abi.encodeWithSelector(UnsupportedLiteralType.selector, 7));
-        checkParseError("_:e<1 ", abi.encodeWithSelector(UnsupportedLiteralType.selector, 6));
-        checkParseError("_:e<1", abi.encodeWithSelector(UnsupportedLiteralType.selector, 5));
-        checkParseError("_:e<1 1", abi.encodeWithSelector(UnsupportedLiteralType.selector, 7));
+        checkParseError("_:e<1 1();", abi.encodeWithSelector(UnclosedOperand.selector, 7));
+        checkParseError("_:e<1 0()", abi.encodeWithSelector(UnclosedOperand.selector, 7));
+        checkParseError("_:e<1 ", abi.encodeWithSelector(UnclosedOperand.selector, 6));
+        checkParseError("_:e<1", abi.encodeWithSelector(UnclosedOperand.selector, 5));
+        checkParseError("_:e<1 1", abi.encodeWithSelector(UnclosedOperand.selector, 7));
         checkParseError("_:e<1 1 1", abi.encodeWithSelector(UnclosedOperand.selector, 9));
     }
 
     /// Unopened operand is disallowed.
     function testOperand8M1M1Unopened() external {
-        checkParseError("_:e>1 1>();", abi.encodeWithSelector(ExpectedOperand.selector, 3));
+        checkParseError("_:e>1 1>();", abi.encodeWithSelector(ExpectedOperand.selector));
     }
 }

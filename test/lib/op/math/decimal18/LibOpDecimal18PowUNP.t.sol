@@ -68,6 +68,6 @@ contract LibOpDecimal18PowUNPTest is OpTest {
 
     /// Test that operand is disallowed.
     function testOpDecimal18PowUNPEvalOperandDisallowed() external {
-        checkUnhappyParse("_: decimal18-power-int<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector, 22));
+        checkUnhappyParse("_: decimal18-power-int<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

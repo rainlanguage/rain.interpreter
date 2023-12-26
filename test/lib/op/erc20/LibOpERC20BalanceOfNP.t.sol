@@ -61,7 +61,7 @@ contract LibOpERC20BalanceOfNPTest is OpTest {
     /// Test that operand is disallowed.
     function testOpERC20BalanceOfNPEvalOperandDisallowed() external {
         checkUnhappyParse(
-            "_: erc20-balance-of<0>(0xdeadbeef 0xdeadc0de);", abi.encodeWithSelector(UnexpectedOperand.selector, 19)
+            "_: erc20-balance-of<0>(0xdeadbeef 0xdeadc0de);", abi.encodeWithSelector(UnexpectedOperand.selector)
         );
     }
 }

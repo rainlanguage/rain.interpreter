@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 import {LibParseState, ParseState} from "./LibParseState.sol";
 import {OPCODE_UNKNOWN, OPCODE_EXTERN, Operand} from "../../interface/unstable/IInterpreterV2.sol";
 import {LibBytecode, Pointer} from "../bytecode/LibBytecode.sol";
-import {ISubParserV1, COMPATIBLITY_V0} from "../../interface/unstable/ISubParserV1.sol";
+import {ISubParserV1, COMPATIBLITY_V1} from "../../interface/unstable/ISubParserV1.sol";
 import {BadSubParserResult, UnknownWord} from "../../error/ErrParse.sol";
 import {LibExtern, EncodedExternDispatch} from "../extern/LibExtern.sol";
 import {IInterpreterExternV3} from "../../interface/unstable/IInterpreterExternV3.sol";
@@ -116,7 +116,7 @@ library LibSubParse {
                         }
 
                         (bool success, bytes memory subBytecode, uint256[] memory subConstants) =
-                            subParser.subParse(COMPATIBLITY_V0, data);
+                            subParser.subParse(COMPATIBLITY_V1, data);
                         if (success) {
                             // The sub bytecode must be exactly 4 bytes to
                             // represent an op.
@@ -185,16 +185,19 @@ library LibSubParse {
         bytes memory operandHandlers,
         uint256 literalParsers
     ) internal pure returns (uint256 constantsHeight, uint256 ioByte, ParseState memory state) {
+        uint256[] memory operandValues;
         assembly ("memory-safe") {
             // Pull the header out into EVM stack items.
             constantsHeight := and(mload(add(data, 2)), 0xFFFF)
             ioByte := and(mload(add(data, 3)), 0xFF)
 
             // Mutate the data to no longer have a header.
-            let newLength := sub(mload(data), 3)
-            data := add(data, 3)
+            let newLength := and(mload(add(data, 5)), 0xFFFF)
+            data := add(data, 5)
             mstore(data, newLength)
+            operandValues := add(data, add(newLength, 0x20))
         }
         state = LibParseState.newState(data, meta, operandHandlers, literalParsers);
+        state.operandValues = operandValues;
     }
 }
