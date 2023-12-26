@@ -81,7 +81,7 @@ library LibMetaFixture {
         handlers[16] = LibParseOperand.handleOperandDisallowed;
         // p
         handlers[17] = LibParseOperand.handleOperandDisallowed;
-        bytes memory pointers;
+        uint256[] memory pointers;
         assembly ("memory-safe") {
             pointers := handlers
         }

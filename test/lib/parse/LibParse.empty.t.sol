@@ -1,20 +1,25 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "src/lib/parse/LibParse.sol";
-import "src/lib/bytecode/LibBytecode.sol";
+import {LibParse} from "src/lib/parse/LibParse.sol";
+import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
+import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
+import {ParseState} from "src/lib/parse/LibParseState.sol";
+import {MaxSources} from "src/error/ErrParse.sol";
 
 /// @title LibParseEmptyTest
 /// Tests parsing empty sources and constants. All we want to check is that the
 /// parser doesn't revert and the correct number of sources and constants are
 /// returned.
 contract LibParseEmptyTest is Test {
+    using LibParse for ParseState;
+
     /// Check truly empty input bytes. Should not revert and return length 0
     /// sources and constants.
     function testParseEmpty00() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("", "");
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("").parse();
 
         assertEq(LibBytecode.sourceCount(bytecode), 0);
         assertEq(
@@ -29,7 +34,7 @@ contract LibParseEmptyTest is Test {
     /// Check a single empty expression. Should not revert and return length 1
     /// sources and constants.
     function testParseEmpty01() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":;", "");
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(":;").parse();
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(
             bytecode,
@@ -61,7 +66,7 @@ contract LibParseEmptyTest is Test {
     /// Check two empty expressions. Should not revert and return length 2
     /// sources and constants.
     function testParseEmpty02() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":;:;", "");
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(":;:;").parse();
         assertEq(LibBytecode.sourceCount(bytecode), 2);
         assertEq(
             bytecode,
@@ -104,7 +109,7 @@ contract LibParseEmptyTest is Test {
     /// Check three empty expressions. Should not revert and return length 3
     /// sources and constants.
     function testParseEmpty03() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":;:;:;", "");
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(":;:;:;").parse();
         assertEq(LibBytecode.sourceCount(bytecode), 3);
         assertEq(
             bytecode,
@@ -157,7 +162,7 @@ contract LibParseEmptyTest is Test {
     /// Check four empty expressions. Should not revert and return length 4
     /// sources and constants.
     function testParseEmpty04() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":;:;:;:;", "");
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(":;:;:;:;").parse();
         assertEq(LibBytecode.sourceCount(bytecode), 4);
         assertEq(
             bytecode,
@@ -220,7 +225,7 @@ contract LibParseEmptyTest is Test {
     /// Check eight empty expressions. Should not revert and return length 8
     /// sources and constants.
     function testParseEmpty08() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":;:;:;:;:;:;:;:;", "");
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(":;:;:;:;:;:;:;:;").parse();
         assertEq(LibBytecode.sourceCount(bytecode), 8);
         assertEq(
             bytecode,
@@ -323,7 +328,8 @@ contract LibParseEmptyTest is Test {
     /// Check fifteen empty expressions. Should not revert and return length 15
     /// sources and constants.
     function testParseEmpty15() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(":;:;:;:;:;:;:;:;:;:;:;:;:;:;:;", "");
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibMetaFixture.newState(":;:;:;:;:;:;:;:;:;:;:;:;:;:;:;").parse();
         assertEq(LibBytecode.sourceCount(bytecode), 15);
         assertEq(
             bytecode,
@@ -498,6 +504,6 @@ contract LibParseEmptyTest is Test {
     /// state of the parser.
     function testParseEmptyError16() external {
         vm.expectRevert(abi.encodeWithSelector(MaxSources.selector));
-        LibParse.parse(":;:;:;:;:;:;:;:;:;:;:;:;:;:;:;:;", "");
+        LibMetaFixture.newState(":;:;:;:;:;:;:;:;:;:;:;:;:;:;:;:;").parse();
     }
 }

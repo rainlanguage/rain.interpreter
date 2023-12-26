@@ -7,14 +7,17 @@ import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
 import {DecimalLiteralOverflow} from "src/lib/parse/LibParseLiteral.sol";
 import {LibParse, UnexpectedRHSChar, UnexpectedRightParen} from "src/lib/parse/LibParse.sol";
 import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
+import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseLiteralIntegerDecimalTest
 /// Tests parsing integer literal decimal values.
 contract LibParseLiteralIntegerDecimalTest is Test {
+    using LibParse for ParseState;
+
     /// Check a single decimal literal. Should not revert and return length 1
     /// sources and constants.
     function testParseIntegerLiteralDecimal00() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_: 1;", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_: 1;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -49,8 +52,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
     /// Check 2 decimal literals. Should not revert and return one source and
     /// length 2 constants.
     function testParseIntegerLiteralDecimal01() external {
-        (bytes memory bytecode, uint256[] memory constants) =
-            LibParse.parse("_ _: 10 25;", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_ _: 10 25;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -87,8 +89,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
 
     /// Check 3 decimal literals with 2 dupes. Should dedupe and respect ordering.
     function testParseIntegerLiteralDecimal02() external {
-        (bytes memory bytecode, uint256[] memory constants) =
-            LibParse.parse("_ _ _: 11 233 11;", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_ _ _: 11 233 11;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -128,10 +129,9 @@ contract LibParseLiteralIntegerDecimalTest is Test {
 
     /// Check that we can parse uint256 max int in decimal form.
     function testParseIntegerLiteralDecimalUint256Max() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(
-            "_: 115792089237316195423570985008687907853269984665640564039457584007913129639935;",
-            LibMetaFixture.parseMetaV2()
-        );
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(
+            "_: 115792089237316195423570985008687907853269984665640564039457584007913129639935;"
+        ).parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -166,10 +166,9 @@ contract LibParseLiteralIntegerDecimalTest is Test {
     /// Check that we can parse uint256 max int in decimal form with leading
     /// zeros.
     function testParseIntegerLiteralDecimalUint256MaxLeadingZeros() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(
-            "_: 000115792089237316195423570985008687907853269984665640564039457584007913129639935;",
-            LibMetaFixture.parseMetaV2()
-        );
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(
+            "_: 000115792089237316195423570985008687907853269984665640564039457584007913129639935;"
+        ).parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -203,10 +202,9 @@ contract LibParseLiteralIntegerDecimalTest is Test {
     /// Check that decimal literals will revert if they overflow uint256.
     function testParseIntegerLiteralDecimalUint256Overflow() external {
         vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 3));
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(
-            "_: 115792089237316195423570985008687907853269984665640564039457584007913129639936;",
-            LibMetaFixture.parseMetaV2()
-        );
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(
+            "_: 115792089237316195423570985008687907853269984665640564039457584007913129639936;"
+        ).parse();
         (bytecode);
         (constants);
     }
@@ -215,10 +213,9 @@ contract LibParseLiteralIntegerDecimalTest is Test {
     /// leading zeros.
     function testParseIntegerLiteralDecimalUint256OverflowLeadingZeros() external {
         vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 5));
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(
-            "_: 00115792089237316195423570985008687907853269984665640564039457584007913129639936;",
-            LibMetaFixture.parseMetaV2()
-        );
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(
+            "_: 00115792089237316195423570985008687907853269984665640564039457584007913129639936;"
+        ).parse();
         (bytecode);
         (constants);
     }
@@ -227,10 +224,9 @@ contract LibParseLiteralIntegerDecimalTest is Test {
     // a non-one leading digit.
     function testParseIntegerLiteralDecimalUint256OverflowLeadingDigit() external {
         vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 3));
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(
-            "_: 215792089237316195423570985008687907853269984665640564039457584007913129639935;",
-            LibMetaFixture.parseMetaV2()
-        );
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(
+            "_: 215792089237316195423570985008687907853269984665640564039457584007913129639935;"
+        ).parse();
         (bytecode);
         (constants);
     }
@@ -239,10 +235,9 @@ contract LibParseLiteralIntegerDecimalTest is Test {
     /// a non-one leading digit and leading zeros.
     function testParseIntegerLiteralDecimalUint256OverflowLeadingDigitLeadingZeros() external {
         vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 5));
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(
-            "_: 00215792089237316195423570985008687907853269984665640564039457584007913129639935;",
-            LibMetaFixture.parseMetaV2()
-        );
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(
+            "_: 00215792089237316195423570985008687907853269984665640564039457584007913129639935;"
+        ).parse();
         (bytecode);
         (constants);
     }
@@ -250,7 +245,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
     /// Check that e notation works.
     function testParseIntegerLiteralDecimalENotation() external {
         (bytes memory bytecode, uint256[] memory constants) =
-            LibParse.parse("_ _ _ _ _: 1e2 10e2 1e30 1e18 1001e15;", LibMetaFixture.parseMetaV2());
+            LibMetaFixture.newState("_ _ _ _ _: 1e2 10e2 1e30 1e18 1001e15;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -300,7 +295,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
         // but the parser will be in a state of yang, unable to receive the next
         // non-yin char.
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 5));
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:1e0e;", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:1e0e;").parse();
         (bytecode);
         (constants);
     }
@@ -309,7 +304,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
     /// words. This tests left paren.
     function testParseIntegerLiteralDecimalParensLeft() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 3));
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:1(;", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:1(;").parse();
         (bytecode);
         (constants);
     }
@@ -318,7 +313,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
     /// words. This tests right paren.
     function testParseIntegerLiteralDecimalParensRight() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRightParen.selector, 3));
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:1);", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:1);").parse();
         (bytecode);
         (constants);
     }
@@ -327,7 +322,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
     /// words. This tests both parens.
     function testParseIntegerLiteralDecimalParensBoth() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 3));
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_:1();", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:1();").parse();
         (bytecode);
         (constants);
     }

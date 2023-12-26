@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "src/lib/parse/LibParse.sol";
-import "src/lib/bytecode/LibBytecode.sol";
+import {LibParse} from "src/lib/parse/LibParse.sol";
+import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
+import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
+import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseInputsOnlyTest
 /// @notice Tests that inputs (leading LHS items without RHS items) to an
@@ -12,10 +14,12 @@ import "src/lib/bytecode/LibBytecode.sol";
 /// the expression is empty, and the inputs are the entire expression.
 /// I.e. the expression is basically an identity function.
 contract LibParseInputsOnlyTest is Test {
+    using LibParse for ParseState;
+
     /// Some inputs-only examples. Should produce an empty source.
     /// Test a single input.
     function testParseInputsOnlySingle() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes("_:;"), "");
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -46,7 +50,7 @@ contract LibParseInputsOnlyTest is Test {
 
     /// Test multiple inputs.
     function testParseInputsOnlyMultiple() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse(bytes("_ _:;"), "");
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_ _:;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);

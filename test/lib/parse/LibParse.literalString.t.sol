@@ -8,18 +8,21 @@ import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
 import {IntOrAString, LibIntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
 import {StringTooLong, UnclosedStringLiteral} from "src/error/ErrParse.sol";
 import {LibLiteralString} from "test/util/lib/literal/LibLiteralString.sol";
+import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseLiteralStringTest
 contract LibParseLiteralStringTest is Test {
+    using LibParse for ParseState;
+
     /// External parse function to allow us to assert reverts.
-    function externalParse(bytes memory str) external pure returns (bytes memory, uint256[] memory) {
-        return LibParse.parse(str, LibMetaFixture.parseMetaV2());
+    function externalParse(string memory str) external pure returns (bytes memory, uint256[] memory) {
+        return LibMetaFixture.newState(str).parse();
     }
 
     /// Check an empty string literal. Should not revert and return length 1
     /// sources and constants.
     function testParseStringLiteralEmpty() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_: \"\";", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_: \"\";").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -36,7 +39,7 @@ contract LibParseLiteralStringTest is Test {
     /// Check a simple string `"a"` literal. Should not revert and return
     /// length 1 sources and constants.
     function testParseStringLiteralSimple() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("_: \"a\";", LibMetaFixture.parseMetaV2());
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_: \"a\";").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -57,7 +60,7 @@ contract LibParseLiteralStringTest is Test {
         LibLiteralString.conformValidPrintableStringContent(str);
 
         (bytes memory bytecode, uint256[] memory constants) =
-            LibParse.parse(bytes(string.concat("_: \"", str, "\";")), LibMetaFixture.parseMetaV2());
+            LibMetaFixture.newState(string.concat("_: \"", str, "\";")).parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -80,7 +83,7 @@ contract LibParseLiteralStringTest is Test {
         vm.assume(keccak256(bytes(strA)) != keccak256(bytes(strB)));
 
         (bytes memory bytecode, uint256[] memory constants) =
-            LibParse.parse(bytes(string.concat("_ _: \"", strA, "\"\"", strB, "\";")), LibMetaFixture.parseMetaV2());
+            LibMetaFixture.newState(string.concat("_ _: \"", strA, "\"\"", strB, "\";")).parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -101,8 +104,7 @@ contract LibParseLiteralStringTest is Test {
         LibLiteralString.conformValidPrintableStringContent(str);
 
         vm.expectRevert(abi.encodeWithSelector(StringTooLong.selector, 3));
-        (bytes memory bytecode, uint256[] memory constants) =
-            this.externalParse(bytes(string.concat("_: \"", str, "\";")));
+        (bytes memory bytecode, uint256[] memory constants) = this.externalParse(string.concat("_: \"", str, "\";"));
         (bytecode, constants);
     }
 
@@ -118,7 +120,7 @@ contract LibParseLiteralStringTest is Test {
 
         vm.expectRevert(abi.encodeWithSelector(StringTooLong.selector, 3));
         (bytes memory bytecode, uint256[] memory constants) =
-            this.externalParse(bytes(string.concat("_: \"", strA, strB, "\";")));
+            this.externalParse(string.concat("_: \"", strA, strB, "\";"));
         (bytecode, constants);
     }
 
@@ -132,8 +134,7 @@ contract LibParseLiteralStringTest is Test {
         LibLiteralString.corruptSingleChar(str, badIndex);
 
         vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, 4 + badIndex));
-        (bytes memory bytecode, uint256[] memory constants) =
-            this.externalParse(bytes(string.concat("_: \"", str, "\";")));
+        (bytes memory bytecode, uint256[] memory constants) = this.externalParse(string.concat("_: \"", str, "\";"));
         (bytecode, constants);
     }
 }
