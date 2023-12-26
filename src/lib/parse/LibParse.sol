@@ -403,9 +403,12 @@ library LibParse {
             if (state.data.length > 0) {
                 uint256 cursor;
                 uint256 end;
-                assembly ("memory-safe") {
-                    cursor := add(data, 0x20)
-                    end := add(cursor, mload(data))
+                {
+                    bytes memory data = state.data;
+                    assembly ("memory-safe") {
+                        cursor := add(data, 0x20)
+                        end := add(cursor, mload(data))
+                    }
                 }
                 cursor = state.parseInterstitial(cursor, end);
                 cursor = state.parsePragma(cursor, end);

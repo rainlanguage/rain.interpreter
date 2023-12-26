@@ -8,12 +8,12 @@ import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 
-uint256 constant FIXTURE_OPS_LENGTH;
+uint256 constant FIXTURE_OPS_LENGTH = 18;
 
 library LibMetaFixture {
     function newState(string memory s) internal pure returns (ParseState memory) {
         return LibParseState.newState(
-            bytes(s), authoringMetaV2(), operandHandlerFunctionPointers(), LibParseLiteral.buildLiteralParsers()
+            bytes(s), parseMetaV2(), operandHandlerFunctionPointers(), LibParseLiteral.buildLiteralParsers()
         );
     }
 

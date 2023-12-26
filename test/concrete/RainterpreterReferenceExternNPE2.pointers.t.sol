@@ -15,7 +15,7 @@ import {
 } from "src/concrete/RainterpreterReferenceExternNPE2.sol";
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 
-contract RainterpreterReferenceExternNPE2Test is Test {
+contract RainterpreterReferenceExternNPE2PointersTest is Test {
     function testOpcodeFunctionPointers() external {
         RainterpreterReferenceExternNPE2 extern = new RainterpreterReferenceExternNPE2();
         bytes memory expected = extern.buildOpcodeFunctionPointers();

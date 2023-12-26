@@ -8,6 +8,10 @@ contract ErrParse {}
 /// somewhere that we don't expect it or can't handle it.
 error UnexpectedOperand();
 
+/// Thrown when there are more operand values in the operand than the handler
+/// is expecting.
+error UnexpectedOperandValue();
+
 /// Thrown when parsing an operand and some required component of the operand is
 /// not found in the source string.
 error ExpectedOperand();

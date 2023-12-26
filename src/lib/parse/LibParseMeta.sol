@@ -269,7 +269,7 @@ library LibParseMeta {
                 if (wordFingerprint == posData & FINGERPRINT_MASK) {
                     uint256 index;
                     assembly ("memory-safe") {
-                        index := byte(27, posData)
+                        index := byte(28, posData)
                     }
                     return (true, index);
                 } else {

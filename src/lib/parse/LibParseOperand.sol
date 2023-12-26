@@ -6,13 +6,14 @@ import {
     UnclosedOperand,
     OperandOverflow,
     OperandValuesOverflow,
-    UnexpectedOperand
+    UnexpectedOperand,
+    UnexpectedOperandValue
 } from "../../error/ErrParse.sol";
 import {Operand} from "../../interface/unstable/IInterpreterV2.sol";
 import {LibParse} from "./LibParse.sol";
 import {LibParseLiteral} from "./LibParseLiteral.sol";
 import {CMASK_OPERAND_END, CMASK_WHITESPACE, CMASK_OPERAND_START} from "./LibParseCMask.sol";
-import {ParseState, OPERAND_VALUES_LENGTH} from "./LibParseState.sol";
+import {ParseState, OPERAND_VALUES_LENGTH, FSM_YANG_MASK} from "./LibParseState.sol";
 import {LibParseError} from "./LibParseError.sol";
 import {LibParseInterstitial} from "./LibParseInterstitial.sol";
 
@@ -29,10 +30,19 @@ library LibParseOperand {
             char := shl(byte(0, mload(cursor)), 1)
         }
 
+        // Reset operand values to length 0 to avoid any previous values bleeding
+        // into processing this operand.
+        uint256[] memory operandValues = state.operandValues;
+        assembly ("memory-safe") {
+            mstore(operandValues, 0)
+        }
+
         // There may not be an operand. Only process if there is.
         if (char == CMASK_OPERAND_START) {
             // Move past the opening character.
             ++cursor;
+            // Let the state be yin so we can parse literals.
+            state.fsm &= ~FSM_YANG_MASK;
 
             // Load the next char.
             assembly ("memory-safe") {
@@ -41,7 +51,6 @@ library LibParseOperand {
             }
             uint256 i = 0;
             bool success = false;
-            uint256[] memory operandValues = state.operandValues;
             while (cursor < end) {
                 // Load the next char.
                 assembly ("memory-safe") {
@@ -62,8 +71,8 @@ library LibParseOperand {
                     success = true;
                     break;
                 }
-                // Attempt to parse literals.
-                else {
+                // Attempt to parse literals if we're not yang.
+                else if (state.fsm & FSM_YANG_MASK == 0) {
                     (
                         function(ParseState memory, uint256, uint256) pure returns (uint256) literalParser,
                         uint256 innerStart,
@@ -87,6 +96,15 @@ library LibParseOperand {
                         revert OperandValuesOverflow(state.parseErrorOffset(cursor));
                     }
                     cursor = outerEnd;
+                    // Set yang so we don't attempt to parse a literal straight
+                    // off the back of this literal without some whitespace.
+                    state.fsm |= FSM_YANG_MASK;
+                }
+                // Something failed here so let's say the author forgot to close
+                // the operand, which is a literal arbitrary but at least it's
+                // a consistent error.
+                else {
+                    revert UnclosedOperand(state.parseErrorOffset(cursor));
                 }
             }
             if (!success) {
@@ -143,7 +161,7 @@ library LibParseOperand {
         } else if (values.length == 0) {
             operand = Operand.wrap(0);
         } else {
-            revert UnexpectedOperand();
+            revert UnexpectedOperandValue();
         }
     }
 
@@ -165,7 +183,7 @@ library LibParseOperand {
         } else if (values.length < 2) {
             revert ExpectedOperand();
         } else {
-            revert UnexpectedOperand();
+            revert UnexpectedOperandValue();
         }
     }
 
@@ -206,7 +224,7 @@ library LibParseOperand {
         } else if (length == 0) {
             revert ExpectedOperand();
         } else {
-            revert UnexpectedOperand();
+            revert UnexpectedOperandValue();
         }
     }
 
@@ -240,7 +258,7 @@ library LibParseOperand {
 
             operand = Operand.wrap(a | (b << 1));
         } else {
-            revert UnexpectedOperand();
+            revert UnexpectedOperandValue();
         }
     }
 }

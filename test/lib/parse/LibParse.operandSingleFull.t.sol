@@ -2,7 +2,7 @@
 pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
-import {ExpectedOperand, UnclosedOperand, OperandOverflow} from "src/error/ErrParse.sol";
+import {ExpectedOperand, UnclosedOperand, OperandOverflow, UnexpectedOperandValue} from "src/error/ErrParse.sol";
 import {LibParse, ExpectedLeftParen} from "src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
@@ -33,23 +33,38 @@ contract LibParseOperandSingleFullTest is Test {
         assertEq(constants.length, 0);
     }
 
-    /// Empty operand is disallowed.
+    /// Empty operand is allowed.
     function testOperandSingleFullEmpty() external {
-        vm.expectRevert(abi.encodeWithSelector(ExpectedOperand.selector, 4));
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:b<>();").parse();
-        (bytecode);
-        (constants);
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // 0 offset
+            hex"0000"
+            // 1 length
+            hex"01"
+            // 1 stack allocation
+            hex"01"
+            // 0 inputs
+            hex"00"
+            // 1 outputs
+            hex"01"
+            // b 0 operand
+            hex"03000000"
+        );
+        assertEq(constants.length, 0);
     }
 
     /// Multiple operands are disallowed.
     function testOperandSingleFullMultiple() external {
-        vm.expectRevert(abi.encodeWithSelector(UnclosedOperand.selector, 9));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedOperandValue.selector));
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:b<0x00 0x01>();").parse();
         (bytecode);
         (constants);
     }
 
-    /// Can provide decimal 0 as single full operand.
+    /// Can provide decimal integer 0 as single full operand.
     function testOperandSingleFullZero() external {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:b<0>();").parse();
         assertEq(
@@ -189,7 +204,7 @@ contract LibParseOperandSingleFullTest is Test {
 
     /// Overflowing decimal uint16 max as single full operand reverts.
     function testOperandSingleFullUint16MaxOverflow() external {
-        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector, 4));
+        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:b<65536>();").parse();
         (bytecode);
         (constants);
@@ -197,7 +212,7 @@ contract LibParseOperandSingleFullTest is Test {
 
     /// Overflowing hexadecimal uint16 max as a single full operand reverts.
     function testOperandSingleFullHexUint16MaxOverflow() external {
-        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector, 4));
+        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:b<0x010000>();").parse();
         (bytecode);
         (constants);
