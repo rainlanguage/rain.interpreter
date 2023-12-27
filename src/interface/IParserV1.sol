@@ -1,6 +1,21 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
+struct AuthoringMeta {
+    // `word` is referenced directly in assembly so don't move the field.
+    bytes32 word;
+    uint8 operandParserOffset;
+    string description;
+}
+
+/// Identical to AuthoringMeta but without operandParserOffset.
+struct AuthoringMetaV2 {
+    // `word` is referenced directly in assembly so don't move the field. It MUST
+    // be the first item.
+    bytes32 word;
+    string description;
+}
+
 interface IParserV1 {
     /// Parses a Rainlang string into an evaluable expression. MUST be
     /// deterministic and MUST NOT have side effects. The only inputs are the

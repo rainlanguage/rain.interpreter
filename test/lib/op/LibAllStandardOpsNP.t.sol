@@ -30,7 +30,7 @@ contract LibAllStandardOpsNPTest is Test {
         bytes memory integrityFunctionPointers = LibAllStandardOpsNP.integrityFunctionPointers();
         bytes memory functionPointers = LibAllStandardOpsNP.opcodeFunctionPointers();
 
-        bytes memory authoringMeta = LibAllStandardOpsNP.authoringMeta();
+        bytes memory authoringMeta = LibAllStandardOpsNP.authoringMetaV2();
         bytes32[] memory words = abi.decode(authoringMeta, (bytes32[]));
 
         assertEq(integrityFunctionPointers.length, functionPointers.length);

@@ -216,21 +216,19 @@ contract LibOpIntMaxNPTest is OpTest {
     /// Test the eval of `int-max` opcode parsed from a string.
     /// Tests that operands are disallowed.
     function testOpIntMaxNPEvalOperandDisallowed() external {
-        checkDisallowedOperand("_: int-max<>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-max<0>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-max<1>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-max<2>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-max<3 1>(0 0 0);", 10);
+        checkDisallowedOperand("_: int-max<0>(0 0 0);");
+        checkDisallowedOperand("_: int-max<1>(0 0 0);");
+        checkDisallowedOperand("_: int-max<2>(0 0 0);");
+        checkDisallowedOperand("_: int-max<3 1>(0 0 0);");
     }
 
     /// Test the eval of `decimal18-max` opcode parsed from a string.
     /// Tests that operands are disallowed.
     /// MUST be identical to `int-max`.
     function testOpDecimal18MaxNPEvalOperandDisallowed() external {
-        checkDisallowedOperand("_: decimal18-max<>(0 0 0);", 16);
-        checkDisallowedOperand("_: decimal18-max<0>(0 0 0);", 16);
-        checkDisallowedOperand("_: decimal18-max<1>(0 0 0);", 16);
-        checkDisallowedOperand("_: decimal18-max<2>(0 0 0);", 16);
-        checkDisallowedOperand("_: decimal18-max<3 1>(0 0 0);", 16);
+        checkDisallowedOperand("_: decimal18-max<0>(0 0 0);");
+        checkDisallowedOperand("_: decimal18-max<1>(0 0 0);");
+        checkDisallowedOperand("_: decimal18-max<2>(0 0 0);");
+        checkDisallowedOperand("_: decimal18-max<3 1>(0 0 0);");
     }
 }

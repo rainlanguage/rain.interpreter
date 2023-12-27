@@ -161,10 +161,9 @@ contract LibOpIntModNPTest is OpTest {
     /// Test the eval of `int-mod` opcode parsed from a string.
     /// Tests that operands are disallowed.
     function testOpIntModNPEvalOperandDisallowed() external {
-        checkDisallowedOperand("_: int-mod<>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-mod<0>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-mod<1>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-mod<2>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-mod<3 1>(0 0 0);", 10);
+        checkDisallowedOperand("_: int-mod<0>(0 0 0);");
+        checkDisallowedOperand("_: int-mod<1>(0 0 0);");
+        checkDisallowedOperand("_: int-mod<2>(0 0 0);");
+        checkDisallowedOperand("_: int-mod<3 1>(0 0 0);");
     }
 }

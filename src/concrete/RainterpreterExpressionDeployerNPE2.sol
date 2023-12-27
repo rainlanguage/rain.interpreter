@@ -36,7 +36,7 @@ bytes constant INTEGRITY_FUNCTION_POINTERS =
     hex"0a650adf0b480cc00cc00cca0cd30cee0d940d940df00e6c0e760e800cc00cca0cc00cc00cca0e6c0e6c0e6c0e6c0e6c0e8a0eac0ed60cc00e8a0cc00cc00e800cca0cc00cc00ef80ef80cc00cc00cca0cca0ef80ef80ef80ef80ef80ef80ef80ef80ef80ef80ef80ef80cca0f0f0f190f190f19";
 
 /// @dev Hash of the known construction meta.
-bytes32 constant CONSTRUCTION_META_HASH = bytes32(0xb54a52906cc014539c68c995f9261d5f47de3437308ee7e93a36650dd191ecb6);
+bytes32 constant CONSTRUCTION_META_HASH = bytes32(0x223935e6758ce9e5968c652b47f8e98901a7b189e99f1f6274bbb1221ae28dab);
 
 /// All config required to construct a `RainterpreterNPE2`.
 /// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match
@@ -51,9 +51,6 @@ struct RainterpreterExpressionDeployerNPE2ConstructionConfig {
 }
 
 /// @title RainterpreterExpressionDeployerNPE2
-/// @notice !!!EXPERIMENTAL!!! This is the deployer for the RainterpreterNPE2
-/// interpreter. Notably includes onchain parsing/compiling of expressions from
-/// Rainlang strings.
 contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, ERC165 {
     using LibPointer for Pointer;
     using LibStackPointer for Pointer;

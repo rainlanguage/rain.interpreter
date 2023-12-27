@@ -4,12 +4,15 @@ pragma solidity =0.8.19;
 import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 
+import {console2} from "forge-std/console2.sol";
+
 import {ISubParserV1} from "../interface/unstable/ISubParserV1.sol";
 import {IncompatibleSubParser} from "../error/ErrSubParse.sol";
 import {LibSubParse, ParseState} from "../lib/parse/LibSubParse.sol";
 import {CMASK_RHS_WORD_TAIL} from "../lib/parse/LibParseCMask.sol";
 import {LibParse, Operand} from "../lib/parse/LibParse.sol";
 import {LibParseMeta} from "../lib/parse/LibParseMeta.sol";
+import {LibParseOperand} from "../lib/parse/LibParseOperand.sol";
 
 /// @dev This is a placeholder for the subparser function pointers.
 /// The subparser function pointers are a list of 16 bit function pointers,
@@ -29,7 +32,7 @@ bytes constant SUB_PARSER_PARSE_META = hex"";
 /// will handle all operand parsing, the subparser will only be responsible for
 /// checking the validity of the operand values and encoding them into the
 /// resulting bytecode.
-uint256 constant SUB_PARSER_OPERAND_PARSERS = 0;
+bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"";
 
 /// @dev This is a placeholder for the int that encodes pointers to literal
 /// parsers. In the future this will probably be removed and there will be
@@ -81,6 +84,7 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
     using LibBytes for bytes;
     using LibParse for ParseState;
     using LibParseMeta for ParseState;
+    using LibParseOperand for ParseState;
 
     /// Overrideable function to allow implementations to define their parse
     /// meta bytes.
@@ -97,10 +101,10 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
     }
 
     /// Overrideable function to allow implementations to define their operand
-    /// parsers.
+    /// handlers.
     //slither-disable-next-line dead-code
-    function subParserOperandParsers() internal pure virtual returns (uint256) {
-        return SUB_PARSER_OPERAND_PARSERS;
+    function subParserOperandHandlers() internal pure virtual returns (bytes memory) {
+        return SUB_PARSER_OPERAND_HANDLERS;
     }
 
     /// Overrideable function to allow implementations to define their literal
@@ -133,27 +137,21 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
         if (compatibility != subParserCompatibility()) {
             revert IncompatibleSubParser();
         }
+        console2.logBytes(data);
 
         (uint256 constantsHeight, uint256 ioByte, ParseState memory state) = LibSubParse.consumeInputData(
-            data, subParserParseMeta(), subParserLiteralParsers(), subParserOperandParsers()
+            data, subParserParseMeta(), subParserOperandHandlers(), subParserLiteralParsers()
         );
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         uint256 end = cursor + state.data.length;
 
         bytes32 word;
         (cursor, word) = LibParse.parseWord(cursor, end, CMASK_RHS_WORD_TAIL);
-        (
-            bool exists,
-            uint256 index,
-            function(ParseState memory, uint256, uint256) pure returns (uint256, Operand) operandParser
-        ) = state.lookupWord(word);
-        uint256 op;
-        assembly ("memory-safe") {
-            op := operandParser
-        }
+        (bool exists, uint256 index) = state.lookupWord(word);
+        console2.log(exists, index);
+        console2.logBytes(abi.encodePacked(word));
         if (exists) {
-            Operand operand;
-            (cursor, operand) = operandParser(state, cursor, end);
+            Operand operand = state.handleOperand(index);
             function (uint256, uint256, Operand) internal pure returns (bool, bytes memory, uint256[] memory) subParser;
             bytes memory localSubParserFunctionPointers = subParserFunctionPointers();
             assembly ("memory-safe") {

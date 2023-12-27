@@ -102,10 +102,9 @@ contract LibOpSetNPTest is OpTest {
     /// Test the eval of `set` opcode parsed from a string.
     /// Tests that operands are disallowed.
     function testLibOpSetNPEvalOperandsDisallowed() external {
-        checkDisallowedOperand(":set<>(0x1234 0x5678);", 4);
-        checkDisallowedOperand(":set<0>(0x1234 0x5678);", 4);
-        checkDisallowedOperand(":set<1>(0x1234 0x5678);", 4);
-        checkDisallowedOperand(":set<2>(0x1234 0x5678);", 4);
-        checkDisallowedOperand(":set<3 1>(0x1234 0x5678);", 4);
+        checkDisallowedOperand(":set<0>(0x1234 0x5678);");
+        checkDisallowedOperand(":set<1>(0x1234 0x5678);");
+        checkDisallowedOperand(":set<2>(0x1234 0x5678);");
+        checkDisallowedOperand(":set<3 1>(0x1234 0x5678);");
     }
 }

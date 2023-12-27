@@ -10,45 +10,49 @@ import {
     CMASK_LHS_STACK_HEAD
 } from "src/lib/parse/LibParseCMask.sol";
 import {LibParse, UnexpectedLHSChar} from "src/lib/parse/LibParse.sol";
+import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
+import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseUnexpectedLHSTest
 /// The parser should revert if it encounters an unexpected character on the LHS.
 contract LibParseUnexpectedLHSTest is Test {
+    using LibParse for ParseState;
+
     /// Check the parser reverts if it encounters an unexpected EOL on the LHS.
     function testParseUnexpectedLHSEOL() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0));
-        LibParse.parse(",", "");
+        LibMetaFixture.newState(",").parse();
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1));
-        LibParse.parse(" ,", "");
+        LibMetaFixture.newState(" ,").parse();
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1));
-        LibParse.parse("_,", "");
+        LibMetaFixture.newState("_,").parse();
     }
 
     /// Check the parser reverts if it encounters an unexpected EOF on the LHS.
     function testParseUnexpectedLHSEOF() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0));
-        LibParse.parse(";", "");
+        LibMetaFixture.newState(";").parse();
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1));
-        LibParse.parse(" ;", "");
+        LibMetaFixture.newState(" ;").parse();
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1));
-        LibParse.parse("_;", "");
+        LibMetaFixture.newState("_;").parse();
     }
 
     /// Check the parser reverts if it encounters underscores in the tail of an
     /// LHS item.
     function testParseUnexpectedLHSUnderscoreTail() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1));
-        LibParse.parse("a_:;", "");
+        LibMetaFixture.newState("a_:;").parse();
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 2));
-        LibParse.parse("a __:;", "");
+        LibMetaFixture.newState("a __:;").parse();
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 2));
-        LibParse.parse("_a_:;", "");
+        LibMetaFixture.newState("_a_:;").parse();
     }
 
     /// Check the parser reverts if it encounters an unexpected character as the
@@ -60,7 +64,7 @@ contract LibParseUnexpectedLHSTest is Test {
         );
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0));
-        LibParse.parse(bytes.concat(bytes1(a), ":;"), "");
+        LibMetaFixture.newState(string(bytes.concat(bytes1(a), ":;"))).parse();
     }
 
     /// Check the parser reverts if it encounters an unexpected character as the
@@ -72,7 +76,7 @@ contract LibParseUnexpectedLHSTest is Test {
         );
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1));
-        LibParse.parse(bytes.concat("_", bytes1(a), ":;"), "");
+        LibMetaFixture.newState(string(bytes.concat("_", bytes1(a), ":;"))).parse();
     }
 
     /// Check the parser reverts if it encounters an unexpected character as the
@@ -94,6 +98,8 @@ contract LibParseUnexpectedLHSTest is Test {
         vm.assume(hasInvalidChar);
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, i + 1));
-        LibParse.parse(bytes.concat(bytes1(a), b, ":;"), "");
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibMetaFixture.newState(string(bytes.concat(bytes1(a), b, ":;"))).parse();
+        (bytecode, constants);
     }
 }

@@ -4,18 +4,25 @@ pragma solidity =0.8.19;
 import {Test} from "forge-std/Test.sol";
 
 import {ExpectedOperand, UnclosedOperand} from "src/error/ErrParse.sol";
-import {OPERAND_PARSER_OFFSET_DISALLOWED} from "src/lib/parse/LibParseOperand.sol";
-import {AuthoringMeta, LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
+import {AuthoringMetaV2} from "src/interface/IParserV1.sol";
+import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 import {LibParse, DuplicateLHSItem, WordSize} from "src/lib/parse/LibParse.sol";
 import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
+import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
+import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
+import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
+import {Operand, LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
+import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 
 /// @title LibParseNamedLHSTest
 contract LibParseNamedLHSTest is Test {
+    using LibParse for ParseState;
+
     /// A few simple examples that should create some empty sources.
     function testParseNamedLHSEmptySourceExamples() external {
         string[3] memory examples0 = ["a _:;", "a b:;", "foo bar:;"];
         for (uint256 i = 0; i < examples0.length; i++) {
-            (bytes memory bytecode0, uint256[] memory constants0) = LibParse.parse(bytes(examples0[i]), "");
+            (bytes memory bytecode0, uint256[] memory constants0) = LibMetaFixture.newState(examples0[i]).parse();
             assertEq(LibBytecode.sourceCount(bytecode0), 1);
             uint256 sourceIndex0 = 0;
             assertEq(LibBytecode.sourceRelativeOffset(bytecode0, sourceIndex0), 0);
@@ -30,7 +37,7 @@ contract LibParseNamedLHSTest is Test {
 
     /// Two sources with one named input each.
     function testParseNamedLHSTwoInputs() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("a:;b:;", "");
+        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("a:;b:;").parse();
         assertEq(
             bytecode,
             // 2 sources.
@@ -84,7 +91,7 @@ contract LibParseNamedLHSTest is Test {
         // Only the first 32 chars are visible in the error.
         vm.expectRevert(abi.encodeWithSelector(WordSize.selector, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
         // 32 chars is too long.
-        LibParse.parse("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;", "");
+        LibMetaFixture.newState("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;").parse();
     }
 
     /// Exceeding the maximum length of a word should revert. Testing a 33 char
@@ -94,18 +101,31 @@ contract LibParseNamedLHSTest is Test {
         // Only the first 32 chars are visible in the error.
         vm.expectRevert(abi.encodeWithSelector(WordSize.selector, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
         // 33 chars is too long.
-        LibParse.parse("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;", "");
+        LibMetaFixture.newState("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;").parse();
     }
 
     /// Stack needs to index items by name correctly across lines.
     function testParseNamedLHSStackIndex() external {
-        AuthoringMeta[] memory meta = new AuthoringMeta[](3);
-        meta[0] = AuthoringMeta("stack", OPERAND_PARSER_OFFSET_DISALLOWED, "stack");
-        meta[1] = AuthoringMeta("constant", OPERAND_PARSER_OFFSET_DISALLOWED, "constant");
-        meta[2] = AuthoringMeta("c", OPERAND_PARSER_OFFSET_DISALLOWED, "c");
-        bytes memory parseMeta = LibParseMeta.buildParseMeta(meta, 1);
+        AuthoringMetaV2[] memory meta = new AuthoringMetaV2[](3);
+        meta[0] = AuthoringMetaV2("stack", "stack");
+        meta[1] = AuthoringMetaV2("constant", "constant");
+        meta[2] = AuthoringMetaV2("c", "c");
+        bytes memory parseMeta = LibParseMeta.buildParseMetaV2(meta, 1);
 
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("a _:1 2,b:a,:c(),d:3,e:d;", parseMeta);
+        function (uint256[] memory) internal pure returns (Operand)[] memory operandHandlers =
+            new function (uint256[] memory) internal pure returns (Operand)[](3);
+        operandHandlers[0] = LibParseOperand.handleOperandDisallowed;
+        operandHandlers[1] = LibParseOperand.handleOperandDisallowed;
+        operandHandlers[2] = LibParseOperand.handleOperandSingleFull;
+        uint256[] memory pointers;
+        assembly ("memory-safe") {
+            pointers := operandHandlers
+        }
+        bytes memory operandHandlerPointers = LibConvert.unsafeTo16BitBytes(pointers);
+
+        (bytes memory bytecode, uint256[] memory constants) = LibParseState.newState(
+            bytes("a _:1 2,b:a,:c(),d:3,e:d;"), parseMeta, operandHandlerPointers, LibParseLiteral.buildLiteralParsers()
+        ).parse();
         assertEq(
             bytecode,
             // 2 sources.
@@ -142,12 +162,13 @@ contract LibParseNamedLHSTest is Test {
     /// Duplicate names are disallowed in the same source.
     function testParseNamedErrorDuplicateSameSource() external {
         vm.expectRevert(abi.encodeWithSelector(DuplicateLHSItem.selector, 4));
-        LibParse.parse("a:,a:;", "");
+        LibMetaFixture.newState("a:,a:;").parse();
     }
 
     /// Duplicate names are allowed across different sources.
     function testParseNamedDuplicateDifferentSource() external {
-        (bytes memory bytecode, uint256[] memory constants) = LibParse.parse("a b:1 2, e:a;c d:3 4,e:d;", "");
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibParseState.newState("a b:1 2, e:a;c d:3 4,e:d;", "", "", LibParseLiteral.buildLiteralParsers()).parse();
         assertEq(
             bytecode,
             // 2 sources.

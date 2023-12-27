@@ -100,7 +100,7 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
 
     /// Test that operand fails integrity check.
     function testOpERC721BalanceOfNPIntegrityFailOperand() external {
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector, 20));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: erc721-balance-of<0>(0x00 0x01);");
         (bytecode, constants);
     }

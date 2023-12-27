@@ -215,10 +215,9 @@ contract LibOpIntExpNPTest is OpTest {
     /// Test the eval of `int-exp` opcode parsed from a string.
     /// Tests that operands are disallowed.
     function testOpIntExpNPEvalOperandDisallowed() external {
-        checkDisallowedOperand("_: int-exp<>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-exp<0>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-exp<1>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-exp<2>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-exp<3 1>(0 0 0);", 10);
+        checkDisallowedOperand("_: int-exp<0>(0 0 0);");
+        checkDisallowedOperand("_: int-exp<1>(0 0 0);");
+        checkDisallowedOperand("_: int-exp<2>(0 0 0);");
+        checkDisallowedOperand("_: int-exp<3 1>(0 0 0);");
     }
 }

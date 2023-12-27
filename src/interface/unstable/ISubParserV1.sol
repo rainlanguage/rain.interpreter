@@ -12,6 +12,25 @@ pragma solidity ^0.8.18;
 ///   first word char to the char before the opening `(` paren.
 bytes32 constant COMPATIBLITY_V0 = keccak256("2023.12.17 Rainlang Parser v0");
 
+/// @dev This is the second compatibility version of the subparser interface.
+/// Likely it won't survive long, but it's here to demonstrate the concept.
+/// The structure of data for this version is:
+/// - bytes [0,1]: The current height of the constants array on the main parser.
+/// - bytes [2,2]: The IO byte, that at the time of writing represents the
+///   number of inputs to the word.
+/// - bytes [3,4]; Two bytes that encodes N where N is the length in bytes of the
+///   rainlang word that could not be parsed in bytes.
+/// - bytes [5, N+5]: A string slice that the parser could not parse. For well
+///   formed rainlang it will be a word WITHOUT any associated operands. The
+///   parsing of operands is handled by the main parser, and the subparser is
+///   only expected to parse the word itself and handle the pre-parsed operand
+///   values.
+/// - bytes [N+5,...]: The operands that the main parser has already parsed as
+///   a standard `uint256[]` array. The subparser is expected to handle these
+///   operands as-is, and return bytecode that is compatible with the operand
+///   values. The first word of the array is the array length.
+bytes32 constant COMPATIBLITY_V1 = keccak256("2023.12.26 Rainlang Parser v1");
+
 interface ISubParserV1 {
     /// Handle parsing some data on behalf of a parser. The structure and meaning
     /// of the data is entirely up to the parser, the compatibility version

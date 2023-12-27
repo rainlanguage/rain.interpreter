@@ -98,7 +98,7 @@ contract LibOpERC721OwnerOfNPTest is OpTest {
 
     /// Test that operand fails integrity check.
     function testOpERC721OwnerOfNPEvalFailOperand() public {
-        vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector, 18));
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: erc721-owner-of<0>(0x00 0x01);");
         (bytecode, constants);
     }

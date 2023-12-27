@@ -151,12 +151,11 @@ contract LibOpDecimal18MulNPTest is OpTest {
     /// Test the eval of `decimal18-mul` opcode parsed from a string.
     /// Tests that operands are disallowed.
     function testOpDecimal18MulNPEvalOperandsDisallowed() external {
-        checkDisallowedOperand("_: decimal18-mul<>(1e18 1e18 1e18 1e18);", 16);
-        checkDisallowedOperand("_: decimal18-mul<0>(1e18 1e18 1e18);", 16);
-        checkDisallowedOperand("_: decimal18-mul<1>(1e18 1e18 1e18);", 16);
-        checkDisallowedOperand("_: decimal18-mul<2>(1e18 1e18 1e18);", 16);
-        checkDisallowedOperand("_: decimal18-mul<0 0>(1e18 1e18 1e18);", 16);
-        checkDisallowedOperand("_: decimal18-mul<0 1>(1e18 1e18 1e18);", 16);
-        checkDisallowedOperand("_: decimal18-mul<1 0>(1e18 1e18 1e18);", 16);
+        checkDisallowedOperand("_: decimal18-mul<0>(1e18 1e18 1e18);");
+        checkDisallowedOperand("_: decimal18-mul<1>(1e18 1e18 1e18);");
+        checkDisallowedOperand("_: decimal18-mul<2>(1e18 1e18 1e18);");
+        checkDisallowedOperand("_: decimal18-mul<0 0>(1e18 1e18 1e18);");
+        checkDisallowedOperand("_: decimal18-mul<0 1>(1e18 1e18 1e18);");
+        checkDisallowedOperand("_: decimal18-mul<1 0>(1e18 1e18 1e18);");
     }
 }

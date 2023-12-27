@@ -157,10 +157,9 @@ contract LibOpIntDivNPTest is OpTest {
     /// Test the eval of `int-div` opcode parsed from a string.
     /// Tests that operands are disallowed.
     function testOpIntDivNPEvalOperandDisallowed() external {
-        checkDisallowedOperand("_: int-div<>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-div<0>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-div<1>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-div<2>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-div<3 1>(0 0 0);", 10);
+        checkDisallowedOperand("_: int-div<0>(0 0 0);");
+        checkDisallowedOperand("_: int-div<1>(0 0 0);");
+        checkDisallowedOperand("_: int-div<2>(0 0 0);");
+        checkDisallowedOperand("_: int-div<3 1>(0 0 0);");
     }
 }

@@ -7,15 +7,15 @@ import {
     OPCODE_FUNCTION_POINTERS,
     INTEGRITY_FUNCTION_POINTERS,
     SUB_PARSER_FUNCTION_POINTERS,
-    AuthoringMeta,
+    AuthoringMetaV2,
     SUB_PARSER_PARSE_META,
-    SUB_PARSER_OPERAND_PARSERS,
+    SUB_PARSER_OPERAND_HANDLERS,
     LibRainterpreterReferenceExternNPE2,
     SUB_PARSER_LITERAL_PARSERS
 } from "src/concrete/RainterpreterReferenceExternNPE2.sol";
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 
-contract RainterpreterReferenceExternNPE2Test is Test {
+contract RainterpreterReferenceExternNPE2PointersTest is Test {
     function testOpcodeFunctionPointers() external {
         RainterpreterReferenceExternNPE2 extern = new RainterpreterReferenceExternNPE2();
         bytes memory expected = extern.buildOpcodeFunctionPointers();
@@ -31,9 +31,9 @@ contract RainterpreterReferenceExternNPE2Test is Test {
     }
 
     function testSubParserParseMeta() external {
-        bytes memory authoringMetaBytes = LibRainterpreterReferenceExternNPE2.authoringMeta();
-        AuthoringMeta[] memory authoringMeta = abi.decode(authoringMetaBytes, (AuthoringMeta[]));
-        bytes memory expected = LibParseMeta.buildParseMeta(authoringMeta, 2);
+        bytes memory authoringMetaBytes = LibRainterpreterReferenceExternNPE2.authoringMetaV2();
+        AuthoringMetaV2[] memory authoringMeta = abi.decode(authoringMetaBytes, (AuthoringMetaV2[]));
+        bytes memory expected = LibParseMeta.buildParseMetaV2(authoringMeta, 2);
         bytes memory actual = SUB_PARSER_PARSE_META;
         assertEq(actual, expected);
     }
@@ -54,8 +54,8 @@ contract RainterpreterReferenceExternNPE2Test is Test {
 
     function testSubParserOperandParsers() external {
         RainterpreterReferenceExternNPE2 extern = new RainterpreterReferenceExternNPE2();
-        uint256 expected = extern.buildSubParserOperandParsers();
-        uint256 actual = SUB_PARSER_OPERAND_PARSERS;
+        bytes memory expected = extern.buildSubParserOperandHandlers();
+        bytes memory actual = SUB_PARSER_OPERAND_HANDLERS;
         assertEq(actual, expected);
     }
 }

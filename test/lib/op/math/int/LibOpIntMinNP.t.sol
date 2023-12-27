@@ -313,21 +313,19 @@ contract LibOpIntMinNPTest is OpTest {
     /// Test the eval of `int-min` opcode parsed from a string.
     /// Tests that operands are disallowed.
     function testOpIntMinNPEvalOperandDisallowed() external {
-        checkDisallowedOperand("_: int-min<>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-min<0>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-min<1>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-min<2>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-min<3 1>(0 0 0);", 10);
+        checkDisallowedOperand("_: int-min<0>(0 0 0);");
+        checkDisallowedOperand("_: int-min<1>(0 0 0);");
+        checkDisallowedOperand("_: int-min<2>(0 0 0);");
+        checkDisallowedOperand("_: int-min<3 1>(0 0 0);");
     }
 
     /// Test the eval of `decimal18-min` opcode parsed from a string.
     /// Tests that operands are disallowed.
     /// MUST be identical to `int-min`.
     function testOpDecimal18MaxNPEvalOperandDisallowed() external {
-        checkDisallowedOperand("_: decimal18-min<>(0 0 0);", 16);
-        checkDisallowedOperand("_: decimal18-min<0>(0 0 0);", 16);
-        checkDisallowedOperand("_: decimal18-min<1>(0 0 0);", 16);
-        checkDisallowedOperand("_: decimal18-min<2>(0 0 0);", 16);
-        checkDisallowedOperand("_: decimal18-min<3 1>(0 0 0);", 16);
+        checkDisallowedOperand("_: decimal18-min<0>(0 0 0);");
+        checkDisallowedOperand("_: decimal18-min<1>(0 0 0);");
+        checkDisallowedOperand("_: decimal18-min<2>(0 0 0);");
+        checkDisallowedOperand("_: decimal18-min<3 1>(0 0 0);");
     }
 }

@@ -142,12 +142,11 @@ contract LibOpIntMulNPTest is OpTest {
     /// Test the eval of `int-mul` opcode parsed from a string.
     /// Tests that operands are disallowed.
     function testOpIntMulNPEvalOperandsDisallowed() external {
-        checkDisallowedOperand("_: int-mul<>(0 0);", 10);
-        checkDisallowedOperand("_: int-mul<0>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-mul<1>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-mul<2>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-mul<0 0>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-mul<0 1>(0 0 0);", 10);
-        checkDisallowedOperand("_: int-mul<1 0>(0 0 0);", 10);
+        checkDisallowedOperand("_: int-mul<0>(0 0 0);");
+        checkDisallowedOperand("_: int-mul<1>(0 0 0);");
+        checkDisallowedOperand("_: int-mul<2>(0 0 0);");
+        checkDisallowedOperand("_: int-mul<0 0>(0 0 0);");
+        checkDisallowedOperand("_: int-mul<0 1>(0 0 0);");
+        checkDisallowedOperand("_: int-mul<1 0>(0 0 0);");
     }
 }

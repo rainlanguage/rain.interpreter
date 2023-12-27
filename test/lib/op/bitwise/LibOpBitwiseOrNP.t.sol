@@ -59,6 +59,6 @@ contract LibOpBitwiseOrNPTest is OpTest {
 
     /// Test that operand is disallowed.
     function testOpBitwiseORNPEvalBadOperand() external {
-        checkUnhappyParse("_: bitwise-or<0>(0 0);", abi.encodeWithSelector(UnexpectedOperand.selector, 13));
+        checkUnhappyParse("_: bitwise-or<0>(0 0);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

@@ -6,7 +6,8 @@ import {Test, console2, stdError} from "forge-std/Test.sol";
 
 import {INVALID_BYTECODE} from "../lib/etch/LibEtch.sol";
 import {EXPRESSION_DEPLOYER_NP_META_PATH} from "../lib/constants/ExpressionDeployerNPConstants.sol";
-import {LibParseMeta, AuthoringMeta} from "src/lib/parse/LibParseMeta.sol";
+import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
+import {AuthoringMetaV2} from "src/interface/IParserV1.sol";
 import {RainterpreterStoreNPE2, STORE_BYTECODE_HASH} from "src/concrete/RainterpreterStoreNPE2.sol";
 import {
     RainterpreterParserNPE2,
@@ -86,8 +87,8 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
             revert("unexpected parser bytecode hash");
         }
 
-        AuthoringMeta[] memory authoringMeta = abi.decode(LibAllStandardOpsNP.authoringMeta(), (AuthoringMeta[]));
-        bytes memory parseMeta = LibParseMeta.buildParseMeta(authoringMeta, PARSE_META_BUILD_DEPTH);
+        AuthoringMetaV2[] memory authoringMeta = abi.decode(LibAllStandardOpsNP.authoringMetaV2(), (AuthoringMetaV2[]));
+        bytes memory parseMeta = LibParseMeta.buildParseMetaV2(authoringMeta, PARSE_META_BUILD_DEPTH);
         if (keccak256(parseMeta) != keccak256(PARSE_META)) {
             console2.log("current parse meta:");
             console2.logBytes(parseMeta);
