@@ -51,9 +51,6 @@ struct RainterpreterExpressionDeployerNPE2ConstructionConfig {
 }
 
 /// @title RainterpreterExpressionDeployerNPE2
-/// @notice !!!EXPERIMENTAL!!! This is the deployer for the RainterpreterNPE2
-/// interpreter. Notably includes onchain parsing/compiling of expressions from
-/// Rainlang strings.
 contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, ERC165 {
     using LibPointer for Pointer;
     using LibStackPointer for Pointer;

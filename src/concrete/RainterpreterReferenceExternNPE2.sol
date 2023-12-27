@@ -5,7 +5,6 @@ import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {BadDynamicLength} from "../error/ErrOpList.sol";
 import {BaseRainterpreterExternNPE2, Operand} from "../abstract/BaseRainterpreterExternNPE2.sol";
 import {BaseRainterpreterSubParserNPE2} from "../abstract/BaseRainterpreterSubParserNPE2.sol";
-import {OPCODE_EXTERN} from "../interface/unstable/IInterpreterV2.sol";
 import {LibExtern, EncodedExternDispatch} from "../lib/extern/LibExtern.sol";
 import {IInterpreterExternV3} from "../interface/unstable/IInterpreterExternV3.sol";
 import {LibSubParse} from "../lib/parse/LibSubParse.sol";
@@ -19,38 +18,38 @@ import {COMPATIBLITY_V1} from "../interface/unstable/ISubParserV1.sol";
 /// 1:1 with the number of opcodes provided by the extern component of this
 /// contract. It is possible to subparse words into opcodes that run entirely
 /// within the interpreter, and do not have an associated extern dispatch.
-uint256 constant SUB_PARSER_FUNCTION_POINTERS_LENGTH = 1;
+uint256 constant SUB_PARSER_FUNCTION_POINTERS_LENGTH = 2;
 
 /// @dev Real function pointers to the sub parser functions that produce the
 /// bytecode that this contract knows about. This is both constructing the extern
 /// bytecode that dials back into this contract at eval time, and creating
 /// to things that happen entirely on the interpreter such as well known
 /// constants and references to the context grid.
-bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"096c";
+bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"0a150a38";
 
 /// @dev Real sub parser meta bytes that map parsed strings to the functions that
 /// know how to parse those strings into opcodes for the main parser. Structured
 /// identically to parse meta for the main parser.
-bytes constant SUB_PARSER_PARSE_META = hex"0100000000000000000000000000000000000000000000000000000000000000000200ae37f5";
+bytes constant SUB_PARSER_PARSE_META = hex"0100000000000000000000000000000000000000000000000000000000400000000200ae37f501f2eec7";
 
 /// @dev Real function pointers to the operand parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
 /// the rightmost position is a pointer to an operand parser function. In the
 /// future this is likely to be removed, or refactored to value handling only
 /// rather than parsing.
-bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"0659";
+bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"066d06b2";
 
 /// @dev Real function pointers to the literal parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
 /// the rightmost position is a pointer to a literal parser function. In the
 /// future this is likely to be removed, in favour of a dedicated literal parser
 /// feature.
-uint256 constant SUB_PARSER_LITERAL_PARSERS = 17330409966118;
+uint256 constant SUB_PARSER_LITERAL_PARSERS = 18120696007390;
 
 /// @dev Real function pointers to the opcodes for the extern component of this
 /// contract. These get run at eval time wehen the interpreter calls into the
 /// contract as an `IInterpreterExternV3`.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"057a";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"058e";
 
 /// @dev Number of opcode function pointers available to run at eval time.
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
@@ -59,7 +58,7 @@ uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
 /// of this contract. These get run at deploy time when the main integrity checks
 /// are run, the extern opcode integrity on the deployer will delegate integrity
 /// checks to the extern contract.
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"069e";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0747";
 
 /// @dev Opcode index of the extern increment opcode. Needs to be manually kept
 /// in sync with the extern opcode function pointers. Definitely write tests for
@@ -72,6 +71,9 @@ uint256 constant OP_INDEX_INCREMENT = 0;
 /// required to use this pattern, of libs outside the implementation contract,
 /// but it MAY be convenient to do so, as the libs can be moved to dedicated
 /// files, easily tested and reviewed directly, etc.
+///
+/// This op is a simple increment of every input by 1. It is used to demonstrate
+/// handling both multiple inputs and outputs in extern dispatching logic.
 library LibExternOpIntIncNPE2 {
     /// Running the extern increments every input by 1. By allowing many inputs
     /// we can test multi input/output logic is implemented correctly for
@@ -112,6 +114,30 @@ library LibExternOpIntIncNPE2 {
     }
 }
 
+/// @title LibExternOpStackOperandNPE2
+/// This is a library that mimics the op libraries elsewhere in this repo, but
+/// structured to fit extern dispatching rather than internal logic. It is NOT
+/// required to use this pattern, of libs outside the implementation contract,
+/// but it MAY be convenient to do so, as the libs can be moved to dedicated
+/// files, easily tested and reviewed directly, etc.
+///
+/// This op copies its operand value to the stack by copying it to the constants
+/// array at parse time. This means that it doesn't exist as an externed opcode,
+/// the interpreter will run it directly, therefore it has no `run` or
+/// `integrity` logic, only a sub parser. This demonstrates both how to
+/// implement constants, and handling operands in the sub parser.
+library LibExternOpStackOperandNPE2 {
+    //slither-disable-next-line dead-code
+    function subParser(uint256 constantsHeight, uint256, Operand operand)
+        internal
+        pure
+        returns (bool, bytes memory, uint256[] memory)
+    {
+        //slither-disable-next-line unused-return
+        return LibSubParse.subParserConstant(constantsHeight, Operand.unwrap(operand));
+    }
+}
+
 /// @title LibRainterpreterReferenceExternNPE2
 /// This library allows code SEPARATE FROM the implementation contract to do
 /// offchain processing of supporting data without needing to compile all this
@@ -133,6 +159,10 @@ library LibRainterpreterReferenceExternNPE2 {
             AuthoringMetaV2(
                 "reference-extern-inc",
                 "Demonstrates a sugared extern into the reference implementation that increments every input 1:1 with its outputs."
+            ),
+            AuthoringMetaV2(
+                "reference-extern-stack-operand",
+                "Demonstrates using the reference extern to put the operand of a word back into a constant opcode on the main interpreter, without any extern dispatch."
             )
         ];
         AuthoringMetaV2[] memory wordsDynamic;
@@ -242,7 +272,8 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
                 lengthPointer := length
             }
             function(uint256[] memory) internal pure returns (Operand)[SUB_PARSER_FUNCTION_POINTERS_LENGTH + 1] memory
-                handlersFixed = [lengthPointer, LibParseOperand.handleOperandDisallowed];
+                handlersFixed =
+                    [lengthPointer, LibParseOperand.handleOperandDisallowed, LibParseOperand.handleOperandSingleFull];
             uint256[] memory handlersDynamic;
             assembly {
                 handlersDynamic := handlersFixed
@@ -273,7 +304,8 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
                 lengthPointer := length
             }
             function(uint256, uint256, Operand) internal view returns (bool, bytes memory, uint256[] memory)[SUB_PARSER_FUNCTION_POINTERS_LENGTH
-                + 1] memory pointersFixed = [lengthPointer, LibExternOpIntIncNPE2.subParser];
+                + 1] memory pointersFixed =
+                    [lengthPointer, LibExternOpIntIncNPE2.subParser, LibExternOpStackOperandNPE2.subParser];
             uint256[] memory pointersDynamic;
             assembly {
                 pointersDynamic := pointersFixed

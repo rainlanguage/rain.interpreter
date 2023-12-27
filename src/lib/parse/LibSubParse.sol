@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {LibParseState, ParseState} from "./LibParseState.sol";
-import {OPCODE_UNKNOWN, OPCODE_EXTERN, Operand} from "../../interface/unstable/IInterpreterV2.sol";
+import {OPCODE_UNKNOWN, OPCODE_EXTERN, OPCODE_CONSTANT, Operand} from "../../interface/unstable/IInterpreterV2.sol";
 import {LibBytecode, Pointer} from "../bytecode/LibBytecode.sol";
 import {ISubParserV1, COMPATIBLITY_V1} from "../../interface/unstable/ISubParserV1.sol";
 import {BadSubParserResult, UnknownWord} from "../../error/ErrParse.sol";
@@ -12,6 +12,47 @@ import {ExternDispatchConstantsHeightOverflow} from "../../error/ErrSubParse.sol
 
 library LibSubParse {
     using LibParseState for ParseState;
+
+    /// Sub parse a value into the bytecode that will run on the interpreter to
+    /// push the given value onto the stack, using the constant opcode at eval.
+    function subParserConstant(uint256 constantsHeight, uint256 value)
+        internal
+        pure
+        returns (bool, bytes memory, uint256[] memory)
+    {
+        // Build a constant opcode that the interpreter will run itself.
+        bytes memory bytecode;
+        uint256 opIndex = OPCODE_CONSTANT;
+        assembly ("memory-safe") {
+            // Allocate the bytecode.
+            // This is an UNALIGNED allocation.
+            bytecode := mload(0x40)
+            mstore(0x40, add(bytecode, 0x24))
+
+            // It's most efficient to store the constants height first, as it
+            // is in theory multibyte (although it's not expected to be).
+            // This also has the effect of zeroing out the inputs, which is what
+            // we want, as long as the main parser respects the constants height
+            // never being more than 2 bytes.
+            mstore(add(bytecode, 4), constantsHeight)
+
+            // Main opcode is constant.
+            mstore8(add(bytecode, 0x20), opIndex)
+
+            // Write the length of the bytes.
+            mstore(bytecode, 4)
+        }
+
+        uint256[] memory constants;
+        assembly ("memory-safe") {
+            constants := mload(0x40)
+            mstore(0x40, add(constants, 0x40))
+            mstore(constants, 1)
+            mstore(add(constants, 0x20), value)
+        }
+
+        return (true, bytecode, constants);
+    }
 
     /// Sub parse a known extern opcode index into the bytecode that will run
     /// on the interpreter to call the given extern contract. This requires the
@@ -34,9 +75,15 @@ library LibSubParse {
         }
         // Build an extern call that dials back into the current contract at eval
         // time with the current opcode index.
-        bytes memory bytecode = new bytes(4);
+        bytes memory bytecode;
         uint256 opIndex = OPCODE_EXTERN;
         assembly ("memory-safe") {
+            // Allocate the bytecode.
+            // This is an UNALIGNED allocation.
+            bytecode := mload(0x40)
+            mstore(0x40, add(bytecode, 0x24))
+            mstore(bytecode, 4)
+
             // Main opcode is extern, to call back into current contract.
             mstore8(add(bytecode, 0x20), opIndex)
             // Use the io byte as is for inputs.
