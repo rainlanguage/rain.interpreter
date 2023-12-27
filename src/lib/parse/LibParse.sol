@@ -237,6 +237,9 @@ library LibParse {
                             bytes memory subParserBytecode;
 
                             {
+                                // Need to capture the word length up here before
+                                // we move the cursor past the operand that might
+                                // exist.
                                 uint256 wordLength = cursor - cursorForUnknownWord;
                                 uint256 subParserBytecodeLength = SUB_PARSER_BYTECODE_HEADER_SIZE + wordLength;
                                 // We store the final parsed values in the sub parser
