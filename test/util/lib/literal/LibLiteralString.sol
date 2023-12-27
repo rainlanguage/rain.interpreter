@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {CMASK_STRING_LITERAL_TAIL, CMASK_HEX} from "src/lib/parse/LibParseCMask.sol";
+import {CMASK_STRING_LITERAL_TAIL, CMASK_HEX, CMASK_WHITESPACE} from "src/lib/parse/LibParseCMask.sol";
 
 library LibLiteralString {
     function conformStringToMask(string memory str, uint256 mask, uint256 max) internal pure {
@@ -30,6 +30,11 @@ library LibLiteralString {
 
     function conformValidPrintableStringContent(string memory str) internal pure {
         conformStringToMask(str, CMASK_STRING_LITERAL_TAIL, 0x80);
+    }
+
+    function conformStringToWhitespace(string memory str) internal pure {
+        // 33 is ! which is after space.
+        conformStringToMask(str, CMASK_WHITESPACE, 33);
     }
 
     function corruptSingleChar(string memory str, uint256 index) internal pure {

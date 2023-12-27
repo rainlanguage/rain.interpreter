@@ -101,7 +101,7 @@ library LibParseOperand {
                     state.fsm |= FSM_YANG_MASK;
                 }
                 // Something failed here so let's say the author forgot to close
-                // the operand, which is a literal arbitrary but at least it's
+                // the operand, which is a little arbitrary but at least it's
                 // a consistent error.
                 else {
                     revert UnclosedOperand(state.parseErrorOffset(cursor));
@@ -155,7 +155,7 @@ library LibParseOperand {
             assembly ("memory-safe") {
                 operand := mload(add(values, 0x20))
             }
-            if (Operand.unwrap(operand) > type(uint16).max) {
+            if (Operand.unwrap(operand) > uint256(type(uint16).max)) {
                 revert OperandOverflow();
             }
         } else if (values.length == 0) {
