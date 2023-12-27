@@ -25,31 +25,32 @@ uint256 constant SUB_PARSER_FUNCTION_POINTERS_LENGTH = 2;
 /// bytecode that dials back into this contract at eval time, and creating
 /// to things that happen entirely on the interpreter such as well known
 /// constants and references to the context grid.
-bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"0a150a38";
+bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"0b7c0b9f";
 
 /// @dev Real sub parser meta bytes that map parsed strings to the functions that
 /// know how to parse those strings into opcodes for the main parser. Structured
 /// identically to parse meta for the main parser.
-bytes constant SUB_PARSER_PARSE_META = hex"0100000000000000000000000000000000000000000000000000000000400000000200ae37f501f2eec7";
+bytes constant SUB_PARSER_PARSE_META =
+    hex"0100000000000000000000000000000000000000000000000000000000400000000200ae37f501f2eec7";
 
 /// @dev Real function pointers to the operand parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
 /// the rightmost position is a pointer to an operand parser function. In the
 /// future this is likely to be removed, or refactored to value handling only
 /// rather than parsing.
-bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"066d06b2";
+bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"06aa06ef";
 
 /// @dev Real function pointers to the literal parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
 /// the rightmost position is a pointer to a literal parser function. In the
 /// future this is likely to be removed, in favour of a dedicated literal parser
 /// feature.
-uint256 constant SUB_PARSER_LITERAL_PARSERS = 18120696007390;
+uint256 constant SUB_PARSER_LITERAL_PARSERS = 19662612794437;
 
 /// @dev Real function pointers to the opcodes for the extern component of this
 /// contract. These get run at eval time wehen the interpreter calls into the
 /// contract as an `IInterpreterExternV3`.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"058e";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"05cb";
 
 /// @dev Number of opcode function pointers available to run at eval time.
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
@@ -58,7 +59,7 @@ uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
 /// of this contract. These get run at deploy time when the main integrity checks
 /// are run, the extern opcode integrity on the deployer will delegate integrity
 /// checks to the extern contract.
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0747";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0784";
 
 /// @dev Opcode index of the extern increment opcode. Needs to be manually kept
 /// in sync with the extern opcode function pointers. Definitely write tests for
