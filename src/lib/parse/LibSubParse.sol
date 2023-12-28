@@ -183,12 +183,7 @@ library LibSubParse {
                             }
 
                             for (uint256 i; i < subConstants.length; ++i) {
-                                // Use 0 as a fingerprint as the literal
-                                // deduping logic is irrelevant to
-                                // subparsing. This is safe as long as
-                                // nothing that wants to dedupe could collide
-                                // with a 0 fingerprint.
-                                state.pushConstantValue(0, subConstants[i]);
+                                state.pushConstantValue(subConstants[i]);
                             }
 
                             // Stop looping over sub parsers now.

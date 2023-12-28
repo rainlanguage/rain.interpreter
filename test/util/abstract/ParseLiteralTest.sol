@@ -19,44 +19,35 @@ contract ParseLiteralTest is Test {
         uint256 cursor = outerStart;
         uint256 end = outerStart + data.length;
         vm.expectRevert(abi.encodeWithSelector(UnsupportedLiteralType.selector, offset));
-        (
-            function(ParseState memory, uint256, uint256) pure returns (uint256) parser,
-            uint256 innerStart,
-            uint256 innerEnd,
-            uint256 outerEnd
-        ) = state.boundLiteral(cursor, end);
-        (parser);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        uint256 value;
+        (cursor, value) = state.parseLiteral(cursor, end);
+        (cursor, value);
     }
 
-    function checkLiteralBounds(
-        bytes memory data,
-        uint256 expectedInnerStart,
-        uint256 expectedInnerEnd,
-        uint256 expectedOuterEnd,
-        uint256 expectedParser
-    ) internal {
-        ParseState memory state =
-            LibParseState.newState(data, "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
-        state.literalParsers = LibAllStandardOpsNP.literalParserFunctionPointers();
-        uint256 outerStart = Pointer.unwrap(data.dataPointer());
-        uint256 cursor = outerStart;
-        uint256 end = outerStart + data.length;
-        (
-            function(ParseState memory, uint256, uint256) pure returns (uint256) parser,
-            uint256 innerStart,
-            uint256 innerEnd,
-            uint256 outerEnd
-        ) = state.boundLiteral(cursor, end);
-        uint256 actualParser;
-        assembly ("memory-safe") {
-            actualParser := parser
-        }
-        assertEq(actualParser, expectedParser, "parser");
-        assertEq(innerStart, outerStart + expectedInnerStart, "innerStart");
-        assertEq(innerEnd, outerStart + expectedInnerEnd, "innerEnd");
-        assertEq(outerEnd, outerStart + expectedOuterEnd, "outerEnd");
-    }
+    // function checkLiteralBounds(
+    //     function (ParseState memory state, uint256 cursor, uint256 end) pure returns (uint256, uint256, uint256) bounder,
+    //     bytes memory data,
+    //     uint256 expectedInnerEnd,
+    //     uint256 expectedOuterEnd,
+    //     uint256 expectedFinalCursor
+    // ) internal {
+    //     ParseState memory state =
+    //         LibParseState.newState(data, "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+    //     state.literalParsers = LibAllStandardOpsNP.literalParserFunctionPointers();
+    //     uint256 outerStart = Pointer.unwrap(data.dataPointer());
+    //     uint256 cursor = outerStart;
+    //     uint256 end = outerStart + data.length;
+    //     uint256 value;
+    //     (
+    //         cursor, value
+    //     ) = state.parseLiteral(cursor, end);
+    //     uint256 actualParser;
+    //     assembly ("memory-safe") {
+    //         actualParser := parser
+    //     }
+    //     assertEq(actualParser, expectedParser, "parser");
+    //     assertEq(innerStart, outerStart + expectedInnerStart, "innerStart");
+    //     assertEq(innerEnd, outerStart + expectedInnerEnd, "innerEnd");
+    //     assertEq(outerEnd, outerStart + expectedOuterEnd, "outerEnd");
+    // }
 }

@@ -131,8 +131,11 @@ error ParenOverflow();
 /// The parser did not find any whitespace after the pragma keyword.
 error NoWhitespaceAfterUsingWordsFrom(uint256 offset);
 
-/// The parser encountered a hex literal that is the wrong size to be an address.
-error InvalidAddressLength(uint256 offset);
+// /// The parser encountered a hex literal that is the wrong size to be an address.
+// error InvalidAddressLength(uint256 offset);
+
+/// The parser encountered a literal that it cannot use as a sub parser.
+error InvalidSubParser(uint256 offset);
 
 /// The sub parser returned some bytecode that the main parser could not
 /// understand.

@@ -20,12 +20,14 @@ contract LibParseLiteralHexTest is Test {
         string memory hexString = Strings.toHexString(value);
         ParseState memory state =
             LibParseState.newState(bytes(hexString), "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
-        (uint256 parsedValue) = state.parseLiteralHex(
+        uint256 cursor = Pointer.unwrap(state.data.dataPointer());
+        (uint256 cursorAfter, uint256 parsedValue) = state.parseLiteralHex(
             // The hex parser wants only the hexadecimal digits without the
             // leading "0x".
-            Pointer.unwrap(bytes(hexString).dataPointer()) + 2,
+            cursor,
             Pointer.unwrap(bytes(hexString).endDataPointer())
         );
         assertEq(parsedValue, value);
+        assertEq(cursorAfter, cursor + bytes(hexString).length);
     }
 }

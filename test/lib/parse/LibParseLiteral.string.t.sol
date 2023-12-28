@@ -18,10 +18,11 @@ contract LibParseLiteralStringTest is Test {
     function testParseStringLiteralEmpty() external {
         ParseState memory state =
             LibParseState.newState("", "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
-        (uint256 value) = state.parseLiteralString(
-            Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer())
-        );
+        uint256 cursor = Pointer.unwrap(state.data.dataPointer());
+        (uint256 cursorAfter, uint256 value) =
+            state.parseLiteralString(cursor, Pointer.unwrap(state.data.endDataPointer()));
         assertEq(value, 0);
+        assertEq(cursorAfter, cursor);
     }
 
     /// The parser does not care about printable characters, or even ASCII. It
@@ -31,9 +32,11 @@ contract LibParseLiteralStringTest is Test {
             LibParseState.newState(data, "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
 
         uint256 expectedValue = IntOrAString.unwrap(LibIntOrAString.fromString(string(data)));
-        (uint256 value) = state.parseLiteralString(
+        uint256 cursor = Pointer.unwrap(state.data.dataPointer());
+        (uint256 cursorAfter, uint256 value) = state.parseLiteralString(
             Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer())
         );
         assertEq(value, expectedValue);
+        assertEq(cursorAfter, cursor + data.length);
     }
 }

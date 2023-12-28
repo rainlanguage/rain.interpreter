@@ -3,7 +3,7 @@ pragma solidity ^0.8.18;
 
 import {ParseState} from "./LibParseState.sol";
 import {CMASK_WHITESPACE, CMASK_LITERAL_HEX_DISPATCH_START} from "./LibParseCMask.sol";
-import {NoWhitespaceAfterUsingWordsFrom} from "../../error/ErrParse.sol";
+import {NoWhitespaceAfterUsingWordsFrom, InvalidSubParser} from "../../error/ErrParse.sol";
 import {LibParseError} from "./LibParseError.sol";
 import {LibParseInterstitial} from "./LibParseInterstitial.sol";
 import {LibParseLiteral} from "./LibParseLiteral.sol";
@@ -19,7 +19,11 @@ library LibParsePragma {
     using LibParseLiteral for ParseState;
     using LibParsePragma for ParseState;
 
-    function pushSubParser(ParseState memory state, uint256 subParser) internal pure {
+    function pushSubParser(ParseState memory state, uint256 cursor, uint256 subParser) internal pure {
+        if (subParser > type(uint160).max) {
+            revert InvalidSubParser(state.parseErrorOffset(cursor));
+        }
+
         uint256 tail = state.subParsers;
         // Move the tail off to a new allocation.
         uint256 tailPointer;
@@ -70,28 +74,16 @@ library LibParsePragma {
                 // the last address as we don't break til just below.
                 cursor = state.parseInterstitial(cursor, end);
 
-                // If the cursor is NOT pointing at the start of a hex literal
-                // then we're done with the pragma.
-                {
-                    uint256 mustBe0x;
-                    assembly ("memory-safe") {
-                        mustBe0x := mload(sub(cursor, 30))
-                    }
-                    if (uint16(mustBe0x) != CMASK_LITERAL_HEX_DISPATCH_START) {
-                        break;
-                    }
+                // Try to parse a literal and treat it as an address.
+                bool success;
+                uint256 value;
+                (success, cursor, value) = state.tryParseLiteral(cursor, end);
+                // If we didn't parse a literal, we're done with the pragma.
+                if (!success) {
+                    break;
+                } else {
+                    state.pushSubParser(cursor, value);
                 }
-
-                (
-                    function(ParseState memory, uint256, uint256) pure returns (uint256) literalHexAddressParser,
-                    uint256 innerStart,
-                    uint256 innerEnd,
-                    uint256 outerEnd
-                ) = state.boundLiteralHexAddress(cursor, end);
-
-                // Parse and push the sub parser
-                state.pushSubParser(literalHexAddressParser(state, innerStart, innerEnd));
-                cursor = outerEnd;
             }
 
             return cursor;

@@ -73,13 +73,8 @@ library LibParseOperand {
                 }
                 // Attempt to parse literals if we're not yang.
                 else if (state.fsm & FSM_YANG_MASK == 0) {
-                    (
-                        function(ParseState memory, uint256, uint256) pure returns (uint256) literalParser,
-                        uint256 innerStart,
-                        uint256 innerEnd,
-                        uint256 outerEnd
-                    ) = state.boundLiteral(cursor, end);
-                    uint256 value = literalParser(state, innerStart, innerEnd);
+                    uint256 value;
+                    (cursor, value) = state.parseLiteral(cursor, end);
                     // We manipulate the operand values array directly in
                     // assembly because if we used the Solidity indexing syntax
                     // it would bounds check against the _current_ length of the
@@ -95,7 +90,6 @@ library LibParseOperand {
                     if (i++ == OPERAND_VALUES_LENGTH) {
                         revert OperandValuesOverflow(state.parseErrorOffset(cursor));
                     }
-                    cursor = outerEnd;
                     // Set yang so we don't attempt to parse a literal straight
                     // off the back of this literal without some whitespace.
                     state.fsm |= FSM_YANG_MASK;

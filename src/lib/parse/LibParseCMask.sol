@@ -471,6 +471,9 @@ uint128 constant CMASK_NUMERIC_LITERAL_HEAD = CMASK_NUMERIC_0_9;
 /// @dev Rainlang supports string literals as anything starting with "
 uint128 constant CMASK_STRING_LITERAL_HEAD = CMASK_QUOTATION_MARK;
 
+/// @dev Rainlang supports sub parseable literals as anything starting with [
+uint128 constant CMASK_SUB_PARSEABLE_LITERAL_HEAD = CMASK_LEFT_SQUARE_BRACKET;
+
 /// @dev Rainlang string end is "
 uint128 constant CMASK_STRING_LITERAL_END = CMASK_QUOTATION_MARK;
 
