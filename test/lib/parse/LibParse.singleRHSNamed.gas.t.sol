@@ -98,8 +98,9 @@ contract LibParseSingleRHSNamedGasTest is Test {
     }
 
     function newState(string memory source) internal pure returns (ParseState memory) {
-        return
-            LibParseState.newState(bytes(source), parseMeta(), operandHandlers(), LibAllStandardOpsNP.literalParserFunctionPointers());
+        return LibParseState.newState(
+            bytes(source), parseMeta(), operandHandlers(), LibAllStandardOpsNP.literalParserFunctionPointers()
+        );
     }
 
     /// Test parsing "a" (1 char) as the RHS.

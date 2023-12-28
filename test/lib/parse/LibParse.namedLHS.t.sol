@@ -125,7 +125,10 @@ contract LibParseNamedLHSTest is Test {
         bytes memory operandHandlerPointers = LibConvert.unsafeTo16BitBytes(pointers);
 
         (bytes memory bytecode, uint256[] memory constants) = LibParseState.newState(
-            bytes("a _:1 2,b:a,:c(),d:3,e:d;"), parseMeta, operandHandlerPointers, LibAllStandardOpsNP.literalParserFunctionPointers()
+            bytes("a _:1 2,b:a,:c(),d:3,e:d;"),
+            parseMeta,
+            operandHandlerPointers,
+            LibAllStandardOpsNP.literalParserFunctionPointers()
         ).parse();
         assertEq(
             bytecode,
@@ -168,8 +171,9 @@ contract LibParseNamedLHSTest is Test {
 
     /// Duplicate names are allowed across different sources.
     function testParseNamedDuplicateDifferentSource() external {
-        (bytes memory bytecode, uint256[] memory constants) =
-            LibParseState.newState("a b:1 2, e:a;c d:3 4,e:d;", "", "", LibAllStandardOpsNP.literalParserFunctionPointers()).parse();
+        (bytes memory bytecode, uint256[] memory constants) = LibParseState.newState(
+            "a b:1 2, e:a;c d:3 4,e:d;", "", "", LibAllStandardOpsNP.literalParserFunctionPointers()
+        ).parse();
         assertEq(
             bytecode,
             // 2 sources.

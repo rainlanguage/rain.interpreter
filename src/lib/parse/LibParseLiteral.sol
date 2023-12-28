@@ -44,9 +44,11 @@ library LibParseLiteral {
     using LibParseError for ParseState;
     using LibParseLiteral for ParseState;
 
-    function selectLiteralParserByIndex(ParseState memory state, uint256 index) internal pure returns (
-        function(ParseState memory, uint256, uint256) pure returns (uint256)
-    ) {
+    function selectLiteralParserByIndex(ParseState memory state, uint256 index)
+        internal
+        pure
+        returns (function(ParseState memory, uint256, uint256) pure returns (uint256))
+    {
         bytes memory literalParsers = state.literalParsers;
         function(ParseState memory, uint256, uint256) pure returns (uint256) parser;
         assembly ("memory-safe") {

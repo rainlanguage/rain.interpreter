@@ -281,12 +281,13 @@ library LibAllStandardOpsNP {
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function (ParseState memory, uint256, uint256) pure returns (uint256)[LITERAL_PARSERS_LENGTH + 1] memory pointersFixed = [
-                lengthPointer,
-                LibParseLiteral.parseLiteralHex,
-                LibParseLiteral.parseLiteralDecimal,
-                LibParseLiteral.parseLiteralString
-            ];
+            function (ParseState memory, uint256, uint256) pure returns (uint256)[LITERAL_PARSERS_LENGTH + 1] memory
+                pointersFixed = [
+                    lengthPointer,
+                    LibParseLiteral.parseLiteralHex,
+                    LibParseLiteral.parseLiteralDecimal,
+                    LibParseLiteral.parseLiteralString
+                ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
                 pointersDynamic := pointersFixed

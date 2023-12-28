@@ -20,7 +20,8 @@ contract LibParseLiteralBoundLiteralHexAddressTest is ParseLiteralTest {
         pure
         returns (uint256, uint256, uint256, uint256, uint256)
     {
-        ParseState memory state = LibParseState.newState(bytes(value), "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+        ParseState memory state =
+            LibParseState.newState(bytes(value), "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
 
         uint256 outerStart = Pointer.unwrap(bytes(value).dataPointer());
         uint256 end = outerStart + bytes(value).length;

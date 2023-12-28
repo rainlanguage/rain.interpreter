@@ -20,7 +20,8 @@ contract LibParseLiteralBoundLiteralStringTest is Test {
         pure
         returns (uint256, uint256, uint256, uint256, uint256)
     {
-        ParseState memory state = LibParseState.newState(data, "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+        ParseState memory state =
+            LibParseState.newState(data, "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
         state.literalParsers = LibAllStandardOpsNP.literalParserFunctionPointers();
         uint256 outerStart = Pointer.unwrap(bytes(data).dataPointer());
         uint256 cursor = outerStart;
@@ -45,7 +46,8 @@ contract LibParseLiteralBoundLiteralStringTest is Test {
         pure
         returns (uint256, uint256, uint256, uint256, uint256)
     {
-        ParseState memory state = LibParseState.newState(data, "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+        ParseState memory state =
+            LibParseState.newState(data, "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
         state.literalParsers = LibAllStandardOpsNP.literalParserFunctionPointers();
         assembly ("memory-safe") {
             mstore(data, length)

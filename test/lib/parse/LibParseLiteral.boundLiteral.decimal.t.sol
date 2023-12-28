@@ -29,7 +29,8 @@ contract LibParseLiteralBoundLiteralDecimalTest is ParseLiteralTest {
     }
 
     function checkMalformedExponentDigits(bytes memory data, uint256 offset) internal {
-        ParseState memory state = LibParseState.newState(data, "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+        ParseState memory state =
+            LibParseState.newState(data, "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
         state.literalParsers = LibAllStandardOpsNP.literalParserFunctionPointers();
         uint256 outerStart = Pointer.unwrap(data.dataPointer());
         uint256 cursor = outerStart;

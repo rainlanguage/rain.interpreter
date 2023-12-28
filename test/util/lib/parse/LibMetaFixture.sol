@@ -14,7 +14,10 @@ uint256 constant FIXTURE_OPS_LENGTH = 18;
 library LibMetaFixture {
     function newState(string memory s) internal pure returns (ParseState memory) {
         return LibParseState.newState(
-            bytes(s), parseMetaV2(), operandHandlerFunctionPointers(), LibAllStandardOpsNP.literalParserFunctionPointers()
+            bytes(s),
+            parseMetaV2(),
+            operandHandlerFunctionPointers(),
+            LibAllStandardOpsNP.literalParserFunctionPointers()
         );
     }
 
