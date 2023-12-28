@@ -40,8 +40,8 @@ contract RainterpreterReferenceExternNPE2PointersTest is Test {
 
     function testSubParserLiteralParsers() external {
         RainterpreterReferenceExternNPE2 subParser = new RainterpreterReferenceExternNPE2();
-        uint256 expected = subParser.buildSubParserLiteralParsers();
-        uint256 actual = SUB_PARSER_LITERAL_PARSERS;
+        bytes memory expected = subParser.buildSubParserLiteralParsers();
+        bytes memory actual = SUB_PARSER_LITERAL_PARSERS;
         assertEq(actual, expected);
     }
 

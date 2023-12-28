@@ -9,6 +9,7 @@ import {Operand, LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
+import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 
 /// @title LibParseSingleRHSNamedGasTest
 /// Parse a single RHS name for many different sized RHS names just to include
@@ -98,7 +99,7 @@ contract LibParseSingleRHSNamedGasTest is Test {
 
     function newState(string memory source) internal pure returns (ParseState memory) {
         return
-            LibParseState.newState(bytes(source), parseMeta(), operandHandlers(), LibParseLiteral.buildLiteralParsers());
+            LibParseState.newState(bytes(source), parseMeta(), operandHandlers(), LibAllStandardOpsNP.literalParserFunctionPointers());
     }
 
     /// Test parsing "a" (1 char) as the RHS.

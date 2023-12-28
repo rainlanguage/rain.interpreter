@@ -33,49 +33,26 @@ import {
 import {ParseState} from "./LibParseState.sol";
 import {LibParseError} from "./LibParseError.sol";
 
-/// @dev The type of a literal is both a unique value and a literal offset used
-/// to index into the literal parser array as a uint256.
-uint256 constant LITERAL_TYPE_INTEGER_HEX = 0;
+uint256 constant LITERAL_PARSERS_LENGTH = 3;
 
-/// @dev The type of a literal is both a unique value and a literal offset used
-/// to index into the literal parser array as a uint256.
-uint256 constant LITERAL_TYPE_INTEGER_DECIMAL = 0x10;
-
-/// @dev The type of a literal is both a unique value and a literal offset used
-/// to index into the literal parser array as a uint256.
-uint256 constant LITERAL_TYPE_STRING = 0x20;
+uint256 constant LITERAL_PARSER_INDEX_HEX = 0;
+uint256 constant LITERAL_PARSER_INDEX_DECIMAL = 1;
+uint256 constant LITERAL_PARSER_INDEX_STRING = 2;
 
 library LibParseLiteral {
     using LibParseLiteral for ParseState;
     using LibParseError for ParseState;
+    using LibParseLiteral for ParseState;
 
-    function buildLiteralParsers() internal pure returns (uint256 literalParsers) {
-        // Register all the literal parsers in the parse state. Each is a 16 bit
-        // function pointer so we can have up to 16 literal types. This needs to
-        // be done at runtime because the library code doesn't know the bytecode
-        // offsets of the literal parsers until it is compiled into a contract.
-        {
-            function(ParseState memory, uint256, uint256) pure returns (uint256) literalParserHex =
-                LibParseLiteral.parseLiteralHex;
-            uint256 parseLiteralHexOffset = LITERAL_TYPE_INTEGER_HEX;
-            function(ParseState memory, uint256, uint256) pure returns (uint256) literalParserDecimal =
-                LibParseLiteral.parseLiteralDecimal;
-            uint256 parseLiteralDecimalOffset = LITERAL_TYPE_INTEGER_DECIMAL;
-            function(ParseState memory, uint256, uint256) pure returns (uint256) literalParserString =
-                LibParseLiteral.parseLiteralString;
-            uint256 parseLiteralStringOffset = LITERAL_TYPE_STRING;
-
-            assembly ("memory-safe") {
-                literalParsers :=
-                    or(
-                        shl(parseLiteralStringOffset, literalParserString),
-                        or(
-                            shl(parseLiteralHexOffset, literalParserHex),
-                            shl(parseLiteralDecimalOffset, literalParserDecimal)
-                        )
-                    )
-            }
+    function selectLiteralParserByIndex(ParseState memory state, uint256 index) internal pure returns (
+        function(ParseState memory, uint256, uint256) pure returns (uint256)
+    ) {
+        bytes memory literalParsers = state.literalParsers;
+        function(ParseState memory, uint256, uint256) pure returns (uint256) parser;
+        assembly ("memory-safe") {
+            parser := and(mload(add(literalParsers, add(2, mul(index, 2)))), 0xFFFF)
         }
+        return parser;
     }
 
     /// Find the bounds for some literal at the cursor. The caller is responsible
@@ -187,14 +164,7 @@ library LibParseLiteral {
                 outerEnd = innerEnd + 1;
             }
 
-            function(ParseState memory, uint256, uint256) pure returns (uint256) parser;
-            {
-                uint256 p = (state.literalParsers >> LITERAL_TYPE_STRING) & 0xFFFF;
-                assembly ("memory-safe") {
-                    parser := p
-                }
-            }
-            return (parser, innerStart, innerEnd, outerEnd);
+            return (state.selectLiteralParserByIndex(LITERAL_PARSER_INDEX_STRING), innerStart, innerEnd, outerEnd);
         }
     }
 
@@ -238,14 +208,7 @@ library LibParseLiteral {
             }
         }
 
-        function(ParseState memory, uint256, uint256) pure returns (uint256) parser;
-        {
-            uint256 p = (state.literalParsers >> LITERAL_TYPE_INTEGER_HEX) & 0xFFFF;
-            assembly ("memory-safe") {
-                parser := p
-            }
-        }
-        return (parser, innerStart, innerEnd, innerEnd);
+        return (state.selectLiteralParserByIndex(LITERAL_PARSER_INDEX_HEX), innerStart, innerEnd, innerEnd);
     }
 
     /// Bounding a literal hex address is just a special case of bounding a
@@ -366,14 +329,7 @@ library LibParseLiteral {
             revert MalformedExponentDigits(state.parseErrorOffset(ePosition));
         }
 
-        function(ParseState memory, uint256, uint256) pure returns (uint256) parser;
-        {
-            uint256 p = (state.literalParsers >> LITERAL_TYPE_INTEGER_DECIMAL) & 0xFFFF;
-            assembly ("memory-safe") {
-                parser := p
-            }
-        }
-        return (parser, innerStart, innerEnd, innerEnd);
+        return (state.selectLiteralParserByIndex(LITERAL_PARSER_INDEX_DECIMAL), innerStart, innerEnd, innerEnd);
     }
 
     /// Algorithm for parsing decimal literals:

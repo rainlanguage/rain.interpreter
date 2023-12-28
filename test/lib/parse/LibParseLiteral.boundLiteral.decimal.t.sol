@@ -5,6 +5,7 @@ import {ParseLiteralTest} from "test/util/abstract/ParseLiteralTest.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseLiteral, UnsupportedLiteralType, MalformedExponentDigits} from "src/lib/parse/LibParseLiteral.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
+import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 
 /// @title LibParseLiteralBoundLiteralDecimalTest
 /// Tests finding bounds for literal decimal values by parsing.
@@ -28,8 +29,8 @@ contract LibParseLiteralBoundLiteralDecimalTest is ParseLiteralTest {
     }
 
     function checkMalformedExponentDigits(bytes memory data, uint256 offset) internal {
-        ParseState memory state = LibParseState.newState(data, "", "", LibParseLiteral.buildLiteralParsers());
-        state.literalParsers = LibParseLiteral.buildLiteralParsers();
+        ParseState memory state = LibParseState.newState(data, "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+        state.literalParsers = LibAllStandardOpsNP.literalParserFunctionPointers();
         uint256 outerStart = Pointer.unwrap(data.dataPointer());
         uint256 cursor = outerStart;
         uint256 end = outerStart + data.length;

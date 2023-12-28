@@ -4,8 +4,6 @@ pragma solidity =0.8.19;
 import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 
-import {console2} from "forge-std/console2.sol";
-
 import {ISubParserV1} from "../interface/unstable/ISubParserV1.sol";
 import {IncompatibleSubParser} from "../error/ErrSubParse.sol";
 import {LibSubParse, ParseState} from "../lib/parse/LibSubParse.sol";
@@ -38,7 +36,7 @@ bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"";
 /// parsers. In the future this will probably be removed and there will be
 /// dedicated concepts for "sub literal" and "sub word" parsing, that should be
 /// more composable than the current approach.
-uint256 constant SUB_PARSER_LITERAL_PARSERS = 0;
+bytes constant SUB_PARSER_LITERAL_PARSERS = hex"";
 
 /// @dev This is a placeholder for compatibility version. The child contract
 /// should override this to define its own compatibility version.
@@ -110,7 +108,7 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
     /// Overrideable function to allow implementations to define their literal
     /// parsers.
     //slither-disable-next-line dead-code
-    function subParserLiteralParsers() internal pure virtual returns (uint256) {
+    function subParserLiteralParsers() internal pure virtual returns (bytes memory) {
         return SUB_PARSER_LITERAL_PARSERS;
     }
 
@@ -137,7 +135,6 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
         if (compatibility != subParserCompatibility()) {
             revert IncompatibleSubParser();
         }
-        console2.logBytes(data);
 
         (uint256 constantsHeight, uint256 ioByte, ParseState memory state) = LibSubParse.consumeInputData(
             data, subParserParseMeta(), subParserOperandHandlers(), subParserLiteralParsers()
@@ -148,8 +145,6 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
         bytes32 word;
         (cursor, word) = LibParse.parseWord(cursor, end, CMASK_RHS_WORD_TAIL);
         (bool exists, uint256 index) = state.lookupWord(word);
-        console2.log(exists, index);
-        console2.logBytes(abi.encodePacked(word));
         if (exists) {
             Operand operand = state.handleOperand(index);
             function (uint256, uint256, Operand) internal pure returns (bool, bytes memory, uint256[] memory) subParser;

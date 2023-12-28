@@ -45,7 +45,7 @@ bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"06aa06ef";
 /// the rightmost position is a pointer to a literal parser function. In the
 /// future this is likely to be removed, in favour of a dedicated literal parser
 /// feature.
-uint256 constant SUB_PARSER_LITERAL_PARSERS = 19662612794437;
+bytes constant SUB_PARSER_LITERAL_PARSERS = hex"";
 
 /// @dev Real function pointers to the opcodes for the extern component of this
 /// contract. These get run at eval time wehen the interpreter calls into the
@@ -230,7 +230,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// Overrides the base literal parsers for sub parsing. Simply returns the
     /// known constant value, which should allow the compiler to optimise the
     /// entire function call away.
-    function subParserLiteralParsers() internal pure override returns (uint256) {
+    function subParserLiteralParsers() internal pure override returns (bytes memory) {
         return SUB_PARSER_LITERAL_PARSERS;
     }
 
@@ -259,8 +259,8 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// is likely to be changed so that sub parsers only have to define
     /// _additional_ literal parsers that they provide, as it is redundant and
     /// fragile to have to define the same literal parsers in multiple places.
-    function buildSubParserLiteralParsers() external pure returns (uint256) {
-        return LibParseLiteral.buildLiteralParsers();
+    function buildSubParserLiteralParsers() external pure returns (bytes memory) {
+        return hex"";
     }
 
     /// There's only one operand parser for this implementation, the disallowed

@@ -18,7 +18,7 @@ contract LibParseStatePushConstantValueTest is Test {
         bytes memory data,
         bytes memory meta,
         bytes memory operandHandlers,
-        uint256 literalParsers
+        bytes memory literalParsers
     ) external {
         // Start with a fresh state.
         ParseState memory state = LibParseState.newState(data, meta, operandHandlers, literalParsers);
@@ -31,7 +31,7 @@ contract LibParseStatePushConstantValueTest is Test {
     /// in the state with a pointer to 0.
     function testPushConstantValueSingle(FingerprintValue memory fingerprintValue) external {
         // Start with a fresh state.
-        ParseState memory state = LibParseState.newState("", "", "", 0);
+        ParseState memory state = LibParseState.newState("", "", "", "");
 
         assertEq(state.constantsBuilder, 0);
         assertEq(state.literalBloom, 0);
@@ -66,7 +66,7 @@ contract LibParseStatePushConstantValueTest is Test {
     function testPushConstantValueMany(FingerprintValue[] memory fingerprintValues) external {
         vm.assume(fingerprintValues.length > 0);
         // Start with a fresh state.
-        ParseState memory state = LibParseState.newState("", "", "", 0);
+        ParseState memory state = LibParseState.newState("", "", "", "");
 
         assertEq(state.constantsBuilder, 0);
         assertEq(state.literalBloom, 0);

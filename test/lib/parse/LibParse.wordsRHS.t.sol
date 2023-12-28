@@ -9,6 +9,7 @@ import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
 import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
 import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
+import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 
 /// @title LibParseNamedRHSTest
 /// Test that the parser can handle named RHS values.
@@ -23,7 +24,7 @@ contract LibParseNamedRHSTest is Test {
             bytes(s),
             LibMetaFixture.parseMetaV2(),
             LibMetaFixture.operandHandlerFunctionPointers(),
-            LibParseLiteral.buildLiteralParsers()
+            LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
         (bytes memory bytecode, uint256[] memory constants) = state.parse();
@@ -49,7 +50,7 @@ contract LibParseNamedRHSTest is Test {
             bytes(s),
             LibMetaFixture.parseMetaV2(),
             LibMetaFixture.operandHandlerFunctionPointers(),
-            LibParseLiteral.buildLiteralParsers()
+            LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
         (bytes memory bytecode, uint256[] memory constants) = state.parse();
@@ -93,7 +94,7 @@ contract LibParseNamedRHSTest is Test {
             bytes(s),
             LibMetaFixture.parseMetaV2(),
             LibMetaFixture.operandHandlerFunctionPointers(),
-            LibParseLiteral.buildLiteralParsers()
+            LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
         (bytes memory bytecode, uint256[] memory constants) = state.parse();
@@ -141,7 +142,7 @@ contract LibParseNamedRHSTest is Test {
             bytes(s),
             LibMetaFixture.parseMetaV2(),
             LibMetaFixture.operandHandlerFunctionPointers(),
-            LibParseLiteral.buildLiteralParsers()
+            LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
         (bytes memory bytecode, uint256[] memory constants) = state.parse();
@@ -185,7 +186,7 @@ contract LibParseNamedRHSTest is Test {
             bytes(s),
             LibMetaFixture.parseMetaV2(),
             LibMetaFixture.operandHandlerFunctionPointers(),
-            LibParseLiteral.buildLiteralParsers()
+            LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
         (bytes memory bytecode, uint256[] memory constants) = state.parse();
@@ -232,7 +233,7 @@ contract LibParseNamedRHSTest is Test {
             bytes(s),
             LibMetaFixture.parseMetaV2(),
             LibMetaFixture.operandHandlerFunctionPointers(),
-            LibParseLiteral.buildLiteralParsers()
+            LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
         (bytes memory bytecode, uint256[] memory constants) = state.parse();
@@ -284,7 +285,7 @@ contract LibParseNamedRHSTest is Test {
             bytes(s),
             LibMetaFixture.parseMetaV2(),
             LibMetaFixture.operandHandlerFunctionPointers(),
-            LibParseLiteral.buildLiteralParsers()
+            LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
         (bytes memory bytecode, uint256[] memory constants) = state.parse();
@@ -344,7 +345,7 @@ contract LibParseNamedRHSTest is Test {
             bytes(s),
             LibMetaFixture.parseMetaV2(),
             LibMetaFixture.operandHandlerFunctionPointers(),
-            LibParseLiteral.buildLiteralParsers()
+            LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
         (bytes memory bytecode, uint256[] memory constants) = state.parse();
@@ -399,7 +400,7 @@ contract LibParseNamedRHSTest is Test {
             bytes(s),
             LibMetaFixture.parseMetaV2(),
             LibMetaFixture.operandHandlerFunctionPointers(),
-            LibParseLiteral.buildLiteralParsers()
+            LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
         (bytes memory bytecode, uint256[] memory constants) = state.parse();
@@ -506,7 +507,7 @@ contract LibParseNamedRHSTest is Test {
             bytes(s),
             LibMetaFixture.parseMetaV2(),
             LibMetaFixture.operandHandlerFunctionPointers(),
-            LibParseLiteral.buildLiteralParsers()
+            LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
         (bytes memory bytecode, uint256[] memory constants) = state.parse();
@@ -555,7 +556,7 @@ contract LibParseNamedRHSTest is Test {
             bytes(s),
             LibMetaFixture.parseMetaV2(),
             LibMetaFixture.operandHandlerFunctionPointers(),
-            LibParseLiteral.buildLiteralParsers()
+            LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
         (bytes memory bytecode, uint256[] memory constants) = state.parse();

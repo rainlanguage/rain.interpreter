@@ -7,6 +7,7 @@ import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
+import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 
 /// @title LibParseLiteralHexTest
 /// Tests parsing hex literals with LibParseLiteral.
@@ -18,7 +19,7 @@ contract LibParseLiteralHexTest is Test {
     function testParseLiteralHexRoundTrip(uint256 value) external {
         string memory hexString = Strings.toHexString(value);
         ParseState memory state =
-            LibParseState.newState(bytes(hexString), "", "", LibParseLiteral.buildLiteralParsers());
+            LibParseState.newState(bytes(hexString), "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
         (uint256 parsedValue) = state.parseLiteralHex(
             // The hex parser wants only the hexadecimal digits without the
             // leading "0x".

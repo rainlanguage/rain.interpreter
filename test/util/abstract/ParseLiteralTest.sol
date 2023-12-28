@@ -5,14 +5,15 @@ import {Test} from "forge-std/Test.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibParseLiteral, UnsupportedLiteralType} from "src/lib/parse/LibParseLiteral.sol";
+import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 
 contract ParseLiteralTest is Test {
     using LibBytes for bytes;
     using LibParseLiteral for ParseState;
 
     function checkUnsupportedLiteralType(bytes memory data, uint256 offset) internal {
-        ParseState memory state = LibParseState.newState(data, "", "", LibParseLiteral.buildLiteralParsers());
-        state.literalParsers = LibParseLiteral.buildLiteralParsers();
+        ParseState memory state = LibParseState.newState(data, "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+        state.literalParsers = LibAllStandardOpsNP.literalParserFunctionPointers();
         uint256 outerStart = Pointer.unwrap(data.dataPointer());
         uint256 cursor = outerStart;
         uint256 end = outerStart + data.length;
@@ -36,8 +37,8 @@ contract ParseLiteralTest is Test {
         uint256 expectedOuterEnd,
         uint256 expectedParser
     ) internal {
-        ParseState memory state = LibParseState.newState(data, "", "", LibParseLiteral.buildLiteralParsers());
-        state.literalParsers = LibParseLiteral.buildLiteralParsers();
+        ParseState memory state = LibParseState.newState(data, "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+        state.literalParsers = LibAllStandardOpsNP.literalParserFunctionPointers();
         uint256 outerStart = Pointer.unwrap(data.dataPointer());
         uint256 cursor = outerStart;
         uint256 end = outerStart + data.length;

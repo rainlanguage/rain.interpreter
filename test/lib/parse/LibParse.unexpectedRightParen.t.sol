@@ -8,6 +8,7 @@ import {LibParse} from "src/lib/parse/LibParse.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {UnexpectedRightParen} from "src/error/ErrParse.sol";
 import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
+import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 
 /// @title LibParseUnexpectedRightParenTest
 /// Test that the parser errors when it encounters an unexpected right paren.
@@ -21,7 +22,7 @@ contract LibParseUnexpectedRightParenTest is Test {
             bytes(str),
             LibMetaFixture.parseMetaV2(),
             LibMetaFixture.operandHandlerFunctionPointers(),
-            LibParseLiteral.buildLiteralParsers()
+            LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRightParen.selector, 1));
@@ -36,7 +37,7 @@ contract LibParseUnexpectedRightParenTest is Test {
             bytes(str),
             LibMetaFixture.parseMetaV2(),
             LibMetaFixture.operandHandlerFunctionPointers(),
-            LibParseLiteral.buildLiteralParsers()
+            LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRightParen.selector, 7));

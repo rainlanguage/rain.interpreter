@@ -7,6 +7,7 @@ import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {InvalidAddressLength} from "src/error/ErrParse.sol";
+import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 
 /// @title LibParseLiteralBoundLiteralHexAddressTest
 /// Tests parsing bound literal hex address values.
@@ -19,7 +20,7 @@ contract LibParseLiteralBoundLiteralHexAddressTest is ParseLiteralTest {
         pure
         returns (uint256, uint256, uint256, uint256, uint256)
     {
-        ParseState memory state = LibParseState.newState(bytes(value), "", "", LibParseLiteral.buildLiteralParsers());
+        ParseState memory state = LibParseState.newState(bytes(value), "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
 
         uint256 outerStart = Pointer.unwrap(bytes(value).dataPointer());
         uint256 end = outerStart + bytes(value).length;
@@ -41,7 +42,7 @@ contract LibParseLiteralBoundLiteralHexAddressTest is ParseLiteralTest {
         string memory hexAddress = Strings.toHexString(value);
 
         ParseState memory state =
-            LibParseState.newState(bytes(hexAddress), "", "", LibParseLiteral.buildLiteralParsers());
+            LibParseState.newState(bytes(hexAddress), "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
 
         uint256 outerStart = Pointer.unwrap(bytes(hexAddress).dataPointer());
         uint256 end = outerStart + bytes(hexAddress).length;
@@ -81,7 +82,7 @@ contract LibParseLiteralBoundLiteralHexAddressTest is ParseLiteralTest {
         uint256 hexLength;
         {
             ParseState memory state =
-                LibParseState.newState(bytes(value), "", "", LibParseLiteral.buildLiteralParsers());
+                LibParseState.newState(bytes(value), "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
             uint256 cursor = Pointer.unwrap(bytes(value).dataPointer());
             uint256 outerStart0 = cursor;
             uint256 end = cursor + bytes(value).length;
