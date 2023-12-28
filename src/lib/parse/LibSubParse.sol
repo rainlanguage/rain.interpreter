@@ -4,14 +4,17 @@ pragma solidity ^0.8.18;
 import {LibParseState, ParseState} from "./LibParseState.sol";
 import {OPCODE_UNKNOWN, OPCODE_EXTERN, OPCODE_CONSTANT, Operand} from "../../interface/unstable/IInterpreterV2.sol";
 import {LibBytecode, Pointer} from "../bytecode/LibBytecode.sol";
-import {ISubParserV1, COMPATIBLITY_V1} from "../../interface/unstable/ISubParserV1.sol";
-import {BadSubParserResult, UnknownWord} from "../../error/ErrParse.sol";
+import {ISubParserV2, COMPATIBLITY_V2} from "../../interface/unstable/ISubParserV2.sol";
+import {BadSubParserResult, UnknownWord, UnsupportedLiteralType} from "../../error/ErrParse.sol";
 import {LibExtern, EncodedExternDispatch} from "../extern/LibExtern.sol";
 import {IInterpreterExternV3} from "../../interface/unstable/IInterpreterExternV3.sol";
 import {ExternDispatchConstantsHeightOverflow} from "../../error/ErrSubParse.sol";
+import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
+import {LibParseError} from "./LibParseError.sol";
 
 library LibSubParse {
     using LibParseState for ParseState;
+    using LibParseError for ParseState;
 
     /// Sub parse a value into the bytecode that will run on the interpreter to
     /// push the given value onto the stack, using the constant opcode at eval.
@@ -110,7 +113,7 @@ library LibSubParse {
         return (true, bytecode, constants);
     }
 
-    function subParseSlice(ParseState memory state, uint256 cursor, uint256 end) internal pure {
+    function subParseWordSlice(ParseState memory state, uint256 cursor, uint256 end) internal pure {
         unchecked {
             for (; cursor < end; cursor += 4) {
                 uint256 memoryAtCursor;
@@ -120,7 +123,7 @@ library LibSubParse {
                 if (memoryAtCursor >> 0xf8 == OPCODE_UNKNOWN) {
                     uint256 deref = state.subParsers;
                     while (deref != 0) {
-                        ISubParserV1 subParser = ISubParserV1(address(uint160(deref)));
+                        ISubParserV2 subParser = ISubParserV2(address(uint160(deref)));
                         assembly ("memory-safe") {
                             deref := mload(shr(0xf0, deref))
                         }
@@ -163,7 +166,7 @@ library LibSubParse {
                         }
 
                         (bool success, bytes memory subBytecode, uint256[] memory subConstants) =
-                            subParser.subParse(COMPATIBLITY_V1, data);
+                            subParser.subParseWord(COMPATIBLITY_V2, data);
                         if (success) {
                             // The sub bytecode must be exactly 4 bytes to
                             // represent an op.
@@ -204,7 +207,7 @@ library LibSubParse {
         }
     }
 
-    function subParse(ParseState memory state, bytes memory bytecode)
+    function subParseWords(ParseState memory state, bytes memory bytecode)
         internal
         pure
         returns (bytes memory, uint256[] memory)
@@ -215,17 +218,61 @@ library LibSubParse {
                 // Start cursor at the pointer to the source.
                 uint256 cursor = Pointer.unwrap(LibBytecode.sourcePointer(bytecode, sourceIndex)) + 4;
                 uint256 end = cursor + (LibBytecode.sourceOpsCount(bytecode, sourceIndex) * 4);
-                subParseSlice(state, cursor, end);
+                subParseWordSlice(state, cursor, end);
             }
             return (bytecode, state.buildConstants());
         }
     }
 
-    function consumeInputData(
+    function subParseLiteral(
+        ParseState memory state,
+        uint256 dispatchStart,
+        uint256 dispatchEnd,
+        uint256 bodyStart,
+        uint256 bodyEnd
+    ) internal pure returns (uint256) {
+        unchecked {
+            // Build the data for the subparser.
+            bytes memory data;
+            {
+                uint256 copyPointer;
+                uint256 dispatchLength = dispatchEnd - dispatchStart;
+                uint256 bodyLength = bodyEnd - bodyStart;
+                {
+                    uint256 dataLength = 2 + dispatchLength + bodyLength;
+                    assembly ("memory-safe") {
+                        data := mload(0x40)
+                        mstore(0x40, add(data, add(dataLength, 0x20)))
+                        mstore(add(data, 2), dispatchLength)
+                        mstore(data, dataLength)
+                        copyPointer := add(data, 0x22)
+                    }
+                }
+                LibMemCpy.unsafeCopyBytesTo(Pointer.wrap(dispatchStart), Pointer.wrap(copyPointer), dispatchLength);
+                LibMemCpy.unsafeCopyBytesTo(Pointer.wrap(bodyStart), Pointer.wrap(copyPointer + dispatchLength), bodyLength);
+            }
+
+            uint256 deref = state.subParsers;
+            while (deref != 0) {
+                ISubParserV2 subParser = ISubParserV2(address(uint160(deref)));
+                assembly ("memory-safe") {
+                    deref := mload(shr(0xf0, deref))
+                }
+
+                (bool success, uint256 value) = subParser.subParseLiteral(COMPATIBLITY_V2, data);
+                if (success) {
+                    return value;
+                }
+            }
+
+            revert UnsupportedLiteralType(state.parseErrorOffset(dispatchStart));
+        }
+    }
+
+    function consumeSubParseWordInputData(
         bytes memory data,
         bytes memory meta,
-        bytes memory operandHandlers,
-        bytes memory literalParsers
+        bytes memory operandHandlers
     ) internal pure returns (uint256 constantsHeight, uint256 ioByte, ParseState memory state) {
         uint256[] memory operandValues;
         assembly ("memory-safe") {
@@ -239,7 +286,21 @@ library LibSubParse {
             mstore(data, newLength)
             operandValues := add(data, add(newLength, 0x20))
         }
-        state = LibParseState.newState(data, meta, operandHandlers, literalParsers);
+        // Literal parsers are empty for the sub parser as the main parser should
+        // be handling all literals in operands. The sub parser handles literal
+        // parsing as a dedicated interface seperately.
+        state = LibParseState.newState(data, meta, operandHandlers, "");
         state.operandValues = operandValues;
+    }
+
+    function consumeSubParseLiteralInputData(
+        bytes memory data
+    ) internal pure returns (uint256 dispatchStart, uint256 bodyStart, uint256 bodyEnd) {
+        assembly ("memory-safe") {
+            let dispatchLength := and(mload(add(data, 2)), 0xFFFF)
+            dispatchStart := add(data, 0x22)
+            bodyStart := add(dispatchStart, dispatchLength)
+            bodyEnd := add(data, mload(data))
+        }
     }
 }

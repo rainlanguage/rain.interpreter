@@ -429,7 +429,7 @@ library LibParse {
                 }
             }
             //slither-disable-next-line unused-return
-            return state.subParse(state.buildBytecode());
+            return state.subParseWords(state.buildBytecode());
         }
     }
 }

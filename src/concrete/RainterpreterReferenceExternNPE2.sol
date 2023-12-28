@@ -12,20 +12,20 @@ import {AuthoringMetaV2} from "../interface/IParserV1.sol";
 import {ParseState} from "../lib/parse/LibParseState.sol";
 import {LibParseOperand} from "../lib/parse/LibParseOperand.sol";
 import {LibParseLiteral} from "../lib/parse/LibParseLiteral.sol";
-import {COMPATIBLITY_V1} from "../interface/unstable/ISubParserV1.sol";
+import {COMPATIBLITY_V2} from "../interface/unstable/ISubParserV2.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
 /// 1:1 with the number of opcodes provided by the extern component of this
 /// contract. It is possible to subparse words into opcodes that run entirely
 /// within the interpreter, and do not have an associated extern dispatch.
-uint256 constant SUB_PARSER_FUNCTION_POINTERS_LENGTH = 2;
+uint256 constant SUB_PARSER_WORD_PARSERS_LENGTH = 2;
 
 /// @dev Real function pointers to the sub parser functions that produce the
 /// bytecode that this contract knows about. This is both constructing the extern
 /// bytecode that dials back into this contract at eval time, and creating
 /// to things that happen entirely on the interpreter such as well known
 /// constants and references to the context grid.
-bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"0a120a35";
+bytes constant SUB_PARSER_WORD_PARSERS = hex"0a120a35";
 
 /// @dev Real sub parser meta bytes that map parsed strings to the functions that
 /// know how to parse those strings into opcodes for the main parser. Structured
@@ -155,7 +155,7 @@ library LibRainterpreterReferenceExternNPE2 {
     //slither-disable-next-line dead-code
     function authoringMetaV2() internal pure returns (bytes memory) {
         AuthoringMetaV2 memory lengthPlaceholder;
-        AuthoringMetaV2[SUB_PARSER_FUNCTION_POINTERS_LENGTH + 1] memory wordsFixed = [
+        AuthoringMetaV2[SUB_PARSER_WORD_PARSERS_LENGTH + 1] memory wordsFixed = [
             lengthPlaceholder,
             AuthoringMetaV2(
                 "reference-extern-inc",
@@ -167,7 +167,7 @@ library LibRainterpreterReferenceExternNPE2 {
             )
         ];
         AuthoringMetaV2[] memory wordsDynamic;
-        uint256 length = SUB_PARSER_FUNCTION_POINTERS_LENGTH;
+        uint256 length = SUB_PARSER_WORD_PARSERS_LENGTH;
         assembly {
             wordsDynamic := wordsFixed
             mstore(wordsDynamic, length)
@@ -216,8 +216,8 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// Overrides the base function pointers for sub parsing. Simply returns the
     /// known constant value, which should allow the compiler to optimise the
     /// entire function call away.
-    function subParserFunctionPointers() internal pure override returns (bytes memory) {
-        return SUB_PARSER_FUNCTION_POINTERS;
+    function subParserWordParsers() internal pure override returns (bytes memory) {
+        return SUB_PARSER_WORD_PARSERS;
     }
 
     /// Overrides the base operand handlers for sub parsing. Simply returns the
@@ -238,7 +238,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// known constant value, which should allow the compiler to optimise the
     /// entire function call away.
     function subParserCompatibility() internal pure override returns (bytes32) {
-        return COMPATIBLITY_V1;
+        return COMPATIBLITY_V2;
     }
 
     /// Overrides the base function pointers for opcodes. Simply returns the
@@ -268,11 +268,11 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     function buildSubParserOperandHandlers() external pure returns (bytes memory) {
         unchecked {
             function(uint256[] memory) internal pure returns (Operand) lengthPointer;
-            uint256 length = SUB_PARSER_FUNCTION_POINTERS_LENGTH;
+            uint256 length = SUB_PARSER_WORD_PARSERS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(uint256[] memory) internal pure returns (Operand)[SUB_PARSER_FUNCTION_POINTERS_LENGTH + 1] memory
+            function(uint256[] memory) internal pure returns (Operand)[SUB_PARSER_WORD_PARSERS_LENGTH + 1] memory
                 handlersFixed =
                     [lengthPointer, LibParseOperand.handleOperandDisallowed, LibParseOperand.handleOperandSingleFull];
             uint256[] memory handlersDynamic;
@@ -296,15 +296,15 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// gas efficient by allowing it to be constant. The reason this can't be
     /// done within the test itself is that the pointers need to be calculated
     /// relative to the bytecode of the current contract, not the test contract.
-    function buildSubParserFunctionPointers() external pure returns (bytes memory) {
+    function buildSubParserWordParsers() external pure returns (bytes memory) {
         unchecked {
             function(uint256, uint256, Operand) internal view returns (bool, bytes memory, uint256[] memory)
                 lengthPointer;
-            uint256 length = SUB_PARSER_FUNCTION_POINTERS_LENGTH;
+            uint256 length = SUB_PARSER_WORD_PARSERS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(uint256, uint256, Operand) internal view returns (bool, bytes memory, uint256[] memory)[SUB_PARSER_FUNCTION_POINTERS_LENGTH
+            function(uint256, uint256, Operand) internal view returns (bool, bytes memory, uint256[] memory)[SUB_PARSER_WORD_PARSERS_LENGTH
                 + 1] memory pointersFixed =
                     [lengthPointer, LibExternOpIntIncNPE2.subParser, LibExternOpStackOperandNPE2.subParser];
             uint256[] memory pointersDynamic;

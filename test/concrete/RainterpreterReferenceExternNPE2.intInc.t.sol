@@ -17,7 +17,7 @@ import {
 import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
-import {COMPATIBLITY_V1} from "src/interface/unstable/ISubParserV1.sol";
+import {COMPATIBLITY_V2} from "src/interface/unstable/ISubParserV2.sol";
 import {OPCODE_EXTERN} from "src/interface/unstable/IInterpreterV2.sol";
 import {ExternDispatchConstantsHeightOverflow} from "src/error/ErrSubParse.sol";
 
@@ -77,8 +77,8 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
         RainterpreterReferenceExternNPE2 subParser = new RainterpreterReferenceExternNPE2();
 
         bytes memory wordToParse = bytes("reference-extern-inc");
-        (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParse(
-            COMPATIBLITY_V1,
+        (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParseWord(
+            COMPATIBLITY_V2,
             bytes.concat(bytes2(constantsHeight), ioByte, bytes2(uint16(wordToParse.length)), wordToParse, bytes32(0))
         );
         assertTrue(success);
@@ -120,8 +120,8 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
         constantsHeight = uint16(bound(constantsHeight, 0, 0xFF));
         RainterpreterReferenceExternNPE2 subParser = new RainterpreterReferenceExternNPE2();
 
-        (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParse(
-            COMPATIBLITY_V1,
+        (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParseWord(
+            COMPATIBLITY_V2,
             bytes.concat(bytes2(constantsHeight), ioByte, bytes2(uint16(unknownWord.length)), unknownWord, bytes32(0))
         );
         assertFalse(success);
@@ -142,8 +142,8 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
             abi.encodeWithSelector(ExternDispatchConstantsHeightOverflow.selector, uint256(constantsHeight))
         );
         bytes memory word = bytes("reference-extern-inc");
-        (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParse(
-            COMPATIBLITY_V1,
+        (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParseWord(
+            COMPATIBLITY_V2,
             bytes.concat(bytes2(constantsHeight), ioByte, bytes2(uint16(word.length)), word, bytes32(0))
         );
         (success, bytecode, constants);
