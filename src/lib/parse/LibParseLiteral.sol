@@ -51,6 +51,8 @@ library LibParseLiteral {
     {
         bytes memory literalParsers = state.literalParsers;
         function(ParseState memory, uint256, uint256) pure returns (uint256) parser;
+        // This is NOT bounds checked because the indexes are all expected to
+        // be provided by the parser itself and not user input.
         assembly ("memory-safe") {
             parser := and(mload(add(literalParsers, add(2, mul(index, 2)))), 0xFFFF)
         }
