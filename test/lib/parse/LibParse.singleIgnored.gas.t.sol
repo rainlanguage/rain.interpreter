@@ -19,7 +19,7 @@ contract LibParseSingleLHSIgnoredGasTest is Test {
             // There's no operands on the LHS.
             "",
             // There's no literals on the LHS.
-            0
+            ""
         );
     }
 

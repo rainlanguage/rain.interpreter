@@ -25,7 +25,7 @@ uint256 constant SUB_PARSER_FUNCTION_POINTERS_LENGTH = 2;
 /// bytecode that dials back into this contract at eval time, and creating
 /// to things that happen entirely on the interpreter such as well known
 /// constants and references to the context grid.
-bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"0b7c0b9f";
+bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"0a120a35";
 
 /// @dev Real sub parser meta bytes that map parsed strings to the functions that
 /// know how to parse those strings into opcodes for the main parser. Structured
@@ -38,19 +38,19 @@ bytes constant SUB_PARSER_PARSE_META =
 /// the rightmost position is a pointer to an operand parser function. In the
 /// future this is likely to be removed, or refactored to value handling only
 /// rather than parsing.
-bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"06aa06ef";
+bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"066a06af";
 
 /// @dev Real function pointers to the literal parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
 /// the rightmost position is a pointer to a literal parser function. In the
 /// future this is likely to be removed, in favour of a dedicated literal parser
 /// feature.
-uint256 constant SUB_PARSER_LITERAL_PARSERS = 19662612794437;
+bytes constant SUB_PARSER_LITERAL_PARSERS = hex"";
 
 /// @dev Real function pointers to the opcodes for the extern component of this
 /// contract. These get run at eval time wehen the interpreter calls into the
 /// contract as an `IInterpreterExternV3`.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"05cb";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"058b";
 
 /// @dev Number of opcode function pointers available to run at eval time.
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
@@ -59,7 +59,7 @@ uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
 /// of this contract. These get run at deploy time when the main integrity checks
 /// are run, the extern opcode integrity on the deployer will delegate integrity
 /// checks to the extern contract.
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0784";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0744";
 
 /// @dev Opcode index of the extern increment opcode. Needs to be manually kept
 /// in sync with the extern opcode function pointers. Definitely write tests for
@@ -230,7 +230,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// Overrides the base literal parsers for sub parsing. Simply returns the
     /// known constant value, which should allow the compiler to optimise the
     /// entire function call away.
-    function subParserLiteralParsers() internal pure override returns (uint256) {
+    function subParserLiteralParsers() internal pure override returns (bytes memory) {
         return SUB_PARSER_LITERAL_PARSERS;
     }
 
@@ -259,8 +259,8 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// is likely to be changed so that sub parsers only have to define
     /// _additional_ literal parsers that they provide, as it is redundant and
     /// fragile to have to define the same literal parsers in multiple places.
-    function buildSubParserLiteralParsers() external pure returns (uint256) {
-        return LibParseLiteral.buildLiteralParsers();
+    function buildSubParserLiteralParsers() external pure returns (bytes memory) {
+        return hex"";
     }
 
     /// There's only one operand parser for this implementation, the disallowed

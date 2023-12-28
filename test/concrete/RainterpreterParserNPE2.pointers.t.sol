@@ -18,8 +18,8 @@ contract RainterpreterParserNPE2PointersTest is Test {
 
     function testLiteralParserFunctionPointers() external {
         RainterpreterParserNPE2 parser = new RainterpreterParserNPE2();
-        uint256 expected = parser.buildLiteralParserFunctionPointers();
-        uint256 actual = LITERAL_PARSER_FUNCTION_POINTERS;
+        bytes memory expected = parser.buildLiteralParserFunctionPointers();
+        bytes memory actual = LITERAL_PARSER_FUNCTION_POINTERS;
         assertEq(actual, expected);
     }
 }

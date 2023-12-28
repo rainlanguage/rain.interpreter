@@ -7,6 +7,7 @@ import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
 import {LibLiteralString} from "test/util/lib/literal/LibLiteralString.sol";
 import {StringTooLong, UnclosedStringLiteral, ParserOutOfBounds} from "src/error/ErrParse.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
+import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 
 /// @title LibParseLiteralBoundLiteralStringTest
 contract LibParseLiteralBoundLiteralStringTest is Test {
@@ -19,8 +20,9 @@ contract LibParseLiteralBoundLiteralStringTest is Test {
         pure
         returns (uint256, uint256, uint256, uint256, uint256)
     {
-        ParseState memory state = LibParseState.newState(data, "", "", LibParseLiteral.buildLiteralParsers());
-        state.literalParsers = LibParseLiteral.buildLiteralParsers();
+        ParseState memory state =
+            LibParseState.newState(data, "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+        state.literalParsers = LibAllStandardOpsNP.literalParserFunctionPointers();
         uint256 outerStart = Pointer.unwrap(bytes(data).dataPointer());
         uint256 cursor = outerStart;
         uint256 end = outerStart + bytes(data).length;
@@ -44,8 +46,9 @@ contract LibParseLiteralBoundLiteralStringTest is Test {
         pure
         returns (uint256, uint256, uint256, uint256, uint256)
     {
-        ParseState memory state = LibParseState.newState(data, "", "", LibParseLiteral.buildLiteralParsers());
-        state.literalParsers = LibParseLiteral.buildLiteralParsers();
+        ParseState memory state =
+            LibParseState.newState(data, "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+        state.literalParsers = LibAllStandardOpsNP.literalParserFunctionPointers();
         assembly ("memory-safe") {
             mstore(data, length)
         }

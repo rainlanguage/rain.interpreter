@@ -13,6 +13,7 @@ import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
 import {Operand, LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
+import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 
 /// @title LibParseNamedLHSTest
 contract LibParseNamedLHSTest is Test {
@@ -124,7 +125,10 @@ contract LibParseNamedLHSTest is Test {
         bytes memory operandHandlerPointers = LibConvert.unsafeTo16BitBytes(pointers);
 
         (bytes memory bytecode, uint256[] memory constants) = LibParseState.newState(
-            bytes("a _:1 2,b:a,:c(),d:3,e:d;"), parseMeta, operandHandlerPointers, LibParseLiteral.buildLiteralParsers()
+            bytes("a _:1 2,b:a,:c(),d:3,e:d;"),
+            parseMeta,
+            operandHandlerPointers,
+            LibAllStandardOpsNP.literalParserFunctionPointers()
         ).parse();
         assertEq(
             bytecode,
@@ -167,8 +171,9 @@ contract LibParseNamedLHSTest is Test {
 
     /// Duplicate names are allowed across different sources.
     function testParseNamedDuplicateDifferentSource() external {
-        (bytes memory bytecode, uint256[] memory constants) =
-            LibParseState.newState("a b:1 2, e:a;c d:3 4,e:d;", "", "", LibParseLiteral.buildLiteralParsers()).parse();
+        (bytes memory bytecode, uint256[] memory constants) = LibParseState.newState(
+            "a b:1 2, e:a;c d:3 4,e:d;", "", "", LibAllStandardOpsNP.literalParserFunctionPointers()
+        ).parse();
         assertEq(
             bytecode,
             // 2 sources.

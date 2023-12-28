@@ -77,6 +77,8 @@ import {LibOpUniswapV2AmountIn} from "./uniswap/LibOpUniswapV2AmountIn.sol";
 import {LibOpUniswapV2AmountOut} from "./uniswap/LibOpUniswapV2AmountOut.sol";
 import {LibOpUniswapV2Quote} from "./uniswap/LibOpUniswapV2Quote.sol";
 
+import {LibParseLiteral, ParseState, LITERAL_PARSERS_LENGTH} from "../parse/LibParseLiteral.sol";
+
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
 uint256 constant ALL_STANDARD_OPS_LENGTH = 58;
 
@@ -270,6 +272,33 @@ library LibAllStandardOpsNP {
             mstore(wordsDynamic, length)
         }
         return abi.encode(wordsDynamic);
+    }
+
+    function literalParserFunctionPointers() internal pure returns (bytes memory) {
+        unchecked {
+            function (ParseState memory, uint256, uint256) pure returns (uint256) lengthPointer;
+            uint256 length = LITERAL_PARSERS_LENGTH;
+            assembly ("memory-safe") {
+                lengthPointer := length
+            }
+            function (ParseState memory, uint256, uint256) pure returns (uint256)[LITERAL_PARSERS_LENGTH + 1] memory
+                pointersFixed = [
+                    lengthPointer,
+                    LibParseLiteral.parseLiteralHex,
+                    LibParseLiteral.parseLiteralDecimal,
+                    LibParseLiteral.parseLiteralString
+                ];
+            uint256[] memory pointersDynamic;
+            assembly ("memory-safe") {
+                pointersDynamic := pointersFixed
+            }
+            // Sanity check that the dynamic length is correct. Should be an
+            // unreachable error.
+            if (pointersDynamic.length != LITERAL_PARSERS_LENGTH) {
+                revert BadDynamicLength(pointersDynamic.length, length);
+            }
+            return LibConvert.unsafeTo16BitBytes(pointersDynamic);
+        }
     }
 
     function operandHandlerFunctionPointers() internal pure returns (bytes memory) {

@@ -230,7 +230,7 @@ library LibSubParse {
         bytes memory data,
         bytes memory meta,
         bytes memory operandHandlers,
-        uint256 literalParsers
+        bytes memory literalParsers
     ) internal pure returns (uint256 constantsHeight, uint256 ioByte, ParseState memory state) {
         uint256[] memory operandValues;
         assembly ("memory-safe") {
