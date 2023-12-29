@@ -1,11 +1,9 @@
 use crate::registry::{IExpressionDeployerV3, IInterpreterStoreV1, IInterpreterV2, IParserV1};
-use alloy_primitives::{Bytes, U256};
 use ethers::contract::ContractError;
 use ethers::{
     providers::{Http, Provider},
     types::H160,
 };
-use std::str::FromStr;
 
 /// DISPair
 /// Struct representing DISP instances.
@@ -33,25 +31,3 @@ impl IExpressionDeployerV3<Provider<Http>> {
     }
 }
 
-/// Implementation to parse a expression string and get the corresponding bytecode and constants
-impl IParserV1<Provider<Http>> {
-    pub async fn parser_expression(
-        &self,
-        expression: String,
-    ) -> Result<(Bytes, Vec<U256>), ContractError<Provider<Http>>> {
-        let (sources, constants) = self
-            .parse(ethers::types::Bytes::from(expression.as_bytes().to_vec()))
-            .call()
-            .await?;
-
-        let bytecode_npe2 = Bytes::from(sources.to_vec());
-
-        let mut constants_npe2: Vec<U256> = vec![];
-
-        for i in constants.into_iter() {
-            constants_npe2.push(U256::from_str(i.to_string().as_str()).unwrap());
-        }
-
-        Ok((bytecode_npe2, constants_npe2))
-    }
-}
