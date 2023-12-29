@@ -1,0 +1,18 @@
+[package]
+name = "interpreter-rs"
+version = "0.1.0"
+edition = "2021"
+license = "CAL-1.0"
+description = "Rain Interpreter Rust Crate."
+homepage = "https://github.com/rainlanguage/rain.interpreter"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = "1.0.160"
+serde_bytes = "0.11.9"
+tokio = { version = "1.28.0", features = ["full"] }
+ethers = "2.0.7"
+alloy-primitives = { version = "0.5.3" }
+
+    
