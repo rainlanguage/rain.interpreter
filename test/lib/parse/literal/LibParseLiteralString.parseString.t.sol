@@ -19,8 +19,7 @@ contract LibParseLiteralStringTest is Test {
 
     /// Check that an empty string literal is parsed correctly.
     function testParseStringLiteralEmpty() external {
-        ParseState memory state =
-            LibParseState.newState("\"\"", "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+        ParseState memory state = LibParseState.newState("\"\"", "", "", "");
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         (uint256 cursorAfter, uint256 value) = state.parseString(cursor, Pointer.unwrap(state.data.endDataPointer()));
         assertEq(value, 0);
@@ -31,9 +30,7 @@ contract LibParseLiteralStringTest is Test {
     function testParseStringLiteralAny(bytes memory data) external {
         LibLiteralString.conformStringToMask(string(data), CMASK_STRING_LITERAL_TAIL, 0x80);
         vm.assume(data.length < 32);
-        ParseState memory state = LibParseState.newState(
-            bytes(string.concat("\"", string(data), "\"")), "", "", LibAllStandardOpsNP.literalParserFunctionPointers()
-        );
+        ParseState memory state = LibParseState.newState(bytes(string.concat("\"", string(data), "\"")), "", "", "");
 
         uint256 expectedValue = IntOrAString.unwrap(LibIntOrAString.fromString(string(data)));
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
@@ -51,9 +48,7 @@ contract LibParseLiteralStringTest is Test {
         corruptIndex = bound(corruptIndex, 0, data.length - 1);
         LibLiteralString.corruptSingleChar(string(data), corruptIndex);
 
-        ParseState memory state = LibParseState.newState(
-            bytes(string.concat("\"", string(data), "\"")), "", "", LibAllStandardOpsNP.literalParserFunctionPointers()
-        );
+        ParseState memory state = LibParseState.newState(bytes(string.concat("\"", string(data), "\"")), "", "", "");
 
         vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, 1 + corruptIndex));
         (uint256 cursorAfter, uint256 value) =

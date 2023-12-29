@@ -24,30 +24,22 @@ contract ParseLiteralTest is Test {
         (cursor, value);
     }
 
-    // function checkLiteralBounds(
-    //     function (ParseState memory state, uint256 cursor, uint256 end) pure returns (uint256, uint256, uint256) bounder,
-    //     bytes memory data,
-    //     uint256 expectedInnerEnd,
-    //     uint256 expectedOuterEnd,
-    //     uint256 expectedFinalCursor
-    // ) internal {
-    //     ParseState memory state =
-    //         LibParseState.newState(data, "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
-    //     state.literalParsers = LibAllStandardOpsNP.literalParserFunctionPointers();
-    //     uint256 outerStart = Pointer.unwrap(data.dataPointer());
-    //     uint256 cursor = outerStart;
-    //     uint256 end = outerStart + data.length;
-    //     uint256 value;
-    //     (
-    //         cursor, value
-    //     ) = state.parseLiteral(cursor, end);
-    //     uint256 actualParser;
-    //     assembly ("memory-safe") {
-    //         actualParser := parser
-    //     }
-    //     assertEq(actualParser, expectedParser, "parser");
-    //     assertEq(innerStart, outerStart + expectedInnerStart, "innerStart");
-    //     assertEq(innerEnd, outerStart + expectedInnerEnd, "innerEnd");
-    //     assertEq(outerEnd, outerStart + expectedOuterEnd, "outerEnd");
-    // }
+    function checkLiteralBounds(
+        function (ParseState memory, uint256, uint256) pure returns (uint256, uint256, uint256) bounder,
+        bytes memory data,
+        uint256 expectedInnerStart,
+        uint256 expectedInnerEnd,
+        uint256 expectedOuterEnd,
+        uint256 expectedFinalCursor
+    ) internal {
+        uint256 cursor = Pointer.unwrap(data.dataPointer());
+        uint256 end = cursor + data.length;
+
+        (uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
+            bounder(LibParseState.newState(data, "", "", ""), cursor, end);
+        assertEq(innerStart, cursor + expectedInnerStart, "innerStart");
+        assertEq(innerEnd, cursor + expectedInnerEnd, "innerEnd");
+        assertEq(outerEnd, cursor + expectedOuterEnd, "outerEnd");
+        assertEq(outerEnd - cursor, expectedFinalCursor, "finalCursor");
+    }
 }

@@ -79,6 +79,7 @@ import {LibOpUniswapV2Quote} from "./uniswap/LibOpUniswapV2Quote.sol";
 
 import {LibParseLiteral, ParseState, LITERAL_PARSERS_LENGTH} from "../parse/literal/LibParseLiteral.sol";
 import {LibParseLiteralString} from "../parse/literal/LibParseLiteralString.sol";
+import {LibParseLiteralDecimal} from "../parse/literal/LibParseLiteralDecimal.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
 uint256 constant ALL_STANDARD_OPS_LENGTH = 58;
@@ -286,7 +287,7 @@ library LibAllStandardOpsNP {
                 memory pointersFixed = [
                     lengthPointer,
                     LibParseLiteral.parseLiteralHex,
-                    LibParseLiteral.parseLiteralDecimal,
+                    LibParseLiteralDecimal.parseDecimal,
                     LibParseLiteralString.parseString
                 ];
             uint256[] memory pointersDynamic;

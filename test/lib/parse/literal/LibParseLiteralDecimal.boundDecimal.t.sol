@@ -8,6 +8,7 @@ import {
 } from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
+import {LibParseLiteralDecimal} from "src/lib/parse/literal/LibParseLiteralDecimal.sol";
 
 /// @title LibParseLiteralBoundLiteralDecimalTest
 /// Tests finding bounds for literal decimal values by parsing.
@@ -15,20 +16,21 @@ contract LibParseLiteralBoundLiteralDecimalTest is ParseLiteralTest {
     using LibBytes for bytes;
     using LibParseLiteral for ParseState;
 
-    // function checkDecimalBounds(
-    //     bytes memory data,
-    //     uint256 expectedInnerStart,
-    //     uint256 expectedInnerEnd,
-    //     uint256 expectedOuterEnd
-    // ) internal {
-    //     uint256 decimalParser;
-    //     function (ParseState memory, uint256, uint256) pure returns (uint256) parseLiteralDecimal =
-    //         LibParseLiteral.parseLiteralDecimal;
-    //     assembly ("memory-safe") {
-    //         decimalParser := parseLiteralDecimal
-    //     }
-    //     checkLiteralBounds(data, expectedInnerStart, expectedInnerEnd, expectedOuterEnd, decimalParser);
-    // }
+    function checkDecimalBounds(
+        bytes memory data,
+        uint256 expectedInnerStart,
+        uint256 expectedInnerEnd,
+        uint256 expectedOuterEnd
+    ) internal {
+        checkLiteralBounds(
+            LibParseLiteralDecimal.boundDecimal,
+            data,
+            expectedInnerStart,
+            expectedInnerEnd,
+            expectedOuterEnd,
+            expectedOuterEnd
+        );
+    }
 
     function checkMalformedExponentDigits(bytes memory data, uint256 offset) internal {
         ParseState memory state =
@@ -43,55 +45,25 @@ contract LibParseLiteralBoundLiteralDecimalTest is ParseLiteralTest {
         (cursor, value);
     }
 
-    // /// Check that a single digit is bounded as a decimal literal. Tests "0".
-    // function testParseLiteralBoundLiteralDecimal0() external {
-    //     checkDecimalBounds("0", 0, 1, 1);
-    // }
+    /// Check that an empty string bounds to a zero length decimal, which is an
+    /// error when parsing but not bounding.
+    function testParseLiteralBoundLiteralDecimalEmpty() external {
+        checkDecimalBounds("", 0, 0, 0);
+    }
 
-    // /// Check that a single digit is bounded as a decimal literal. Tests "1".
-    // function testParseLiteralBoundLiteralDecimal1() external {
-    //     checkDecimalBounds("1", 0, 1, 1);
-    // }
-
-    // /// Check that a single digit is bounded as a decimal literal. Tests "2".
-    // function testParseLiteralBoundLiteralDecimal2() external {
-    //     checkDecimalBounds("2", 0, 1, 1);
-    // }
-
-    // /// Check that a single digit is bounded as a decimal literal. Tests "3".
-    // function testParseLiteralBoundLiteralDecimal3() external {
-    //     checkDecimalBounds("3", 0, 1, 1);
-    // }
-
-    // /// Check that a single digit is bounded as a decimal literal. Tests "4".
-    // function testParseLiteralBoundLiteralDecimal4() external {
-    //     checkDecimalBounds("4", 0, 1, 1);
-    // }
-
-    // /// Check that a single digit is bounded as a decimal literal. Tests "5".
-    // function testParseLiteralBoundLiteralDecimal5() external {
-    //     checkDecimalBounds("5", 0, 1, 1);
-    // }
-
-    // /// Check that a single digit is bounded as a decimal literal. Tests "6".
-    // function testParseLiteralBoundLiteralDecimal6() external {
-    //     checkDecimalBounds("6", 0, 1, 1);
-    // }
-
-    // /// Check that a single digit is bounded as a decimal literal. Tests "7".
-    // function testParseLiteralBoundLiteralDecimal7() external {
-    //     checkDecimalBounds("7", 0, 1, 1);
-    // }
-
-    // /// Check that a single digit is bounded as a decimal literal. Tests "8".
-    // function testParseLiteralBoundLiteralDecimal8() external {
-    //     checkDecimalBounds("8", 0, 1, 1);
-    // }
-
-    // /// Check that a single digit is bounded as a decimal literal. Tests "9".
-    // function testParseLiteralBoundLiteralDecimal9() external {
-    //     checkDecimalBounds("9", 0, 1, 1);
-    // }
+    /// Check that a single digit is bounded as a decimal literal.
+    function testParseLiteralBoundLiteralDecimalSimple() external {
+        checkDecimalBounds("0", 0, 1, 1);
+        checkDecimalBounds("1", 0, 1, 1);
+        checkDecimalBounds("2", 0, 1, 1);
+        checkDecimalBounds("3", 0, 1, 1);
+        checkDecimalBounds("4", 0, 1, 1);
+        checkDecimalBounds("5", 0, 1, 1);
+        checkDecimalBounds("6", 0, 1, 1);
+        checkDecimalBounds("7", 0, 1, 1);
+        checkDecimalBounds("8", 0, 1, 1);
+        checkDecimalBounds("9", 0, 1, 1);
+    }
 
     /// Check that "e" or "E" in isolation is not treated as a literal.
     function testParseLiteralBoundLiteralDecimalE() external {
@@ -191,23 +163,23 @@ contract LibParseLiteralBoundLiteralDecimalTest is ParseLiteralTest {
         checkMalformedExponentDigits("01E1234", 2);
     }
 
-    // /// Check that a string with multiple e/E only bounds the first.
-    // function testParseLiteralBoundLiteralDecimalMultipleE() external {
-    //     checkDecimalBounds("0e0e0", 0, 3, 3);
-    //     checkDecimalBounds("0E0E0", 0, 3, 3);
-    // }
+    /// Check that a string with multiple e/E only bounds the first.
+    function testParseLiteralBoundLiteralDecimalMultipleE() external {
+        checkDecimalBounds("0e0e0", 0, 3, 3);
+        checkDecimalBounds("0E0E0", 0, 3, 3);
+    }
 
-    // /// Check that a string with non digit characters after the first exponent
-    // /// digit is handled correctly (bounds up to the first exponent digit).
-    // function testParseLiteralBoundLiteralDecimalNonDigitAfterFirstExponent() external {
-    //     checkDecimalBounds("0e0ze0", 0, 3, 3);
-    //     checkDecimalBounds("0E0ZE0", 0, 3, 3);
-    // }
+    /// Check that a string with non digit characters after the first exponent
+    /// digit is handled correctly (bounds up to the first exponent digit).
+    function testParseLiteralBoundLiteralDecimalNonDigitAfterFirstExponent() external {
+        checkDecimalBounds("0e0ze0", 0, 3, 3);
+        checkDecimalBounds("0E0ZE0", 0, 3, 3);
+    }
 
-    // /// Check that a string with non digit characters after the second exponent
-    // /// digit is handled correctly (bounds up to the second exponent digit).
-    // function testParseLiteralBoundLiteralDecimalNonDigitAfterExponent() external {
-    //     checkDecimalBounds("0e00ze0", 0, 4, 4);
-    //     checkDecimalBounds("0E00ZE0", 0, 4, 4);
-    // }
+    /// Check that a string with non digit characters after the second exponent
+    /// digit is handled correctly (bounds up to the second exponent digit).
+    function testParseLiteralBoundLiteralDecimalNonDigitAfterExponent() external {
+        checkDecimalBounds("0e00ze0", 0, 4, 4);
+        checkDecimalBounds("0E00ZE0", 0, 4, 4);
+    }
 }
