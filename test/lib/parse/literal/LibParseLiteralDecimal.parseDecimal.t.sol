@@ -19,51 +19,36 @@ contract LibParseLiteralDecimalTest is Test {
     using LibParseLiteral for ParseState;
     using LibParseLiteralDecimal for ParseState;
 
-    function checkParseDecimal(
-        string memory data,
-        uint256 expectedValue,
-        uint256 expectedCursorAfter
-    ) internal {
-        ParseState memory state =
-            LibParseState.newState(bytes(data), "", "", "");
+    function checkParseDecimal(string memory data, uint256 expectedValue, uint256 expectedCursorAfter) internal {
+        ParseState memory state = LibParseState.newState(bytes(data), "", "", "");
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
-        (uint256 cursorAfter, uint256 value) = state.parseDecimal(
-            cursor, Pointer.unwrap(state.data.endDataPointer())
-        );
+        (uint256 cursorAfter, uint256 value) = state.parseDecimal(cursor, Pointer.unwrap(state.data.endDataPointer()));
         assertEq(cursorAfter - cursor, expectedCursorAfter);
         assertEq(value, expectedValue);
     }
 
     /// Check that an empty string literal is an error.
     function testParseLiteralDecimalEmpty() external {
-        ParseState memory state =
-            LibParseState.newState("", "", "", "");
+        ParseState memory state = LibParseState.newState("", "", "", "");
         vm.expectRevert(abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
-        (uint256 cursorAfter, uint256 value) = state.parseDecimal(
-            Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer())
-        );
+        (uint256 cursorAfter, uint256 value) =
+            state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
         (cursorAfter, value);
     }
 
     /// A non decimal literal is an error.
     function testParseLiteralDecimalNonDecimal() external {
-        ParseState memory state =
-            LibParseState.newState("hello", "", "", "");
+        ParseState memory state = LibParseState.newState("hello", "", "", "");
         vm.expectRevert(abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
-        (uint256 cursorAfter, uint256 value) = state.parseDecimal(
-            Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer())
-        );
+        (uint256 cursorAfter, uint256 value) =
+            state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
         (cursorAfter, value);
     }
 
     /// Fuzz and round trip.
     function testParseLiteralDecimalRoundTrip(uint256 value) external {
         string memory valueStr = Strings.toString(value);
-        checkParseDecimal(
-            valueStr,
-            value,
-            bytes(valueStr).length
-        );
+        checkParseDecimal(valueStr, value, bytes(valueStr).length);
     }
 
     /// Check some specific examples.
@@ -175,34 +160,28 @@ contract LibParseLiteralDecimalTest is Test {
 
     // e without a digit is an error.
     function testParseLiteralDecimalExponentsError() external {
-        ParseState memory state =
-            LibParseState.newState("e", "", "", "");
+        ParseState memory state = LibParseState.newState("e", "", "", "");
         vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 0));
-        (uint256 cursorAfter, uint256 value) = state.parseDecimal(
-            Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer())
-        );
+        (uint256 cursorAfter, uint256 value) =
+            state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
         (cursorAfter, value);
     }
 
     // e with more than 2 digits is an error.
     function testParseLiteralDecimalExponentsError2() external {
-        ParseState memory state =
-            LibParseState.newState("1e000", "", "", "");
+        ParseState memory state = LibParseState.newState("1e000", "", "", "");
         vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 1));
-        (uint256 cursorAfter, uint256 value) = state.parseDecimal(
-            Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer())
-        );
+        (uint256 cursorAfter, uint256 value) =
+            state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
         (cursorAfter, value);
     }
 
     // e with a left digit but not a right digit is an error.
     function testParseLiteralDecimalExponentsError3() external {
-        ParseState memory state =
-            LibParseState.newState("1e", "", "", "");
+        ParseState memory state = LibParseState.newState("1e", "", "", "");
         vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 1));
-        (uint256 cursorAfter, uint256 value) = state.parseDecimal(
-            Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer())
-        );
+        (uint256 cursorAfter, uint256 value) =
+            state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
         (cursorAfter, value);
     }
 
@@ -211,12 +190,10 @@ contract LibParseLiteralDecimalTest is Test {
     // a literal.
     // Tests e in the 2nd place.
     function testParseLiteralDecimalExponentsError4() external {
-        ParseState memory state =
-            LibParseState.newState("e0", "", "", "");
+        ParseState memory state = LibParseState.newState("e0", "", "", "");
         vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 0));
-        (uint256 cursorAfter, uint256 value) = state.parseDecimal(
-            Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer())
-        );
+        (uint256 cursorAfter, uint256 value) =
+            state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
         (cursorAfter, value);
     }
 
@@ -225,12 +202,10 @@ contract LibParseLiteralDecimalTest is Test {
     // a literal.
     // Tests e in the 3rd place.
     function testParseLiteralDecimalExponentsError5() external {
-        ParseState memory state =
-            LibParseState.newState("e00", "", "", "");
+        ParseState memory state = LibParseState.newState("e00", "", "", "");
         vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 0));
-        (uint256 cursorAfter, uint256 value) = state.parseDecimal(
-            Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer())
-        );
+        (uint256 cursorAfter, uint256 value) =
+            state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
         (cursorAfter, value);
     }
 }

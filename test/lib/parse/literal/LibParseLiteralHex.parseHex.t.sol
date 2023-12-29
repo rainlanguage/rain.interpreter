@@ -8,20 +8,20 @@ import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
+import {LibParseLiteralHex} from "src/lib/parse/literal/LibParseLiteralHex.sol";
 
 /// @title LibParseLiteralHexTest
-/// Tests parsing hex literals with LibParseLiteral.
-contract LibParseLiteralHexTest is Test {
-    using LibParseLiteral for ParseState;
+/// Tests parsing hex literals with LibParseLiteralHex.
+contract LibParseLiteralHexBoundHexTest is Test {
+    using LibParseLiteralHex for ParseState;
     using LibBytes for bytes;
 
     /// Fuzz and round trip.
     function testParseLiteralHexRoundTrip(uint256 value) external {
         string memory hexString = Strings.toHexString(value);
-        ParseState memory state =
-            LibParseState.newState(bytes(hexString), "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+        ParseState memory state = LibParseState.newState(bytes(hexString), "", "", "");
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
-        (uint256 cursorAfter, uint256 parsedValue) = state.parseLiteralHex(
+        (uint256 cursorAfter, uint256 parsedValue) = state.parseHex(
             // The hex parser wants only the hexadecimal digits without the
             // leading "0x".
             cursor,
