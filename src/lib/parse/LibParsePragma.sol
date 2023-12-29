@@ -20,7 +20,7 @@ library LibParsePragma {
     using LibParsePragma for ParseState;
 
     function pushSubParser(ParseState memory state, uint256 cursor, uint256 subParser) internal pure {
-        if (subParser > type(uint160).max) {
+        if (subParser > uint256(type(uint160).max)) {
             revert InvalidSubParser(state.parseErrorOffset(cursor));
         }
 
