@@ -15,7 +15,7 @@ contract LibParsePragmaPushSubParserTest is Test {
     /// Pushing any value onto the sub parser that exceeds the maximum value
     /// should revert.
     function testPushSubParserOverflow(ParseState memory state, uint256 value) external {
-        value = bound(value, type(uint160).max + 1, type(uint256).max);
+        value = bound(value, uint256(type(uint160).max) + 1, type(uint256).max);
 
         state.subParsers = 0;
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
