@@ -77,7 +77,7 @@ import {LibOpUniswapV2AmountIn} from "./uniswap/LibOpUniswapV2AmountIn.sol";
 import {LibOpUniswapV2AmountOut} from "./uniswap/LibOpUniswapV2AmountOut.sol";
 import {LibOpUniswapV2Quote} from "./uniswap/LibOpUniswapV2Quote.sol";
 
-import {LibParseLiteral, ParseState, LITERAL_PARSERS_LENGTH} from "../parse/LibParseLiteral.sol";
+import {LibParseLiteral, ParseState, LITERAL_PARSERS_LENGTH} from "../parse/literal/LibParseLiteral.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
 uint256 constant ALL_STANDARD_OPS_LENGTH = 58;

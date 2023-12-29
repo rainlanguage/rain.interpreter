@@ -22,7 +22,7 @@ import {
 } from "./LibParseCMask.sol";
 import {LibCtPop} from "../bitwise/LibCtPop.sol";
 import {LibParseMeta} from "./LibParseMeta.sol";
-import {LibParseLiteral} from "./LibParseLiteral.sol";
+import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 import {LibParseOperand} from "./LibParseOperand.sol";
 import {Operand, OPCODE_STACK, OPCODE_UNKNOWN} from "../../interface/unstable/IInterpreterV2.sol";
 import {LibParseStackName} from "./LibParseStackName.sol";

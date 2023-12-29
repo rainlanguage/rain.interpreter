@@ -3,7 +3,7 @@ pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
-import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
+import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibLiteralString} from "test/util/lib/literal/LibLiteralString.sol";
 import {StringTooLong, UnclosedStringLiteral, ParserOutOfBounds} from "src/error/ErrParse.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";

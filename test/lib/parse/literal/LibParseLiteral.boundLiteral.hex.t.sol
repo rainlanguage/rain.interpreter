@@ -3,7 +3,7 @@ pragma solidity =0.8.19;
 
 import {ParseLiteralTest} from "test/util/abstract/ParseLiteralTest.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
-import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
+import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibLiteralString} from "test/util/lib/literal/LibLiteralString.sol";
 import {CMASK_HEX} from "src/lib/parse/LibParseCMask.sol";
 

@@ -15,8 +15,8 @@ import {
     CMASK_SUB_PARSEABLE_LITERAL_HEAD,
     CMASK_SUB_PARSEABLE_LITERAL_END,
     CMASK_WHITESPACE
-} from "./LibParseCMask.sol";
-import {LibParse} from "./LibParse.sol";
+} from "../LibParseCMask.sol";
+import {LibParse} from "../LibParse.sol";
 
 import {IntOrAString, LibIntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
 
@@ -32,11 +32,11 @@ import {
     UnclosedStringLiteral,
     UnsupportedLiteralType,
     UnclosedSubParseableLiteral
-} from "../../error/ErrParse.sol";
-import {ParseState} from "./LibParseState.sol";
-import {LibParseError} from "./LibParseError.sol";
-import {LibParseInterstitial} from "./LibParseInterstitial.sol";
-import {LibSubParse} from "./LibSubParse.sol";
+} from "../../../error/ErrParse.sol";
+import {ParseState} from "../LibParseState.sol";
+import {LibParseError} from "../LibParseError.sol";
+import {LibParseInterstitial} from "../LibParseInterstitial.sol";
+import {LibSubParse} from "../LibSubParse.sol";
 
 uint256 constant LITERAL_PARSERS_LENGTH = 3;
 

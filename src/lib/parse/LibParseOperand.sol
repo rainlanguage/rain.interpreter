@@ -11,7 +11,7 @@ import {
 } from "../../error/ErrParse.sol";
 import {Operand} from "../../interface/unstable/IInterpreterV2.sol";
 import {LibParse} from "./LibParse.sol";
-import {LibParseLiteral} from "./LibParseLiteral.sol";
+import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 import {CMASK_OPERAND_END, CMASK_WHITESPACE, CMASK_OPERAND_START} from "./LibParseCMask.sol";
 import {ParseState, OPERAND_VALUES_LENGTH, FSM_YANG_MASK} from "./LibParseState.sol";
 import {LibParseError} from "./LibParseError.sol";
@@ -73,6 +73,11 @@ library LibParseOperand {
                 }
                 // Attempt to parse literals if we're not yang.
                 else if (state.fsm & FSM_YANG_MASK == 0) {
+                    // We can't exceed the initial length of the operand values
+                    // that was allocated when the parse state was created.
+                    if (i == OPERAND_VALUES_LENGTH) {
+                        revert OperandValuesOverflow(state.parseErrorOffset(cursor));
+                    }
                     uint256 value;
                     (cursor, value) = state.parseLiteral(cursor, end);
                     // We manipulate the operand values array directly in
@@ -85,14 +90,10 @@ library LibParseOperand {
                     assembly ("memory-safe") {
                         mstore(add(operandValues, add(0x20, mul(i, 0x20))), value)
                     }
-                    // We can't exceed the initial length of the operand values
-                    // that was allocated when the parse state was created.
-                    if (i++ == OPERAND_VALUES_LENGTH) {
-                        revert OperandValuesOverflow(state.parseErrorOffset(cursor));
-                    }
                     // Set yang so we don't attempt to parse a literal straight
                     // off the back of this literal without some whitespace.
                     state.fsm |= FSM_YANG_MASK;
+                    ++i;
                 }
                 // Something failed here so let's say the author forgot to close
                 // the operand, which is a little arbitrary but at least it's

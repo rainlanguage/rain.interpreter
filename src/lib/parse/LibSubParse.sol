@@ -249,7 +249,9 @@ library LibSubParse {
                     }
                 }
                 LibMemCpy.unsafeCopyBytesTo(Pointer.wrap(dispatchStart), Pointer.wrap(copyPointer), dispatchLength);
-                LibMemCpy.unsafeCopyBytesTo(Pointer.wrap(bodyStart), Pointer.wrap(copyPointer + dispatchLength), bodyLength);
+                LibMemCpy.unsafeCopyBytesTo(
+                    Pointer.wrap(bodyStart), Pointer.wrap(copyPointer + dispatchLength), bodyLength
+                );
             }
 
             uint256 deref = state.subParsers;
@@ -269,11 +271,11 @@ library LibSubParse {
         }
     }
 
-    function consumeSubParseWordInputData(
-        bytes memory data,
-        bytes memory meta,
-        bytes memory operandHandlers
-    ) internal pure returns (uint256 constantsHeight, uint256 ioByte, ParseState memory state) {
+    function consumeSubParseWordInputData(bytes memory data, bytes memory meta, bytes memory operandHandlers)
+        internal
+        pure
+        returns (uint256 constantsHeight, uint256 ioByte, ParseState memory state)
+    {
         uint256[] memory operandValues;
         assembly ("memory-safe") {
             // Pull the header out into EVM stack items.
@@ -293,9 +295,11 @@ library LibSubParse {
         state.operandValues = operandValues;
     }
 
-    function consumeSubParseLiteralInputData(
-        bytes memory data
-    ) internal pure returns (uint256 dispatchStart, uint256 bodyStart, uint256 bodyEnd) {
+    function consumeSubParseLiteralInputData(bytes memory data)
+        internal
+        pure
+        returns (uint256 dispatchStart, uint256 bodyStart, uint256 bodyEnd)
+    {
         assembly ("memory-safe") {
             let dispatchLength := and(mload(add(data, 2)), 0xFFFF)
             dispatchStart := add(data, 0x22)

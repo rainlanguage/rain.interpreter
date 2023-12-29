@@ -8,7 +8,7 @@ import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 
 import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
 import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
-import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
+import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 
 /// @title LibParseNamedRHSTest

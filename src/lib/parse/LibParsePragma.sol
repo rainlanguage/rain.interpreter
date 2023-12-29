@@ -6,7 +6,7 @@ import {CMASK_WHITESPACE, CMASK_LITERAL_HEX_DISPATCH_START} from "./LibParseCMas
 import {NoWhitespaceAfterUsingWordsFrom, InvalidSubParser} from "../../error/ErrParse.sol";
 import {LibParseError} from "./LibParseError.sol";
 import {LibParseInterstitial} from "./LibParseInterstitial.sol";
-import {LibParseLiteral} from "./LibParseLiteral.sol";
+import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 
 bytes constant PRAGMA_KEYWORD_BYTES = bytes("using-words-from");
 bytes32 constant PRAGMA_KEYWORD_BYTES32 = bytes32(PRAGMA_KEYWORD_BYTES);

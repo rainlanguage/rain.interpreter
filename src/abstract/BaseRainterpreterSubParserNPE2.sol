@@ -119,26 +119,18 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV2 {
         return SUB_PARSER_COMPATIBLITY;
     }
 
-    function matchSubParseLiteralDispatch(uint256, uint256)
-        internal pure virtual returns (bool, uint256, uint256) {
-            return (false, 0, 0);
+    function matchSubParseLiteralDispatch(uint256, uint256) internal pure virtual returns (bool, uint256, uint256) {
+        return (false, 0, 0);
     }
 
-    function subParseLiteral(bytes32 compatibility, bytes memory data)
-        external
-        pure
-        virtual
-        returns (bool, uint256)
-    {
+    function subParseLiteral(bytes32 compatibility, bytes memory data) external pure virtual returns (bool, uint256) {
         if (compatibility != subParserCompatibility()) {
             revert IncompatibleSubParser();
         }
 
         (uint256 dispatchStart, uint256 bodyStart, uint256 bodyEnd) = LibSubParse.consumeSubParseLiteralInputData(data);
 
-        (bool success, uint256 index, uint256 dispatchValue) = matchSubParseLiteralDispatch(
-            dispatchStart, bodyStart
-        );
+        (bool success, uint256 index, uint256 dispatchValue) = matchSubParseLiteralDispatch(dispatchStart, bodyStart);
 
         if (success) {
             function (uint256, uint256, uint256) internal pure returns (uint256) subParser;
@@ -170,9 +162,8 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV2 {
             revert IncompatibleSubParser();
         }
 
-        (uint256 constantsHeight, uint256 ioByte, ParseState memory state) = LibSubParse.consumeSubParseWordInputData(
-            data, subParserParseMeta(), subParserOperandHandlers()
-        );
+        (uint256 constantsHeight, uint256 ioByte, ParseState memory state) =
+            LibSubParse.consumeSubParseWordInputData(data, subParserParseMeta(), subParserOperandHandlers());
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         uint256 end = cursor + state.data.length;
 

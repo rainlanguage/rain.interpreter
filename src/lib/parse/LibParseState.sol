@@ -15,7 +15,7 @@ import {
     NotAcceptingInputs,
     UnsupportedLiteralType
 } from "../../error/ErrParse.sol";
-import {LibParseLiteral} from "./LibParseLiteral.sol";
+import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 import {LibParse} from "./LibParse.sol";
 import {LibParseOperand} from "./LibParseOperand.sol";
 import {LibParseError} from "./LibParseError.sol";

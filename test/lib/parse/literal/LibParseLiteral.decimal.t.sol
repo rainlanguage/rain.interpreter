@@ -5,7 +5,7 @@ import {Test} from "forge-std/Test.sol";
 
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
-import {LibParseLiteral, ZeroLengthDecimal} from "src/lib/parse/LibParseLiteral.sol";
+import {LibParseLiteral, ZeroLengthDecimal} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 

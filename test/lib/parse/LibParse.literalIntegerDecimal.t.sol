@@ -4,7 +4,7 @@ pragma solidity =0.8.19;
 import {Test} from "forge-std/Test.sol";
 import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
 
-import {DecimalLiteralOverflow} from "src/lib/parse/LibParseLiteral.sol";
+import {DecimalLiteralOverflow} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibParse, UnexpectedRHSChar, UnexpectedRightParen} from "src/lib/parse/LibParse.sol";
 import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
