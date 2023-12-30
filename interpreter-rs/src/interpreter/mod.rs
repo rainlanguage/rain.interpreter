@@ -5,7 +5,6 @@ use ethers::{
     providers::{Http, Provider},
     types::H160,
 };
-use mockall::automock;
 
 /// DISPair
 /// Struct representing DISP instances.
@@ -16,7 +15,6 @@ pub struct DISPair {
     pub parser: IParserV1<Provider<Http>>,
 }
 
-#[automock]
 /// Implementation to build DISPair from Deployer instance.
 impl IExpressionDeployerV3<Provider<Http>> {
     pub async fn try_build_dispair(&self) -> Result<DISPair, ContractError<Provider<Http>>> {
