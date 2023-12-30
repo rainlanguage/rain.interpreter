@@ -43,16 +43,30 @@ bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"083b0880";
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
 /// the rightmost position is a pointer to a literal parser function.
 bytes constant SUB_PARSER_LITERAL_PARSERS = hex"080c";
+
+/// @dev The number of literal parsers provided by the sub parser.
 uint256 constant SUB_PARSER_LITERAL_PARSERS_LENGTH = 1;
 
+/// @dev The keyword for the repeat literal parser. The digit after this keyword
+/// is the digit to repeat in the literal when it is parsed to a value.
 bytes constant SUB_PARSER_LITERAL_REPEAT_KEYWORD = bytes("reference-extern-repeat-");
+
+/// @dev The keyword for the repeat literal parser, as a bytes32.
 bytes32 constant SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES32 = bytes32(SUB_PARSER_LITERAL_REPEAT_KEYWORD);
+
+/// @dev The number of bytes in the repeat literal keyword.
 uint256 constant SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH = 24;
+
+/// @dev The mask to apply to the dispatch bytes when parsing to determin whether
+/// the dispatch is for the repeat literal parser.
 bytes32 constant SUB_PARSER_LITERAL_REPEAT_KEYWORD_MASK =
     bytes32(~((1 << (32 - SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH) * 8) - 1));
 
+/// @dev The index of the repeat literal parser in the literal parser function
+/// pointers.
 uint256 constant SUB_PARSER_LITERAL_REPEAT_INDEX = 0;
 
+/// @dev Thrown when the repeat literal parser is not a single digit.
 error InvalidRepeatCount(uint256 value);
 
 /// @dev Real function pointers to the opcodes for the extern component of this
@@ -147,6 +161,30 @@ library LibExternOpStackOperandNPE2 {
     }
 }
 
+/// @title LibParseLiteralRepeat
+/// This is a library that mimics the literal libraries elsewhere in this repo,
+/// but structured to fit sub parsing rather than internal logic. It is NOT
+/// required to use this pattern, of libs outside the implementation contract,
+/// but it MAY be convenient to do so, as the libs can be moved to dedicated
+/// files, easily tested and reviewed directly, etc.
+///
+/// This literal parser is a simple repeat literal parser. It is extremely
+/// contrived and serves no real world purpose. It is used to demonstrate how
+/// to implement a literal parser, including extracting a value from the
+/// dispatch data and providing it to the parser.
+///
+/// The repeat literal parser takes a single digit as input, and repeats that
+/// digit for every byte in the literal.
+/// ```
+/// /* 000 */
+/// [reference-extern-repeat-0 abc]
+/// /* 111 */
+/// [reference-extern-repeat-1 cde]
+/// /* 222 */
+/// [reference-extern-repeat-2 zzz]
+/// /* 333 */
+/// [reference-extern-repeat-3 123]
+/// ```
 library LibParseLiteralRepeat {
     function parseRepeat(uint256 dispatchValue, uint256 cursor, uint256 end)
         internal
