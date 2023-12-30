@@ -36,16 +36,12 @@ bytes constant SUB_PARSER_PARSE_META =
 
 /// @dev Real function pointers to the operand parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
-/// the rightmost position is a pointer to an operand parser function. In the
-/// future this is likely to be removed, or refactored to value handling only
-/// rather than parsing.
+/// the rightmost position is a pointer to an operand parser function.
 bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"083b0880";
 
 /// @dev Real function pointers to the literal parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
-/// the rightmost position is a pointer to a literal parser function. In the
-/// future this is likely to be removed, in favour of a dedicated literal parser
-/// feature.
+/// the rightmost position is a pointer to a literal parser function.
 bytes constant SUB_PARSER_LITERAL_PARSERS = hex"080c";
 uint256 constant SUB_PARSER_LITERAL_PARSERS_LENGTH = 1;
 
@@ -284,10 +280,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
         return INTEGRITY_FUNCTION_POINTERS;
     }
 
-    /// The literal parsers are the same as the main parser. In the future this
-    /// is likely to be changed so that sub parsers only have to define
-    /// _additional_ literal parsers that they provide, as it is redundant and
-    /// fragile to have to define the same literal parsers in multiple places.
+    /// The literal parsers are the same as the main parser.
     function buildSubParserLiteralParsers() external pure returns (bytes memory) {
         unchecked {
             function (uint256, uint256, uint256) internal pure returns (uint256) lengthPointer;

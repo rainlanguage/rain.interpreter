@@ -26,16 +26,11 @@ bytes constant SUB_PARSER_WORD_PARSERS = hex"";
 bytes constant SUB_PARSER_PARSE_META = hex"";
 
 /// @dev This is a placeholder for the int that encodes pointers to operand
-/// parsers. In the future this will probably be removed and the main parser
-/// will handle all operand parsing, the subparser will only be responsible for
-/// checking the validity of the operand values and encoding them into the
-/// resulting bytecode.
+/// parsers.
 bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"";
 
 /// @dev This is a placeholder for the int that encodes pointers to literal
-/// parsers. In the future this will probably be removed and there will be
-/// dedicated concepts for "sub literal" and "sub word" parsing, that should be
-/// more composable than the current approach.
+/// parsers.
 bytes constant SUB_PARSER_LITERAL_PARSERS = hex"";
 
 /// @dev This is a placeholder for compatibility version. The child contract
