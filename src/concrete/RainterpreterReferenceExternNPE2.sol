@@ -9,10 +9,11 @@ import {LibExtern, EncodedExternDispatch} from "../lib/extern/LibExtern.sol";
 import {IInterpreterExternV3} from "../interface/unstable/IInterpreterExternV3.sol";
 import {LibSubParse} from "../lib/parse/LibSubParse.sol";
 import {AuthoringMetaV2} from "../interface/IParserV1.sol";
-import {ParseState} from "../lib/parse/LibParseState.sol";
+import {LibParseState, ParseState} from "../lib/parse/LibParseState.sol";
 import {LibParseOperand} from "../lib/parse/LibParseOperand.sol";
 import {LibParseLiteral} from "../lib/parse/literal/LibParseLiteral.sol";
 import {COMPATIBLITY_V2} from "../interface/unstable/ISubParserV2.sol";
+import {LibParseLiteralDecimal} from "../lib/parse/literal/LibParseLiteralDecimal.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
 /// 1:1 with the number of opcodes provided by the extern component of this
@@ -46,6 +47,17 @@ bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"076807ad";
 /// future this is likely to be removed, in favour of a dedicated literal parser
 /// feature.
 bytes constant SUB_PARSER_LITERAL_PARSERS = hex"";
+uint256 constant SUB_PARSER_LITERAL_PARSERS_LENGTH = 1;
+
+bytes constant SUB_PARSER_LITERAL_REPEAT_KEYWORD = bytes("reference-extern-repeat-");
+bytes32 constant SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES32 = bytes32(SUB_PARSER_LITERAL_REPEAT_KEYWORD);
+uint256 constant SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH = 24;
+bytes32 constant SUB_PARSER_LITERAL_REPEAT_KEYWORD_MASK =
+    bytes32(~((1 << (32 - SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH) * 8) - 1));
+
+uint256 constant SUB_PARSER_LITERAL_REPEAT_INDEX = 0;
+
+error InvalidRepeatCount(uint256 value);
 
 /// @dev Real function pointers to the opcodes for the extern component of this
 /// contract. These get run at eval time wehen the interpreter calls into the
@@ -136,6 +148,23 @@ library LibExternOpStackOperandNPE2 {
     {
         //slither-disable-next-line unused-return
         return LibSubParse.subParserConstant(constantsHeight, Operand.unwrap(operand));
+    }
+}
+
+library LibParseLiteralRepeat {
+    function parseRepeat(ParseState memory, uint256 cursor, uint256 end, uint256 dispatchValue)
+        internal
+        pure
+        returns (uint256)
+    {
+        unchecked {
+            uint256 value;
+            uint256 length = end - cursor;
+            for (uint256 i = 0; i < length; ++i) {
+                value += dispatchValue * 10 ** i;
+            }
+            return value;
+        }
     }
 }
 
@@ -260,7 +289,61 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// _additional_ literal parsers that they provide, as it is redundant and
     /// fragile to have to define the same literal parsers in multiple places.
     function buildSubParserLiteralParsers() external pure returns (bytes memory) {
-        return hex"";
+        unchecked {
+            function (ParseState memory, uint256, uint256, uint256) internal pure returns (uint256) lengthPointer;
+            uint256 length = SUB_PARSER_LITERAL_PARSERS_LENGTH;
+            assembly ("memory-safe") {
+                lengthPointer := length
+            }
+            function (ParseState memory, uint256, uint256, uint256) internal pure returns (uint256)[SUB_PARSER_LITERAL_PARSERS_LENGTH
+                + 1] memory parsersFixed = [lengthPointer, LibParseLiteralRepeat.parseRepeat];
+            uint256[] memory parsersDynamic;
+            assembly {
+                parsersDynamic := parsersFixed
+            }
+            // Sanity check that the dynamic length is correct. Should be an
+            // unreachable error.
+            if (parsersDynamic.length != length) {
+                revert BadDynamicLength(parsersDynamic.length, length);
+            }
+            return LibConvert.unsafeTo16BitBytes(parsersDynamic);
+        }
+    }
+
+    function matchSubParseLiteralDispatch(uint256 cursor, uint256 end)
+        internal
+        pure
+        virtual
+        override
+        returns (bool, uint256, uint256)
+    {
+        unchecked {
+            uint256 length = end - cursor;
+            bytes32 word;
+            assembly ("memory-safe") {
+                word := mload(cursor)
+            }
+            if (
+                length > SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH
+                    && (word & SUB_PARSER_LITERAL_REPEAT_KEYWORD_MASK) == SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES32
+            ) {
+                ParseState memory state = LibParseState.newState("", "", "", "");
+                // If we have a match on the keyword then the next chars MUST
+                // be a decimal, otherwise it's an error.
+                uint256 value;
+                (cursor, value) = LibParseLiteralDecimal.parseDecimal(
+                    state, cursor + SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH, end
+                );
+                // We can only repeat a single digit.
+                if (value > 9) {
+                    revert InvalidRepeatCount(value);
+                }
+
+                return (true, SUB_PARSER_LITERAL_REPEAT_INDEX, value);
+            } else {
+                return (false, 0, 0);
+            }
+        }
     }
 
     /// There's only one operand parser for this implementation, the disallowed
