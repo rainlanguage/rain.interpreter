@@ -47,6 +47,7 @@ pub mod test {
         assert!(dispair.parser.address().ne(&Address::zero()));
         assert!(dispair.deployer.address().ne(&Address::zero()));
 
+        drop(anvil);
         Ok(())
 
     }
