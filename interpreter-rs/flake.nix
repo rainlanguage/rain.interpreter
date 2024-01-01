@@ -63,7 +63,7 @@
 
         # For `nix build` & `nix run`:
         defaultPackage = naersk'.buildPackage {
-          src = ./.;
+          src = ../.;
           nativeBuildInputs = with pkgs; [ 
             gmp 
             iconv 
@@ -76,10 +76,8 @@
             pkgs.darwin.apple_sdk.frameworks.CoreFoundation
             pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
           ]);
-          cargoBuildOptions = (prev: prev ++ [ "--all-features" ]);
-          cargoBuild = (prev: [ "gen-artifacts" ] ++ prev);
-          # cargoBuild = (prev: ''gen-artifacts && ''  ++ prev);
-
+          cargoBuildOptions = (prev: prev ++ [ "--all-features", "--manifest-path ./interpreter-rs/Cargo.toml" ]);
+          preBuild = '' ${packages.gen-artifacts}/bin/gen-artifacts '';
         };
 
         # For `nix develop`:
