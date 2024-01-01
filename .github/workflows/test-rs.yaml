@@ -1,22 +1,29 @@
-# on: [push]
+on: [push]
 
-# name: test interpreter crate
+name: test interpreter crate
 
-# jobs:
-#   check:
-#     name: interpreter crate test
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v3
-#         with:
-#           submodules: recursive
-#       - name: Install Foundry
-#         uses: foundry-rs/foundry-toolchain@v1
-#         with:
-#           version: nightly
-#       - name: Install stable
-#         uses: actions-rs/toolchain@v1
-#         with:
-#             toolchain: stable
-#       - name: Run cargo test
-#         run: cd interpreter-rs && cargo fmt --check && cargo clippy -- -D clippy::all && cargo test
+jobs:
+  check:
+    name: interpreter crate test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+      - name: Install stable
+        uses: actions-rs/toolchain@v1
+        with:
+            toolchain: stable
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v4
+      - uses: DeterminateSystems/magic-nix-cache-action@v2
+
+      - name: Build
+        run: nix build
+      
+      # - name: Run cargo test
+      #   run: cd interpreter-rs && cargo fmt --check && cargo clippy -- -D clippy::all && cargo test
