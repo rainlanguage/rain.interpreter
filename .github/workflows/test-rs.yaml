@@ -25,5 +25,8 @@ jobs:
       - name: Build
         run: nix build
       
+      - name: C
+        run: ls -l
+
       # - name: Run cargo test
       #   run: cd interpreter-rs && cargo fmt --check && cargo clippy -- -D clippy::all && cargo test
