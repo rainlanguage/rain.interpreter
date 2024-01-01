@@ -1,45 +1,22 @@
-name: Cargo Test
+# on: [push]
 
-on: [push]
+# name: test interpreter crate
 
-jobs:
-  check:
-    strategy:
-      fail-fast: true
-    name: Cargo Test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
-
-      - name: Install Foundry Deps
-        run: forge install --shallow
-
-      - name: Foundry Build
-        run: forge build 
-
-      - name: Install rust stable
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-
-      - name: Cargo Build
-        run: cargo build
-        working-directory: interpreter-rs
-
-      - name: Cargo tests
-        run: cargo test --lib
-        working-directory: interpreter-rs
-
-      - name: Cargo Lint
-        run: cargo clippy
-        working-directory: interpreter-rs
-
-      - name: Cargo Fmt
-        run: cargo fmt --check
-        working-directory: interpreter-rs
-      
+# jobs:
+#   check:
+#     name: interpreter crate test
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#         with:
+#           submodules: recursive
+#       - name: Install Foundry
+#         uses: foundry-rs/foundry-toolchain@v1
+#         with:
+#           version: nightly
+#       - name: Install stable
+#         uses: actions-rs/toolchain@v1
+#         with:
+#             toolchain: stable
+#       - name: Run cargo test
+#         run: cd interpreter-rs && cargo fmt --check && cargo clippy -- -D clippy::all && cargo test

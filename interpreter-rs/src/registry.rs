@@ -2,13 +2,13 @@ use ethers::contract::abigen;
 
 abigen!(
     IInterpreterV2,
-    "../out/IInterpreterV2.sol/IInterpreterV2.json"
+    "./abis/IInterpreterV2.json"
 );
 abigen!(
     IInterpreterStoreV1,
-    "../out/IInterpreterStoreV1.sol/IInterpreterStoreV1.json"
+    "./abis/IInterpreterStoreV1.json"
 );
-abigen!(IParserV1, "../out/IParserV1.sol/IParserV1.json");
+abigen!(IParserV1, "./abis/IParserV1.json");
 abigen!(
     IExpressionDeployerV3,
     r#"[
