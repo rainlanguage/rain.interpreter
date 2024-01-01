@@ -1,0 +1,41 @@
+name: Cargo Test
+
+on: [push]
+
+jobs:
+  check:
+    strategy:
+      fail-fast: true
+    name: Cargo Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Install Foundry Deps
+        run: forge install --shallow
+
+      - name: Foundry Build
+        run: forge build 
+
+      - name: Install rust stable
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Cargo Build
+        run: cargo build
+
+      - name: Cargo tests
+        run: cargo test
+
+      - name: Cargo Lint
+        run: cargo clippy
+
+      - name: Cargo Fmt
+        run: cargo fmt --check
+      
