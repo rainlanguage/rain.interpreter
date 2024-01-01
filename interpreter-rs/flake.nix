@@ -77,8 +77,8 @@
             pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
           ]);
           cargoBuildOptions = (prev: prev ++ [ "--all-features" ]);
-          # cargoBuildOptions = (prev: [ "gen-artifacts" ] ++ prev);
-          # cargoBuildOptions = (prev: "gen-artifacts && "  ++ prev);
+          cargoBuild = (prev: [ "gen-artifacts" ] ++ prev);
+          # cargoBuild = (prev: ''gen-artifacts && ''  ++ prev);
 
         };
 
