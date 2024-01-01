@@ -23,7 +23,7 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@v2
 
       - name: Build
-        run: nix build
+        run: cd interpreter-rs && nix build
       
       - name: C
         run: ls -l
