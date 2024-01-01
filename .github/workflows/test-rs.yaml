@@ -29,13 +29,17 @@ jobs:
 
       - name: Cargo Build
         run: cargo build
+        working-directory: interpreter-rs
 
       - name: Cargo tests
         run: cargo test
+        working-directory: interpreter-rs
 
       - name: Cargo Lint
         run: cargo clippy
+        working-directory: interpreter-rs
 
       - name: Cargo Fmt
         run: cargo fmt --check
+        working-directory: interpreter-rs
       
