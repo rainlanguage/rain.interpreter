@@ -62,26 +62,29 @@
         };
 
         # For `nix build` & `nix run`:
-        defaultPackage = naersk'.buildPackage {
+        # For `nix build` & `nix run`:
+        defaultPackage = (naersk'.buildPackage {
           src = ../.;
           root = ./.;
+          copyLibs = true;
           nativeBuildInputs = with pkgs; [ 
             gmp 
             iconv 
             openssl 
             pkg-config
-          ] ++ (pkgs.lib.optionals pkgs.stdenv.isDarwin [
-            pkgs.libiconv
-            pkgs.darwin.apple_sdk.frameworks.Security
-            pkgs.darwin.apple_sdk.frameworks.CoreServices
-            pkgs.darwin.apple_sdk.frameworks.CoreFoundation
-            pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
-          ]);
-          remapPathPrefix = false;
-          cargoBuildOptions = (prev: prev ++ [ "--all-features" ]);
-          # cargoBuildOptions = (prev: [ "--manifest-path=./interpreter-rs/Cargo.toml" ] ++ prev);
-          preBuild = '' ${packages.gen-artifacts}/bin/gen-artifacts '';
-        };
+          ];
+        }).overrideAttrs (old: {
+          nativeBuildInputs = old.nativeBuildInputs;        
+          buildInputs = old.buildInputs;
+          buildPhase = ''
+            forge -V && echo $PATH
+            cd interpreter-rs && ls -l
+          '' + old.buildPhase + '' ls -l '';
+          installPhase = old.installPhase + ''
+            mv public $out/bin
+            mv bin/run $out/bin/run
+          '';
+        });
 
         # For `nix develop`:
         devShell = pkgs.mkShell {
