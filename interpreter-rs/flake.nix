@@ -3,9 +3,10 @@
     flake-utils.url = "github:numtide/flake-utils";
     naersk.url = "github:nix-community/naersk";
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    foundry.url = "github:shazow/foundry.nix/monthly";
   };
 
-  outputs = { self, flake-utils, naersk, nixpkgs }:
+  outputs = { self, flake-utils, naersk, nixpkgs, foundry }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = (import nixpkgs) {
@@ -62,29 +63,44 @@
         };
 
         # For `nix build` & `nix run`:
-        # For `nix build` & `nix run`:
         defaultPackage = (naersk'.buildPackage {
           src = ../.;
-          root = ./.;
+          # root = ../.;
           copyLibs = true;
+      
           nativeBuildInputs = with pkgs; [ 
             gmp 
             iconv 
             openssl 
             pkg-config
+          ] ++ [ 
+            foundry.defaultPackage.${system} 
           ];
-        }).overrideAttrs (old: {
-          nativeBuildInputs = old.nativeBuildInputs;        
-          buildInputs = old.buildInputs;
-          buildPhase = ''
-            forge -V && echo $PATH
-            cd interpreter-rs && ls -l
-          '' + old.buildPhase + '' ls -l '';
-          installPhase = old.installPhase + ''
-            mv public $out/bin
-            mv bin/run $out/bin/run
+          preBuild = '' 
+            forge build
+            
+            rm -rf ./interpreter-rs/abis
+            mkdir ./interpreter-rs/abis
+
+            ${packages.copy-abis}
           '';
+          # overrideMain = old: {
+          #   root = ./.;
+          #   preBuild = ''
+          #   ls -l
+          #   forge build
+          #   ''; 
+          # };
         });
+        # .overrideAttrs (old: {
+        #   nativeBuildInputs = old.nativeBuildInputs;        
+        #   buildInputs = old.buildInputs;
+        #   buildPhase = ''
+        #     forge build
+        #     ls -l
+        #     cd interpreter-rs && ls -l
+        #   '' + old.buildPhase;
+        # });
 
         # For `nix develop`:
         devShell = pkgs.mkShell {
@@ -98,7 +114,9 @@
             docgen
             lint-fix
             lint-check
-          ]) ++ (pkgs.lib.optionals pkgs.stdenv.isDarwin [
+          ]) ++ [ 
+            foundry.defaultPackage.${system} 
+          ] ++ (pkgs.lib.optionals pkgs.stdenv.isDarwin [
             pkgs.libiconv
             pkgs.darwin.apple_sdk.frameworks.Security
             pkgs.darwin.apple_sdk.frameworks.CoreServices
