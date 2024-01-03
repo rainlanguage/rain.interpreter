@@ -26,7 +26,7 @@ uint256 constant SUB_PARSER_WORD_PARSERS_LENGTH = 2;
 /// bytecode that dials back into this contract at eval time, and creating
 /// to things that happen entirely on the interpreter such as well known
 /// constants and references to the context grid.
-bytes constant SUB_PARSER_WORD_PARSERS = hex"0657067a";
+bytes constant SUB_PARSER_WORD_PARSERS = hex"06fe0721";
 
 /// @dev Real sub parser meta bytes that map parsed strings to the functions that
 /// know how to parse those strings into opcodes for the main parser. Structured
@@ -39,14 +39,14 @@ bytes constant SUB_PARSER_PARSE_META =
 /// the rightmost position is a pointer to an operand parser function. In the
 /// future this is likely to be removed, or refactored to value handling only
 /// rather than parsing.
-bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"076807ad";
+bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"083e0883";
 
 /// @dev Real function pointers to the literal parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
 /// the rightmost position is a pointer to a literal parser function. In the
 /// future this is likely to be removed, in favour of a dedicated literal parser
 /// feature.
-bytes constant SUB_PARSER_LITERAL_PARSERS = hex"";
+bytes constant SUB_PARSER_LITERAL_PARSERS = hex"080f";
 uint256 constant SUB_PARSER_LITERAL_PARSERS_LENGTH = 1;
 
 bytes constant SUB_PARSER_LITERAL_REPEAT_KEYWORD = bytes("reference-extern-repeat-");
@@ -62,7 +62,7 @@ error InvalidRepeatCount(uint256 value);
 /// @dev Real function pointers to the opcodes for the extern component of this
 /// contract. These get run at eval time wehen the interpreter calls into the
 /// contract as an `IInterpreterExternV3`.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"071a";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"07c1";
 
 /// @dev Number of opcode function pointers available to run at eval time.
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
@@ -71,7 +71,7 @@ uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
 /// of this contract. These get run at deploy time when the main integrity checks
 /// are run, the extern opcode integrity on the deployer will delegate integrity
 /// checks to the extern contract.
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0842";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0918";
 
 /// @dev Opcode index of the extern increment opcode. Needs to be manually kept
 /// in sync with the extern opcode function pointers. Definitely write tests for
@@ -152,11 +152,7 @@ library LibExternOpStackOperandNPE2 {
 }
 
 library LibParseLiteralRepeat {
-    function parseRepeat(ParseState memory, uint256 cursor, uint256 end, uint256 dispatchValue)
-        internal
-        pure
-        returns (uint256)
-    {
+    function parseRepeat(uint256 dispatchValue, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
             uint256 value;
             uint256 length = end - cursor;
@@ -290,13 +286,13 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// fragile to have to define the same literal parsers in multiple places.
     function buildSubParserLiteralParsers() external pure returns (bytes memory) {
         unchecked {
-            function (ParseState memory, uint256, uint256, uint256) internal pure returns (uint256) lengthPointer;
+            function (uint256, uint256, uint256) internal pure returns (uint256) lengthPointer;
             uint256 length = SUB_PARSER_LITERAL_PARSERS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function (ParseState memory, uint256, uint256, uint256) internal pure returns (uint256)[SUB_PARSER_LITERAL_PARSERS_LENGTH
-                + 1] memory parsersFixed = [lengthPointer, LibParseLiteralRepeat.parseRepeat];
+            function (uint256, uint256, uint256) internal pure returns (uint256)[SUB_PARSER_LITERAL_PARSERS_LENGTH + 1]
+                memory parsersFixed = [lengthPointer, LibParseLiteralRepeat.parseRepeat];
             uint256[] memory parsersDynamic;
             assembly {
                 parsersDynamic := parsersFixed

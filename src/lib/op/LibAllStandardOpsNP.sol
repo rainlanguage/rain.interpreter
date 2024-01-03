@@ -81,6 +81,7 @@ import {LibParseLiteral, ParseState, LITERAL_PARSERS_LENGTH} from "../parse/lite
 import {LibParseLiteralString} from "../parse/literal/LibParseLiteralString.sol";
 import {LibParseLiteralDecimal} from "../parse/literal/LibParseLiteralDecimal.sol";
 import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
+import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
 uint256 constant ALL_STANDARD_OPS_LENGTH = 58;
@@ -289,7 +290,8 @@ library LibAllStandardOpsNP {
                     lengthPointer,
                     LibParseLiteralHex.parseHex,
                     LibParseLiteralDecimal.parseDecimal,
-                    LibParseLiteralString.parseString
+                    LibParseLiteralString.parseString,
+                    LibParseLiteralSubParseable.parseSubParseable
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {

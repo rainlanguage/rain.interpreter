@@ -32,7 +32,7 @@ import {LibParseError} from "../LibParseError.sol";
 import {LibParseInterstitial} from "../LibParseInterstitial.sol";
 import {LibSubParse} from "../LibSubParse.sol";
 
-uint256 constant LITERAL_PARSERS_LENGTH = 3;
+uint256 constant LITERAL_PARSERS_LENGTH = 4;
 
 uint256 constant LITERAL_PARSER_INDEX_HEX = 0;
 uint256 constant LITERAL_PARSER_INDEX_DECIMAL = 1;
@@ -121,54 +121,5 @@ library LibParseLiteral {
         uint256 value;
         (cursor, value) = state.selectLiteralParserByIndex(index)(state, cursor, end);
         return (true, cursor, value);
-    }
-
-    function parseLiteralSubParseable(ParseState memory state, uint256 cursor, uint256 end)
-        internal
-        pure
-        returns (uint256, uint256)
-    {
-        unchecked {
-            // Move cursor past opening bracket.
-            // Caller is responsible for checking that the cursor is pointing
-            // at a sub parseable literal.
-            ++cursor;
-
-            // Skip any whitespace.
-            cursor = state.skipWhitespace(cursor, end);
-
-            uint256 dispatchStart = cursor;
-
-            // Skip all non-whitespace and non-bracket characters.
-            cursor = LibParse.skipMask(cursor, end, ~(CMASK_WHITESPACE | CMASK_SUB_PARSEABLE_LITERAL_HEAD));
-            uint256 dispatchEnd = cursor;
-
-            // Skip any whitespace.
-            cursor = state.skipWhitespace(cursor, end);
-
-            uint256 bodyStart = cursor;
-
-            // Skip all non-whitespace and non-bracket characters.
-            cursor = LibParse.skipMask(cursor, end, ~(CMASK_WHITESPACE | CMASK_SUB_PARSEABLE_LITERAL_HEAD));
-            uint256 bodyEnd = cursor;
-
-            // Skip any whitespace.
-            cursor = state.skipWhitespace(cursor, end);
-
-            {
-                uint256 finalChar;
-                assembly ("memory-safe") {
-                    finalChar := shl(byte(0, mload(cursor)), 1)
-                }
-                if ((finalChar & CMASK_SUB_PARSEABLE_LITERAL_END) == 0) {
-                    revert UnclosedSubParseableLiteral(state.parseErrorOffset(cursor));
-                }
-            }
-
-            // Move cursor past closing bracket.
-            ++cursor;
-
-            return (cursor, state.subParseLiteral(dispatchStart, dispatchEnd, bodyStart, bodyEnd));
-        }
     }
 }

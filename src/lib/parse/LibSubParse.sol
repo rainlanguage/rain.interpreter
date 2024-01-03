@@ -304,7 +304,7 @@ library LibSubParse {
             let dispatchLength := and(mload(add(data, 2)), 0xFFFF)
             dispatchStart := add(data, 0x22)
             bodyStart := add(dispatchStart, dispatchLength)
-            bodyEnd := add(data, mload(data))
+            bodyEnd := add(data, add(0x20, mload(data)))
         }
     }
 }
