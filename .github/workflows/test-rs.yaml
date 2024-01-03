@@ -10,26 +10,16 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
-      - name: Install stable
-        uses: actions-rs/toolchain@v1
-        with:
-            toolchain: stable
+      
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v4
       - uses: DeterminateSystems/magic-nix-cache-action@v2
 
       - name: Prepare Interpreter Crate
-        run: nix run .#gen-artifacts
-        working-directory: interpreter-rs
+        run: cd ./interpreter-rs && nix run .#gen-artifacts
       
       - name: Test Crate
-        run: nix run .#test
-        working-directory: interpreter-rs
+        run: cd ./interpreter-rs && nix run .#test
       
       - name: Lint
-        run: nix run .#lint-check
-        working-directory: interpreter-rs
+        run: cd ./interpreter-rs && nix run .#lint-check
