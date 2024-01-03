@@ -12,12 +12,10 @@ jobs:
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
-        working-directory: interpreter-rs
       
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v4
       - uses: DeterminateSystems/magic-nix-cache-action@v2
-        working-directory: interpreter-rs
 
       - name: Prepare Interpreter Crate
         run: nix run .#gen-artifacts
