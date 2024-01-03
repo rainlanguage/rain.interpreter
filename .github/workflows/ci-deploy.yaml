@@ -30,4 +30,4 @@ jobs:
         env:
           CI_DEPLOY_RPC_URL: ${{ inputs.network == 'polygon' && secrets.CI_DEPLOY_POLYGON_RPC_URL || secrets.CI_DEPLOY_RPC_URL }}
           EXPLORER_VERIFICATION_KEY: ${{ secrets.EXPLORER_VERIFICATION_KEY }}
-        # run: nix run .#deploy-dispair
+        run: nix run .#deploy-dispair
