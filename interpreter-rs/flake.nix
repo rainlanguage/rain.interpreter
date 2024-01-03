@@ -28,7 +28,7 @@
             ${pkgs.lib.concatStrings (
               map (
                 contract: copy-abi {
-                  origin_root = "../";
+                  origin_root = "..";
                   destiny = abi-path;
                   contract = contract; 
                 })
