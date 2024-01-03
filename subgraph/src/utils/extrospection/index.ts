@@ -8,7 +8,7 @@ export class ExtrospectionPerNetwork {
 
     // TODO: Implement keyless deploy or CREATE2 opcode to have the same address on all chains
     if (currentNetwork == "mainnet")
-      address = "0x4e6f010e1a4a51d241ea88eb01c52824e728a877";
+      address = "0xEF886DA46c13621452a04EA026C5Aaf686535a87";
 
     if (currentNetwork == "mumbai")
       address = "0x2c9f3204590765aefa7bee01bccb540a7d06e967";
