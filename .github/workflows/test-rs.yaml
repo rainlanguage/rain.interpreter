@@ -28,9 +28,11 @@ jobs:
         working-directory: interpreter-rs
       
       - name: Test Crate
+        uses: actions-rs/cargo@v1
         run: nix run .#test
         working-directory: interpreter-rs
       
       - name: Lint
+        uses: actions-rs/cargo@v1
         run: nix run .#lint-check
         working-directory: interpreter-rs
