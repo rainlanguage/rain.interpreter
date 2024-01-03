@@ -12,6 +12,12 @@ jobs:
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
+
+      - uses: actions/checkout@v3
+      - name: Install Rust
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
       
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v4
