@@ -24,7 +24,10 @@ jobs:
         run: nix run
       
       - name: Lint Check
-        run: cargo fmt --check && cargo clippy
+        run: nix develop --command cargo clippy
+
+      - name: Cargo Fmt
+        run: nix develop --command cargo fmt
 
       - name: Cargo Test
-        run: cargo test --all-features
+        run: nix develop --command cargo test

@@ -39,6 +39,23 @@
           '');
 
           default = build-meta;
+
+          # For `nix develop`:
+          devShell = pkgs.mkShell {
+          nativeBuildInputs = with pkgs; [ 
+            gmp 
+            iconv 
+            rustup 
+          ] ++ (pkgs.lib.optionals pkgs.stdenv.isDarwin [
+            pkgs.libiconv
+            pkgs.darwin.apple_sdk.frameworks.Security
+            pkgs.darwin.apple_sdk.frameworks.CoreServices
+            pkgs.darwin.apple_sdk.frameworks.CoreFoundation
+            pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
+          ]);
+        };
+
+
         };
       }
     );
