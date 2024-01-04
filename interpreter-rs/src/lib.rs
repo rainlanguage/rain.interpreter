@@ -17,22 +17,22 @@ pub mod test {
 
     abigen!(
         RainterpreterNPE2,
-        "./abis/RainterpreterNPE2.json",
+        "../out/RainterpreterNPE2.sol/RainterpreterNPE2.json",
         derives(serde::Deserialize, serde::Serialize)
     );
     abigen!(
         RainterpreterStoreNPE2,
-        "./abis/RainterpreterStoreNPE2.json",
+        "../out/RainterpreterStoreNPE2.sol/RainterpreterStoreNPE2.json",
         derives(serde::Deserialize, serde::Serialize)
     );
     abigen!(
         RainterpreterParserNPE2,
-        "./abis/RainterpreterParserNPE2.json",
+        "../out/RainterpreterParserNPE2.sol/RainterpreterParserNPE2.json",
         derives(serde::Deserialize, serde::Serialize)
     );
     abigen!(
         RainterpreterExpressionDeployerNPE2,
-        "./abis/RainterpreterExpressionDeployerNPE2.json",
+        "../out/RainterpreterExpressionDeployerNPE2.sol/RainterpreterExpressionDeployerNPE2.json",
         derives(serde::Deserialize, serde::Serialize)
     );
 

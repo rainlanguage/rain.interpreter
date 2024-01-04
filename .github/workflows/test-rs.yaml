@@ -24,9 +24,7 @@ jobs:
         run: nix run
       
       - name: Lint Check
-        run: nix run .#lint-check
-        working-directory: interpreter-rs
+        run: cargo fmt --check && cargo clippy
 
       - name: Cargo Test
-        run: nix run .#test
-        working-directory: interpreter-rs
+        run: cargo test --all-features
