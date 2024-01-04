@@ -3,7 +3,7 @@ pragma solidity ^0.8.18;
 
 import {ParseState} from "../LibParseState.sol";
 import {LibParse} from "../LibParse.sol";
-import {UnclosedSubParseableLiteral} from "../../../error/ErrParse.sol";
+import {UnclosedSubParseableLiteral, SubParseableMissingDispatch} from "../../../error/ErrParse.sol";
 import {
     CMASK_WHITESPACE, CMASK_SUB_PARSEABLE_LITERAL_HEAD, CMASK_SUB_PARSEABLE_LITERAL_END
 } from "../LibParseCMask.sol";
@@ -31,8 +31,12 @@ library LibParseLiteralSubParseable {
             uint256 dispatchStart = cursor;
 
             // Skip all non-whitespace and non-bracket characters.
-            cursor = LibParse.skipMask(cursor, end, ~(CMASK_WHITESPACE | CMASK_SUB_PARSEABLE_LITERAL_HEAD));
+            cursor = LibParse.skipMask(cursor, end, ~(CMASK_WHITESPACE | CMASK_SUB_PARSEABLE_LITERAL_END));
             uint256 dispatchEnd = cursor;
+
+            if (dispatchEnd == dispatchStart) {
+                revert SubParseableMissingDispatch(state.parseErrorOffset(cursor));
+            }
 
             // Skip any whitespace.
             cursor = state.skipWhitespace(cursor, end);

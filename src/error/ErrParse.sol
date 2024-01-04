@@ -140,6 +140,9 @@ error InvalidSubParser(uint256 offset);
 /// The parser encountered an unclosed sub parsed literal.
 error UnclosedSubParseableLiteral(uint256 offset);
 
+/// The parser encountered a sub parseable literal with a missing dispatch.
+error SubParseableMissingDispatch(uint256 offset);
+
 /// The sub parser returned some bytecode that the main parser could not
 /// understand.
 error BadSubParserResult(bytes bytecode);
