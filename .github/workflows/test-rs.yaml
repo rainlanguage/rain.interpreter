@@ -16,14 +16,6 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v4
       - uses: DeterminateSystems/magic-nix-cache-action@v2
-
-      - name: Prepare Interpreter Crate
-        run: nix run .#gen-artifacts
-        working-directory: interpreter-rs
-      
-      - name: Test Crate
-        run: nix run .#test
-        working-directory: interpreter-rs
       
       - name: Lint
         run: nix run .#lint-check

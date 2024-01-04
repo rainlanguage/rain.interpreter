@@ -17,33 +17,6 @@
 
       in rec {
         packages = rec {
-          abi-path = "./abis/";
-
-          copy-abi = { origin_root, destiny, contract }: ''
-            cp ${origin_root}/out/${contract}.sol/${contract}.json ${destiny}
-          ''; 
-
-          copy-abis = ''
-            # Copying contract ABIs needed
-            ${pkgs.lib.concatStrings (
-              map (
-                contract: copy-abi {
-                  origin_root = "..";
-                  destiny = abi-path;
-                  contract = contract; 
-                })
-              ["RainterpreterNPE2" "RainterpreterStoreNPE2" "RainterpreterParserNPE2" "RainterpreterExpressionDeployerNPE2" "IInterpreterV2" "IInterpreterStoreV1" "IParserV1"]
-            )}
-          '';
-
-          gen-artifacts =  pkgs.writeShellScriptBin "gen-artifacts" (''
-            forge build --root ../
-
-            rm -rf ./abis
-            mkdir ./abis
-
-            ${copy-abis}
-          ''); 
 
           test = pkgs.writeShellScriptBin "test" ''
             cargo test --all-features
@@ -65,7 +38,6 @@
         # For `nix build` & `nix run`:
         defaultPackage = (naersk'.buildPackage {
           src = ../.;
-          # root = ../.;
           copyLibs = true;
       
           nativeBuildInputs = with pkgs; [ 
@@ -76,32 +48,8 @@
           ] ++ [ 
             foundry.defaultPackage.${system} 
           ];
-          preBuild = '' 
-            forge build
-            
-            rm -rf ./interpreter-rs/abis
-            mkdir ./interpreter-rs/abis
-
-            ${packages.copy-abis}
-          '';
-          # overrideMain = old: {
-          #   root = ./.;
-          #   preBuild = ''
-          #   ls -l
-          #   forge build
-          #   ''; 
-          # };
         });
-        # .overrideAttrs (old: {
-        #   nativeBuildInputs = old.nativeBuildInputs;        
-        #   buildInputs = old.buildInputs;
-        #   buildPhase = ''
-        #     forge build
-        #     ls -l
-        #     cd interpreter-rs && ls -l
-        #   '' + old.buildPhase;
-        # });
-
+        
         # For `nix develop`:
         devShell = pkgs.mkShell {
           nativeBuildInputs = with pkgs; [ 
