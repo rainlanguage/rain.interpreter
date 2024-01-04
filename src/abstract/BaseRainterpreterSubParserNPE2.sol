@@ -26,16 +26,11 @@ bytes constant SUB_PARSER_WORD_PARSERS = hex"";
 bytes constant SUB_PARSER_PARSE_META = hex"";
 
 /// @dev This is a placeholder for the int that encodes pointers to operand
-/// parsers. In the future this will probably be removed and the main parser
-/// will handle all operand parsing, the subparser will only be responsible for
-/// checking the validity of the operand values and encoding them into the
-/// resulting bytecode.
+/// parsers.
 bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"";
 
 /// @dev This is a placeholder for the int that encodes pointers to literal
-/// parsers. In the future this will probably be removed and there will be
-/// dedicated concepts for "sub literal" and "sub word" parsing, that should be
-/// more composable than the current approach.
+/// parsers.
 bytes constant SUB_PARSER_LITERAL_PARSERS = hex"";
 
 /// @dev This is a placeholder for compatibility version. The child contract
@@ -119,10 +114,41 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV2 {
         return SUB_PARSER_COMPATIBLITY;
     }
 
-    function matchSubParseLiteralDispatch(uint256, uint256) internal pure virtual returns (bool, uint256, uint256) {
-        return (false, 0, 0);
+    /// Overrideable function to allow implementations to define their
+    /// literal dispatch matching. This is optional, and if not overridden
+    /// simply won't attempt to parse any literals. This is usually what you
+    /// want, as the main parser will handle common literals and the subparser
+    /// can focus on words, which is the more common case.
+    /// @param cursor The cursor to the memory location of the start of the
+    /// dispatch data.
+    /// @param end The cursor to the memory location of the end of the dispatch
+    /// data.
+    /// @return success Whether the dispatch was successfully matched. If the
+    /// sub parser does not recognise the dispatch data, it should return false.
+    /// The main parser MAY fallback to other sub parsers, so this is not
+    /// necessarily a failure condition.
+    /// @return index The index of the sub parser literal parser to use. If
+    /// success is true, this MUST match the position of the function pointer in
+    /// the bytes returned by `subParserLiteralParsers`.
+    /// @return value The value of the dispatch data, which is passed to the
+    /// sub parser literal parser. This MAY be zero if the sub parser does not
+    /// need to use the dispatch data. The interpretation of this value is
+    /// entirely up to the sub parser.
+    function matchSubParseLiteralDispatch(uint256 cursor, uint256 end) internal pure virtual returns (bool success, uint256 index, uint256 value) {
+        (cursor, end);
+        success = false;
+        index = 0;
+        value = 0;
     }
 
+    /// A basic implementation of sub parsing literals that uses encoded
+    /// function pointers to dispatch everything necessary in O(1) and allows
+    /// for the child contract to override all relevant functions with some
+    /// modest boilerplate.
+    /// This is virtual but the expectation is that it generally DOES NOT need
+    /// to be overridden, as the function pointers and metadata bytes are all
+    /// that need to be changed to implement a new subparser.
+    /// @inheritdoc ISubParserV2
     function subParseLiteral(bytes32 compatibility, bytes memory data) external pure virtual returns (bool, uint256) {
         if (compatibility != subParserCompatibility()) {
             revert IncompatibleSubParser();
