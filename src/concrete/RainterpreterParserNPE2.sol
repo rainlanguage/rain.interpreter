@@ -11,7 +11,7 @@ import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
 
 /// @dev The known hash of the parser bytecode. This is used by the deployer to
 /// check that it is deploying a parser that is compatible with the interpreter.
-bytes32 constant PARSER_BYTECODE_HASH = bytes32(0xdac200dee56b889c5c2824deebae89b13219ce498f18514270a68dff9c901833);
+bytes32 constant PARSER_BYTECODE_HASH = bytes32(0xdbe12a9f7e06d337d2caf36631fc3028c934a016cc68b2f0bbc4c1bfd0e286d6);
 
 /// @dev Encodes the parser meta that is used to lookup word definitions.
 /// The structure of the parser meta is:
@@ -44,7 +44,7 @@ bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
 /// dispatches are determined by the first byte(s) of the literal rather than a
 /// full word lookup, and are done with simple conditional jumps as the
 /// possibilities are limited compared to the number of words we have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"07e60aae0dab";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"07ee0ab60db30e6b";
 
 /// @title RainterpreterParserNPE2
 /// @dev The parser implementation.
