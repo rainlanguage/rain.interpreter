@@ -20,6 +20,10 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@v4
       - uses: DeterminateSystems/magic-nix-cache-action@v2
       
-      - name: Lint
+      - name: Lint Check
         run: nix run .#lint-check
+        working-directory: interpreter-rs
+
+      - name: Cargo Test
+        run: nix run .#test
         working-directory: interpreter-rs
