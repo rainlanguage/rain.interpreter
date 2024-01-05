@@ -46,11 +46,6 @@
           '');
 
           default = build-meta;
-
-          # nativeBuildInputs = [
-          #   pkgs.gmp
-          #   pkgs.iconv
-          # ];
         };
 
           # For `nix develop`:
