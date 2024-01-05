@@ -1,0 +1,899 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>LibParseCMask constants</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../../../../favicon.svg">
+        <link rel="shortcut icon" href="../../../../favicon.png">
+        <link rel="stylesheet" href="../../../../css/variables.css">
+        <link rel="stylesheet" href="../../../../css/general.css">
+        <link rel="stylesheet" href="../../../../css/chrome.css">
+        <link rel="stylesheet" href="../../../../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../../../../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../../../../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../../../../highlight.css">
+        <link rel="stylesheet" href="../../../../tomorrow-night.css">
+        <link rel="stylesheet" href="../../../../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../../../book.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../../../../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item "><a href="../../../../index.html">Home</a></li><li class="chapter-item affix "><li class="part-title">src</li><li class="chapter-item "><a href="../../../../src/abstract/index.html">❱ abstract</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/abstract/BaseRainterpreterExternNPE2.sol/abstract.BaseRainterpreterExternNPE2.html">BaseRainterpreterExternNPE2</a></li><li class="chapter-item "><a href="../../../../src/abstract/BaseRainterpreterExternNPE2.sol/constants.BaseRainterpreterExternNPE2.html">BaseRainterpreterExternNPE2 constants</a></li><li class="chapter-item "><a href="../../../../src/abstract/BaseRainterpreterSubParserNPE2.sol/abstract.BaseRainterpreterSubParserNPE2.html">BaseRainterpreterSubParserNPE2</a></li><li class="chapter-item "><a href="../../../../src/abstract/BaseRainterpreterSubParserNPE2.sol/constants.BaseRainterpreterSubParserNPE2.html">BaseRainterpreterSubParserNPE2 constants</a></li><li class="chapter-item "><a href="../../../../src/abstract/DeployerDiscoverableMetaV3.sol/struct.DeployerDiscoverableMetaV3ConstructionConfig.html">DeployerDiscoverableMetaV3ConstructionConfig</a></li><li class="chapter-item "><a href="../../../../src/abstract/DeployerDiscoverableMetaV3.sol/abstract.DeployerDiscoverableMetaV3.html">DeployerDiscoverableMetaV3</a></li></ol></li><li class="chapter-item "><a href="../../../../src/concrete/index.html">❱ concrete</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/concrete/RainterpreterExpressionDeployerNPE2.sol/struct.RainterpreterExpressionDeployerNPE2ConstructionConfig.html">RainterpreterExpressionDeployerNPE2ConstructionConfig</a></li><li class="chapter-item "><a href="../../../../src/concrete/RainterpreterExpressionDeployerNPE2.sol/contract.RainterpreterExpressionDeployerNPE2.html">RainterpreterExpressionDeployerNPE2</a></li><li class="chapter-item "><a href="../../../../src/concrete/RainterpreterExpressionDeployerNPE2.sol/constants.RainterpreterExpressionDeployerNPE2.html">RainterpreterExpressionDeployerNPE2 constants</a></li><li class="chapter-item "><a href="../../../../src/concrete/RainterpreterNPE2.sol/contract.RainterpreterNPE2.html">RainterpreterNPE2</a></li><li class="chapter-item "><a href="../../../../src/concrete/RainterpreterNPE2.sol/constants.RainterpreterNPE2.html">RainterpreterNPE2 constants</a></li><li class="chapter-item "><a href="../../../../src/concrete/RainterpreterParserNPE2.sol/contract.RainterpreterParserNPE2.html">RainterpreterParserNPE2</a></li><li class="chapter-item "><a href="../../../../src/concrete/RainterpreterParserNPE2.sol/constants.RainterpreterParserNPE2.html">RainterpreterParserNPE2 constants</a></li><li class="chapter-item "><a href="../../../../src/concrete/RainterpreterReferenceExternNPE2.sol/library.LibExternOpIntIncNPE2.html">LibExternOpIntIncNPE2</a></li><li class="chapter-item "><a href="../../../../src/concrete/RainterpreterReferenceExternNPE2.sol/library.LibExternOpStackOperandNPE2.html">LibExternOpStackOperandNPE2</a></li><li class="chapter-item "><a href="../../../../src/concrete/RainterpreterReferenceExternNPE2.sol/library.LibRainterpreterReferenceExternNPE2.html">LibRainterpreterReferenceExternNPE2</a></li><li class="chapter-item "><a href="../../../../src/concrete/RainterpreterReferenceExternNPE2.sol/contract.RainterpreterReferenceExternNPE2.html">RainterpreterReferenceExternNPE2</a></li><li class="chapter-item "><a href="../../../../src/concrete/RainterpreterReferenceExternNPE2.sol/constants.RainterpreterReferenceExternNPE2.html">RainterpreterReferenceExternNPE2 constants</a></li><li class="chapter-item "><a href="../../../../src/concrete/RainterpreterStoreNPE2.sol/error.OddSetLength.html">OddSetLength</a></li><li class="chapter-item "><a href="../../../../src/concrete/RainterpreterStoreNPE2.sol/contract.RainterpreterStoreNPE2.html">RainterpreterStoreNPE2</a></li><li class="chapter-item "><a href="../../../../src/concrete/RainterpreterStoreNPE2.sol/constants.RainterpreterStoreNPE2.html">RainterpreterStoreNPE2 constants</a></li></ol></li><li class="chapter-item "><a href="../../../../src/error/index.html">❱ error</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/error/ErrBitwise.sol/contract.ErrBitwise.html">ErrBitwise</a></li><li class="chapter-item "><a href="../../../../src/error/ErrBitwise.sol/error.UnsupportedBitwiseShiftAmount.html">UnsupportedBitwiseShiftAmount</a></li><li class="chapter-item "><a href="../../../../src/error/ErrBitwise.sol/error.TruncatedBitwiseEncoding.html">TruncatedBitwiseEncoding</a></li><li class="chapter-item "><a href="../../../../src/error/ErrBitwise.sol/error.ZeroLengthBitwiseEncoding.html">ZeroLengthBitwiseEncoding</a></li><li class="chapter-item "><a href="../../../../src/error/ErrBytecode.sol/contract.ErrBytecode.html">ErrBytecode</a></li><li class="chapter-item "><a href="../../../../src/error/ErrBytecode.sol/error.SourceIndexOutOfBounds.html">SourceIndexOutOfBounds</a></li><li class="chapter-item "><a href="../../../../src/error/ErrBytecode.sol/error.UnexpectedSources.html">UnexpectedSources</a></li><li class="chapter-item "><a href="../../../../src/error/ErrBytecode.sol/error.UnexpectedTrailingOffsetBytes.html">UnexpectedTrailingOffsetBytes</a></li><li class="chapter-item "><a href="../../../../src/error/ErrBytecode.sol/error.TruncatedSource.html">TruncatedSource</a></li><li class="chapter-item "><a href="../../../../src/error/ErrBytecode.sol/error.TruncatedHeader.html">TruncatedHeader</a></li><li class="chapter-item "><a href="../../../../src/error/ErrBytecode.sol/error.TruncatedHeaderOffsets.html">TruncatedHeaderOffsets</a></li><li class="chapter-item "><a href="../../../../src/error/ErrBytecode.sol/error.StackSizingsNotMonotonic.html">StackSizingsNotMonotonic</a></li><li class="chapter-item "><a href="../../../../src/error/ErrDeploy.sol/contract.ErrDeploy.html">ErrDeploy</a></li><li class="chapter-item "><a href="../../../../src/error/ErrDeploy.sol/error.UnexpectedPointers.html">UnexpectedPointers</a></li><li class="chapter-item "><a href="../../../../src/error/ErrDeploy.sol/error.UnexpectedInterpreterBytecodeHash.html">UnexpectedInterpreterBytecodeHash</a></li><li class="chapter-item "><a href="../../../../src/error/ErrDeploy.sol/error.UnexpectedStoreBytecodeHash.html">UnexpectedStoreBytecodeHash</a></li><li class="chapter-item "><a href="../../../../src/error/ErrDeploy.sol/error.UnexpectedParserBytecodeHash.html">UnexpectedParserBytecodeHash</a></li><li class="chapter-item "><a href="../../../../src/error/ErrDeploy.sol/error.UnexpectedConstructionMetaHash.html">UnexpectedConstructionMetaHash</a></li><li class="chapter-item "><a href="../../../../src/error/ErrExtern.sol/contract.ErrExtern.html">ErrExtern</a></li><li class="chapter-item "><a href="../../../../src/error/ErrExtern.sol/error.NotAnExternContract.html">NotAnExternContract</a></li><li class="chapter-item "><a href="../../../../src/error/ErrExtern.sol/error.BadInputs.html">BadInputs</a></li><li class="chapter-item "><a href="../../../../src/error/ErrOpList.sol/contract.ErrOpList.html">ErrOpList</a></li><li class="chapter-item "><a href="../../../../src/error/ErrOpList.sol/error.BadDynamicLength.html">BadDynamicLength</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/contract.ErrParse.html">ErrParse</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.UnexpectedOperand.html">UnexpectedOperand</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.UnexpectedOperandValue.html">UnexpectedOperandValue</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.ExpectedOperand.html">ExpectedOperand</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.OperandOverflow.html">OperandOverflow</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.OperandValuesOverflow.html">OperandValuesOverflow</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.UnclosedOperand.html">UnclosedOperand</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.UnsupportedLiteralType.html">UnsupportedLiteralType</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.StringTooLong.html">StringTooLong</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.UnclosedStringLiteral.html">UnclosedStringLiteral</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.HexLiteralOverflow.html">HexLiteralOverflow</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.ZeroLengthHexLiteral.html">ZeroLengthHexLiteral</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.OddLengthHexLiteral.html">OddLengthHexLiteral</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.MalformedHexLiteral.html">MalformedHexLiteral</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.DecimalLiteralOverflow.html">DecimalLiteralOverflow</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.MalformedExponentDigits.html">MalformedExponentDigits</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.ZeroLengthDecimal.html">ZeroLengthDecimal</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.MissingFinalSemi.html">MissingFinalSemi</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.UnexpectedLHSChar.html">UnexpectedLHSChar</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.UnexpectedRHSChar.html">UnexpectedRHSChar</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.ExpectedLeftParen.html">ExpectedLeftParen</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.UnexpectedRightParen.html">UnexpectedRightParen</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.UnclosedLeftParen.html">UnclosedLeftParen</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.UnexpectedComment.html">UnexpectedComment</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.UnclosedComment.html">UnclosedComment</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.MalformedCommentStart.html">MalformedCommentStart</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.DuplicateLHSItem.html">DuplicateLHSItem</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.ExcessLHSItems.html">ExcessLHSItems</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.NotAcceptingInputs.html">NotAcceptingInputs</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.ExcessRHSItems.html">ExcessRHSItems</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.WordSize.html">WordSize</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.UnknownWord.html">UnknownWord</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.MaxSources.html">MaxSources</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.DanglingSource.html">DanglingSource</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.ParserOutOfBounds.html">ParserOutOfBounds</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.ParseStackOverflow.html">ParseStackOverflow</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.ParseStackUnderflow.html">ParseStackUnderflow</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.ParenOverflow.html">ParenOverflow</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.NoWhitespaceAfterUsingWordsFrom.html">NoWhitespaceAfterUsingWordsFrom</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.InvalidAddressLength.html">InvalidAddressLength</a></li><li class="chapter-item "><a href="../../../../src/error/ErrParse.sol/error.BadSubParserResult.html">BadSubParserResult</a></li><li class="chapter-item "><a href="../../../../src/error/ErrSubParse.sol/error.IncompatibleSubParser.html">IncompatibleSubParser</a></li><li class="chapter-item "><a href="../../../../src/error/ErrSubParse.sol/error.ExternDispatchConstantsHeightOverflow.html">ExternDispatchConstantsHeightOverflow</a></li></ol></li><li class="chapter-item "><a href="../../../../src/interface/index.html">❱ interface</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/interface/deprecated/index.html">❱ deprecated</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/interface/deprecated/IDebugExpressionDeployerV1.sol/interface.IDebugExpressionDeployerV1.html">IDebugExpressionDeployerV1</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IDebugExpressionDeployerV2.sol/interface.IDebugExpressionDeployerV2.html">IDebugExpressionDeployerV2</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IDebugInterpreterV1.sol/interface.IDebugInterpreterV1.html">IDebugInterpreterV1</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IDebugInterpreterV2.sol/interface.IDebugInterpreterV2.html">IDebugInterpreterV2</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IExpressionDeployerV1.sol/interface.IExpressionDeployerV1.html">IExpressionDeployerV1</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IExpressionDeployerV1.sol/constants.IExpressionDeployerV1.html">IExpressionDeployerV1 constants</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IExpressionDeployerV2.sol/interface.IExpressionDeployerV2.html">IExpressionDeployerV2</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IExpressionDeployerV2.sol/constants.IExpressionDeployerV2.html">IExpressionDeployerV2 constants</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IInterpreterCallerV1.sol/struct.EvaluableConfig.html">EvaluableConfig</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IInterpreterCallerV1.sol/struct.EvaluableConfigV2.html">EvaluableConfigV2</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IInterpreterCallerV1.sol/struct.Evaluable.html">Evaluable</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IInterpreterCallerV1.sol/struct.SignedContext.html">SignedContext</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IInterpreterCallerV1.sol/interface.IInterpreterCallerV1.html">IInterpreterCallerV1</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IInterpreterCallerV1.sol/constants.IInterpreterCallerV1.html">IInterpreterCallerV1 constants</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IInterpreterExternV1.sol/type.EncodedExternDispatch.html">EncodedExternDispatch</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IInterpreterExternV1.sol/type.ExternDispatch.html">ExternDispatch</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IInterpreterExternV1.sol/interface.IInterpreterExternV1.html">IInterpreterExternV1</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IInterpreterExternV2.sol/interface.IInterpreterExternV2.html">IInterpreterExternV2</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IInterpreterV1.sol/type.SourceIndex.html">SourceIndex</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IInterpreterV1.sol/type.EncodedDispatch.html">EncodedDispatch</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IInterpreterV1.sol/type.StateNamespace.html">StateNamespace</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IInterpreterV1.sol/type.Operand.html">Operand</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IInterpreterV1.sol/interface.IInterpreterV1.html">IInterpreterV1</a></li><li class="chapter-item "><a href="../../../../src/interface/deprecated/IInterpreterV1.sol/constants.IInterpreterV1.html">IInterpreterV1 constants</a></li></ol></li><li class="chapter-item "><a href="../../../../src/interface/unstable/index.html">❱ unstable</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/interface/unstable/IExpressionDeployerV3.sol/interface.IExpressionDeployerV3.html">IExpressionDeployerV3</a></li><li class="chapter-item "><a href="../../../../src/interface/unstable/IExpressionDeployerV3.sol/constants.IExpressionDeployerV3.html">IExpressionDeployerV3 constants</a></li><li class="chapter-item "><a href="../../../../src/interface/unstable/IInterpreterExternV3.sol/interface.IInterpreterExternV3.html">IInterpreterExternV3</a></li><li class="chapter-item "><a href="../../../../src/interface/unstable/IInterpreterStoreV2.sol/interface.IInterpreterStoreV2.html">IInterpreterStoreV2</a></li><li class="chapter-item "><a href="../../../../src/interface/unstable/IInterpreterV2.sol/type.SourceIndexV2.html">SourceIndexV2</a></li><li class="chapter-item "><a href="../../../../src/interface/unstable/IInterpreterV2.sol/interface.IInterpreterV2.html">IInterpreterV2</a></li><li class="chapter-item "><a href="../../../../src/interface/unstable/IInterpreterV2.sol/constants.IInterpreterV2.html">IInterpreterV2 constants</a></li><li class="chapter-item "><a href="../../../../src/interface/unstable/ISubParserV1.sol/interface.ISubParserV1.html">ISubParserV1</a></li><li class="chapter-item "><a href="../../../../src/interface/unstable/ISubParserV1.sol/constants.ISubParserV1.html">ISubParserV1 constants</a></li></ol></li><li class="chapter-item "><a href="../../../../src/interface/IInterpreterCallerV2.sol/struct.EvaluableConfigV3.html">EvaluableConfigV3</a></li><li class="chapter-item "><a href="../../../../src/interface/IInterpreterCallerV2.sol/struct.EvaluableV2.html">EvaluableV2</a></li><li class="chapter-item "><a href="../../../../src/interface/IInterpreterCallerV2.sol/struct.SignedContextV1.html">SignedContextV1</a></li><li class="chapter-item "><a href="../../../../src/interface/IInterpreterCallerV2.sol/interface.IInterpreterCallerV2.html">IInterpreterCallerV2</a></li><li class="chapter-item "><a href="../../../../src/interface/IInterpreterCallerV2.sol/constants.IInterpreterCallerV2.html">IInterpreterCallerV2 constants</a></li><li class="chapter-item "><a href="../../../../src/interface/IInterpreterStoreV1.sol/type.FullyQualifiedNamespace.html">FullyQualifiedNamespace</a></li><li class="chapter-item "><a href="../../../../src/interface/IInterpreterStoreV1.sol/interface.IInterpreterStoreV1.html">IInterpreterStoreV1</a></li><li class="chapter-item "><a href="../../../../src/interface/IInterpreterStoreV1.sol/constants.IInterpreterStoreV1.html">IInterpreterStoreV1 constants</a></li><li class="chapter-item "><a href="../../../../src/interface/IParserV1.sol/struct.AuthoringMeta.html">AuthoringMeta</a></li><li class="chapter-item "><a href="../../../../src/interface/IParserV1.sol/struct.AuthoringMetaV2.html">AuthoringMetaV2</a></li><li class="chapter-item "><a href="../../../../src/interface/IParserV1.sol/interface.IParserV1.html">IParserV1</a></li></ol></li><li class="chapter-item expanded "><a href="../../../../src/lib/index.html">❱ lib</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/bitwise/index.html">❱ bitwise</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/bitwise/LibCtPop.sol/library.LibCtPop.html">LibCtPop</a></li><li class="chapter-item "><a href="../../../../src/lib/bitwise/LibCtPop.sol/constants.LibCtPop.html">LibCtPop constants</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/bytecode/index.html">❱ bytecode</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/bytecode/LibBytecode.sol/library.LibBytecode.html">LibBytecode</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/caller/index.html">❱ caller</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/caller/LibContext.sol/error.InvalidSignature.html">InvalidSignature</a></li><li class="chapter-item "><a href="../../../../src/lib/caller/LibContext.sol/library.LibContext.html">LibContext</a></li><li class="chapter-item "><a href="../../../../src/lib/caller/LibDeployerDiscoverable.sol/library.LibDeployerDiscoverable.html">LibDeployerDiscoverable</a></li><li class="chapter-item "><a href="../../../../src/lib/caller/LibEncodedDispatch.sol/library.LibEncodedDispatch.html">LibEncodedDispatch</a></li><li class="chapter-item "><a href="../../../../src/lib/caller/LibEvaluable.sol/library.LibEvaluable.html">LibEvaluable</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/compile/index.html">❱ compile</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/compile/LibCompile.sol/library.LibCompile.html">LibCompile</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/eval/index.html">❱ eval</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/eval/LibEvalNP.sol/error.InputsLengthMismatch.html">InputsLengthMismatch</a></li><li class="chapter-item "><a href="../../../../src/lib/eval/LibEvalNP.sol/library.LibEvalNP.html">LibEvalNP</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/extern/index.html">❱ extern</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/extern/LibExtern.sol/library.LibExtern.html">LibExtern</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/integrity/index.html">❱ integrity</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/integrity/LibIntegrityCheckNP.sol/error.EntrypointMissing.html">EntrypointMissing</a></li><li class="chapter-item "><a href="../../../../src/lib/integrity/LibIntegrityCheckNP.sol/error.EntrypointNonZeroInput.html">EntrypointNonZeroInput</a></li><li class="chapter-item "><a href="../../../../src/lib/integrity/LibIntegrityCheckNP.sol/error.BadOpInputsLength.html">BadOpInputsLength</a></li><li class="chapter-item "><a href="../../../../src/lib/integrity/LibIntegrityCheckNP.sol/error.StackUnderflow.html">StackUnderflow</a></li><li class="chapter-item "><a href="../../../../src/lib/integrity/LibIntegrityCheckNP.sol/error.StackUnderflowHighwater.html">StackUnderflowHighwater</a></li><li class="chapter-item "><a href="../../../../src/lib/integrity/LibIntegrityCheckNP.sol/error.StackAllocationMismatch.html">StackAllocationMismatch</a></li><li class="chapter-item "><a href="../../../../src/lib/integrity/LibIntegrityCheckNP.sol/error.StackOutputsMismatch.html">StackOutputsMismatch</a></li><li class="chapter-item "><a href="../../../../src/lib/integrity/LibIntegrityCheckNP.sol/struct.IntegrityCheckStateNP.html">IntegrityCheckStateNP</a></li><li class="chapter-item "><a href="../../../../src/lib/integrity/LibIntegrityCheckNP.sol/library.LibIntegrityCheckNP.html">LibIntegrityCheckNP</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/ns/index.html">❱ ns</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/ns/LibNamespace.sol/library.LibNamespace.html">LibNamespace</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/op/index.html">❱ op</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/op/00/index.html">❱ 00</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/op/00/LibOpConstantNP.sol/error.OutOfBoundsConstantRead.html">OutOfBoundsConstantRead</a></li><li class="chapter-item "><a href="../../../../src/lib/op/00/LibOpConstantNP.sol/library.LibOpConstantNP.html">LibOpConstantNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/00/LibOpExternNP.sol/error.OutOfBoundsConstantRead.html">OutOfBoundsConstantRead</a></li><li class="chapter-item "><a href="../../../../src/lib/op/00/LibOpExternNP.sol/error.BadOutputsLength.html">BadOutputsLength</a></li><li class="chapter-item "><a href="../../../../src/lib/op/00/LibOpExternNP.sol/library.LibOpExternNP.html">LibOpExternNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/00/LibOpStackNP.sol/error.OutOfBoundsStackRead.html">OutOfBoundsStackRead</a></li><li class="chapter-item "><a href="../../../../src/lib/op/00/LibOpStackNP.sol/library.LibOpStackNP.html">LibOpStackNP</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/op/bitwise/index.html">❱ bitwise</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/op/bitwise/LibOpBitwiseAndNP.sol/library.LibOpBitwiseAndNP.html">LibOpBitwiseAndNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/bitwise/LibOpBitwiseOrNP.sol/library.LibOpBitwiseOrNP.html">LibOpBitwiseOrNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/bitwise/LibOpCtPopNP.sol/library.LibOpCtPopNP.html">LibOpCtPopNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/bitwise/LibOpDecodeBitsNP.sol/library.LibOpDecodeBitsNP.html">LibOpDecodeBitsNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/bitwise/LibOpEncodeBitsNP.sol/library.LibOpEncodeBitsNP.html">LibOpEncodeBitsNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/bitwise/LibOpShiftBitsLeftNP.sol/library.LibOpShiftBitsLeftNP.html">LibOpShiftBitsLeftNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/bitwise/LibOpShiftBitsRightNP.sol/library.LibOpShiftBitsRightNP.html">LibOpShiftBitsRightNP</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/op/call/index.html">❱ call</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/op/call/LibOpCallNP.sol/error.CallOutputsExceedSource.html">CallOutputsExceedSource</a></li><li class="chapter-item "><a href="../../../../src/lib/op/call/LibOpCallNP.sol/library.LibOpCallNP.html">LibOpCallNP</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/op/context/index.html">❱ context</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/op/context/LibOpContextNP.sol/library.LibOpContextNP.html">LibOpContextNP</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/op/crypto/index.html">❱ crypto</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/op/crypto/LibOpHashNP.sol/library.LibOpHashNP.html">LibOpHashNP</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/op/erc20/index.html">❱ erc20</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/op/erc20/LibOpERC20AllowanceNP.sol/library.LibOpERC20AllowanceNP.html">LibOpERC20AllowanceNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/erc20/LibOpERC20BalanceOfNP.sol/library.LibOpERC20BalanceOfNP.html">LibOpERC20BalanceOfNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/erc20/LibOpERC20TotalSupplyNP.sol/library.LibOpERC20TotalSupplyNP.html">LibOpERC20TotalSupplyNP</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/op/erc5313/index.html">❱ erc5313</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/op/erc5313/LibOpERC5313OwnerNP.sol/library.LibOpERC5313OwnerNP.html">LibOpERC5313OwnerNP</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/op/erc721/index.html">❱ erc721</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/op/erc721/LibOpERC721BalanceOfNP.sol/library.LibOpERC721BalanceOfNP.html">LibOpERC721BalanceOfNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/erc721/LibOpERC721OwnerOfNP.sol/library.LibOpERC721OwnerOfNP.html">LibOpERC721OwnerOfNP</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/op/evm/index.html">❱ evm</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/op/evm/LibOpBlockNumberNP.sol/library.LibOpBlockNumberNP.html">LibOpBlockNumberNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/evm/LibOpChainIdNP.sol/library.LibOpChainIdNP.html">LibOpChainIdNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/evm/LibOpMaxUint256NP.sol/library.LibOpMaxUint256NP.html">LibOpMaxUint256NP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/evm/LibOpTimestampNP.sol/library.LibOpTimestampNP.html">LibOpTimestampNP</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/op/logic/index.html">❱ logic</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/op/logic/LibOpAnyNP.sol/library.LibOpAnyNP.html">LibOpAnyNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/logic/LibOpConditionsNP.sol/error.NoConditionsMet.html">NoConditionsMet</a></li><li class="chapter-item "><a href="../../../../src/lib/op/logic/LibOpConditionsNP.sol/library.LibOpConditionsNP.html">LibOpConditionsNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/logic/LibOpEnsureNP.sol/error.EnsureFailed.html">EnsureFailed</a></li><li class="chapter-item "><a href="../../../../src/lib/op/logic/LibOpEnsureNP.sol/library.LibOpEnsureNP.html">LibOpEnsureNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/logic/LibOpEqualToNP.sol/library.LibOpEqualToNP.html">LibOpEqualToNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/logic/LibOpEveryNP.sol/library.LibOpEveryNP.html">LibOpEveryNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/logic/LibOpGreaterThanNP.sol/library.LibOpGreaterThanNP.html">LibOpGreaterThanNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/logic/LibOpGreaterThanOrEqualToNP.sol/library.LibOpGreaterThanOrEqualToNP.html">LibOpGreaterThanOrEqualToNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/logic/LibOpIfNP.sol/library.LibOpIfNP.html">LibOpIfNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/logic/LibOpIsZeroNP.sol/library.LibOpIsZeroNP.html">LibOpIsZeroNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/logic/LibOpLessThanNP.sol/library.LibOpLessThanNP.html">LibOpLessThanNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/logic/LibOpLessThanOrEqualToNP.sol/library.LibOpLessThanOrEqualToNP.html">LibOpLessThanOrEqualToNP</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/op/math/index.html">❱ math</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/op/math/decimal18/index.html">❱ decimal18</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/op/math/decimal18/LibOpDecimal18DivNP.sol/library.LibOpDecimal18DivNP.html">LibOpDecimal18DivNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/math/decimal18/LibOpDecimal18MulNP.sol/library.LibOpDecimal18MulNP.html">LibOpDecimal18MulNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/math/decimal18/LibOpDecimal18PowUNP.sol/library.LibOpDecimal18PowUNP.html">LibOpDecimal18PowUNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/math/decimal18/LibOpDecimal18Scale18DynamicNP.sol/library.LibOpDecimal18Scale18DynamicNP.html">LibOpDecimal18Scale18DynamicNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/math/decimal18/LibOpDecimal18Scale18NP.sol/library.LibOpDecimal18Scale18NP.html">LibOpDecimal18Scale18NP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/math/decimal18/LibOpDecimal18ScaleNNP.sol/library.LibOpDecimal18ScaleNNP.html">LibOpDecimal18ScaleNNP</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/op/math/int/index.html">❱ int</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/op/math/int/LibOpIntAddNP.sol/library.LibOpIntAddNP.html">LibOpIntAddNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/math/int/LibOpIntDivNP.sol/library.LibOpIntDivNP.html">LibOpIntDivNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/math/int/LibOpIntExpNP.sol/library.LibOpIntExpNP.html">LibOpIntExpNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/math/int/LibOpIntMaxNP.sol/library.LibOpIntMaxNP.html">LibOpIntMaxNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/math/int/LibOpIntMinNP.sol/library.LibOpIntMinNP.html">LibOpIntMinNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/math/int/LibOpIntModNP.sol/library.LibOpIntModNP.html">LibOpIntModNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/math/int/LibOpIntMulNP.sol/library.LibOpIntMulNP.html">LibOpIntMulNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/math/int/LibOpIntSubNP.sol/library.LibOpIntSubNP.html">LibOpIntSubNP</a></li></ol></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/op/store/index.html">❱ store</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/op/store/LibOpGetNP.sol/library.LibOpGetNP.html">LibOpGetNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/store/LibOpSetNP.sol/library.LibOpSetNP.html">LibOpSetNP</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/op/uniswap/index.html">❱ uniswap</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/op/uniswap/LibOpUniswapV2AmountIn.sol/library.LibOpUniswapV2AmountIn.html">LibOpUniswapV2AmountIn</a></li><li class="chapter-item "><a href="../../../../src/lib/op/uniswap/LibOpUniswapV2AmountOut.sol/library.LibOpUniswapV2AmountOut.html">LibOpUniswapV2AmountOut</a></li><li class="chapter-item "><a href="../../../../src/lib/op/uniswap/LibOpUniswapV2Quote.sol/library.LibOpUniswapV2Quote.html">LibOpUniswapV2Quote</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/op/LibAllStandardOpsNP.sol/library.LibAllStandardOpsNP.html">LibAllStandardOpsNP</a></li><li class="chapter-item "><a href="../../../../src/lib/op/LibAllStandardOpsNP.sol/constants.LibAllStandardOpsNP.html">LibAllStandardOpsNP constants</a></li></ol></li><li class="chapter-item expanded "><a href="../../../../src/lib/parse/index.html">❱ parse</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/parse/LibParse.sol/library.LibParse.html">LibParse</a></li><li class="chapter-item "><a href="../../../../src/lib/parse/LibParse.sol/constants.LibParse.html">LibParse constants</a></li><li class="chapter-item "><a href="../../../../src/lib/parse/LibParseCMask.sol/contract.LibParseCMask.html">LibParseCMask</a></li><li class="chapter-item expanded "><a href="../../../../src/lib/parse/LibParseCMask.sol/constants.LibParseCMask.html" class="active">LibParseCMask constants</a></li><li class="chapter-item "><a href="../../../../src/lib/parse/LibParseError.sol/library.LibParseError.html">LibParseError</a></li><li class="chapter-item "><a href="../../../../src/lib/parse/LibParseInterstitial.sol/library.LibParseInterstitial.html">LibParseInterstitial</a></li><li class="chapter-item "><a href="../../../../src/lib/parse/LibParseLiteral.sol/library.LibParseLiteral.html">LibParseLiteral</a></li><li class="chapter-item "><a href="../../../../src/lib/parse/LibParseLiteral.sol/constants.LibParseLiteral.html">LibParseLiteral constants</a></li><li class="chapter-item "><a href="../../../../src/lib/parse/LibParseMeta.sol/error.DuplicateFingerprint.html">DuplicateFingerprint</a></li><li class="chapter-item "><a href="../../../../src/lib/parse/LibParseMeta.sol/error.WordIOFnPointerMismatch.html">WordIOFnPointerMismatch</a></li><li class="chapter-item "><a href="../../../../src/lib/parse/LibParseMeta.sol/library.LibParseMeta.html">LibParseMeta</a></li><li class="chapter-item "><a href="../../../../src/lib/parse/LibParseMeta.sol/constants.LibParseMeta.html">LibParseMeta constants</a></li><li class="chapter-item "><a href="../../../../src/lib/parse/LibParseOperand.sol/library.LibParseOperand.html">LibParseOperand</a></li><li class="chapter-item "><a href="../../../../src/lib/parse/LibParsePragma.sol/library.LibParsePragma.html">LibParsePragma</a></li><li class="chapter-item "><a href="../../../../src/lib/parse/LibParsePragma.sol/constants.LibParsePragma.html">LibParsePragma constants</a></li><li class="chapter-item "><a href="../../../../src/lib/parse/LibParseStackName.sol/library.LibParseStackName.html">LibParseStackName</a></li><li class="chapter-item "><a href="../../../../src/lib/parse/LibParseStackTracker.sol/type.ParseStackTracker.html">ParseStackTracker</a></li><li class="chapter-item "><a href="../../../../src/lib/parse/LibParseStackTracker.sol/library.LibParseStackTracker.html">LibParseStackTracker</a></li><li class="chapter-item "><a href="../../../../src/lib/parse/LibParseState.sol/struct.ParseState.html">ParseState</a></li><li class="chapter-item "><a href="../../../../src/lib/parse/LibParseState.sol/library.LibParseState.html">LibParseState</a></li><li class="chapter-item "><a href="../../../../src/lib/parse/LibParseState.sol/constants.LibParseState.html">LibParseState constants</a></li><li class="chapter-item "><a href="../../../../src/lib/parse/LibSubParse.sol/library.LibSubParse.html">LibSubParse</a></li></ol></li><li class="chapter-item "><a href="../../../../src/lib/state/index.html">❱ state</a><a class="toggle"><div>❱</div></a></li><li><ol class="section"><li class="chapter-item "><a href="../../../../src/lib/state/LibInterpreterStateDataContractNP.sol/library.LibInterpreterStateDataContractNP.html">LibInterpreterStateDataContractNP</a></li><li class="chapter-item "><a href="../../../../src/lib/state/LibInterpreterStateNP.sol/struct.InterpreterStateNP.html">InterpreterStateNP</a></li><li class="chapter-item "><a href="../../../../src/lib/state/LibInterpreterStateNP.sol/library.LibInterpreterStateNP.html">LibInterpreterStateNP</a></li></ol></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title"></h1>
+
+                    <div class="right-buttons">
+                        <a href="../../../../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/rainlanguage/rain.interpreter" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="constants"><a class="header" href="#constants">Constants</a></h1>
+<p><a href="https://github.com/rainlanguage/rain.interpreter/blob/f1a1e902622f14ed572880011113c54a0bcfe144/src/lib/parse/LibParseCMask.sol">Git Source</a></p>
+<h3 id="cmask_null"><a class="header" href="#cmask_null">CMASK_NULL</a></h3>
+<p><em>ASCII null</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_NULL = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x00&quot;)));
+</code></pre>
+<h3 id="cmask_start_of_heading"><a class="header" href="#cmask_start_of_heading">CMASK_START_OF_HEADING</a></h3>
+<p><em>ASCII start of heading</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_START_OF_HEADING = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x01&quot;)));
+</code></pre>
+<h3 id="cmask_start_of_text"><a class="header" href="#cmask_start_of_text">CMASK_START_OF_TEXT</a></h3>
+<p><em>ASCII start of text</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_START_OF_TEXT = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x02&quot;)));
+</code></pre>
+<h3 id="cmask_end_of_text"><a class="header" href="#cmask_end_of_text">CMASK_END_OF_TEXT</a></h3>
+<p><em>ASCII end of text</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_END_OF_TEXT = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x03&quot;)));
+</code></pre>
+<h3 id="cmask_end_of_transmission"><a class="header" href="#cmask_end_of_transmission">CMASK_END_OF_TRANSMISSION</a></h3>
+<p><em>ASCII end of transmission</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_END_OF_TRANSMISSION = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x04&quot;)));
+</code></pre>
+<h3 id="cmask_enquiry"><a class="header" href="#cmask_enquiry">CMASK_ENQUIRY</a></h3>
+<p><em>ASCII enquiry</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_ENQUIRY = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x05&quot;)));
+</code></pre>
+<h3 id="cmask_acknowledge"><a class="header" href="#cmask_acknowledge">CMASK_ACKNOWLEDGE</a></h3>
+<p><em>ASCII acknowledge</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_ACKNOWLEDGE = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x06&quot;)));
+</code></pre>
+<h3 id="cmask_bell"><a class="header" href="#cmask_bell">CMASK_BELL</a></h3>
+<p><em>ASCII bell</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_BELL = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x07&quot;)));
+</code></pre>
+<h3 id="cmask_backspace"><a class="header" href="#cmask_backspace">CMASK_BACKSPACE</a></h3>
+<p><em>ASCII backspace</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_BACKSPACE = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x08&quot;)));
+</code></pre>
+<h3 id="cmask_horizontal_tab"><a class="header" href="#cmask_horizontal_tab">CMASK_HORIZONTAL_TAB</a></h3>
+<p><em>ASCII horizontal tab</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_HORIZONTAL_TAB = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\t&quot;)));
+</code></pre>
+<h3 id="cmask_line_feed"><a class="header" href="#cmask_line_feed">CMASK_LINE_FEED</a></h3>
+<p><em>ASCII line feed</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LINE_FEED = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\n&quot;)));
+</code></pre>
+<h3 id="cmask_vertical_tab"><a class="header" href="#cmask_vertical_tab">CMASK_VERTICAL_TAB</a></h3>
+<p><em>ASCII vertical tab</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_VERTICAL_TAB = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x0B&quot;)));
+</code></pre>
+<h3 id="cmask_form_feed"><a class="header" href="#cmask_form_feed">CMASK_FORM_FEED</a></h3>
+<p><em>ASCII form feed</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_FORM_FEED = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x0C&quot;)));
+</code></pre>
+<h3 id="cmask_carriage_return"><a class="header" href="#cmask_carriage_return">CMASK_CARRIAGE_RETURN</a></h3>
+<p><em>ASCII carriage return</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_CARRIAGE_RETURN = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\r&quot;)));
+</code></pre>
+<h3 id="cmask_shift_out"><a class="header" href="#cmask_shift_out">CMASK_SHIFT_OUT</a></h3>
+<p><em>ASCII shift out</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_SHIFT_OUT = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x0E&quot;)));
+</code></pre>
+<h3 id="cmask_shift_in"><a class="header" href="#cmask_shift_in">CMASK_SHIFT_IN</a></h3>
+<p><em>ASCII shift in</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_SHIFT_IN = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x0F&quot;)));
+</code></pre>
+<h3 id="cmask_data_link_escape"><a class="header" href="#cmask_data_link_escape">CMASK_DATA_LINK_ESCAPE</a></h3>
+<p><em>ASCII data link escape</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_DATA_LINK_ESCAPE = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x10&quot;)));
+</code></pre>
+<h3 id="cmask_device_control_1"><a class="header" href="#cmask_device_control_1">CMASK_DEVICE_CONTROL_1</a></h3>
+<p><em>ASCII device control 1</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_DEVICE_CONTROL_1 = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x11&quot;)));
+</code></pre>
+<h3 id="cmask_device_control_2"><a class="header" href="#cmask_device_control_2">CMASK_DEVICE_CONTROL_2</a></h3>
+<p><em>ASCII device control 2</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_DEVICE_CONTROL_2 = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x12&quot;)));
+</code></pre>
+<h3 id="cmask_device_control_3"><a class="header" href="#cmask_device_control_3">CMASK_DEVICE_CONTROL_3</a></h3>
+<p><em>ASCII device control 3</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_DEVICE_CONTROL_3 = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x13&quot;)));
+</code></pre>
+<h3 id="cmask_device_control_4"><a class="header" href="#cmask_device_control_4">CMASK_DEVICE_CONTROL_4</a></h3>
+<p><em>ASCII device control 4</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_DEVICE_CONTROL_4 = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x14&quot;)));
+</code></pre>
+<h3 id="cmask_negative_acknowledge"><a class="header" href="#cmask_negative_acknowledge">CMASK_NEGATIVE_ACKNOWLEDGE</a></h3>
+<p><em>ASCII negative acknowledge</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_NEGATIVE_ACKNOWLEDGE = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x15&quot;)));
+</code></pre>
+<h3 id="cmask_synchronous_idle"><a class="header" href="#cmask_synchronous_idle">CMASK_SYNCHRONOUS_IDLE</a></h3>
+<p><em>ASCII synchronous idle</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_SYNCHRONOUS_IDLE = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x16&quot;)));
+</code></pre>
+<h3 id="cmask_end_of_transmission_block"><a class="header" href="#cmask_end_of_transmission_block">CMASK_END_OF_TRANSMISSION_BLOCK</a></h3>
+<p><em>ASCII end of transmission block</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_END_OF_TRANSMISSION_BLOCK = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x17&quot;)));
+</code></pre>
+<h3 id="cmask_cancel"><a class="header" href="#cmask_cancel">CMASK_CANCEL</a></h3>
+<p><em>ASCII cancel</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_CANCEL = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x18&quot;)));
+</code></pre>
+<h3 id="cmask_end_of_medium"><a class="header" href="#cmask_end_of_medium">CMASK_END_OF_MEDIUM</a></h3>
+<p><em>ASCII end of medium</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_END_OF_MEDIUM = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x19&quot;)));
+</code></pre>
+<h3 id="cmask_substitute"><a class="header" href="#cmask_substitute">CMASK_SUBSTITUTE</a></h3>
+<p><em>ASCII substitute</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_SUBSTITUTE = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x1A&quot;)));
+</code></pre>
+<h3 id="cmask_escape"><a class="header" href="#cmask_escape">CMASK_ESCAPE</a></h3>
+<p><em>ASCII escape</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_ESCAPE = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x1B&quot;)));
+</code></pre>
+<h3 id="cmask_file_separator"><a class="header" href="#cmask_file_separator">CMASK_FILE_SEPARATOR</a></h3>
+<p><em>ASCII file separator</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_FILE_SEPARATOR = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x1C&quot;)));
+</code></pre>
+<h3 id="cmask_group_separator"><a class="header" href="#cmask_group_separator">CMASK_GROUP_SEPARATOR</a></h3>
+<p><em>ASCII group separator</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_GROUP_SEPARATOR = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x1D&quot;)));
+</code></pre>
+<h3 id="cmask_record_separator"><a class="header" href="#cmask_record_separator">CMASK_RECORD_SEPARATOR</a></h3>
+<p><em>ASCII record separator</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_RECORD_SEPARATOR = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x1E&quot;)));
+</code></pre>
+<h3 id="cmask_unit_separator"><a class="header" href="#cmask_unit_separator">CMASK_UNIT_SEPARATOR</a></h3>
+<p><em>ASCII unit separator</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UNIT_SEPARATOR = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x1F&quot;)));
+</code></pre>
+<h3 id="cmask_space"><a class="header" href="#cmask_space">CMASK_SPACE</a></h3>
+<p><em>ASCII space</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_SPACE = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot; &quot;)));
+</code></pre>
+<h3 id="cmask_exclamation_mark"><a class="header" href="#cmask_exclamation_mark">CMASK_EXCLAMATION_MARK</a></h3>
+<p><em>ASCII !</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_EXCLAMATION_MARK = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;!&quot;)));
+</code></pre>
+<h3 id="cmask_quotation_mark"><a class="header" href="#cmask_quotation_mark">CMASK_QUOTATION_MARK</a></h3>
+<p><em>ASCII &quot;</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_QUOTATION_MARK = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\&quot;&quot;)));
+</code></pre>
+<h3 id="cmask_number_sign"><a class="header" href="#cmask_number_sign">CMASK_NUMBER_SIGN</a></h3>
+<p><em>ASCII #</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_NUMBER_SIGN = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;#&quot;)));
+</code></pre>
+<h3 id="cmask_dollar_sign"><a class="header" href="#cmask_dollar_sign">CMASK_DOLLAR_SIGN</a></h3>
+<p><em>ASCII $</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_DOLLAR_SIGN = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;$&quot;)));
+</code></pre>
+<h3 id="cmask_percent_sign"><a class="header" href="#cmask_percent_sign">CMASK_PERCENT_SIGN</a></h3>
+<p><em>ASCII %</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_PERCENT_SIGN = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;%&quot;)));
+</code></pre>
+<h3 id="cmask_ampersand"><a class="header" href="#cmask_ampersand">CMASK_AMPERSAND</a></h3>
+<p><em>ASCII &amp;</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_AMPERSAND = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;&amp;&quot;)));
+</code></pre>
+<h3 id="cmask_apostrophe"><a class="header" href="#cmask_apostrophe">CMASK_APOSTROPHE</a></h3>
+<p><em>ASCII '</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_APOSTROPHE = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;'&quot;)));
+</code></pre>
+<h3 id="cmask_left_paren"><a class="header" href="#cmask_left_paren">CMASK_LEFT_PAREN</a></h3>
+<p><em>ASCII (</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LEFT_PAREN = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;(&quot;)));
+</code></pre>
+<h3 id="cmask_right_paren"><a class="header" href="#cmask_right_paren">CMASK_RIGHT_PAREN</a></h3>
+<p><em>ASCII )</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_RIGHT_PAREN = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;)&quot;)));
+</code></pre>
+<h3 id="cmask_asterisk"><a class="header" href="#cmask_asterisk">CMASK_ASTERISK</a></h3>
+<p>*ASCII **</p>
+<pre><code class="language-solidity">uint128 constant CMASK_ASTERISK = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;*&quot;)));
+</code></pre>
+<h3 id="cmask_plus_sign"><a class="header" href="#cmask_plus_sign">CMASK_PLUS_SIGN</a></h3>
+<p><em>ASCII +</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_PLUS_SIGN = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;+&quot;)));
+</code></pre>
+<h3 id="cmask_comma"><a class="header" href="#cmask_comma">CMASK_COMMA</a></h3>
+<p><em>ASCII ,</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_COMMA = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;,&quot;)));
+</code></pre>
+<h3 id="cmask_dash"><a class="header" href="#cmask_dash">CMASK_DASH</a></h3>
+<p><em>ASCII -</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_DASH = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;-&quot;)));
+</code></pre>
+<h3 id="cmask_full_stop"><a class="header" href="#cmask_full_stop">CMASK_FULL_STOP</a></h3>
+<p><em>ASCII .</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_FULL_STOP = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;.&quot;)));
+</code></pre>
+<h3 id="cmask_slash"><a class="header" href="#cmask_slash">CMASK_SLASH</a></h3>
+<p><em>ASCII /</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_SLASH = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;/&quot;)));
+</code></pre>
+<h3 id="cmask_zero"><a class="header" href="#cmask_zero">CMASK_ZERO</a></h3>
+<p><em>ASCII 0</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_ZERO = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;0&quot;)));
+</code></pre>
+<h3 id="cmask_one"><a class="header" href="#cmask_one">CMASK_ONE</a></h3>
+<p><em>ASCII 1</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_ONE = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;1&quot;)));
+</code></pre>
+<h3 id="cmask_two"><a class="header" href="#cmask_two">CMASK_TWO</a></h3>
+<p><em>ASCII 2</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_TWO = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;2&quot;)));
+</code></pre>
+<h3 id="cmask_three"><a class="header" href="#cmask_three">CMASK_THREE</a></h3>
+<p><em>ASCII 3</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_THREE = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;3&quot;)));
+</code></pre>
+<h3 id="cmask_four"><a class="header" href="#cmask_four">CMASK_FOUR</a></h3>
+<p><em>ASCII 4</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_FOUR = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;4&quot;)));
+</code></pre>
+<h3 id="cmask_five"><a class="header" href="#cmask_five">CMASK_FIVE</a></h3>
+<p><em>ASCII 5</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_FIVE = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;5&quot;)));
+</code></pre>
+<h3 id="cmask_six"><a class="header" href="#cmask_six">CMASK_SIX</a></h3>
+<p><em>ASCII 6</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_SIX = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;6&quot;)));
+</code></pre>
+<h3 id="cmask_seven"><a class="header" href="#cmask_seven">CMASK_SEVEN</a></h3>
+<p><em>ASCII 7</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_SEVEN = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;7&quot;)));
+</code></pre>
+<h3 id="cmask_eight"><a class="header" href="#cmask_eight">CMASK_EIGHT</a></h3>
+<p><em>ASCII 8</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_EIGHT = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;8&quot;)));
+</code></pre>
+<h3 id="cmask_nine"><a class="header" href="#cmask_nine">CMASK_NINE</a></h3>
+<p><em>ASCII 9</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_NINE = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;9&quot;)));
+</code></pre>
+<h3 id="cmask_colon"><a class="header" href="#cmask_colon">CMASK_COLON</a></h3>
+<p><em>ASCII :</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_COLON = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;:&quot;)));
+</code></pre>
+<h3 id="cmask_semicolon"><a class="header" href="#cmask_semicolon">CMASK_SEMICOLON</a></h3>
+<p><em>ASCII ;</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_SEMICOLON = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;;&quot;)));
+</code></pre>
+<h3 id="cmask_less_than_sign"><a class="header" href="#cmask_less_than_sign">CMASK_LESS_THAN_SIGN</a></h3>
+<p><em>ASCII &lt;</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LESS_THAN_SIGN = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;&lt;&quot;)));
+</code></pre>
+<h3 id="cmask_equals_sign"><a class="header" href="#cmask_equals_sign">CMASK_EQUALS_SIGN</a></h3>
+<p><em>ASCII =</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_EQUALS_SIGN = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;=&quot;)));
+</code></pre>
+<h3 id="cmask_greater_than_sign"><a class="header" href="#cmask_greater_than_sign">CMASK_GREATER_THAN_SIGN</a></h3>
+<p><em>ASCII &gt;</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_GREATER_THAN_SIGN = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;&gt;&quot;)));
+</code></pre>
+<h3 id="cmask_question_mark"><a class="header" href="#cmask_question_mark">CMASK_QUESTION_MARK</a></h3>
+<p><em>ASCII ?</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_QUESTION_MARK = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;?&quot;)));
+</code></pre>
+<h3 id="cmask_at_sign"><a class="header" href="#cmask_at_sign">CMASK_AT_SIGN</a></h3>
+<p><em>ASCII @</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_AT_SIGN = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;@&quot;)));
+</code></pre>
+<h3 id="cmask_upper_a"><a class="header" href="#cmask_upper_a">CMASK_UPPER_A</a></h3>
+<p><em>ASCII A</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_A = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;A&quot;)));
+</code></pre>
+<h3 id="cmask_upper_b"><a class="header" href="#cmask_upper_b">CMASK_UPPER_B</a></h3>
+<p><em>ASCII B</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_B = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;B&quot;)));
+</code></pre>
+<h3 id="cmask_upper_c"><a class="header" href="#cmask_upper_c">CMASK_UPPER_C</a></h3>
+<p><em>ASCII C</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_C = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;C&quot;)));
+</code></pre>
+<h3 id="cmask_upper_d"><a class="header" href="#cmask_upper_d">CMASK_UPPER_D</a></h3>
+<p><em>ASCII D</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_D = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;D&quot;)));
+</code></pre>
+<h3 id="cmask_upper_e"><a class="header" href="#cmask_upper_e">CMASK_UPPER_E</a></h3>
+<p><em>ASCII E</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_E = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;E&quot;)));
+</code></pre>
+<h3 id="cmask_upper_f"><a class="header" href="#cmask_upper_f">CMASK_UPPER_F</a></h3>
+<p><em>ASCII F</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_F = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;F&quot;)));
+</code></pre>
+<h3 id="cmask_upper_g"><a class="header" href="#cmask_upper_g">CMASK_UPPER_G</a></h3>
+<p><em>ASCII G</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_G = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;G&quot;)));
+</code></pre>
+<h3 id="cmask_upper_h"><a class="header" href="#cmask_upper_h">CMASK_UPPER_H</a></h3>
+<p><em>ASCII H</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_H = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;H&quot;)));
+</code></pre>
+<h3 id="cmask_upper_i"><a class="header" href="#cmask_upper_i">CMASK_UPPER_I</a></h3>
+<p><em>ASCII I</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_I = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;I&quot;)));
+</code></pre>
+<h3 id="cmask_upper_j"><a class="header" href="#cmask_upper_j">CMASK_UPPER_J</a></h3>
+<p><em>ASCII J</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_J = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;J&quot;)));
+</code></pre>
+<h3 id="cmask_upper_k"><a class="header" href="#cmask_upper_k">CMASK_UPPER_K</a></h3>
+<p><em>ASCII K</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_K = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;K&quot;)));
+</code></pre>
+<h3 id="cmask_upper_l"><a class="header" href="#cmask_upper_l">CMASK_UPPER_L</a></h3>
+<p><em>ASCII L</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_L = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;L&quot;)));
+</code></pre>
+<h3 id="cmask_upper_m"><a class="header" href="#cmask_upper_m">CMASK_UPPER_M</a></h3>
+<p><em>ASCII M</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_M = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;M&quot;)));
+</code></pre>
+<h3 id="cmask_upper_n"><a class="header" href="#cmask_upper_n">CMASK_UPPER_N</a></h3>
+<p><em>ASCII N</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_N = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;N&quot;)));
+</code></pre>
+<h3 id="cmask_upper_o"><a class="header" href="#cmask_upper_o">CMASK_UPPER_O</a></h3>
+<p><em>ASCII O</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_O = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;O&quot;)));
+</code></pre>
+<h3 id="cmask_upper_p"><a class="header" href="#cmask_upper_p">CMASK_UPPER_P</a></h3>
+<p><em>ASCII P</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_P = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;P&quot;)));
+</code></pre>
+<h3 id="cmask_upper_q"><a class="header" href="#cmask_upper_q">CMASK_UPPER_Q</a></h3>
+<p><em>ASCII Q</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_Q = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;Q&quot;)));
+</code></pre>
+<h3 id="cmask_upper_r"><a class="header" href="#cmask_upper_r">CMASK_UPPER_R</a></h3>
+<p><em>ASCII R</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_R = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;R&quot;)));
+</code></pre>
+<h3 id="cmask_upper_s"><a class="header" href="#cmask_upper_s">CMASK_UPPER_S</a></h3>
+<p><em>ASCII S</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_S = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;S&quot;)));
+</code></pre>
+<h3 id="cmask_upper_t"><a class="header" href="#cmask_upper_t">CMASK_UPPER_T</a></h3>
+<p><em>ASCII T</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_T = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;T&quot;)));
+</code></pre>
+<h3 id="cmask_upper_u"><a class="header" href="#cmask_upper_u">CMASK_UPPER_U</a></h3>
+<p><em>ASCII U</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_U = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;U&quot;)));
+</code></pre>
+<h3 id="cmask_upper_v"><a class="header" href="#cmask_upper_v">CMASK_UPPER_V</a></h3>
+<p><em>ASCII V</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_V = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;V&quot;)));
+</code></pre>
+<h3 id="cmask_upper_w"><a class="header" href="#cmask_upper_w">CMASK_UPPER_W</a></h3>
+<p><em>ASCII W</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_W = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;W&quot;)));
+</code></pre>
+<h3 id="cmask_upper_x"><a class="header" href="#cmask_upper_x">CMASK_UPPER_X</a></h3>
+<p><em>ASCII X</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_X = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;X&quot;)));
+</code></pre>
+<h3 id="cmask_upper_y"><a class="header" href="#cmask_upper_y">CMASK_UPPER_Y</a></h3>
+<p><em>ASCII Y</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_Y = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;Y&quot;)));
+</code></pre>
+<h3 id="cmask_upper_z"><a class="header" href="#cmask_upper_z">CMASK_UPPER_Z</a></h3>
+<p><em>ASCII Z</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_Z = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;Z&quot;)));
+</code></pre>
+<h3 id="cmask_left_square_bracket"><a class="header" href="#cmask_left_square_bracket">CMASK_LEFT_SQUARE_BRACKET</a></h3>
+<p><em>ASCII [</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LEFT_SQUARE_BRACKET = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;[&quot;)));
+</code></pre>
+<h3 id="cmask_backslash"><a class="header" href="#cmask_backslash">CMASK_BACKSLASH</a></h3>
+<p>*ASCII *</p>
+<pre><code class="language-solidity">uint128 constant CMASK_BACKSLASH = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\\&quot;)));
+</code></pre>
+<h3 id="cmask_right_square_bracket"><a class="header" href="#cmask_right_square_bracket">CMASK_RIGHT_SQUARE_BRACKET</a></h3>
+<p><em>ASCII ]</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_RIGHT_SQUARE_BRACKET = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;]&quot;)));
+</code></pre>
+<h3 id="cmask_circumflex_accent"><a class="header" href="#cmask_circumflex_accent">CMASK_CIRCUMFLEX_ACCENT</a></h3>
+<p><em>ASCII ^</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_CIRCUMFLEX_ACCENT = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;^&quot;)));
+</code></pre>
+<h3 id="cmask_underscore"><a class="header" href="#cmask_underscore">CMASK_UNDERSCORE</a></h3>
+<p><em>ASCII _</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UNDERSCORE = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;_&quot;)));
+</code></pre>
+<h3 id="cmask_grave_accent"><a class="header" href="#cmask_grave_accent">CMASK_GRAVE_ACCENT</a></h3>
+<p><em>ASCII `</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_GRAVE_ACCENT = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;`&quot;)));
+</code></pre>
+<h3 id="cmask_lower_a"><a class="header" href="#cmask_lower_a">CMASK_LOWER_A</a></h3>
+<p><em>ASCII a</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_A = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;a&quot;)));
+</code></pre>
+<h3 id="cmask_lower_b"><a class="header" href="#cmask_lower_b">CMASK_LOWER_B</a></h3>
+<p><em>ASCII b</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_B = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;b&quot;)));
+</code></pre>
+<h3 id="cmask_lower_c"><a class="header" href="#cmask_lower_c">CMASK_LOWER_C</a></h3>
+<p><em>ASCII c</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_C = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;c&quot;)));
+</code></pre>
+<h3 id="cmask_lower_d"><a class="header" href="#cmask_lower_d">CMASK_LOWER_D</a></h3>
+<p><em>ASCII d</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_D = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;d&quot;)));
+</code></pre>
+<h3 id="cmask_lower_e"><a class="header" href="#cmask_lower_e">CMASK_LOWER_E</a></h3>
+<p><em>ASCII e</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_E = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;e&quot;)));
+</code></pre>
+<h3 id="cmask_lower_f"><a class="header" href="#cmask_lower_f">CMASK_LOWER_F</a></h3>
+<p><em>ASCII f</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_F = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;f&quot;)));
+</code></pre>
+<h3 id="cmask_lower_g"><a class="header" href="#cmask_lower_g">CMASK_LOWER_G</a></h3>
+<p><em>ASCII g</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_G = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;g&quot;)));
+</code></pre>
+<h3 id="cmask_lower_h"><a class="header" href="#cmask_lower_h">CMASK_LOWER_H</a></h3>
+<p><em>ASCII h</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_H = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;h&quot;)));
+</code></pre>
+<h3 id="cmask_lower_i"><a class="header" href="#cmask_lower_i">CMASK_LOWER_I</a></h3>
+<p><em>ASCII i</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_I = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;i&quot;)));
+</code></pre>
+<h3 id="cmask_lower_j"><a class="header" href="#cmask_lower_j">CMASK_LOWER_J</a></h3>
+<p><em>ASCII j</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_J = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;j&quot;)));
+</code></pre>
+<h3 id="cmask_lower_k"><a class="header" href="#cmask_lower_k">CMASK_LOWER_K</a></h3>
+<p><em>ASCII k</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_K = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;k&quot;)));
+</code></pre>
+<h3 id="cmask_lower_l"><a class="header" href="#cmask_lower_l">CMASK_LOWER_L</a></h3>
+<p><em>ASCII l</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_L = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;l&quot;)));
+</code></pre>
+<h3 id="cmask_lower_m"><a class="header" href="#cmask_lower_m">CMASK_LOWER_M</a></h3>
+<p><em>ASCII m</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_M = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;m&quot;)));
+</code></pre>
+<h3 id="cmask_lower_n"><a class="header" href="#cmask_lower_n">CMASK_LOWER_N</a></h3>
+<p><em>ASCII n</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_N = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;n&quot;)));
+</code></pre>
+<h3 id="cmask_lower_o"><a class="header" href="#cmask_lower_o">CMASK_LOWER_O</a></h3>
+<p><em>ASCII o</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_O = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;o&quot;)));
+</code></pre>
+<h3 id="cmask_lower_p"><a class="header" href="#cmask_lower_p">CMASK_LOWER_P</a></h3>
+<p><em>ASCII p</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_P = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;p&quot;)));
+</code></pre>
+<h3 id="cmask_lower_q"><a class="header" href="#cmask_lower_q">CMASK_LOWER_Q</a></h3>
+<p><em>ASCII q</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_Q = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;q&quot;)));
+</code></pre>
+<h3 id="cmask_lower_r"><a class="header" href="#cmask_lower_r">CMASK_LOWER_R</a></h3>
+<p><em>ASCII r</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_R = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;r&quot;)));
+</code></pre>
+<h3 id="cmask_lower_s"><a class="header" href="#cmask_lower_s">CMASK_LOWER_S</a></h3>
+<p><em>ASCII s</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_S = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;s&quot;)));
+</code></pre>
+<h3 id="cmask_lower_t"><a class="header" href="#cmask_lower_t">CMASK_LOWER_T</a></h3>
+<p><em>ASCII t</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_T = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;t&quot;)));
+</code></pre>
+<h3 id="cmask_lower_u"><a class="header" href="#cmask_lower_u">CMASK_LOWER_U</a></h3>
+<p><em>ASCII u</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_U = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;u&quot;)));
+</code></pre>
+<h3 id="cmask_lower_v"><a class="header" href="#cmask_lower_v">CMASK_LOWER_V</a></h3>
+<p><em>ASCII v</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_V = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;v&quot;)));
+</code></pre>
+<h3 id="cmask_lower_w"><a class="header" href="#cmask_lower_w">CMASK_LOWER_W</a></h3>
+<p><em>ASCII w</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_W = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;w&quot;)));
+</code></pre>
+<h3 id="cmask_lower_x"><a class="header" href="#cmask_lower_x">CMASK_LOWER_X</a></h3>
+<p><em>ASCII x</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_X = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;x&quot;)));
+</code></pre>
+<h3 id="cmask_lower_y"><a class="header" href="#cmask_lower_y">CMASK_LOWER_Y</a></h3>
+<p><em>ASCII y</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_Y = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;y&quot;)));
+</code></pre>
+<h3 id="cmask_lower_z"><a class="header" href="#cmask_lower_z">CMASK_LOWER_Z</a></h3>
+<p><em>ASCII z</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_Z = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;z&quot;)));
+</code></pre>
+<h3 id="cmask_left_curly_bracket"><a class="header" href="#cmask_left_curly_bracket">CMASK_LEFT_CURLY_BRACKET</a></h3>
+<p><em>ASCII {</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LEFT_CURLY_BRACKET = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;{&quot;)));
+</code></pre>
+<h3 id="cmask_vertical_bar"><a class="header" href="#cmask_vertical_bar">CMASK_VERTICAL_BAR</a></h3>
+<p><em>ASCII |</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_VERTICAL_BAR = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;|&quot;)));
+</code></pre>
+<h3 id="cmask_right_curly_bracket"><a class="header" href="#cmask_right_curly_bracket">CMASK_RIGHT_CURLY_BRACKET</a></h3>
+<p><em>ASCII }</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_RIGHT_CURLY_BRACKET = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;}&quot;)));
+</code></pre>
+<h3 id="cmask_tilde"><a class="header" href="#cmask_tilde">CMASK_TILDE</a></h3>
+<p><em>ASCII ~</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_TILDE = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;~&quot;)));
+</code></pre>
+<h3 id="cmask_delete"><a class="header" href="#cmask_delete">CMASK_DELETE</a></h3>
+<p><em>ASCII delete</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_DELETE = uint128(1) &lt;&lt; uint128(uint8(bytes1(&quot;\x7F&quot;)));
+</code></pre>
+<h3 id="cmask_printable"><a class="header" href="#cmask_printable">CMASK_PRINTABLE</a></h3>
+<p><em>ASCII printable characters is everything 0x20 and above, except 0x7F</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_PRINTABLE = ~(
+    CMASK_NULL | CMASK_START_OF_HEADING | CMASK_START_OF_TEXT | CMASK_END_OF_TEXT | CMASK_END_OF_TRANSMISSION
+        | CMASK_ENQUIRY | CMASK_ACKNOWLEDGE | CMASK_BELL | CMASK_BACKSPACE | CMASK_HORIZONTAL_TAB | CMASK_LINE_FEED
+        | CMASK_VERTICAL_TAB | CMASK_FORM_FEED | CMASK_CARRIAGE_RETURN | CMASK_SHIFT_OUT | CMASK_SHIFT_IN
+        | CMASK_DATA_LINK_ESCAPE | CMASK_DEVICE_CONTROL_1 | CMASK_DEVICE_CONTROL_2 | CMASK_DEVICE_CONTROL_3
+        | CMASK_DEVICE_CONTROL_4 | CMASK_NEGATIVE_ACKNOWLEDGE | CMASK_SYNCHRONOUS_IDLE | CMASK_END_OF_TRANSMISSION_BLOCK
+        | CMASK_CANCEL | CMASK_END_OF_MEDIUM | CMASK_SUBSTITUTE | CMASK_ESCAPE | CMASK_FILE_SEPARATOR
+        | CMASK_GROUP_SEPARATOR | CMASK_RECORD_SEPARATOR | CMASK_UNIT_SEPARATOR | CMASK_DELETE
+);
+</code></pre>
+<h3 id="cmask_numeric_0_9"><a class="header" href="#cmask_numeric_0_9">CMASK_NUMERIC_0_9</a></h3>
+<p><em>numeric 0-9</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_NUMERIC_0_9 = CMASK_ZERO | CMASK_ONE | CMASK_TWO | CMASK_THREE | CMASK_FOUR | CMASK_FIVE
+    | CMASK_SIX | CMASK_SEVEN | CMASK_EIGHT | CMASK_NINE;
+</code></pre>
+<h3 id="cmask_e_notation"><a class="header" href="#cmask_e_notation">CMASK_E_NOTATION</a></h3>
+<p><em>e notation eE</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_E_NOTATION = CMASK_LOWER_E | CMASK_UPPER_E;
+</code></pre>
+<h3 id="cmask_lower_alpha_a_z"><a class="header" href="#cmask_lower_alpha_a_z">CMASK_LOWER_ALPHA_A_Z</a></h3>
+<p><em>lower alpha a-z</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_ALPHA_A_Z = CMASK_LOWER_A | CMASK_LOWER_B | CMASK_LOWER_C | CMASK_LOWER_D | CMASK_LOWER_E
+    | CMASK_LOWER_F | CMASK_LOWER_G | CMASK_LOWER_H | CMASK_LOWER_I | CMASK_LOWER_J | CMASK_LOWER_K | CMASK_LOWER_L
+    | CMASK_LOWER_M | CMASK_LOWER_N | CMASK_LOWER_O | CMASK_LOWER_P | CMASK_LOWER_Q | CMASK_LOWER_R | CMASK_LOWER_S
+    | CMASK_LOWER_T | CMASK_LOWER_U | CMASK_LOWER_V | CMASK_LOWER_W | CMASK_LOWER_X | CMASK_LOWER_Y | CMASK_LOWER_Z;
+</code></pre>
+<h3 id="cmask_upper_alpha_a_z"><a class="header" href="#cmask_upper_alpha_a_z">CMASK_UPPER_ALPHA_A_Z</a></h3>
+<p><em>upper alpha A-Z</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_ALPHA_A_Z = CMASK_UPPER_A | CMASK_UPPER_B | CMASK_UPPER_C | CMASK_UPPER_D | CMASK_UPPER_E
+    | CMASK_UPPER_F | CMASK_UPPER_G | CMASK_UPPER_H | CMASK_UPPER_I | CMASK_UPPER_J | CMASK_UPPER_K | CMASK_UPPER_L
+    | CMASK_UPPER_M | CMASK_UPPER_N | CMASK_UPPER_O | CMASK_UPPER_P | CMASK_UPPER_Q | CMASK_UPPER_R | CMASK_UPPER_S
+    | CMASK_UPPER_T | CMASK_UPPER_U | CMASK_UPPER_V | CMASK_UPPER_W | CMASK_UPPER_X | CMASK_UPPER_Y | CMASK_UPPER_Z;
+</code></pre>
+<h3 id="cmask_lower_alpha_a_f"><a class="header" href="#cmask_lower_alpha_a_f">CMASK_LOWER_ALPHA_A_F</a></h3>
+<p><em>lower alpha a-f (hex)</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LOWER_ALPHA_A_F =
+    CMASK_LOWER_A | CMASK_LOWER_B | CMASK_LOWER_C | CMASK_LOWER_D | CMASK_LOWER_E | CMASK_LOWER_F;
+</code></pre>
+<h3 id="cmask_upper_alpha_a_f"><a class="header" href="#cmask_upper_alpha_a_f">CMASK_UPPER_ALPHA_A_F</a></h3>
+<p><em>upper alpha A-F (hex)</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_UPPER_ALPHA_A_F =
+    CMASK_UPPER_A | CMASK_UPPER_B | CMASK_UPPER_C | CMASK_UPPER_D | CMASK_UPPER_E | CMASK_UPPER_F;
+</code></pre>
+<h3 id="cmask_hex"><a class="header" href="#cmask_hex">CMASK_HEX</a></h3>
+<p><em>hex 0-9 a-f A-F</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_HEX = CMASK_NUMERIC_0_9 | CMASK_LOWER_ALPHA_A_F | CMASK_UPPER_ALPHA_A_F;
+</code></pre>
+<h3 id="cmask_eol"><a class="header" href="#cmask_eol">CMASK_EOL</a></h3>
+<p><em>Rainlang end of line is ,</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_EOL = CMASK_COMMA;
+</code></pre>
+<h3 id="cmask_lhs_rhs_delimiter"><a class="header" href="#cmask_lhs_rhs_delimiter">CMASK_LHS_RHS_DELIMITER</a></h3>
+<p><em>Rainlang LHS/RHS delimiter is :</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LHS_RHS_DELIMITER = CMASK_COLON;
+</code></pre>
+<h3 id="cmask_eos"><a class="header" href="#cmask_eos">CMASK_EOS</a></h3>
+<p><em>Rainlang end of source is ;</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_EOS = CMASK_SEMICOLON;
+</code></pre>
+<h3 id="cmask_lhs_stack_head"><a class="header" href="#cmask_lhs_stack_head">CMASK_LHS_STACK_HEAD</a></h3>
+<p><em>Rainlang stack head is lower alpha and underscore a-z _</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LHS_STACK_HEAD = CMASK_LOWER_ALPHA_A_Z | CMASK_UNDERSCORE;
+</code></pre>
+<h3 id="cmask_identifier_head"><a class="header" href="#cmask_identifier_head">CMASK_IDENTIFIER_HEAD</a></h3>
+<p><em>Rainlang identifier head is lower alpha a-z</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_IDENTIFIER_HEAD = CMASK_LOWER_ALPHA_A_Z;
+</code></pre>
+<h3 id="cmask_rhs_word_head"><a class="header" href="#cmask_rhs_word_head">CMASK_RHS_WORD_HEAD</a></h3>
+<pre><code class="language-solidity">uint128 constant CMASK_RHS_WORD_HEAD = CMASK_IDENTIFIER_HEAD;
+</code></pre>
+<h3 id="cmask_identifier_tail"><a class="header" href="#cmask_identifier_tail">CMASK_IDENTIFIER_TAIL</a></h3>
+<p><em>Rainlang stack/identifier tail is lower alphanumeric kebab a-z 0-9 -</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_IDENTIFIER_TAIL = CMASK_IDENTIFIER_HEAD | CMASK_NUMERIC_0_9 | CMASK_DASH;
+</code></pre>
+<h3 id="cmask_lhs_stack_tail"><a class="header" href="#cmask_lhs_stack_tail">CMASK_LHS_STACK_TAIL</a></h3>
+<pre><code class="language-solidity">uint128 constant CMASK_LHS_STACK_TAIL = CMASK_IDENTIFIER_TAIL;
+</code></pre>
+<h3 id="cmask_rhs_word_tail"><a class="header" href="#cmask_rhs_word_tail">CMASK_RHS_WORD_TAIL</a></h3>
+<pre><code class="language-solidity">uint128 constant CMASK_RHS_WORD_TAIL = CMASK_IDENTIFIER_TAIL;
+</code></pre>
+<h3 id="cmask_operand_start"><a class="header" href="#cmask_operand_start">CMASK_OPERAND_START</a></h3>
+<p><em>Rainlang operand start is &lt;</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_OPERAND_START = CMASK_LESS_THAN_SIGN;
+</code></pre>
+<h3 id="cmask_operand_end"><a class="header" href="#cmask_operand_end">CMASK_OPERAND_END</a></h3>
+<p><em>Rainlang operand end is &gt;</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_OPERAND_END = CMASK_GREATER_THAN_SIGN;
+</code></pre>
+<h3 id="cmask_not_identifier_tail"><a class="header" href="#cmask_not_identifier_tail">CMASK_NOT_IDENTIFIER_TAIL</a></h3>
+<p><em>NOT lower alphanumeric kebab</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_NOT_IDENTIFIER_TAIL = ~CMASK_IDENTIFIER_TAIL;
+</code></pre>
+<h3 id="cmask_whitespace"><a class="header" href="#cmask_whitespace">CMASK_WHITESPACE</a></h3>
+<p><em>Rainlang whitespace is \n \r \t space</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_WHITESPACE = CMASK_LINE_FEED | CMASK_CARRIAGE_RETURN | CMASK_HORIZONTAL_TAB | CMASK_SPACE;
+</code></pre>
+<h3 id="cmask_lhs_stack_delimiter"><a class="header" href="#cmask_lhs_stack_delimiter">CMASK_LHS_STACK_DELIMITER</a></h3>
+<p><em>Rainlang stack item delimiter is whitespace</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LHS_STACK_DELIMITER = CMASK_WHITESPACE;
+</code></pre>
+<h3 id="cmask_numeric_literal_head"><a class="header" href="#cmask_numeric_literal_head">CMASK_NUMERIC_LITERAL_HEAD</a></h3>
+<p><em>Rainlang supports numeric literals as anything starting with 0-9</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_NUMERIC_LITERAL_HEAD = CMASK_NUMERIC_0_9;
+</code></pre>
+<h3 id="cmask_string_literal_head"><a class="header" href="#cmask_string_literal_head">CMASK_STRING_LITERAL_HEAD</a></h3>
+<p><em>Rainlang supports string literals as anything starting with &quot;</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_STRING_LITERAL_HEAD = CMASK_QUOTATION_MARK;
+</code></pre>
+<h3 id="cmask_string_literal_end"><a class="header" href="#cmask_string_literal_end">CMASK_STRING_LITERAL_END</a></h3>
+<p><em>Rainlang string end is &quot;</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_STRING_LITERAL_END = CMASK_QUOTATION_MARK;
+</code></pre>
+<h3 id="cmask_string_literal_tail"><a class="header" href="#cmask_string_literal_tail">CMASK_STRING_LITERAL_TAIL</a></h3>
+<p><em>Rainlang string tail is any printable ASCII except &quot; which ends it.</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_STRING_LITERAL_TAIL = ~CMASK_STRING_LITERAL_END &amp; CMASK_PRINTABLE;
+</code></pre>
+<h3 id="cmask_literal_head"><a class="header" href="#cmask_literal_head">CMASK_LITERAL_HEAD</a></h3>
+<p><em>Rainlang literal head</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LITERAL_HEAD = CMASK_NUMERIC_LITERAL_HEAD | CMASK_STRING_LITERAL_HEAD;
+</code></pre>
+<h3 id="cmask_comment_head"><a class="header" href="#cmask_comment_head">CMASK_COMMENT_HEAD</a></h3>
+<p><em>Rainlang comment head is /</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_COMMENT_HEAD = CMASK_SLASH;
+</code></pre>
+<h3 id="cmask_interstitial_head"><a class="header" href="#cmask_interstitial_head">CMASK_INTERSTITIAL_HEAD</a></h3>
+<p><em>Rainlang interstitial head could be some whitespace or a comment head.</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_INTERSTITIAL_HEAD = CMASK_WHITESPACE | CMASK_COMMENT_HEAD;
+</code></pre>
+<h3 id="comment_start_sequence"><a class="header" href="#comment_start_sequence">COMMENT_START_SEQUENCE</a></h3>
+<p><em>Rainlang comment starting sequence is /</em>*</p>
+<pre><code class="language-solidity">uint256 constant COMMENT_START_SEQUENCE = uint256(uint16(bytes2(&quot;/*&quot;)));
+</code></pre>
+<h3 id="comment_end_sequence"><a class="header" href="#comment_end_sequence">COMMENT_END_SEQUENCE</a></h3>
+<p>*Rainlang comment ending sequence is <em>/</em></p>
+<pre><code class="language-solidity">uint256 constant COMMENT_END_SEQUENCE = uint256(uint16(bytes2(&quot;*/&quot;)));
+</code></pre>
+<h3 id="cmask_comment_end_sequence_end"><a class="header" href="#cmask_comment_end_sequence_end">CMASK_COMMENT_END_SEQUENCE_END</a></h3>
+<p>*Rainlang comment end sequence end byte is / <em>/</em></p>
+<pre><code class="language-solidity">uint256 constant CMASK_COMMENT_END_SEQUENCE_END = COMMENT_END_SEQUENCE &amp; 0xFF;
+</code></pre>
+<h3 id="cmask_literal_hex_dispatch"><a class="header" href="#cmask_literal_hex_dispatch">CMASK_LITERAL_HEX_DISPATCH</a></h3>
+<p><em>Rainlang literal hexadecimal dispatch is 0x
+We compare the head and dispatch together to avoid a second comparison.
+This is safe because the head is prefiltered to be 0-9 due to the numeric
+literal head, therefore the only possible match is 0x (not x0).</em></p>
+<pre><code class="language-solidity">uint128 constant CMASK_LITERAL_HEX_DISPATCH = CMASK_ZERO | CMASK_LOWER_X;
+</code></pre>
+<h3 id="cmask_literal_hex_dispatch_start"><a class="header" href="#cmask_literal_hex_dispatch_start">CMASK_LITERAL_HEX_DISPATCH_START</a></h3>
+<p><em>We may want to match the exact start of a hex literal.</em></p>
+<pre><code class="language-solidity">uint256 constant CMASK_LITERAL_HEX_DISPATCH_START = uint256(uint16(bytes2(&quot;0x&quot;)));
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../../../../src/lib/parse/LibParseCMask.sol/contract.LibParseCMask.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../../../../src/lib/parse/LibParseError.sol/library.LibParseError.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../../../../src/lib/parse/LibParseCMask.sol/contract.LibParseCMask.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../../../../src/lib/parse/LibParseError.sol/library.LibParseError.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../../../../elasticlunr.min.js"></script>
+        <script src="../../../../mark.min.js"></script>
+        <script src="../../../../searcher.js"></script>
+
+        <script src="../../../../clipboard.min.js"></script>
+        <script src="../../../../highlight.js"></script>
+        <script src="../../../../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../../../../solidity.min.js"></script>
+
+
+    </div>
+    </body>
+</html>
