@@ -8,13 +8,17 @@
     rust-overlay.url = "github:oxalica/rust-overlay";
   };
 
-  outputs = { self, nixpkgs, rain, flake-utils, rust-overlay }:
+  outputs = { self, nixpkgs, rain, flake-utils, rust-overlay, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        pkgs = nixpkgs.legacyPackages.${system};
+        # pkgs = nixpkgs.legacyPackages.${system};
+        overlays =[ (import rust-overlay) ];
+        pkgs = import nixpkgs {
+          inherit system overlays;
+        };
         rain-cli = "${rain.defaultPackage.${system}}/bin/rain";
 
-      in rec {
+      in with pkgs; rec {
         packages = rec {
 
           build-dispair-meta-cmd = ''
@@ -41,12 +45,9 @@
 
           default = build-meta;
 
-          # For `nix develop`:
-          devShell = pkgs.mkShell {
-          nativeBuildInputs = with pkgs; [
+          nativeBuildInputs = [
             gmp
             iconv
-            rust-bin.stable."1.75.0".default
           ] ++ (pkgs.lib.optionals pkgs.stdenv.isDarwin [
             pkgs.libiconv
             pkgs.darwin.apple_sdk.frameworks.Security
@@ -56,7 +57,13 @@
           ]);
         };
 
-
+          # For `nix develop`:
+        devShells.default = pkgs.mkShell {
+          buildInputs = [
+            rust-bin.stable."1.75.0".default
+          ] ++ (pkgs.lib.optionals pkgs.stdenv.isDarwin [
+            pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
+          ]);
         };
       }
     );
