@@ -43,10 +43,10 @@
 
           # For `nix develop`:
           devShell = pkgs.mkShell {
-          nativeBuildInputs = with pkgs; [ 
-            gmp 
-            iconv 
-            rust 
+          nativeBuildInputs = with pkgs; [
+            gmp
+            iconv
+            rust-bin.stable."1.75.0".default
           ] ++ (pkgs.lib.optionals pkgs.stdenv.isDarwin [
             pkgs.libiconv
             pkgs.darwin.apple_sdk.frameworks.Security
