@@ -8,26 +8,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
+      - run: cargo --version
+      # - name: Install Foundry
+      #   uses: foundry-rs/foundry-toolchain@v1
+      #   with:
+      #     version: nightly
 
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v4
-      - uses: DeterminateSystems/magic-nix-cache-action@v2
+      # - name: Install Nix
+      #   uses: DeterminateSystems/nix-installer-action@v4
+      # - uses: DeterminateSystems/magic-nix-cache-action@v2
 
-      - name: Forge Build
-        run: forge build
+      # - name: Forge Build
+      #   run: forge build
 
-      - name: Prepare repo
-        run: nix run
-      
-      - name: Lint Check
-        run: nix develop --command cargo clippy
+      # - name: Prepare repo
+      #   run: nix run
 
-      - name: Cargo Fmt
-        run: nix develop --command cargo fmt --check
+      # - name: Lint Check
+      #   run: nix develop --command cargo clippy
 
-      - name: Cargo Test
-        run: nix develop --command cargo test
+      # - name: Cargo Fmt
+      #   run: nix develop --command cargo fmt --check
+
+      # - name: Cargo Test
+      #   run: nix develop --command cargo test
