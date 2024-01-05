@@ -5,15 +5,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      # This is technically not needed as slither will try to install foundry but
-      # I found the installer flakey on CI.
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: nightly
-      - name: Use Node.js
-        uses: actions/setup-node@v3
+          submodules: recursive
 
-      - uses: crytic/slither-action@v0.3.0
-        with:
-          slither-version: refs/heads/master
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v4
+      - uses: DeterminateSystems/magic-nix-cache-action@v2
+
+      - run: nix develop --command slither .
