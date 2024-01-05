@@ -8,21 +8,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
-
-      - run: forge --version
 
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v4
       - uses: DeterminateSystems/magic-nix-cache-action@v2
 
+      - run: nix develop --command forge --version
       - run: nix develop --command cargo --version
 
       - name: Forge Build
-        run: forge build
+        run: nix develop --command forge build
 
       - name: Prepare repo
         run: nix run
