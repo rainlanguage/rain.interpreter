@@ -6,13 +6,14 @@
     rain.url = "github:rainprotocol/rain.cli/6a912680be6d967fd6114aafab793ebe8503d27b";
     flake-utils.url = "github:numtide/flake-utils";
     rust-overlay.url = "github:oxalica/rust-overlay";
+    foundry.url = "github:shazow/foundry.nix/monthly";
   };
 
-  outputs = { self, nixpkgs, rain, flake-utils, rust-overlay, ... }:
+  outputs = { self, nixpkgs, rain, flake-utils, rust-overlay, foundry, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         # pkgs = nixpkgs.legacyPackages.${system};
-        overlays =[ (import rust-overlay) ];
+        overlays =[ (import rust-overlay) foundry.overlay ];
         pkgs = import nixpkgs {
           inherit system overlays;
         };
@@ -46,8 +47,8 @@
           default = build-meta;
 
           nativeBuildInputs = [
-            gmp
-            iconv
+            pkgs.gmp
+            pkgs.iconv
           ] ++ (pkgs.lib.optionals pkgs.stdenv.isDarwin [
             pkgs.libiconv
             pkgs.darwin.apple_sdk.frameworks.Security
@@ -61,6 +62,7 @@
         devShells.default = pkgs.mkShell {
           buildInputs = [
             rust-bin.stable."1.75.0".default
+            foundry-bin
           ] ++ (pkgs.lib.optionals pkgs.stdenv.isDarwin [
             pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
           ]);
