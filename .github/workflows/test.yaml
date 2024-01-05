@@ -9,25 +9,14 @@ jobs:
   check:
     strategy:
       fail-fast: true
-
+      matrix:
+        os: [ubuntu-latest, macos-latest]
     name: Tests
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
-
-      - name: Install deps
-        run: forge install --shallow
-
-      - name: Run Forge fmt
-        run: forge fmt --check
-        id: fmt
 
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v4
@@ -36,6 +25,11 @@ jobs:
       - name: Prepare repo
         run: nix run
 
+      - name: Install deps
+        run: nix develop --command forge install --shallow
+
+      - name: Run Forge fmt
+        run: nix develop --command forge fmt --check
+
       - name: Run Forge tests
-        run: forge test -vvv --gas-report
-        id: test
+        run: nix develop --command forge test -vvv --gas-report
