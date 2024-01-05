@@ -18,16 +18,12 @@ pub struct DISPair {
 /// Implementation to build DISPair from Deployer instance.
 impl IExpressionDeployerV3<Provider<Http>> {
     pub async fn try_build_dispair(&self) -> Result<DISPair, ContractError<Provider<Http>>> {
-        let arc_client = self.client();
-        let interpreter_address: H160 = self.i_interpreter().call().await?.to_fixed_bytes().into();
-        let store_address: H160 = self.i_store().call().await?.to_fixed_bytes().into();
-        let parser_address: H160 = self.i_parser().call().await?.to_fixed_bytes().into();
-
         Ok(DISPair {
             deployer: self.clone(),
-            interpreter: IInterpreterV2::new(interpreter_address, arc_client.clone()),
-            store: IInterpreterStoreV1::new(store_address, arc_client.clone()),
-            parser: IParserV1::new(parser_address, arc_client.clone()),
+            interpreter: IInterpreterV2::new(H160::from(self.i_interpreter().call().await?.to_fixed_bytes()), self.client().clone()),
+            store: IInterpreterStoreV1::new(H160::from(self.i_store().call().await?.to_fixed_bytes()), self.client().clone()),
+            parser: IParserV1::new(H160::from(self.i_parser().call().await?.to_fixed_bytes()), self.client().clone()),
         })
     }
+
 }
