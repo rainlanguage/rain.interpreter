@@ -11,8 +11,7 @@ jobs:
       fail-fast: true
 
     name: Gas snapshot
-    # Most dev work is done on mac, and snapshots disagree between platforms.
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
