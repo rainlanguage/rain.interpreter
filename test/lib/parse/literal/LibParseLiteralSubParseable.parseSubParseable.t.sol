@@ -14,10 +14,28 @@ contract LibParseLiteralSubParseableTest is Test {
 
     function checkParseSubParseable(
         string memory data,
+        string memory expectedDispatch,
+        string memory expectedBody,
         uint256 expectedCursorAfter
     ) internal {
         ParseState memory state = LibParseState.newState(bytes(data), "", "", "");
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
+        address subParser = address(0x1234567890123456789012345678901234567890);
+        state.pushSubParser(0, uint256(subParser));
+        bytes memory subParseData = bytes.concat(
+            bytes2(uint16(expectedDispatch.length)),
+            bytes(expectedDispatch),
+            bytes(expectedBody)
+        );
+        vm.mockCall(
+            subParser,
+            abi.encodeWithSelector(
+                ISubParserV2.subParseLiteral,
+                COMPATIBLITY_V2,
+                subParseData
+            ),
+            abi.encode(0, 0)
+        );
         (uint256 cursorAfter, uint256 value) = state.parseSubParseable(cursor, Pointer.unwrap(state.data.endDataPointer()));
         assertEq(cursorAfter - cursor, expectedCursorAfter);
     }
@@ -84,5 +102,10 @@ contract LibParseLiteralSubParseableTest is Test {
                 SubParseableMissingDispatch.selector,
                 1
             ));
+    }
+
+    /// A dispatch with an empty body is allowed.
+    function testParseLiteralSubParseableEmpty() external {
+        checkParseSubParseable("[pi]", 4);
     }
 }
