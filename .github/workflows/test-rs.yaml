@@ -1,0 +1,35 @@
+on: [push]
+
+name: Interpreter Crate
+
+jobs:
+  check:
+    name: Test
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v4
+      - uses: DeterminateSystems/magic-nix-cache-action@v2
+
+      - run: nix develop --command forge --version
+      - run: nix develop --command cargo --version
+
+      - name: Forge Build
+        run: nix develop --command forge build
+
+      - name: Prepare repo
+        run: nix run
+
+      - name: Lint Check
+        run: nix develop --command cargo clippy
+
+      - name: Cargo Fmt
+        run: nix develop --command cargo fmt --check
+
+      - name: Cargo Test
+        run: nix develop --command cargo test
