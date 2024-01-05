@@ -14,9 +14,11 @@ jobs:
       #   with:
       #     version: nightly
 
-      # - name: Install Nix
-      #   uses: DeterminateSystems/nix-installer-action@v4
-      # - uses: DeterminateSystems/magic-nix-cache-action@v2
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v4
+      - uses: DeterminateSystems/magic-nix-cache-action@v2
+
+      - run: nix develop --command cargo --version
 
       # - name: Forge Build
       #   run: forge build
