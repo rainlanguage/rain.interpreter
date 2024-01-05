@@ -27,7 +27,7 @@ jobs:
         run: nix develop --command cargo clippy
 
       - name: Cargo Fmt
-        run: nix develop --command cargo fmt
+        run: nix develop --command cargo fmt --check
 
       - name: Cargo Test
         run: nix develop --command cargo test
