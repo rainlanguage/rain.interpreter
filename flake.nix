@@ -53,6 +53,7 @@
           buildInputs = [
             rust-bin.stable."1.75.0".default
             foundry-bin
+            slither-analyzer
           ] ++ (pkgs.lib.optionals pkgs.stdenv.isDarwin [
             pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
           ]);
