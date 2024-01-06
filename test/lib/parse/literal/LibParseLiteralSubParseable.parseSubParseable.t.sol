@@ -25,103 +25,67 @@ contract LibParseLiteralSubParseableTest is Test {
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         address subParser = address(0x1234567890123456789012345678901234567890);
         state.pushSubParser(0, uint256(uint160(subParser)));
-        bytes memory subParseData = bytes.concat(
-            bytes2(uint16(bytes(expectedDispatch).length)),
-            bytes(expectedDispatch),
-            bytes(expectedBody)
-        );
+        bytes memory subParseData =
+            bytes.concat(bytes2(uint16(bytes(expectedDispatch).length)), bytes(expectedDispatch), bytes(expectedBody));
+        uint256 returnValue = 99;
         vm.mockCall(
             subParser,
-            abi.encodeWithSelector(
-                ISubParserV2.subParseLiteral.selector,
-                COMPATIBLITY_V2,
-                subParseData
-            ),
-            abi.encode(true, 0)
+            abi.encodeWithSelector(ISubParserV2.subParseLiteral.selector, COMPATIBLITY_V2, subParseData),
+            abi.encode(true, returnValue)
         );
         vm.expectCall(
-            subParser,
-            abi.encodeWithSelector(
-                ISubParserV2.subParseLiteral.selector,
-                COMPATIBLITY_V2,
-                subParseData
-            )
+            subParser, abi.encodeWithSelector(ISubParserV2.subParseLiteral.selector, COMPATIBLITY_V2, subParseData)
         );
-        (uint256 cursorAfter, uint256 value) = state.parseSubParseable(cursor, Pointer.unwrap(state.data.endDataPointer()));
+        (uint256 cursorAfter, uint256 value) =
+            state.parseSubParseable(cursor, Pointer.unwrap(state.data.endDataPointer()));
         assertEq(cursorAfter - cursor, expectedCursorAfter);
+        assertEq(value, returnValue);
     }
 
-    function checkParseSubParseableError(
-        string memory data,
-        bytes memory err
-    ) internal {
+    function checkParseSubParseableError(string memory data, bytes memory err) internal {
         vm.expectRevert(err);
         checkParseSubParseable(data, "", "", 0);
     }
 
     /// An unclosed sub parseable literal is an error.
     function testParseLiteralSubParseableUnclosedDispatch0() external {
-        checkParseSubParseableError("[a", abi.encodeWithSelector(
-                UnclosedSubParseableLiteral.selector,
-                2
-            ));
+        checkParseSubParseableError("[a", abi.encodeWithSelector(UnclosedSubParseableLiteral.selector, 2));
     }
 
     /// An unclosed sub parseable literal is an error.
     function testParseLiteralSubParseableUnclosedDispatchWhitespace0() external {
-        checkParseSubParseableError("[a ", abi.encodeWithSelector(
-                UnclosedSubParseableLiteral.selector,
-                3
-            ));
+        checkParseSubParseableError("[a ", abi.encodeWithSelector(UnclosedSubParseableLiteral.selector, 3));
     }
 
     /// An unclosed sub parseable literal is an error.
     /// Tests with a body.
     function testParseLiteralSubParseableUnclosedDispatchBody() external {
-        checkParseSubParseableError("[a b", abi.encodeWithSelector(
-                UnclosedSubParseableLiteral.selector,
-                4
-            ));
+        checkParseSubParseableError("[a b", abi.encodeWithSelector(UnclosedSubParseableLiteral.selector, 4));
     }
 
     /// An unclosed sub parseable literal is an error.
     function testParseLiteralSubParseableUnclosedDoubleOpen() external {
-        checkParseSubParseableError("[[", abi.encodeWithSelector(
-                UnclosedSubParseableLiteral.selector,
-                2
-            ));
+        checkParseSubParseableError("[[", abi.encodeWithSelector(UnclosedSubParseableLiteral.selector, 2));
     }
 
     /// An empty sub parseable literal is an error.
     function testParseLiteralSubParseableMissingDispatchEmpty() external {
-        checkParseSubParseableError("[]", abi.encodeWithSelector(
-                SubParseableMissingDispatch.selector,
-                1
-            ));
+        checkParseSubParseableError("[]", abi.encodeWithSelector(SubParseableMissingDispatch.selector, 1));
     }
 
     /// An unclosed sub parseable literal with no dispatch is an error.
     function testParseLiteralSubParseableMissingDispatchUnclosed() external {
-        checkParseSubParseableError("[", abi.encodeWithSelector(
-                SubParseableMissingDispatch.selector,
-                1
-            ));
+        checkParseSubParseableError("[", abi.encodeWithSelector(SubParseableMissingDispatch.selector, 1));
     }
 
     /// An unclosed sub parseable literal with no dispatch is an error.
     function testParseLiteralSubParseableMissingDispatchUnclosedWhitespace0() external {
-        checkParseSubParseableError("[ ", abi.encodeWithSelector(
-                SubParseableMissingDispatch.selector,
-                1
-            ));
+        checkParseSubParseableError("[ ", abi.encodeWithSelector(SubParseableMissingDispatch.selector, 1));
     }
 
     /// An unclosed sub parseable literal with no dispatch is an error.
     function testParseLiteralSubParseableMissingDispatchUnclosedWhitespace1() external {
-        checkParseSubParseableError("[  ", abi.encodeWithSelector(
-                SubParseableMissingDispatch.selector,
-                1
-            ));
+        checkParseSubParseableError("[  ", abi.encodeWithSelector(SubParseableMissingDispatch.selector, 1));
     }
 
     /// A dispatch with an empty body is allowed. Trailing whitespace is ignored.
@@ -145,7 +109,9 @@ contract LibParseLiteralSubParseableTest is Test {
     }
 
     /// Fuzz the happy path.
-    function testParseLiteralSubParseableHappyFuzz(string memory dispatch, string memory whitespace, string memory body) external {
+    function testParseLiteralSubParseableHappyFuzz(string memory dispatch, string memory whitespace, string memory body)
+        external
+    {
         vm.assume(bytes(dispatch).length > 0);
         vm.assume(bytes(whitespace).length > 0);
 

@@ -16,24 +16,14 @@ contract RainterpreterReferenceExternNPE2RepeatTest is OpTest {
         expectedStack[0] = 999;
 
         checkHappy(
-            bytes(
-                string.concat(
-                    baseStr, "nineninenine: [reference-extern-repeat-9 abc];"
-                )
-            ),
+            bytes(string.concat(baseStr, "nineninenine: [reference-extern-repeat-9 abc];")),
             expectedStack,
             "repeat 9 abc"
         );
 
         expectedStack[0] = 88;
         checkHappy(
-            bytes(
-                string.concat(
-                    baseStr, "eighteight: [reference-extern-repeat-8 zz];"
-                )
-            ),
-            expectedStack,
-            "repeat 8 zz"
+            bytes(string.concat(baseStr, "eighteight: [reference-extern-repeat-8 zz];")), expectedStack, "repeat 8 zz"
         );
     }
 }

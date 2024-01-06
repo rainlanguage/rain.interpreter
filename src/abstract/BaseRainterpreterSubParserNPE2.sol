@@ -134,7 +134,12 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV2 {
     /// sub parser literal parser. This MAY be zero if the sub parser does not
     /// need to use the dispatch data. The interpretation of this value is
     /// entirely up to the sub parser.
-    function matchSubParseLiteralDispatch(uint256 cursor, uint256 end) internal pure virtual returns (bool success, uint256 index, uint256 value) {
+    function matchSubParseLiteralDispatch(uint256 cursor, uint256 end)
+        internal
+        pure
+        virtual
+        returns (bool success, uint256 index, uint256 value)
+    {
         (cursor, end);
         success = false;
         index = 0;

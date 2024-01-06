@@ -399,6 +399,10 @@ library LibParseState {
         }
     }
 
+    function constantValueBloom(uint256 value) internal pure returns (uint256 bloom) {
+        return uint256(1) << (value % 256);
+    }
+
     /// Includes a constant value in the constants linked list so that it will
     /// appear in the final constants array.
     function pushConstantValue(ParseState memory state, uint256 value) internal pure {
@@ -420,13 +424,7 @@ library LibParseState {
             state.constantsBuilder = ((state.constantsBuilder & 0xFFFF) + 1) | (headPtr << 0x10);
 
             // Merge in the value bloom.
-            //slither-disable-next-line incorrect-shift
-            uint256 valueBloom;
-            assembly ("memory-safe") {
-                mstore(0, value)
-                valueBloom := shl(byte(0, keccak256(0, 0x20)), 1)
-            }
-            state.constantsBloom |= valueBloom;
+            state.constantsBloom |= constantValueBloom(value);
         }
     }
 
@@ -438,11 +436,6 @@ library LibParseState {
             // Don't continue trying to push something that we can't parse.
             if (!success) {
                 revert UnsupportedLiteralType(state.parseErrorOffset(cursor));
-            }
-            uint256 constantBloom;
-            assembly ("memory-safe") {
-                mstore(0, constantValue)
-                constantBloom := shl(byte(0, keccak256(0, 0x20)), 1)
             }
 
             // Whether the constant is a duplicate.
@@ -463,7 +456,7 @@ library LibParseState {
             // Worst case is a false positive in the bloom filter, which means
             // we traverse the linked list and find no match. This is O(1) for
             // the bloom filter and O(n) for the linked list traversal.
-            if (state.constantsBloom & constantBloom != 0) {
+            if (state.constantsBloom & constantValueBloom(constantValue) != 0) {
                 uint256 tailPtr = state.constantsBuilder >> 0x10;
                 while (tailPtr != 0 && !exists) {
                     ++t;

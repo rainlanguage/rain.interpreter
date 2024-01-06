@@ -3,12 +3,11 @@ pragma solidity ^0.8.18;
 
 import {Test} from "forge-std/Test.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
-import {LibParsePragma} from "src/lib/parse/LibParsePragma.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {InvalidSubParser} from "src/error/ErrParse.sol";
 
-/// @title LibParsePragmaPushSubParserTest
-contract LibParsePragmaPushSubParserTest is Test {
+/// @title LibParseStatePushSubParserTest
+contract LibParseStatePushSubParserTest is Test {
     using LibParseState for ParseState;
     using LibBytes for bytes;
 

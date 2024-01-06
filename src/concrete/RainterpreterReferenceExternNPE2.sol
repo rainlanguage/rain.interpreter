@@ -186,11 +186,7 @@ library LibExternOpStackOperandNPE2 {
 /// [reference-extern-repeat-3 123]
 /// ```
 library LibParseLiteralRepeat {
-    function parseRepeat(uint256 dispatchValue, uint256 cursor, uint256 end)
-        internal
-        pure
-        returns (uint256)
-    {
+    function parseRepeat(uint256 dispatchValue, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
             uint256 value;
             uint256 length = end - cursor;
@@ -326,8 +322,8 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function (uint256, uint256, uint256) internal pure returns (uint256)[SUB_PARSER_LITERAL_PARSERS_LENGTH
-                + 1] memory parsersFixed = [lengthPointer, LibParseLiteralRepeat.parseRepeat];
+            function (uint256, uint256, uint256) internal pure returns (uint256)[SUB_PARSER_LITERAL_PARSERS_LENGTH + 1]
+                memory parsersFixed = [lengthPointer, LibParseLiteralRepeat.parseRepeat];
             uint256[] memory parsersDynamic;
             assembly {
                 parsersDynamic := parsersFixed
