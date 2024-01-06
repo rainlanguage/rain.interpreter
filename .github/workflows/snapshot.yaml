@@ -17,14 +17,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: nightly
-
-      - name: Install deps
-        run: forge install --shallow
-
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v4
       - uses: DeterminateSystems/magic-nix-cache-action@v2
@@ -32,6 +24,8 @@ jobs:
       - name: Prepare repo
         run: nix run
 
+      - name: Install deps
+        run: nix develop --command forge install --shallow
+
       - name: Check gas snapshots
-        run: forge snapshot --check
-        id: snapshot
+        run: nix develop --command forge snapshot --check
