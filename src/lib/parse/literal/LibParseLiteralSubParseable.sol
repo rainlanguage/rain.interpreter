@@ -17,6 +17,16 @@ library LibParseLiteralSubParseable {
     using LibParseError for ParseState;
     using LibSubParse for ParseState;
 
+    /// Parse a sub parseable literal. All sub parseable literals are bounded by
+    /// square brackets, and contain a dispatch and a body. The dispatch is the
+    /// string immediately following the opening bracket, and the body is the
+    /// string immediately following the dispatch, up to the closing bracket.
+    /// The dispatch and body MUST be separated by at least one whitespace char.
+    /// This implies that the dispatch MAY NOT contain any whitespace chars, and
+    /// the body MAY contain any chars except for the closing bracket.
+    /// Leading and trailing whitespace before/after the dispatch/body is NOT
+    /// supported. The former will error and the latter will be treated as part
+    /// of the body.
     function parseSubParseable(ParseState memory state, uint256 cursor, uint256 end)
         internal
         pure

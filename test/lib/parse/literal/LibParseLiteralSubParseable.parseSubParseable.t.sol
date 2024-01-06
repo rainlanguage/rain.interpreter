@@ -52,6 +52,11 @@ contract LibParseLiteralSubParseableTest is Test {
         checkParseSubParseableError("[a", abi.encodeWithSelector(UnclosedSubParseableLiteral.selector, 2));
     }
 
+    /// Leading whitespace is not allowed.
+    function testParseLiteralSubParseableUnclosedDispatchWhitespace1() external {
+        checkParseSubParseableError("[ a", abi.encodeWithSelector(SubParseableMissingDispatch.selector, 1));
+    }
+
     /// An unclosed sub parseable literal is an error.
     function testParseLiteralSubParseableUnclosedDispatchWhitespace0() external {
         checkParseSubParseableError("[a ", abi.encodeWithSelector(UnclosedSubParseableLiteral.selector, 3));
