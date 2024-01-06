@@ -3,15 +3,15 @@
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-    rainix.url = "github:rainprotocol/rainix/915ad139d76afd9aab098cc88191be20c1bbfd07";
+    rainix.url = "github:rainprotocol/rainix/e58f5e9646afa9a9e23e91109904c6296bfcee57";
   };
 
   outputs = { self, flake-utils, rainix, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        rain-cli-bin = "${rainix.rain.defaultPackage.${system}}/bin/rain";
-        forge-bin = "${rainix.foundry.defaultPackage.${system}}/bin/forge";
         pkgs = rainix.pkgs.${system};
+        rain-cli-bin = "${pkgs.rain}/bin/rain";
+        forge-bin = "${pkgs.foundry-bin}/bin/forge";
       in {
         packages = rec {
           build-dispair-meta-cmd = ''
@@ -20,13 +20,13 @@
               -i <(${forge-bin} script --silent ./script/GetAuthoringMeta.sol && cat ./meta/AuthoringMeta.rain.meta) -m authoring-meta-v1 -t cbor -e deflate -l none \
           '';
 
-          build-meta = rainix.pkgs.writeShellScriptBin "build-meta" ''
+          build-meta = pkgs.writeShellScriptBin "build-meta" ''
             mkdir -p meta;
             ${forge-bin} build --force;
             ${(build-dispair-meta-cmd)} -o meta/RainterpreterExpressionDeployerNPE2.rain.meta;
           '';
 
-          deploy-dispair = rainix.pkgs.writeShellScriptBin "deploy-dispair" (''
+          deploy-dispair = pkgs.writeShellScriptBin "deploy-dispair" (''
             set -euo pipefail;
             mkdir -p meta;
             ${forge-bin} build --force;
@@ -37,9 +37,9 @@
           '');
 
           default = build-meta;
-        } // rainix.packages.${system};
+        } // rainix.packages;
 
-        devShells.default = rainix.devShells.${system}.default;
+        devShells = rainix.devShells;
       }
     );
 }
