@@ -37,18 +37,9 @@
           '');
 
           default = build-meta;
-        };
+        } // rainix.packages.${system};
 
-          # For `nix develop`:
-        devShells.default = pkgs.mkShell {
-          buildInputs = [
-            pkgs.rust-bin.stable."1.75.0".default
-            pkgs.foundry-bin
-            pkgs.slither-analyzer
-          ] ++ (pkgs.lib.optionals pkgs.stdenv.isDarwin [
-            pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
-          ]);
-        };
+        devShells.default = rainix.devShells.${system}.default;
       }
     );
 }
