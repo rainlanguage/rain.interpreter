@@ -23,6 +23,15 @@ library LibLiteralString {
         }
     }
 
+    function conformStringToMask(string memory str, uint256 mask) internal pure {
+        // Assume that we want to restrict to ASCII range.
+        conformStringToMask(str, mask, 0x80);
+    }
+
+    function conformStringToAscii(string memory str) internal pure {
+        conformStringToMask(str, type(uint128).max, 0x80);
+    }
+
     function conformStringToHexDigits(string memory str) internal pure {
         // 0x7B is '{' which is just after 'z'.
         conformStringToMask(str, CMASK_HEX, 0x7B);

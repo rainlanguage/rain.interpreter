@@ -13,7 +13,8 @@ import {
     ExcessRHSItems,
     ExcessLHSItems,
     NotAcceptingInputs,
-    UnsupportedLiteralType
+    UnsupportedLiteralType,
+    InvalidSubParser
 } from "../../error/ErrParse.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 import {LibParse} from "./LibParse.sol";
@@ -228,6 +229,23 @@ library LibParseState {
         );
         state.resetSource();
         return state;
+    }
+
+    function pushSubParser(ParseState memory state, uint256 cursor, uint256 subParser) internal pure {
+        if (subParser > uint256(type(uint160).max)) {
+            revert InvalidSubParser(state.parseErrorOffset(cursor));
+        }
+
+        uint256 tail = state.subParsers;
+        // Move the tail off to a new allocation.
+        uint256 tailPointer;
+        assembly ("memory-safe") {
+            tailPointer := mload(0x40)
+            mstore(0x40, add(tailPointer, 0x20))
+            mstore(tailPointer, tail)
+        }
+        // Put the tail pointer in the high bits of the new head.
+        state.subParsers = subParser | tailPointer << 0xF0;
     }
 
     // Find the pointer to the first opcode in the source LL. Put it in the line
