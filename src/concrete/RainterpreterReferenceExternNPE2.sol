@@ -186,6 +186,7 @@ library LibExternOpStackOperandNPE2 {
 /// [reference-extern-repeat-3 123]
 /// ```
 library LibParseLiteralRepeat {
+    //slither-disable-next-line dead-code
     function parseRepeat(uint256 dispatchValue, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
             uint256 value;

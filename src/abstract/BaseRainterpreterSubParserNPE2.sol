@@ -134,6 +134,7 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV2 {
     /// sub parser literal parser. This MAY be zero if the sub parser does not
     /// need to use the dispatch data. The interpretation of this value is
     /// entirely up to the sub parser.
+    //slither-disable-next-line dead-code
     function matchSubParseLiteralDispatch(uint256 cursor, uint256 end)
         internal
         pure

@@ -63,6 +63,7 @@ library LibParseLiteralSubParseable {
             {
                 uint256 finalChar;
                 assembly ("memory-safe") {
+                    //slither-disable-next-line incorrect-shift
                     finalChar := shl(byte(0, mload(cursor)), 1)
                 }
                 if ((finalChar & CMASK_SUB_PARSEABLE_LITERAL_END) == 0) {
