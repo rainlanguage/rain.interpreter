@@ -1,0 +1,20 @@
+name: Rainix CI
+on: [push]
+
+jobs:
+  standard-tests:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        task: [test-sol, test-rs, slither, sol-fn-selectors, docs, sol-deploy]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v4
+      - uses: DeterminateSystems/magic-nix-cache-action@v2
+
+      - run: nix develop github:rainlanguage/rainix#${{ matrix.task }}
