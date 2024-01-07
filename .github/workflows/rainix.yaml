@@ -6,7 +6,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        task: [ci-test-sol, test-rs, slither, sol-fn-selectors, docs, sol-deploy]
+        task: [ci-test-sol, ci-slither]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
