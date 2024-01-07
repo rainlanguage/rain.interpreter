@@ -6,15 +6,21 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        task: [ci-test-sol, ci-test-rs]
+        task: [ci-rs-test, ci-rs-artifacts]
         include:
+          # Solidity doesn't need to be tested on multiple platforms
           - os: ubuntu-latest
-            task: ci-slither
+            task: ci-sol-test
+          - os: ubuntu-latest
+            task: ci-sol-static
+          - os: ubuntu-latest
+            task: ci-sol-artifacts
+          # We don't need to do rust static analysis on multiple platforms
+          - os: ubuntu-latest
+            task: ci-rs-static
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: recursive
 
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v4

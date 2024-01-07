@@ -3,7 +3,7 @@
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-    rainix.url = "github:rainprotocol/rainix/96cc56b7cd8f4799a71ae59aab331844b7b0f767";
+    rainix.url = "github:rainprotocol/rainix/258dbefd4391f84115d1de9c6176b851ddce7d2f";
     rain.url = "github:rainprotocol/rain.cli/6a912680be6d967fd6114aafab793ebe8503d27b";
   };
 
@@ -37,8 +37,13 @@
             ;
           '');
 
+          ci-prep = pkgs.writeShellScriptBin "ci-prep" ''
+            ${forge-bin} install --shallow
+            ${forge-bin} build --force;
+            ${(build-dispair-meta-cmd)} -o meta/RainterpreterExpressionDeployerNPE2.rain.meta;
+          '';
+
           default = build-meta;
-          ci-prep = build-meta;
         } // rainix.packages.${system};
 
         devShells = rainix.devShells.${system};
