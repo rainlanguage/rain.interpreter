@@ -3,7 +3,7 @@
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-    rainix.url = "github:rainprotocol/rainix/ab466c674e0673083296ae12b0ef88b9f0b497ca";
+    rainix.url = "github:rainprotocol/rainix/9b3ec59b151c6356e71fadd07ec88003b8e47d02";
     rain.url = "github:rainprotocol/rain.cli/6a912680be6d967fd6114aafab793ebe8503d27b";
   };
 
