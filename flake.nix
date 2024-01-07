@@ -3,20 +3,21 @@
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-    rainix.url = "github:rainprotocol/rainix/e58f5e9646afa9a9e23e91109904c6296bfcee57";
+    rainix.url = "github:rainprotocol/rainix/0dd3fa8c326f51fc09533c5fdac839c1db844a1e";
+    rain.url = "github:rainprotocol/rain.cli/6a912680be6d967fd6114aafab793ebe8503d27b";
   };
 
-  outputs = { self, flake-utils, rainix, ... }:
+  outputs = { self, flake-utils, rainix, rain, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = rainix.pkgs.${system};
-        rain-cli-bin = "${pkgs.rain}/bin/rain";
         forge-bin = "${pkgs.foundry-bin}/bin/forge";
+        rain-bin = "${rain.defaultPackage.${system}}/bin/rain";
       in {
         packages = rec {
           build-dispair-meta-cmd = ''
-            ${rain-cli-bin} meta build \
-              -i <(${rain-cli-bin} meta solc artifact -c abi -i out/RainterpreterExpressionDeployerNPE2.sol/RainterpreterExpressionDeployerNPE2.json) -m solidity-abi-v2 -t json -e deflate -l en \
+            ${rain-bin} meta build \
+              -i <(${rain-bin} meta solc artifact -c abi -i out/RainterpreterExpressionDeployerNPE2.sol/RainterpreterExpressionDeployerNPE2.json) -m solidity-abi-v2 -t json -e deflate -l en \
               -i <(${forge-bin} script --silent ./script/GetAuthoringMeta.sol && cat ./meta/AuthoringMeta.rain.meta) -m authoring-meta-v1 -t cbor -e deflate -l none \
           '';
 
