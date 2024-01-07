@@ -4,7 +4,7 @@ pragma solidity =0.8.19;
 import {Test} from "forge-std/Test.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibParse} from "src/lib/parse/LibParse.sol";
-import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
+import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 
 /// @title LibParseSingleLHSNamedGasTest
 /// Parse a single named LHS for many different sized LHS names just to include

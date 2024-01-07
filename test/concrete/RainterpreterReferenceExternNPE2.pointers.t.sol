@@ -6,7 +6,7 @@ import {
     RainterpreterReferenceExternNPE2,
     OPCODE_FUNCTION_POINTERS,
     INTEGRITY_FUNCTION_POINTERS,
-    SUB_PARSER_FUNCTION_POINTERS,
+    SUB_PARSER_WORD_PARSERS,
     AuthoringMetaV2,
     SUB_PARSER_PARSE_META,
     SUB_PARSER_OPERAND_HANDLERS,
@@ -47,8 +47,8 @@ contract RainterpreterReferenceExternNPE2PointersTest is Test {
 
     function testSubParserFunctionPointers() external {
         RainterpreterReferenceExternNPE2 extern = new RainterpreterReferenceExternNPE2();
-        bytes memory expected = extern.buildSubParserFunctionPointers();
-        bytes memory actual = SUB_PARSER_FUNCTION_POINTERS;
+        bytes memory expected = extern.buildSubParserWordParsers();
+        bytes memory actual = SUB_PARSER_WORD_PARSERS;
         assertEq(actual, expected);
     }
 

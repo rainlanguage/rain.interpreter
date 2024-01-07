@@ -5,7 +5,7 @@ import {AuthoringMetaV2} from "src/interface/IParserV1.sol";
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 import {Operand, LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
-import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
+import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 

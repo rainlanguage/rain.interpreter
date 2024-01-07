@@ -12,9 +12,11 @@ import {
     UnclosedLeftParen,
     ExcessRHSItems,
     ExcessLHSItems,
-    NotAcceptingInputs
+    NotAcceptingInputs,
+    UnsupportedLiteralType,
+    InvalidSubParser
 } from "../../error/ErrParse.sol";
-import {LibParseLiteral} from "./LibParseLiteral.sol";
+import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 import {LibParse} from "./LibParse.sol";
 import {LibParseOperand} from "./LibParseOperand.sol";
 import {LibParseError} from "./LibParseError.sol";
@@ -129,8 +131,8 @@ struct ParseState {
     uint256 fsm;
     uint256 stackNames;
     uint256 stackNameBloom;
-    uint256 literalBloom;
     uint256 constantsBuilder;
+    uint256 constantsBloom;
     bytes literalParsers;
     bytes operandHandlers;
     uint256[] operandValues;
@@ -227,6 +229,23 @@ library LibParseState {
         );
         state.resetSource();
         return state;
+    }
+
+    function pushSubParser(ParseState memory state, uint256 cursor, uint256 subParser) internal pure {
+        if (subParser > uint256(type(uint160).max)) {
+            revert InvalidSubParser(state.parseErrorOffset(cursor));
+        }
+
+        uint256 tail = state.subParsers;
+        // Move the tail off to a new allocation.
+        uint256 tailPointer;
+        assembly ("memory-safe") {
+            tailPointer := mload(0x40)
+            mstore(0x40, add(tailPointer, 0x20))
+            mstore(tailPointer, tail)
+        }
+        // Put the tail pointer in the high bits of the new head.
+        state.subParsers = subParser | tailPointer << 0xF0;
     }
 
     // Find the pointer to the first opcode in the source LL. Put it in the line
@@ -380,107 +399,78 @@ library LibParseState {
         }
     }
 
+    function constantValueBloom(uint256 value) internal pure returns (uint256 bloom) {
+        return uint256(1) << (value % 256);
+    }
+
     /// Includes a constant value in the constants linked list so that it will
     /// appear in the final constants array.
-    function pushConstantValue(ParseState memory state, uint256 fingerprint, uint256 value) internal pure {
+    function pushConstantValue(ParseState memory state, uint256 value) internal pure {
         unchecked {
-            uint256 ptr;
+            uint256 headPtr;
+            uint256 tailPtr = state.constantsBuilder >> 0x10;
             assembly ("memory-safe") {
                 // Allocate two words.
-                ptr := mload(0x40)
-                mstore(0x40, add(ptr, 0x40))
-            }
-            // First word is the key.
-            {
-                // tail key is the fingerprint with the low 16 bits set to
-                // the pointer to the next item in the linked list. If there
-                // is no next item then the pointer is 0.
-                uint256 tailKey = state.constantsBuilder >> 0x10
-                // The caller should have already masked the fingerprint but we
-                // do it here again for safety.
-                | (fingerprint & ~uint256(0xFFFF));
-                assembly ("memory-safe") {
-                    mstore(ptr, tailKey)
-                }
-            }
-            // Second word is the value.
-            {
-                assembly ("memory-safe") {
-                    // Second word is the value
-                    mstore(add(ptr, 0x20), value)
-                }
+                headPtr := mload(0x40)
+                mstore(0x40, add(headPtr, 0x40))
+
+                // First word is the pointer to the tail of the LL.
+                mstore(headPtr, tailPtr)
+                // Second word is the value.
+                mstore(add(headPtr, 0x20), value)
             }
 
-            state.constantsBuilder = ((state.constantsBuilder & 0xFFFF) + 1) | (ptr << 0x10);
-            // Bloom using the high byte of the fingerprint to match the literal
-            // deduping logic.
-            //slither-disable-next-line incorrect-shift
-            state.literalBloom |= 1 << (fingerprint >> 0xf8);
+            // Inc the constants height by 1 and set the new head pointer.
+            state.constantsBuilder = ((state.constantsBuilder & 0xFFFF) + 1) | (headPtr << 0x10);
+
+            // Merge in the value bloom.
+            state.constantsBloom |= constantValueBloom(value);
         }
     }
 
     function pushLiteral(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
-            (
-                function(ParseState memory, uint256, uint256) pure returns (uint256) parser,
-                uint256 innerStart,
-                uint256 innerEnd,
-                uint256 outerEnd
-            ) = state.boundLiteral(cursor, end);
-            uint256 fingerprint;
-            uint256 fingerprintBloom;
-            assembly ("memory-safe") {
-                fingerprint := and(keccak256(cursor, sub(outerEnd, cursor)), not(0xFFFF))
-                //slither-disable-next-line incorrect-shift
-                fingerprintBloom := shl(byte(0, fingerprint), 1)
+            uint256 constantValue;
+            bool success;
+            (success, cursor, constantValue) = state.tryParseLiteral(cursor, end);
+            // Don't continue trying to push something that we can't parse.
+            if (!success) {
+                revert UnsupportedLiteralType(state.parseErrorOffset(cursor));
             }
 
-            // Whether the literal is a duplicate.
+            // Whether the constant is a duplicate.
             bool exists = false;
 
-            // The index of the literal in the linked list of literals. This is
+            // The index of the constant in the constants builder LL. This is
             // starting from the top of the linked list, so the final index is
             // the height of the linked list minus this value.
-            uint256 t = 1;
+            uint256 t = 0;
 
-            // If the literal is in the bloom filter, then it MAY be a duplicate.
-            // Try to find the literal in the linked list of literals using the
-            // full fingerprint for better collision resistance than the bloom.
+            // If the constant is in the bloom filter, then it MAY be a
+            // duplicate. Try to find the constant value in the linked list of
+            // constants.
             //
-            // If the literal is NOT in the bloom filter, then it is definitely
+            // If the constant is NOT in the bloom filter, then it is definitely
             // NOT a duplicate, so avoid traversing the linked list.
             //
             // Worst case is a false positive in the bloom filter, which means
             // we traverse the linked list and find no match. This is O(1) for
-            // the bloom filter and O(n) for the linked list traversal, then
-            // O(m) for the per-char literal parsing. The bloom filter is
-            // 256 bits, so the chance of there being at least one false positive
-            // over 10 literals is ~15% due to the birthday paradox.
-            if (state.literalBloom & fingerprintBloom != 0) {
+            // the bloom filter and O(n) for the linked list traversal.
+            if (state.constantsBloom & constantValueBloom(constantValue) != 0) {
                 uint256 tailPtr = state.constantsBuilder >> 0x10;
-                while (tailPtr != 0) {
-                    uint256 tailKey;
+                while (tailPtr != 0 && !exists) {
+                    ++t;
+                    uint256 tailValue;
                     assembly ("memory-safe") {
-                        tailKey := mload(tailPtr)
+                        tailValue := mload(add(tailPtr, 0x20))
+                        tailPtr := mload(tailPtr)
                     }
-                    // If the fingerprint  matches, then the literal IS a duplicate,
-                    // with 240 bits of collision resistance. The value sits alongside
-                    // the key in memory.
-                    if (fingerprint == (tailKey & ~uint256(0xFFFF))) {
-                        exists = true;
-                        break;
-                    }
-
-                    assembly ("memory-safe") {
-                        // Tail pointer is the low 16 bits of the key.
-                        tailPtr := and(mload(tailPtr), 0xFFFF)
-                    }
-                    t++;
+                    exists = constantValue == tailValue;
                 }
             }
 
-            // Push the literal opcode to the source.
-            // The index is either the height of the constants, if the literal
+            // Push the constant opcode to the source.
+            // The index is either the height of the constants, if the constant
             // is NOT a duplicate, or the height minus the index of the
             // duplicate. This is because the final constants array is built
             // 0 indexed from the bottom of the linked list to the top.
@@ -494,10 +484,10 @@ library LibParseState {
             // build the constants array from the values in the linked list
             // later.
             if (!exists) {
-                state.pushConstantValue(fingerprint, parser(state, innerStart, innerEnd));
+                state.pushConstantValue(constantValue);
             }
 
-            return outerEnd;
+            return cursor;
         }
     }
 

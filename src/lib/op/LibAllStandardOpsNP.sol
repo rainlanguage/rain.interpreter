@@ -77,7 +77,11 @@ import {LibOpUniswapV2AmountIn} from "./uniswap/LibOpUniswapV2AmountIn.sol";
 import {LibOpUniswapV2AmountOut} from "./uniswap/LibOpUniswapV2AmountOut.sol";
 import {LibOpUniswapV2Quote} from "./uniswap/LibOpUniswapV2Quote.sol";
 
-import {LibParseLiteral, ParseState, LITERAL_PARSERS_LENGTH} from "../parse/LibParseLiteral.sol";
+import {LibParseLiteral, ParseState, LITERAL_PARSERS_LENGTH} from "../parse/literal/LibParseLiteral.sol";
+import {LibParseLiteralString} from "../parse/literal/LibParseLiteralString.sol";
+import {LibParseLiteralDecimal} from "../parse/literal/LibParseLiteralDecimal.sol";
+import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
+import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
 uint256 constant ALL_STANDARD_OPS_LENGTH = 58;
@@ -276,17 +280,18 @@ library LibAllStandardOpsNP {
 
     function literalParserFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
-            function (ParseState memory, uint256, uint256) pure returns (uint256) lengthPointer;
+            function (ParseState memory, uint256, uint256) pure returns (uint256, uint256) lengthPointer;
             uint256 length = LITERAL_PARSERS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function (ParseState memory, uint256, uint256) pure returns (uint256)[LITERAL_PARSERS_LENGTH + 1] memory
-                pointersFixed = [
+            function (ParseState memory, uint256, uint256) pure returns (uint256, uint256)[LITERAL_PARSERS_LENGTH + 1]
+                memory pointersFixed = [
                     lengthPointer,
-                    LibParseLiteral.parseLiteralHex,
-                    LibParseLiteral.parseLiteralDecimal,
-                    LibParseLiteral.parseLiteralString
+                    LibParseLiteralHex.parseHex,
+                    LibParseLiteralDecimal.parseDecimal,
+                    LibParseLiteralString.parseString,
+                    LibParseLiteralSubParseable.parseSubParseable
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {

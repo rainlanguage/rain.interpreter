@@ -3,9 +3,12 @@ pragma solidity =0.8.19;
 
 import {ParseLiteralTest} from "test/util/abstract/ParseLiteralTest.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
-import {LibParseLiteral, UnsupportedLiteralType, MalformedExponentDigits} from "src/lib/parse/LibParseLiteral.sol";
+import {
+    LibParseLiteral, UnsupportedLiteralType, MalformedExponentDigits
+} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
+import {LibParseLiteralDecimal} from "src/lib/parse/literal/LibParseLiteralDecimal.sol";
 
 /// @title LibParseLiteralBoundLiteralDecimalTest
 /// Tests finding bounds for literal decimal values by parsing.
@@ -19,13 +22,14 @@ contract LibParseLiteralBoundLiteralDecimalTest is ParseLiteralTest {
         uint256 expectedInnerEnd,
         uint256 expectedOuterEnd
     ) internal {
-        uint256 decimalParser;
-        function (ParseState memory, uint256, uint256) pure returns (uint256) parseLiteralDecimal =
-            LibParseLiteral.parseLiteralDecimal;
-        assembly ("memory-safe") {
-            decimalParser := parseLiteralDecimal
-        }
-        checkLiteralBounds(data, expectedInnerStart, expectedInnerEnd, expectedOuterEnd, decimalParser);
+        checkLiteralBounds(
+            LibParseLiteralDecimal.boundDecimal,
+            data,
+            expectedInnerStart,
+            expectedInnerEnd,
+            expectedOuterEnd,
+            expectedOuterEnd
+        );
     }
 
     function checkMalformedExponentDigits(bytes memory data, uint256 offset) internal {
@@ -36,65 +40,28 @@ contract LibParseLiteralBoundLiteralDecimalTest is ParseLiteralTest {
         uint256 cursor = outerStart;
         uint256 end = outerStart + data.length;
         vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, offset));
-        (
-            function(ParseState memory, uint256, uint256) pure returns (uint256) parser,
-            uint256 innerStart,
-            uint256 innerEnd,
-            uint256 outerEnd
-        ) = state.boundLiteral(cursor, end);
-        (parser);
-        (innerStart);
-        (innerEnd);
-        (outerEnd);
+        uint256 value;
+        (cursor, value) = state.parseLiteral(cursor, end);
+        (cursor, value);
     }
 
-    /// Check that a single digit is bounded as a decimal literal. Tests "0".
-    function testParseLiteralBoundLiteralDecimal0() external {
+    /// Check that an empty string bounds to a zero length decimal, which is an
+    /// error when parsing but not bounding.
+    function testParseLiteralBoundLiteralDecimalEmpty() external {
+        checkDecimalBounds("", 0, 0, 0);
+    }
+
+    /// Check that a single digit is bounded as a decimal literal.
+    function testParseLiteralBoundLiteralDecimalSimple() external {
         checkDecimalBounds("0", 0, 1, 1);
-    }
-
-    /// Check that a single digit is bounded as a decimal literal. Tests "1".
-    function testParseLiteralBoundLiteralDecimal1() external {
         checkDecimalBounds("1", 0, 1, 1);
-    }
-
-    /// Check that a single digit is bounded as a decimal literal. Tests "2".
-    function testParseLiteralBoundLiteralDecimal2() external {
         checkDecimalBounds("2", 0, 1, 1);
-    }
-
-    /// Check that a single digit is bounded as a decimal literal. Tests "3".
-    function testParseLiteralBoundLiteralDecimal3() external {
         checkDecimalBounds("3", 0, 1, 1);
-    }
-
-    /// Check that a single digit is bounded as a decimal literal. Tests "4".
-    function testParseLiteralBoundLiteralDecimal4() external {
         checkDecimalBounds("4", 0, 1, 1);
-    }
-
-    /// Check that a single digit is bounded as a decimal literal. Tests "5".
-    function testParseLiteralBoundLiteralDecimal5() external {
         checkDecimalBounds("5", 0, 1, 1);
-    }
-
-    /// Check that a single digit is bounded as a decimal literal. Tests "6".
-    function testParseLiteralBoundLiteralDecimal6() external {
         checkDecimalBounds("6", 0, 1, 1);
-    }
-
-    /// Check that a single digit is bounded as a decimal literal. Tests "7".
-    function testParseLiteralBoundLiteralDecimal7() external {
         checkDecimalBounds("7", 0, 1, 1);
-    }
-
-    /// Check that a single digit is bounded as a decimal literal. Tests "8".
-    function testParseLiteralBoundLiteralDecimal8() external {
         checkDecimalBounds("8", 0, 1, 1);
-    }
-
-    /// Check that a single digit is bounded as a decimal literal. Tests "9".
-    function testParseLiteralBoundLiteralDecimal9() external {
         checkDecimalBounds("9", 0, 1, 1);
     }
 

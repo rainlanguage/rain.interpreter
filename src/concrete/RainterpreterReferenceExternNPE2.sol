@@ -9,23 +9,24 @@ import {LibExtern, EncodedExternDispatch} from "../lib/extern/LibExtern.sol";
 import {IInterpreterExternV3} from "../interface/unstable/IInterpreterExternV3.sol";
 import {LibSubParse} from "../lib/parse/LibSubParse.sol";
 import {AuthoringMetaV2} from "../interface/IParserV1.sol";
-import {ParseState} from "../lib/parse/LibParseState.sol";
+import {LibParseState, ParseState} from "../lib/parse/LibParseState.sol";
 import {LibParseOperand} from "../lib/parse/LibParseOperand.sol";
-import {LibParseLiteral} from "../lib/parse/LibParseLiteral.sol";
-import {COMPATIBLITY_V1} from "../interface/unstable/ISubParserV1.sol";
+import {LibParseLiteral} from "../lib/parse/literal/LibParseLiteral.sol";
+import {COMPATIBLITY_V2} from "../interface/unstable/ISubParserV2.sol";
+import {LibParseLiteralDecimal} from "../lib/parse/literal/LibParseLiteralDecimal.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
 /// 1:1 with the number of opcodes provided by the extern component of this
 /// contract. It is possible to subparse words into opcodes that run entirely
 /// within the interpreter, and do not have an associated extern dispatch.
-uint256 constant SUB_PARSER_FUNCTION_POINTERS_LENGTH = 2;
+uint256 constant SUB_PARSER_WORD_PARSERS_LENGTH = 2;
 
 /// @dev Real function pointers to the sub parser functions that produce the
 /// bytecode that this contract knows about. This is both constructing the extern
 /// bytecode that dials back into this contract at eval time, and creating
 /// to things that happen entirely on the interpreter such as well known
 /// constants and references to the context grid.
-bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"0a120a35";
+bytes constant SUB_PARSER_WORD_PARSERS = hex"06fe0721";
 
 /// @dev Real sub parser meta bytes that map parsed strings to the functions that
 /// know how to parse those strings into opcodes for the main parser. Structured
@@ -35,22 +36,43 @@ bytes constant SUB_PARSER_PARSE_META =
 
 /// @dev Real function pointers to the operand parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
-/// the rightmost position is a pointer to an operand parser function. In the
-/// future this is likely to be removed, or refactored to value handling only
-/// rather than parsing.
-bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"066a06af";
+/// the rightmost position is a pointer to an operand parser function.
+bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"083e0883";
 
 /// @dev Real function pointers to the literal parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
-/// the rightmost position is a pointer to a literal parser function. In the
-/// future this is likely to be removed, in favour of a dedicated literal parser
-/// feature.
-bytes constant SUB_PARSER_LITERAL_PARSERS = hex"";
+/// the rightmost position is a pointer to a literal parser function.
+bytes constant SUB_PARSER_LITERAL_PARSERS = hex"080f";
+
+/// @dev The number of literal parsers provided by the sub parser.
+uint256 constant SUB_PARSER_LITERAL_PARSERS_LENGTH = 1;
+
+/// @dev The keyword for the repeat literal parser. The digit after this keyword
+/// is the digit to repeat in the literal when it is parsed to a value.
+bytes constant SUB_PARSER_LITERAL_REPEAT_KEYWORD = bytes("reference-extern-repeat-");
+
+/// @dev The keyword for the repeat literal parser, as a bytes32.
+bytes32 constant SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES32 = bytes32(SUB_PARSER_LITERAL_REPEAT_KEYWORD);
+
+/// @dev The number of bytes in the repeat literal keyword.
+uint256 constant SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH = 24;
+
+/// @dev The mask to apply to the dispatch bytes when parsing to determin whether
+/// the dispatch is for the repeat literal parser.
+bytes32 constant SUB_PARSER_LITERAL_REPEAT_KEYWORD_MASK =
+    bytes32(~((1 << (32 - SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH) * 8) - 1));
+
+/// @dev The index of the repeat literal parser in the literal parser function
+/// pointers.
+uint256 constant SUB_PARSER_LITERAL_REPEAT_INDEX = 0;
+
+/// @dev Thrown when the repeat literal parser is not a single digit.
+error InvalidRepeatCount(uint256 value);
 
 /// @dev Real function pointers to the opcodes for the extern component of this
 /// contract. These get run at eval time wehen the interpreter calls into the
 /// contract as an `IInterpreterExternV3`.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"058b";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"07c1";
 
 /// @dev Number of opcode function pointers available to run at eval time.
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
@@ -59,7 +81,7 @@ uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
 /// of this contract. These get run at deploy time when the main integrity checks
 /// are run, the extern opcode integrity on the deployer will delegate integrity
 /// checks to the extern contract.
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0744";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0918";
 
 /// @dev Opcode index of the extern increment opcode. Needs to be manually kept
 /// in sync with the extern opcode function pointers. Definitely write tests for
@@ -139,6 +161,44 @@ library LibExternOpStackOperandNPE2 {
     }
 }
 
+/// @title LibParseLiteralRepeat
+/// This is a library that mimics the literal libraries elsewhere in this repo,
+/// but structured to fit sub parsing rather than internal logic. It is NOT
+/// required to use this pattern, of libs outside the implementation contract,
+/// but it MAY be convenient to do so, as the libs can be moved to dedicated
+/// files, easily tested and reviewed directly, etc.
+///
+/// This literal parser is a simple repeat literal parser. It is extremely
+/// contrived and serves no real world purpose. It is used to demonstrate how
+/// to implement a literal parser, including extracting a value from the
+/// dispatch data and providing it to the parser.
+///
+/// The repeat literal parser takes a single digit as input, and repeats that
+/// digit for every byte in the literal.
+/// ```
+/// /* 000 */
+/// [reference-extern-repeat-0 abc]
+/// /* 111 */
+/// [reference-extern-repeat-1 cde]
+/// /* 222 */
+/// [reference-extern-repeat-2 zzz]
+/// /* 333 */
+/// [reference-extern-repeat-3 123]
+/// ```
+library LibParseLiteralRepeat {
+    //slither-disable-next-line dead-code
+    function parseRepeat(uint256 dispatchValue, uint256 cursor, uint256 end) internal pure returns (uint256) {
+        unchecked {
+            uint256 value;
+            uint256 length = end - cursor;
+            for (uint256 i = 0; i < length; ++i) {
+                value += dispatchValue * 10 ** i;
+            }
+            return value;
+        }
+    }
+}
+
 /// @title LibRainterpreterReferenceExternNPE2
 /// This library allows code SEPARATE FROM the implementation contract to do
 /// offchain processing of supporting data without needing to compile all this
@@ -155,7 +215,7 @@ library LibRainterpreterReferenceExternNPE2 {
     //slither-disable-next-line dead-code
     function authoringMetaV2() internal pure returns (bytes memory) {
         AuthoringMetaV2 memory lengthPlaceholder;
-        AuthoringMetaV2[SUB_PARSER_FUNCTION_POINTERS_LENGTH + 1] memory wordsFixed = [
+        AuthoringMetaV2[SUB_PARSER_WORD_PARSERS_LENGTH + 1] memory wordsFixed = [
             lengthPlaceholder,
             AuthoringMetaV2(
                 "reference-extern-inc",
@@ -167,7 +227,7 @@ library LibRainterpreterReferenceExternNPE2 {
             )
         ];
         AuthoringMetaV2[] memory wordsDynamic;
-        uint256 length = SUB_PARSER_FUNCTION_POINTERS_LENGTH;
+        uint256 length = SUB_PARSER_WORD_PARSERS_LENGTH;
         assembly {
             wordsDynamic := wordsFixed
             mstore(wordsDynamic, length)
@@ -216,8 +276,8 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// Overrides the base function pointers for sub parsing. Simply returns the
     /// known constant value, which should allow the compiler to optimise the
     /// entire function call away.
-    function subParserFunctionPointers() internal pure override returns (bytes memory) {
-        return SUB_PARSER_FUNCTION_POINTERS;
+    function subParserWordParsers() internal pure override returns (bytes memory) {
+        return SUB_PARSER_WORD_PARSERS;
     }
 
     /// Overrides the base operand handlers for sub parsing. Simply returns the
@@ -238,7 +298,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// known constant value, which should allow the compiler to optimise the
     /// entire function call away.
     function subParserCompatibility() internal pure override returns (bytes32) {
-        return COMPATIBLITY_V1;
+        return COMPATIBLITY_V2;
     }
 
     /// Overrides the base function pointers for opcodes. Simply returns the
@@ -255,12 +315,63 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
         return INTEGRITY_FUNCTION_POINTERS;
     }
 
-    /// The literal parsers are the same as the main parser. In the future this
-    /// is likely to be changed so that sub parsers only have to define
-    /// _additional_ literal parsers that they provide, as it is redundant and
-    /// fragile to have to define the same literal parsers in multiple places.
+    /// The literal parsers are the same as the main parser.
     function buildSubParserLiteralParsers() external pure returns (bytes memory) {
-        return hex"";
+        unchecked {
+            function (uint256, uint256, uint256) internal pure returns (uint256) lengthPointer;
+            uint256 length = SUB_PARSER_LITERAL_PARSERS_LENGTH;
+            assembly ("memory-safe") {
+                lengthPointer := length
+            }
+            function (uint256, uint256, uint256) internal pure returns (uint256)[SUB_PARSER_LITERAL_PARSERS_LENGTH + 1]
+                memory parsersFixed = [lengthPointer, LibParseLiteralRepeat.parseRepeat];
+            uint256[] memory parsersDynamic;
+            assembly {
+                parsersDynamic := parsersFixed
+            }
+            // Sanity check that the dynamic length is correct. Should be an
+            // unreachable error.
+            if (parsersDynamic.length != length) {
+                revert BadDynamicLength(parsersDynamic.length, length);
+            }
+            return LibConvert.unsafeTo16BitBytes(parsersDynamic);
+        }
+    }
+
+    function matchSubParseLiteralDispatch(uint256 cursor, uint256 end)
+        internal
+        pure
+        virtual
+        override
+        returns (bool, uint256, uint256)
+    {
+        unchecked {
+            uint256 length = end - cursor;
+            bytes32 word;
+            assembly ("memory-safe") {
+                word := mload(cursor)
+            }
+            if (
+                length > SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH
+                    && (word & SUB_PARSER_LITERAL_REPEAT_KEYWORD_MASK) == SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES32
+            ) {
+                ParseState memory state = LibParseState.newState("", "", "", "");
+                // If we have a match on the keyword then the next chars MUST
+                // be a decimal, otherwise it's an error.
+                uint256 value;
+                (cursor, value) = LibParseLiteralDecimal.parseDecimal(
+                    state, cursor + SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH, end
+                );
+                // We can only repeat a single digit.
+                if (value > 9) {
+                    revert InvalidRepeatCount(value);
+                }
+
+                return (true, SUB_PARSER_LITERAL_REPEAT_INDEX, value);
+            } else {
+                return (false, 0, 0);
+            }
+        }
     }
 
     /// There's only one operand parser for this implementation, the disallowed
@@ -268,11 +379,11 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     function buildSubParserOperandHandlers() external pure returns (bytes memory) {
         unchecked {
             function(uint256[] memory) internal pure returns (Operand) lengthPointer;
-            uint256 length = SUB_PARSER_FUNCTION_POINTERS_LENGTH;
+            uint256 length = SUB_PARSER_WORD_PARSERS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(uint256[] memory) internal pure returns (Operand)[SUB_PARSER_FUNCTION_POINTERS_LENGTH + 1] memory
+            function(uint256[] memory) internal pure returns (Operand)[SUB_PARSER_WORD_PARSERS_LENGTH + 1] memory
                 handlersFixed =
                     [lengthPointer, LibParseOperand.handleOperandDisallowed, LibParseOperand.handleOperandSingleFull];
             uint256[] memory handlersDynamic;
@@ -296,15 +407,15 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// gas efficient by allowing it to be constant. The reason this can't be
     /// done within the test itself is that the pointers need to be calculated
     /// relative to the bytecode of the current contract, not the test contract.
-    function buildSubParserFunctionPointers() external pure returns (bytes memory) {
+    function buildSubParserWordParsers() external pure returns (bytes memory) {
         unchecked {
             function(uint256, uint256, Operand) internal view returns (bool, bytes memory, uint256[] memory)
                 lengthPointer;
-            uint256 length = SUB_PARSER_FUNCTION_POINTERS_LENGTH;
+            uint256 length = SUB_PARSER_WORD_PARSERS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(uint256, uint256, Operand) internal view returns (bool, bytes memory, uint256[] memory)[SUB_PARSER_FUNCTION_POINTERS_LENGTH
+            function(uint256, uint256, Operand) internal view returns (bool, bytes memory, uint256[] memory)[SUB_PARSER_WORD_PARSERS_LENGTH
                 + 1] memory pointersFixed =
                     [lengthPointer, LibExternOpIntIncNPE2.subParser, LibExternOpStackOperandNPE2.subParser];
             uint256[] memory pointersDynamic;

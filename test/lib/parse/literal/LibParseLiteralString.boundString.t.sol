@@ -3,40 +3,24 @@ pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
-import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
+import {LibParseLiteralString} from "src/lib/parse/literal/LibParseLiteralString.sol";
 import {LibLiteralString} from "test/util/lib/literal/LibLiteralString.sol";
 import {StringTooLong, UnclosedStringLiteral, ParserOutOfBounds} from "src/error/ErrParse.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 
-/// @title LibParseLiteralBoundLiteralStringTest
-contract LibParseLiteralBoundLiteralStringTest is Test {
+/// @title LibParseLiteralStringBoundTest
+contract LibParseLiteralStringBoundTest is Test {
     using LibBytes for bytes;
-    using LibParseLiteral for ParseState;
+    using LibParseLiteralString for ParseState;
 
     /// External parse function to allow us to assert reverts.
-    function externalBoundLiteral(bytes memory data)
-        external
-        pure
-        returns (uint256, uint256, uint256, uint256, uint256)
-    {
-        ParseState memory state =
-            LibParseState.newState(data, "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
-        state.literalParsers = LibAllStandardOpsNP.literalParserFunctionPointers();
-        uint256 outerStart = Pointer.unwrap(bytes(data).dataPointer());
-        uint256 cursor = outerStart;
-        uint256 end = outerStart + bytes(data).length;
-        (
-            function(ParseState memory, uint256, uint256) pure returns (uint256) parserFn,
-            uint256 innerStart,
-            uint256 innerEnd,
-            uint256 outerEnd
-        ) = state.boundLiteral(cursor, end);
-        uint256 parser;
-        assembly ("memory-safe") {
-            parser := parserFn
-        }
-        return (parser, outerStart, innerStart, innerEnd, outerEnd);
+    function externalBoundString(bytes memory data) external pure returns (uint256, uint256, uint256, uint256) {
+        ParseState memory state = LibParseState.newState(data, "", "", "");
+        uint256 cursor = Pointer.unwrap(bytes(data).dataPointer());
+        uint256 end = cursor + bytes(data).length;
+        (uint256 innerStart, uint256 innerEnd, uint256 outerEnd) = state.boundString(cursor, end);
+        return (cursor, innerStart, innerEnd, outerEnd);
     }
 
     /// External parse function to allow us to assert reverts after forcing the
@@ -44,10 +28,9 @@ contract LibParseLiteralBoundLiteralStringTest is Test {
     function externalBoundLiteralForceLength(bytes memory data, uint256 length)
         external
         pure
-        returns (uint256, uint256, uint256, uint256, uint256)
+        returns (uint256, uint256, uint256, uint256)
     {
-        ParseState memory state =
-            LibParseState.newState(data, "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+        ParseState memory state = LibParseState.newState(data, "", "", "");
         state.literalParsers = LibAllStandardOpsNP.literalParserFunctionPointers();
         assembly ("memory-safe") {
             mstore(data, length)
@@ -55,17 +38,8 @@ contract LibParseLiteralBoundLiteralStringTest is Test {
         uint256 outerStart = Pointer.unwrap(bytes(data).dataPointer());
         uint256 cursor = outerStart;
         uint256 end = outerStart + length;
-        (
-            function(ParseState memory, uint256, uint256) pure returns (uint256) parserFn,
-            uint256 innerStart,
-            uint256 innerEnd,
-            uint256 outerEnd
-        ) = state.boundLiteral(cursor, end);
-        uint256 parser;
-        assembly ("memory-safe") {
-            parser := parserFn
-        }
-        return (parser, outerStart, innerStart, innerEnd, outerEnd);
+        (uint256 innerStart, uint256 innerEnd, uint256 outerEnd) = state.boundString(cursor, end);
+        return (outerStart, innerStart, innerEnd, outerEnd);
     }
 
     function checkStringBounds(
@@ -74,15 +48,8 @@ contract LibParseLiteralBoundLiteralStringTest is Test {
         uint256 expectedInnerEnd,
         uint256 expectedOuterEnd
     ) internal {
-        (uint256 actualParser, uint256 outerStart, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            this.externalBoundLiteral(bytes(str));
-        uint256 expectedParser;
-        function(ParseState memory, uint256, uint256) pure returns (uint256) parseLiteralString =
-            LibParseLiteral.parseLiteralString;
-        assembly ("memory-safe") {
-            expectedParser := parseLiteralString
-        }
-        assertEq(actualParser, expectedParser, "parser");
+        (uint256 outerStart, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
+            this.externalBoundString(bytes(str));
         assertEq(innerStart, outerStart + expectedInnerStart, "innerStart");
         assertEq(innerEnd, outerStart + expectedInnerEnd, "innerEnd");
         assertEq(outerEnd, outerStart + expectedOuterEnd, "outerEnd");
@@ -103,9 +70,7 @@ contract LibParseLiteralBoundLiteralStringTest is Test {
         LibLiteralString.conformValidPrintableStringContent(str);
 
         vm.expectRevert(abi.encodeWithSelector(StringTooLong.selector, 0));
-        (uint256 actualParser, uint256 outerStart, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            this.externalBoundLiteral(bytes(string.concat("\"", str, "\"")));
-        (actualParser, outerStart, innerStart, innerEnd, outerEnd);
+        checkStringBounds(string.concat("\"", str, "\""), 0, 0, 0);
     }
 
     /// Invalid chars in the first 31 bytes should error.
@@ -116,9 +81,7 @@ contract LibParseLiteralBoundLiteralStringTest is Test {
         LibLiteralString.corruptSingleChar(str, badIndex);
 
         vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, 1 + badIndex));
-        (uint256 actualParser, uint256 outerStart, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
-            this.externalBoundLiteral(bytes(string.concat("\"", str, "\"")));
-        (actualParser, outerStart, innerStart, innerEnd, outerEnd);
+        checkStringBounds(string.concat("\"", str, "\""), 0, 0, 0);
     }
 
     /// Valid string data beyond the bounds of the parsed data should error as
@@ -130,8 +93,8 @@ contract LibParseLiteralBoundLiteralStringTest is Test {
         length = bound(length, 1, bytes(str).length - 1);
 
         vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, length));
-        (uint256 actualParser, uint256 outerStart, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
+        (uint256 outerStart, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
             this.externalBoundLiteralForceLength(bytes(str), length);
-        (actualParser, outerStart, innerStart, innerEnd, outerEnd);
+        (outerStart, innerStart, innerEnd, outerEnd);
     }
 }

@@ -90,7 +90,7 @@ library LibParseInterstitial {
         unchecked {
             // Set ying as we now open to possibilities.
             state.fsm &= ~FSM_YANG_MASK;
-            return LibParse.skipMask(cursor + 1, end, CMASK_WHITESPACE);
+            return LibParse.skipMask(cursor, end, CMASK_WHITESPACE);
         }
     }
 

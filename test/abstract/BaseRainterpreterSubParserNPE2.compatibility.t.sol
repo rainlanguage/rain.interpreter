@@ -6,7 +6,7 @@ import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC
 import {
     BaseRainterpreterSubParserNPE2, SUB_PARSER_COMPATIBLITY
 } from "src/abstract/BaseRainterpreterSubParserNPE2.sol";
-import {ISubParserV1} from "src/interface/unstable/ISubParserV1.sol";
+import {ISubParserV2} from "src/interface/unstable/ISubParserV2.sol";
 import {IncompatibleSubParser} from "src/error/ErrSubParse.sol";
 
 /// @dev We need a contract that is deployable in order to test the abstract
@@ -22,7 +22,7 @@ contract BaseRainterpreterSubParserNPE2CompatibilityTest is Test {
         ChildRainterpreterSubParserNPE2 subParser = new ChildRainterpreterSubParserNPE2();
         vm.expectRevert(abi.encodeWithSelector(IncompatibleSubParser.selector));
         (bool success, bytes memory bytecode, uint256[] memory constants) =
-            ISubParserV1(address(subParser)).subParse(badCompatibility, data);
+            ISubParserV2(address(subParser)).subParseWord(badCompatibility, data);
         (success, bytecode, constants);
     }
 }

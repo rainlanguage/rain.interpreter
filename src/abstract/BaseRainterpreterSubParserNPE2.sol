@@ -4,7 +4,7 @@ pragma solidity =0.8.19;
 import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 
-import {ISubParserV1} from "../interface/unstable/ISubParserV1.sol";
+import {ISubParserV2} from "../interface/unstable/ISubParserV2.sol";
 import {IncompatibleSubParser} from "../error/ErrSubParse.sol";
 import {LibSubParse, ParseState} from "../lib/parse/LibSubParse.sol";
 import {CMASK_RHS_WORD_TAIL} from "../lib/parse/LibParseCMask.sol";
@@ -17,7 +17,7 @@ import {LibParseOperand} from "../lib/parse/LibParseOperand.sol";
 /// where each subparser function is responsible for parsing a particular
 /// word into a an opcode that will be used by the main parser to build the
 /// final bytecode.
-bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"";
+bytes constant SUB_PARSER_WORD_PARSERS = hex"";
 
 /// @dev This is a placeholder for the subparser meta bytes.
 /// The subparser meta bytes are the same structure as the main parser meta
@@ -26,23 +26,18 @@ bytes constant SUB_PARSER_FUNCTION_POINTERS = hex"";
 bytes constant SUB_PARSER_PARSE_META = hex"";
 
 /// @dev This is a placeholder for the int that encodes pointers to operand
-/// parsers. In the future this will probably be removed and the main parser
-/// will handle all operand parsing, the subparser will only be responsible for
-/// checking the validity of the operand values and encoding them into the
-/// resulting bytecode.
+/// parsers.
 bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"";
 
 /// @dev This is a placeholder for the int that encodes pointers to literal
-/// parsers. In the future this will probably be removed and there will be
-/// dedicated concepts for "sub literal" and "sub word" parsing, that should be
-/// more composable than the current approach.
+/// parsers.
 bytes constant SUB_PARSER_LITERAL_PARSERS = hex"";
 
 /// @dev This is a placeholder for compatibility version. The child contract
 /// should override this to define its own compatibility version.
 bytes32 constant SUB_PARSER_COMPATIBLITY = bytes32(0);
 
-/// Base implementation of `ISubParserV1`. Inherit from this contract and
+/// Base implementation of `ISubParserV2`. Inherit from this contract and
 /// override the virtual functions to align all the relevant pointers and
 /// metadata bytes so that it can actually run.
 /// The basic workflow for subparsing via this contract is:
@@ -78,7 +73,7 @@ bytes32 constant SUB_PARSER_COMPATIBLITY = bytes32(0);
 ///   of the main parser. The expectation on failure is that there may be some
 ///   other subparser that can parse the data, so the main parser will handle
 ///   fallback logic.
-abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
+abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV2 {
     using LibBytes for bytes;
     using LibParse for ParseState;
     using LibParseMeta for ParseState;
@@ -94,8 +89,8 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
     /// Overrideable function to allow implementations to define their function
     /// pointers to each sub parser.
     //slither-disable-next-line dead-code
-    function subParserFunctionPointers() internal pure virtual returns (bytes memory) {
-        return SUB_PARSER_FUNCTION_POINTERS;
+    function subParserWordParsers() internal pure virtual returns (bytes memory) {
+        return SUB_PARSER_WORD_PARSERS;
     }
 
     /// Overrideable function to allow implementations to define their operand
@@ -119,26 +114,88 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
         return SUB_PARSER_COMPATIBLITY;
     }
 
-    /// A basic implementation of sub parsing that uses encoded function pointers
-    /// to dispatch everything necessary in O(1) and allows for the child
-    /// contract to override all relevant functions with some modest boilerplate.
+    /// Overrideable function to allow implementations to define their
+    /// literal dispatch matching. This is optional, and if not overridden
+    /// simply won't attempt to parse any literals. This is usually what you
+    /// want, as the main parser will handle common literals and the subparser
+    /// can focus on words, which is the more common case.
+    /// @param cursor The cursor to the memory location of the start of the
+    /// dispatch data.
+    /// @param end The cursor to the memory location of the end of the dispatch
+    /// data.
+    /// @return success Whether the dispatch was successfully matched. If the
+    /// sub parser does not recognise the dispatch data, it should return false.
+    /// The main parser MAY fallback to other sub parsers, so this is not
+    /// necessarily a failure condition.
+    /// @return index The index of the sub parser literal parser to use. If
+    /// success is true, this MUST match the position of the function pointer in
+    /// the bytes returned by `subParserLiteralParsers`.
+    /// @return value The value of the dispatch data, which is passed to the
+    /// sub parser literal parser. This MAY be zero if the sub parser does not
+    /// need to use the dispatch data. The interpretation of this value is
+    /// entirely up to the sub parser.
+    //slither-disable-next-line dead-code
+    function matchSubParseLiteralDispatch(uint256 cursor, uint256 end)
+        internal
+        pure
+        virtual
+        returns (bool success, uint256 index, uint256 value)
+    {
+        (cursor, end);
+        success = false;
+        index = 0;
+        value = 0;
+    }
+
+    /// A basic implementation of sub parsing literals that uses encoded
+    /// function pointers to dispatch everything necessary in O(1) and allows
+    /// for the child contract to override all relevant functions with some
+    /// modest boilerplate.
     /// This is virtual but the expectation is that it generally DOES NOT need
     /// to be overridden, as the function pointers and metadata bytes are all
     /// that need to be changed to implement a new subparser.
-    /// @inheritdoc ISubParserV1
-    function subParse(bytes32 compatibility, bytes memory data)
+    /// @inheritdoc ISubParserV2
+    function subParseLiteral(bytes32 compatibility, bytes memory data) external pure virtual returns (bool, uint256) {
+        if (compatibility != subParserCompatibility()) {
+            revert IncompatibleSubParser();
+        }
+
+        (uint256 dispatchStart, uint256 bodyStart, uint256 bodyEnd) = LibSubParse.consumeSubParseLiteralInputData(data);
+
+        (bool success, uint256 index, uint256 dispatchValue) = matchSubParseLiteralDispatch(dispatchStart, bodyStart);
+
+        if (success) {
+            function (uint256, uint256, uint256) internal pure returns (uint256) subParser;
+            bytes memory localSubParserLiteralParsers = subParserLiteralParsers();
+            assembly ("memory-safe") {
+                subParser := and(mload(add(localSubParserLiteralParsers, mul(add(index, 1), 2))), 0xFFFF)
+            }
+            return (true, subParser(dispatchValue, bodyStart, bodyEnd));
+        } else {
+            return (false, 0);
+        }
+    }
+
+    /// A basic implementation of sub parsing words that uses encoded function
+    /// pointers to dispatch everything necessary in O(1) and allows for the
+    /// child contract to override all relevant functions with some modest
+    /// boilerplate.
+    /// This is virtual but the expectation is that it generally DOES NOT need
+    /// to be overridden, as the function pointers and metadata bytes are all
+    /// that need to be changed to implement a new subparser.
+    /// @inheritdoc ISubParserV2
+    function subParseWord(bytes32 compatibility, bytes memory data)
         external
         pure
         virtual
-        returns (bool success, bytes memory bytecode, uint256[] memory constants)
+        returns (bool, bytes memory, uint256[] memory)
     {
         if (compatibility != subParserCompatibility()) {
             revert IncompatibleSubParser();
         }
 
-        (uint256 constantsHeight, uint256 ioByte, ParseState memory state) = LibSubParse.consumeInputData(
-            data, subParserParseMeta(), subParserOperandHandlers(), subParserLiteralParsers()
-        );
+        (uint256 constantsHeight, uint256 ioByte, ParseState memory state) =
+            LibSubParse.consumeSubParseWordInputData(data, subParserParseMeta(), subParserOperandHandlers());
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         uint256 end = cursor + state.data.length;
 
@@ -148,9 +205,9 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
         if (exists) {
             Operand operand = state.handleOperand(index);
             function (uint256, uint256, Operand) internal pure returns (bool, bytes memory, uint256[] memory) subParser;
-            bytes memory localSubParserFunctionPointers = subParserFunctionPointers();
+            bytes memory localSubParserWordParsers = subParserWordParsers();
             assembly ("memory-safe") {
-                subParser := and(mload(add(localSubParserFunctionPointers, mul(add(index, 1), 2))), 0xFFFF)
+                subParser := and(mload(add(localSubParserWordParsers, mul(add(index, 1), 2))), 0xFFFF)
             }
             return subParser(constantsHeight, ioByte, operand);
         } else {
@@ -160,6 +217,6 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV1 {
 
     /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(ISubParserV1).interfaceId || super.supportsInterface(interfaceId);
+        return interfaceId == type(ISubParserV2).interfaceId || super.supportsInterface(interfaceId);
     }
 }

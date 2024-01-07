@@ -15,7 +15,7 @@ import {
 import {LibLiteralString} from "test/util/lib/literal/LibLiteralString.sol";
 import {NoWhitespaceAfterUsingWordsFrom} from "src/error/ErrParse.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
-import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
+import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 
 /// @title LibParsePragmaKeywordTest

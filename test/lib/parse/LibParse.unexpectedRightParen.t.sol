@@ -7,7 +7,7 @@ import {LibMetaFixture} from "test/util/lib/parse/LibMetaFixture.sol";
 import {LibParse} from "src/lib/parse/LibParse.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {UnexpectedRightParen} from "src/error/ErrParse.sol";
-import {LibParseLiteral} from "src/lib/parse/LibParseLiteral.sol";
+import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 
 /// @title LibParseUnexpectedRightParenTest
