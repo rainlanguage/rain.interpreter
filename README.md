@@ -1,6 +1,8 @@
 # rain.interpreter
 
-Docs at https://rainprotocol.github.io/rain.interpreter
+Solidity docs can be generated with `nix develop --command forge doc -b`.
+
+Rust docs with `nix develop --command cargo doc`.
 
 ## Overview
 
