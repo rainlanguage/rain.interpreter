@@ -6,7 +6,10 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        task: [ci-test-sol, ci-slither]
+        task: [ci-test-sol, ci-test-rs]
+        include:
+          - os: ubuntu-latest
+            task: ci-slither
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
