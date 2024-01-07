@@ -38,7 +38,8 @@
           '');
 
           ci-prep = pkgs.writeShellScriptBin "ci-prep" ''
-            ${forge-bin} install --shallow
+            mkdir -p meta;
+            ${forge-bin} install --shallow;
             ${forge-bin} build --force;
             ${(build-dispair-meta-cmd)} -o meta/RainterpreterExpressionDeployerNPE2.rain.meta;
           '';
