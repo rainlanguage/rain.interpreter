@@ -3,7 +3,7 @@
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-    rainix.url = "github:rainprotocol/rainix/0dd3fa8c326f51fc09533c5fdac839c1db844a1e";
+    rainix.url = "github:rainprotocol/rainix/bcdea29f2621a80a35d7bef4266e324931b6b2f4";
     rain.url = "github:rainprotocol/rain.cli/6a912680be6d967fd6114aafab793ebe8503d27b";
   };
 
@@ -38,9 +38,9 @@
           '');
 
           default = build-meta;
-        } // rainix.packages;
+        } // rainix.packages.${system};
 
-        devShells = rainix.devShells;
+        devShells = rainix.devShells.${system};
       }
     );
 }
