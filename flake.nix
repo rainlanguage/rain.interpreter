@@ -38,6 +38,7 @@
           '');
 
           default = build-meta;
+          ci-prep = build-meta;
         } // rainix.packages.${system};
 
         devShells = rainix.devShells.${system};
