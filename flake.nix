@@ -3,7 +3,7 @@
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-    rainix.url = "github:rainprotocol/rainix/9b3ec59b151c6356e71fadd07ec88003b8e47d02";
+    rainix.url = "github:rainprotocol/rainix/9e945f33349606c12f71559f947473766ed3f922";
     rain.url = "github:rainprotocol/rain.cli/6a912680be6d967fd6114aafab793ebe8503d27b";
   };
 
@@ -17,7 +17,6 @@
         packages = rec {
           build-dispair-meta-cmd = ''
             ${rain-bin} meta build \
-              -i <(${rain-bin} meta solc artifact -c abi -i out/RainterpreterExpressionDeployerNPE2.sol/RainterpreterExpressionDeployerNPE2.json) -m solidity-abi-v2 -t json -e deflate -l en \
               -i <(${forge-bin} script --silent ./script/GetAuthoringMeta.sol && cat ./meta/AuthoringMeta.rain.meta) -m authoring-meta-v1 -t cbor -e deflate -l none \
           '';
 
