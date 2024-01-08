@@ -26,4 +26,6 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@v4
       - uses: DeterminateSystems/magic-nix-cache-action@v2
 
-      - run: nix run github:rainlanguage/rainix#${{ matrix.task }}
+      - run: nix run .#rainix-prelude
+      - run: nix run .#build-meta
+      - run: nix run .#${{ matrix.task }}
