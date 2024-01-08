@@ -1,0 +1,24 @@
+name: Manual sol artifacts
+on:
+  workflow_dispatch:
+    inputs:
+      network:
+        description: 'Network to deploy to'
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: DeterminateSystems/nix-installer-action@v4
+      - uses: DeterminateSystems/magic-nix-cache-action@v2
+
+      - run: nix run .#rainix-prelude
+      - run: nix run .#build-dispair-meta
+      - run: nix run .#rainix-sol-artifacts
+        env:
+          CI_DEPLOY_RPC_URL: ${{ inputs.network == 'polygon' && secrets.CI_DEPLOY_POLYGON_RPC_URL || secrets.CI_DEPLOY_RPC_URL }}
+          EXPLORER_VERIFICATION_KEY: ${{ secrets.EXPLORER_VERIFICATION_KEY }}
