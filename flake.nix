@@ -13,7 +13,7 @@
         mkTaskLocal = name: rainix.mkTask.${system} { name = name; body = (builtins.readFile ./task/${name}.sh); };
       in {
         packages = rec {
-          build-meta = mkTaskLocal "build-meta";
+          build-dispair-meta = mkTaskLocal "build-dispair-meta";
         } // rainix.packages.${system};
 
         devShells = rainix.devShells.${system};
