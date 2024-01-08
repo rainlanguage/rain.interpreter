@@ -9,7 +9,7 @@ import {LibAllStandardOpsNP} from "../src/lib/op/LibAllStandardOpsNP.sol";
 /// directly from the lib. This is intended to be packed with ExpressionDeployerNP
 /// ABI, deflated, cbor encoded and then passed to ExpressionDeployerNP constructor
 /// when deploying.
-contract GetAuthoringMeta is Script {
+contract BuildAuthoringMeta is Script {
     function run() external {
         vm.writeFileBinary("meta/AuthoringMeta.rain.meta", LibAllStandardOpsNP.authoringMetaV2());
     }
