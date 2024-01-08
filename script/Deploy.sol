@@ -10,13 +10,13 @@ import {
     RainterpreterExpressionDeployerNPE2ConstructionConfig
 } from "../src/concrete/RainterpreterExpressionDeployerNPE2.sol";
 
-/// @title DeployDISPair
-/// @notice A script that deploys a DeployDISPair.
+/// @title Deploy
 /// This is intended to be run on every commit by CI to a testnet such as mumbai,
 /// then cross chain deployed to whatever mainnet is required, by users.
-contract DeployDISPair is Script {
-    function run(bytes memory constructionMeta) external {
+contract Deploy is Script {
+    function run() external {
         uint256 deployerPrivateKey = vm.envUint("DEPLOYMENT_KEY");
+        bytes memory constructionMeta = vm.readFileBinary("meta/RainterpreterExpressionDeployerNPE2.rain.meta");
 
         vm.startBroadcast(deployerPrivateKey);
         RainterpreterNPE2 interpreter = new RainterpreterNPE2();
