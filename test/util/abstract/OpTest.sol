@@ -190,11 +190,12 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (io);
+        uint256[][] memory context = LibContext.build(new uint256[][](0), new SignedContextV1[](0));
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
             LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), type(uint16).max),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            context,
             new uint256[](0)
         );
         return (stack, kvs);
