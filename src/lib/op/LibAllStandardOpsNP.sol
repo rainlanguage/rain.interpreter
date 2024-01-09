@@ -101,6 +101,10 @@ library LibAllStandardOpsNP {
                 "extern",
                 "Calls an external contract. The first operand is the index of the encoded dispatch in the constants array, the second is the number of outputs."
             ),
+            AuthoringMetaV2(
+                "context",
+                "Copies a value from the context. The first operand is the context column and second is the context row."
+            ),
             // These are all ordered according to how they appear in the file system.
             AuthoringMetaV2("bitwise-and", "Bitwise AND the top two items on the stack."),
             AuthoringMetaV2("bitwise-or", "Bitwise OR the top two items on the stack."),
@@ -118,10 +122,6 @@ library LibAllStandardOpsNP {
             AuthoringMetaV2(
                 "call",
                 "Calls a source by index in the same Rain bytecode. The inputs to call are copied to the top of the called stack and the outputs specified in the operand are copied back to the calling stack. The first operand is the source index and the second is the number of outputs."
-            ),
-            AuthoringMetaV2(
-                "context",
-                "Copies a value from the context. The first operand is the context column and second is the context row."
             ),
             AuthoringMetaV2("hash", "Hashes all inputs into a single 32 byte value using keccak256."),
             AuthoringMetaV2(
@@ -322,6 +322,8 @@ library LibAllStandardOpsNP {
                     LibParseOperand.handleOperandSingleFull,
                     // Extern
                     LibParseOperand.handleOperandDoublePerByteNoDefault,
+                    // Context
+                    LibParseOperand.handleOperandDoublePerByteNoDefault,
                     // Bitwise and
                     LibParseOperand.handleOperandDisallowed,
                     // Bitwise or
@@ -337,8 +339,6 @@ library LibAllStandardOpsNP {
                     // Bitwise shift right
                     LibParseOperand.handleOperandSingleFull,
                     // Call
-                    LibParseOperand.handleOperandDoublePerByteNoDefault,
-                    // Context
                     LibParseOperand.handleOperandDoublePerByteNoDefault,
                     // Hash
                     LibParseOperand.handleOperandDisallowed,
@@ -459,13 +459,12 @@ library LibAllStandardOpsNP {
                 view
                 returns (uint256, uint256)[ALL_STANDARD_OPS_LENGTH + 1] memory pointersFixed = [
                     lengthPointer,
-                    // Stack then constant are the first two ops to match the
-                    // field ordering in the interpreter state NOT the lexical
-                    // ordering of the file system. Extern is also out of lexical
-                    // order to fit these two in.
+                    // The first ops are out of lexical ordering so that they
+                    // can sit at stable well known indexes.
                     LibOpStackNP.integrity,
                     LibOpConstantNP.integrity,
                     LibOpExternNP.integrity,
+                    LibOpContextNP.integrity,
                     // Everything else is alphabetical, including folders.
                     LibOpBitwiseAndNP.integrity,
                     LibOpBitwiseOrNP.integrity,
@@ -475,7 +474,6 @@ library LibAllStandardOpsNP {
                     LibOpShiftBitsLeftNP.integrity,
                     LibOpShiftBitsRightNP.integrity,
                     LibOpCallNP.integrity,
-                    LibOpContextNP.integrity,
                     LibOpHashNP.integrity,
                     LibOpERC20AllowanceNP.integrity,
                     LibOpERC20BalanceOfNP.integrity,
@@ -567,13 +565,12 @@ library LibAllStandardOpsNP {
                 view
                 returns (Pointer)[ALL_STANDARD_OPS_LENGTH + 1] memory pointersFixed = [
                     lengthPointer,
-                    // Stack then constant are the first two ops to match the
-                    // field ordering in the interpreter state NOT the lexical
-                    // ordering of the file system. Extern is also out of lexical
-                    // order to fit these two in.
+                    // The first ops are out of lexical ordering so that they
+                    // can sit at stable well known indexes.
                     LibOpStackNP.run,
                     LibOpConstantNP.run,
                     LibOpExternNP.run,
+                    LibOpContextNP.run,
                     // Everything else is alphabetical, including folders.
                     LibOpBitwiseAndNP.run,
                     LibOpBitwiseOrNP.run,
@@ -583,7 +580,6 @@ library LibAllStandardOpsNP {
                     LibOpShiftBitsLeftNP.run,
                     LibOpShiftBitsRightNP.run,
                     LibOpCallNP.run,
-                    LibOpContextNP.run,
                     LibOpHashNP.run,
                     LibOpERC20AllowanceNP.run,
                     LibOpERC20BalanceOfNP.run,

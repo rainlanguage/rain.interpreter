@@ -21,7 +21,7 @@ contract RainterpreterReferenceExternNPE2StackOperandTest is OpTest {
                 string.concat(
                     "using-words-from ",
                     address(extern).toHexString(),
-                    " _: reference-extern-stack-operand<",
+                    " _: ref-extern-stack-operand<",
                     value.toString(),
                     ">();"
                 )

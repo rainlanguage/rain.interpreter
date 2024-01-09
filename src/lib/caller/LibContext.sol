@@ -12,6 +12,10 @@ import "../../interface/IInterpreterCallerV2.sol";
 /// Thrown when the ith signature from a list of signed contexts is invalid.
 error InvalidSignature(uint256 i);
 
+uint256 constant CONTEXT_BASE_COLUMN = 0;
+uint256 constant CONTEXT_BASE_ROW_SENDER = 0;
+uint256 constant CONTEXT_BASE_ROW_CALLING_CONTRACT = 1;
+
 /// @title LibContext
 /// @notice Conventions for working with context as a calling contract. All of
 /// this functionality is OPTIONAL but probably useful for the majority of use
