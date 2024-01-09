@@ -24,30 +24,30 @@ import {
 /// 1:1 with the number of opcodes provided by the extern component of this
 /// contract. It is possible to subparse words into opcodes that run entirely
 /// within the interpreter, and do not have an associated extern dispatch.
-uint256 constant SUB_PARSER_WORD_PARSERS_LENGTH = 4;
+uint256 constant SUB_PARSER_WORD_PARSERS_LENGTH = 5;
 
 /// @dev Real function pointers to the sub parser functions that produce the
 /// bytecode that this contract knows about. This is both constructing the extern
 /// bytecode that dials back into this contract at eval time, and creating
 /// to things that happen entirely on the interpreter such as well known
 /// constants and references to the context grid.
-bytes constant SUB_PARSER_WORD_PARSERS = hex"0721074407530763";
+bytes constant SUB_PARSER_WORD_PARSERS = hex"07300753076207720783";
 
 /// @dev Real sub parser meta bytes that map parsed strings to the functions that
 /// know how to parse those strings into opcodes for the main parser. Structured
 /// identically to parse meta for the main parser.
 bytes constant SUB_PARSER_PARSE_META =
-    hex"0100000000008000000000000000000000110000000000000000000000000000008000e438fc025be81c0384254101285ca1";
+    hex"0100000000008000000000000000000000110000000000000020000000000000008000e438fc04aafc63025be81c0384254101285ca1";
 
 /// @dev Real function pointers to the operand parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
 /// the rightmost position is a pointer to an operand parser function.
-bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"088208c708820882";
+bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"08ab08f008ab08ab08ab";
 
 /// @dev Real function pointers to the literal parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
 /// the rightmost position is a pointer to a literal parser function.
-bytes constant SUB_PARSER_LITERAL_PARSERS = hex"0853";
+bytes constant SUB_PARSER_LITERAL_PARSERS = hex"087c";
 
 /// @dev The number of literal parsers provided by the sub parser.
 uint256 constant SUB_PARSER_LITERAL_PARSERS_LENGTH = 1;
@@ -77,7 +77,7 @@ error InvalidRepeatCount(uint256 value);
 /// @dev Real function pointers to the opcodes for the extern component of this
 /// contract. These get run at eval time wehen the interpreter calls into the
 /// contract as an `IInterpreterExternV3`.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"0805";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"082e";
 
 /// @dev Number of opcode function pointers available to run at eval time.
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
@@ -86,7 +86,7 @@ uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
 /// of this contract. These get run at deploy time when the main integrity checks
 /// are run, the extern opcode integrity on the deployer will delegate integrity
 /// checks to the extern contract.
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"095c";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0985";
 
 /// @dev Opcode index of the extern increment opcode. Needs to be manually kept
 /// in sync with the extern opcode function pointers. Definitely write tests for
@@ -205,6 +205,25 @@ library LibExternOpContextCallingContractNPE2 {
     }
 }
 
+/// @title LibExternOpContextRainlenNPE2
+/// This is a library that mimics the op libraries elsewhere in this repo, but
+/// structured to fit extern dispatching rather than internal logic. It is NOT
+/// required to use this pattern, of libs outside the implementation contract,
+/// but it MAY be convenient to do so, as the libs can be moved to dedicated
+/// files, easily tested and reviewed directly, etc.
+///
+/// This op is a simple reference to the length of the rainlang bytes. It is
+/// used to demonstrate how to implement context references.
+library LibExternOpContextRainlenNPE2 {
+    /// The sub parser for the extern increment opcode. It has no special logic
+    /// so uses the default sub parser from `LibSubParse`.
+    //slither-disable-next-line dead-code
+    function subParser(uint256, uint256, Operand) internal pure returns (bool, bytes memory, uint256[] memory) {
+        //slither-disable-next-line unused-return
+        return LibSubParse.subParserContext(CONTEXT_BASE_COLUMN + 1, 0);
+    }
+}
+
 /// @title LibParseLiteralRepeat
 /// This is a library that mimics the literal libraries elsewhere in this repo,
 /// but structured to fit sub parsing rather than internal logic. It is NOT
@@ -276,6 +295,10 @@ library LibRainterpreterReferenceExternNPE2 {
             AuthoringMetaV2(
                 "ref-extern-context-contract",
                 "Demonstrates a sugared context reference to the calling contract assuming the standard position in the context grid at <0 1>."
+            ),
+            AuthoringMetaV2(
+                "ref-extern-context-rainlen",
+                "Demonstrates a sugared context reference to the rainlang bytes length assuming the standard position in the context grid at <1 0>."
             )
         ];
         AuthoringMetaV2[] memory wordsDynamic;
@@ -445,6 +468,8 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
                     // Context sender
                     LibParseOperand.handleOperandDisallowed,
                     // Context contract
+                    LibParseOperand.handleOperandDisallowed,
+                    // Context rainlen
                     LibParseOperand.handleOperandDisallowed
                 ];
             uint256[] memory handlersDynamic;
@@ -482,7 +507,8 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
                     LibExternOpIntIncNPE2.subParser,
                     LibExternOpStackOperandNPE2.subParser,
                     LibExternOpContextSenderNPE2.subParser,
-                    LibExternOpContextCallingContractNPE2.subParser
+                    LibExternOpContextCallingContractNPE2.subParser,
+                    LibExternOpContextRainlenNPE2.subParser
                 ];
             uint256[] memory pointersDynamic;
             assembly {
