@@ -2,23 +2,25 @@
 pragma solidity =0.8.19;
 
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
-import {BadDynamicLength} from "../error/ErrOpList.sol";
-import {BaseRainterpreterExternNPE2, Operand} from "../abstract/BaseRainterpreterExternNPE2.sol";
-import {BaseRainterpreterSubParserNPE2} from "../abstract/BaseRainterpreterSubParserNPE2.sol";
-import {LibExtern, EncodedExternDispatch} from "../lib/extern/LibExtern.sol";
-import {IInterpreterExternV3} from "../interface/unstable/IInterpreterExternV3.sol";
-import {LibSubParse} from "../lib/parse/LibSubParse.sol";
-import {AuthoringMetaV2} from "../interface/IParserV1.sol";
-import {LibParseState, ParseState} from "../lib/parse/LibParseState.sol";
-import {LibParseOperand} from "../lib/parse/LibParseOperand.sol";
-import {LibParseLiteral} from "../lib/parse/literal/LibParseLiteral.sol";
-import {COMPATIBLITY_V2} from "../interface/unstable/ISubParserV2.sol";
-import {LibParseLiteralDecimal} from "../lib/parse/literal/LibParseLiteralDecimal.sol";
-import {
-    CONTEXT_BASE_COLUMN,
-    CONTEXT_BASE_ROW_CALLING_CONTRACT,
-    CONTEXT_BASE_ROW_SENDER
-} from "../lib/caller/LibContext.sol";
+import {BadDynamicLength} from "../../error/ErrOpList.sol";
+import {BaseRainterpreterExternNPE2, Operand} from "../../abstract/BaseRainterpreterExternNPE2.sol";
+import {BaseRainterpreterSubParserNPE2} from "../../abstract/BaseRainterpreterSubParserNPE2.sol";
+import {LibExtern, EncodedExternDispatch} from "../../lib/extern/LibExtern.sol";
+import {IInterpreterExternV3} from "../../interface/unstable/IInterpreterExternV3.sol";
+import {LibSubParse} from "../../lib/parse/LibSubParse.sol";
+import {AuthoringMetaV2} from "../../interface/IParserV1.sol";
+import {LibParseState, ParseState} from "../../lib/parse/LibParseState.sol";
+import {LibParseOperand} from "../../lib/parse/LibParseOperand.sol";
+import {LibParseLiteral} from "../../lib/parse/literal/LibParseLiteral.sol";
+import {COMPATIBLITY_V2} from "../../interface/unstable/ISubParserV2.sol";
+import {LibExternOpIntIncNPE2, OP_INDEX_INCREMENT} from "../../lib/extern/reference/op/LibExternOpIntIncNPE2.sol";
+import {LibExternOpStackOperandNPE2} from "../../lib/extern/reference/op/LibExternOpStackOperandNPE2.sol";
+import {LibExternOpContextSenderNPE2} from "../../lib/extern/reference/op/LibExternOpContextSenderNPE2.sol";
+import {LibExternOpContextCallingContractNPE2} from
+    "../../lib/extern/reference/op/LibExternOpContextCallingContractNPE2.sol";
+import {LibExternOpContextRainlenNPE2} from "../../lib/extern/reference/op/LibExternOpContextRainlenNPE2.sol";
+import {LibParseLiteralRepeat} from "../../lib/extern/reference/literal/LibParseLiteralRepeat.sol";
+import {LibParseLiteralDecimal} from "../../lib/parse/literal/LibParseLiteralDecimal.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
 /// 1:1 with the number of opcodes provided by the extern component of this
@@ -42,12 +44,12 @@ bytes constant SUB_PARSER_PARSE_META =
 /// @dev Real function pointers to the operand parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
 /// the rightmost position is a pointer to an operand parser function.
-bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"08ab08f008ab08ab08ab";
+bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"08a208e708a208a208a2";
 
 /// @dev Real function pointers to the literal parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
 /// the rightmost position is a pointer to a literal parser function.
-bytes constant SUB_PARSER_LITERAL_PARSERS = hex"087c";
+bytes constant SUB_PARSER_LITERAL_PARSERS = hex"0873";
 
 /// @dev The number of literal parsers provided by the sub parser.
 uint256 constant SUB_PARSER_LITERAL_PARSERS_LENGTH = 1;
@@ -77,7 +79,7 @@ error InvalidRepeatCount(uint256 value);
 /// @dev Real function pointers to the opcodes for the extern component of this
 /// contract. These get run at eval time wehen the interpreter calls into the
 /// contract as an `IInterpreterExternV3`.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"082e";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"0825";
 
 /// @dev Number of opcode function pointers available to run at eval time.
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
@@ -86,181 +88,7 @@ uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
 /// of this contract. These get run at deploy time when the main integrity checks
 /// are run, the extern opcode integrity on the deployer will delegate integrity
 /// checks to the extern contract.
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0985";
-
-/// @dev Opcode index of the extern increment opcode. Needs to be manually kept
-/// in sync with the extern opcode function pointers. Definitely write tests for
-/// this to ensure a mismatch doesn't happen silently.
-uint256 constant OP_INDEX_INCREMENT = 0;
-
-/// @title LibExternOpIntIncNPE2
-/// This is a library that mimics the op libraries elsewhere in this repo, but
-/// structured to fit extern dispatching rather than internal logic. It is NOT
-/// required to use this pattern, of libs outside the implementation contract,
-/// but it MAY be convenient to do so, as the libs can be moved to dedicated
-/// files, easily tested and reviewed directly, etc.
-///
-/// This op is a simple increment of every input by 1. It is used to demonstrate
-/// handling both multiple inputs and outputs in extern dispatching logic.
-library LibExternOpIntIncNPE2 {
-    /// Running the extern increments every input by 1. By allowing many inputs
-    /// we can test multi input/output logic is implemented correctly for
-    /// externs.
-    //slither-disable-next-line dead-code
-    function run(Operand, uint256[] memory inputs) internal pure returns (uint256[] memory) {
-        for (uint256 i = 0; i < inputs.length; i++) {
-            ++inputs[i];
-        }
-        return inputs;
-    }
-
-    /// The integrity check for the extern increment opcode. The inputs and
-    /// outputs are the same always.
-    //slither-disable-next-line dead-code
-    function integrity(Operand, uint256 inputs, uint256) internal pure returns (uint256, uint256) {
-        return (inputs, inputs);
-    }
-
-    /// The sub parser for the extern increment opcode. It has no special logic
-    /// so uses the default sub parser from `LibSubParse`.
-    //slither-disable-next-line dead-code
-    function subParser(uint256 constantsHeight, uint256 inputsByte, Operand operand)
-        internal
-        view
-        returns (bool, bytes memory, uint256[] memory)
-    {
-        //slither-disable-next-line unused-return
-        return LibSubParse.subParserExtern(
-            IInterpreterExternV3(address(this)),
-            constantsHeight,
-            inputsByte,
-            // Same number of outputs as inputs for inc.
-            inputsByte,
-            operand,
-            OP_INDEX_INCREMENT
-        );
-    }
-}
-
-/// @title LibExternOpStackOperandNPE2
-/// This is a library that mimics the op libraries elsewhere in this repo, but
-/// structured to fit extern dispatching rather than internal logic. It is NOT
-/// required to use this pattern, of libs outside the implementation contract,
-/// but it MAY be convenient to do so, as the libs can be moved to dedicated
-/// files, easily tested and reviewed directly, etc.
-///
-/// This op copies its operand value to the stack by copying it to the constants
-/// array at parse time. This means that it doesn't exist as an externed opcode,
-/// the interpreter will run it directly, therefore it has no `run` or
-/// `integrity` logic, only a sub parser. This demonstrates both how to
-/// implement constants, and handling operands in the sub parser.
-library LibExternOpStackOperandNPE2 {
-    //slither-disable-next-line dead-code
-    function subParser(uint256 constantsHeight, uint256, Operand operand)
-        internal
-        pure
-        returns (bool, bytes memory, uint256[] memory)
-    {
-        //slither-disable-next-line unused-return
-        return LibSubParse.subParserConstant(constantsHeight, Operand.unwrap(operand));
-    }
-}
-
-/// @title LibExternOpContextSenderNPE2
-/// This is a library that mimics the op libraries elsewhere in this repo, but
-/// structured to fit extern dispatching rather than internal logic. It is NOT
-/// required to use this pattern, of libs outside the implementation contract,
-/// but it MAY be convenient to do so, as the libs can be moved to dedicated
-/// files, easily tested and reviewed directly, etc.
-///
-/// This op is a simple reference to the sender of the transaction that called
-/// the interpreter. It is used to demonstrate how to implement context
-/// references.
-library LibExternOpContextSenderNPE2 {
-    /// The sub parser for the extern increment opcode. It has no special logic
-    /// so uses the default sub parser from `LibSubParse`.
-    //slither-disable-next-line dead-code
-    function subParser(uint256, uint256, Operand) internal pure returns (bool, bytes memory, uint256[] memory) {
-        //slither-disable-next-line unused-return
-        return LibSubParse.subParserContext(CONTEXT_BASE_COLUMN, CONTEXT_BASE_ROW_SENDER);
-    }
-}
-
-/// @title LibExternOpContextCallingContractNPE2
-/// This is a library that mimics the op libraries elsewhere in this repo, but
-/// structured to fit extern dispatching rather than internal logic. It is NOT
-/// required to use this pattern, of libs outside the implementation contract,
-/// but it MAY be convenient to do so, as the libs can be moved to dedicated
-/// files, easily tested and reviewed directly, etc.
-///
-/// This op is a simple reference to the contract that called the interpreter.
-/// It is used to demonstrate how to implement context references.
-library LibExternOpContextCallingContractNPE2 {
-    /// The sub parser for the extern increment opcode. It has no special logic
-    /// so uses the default sub parser from `LibSubParse`.
-    //slither-disable-next-line dead-code
-    function subParser(uint256, uint256, Operand) internal pure returns (bool, bytes memory, uint256[] memory) {
-        //slither-disable-next-line unused-return
-        return LibSubParse.subParserContext(CONTEXT_BASE_COLUMN, CONTEXT_BASE_ROW_CALLING_CONTRACT);
-    }
-}
-
-/// @title LibExternOpContextRainlenNPE2
-/// This is a library that mimics the op libraries elsewhere in this repo, but
-/// structured to fit extern dispatching rather than internal logic. It is NOT
-/// required to use this pattern, of libs outside the implementation contract,
-/// but it MAY be convenient to do so, as the libs can be moved to dedicated
-/// files, easily tested and reviewed directly, etc.
-///
-/// This op is a simple reference to the length of the rainlang bytes. It is
-/// used to demonstrate how to implement context references.
-library LibExternOpContextRainlenNPE2 {
-    /// The sub parser for the extern increment opcode. It has no special logic
-    /// so uses the default sub parser from `LibSubParse`.
-    //slither-disable-next-line dead-code
-    function subParser(uint256, uint256, Operand) internal pure returns (bool, bytes memory, uint256[] memory) {
-        //slither-disable-next-line unused-return
-        return LibSubParse.subParserContext(CONTEXT_BASE_COLUMN + 1, 0);
-    }
-}
-
-/// @title LibParseLiteralRepeat
-/// This is a library that mimics the literal libraries elsewhere in this repo,
-/// but structured to fit sub parsing rather than internal logic. It is NOT
-/// required to use this pattern, of libs outside the implementation contract,
-/// but it MAY be convenient to do so, as the libs can be moved to dedicated
-/// files, easily tested and reviewed directly, etc.
-///
-/// This literal parser is a simple repeat literal parser. It is extremely
-/// contrived and serves no real world purpose. It is used to demonstrate how
-/// to implement a literal parser, including extracting a value from the
-/// dispatch data and providing it to the parser.
-///
-/// The repeat literal parser takes a single digit as input, and repeats that
-/// digit for every byte in the literal.
-/// ```
-/// /* 000 */
-/// [ref-extern-repeat-0 abc]
-/// /* 111 */
-/// [ref-extern-repeat-1 cde]
-/// /* 222 */
-/// [ref-extern-repeat-2 zzz]
-/// /* 333 */
-/// [ref-extern-repeat-3 123]
-/// ```
-library LibParseLiteralRepeat {
-    //slither-disable-next-line dead-code
-    function parseRepeat(uint256 dispatchValue, uint256 cursor, uint256 end) internal pure returns (uint256) {
-        unchecked {
-            uint256 value;
-            uint256 length = end - cursor;
-            for (uint256 i = 0; i < length; ++i) {
-                value += dispatchValue * 10 ** i;
-            }
-            return value;
-        }
-    }
-}
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"097c";
 
 /// @title LibRainterpreterReferenceExternNPE2
 /// This library allows code SEPARATE FROM the implementation contract to do

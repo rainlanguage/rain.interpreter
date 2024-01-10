@@ -2,7 +2,7 @@
 pragma solidity =0.8.19;
 
 import {OpTest} from "test/util/abstract/OpTest.sol";
-import {RainterpreterReferenceExternNPE2} from "src/concrete/RainterpreterReferenceExternNPE2.sol";
+import {RainterpreterReferenceExternNPE2} from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 
 contract RainterpreterReferenceExternNPE2StackOperandTest is OpTest {

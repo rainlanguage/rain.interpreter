@@ -6,7 +6,7 @@ import {Test} from "forge-std/Test.sol";
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 import {IInterpreterExternV3} from "src/interface/unstable/IInterpreterExternV3.sol";
 import {ISubParserV2} from "src/interface/unstable/ISubParserV2.sol";
-import {RainterpreterReferenceExternNPE2} from "src/concrete/RainterpreterReferenceExternNPE2.sol";
+import {RainterpreterReferenceExternNPE2} from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
 
 contract RainterpreterReferenceExternNPE2IERC165Test is Test {
     /// Test that ERC165 is implemented for the reference extern contract.

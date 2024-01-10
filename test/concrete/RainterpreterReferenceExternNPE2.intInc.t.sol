@@ -8,7 +8,7 @@ import {
     INTEGRITY_FUNCTION_POINTERS,
     OP_INDEX_INCREMENT,
     LibExternOpIntIncNPE2
-} from "src/concrete/RainterpreterReferenceExternNPE2.sol";
+} from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
 import {
     ExternDispatch,
     EncodedExternDispatch,
