@@ -2,7 +2,7 @@
 pragma solidity =0.8.19;
 
 import {OpTest} from "test/util/abstract/OpTest.sol";
-import {RainterpreterReferenceExternNPE2} from "src/concrete/RainterpreterReferenceExternNPE2.sol";
+import {RainterpreterReferenceExternNPE2} from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 
 contract RainterpreterReferenceExternNPE2RepeatTest is OpTest {
@@ -16,14 +16,10 @@ contract RainterpreterReferenceExternNPE2RepeatTest is OpTest {
         expectedStack[0] = 999;
 
         checkHappy(
-            bytes(string.concat(baseStr, "nineninenine: [reference-extern-repeat-9 abc];")),
-            expectedStack,
-            "repeat 9 abc"
+            bytes(string.concat(baseStr, "nineninenine: [ref-extern-repeat-9 abc];")), expectedStack, "repeat 9 abc"
         );
 
         expectedStack[0] = 88;
-        checkHappy(
-            bytes(string.concat(baseStr, "eighteight: [reference-extern-repeat-8 zz];")), expectedStack, "repeat 8 zz"
-        );
+        checkHappy(bytes(string.concat(baseStr, "eighteight: [ref-extern-repeat-8 zz];")), expectedStack, "repeat 8 zz");
     }
 }

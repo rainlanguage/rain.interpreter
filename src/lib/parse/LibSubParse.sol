@@ -2,7 +2,13 @@
 pragma solidity ^0.8.18;
 
 import {LibParseState, ParseState} from "./LibParseState.sol";
-import {OPCODE_UNKNOWN, OPCODE_EXTERN, OPCODE_CONSTANT, Operand} from "../../interface/unstable/IInterpreterV2.sol";
+import {
+    OPCODE_UNKNOWN,
+    OPCODE_EXTERN,
+    OPCODE_CONSTANT,
+    OPCODE_CONTEXT,
+    Operand
+} from "../../interface/unstable/IInterpreterV2.sol";
 import {LibBytecode, Pointer} from "../bytecode/LibBytecode.sol";
 import {ISubParserV2, COMPATIBLITY_V2} from "../../interface/unstable/ISubParserV2.sol";
 import {BadSubParserResult, UnknownWord, UnsupportedLiteralType} from "../../error/ErrParse.sol";
@@ -15,6 +21,44 @@ import {LibParseError} from "./LibParseError.sol";
 library LibSubParse {
     using LibParseState for ParseState;
     using LibParseError for ParseState;
+
+    /// Sub parse a word into a context grid position.
+    function subParserContext(uint256 column, uint256 row)
+        internal
+        pure
+        returns (bool, bytes memory, uint256[] memory)
+    {
+        bytes memory bytecode;
+        uint256 opIndex = OPCODE_CONTEXT;
+        assembly ("memory-safe") {
+            // Allocate the bytecode.
+            // This is an UNALIGNED allocation.
+            bytecode := mload(0x40)
+            mstore(0x40, add(bytecode, 0x24))
+
+            // The caller is responsible for ensuring the column and row are
+            // within `uint8`.
+            mstore8(add(bytecode, 0x23), column)
+            mstore8(add(bytecode, 0x22), row)
+
+            // 0 inputs.
+            mstore8(add(bytecode, 0x21), 0)
+
+            mstore8(add(bytecode, 0x20), opIndex)
+
+            // Write the length of the bytes.
+            mstore(bytecode, 4)
+        }
+
+        uint256[] memory constants;
+        assembly ("memory-safe") {
+            constants := mload(0x40)
+            mstore(0x40, add(constants, 0x20))
+            mstore(constants, 0)
+        }
+
+        return (true, bytecode, constants);
+    }
 
     /// Sub parse a value into the bytecode that will run on the interpreter to
     /// push the given value onto the stack, using the constant opcode at eval.

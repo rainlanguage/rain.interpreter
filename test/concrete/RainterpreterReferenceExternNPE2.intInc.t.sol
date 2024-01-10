@@ -8,7 +8,7 @@ import {
     INTEGRITY_FUNCTION_POINTERS,
     OP_INDEX_INCREMENT,
     LibExternOpIntIncNPE2
-} from "src/concrete/RainterpreterReferenceExternNPE2.sol";
+} from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
 import {
     ExternDispatch,
     EncodedExternDispatch,
@@ -61,9 +61,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
 
         checkHappy(
             bytes(
-                string.concat(
-                    "using-words-from ", address(extern).toHexString(), " three four: reference-extern-inc(2 3);"
-                )
+                string.concat("using-words-from ", address(extern).toHexString(), " three four: ref-extern-inc(2 3);")
             ),
             expectedStack,
             "sugared inc 2 3 = 3 4"
@@ -76,7 +74,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
         constantsHeight = uint16(bound(constantsHeight, 0, 0xFF));
         RainterpreterReferenceExternNPE2 subParser = new RainterpreterReferenceExternNPE2();
 
-        bytes memory wordToParse = bytes("reference-extern-inc");
+        bytes memory wordToParse = bytes("ref-extern-inc");
         (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParseWord(
             COMPATIBLITY_V2,
             bytes.concat(bytes2(constantsHeight), ioByte, bytes2(uint16(wordToParse.length)), wordToParse, bytes32(0))
@@ -114,7 +112,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
         bytes1 ioByte,
         bytes memory unknownWord
     ) external {
-        vm.assume(keccak256(unknownWord) != keccak256("reference-extern-inc"));
+        vm.assume(keccak256(unknownWord) != keccak256("ref-extern-inc"));
         vm.assume(unknownWord.length < 32);
         // Extern "only" supports up to constant height of 0xFF.
         constantsHeight = uint16(bound(constantsHeight, 0, 0xFF));
@@ -141,7 +139,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
         vm.expectRevert(
             abi.encodeWithSelector(ExternDispatchConstantsHeightOverflow.selector, uint256(constantsHeight))
         );
-        bytes memory word = bytes("reference-extern-inc");
+        bytes memory word = bytes("ref-extern-inc");
         (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParseWord(
             COMPATIBLITY_V2,
             bytes.concat(bytes2(constantsHeight), ioByte, bytes2(uint16(word.length)), word, bytes32(0))

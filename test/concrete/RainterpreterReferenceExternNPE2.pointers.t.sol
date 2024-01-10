@@ -12,7 +12,7 @@ import {
     SUB_PARSER_OPERAND_HANDLERS,
     LibRainterpreterReferenceExternNPE2,
     SUB_PARSER_LITERAL_PARSERS
-} from "src/concrete/RainterpreterReferenceExternNPE2.sol";
+} from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 
 contract RainterpreterReferenceExternNPE2PointersTest is Test {

@@ -2,32 +2,28 @@
 pragma solidity =0.8.19;
 
 import {OpTest} from "test/util/abstract/OpTest.sol";
-import {RainterpreterReferenceExternNPE2} from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
+import {RainterpreterReferenceExternNPE2} from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
 
-contract RainterpreterReferenceExternNPE2StackOperandTest is OpTest {
+contract RainterpreterReferenceExternNPE2ContextSenderTest is OpTest {
     using Strings for address;
-    using Strings for uint256;
 
-    function testRainterpreterReferenceExternNPE2StackOperandSingle(uint256 value) external {
-        value = bound(value, 0, type(uint16).max);
+    function testRainterpreterReferenceExterNPE2ContextSenderHappy() external {
         RainterpreterReferenceExternNPE2 extern = new RainterpreterReferenceExternNPE2();
 
         uint256[] memory expectedStack = new uint256[](1);
-        expectedStack[0] = value;
+        expectedStack[0] = uint256(uint160(address(this)));
 
         checkHappy(
             bytes(
                 string.concat(
                     "using-words-from ",
                     address(extern).toHexString(),
-                    " _: ref-extern-stack-operand<",
-                    value.toString(),
-                    ">();"
+                    " calling-contract: ref-extern-context-contract();"
                 )
             ),
             expectedStack,
-            "stack operand"
+            "calling-contract"
         );
     }
 }
