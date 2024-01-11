@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {ParseState} from "src/lib/parse/LibParseState.sol";
+import {ParseState} from "../LibParseState.sol";
 import {
-    MalformedHexLiteral, OddLengthHexLiteral, ZeroLengthHexLiteral, HexLiteralOverflow
-} from "src/error/ErrParse.sol";
-import {
-    CMASK_UPPER_ALPHA_A_F, CMASK_LOWER_ALPHA_A_F, CMASK_NUMERIC_0_9, CMASK_HEX
-} from "src/lib/parse/LibParseCMask.sol";
+    MalformedHexLiteral,
+    OddLengthHexLiteral,
+    ZeroLengthHexLiteral,
+    HexLiteralOverflow
+} from "../../../error/ErrParse.sol";
+import {CMASK_UPPER_ALPHA_A_F, CMASK_LOWER_ALPHA_A_F, CMASK_NUMERIC_0_9, CMASK_HEX} from "../LibParseCMask.sol";
 import {LibParseError} from "../LibParseError.sol";
 
 library LibParseLiteralHex {
