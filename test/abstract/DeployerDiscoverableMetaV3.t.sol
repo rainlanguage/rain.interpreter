@@ -2,8 +2,8 @@
 pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
-import {UnexpectedMetaHash, META_MAGIC_NUMBER_V1, NotRainMetaV1} from "rain.metadata/src/interface/IMetaV1.sol";
-import {LibMeta} from "rain.metadata/src/lib/LibMeta.sol";
+import {UnexpectedMetaHash, META_MAGIC_NUMBER_V1, NotRainMetaV1} from "rain.metadata/interface/IMetaV1.sol";
+import {LibMeta} from "rain.metadata/lib/LibMeta.sol";
 
 import {IExpressionDeployerV3} from "src/interface/unstable/IExpressionDeployerV3.sol";
 import {
