@@ -3,9 +3,7 @@ pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
-import {
-    BaseRainterpreterSubParserNPE2, COMPATIBLITY_V2
-} from "src/abstract/BaseRainterpreterSubParserNPE2.sol";
+import {BaseRainterpreterSubParserNPE2, COMPATIBLITY_V2} from "src/abstract/BaseRainterpreterSubParserNPE2.sol";
 import {ISubParserV2} from "src/interface/unstable/ISubParserV2.sol";
 import {IncompatibleSubParser} from "src/error/ErrSubParse.sol";
 
