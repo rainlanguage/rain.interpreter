@@ -14,7 +14,7 @@ import {IntegrityCheckStateNP, LibIntegrityCheckNP} from "../../../src/lib/integ
 
 import {LibContext} from "../../../src/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "../../../src/error/ErrParse.sol";
-import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {BadOpInputsLength} from "../../../src/lib/integrity/LibIntegrityCheckNP.sol";
 import {Operand, IInterpreterV2, SourceIndexV2} from "../../../src/interface/unstable/IInterpreterV2.sol";
 import {
     IInterpreterStoreV1,
