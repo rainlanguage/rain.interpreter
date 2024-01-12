@@ -162,7 +162,13 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV2 {
     /// to be overridden, as the function pointers and metadata bytes are all
     /// that need to be changed to implement a new subparser.
     /// @inheritdoc ISubParserV2
-    function subParseLiteral(bytes32 compatibility, bytes memory data) onlyCompatible(compatibility) external pure virtual returns (bool, uint256) {
+    function subParseLiteral(bytes32 compatibility, bytes memory data)
+        external
+        pure
+        virtual
+        onlyCompatible(compatibility)
+        returns (bool, uint256)
+    {
         (uint256 dispatchStart, uint256 bodyStart, uint256 bodyEnd) = LibSubParse.consumeSubParseLiteralInputData(data);
 
         (bool success, uint256 index, uint256 dispatchValue) = matchSubParseLiteralDispatch(dispatchStart, bodyStart);
@@ -188,10 +194,10 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV2 {
     /// that need to be changed to implement a new subparser.
     /// @inheritdoc ISubParserV2
     function subParseWord(bytes32 compatibility, bytes memory data)
-        onlyCompatible(compatibility)
         external
         pure
         virtual
+        onlyCompatible(compatibility)
         returns (bool, bytes memory, uint256[] memory)
     {
         (uint256 constantsHeight, uint256 ioByte, ParseState memory state) =
