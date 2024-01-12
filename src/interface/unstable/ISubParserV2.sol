@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
+// Reexport this for implementations to use.
+import {AuthoringMetaV2} from "../IParserV1.sol";
+
 /// @dev A compatibility version for the subparser interface.
 ///
 /// ## Literal parsing
