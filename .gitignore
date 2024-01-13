@@ -5,3 +5,6 @@ result
 meta
 target
 docs
+
+# This is for our deploy scripts that report the addresses of deployed contracts
+deployments
