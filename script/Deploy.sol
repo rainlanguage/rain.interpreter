@@ -21,20 +21,20 @@ contract Deploy is Script {
         vm.startBroadcast(deployerPrivateKey);
 
         RainterpreterParserNPE2 parser = new RainterpreterParserNPE2();
-        vm.writeFile("deployments/latest/RainterpreterParserNPE2", address(parser));
+        vm.writeFile("deployments/latest/RainterpreterParserNPE2", vm.toString(address(parser)));
 
         RainterpreterStoreNPE2 store = new RainterpreterStoreNPE2();
-        vm.writeFile("deployments/latest/RainterpreterStoreNPE2", address(store));
+        vm.writeFile("deployments/latest/RainterpreterStoreNPE2", vm.toString(address(store)));
 
         RainterpreterNPE2 interpreter = new RainterpreterNPE2();
-        vm.writeFile("deployments/latest/RainterpreterNPE2", address(interpreter));
+        vm.writeFile("deployments/latest/RainterpreterNPE2", vm.toString(address(interpreter)));
 
         RainterpreterExpressionDeployerNPE2 deployer = new RainterpreterExpressionDeployerNPE2(
             RainterpreterExpressionDeployerNPE2ConstructionConfig(
                 address(interpreter), address(store), address(parser), constructionMeta
             )
         );
-        vm.writeFile("deployments/latest/RainterpreterExpressionDeployerNPE2", address(deployer));
+        vm.writeFile("deployments/latest/RainterpreterExpressionDeployerNPE2", vm.toString(address(deployer)));
 
         vm.stopBroadcast();
     }
