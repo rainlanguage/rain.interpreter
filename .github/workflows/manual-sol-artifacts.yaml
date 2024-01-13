@@ -19,7 +19,7 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@v2
 
       - run: nix run .#rainix-prelude
-      - run: nix run .#build-dispair-meta
+      - run: nix run .#i9r-prelude
       - run: nix run .#rainix-sol-artifacts
         env:
           ETH_RPC_URL: ${{ inputs.network == 'polygon' && secrets.CI_DEPLOY_POLYGON_RPC_URL || secrets.CI_DEPLOY_RPC_URL }}

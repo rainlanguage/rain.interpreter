@@ -29,8 +29,7 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@v2
 
       - run: nix run .#rainix-prelude
-      # Local step to build the meta needed for DISPair construction.
-      - run: nix run .#build-dispair-meta
+      - run: nix run .#i9r-prelude
       - name: Run ${{ matrix.task }}
         env:
           ETH_RPC_URL: ${{ secrets.CI_DEPLOY_RPC_URL }}
