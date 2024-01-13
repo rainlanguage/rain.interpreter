@@ -21,7 +21,13 @@ optimizer_runs = 1000000
 bytecode_hash = "none"
 cbor_metadata = false
 
-fs_permissions = [{ access = "read-write", path = "./meta"}]
+fs_permissions = [
+    { access = "read-write", path = "./meta" },
+    { access = "write", path = "./deployments/latest/RainterpreterParserNPE2" },
+    { access = "write", path = "./deployments/latest/RainterpreterStoreNPE2" },
+    { access = "write", path = "./deployments/latest/RainterpreterNPE2" },
+    { access = "write", path = "./deployments/latest/RainterpreterExpressionDeployerNPE2" }
+]
 
 remappings = [
     # The auto remapping wasn't appending /src/ for some reason.
