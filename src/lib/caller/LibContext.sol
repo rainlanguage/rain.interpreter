@@ -13,6 +13,8 @@ import "../../interface/IInterpreterCallerV2.sol";
 error InvalidSignature(uint256 i);
 
 uint256 constant CONTEXT_BASE_COLUMN = 0;
+uint256 constant CONTEXT_BASE_ROWS = 2;
+
 uint256 constant CONTEXT_BASE_ROW_SENDER = 0;
 uint256 constant CONTEXT_BASE_ROW_CALLING_CONTRACT = 1;
 
