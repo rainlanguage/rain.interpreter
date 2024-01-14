@@ -185,18 +185,15 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         opReferenceCheckExpectations(state, operand, referenceFn, pointers, inputs, calcOutputs);
     }
 
-    function parseAndEval(bytes memory rainString) internal returns (uint256[] memory, uint256[] memory) {
+    function parseAndEval(bytes memory rainString, uint256[][] memory context)
+        internal
+        returns (uint256[] memory, uint256[] memory)
+    {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (io);
 
-        // Put something in the caller context, in case we want to read it.
-        uint256[][] memory callerContext = new uint256[][](1);
-        callerContext[0] = new uint256[](1);
-        callerContext[0][0] = rainString.length;
-
-        uint256[][] memory context = LibContext.build(callerContext, new SignedContextV1[](0));
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
@@ -207,16 +204,29 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         return (stack, kvs);
     }
 
-    function checkHappy(bytes memory rainString, uint256 expectedValue, string memory errString) internal {
-        (uint256[] memory stack, uint256[] memory kvs) = parseAndEval(rainString);
+    /// 90%+ of the time we don't need to pass a context. This overloads a
+    /// simplified interface to parse and eval.
+    function parseAndEval(bytes memory rainString) internal returns (uint256[] memory, uint256[] memory) {
+        return parseAndEval(rainString, LibContext.build(new uint256[][](0), new SignedContextV1[](0)));
+    }
 
-        assertEq(stack.length, 1);
-        assertEq(stack[0], expectedValue, errString);
-        assertEq(kvs.length, 0);
+    function checkHappy(bytes memory rainString, uint256 expectedValue, string memory errString) internal {
+        uint256[] memory expectedStack = new uint256[](1);
+        expectedStack[0] = expectedValue;
+        checkHappy(rainString, expectedStack, errString);
     }
 
     function checkHappy(bytes memory rainString, uint256[] memory expectedStack, string memory errString) internal {
-        (uint256[] memory stack, uint256[] memory kvs) = parseAndEval(rainString);
+        checkHappy(rainString, LibContext.build(new uint256[][](0), new SignedContextV1[](0)), expectedStack, errString);
+    }
+
+    function checkHappy(
+        bytes memory rainString,
+        uint256[][] memory context,
+        uint256[] memory expectedStack,
+        string memory errString
+    ) internal {
+        (uint256[] memory stack, uint256[] memory kvs) = parseAndEval(rainString, context);
 
         assertEq(stack.length, expectedStack.length, errString);
         for (uint256 i = 0; i < expectedStack.length; i++) {
