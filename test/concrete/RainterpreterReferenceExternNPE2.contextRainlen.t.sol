@@ -4,6 +4,8 @@ pragma solidity =0.8.19;
 import {OpTest} from "test/util/abstract/OpTest.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {RainterpreterReferenceExternNPE2} from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
+import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+import {LibContext} from "src/lib/caller/LibContext.sol";
 
 contract RainterpreterReferenceExternNPE2ContextRainlenTest is OpTest {
     using Strings for address;
@@ -18,6 +20,10 @@ contract RainterpreterReferenceExternNPE2ContextRainlenTest is OpTest {
         uint256[] memory expectedStack = new uint256[](1);
         expectedStack[0] = rainlang.length;
 
-        checkHappy(rainlang, expectedStack, "rainlen");
+        uint256[][] memory callerContext = new uint256[][](1);
+        callerContext[0] = new uint256[](1);
+        callerContext[0][0] = rainlang.length;
+
+        checkHappy(rainlang, LibContext.build(callerContext, new SignedContextV1[](0)), expectedStack, "rainlen");
     }
 }
