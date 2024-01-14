@@ -185,7 +185,10 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         opReferenceCheckExpectations(state, operand, referenceFn, pointers, inputs, calcOutputs);
     }
 
-    function parseAndEval(bytes memory rainString, uint256[][] memory context) internal returns (uint256[] memory, uint256[] memory) {
+    function parseAndEval(bytes memory rainString, uint256[][] memory context)
+        internal
+        returns (uint256[] memory, uint256[] memory)
+    {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
@@ -214,15 +217,15 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     }
 
     function checkHappy(bytes memory rainString, uint256[] memory expectedStack, string memory errString) internal {
-        checkHappy(
-            rainString,
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            expectedStack,
-            errString
-        );
+        checkHappy(rainString, LibContext.build(new uint256[][](0), new SignedContextV1[](0)), expectedStack, errString);
     }
 
-    function checkHappy(bytes memory rainString, uint256[][] memory context, uint256[] memory expectedStack, string memory errString) internal {
+    function checkHappy(
+        bytes memory rainString,
+        uint256[][] memory context,
+        uint256[] memory expectedStack,
+        string memory errString
+    ) internal {
         (uint256[] memory stack, uint256[] memory kvs) = parseAndEval(rainString, context);
 
         assertEq(stack.length, expectedStack.length, errString);
