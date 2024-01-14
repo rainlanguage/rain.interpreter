@@ -160,6 +160,23 @@ library LibParseOperand {
         }
     }
 
+    /// There must be exactly one value. There is no default fallback.
+    function handleOperandSingleFullNoDefault(uint256[] memory values) internal pure returns (Operand operand) {
+        // Happy path at the top for efficiency.
+        if (values.length == 1) {
+            assembly ("memory-safe") {
+                operand := mload(add(values, 0x20))
+            }
+            if (Operand.unwrap(operand) > uint256(type(uint16).max)) {
+                revert OperandOverflow();
+            }
+        } else if (values.length == 0) {
+            revert ExpectedOperand();
+        } else {
+            revert UnexpectedOperandValue();
+        }
+    }
+
     /// There must be exactly two values. There is no default fallback. Each
     /// value MUST fit in one byte and is used as is.
     function handleOperandDoublePerByteNoDefault(uint256[] memory values) internal pure returns (Operand operand) {
