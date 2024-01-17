@@ -18,3 +18,11 @@ sol!(
     IExpressionDeployerV3,
     "../../out/IExpressionDeployerV3.sol/IExpressionDeployerV3.json"
 );
+sol! {
+    #![sol(all_derives = true)]
+    interface  DeployerISP {
+        function iInterpreter() public view returns(address);
+        function iStore() public view returns(address);
+        function iParser() public view returns(address);
+    }
+}

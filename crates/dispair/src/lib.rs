@@ -1,33 +1,58 @@
-use rain_interpreter_bindings::{
-    IExpressionDeployerV3, IInterpreterStoreV1, IInterpreterV2, IParserV1,
-};
+use alloy_ethers_typecast::transaction::{ReadContractParametersBuilder, ReadableClientHttp};
+use alloy_primitives::*;
+use anyhow::*;
+use rain_interpreter_bindings::DeployerISP;
 
 /// DISPair
 /// Struct representing DISP instances.
+#[derive(Clone, Default)]
 pub struct DISPair {
-    pub deployer: IExpressionDeployerV3,
-    pub interpreter: IInterpreterV2<Provider<Http>>,
-    pub store: IInterpreterStoreV1<Provider<Http>>,
-    pub parser: IParserV1<Provider<Http>>,
+    pub deployer: Address,
+    pub interpreter: Address,
+    pub store: Address,
+    pub parser: Address,
 }
 
-/// Implementation to build DISPair from Deployer instance.
-impl IExpressionDeployerV {
-    pub async fn try_build_dispair(&self) -> Result<DISPair, ContractError<Provider<Http>>> {
-        Ok(DISPair {
-            deployer: self.clone(),
-            interpreter: IInterpreterV2::new(
-                H160::from(self.i_interpreter().call().await?.to_fixed_bytes()),
-                self.client().clone(),
-            ),
-            store: IInterpreterStoreV1::new(
-                H160::from(self.i_store().call().await?.to_fixed_bytes()),
-                self.client().clone(),
-            ),
-            parser: IParserV1::new(
-                H160::from(self.i_parser().call().await?.to_fixed_bytes()),
-                self.client().clone(),
-            ),
-        })
+/// Implementation to build DISPair from Deployer address.
+impl DISPair {
+    pub async fn from_deployer(
+        deployer: Address,
+        client: ReadableClientHttp,
+    ) -> anyhow::Result<Self> {
+        let mut dispair = Self::default();
+
+        dispair.deployer = deployer;
+
+        dispair.interpreter = client
+            .read(
+                ReadContractParametersBuilder::default()
+                    .address(deployer)
+                    .call(DeployerISP::iInterpreterCall {})
+                    .build()?,
+            )
+            .await?
+            ._0;
+
+        dispair.store = client
+            .read(
+                ReadContractParametersBuilder::default()
+                    .address(deployer)
+                    .call(DeployerISP::iStoreCall {})
+                    .build()?,
+            )
+            .await?
+            ._0;
+
+        dispair.parser = client
+            .read(
+                ReadContractParametersBuilder::default()
+                    .address(deployer)
+                    .call(DeployerISP::iParserCall {})
+                    .build()?,
+            )
+            .await?
+            ._0;
+
+        Ok(dispair)
     }
 }
