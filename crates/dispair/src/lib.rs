@@ -19,40 +19,35 @@ impl DISPair {
         deployer: Address,
         client: ReadableClientHttp,
     ) -> anyhow::Result<Self> {
-        let mut dispair = Self::default();
-
-        dispair.deployer = deployer;
-
-        dispair.interpreter = client
-            .read(
-                ReadContractParametersBuilder::default()
-                    .address(deployer)
-                    .call(DeployerISP::iInterpreterCall {})
-                    .build()?,
-            )
-            .await?
-            ._0;
-
-        dispair.store = client
-            .read(
-                ReadContractParametersBuilder::default()
-                    .address(deployer)
-                    .call(DeployerISP::iStoreCall {})
-                    .build()?,
-            )
-            .await?
-            ._0;
-
-        dispair.parser = client
-            .read(
-                ReadContractParametersBuilder::default()
-                    .address(deployer)
-                    .call(DeployerISP::iParserCall {})
-                    .build()?,
-            )
-            .await?
-            ._0;
-
-        Ok(dispair)
+        Ok(DISPair {
+            deployer,
+            interpreter: client
+                .read(
+                    ReadContractParametersBuilder::default()
+                        .address(deployer)
+                        .call(DeployerISP::iInterpreterCall {})
+                        .build()?,
+                )
+                .await?
+                ._0,
+            store: client
+                .read(
+                    ReadContractParametersBuilder::default()
+                        .address(deployer)
+                        .call(DeployerISP::iStoreCall {})
+                        .build()?,
+                )
+                .await?
+                ._0,
+            parser: client
+                .read(
+                    ReadContractParametersBuilder::default()
+                        .address(deployer)
+                        .call(DeployerISP::iParserCall {})
+                        .build()?,
+                )
+                .await?
+                ._0,
+        })
     }
 }
