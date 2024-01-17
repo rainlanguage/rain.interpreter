@@ -1,3 +1,8 @@
 [workspace]
-members = ["interpreter-rs"]
+members = ["crates/*"]
 resolver = "2"
+
+[workspace.package]
+edition = "2021"
+license = "CAL-1.0"
+homepage = "https://github.com/rainprotocol/rain.interpreter"

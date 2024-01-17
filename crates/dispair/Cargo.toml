@@ -1,5 +1,5 @@
 [package]
-name = "interpreter-rs"
+name = "rain_interpreter_dispair"
 version = "0.1.0"
 edition = "2021"
 license = "CAL-1.0"
@@ -7,10 +7,12 @@ description = "Rain Interpreter Rust Crate."
 homepage = "https://github.com/rainlanguage/rain.interpreter"
 
 [dependencies]
+alloy-ethers-typecast = { git = "https://github.com/rainlanguage/alloy-ethers-typecast", rev = "d35a8e08ef240c4a66177f6de4e1de6fcb165b5f" }
+rain_interpreter_bindings = { path = "../bindings" }
 serde = "1.0"
 serde_json = "1.0"
 tokio = { version = "1.28.0", features = ["full"] }
-ethers = { version = "2.0", features = ["legacy"] }
+alloy-primitives = "0.5.4"
 
 [package.metadata.docs.rs]
 all-features = true
