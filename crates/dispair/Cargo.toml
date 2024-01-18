@@ -7,7 +7,7 @@ description = "Rain Interpreter Rust Crate."
 homepage = "https://github.com/rainlanguage/rain.interpreter"
 
 [dependencies]
-alloy-ethers-typecast = { git = "https://github.com/rainlanguage/alloy-ethers-typecast", rev = "c4a726ea244a43bbd7c0d023ce11b82a60a392eb" }
+alloy-ethers-typecast = { git = "https://github.com/rainlanguage/alloy-ethers-typecast", rev = "366a8d333c876b31891ec01b15b62e8294340410" }
 rain_interpreter_bindings = { path = "../bindings" }
 serde = "1.0.195"
 serde_json = "1.0.111"
@@ -15,6 +15,9 @@ tokio = { version = "1.28.0", features = ["full"] }
 alloy-primitives = "0.5.4"
 alloy-sol-types = { version = "0.5.4" }
 anyhow = "1.0.70"
+ethers = { version = "2.0", features = ["legacy"] }
+tracing = "0.1.37"
+tracing-subscriber = "0.3.18"
 
 [package.metadata.docs.rs]
 all-features = true
