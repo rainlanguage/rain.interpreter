@@ -2693,6 +2693,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "rain_interpreter_parser"
+version = "0.1.0"
+dependencies = [
+ "alloy-ethers-typecast",
+ "alloy-primitives",
+ "alloy-sol-types",
+ "anyhow",
+ "ethers",
+ "rain_interpreter_bindings",
+ "rain_interpreter_dispair",
+ "serde",
+ "serde_json",
+ "tokio",
+]
+
+[[package]]
 name = "rand"
 version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"

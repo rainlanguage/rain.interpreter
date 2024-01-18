@@ -1,25 +1,31 @@
 use alloy_ethers_typecast::transaction::{ReadContractParametersBuilder, ReadableClient};
 use alloy_primitives::*;
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use ethers::providers::JsonRpcClient;
-use rain_interpreter_bindings::IParserV1;
+use rain_interpreter_bindings::IParserV1::*;
 use rain_interpreter_dispair::DISPair;
 
 pub trait Parser {
-  /// Call Parser contract to parse the provided rainlang text.
-  pub async fn parse_text(&self, rainlang: String) -> Result<Parse> {
-    self.parse(text.as_bytes())
-  }
+    /// Call Parser contract to parse the provided rainlang text.
+    fn parse_text<T: JsonRpcClient>(
+        &self,
+        text: &str,
+        client: ReadableClient<T>,
+    ) -> impl std::future::Future<Output = Result<parseReturn>> + Send
+    where
+        Self: Sync,
+    {
+        self.parse(text.as_bytes().to_vec(), client)
+    }
 
-  /// Call Parser contract to parse the provided data
-  /// The provided data must contain valid UTF-8 encoding of valid rainlang text.
-  pub async fn parse(
-    &self,
-    data: Vec<u8>
-    client: ReadableClient<T>,
-  ) -> Result<Parse>;
+    /// Call Parser contract to parse the provided data
+    /// The provided data must contain valid UTF-8 encoding of valid rainlang text.
+    fn parse<T: JsonRpcClient>(
+        &self,
+        data: Vec<u8>,
+        client: ReadableClient<T>,
+    ) -> impl std::future::Future<Output = Result<parseReturn>> + Send;
 }
-
 /// ParserV1
 /// Struct representing ParserV1 instances.
 #[derive(Clone, Default)]
@@ -36,142 +42,103 @@ impl From<DISPair> for ParserV1 {
 }
 
 impl Parser for ParserV1 {
-    pub async fn parse(
-      &self,
-      data: Vec<u8>
-      client: ReadableClient<T>,
-    ) -> Result<Parse> {
-        Ok(
-          client
+    async fn parse<T: JsonRpcClient>(
+        &self,
+        data: Vec<u8>,
+        client: ReadableClient<T>,
+    ) -> Result<parseReturn> {
+        client
             .read(
                 ReadContractParametersBuilder::default()
                     .address(self.address)
-                    .call(ParserV1 {
-                      data
-                    })
+                    .call(parseCall { data })
                     .build()?,
             )
-            .await?
-            ._0
-          )
+            .await
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloy_primitives::Address;
+    use alloy_primitives::{Address, U256};
     use ethers::providers::{MockProvider, MockResponse, Provider};
-    use serde_json::json;
-    use tracing_subscriber::FmtSubscriber;
 
     #[tokio::test]
-    async fn test_from_dispair() -> Result<(), Error> {
-        setup_tracing();
-
-        let parser_address = "1234567890123456789012345678901234567893";
+    async fn test_from_dispair() -> Result<()> {
+        let parser_address = Address::repeat_byte(0x4);
 
         let dispair = DISPair {
-          deployer: "",
-          interpreter: "",
-          store: "",
-          parser: parser_address
+            deployer: Address::repeat_byte(0x1),
+            interpreter: Address::repeat_byte(0x2),
+            store: Address::repeat_byte(0x3),
+            parser: parser_address,
         };
 
-        let parser: ParserV1 = DISPair.into();
+        let parser: ParserV1 = dispair.clone().into();
 
         assert_eq!(parser.address, dispair.parser);
-        assert_eq!(parser.address, parser_address.parse::<Address>()?);
+        assert_eq!(parser.address, parser_address);
         Ok(())
     }
 
     #[tokio::test]
-    async fn test_parse() -> Result<(), Error> {
-        setup_tracing();
-
-        // @todo add expected bytecode and constant values
-        // Mock responses for the read calls - the responses will be popped off
-        // the stack in the reverse order they are pushed on.
+    async fn test_parse() -> Result<()> {
         let transport = MockProvider::default();
-        transport.push_response(MockResponse::Value(json!(
-          ("bytecode", "constants")
+        transport.push_response(MockResponse::Value(serde_json::Value::String(
+            vec![
+                "0x0000000000000000000000000000000000000000000000000000000000000040", // offset to start of bytecode
+                "0000000000000000000000000000000000000000000000000000000000000080", // offset to start of constants
+                "0000000000000000000000000000000000000000000000000000000000000002", // length of bytecode
+                "1234000000000000000000000000000000000000000000000000000000000000", // bytecode
+                "0000000000000000000000000000000000000000000000000000000000000002", // length of constants
+                "0000000000000000000000000000000000000000000000000000000000000003", // constants[0]
+                "0000000000000000000000000000000000000000000000000000000000000004", // constants[1]
+            ]
+            .concat(),
         )));
 
-        let parser = ParserV1 {
-          address: "1234567890123456789012345678901234567893"
-        }; 
-        let rainlang = "start-time: 160000,
-end-time: 160600,
-start-price: 100e18,
-rate: 1e16
-
-:ensure(
-    every(
-        gt(now() start-time))
-        lt(now() end-time)),
-    )
-),
-
-elapsed: sub(now() start-time),
-
-max-amount: 1000e18,
-price: sub(start-price mul(rate elapsed))
-";
-        let rainlang_utf8 = rainlang.as_bytes();
-      
         let client = ReadableClient::new(Provider::new(transport));
-        let response = parser.parse(rainlang_utf8, client).await?;
-
-        Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_parse_text() -> Result<(), Error> {
-        setup_tracing();
-
-        // @todo add expected bytecode and constant values
-        // Mock responses for the read calls - the responses will be popped off
-        // the stack in the reverse order they are pushed on.
-        let transport = MockProvider::default();
-        transport.push_response(MockResponse::Value(json!(
-          ("bytecode", "constants")
-        )));
-
         let parser = ParserV1 {
-          address: "1234567890123456789012345678901234567893"
+            address: Address::repeat_byte(0x1),
         };
-        let rainlang = "start-time: 160000,
-end-time: 160600,
-start-price: 100e18,
-rate: 1e16
 
-:ensure(
-    every(
-        gt(now() start-time))
-        lt(now() end-time)),
-    )
-),
+        let result = parser.parse_text("my rainlang", client).await?;
 
-elapsed: sub(now() start-time),
+        assert_eq!(result.bytecode, hex!("1234"));
+        assert_eq!(result.constants, vec![U256::from(3), U256::from(4)]);
 
-max-amount: 1000e18,
-price: sub(start-price mul(rate elapsed))
-";
-
-        let client = ReadableClient::new(Provider::new(transport));
-        let response = parser.parse_text(rainlang, client).await?;        
-        
         Ok(())
     }
 
+    #[tokio::test]
+    async fn test_parse_text() -> Result<()> {
+        let rainlang = "my rainlang";
 
-    #[allow(dead_code)]
-    fn setup_tracing() {
-        let subscriber = FmtSubscriber::builder()
-            .with_max_level(tracing::Level::DEBUG)
-            .finish();
+        let transport = MockProvider::default();
+        transport.push_response(MockResponse::Value(serde_json::Value::String(
+            vec![
+                "0x0000000000000000000000000000000000000000000000000000000000000040", // offset to start of bytecode
+                "0000000000000000000000000000000000000000000000000000000000000080", // offset to start of constants
+                "000000000000000000000000000000000000000000000000000000000000000b", // length of bytecode
+                "6d79207261696e6c616e67000000000000000000000000000000000000000000", // bytecode
+                "0000000000000000000000000000000000000000000000000000000000000002", // length of constants
+                "0000000000000000000000000000000000000000000000000000000000000003", // constants[0]
+                "0000000000000000000000000000000000000000000000000000000000000004", // constants[1]
+            ]
+            .concat(),
+        )));
 
-        tracing::subscriber::set_global_default(subscriber)
-            .expect("Failed to set tracing subscriber");
+        let client = ReadableClient::new(Provider::new(transport));
+        let parser = ParserV1 {
+            address: Address::repeat_byte(0x1),
+        };
+
+        let result = parser.parse_text(rainlang, client).await?;
+
+        assert_eq!(result.bytecode, hex!("6d79207261696e6c616e67"));
+        assert_eq!(result.constants, vec![U256::from(3), U256::from(4)]);
+
+        Ok(())
     }
 }
