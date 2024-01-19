@@ -23,5 +23,5 @@ jobs:
       - run: nix run .#i9r-prelude
       - run: nix run .#rainix-sol-artifacts
         env:
-          ETH_RPC_URL: ${{ inputs.network == 'polygon' && secrets.CI_DEPLOY_POLYGON_RPC_URL || secrets.CI_DEPLOY_RPC_URL }}
+          ETH_RPC_URL: ${{ inputs.network == 'polygon' && secrets.CI_DEPLOY_POLYGON_RPC_URL || inputs.network == 'songbird' && secrets.CI_DEPLOY_SONGBIRD_RPC_URL || secrets.CI_DEPLOY_RPC_URL }}
           ETHERSCAN_API_KEY: ${{ secrets.EXPLORER_VERIFICATION_KEY }}
