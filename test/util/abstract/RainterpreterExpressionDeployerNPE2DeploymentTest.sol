@@ -40,7 +40,15 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
     //solhint-disable-next-line private-vars-leading-underscore
     RainterpreterParserNPE2 internal immutable iParser;
 
+    function beforeOpTestConstructor() internal virtual {}
+
+    function constructionMetaPath() internal view virtual returns (string memory) {
+        return EXPRESSION_DEPLOYER_NP_META_PATH;
+    }
+
     constructor() {
+        beforeOpTestConstructor();
+
         iInterpreter = new RainterpreterNPE2();
         iStore = new RainterpreterStoreNPE2();
         iParser = new RainterpreterParserNPE2();
@@ -125,9 +133,5 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
             console2.logBytes(integrityFunctionPointers);
             revert("unexpected deployer integrity function pointers");
         }
-    }
-
-    function constructionMetaPath() internal view virtual returns (string memory) {
-        return EXPRESSION_DEPLOYER_NP_META_PATH;
     }
 }
