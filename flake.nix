@@ -12,7 +12,7 @@
         pkgs = rainix.pkgs.${system};
       in {
         packages = rec {
-          i9r-prelude = rainix.${system}.mkTask {
+          i9r-prelude = rainix.mkTask.${system} {
             name = "i9r-prelude";
             body = ''
               set -euxo pipefail
