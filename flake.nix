@@ -31,7 +31,7 @@
                 -o meta/RainterpreterExpressionDeployerNPE2.rain.meta \
               ;
             '';
-            additionalBuildInputs = rainix.${system}.sol-build-inputs;
+            additionalBuildInputs = rainix.sol-build-inputs.${system};
           };
         } // rainix.packages.${system};
 
