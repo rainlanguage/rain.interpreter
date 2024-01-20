@@ -54,6 +54,7 @@ import {LibOpIsZeroNP} from "./logic/LibOpIsZeroNP.sol";
 import {LibOpLessThanNP} from "./logic/LibOpLessThanNP.sol";
 import {LibOpLessThanOrEqualToNP} from "./logic/LibOpLessThanOrEqualToNP.sol";
 
+import {LibOpDecimal18AvgNP} from "./math/decimal18/LibOpDecimal18AvgNP.sol";
 import {LibOpDecimal18MulNP} from "./math/decimal18/LibOpDecimal18MulNP.sol";
 import {LibOpDecimal18DivNP} from "./math/decimal18/LibOpDecimal18DivNP.sol";
 import {LibOpDecimal18PowNP} from "./math/decimal18/LibOpDecimal18PowNP.sol";
@@ -85,7 +86,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 59;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 60;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -178,6 +179,7 @@ library LibAllStandardOpsNP {
             AuthoringMetaV2(
                 "less-than-or-equal-to", "1 if the first input is less than or equal to the second input, 0 otherwise."
             ),
+            AuthoringMetaV2("decimal18-avg", "18 decimal fixed point arithmetic average of two numbers."),
             AuthoringMetaV2(
                 "decimal18-div",
                 "Divides the first input by all other inputs as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Errors if any divisor is zero."
@@ -391,6 +393,8 @@ library LibAllStandardOpsNP {
                     LibParseOperand.handleOperandDisallowed,
                     // Less than or equal to
                     LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 avg
+                    LibParseOperand.handleOperandDisallowed,
                     // Decimal18 div
                     LibParseOperand.handleOperandDisallowed,
                     // Decimal18 mul
@@ -507,6 +511,7 @@ library LibAllStandardOpsNP {
                     LibOpIsZeroNP.integrity,
                     LibOpLessThanNP.integrity,
                     LibOpLessThanOrEqualToNP.integrity,
+                    LibOpDecimal18AvgNP.integrity,
                     LibOpDecimal18DivNP.integrity,
                     LibOpDecimal18MulNP.integrity,
                     LibOpDecimal18PowNP.integrity,
@@ -614,6 +619,7 @@ library LibAllStandardOpsNP {
                     LibOpIsZeroNP.run,
                     LibOpLessThanNP.run,
                     LibOpLessThanOrEqualToNP.run,
+                    LibOpDecimal18AvgNP.run,
                     LibOpDecimal18DivNP.run,
                     LibOpDecimal18MulNP.run,
                     LibOpDecimal18PowNP.run,
