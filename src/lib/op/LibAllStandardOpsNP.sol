@@ -54,10 +54,22 @@ import {LibOpIsZeroNP} from "./logic/LibOpIsZeroNP.sol";
 import {LibOpLessThanNP} from "./logic/LibOpLessThanNP.sol";
 import {LibOpLessThanOrEqualToNP} from "./logic/LibOpLessThanOrEqualToNP.sol";
 
+import {LibOpDecimal18AvgNP} from "./math/decimal18/LibOpDecimal18AvgNP.sol";
+import {LibOpDecimal18CeilNP} from "./math/decimal18/LibOpDecimal18CeilNP.sol";
 import {LibOpDecimal18MulNP} from "./math/decimal18/LibOpDecimal18MulNP.sol";
 import {LibOpDecimal18DivNP} from "./math/decimal18/LibOpDecimal18DivNP.sol";
+import {LibOpDecimal18ExpNP} from "./math/decimal18/LibOpDecimal18ExpNP.sol";
+import {LibOpDecimal18Exp2NP} from "./math/decimal18/LibOpDecimal18Exp2NP.sol";
+import {LibOpDecimal18FloorNP} from "./math/decimal18/LibOpDecimal18FloorNP.sol";
+import {LibOpDecimal18FracNP} from "./math/decimal18/LibOpDecimal18FracNP.sol";
+import {LibOpDecimal18GmNP} from "./math/decimal18/LibOpDecimal18GmNP.sol";
+import {LibOpDecimal18InvNP} from "./math/decimal18/LibOpDecimal18InvNP.sol";
+import {LibOpDecimal18LnNP} from "./math/decimal18/LibOpDecimal18LnNP.sol";
+import {LibOpDecimal18Log10NP} from "./math/decimal18/LibOpDecimal18Log10NP.sol";
+import {LibOpDecimal18Log2NP} from "./math/decimal18/LibOpDecimal18Log2NP.sol";
 import {LibOpDecimal18PowNP} from "./math/decimal18/LibOpDecimal18PowNP.sol";
 import {LibOpDecimal18PowUNP} from "./math/decimal18/LibOpDecimal18PowUNP.sol";
+import {LibOpDecimal18SqrtNP} from "./math/decimal18/LibOpDecimal18SqrtNP.sol";
 import {LibOpDecimal18Scale18DynamicNP} from "./math/decimal18/LibOpDecimal18Scale18DynamicNP.sol";
 import {LibOpDecimal18Scale18NP} from "./math/decimal18/LibOpDecimal18Scale18NP.sol";
 import {LibOpDecimal18ScaleNNP} from "./math/decimal18/LibOpDecimal18ScaleNNP.sol";
@@ -85,7 +97,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 59;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 71;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -178,9 +190,41 @@ library LibAllStandardOpsNP {
             AuthoringMetaV2(
                 "less-than-or-equal-to", "1 if the first input is less than or equal to the second input, 0 otherwise."
             ),
+            AuthoringMetaV2("decimal18-avg", "18 decimal fixed point arithmetic average of two numbers."),
+            AuthoringMetaV2("decimal18-ceil", "18 decimal fixed point ceiling of a number."),
             AuthoringMetaV2(
                 "decimal18-div",
                 "Divides the first input by all other inputs as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Errors if any divisor is zero."
+            ),
+            AuthoringMetaV2(
+                "decimal18-exp",
+                "Calculates the natural exponential e^x where x is the input as a fixed point 18 decimal number (i.e. 'one' is 1e18). Errors if the exponentiation would exceed the maximum value (roughly 1.15e77)."
+            ),
+            AuthoringMetaV2(
+                "decimal18-exp2",
+                "Calculates the binary exponential 2^x where x is the input as a fixed point 18 decimal number (i.e. 'one' is 1e18). Errors if the exponentiation would exceed the maximum value (roughly 1.15e77)."
+            ),
+            AuthoringMetaV2("decimal18-floor", "18 decimal fixed point floor of a number."),
+            AuthoringMetaV2("decimal18-frac", "18 decimal fixed point fractional part of a number."),
+            AuthoringMetaV2(
+                "decimal18-gm",
+                "Calculates the geometric mean of all inputs as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Errors if any input is zero."
+            ),
+            AuthoringMetaV2(
+                "decimal18-inv",
+                "Calculates the inverse 1 / x of the input as a fixed point 18 decimal number (i.e. 'one' is 1e18). Errors if the input is zero."
+            ),
+            AuthoringMetaV2(
+                "decimal18-ln",
+                "Calculates the natural logarithm ln(x) where x is the input as a fixed point 18 decimal number (i.e. 'one' is 1e18). Errors if the input is zero."
+            ),
+            AuthoringMetaV2(
+                "decimal18-log10",
+                "Calculates the base 10 logarithm log10(x) where x is the input as a fixed point 18 decimal number (i.e. 'one' is 1e18). Errors if the input is zero."
+            ),
+            AuthoringMetaV2(
+                "decimal18-log2",
+                "Calculates the base 2 logarithm log2(x) where x is the input as a fixed point 18 decimal number (i.e. 'one' is 1e18). Errors if the input is zero."
             ),
             AuthoringMetaV2(
                 "decimal18-mul",
@@ -193,6 +237,10 @@ library LibAllStandardOpsNP {
             AuthoringMetaV2(
                 "decimal18-power-int",
                 "Raises the first input as a fixed point 18 decimal value to the power of the second input as an integer."
+            ),
+            AuthoringMetaV2(
+                "decimal18-sqrt",
+                "Calculates the square root of the input as a fixed point 18 decimal number (i.e. 'one' is 1e18). Errors if the input is negative."
             ),
             AuthoringMetaV2(
                 "decimal18-scale18-dynamic",
@@ -391,13 +439,37 @@ library LibAllStandardOpsNP {
                     LibParseOperand.handleOperandDisallowed,
                     // Less than or equal to
                     LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 avg
+                    LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 ceil
+                    LibParseOperand.handleOperandDisallowed,
                     // Decimal18 div
+                    LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 exp
+                    LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 exp2
+                    LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 floor
+                    LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 frac
+                    LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 gm
+                    LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 inv
+                    LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 ln
+                    LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 log10
+                    LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 log2
                     LibParseOperand.handleOperandDisallowed,
                     // Decimal18 mul
                     LibParseOperand.handleOperandDisallowed,
                     // Decimal18 power
                     LibParseOperand.handleOperandDisallowed,
                     // Decimal18 power int
+                    LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 sqrt
                     LibParseOperand.handleOperandDisallowed,
                     // Decimal18 scale18 dynamic
                     LibParseOperand.handleOperandM1M1,
@@ -507,10 +579,22 @@ library LibAllStandardOpsNP {
                     LibOpIsZeroNP.integrity,
                     LibOpLessThanNP.integrity,
                     LibOpLessThanOrEqualToNP.integrity,
+                    LibOpDecimal18AvgNP.integrity,
+                    LibOpDecimal18CeilNP.integrity,
                     LibOpDecimal18DivNP.integrity,
+                    LibOpDecimal18ExpNP.integrity,
+                    LibOpDecimal18Exp2NP.integrity,
+                    LibOpDecimal18FloorNP.integrity,
+                    LibOpDecimal18FracNP.integrity,
+                    LibOpDecimal18GmNP.integrity,
+                    LibOpDecimal18InvNP.integrity,
+                    LibOpDecimal18LnNP.integrity,
+                    LibOpDecimal18Log10NP.integrity,
+                    LibOpDecimal18Log2NP.integrity,
                     LibOpDecimal18MulNP.integrity,
                     LibOpDecimal18PowNP.integrity,
                     LibOpDecimal18PowUNP.integrity,
+                    LibOpDecimal18SqrtNP.integrity,
                     LibOpDecimal18Scale18DynamicNP.integrity,
                     LibOpDecimal18Scale18NP.integrity,
                     LibOpDecimal18ScaleNNP.integrity,
@@ -614,10 +698,22 @@ library LibAllStandardOpsNP {
                     LibOpIsZeroNP.run,
                     LibOpLessThanNP.run,
                     LibOpLessThanOrEqualToNP.run,
+                    LibOpDecimal18AvgNP.run,
+                    LibOpDecimal18CeilNP.run,
                     LibOpDecimal18DivNP.run,
+                    LibOpDecimal18ExpNP.run,
+                    LibOpDecimal18Exp2NP.run,
+                    LibOpDecimal18FloorNP.run,
+                    LibOpDecimal18FracNP.run,
+                    LibOpDecimal18GmNP.run,
+                    LibOpDecimal18InvNP.run,
+                    LibOpDecimal18LnNP.run,
+                    LibOpDecimal18Log10NP.run,
+                    LibOpDecimal18Log2NP.run,
                     LibOpDecimal18MulNP.run,
                     LibOpDecimal18PowNP.run,
                     LibOpDecimal18PowUNP.run,
+                    LibOpDecimal18SqrtNP.run,
                     LibOpDecimal18Scale18DynamicNP.run,
                     LibOpDecimal18Scale18NP.run,
                     LibOpDecimal18ScaleNNP.run,
