@@ -7,3 +7,11 @@ edition = "2021"
 license = "CAL-1.0"
 homepage = "https://github.com/rainprotocol/rain.interpreter"
 
+[workspace.dependencies.rain_interpreter_parser]
+path = "crates/parser"
+
+[workspace.dependencies.rain_interpreter_dispair]
+path = "crates/dispair"
+
+[workspace.dependencies.rain_interpreter_bindings]
+path = "crates/bindings"
