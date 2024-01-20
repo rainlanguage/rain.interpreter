@@ -56,6 +56,7 @@ import {LibOpLessThanOrEqualToNP} from "./logic/LibOpLessThanOrEqualToNP.sol";
 
 import {LibOpDecimal18MulNP} from "./math/decimal18/LibOpDecimal18MulNP.sol";
 import {LibOpDecimal18DivNP} from "./math/decimal18/LibOpDecimal18DivNP.sol";
+import {LibOpDecimal18PowNP} from "./math/decimal18/LibOpDecimal18PowNP.sol";
 import {LibOpDecimal18PowUNP} from "./math/decimal18/LibOpDecimal18PowUNP.sol";
 import {LibOpDecimal18Scale18DynamicNP} from "./math/decimal18/LibOpDecimal18Scale18DynamicNP.sol";
 import {LibOpDecimal18Scale18NP} from "./math/decimal18/LibOpDecimal18Scale18NP.sol";
@@ -84,7 +85,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 58;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 59;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -184,6 +185,10 @@ library LibAllStandardOpsNP {
             AuthoringMetaV2(
                 "decimal18-mul",
                 "Multiplies all inputs together as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Errors if the multiplication exceeds the maximum value (roughly 1.15e77)."
+            ),
+            AuthoringMetaV2(
+                "decimal18-power",
+                "Raises the first input as a fixed point 18 decimal value to the power of the second input as a fixed point 18 decimal value. Errors if the exponentiation would exceed the maximum value (roughly 1.15e77)."
             ),
             AuthoringMetaV2(
                 "decimal18-power-int",
@@ -390,6 +395,8 @@ library LibAllStandardOpsNP {
                     LibParseOperand.handleOperandDisallowed,
                     // Decimal18 mul
                     LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 power
+                    LibParseOperand.handleOperandDisallowed,
                     // Decimal18 power int
                     LibParseOperand.handleOperandDisallowed,
                     // Decimal18 scale18 dynamic
@@ -502,6 +509,7 @@ library LibAllStandardOpsNP {
                     LibOpLessThanOrEqualToNP.integrity,
                     LibOpDecimal18DivNP.integrity,
                     LibOpDecimal18MulNP.integrity,
+                    LibOpDecimal18PowNP.integrity,
                     LibOpDecimal18PowUNP.integrity,
                     LibOpDecimal18Scale18DynamicNP.integrity,
                     LibOpDecimal18Scale18NP.integrity,
@@ -608,6 +616,7 @@ library LibAllStandardOpsNP {
                     LibOpLessThanOrEqualToNP.run,
                     LibOpDecimal18DivNP.run,
                     LibOpDecimal18MulNP.run,
+                    LibOpDecimal18PowNP.run,
                     LibOpDecimal18PowUNP.run,
                     LibOpDecimal18Scale18DynamicNP.run,
                     LibOpDecimal18Scale18NP.run,
