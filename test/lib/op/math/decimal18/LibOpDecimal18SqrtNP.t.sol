@@ -42,9 +42,9 @@ contract LibOpDecimal18SqrtNPTest is OpTest {
     function testOpDecimal18SqrtNPEval() external {
         checkHappy("_: decimal18-sqrt(0);", 0, "0");
         checkHappy("_: decimal18-sqrt(1e18);", 1e18, "1e18");
-        checkHappy("_: decimal18-sqrt(5e17);", 1e18, "5e17");
-        checkHappy("_: decimal18-sqrt(2e18);", 2e18, "2e18");
-        checkHappy("_: decimal18-sqrt(25e17);", 3e18, "25e17");
+        checkHappy("_: decimal18-sqrt(5e17);", 707106781186547524, "5e17");
+        checkHappy("_: decimal18-sqrt(2e18);", 1414213562373095048, "2e18");
+        checkHappy("_: decimal18-sqrt(25e17);", 1581138830084189665, "25e17");
     }
 
     /// Test the eval of `decimal18-sqrt` for bad inputs.
