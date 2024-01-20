@@ -33,7 +33,7 @@ import {STORE_BYTECODE_HASH} from "./RainterpreterStoreNPE2.sol";
 
 /// @dev The function pointers for the integrity check fns.
 bytes constant INTEGRITY_FUNCTION_POINTERS =
-    hex"0a6d0ae70b500cc80cd20cd20cdc0ce50d000da60da60e020e7e0e880cd20cdc0cd20cd20cdc0cc80cc80cc80cc80cc80e920eb40ede0cd20e920cd20cd20e880cdc0cd20cd20f000f000cd20cd20cd20cdc0cdc0f000f000f000f000f000f000f000f000f000f000f000f000cdc0f170f210f210f21";
+    hex"0acd0b470bb00d280d320d320d3c0d450d600e060e060e620ede0ee80d320d3c0d320d320d3c0d280d280d280d280d280ef20f140f3e0d320ef20d320d320ee80d3c0d320d320d320d3c0f600d3c0d3c0d3c0d3c0d320d3c0d3c0d3c0d3c0f600d320d320d3c0d320d3c0d3c0f600f600f600f600f600f600f600f600f600f600f600f600d3c0f770f810f810f81";
 
 /// @dev Hash of the known construction meta.
 bytes32 constant CONSTRUCTION_META_HASH = bytes32(0x73021b25ff248d48aaf7d987c4e8408f339987e489d4cef67a150c3a0364fafd);
