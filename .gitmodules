@@ -1,42 +1,56 @@
 [submodule "lib/rain.lib.typecast"]
 	path = lib/rain.lib.typecast
 	url = https://github.com/rainprotocol/rain.lib.typecast
+	update = none
 [submodule "lib/rain.metadata"]
 	path = lib/rain.metadata
 	url = https://github.com/rainprotocol/rain.metadata
+	update = none
 [submodule "lib/rain.datacontract"]
 	path = lib/rain.datacontract
 	url = https://github.com/rainprotocol/rain.datacontract
+	update = none
 [submodule "lib/forge-std"]
 	path = lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
+	update = none
 [submodule "lib/rain.erc1820"]
 	path = lib/rain.erc1820
 	url = https://github.com/rainprotocol/rain.erc1820
+	update = none
 [submodule "lib/rain.lib.memkv"]
 	path = lib/rain.lib.memkv
 	url = https://github.com/rainprotocol/rain.lib.memkv
+	update = none
 [submodule "lib/prb-math"]
 	path = lib/prb-math
 	url = https://github.com/PaulRBerg/prb-math
+	update = none
 [submodule "lib/sol.lib.binmaskflag"]
 	path = lib/sol.lib.binmaskflag
 	url = https://github.com/rainprotocol/sol.lib.binmaskflag
+	update = none
 [submodule "lib/rain.math.fixedpoint"]
 	path = lib/rain.math.fixedpoint
 	url = https://github.com/rainprotocol/rain.math.fixedpoint
+	update = none
 [submodule "lib/openzeppelin-contracts"]
 	path = lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+	update = none
 [submodule "lib/rain.chainlink"]
 	path = lib/rain.chainlink
 	url = https://github.com/rainprotocol/rain.chainlink
+	update = none
 [submodule "lib/rain.uniswapv2"]
 	path = lib/rain.uniswapv2
 	url = https://github.com/rainprotocol/rain.uniswapv2
+	update = none
 [submodule "lib/rain.solmem"]
 	path = lib/rain.solmem
 	url = https://github.com/rainlanguage/rain.solmem
+	update = none
 [submodule "lib/rain.intorastring"]
 	path = lib/rain.intorastring
 	url = https://github.com/rainlanguage/rain.intorastring
+	update = none
