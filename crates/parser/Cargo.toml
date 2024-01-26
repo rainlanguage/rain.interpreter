@@ -7,7 +7,7 @@ description = "Rain Interpreter Parser Rust Crate."
 homepage = "https://github.com/rainlanguage/rain.interpreter"
 
 [dependencies]
-alloy-ethers-typecast = { git = "https://github.com/rainlanguage/alloy-ethers-typecast", rev = "cabcd6f1efee2afe268e93fc06c05b59e1356456" }
+alloy-ethers-typecast = { git = "https://github.com/rainlanguage/alloy-ethers-typecast", rev = "36a64e092193338507f0eb233aec07d8bd1eba80" }
 rain_interpreter_dispair = { workspace = true }
 rain_interpreter_bindings = { workspace = true }
 serde = "1.0.195"
