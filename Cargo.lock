@@ -50,7 +50,7 @@ dependencies = [
 [[package]]
 name = "alloy-ethers-typecast"
 version = "0.2.0"
-source = "git+https://github.com/rainlanguage/alloy-ethers-typecast?rev=47b2d9f073ff891254af6ece6f0efc140566d3d5#47b2d9f073ff891254af6ece6f0efc140566d3d5"
+source = "git+https://github.com/rainlanguage/alloy-ethers-typecast?rev=cabcd6f1efee2afe268e93fc06c05b59e1356456#cabcd6f1efee2afe268e93fc06c05b59e1356456"
 dependencies = [
  "alloy-primitives",
  "alloy-sol-types",
