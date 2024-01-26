@@ -1,8 +1,19 @@
-use alloy_ethers_typecast::transaction::{ReadContractParametersBuilder, ReadableClient};
+use alloy_ethers_typecast::transaction::{
+    ReadContractParametersBuilder, ReadContractParametersBuilderError, ReadableClient,
+    ReadableClientError,
+};
 use alloy_primitives::*;
-use anyhow::*;
 use ethers::providers::JsonRpcClient;
 use rain_interpreter_bindings::DeployerISP;
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum DISPairError {
+    #[error(transparent)]
+    ReadableClientError(#[from] ReadableClientError),
+    #[error(transparent)]
+    ReadContractParametersBuilderError(#[from] ReadContractParametersBuilderError),
+}
 
 /// DISPair
 /// Struct representing DISP instances.
@@ -19,7 +30,7 @@ impl DISPair {
     pub async fn from_deployer<T: JsonRpcClient>(
         deployer: Address,
         client: ReadableClient<T>,
-    ) -> anyhow::Result<Self> {
+    ) -> Result<Self, DISPairError> {
         Ok(DISPair {
             deployer,
             interpreter: client
@@ -27,27 +38,33 @@ impl DISPair {
                     ReadContractParametersBuilder::default()
                         .address(deployer)
                         .call(DeployerISP::iInterpreterCall {})
-                        .build()?,
+                        .build()
+                        .map_err(DISPairError::ReadContractParametersBuilderError)?,
                 )
-                .await?
+                .await
+                .map_err(DISPairError::ReadableClientError)?
                 ._0,
             store: client
                 .read(
                     ReadContractParametersBuilder::default()
                         .address(deployer)
                         .call(DeployerISP::iStoreCall {})
-                        .build()?,
+                        .build()
+                        .map_err(DISPairError::ReadContractParametersBuilderError)?,
                 )
-                .await?
+                .await
+                .map_err(DISPairError::ReadableClientError)?
                 ._0,
             parser: client
                 .read(
                     ReadContractParametersBuilder::default()
                         .address(deployer)
                         .call(DeployerISP::iParserCall {})
-                        .build()?,
+                        .build()
+                        .map_err(DISPairError::ReadContractParametersBuilderError)?,
                 )
-                .await?
+                .await
+                .map_err(DISPairError::ReadableClientError)?
                 ._0,
         })
     }
@@ -62,12 +79,14 @@ mod tests {
     use tracing_subscriber::FmtSubscriber;
 
     #[tokio::test]
-    async fn test_from_deployer() -> Result<(), Error> {
+    async fn test_from_deployer() {
         setup_tracing();
 
         // MockProvider for testing
         let transport = MockProvider::default();
-        let deployer_address = "0x1234567890123456789012345678901234567890".parse::<Address>()?;
+        let deployer_address = "0x1234567890123456789012345678901234567890"
+            .parse::<Address>()
+            .unwrap();
         let interpreter_address = "1234567890123456789012345678901234567891";
         let store_address = "1234567890123456789012345678901234567892";
         let parser_address = "1234567890123456789012345678901234567893";
@@ -90,13 +109,17 @@ mod tests {
         ))));
 
         let client = ReadableClient::new(Provider::new(transport));
-        let dispair = DISPair::from_deployer(deployer_address, client).await?;
+        let dispair = DISPair::from_deployer(deployer_address, client)
+            .await
+            .unwrap();
 
         assert_eq!(dispair.deployer, deployer_address);
-        assert_eq!(dispair.interpreter, interpreter_address.parse::<Address>()?);
-        assert_eq!(dispair.store, store_address.parse::<Address>()?);
-        assert_eq!(dispair.parser, parser_address.parse::<Address>()?);
-        Ok(())
+        assert_eq!(
+            dispair.interpreter,
+            interpreter_address.parse::<Address>().unwrap()
+        );
+        assert_eq!(dispair.store, store_address.parse::<Address>().unwrap());
+        assert_eq!(dispair.parser, parser_address.parse::<Address>().unwrap());
     }
 
     #[allow(dead_code)]
