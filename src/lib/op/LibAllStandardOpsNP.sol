@@ -86,10 +86,6 @@ import {LibOpIntSubNP} from "./math/int/LibOpIntSubNP.sol";
 import {LibOpGetNP} from "./store/LibOpGetNP.sol";
 import {LibOpSetNP} from "./store/LibOpSetNP.sol";
 
-import {LibOpUniswapV2AmountIn} from "./uniswap/LibOpUniswapV2AmountIn.sol";
-import {LibOpUniswapV2AmountOut} from "./uniswap/LibOpUniswapV2AmountOut.sol";
-import {LibOpUniswapV2Quote} from "./uniswap/LibOpUniswapV2Quote.sol";
-
 import {LibParseLiteral, ParseState, LITERAL_PARSERS_LENGTH} from "../parse/literal/LibParseLiteral.sol";
 import {LibParseLiteralString} from "../parse/literal/LibParseLiteralString.sol";
 import {LibParseLiteralDecimal} from "../parse/literal/LibParseLiteralDecimal.sol";
@@ -97,7 +93,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 71;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 68;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -308,18 +304,6 @@ library LibAllStandardOpsNP {
             AuthoringMetaV2(
                 "set",
                 "Sets a value in storage. The first operand is the key to set and the second operand is the value to set."
-            ),
-            AuthoringMetaV2(
-                "uniswap-v2-amount-in",
-                "Computes the minimum amount of input tokens required to get a given amount of output tokens from a UniswapV2 pair. Input/output token directions are from the perspective of the Uniswap contract. The first input is the factory address, the second is the amount of output tokens, the third is the input token address, and the fourth is the output token address. If the operand is 1 the last time the prices changed will be returned as well."
-            ),
-            AuthoringMetaV2(
-                "uniswap-v2-amount-out",
-                "Computes the maximum amount of output tokens received from a given amount of input tokens from a UniswapV2 pair. Input/output token directions are from the perspective of the Uniswap contract. The first input is the factory address, the second is the amount of input tokens, the third is the input token address, and the fourth is the output token address. If the operand is 1 the last time the prices changed will be returned as well."
-            ),
-            AuthoringMetaV2(
-                "uniswap-v2-quote",
-                "Given an amount of token A, calculates the equivalent valued amount of token B. The first input is the factory address, the second is the amount of token A, the third is token A's address, and the fourth is token B's address. If the operand is 1 the last time the prices changed will be returned as well."
             )
         ];
         AuthoringMetaV2[] memory wordsDynamic;
@@ -504,13 +488,7 @@ library LibAllStandardOpsNP {
                     // Get
                     LibParseOperand.handleOperandDisallowed,
                     // Set
-                    LibParseOperand.handleOperandDisallowed,
-                    // UniswapV2 amount in
-                    LibParseOperand.handleOperandSingleFull,
-                    // UniswapV2 amount out
-                    LibParseOperand.handleOperandSingleFull,
-                    // UniswapV2 quote
-                    LibParseOperand.handleOperandSingleFull
+                    LibParseOperand.handleOperandDisallowed
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
@@ -623,10 +601,7 @@ library LibAllStandardOpsNP {
                     // decimal18 sub.
                     LibOpIntSubNP.integrity,
                     LibOpGetNP.integrity,
-                    LibOpSetNP.integrity,
-                    LibOpUniswapV2AmountIn.integrity,
-                    LibOpUniswapV2AmountOut.integrity,
-                    LibOpUniswapV2Quote.integrity
+                    LibOpSetNP.integrity
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
@@ -742,10 +717,7 @@ library LibAllStandardOpsNP {
                     // decimal18 sub.
                     LibOpIntSubNP.run,
                     LibOpGetNP.run,
-                    LibOpSetNP.run,
-                    LibOpUniswapV2AmountIn.run,
-                    LibOpUniswapV2AmountOut.run,
-                    LibOpUniswapV2Quote.run
+                    LibOpSetNP.run
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {

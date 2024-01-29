@@ -31,9 +31,6 @@
 [submodule "lib/rain.chainlink"]
 	path = lib/rain.chainlink
 	url = https://github.com/rainprotocol/rain.chainlink
-[submodule "lib/rain.uniswapv2"]
-	path = lib/rain.uniswapv2
-	url = https://github.com/rainprotocol/rain.uniswapv2
 [submodule "lib/rain.solmem"]
 	path = lib/rain.solmem
 	url = https://github.com/rainlanguage/rain.solmem
