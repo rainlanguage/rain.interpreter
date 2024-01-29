@@ -64,10 +64,10 @@ impl Parser for ParserV1 {
                     .address(self.address)
                     .call(parseCall { data })
                     .build()
-                    .map_err(|e| ParserError::ReadContractParametersBuilderError(e))?,
+                    .map_err(ParserError::ReadContractParametersBuilderError)?,
             )
             .await
-            .map_err(|e| ParserError::ReadableClientError(e))
+            .map_err(ParserError::ReadableClientError)
     }
 }
 
