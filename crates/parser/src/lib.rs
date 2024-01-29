@@ -1,9 +1,20 @@
-use alloy_ethers_typecast::transaction::{ReadContractParametersBuilder, ReadableClient};
+use alloy_ethers_typecast::transaction::{
+    ReadContractParametersBuilder, ReadContractParametersBuilderError, ReadableClient,
+    ReadableClientError,
+};
 use alloy_primitives::*;
-use anyhow::Result;
 use ethers::providers::JsonRpcClient;
 use rain_interpreter_bindings::IParserV1::*;
 use rain_interpreter_dispair::DISPair;
+use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum ParserError {
+    #[error(transparent)]
+    ReadableClientError(#[from] ReadableClientError),
+    #[error(transparent)]
+    ReadContractParametersBuilderError(#[from] ReadContractParametersBuilderError),
+}
 
 pub trait Parser {
     /// Call Parser contract to parse the provided rainlang text.
@@ -11,7 +22,7 @@ pub trait Parser {
         &self,
         text: &str,
         client: ReadableClient<T>,
-    ) -> impl std::future::Future<Output = Result<parseReturn>> + Send
+    ) -> impl std::future::Future<Output = Result<parseReturn, ParserError>> + Send
     where
         Self: Sync,
     {
@@ -24,7 +35,7 @@ pub trait Parser {
         &self,
         data: Vec<u8>,
         client: ReadableClient<T>,
-    ) -> impl std::future::Future<Output = Result<parseReturn>> + Send;
+    ) -> impl std::future::Future<Output = Result<parseReturn, ParserError>> + Send;
 }
 /// ParserV1
 /// Struct representing ParserV1 instances.
@@ -46,15 +57,17 @@ impl Parser for ParserV1 {
         &self,
         data: Vec<u8>,
         client: ReadableClient<T>,
-    ) -> Result<parseReturn> {
+    ) -> Result<parseReturn, ParserError> {
         client
             .read(
                 ReadContractParametersBuilder::default()
                     .address(self.address)
                     .call(parseCall { data })
-                    .build()?,
+                    .build()
+                    .map_err(ParserError::ReadContractParametersBuilderError)?,
             )
             .await
+            .map_err(ParserError::ReadableClientError)
     }
 }
 
@@ -65,7 +78,7 @@ mod tests {
     use ethers::providers::{MockProvider, MockResponse, Provider};
 
     #[tokio::test]
-    async fn test_from_dispair() -> Result<()> {
+    async fn test_from_dispair() {
         let parser_address = Address::repeat_byte(0x4);
 
         let dispair = DISPair {
@@ -79,11 +92,10 @@ mod tests {
 
         assert_eq!(parser.address, dispair.parser);
         assert_eq!(parser.address, parser_address);
-        Ok(())
     }
 
     #[tokio::test]
-    async fn test_parse() -> Result<()> {
+    async fn test_parse() {
         let transport = MockProvider::default();
         transport.push_response(MockResponse::Value(serde_json::Value::String(
             [
@@ -103,16 +115,14 @@ mod tests {
             address: Address::repeat_byte(0x1),
         };
 
-        let result = parser.parse_text("my rainlang", client).await?;
+        let result = parser.parse_text("my rainlang", client).await.unwrap();
 
         assert_eq!(result.bytecode, hex!("1234"));
         assert_eq!(result.constants, vec![U256::from(3), U256::from(4)]);
-
-        Ok(())
     }
 
     #[tokio::test]
-    async fn test_parse_text() -> Result<()> {
+    async fn test_parse_text() {
         let rainlang = "my rainlang";
 
         let transport = MockProvider::default();
@@ -134,11 +144,9 @@ mod tests {
             address: Address::repeat_byte(0x1),
         };
 
-        let result = parser.parse_text(rainlang, client).await?;
+        let result = parser.parse_text(rainlang, client).await.unwrap();
 
         assert_eq!(result.bytecode, hex!("6d79207261696e6c616e67"));
         assert_eq!(result.constants, vec![U256::from(3), U256::from(4)]);
-
-        Ok(())
     }
 }
