@@ -1,6 +1,6 @@
 [package]
 name = "rain-interpreter-dispair"
-version = "0.0.1"
+version = "0.0.0"
 edition = "2021"
 license = "CAL-1.0"
 description = "Rain Interpreter Rust Crate."
