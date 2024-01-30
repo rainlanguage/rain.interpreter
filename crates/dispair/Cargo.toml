@@ -1,6 +1,6 @@
 [package]
-name = "rain_interpreter_dispair"
-version = "0.1.0"
+name = "rain-interpreter-dispair"
+version = "0.0.1"
 edition = "2021"
 license = "CAL-1.0"
 description = "Rain Interpreter Rust Crate."
@@ -8,7 +8,7 @@ homepage = "https://github.com/rainlanguage/rain.interpreter"
 
 [dependencies]
 alloy-ethers-typecast = { git = "https://github.com/rainlanguage/alloy-ethers-typecast", rev = "9e830eda8a429fda60d1a87f480241c7678266bb" }
-rain_interpreter_bindings = { workspace = true }
+rain-interpreter-bindings = { workspace = true }
 serde = "1.0.195"
 serde_json = "1.0.111"
 tokio = { version = "1.28.0", features = ["full"] }
