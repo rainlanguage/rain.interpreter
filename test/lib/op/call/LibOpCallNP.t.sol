@@ -12,6 +12,7 @@ import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibOpCallNP, CallOutputsExceedSource} from "src/lib/op/call/LibOpCallNP.sol";
 import {LibBytecode, SourceIndexOutOfBounds} from "src/lib/bytecode/LibBytecode.sol";
 import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {STACK_TRACER} from "src/lib/state/LibInterpreterStateNP.sol";
 
 /// @title LibOpCallNPTest
 /// @notice Test the LibOpCallNP library that includes the "call" word.
@@ -125,6 +126,73 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         checkSourceDoesNotExist(": call<3 0>();:;", 3);
     }
 
+    struct ExpectedTrace {
+        uint256 sourceIndex;
+        uint256[] stack;
+    }
+
+    function checkCallNPTraces(bytes memory rainlang, ExpectedTrace[] memory traces) internal {
+        for (uint256 i = 0; i < traces.length; ++i) {
+            vm.expectCall(STACK_TRACER, abi.encodePacked(bytes4(uint32(traces[i].sourceIndex)), traces[i].stack), 1);
+        }
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainlang);
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
+        (io);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
+            storeDeployer,
+            FullyQualifiedNamespace.wrap(0),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), type(uint8).max),
+            new uint256[][](0),
+            new uint256[](0)
+        );
+        (stack, kvs);
+    }
+
+    function testCallTraceOuterOnly() external {
+        ExpectedTrace[] memory traces = new ExpectedTrace[](1);
+        traces[0].sourceIndex = 0;
+        traces[0].stack = new uint256[](1);
+        traces[0].stack[0] = 1;
+        checkCallNPTraces("_: 1;", traces);
+    }
+
+    function testCallTraceInnerOnly() external {
+        ExpectedTrace[] memory traces = new ExpectedTrace[](2);
+        traces[0].sourceIndex = 0;
+        traces[0].stack = new uint256[](0);
+        traces[1].sourceIndex = 1;
+        traces[1].stack = new uint256[](1);
+        traces[1].stack[0] = 1;
+        checkCallNPTraces(":call<1 0>();_:1;", traces);
+    }
+
+    function testCallTraceOuterAndInner() external {
+        ExpectedTrace[] memory traces = new ExpectedTrace[](2);
+        traces[0].sourceIndex = 0;
+        traces[0].stack = new uint256[](1);
+        traces[0].stack[0] = 2;
+        traces[1].sourceIndex = 1;
+        traces[1].stack = new uint256[](1);
+        traces[1].stack[0] = 1;
+        checkCallNPTraces("_:int-add(call<1 1>() 1);_:1;", traces);
+    }
+
+    function testCallTraceOuterAndTwoInner() external {
+        ExpectedTrace[] memory traces = new ExpectedTrace[](3);
+        traces[0].sourceIndex = 0;
+        traces[0].stack = new uint256[](1);
+        traces[0].stack[0] = 12;
+        traces[1].sourceIndex = 1;
+        traces[1].stack = new uint256[](2);
+        traces[1].stack[1] = 2;
+        traces[1].stack[0] = 11;
+        traces[2].sourceIndex = 2;
+        traces[2].stack = new uint256[](1);
+        traces[2].stack[0] = 10;
+        checkCallNPTraces("_:int-add(call<1 1>(2) 1);two:,_:int-add(call<2 1>() 1);_:10;", traces);
+    }
+
     /// Boilerplate for checking the stack and kvs of a call.
     function checkCallNPRun(bytes memory rainlang, uint256[] memory stack, uint256[] memory kvs) internal {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainlang);
@@ -192,6 +260,11 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         stack = new uint256[](1);
         stack[0] = 10;
         checkCallNPRun("a:call<1 1>(9);nine:,:set(10 11),ret:int-add(nine 1);", stack, kvs);
+
+        // Can call a few different things without a final stack.
+        stack = new uint256[](0);
+        kvs = new uint256[](0);
+        checkCallNPRun(":call<1 0>();one two three: 1 2 3, :call<2 0>();five six: 5 6;", stack, kvs);
     }
 
     /// Boilerplate to check a generic runtime error happens upon recursion.
