@@ -102,9 +102,11 @@ library LibOpCallNP {
         // input to call, is the bottom of the stack from the perspective of the
         // callee.
         Pointer[] memory stackBottoms = state.stackBottoms;
+        Pointer evalStackBottom;
         Pointer evalStackTop;
         assembly ("memory-safe") {
-            evalStackTop := mload(add(stackBottoms, mul(add(sourceIndex, 1), 0x20)))
+            evalStackBottom := mload(add(stackBottoms, mul(add(sourceIndex, 1), 0x20)))
+            evalStackTop := evalStackBottom
             let end := add(stackTop, mul(inputs, 0x20))
             for {} lt(stackTop, end) { stackTop := add(stackTop, 0x20) } {
                 evalStackTop := sub(evalStackTop, 0x20)
@@ -121,6 +123,10 @@ library LibOpCallNP {
 
         // Run the eval loop.
         evalStackTop = LibEvalNP.evalLoopNP(state, evalStackTop);
+
+        assembly ("memory-safe") {
+            let success := staticcall(gas(), 0, evalStackTop, sub(evalStackBottom, evalStackTop), 0, 0)
+        }
 
         // Restore the source index in the state.
         state.sourceIndex = currentSourceIndex;
