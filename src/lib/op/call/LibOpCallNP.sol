@@ -124,13 +124,7 @@ library LibOpCallNP {
         // Run the eval loop.
         evalStackTop = LibEvalNP.evalLoopNP(state, evalStackTop);
 
-        assembly ("memory-safe") {
-            let beforePtr := sub(evalStackTop, 0x20)
-            let before := mload(beforePtr)
-            mstore(beforePtr, sourceIndex)
-            let success := staticcall(gas(), 0, sub(evalStackTop, 4), add(sub(evalStackBottom, evalStackTop), 4), 0, 0)
-            mstore(beforePtr, before)
-        }
+        LibInterpreterStateNP.stackTrace(sourceIndex, evalStackTop, evalStackBottom);
 
         // Restore the source index in the state.
         state.sourceIndex = currentSourceIndex;
