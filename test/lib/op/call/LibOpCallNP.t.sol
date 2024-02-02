@@ -192,6 +192,11 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         stack = new uint256[](1);
         stack[0] = 10;
         checkCallNPRun("a:call<1 1>(9);nine:,:set(10 11),ret:int-add(nine 1);", stack, kvs);
+
+        // Can call a few different things without a final stack.
+        stack = new uint256[](0);
+        kvs = new uint256[](0);
+        checkCallNPRun(":call<1 0>();one two three: 1 2 3, :call<2 0>();five six: 5 6;", stack, kvs);
     }
 
     /// Boilerplate to check a generic runtime error happens upon recursion.
