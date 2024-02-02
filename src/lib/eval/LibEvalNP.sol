@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {InterpreterStateNP} from "../state/LibInterpreterStateNP.sol";
+import {LibInterpreterStateNP, InterpreterStateNP} from "../state/LibInterpreterStateNP.sol";
 
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibMemoryKV, MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
@@ -17,7 +17,11 @@ error InputsLengthMismatch(uint256 expected, uint256 actual);
 library LibEvalNP {
     using LibMemoryKV for MemoryKV;
 
-    function evalLoopNP(InterpreterStateNP memory state, Pointer stackTop) internal view returns (Pointer) {
+    function evalLoopNP(InterpreterStateNP memory state, Pointer stackTop, Pointer stackBottom)
+        internal
+        view
+        returns (Pointer)
+    {
         uint256 sourceIndex = state.sourceIndex;
         uint256 cursor;
         uint256 end;
@@ -149,6 +153,8 @@ library LibEvalNP {
             cursor += 4;
         }
 
+        LibInterpreterStateNP.stackTrace(sourceIndex, stackTop, stackBottom);
+
         return stackTop;
     }
 
@@ -164,9 +170,11 @@ library LibEvalNP {
             (uint256 sourceInputs, uint256 sourceOutputs) =
                 LibBytecode.sourceInputsOutputsLength(state.bytecode, state.sourceIndex);
 
+            Pointer stackBottom;
             Pointer stackTop;
             {
-                stackTop = state.stackBottoms[state.sourceIndex];
+                stackBottom = state.stackBottoms[state.sourceIndex];
+                stackTop = stackBottom;
                 // Copy inputs into place if needed.
                 if (inputs.length > 0) {
                     // Inline some logic to avoid jumping due to function calls
@@ -184,7 +192,7 @@ library LibEvalNP {
             }
 
             // Run the loop.
-            stackTop = evalLoopNP(state, stackTop);
+            stackTop = evalLoopNP(state, stackTop, stackBottom);
 
             // Convert the stack top pointer to an array with the correct length.
             // If the stack top is pointing to the base of Solidity's understanding

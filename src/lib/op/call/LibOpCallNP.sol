@@ -122,9 +122,7 @@ library LibOpCallNP {
         state.sourceIndex = sourceIndex;
 
         // Run the eval loop.
-        evalStackTop = LibEvalNP.evalLoopNP(state, evalStackTop);
-
-        LibInterpreterStateNP.stackTrace(sourceIndex, evalStackTop, evalStackBottom);
+        evalStackTop = LibEvalNP.evalLoopNP(state, evalStackTop, evalStackBottom);
 
         // Restore the source index in the state.
         state.sourceIndex = currentSourceIndex;
