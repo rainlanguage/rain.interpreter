@@ -294,7 +294,7 @@ library LibAllStandardOpsNP {
             // the same function pointer. This is intentional.
             AuthoringMetaV2(
                 "int-sub",
-                "Subtracts all inputs from the first input as non-negative integers. Errors if the subtraction would result in a negative value."
+                "Subtracts all inputs from the first input as non-negative integers. The operand controls whether subtraction will saturate at 0. The default behaviour, and what will happen if the operand is 0, is that the word will revert if the subtraction would result in a negative value. If the operand is 1, the word will saturate at 0 (e.g. 1-2=0)."
             ),
             AuthoringMetaV2(
                 "decimal18-sub",
@@ -482,9 +482,9 @@ library LibAllStandardOpsNP {
                     // Int mul
                     LibParseOperand.handleOperandDisallowed,
                     // Int sub
-                    LibParseOperand.handleOperandDisallowed,
+                    LibParseOperand.handleOperandSingleFull,
                     // Decimal18 sub
-                    LibParseOperand.handleOperandDisallowed,
+                    LibParseOperand.handleOperandSingleFull,
                     // Get
                     LibParseOperand.handleOperandDisallowed,
                     // Set
