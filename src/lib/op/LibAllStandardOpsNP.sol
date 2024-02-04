@@ -69,10 +69,11 @@ import {LibOpDecimal18Log10NP} from "./math/decimal18/LibOpDecimal18Log10NP.sol"
 import {LibOpDecimal18Log2NP} from "./math/decimal18/LibOpDecimal18Log2NP.sol";
 import {LibOpDecimal18PowNP} from "./math/decimal18/LibOpDecimal18PowNP.sol";
 import {LibOpDecimal18PowUNP} from "./math/decimal18/LibOpDecimal18PowUNP.sol";
-import {LibOpDecimal18SqrtNP} from "./math/decimal18/LibOpDecimal18SqrtNP.sol";
 import {LibOpDecimal18Scale18DynamicNP} from "./math/decimal18/LibOpDecimal18Scale18DynamicNP.sol";
 import {LibOpDecimal18Scale18NP} from "./math/decimal18/LibOpDecimal18Scale18NP.sol";
 import {LibOpDecimal18ScaleNNP} from "./math/decimal18/LibOpDecimal18ScaleNNP.sol";
+import {LibOpDecimal18SnapToUnitNP} from "./math/decimal18/LibOpDecimal18SnapToUnitNP.sol";
+import {LibOpDecimal18SqrtNP} from "./math/decimal18/LibOpDecimal18SqrtNP.sol";
 
 import {LibOpIntAddNP} from "./math/int/LibOpIntAddNP.sol";
 import {LibOpIntDivNP} from "./math/int/LibOpIntDivNP.sol";
@@ -93,7 +94,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 68;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 69;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -235,10 +236,6 @@ library LibAllStandardOpsNP {
                 "Raises the first input as a fixed point 18 decimal value to the power of the second input as an integer."
             ),
             AuthoringMetaV2(
-                "decimal18-sqrt",
-                "Calculates the square root of the input as a fixed point 18 decimal number (i.e. 'one' is 1e18). Errors if the input is negative."
-            ),
-            AuthoringMetaV2(
                 "decimal18-scale18-dynamic",
                 "Scales a value from some fixed point decimal scale to 18 decimal fixed point. The first input is the scale to scale from and the second is the value to scale. The two optional operands control rounding and saturation respectively as per `decimal18-scale18`."
             ),
@@ -249,6 +246,14 @@ library LibAllStandardOpsNP {
             AuthoringMetaV2(
                 "decimal18-scale-n",
                 "Scales an input value from 18 decimal fixed point to some other fixed point scale N. The first operand is the scale to scale to. The second (optional) operand controls rounding where 0 (default) rounds down and 1 rounds up. The third (optional) operand controls saturation where 0 (default) errors on overflow and 1 saturates at max-decimal-value."
+            ),
+            AuthoringMetaV2(
+                "decimal18-snap-to-unit",
+                "Rounds a fixed point 18 decimal number (i.e. 'one' is 1e18) to the nearest whole number if it is within the threshold distance from that whole number. The first input is the threshold as an 18 decimal fixed point number and the second is the value to snap to the nearest unit."
+            ),
+            AuthoringMetaV2(
+                "decimal18-sqrt",
+                "Calculates the square root of the input as a fixed point 18 decimal number (i.e. 'one' is 1e18). Errors if the input is negative."
             ),
             // int and decimal18 add have identical implementations and point to
             // the same function pointer. This is intentional.
@@ -453,14 +458,16 @@ library LibAllStandardOpsNP {
                     LibParseOperand.handleOperandDisallowed,
                     // Decimal18 power int
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 sqrt
-                    LibParseOperand.handleOperandDisallowed,
                     // Decimal18 scale18 dynamic
                     LibParseOperand.handleOperandM1M1,
                     // Decimal18 scale18
                     LibParseOperand.handleOperand8M1M1,
                     // Decimal18 scale n
                     LibParseOperand.handleOperand8M1M1,
+                    // Decimal18 snap to unit
+                    LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 sqrt
+                    LibParseOperand.handleOperandDisallowed,
                     // Int add
                     LibParseOperand.handleOperandDisallowed,
                     // Decimal18 add
@@ -572,10 +579,11 @@ library LibAllStandardOpsNP {
                     LibOpDecimal18MulNP.integrity,
                     LibOpDecimal18PowNP.integrity,
                     LibOpDecimal18PowUNP.integrity,
-                    LibOpDecimal18SqrtNP.integrity,
                     LibOpDecimal18Scale18DynamicNP.integrity,
                     LibOpDecimal18Scale18NP.integrity,
                     LibOpDecimal18ScaleNNP.integrity,
+                    LibOpDecimal18SnapToUnitNP.integrity,
+                    LibOpDecimal18SqrtNP.integrity,
                     // int and decimal18 add have identical implementations and
                     // point to the same function pointer. This is intentional.
                     LibOpIntAddNP.integrity,
@@ -688,10 +696,11 @@ library LibAllStandardOpsNP {
                     LibOpDecimal18MulNP.run,
                     LibOpDecimal18PowNP.run,
                     LibOpDecimal18PowUNP.run,
-                    LibOpDecimal18SqrtNP.run,
                     LibOpDecimal18Scale18DynamicNP.run,
                     LibOpDecimal18Scale18NP.run,
                     LibOpDecimal18ScaleNNP.run,
+                    LibOpDecimal18SnapToUnitNP.run,
+                    LibOpDecimal18SqrtNP.run,
                     // int and decimal18 add have identical implementations and
                     // point to the same function pointer. This is intentional.
                     LibOpIntAddNP.run,
