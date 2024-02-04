@@ -36,7 +36,7 @@ bytes constant INTEGRITY_FUNCTION_POINTERS =
     hex"0abd0b370ba00d180d220d220d2c0d350d500df60df60e520ece0ed80d220d2c0d220d220d2c0d180d180d180d180d180ee20f040f2e0d220ee20d220d220ed80d2c0d220d220d220d2c0f500d2c0d2c0d2c0d2c0d220d2c0d2c0d2c0d2c0f500d220d220d220d2c0d2c0d220d2c0f500f500f500f500f500f500f500f500f500f500f500f500d2c0f67";
 
 /// @dev Hash of the known construction meta.
-bytes32 constant CONSTRUCTION_META_HASH = bytes32(0x6e3a2ec5968381a2f2df5de6e7b8c210fe5bc54081aee96e92e9c03da9ad4f1e);
+bytes32 constant CONSTRUCTION_META_HASH = bytes32(0x5f2307ae2629624532e9636ef3019528378db2c7d99458b3b0fde94dfee47457);
 
 /// All config required to construct a `RainterpreterNPE2`.
 /// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match
