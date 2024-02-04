@@ -11,7 +11,7 @@ import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
 
 /// @dev The known hash of the parser bytecode. This is used by the deployer to
 /// check that it is deploying a parser that is compatible with the interpreter.
-bytes32 constant PARSER_BYTECODE_HASH = bytes32(0xafcd558bea0813df415541e7165a26792b8992c76113755af2103e03244a92ef);
+bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x580df50dff7f22f8ec4fcd981c60e692235218496495495e171187da15e42844);
 
 /// @dev Encodes the parser meta that is used to lookup word definitions.
 /// The structure of the parser meta is:
@@ -30,7 +30,7 @@ bytes32 constant PARSER_BYTECODE_HASH = bytes32(0xafcd558bea0813df415541e7165a26
 /// bit count of the previous bloom filter. If we reach the end of the bloom
 /// filters then we have a miss.
 bytes constant PARSE_META =
-    hex"02588423002e0844a4805a09380046408a2000483d10000941044dd10693108128840000000000000000000800000000000000000000000000100000000000000000001f49c6a30c1dc5373eb46c3a1a6b5d512ac697651ba56d9d3b6380a8416811913fbf1f411c9320383a25b20725767586017788743754ad3411facaed0bf793d9285dd6b83398844e0ac51f7f13de413210b7896422844b300fd8f798297c1ad31611585907980f123c008574126e57172c75b953212a4b6e302c3f7f2ef3a7222b87d7c6382012363d5fbbfc2fe281ae23b491eb397af18834b312972d2973c126b94d70431ec04218a0265d362223f20482963a035436e60205c2140075eca1152558bb061fa22142a5e8dd144329870d65981835bd10093162c9701ee60c0709880be5249879ba1d7d424b3298ad584054aa05197e9c5305e7bf522708ea4b202f3f5e0e52726c08783df917448fdb449232f7";
+    hex"02588423402e0844a4805a09380046408a2000483d10000941044dd10693108128840000000000000000000800000000000000000000000000100000000000000000001f49c6a30c1dc5373fb46c3a1a6b5d512ac697651ba56d9d3c6380a84268119140bf1f411c9320383b25b20725767586017788743854ad3411facaed0bf793d9285dd6b83398844e0ac51f7f13de413210b7896422844b300fd8f798297c1ad31611585907980f123d008574126e57172c75b953212a4b6e302c3f7f2ef3a7222b87d7c6392012363e5fbbfc2fe281ae23b491eb3a7af18835b312972d2973c126b94d70441ec04218a0265d372223f20482963a035436e60205c2140075eca1152558bb061fa22143a5e8dd144329870d65981836bd10093162c9701ee60c0709880be5249879ba1d7d424b3298ad584154aa05197e9c53342dd7b205e7bf522708ea4b202f3f5e0e52726c08783df917448fdb459232f7";
 
 /// @dev The build depth of the parser meta.
 uint8 constant PARSE_META_BUILD_DEPTH = 2;
@@ -38,13 +38,13 @@ uint8 constant PARSE_META_BUILD_DEPTH = 2;
 /// @dev Every two bytes is a function pointer for an operand handler. These
 /// positional indexes all map to the same indexes looked up in the parse meta.
 bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
-    hex"10b410b41149114911ea11ea11ea1149114910b410b4114911ea11ea11ea11ea11ea11ea11ea11ea11ea11ea11ea11ea11ea10b410b411ea11ea11ea11ea11ea11ea11ea11ea11ea11ea11ea11ea11ea11ea11ea11ea11ea11ea11ea11ea11ea11ea11ea122f12c312c311ea11ea11ea11ea11ea11ea11ea11ea11ea11ea11ea11ea10b410b411ea11ea";
+    hex"10bc10bc1151115111f211f211f21151115110bc10bc115111f211f211f211f211f211f211f211f211f211f211f211f211f210bc10bc11f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f2123712cb11f212cb11f211f211f211f211f211f211f211f211f211f211f211f210bc10bc11f211f2";
 
 /// @dev Every two bytes is a function pointer for a literal parser. Literal
 /// dispatches are determined by the first byte(s) of the literal rather than a
 /// full word lookup, and are done with simple conditional jumps as the
 /// possibilities are limited compared to the number of words we have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"08460b0e0e0b0ec3";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"084e0b160e130ecb";
 
 /// @title RainterpreterParserNPE2
 /// @dev The parser implementation.

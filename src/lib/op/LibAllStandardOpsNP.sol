@@ -94,7 +94,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 69;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 70;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -244,6 +244,10 @@ library LibAllStandardOpsNP {
                 "Scales an input value from some fixed point decimal scale to 18 decimal fixed point. The first operand is the scale to scale from. The second (optional) operand controls rounding where 0 (default) rounds down and 1 rounds up. The third (optional) operand controls saturation where 0 (default) errors on overflow and 1 saturates at max-decimal-value."
             ),
             AuthoringMetaV2(
+                "int-to-decimal18",
+                "Scales an integer value to 18 decimal fixed point, E.g. 1 becomes 1e18 and 10 becomes 1e19. Identical to `decimal18-scale18` with an input scale of 0, but perhaps more legible. Does NOT support saturation."
+            ),
+            AuthoringMetaV2(
                 "decimal18-scale-n",
                 "Scales an input value from 18 decimal fixed point to some other fixed point scale N. The first operand is the scale to scale to. The second (optional) operand controls rounding where 0 (default) rounds down and 1 rounds up. The third (optional) operand controls saturation where 0 (default) errors on overflow and 1 saturates at max-decimal-value."
             ),
@@ -303,7 +307,7 @@ library LibAllStandardOpsNP {
             ),
             AuthoringMetaV2(
                 "decimal18-sub",
-                "Subtracts all inputs from the first input as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Errors if the subtraction would result in a negative value."
+                "Subtracts all inputs from the first input as fixed point 18 decimal numbers (i.e. 'one' is 1e18). The operand controls whether subtraction will saturate at 0. The default behaviour, and what will happen if the operand is 0, is that the word will revert if the subtraction would result in a negative value. If the operand is 1, the word will saturate at 0 (e.g. 1-2=0)."
             ),
             AuthoringMetaV2("get", "Gets a value from storage. The first operand is the key to lookup."),
             AuthoringMetaV2(
@@ -462,6 +466,8 @@ library LibAllStandardOpsNP {
                     LibParseOperand.handleOperandM1M1,
                     // Decimal18 scale18
                     LibParseOperand.handleOperand8M1M1,
+                    // Int to decimal18
+                    LibParseOperand.handleOperandDisallowed,
                     // Decimal18 scale n
                     LibParseOperand.handleOperand8M1M1,
                     // Decimal18 snap to unit
@@ -581,6 +587,8 @@ library LibAllStandardOpsNP {
                     LibOpDecimal18PowUNP.integrity,
                     LibOpDecimal18Scale18DynamicNP.integrity,
                     LibOpDecimal18Scale18NP.integrity,
+                    // Int to decimal18 is a repeat of decimal18 scale18.
+                    LibOpDecimal18Scale18NP.integrity,
                     LibOpDecimal18ScaleNNP.integrity,
                     LibOpDecimal18SnapToUnitNP.integrity,
                     LibOpDecimal18SqrtNP.integrity,
@@ -697,6 +705,8 @@ library LibAllStandardOpsNP {
                     LibOpDecimal18PowNP.run,
                     LibOpDecimal18PowUNP.run,
                     LibOpDecimal18Scale18DynamicNP.run,
+                    LibOpDecimal18Scale18NP.run,
+                    // Int to decimal18 is a repeat of decimal18 scale18.
                     LibOpDecimal18Scale18NP.run,
                     LibOpDecimal18ScaleNNP.run,
                     LibOpDecimal18SnapToUnitNP.run,
