@@ -10,7 +10,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = rainix.pkgs.${system};
-      in {
+      in rec {
         packages = rec {
           i9r-prelude = rainix.mkTask.${system} {
             name = "i9r-prelude";
@@ -35,7 +35,10 @@
           };
         } // rainix.packages.${system};
 
-        devShells = rainix.devShells.${system};
+        devShells.default = pkgs.mkShell {
+          packages = [ packages.i9r-prelude ];
+          inputsFrom = [ rainix.devShells.${system}.default ];
+        };
       }
     );
 }
