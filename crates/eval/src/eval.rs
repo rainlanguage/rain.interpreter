@@ -61,7 +61,7 @@ impl ForkedEvm {
         };
 
         let deploy_return = self
-            .read(Address::default(), deployer, deploy_call)
+            .write(Address::default(), deployer, deploy_call, U256::from(0))
             .unwrap()
             .typed_return;
 

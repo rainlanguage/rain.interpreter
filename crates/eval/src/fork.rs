@@ -69,7 +69,7 @@ impl ForkedEvm {
     }
 
     pub fn read<C: SolCall>(
-        &mut self,
+        &self,
         from_address: Address,
         to_address: Address,
         call: C,
@@ -82,6 +82,27 @@ impl ForkedEvm {
         let mut executor = self.build_executor();
         let raw = executor
             .call_raw_with_env(env)
+            .map_err(|e| ForkCallError::ExecutorError)?;
+        let typed_return = C::abi_decode_returns(&raw.result.to_vec().as_slice(), true)
+            .map_err(|e| ForkCallError::TypedError)?;
+        Ok(ForkTypedReturn { raw, typed_return })
+    }
+
+    pub fn write<C: SolCall>(
+        &self,
+        from_address: Address,
+        to_address: Address,
+        call: C,
+        value: U256,
+    ) -> Result<ForkTypedReturn<C>, ForkCallError> {
+        let mut executor = self.build_executor();
+        let raw = executor
+            .call_raw_committing(
+                from_address.into_array().into(),
+                to_address.into_array().into(),
+                Bytes::from(call.abi_encode()),
+                value,
+            )
             .map_err(|e| ForkCallError::ExecutorError)?;
         let typed_return = C::abi_decode_returns(&raw.result.to_vec().as_slice(), true)
             .map_err(|e| ForkCallError::TypedError)?;
