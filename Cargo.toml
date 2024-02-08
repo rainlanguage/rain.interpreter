@@ -7,6 +7,10 @@ edition = "2021"
 license = "CAL-1.0"
 homepage = "https://github.com/rainprotocol/rain.interpreter"
 
+[workspace.dependencies]
+thiserror = "1.0.56"
+alloy-primitives = "0.5.4"
+
 [workspace.dependencies.rain_interpreter_parser]
 path = "crates/parser"
 
