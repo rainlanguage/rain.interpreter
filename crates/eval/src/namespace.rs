@@ -5,7 +5,7 @@ use rain_interpreter_bindings::IInterpreterV2::FullyQualifiedNamespace;
 pub struct CreateNamespace {}
 
 impl CreateNamespace {
-    pub fn qualify_namepsace(state_namespace: B256, sender: Address) -> FullyQualifiedNamespace {
+    pub fn qualify_namespace(state_namespace: B256, sender: Address) -> FullyQualifiedNamespace {
         // Combine state namespace and sender into a single 52-byte array
         let mut combined = [0u8; 52];
         combined[..32].copy_from_slice(state_namespace.as_slice());
@@ -28,7 +28,7 @@ mod tests {
     fn test_new() {
         let state_namespace = B256::repeat_byte(0x1);
         let sender = Address::repeat_byte(0x2);
-        let namespace = CreateNamespace::qualify_namepsace(state_namespace, sender);
+        let namespace = CreateNamespace::qualify_namespace(state_namespace, sender);
 
         let expected =
             B256::from_str("0x237ee2f05725394bde01994812b89c92cd3f7f74a934080a8f73e8b743d99dcd")

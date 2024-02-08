@@ -12,3 +12,5 @@ thiserror = { workspace = true }
 alloy-primitives = {workspace = true}
 rain_interpreter_bindings = { workspace = true }
 alloy-sol-types = { workspace = true }
+foundry-evm = { workspace = true }
+revm = { workspace = true }
