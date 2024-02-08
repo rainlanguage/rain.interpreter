@@ -1,14 +1,14 @@
 use alloy_primitives::Address;
+use alloy_sol_types::SolType;
+use rain_interpreter_bindings::IInterpreterV2::EncodedDispatch;
 
-#[derive(Debug)]
-pub struct EncodedDispatch {
-    pub bytes: [u8; 32],
-}
+#[derive(Debug, PartialEq)]
+pub struct CreateEncodedDispatch {}
 
-impl EncodedDispatch {
+impl CreateEncodedDispatch {
     /// Constructs an `EncodedDispatch` from an address, source index, and max outputs.
     /// Returns an `EncodingError` if the expression address is not exactly 20 bytes.
-    pub fn encode(expression: &Address, source_index: u16, max_outputs: u16) -> Self {
+    pub fn encode(expression: &Address, source_index: u16, max_outputs: u16) -> EncodedDispatch {
         let expression_bytes = expression.as_slice();
 
         let mut result_bytes = [0u8; 32];
@@ -20,9 +20,7 @@ impl EncodedDispatch {
         result_bytes[28..30].copy_from_slice(&source_index.to_be_bytes());
         result_bytes[30..32].copy_from_slice(&max_outputs.to_be_bytes());
 
-        EncodedDispatch {
-            bytes: result_bytes,
-        }
+        EncodedDispatch::from(EncodedDispatch::abi_decode(&result_bytes, true).unwrap())
     }
 }
 
@@ -36,15 +34,18 @@ mod tests {
         let source_index = 123;
         let max_outputs = 456;
 
-        let encoded_dispatch = EncodedDispatch::encode(&address, source_index, max_outputs);
+        let encoded_dispatch = CreateEncodedDispatch::encode(&address, source_index, max_outputs);
 
-        assert_eq!(&encoded_dispatch.bytes[8..28], address.as_slice());
+        let mut encoded_dispatch_bytes = encoded_dispatch.into().as_le_slice().to_owned();
+        encoded_dispatch_bytes.reverse();
+
+        assert_eq!(&encoded_dispatch_bytes[8..28], address.as_slice());
         assert_eq!(
-            u16::from_be_bytes(encoded_dispatch.bytes[28..30].try_into().unwrap()),
+            u16::from_be_bytes(encoded_dispatch_bytes[28..30].try_into().unwrap()),
             source_index
         );
         assert_eq!(
-            u16::from_be_bytes(encoded_dispatch.bytes[30..32].try_into().unwrap()),
+            u16::from_be_bytes(encoded_dispatch_bytes[30..32].try_into().unwrap()),
             max_outputs
         );
     }
