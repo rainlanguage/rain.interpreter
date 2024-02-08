@@ -82,9 +82,9 @@ impl ForkedEvm {
         let mut executor = self.build_executor();
         let raw = executor
             .call_raw_with_env(env)
-            .map_err(|e| ForkCallError::ExecutorError)?;
-        let typed_return = C::abi_decode_returns(&raw.result.to_vec().as_slice(), true)
-            .map_err(|e| ForkCallError::TypedError)?;
+            .map_err(|_e| ForkCallError::ExecutorError)?;
+        let typed_return = C::abi_decode_returns(raw.result.to_vec().as_slice(), true)
+            .map_err(|_e| ForkCallError::TypedError)?;
         Ok(ForkTypedReturn { raw, typed_return })
     }
 
@@ -103,9 +103,9 @@ impl ForkedEvm {
                 Bytes::from(call.abi_encode()),
                 value,
             )
-            .map_err(|e| ForkCallError::ExecutorError)?;
-        let typed_return = C::abi_decode_returns(&raw.result.to_vec().as_slice(), true)
-            .map_err(|e| ForkCallError::TypedError)?;
+            .map_err(|_e| ForkCallError::ExecutorError)?;
+        let typed_return = C::abi_decode_returns(raw.result.to_vec().as_slice(), true)
+            .map_err(|_e| ForkCallError::TypedError)?;
         Ok(ForkTypedReturn { raw, typed_return })
     }
 }

@@ -14,7 +14,7 @@ impl CreateNamespace {
         // Hash the combined array with Keccak256
         let qualified_namespace = keccak256(combined);
         FullyQualifiedNamespace::from(
-            FullyQualifiedNamespace::abi_decode(&qualified_namespace.as_slice(), true).unwrap(),
+            FullyQualifiedNamespace::abi_decode(qualified_namespace.as_slice(), true).unwrap(),
         )
     }
 }
