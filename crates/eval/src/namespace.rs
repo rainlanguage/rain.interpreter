@@ -7,9 +7,9 @@ pub struct CreateNamespace {}
 impl CreateNamespace {
     pub fn qualify_namespace(state_namespace: B256, sender: Address) -> FullyQualifiedNamespace {
         // Combine state namespace and sender into a single 52-byte array
-        let mut combined = [0u8; 52];
+        let mut combined = [0u8; 64];
         combined[..32].copy_from_slice(state_namespace.as_slice());
-        combined[32..].copy_from_slice(sender.as_slice());
+        combined[44..].copy_from_slice(sender.as_slice());
 
         // Hash the combined array with Keccak256
         let qualified_namespace = keccak256(combined);
@@ -30,8 +30,9 @@ mod tests {
         let sender = Address::repeat_byte(0x2);
         let namespace = CreateNamespace::qualify_namespace(state_namespace, sender);
 
+        // Got the below from chisel
         let expected =
-            B256::from_str("0x237ee2f05725394bde01994812b89c92cd3f7f74a934080a8f73e8b743d99dcd")
+            B256::from_str("0x92f6b29736bf07627a27ffec88dbcb964f312685ab557770ad73f67336b9aee8")
                 .unwrap()
                 .as_slice()
                 .to_owned();

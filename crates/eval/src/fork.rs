@@ -10,6 +10,12 @@ use foundry_evm::{
 };
 use revm::primitives::{Bytes, Env, TransactTo, U256};
 
+/// A forked EVM instance.
+/// This is a wrapper around the `foundry_evm` crate, providing a simplified
+/// interface for interacting with the EVM. It is used to interact with a forked
+/// EVM instance, allowing for reading and writing to the EVM. To persist state
+/// between calls, build an executor and pass it to the `read` and `write`
+/// methods. If no executor is passed, a new one will be created each time.
 pub struct ForkedEvm {
     fork_opts: CreateFork,
     backend: Backend,
@@ -27,7 +33,28 @@ pub enum ForkCallError {
 }
 
 impl ForkedEvm {
+    /// Creates a new instance of `ForkedEvm` with the specified fork URL and optional fork block number.
+    ///
+    /// # Arguments
+    ///
+    /// * `fork_url` - The URL of the fork to connect to.
+    /// * `fork_block_number` - Optional fork block number to start from.
+    ///
+    /// # Returns
+    ///
+    /// A new instance of `ForkedEvm`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use rain_interpreter_eval::fork::ForkedEvm;
+    ///
+    /// let fork_url = "https://example.com/fork";
+    /// let fork_block_number = Some(12345);
+    /// let forked_evm = ForkedEvm::new(fork_url, fork_block_number);
+    /// ```
     pub async fn new(fork_url: &str, fork_block_number: Option<BlockNumber>) -> ForkedEvm {
+        // dealing with boilerplate
         let evm_opts = EvmOpts {
             fork_url: Some(fork_url.to_string()),
             fork_block_number,
@@ -53,13 +80,24 @@ impl ForkedEvm {
         Self { fork_opts, backend }
     }
 
+    /// Builds an executor for the forked EVM.
+    /// # Returns
+    /// An instance of `Executor`.
     pub fn build_executor(&self) -> Executor {
         let builder = ExecutorBuilder::default()
             .gas_limit(U256::from(U64::MAX))
-            .inspectors(|stack| stack.trace(true).debug(true));
+            .inspectors(|stack| stack.trace(true).debug(false));
         builder.build(self.fork_opts.env.clone(), self.backend.clone())
     }
 
+    /// Reads from the forked EVM.
+    /// # Arguments
+    /// * `executor` - An optional instance of `Executor`.
+    /// * `from_address` - The address to call from.
+    /// * `to_address` - The address to call to.
+    /// * `call` - The call to make.
+    /// # Returns
+    /// A result containing the raw call result and the typed return.
     pub fn read<C: SolCall>(
         &self,
         executor: Option<&mut Executor>,
@@ -95,6 +133,15 @@ impl ForkedEvm {
         Ok(ForkTypedReturn { raw, typed_return })
     }
 
+    /// Writes to the forked EVM.
+    /// # Arguments
+    /// * `executor` - An optional instance of `Executor`.
+    /// * `from_address` - The address to call from.
+    /// * `to_address` - The address to call to.
+    /// * `call` - The call to make.
+    /// * `value` - The value to send with the call.
+    /// # Returns
+    /// A result containing the raw call result and the typed return.
     pub fn write<C: SolCall>(
         &self,
         executor: Option<&mut Executor>,
@@ -124,5 +171,85 @@ impl ForkedEvm {
                 ForkCallError::TypedError(format!("Call:{:?} Error:{:?}", type_name::<C>(), e))
             })?;
         Ok(ForkTypedReturn { raw, typed_return })
+    }
+}
+
+#[cfg(test)]
+
+mod tests {
+    use crate::namespace::CreateNamespace;
+
+    use super::*;
+    use alloy_primitives::U256;
+    use rain_interpreter_bindings::{
+        DeployerISP::iParserCall,
+        IInterpreterStoreV1::{getCall, setCall},
+    };
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+    async fn test_forked_evm_read() {
+        let fork_url = "https://rpc.ankr.com/polygon_mumbai";
+        let fork_block_number: BlockNumber = 45658085;
+        let forked_evm = ForkedEvm::new(fork_url, Some(fork_block_number)).await;
+
+        let from_address = Address::default();
+        let to_address: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
+            .parse::<Address>()
+            .unwrap();
+        let call = iParserCall {};
+        let result = forked_evm
+            .read(None, from_address, to_address, call)
+            .unwrap();
+        let parser_address = result.typed_return._0;
+        let expected_address = "0x4f8024FB052DbE76b156C6C262Ad27e0F436AF98"
+            .parse::<Address>()
+            .unwrap();
+        assert_eq!(parser_address, expected_address);
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+    async fn test_forked_evm_write() {
+        let fork_url = "https://rpc.ankr.com/polygon_mumbai";
+        let fork_block_number: BlockNumber = 45658085;
+        let forked_evm = ForkedEvm::new(fork_url, Some(fork_block_number)).await;
+
+        let mut executor = forked_evm.build_executor();
+        let from_address = Address::repeat_byte(0x02);
+        let to_address: Address = "0xF34e1f2BCeC2baD9c7bE8Aec359691839B784861"
+            .parse::<Address>()
+            .unwrap();
+        let namespace = U256::from(1);
+        let key = U256::from(3);
+        let value = U256::from(4);
+        let set = forked_evm
+            .write(
+                Some(&mut executor),
+                from_address,
+                to_address,
+                setCall {
+                    namespace,
+                    kvs: vec![key, value],
+                },
+                U256::from(0),
+            )
+            .unwrap();
+
+        let fully_quallified_namespace =
+            CreateNamespace::qualify_namespace(namespace.into(), from_address);
+
+        let get = forked_evm
+            .read(
+                Some(&mut executor),
+                from_address,
+                to_address,
+                getCall {
+                    namespace: fully_quallified_namespace.into(),
+                    key: U256::from(3),
+                },
+            )
+            .unwrap()
+            .typed_return
+            ._0;
+        assert_eq!(value, get);
     }
 }
