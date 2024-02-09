@@ -3942,6 +3942,8 @@ dependencies = [
  "rain_interpreter_bindings",
  "revm",
  "thiserror",
+ "tokio",
+ "tracing",
 ]
 
 [[package]]

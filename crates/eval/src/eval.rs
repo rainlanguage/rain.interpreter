@@ -14,9 +14,14 @@ impl ForkedEvm {
         rainlang_string: &str,
         deployer: Address,
     ) -> Result<ForkTypedReturn<parseCall>, ForkCallError> {
+        let mut executor = self.build_executor();
         let parser = self
-            .read(Address::default(), deployer, iParserCall {})
-            .unwrap()
+            .read(
+                Some(&mut executor),
+                Address::default(),
+                deployer,
+                iParserCall {},
+            )?
             .typed_return
             ._0;
 
@@ -24,7 +29,9 @@ impl ForkedEvm {
             data: rainlang_string.as_bytes().to_vec(),
         };
 
-        let parse_result = self.read(Address::default(), parser, parse_call).unwrap();
+        let parse_result = self
+            .read(Some(&mut executor), Address::default(), parser, parse_call)
+            .unwrap();
 
         Ok(parse_result)
     }
@@ -37,21 +44,29 @@ impl ForkedEvm {
         namespace: FullyQualifiedNamespace,
         context: Vec<Vec<U256>>,
     ) -> Result<ForkTypedReturn<eval2Call>, ForkCallError> {
+        let mut executor = self.build_executor();
         let expression_config = self
             .fork_parse(rainlang_string, deployer)
-            .await
-            .unwrap()
+            .await?
             .typed_return;
 
         let store = self
-            .read(Address::default(), deployer, iStoreCall {})
-            .unwrap()
+            .read(
+                Some(&mut executor),
+                Address::default(),
+                deployer,
+                iStoreCall {},
+            )?
             .typed_return
             ._0;
 
         let interpreter = self
-            .read(Address::default(), deployer, iInterpreterCall {})
-            .unwrap()
+            .read(
+                Some(&mut executor),
+                Address::default(),
+                deployer,
+                iInterpreterCall {},
+            )?
             .typed_return
             ._0;
 
@@ -61,8 +76,13 @@ impl ForkedEvm {
         };
 
         let deploy_return = self
-            .write(Address::default(), deployer, deploy_call, U256::from(0))
-            .unwrap()
+            .write(
+                Some(&mut executor),
+                Address::default(),
+                deployer,
+                deploy_call,
+                U256::from(0),
+            )?
             .typed_return;
 
         let dispatch =
@@ -76,10 +96,49 @@ impl ForkedEvm {
             inputs: vec![],
         };
 
-        let eval_result = self
-            .read(Address::default(), interpreter, eval_args)
-            .unwrap();
+        let eval_result = self.read(
+            Some(&mut executor),
+            Address::default(),
+            interpreter,
+            eval_args,
+        );
 
-        Ok(eval_result)
+        eval_result
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use alloy_primitives::BlockNumber;
+
+    const FORK_URL: &str = "https://rpc.ankr.com/polygon_mumbai";
+    const FORK_BLOCK_NUMBER: BlockNumber = 45658085;
+
+    // 0xF06Cd48c98d7321649dB7D8b2C396A81A2046555
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+    async fn test_fork_eval() {
+        let deployer_address: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
+            .parse::<Address>()
+            .unwrap();
+        let mut fork = ForkedEvm::new(FORK_URL, Some(FORK_BLOCK_NUMBER)).await;
+        match fork
+            .fork_eval(
+                r"_: int-add(1 2);",
+                0,
+                deployer_address,
+                FullyQualifiedNamespace::default(),
+                vec![],
+            )
+            .await
+        {
+            Ok(result) => {
+                println!("{:?}", result.raw.traces);
+            }
+            Err(e) => {
+                println!("{:?}", e);
+            }
+        }
     }
 }

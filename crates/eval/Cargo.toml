@@ -14,3 +14,7 @@ rain_interpreter_bindings = { workspace = true }
 alloy-sol-types = { workspace = true }
 foundry-evm = { workspace = true }
 revm = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }
+tracing = { workspace = true }
