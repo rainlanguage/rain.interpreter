@@ -32,6 +32,12 @@ pub enum ForkCallError {
     TypedError(String),
 }
 
+#[derive(Debug, Clone)]
+pub struct NewForkedEvm {
+    pub fork_url: String,
+    pub fork_block_number: Option<BlockNumber>,
+}
+
 impl ForkedEvm {
     /// Creates a new instance of `ForkedEvm` with the specified fork URL and optional fork block number.
     ///
@@ -47,13 +53,19 @@ impl ForkedEvm {
     /// # Examples
     ///
     /// ```
-    /// use rain_interpreter_eval::fork::ForkedEvm;
+    /// use rain_interpreter_eval::fork::{NewForkedEvm, ForkedEvm};
     ///
-    /// let fork_url = "https://example.com/fork";
-    /// let fork_block_number = Some(12345);
-    /// let forked_evm = ForkedEvm::new(fork_url, fork_block_number);
+    /// let new_forked_evm = NewForkedEvm {
+    ///   fork_url: "https://example.com/fork".to_string(),
+    ///   fork_block_number: Some(12345),
+    /// };
+    /// let forked_evm = ForkedEvm::new(new_forked_evm);
     /// ```
-    pub async fn new(fork_url: &str, fork_block_number: Option<BlockNumber>) -> ForkedEvm {
+    pub async fn new(args: NewForkedEvm) -> ForkedEvm {
+        let NewForkedEvm {
+            fork_url,
+            fork_block_number,
+        } = args;
         // dealing with boilerplate
         let evm_opts = EvmOpts {
             fork_url: Some(fork_url.to_string()),
@@ -190,7 +202,11 @@ mod tests {
     async fn test_forked_evm_read() {
         let fork_url = "https://rpc.ankr.com/polygon_mumbai";
         let fork_block_number: BlockNumber = 45658085;
-        let forked_evm = ForkedEvm::new(fork_url, Some(fork_block_number)).await;
+        let forked_evm = ForkedEvm::new(NewForkedEvm {
+            fork_url: fork_url.into(),
+            fork_block_number: Some(fork_block_number),
+        })
+        .await;
 
         let from_address = Address::default();
         let to_address: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
@@ -211,8 +227,11 @@ mod tests {
     async fn test_forked_evm_write() {
         let fork_url = "https://rpc.ankr.com/polygon_mumbai";
         let fork_block_number: BlockNumber = 45658085;
-        let forked_evm = ForkedEvm::new(fork_url, Some(fork_block_number)).await;
-
+        let forked_evm = ForkedEvm::new(NewForkedEvm {
+            fork_url: fork_url.into(),
+            fork_block_number: Some(fork_block_number),
+        })
+        .await;
         let mut executor = forked_evm.build_executor();
         let from_address = Address::repeat_byte(0x02);
         let to_address: Address = "0xF34e1f2BCeC2baD9c7bE8Aec359691839B784861"
@@ -221,7 +240,7 @@ mod tests {
         let namespace = U256::from(1);
         let key = U256::from(3);
         let value = U256::from(4);
-        let set = forked_evm
+        let _set = forked_evm
             .write(
                 Some(&mut executor),
                 from_address,
