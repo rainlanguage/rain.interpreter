@@ -127,13 +127,20 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
     }
 
     struct ExpectedTrace {
+        uint256 parentSourceIndex;
         uint256 sourceIndex;
         uint256[] stack;
     }
 
     function checkCallNPTraces(bytes memory rainlang, ExpectedTrace[] memory traces) internal {
         for (uint256 i = 0; i < traces.length; ++i) {
-            vm.expectCall(STACK_TRACER, abi.encodePacked(bytes4(uint32(traces[i].sourceIndex)), traces[i].stack), 1);
+            vm.expectCall(
+                STACK_TRACER,
+                abi.encodePacked(
+                    bytes2(uint16(traces[i].parentSourceIndex)), bytes2(uint16(traces[i].sourceIndex)), traces[i].stack
+                ),
+                1
+            );
         }
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainlang);
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
@@ -183,10 +190,12 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         traces[0].sourceIndex = 0;
         traces[0].stack = new uint256[](1);
         traces[0].stack[0] = 12;
+        traces[1].parentSourceIndex = 0;
         traces[1].sourceIndex = 1;
         traces[1].stack = new uint256[](2);
         traces[1].stack[1] = 2;
         traces[1].stack[0] = 11;
+        traces[2].parentSourceIndex = 1;
         traces[2].sourceIndex = 2;
         traces[2].stack = new uint256[](1);
         traces[2].stack[0] = 10;
