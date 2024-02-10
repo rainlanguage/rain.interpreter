@@ -134,7 +134,13 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
 
     function checkCallNPTraces(bytes memory rainlang, ExpectedTrace[] memory traces) internal {
         for (uint256 i = 0; i < traces.length; ++i) {
-            vm.expectCall(STACK_TRACER, abi.encodePacked(bytes2(uint16(traces[i].parentSourceIndex)), bytes2(uint16(traces[i].sourceIndex)), traces[i].stack), 1);
+            vm.expectCall(
+                STACK_TRACER,
+                abi.encodePacked(
+                    bytes2(uint16(traces[i].parentSourceIndex)), bytes2(uint16(traces[i].sourceIndex)), traces[i].stack
+                ),
+                1
+            );
         }
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainlang);
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
