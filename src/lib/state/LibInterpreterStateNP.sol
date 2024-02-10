@@ -82,14 +82,17 @@ library LibInterpreterStateNP {
     ///   would be both complex and onerous for caller implementations, and make
     ///   it much harder for tooling/consumers to reliably find all the data, as
     ///   it would be spread across callers in potentially inconsistent events.
-    function stackTrace(uint256 sourceIndex, Pointer stackTop, Pointer stackBottom) internal view {
+    function stackTrace(uint256 parentSourceIndex, uint256 sourceIndex, Pointer stackTop, Pointer stackBottom)
+        internal
+        view
+    {
         address tracer = STACK_TRACER;
         assembly ("memory-safe") {
             // We are mutating memory in place to avoid allocation, copying, etc.
             let beforePtr := sub(stackTop, 0x20)
             // We need to save the value at the pointer before we overwrite it.
             let before := mload(beforePtr)
-            mstore(beforePtr, sourceIndex)
+            mstore(beforePtr, or(shl(0x10, parentSourceIndex), sourceIndex))
             // We don't care about success, we just want to call the tracer.
             let success := staticcall(gas(), tracer, sub(stackTop, 4), add(sub(stackBottom, stackTop), 4), 0, 0)
             // Restore the value at the pointer that we mutated above.

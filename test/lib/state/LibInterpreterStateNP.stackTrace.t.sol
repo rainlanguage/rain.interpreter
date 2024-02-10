@@ -8,10 +8,14 @@ import {Test} from "forge-std/Test.sol";
 contract LibInterpreterStateNPStackTraceTest is Test {
     using LibUint256Array for uint256[];
 
-    function testStackTraceCall(uint256 sourceIndex, uint256[] memory inputs) external {
+    function testStackTraceCall(uint256 parentSourceIndex, uint256 sourceIndex, uint256[] memory inputs) external {
+        parentSourceIndex = bound(parentSourceIndex, 0, 0xFFFF);
+        sourceIndex = bound(sourceIndex, 0, 0xFFFF);
         uint256 lengthBefore = inputs.length;
-        vm.expectCall(STACK_TRACER, abi.encodePacked(bytes4(uint32(sourceIndex)), inputs), 1);
-        LibInterpreterStateNP.stackTrace(sourceIndex, inputs.dataPointer(), inputs.endPointer());
+        vm.expectCall(
+            STACK_TRACER, abi.encodePacked(bytes2(uint16(parentSourceIndex)), bytes2(uint16(sourceIndex)), inputs), 1
+        );
+        LibInterpreterStateNP.stackTrace(parentSourceIndex, sourceIndex, inputs.dataPointer(), inputs.endPointer());
         // Check we didn't corrupt the inputs length while mutating memory.
         assertEq(inputs.length, lengthBefore);
     }
