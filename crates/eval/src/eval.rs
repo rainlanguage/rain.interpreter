@@ -40,9 +40,8 @@ impl ForkedEvm {
             data: rainlang_string.as_bytes().to_vec(),
         };
 
-        let parse_result = self
-            .read(Some(&mut executor), Address::default(), parser, parse_call)
-            .unwrap();
+        let parse_result =
+            self.read(Some(&mut executor), Address::default(), parser, parse_call)?;
 
         Ok(parse_result)
     }

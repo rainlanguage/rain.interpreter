@@ -221,7 +221,7 @@ mod tests {
         let namespace = U256::from(1);
         let key = U256::from(3);
         let value = U256::from(4);
-        let set = forked_evm
+        let _set = forked_evm
             .write(
                 Some(&mut executor),
                 from_address,

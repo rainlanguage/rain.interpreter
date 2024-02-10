@@ -1,5 +1,4 @@
-use alloy_primitives::Address;
-use alloy_sol_types::SolType;
+use alloy_primitives::{Address, U256};
 use rain_interpreter_bindings::IInterpreterV2::EncodedDispatch;
 
 #[derive(Debug, PartialEq)]
@@ -20,7 +19,7 @@ impl CreateEncodedDispatch {
         result_bytes[28..30].copy_from_slice(&source_index.to_be_bytes());
         result_bytes[30..32].copy_from_slice(&max_outputs.to_be_bytes());
 
-        EncodedDispatch::from(EncodedDispatch::abi_decode(&result_bytes, true).unwrap())
+        EncodedDispatch::from(U256::from_be_bytes(result_bytes))
     }
 }
 
