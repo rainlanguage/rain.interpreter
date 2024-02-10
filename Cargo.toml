@@ -8,9 +8,10 @@ license = "CAL-1.0"
 homepage = "https://github.com/rainprotocol/rain.interpreter"
 
 [workspace.dependencies]
-thiserror = "1.0.56"
 alloy-primitives = "0.5.4"
 alloy-sol-types = { version = "0.5.4", features = ["json"] }
+anyhow = "1.0.70"
+clap = { version = "4.2.5", features = ["cargo", "derive"] }
 ethers = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107", default-features = false }
 foundry-evm = { git = "https://github.com/foundry-rs/foundry", rev = "a5efe4f8f425e2f6fb35b0e298f0f46acce11dad" }
 revm = { version = "3", default-features = false, features = [
@@ -22,8 +23,13 @@ revm = { version = "3", default-features = false, features = [
     "optional_no_base_fee",
     "arbitrary",
 ] }
+serde = "1.0.160"
+serde_bytes = "0.11.9"
+thiserror = "1.0.56"
 tokio = { version = "1.28.0", features = ["full"] }
 tracing = "0.1.37"
+tracing-subscriber = "0.3.17"
+
 
 [workspace.dependencies.rain_interpreter_parser]
 path = "crates/parser"
@@ -33,6 +39,9 @@ path = "crates/dispair"
 
 [workspace.dependencies.rain_interpreter_bindings]
 path = "crates/bindings"
+
+[workspace.dependencies.rain_interpreter_eval]
+path = "crates/eval"
 
 [patch.crates-io]
 ethers = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }

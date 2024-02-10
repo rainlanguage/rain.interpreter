@@ -130,6 +130,8 @@ impl ForkedEvm {
 
 #[cfg(test)]
 mod tests {
+    use crate::fork::NewForkedEvm;
+
     use super::*;
     use alloy_primitives::{BlockNumber, Bytes};
 
@@ -141,7 +143,11 @@ mod tests {
         let deployer_address: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
             .parse::<Address>()
             .unwrap();
-        let mut fork = ForkedEvm::new(FORK_URL, Some(FORK_BLOCK_NUMBER)).await;
+        let mut fork = ForkedEvm::new(NewForkedEvm {
+            fork_url: FORK_URL.into(),
+            fork_block_number: Some(FORK_BLOCK_NUMBER),
+        })
+        .await;
         let res = fork
             .fork_parse(r"_: int-add(1 2);", deployer_address)
             .await
@@ -166,8 +172,11 @@ mod tests {
         let deployer_address: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
             .parse::<Address>()
             .unwrap();
-        let mut fork = ForkedEvm::new(FORK_URL, Some(FORK_BLOCK_NUMBER)).await;
-
+        let mut fork = ForkedEvm::new(NewForkedEvm {
+            fork_url: FORK_URL.into(),
+            fork_block_number: Some(FORK_BLOCK_NUMBER),
+        })
+        .await;
         let res = fork
             .fork_eval(
                 r"_: int-add(1 2);",
