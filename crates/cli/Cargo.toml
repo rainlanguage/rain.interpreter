@@ -9,13 +9,10 @@ homepage = "https://github.com/rainprotocol/rain.orderbook"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-# alloy-ethers-typecast = { workspace = true }
 rain_interpreter_bindings = { workspace = true }
 rain_interpreter_eval = { workspace = true }
 anyhow = { workspace = true }
 clap = { workspace = true }
-# reqwest = { workspace = true }
-# rust-bigint = { workspace = true }
 serde = { workspace = true }
 serde_bytes = { workspace = true }
 tokio = { workspace = true }
@@ -23,5 +20,3 @@ tracing = { workspace = true }
 tracing-subscriber = { workspace = true, features = ['env-filter'] }
 alloy-primitives = { workspace = true }
 alloy-sol-types = { workspace = true }
-# comfy-table = { workspace = true }
-# chrono = { workspace = true }
