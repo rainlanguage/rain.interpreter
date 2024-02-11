@@ -1,5 +1,5 @@
 [package]
-name = "rain_i9r_cli"
+name = "rain-i9r-cli"
 version = "0.0.1"
 edition = "2021"
 license = "CAL-1.0"
