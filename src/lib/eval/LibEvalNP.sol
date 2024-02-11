@@ -17,11 +17,12 @@ error InputsLengthMismatch(uint256 expected, uint256 actual);
 library LibEvalNP {
     using LibMemoryKV for MemoryKV;
 
-    function evalLoopNP(InterpreterStateNP memory state, Pointer stackTop, Pointer stackBottom)
-        internal
-        view
-        returns (Pointer)
-    {
+    function evalLoopNP(
+        InterpreterStateNP memory state,
+        uint256 parentSourceIndex,
+        Pointer stackTop,
+        Pointer stackBottom
+    ) internal view returns (Pointer) {
         uint256 sourceIndex = state.sourceIndex;
         uint256 cursor;
         uint256 end;
@@ -153,7 +154,7 @@ library LibEvalNP {
             cursor += 4;
         }
 
-        LibInterpreterStateNP.stackTrace(sourceIndex, stackTop, stackBottom);
+        LibInterpreterStateNP.stackTrace(parentSourceIndex, sourceIndex, stackTop, stackBottom);
 
         return stackTop;
     }
@@ -192,7 +193,8 @@ library LibEvalNP {
             }
 
             // Run the loop.
-            stackTop = evalLoopNP(state, stackTop, stackBottom);
+            // Parent source index and child are the same at the root eval.
+            stackTop = evalLoopNP(state, state.sourceIndex, stackTop, stackBottom);
 
             // Convert the stack top pointer to an array with the correct length.
             // If the stack top is pointing to the base of Solidity's understanding

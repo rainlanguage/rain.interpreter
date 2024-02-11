@@ -111,7 +111,7 @@ dependencies = [
 [[package]]
 name = "alloy-ethers-typecast"
 version = "0.2.0"
-source = "git+https://github.com/rainlanguage/alloy-ethers-typecast?rev=c00a8b8f00802e8291f64b9a89494b83ce9c8169#c00a8b8f00802e8291f64b9a89494b83ce9c8169"
+source = "git+https://github.com/rainlanguage/alloy-ethers-typecast?rev=846dae9034c79f3935a0021635c9a6ee2d91f13e#846dae9034c79f3935a0021635c9a6ee2d91f13e"
 dependencies = [
  "alloy-primitives 0.5.4",
  "alloy-sol-types 0.5.4",
@@ -3923,20 +3923,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dc33ff2d4973d518d823d61aa239014831e521c75da58e3df4840d3f47749d09"
 
 [[package]]
-name = "rain-i9r-cli"
-version = "0.0.1"
+name = "rain-interpreter-eval"
+version = "0.1.0"
 dependencies = [
  "alloy-primitives 0.5.4",
  "alloy-sol-types 0.5.4",
- "anyhow",
- "clap",
+ "foundry-evm",
  "rain_interpreter_bindings",
- "rain_interpreter_eval",
- "serde",
- "serde_bytes",
+ "revm",
+ "thiserror",
  "tokio",
  "tracing",
- "tracing-subscriber",
 ]
 
 [[package]]
@@ -3962,20 +3959,6 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
-]
-
-[[package]]
-name = "rain_interpreter_eval"
-version = "0.1.0"
-dependencies = [
- "alloy-primitives 0.5.4",
- "alloy-sol-types 0.5.4",
- "foundry-evm",
- "rain_interpreter_bindings",
- "revm",
- "thiserror",
- "tokio",
- "tracing",
 ]
 
 [[package]]
