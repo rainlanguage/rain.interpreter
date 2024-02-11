@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import {OpTest} from "test/util/abstract/OpTest.sol";
+import {OpTest, UnexpectedOperand} from "test/util/abstract/OpTest.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 import {ExcessRHSItems} from "src/lib/parse/LibParse.sol";
 import {LibOpEnsureNP} from "src/lib/op/logic/LibOpEnsureNP.sol";
@@ -97,5 +97,11 @@ contract LibOpEnsureNPTest is OpTest {
 
         // Empty reason should be fine.
         checkUnhappy(":ensure(0 \"\"), _:1;", "");
+    }
+
+    /// Test the eval of `ensure` parsed from a string. Tests the unhappy path
+    /// where an operand is provided.
+    function testOpEnsureNPEvalUnhappyOperand() external {
+        checkUnhappyParse(":ensure<0>(1 \"foo\"), _:1;", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }
