@@ -3,7 +3,7 @@ pragma solidity =0.8.19;
 
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
-import {OpTest} from "test/util/abstract/OpTest.sol";
+import {OpTest, UnexpectedOperand} from "test/util/abstract/OpTest.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 import {LibOpConditionsNP} from "src/lib/op/logic/LibOpConditionsNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
@@ -57,7 +57,6 @@ contract LibOpConditionsNPTest is OpTest {
     /// Test the error case where no conditions are met.
     function testOpConditionsNPRunNoConditionsMet(uint256[] memory inputs, string memory reason) external {
         vm.assume(bytes(reason).length <= 31);
-        reason = "foo";
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
         // Ensure that we have inputs that are a valid pairwise conditions.
@@ -227,5 +226,11 @@ contract LibOpConditionsNPTest is OpTest {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: conditions(0x00);");
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 2, 1));
         iDeployer.deployExpression2(bytecode, constants);
+    }
+
+    /// Test the eval of `conditions` parsed from a string. Tests the unhappy path
+    /// where an operand is provided.
+    function testOpEnsureNPEvalUnhappyOperand() external {
+        checkUnhappyParse("_ :conditions<0>(1 1 \"foo\");", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

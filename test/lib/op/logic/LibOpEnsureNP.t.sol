@@ -102,6 +102,6 @@ contract LibOpEnsureNPTest is OpTest {
     /// Test the eval of `ensure` parsed from a string. Tests the unhappy path
     /// where an operand is provided.
     function testOpEnsureNPEvalUnhappyOperand() external {
-        checkUnhappyParse(":ensure<0>(1 \"foo\"), _:1;", abi.encodeWithSelector(UnexpectedOperand.selector));
+        checkUnhappyParse(":ensure<0>(1 \"foo\");", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }
