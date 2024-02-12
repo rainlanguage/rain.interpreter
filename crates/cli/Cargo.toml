@@ -10,7 +10,7 @@ homepage = "https://github.com/rainprotocol/rain.orderbook"
 
 [dependencies]
 rain_interpreter_bindings = { workspace = true }
-rain_interpreter_eval = { workspace = true }
+rain-interpreter-eval = { workspace = true }
 anyhow = { workspace = true }
 clap = { workspace = true }
 serde = { workspace = true }

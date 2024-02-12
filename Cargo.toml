@@ -40,7 +40,7 @@ path = "crates/dispair"
 [workspace.dependencies.rain_interpreter_bindings]
 path = "crates/bindings"
 
-[workspace.dependencies.rain_interpreter_eval]
+[workspace.dependencies.rain-interpreter-eval]
 path = "crates/eval"
 
 [patch.crates-io]
