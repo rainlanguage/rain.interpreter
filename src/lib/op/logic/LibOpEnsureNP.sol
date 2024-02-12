@@ -5,68 +5,42 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Operand} from "../../../interface/unstable/IInterpreterV2.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
-
-/// Thrown if a zero condition is found.
-/// @param ensureCode The ensure code that was evaluated. This is the low 16
-/// bits of the operand. Allows the author to provide more context about which
-/// condition failed if there is more than one in the expression.
-/// @param errorIndex The index of the condition that failed.
-error EnsureFailed(uint256 ensureCode, uint256 errorIndex);
+import {LibIntOrAString, IntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
 
 /// @title LibOpEnsureNP
-/// @notice Opcode to revert if any condition is zero.
+/// @notice Opcode to revert if the condition is zero.
 library LibOpEnsureNP {
-    function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
-        // There must be at least one input.
-        uint256 inputs = Operand.unwrap(operand) >> 0x10;
-        inputs = inputs > 0 ? inputs : 1;
-        return (inputs, 0);
+    using LibIntOrAString for IntOrAString;
+
+    function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
+        // There must be exactly 2 inputs.
+        return (2, 0);
     }
 
     /// `ensure`
-    /// List of conditions. If any condition is zero, the expression will revert.
+    /// If the condition is zero, the expression will revert with the given
+    /// string.
     /// All conditions are eagerly evaluated and there are no outputs.
-    function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
+    function run(InterpreterStateNP memory, Operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 condition;
-        Pointer cursor = stackTop;
+        IntOrAString reason;
         assembly ("memory-safe") {
-            for {
-                let end := add(cursor, mul(shr(0x10, operand), 0x20))
-                condition := mload(cursor)
-                cursor := add(cursor, 0x20)
-            } and(lt(cursor, end), gt(condition, 0)) {} {
-                condition := mload(cursor)
-                cursor := add(cursor, 0x20)
-            }
+            condition := mload(stackTop)
+            reason := mload(add(stackTop, 0x20))
+            stackTop := add(stackTop, 0x40)
         }
-        if (condition == 0) {
-            // If somehow we hit an underflow on the pointer math, we'd still
-            // prefer to see our ensure error rather than the generic underflow
-            // error.
-            unchecked {
-                revert EnsureFailed(
-                    uint16(Operand.unwrap(operand)), (Pointer.unwrap(cursor) - Pointer.unwrap(stackTop) - 0x20) / 0x20
-                );
-            }
-        }
-        return cursor;
+
+        require(condition > 0, reason.toString());
+        return stackTop;
     }
 
     /// Gas intensive reference implementation of `ensure` for testing.
-    function referenceFn(InterpreterStateNP memory, Operand operand, uint256[] memory inputs)
+    function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
         internal
         pure
         returns (uint256[] memory outputs)
     {
-        // Unchecked so that any overflow errors come from the real
-        // implementation.
-        unchecked {
-            for (uint256 i = 0; i < inputs.length; i++) {
-                if (inputs[i] == 0) {
-                    revert EnsureFailed(uint16(Operand.unwrap(operand)), i);
-                }
-            }
-            outputs = new uint256[](0);
-        }
+        require(inputs[0] > 0, IntOrAString.wrap(inputs[1]).toString());
+        outputs = new uint256[](0);
     }
 }
