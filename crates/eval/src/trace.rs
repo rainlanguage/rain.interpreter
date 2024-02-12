@@ -4,7 +4,10 @@ use rain_interpreter_bindings::IInterpreterV2::{eval2Call, eval2Return};
 
 pub const RAIN_TRACER_ADDRESS: &str = "0xF06Cd48c98d7321649dB7D8b2C396A81A2046555";
 
-#[derive(Debug, Clone)]
+/// A struct representing a single trace from a Rain source. Intended to be decoded
+/// from the calldata sent as part of a noop call by the Interpreter to the
+/// non-existent tracer contract.
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RainSourceTrace {
     pub parent_source_index: u16,
     pub source_index: u16,
@@ -41,6 +44,8 @@ impl RainSourceTrace {
     }
 }
 
+/// A struct representing the result of a Rain eval call. Contains the stack,
+/// writes, and traces. Can be constructed from a `ForkTypedReturn<eval2Call>`.
 #[derive(Debug, Clone)]
 pub struct RainEvalResult {
     pub reverted: bool,
@@ -83,19 +88,23 @@ impl From<ForkTypedReturn<eval2Call>> for RainEvalResult {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::fork::ForkedEvm;
+    use crate::fork::{ForkedEvm, NewForkedEvm};
     use alloy_primitives::BlockNumber;
     use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
 
     const FORK_URL: &str = "https://rpc.ankr.com/polygon_mumbai";
-    const FORK_BLOCK_NUMBER: BlockNumber = 45658085;
+    const FORK_BLOCK_NUMBER: BlockNumber = 45806808;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_eval() {
-        let deployer_address: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
+        let deployer_address: Address = "0x83aA87e8773bBE65DD34c5C5895948ce9f6cd2af"
             .parse::<Address>()
             .unwrap();
-        let mut fork = ForkedEvm::new(FORK_URL, Some(FORK_BLOCK_NUMBER)).await;
+        let mut fork = ForkedEvm::new(NewForkedEvm {
+            fork_url: FORK_URL.into(),
+            fork_block_number: Some(FORK_BLOCK_NUMBER),
+        })
+        .await;
 
         let res = fork
             .fork_eval(
@@ -104,12 +113,13 @@ mod tests {
                 b: 2,
                 c: 4,
                 _: call<1 1>(1 2),
-                _: call<1 1>(3 4),
-                _: call<1 1>(5 6),
                 :set(1 2),
                 :set(3 4);
                 a b:,
-                c: int-add(a b);
+                c: call<2 1>(a b),
+                d: int-add(a b);
+                a b:,
+                c: int-mul(a b);
                 ",
                 0,
                 deployer_address,
@@ -121,13 +131,10 @@ mod tests {
 
         let rain_eval_result = RainEvalResult::from(res);
 
-        println!("{:#?}", rain_eval_result);
-
         // reverted
-        assert_eq!(rain_eval_result.reverted, false);
-
+        assert!(!rain_eval_result.reverted);
         // stack
-        let expected_stack = vec_i32_to_u256(vec![11, 7, 3, 4, 2, 3]);
+        let expected_stack = vec_i32_to_u256(vec![3, 4, 2, 3]);
         assert_eq!(rain_eval_result.stack, expected_stack);
 
         // storage writes
@@ -136,22 +143,26 @@ mod tests {
 
         // stack traces
         // 0 0
-        assert_eq!(rain_eval_result.traces[0].stack, expected_stack);
+        let trace_0 = RainSourceTrace {
+            parent_source_index: 0,
+            source_index: 0,
+            stack: vec_i32_to_u256(vec![3, 4, 2, 3]),
+        };
+        assert_eq!(rain_eval_result.traces[0], trace_0);
         // 0 1
-        assert_eq!(
-            rain_eval_result.traces[1].stack,
-            vec_i32_to_u256(vec![11, 6, 5])
-        );
-        // 0 1
-        assert_eq!(
-            rain_eval_result.traces[2].stack,
-            vec_i32_to_u256(vec![7, 4, 3])
-        );
-        // 0 1
-        assert_eq!(
-            rain_eval_result.traces[3].stack,
-            vec_i32_to_u256(vec![3, 2, 1])
-        );
+        let trace_1 = RainSourceTrace {
+            parent_source_index: 0,
+            source_index: 1,
+            stack: vec_i32_to_u256(vec![3, 2, 2, 1]),
+        };
+        assert_eq!(rain_eval_result.traces[1], trace_1);
+        // 1 2
+        let trace_2 = RainSourceTrace {
+            parent_source_index: 1,
+            source_index: 2,
+            stack: vec_i32_to_u256(vec![2, 2, 1]),
+        };
+        assert_eq!(rain_eval_result.traces[2], trace_2);
     }
 
     fn vec_i32_to_u256(vec: Vec<i32>) -> Vec<U256> {
