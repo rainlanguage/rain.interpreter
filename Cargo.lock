@@ -3923,6 +3923,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dc33ff2d4973d518d823d61aa239014831e521c75da58e3df4840d3f47749d09"
 
 [[package]]
+name = "rain-i9r-cli"
+version = "0.0.1"
+dependencies = [
+ "alloy-primitives 0.5.4",
+ "alloy-sol-types 0.5.4",
+ "anyhow",
+ "clap",
+ "rain-interpreter-eval",
+ "rain_interpreter_bindings",
+ "serde",
+ "serde_bytes",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "rain-interpreter-eval"
 version = "0.1.0"
 dependencies = [
