@@ -1,21 +1,19 @@
-use alloy_primitives::{keccak256, Address, B256};
-use alloy_sol_types::SolType;
+use alloy_primitives::{keccak256, Address, B256, U256};
 use rain_interpreter_bindings::IInterpreterV2::FullyQualifiedNamespace;
 
 pub struct CreateNamespace {}
 
 impl CreateNamespace {
     pub fn qualify_namespace(state_namespace: B256, sender: Address) -> FullyQualifiedNamespace {
-        // Combine state namespace and sender into a single 52-byte array
+        // Combine state namespace and sender into a single 64-byte array
         let mut combined = [0u8; 64];
         combined[..32].copy_from_slice(state_namespace.as_slice());
         combined[44..].copy_from_slice(sender.as_slice());
 
         // Hash the combined array with Keccak256
         let qualified_namespace = keccak256(combined);
-        FullyQualifiedNamespace::from(
-            FullyQualifiedNamespace::abi_decode(qualified_namespace.as_slice(), true).unwrap(),
-        )
+
+        FullyQualifiedNamespace::from(U256::from_be_bytes(qualified_namespace.0))
     }
 }
 
