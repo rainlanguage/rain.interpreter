@@ -5,25 +5,18 @@ import {Operand} from "../../../interface/unstable/IInterpreterV2.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
-
-/// Thrown if no nonzero condition is found.
-/// @param condCode The condition code that was evaluated. This is the low 16
-/// bits of the operand. Allows the author to provide more context about which
-/// condition failed if there is more than one in the expression.
-error NoConditionsMet(uint256 condCode);
+import {LibIntOrAString, IntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
 
 /// @title LibOpConditionsNP
 /// @notice Opcode to return the first nonzero item on the stack up to the inputs
 /// limit.
 library LibOpConditionsNP {
+    using LibIntOrAString for IntOrAString;
+
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
         uint256 inputs = Operand.unwrap(operand) >> 0x10;
-        inputs = inputs > 0 ? inputs : 2;
-        // Odd inputs are not allowed.
-        unchecked {
-            inputs = inputs % 2 == 0 ? inputs : inputs + 1;
-        }
+        inputs = inputs > 2 ? inputs : 2;
         return (inputs, 1);
     }
 
@@ -36,11 +29,16 @@ library LibOpConditionsNP {
     /// condition to some nonzero constant value such as 1.
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 condition;
+        IntOrAString reason = IntOrAString.wrap(0);
         assembly ("memory-safe") {
+            let inputs := shr(0x10, operand)
+            let oddInputs := mod(inputs, 2)
+
             let cursor := stackTop
             for {
-                let end := add(cursor, mul(shr(0x10, operand), 0x20))
-                stackTop := sub(end, 0x20)
+                let end := add(cursor, mul(sub(inputs, oddInputs), 0x20))
+                stackTop := sub(end, mul(iszero(oddInputs), 0x20))
+                if oddInputs { reason := mload(end) }
             } lt(cursor, end) { cursor := add(cursor, 0x40) } {
                 condition := mload(cursor)
                 if condition {
@@ -49,14 +47,12 @@ library LibOpConditionsNP {
                 }
             }
         }
-        if (condition == 0) {
-            revert NoConditionsMet(uint16(Operand.unwrap(operand)));
-        }
+        require(condition > 0, reason.toString());
         return stackTop;
     }
 
     /// Gas intensive reference implementation of `condition` for testing.
-    function referenceFn(InterpreterStateNP memory, Operand operand, uint256[] memory inputs)
+    function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
         internal
         pure
         returns (uint256[] memory outputs)
@@ -65,7 +61,6 @@ library LibOpConditionsNP {
         // implementation.
         unchecked {
             uint256 length = inputs.length;
-            require(length % 2 == 0, "Odd number of inputs");
             outputs = new uint256[](1);
             for (uint256 i = 0; i < length; i += 2) {
                 if (inputs[i] != 0) {
@@ -73,7 +68,12 @@ library LibOpConditionsNP {
                     return outputs;
                 }
             }
-            revert NoConditionsMet(uint16(Operand.unwrap(operand)));
+            if (inputs.length % 2 != 0) {
+                IntOrAString reason = IntOrAString.wrap(inputs[length - 1]);
+                require(false, reason.toString());
+            } else {
+                require(false, "");
+            }
         }
     }
 }
