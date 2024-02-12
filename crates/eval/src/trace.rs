@@ -132,7 +132,7 @@ mod tests {
         let rain_eval_result = RainEvalResult::from(res);
 
         // reverted
-        assert_eq!(rain_eval_result.reverted, false);
+        assert_eq!(!rain_eval_result.reverted);
 
         // stack
         let expected_stack = vec_i32_to_u256(vec![3, 4, 2, 3]);
