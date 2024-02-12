@@ -165,7 +165,7 @@ library LibAllStandardOpsNP {
             AuthoringMetaV2("any", "The first non-zero value out of all inputs, or 0 if every input is 0."),
             AuthoringMetaV2(
                 "conditions",
-                "Treats inputs as pairwise condition/value pairs. The first nonzero condition's value is used. If no conditions are nonzero, the expression reverts. The operand can be used as an error code to differentiate between multiple conditions in the same expression."
+                "Treats inputs as pairwise condition/value pairs. The first nonzero condition's value is used. If no conditions are nonzero, the expression reverts. Provide a constant nonzero value to define a fallback case. If the number of inputs is odd, the final value is used as an error string in the case that no conditions match."
             ),
             AuthoringMetaV2(
                 "ensure",
@@ -413,7 +413,7 @@ library LibAllStandardOpsNP {
                     // Any
                     LibParseOperand.handleOperandDisallowed,
                     // Conditions
-                    LibParseOperand.handleOperandSingleFull,
+                    LibParseOperand.handleOperandDisallowed,
                     // Ensure
                     LibParseOperand.handleOperandDisallowed,
                     // Equal to
