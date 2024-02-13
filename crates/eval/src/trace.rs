@@ -88,7 +88,10 @@ impl From<ForkTypedReturn<eval2Call>> for RainEvalResult {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::fork::{ForkedEvm, NewForkedEvm};
+    use crate::{
+        eval::ForkEvalArgs,
+        fork::{ForkedEvm, NewForkedEvm},
+    };
     use alloy_primitives::BlockNumber;
     use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
 
@@ -107,8 +110,8 @@ mod tests {
         .await;
 
         let res = fork
-            .fork_eval(
-                r"
+            .fork_eval(ForkEvalArgs {
+                rainlang_string: r"
                 a: int-add(1 2),
                 b: 2,
                 c: 4,
@@ -120,12 +123,13 @@ mod tests {
                 d: int-add(a b);
                 a b:,
                 c: int-mul(a b);
-                ",
-                0,
-                deployer_address,
-                FullyQualifiedNamespace::default(),
-                vec![],
-            )
+                "
+                .into(),
+                source_index: 0,
+                deployer: deployer_address,
+                namespace: FullyQualifiedNamespace::default(),
+                context: vec![],
+            })
             .await
             .unwrap();
 
