@@ -11,7 +11,7 @@ import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
 
 /// @dev The known hash of the parser bytecode. This is used by the deployer to
 /// check that it is deploying a parser that is compatible with the interpreter.
-bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x0e4c5af410f3bba8950eb66817b8a59f691ef4888be9e9b615bb9b86aefee5e4);
+bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x02126365b79125c0f93e2b5af4e79c326a3b1c3da9a89329693f16d79e58d579);
 
 /// @dev Encodes the parser meta that is used to lookup word definitions.
 /// The structure of the parser meta is:
@@ -38,7 +38,7 @@ uint8 constant PARSE_META_BUILD_DEPTH = 2;
 /// @dev Every two bytes is a function pointer for an operand handler. These
 /// positional indexes all map to the same indexes looked up in the parse meta.
 bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
-    hex"10bc10bc1151115111f211f211f21151115110bc10bc115111f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f2123712cb11f212cb11f211f211f211f211f211f211f211f211f211f211f211f210bc10bc11f211f2";
+    hex"10bc10bc1151115111f211f211f21151115110bc10bc10bc11f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f211f2123712cb11f212cb11f211f211f211f211f211f211f211f211f211f211f211f210bc10bc11f211f2";
 
 /// @dev Every two bytes is a function pointer for a literal parser. Literal
 /// dispatches are determined by the first byte(s) of the literal rather than a

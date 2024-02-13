@@ -9,6 +9,7 @@ import {
     UnexpectedOperand
 } from "test/abstract/OpTest.sol";
 import {LibOpDecimal18ExpNP} from "src/lib/op/math/decimal18/LibOpDecimal18ExpNP.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpDecimal18ExpNPTest is OpTest {
     /// Directly test the integrity logic of LibOpDecimal18ExpNP.
@@ -20,11 +21,11 @@ contract LibOpDecimal18ExpNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpDecimal18ExpNP.
-    function testOpDecimal18ExpNPRun(uint256 a) public {
+    function testOpDecimal18ExpNPRun(uint256 a, uint16 operandData) public {
         a = bound(a, 0, type(uint64).max - 1e18);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
-        Operand operand = Operand.wrap((1 << 0x10) | 0);
+        Operand operand = LibOperand.build(1, 1, operandData);
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = a;
 

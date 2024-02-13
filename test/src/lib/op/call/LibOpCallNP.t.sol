@@ -110,20 +110,20 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
     /// upon deploy.
     function testOpCallNPRunSourceDoesNotExist() external {
         // 0 inputs and outputs different source indexes.
-        checkSourceDoesNotExist(": call<1 0>();", 1);
-        checkSourceDoesNotExist(": call<2 0>();", 2);
+        checkSourceDoesNotExist(": call<1>();", 1);
+        checkSourceDoesNotExist(": call<2>();", 2);
         // 1 input and 0 outputs different source indexes.
-        checkSourceDoesNotExist(": call<1 0>(1);", 1);
-        checkSourceDoesNotExist(": call<2 0>(1);", 2);
+        checkSourceDoesNotExist(": call<1>(1);", 1);
+        checkSourceDoesNotExist(": call<2>(1);", 2);
         // 0 inputs and 1 output different source indexes.
-        checkSourceDoesNotExist("_: call<1 1>();", 1);
-        checkSourceDoesNotExist("_: call<2 1>();", 2);
+        checkSourceDoesNotExist("_: call<1>();", 1);
+        checkSourceDoesNotExist("_: call<2>();", 2);
         // Several inputs and outputs different source indexes.
-        checkSourceDoesNotExist("a b: call<1 2>(10 5);", 1);
-        checkSourceDoesNotExist("a b: call<2 2>(10 5);", 2);
+        checkSourceDoesNotExist("a b: call<1>(10 5);", 1);
+        checkSourceDoesNotExist("a b: call<2>(10 5);", 2);
         // Multiple sources.
-        checkSourceDoesNotExist(": call<2 0>();:;", 2);
-        checkSourceDoesNotExist(": call<3 0>();:;", 3);
+        checkSourceDoesNotExist(": call<2>();:;", 2);
+        checkSourceDoesNotExist(": call<3>();:;", 3);
     }
 
     struct ExpectedTrace {
@@ -171,7 +171,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         traces[1].sourceIndex = 1;
         traces[1].stack = new uint256[](1);
         traces[1].stack[0] = 1;
-        checkCallNPTraces(":call<1 0>();_:1;", traces);
+        checkCallNPTraces(":call<1>();_:1;", traces);
     }
 
     function testCallTraceOuterAndInner() external {
@@ -182,7 +182,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         traces[1].sourceIndex = 1;
         traces[1].stack = new uint256[](1);
         traces[1].stack[0] = 1;
-        checkCallNPTraces("_:int-add(call<1 1>() 1);_:1;", traces);
+        checkCallNPTraces("_:int-add(call<1>() 1);_:1;", traces);
     }
 
     function testCallTraceOuterAndTwoInner() external {
@@ -298,17 +298,17 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
     /// Test that recursive calls are a (very gas intensive) runtime error.
     function testOpCallNPRunRecursive() external {
         // Simple call self.
-        checkCallNPRunRecursive(":call<0 0>();");
+        checkCallNPRunRecursive(":call<0>();");
         // Ping pong between two calls.
-        checkCallNPRunRecursive(":call<1 0>();:call<0 0>();");
+        checkCallNPRunRecursive(":call<1>();:call<0>();");
         // If is eager so doesn't help.
-        checkCallNPRunRecursive("a:call<1 1>(1);do-call:,a:if(do-call call<1 1>(0) 5);");
+        checkCallNPRunRecursive("a:call<1>(1);do-call:,a:if(do-call call<1>(0) 5);");
     }
 
     /// Test a mismatch in the inputs from caller and callee.
     function testOpCallNPRunInputsMismatch() external {
         (bytes memory bytecode, uint256[] memory constants) =
-            iParser.parse("a: call<1 1>(10 11); ten:,a b c:ten 11 12;");
+            iParser.parse("a: call<1>(10 11); ten:,a b c:ten 11 12;");
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 2, 1, 2));
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
@@ -318,7 +318,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
     /// Test a mismatch in the outputs from caller and callee.
     function testOpCallNPRunOutputsMismatch() external {
         (bytes memory bytecode, uint256[] memory constants) =
-            iParser.parse("ten eleven a b: call<1 4>(10 11); ten eleven:,a:9;");
+            iParser.parse("ten eleven a b: call<1>(10 11); ten eleven:,a:9;");
         vm.expectRevert(abi.encodeWithSelector(CallOutputsExceedSource.selector, 3, 4));
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);

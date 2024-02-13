@@ -7,6 +7,7 @@ import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
 import {LibOpERC20BalanceOfNP} from "src/lib/op/erc20/LibOpERC20BalanceOfNP.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 /// @title LibOpERC20BalanceOfNPTest
 /// @notice Test the opcode for getting the balance of an erc20 token.
@@ -18,14 +19,14 @@ contract LibOpERC20BalanceOfNPTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    function testOpERC20BalanceOfNPRun(address token, address account, uint256 balance) external {
+    function testOpERC20BalanceOfNPRun(address token, address account, uint256 balance, uint16 operandData) external {
         assumeEtchable(token);
         vm.etch(token, hex"fe");
 
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = uint256(uint160(token));
         inputs[1] = uint256(uint160(account));
-        Operand operand = Operand.wrap(uint256(2) << 0x10);
+        Operand operand = LibOperand.build(2, 1, operandData);
 
         vm.mockCall(token, abi.encodeWithSelector(IERC20.balanceOf.selector, account), abi.encode(balance));
         // called once for reference, once for run

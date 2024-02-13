@@ -74,8 +74,8 @@ library LibOpCallNP {
     using LibPointer for Pointer;
 
     function integrity(IntegrityCheckStateNP memory state, Operand operand) internal pure returns (uint256, uint256) {
-        uint256 sourceIndex = Operand.unwrap(operand) & 0xFF;
-        uint256 outputs = (Operand.unwrap(operand) >> 8) & 0xFF;
+        uint256 sourceIndex = Operand.unwrap(operand) & 0xFFFF;
+        uint256 outputs = Operand.unwrap(operand) >> 0x14;
 
         (uint256 sourceInputs, uint256 sourceOutputs) =
             LibBytecode.sourceInputsOutputsLength(state.bytecode, sourceIndex);
@@ -93,9 +93,9 @@ library LibOpCallNP {
     /// and then copies the outputs to the calling stack.
     function run(InterpreterStateNP memory state, Operand operand, Pointer stackTop) internal view returns (Pointer) {
         // Extract config from the operand.
-        uint256 sourceIndex = Operand.unwrap(operand) & 0xFF;
-        uint256 outputs = (Operand.unwrap(operand) >> 8) & 0xFF;
-        uint256 inputs = (Operand.unwrap(operand) >> 0x10) & 0xFF;
+        uint256 sourceIndex = Operand.unwrap(operand) & 0xFFFF;
+        uint256 inputs = (Operand.unwrap(operand) >> 0x10) & 0x0F;
+        uint256 outputs = Operand.unwrap(operand) >> 0x14;
 
         // Copy inputs in. The inputs have to be copied in reverse order so that
         // the top of the stack from the perspective of `call`, i.e. the first

@@ -28,7 +28,7 @@ contract LibParseOperandSingleFullTest is Test {
             // 1 outputs
             hex"01"
             // b 0 operand
-            hex"03000000"
+            hex"03100000"
         );
         assertEq(constants.length, 0);
     }
@@ -51,7 +51,7 @@ contract LibParseOperandSingleFullTest is Test {
             // 1 outputs
             hex"01"
             // b 0 operand
-            hex"03000000"
+            hex"03100000"
         );
         assertEq(constants.length, 0);
     }
@@ -82,7 +82,7 @@ contract LibParseOperandSingleFullTest is Test {
             // 1 outputs
             hex"01"
             // b 0 operand
-            hex"03000000"
+            hex"03100000"
         );
         assertEq(constants.length, 0);
     }
@@ -105,7 +105,7 @@ contract LibParseOperandSingleFullTest is Test {
             // 1 outputs
             hex"01"
             // b 0 operand
-            hex"03000000"
+            hex"03100000"
         );
         assertEq(constants.length, 0);
     }
@@ -128,7 +128,7 @@ contract LibParseOperandSingleFullTest is Test {
             // 1 outputs
             hex"01"
             // b 1 operand
-            hex"03000001"
+            hex"03100001"
         );
         assertEq(constants.length, 0);
     }
@@ -151,7 +151,7 @@ contract LibParseOperandSingleFullTest is Test {
             // 1 outputs
             hex"01"
             // b 1 operand
-            hex"03000001"
+            hex"03100001"
         );
         assertEq(constants.length, 0);
     }
@@ -174,7 +174,7 @@ contract LibParseOperandSingleFullTest is Test {
             // 1 outputs
             hex"01"
             // b 65535 operand
-            hex"0300ffff"
+            hex"0310ffff"
         );
         assertEq(constants.length, 0);
     }
@@ -197,7 +197,7 @@ contract LibParseOperandSingleFullTest is Test {
             // 1 outputs
             hex"01"
             // b 65535 operand
-            hex"0300ffff"
+            hex"0310ffff"
         );
         assertEq(constants.length, 0);
     }
@@ -252,7 +252,7 @@ contract LibParseOperandSingleFullTest is Test {
             // 1 outputs
             hex"01"
             // b 5 operand
-            hex"03000005"
+            hex"03100005"
         );
         assertEq(constants.length, 0);
     }
@@ -275,7 +275,7 @@ contract LibParseOperandSingleFullTest is Test {
             // 1 outputs
             hex"01"
             // b 5 operand
-            hex"03000005"
+            hex"03100005"
         );
         assertEq(constants.length, 0);
     }
@@ -298,7 +298,7 @@ contract LibParseOperandSingleFullTest is Test {
             // 1 outputs
             hex"01"
             // b 5 operand
-            hex"03000005"
+            hex"03100005"
         );
         assertEq(constants.length, 0);
     }

@@ -131,7 +131,7 @@ library LibAllStandardOpsNP {
             AuthoringMetaV2("bitwise-shift-right", "Shifts the input right by the number of bits specified in the operand."),
             AuthoringMetaV2(
                 "call",
-                "Calls a source by index in the same Rain bytecode. The inputs to call are copied to the top of the called stack and the outputs specified in the operand are copied back to the calling stack. The first operand is the source index and the second is the number of outputs."
+                "Calls a source by index in the same Rain bytecode. The inputs to call are copied to the top of the called stack and the outputs are copied back to the calling stack according to the LHS items. The first operand is the source index."
             ),
             AuthoringMetaV2("hash", "Hashes all inputs into a single 32 byte value using keccak256."),
             AuthoringMetaV2(
@@ -385,7 +385,7 @@ library LibAllStandardOpsNP {
                     // Bitwise shift right
                     LibParseOperand.handleOperandSingleFull,
                     // Call
-                    LibParseOperand.handleOperandDoublePerByteNoDefault,
+                    LibParseOperand.handleOperandSingleFull,
                     // Hash
                     LibParseOperand.handleOperandDisallowed,
                     // ERC20 allowance

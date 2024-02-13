@@ -114,11 +114,11 @@ contract LibParseLiteralIntegerHexTest is Test {
             // 3 outputs
             hex"03"
             // constant 0
-            hex"01000000"
+            hex"01100000"
             // constant 1
-            hex"01000001"
+            hex"01100001"
             // constant 0
-            hex"01000000"
+            hex"01100000"
         );
 
         assertEq(constants.length, 2);
@@ -153,7 +153,7 @@ contract LibParseLiteralIntegerHexTest is Test {
             // 1 output
             hex"01"
             // constant 0
-            hex"01000000"
+            hex"01100000"
         );
         assertEq(constants.length, 1);
         assertEq(constants[0], type(uint256).max);

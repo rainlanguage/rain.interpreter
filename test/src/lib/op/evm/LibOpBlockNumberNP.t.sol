@@ -16,6 +16,7 @@ import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {LibOpBlockNumberNP} from "src/lib/op/evm/LibOpBlockNumberNP.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 /// @title LibOpBlockNumberNPTest
 /// @notice Test the runtime and integrity time logic of LibOpBlockNumberNP.
@@ -35,11 +36,11 @@ contract LibOpBlockNumberNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpBlockNumberNP. This tests that the
     /// opcode correctly pushes the block number onto the stack.
-    function testOpBlockNumberNPRun(uint256 blockNumber) external {
+    function testOpBlockNumberNPRun(uint256 blockNumber, uint16 operandData) external {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.roll(blockNumber);
         uint256[] memory inputs = new uint256[](0);
-        Operand operand = Operand.wrap(0);
+        Operand operand = LibOperand.build(0, 1, operandData);
         opReferenceCheck(
             state, operand, LibOpBlockNumberNP.referenceFn, LibOpBlockNumberNP.integrity, LibOpBlockNumberNP.run, inputs
         );
