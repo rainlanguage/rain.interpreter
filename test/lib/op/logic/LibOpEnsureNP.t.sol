@@ -1,24 +1,24 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import {OpTest} from "test/util/abstract/OpTest.sol";
+import {OpTest, UnexpectedOperand} from "test/util/abstract/OpTest.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 import {ExcessRHSItems} from "src/lib/parse/LibParse.sol";
-import {LibOpEnsureNP, EnsureFailed} from "src/lib/op/logic/LibOpEnsureNP.sol";
+import {LibOpEnsureNP} from "src/lib/op/logic/LibOpEnsureNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
     IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace
 } from "src/interface/unstable/IInterpreterV2.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {LibIntOrAString, IntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
 
 contract LibOpEnsureNPTest is OpTest {
     /// Directly test the integrity logic of LibOpEnsureNP. This tests the
     /// happy path where there is at least one input.
     function testOpEnsureNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external {
-        inputs = uint8(bound(inputs, 1, type(uint8).max));
         (uint256 calcInputs, uint256 calcOutputs) =
             LibOpEnsureNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
-        assertEq(calcInputs, inputs);
+        assertEq(calcInputs, 2);
         assertEq(calcOutputs, 0);
     }
 
@@ -26,28 +26,38 @@ contract LibOpEnsureNPTest is OpTest {
     /// unhappy path where there are no inputs.
     function testOpEnsureNPIntegrityUnhappy(IntegrityCheckStateNP memory state) external {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpEnsureNP.integrity(state, Operand.wrap(0));
-        assertEq(calcInputs, 1);
+        assertEq(calcInputs, 2);
         assertEq(calcOutputs, 0);
     }
 
     /// Directly test the run logic of LibOpEnsureNP.
-    function testOpEnsureNPRun(uint256[] memory inputs, uint16 errorCode) external {
+    function testOpEnsureNPRun(uint256 condition, string memory reason) external {
+        vm.assume(bytes(reason).length <= 31);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
-        vm.assume(inputs.length > 0);
-        vm.assume(inputs.length <= type(uint8).max);
-        Operand operand = Operand.wrap(uint256(inputs.length) << 0x10 | uint256(errorCode));
-        for (uint256 i = 0; i < inputs.length; i++) {
-            if (inputs[i] == 0) {
-                vm.expectRevert(abi.encodeWithSelector(EnsureFailed.selector, errorCode, i));
-                break;
-            }
+        uint256[] memory inputs = new uint256[](2);
+        inputs[0] = condition;
+        inputs[1] = IntOrAString.unwrap(LibIntOrAString.fromString(reason));
+
+        Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
+        if (condition == 0) {
+            vm.expectRevert(bytes(reason));
         }
         opReferenceCheck(state, operand, LibOpEnsureNP.referenceFn, LibOpEnsureNP.integrity, LibOpEnsureNP.run, inputs);
     }
 
     /// Test the eval of `ensure` parsed from a string. Tests zero inputs.
     function testOpEnsureNPEvalZero() external {
-        checkBadInputs(":ensure();", 0, 1, 0);
+        checkBadInputs(":ensure();", 0, 2, 0);
+    }
+
+    /// Test the eval of `ensure` parsed from a string. Tests one input.
+    function testOpEnsureNPEvalOne() external {
+        checkBadInputs(":ensure(1);", 1, 2, 1);
+    }
+
+    /// Test the eval of `ensure` parsed from a string. Tests three inputs.
+    function testOpEnsureNPEvalThree() external {
+        checkBadInputs(":ensure(1 2 3);", 3, 2, 3);
     }
 
     /// Test the eval of `ensure` parsed from a string. Tests that ensure cannot
@@ -73,72 +83,25 @@ contract LibOpEnsureNPTest is OpTest {
     /// Test the eval of `ensure` parsed from a string. Tests the happy path
     /// where all inputs are nonzero.
     function testOpEnsureNPEvalHappy() external {
-        // Check without operand.
-        checkHappy(":ensure(1), _:1;", 1, "1");
-        checkHappy(":ensure(5), _:1;", 1, "5");
-        checkHappy(":ensure(1 2), _:1;", 1, "1 2");
-        checkHappy(":ensure(1 2 3), _:1;", 1, "1 2 3");
-        checkHappy(":ensure(1 2 3 4), _:1;", 1, "1 2 3 4");
-        checkHappy(":ensure(1 2 3 4 5), _:1;", 1, "1 2 3 4 5");
+        checkHappy(":ensure(1 \"always 1\"), _:1;", 1, "1");
+        checkHappy(":ensure(5 \"always 5\"), _:1;", 1, "5");
 
-        // Check with 0 operand.
-        checkHappy(":ensure<0>(1), _:1;", 1, "1");
-        checkHappy(":ensure<0>(5), _:1;", 1, "5");
-        checkHappy(":ensure<0>(1 2), _:1;", 1, "1 2");
-        checkHappy(":ensure<0>(1 2 3), _:1;", 1, "1 2 3");
-        checkHappy(":ensure<0>(1 2 3 4), _:1;", 1, "1 2 3 4");
-        checkHappy(":ensure<0>(1 2 3 4 5), _:1;", 1, "1 2 3 4 5");
-
-        // Check with 1 operand.
-        checkHappy(":ensure<1>(1), _:1;", 1, "1");
-        checkHappy(":ensure<1>(5), _:1;", 1, "5");
-        checkHappy(":ensure<1>(1 2), _:1;", 1, "1 2");
-        checkHappy(":ensure<1>(1 2 3), _:1;", 1, "1 2 3");
-        checkHappy(":ensure<1>(1 2 3 4), _:1;", 1, "1 2 3 4");
-        checkHappy(":ensure<1>(1 2 3 4 5), _:1;", 1, "1 2 3 4 5");
-
-        // Check with max uint16 operand.
-        checkHappy(":ensure<0xFFFF>(1), _:1;", 1, "1");
-        checkHappy(":ensure<0xFFFF>(5), _:1;", 1, "5");
-        checkHappy(":ensure<0xFFFF>(1 2), _:1;", 1, "1 2");
-        checkHappy(":ensure<0xFFFF>(1 2 3), _:1;", 1, "1 2 3");
-        checkHappy(":ensure<0xFFFF>(1 2 3 4), _:1;", 1, "1 2 3 4");
-        checkHappy(":ensure<0xFFFF>(1 2 3 4 5), _:1;", 1, "1 2 3 4 5");
+        // Empty reason should be fine.
+        checkHappy(":ensure(1 \"\"), _:1;", 1, "");
     }
 
     /// Test the eval of `ensure` parsed from a string. Tests the unhappy path
-    /// where at least one input is zero.
+    /// where the input is 0.
     function testOpEnsureNPEvalUnhappy() external {
-        // Check without operand.
-        checkUnhappy(":ensure(0), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 0, 0));
-        checkUnhappy(":ensure(0 1), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 0, 0));
-        checkUnhappy(":ensure(1 0), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 0, 1));
-        checkUnhappy(":ensure(0 1 2), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 0, 0));
-        checkUnhappy(":ensure(1 0 2), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 0, 1));
-        checkUnhappy(":ensure(1 2 0), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 0, 2));
+        checkUnhappy(":ensure(0 \"foo\"), _:1;", "foo");
 
-        // Check with 0 operand.
-        checkUnhappy(":ensure<0>(0), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 0, 0));
-        checkUnhappy(":ensure<0>(0 1), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 0, 0));
-        checkUnhappy(":ensure<0>(1 0), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 0, 1));
-        checkUnhappy(":ensure<0>(0 1 2), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 0, 0));
-        checkUnhappy(":ensure<0>(1 0 2), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 0, 1));
-        checkUnhappy(":ensure<0>(1 2 0), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 0, 2));
+        // Empty reason should be fine.
+        checkUnhappy(":ensure(0 \"\"), _:1;", "");
+    }
 
-        // Check with 1 operand.
-        checkUnhappy(":ensure<1>(0), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 1, 0));
-        checkUnhappy(":ensure<1>(0 1), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 1, 0));
-        checkUnhappy(":ensure<1>(1 0), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 1, 1));
-        checkUnhappy(":ensure<1>(0 1 2), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 1, 0));
-        checkUnhappy(":ensure<1>(1 0 2), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 1, 1));
-        checkUnhappy(":ensure<1>(1 2 0), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 1, 2));
-
-        // Check with max uint16 operand.
-        checkUnhappy(":ensure<0xFFFF>(0), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 0xFFFF, 0));
-        checkUnhappy(":ensure<0xFFFF>(0 1), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 0xFFFF, 0));
-        checkUnhappy(":ensure<0xFFFF>(1 0), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 0xFFFF, 1));
-        checkUnhappy(":ensure<0xFFFF>(0 1 2), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 0xFFFF, 0));
-        checkUnhappy(":ensure<0xFFFF>(1 0 2), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 0xFFFF, 1));
-        checkUnhappy(":ensure<0xFFFF>(1 2 0), _:1;", abi.encodeWithSelector(EnsureFailed.selector, 0xFFFF, 2));
+    /// Test the eval of `ensure` parsed from a string. Tests the unhappy path
+    /// where an operand is provided.
+    function testOpEnsureNPEvalUnhappyOperand() external {
+        checkUnhappyParse(":ensure<0>(1 \"foo\");", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

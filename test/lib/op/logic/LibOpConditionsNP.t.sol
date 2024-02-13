@@ -3,9 +3,9 @@ pragma solidity =0.8.19;
 
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
-import {OpTest} from "test/util/abstract/OpTest.sol";
+import {OpTest, UnexpectedOperand} from "test/util/abstract/OpTest.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
-import {NoConditionsMet, LibOpConditionsNP} from "src/lib/op/logic/LibOpConditionsNP.sol";
+import {LibOpConditionsNP} from "src/lib/op/logic/LibOpConditionsNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {
@@ -14,6 +14,7 @@ import {
 import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
+import {LibIntOrAString, IntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
 
 contract LibOpConditionsNPTest is OpTest {
     using LibUint256Array for uint256[];
@@ -24,16 +25,10 @@ contract LibOpConditionsNPTest is OpTest {
         (uint256 calcInputs, uint256 calcOutputs) =
             LibOpConditionsNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
 
-        uint256 expectedCalcInputs;
+        uint256 expectedCalcInputs = inputs;
         // Calc inputs will be minimum 2.
         if (inputs < 2) {
             expectedCalcInputs = 2;
-        }
-        // Calc inputs will be even, adding 1 if necessary.
-        else if (inputs % 2 == 0) {
-            expectedCalcInputs = inputs;
-        } else {
-            expectedCalcInputs = uint256(inputs) + 1;
         }
         assertEq(calcInputs, expectedCalcInputs, "calc inputs");
         assertEq(calcOutputs, 1);
@@ -60,20 +55,24 @@ contract LibOpConditionsNPTest is OpTest {
     }
 
     /// Test the error case where no conditions are met.
-    function testOpConditionsNPRunNoConditionsMet(uint256[] memory inputs, uint16 conditionCode) external {
+    function testOpConditionsNPRunNoConditionsMet(uint256[] memory inputs, string memory reason) external {
+        vm.assume(bytes(reason).length <= 31);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
-        Operand operand = Operand.wrap(uint256(inputs.length) << 0x10 | uint256(conditionCode));
+        Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
         // Ensure that we have inputs that are a valid pairwise conditions.
         vm.assume(inputs.length > 1);
-        if (inputs.length % 2 != 0) {
-            inputs.truncate(inputs.length - 1);
-        }
         // Ensure all the conditions are zero so that we error.
         for (uint256 i = 0; i < inputs.length; i += 2) {
             inputs[i] = 0;
         }
 
-        vm.expectRevert(abi.encodeWithSelector(NoConditionsMet.selector, uint256(conditionCode)));
+        if (inputs.length % 2 != 0) {
+            inputs[inputs.length - 1] = IntOrAString.unwrap(LibIntOrAString.fromString(reason));
+        } else {
+            reason = "";
+        }
+
+        vm.expectRevert(bytes(reason));
         opReferenceCheck(
             state, operand, LibOpConditionsNP.referenceFn, LibOpConditionsNP.integrity, LibOpConditionsNP.run, inputs
         );
@@ -124,7 +123,7 @@ contract LibOpConditionsNPTest is OpTest {
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (io);
-        vm.expectRevert(abi.encodeWithSelector(NoConditionsMet.selector, 0));
+        vm.expectRevert(bytes(""));
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             FullyQualifiedNamespace.wrap(0),
@@ -138,11 +137,12 @@ contract LibOpConditionsNPTest is OpTest {
 
     /// Test that conditions can take an error code as an operand.
     function testOpConditionsNPEvalErrorCode() external {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: conditions<7>(0x00 0x00 0x00 0x00);");
+        (bytes memory bytecode, uint256[] memory constants) =
+            iParser.parse("_: conditions(0x00 0x00 0x00 0x00 \"fail\");");
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (io);
-        vm.expectRevert(abi.encodeWithSelector(NoConditionsMet.selector, 7));
+        vm.expectRevert(abi.encodeWithSelector("fail"));
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
             FullyQualifiedNamespace.wrap(0),
@@ -228,17 +228,9 @@ contract LibOpConditionsNPTest is OpTest {
         iDeployer.deployExpression2(bytecode, constants);
     }
 
-    /// Test that conditions with 3 inputs fails integrity check.
-    function testOpConditionsNPEvalFail3Inputs() public {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: conditions(0x00 0x00 0x00);");
-        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 4, 3));
-        iDeployer.deployExpression2(bytecode, constants);
-    }
-
-    /// Test that conditions with 5 inputs fails integrity check.
-    function testOpConditionsNPEvalFail5Inputs() public {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: conditions(0x00 0x00 0x00 0x00 0x00);");
-        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 5, 6, 5));
-        iDeployer.deployExpression2(bytecode, constants);
+    /// Test the eval of `conditions` parsed from a string. Tests the unhappy path
+    /// where an operand is provided.
+    function testOpEnsureNPEvalUnhappyOperand() external {
+        checkUnhappyParse("_ :conditions<0>(1 1 \"foo\");", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

@@ -44,7 +44,7 @@ import {LibOpTimestampNP} from "./evm/LibOpTimestampNP.sol";
 
 import {LibOpAnyNP} from "./logic/LibOpAnyNP.sol";
 import {LibOpConditionsNP} from "./logic/LibOpConditionsNP.sol";
-import {EnsureFailed, LibOpEnsureNP} from "./logic/LibOpEnsureNP.sol";
+import {LibOpEnsureNP} from "./logic/LibOpEnsureNP.sol";
 import {LibOpEqualToNP} from "./logic/LibOpEqualToNP.sol";
 import {LibOpEveryNP} from "./logic/LibOpEveryNP.sol";
 import {LibOpGreaterThanNP} from "./logic/LibOpGreaterThanNP.sol";
@@ -165,11 +165,11 @@ library LibAllStandardOpsNP {
             AuthoringMetaV2("any", "The first non-zero value out of all inputs, or 0 if every input is 0."),
             AuthoringMetaV2(
                 "conditions",
-                "Treats inputs as pairwise condition/value pairs. The first nonzero condition's value is used. If no conditions are nonzero, the expression reverts. The operand can be used as an error code to differentiate between multiple conditions in the same expression."
+                "Treats inputs as pairwise condition/value pairs. The first nonzero condition's value is used. If no conditions are nonzero, the expression reverts. Provide a constant nonzero value to define a fallback case. If the number of inputs is odd, the final value is used as an error string in the case that no conditions match."
             ),
             AuthoringMetaV2(
                 "ensure",
-                "Reverts if any input is 0. All inputs are eagerly evaluated there are no outputs. The operand can be used as an error code to differentiate between multiple conditions in the same expression."
+                "Reverts if the first input is 0. The second input is a string that is used as the revert reason if the first input is 0. Has 0 outputs."
             ),
             AuthoringMetaV2("equal-to", "1 if all inputs are equal, 0 otherwise."),
             AuthoringMetaV2("every", "The last nonzero value out of all inputs, or 0 if any input is 0."),
@@ -413,9 +413,9 @@ library LibAllStandardOpsNP {
                     // Any
                     LibParseOperand.handleOperandDisallowed,
                     // Conditions
-                    LibParseOperand.handleOperandSingleFull,
+                    LibParseOperand.handleOperandDisallowed,
                     // Ensure
-                    LibParseOperand.handleOperandSingleFull,
+                    LibParseOperand.handleOperandDisallowed,
                     // Equal to
                     LibParseOperand.handleOperandDisallowed,
                     // Every
