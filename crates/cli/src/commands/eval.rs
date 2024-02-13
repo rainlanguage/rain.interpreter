@@ -40,7 +40,6 @@ impl TryFrom<ForkEvalCliArgs> for ForkEvalArgs {
     type Error = anyhow::Error;
 
     fn try_from(args: ForkEvalCliArgs) -> Result<Self> {
-        // Parse namespace, accepting both integer and hex formats
         let namespace = parse_int_or_hex(&args.namespace).context("Invalid namespace format")?;
 
         let context = args
@@ -55,7 +54,6 @@ impl TryFrom<ForkEvalCliArgs> for ForkEvalArgs {
             .collect::<Result<Vec<Vec<U256>>>>()?;
 
         Ok(ForkEvalArgs {
-            // Assign fields from args and parsed values
             rainlang_string: args.rainlang_string,
             source_index: args.source_index,
             deployer: args.deployer,
@@ -129,17 +127,18 @@ mod tests {
                 fork_block_number: Some(45658085),
             },
             fork_eval_args: ForkEvalCliArgs {
-                rainlang_string: r"_: int-add(1 2);".into(),
+                rainlang_string: r"_: int-add(10 2), _: context<0 0>(), _:context<0 1>();".into(),
                 source_index: 0,
                 deployer: "0x0754030e91F316B2d0b992fe7867291E18200A77"
                     .parse()
                     .unwrap(),
                 namespace: "0x123".into(),
-                context: vec!["1,2".into()],
+                context: vec!["0x06,99".into()],
             },
         };
 
         let result = eval.execute().await;
+        println!("{:?}", result);
         assert!(result.is_ok());
     }
 }
