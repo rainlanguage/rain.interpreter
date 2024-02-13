@@ -1,5 +1,0 @@
----
-#bind 3
-
-#main
-test: int-add(bind bind), _: decimal18-power(5 bind);
