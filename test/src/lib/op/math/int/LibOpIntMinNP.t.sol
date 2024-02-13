@@ -1,22 +1,23 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "rain.solmem/lib/LibUint256Array.sol";
+import {LibUint256Array} from  "rain.solmem/lib/LibUint256Array.sol";
 
-import "test/abstract/OpTest.sol";
-import "src/lib/caller/LibContext.sol";
+import {OpTest, IntegrityCheckStateNP, InterpreterStateNP} from "test/abstract/OpTest.sol";
+import {LibContext} from "src/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOpIntMinNP} from "src/lib/op/math/int/LibOpIntMinNP.sol";
+import {LibOperand, Operand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpIntMinNPTest is OpTest {
     using LibUint256Array for uint256[];
 
     /// Directly test the integrity logic of LibOpIntMinNP. This tests the happy
     /// path where the inputs input and calc match.
-    function testOpIntMinNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external {
+    function testOpIntMinNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData) external {
         inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpIntMinNP.integrity(state, Operand.wrap((uint256(inputs) || uint256(0x10)) << 0x10));
+            LibOpIntMinNP.integrity(state, LibOperand.build(inputs, 1, operandData));
 
         assertEq(calcInputs, inputs);
         assertEq(calcOutputs, 1);
@@ -41,10 +42,11 @@ contract LibOpIntMinNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpIntMinNP.
-    function testOpIntMinNPRun(uint256[] memory inputs) external {
+    function testOpIntMinNPRun(uint256[] memory inputs, uint16 operandData) external {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
-        Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
+        vm.assume(inputs.length <= 0x0F);
+        Operand operand = LibOperand.build(uint8(inputs.length), 1, operandData);
         opReferenceCheck(state, operand, LibOpIntMinNP.referenceFn, LibOpIntMinNP.integrity, LibOpIntMinNP.run, inputs);
     }
 

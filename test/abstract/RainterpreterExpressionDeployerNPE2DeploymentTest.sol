@@ -23,7 +23,7 @@ import {
     INTEGRITY_FUNCTION_POINTERS,
     RainterpreterExpressionDeployerNPE2ConstructionConfig,
     RainterpreterExpressionDeployerNPE2
-} from "../../../src/concrete/RainterpreterExpressionDeployerNPE2.sol";
+} from "../../src/concrete/RainterpreterExpressionDeployerNPE2.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 

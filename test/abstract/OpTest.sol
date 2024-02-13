@@ -9,21 +9,21 @@ import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 
 import {RainterpreterExpressionDeployerNPE2DeploymentTest} from
     "./RainterpreterExpressionDeployerNPE2DeploymentTest.sol";
-import {LibInterpreterStateNP, InterpreterStateNP} from "../../../src/lib/state/LibInterpreterStateNP.sol";
-import {IntegrityCheckStateNP, LibIntegrityCheckNP} from "../../../src/lib/integrity/LibIntegrityCheckNP.sol";
+import {LibInterpreterStateNP, InterpreterStateNP} from "../../src/lib/state/LibInterpreterStateNP.sol";
+import {IntegrityCheckStateNP, LibIntegrityCheckNP} from "../../src/lib/integrity/LibIntegrityCheckNP.sol";
 
-import {LibContext} from "../../../src/lib/caller/LibContext.sol";
-import {UnexpectedOperand} from "../../../src/error/ErrParse.sol";
-import {BadOpInputsLength} from "../../../src/lib/integrity/LibIntegrityCheckNP.sol";
-import {Operand, IInterpreterV2, SourceIndexV2} from "../../../src/interface/unstable/IInterpreterV2.sol";
+import {LibContext} from "../../src/lib/caller/LibContext.sol";
+import {UnexpectedOperand} from "../../src/error/ErrParse.sol";
+import {BadOpInputsLength} from "../../src/lib/integrity/LibIntegrityCheckNP.sol";
+import {Operand, IInterpreterV2, SourceIndexV2} from "../../src/interface/unstable/IInterpreterV2.sol";
 import {
     IInterpreterStoreV1,
     FullyQualifiedNamespace,
     StateNamespace
-} from "../../../src/interface/IInterpreterStoreV1.sol";
-import {SignedContextV1} from "../../../src/interface/IInterpreterCallerV2.sol";
-import {LibEncodedDispatch} from "../../../src/lib/caller/LibEncodedDispatch.sol";
-import {LibNamespace} from "../../../src/lib/ns/LibNamespace.sol";
+} from "../../src/interface/IInterpreterStoreV1.sol";
+import {SignedContextV1} from "../../src/interface/IInterpreterCallerV2.sol";
+import {LibEncodedDispatch} from "../../src/lib/caller/LibEncodedDispatch.sol";
+import {LibNamespace} from "../../src/lib/ns/LibNamespace.sol";
 
 uint256 constant PRE = uint256(keccak256(abi.encodePacked("pre")));
 uint256 constant POST = uint256(keccak256(abi.encodePacked("post")));
@@ -89,7 +89,8 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         IntegrityCheckStateNP memory integrityState = LibIntegrityCheckNP.newState("", 0, constants);
         (uint256 calcInputs, uint256 calcOutputs) = integrityFn(integrityState, operand);
         assertEq(calcInputs, inputs.length, "inputs length");
-        assertEq(calcInputs, Operand.unwrap(operand) >> 0x10, "operand inputs");
+        assertEq(calcInputs, (Operand.unwrap(operand) >> 0x10) & 0x0F, "operand inputs");
+        assertEq(calcOutputs, Operand.unwrap(operand) >> 0x14, "operand outputs");
         return calcOutputs;
     }
 
