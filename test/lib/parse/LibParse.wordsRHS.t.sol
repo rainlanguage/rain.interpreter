@@ -38,7 +38,7 @@ contract LibParseNamedRHSTest is Test {
         assertEq(inputs, 0);
         assertEq(outputs, 1);
         // a
-        assertEq(bytecode, hex"0100000101000102000000");
+        assertEq(bytecode, hex"0100000101000102100000");
         assertEq(constants.length, 0);
     }
 
@@ -264,15 +264,15 @@ contract LibParseNamedRHSTest is Test {
             // e d c b a outputs count
             hex"01"
             // e
-            hex"06000000"
+            hex"06100000"
             // d
-            hex"05000000"
+            hex"05100000"
             // c 2 inputs
-            hex"04020000"
+            hex"04120000"
             // b
-            hex"03000000"
+            hex"03100000"
             // a 2 inputs
-            hex"02020000"
+            hex"02120000"
         );
     }
 
@@ -316,23 +316,23 @@ contract LibParseNamedRHSTest is Test {
             // i h g f e d c b a outputs count
             hex"01"
             // i
-            hex"0a000000"
+            hex"0a100000"
             // h
-            hex"09000000"
+            hex"09100000"
             // g 2 inputs
-            hex"08020000"
+            hex"08120000"
             // f
-            hex"07000000"
+            hex"07100000"
             // e
-            hex"06000000"
+            hex"06100000"
             // d
-            hex"05000000"
+            hex"05100000"
             // c 2 inputs
-            hex"04020000"
+            hex"04120000"
             // b
-            hex"03000000"
+            hex"03100000"
             // a 4 inputs
-            hex"02040000"
+            hex"02140000"
         );
     }
 
@@ -365,19 +365,19 @@ contract LibParseNamedRHSTest is Test {
             // d c b a d b e outputs count
             hex"03"
             // d
-            hex"05000000"
+            hex"05100000"
             // c 1 input
-            hex"04010000"
+            hex"04110000"
             // b
-            hex"03000000"
+            hex"03100000"
             // a 2 inputs
-            hex"02020000"
+            hex"02120000"
             // d
-            hex"05000000"
+            hex"05100000"
             // b
-            hex"03000000"
+            hex"03100000"
             // e 1 input
-            hex"06010000"
+            hex"06110000"
         );
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
@@ -433,69 +433,69 @@ contract LibParseNamedRHSTest is Test {
             // p o n m l k j i h g f e d c b a a b c d e f g h i j k l m n o p outputs count
             hex"02"
             // p
-            hex"11000000"
+            hex"11100000"
             // o
-            hex"10000000"
+            hex"10100000"
             // n
-            hex"0f000000"
+            hex"0f100000"
             // m
-            hex"0e000000"
+            hex"0e100000"
             // l
-            hex"0d000000"
+            hex"0d100000"
             // k
-            hex"0c000000"
+            hex"0c100000"
             // j
-            hex"0b000000"
+            hex"0b100000"
             // i
-            hex"0a000000"
+            hex"0a100000"
             // h
-            hex"09000000"
+            hex"09100000"
             // g
-            hex"08000000"
+            hex"08100000"
             // f
-            hex"07000000"
+            hex"07100000"
             // e
-            hex"06000000"
+            hex"06100000"
             // d
-            hex"05000000"
+            hex"05100000"
             // c 13 inputs
-            hex"040d0000"
+            hex"041d0000"
             // b
-            hex"03000000"
+            hex"03100000"
             // a 2 inputs
-            hex"02020000"
+            hex"02120000"
             // a
-            hex"02000000"
+            hex"02100000"
             // b
-            hex"03000000"
+            hex"03100000"
             // c
-            hex"04000000"
+            hex"04100000"
             // d
-            hex"05000000"
+            hex"05100000"
             // e
-            hex"06000000"
+            hex"06100000"
             // f
-            hex"07000000"
+            hex"07100000"
             // g
-            hex"08000000"
+            hex"08100000"
             // h
-            hex"09000000"
+            hex"09100000"
             // i
-            hex"0a000000"
+            hex"0a100000"
             // j
-            hex"0b000000"
+            hex"0b100000"
             // k
-            hex"0c000000"
+            hex"0c100000"
             // l
-            hex"0d000000"
+            hex"0d100000"
             // m
-            hex"0e000000"
+            hex"0e100000"
             // n 13 inputs
-            hex"0f0d0000"
+            hex"0f1d0000"
             // o
-            hex"10000000"
+            hex"10100000"
             // p 2 inputs
-            hex"11020000"
+            hex"11120000"
         );
     }
 
@@ -538,13 +538,13 @@ contract LibParseNamedRHSTest is Test {
             // a b d c outputs count
             hex"03"
             // a
-            hex"02000000"
+            hex"02100000"
             // b
-            hex"03000000"
+            hex"03100000"
             // d
-            hex"05000000"
+            hex"05100000"
             // c 1 input
-            hex"04010000"
+            hex"04110000"
         );
     }
 
@@ -597,7 +597,7 @@ contract LibParseNamedRHSTest is Test {
             // a outputs count
             hex"01"
             // a
-            hex"02000000"
+            hex"02100000"
             // b ops count
             hex"01"
             // b stack allocation
@@ -607,7 +607,7 @@ contract LibParseNamedRHSTest is Test {
             // b outputs count
             hex"01"
             // b
-            hex"03000000"
+            hex"03100000"
         );
     }
 }

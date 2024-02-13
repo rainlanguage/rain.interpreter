@@ -71,7 +71,7 @@ contract LibOpIntMinNPTest is OpTest {
     /// Test the eval of `decimal18-min` opcode parsed from a string.
     /// Tests one input.
     /// MUST be identical to `int-min`.
-    function testOpDecimal18MaxNPEvalOneInput() external {
+    function testOpDecimal18MinNPEvalOneInput() external {
         checkBadInputs("_: decimal18-min(5);", 1, 2, 1);
         checkBadInputs("_: decimal18-min(0);", 1, 2, 1);
         checkBadInputs("_: decimal18-min(1);", 1, 2, 1);
@@ -101,7 +101,7 @@ contract LibOpIntMinNPTest is OpTest {
     /// Test the eval of `decimal18-min` opcode parsed from a string.
     /// Tests two inputs.
     /// MUST be identical to `int-min`.
-    function testOpDecimal18MaxNPEval2InputsHappy() external {
+    function testOpDecimal18MinNPEval2InputsHappy() external {
         checkHappy("_: decimal18-min(0 0);", 0, "0 > 0 ? 0 : 1");
         checkHappy("_: decimal18-min(1 0);", 0, "1 > 0 ? 1 : 0");
         checkHappy(
@@ -203,7 +203,7 @@ contract LibOpIntMinNPTest is OpTest {
     /// Test the eval of `decimal18-min` opcode parsed from a string.
     /// Tests three inputs.
     /// MUST be identical to `int-min`.
-    function testOpDecimal18MaxNPEval3InputsHappy() external {
+    function testOpDecimal18MinNPEval3InputsHappy() external {
         checkHappy("_: decimal18-min(0 0 0);", 0, "0 0 0");
         checkHappy("_: decimal18-min(1 0 0);", 0, "1 0 0");
         checkHappy("_: decimal18-min(2 0 0);", 0, "2 0 0");
@@ -322,7 +322,7 @@ contract LibOpIntMinNPTest is OpTest {
     /// Test the eval of `decimal18-min` opcode parsed from a string.
     /// Tests that operands are disallowed.
     /// MUST be identical to `int-min`.
-    function testOpDecimal18MaxNPEvalOperandDisallowed() external {
+    function testOpDecimal18MinNPEvalOperandDisallowed() external {
         checkDisallowedOperand("_: decimal18-min<0>(0 0 0);");
         checkDisallowedOperand("_: decimal18-min<1>(0 0 0);");
         checkDisallowedOperand("_: decimal18-min<2>(0 0 0);");

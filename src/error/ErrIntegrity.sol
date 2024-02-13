@@ -14,6 +14,9 @@ error EntrypointNonZeroInput(uint256 entrypointIndex, uint256 inputsLength);
 /// The bytecode and integrity function disagree on number of inputs.
 error BadOpInputsLength(uint256 opIndex, uint256 calculatedInputs, uint256 bytecodeInputs);
 
+/// The bytecode and integrity function disagree on number of outputs.
+error BadOpOutputsLength(uint256 opIndex, uint256 calculatedOutputs, uint256 bytecodeOutputs);
+
 /// The stack underflowed during integrity check.
 error StackUnderflow(uint256 opIndex, uint256 stackIndex, uint256 calculatedInputs);
 

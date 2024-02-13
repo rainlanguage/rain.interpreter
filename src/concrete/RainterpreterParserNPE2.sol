@@ -11,7 +11,7 @@ import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
 
 /// @dev The known hash of the parser bytecode. This is used by the deployer to
 /// check that it is deploying a parser that is compatible with the interpreter.
-bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x3d8c7c8fc29e61cc43487b05f11892d29d97e8077e37bc19ce215dd84eac39e9);
+bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x0e4c5af410f3bba8950eb66817b8a59f691ef4888be9e9b615bb9b86aefee5e4);
 
 /// @dev Encodes the parser meta that is used to lookup word definitions.
 /// The structure of the parser meta is:

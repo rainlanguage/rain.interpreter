@@ -16,7 +16,7 @@ error OutOfBoundsConstantRead(uint256 opIndex, uint256 constantsLength, uint256 
 library LibOpConstantNP {
     function integrity(IntegrityCheckStateNP memory state, Operand operand) internal pure returns (uint256, uint256) {
         // Operand is the index so ensure it doesn't exceed the constants length.
-        if (Operand.unwrap(operand) >= state.constants.length) {
+        if ((Operand.unwrap(operand) & 0xFFFF) >= state.constants.length) {
             revert OutOfBoundsConstantRead(state.opIndex, state.constants.length, Operand.unwrap(operand));
         }
         // As inputs MUST always be 0, we don't have to check the high byte of
@@ -28,7 +28,7 @@ library LibOpConstantNP {
         uint256[] memory constants = state.constants;
         // Skip index OOB check and rely on integrity check for that.
         assembly ("memory-safe") {
-            let value := mload(add(constants, mul(add(operand, 1), 0x20)))
+            let value := mload(add(constants, mul(add(and(operand, 0xFFFF), 1), 0x20)))
             stackTop := sub(stackTop, 0x20)
             mstore(stackTop, value)
         }
@@ -40,7 +40,7 @@ library LibOpConstantNP {
         pure
         returns (uint256[] memory outputs)
     {
-        uint256 index = Operand.unwrap(operand);
+        uint256 index = Operand.unwrap(operand) & 0xFFFF;
         outputs = new uint256[](1);
         outputs[0] = state.constants[index];
     }

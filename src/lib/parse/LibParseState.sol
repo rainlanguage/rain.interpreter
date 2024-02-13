@@ -371,7 +371,7 @@ library LibParseState {
                             state.stackTracker.push(opOutputs);
 
                         // Merge the op outputs and inputs into a single byte.
-                        if (opOutputs > 0xf || opInputs > 0xf) {
+                        if (opOutputs > 0x0F || opInputs > 0x0F) {
                             revert OpcodeIOOverflow(state.parseErrorOffset(cursor));
                         }
                         assembly ("memory-safe") {
