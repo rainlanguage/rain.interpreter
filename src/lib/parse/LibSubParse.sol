@@ -109,8 +109,8 @@ library LibSubParse {
     function subParserExtern(
         IInterpreterExternV3 extern,
         uint256 constantsHeight,
-        uint256 inputsByte,
-        uint256 outputsByte,
+        uint256 inputs,
+        uint256 outputs,
         Operand operand,
         uint256 opcodeIndex
     ) internal pure returns (bool, bytes memory, uint256[] memory) {
@@ -129,17 +129,13 @@ library LibSubParse {
             // This is an UNALIGNED allocation.
             bytecode := mload(0x40)
             mstore(0x40, add(bytecode, 0x24))
-            mstore(bytecode, 4)
-
+            mstore(add(bytecode, 4), constantsHeight)
+            // The IO byte is inputs merged with outputs.
+            mstore8(add(bytecode, 0x21), or(shl(4, outputs), inputs))
             // Main opcode is extern, to call back into current contract.
             mstore8(add(bytecode, 0x20), opIndex)
-            // Use the io byte as is for inputs.
-            mstore8(add(bytecode, 0x21), inputsByte)
-            // The outputs are encoded to their own byte for extern opcode.
-            mstore8(add(bytecode, 0x22), outputsByte)
-            // The extern dispatch is the index to the new constant that we will
-            // add to the constants array.
-            mstore8(add(bytecode, 0x23), constantsHeight)
+            // The bytes length is 4.
+            mstore(bytecode, 4)
         }
 
         uint256 externDispatch = EncodedExternDispatch.unwrap(

@@ -15,7 +15,7 @@ library LibOpConditionsNP {
 
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
-        uint256 inputs = Operand.unwrap(operand) >> 0x10;
+        uint256 inputs = (Operand.unwrap(operand) >> 0x10) & 0x0F;
         inputs = inputs > 2 ? inputs : 2;
         return (inputs, 1);
     }
@@ -31,7 +31,7 @@ library LibOpConditionsNP {
         uint256 condition;
         IntOrAString reason = IntOrAString.wrap(0);
         assembly ("memory-safe") {
-            let inputs := shr(0x10, operand)
+            let inputs := and(shr(0x10, operand), 0x0F)
             let oddInputs := mod(inputs, 2)
 
             let cursor := stackTop

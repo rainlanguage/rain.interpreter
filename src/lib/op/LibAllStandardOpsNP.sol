@@ -367,7 +367,7 @@ library LibAllStandardOpsNP {
                     // Constant
                     LibParseOperand.handleOperandSingleFull,
                     // Extern
-                    LibParseOperand.handleOperandDoublePerByteNoDefault,
+                    LibParseOperand.handleOperandSingleFull,
                     // Context
                     LibParseOperand.handleOperandDoublePerByteNoDefault,
                     // Bitwise and

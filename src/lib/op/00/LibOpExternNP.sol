@@ -28,7 +28,7 @@ library LibOpExternNP {
     using LibUint256Array for uint256[];
 
     function integrity(IntegrityCheckStateNP memory state, Operand operand) internal view returns (uint256, uint256) {
-        uint256 encodedExternDispatchIndex = Operand.unwrap(operand) & 0xFF;
+        uint256 encodedExternDispatchIndex = Operand.unwrap(operand) & 0xFFFF;
 
         EncodedExternDispatch encodedExternDispatch =
             EncodedExternDispatch.wrap(state.constants[encodedExternDispatchIndex]);
@@ -36,16 +36,16 @@ library LibOpExternNP {
         if (!ERC165Checker.supportsInterface(address(extern), type(IInterpreterExternV3).interfaceId)) {
             revert NotAnExternContract(address(extern));
         }
-        uint256 expectedOutputsLength = (Operand.unwrap(operand) >> 0x08) & 0xFF;
-        uint256 expectedInputsLength = (Operand.unwrap(operand) >> 0x10) & 0xFF;
+        uint256 expectedInputsLength = (Operand.unwrap(operand) >> 0x10) & 0x0F;
+        uint256 expectedOutputsLength = (Operand.unwrap(operand) >> 0x14) & 0x0F;
         //slither-disable-next-line unused-return
         return extern.externIntegrity(dispatch, expectedInputsLength, expectedOutputsLength);
     }
 
     function run(InterpreterStateNP memory state, Operand operand, Pointer stackTop) internal view returns (Pointer) {
-        uint256 encodedExternDispatchIndex = Operand.unwrap(operand) & 0xFF;
-        uint256 outputsLength = (Operand.unwrap(operand) >> 0x08) & 0xFF;
-        uint256 inputsLength = (Operand.unwrap(operand) >> 0x10) & 0xFF;
+        uint256 encodedExternDispatchIndex = Operand.unwrap(operand) & 0xFFFF;
+        uint256 inputsLength = (Operand.unwrap(operand) >> 0x10) & 0x0F;
+        uint256 outputsLength = (Operand.unwrap(operand) >> 0x14) & 0x0F;
 
         uint256 encodedExternDispatch = state.constants[encodedExternDispatchIndex];
         (IInterpreterExternV3 extern, ExternDispatch dispatch) =
@@ -95,8 +95,8 @@ library LibOpExternNP {
         view
         returns (uint256[] memory outputs)
     {
-        uint256 encodedExternDispatchIndex = Operand.unwrap(operand) & 0xFF;
-        uint256 outputsLength = (Operand.unwrap(operand) >> 0x08) & 0xFF;
+        uint256 encodedExternDispatchIndex = Operand.unwrap(operand) & 0xFFFF;
+        uint256 outputsLength = (Operand.unwrap(operand) >> 0x14) & 0x0F;
 
         uint256 encodedExternDispatch = state.constants[encodedExternDispatchIndex];
         (IInterpreterExternV3 extern, ExternDispatch dispatch) =

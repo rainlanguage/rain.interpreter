@@ -20,6 +20,7 @@ import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 /// @title LibOpChainIdNPTest
 /// @notice Test the runtime and integrity time logic of LibOpChainIdNP.
@@ -37,11 +38,11 @@ contract LibOpChainIdNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpChainId. This tests that the
     /// opcode correctly pushes the chain ID onto the stack.
-    function testOpChainIdNPRun(uint64 chainId) external {
+    function testOpChainIdNPRun(uint64 chainId, uint16 operandData) external {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.chainId(chainId);
         uint256[] memory inputs = new uint256[](0);
-        Operand operand = Operand.wrap(0);
+        Operand operand = LibOperand.build(0, 1, operandData);
         opReferenceCheck(
             state, operand, LibOpChainIdNP.referenceFn, LibOpChainIdNP.integrity, LibOpChainIdNP.run, inputs
         );

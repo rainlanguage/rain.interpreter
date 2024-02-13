@@ -13,6 +13,7 @@ import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 /// @title LibOpERC721BalanceOfNPTest
 /// @notice Test the opcode for getting the balance of an erc721 token.
@@ -25,14 +26,14 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    function testOpERC721BalanceOfNPRun(address token, address account, uint256 balance) external {
+    function testOpERC721BalanceOfNPRun(address token, address account, uint256 balance, uint16 operandData) external {
         assumeEtchable(token);
         vm.etch(token, hex"fe");
 
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = uint256(uint160(token));
         inputs[1] = uint256(uint160(account));
-        Operand operand = Operand.wrap(uint256(2) << 0x10);
+        Operand operand = LibOperand.build(2, 1, operandData);
 
         // invalid token
         vm.mockCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), abi.encode(balance));

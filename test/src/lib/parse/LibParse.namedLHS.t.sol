@@ -145,17 +145,17 @@ contract LibParseNamedLHSTest is Test {
             // 5 output
             hex"05"
             // constant 0
-            hex"01000000"
+            hex"01100000"
             // constant 1
-            hex"01000001"
+            hex"01100001"
             // stack 0
-            hex"00000000"
+            hex"00100000"
             // c
-            hex"02000000"
+            hex"02100000"
             // constant 2
-            hex"01000002"
+            hex"01100002"
             // stack 3
-            hex"00000003"
+            hex"00100003"
         );
         assertEq(constants.length, 3);
         assertEq(constants[0], 1);
@@ -191,11 +191,11 @@ contract LibParseNamedLHSTest is Test {
             // 3 output
             hex"03"
             // constant 0
-            hex"01000000"
+            hex"01100000"
             // constant 1
-            hex"01000001"
+            hex"01100001"
             // stack 0
-            hex"00000000"
+            hex"00100000"
             // 3 ops
             hex"03"
             // 1 stack allocation
@@ -205,11 +205,11 @@ contract LibParseNamedLHSTest is Test {
             // 3 outputs
             hex"03"
             // constant 2
-            hex"01000002"
+            hex"01100002"
             // constant 3
-            hex"01000003"
+            hex"01100003"
             // stack 1
-            hex"00000001"
+            hex"00100001"
         );
         assertEq(constants.length, 4);
         assertEq(constants[0], 1);

@@ -16,8 +16,7 @@ library LibOpContextNP {
 
     function run(InterpreterStateNP memory state, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 i = Operand.unwrap(operand) & 0xFF;
-        // Integrity check enforces the inputs byte is 0.
-        uint256 j = Operand.unwrap(operand) >> 8;
+        uint256 j = (Operand.unwrap(operand) >> 8) & 0xFF;
         // We want these indexes to be checked at runtime for OOB accesses
         // because we don't know the shape of the context at compile time.
         // Solidity handles that for us as long as we don't invoke yul for the

@@ -7,6 +7,7 @@ import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
 import {LibOpERC20TotalSupplyNP} from "src/lib/op/erc20/LibOpERC20TotalSupplyNP.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/interfaces/IERC20.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 /// @title LibOpERC20TotalSupplyNPTest
 /// @notice Test the opcode for getting the total supply of an erc20 contract.
@@ -18,13 +19,13 @@ contract LibOpERC20TotalSupplyNPTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    function testOpERC20TotalSupplyNPRun(address account, uint256 totalSupply) external {
+    function testOpERC20TotalSupplyNPRun(address account, uint256 totalSupply, uint16 operandData) external {
         assumeEtchable(account);
         vm.etch(account, hex"fe");
 
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = uint256(uint160(account));
-        Operand operand = Operand.wrap(uint256(1) << 0x10);
+        Operand operand = LibOperand.build(1, 1, operandData);
 
         vm.mockCall(account, abi.encodeWithSelector(IERC20.totalSupply.selector), abi.encode(totalSupply));
         // called once for reference, once for run

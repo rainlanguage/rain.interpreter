@@ -13,6 +13,7 @@ import {LibOpCallNP, CallOutputsExceedSource} from "src/lib/op/call/LibOpCallNP.
 import {LibBytecode, SourceIndexOutOfBounds} from "src/lib/bytecode/LibBytecode.sol";
 import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {STACK_TRACER} from "src/lib/state/LibInterpreterStateNP.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 /// @title LibOpCallNPTest
 /// @notice Test the LibOpCallNP library that includes the "call" word.
@@ -27,19 +28,19 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         uint8 sourceCount,
         bytes32 seed
     ) external {
-        inputs = bound(inputs, 0, type(uint8).max);
+        inputs = bound(inputs, 0, 0x0F);
 
         conformBytecode(state.bytecode, sourceCount, seed);
 
         uint256 sourcePosition = randomSourcePosition(state.bytecode, seed);
         uint256 sourceOutputs = uint8(state.bytecode[sourcePosition + 3]);
-        vm.assume(sourceOutputs < type(uint8).max);
-        outputs = bound(outputs, sourceOutputs + 1, type(uint8).max);
+        vm.assume(sourceOutputs < 0x0F);
+        outputs = bound(outputs, sourceOutputs + 1, 0x0F);
 
         uint256 sourceIndex = randomSourceIndex(state.bytecode, seed);
-        assertTrue(sourceIndex <= type(uint8).max);
+        assertTrue(sourceIndex <= type(uint16).max);
 
-        Operand operand = Operand.wrap(inputs << 0x10 | outputs << 0x08 | sourceIndex);
+        Operand operand = LibOperand.build(uint8(inputs), uint8(outputs), uint16(sourceIndex));
         vm.expectRevert(abi.encodeWithSelector(CallOutputsExceedSource.selector, sourceOutputs, outputs));
         LibOpCallNP.integrity(state, operand);
     }
@@ -55,15 +56,15 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         uint256 sourceIndex,
         bytes32 seed
     ) external {
-        inputs = bound(inputs, 0, type(uint8).max);
-        outputs = bound(outputs, 0, type(uint8).max);
+        inputs = bound(inputs, 0, 0x0F);
+        outputs = bound(outputs, 0, 0x0F);
 
         conformBytecode(state.bytecode, sourceCount, seed);
         sourceCount = LibBytecode.sourceCount(state.bytecode);
 
-        sourceIndex = bound(sourceIndex, sourceCount, type(uint8).max);
+        sourceIndex = bound(sourceIndex, sourceCount, type(uint16).max);
 
-        Operand operand = Operand.wrap(inputs << 0x10 | outputs << 0x08 | sourceIndex);
+        Operand operand = LibOperand.build(uint8(inputs), uint8(outputs), uint16(sourceIndex));
         vm.expectRevert(abi.encodeWithSelector(SourceIndexOutOfBounds.selector, state.bytecode, sourceIndex));
         LibOpCallNP.integrity(state, operand);
     }
@@ -79,18 +80,18 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         uint8 sourceCount,
         bytes32 seed
     ) external {
-        inputs = bound(inputs, 0, type(uint8).max);
+        inputs = bound(inputs, 0, 0x0F);
 
         conformBytecode(state.bytecode, sourceCount, seed);
 
         uint256 sourcePosition = randomSourcePosition(state.bytecode, seed);
         uint256 sourceOutputs = uint8(state.bytecode[sourcePosition + 3]);
-        outputs = bound(outputs, 0, sourceOutputs);
+        outputs = bound(outputs, 0, sourceOutputs > 0x0F ? 0x0F : sourceOutputs);
 
         uint256 sourceIndex = randomSourceIndex(state.bytecode, seed);
         assertTrue(sourceIndex <= type(uint8).max);
 
-        Operand operand = Operand.wrap(inputs << 0x10 | outputs << 0x08 | sourceIndex);
+        Operand operand = LibOperand.build(uint8(inputs), uint8(outputs), uint16(sourceIndex));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpCallNP.integrity(state, operand);
         uint256 sourceInputs = uint8(state.bytecode[sourcePosition + 2]);
         assertEq(calcInputs, sourceInputs, "inputs");
@@ -199,7 +200,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         traces[2].sourceIndex = 2;
         traces[2].stack = new uint256[](1);
         traces[2].stack[0] = 10;
-        checkCallNPTraces("_:int-add(call<1 1>(2) 1);two:,_:int-add(call<2 1>() 1);_:10;", traces);
+        checkCallNPTraces("_:int-add(call<1>(2) 1);two:,_:int-add(call<2>() 1);_:10;", traces);
     }
 
     /// Boilerplate for checking the stack and kvs of a call.
@@ -231,49 +232,49 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         uint256[] memory stack = new uint256[](0);
         uint256[] memory kvs = new uint256[](0);
         // 0 IO, call noop.
-        checkCallNPRun(":call<1 0>();:;", stack, kvs);
+        checkCallNPRun(":call<1>();:;", stack, kvs);
         // Single input and no outputs.
-        checkCallNPRun(":call<1 0>(10);ten:;", stack, kvs);
+        checkCallNPRun(":call<1>(10);ten:;", stack, kvs);
 
         // Check evals that result in a stack of one item but no kvs.
         stack = new uint256[](1);
         // Single input and single output.
         stack[0] = 10;
-        checkCallNPRun("ten:call<1 1>(10);ten:;", stack, kvs);
+        checkCallNPRun("ten:call<1>(10);ten:;", stack, kvs);
         // zero input single output.
-        checkCallNPRun("ten:call<1 1>();ten:10;", stack, kvs);
+        checkCallNPRun("ten:call<1>();ten:10;", stack, kvs);
         // Two inputs and one output.
         stack[0] = 12;
-        checkCallNPRun("a: call<1 1>(10 11); ten eleven:,a b c:ten eleven 12;", stack, kvs);
+        checkCallNPRun("a: call<1>(10 11); ten eleven:,a b c:ten eleven 12;", stack, kvs);
 
         // Check evals that result in a stack of two items but no kvs.
         stack = new uint256[](2);
         // Order dependent inputs and outputs.
         stack[0] = 9;
         stack[1] = 2;
-        checkCallNPRun("a b: call<1 2>(10 5); ten five:, a b: int-div(ten five) 9;", stack, kvs);
+        checkCallNPRun("a b: call<1>(10 5); ten five:, a b: int-div(ten five) 9;", stack, kvs);
 
         // One input two outputs.
         stack[0] = 11;
         stack[1] = 10;
-        checkCallNPRun("a b: call<1 2>(10); ten:,a b:ten 11;", stack, kvs);
+        checkCallNPRun("a b: call<1>(10); ten:,a b:ten 11;", stack, kvs);
 
         // Can call something with no IO purely for the kv side effects.
         stack = new uint256[](0);
         kvs = new uint256[](2);
         kvs[0] = 10;
         kvs[1] = 11;
-        checkCallNPRun(":call<1 0>();:set(10 11);", stack, kvs);
+        checkCallNPRun(":call<1>();:set(10 11);", stack, kvs);
 
         // Can call for side effects and also get a stack based on IO.
         stack = new uint256[](1);
         stack[0] = 10;
-        checkCallNPRun("a:call<1 1>(9);nine:,:set(10 11),ret:int-add(nine 1);", stack, kvs);
+        checkCallNPRun("a:call<1>(9);nine:,:set(10 11),ret:int-add(nine 1);", stack, kvs);
 
         // Can call a few different things without a final stack.
         stack = new uint256[](0);
         kvs = new uint256[](0);
-        checkCallNPRun(":call<1 0>();one two three: 1 2 3, :call<2 0>();five six: 5 6;", stack, kvs);
+        checkCallNPRun(":call<1>();one two three: 1 2 3, :call<2>();five six: 5 6;", stack, kvs);
     }
 
     /// Boilerplate to check a generic runtime error happens upon recursion.

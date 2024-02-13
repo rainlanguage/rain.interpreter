@@ -13,6 +13,7 @@ import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 /// @title LibOpERC721OwnerOfNPTest
 /// @notice Test the opcode for getting the owner of an erc721 token.
@@ -25,7 +26,7 @@ contract LibOpERC721OwnerOfNPTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    function testOpERC721OwnerOfNPRun(address token, uint256 tokenId, address owner) external {
+    function testOpERC721OwnerOfNPRun(address token, uint256 tokenId, address owner, uint16 operandData) external {
         assumeEtchable(token);
         vm.etch(token, hex"fe");
         vm.mockCall(token, abi.encodeWithSelector(IERC721.ownerOf.selector, tokenId), abi.encode(owner));
@@ -35,7 +36,7 @@ contract LibOpERC721OwnerOfNPTest is OpTest {
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = uint256(uint160(token));
         inputs[1] = tokenId;
-        Operand operand = Operand.wrap(uint256(2) << 0x10);
+        Operand operand = LibOperand.build(2, 1, operandData);
 
         opReferenceCheck(
             opTestDefaultInterpreterState(),

@@ -8,7 +8,7 @@ import {RainterpreterReferenceExternNPE2} from "src/concrete/extern/Rainterprete
 contract RainterpreterReferenceExternNPE2ContextSenderTest is OpTest {
     using Strings for address;
 
-    function testRainterpreterReferenceExterNPE2ContextSenderHappy() external {
+    function testRainterpreterReferenceExterNPE2ContextContractHappy() external {
         RainterpreterReferenceExternNPE2 extern = new RainterpreterReferenceExternNPE2();
 
         uint256[] memory expectedStack = new uint256[](1);

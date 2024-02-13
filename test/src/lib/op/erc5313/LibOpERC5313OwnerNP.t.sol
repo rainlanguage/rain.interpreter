@@ -7,6 +7,7 @@ import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
 import {LibOpERC5313OwnerNP} from "src/lib/op/erc5313/LibOpERC5313OwnerNP.sol";
 import {IERC5313} from "openzeppelin-contracts/contracts/interfaces/IERC5313.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 /// @title LibOpERC5313OwnerNPTest
 /// @notice Test the opcode for getting the owner of an erc5313 contract.
@@ -18,13 +19,13 @@ contract LibOpERC5313OwnerNPTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    function testOpERC5313OwnerOfNPRun(address account, address owner) external {
+    function testOpERC5313OwnerOfNPRun(address account, address owner, uint16 operandData) external {
         assumeEtchable(account);
         vm.etch(account, hex"fe");
 
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = uint256(uint160(account));
-        Operand operand = Operand.wrap(uint256(1) << 0x10);
+        Operand operand = LibOperand.build(1, 1, operandData);
 
         vm.mockCall(account, abi.encodeWithSelector(IERC5313.owner.selector), abi.encode(owner));
         // called once for reference, once for run

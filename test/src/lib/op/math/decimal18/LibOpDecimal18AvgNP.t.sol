@@ -9,6 +9,7 @@ import {
     UnexpectedOperand
 } from "test/abstract/OpTest.sol";
 import {LibOpDecimal18AvgNP} from "src/lib/op/math/decimal18/LibOpDecimal18AvgNP.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpDecimal18AvgNPTest is OpTest {
     /// Directly test the integrity logic of LibOpDecimal18AvgNP.
@@ -20,7 +21,7 @@ contract LibOpDecimal18AvgNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpDecimal18AvgNP.
-    function testOpDecimal18AvgNPRun(uint256 a, uint256 b) public {
+    function testOpDecimal18AvgNPRun(uint256 a, uint256 b, uint16 operandData) public {
         // @TODO This is a hack to get around the fact that we are very likely
         // to overflow uint256 if we just fuzz it, and that it's clunky to
         // determine whether it will overflow or not. Basically the overflow
@@ -31,7 +32,7 @@ contract LibOpDecimal18AvgNPTest is OpTest {
         b = bound(b, 0, 10);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
-        Operand operand = Operand.wrap((2 << 0x10) | 0);
+        Operand operand = LibOperand.build(2, 1, operandData);
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = a;
         inputs[1] = b;

@@ -1,20 +1,21 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "rain.solmem/lib/LibPointer.sol";
+import {LibPointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibOpDecimal18MulNP} from "src/lib/op/math/decimal18/LibOpDecimal18MulNP.sol";
 import {Math as OZMath} from "openzeppelin-contracts/contracts/utils/math/Math.sol";
-import "test/abstract/OpTest.sol";
+import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP} from "test/abstract/OpTest.sol";
 import {PRBMath_MulDiv18_Overflow} from "prb-math/Common.sol";
-import "rain.math.fixedpoint/lib/LibWillOverflow.sol";
+import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpDecimal18MulNPTest is OpTest {
     /// Directly test the integrity logic of LibOpDecimal18MulNP. This tests the
     /// happy path where the inputs input and calc match.
-    function testOpDecimal18MulNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external {
-        inputs = uint8(bound(inputs, 2, type(uint8).max));
+    function testOpDecimal18MulNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData) external {
+        inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpDecimal18MulNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
+            LibOpDecimal18MulNP.integrity(state, LibOperand.build(inputs, 1, operandData));
 
         assertEq(calcInputs, inputs);
         assertEq(calcOutputs, 1);

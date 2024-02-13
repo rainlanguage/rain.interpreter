@@ -12,7 +12,7 @@ library LibOpHashNP {
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
         // Any number of inputs are valid.
         // 0 inputs will be the hash of empty (0 length) bytes.
-        uint256 inputs = Operand.unwrap(operand) >> 0x10;
+        uint256 inputs = (Operand.unwrap(operand) >> 0x10) & 0x0F;
         return (inputs, 1);
     }
 
