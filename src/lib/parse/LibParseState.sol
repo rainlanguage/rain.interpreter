@@ -14,7 +14,8 @@ import {
     ExcessLHSItems,
     NotAcceptingInputs,
     UnsupportedLiteralType,
-    InvalidSubParser
+    InvalidSubParser,
+    OpcodeIOOverflow
 } from "../../error/ErrParse.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 import {LibParse} from "./LibParse.sol";
@@ -365,8 +366,20 @@ library LibParseState {
                         // outputs. In this case we defer to the LHS to tell us
                         // how many outputs there are. If the LHS is wrong then
                         // later integrity checks will need to flag it.
+                        uint256 opOutputs = i == opsDepth && lineRHSTopLevel == 1 ? lineLHSItems : 1;
                         state.stackTracker =
-                            state.stackTracker.push(i == opsDepth && lineRHSTopLevel == 1 ? lineLHSItems : 1);
+                            state.stackTracker.push(opOutputs);
+
+                        // Merge the op outputs and inputs into a single byte.
+                        if (opOutputs > 0xf || opInputs > 0xf) {
+                            revert OpcodeIOOverflow(state.parseErrorOffset(cursor));
+                        }
+                        assembly ("memory-safe") {
+                            mstore8(
+                                add(itemSourceHead, 1),
+                                or(shl(4, opOutputs), opInputs)
+                            )
+                        }
                     }
                     itemSourceHead += 4;
                 }

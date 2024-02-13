@@ -143,3 +143,6 @@ error SubParseableMissingDispatch(uint256 offset);
 /// The sub parser returned some bytecode that the main parser could not
 /// understand.
 error BadSubParserResult(bytes bytecode);
+
+/// Thrown when there are more than 16 inputs or outputs for a given opcode.
+error OpcodeIOOverflow(uint256 offset);
