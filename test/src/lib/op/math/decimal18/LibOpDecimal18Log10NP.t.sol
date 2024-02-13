@@ -1,13 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import {
-    OpTest,
-    IntegrityCheckStateNP,
-    Operand,
-    InterpreterStateNP,
-    UnexpectedOperand
-} from "test/abstract/OpTest.sol";
+import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpDecimal18Log10NP} from "src/lib/op/math/decimal18/LibOpDecimal18Log10NP.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 

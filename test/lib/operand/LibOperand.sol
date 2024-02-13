@@ -7,10 +7,6 @@ library LibOperand {
     function build(uint8 inputs, uint8 outputs, uint16 operandData) internal pure returns (Operand) {
         require(inputs < 0x10, "inputs must be less than 16");
         require(outputs < 0x10, "outputs must be less than 16");
-        return Operand.wrap(
-            uint256(outputs) << 0x14
-            | uint256(inputs) << 0x10
-            | uint256(operandData)
-        );
+        return Operand.wrap(uint256(outputs) << 0x14 | uint256(inputs) << 0x10 | uint256(operandData));
     }
 }

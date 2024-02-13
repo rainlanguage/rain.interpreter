@@ -25,7 +25,8 @@ contract LibOpAnyNPTest is OpTest {
     function testOpAnyNPIntegrityHappy(uint8 inputs, uint16 operandData) external {
         IntegrityCheckStateNP memory state = opTestDefaultIngegrityCheckState();
         inputs = uint8(bound(uint256(inputs), 1, 15));
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpAnyNP.integrity(state, LibOperand.build(inputs, 1, operandData));
+        (uint256 calcInputs, uint256 calcOutputs) =
+            LibOpAnyNP.integrity(state, LibOperand.build(inputs, 1, operandData));
 
         assertEq(calcInputs, inputs);
         assertEq(calcOutputs, 1);

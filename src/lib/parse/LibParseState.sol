@@ -367,18 +367,14 @@ library LibParseState {
                         // how many outputs there are. If the LHS is wrong then
                         // later integrity checks will need to flag it.
                         uint256 opOutputs = i == opsDepth && lineRHSTopLevel == 1 ? lineLHSItems : 1;
-                        state.stackTracker =
-                            state.stackTracker.push(opOutputs);
+                        state.stackTracker = state.stackTracker.push(opOutputs);
 
                         // Merge the op outputs and inputs into a single byte.
                         if (opOutputs > 0x0F || opInputs > 0x0F) {
                             revert OpcodeIOOverflow(state.parseErrorOffset(cursor));
                         }
                         assembly ("memory-safe") {
-                            mstore8(
-                                add(itemSourceHead, 1),
-                                or(shl(4, opOutputs), opInputs)
-                            )
+                            mstore8(add(itemSourceHead, 1), or(shl(4, opOutputs), opInputs))
                         }
                     }
                     itemSourceHead += 4;

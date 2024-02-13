@@ -22,7 +22,12 @@ contract LibOpConditionsNPTest is OpTest {
 
     /// Directly test the integrity logic of LibOpConditionsNP. This tests the happy
     /// path where the operand is valid.
-    function testOpConditionsNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint8 outputs, uint16 operandData) external {
+    function testOpConditionsNPIntegrityHappy(
+        IntegrityCheckStateNP memory state,
+        uint8 inputs,
+        uint8 outputs,
+        uint16 operandData
+    ) external {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =

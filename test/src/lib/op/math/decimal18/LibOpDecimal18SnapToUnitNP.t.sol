@@ -1,13 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import {
-    OpTest,
-    IntegrityCheckStateNP,
-    Operand,
-    InterpreterStateNP,
-    UnexpectedOperand
-} from "test/abstract/OpTest.sol";
+import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpDecimal18SnapToUnitNP} from "src/lib/op/math/decimal18/LibOpDecimal18SnapToUnitNP.sol";
 
 contract LibOpDecimal18SnapToUnitNPTest is OpTest {

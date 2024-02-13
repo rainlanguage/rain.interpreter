@@ -51,17 +51,11 @@ contract LibOpStackNPTest is OpTest {
     ) external {
         stackIndex = uint16(bound(stackIndex, 0, uint256(type(uint16).max)));
         readIndex = uint16(bound(readIndex, stackIndex, uint256(type(uint16).max)));
-        Operand operand = LibOperand.build(
-            0,
-            1,
-            readIndex
-        );
+        Operand operand = LibOperand.build(0, 1, readIndex);
         IntegrityCheckStateNP memory state = LibIntegrityCheckNP.newState(bytecode, stackIndex, constants);
         state.opIndex = opIndex;
 
-        vm.expectRevert(
-            abi.encodeWithSelector(OutOfBoundsStackRead.selector, state.opIndex, stackIndex, readIndex)
-        );
+        vm.expectRevert(abi.encodeWithSelector(OutOfBoundsStackRead.selector, state.opIndex, stackIndex, readIndex));
         LibOpStackNP.integrity(state, operand);
     }
 

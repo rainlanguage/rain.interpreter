@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import {LibUint256Array} from  "rain.solmem/lib/LibUint256Array.sol";
+import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
 import {OpTest, IntegrityCheckStateNP, InterpreterStateNP} from "test/abstract/OpTest.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
@@ -14,7 +14,9 @@ contract LibOpIntMinNPTest is OpTest {
 
     /// Directly test the integrity logic of LibOpIntMinNP. This tests the happy
     /// path where the inputs input and calc match.
-    function testOpIntMinNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData) external {
+    function testOpIntMinNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData)
+        external
+    {
         inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
             LibOpIntMinNP.integrity(state, LibOperand.build(inputs, 1, operandData));

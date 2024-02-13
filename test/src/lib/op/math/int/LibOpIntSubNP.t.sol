@@ -1,16 +1,19 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/abstract/OpTest.sol";
+import {OpTest, IntegrityCheckStateNP, InterpreterStateNP, Operand, stdError} from "test/abstract/OpTest.sol";
 import {LibOpIntSubNP} from "src/lib/op/math/int/LibOpIntSubNP.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpIntSubNPTest is OpTest {
     /// Directly test the integrity logic of LibOpIntSubNP. This tests the happy
     /// path where the inputs input and calc match.
-    function testOpIntSubNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external {
-        inputs = uint8(bound(inputs, 2, type(uint8).max));
+    function testOpIntSubNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData)
+        external
+    {
+        inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpIntSubNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
+            LibOpIntSubNP.integrity(state, LibOperand.build(inputs, 1, operandData));
 
         assertEq(calcInputs, inputs);
         assertEq(calcOutputs, 1);
@@ -35,10 +38,11 @@ contract LibOpIntSubNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpIntSubNP.
-    function testOpIntSubNPRun(uint256[] memory inputs) external {
+    function testOpIntSubNPRun(uint256[] memory inputs, uint16 operandData) external {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
-        Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
+        vm.assume(inputs.length <= 0x0F);
+        Operand operand = LibOperand.build(uint8(inputs.length), 1, operandData);
         uint256 underflows = 0;
         unchecked {
             uint256 a = inputs[0];
