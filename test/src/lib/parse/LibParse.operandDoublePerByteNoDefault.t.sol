@@ -53,7 +53,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
             // 1 output
             hex"01"
             // c operand 1 2
-            hex"04000201"
+            hex"04100201"
         );
         assertEq(constants.length, 0);
     }
@@ -76,7 +76,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
             // 1 output
             hex"01"
             // c operand 0 0
-            hex"04000000"
+            hex"04100000"
         );
         assertEq(constants.length, 0);
     }
@@ -99,7 +99,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
             // 1 output
             hex"01"
             // c operand 255 0
-            hex"040000ff"
+            hex"041000ff"
         );
         assertEq(constants.length, 0);
     }
@@ -122,7 +122,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
             // 1 output
             hex"01"
             // c operand 0 255
-            hex"0400ff00"
+            hex"0410ff00"
         );
         assertEq(constants.length, 0);
     }
@@ -145,7 +145,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
             // 1 output
             hex"01"
             // c operand 255 255
-            hex"0400ffff"
+            hex"0410ffff"
         );
         assertEq(constants.length, 0);
     }
@@ -208,7 +208,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
             // 1 output
             hex"01"
             // c operand 1 2
-            hex"04000201"
+            hex"04100201"
         );
         assertEq(constants.length, 0);
     }
@@ -231,7 +231,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
             // 1 output
             hex"01"
             // c operand 1 2
-            hex"04000201"
+            hex"04100201"
         );
         assertEq(constants.length, 0);
     }
@@ -254,7 +254,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
             // 1 output
             hex"01"
             // c operand 1 2
-            hex"04000201"
+            hex"04100201"
         );
         assertEq(constants.length, 0);
     }

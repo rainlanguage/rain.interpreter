@@ -13,6 +13,7 @@ import {IInterpreterStoreV1, FullyQualifiedNamespace} from "src/interface/IInter
 import {OpTest, PRE, POST} from "test/abstract/OpTest.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 /// @title LibOpStackNPTest
 /// @notice Test the runtime and integrity time logic of LibOpStackNP.
@@ -43,18 +44,23 @@ contract LibOpStackNPTest is OpTest {
     /// error as an OOB read.
     function testOpStackNPIntegrityOOBStack(
         bytes memory bytecode,
-        uint256 stackIndex,
+        uint16 stackIndex,
         uint256[] memory constants,
-        Operand operand,
+        uint16 readIndex,
         uint256 opIndex
     ) external {
-        stackIndex = bound(stackIndex, 1, type(uint256).max);
-        operand = Operand.wrap(bound(Operand.unwrap(operand), stackIndex, type(uint256).max));
+        stackIndex = uint16(bound(stackIndex, 0, uint256(type(uint16).max)));
+        readIndex = uint16(bound(readIndex, stackIndex, uint256(type(uint16).max)));
+        Operand operand = LibOperand.build(
+            0,
+            1,
+            readIndex
+        );
         IntegrityCheckStateNP memory state = LibIntegrityCheckNP.newState(bytecode, stackIndex, constants);
         state.opIndex = opIndex;
 
         vm.expectRevert(
-            abi.encodeWithSelector(OutOfBoundsStackRead.selector, state.opIndex, stackIndex, Operand.unwrap(operand))
+            abi.encodeWithSelector(OutOfBoundsStackRead.selector, state.opIndex, stackIndex, readIndex)
         );
         LibOpStackNP.integrity(state, operand);
     }
@@ -145,9 +151,9 @@ contract LibOpStackNPTest is OpTest {
             // 2 outputs
             hex"02"
             // constant 0
-            hex"01000000"
+            hex"01100000"
             // stack 0
-            hex"00000000"
+            hex"00100000"
         );
 
         assertEq(constants.length, 1);
@@ -190,17 +196,17 @@ contract LibOpStackNPTest is OpTest {
             // 6 outputs
             hex"06"
             // constant 0 (1)
-            hex"01000000"
+            hex"01100000"
             // stack 0 (foo)
-            hex"00000000"
+            hex"00100000"
             // stack 1 (bar)
-            hex"00000001"
+            hex"00100001"
             // stack 1 (bar)
-            hex"00000001"
+            hex"00100001"
             // stack 0 (foo)
-            hex"00000000"
+            hex"00100000"
             // stack 3 (baz)
-            hex"00000003"
+            hex"00100003"
         );
 
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =

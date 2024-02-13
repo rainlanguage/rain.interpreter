@@ -151,7 +151,7 @@ contract LibParseNamedLHSTest is Test {
             // stack 0
             hex"00100000"
             // c
-            hex"02100000"
+            hex"02000000"
             // constant 2
             hex"01100002"
             // stack 3

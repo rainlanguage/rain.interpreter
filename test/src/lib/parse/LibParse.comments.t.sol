@@ -69,7 +69,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // a
-            hex"02000000"
+            hex"02100000"
         );
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -103,7 +103,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // a
-            hex"02000000"
+            hex"02100000"
         );
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -138,7 +138,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // a
-            hex"02000000"
+            hex"02100000"
             // 1 op
             hex"01"
             // 1 stack allocation
@@ -148,7 +148,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // b
-            hex"03000000"
+            hex"03100000"
         );
 
         // a
@@ -194,7 +194,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // a
-            hex"02000000"
+            hex"02100000"
             // 1 op
             hex"01"
             // 1 stack allocation
@@ -204,7 +204,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // b
-            hex"03000000"
+            hex"03100000"
         );
 
         // a
@@ -250,7 +250,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // a
-            hex"02000000"
+            hex"02100000"
             // 1 op
             hex"01"
             // 1 stack allocation
@@ -260,7 +260,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // b
-            hex"03000000"
+            hex"03100000"
         );
 
         // a
@@ -305,7 +305,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // a
-            hex"02000000"
+            hex"02100000"
         );
         assertEq(constants.length, 0);
 
@@ -341,7 +341,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // a
-            hex"02000000"
+            hex"02100000"
         );
         assertEq(constants.length, 0);
 
@@ -379,7 +379,7 @@ contract LibParseCommentsTest is Test {
             // 1 output
             hex"01"
             // a
-            hex"02000000"
+            hex"02100000"
         );
 
         uint256 sourceIndex = 0;

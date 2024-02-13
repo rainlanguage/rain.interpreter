@@ -42,7 +42,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
             // 1 output
             hex"01"
             // constant 0
-            hex"01000000"
+            hex"01100000"
         );
 
         assertEq(constants.length, 1);
@@ -77,9 +77,9 @@ contract LibParseLiteralIntegerDecimalTest is Test {
             // 2 outputs
             hex"02"
             // constant 0
-            hex"01000000"
+            hex"01100000"
             // constant 1
-            hex"01000001"
+            hex"01100001"
         );
 
         assertEq(constants.length, 2);
@@ -116,11 +116,11 @@ contract LibParseLiteralIntegerDecimalTest is Test {
             // 3 outputs
             hex"03"
             // constant 0
-            hex"01000000"
+            hex"01100000"
             // constant 1
-            hex"01000001"
+            hex"01100001"
             // constant 0
-            hex"01000000"
+            hex"01100000"
         );
         assertEq(constants.length, 2);
         assertEq(constants[0], 11);
@@ -156,7 +156,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
             // 1 output
             hex"01"
             // constant 0
-            hex"01000000"
+            hex"01100000"
         );
 
         assertEq(constants.length, 1);
@@ -193,7 +193,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
             // 1 output
             hex"01"
             // constant 0
-            hex"01000000"
+            hex"01100000"
         );
         assertEq(constants.length, 1);
         assertEq(constants[0], type(uint256).max);
@@ -270,15 +270,15 @@ contract LibParseLiteralIntegerDecimalTest is Test {
             // 5 outputs
             hex"05"
             // constant 0
-            hex"01000000"
+            hex"01100000"
             // constant 1
-            hex"01000001"
+            hex"01100001"
             // constant 2
-            hex"01000002"
+            hex"01100002"
             // constant 3
-            hex"01000003"
+            hex"01100003"
             // constant 4
-            hex"01000004"
+            hex"01100004"
         );
 
         assertEq(constants.length, 5);

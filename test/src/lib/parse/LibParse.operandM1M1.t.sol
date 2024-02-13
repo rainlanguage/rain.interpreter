@@ -30,7 +30,7 @@ contract LibParseOperandM1M1Test is OperandTest {
             // 1 output
             hex"01"
             // d operand 0 0
-            hex"05000000"
+            hex"05100000"
         );
         assertEq(constants.length, 0);
     }
@@ -53,7 +53,7 @@ contract LibParseOperandM1M1Test is OperandTest {
             // 1 output
             hex"01"
             // d operand 0 0
-            hex"05000000"
+            hex"05100000"
         );
         assertEq(constants.length, 0);
     }
@@ -76,7 +76,7 @@ contract LibParseOperandM1M1Test is OperandTest {
             // 1 output
             hex"01"
             // d operand 1 0
-            hex"05000001"
+            hex"05100001"
         );
         assertEq(constants.length, 0);
     }
@@ -107,7 +107,7 @@ contract LibParseOperandM1M1Test is OperandTest {
             // 1 output
             hex"01"
             // d operand 0 1
-            hex"05000002"
+            hex"05100002"
         );
         assertEq(constants.length, 0);
     }
@@ -130,7 +130,7 @@ contract LibParseOperandM1M1Test is OperandTest {
             // 1 output
             hex"01"
             // d operand 0 0
-            hex"05000000"
+            hex"05100000"
         );
         assertEq(constants.length, 0);
     }
@@ -161,7 +161,7 @@ contract LibParseOperandM1M1Test is OperandTest {
             // 1 output
             hex"01"
             // d operand 1 1
-            hex"05000003"
+            hex"05100003"
         );
         assertEq(constants.length, 0);
     }

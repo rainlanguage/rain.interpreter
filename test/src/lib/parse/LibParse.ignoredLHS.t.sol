@@ -131,7 +131,7 @@ contract LibParseIgnoredLHSTest is Test {
             // 1 output
             hex"01"
             // a
-            hex"02000000"
+            hex"02100000"
         );
 
         assertEq(constants.length, 0);
