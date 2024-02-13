@@ -79,9 +79,9 @@ contract LibParseNamedRHSTest is Test {
             // a b outputs count
             hex"02"
             // a
-            hex"02000000"
+            hex"02100000"
             // b
-            hex"03000000"
+            hex"03100000"
         );
         assertEq(constants.length, 0);
     }
@@ -123,13 +123,13 @@ contract LibParseNamedRHSTest is Test {
             // b a c b outputs count
             hex"02"
             // b
-            hex"03000000"
+            hex"03100000"
             // a 1 input
-            hex"02010000"
+            hex"02110000"
             // c
-            hex"04000000"
+            hex"04100000"
             // b 1 input
-            hex"03010000"
+            hex"03110000"
         );
         assertEq(constants.length, 0);
     }
@@ -171,9 +171,9 @@ contract LibParseNamedRHSTest is Test {
             // b a outputs count
             hex"01"
             // b
-            hex"03000000"
+            hex"03100000"
             // a 1 input
-            hex"02010000"
+            hex"02110000"
         );
         assertEq(constants.length, 0);
     }
@@ -215,11 +215,11 @@ contract LibParseNamedRHSTest is Test {
             // c b a outputs count
             hex"01"
             // c
-            hex"04000000"
+            hex"04100000"
             // b
-            hex"03000000"
+            hex"03100000"
             // a 2 inputs
-            hex"02020000"
+            hex"02120000"
         );
         assertEq(constants.length, 0);
     }

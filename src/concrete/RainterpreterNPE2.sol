@@ -24,14 +24,14 @@ import {
 import {IInterpreterStoreV1} from "../interface/IInterpreterStoreV1.sol";
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x0f649689148d68995e2657dc49b591954cc0e5ba0f2ce2ba87fbf42e5dfa883f);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xc549b5c1735c87cd89daafaf0368f516c5e291f1e2984d0aeaf3a54e0aba9fe1);
 
 /// @dev The function pointers known to the interpreter for dynamic dispatch.
 /// By setting these as a constant they can be inlined into the interpreter
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
 bytes constant OPCODE_FUNCTION_POINTERS =
-    hex"0cb30cff0d410f060fea0ffc100e1027106910bb10cc10dd118011ba12781328127813ac144e14c614f515241524157315a2160416d51728173c179217a617bb17d517e017f418091821182f18ac18ba18c818e318f81910191e192c193a1948199319ab19c319dd19dd19f41a0b1a601a6e1a6e1ab91b041b4f1b4f1b9d1b9d1be81c331c7e1c7e1d1f1e06";
+    hex"0cb30cff0d410f060fea0ffc100e1027106910bb10cc10dd118011ba12781328127813ac144e14c614f515241524157315a2160716d8172b173f179517a917be17d817e317f7180c1824183218af18bd18cb18e618fb19131921192f193d194b199619ae19c619e019e019f71a0e1a631a711a711abc1b071b521b521ba01ba01bee1c391c841c841d251e0c";
 
 /// @title RainterpreterNPE2
 /// @notice Implementation of a Rainlang interpreter that is compatible with

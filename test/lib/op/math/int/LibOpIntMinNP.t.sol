@@ -14,9 +14,9 @@ contract LibOpIntMinNPTest is OpTest {
     /// Directly test the integrity logic of LibOpIntMinNP. This tests the happy
     /// path where the inputs input and calc match.
     function testOpIntMinNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external {
-        inputs = uint8(bound(inputs, 2, type(uint8).max));
+        inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpIntMinNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
+            LibOpIntMinNP.integrity(state, Operand.wrap((uint256(inputs) || uint256(0x10)) << 0x10));
 
         assertEq(calcInputs, inputs);
         assertEq(calcOutputs, 1);
@@ -56,7 +56,7 @@ contract LibOpIntMinNPTest is OpTest {
     /// Test the eval of `decimal18-min` opcode parsed from a string.
     /// Tests zero inputs.
     /// MUST be identical to `int-min`.
-    function testOpDecimal18MaxNPEvalZeroInputs() external {
+    function testOpDecimal18MinNPEvalZeroInputs() external {
         checkBadInputs("_: decimal18-min();", 0, 2, 0);
     }
 

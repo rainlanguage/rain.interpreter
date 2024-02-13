@@ -12,7 +12,7 @@ import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 library LibOpAnyNP {
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
         // There must be at least one input.
-        uint256 inputs = Operand.unwrap(operand) >> 0x10;
+        uint256 inputs = (Operand.unwrap(operand) >> 0x10) & 0x0F;
         inputs = inputs > 0 ? inputs : 1;
         return (inputs, 1);
     }
@@ -21,7 +21,7 @@ library LibOpAnyNP {
     /// ANY is the first nonzero item, else 0.
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         assembly ("memory-safe") {
-            let length := mul(shr(0x10, operand), 0x20)
+            let length := mul(and(shr(0x10, operand), 0x0F), 0x20)
             let cursor := stackTop
             stackTop := sub(add(stackTop, length), 0x20)
             for { let end := add(cursor, length) } lt(cursor, end) { cursor := add(cursor, 0x20) } {

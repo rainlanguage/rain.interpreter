@@ -76,9 +76,9 @@ contract LibParseLiteralIntegerHexTest is Test {
             // 2 outputs
             hex"02"
             // constant 0
-            hex"01000000"
+            hex"01100000"
             // constant 1
-            hex"01000001"
+            hex"01100001"
         );
 
         assertEq(constants.length, 2);
