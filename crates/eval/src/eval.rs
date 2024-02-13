@@ -90,7 +90,7 @@ impl ForkedEvm {
         args: ForkEvalArgs,
     ) -> Result<ForkTypedReturn<eval2Call>, ForkCallError> {
         let ForkEvalArgs {
-            rainlang_string,
+            rainlang_string: _,
             source_index,
             deployer,
             namespace,

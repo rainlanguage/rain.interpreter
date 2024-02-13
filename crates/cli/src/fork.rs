@@ -5,9 +5,9 @@ use clap::Args;
 #[derive(Args, Clone, Debug)]
 pub struct NewForkedEvmCliArgs {
     #[arg(short = 'i', long, help = "RPC url for the fork")]
-    fork_url: String,
+    pub fork_url: String,
     #[arg(short = 'i', long, help = "Optional block number to fork from")]
-    fork_block_number: Option<BlockNumber>,
+    pub fork_block_number: Option<BlockNumber>,
 }
 
 impl From<NewForkedEvmCliArgs> for NewForkedEvm {
