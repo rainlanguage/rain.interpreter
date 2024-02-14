@@ -28,8 +28,7 @@ contract LibSubParseSubParserExternTest is Test {
         (bool success, bytes memory bytecode, uint256[] memory constants) = LibSubParse.subParserExtern(
             extern,
             uint256(constantsHeight),
-            uint256(inputs),
-            uint256(outputs),
+            uint256(outputs) << 4 | uint256(inputs),
             Operand.wrap(uint256(operandValue)),
             uint256(opcodeIndex)
         );
@@ -53,21 +52,18 @@ contract LibSubParseSubParserExternTest is Test {
     /// Constants height must be less than 256 or the lib will error.
     function testLibSubParseSubParserExternConstantsHeightOverflow(
         IInterpreterExternV3 extern,
-        uint16 constantsHeight,
+        uint256 constantsHeight,
         uint8 inputsByte,
         uint8 outputsByte,
         uint16 operandValue,
         uint8 opcodeIndex
     ) external {
-        constantsHeight = uint16(bound(uint256(constantsHeight), 0x100, 0xFFFF));
-        vm.expectRevert(
-            abi.encodeWithSelector(ExternDispatchConstantsHeightOverflow.selector, uint256(constantsHeight))
-        );
+        constantsHeight = bound(constantsHeight, uint256(type(uint16).max) + 1, type(uint256).max);
+        vm.expectRevert(abi.encodeWithSelector(ExternDispatchConstantsHeightOverflow.selector, constantsHeight));
         (bool success, bytes memory bytecode, uint256[] memory constants) = LibSubParse.subParserExtern(
             extern,
-            uint256(constantsHeight),
-            uint256(inputsByte),
-            uint256(outputsByte),
+            constantsHeight,
+            uint256(outputsByte) << 4 | uint256(inputsByte),
             Operand.wrap(uint256(operandValue)),
             uint256(opcodeIndex)
         );

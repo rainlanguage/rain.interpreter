@@ -15,10 +15,14 @@ import {
     ExternDispatch
 } from "src/interface/unstable/IInterpreterExternV3.sol";
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
 /// @title LibOpExternNPTest
 /// @notice Test the runtime and integrity time logic of LibOpExternNP.
 contract LibOpExternNPTest is OpTest {
+    using LibUint256Array for uint256[];
+
     function mockImplementsERC165IInterpreterExternV3(IInterpreterExternV3 extern) internal {
         // Extern needs to implement ERC165 for the interface.
         vm.mockCall(
@@ -41,21 +45,21 @@ contract LibOpExternNPTest is OpTest {
     function testOpExternNPIntegrityHappy(
         IntegrityCheckStateNP memory state,
         IInterpreterExternV3 extern,
-        uint256 constantIndex,
-        uint256 inputs,
-        uint256 outputs
+        uint16 constantIndex,
+        uint8 inputs,
+        uint8 outputs
     ) external {
-        inputs = bound(inputs, 0, 0xFF);
-        outputs = bound(outputs, 0, 0xFF);
+        inputs = uint8(bound(inputs, 0, 0x0F));
+        outputs = uint8(bound(outputs, 0, 0x0F));
 
         assumeEtchable(address(extern));
         vm.etch(address(extern), hex"fe");
         mockImplementsERC165IInterpreterExternV3(extern);
 
         vm.assume(state.constants.length > 0);
-        constantIndex = bound(constantIndex, 0, state.constants.length - 1);
+        constantIndex = uint16(bound(constantIndex, 0, state.constants.length - 1));
 
-        Operand operand = Operand.wrap(inputs << 0x10 | outputs << 0x08 | constantIndex);
+        Operand operand = LibOperand.build(inputs, outputs, constantIndex);
         ExternDispatch externDispatch = LibExtern.encodeExternDispatch(0, operand);
         EncodedExternDispatch encodedExternDispatch = LibExtern.encodeExternCall(extern, externDispatch);
         state.constants[constantIndex] = EncodedExternDispatch.unwrap(encodedExternDispatch);
@@ -80,12 +84,12 @@ contract LibOpExternNPTest is OpTest {
     function testOpExternNPIntegrityNotAnExternContract(
         IntegrityCheckStateNP memory state,
         IInterpreterExternV3 extern,
-        uint256 constantIndex,
-        uint256 inputs,
-        uint256 outputs
+        uint16 constantIndex,
+        uint8 inputs,
+        uint8 outputs
     ) external {
-        inputs = bound(inputs, 0, 0xFF);
-        outputs = bound(outputs, 0, 0xFF);
+        inputs = uint8(bound(inputs, 0, 0x0F));
+        outputs = uint8(bound(outputs, 0, 0x0F));
 
         assumeEtchable(address(extern));
         vm.etch(address(extern), hex"fe");
@@ -108,9 +112,9 @@ contract LibOpExternNPTest is OpTest {
         );
 
         vm.assume(state.constants.length > 0);
-        constantIndex = bound(constantIndex, 0, state.constants.length - 1);
+        constantIndex = uint16(bound(constantIndex, 0, state.constants.length - 1));
 
-        Operand operand = Operand.wrap(inputs << 0x10 | outputs << 0x08 | constantIndex);
+        Operand operand = LibOperand.build(inputs, outputs, constantIndex);
         ExternDispatch externDispatch = LibExtern.encodeExternDispatch(0, operand);
         EncodedExternDispatch encodedExternDispatch = LibExtern.encodeExternCall(extern, externDispatch);
         state.constants[constantIndex] = EncodedExternDispatch.unwrap(encodedExternDispatch);
@@ -133,14 +137,17 @@ contract LibOpExternNPTest is OpTest {
     function testOpExternNPRunHappy(
         IInterpreterExternV3 extern,
         uint256[] memory constants,
-        uint256 constantIndex,
+        uint16 constantIndex,
         uint256[] memory inputs,
         uint256[] memory outputs
     ) external {
         vm.assume(constants.length > 0);
-        vm.assume(constants.length <= type(uint8).max);
-        vm.assume(inputs.length <= type(uint8).max);
-        vm.assume(outputs.length <= type(uint8).max);
+        if (inputs.length > 0x0F) {
+            inputs.truncate(0x0F);
+        }
+        if (outputs.length > 0x0F) {
+            outputs.truncate(0x0F);
+        }
 
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         state.constants = constants;
@@ -149,9 +156,9 @@ contract LibOpExternNPTest is OpTest {
         vm.etch(address(extern), hex"fe");
         mockImplementsERC165IInterpreterExternV3(extern);
 
-        constantIndex = bound(constantIndex, 0, state.constants.length - 1);
+        constantIndex = uint16(bound(constantIndex, 0, state.constants.length - 1));
 
-        Operand operand = Operand.wrap(inputs.length << 0x10 | outputs.length << 0x08 | constantIndex);
+        Operand operand = LibOperand.build(uint8(inputs.length), uint8(outputs.length), constantIndex);
         ExternDispatch externDispatch = LibExtern.encodeExternDispatch(0, operand);
         EncodedExternDispatch encodedExternDispatch = LibExtern.encodeExternCall(extern, externDispatch);
         state.constants[constantIndex] = EncodedExternDispatch.unwrap(encodedExternDispatch);

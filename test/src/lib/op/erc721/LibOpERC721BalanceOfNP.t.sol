@@ -24,6 +24,8 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
         uint8 outputs,
         uint16 operandData
     ) external {
+        inputs = uint8(bound(inputs, 0, 0x0F));
+        outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
             LibOpERC721BalanceOfNP.integrity(state, LibOperand.build(inputs, outputs, operandData));
 

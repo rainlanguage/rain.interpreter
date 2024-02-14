@@ -41,8 +41,8 @@ library LibSubParse {
             mstore8(add(bytecode, 0x23), column)
             mstore8(add(bytecode, 0x22), row)
 
-            // 0 inputs.
-            mstore8(add(bytecode, 0x21), 0)
+            // 0 inputs 1 output.
+            mstore8(add(bytecode, 0x21), 0x10)
 
             mstore8(add(bytecode, 0x20), opIndex)
 
@@ -83,6 +83,9 @@ library LibSubParse {
             // never being more than 2 bytes.
             mstore(add(bytecode, 4), constantsHeight)
 
+            // 0 inputs 1 output.
+            mstore8(add(bytecode, 0x21), 0x10)
+
             // Main opcode is constant.
             mstore8(add(bytecode, 0x20), opIndex)
 
@@ -109,15 +112,14 @@ library LibSubParse {
     function subParserExtern(
         IInterpreterExternV3 extern,
         uint256 constantsHeight,
-        uint256 inputs,
-        uint256 outputs,
+        uint256 ioByte,
         Operand operand,
         uint256 opcodeIndex
     ) internal pure returns (bool, bytes memory, uint256[] memory) {
         // The constants height is an error check because the main parser can
         // provide two bytes for it. Everything else is expected to be more
         // directly controlled by the subparser itself.
-        if (constantsHeight > 0xFF) {
+        if (constantsHeight > 0xFFFF) {
             revert ExternDispatchConstantsHeightOverflow(constantsHeight);
         }
         // Build an extern call that dials back into the current contract at eval
@@ -131,7 +133,7 @@ library LibSubParse {
             mstore(0x40, add(bytecode, 0x24))
             mstore(add(bytecode, 4), constantsHeight)
             // The IO byte is inputs merged with outputs.
-            mstore8(add(bytecode, 0x21), or(shl(4, outputs), inputs))
+            mstore8(add(bytecode, 0x21), ioByte)
             // Main opcode is extern, to call back into current contract.
             mstore8(add(bytecode, 0x20), opIndex)
             // The bytes length is 4.
