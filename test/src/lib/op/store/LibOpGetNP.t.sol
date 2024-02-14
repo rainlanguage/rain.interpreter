@@ -19,8 +19,16 @@ contract LibOpGetNPTest is OpTest {
 
     /// Directly test the integrity logic of LibOpGetNP. The inputs are always
     /// 1 and the outputs are always 1.
-    function testLibOpGetNPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs) public {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpGetNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
+    function testLibOpGetNPIntegrity(
+        IntegrityCheckStateNP memory state,
+        uint8 inputs,
+        uint8 outputs,
+        uint16 operandData
+    ) public {
+        inputs = uint8(bound(inputs, 1, 0x0F));
+        outputs = uint8(bound(outputs, 1, 0x0F));
+        (uint256 calcInputs, uint256 calcOutputs) =
+            LibOpGetNP.integrity(state, LibOperand.build(inputs, outputs, operandData));
         assertEq(calcInputs, 1, "inputs");
         assertEq(calcOutputs, 1, "outputs");
     }

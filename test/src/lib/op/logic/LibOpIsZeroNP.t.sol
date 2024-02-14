@@ -13,15 +13,23 @@ import {
 import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpIsZeroNPTest is OpTest {
     using LibUint256Array for uint256[];
 
     /// Directly test the integrity logic of LibOpIsZeroNP. This tests the happy
     /// path where the operand is valid. IsZero is a 1 input, 1 output op.
-    function testOpIsZeroNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external {
+    function testOpIsZeroNPIntegrityHappy(
+        IntegrityCheckStateNP memory state,
+        uint8 inputs,
+        uint8 outputs,
+        uint16 operandData
+    ) external {
+        inputs = uint8(bound(inputs, 1, 0x0F));
+        outputs = uint8(bound(outputs, 1, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpIsZeroNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
+            LibOpIsZeroNP.integrity(state, LibOperand.build(inputs, outputs, operandData));
 
         // The inputs from the operand are ignored. The op is always 1 input.
         assertEq(calcInputs, 1);
@@ -33,7 +41,7 @@ contract LibOpIsZeroNPTest is OpTest {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = input;
-        Operand operand = Operand.wrap(inputs.length << 0x10);
+        Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
         opReferenceCheck(state, operand, LibOpIsZeroNP.referenceFn, LibOpIsZeroNP.integrity, LibOpIsZeroNP.run, inputs);
     }
 

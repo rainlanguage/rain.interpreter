@@ -1,16 +1,18 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/abstract/OpTest.sol";
+import {OpTest, IntegrityCheckStateNP, InterpreterStateNP, Operand, stdError} from "test/abstract/OpTest.sol";
 import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
 import {LibOpDecimal18ScaleNNP} from "src/lib/op/math/decimal18/LibOpDecimal18ScaleNNP.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpDecimal18ScaleNNPTest is OpTest {
     /// Directly test the integrity logic of LibOpDecimal18ScaleNNP.
     /// Inputs are always 1, outputs are always 1.
     function testOpDecimal18ScaleNNPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs, uint16 op) external {
+        inputs = uint8(bound(inputs, 1, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpDecimal18ScaleNNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10 | uint256(op)));
+            LibOpDecimal18ScaleNNP.integrity(state, LibOperand.build(inputs, 1, op));
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
     }
@@ -23,7 +25,8 @@ contract LibOpDecimal18ScaleNNPTest is OpTest {
         uint256 flags = round | (saturate << 1);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
-        Operand operand = Operand.wrap((1 << 0x10) | (flags << 8) | scale);
+        Operand operand = LibOperand.build(1, 1, uint16((flags << 8) | scale));
+
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = value;
 

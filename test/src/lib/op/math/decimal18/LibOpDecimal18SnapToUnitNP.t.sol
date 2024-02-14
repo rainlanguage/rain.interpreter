@@ -3,6 +3,7 @@ pragma solidity =0.8.19;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpDecimal18SnapToUnitNP} from "src/lib/op/math/decimal18/LibOpDecimal18SnapToUnitNP.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpDecimal18SnapToUnitNPTest is OpTest {
     /// Directly test the integrity logic of LibOpDecimal18SnapToUnitNP.
@@ -18,7 +19,7 @@ contract LibOpDecimal18SnapToUnitNPTest is OpTest {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         value = bound(value, 0, type(uint64).max - 1e18);
 
-        Operand operand = Operand.wrap((2 << 0x10) | 0);
+        Operand operand = LibOperand.build(2, 1, 0);
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = threshold;
         inputs[1] = value;

@@ -1,18 +1,21 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/abstract/OpTest.sol";
-import "src/lib/caller/LibContext.sol";
+import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, stdError} from "test/abstract/OpTest.sol";
+import {LibContext} from "src/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOpIntDivNP} from "src/lib/op/math/int/LibOpIntDivNP.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpIntDivNPTest is OpTest {
     /// Directly test the integrity logic of LibOpIntDivNP. This tests the happy
     /// path where the inputs input and calc match.
-    function testOpIntDivNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external {
-        inputs = uint8(bound(inputs, 2, type(uint8).max));
+    function testOpIntDivNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData)
+        external
+    {
+        inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpIntDivNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
+            LibOpIntDivNP.integrity(state, LibOperand.build(inputs, 1, operandData));
 
         assertEq(calcInputs, inputs);
         assertEq(calcOutputs, 1);
@@ -40,7 +43,9 @@ contract LibOpIntDivNPTest is OpTest {
     function testOpIntDivNPRun(uint256[] memory inputs) external {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
-        Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
+        vm.assume(inputs.length <= 0x0F);
+        Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
+
         uint256 divZeros = 0;
         for (uint256 i = 1; i < inputs.length; i++) {
             if (inputs[i] == 0) {

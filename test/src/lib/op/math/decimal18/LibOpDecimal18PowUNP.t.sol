@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/abstract/OpTest.sol";
+import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpDecimal18PowUNP} from "src/lib/op/math/decimal18/LibOpDecimal18PowUNP.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpDecimal18PowUNPTest is OpTest {
     /// Directly test the integrity logic of LibOpDecimal18PowUNP.
@@ -25,7 +26,7 @@ contract LibOpDecimal18PowUNPTest is OpTest {
         b = bound(b, 0, 10);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
-        Operand operand = Operand.wrap((2 << 0x10) | 0);
+        Operand operand = LibOperand.build(2, 1, 0);
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = a;
         inputs[1] = b;

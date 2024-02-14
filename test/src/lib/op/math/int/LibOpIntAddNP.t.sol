@@ -4,14 +4,17 @@ pragma solidity =0.8.19;
 import {stdError} from "forge-std/Test.sol";
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP} from "test/abstract/OpTest.sol";
 import {LibOpIntAddNP} from "src/lib/op/math/int/LibOpIntAddNP.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpIntAddNPTest is OpTest {
     /// Directly test the integrity logic of LibOpIntAddNP. This tests the happy
     /// path where the inputs and calc match.
-    function testOpIntAddNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external {
-        inputs = uint8(bound(inputs, 2, type(uint8).max));
+    function testOpIntAddNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData)
+        external
+    {
+        inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpIntAddNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
+            LibOpIntAddNP.integrity(state, LibOperand.build(inputs, 1, operandData));
 
         assertEq(calcInputs, inputs);
         assertEq(calcOutputs, 1);
@@ -39,7 +42,8 @@ contract LibOpIntAddNPTest is OpTest {
     function testOpIntAddNPRun(uint256[] memory inputs) external {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
-        Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
+        vm.assume(inputs.length <= 0x0F);
+        Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
         uint256 overflows = 0;
         unchecked {
             uint256 a = inputs[0];

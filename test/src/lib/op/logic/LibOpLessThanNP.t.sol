@@ -12,14 +12,22 @@ import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpLessThanNPTest is OpTest {
     /// Directly test the integrity logic of LibOpLessThanNP. No matter the
     /// operand inputs, the calc inputs must be 2, and the calc outputs must be
     /// 1.
-    function testOpLessThanNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external {
+    function testOpLessThanNPIntegrityHappy(
+        IntegrityCheckStateNP memory state,
+        uint8 inputs,
+        uint8 outputs,
+        uint16 operandData
+    ) external {
+        inputs = uint8(bound(inputs, 0, 0x0F));
+        outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpLessThanNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
+            LibOpLessThanNP.integrity(state, LibOperand.build(inputs, outputs, operandData));
 
         // The inputs from the operand are ignored. The op is always 2 inputs.
         assertEq(calcInputs, 2);
@@ -32,7 +40,7 @@ contract LibOpLessThanNPTest is OpTest {
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = input1;
         inputs[1] = input2;
-        Operand operand = Operand.wrap(inputs.length << 0x10);
+        Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
         opReferenceCheck(
             state, operand, LibOpLessThanNP.referenceFn, LibOpLessThanNP.integrity, LibOpLessThanNP.run, inputs
         );

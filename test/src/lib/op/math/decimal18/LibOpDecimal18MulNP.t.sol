@@ -45,7 +45,8 @@ contract LibOpDecimal18MulNPTest is OpTest {
     function testOpDecimal18MulNPRun(uint256[] memory inputs) public {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
-        Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
+        vm.assume(inputs.length <= 0x0F);
+        Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
         // This is kinda shitty because it just duplicates what the reference
         // fn is doing, but because neither PRB nor Open Zeppelin expose a
         // try/catch for overflow, we have to do this.

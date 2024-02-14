@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "test/abstract/OpTest.sol";
+import {OpTest, IntegrityCheckStateNP, InterpreterStateNP, Operand, stdError} from "test/abstract/OpTest.sol";
 import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
 import {LibOpDecimal18Scale18DynamicNP} from "src/lib/op/math/decimal18/LibOpDecimal18Scale18DynamicNP.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpDecimal18Scale18DynamicNPTest is OpTest {
     /// Directly test the integrity logic of LibOpDecimal18Scale18DynamicNP.
@@ -11,8 +12,9 @@ contract LibOpDecimal18Scale18DynamicNPTest is OpTest {
     function testOpDecimal18Scale18DynamicNPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs, uint16 op)
         external
     {
+        inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpDecimal18Scale18DynamicNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10 | uint256(op)));
+            LibOpDecimal18Scale18DynamicNP.integrity(state, LibOperand.build(inputs, 1, op));
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
     }
@@ -24,7 +26,7 @@ contract LibOpDecimal18Scale18DynamicNPTest is OpTest {
         uint256 flags = round | (saturate << 1);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
-        Operand operand = Operand.wrap((2 << 0x10) | flags);
+        Operand operand = LibOperand.build(2, 1, uint16(flags));
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = scale;
         inputs[1] = value;

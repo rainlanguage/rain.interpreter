@@ -1,21 +1,24 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import "rain.solmem/lib/LibPointer.sol";
+import {LibPointer} from "rain.solmem/lib/LibPointer.sol";
 
 import {Math as OZMath} from "openzeppelin-contracts/contracts/utils/math/Math.sol";
-import "test/abstract/OpTest.sol";
+import {OpTest, IntegrityCheckStateNP, InterpreterStateNP, Operand, stdError} from "test/abstract/OpTest.sol";
 import {PRBMath_MulDiv_Overflow} from "prb-math/Common.sol";
-import "rain.math.fixedpoint/lib/LibWillOverflow.sol";
+import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
 import {LibOpDecimal18DivNP} from "src/lib/op/math/decimal18/LibOpDecimal18DivNP.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpDecimal18DivNPTest is OpTest {
     /// Directly test the integrity logic of LibOpDecimal18DivNP. This tests the
     /// happy path where the inputs input and calc match.
-    function testOpDecimal18DivNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external {
-        inputs = uint8(bound(inputs, 2, type(uint8).max));
+    function testOpDecimal18DivNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData)
+        external
+    {
+        inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpDecimal18DivNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
+            LibOpDecimal18DivNP.integrity(state, LibOperand.build(inputs, 1, operandData));
 
         assertEq(calcInputs, inputs);
         assertEq(calcOutputs, 1);
@@ -33,7 +36,7 @@ contract LibOpDecimal18DivNPTest is OpTest {
     /// Directly test the integrity logic of LibOpDecimal18DivNP. This tests the
     /// unhappy path where the operand is invalid due to 1 inputs.
     function testOpDecimal18DivNPIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpDecimal18DivNP.integrity(state, Operand.wrap(0x010000));
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpDecimal18DivNP.integrity(state, Operand.wrap(0x110000));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
@@ -43,7 +46,8 @@ contract LibOpDecimal18DivNPTest is OpTest {
     function testOpDecimal18DivNPRun(uint256[] memory inputs) public {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
-        Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
+        vm.assume(inputs.length <= 0x0F);
+        Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
         // This is kinda shitty because it just duplicates what the reference
         // fn is doing, but because neither PRB nor Open Zeppelin expose a
         // try/catch for overflow, we have to do this.

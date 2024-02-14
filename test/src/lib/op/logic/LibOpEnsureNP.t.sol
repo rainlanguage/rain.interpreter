@@ -11,13 +11,21 @@ import {
 } from "src/interface/unstable/IInterpreterV2.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {LibIntOrAString, IntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpEnsureNPTest is OpTest {
     /// Directly test the integrity logic of LibOpEnsureNP. This tests the
     /// happy path where there is at least one input.
-    function testOpEnsureNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external {
+    function testOpEnsureNPIntegrityHappy(
+        IntegrityCheckStateNP memory state,
+        uint8 inputs,
+        uint8 outputs,
+        uint16 operandData
+    ) external {
+        inputs = uint8(bound(inputs, 0, 0x0F));
+        outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpEnsureNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
+            LibOpEnsureNP.integrity(state, LibOperand.build(inputs, outputs, operandData));
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 0);
     }
@@ -38,7 +46,7 @@ contract LibOpEnsureNPTest is OpTest {
         inputs[0] = condition;
         inputs[1] = IntOrAString.unwrap(LibIntOrAString.fromString(reason));
 
-        Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
+        Operand operand = LibOperand.build(2, 0, 0);
         if (condition == 0) {
             vm.expectRevert(bytes(reason));
         }

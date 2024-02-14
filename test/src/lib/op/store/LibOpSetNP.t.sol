@@ -8,14 +8,23 @@ import {LibOpSetNP} from "src/lib/op/store/LibOpSetNP.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpSetNPTest is OpTest {
     using LibMemoryKV for MemoryKV;
 
     /// Directly test the integrity logic of LibOpSetNP. The inputs are always
     /// 2 and the outputs are always 0.
-    function testLibOpSetNPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs) public {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpSetNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
+    function testLibOpSetNPIntegrity(
+        IntegrityCheckStateNP memory state,
+        uint8 inputs,
+        uint8 outputs,
+        uint16 operandData
+    ) public {
+        inputs = uint8(bound(inputs, 0, 0x0F));
+        outputs = uint8(bound(outputs, 0, 0x0F));
+        (uint256 calcInputs, uint256 calcOutputs) =
+            LibOpSetNP.integrity(state, LibOperand.build(inputs, outputs, operandData));
         assertEq(calcInputs, 2, "inputs");
         assertEq(calcOutputs, 0, "outputs");
     }

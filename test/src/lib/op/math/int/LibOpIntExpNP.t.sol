@@ -12,16 +12,19 @@ import {LibOpIntExpNP} from "src/lib/op/math/int/LibOpIntExpNP.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpIntExpNPTest is OpTest {
     using LibUint256Array for uint256[];
 
     /// Directly test the integrity logic of LibOpIntExpNP. This tests the happy
     /// path where the inputs input and calc match.
-    function testOpIntExpNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external {
-        inputs = uint8(bound(inputs, 2, type(uint8).max));
+    function testOpIntExpNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData)
+        external
+    {
+        inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpIntExpNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
+            LibOpIntExpNP.integrity(state, LibOperand.build(inputs, 1, operandData));
 
         assertEq(calcInputs, inputs);
         assertEq(calcOutputs, 1);
@@ -49,7 +52,8 @@ contract LibOpIntExpNPTest is OpTest {
     function testOpIntExpNPRun(uint256[] memory inputs) external {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
-        Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
+        vm.assume(inputs.length <= 0x0F);
+        Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
         uint256 overflows = 0;
         unchecked {
             uint256 a = inputs[0];

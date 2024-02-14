@@ -3,6 +3,7 @@ pragma solidity =0.8.19;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpDecimal18Log2NP} from "src/lib/op/math/decimal18/LibOpDecimal18Log2NP.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpDecimal18Log2NPTest is OpTest {
     /// Directly test the integrity logic of LibOpDecimal18Log2NP.
@@ -19,7 +20,7 @@ contract LibOpDecimal18Log2NPTest is OpTest {
         a = bound(a, 2_718281828459045235, type(uint64).max - 1e18);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
-        Operand operand = Operand.wrap((1 << 0x10) | 0);
+        Operand operand = LibOperand.build(1, 1, 0);
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = a;
 

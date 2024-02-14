@@ -38,11 +38,11 @@ contract LibOpIntSubNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpIntSubNP.
-    function testOpIntSubNPRun(uint256[] memory inputs, uint16 operandData) external {
+    function testOpIntSubNPRun(uint256[] memory inputs) external {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
         vm.assume(inputs.length <= 0x0F);
-        Operand operand = LibOperand.build(uint8(inputs.length), 1, operandData);
+        Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
         uint256 underflows = 0;
         unchecked {
             uint256 a = inputs[0];

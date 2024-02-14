@@ -12,6 +12,7 @@ import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpGreaterThanOrEqualToNPTest is OpTest {
     /// Directly test the integrity logic of LibOpGreaterThanOrEqualToNP. No matter the
@@ -32,7 +33,7 @@ contract LibOpGreaterThanOrEqualToNPTest is OpTest {
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = input1;
         inputs[1] = input2;
-        Operand operand = Operand.wrap(inputs.length << 0x10);
+        Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
         opReferenceCheck(
             state,
             operand,
