@@ -14,6 +14,7 @@ import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 
 import {LibOpTimestampNP} from "src/lib/op/evm/LibOpTimestampNP.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 /// @title LibOpTimestampNPTest
 /// @notice Test the runtime and integrity time logic of LibOpTimestampNP.
@@ -23,9 +24,16 @@ contract LibOpTimestampNPTest is OpTest {
     using LibInterpreterStateNP for InterpreterStateNP;
 
     /// Directly test the integrity logic of LibOpTimestampNP.
-    function testOpTimestampNPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs) external {
+    function testOpTimestampNPIntegrity(
+        IntegrityCheckStateNP memory state,
+        uint8 inputs,
+        uint8 outputs,
+        uint16 operandData
+    ) external {
+        inputs = uint8(bound(inputs, 0, 0x0F));
+        outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpTimestampNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
+            LibOpTimestampNP.integrity(state, LibOperand.build(inputs, outputs, operandData));
 
         assertEq(calcInputs, 0);
         assertEq(calcOutputs, 1);
@@ -37,7 +45,7 @@ contract LibOpTimestampNPTest is OpTest {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.warp(blockTimestamp);
         uint256[] memory inputs = new uint256[](0);
-        Operand operand = Operand.wrap(0);
+        Operand operand = LibOperand.build(0, 1, 0);
         opReferenceCheck(
             state, operand, LibOpTimestampNP.referenceFn, LibOpTimestampNP.integrity, LibOpTimestampNP.run, inputs
         );

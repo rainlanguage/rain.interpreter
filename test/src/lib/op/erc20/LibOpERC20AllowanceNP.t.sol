@@ -7,6 +7,7 @@ import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
 import {LibOpERC20AllowanceNP} from "src/lib/op/erc20/LibOpERC20AllowanceNP.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 /// @title LibOpERC20AllowanceNPTest
 /// @notice Test the opcode for getting the allowance of an erc20 token.
@@ -26,7 +27,7 @@ contract LibOpERC20AllowanceNPTest is OpTest {
         inputs[0] = uint256(uint160(token));
         inputs[1] = uint256(uint160(owner));
         inputs[2] = uint256(uint160(spender));
-        Operand operand = Operand.wrap(uint256(3) << 0x10);
+        Operand operand = LibOperand.build(3, 1, 0);
 
         vm.mockCall(token, abi.encodeWithSelector(IERC20.allowance.selector, owner, spender), abi.encode(allowance));
         // called once for reference, once for run

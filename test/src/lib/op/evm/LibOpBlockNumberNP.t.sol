@@ -26,9 +26,16 @@ contract LibOpBlockNumberNPTest is OpTest {
     using LibInterpreterStateNP for InterpreterStateNP;
 
     /// Directly test the integrity logic of LibOpBlockNumberNP.
-    function testOpBlockNumberNPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs) external {
+    function testOpBlockNumberNPIntegrity(
+        IntegrityCheckStateNP memory state,
+        uint8 inputs,
+        uint8 outputs,
+        uint16 operandData
+    ) external {
+        inputs = uint8(bound(inputs, 0, 0x0F));
+        outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpBlockNumberNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
+            LibOpBlockNumberNP.integrity(state, LibOperand.build(inputs, outputs, operandData));
 
         assertEq(calcInputs, 0);
         assertEq(calcOutputs, 1);

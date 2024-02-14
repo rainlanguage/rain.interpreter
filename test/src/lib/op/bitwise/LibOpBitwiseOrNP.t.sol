@@ -7,6 +7,7 @@ import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
 import {LibOpBitwiseOrNP} from "src/lib/op/bitwise/LibOpBitwiseOrNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpBitwiseOrNPTest is OpTest {
     /// Directly test the integrity logic of LibOpBitwiseOrNP. All possible
@@ -24,7 +25,7 @@ contract LibOpBitwiseOrNPTest is OpTest {
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = x;
         inputs[1] = y;
-        Operand operand = Operand.wrap(2 << 0x10);
+        Operand operand = LibOperand.build(2, 1, 0);
         opReferenceCheck(
             state, operand, LibOpBitwiseOrNP.referenceFn, LibOpBitwiseOrNP.integrity, LibOpBitwiseOrNP.run, inputs
         );

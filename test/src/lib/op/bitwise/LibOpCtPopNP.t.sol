@@ -13,6 +13,7 @@ import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibCtPop} from "src/lib/bitwise/LibCtPop.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpCtPopNPTest is OpTest {
     /// Directly test the integrity logic of LibOpCtPopNP. All possible operands
@@ -29,7 +30,7 @@ contract LibOpCtPopNPTest is OpTest {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = x;
-        Operand operand = Operand.wrap(1 << 0x10);
+        Operand operand = LibOperand.build(1, 1, 0);
         opReferenceCheck(state, operand, LibOpCtPopNP.referenceFn, LibOpCtPopNP.integrity, LibOpCtPopNP.run, inputs);
     }
 

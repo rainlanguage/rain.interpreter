@@ -14,6 +14,7 @@ import {
 import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 /// @title LibOpConstantNPTest
 /// @notice Test the runtime and integrity time logic of LibOpConstantNP.
@@ -37,7 +38,7 @@ contract LibOpConstantNPTest is OpTest {
     /// where the operand points past the end of the constants array, which MUST
     /// always error as an OOB read.
     function testOpConstantNPIntegrityOOBConstants(IntegrityCheckStateNP memory state, Operand operand) external {
-        operand = Operand.wrap(bound(Operand.unwrap(operand), state.constants.length, type(uint256).max));
+        operand = Operand.wrap(bound(Operand.unwrap(operand), state.constants.length, type(uint16).max));
 
         vm.expectRevert(
             abi.encodeWithSelector(
@@ -49,16 +50,17 @@ contract LibOpConstantNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpConstantNP. This tests that the
     /// operand always puts a single value on the stack.
-    function testOpConstantNPRun(uint256[] memory constants, uint256 constantIndex) external {
+    function testOpConstantNPRun(uint256[] memory constants, uint16 constantIndex) external {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         state.constants = constants;
         vm.assume(state.constants.length > 0);
-        constantIndex = bound(constantIndex, 0, state.constants.length - 1);
+        vm.assume(state.constants.length <= type(uint16).max);
+        constantIndex = uint16(bound(constantIndex, 0, uint16(state.constants.length - 1)));
 
         uint256[] memory inputs = new uint256[](0);
         opReferenceCheck(
             state,
-            Operand.wrap(constantIndex),
+            LibOperand.build(0, 1, constantIndex),
             LibOpConstantNP.referenceFn,
             LibOpConstantNP.integrity,
             LibOpConstantNP.run,
@@ -94,11 +96,11 @@ contract LibOpConstantNPTest is OpTest {
             // 3 outputs
             hex"03"
             // constant 0
-            hex"01000000"
+            hex"01100000"
             // constant 0
-            hex"01000000"
+            hex"01100000"
             // constant 0
-            hex"01000000"
+            hex"01100000"
         );
 
         assertEq(constants.length, 0);

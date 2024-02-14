@@ -18,9 +18,14 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 /// @title LibOpERC721BalanceOfNPTest
 /// @notice Test the opcode for getting the balance of an erc721 token.
 contract LibOpERC721BalanceOfNPTest is OpTest {
-    function testOpERC721BalanceOfNPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs) external {
+    function testOpERC721BalanceOfNPIntegrity(
+        IntegrityCheckStateNP memory state,
+        uint8 inputs,
+        uint8 outputs,
+        uint16 operandData
+    ) external {
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpERC721BalanceOfNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
+            LibOpERC721BalanceOfNP.integrity(state, LibOperand.build(inputs, outputs, operandData));
 
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);

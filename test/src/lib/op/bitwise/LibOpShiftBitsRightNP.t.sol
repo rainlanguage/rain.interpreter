@@ -14,16 +14,22 @@ import {LibContext} from "src/lib/caller/LibContext.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {UnsupportedBitwiseShiftAmount} from "src/error/ErrBitwise.sol";
 import {OperandOverflow} from "src/error/ErrParse.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpShiftBitsRightNPTest is OpTest {
     /// Directly test the integrity logic of LibOpShiftBitsRightNP. Tests the
     /// happy path where the integrity check does not error due to an unsupported
     /// shift amount.
-    function testOpShiftBitsRightNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint8 shiftAmount)
-        external
-    {
+    function testOpShiftBitsRightNPIntegrityHappy(
+        IntegrityCheckStateNP memory state,
+        uint8 inputs,
+        uint8 outputs,
+        uint8 shiftAmount
+    ) external {
         vm.assume(shiftAmount != 0);
-        Operand operand = Operand.wrap(uint256(inputs) << 0x10 | shiftAmount);
+        inputs = uint8(bound(inputs, 1, 0x0F));
+        outputs = uint8(bound(outputs, 1, 0x0F));
+        Operand operand = LibOperand.build(inputs, outputs, shiftAmount);
         (uint256 calcInputs, uint256 calcOutputs) = LibOpShiftBitsRightNP.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
@@ -59,7 +65,7 @@ contract LibOpShiftBitsRightNPTest is OpTest {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = x;
-        Operand operand = Operand.wrap(uint256(1) << 0x10 | shiftAmount);
+        Operand operand = LibOperand.build(uint8(inputs.length), 1, shiftAmount);
         opReferenceCheck(
             state,
             operand,

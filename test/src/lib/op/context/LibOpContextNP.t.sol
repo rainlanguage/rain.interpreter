@@ -14,6 +14,7 @@ import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 /// @title LibOpContextNPTest
 /// @notice Test the LibOpContextNP library that includes the "context" word.
@@ -39,7 +40,7 @@ contract LibOpContextNPTest is OpTest {
         vm.assume(state.context[i].length > 0);
         vm.assume(state.context[i].length < type(uint8).max);
         j = bound(j, 0, state.context[i].length - 1);
-        Operand operand = Operand.wrap(uint256(i) | uint256(j) << 8);
+        Operand operand = LibOperand.build(0, 1, uint16(uint256(i) | uint256(j) << 8));
         uint256[] memory inputs = new uint256[](0);
         opReferenceCheck(
             state, operand, LibOpContextNP.referenceFn, LibOpContextNP.integrity, LibOpContextNP.run, inputs
@@ -54,7 +55,7 @@ contract LibOpContextNPTest is OpTest {
         vm.assume(state.context.length < type(uint8).max);
         i = bound(i, state.context.length, type(uint8).max);
         j = bound(j, 0, type(uint8).max);
-        Operand operand = Operand.wrap(uint256(i) | uint256(j) << 8);
+        Operand operand = LibOperand.build(0, 1, uint16(uint256(i) | uint256(j) << 8));
         uint256[] memory inputs = new uint256[](0);
         vm.expectRevert(stdError.indexOOBError);
         opReferenceCheck(
@@ -72,7 +73,7 @@ contract LibOpContextNPTest is OpTest {
         i = bound(i, 0, state.context.length - 1);
         vm.assume(state.context[i].length < type(uint8).max);
         j = bound(j, state.context[i].length, type(uint8).max);
-        Operand operand = Operand.wrap(uint256(i) | uint256(j) << 8);
+        Operand operand = LibOperand.build(0, 1, uint16(uint256(i) | uint256(j) << 8));
         uint256[] memory inputs = new uint256[](0);
         vm.expectRevert(stdError.indexOOBError);
         opReferenceCheck(

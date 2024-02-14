@@ -16,6 +16,7 @@ import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP, LibInterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 /// @title LibOpHashNPTest
 /// @notice Test the runtime and integrity time logic of LibOpHashNP.
@@ -26,8 +27,15 @@ contract LibOpHashNPTest is OpTest {
 
     /// Directly test the integrity logic of LibOpHashNP. This tests the happy
     /// path where the operand is valid.
-    function testOpHashNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external {
-        Operand operand = Operand.wrap(uint256(inputs) << 0x10);
+    function testOpHashNPIntegrityHappy(
+        IntegrityCheckStateNP memory state,
+        uint8 inputs,
+        uint8 outputs,
+        uint16 operandData
+    ) external {
+        inputs = uint8(bound(inputs, 0, 0x0F));
+        outputs = uint8(bound(outputs, 0, 0x0F));
+        Operand operand = LibOperand.build(inputs, outputs, operandData);
         (uint256 calcInputs, uint256 calcOutputs) = LibOpHashNP.integrity(state, operand);
 
         assertEq(inputs, calcInputs);
@@ -36,8 +44,9 @@ contract LibOpHashNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpHashNP.
     function testOpHashNPRun(uint256[] memory inputs) external {
+        vm.assume(inputs.length <= 0x0F);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
-        Operand operand = Operand.wrap(uint256(inputs.length) << 0x10);
+        Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
         opReferenceCheck(state, operand, LibOpHashNP.referenceFn, LibOpHashNP.integrity, LibOpHashNP.run, inputs);
     }
 

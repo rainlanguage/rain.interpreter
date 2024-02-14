@@ -7,18 +7,25 @@ import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
 import {TruncatedBitwiseEncoding, ZeroLengthBitwiseEncoding} from "src/error/ErrBitwise.sol";
 import {LibOpDecodeBitsNP} from "src/lib/op/bitwise/LibOpDecodeBitsNP.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpDecodeBitsNPTest is OpTest {
     /// Directly test the integrity logic of LibOpDecodeBitsNP. All possible
     /// operands result in the same number of inputs and outputs, (2, 1).
     /// However, lengths can overflow and error so we bound the operand to avoid
     /// that here.
-    function testOpDecodeBitsNPIntegrity(IntegrityCheckStateNP memory state, uint8 start8Bit, uint8 length8Bit)
-        external
-    {
+    function testOpDecodeBitsNPIntegrity(
+        IntegrityCheckStateNP memory state,
+        uint8 inputs,
+        uint8 outputs,
+        uint8 start8Bit,
+        uint8 length8Bit
+    ) external {
+        inputs = uint8(bound(inputs, 0, 0x0F));
+        outputs = uint8(bound(outputs, 0, 0x0F));
         uint256 start = bound(uint256(start8Bit), 0, type(uint8).max);
         uint256 length = bound(uint256(length8Bit), 1, type(uint8).max - start + 1);
-        Operand operand = Operand.wrap(2 << 0x10 | (uint256(length) << 8) | uint256(start));
+        Operand operand = LibOperand.build(inputs, outputs, uint16((uint256(length) << 8) | uint256(start)));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpDecodeBitsNP.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
@@ -52,7 +59,7 @@ contract LibOpDecodeBitsNPTest is OpTest {
     function testOpDecodeBitsNPRun(uint256 value, uint8 start8Bit, uint8 length8Bit) external {
         uint256 start = uint256(start8Bit);
         uint256 length = bound(uint256(length8Bit), 1, type(uint8).max - start + 1);
-        Operand operand = Operand.wrap(1 << 0x10 | (uint256(length) << 8) | uint256(start));
+        Operand operand = LibOperand.build(1, 1, uint16((uint256(length) << 8) | uint256(start)));
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = value;
         InterpreterStateNP memory state = opTestDefaultInterpreterState();

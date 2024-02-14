@@ -12,6 +12,7 @@ import {LibContext} from "src/lib/caller/LibContext.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 /// @title LibOpMaxUint256NPTest
 /// @notice Test the runtime and integrity time logic of LibOpMaxUint256NP.
@@ -19,9 +20,16 @@ contract LibOpMaxUint256NPTest is OpTest {
     using LibInterpreterStateNP for InterpreterStateNP;
 
     /// Directly test the integrity logic of LibOpMaxUint256NP.
-    function testOpMaxUint256NPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs) external {
+    function testOpMaxUint256NPIntegrity(
+        IntegrityCheckStateNP memory state,
+        uint8 inputs,
+        uint8 outputs,
+        uint16 operandData
+    ) external {
+        inputs = uint8(bound(inputs, 0, 0x0F));
+        outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpMaxUint256NP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
+            LibOpMaxUint256NP.integrity(state, LibOperand.build(inputs, outputs, operandData));
 
         assertEq(calcInputs, 0);
         assertEq(calcOutputs, 1);
@@ -32,7 +40,7 @@ contract LibOpMaxUint256NPTest is OpTest {
     function testOpMaxUint256NPRun() external {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](0);
-        Operand operand = Operand.wrap(0);
+        Operand operand = LibOperand.build(0, 1, 0);
         opReferenceCheck(
             state, operand, LibOpMaxUint256NP.referenceFn, LibOpMaxUint256NP.integrity, LibOpMaxUint256NP.run, inputs
         );

@@ -28,9 +28,16 @@ contract LibOpChainIdNPTest is OpTest {
     using LibInterpreterStateNP for InterpreterStateNP;
 
     /// Directly test the integrity logic of LibOpChainIdNP.
-    function testOpChainIDNPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs) external {
+    function testOpChainIDNPIntegrity(
+        IntegrityCheckStateNP memory state,
+        uint8 inputs,
+        uint8 outputs,
+        uint16 operandData
+    ) external {
+        inputs = uint8(bound(inputs, 0, 0x0F));
+        outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpChainIdNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
+            LibOpChainIdNP.integrity(state, LibOperand.build(inputs, outputs, operandData));
 
         assertEq(calcInputs, 0);
         assertEq(calcOutputs, 1);

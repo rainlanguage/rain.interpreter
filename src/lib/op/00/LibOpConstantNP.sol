@@ -16,8 +16,9 @@ error OutOfBoundsConstantRead(uint256 opIndex, uint256 constantsLength, uint256 
 library LibOpConstantNP {
     function integrity(IntegrityCheckStateNP memory state, Operand operand) internal pure returns (uint256, uint256) {
         // Operand is the index so ensure it doesn't exceed the constants length.
-        if ((Operand.unwrap(operand) & 0xFFFF) >= state.constants.length) {
-            revert OutOfBoundsConstantRead(state.opIndex, state.constants.length, Operand.unwrap(operand));
+        uint256 constantIndex = Operand.unwrap(operand) & 0xFFFF;
+        if (constantIndex >= state.constants.length) {
+            revert OutOfBoundsConstantRead(state.opIndex, state.constants.length, constantIndex);
         }
         // As inputs MUST always be 0, we don't have to check the high byte of
         // the operand here, the integrity check will do that for us.

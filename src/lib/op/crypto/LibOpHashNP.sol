@@ -18,7 +18,7 @@ library LibOpHashNP {
 
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         assembly ("memory-safe") {
-            let length := mul(shr(0x10, operand), 0x20)
+            let length := mul(and(shr(0x10, operand), 0x0F), 0x20)
             let value := keccak256(stackTop, length)
             stackTop := sub(add(stackTop, length), 0x20)
             mstore(stackTop, value)
