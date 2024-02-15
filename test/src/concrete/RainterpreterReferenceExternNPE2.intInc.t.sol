@@ -17,7 +17,7 @@ import {
 import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
-import {COMPATIBLITY_V2} from "src/interface/unstable/ISubParserV2.sol";
+import {COMPATIBLITY_V3} from "src/interface/unstable/ISubParserV2.sol";
 import {OPCODE_EXTERN} from "src/interface/unstable/IInterpreterV2.sol";
 import {ExternDispatchConstantsHeightOverflow} from "src/error/ErrSubParse.sol";
 
@@ -78,7 +78,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
 
         bytes memory wordToParse = bytes("ref-extern-inc");
         (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParseWord(
-            COMPATIBLITY_V2,
+            COMPATIBLITY_V3,
             bytes.concat(bytes2(constantsHeight), ioByte, bytes2(uint16(wordToParse.length)), wordToParse, bytes32(0))
         );
         assertTrue(success);
@@ -121,7 +121,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
         RainterpreterReferenceExternNPE2 subParser = new RainterpreterReferenceExternNPE2();
 
         (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParseWord(
-            COMPATIBLITY_V2,
+            COMPATIBLITY_V3,
             bytes.concat(bytes2(constantsHeight), ioByte, bytes2(uint16(unknownWord.length)), unknownWord, bytes32(0))
         );
         assertFalse(success);

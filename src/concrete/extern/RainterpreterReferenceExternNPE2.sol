@@ -12,7 +12,7 @@ import {AuthoringMetaV2} from "../../interface/IParserV1.sol";
 import {LibParseState, ParseState} from "../../lib/parse/LibParseState.sol";
 import {LibParseOperand} from "../../lib/parse/LibParseOperand.sol";
 import {LibParseLiteral} from "../../lib/parse/literal/LibParseLiteral.sol";
-import {COMPATIBLITY_V2} from "../../interface/unstable/ISubParserV2.sol";
+import {COMPATIBLITY_V3} from "../../interface/unstable/ISubParserV2.sol";
 import {LibExternOpIntIncNPE2, OP_INDEX_INCREMENT} from "../../lib/extern/reference/op/LibExternOpIntIncNPE2.sol";
 import {LibExternOpStackOperandNPE2} from "../../lib/extern/reference/op/LibExternOpStackOperandNPE2.sol";
 import {LibExternOpContextSenderNPE2} from "../../lib/extern/reference/op/LibExternOpContextSenderNPE2.sol";
@@ -201,7 +201,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// known constant value, which should allow the compiler to optimise the
     /// entire function call away.
     function subParserCompatibility() internal pure override returns (bytes32) {
-        return COMPATIBLITY_V2;
+        return COMPATIBLITY_V3;
     }
 
     /// Overrides the base function pointers for opcodes. Simply returns the
