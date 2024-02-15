@@ -77,6 +77,14 @@ contract LibOpIntMulNPTest is OpTest {
         checkBadInputs("_: int-mul(max-int-value());", 1, 2, 1);
     }
 
+    function testOpIntMulNPEvalZeroOutputs() external {
+        checkBadOutputs(": int-mul(0 0);", 2, 1, 0);
+    }
+
+    function testOpIntMulNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _: int-mul(0 0);", 2, 1, 2);
+    }
+
     /// Test the eval of `int-mul` opcode parsed from a string. Tests two inputs.
     /// Tests the happy path where multiplication does not overflow.
     function testOpIntMulNPEvalTwoInputsHappy() external {

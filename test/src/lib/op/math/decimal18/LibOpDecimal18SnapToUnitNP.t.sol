@@ -62,6 +62,14 @@ contract LibOpDecimal18SnapToUnitNPTest is OpTest {
         checkBadInputs("_: decimal18-snap-to-unit(1 1 1);", 3, 2, 3);
     }
 
+    function testOpDecimal18SnapToUnitNPEvalZeroOutputs() external {
+        checkBadOutputs(": decimal18-snap-to-unit(1 1);", 2, 1, 0);
+    }
+
+    function testOpDecimal18SnapToUnitNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _: decimal18-snap-to-unit(1 1);", 2, 1, 2);
+    }
+
     /// Test that operand is disallowed.
     function testOpDecimal18SnapToUnitNPEvalOperandDisallowed() external {
         checkUnhappyParse("_: decimal18-snap-to-unit<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector));

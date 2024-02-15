@@ -41,9 +41,20 @@ contract LibOpDecimal18LnNPTest is OpTest {
     }
 
     /// Test the eval of `decimal18-ln` for bad inputs.
-    function testOpDecimal18LnNPEvalBad() external {
+    function testOpDecimal18LnNPZeroInputs() external {
         checkBadInputs("_: decimal18-ln();", 0, 1, 0);
+    }
+
+    function testOpDecimal18LnNPTwoInputs() external {
         checkBadInputs("_: decimal18-ln(1 1);", 2, 1, 2);
+    }
+
+    function testOpDecimal18LnNPZeroOutputs() external {
+        checkBadOutputs(": decimal18-ln(1);", 1, 1, 0);
+    }
+
+    function testOpDecimal18LnNPTwoOutputs() external {
+        checkBadOutputs("_ _: decimal18-ln(1);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.

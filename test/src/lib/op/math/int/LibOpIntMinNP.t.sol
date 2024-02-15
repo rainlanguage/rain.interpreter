@@ -82,6 +82,14 @@ contract LibOpIntMinNPTest is OpTest {
         checkBadInputs("_: decimal18-min(max-int-value());", 1, 2, 1);
     }
 
+    function testOpDecimal18MinNPEvalZeroOutputs() external {
+        checkBadOutputs(": decimal18-min(0 0);", 2, 1, 0);
+    }
+
+    function testOpDecimal18MinNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _: decimal18-min(0 0);", 2, 1, 2);
+    }
+
     /// Test the eval of `int-min` opcode parsed from a string. Tests two inputs.
     function testOpIntMinNPEval2InputsHappy() external {
         checkHappy("_: int-min(0 0);", 0, "0 > 0 ? 0 : 1");

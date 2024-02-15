@@ -48,6 +48,14 @@ contract LibOpDecimal18SqrtNPTest is OpTest {
         checkBadInputs("_: decimal18-sqrt(1 1);", 2, 1, 2);
     }
 
+    function testOpDecimal18SqrtNPEvalZeroOutputs() external {
+        checkBadOutputs(": decimal18-sqrt(1);", 1, 1, 0);
+    }
+
+    function testOpDecimal18SqrtNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _: decimal18-sqrt(1);", 1, 1, 2);
+    }
+
     /// Test that operand is disallowed.
     function testOpDecimal18SqrtNPEvalOperandDisallowed() external {
         checkUnhappyParse("_: decimal18-sqrt<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));

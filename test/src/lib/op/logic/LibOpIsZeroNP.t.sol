@@ -96,4 +96,12 @@ contract LibOpIsZeroNPTest is OpTest {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 2, 1, 2));
         iDeployer.deployExpression2(bytecode, constants);
     }
+
+    function testOpIsZeroNPZeroOutputs() external {
+        checkBadOutputs(": is-zero(0);", 1, 1, 0);
+    }
+
+    function testOpIsZeroNPTwoOutputs() external {
+        checkBadOutputs("_ _: is-zero(30);", 1, 1, 2);
+    }
 }

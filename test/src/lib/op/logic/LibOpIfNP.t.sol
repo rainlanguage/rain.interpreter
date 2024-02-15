@@ -231,4 +231,12 @@ contract LibOpIfNPTest is OpTest {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 4, 3, 4));
         iDeployer.deployExpression2(bytecode, constants);
     }
+
+    function testOpIfNPEvalZeroOutputs() external {
+        checkBadOutputs(": if(5 0 0);", 3, 1, 0);
+    }
+
+    function testOpIfNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _: if(5 0 0);", 3, 1, 2);
+    }
 }

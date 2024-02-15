@@ -74,6 +74,14 @@ contract LibOpIntModNPTest is OpTest {
         checkBadInputs("_: int-mod(max-int-value());", 1, 2, 1);
     }
 
+    function testOpIntModNPEvalZeroOutputs() external {
+        checkBadOutputs(": int-mod(0 0);", 2, 1, 0);
+    }
+
+    function testOpIntModNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _: int-mod(0 0);", 2, 1, 2);
+    }
+
     /// Test the eval of `int-mod` opcode parsed from a string. Tests two inputs.
     /// Tests the happy path where we do not mod by zero.
     function testOpIntModNPEval2InputsHappy() external {

@@ -125,6 +125,14 @@ contract LibOpIntSubNPTest is OpTest {
         checkBadInputs("_: decimal18-sub<1>(max-int-value());", 1, 2, 1);
     }
 
+    function testOpDecimal18SubNPEvalZeroOutputs() external {
+        checkBadOutputs(": decimal18-sub(0 0);", 2, 1, 0);
+    }
+
+    function testOpDecimal18SubNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _: decimal18-sub(0 0);", 2, 1, 2);
+    }
+
     /// Test the eval of `int-sub` opcode parsed from a string. Tests two inputs.
     function testOpIntSubNPEvalTwoInputs() external {
         checkHappy("_: int-sub(1 0);", 1, "1 0");

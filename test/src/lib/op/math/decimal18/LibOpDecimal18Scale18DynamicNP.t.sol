@@ -141,4 +141,12 @@ contract LibOpDecimal18Scale18DynamicNPTest is OpTest {
         checkBadInputs("_: decimal18-scale18-dynamic(1 1 0);", 3, 2, 3);
         checkBadInputs("_: decimal18-scale18-dynamic(1 1 1);", 3, 2, 3);
     }
+
+    function testOpDecimal18Scale18DynamicNPZeroOutputs() external {
+        checkBadOutputs(": decimal18-scale18-dynamic(0 0);", 2, 1, 0);
+    }
+
+    function testOpDecimal18Scale18DynamicNPTwoOutputs() external {
+        checkBadOutputs("_ _: decimal18-scale18-dynamic(0 0);", 2, 1, 2);
+    }
 }

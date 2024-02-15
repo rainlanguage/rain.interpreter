@@ -55,9 +55,20 @@ contract LibOpDecimal18AvgNPTest is OpTest {
     }
 
     /// Test the eval of `decimal18-avg` for bad inputs.
-    function testOpDecimal18AvgNPEvalBad() external {
+    function testOpDecimal18AvgNPEvalOneInput() external {
         checkBadInputs("_: decimal18-avg(1e18);", 1, 2, 1);
+    }
+
+    function testOpDecimal18AvgNPEvalThreeInputs() external {
         checkBadInputs("_: decimal18-avg(1 1 1);", 3, 2, 3);
+    }
+
+    function testOpDecimal18AvgNPEvalZeroOutputs() external {
+        checkBadOutputs(": decimal18-avg(0 0);", 2, 1, 0);
+    }
+
+    function testOpDecimal18AvgNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _: decimal18-avg(0 0);", 2, 1, 2);
     }
 
     /// Test that operand is disallowed.

@@ -174,4 +174,12 @@ contract LibOpEveryNPTest is OpTest {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 1, 0));
         iDeployer.deployExpression2(bytecode, constants);
     }
+
+    function testOpEveryNPZeroOutputs() external {
+        checkBadOutputs(": every(5);", 1, 1, 0);
+    }
+
+    function testOpEveryNPTwoOutputs() external {
+        checkBadOutputs("_ _: every(5);", 1, 1, 2);
+    }
 }

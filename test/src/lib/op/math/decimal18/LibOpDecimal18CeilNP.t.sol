@@ -43,9 +43,20 @@ contract LibOpDecimal18CeilNPTest is OpTest {
     }
 
     /// Test the eval of `decimal18-ceil` for bad inputs.
-    function testOpDecimal18CeilNPEvalBad() external {
+    function testOpDecimal18CeilNPZeroInputs() external {
         checkBadInputs("_: decimal18-ceil();", 0, 1, 0);
+    }
+
+    function testOpDecimal18CeilNPTwoInputs() external {
         checkBadInputs("_: decimal18-ceil(1 1);", 2, 1, 2);
+    }
+
+    function testOpDecimal18CeilNPZeroOutputs() external {
+        checkBadOutputs(": decimal18-ceil(1);", 1, 1, 0);
+    }
+
+    function testOpDecimal18CeilNPTwoOutputs() external {
+        checkBadOutputs("_ _: decimal18-ceil(1);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.

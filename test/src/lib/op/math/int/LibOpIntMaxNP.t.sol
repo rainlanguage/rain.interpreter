@@ -85,6 +85,14 @@ contract LibOpIntMaxNPTest is OpTest {
         checkBadInputs("_: decimal18-max(max-int-value());", 1, 2, 1);
     }
 
+    function testOpDecimal18MaxNPEvalZeroOutputs() external {
+        checkBadOutputs(": decimal18-max(0 0);", 2, 1, 0);
+    }
+
+    function testOpIntMaxNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _: int-max(0 0);", 2, 1, 2);
+    }
+
     /// Test the eval of `int-max` opcode parsed from a string. Tests two inputs.
     function testOpIntMaxNPEval2InputsHappy() external {
         checkHappy("_: int-max(0 0);", 0, "0 > 0 ? 0 : 1");

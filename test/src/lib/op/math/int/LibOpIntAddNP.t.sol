@@ -78,6 +78,14 @@ contract LibOpIntAddNPTest is OpTest {
         checkBadInputs("_: int-add(5);", 1, 2, 1);
     }
 
+    function testOpIntAddNPEvalZeroOutputs() external {
+        checkBadOutputs(": int-add(5 6);", 2, 1, 0);
+    }
+
+    function testOpIntAddNPEvalTwoOutput() external {
+        checkBadOutputs("_ _: int-add(5 6);", 2, 1, 2);
+    }
+
     /// Test the eval of `decimal18-add` opcode parsed from a string.
     /// MUST behave identically to `int-add`.
     /// Tests one input.

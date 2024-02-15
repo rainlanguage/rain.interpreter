@@ -50,9 +50,20 @@ contract LibOpDecimal18GmNPTest is OpTest {
     }
 
     /// Test the eval of `decimal18-gm` for bad inputs.
-    function testOpDecimal18GmNPEvalBad() external {
+    function testOpDecimal18GmNPOneInput() external {
         checkBadInputs("_: decimal18-gm(1e18);", 1, 2, 1);
+    }
+
+    function testOpDecimal18GmNPThreeInputs() external {
         checkBadInputs("_: decimal18-gm(1 1 1);", 3, 2, 3);
+    }
+
+    function testOpDecimal18GmNPZeroOutputs() external {
+        checkBadOutputs(": decimal18-gm(1 1);", 2, 1, 0);
+    }
+
+    function testOpDecimal18GmNPTwoOutputs() external {
+        checkBadOutputs("_ _: decimal18-gm(1 1);", 2, 1, 2);
     }
 
     /// Test that operand is disallowed.

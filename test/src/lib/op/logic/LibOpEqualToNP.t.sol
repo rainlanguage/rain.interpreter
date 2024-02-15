@@ -146,4 +146,12 @@ contract LibOpEqualToNPTest is OpTest {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
         iDeployer.deployExpression2(bytecode, constants);
     }
+
+    function testOpEqualToNPZeroOutputs() external {
+        checkBadOutputs(": equal-to(0 0);", 2, 1, 0);
+    }
+
+    function testOpEqualToNPTwoOutputs() external {
+        checkBadOutputs("_ _: equal-to(0 0);", 2, 1, 2);
+    }
 }

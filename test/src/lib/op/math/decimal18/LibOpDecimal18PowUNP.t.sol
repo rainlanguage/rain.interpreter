@@ -62,9 +62,20 @@ contract LibOpDecimal18PowUNPTest is OpTest {
     }
 
     /// Test the eval of `decimal18-power-int` for bad inputs.
-    function testOpDecimal18PowUNPEvalBad() external {
+    function testOpDecimal18PowUNPOneInput() external {
         checkBadInputs("_: decimal18-power-int(1e18);", 1, 2, 1);
+    }
+
+    function testOpDecimal18PowUNPThreeInputs() external {
         checkBadInputs("_: decimal18-power-int(1 1 1);", 3, 2, 3);
+    }
+
+    function testOpDecimal18PowUNPZeroOutputs() external {
+        checkBadOutputs(": decimal18-power-int(1 1);", 2, 1, 0);
+    }
+
+    function testOpDecimal18PowUNPTwoOutputs() external {
+        checkBadOutputs("_ _: decimal18-power-int(1 1);", 2, 1, 2);
     }
 
     /// Test that operand is disallowed.

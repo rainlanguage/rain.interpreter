@@ -207,4 +207,12 @@ contract LibOpDecimal18DivNPTest is OpTest {
         checkDisallowedOperand("_: decimal18-div<0 1>(1e18 1e18 1e18);");
         checkDisallowedOperand("_: decimal18-div<1 0>(1e18 1e18 1e18);");
     }
+
+    function testOpDecimal18DivNPEvalZeroOutputs() external {
+        checkBadOutputs(": decimal18-div(0 1);", 2, 1, 0);
+    }
+
+    function testOpDecimal18DivNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _: decimal18-div(0 1);", 2, 1, 2);
+    }
 }

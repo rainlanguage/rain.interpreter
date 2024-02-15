@@ -146,4 +146,12 @@ contract LibOpGreaterThanNPTest is OpTest {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
         iDeployer.deployExpression2(bytecode, constants);
     }
+
+    function testOpGreaterThanNPZeroOutputs() external {
+        checkBadOutputs(": greater-than(1 2);", 2, 1, 0);
+    }
+
+    function testOpGreaterThanNPTwoOutputs() external {
+        checkBadOutputs("_ _: greater-than(1 2);", 2, 1, 2);
+    }
 }

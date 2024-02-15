@@ -52,4 +52,12 @@ contract LibOpDecimal18Exp2NPTest is OpTest {
     function testOpDecimal18Exp2NPEvalOperandDisallowed() external {
         checkUnhappyParse("_: decimal18-exp2<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
+
+    function testOpDecimal18Exp2NPZeroOutputs() external {
+        checkBadOutputs(": decimal18-exp2(1);", 1, 1, 0);
+    }
+
+    function testOpDecimal18Exp2NPTwoOutputs() external {
+        checkBadOutputs("_ _: decimal18-exp2(1);", 1, 1, 2);
+    }
 }

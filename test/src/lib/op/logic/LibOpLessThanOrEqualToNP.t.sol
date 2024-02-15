@@ -151,4 +151,12 @@ contract LibOpLessThanOrEqualToNPTest is OpTest {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
         iDeployer.deployExpression2(bytecode, constants);
     }
+
+    function testOpLessThanOrEqualToNPZeroOutputs() external {
+        checkBadOutputs(": less-than-or-equal-to(1 2);", 2, 1, 0);
+    }
+
+    function testOpLessThanOrEqualToNPTwoOutputs() external {
+        checkBadOutputs("_ _: less-than-or-equal-to(1 2);", 2, 1, 2);
+    }
 }

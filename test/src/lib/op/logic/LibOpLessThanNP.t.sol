@@ -153,4 +153,12 @@ contract LibOpLessThanNPTest is OpTest {
             iDeployer.deployExpression2(bytecode, constants);
         (interpreterDeployer, storeDeployer, expression, io);
     }
+
+    function testOpLessThanNPZeroOutputs() external {
+        checkBadOutputs(": less-than(0 0);", 2, 1, 0);
+    }
+
+    function testOpLessThanNPTwoOutputs() external {
+        checkBadOutputs("_ _: less-than(30 0);", 2, 1, 2);
+    }
 }

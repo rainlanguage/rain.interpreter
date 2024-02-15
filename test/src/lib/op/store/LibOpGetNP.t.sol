@@ -485,6 +485,14 @@ contract LibOpGetNPTest is OpTest {
         checkBadInputs("_:get(0x1234 0x5678 0x9abc);", 3, 1, 3);
     }
 
+    function testLibOpGetNPEvalZeroOutputs() external {
+        checkBadOutputs(":get(0x1234);", 1, 1, 0);
+    }
+
+    function testLibOpGetNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _:get(0x1234);", 1, 1, 2);
+    }
+
     /// Test the eval of `get` opcode parsed from a string.
     /// Tests that operands are disallowed.
     function testLibOpGetNPEvalOperandDisallowed() external {

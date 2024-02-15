@@ -71,6 +71,14 @@ contract LibOpIntDivNPTest is OpTest {
         checkBadInputs("_: int-div(max-int-value());", 1, 2, 1);
     }
 
+    function testOpIntDivNPEvalZeroOutputs() external {
+        checkBadOutputs(": int-div(0 0);", 2, 1, 0);
+    }
+
+    function testOpIntDivNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _: int-div(0 0);", 2, 1, 2);
+    }
+
     /// Test the eval of `int-div` opcode parsed from a string. Tests two inputs.
     /// Tests the happy path where we do not divide by zero.
     /// Note that the division truncates (rounds down).

@@ -112,4 +112,8 @@ contract LibOpEnsureNPTest is OpTest {
     function testOpEnsureNPEvalUnhappyOperand() external {
         checkUnhappyParse(":ensure<0>(1 \"foo\");", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
+
+    function testOpEnsureNPOneOutput() external {
+        checkBadOutputs("_:ensure(1 \"foo\");", 2, 0, 1);
+    }
 }

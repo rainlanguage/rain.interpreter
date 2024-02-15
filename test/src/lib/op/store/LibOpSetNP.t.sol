@@ -108,6 +108,14 @@ contract LibOpSetNPTest is OpTest {
         checkBadInputs(":set(0x1234 0x5678 0x9abc);", 3, 2, 3);
     }
 
+    function testLibOpSetNPEvalOneOutput() external {
+        checkBadOutputs("_:set(0x1234 0x5678);", 2, 0, 1);
+    }
+
+    function testLibOpSetNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _:set(0x1234 0x5678);", 2, 0, 2);
+    }
+
     /// Test the eval of `set` opcode parsed from a string.
     /// Tests that operands are disallowed.
     function testLibOpSetNPEvalOperandsDisallowed() external {

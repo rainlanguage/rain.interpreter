@@ -127,4 +127,12 @@ contract LibOpDecimal18ScaleNNPTest is OpTest {
         checkBadInputs("_: decimal18-scale-n<0>(0 1);", 2, 1, 2);
         checkBadInputs("_: decimal18-scale-n<0>(0 max-int-value());", 2, 1, 2);
     }
+
+    function testOpDecimal18ScaleNNPEvalZeroOutputs() external {
+        checkBadOutputs(": decimal18-scale-n<0>(0);", 1, 1, 0);
+    }
+
+    function testOpDecimal18ScaleNNPTwoOutputs() external {
+        checkBadOutputs("_ _: decimal18-scale-n<0>(0);", 1, 1, 2);
+    }
 }

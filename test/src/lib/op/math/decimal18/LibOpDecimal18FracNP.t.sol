@@ -44,9 +44,20 @@ contract LibOpDecimal18FracNPTest is OpTest {
     }
 
     /// Test the eval of `decimal18-frac` for bad inputs.
-    function testOpDecimal18FracNPEvalBad() external {
+    function testOpDecimal18FracNPZeroInputs() external {
         checkBadInputs("_: decimal18-frac();", 0, 1, 0);
+    }
+
+    function testOpDecimal18FracNPTwoInputs() external {
         checkBadInputs("_: decimal18-frac(1 1);", 2, 1, 2);
+    }
+
+    function testOpDecimal18FracNPZeroOutputs() external {
+        checkBadOutputs(": decimal18-frac(1);", 1, 1, 0);
+    }
+
+    function testOpDecimal18FracNPTwoOutputs() external {
+        checkBadOutputs("_ _: decimal18-frac(1);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.

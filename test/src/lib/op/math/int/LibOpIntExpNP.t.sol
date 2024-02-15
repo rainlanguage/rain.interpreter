@@ -99,6 +99,14 @@ contract LibOpIntExpNPTest is OpTest {
         checkBadInputs("_: int-exp(max-int-value());", 1, 2, 1);
     }
 
+    function testOpIntExpNPEvalZeroOutputs() external {
+        checkBadOutputs(": int-exp(0 0);", 2, 1, 0);
+    }
+
+    function testOpIntExpNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _: int-exp(0 0);", 2, 1, 2);
+    }
+
     /// Test the eval of `int-exp` opcode parsed from a string. Tests two inputs.
     /// Tests the happy path where we do not overflow.
     function testOpIntExpNPEval2InputsHappy() external {

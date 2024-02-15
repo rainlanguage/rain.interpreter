@@ -44,9 +44,20 @@ contract LibOpDecimal18FloorNPTest is OpTest {
     }
 
     /// Test the eval of `decimal18-floor` for bad inputs.
-    function testOpDecimal18FloorNPEvalBad() external {
+    function testOpDecimal18FloorNPZeroInputs() external {
         checkBadInputs("_: decimal18-floor();", 0, 1, 0);
+    }
+
+    function testOpDecimal18FloorNPTwoInputs() external {
         checkBadInputs("_: decimal18-floor(1 1);", 2, 1, 2);
+    }
+
+    function testOpDecimal18FloorNPZeroOutputs() external {
+        checkBadOutputs(": decimal18-floor(1);", 1, 1, 0);
+    }
+
+    function testOpDecimal18FloorNPTwoOutputs() external {
+        checkBadOutputs("_ _: decimal18-floor(1);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.

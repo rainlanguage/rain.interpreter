@@ -84,6 +84,14 @@ contract LibOpDecimal18MulNPTest is OpTest {
         checkBadInputs("_: decimal18-mul(max-decimal18-value());", 1, 2, 1);
     }
 
+    function testOpDecimal18MulNPZeroOutputs() external {
+        checkBadOutputs(": decimal18-mul(0 0);", 2, 1, 0);
+    }
+
+    function testOpDecimal18MulNPTwoOutputs() external {
+        checkBadOutputs("_ _: decimal18-mul(0 0);", 2, 1, 2);
+    }
+
     /// Test the eval of `decimal18-mul` opcode parsed from a string.
     /// Tests two inputs.
     /// Tests the happy path where we do not overflow.
