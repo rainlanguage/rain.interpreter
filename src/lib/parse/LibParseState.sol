@@ -270,6 +270,7 @@ library LibParseState {
         }
     }
 
+    //slither-disable-next-line cyclomatic-complexity
     function endLine(ParseState memory state, uint256 cursor) internal pure {
         unchecked {
             {
