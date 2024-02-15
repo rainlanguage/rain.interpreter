@@ -86,24 +86,21 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
         assertEq(bytecode.length, 4);
         assertEq(uint256(uint8(bytecode[0])), OPCODE_EXTERN);
         assertEq(bytecode[1], ioByte);
-        // // High byte for extern opcode is the outputs which is the same as
-        // // the inputs for inc.
-        // assertEq(bytecode[2], ioByte);
-        // // Low byte for the extern opcode is the constants index of the extern
-        // // dispatch.
-        // assertEq(uint16(uint8(bytecode[3])), constantsHeight);
+        // Low bytes for the extern opcode is the constants index of the extern
+        // dispatch.
+        assertEq((uint16(uint8(bytecode[2])) << 8) | uint16(uint8(bytecode[3])), constantsHeight);
 
-        // assertEq(constants.length, 1);
-        // (IInterpreterExternV3 decodedExtern, ExternDispatch decodedExternDispatch) =
-        //     LibExtern.decodeExternCall(EncodedExternDispatch.wrap(constants[0]));
+        assertEq(constants.length, 1);
+        (IInterpreterExternV3 decodedExtern, ExternDispatch decodedExternDispatch) =
+            LibExtern.decodeExternCall(EncodedExternDispatch.wrap(constants[0]));
 
-        // // The sub parser is also the extern contract because the reference
-        // // implementation includes both.
-        // assertEq(address(decodedExtern), address(subParser));
+        // The sub parser is also the extern contract because the reference
+        // implementation includes both.
+        assertEq(address(decodedExtern), address(subParser));
 
-        // (uint256 opcode, Operand operand) = LibExtern.decodeExternDispatch(decodedExternDispatch);
-        // assertEq(opcode, OP_INDEX_INCREMENT);
-        // assertEq(Operand.unwrap(operand), 0);
+        (uint256 opcode, Operand operand) = LibExtern.decodeExternDispatch(decodedExternDispatch);
+        assertEq(opcode, OP_INDEX_INCREMENT);
+        assertEq(Operand.unwrap(operand), 0);
     }
 
     /// Directly test the subparsing of the reference extern opcode. Check that

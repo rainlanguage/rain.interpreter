@@ -109,7 +109,7 @@ library LibAllStandardOpsNP {
             AuthoringMetaV2("constant", "Copies a constant value onto the stack."),
             AuthoringMetaV2(
                 "extern",
-                "Calls an external contract. The first operand is the index of the encoded dispatch in the constants array, the second is the number of outputs."
+                "Calls an external contract. The operand is the index of the encoded dispatch in the constants array. The outputs are inferred from the number of LHS items."
             ),
             AuthoringMetaV2(
                 "context",
