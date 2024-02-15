@@ -79,4 +79,16 @@ contract LibOpBlockNumberNPTest is OpTest {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
         iDeployer.deployExpression2(bytecode, constants);
     }
+
+    function testOpBlockNumberNPEvalOneInput() external {
+        checkBadInputs("_: block-number(0x00);", 1, 0, 1);
+    }
+
+    function testOpBlockNumberNPEvalZeroOutputs() external {
+        checkBadOutputs(": block-number();", 0, 1, 0);
+    }
+
+    function testOpBlockNumberNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _: block-number();", 0, 1, 2);
+    }
 }

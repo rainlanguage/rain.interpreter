@@ -201,4 +201,20 @@ contract LibOpContextNPTest is OpTest {
             new uint256[](0)
         );
     }
+
+    function testOpContextNPOneInput() external {
+        checkBadInputs("_: context<0 0>(0);", 1, 0, 1);
+    }
+
+    function testOpContextNPTwoInputs() external {
+        checkBadInputs("_: context<0 0>(0 0);", 2, 0, 2);
+    }
+
+    function testOpContextNPZeroOutputs() external {
+        checkBadOutputs(": context<0 0>();", 0, 1, 0);
+    }
+
+    function testOpContextNPTwoOutputs() external {
+        checkBadOutputs("_ _: context<0 0>();", 0, 1, 2);
+    }
 }

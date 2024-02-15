@@ -50,9 +50,20 @@ contract LibOpERC5313OwnerNPTest is OpTest {
     }
 
     /// Test that an owner with bad inputs fails integrity.
-    function testOpERC5313OwnerNPEvalBadInputs() external {
+    function testOpERC5313OwnerNPEvalZeroInputs() external {
         checkBadInputs("_: erc5313-owner();", 0, 1, 0);
+    }
+
+    function testOpERC5313OwnerNPEvalTwoInputs() external {
         checkBadInputs("_: erc5313-owner(0xdeadbeef 0xdeadc0de);", 2, 1, 2);
+    }
+
+    function testOpERC5313OwnerNPEvalZeroOutputs() external {
+        checkBadOutputs(": erc5313-owner(0xdeadbeef);", 1, 1, 0);
+    }
+
+    function testOpERC5313OwnerNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _: erc5313-owner(0xdeadbeef);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.

@@ -57,8 +57,19 @@ contract LibOpCtPopNPTest is OpTest {
     }
 
     /// Test that a bitwise count with bad inputs fails integrity.
-    function testOpCtPopNPIntegrityFail() external {
+    function testOpCtPopNPZeroInputs() external {
         checkBadInputs("_: bitwise-count-ones();", 0, 1, 0);
+    }
+
+    function testOpCtPopNPTwoInputs() external {
         checkBadInputs("_: bitwise-count-ones(0 0);", 2, 1, 2);
+    }
+
+    function testOpCtPopNPZeroOutputs() external {
+        checkBadOutputs(": bitwise-count-ones(0);", 1, 1, 0);
+    }
+
+    function testOpCtPopNPTwoOutputs() external {
+        checkBadOutputs("_ _: bitwise-count-ones(0);", 1, 1, 2);
     }
 }

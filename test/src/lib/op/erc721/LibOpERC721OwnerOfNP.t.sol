@@ -103,4 +103,24 @@ contract LibOpERC721OwnerOfNPTest is OpTest {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: erc721-owner-of<0>(0x00 0x01);");
         (bytecode, constants);
     }
+
+    function testOpERC721OwnerOfNPEvalZeroInputs() external {
+        checkBadInputs("_: erc721-owner-of();", 0, 2, 0);
+    }
+
+    function testOpERC721OwnerOfNPEvalOneInput() external {
+        checkBadInputs("_: erc721-owner-of(0x00);", 1, 2, 1);
+    }
+
+    function testOpERC721OwnerOfNPEvalThreeInputs() external {
+        checkBadInputs("_: erc721-owner-of(0x00 0x01 0x02);", 3, 2, 3);
+    }
+
+    function testOpERC721OwnerOfNPEvalZeroOutputs() external {
+        checkBadOutputs(": erc721-owner-of(0x00 0x01);", 2, 1, 0);
+    }
+
+    function testOpERC721OwnerOfNPTwoOutputs() external {
+        checkBadOutputs("_ _: erc721-owner-of(0x00 0x01);", 2, 1, 2);
+    }
 }

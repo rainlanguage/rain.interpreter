@@ -153,4 +153,12 @@ contract LibOpHashNPTest is OpTest {
         assertEq(kvs.length, 0);
         assertEq(io, hex"0003");
     }
+
+    function testOpHashNPZeroOutputs() external {
+        checkBadOutputs(":hash();", 0, 1, 0);
+    }
+
+    function testOpHashNPTwoOutputs() external {
+        checkBadOutputs("_ _: hash();", 0, 1, 2);
+    }
 }

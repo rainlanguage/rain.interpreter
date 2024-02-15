@@ -14,7 +14,7 @@ import {IntegrityCheckStateNP, LibIntegrityCheckNP} from "../../src/lib/integrit
 
 import {LibContext} from "../../src/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "../../src/error/ErrParse.sol";
-import {BadOpInputsLength} from "../../src/lib/integrity/LibIntegrityCheckNP.sol";
+import {BadOpInputsLength, BadOpOutputsLength} from "../../src/lib/integrity/LibIntegrityCheckNP.sol";
 import {Operand, IInterpreterV2, SourceIndexV2} from "../../src/interface/unstable/IInterpreterV2.sol";
 import {
     IInterpreterStoreV1, FullyQualifiedNamespace, StateNamespace
@@ -282,11 +282,17 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     function checkBadInputs(bytes memory rainString, uint256 opIndex, uint256 calcInputs, uint256 bytecodeInputs)
         internal
     {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
-        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, opIndex, calcInputs, bytecodeInputs));
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
-            iDeployer.deployExpression2(bytecode, constants);
-        (interpreterDeployer, storeDeployer, expression, io);
+        checkUnhappyDeploy(
+            rainString, abi.encodeWithSelector(BadOpInputsLength.selector, opIndex, calcInputs, bytecodeInputs)
+        );
+    }
+
+    function checkBadOutputs(bytes memory rainString, uint256 opIndex, uint256 calcOutputs, uint256 bytecodeOutputs)
+        internal
+    {
+        checkUnhappyDeploy(
+            rainString, abi.encodeWithSelector(BadOpOutputsLength.selector, opIndex, calcOutputs, bytecodeOutputs)
+        );
     }
 
     function checkDisallowedOperand(bytes memory rainString) internal {

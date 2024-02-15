@@ -56,11 +56,28 @@ contract LibOpERC20AllowanceNPTest is OpTest {
     }
 
     /// Test that a allowance with bad inputs fails integrity.
-    function testOpERC20AllowanceNPEvalBadInputs() external {
+    function testOpERC20AllowanceNPEvalZeroInputs() external {
         checkBadInputs("_: erc20-allowance();", 0, 3, 0);
+    }
+
+    function testOpERC20AllowanceNPEvalOneInput() external {
         checkBadInputs("_: erc20-allowance(0xdeadbeef);", 1, 3, 1);
+    }
+
+    function testOpERC20AllowanceNPEvalTwoInputs() external {
         checkBadInputs("_: erc20-allowance(0xdeadbeef 0xdeadc0de);", 2, 3, 2);
+    }
+
+    function testOpERC20AllowanceNPEvalFourInputs() external {
         checkBadInputs("_: erc20-allowance(0xdeadbeef 0xdeadc0de 0xdeaddead 0xdeaddead);", 4, 3, 4);
+    }
+
+    function testOpERC20AllowanceNPEvalZeroOutputs() external {
+        checkBadOutputs(": erc20-allowance(0xdeadbeef 0xdeadc0de 0xdeaddead);", 3, 1, 0);
+    }
+
+    function testOpERC20AllowanceNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _: erc20-allowance(0xdeadbeef 0xdeadc0de 0xdeaddead);", 3, 1, 2);
     }
 
     /// Test that operand is disallowed.

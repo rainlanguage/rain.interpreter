@@ -111,9 +111,20 @@ contract LibOpShiftBitsLeftNPTest is OpTest {
     }
 
     /// Test that a bitwise shift with bad inputs fails integrity.
-    function testOpShiftBitsLeftNPIntegrityFailBadInputs() external {
+    function testOpShiftBitsLeftNPIntegrityFailZeroInputs() external {
         checkBadInputs("_: bitwise-shift-left<1>();", 0, 1, 0);
+    }
+
+    function testOpShiftBitsLeftNPIntegrityFailTwoInputs() external {
         checkBadInputs("_: bitwise-shift-left<1>(0 0);", 2, 1, 2);
+    }
+
+    function testOpShiftBitsLeftNPIntegrityFailZeroOutputs() external {
+        checkBadOutputs(": bitwise-shift-left<1>(0);", 1, 1, 0);
+    }
+
+    function testOpShiftBitsLeftNPIntegrityFailTwoOutputs() external {
+        checkBadOutputs("_ _: bitwise-shift-left<1>(0);", 1, 1, 2);
     }
 
     /// Test that a bitwise shift with bad shift amount fails integrity.

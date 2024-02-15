@@ -84,9 +84,23 @@ contract LibOpEncodeBitsNPTest is OpTest {
     }
 
     /// Check bad inputs.
-    function testOpEncodeBitsNPEvalBadInputs() external {
+    function testOpEncodeBitsNPEvalZeroInputs() external {
         checkBadInputs("_:bitwise-encode<0 1>();", 0, 2, 0);
+    }
+
+    function testOpEncodeBitsNPEvalOneInput() external {
         checkBadInputs("_:bitwise-encode<0 1>(0);", 1, 2, 1);
+    }
+
+    function testOpEncodeBitsNPEvalThreeInputs() external {
         checkBadInputs("_:bitwise-encode<0 1>(0 0 0);", 3, 2, 3);
+    }
+
+    function testOpEncodeBitsNPEvalZeroOutputs() external {
+        checkBadOutputs(":bitwise-encode<0 1>(0 0);", 2, 1, 0);
+    }
+
+    function testOpEncodeBitsNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _:bitwise-encode<0 1>(0 0);", 2, 1, 2);
     }
 }

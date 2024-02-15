@@ -53,10 +53,24 @@ contract LibOpERC20BalanceOfNPTest is OpTest {
     }
 
     /// Test that a balanceOf with bad inputs fails integrity.
-    function testOpERC20BalanceOfNPEvalBadInputs() external {
+    function testOpERC20BalanceOfNPEvalZeroInputs() external {
         checkBadInputs("_: erc20-balance-of();", 0, 2, 0);
+    }
+
+    function testOpERC20BalanceOfNPEvalOneInput() external {
         checkBadInputs("_: erc20-balance-of(0xdeadbeef);", 1, 2, 1);
+    }
+
+    function testOpERC20BalanceOfNPEvalThreeInputs() external {
         checkBadInputs("_: erc20-balance-of(0xdeadbeef 0xdeadc0de 0xdeadc0de);", 3, 2, 3);
+    }
+
+    function testOpERC20BalanceOfNPEvalZeroOutputs() external {
+        checkBadOutputs(": erc20-balance-of(0xdeadbeef 0xdeadc0de);", 2, 1, 0);
+    }
+
+    function testOpERC20BalanceOfNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _: erc20-balance-of(0xdeadbeef 0xdeadc0de);", 2, 1, 2);
     }
 
     /// Test that operand is disallowed.

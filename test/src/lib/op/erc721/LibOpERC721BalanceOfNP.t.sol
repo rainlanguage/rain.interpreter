@@ -112,4 +112,24 @@ contract LibOpERC721BalanceOfNPTest is OpTest {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: erc721-balance-of<0>(0x00 0x01);");
         (bytecode, constants);
     }
+
+    function testOpERC721BalanceOfNPZeroInputs() external {
+        checkBadInputs("_: erc721-balance-of();", 0, 2, 0);
+    }
+
+    function testOpERC721BalanceOfNPOneInput() external {
+        checkBadInputs("_: erc721-balance-of(0x00);", 1, 2, 1);
+    }
+
+    function testOpERC721BalanceOfNPThreeInputs() external {
+        checkBadInputs("_: erc721-balance-of(0x00 0x01 0x02);", 3, 2, 3);
+    }
+
+    function testOpERC721BalanceOfNPZeroOutputs() external {
+        checkBadOutputs(": erc721-balance-of(0x00 0x01);", 2, 1, 0);
+    }
+
+    function testOpERC721BalanceOfNPTwoOutputs() external {
+        checkBadOutputs("_ _: erc721-balance-of(0x00 0x01);", 2, 1, 2);
+    }
 }

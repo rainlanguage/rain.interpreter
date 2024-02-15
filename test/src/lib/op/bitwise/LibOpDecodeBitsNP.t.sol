@@ -91,8 +91,19 @@ contract LibOpDecodeBitsNPTest is OpTest {
     }
 
     /// Check bad inputs.
-    function testOpDecodeBitsNPEvalBadInputs() external {
+    function testOpDecodeBitsNPEvalZeroInputs() external {
         checkBadInputs("_:bitwise-decode<0 1>();", 0, 1, 0);
+    }
+
+    function testOpDecodeBitsNPEvalTwoInputs() external {
         checkBadInputs("_:bitwise-decode<0 1>(0 0);", 2, 1, 2);
+    }
+
+    function testOpDecodeBitsNPEvalZeroOutputs() external {
+        checkBadOutputs(":bitwise-decode<0 1>(0);", 1, 1, 0);
+    }
+
+    function testOpDecodeBitsNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _:bitwise-decode<0 1>(0);", 1, 1, 2);
     }
 }

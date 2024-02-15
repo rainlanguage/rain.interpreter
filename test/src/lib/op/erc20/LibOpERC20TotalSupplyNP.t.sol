@@ -48,9 +48,20 @@ contract LibOpERC20TotalSupplyNPTest is OpTest {
     }
 
     /// Test that a totalSupply with bad inputs fails integrity.
-    function testOpERC20TotalSupplyNPEvalBadInputs() external {
+    function testOpERC20TotalSupplyNPEvalZeroInputs() external {
         checkBadInputs("_: erc20-total-supply();", 0, 1, 0);
+    }
+
+    function testOpERC20TotalSupplyNPEvalTwoInputs() external {
         checkBadInputs("_: erc20-total-supply(0xdeadbeef 0xdeadc0de);", 2, 1, 2);
+    }
+
+    function testOpERC20TotalSupplyNPEvalZeroOutputs() external {
+        checkBadOutputs(": erc20-total-supply(0xdeadbeef);", 1, 1, 0);
+    }
+
+    function testOpERC20TotalSupplyNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _: erc20-total-supply(0xdeadbeef);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.

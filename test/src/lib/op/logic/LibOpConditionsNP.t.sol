@@ -244,7 +244,15 @@ contract LibOpConditionsNPTest is OpTest {
 
     /// Test the eval of `conditions` parsed from a string. Tests the unhappy path
     /// where an operand is provided.
-    function testOpEnsureNPEvalUnhappyOperand() external {
+    function testOpConditionsNPEvalUnhappyOperand() external {
         checkUnhappyParse("_ :conditions<0>(1 1 \"foo\");", abi.encodeWithSelector(UnexpectedOperand.selector));
+    }
+
+    function testOpConditionsNPZeroOutputs() external {
+        checkBadOutputs(": conditions(0x00 0x00);", 2, 1, 0);
+    }
+
+    function testOpConditionsNPTwoOutputs() external {
+        checkBadOutputs("_ _: conditions(0x00 0x00);", 2, 1, 2);
     }
 }

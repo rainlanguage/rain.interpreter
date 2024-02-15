@@ -76,4 +76,12 @@ contract LibOpTimestampNPTest is OpTest {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
         iDeployer.deployExpression2(bytecode, constants);
     }
+
+    function testOpBlockTimestampNPZeroOutputs() external {
+        checkBadOutputs(": block-timestamp();", 0, 1, 0);
+    }
+
+    function testOpBlockTimestampNPTwoOutputs() external {
+        checkBadOutputs("_ _: block-timestamp();", 0, 1, 2);
+    }
 }

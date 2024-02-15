@@ -52,10 +52,24 @@ contract LibOpBitwiseAndNPTest is OpTest {
     }
 
     /// Test that a bitwise OR with bad inputs fails integrity.
-    function testOpBitwiseORNPEvalBadInputs() external {
+    function testOpBitwiseORNPEvalZeroInputs() external {
         checkBadInputs("_: bitwise-and();", 0, 2, 0);
+    }
+
+    function testOpBitwiseORNPEvalOneInput() external {
         checkBadInputs("_: bitwise-and(0);", 1, 2, 1);
+    }
+
+    function testOpBitwiseORNPEvalThreeInputs() external {
         checkBadInputs("_: bitwise-and(0 0 0);", 3, 2, 3);
+    }
+
+    function testOpBitwiseORNPEvalZeroOutputs() external {
+        checkBadOutputs(": bitwise-and(0 0);", 2, 1, 0);
+    }
+
+    function testOpBitwiseORNPEvalTwoOutputs() external {
+        checkBadOutputs("_ _: bitwise-and(0 0);", 2, 1, 2);
     }
 
     /// Test that operand is disallowed.

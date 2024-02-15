@@ -72,4 +72,12 @@ contract LibOpMaxUint256NPTest is OpTest {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
         iDeployer.deployExpression2(bytecode, constants);
     }
+
+    function testOpMaxUint256NPZeroOutputs() external {
+        checkBadOutputs(": max-int-value();", 0, 1, 0);
+    }
+
+    function testOpMaxUint256NPTwoOutputs() external {
+        checkBadOutputs("_ _: max-int-value();", 0, 1, 2);
+    }
 }

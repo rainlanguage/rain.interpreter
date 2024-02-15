@@ -211,4 +211,12 @@ contract LibOpAnyNPTest is OpTest {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 1, 0));
         iDeployer.deployExpression2(bytecode, constants);
     }
+
+    function testOpAnyNPZeroOutputs() external {
+        checkBadOutputs(": any(0);", 1, 1, 0);
+    }
+
+    function testOpAnyNPTwoOutputs() external {
+        checkBadOutputs("_ _: any(0);", 1, 1, 2);
+    }
 }

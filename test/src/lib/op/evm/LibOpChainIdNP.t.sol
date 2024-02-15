@@ -82,4 +82,12 @@ contract LibOpChainIdNPTest is OpTest {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
         iDeployer.deployExpression2(bytecode, constants);
     }
+
+    function testOpChainIdNPZeroOutputs() external {
+        checkBadOutputs(": chain-id();", 0, 1, 0);
+    }
+
+    function testOpChainIdNPTwoOutputs() external {
+        checkBadOutputs("_ _: chain-id();", 0, 1, 2);
+    }
 }
