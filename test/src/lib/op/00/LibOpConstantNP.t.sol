@@ -15,6 +15,7 @@ import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {BadOpOutputsLength} from "src/error/ErrIntegrity.sol";
 
 /// @title LibOpConstantNPTest
 /// @notice Test the runtime and integrity time logic of LibOpConstantNP.
@@ -136,5 +137,25 @@ contract LibOpConstantNPTest is OpTest {
         assertEq(stack[0], 1001e15);
         assertEq(stack[1], type(uint256).max);
         assertEq(kvs.length, 0);
+    }
+
+    /// It is an error to have multiple outputs for a constant.
+    function testOpConstantNPMultipleOutputErrorSugared() external {
+        checkUnhappyDeploy("_ _: 1;", abi.encodeWithSelector(BadOpOutputsLength.selector, 0, 1, 2));
+    }
+
+    /// It is an error to have multiple outputs for a constant.
+    function testOpConstantNPMultipleOutputErrorUnsugared() external {
+        checkUnhappyDeploy("_:1,_ _: constant<0>();", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 2));
+    }
+
+    /// It is an error to have zero outputs for a constant.
+    function testOpConstantNPZeroOutputErrorSugared() external {
+        checkUnhappyDeploy(":1;", abi.encodeWithSelector(BadOpOutputsLength.selector, 0, 1, 0));
+    }
+
+    /// It is an error to have zero outputs for a constant.
+    function testOpConstantNPZeroOutputErrorUnsugared() external {
+        checkUnhappyDeploy("_:1,:constant<0>();", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 0));
     }
 }
