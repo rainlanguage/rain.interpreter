@@ -8,7 +8,8 @@ import {
     StackOutputsMismatch,
     StackUnderflow,
     StackUnderflowHighwater,
-    BadOpInputsLength
+    BadOpInputsLength,
+    BadOpOutputsLength
 } from "../../error/ErrIntegrity.sol";
 import {IInterpreterV2, SourceIndexV2} from "../../interface/unstable/IInterpreterV2.sol";
 import {LibBytecode} from "../../lib/bytecode/LibBytecode.sol";
@@ -100,6 +101,7 @@ library LibIntegrityCheckNP {
                 while (cursor < end) {
                     Operand operand;
                     uint256 bytecodeOpInputs;
+                    uint256 bytecodeOpOutputs;
                     function(IntegrityCheckStateNP memory, Operand)
                     view
                     returns (uint256, uint256) f;
@@ -108,11 +110,16 @@ library LibIntegrityCheckNP {
                         f := shr(0xf0, mload(add(fPointersStart, mul(byte(28, word), 2))))
                         // 3 bytes mask.
                         operand := and(word, 0xFFFFFF)
-                        bytecodeOpInputs := byte(29, word)
+                        let ioByte := byte(29, word)
+                        bytecodeOpInputs := and(ioByte, 0x0F)
+                        bytecodeOpOutputs := shr(4, ioByte)
                     }
                     (uint256 calcOpInputs, uint256 calcOpOutputs) = f(state, operand);
                     if (calcOpInputs != bytecodeOpInputs) {
                         revert BadOpInputsLength(state.opIndex, calcOpInputs, bytecodeOpInputs);
+                    }
+                    if (calcOpOutputs != bytecodeOpOutputs) {
+                        revert BadOpOutputsLength(state.opIndex, calcOpOutputs, bytecodeOpOutputs);
                     }
 
                     if (calcOpInputs > state.stackIndex) {

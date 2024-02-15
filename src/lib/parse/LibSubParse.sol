@@ -10,7 +10,7 @@ import {
     Operand
 } from "../../interface/unstable/IInterpreterV2.sol";
 import {LibBytecode, Pointer} from "../bytecode/LibBytecode.sol";
-import {ISubParserV2, COMPATIBLITY_V2} from "../../interface/unstable/ISubParserV2.sol";
+import {ISubParserV2, COMPATIBLITY_V3} from "../../interface/unstable/ISubParserV2.sol";
 import {BadSubParserResult, UnknownWord, UnsupportedLiteralType} from "../../error/ErrParse.sol";
 import {LibExtern, EncodedExternDispatch} from "../extern/LibExtern.sol";
 import {IInterpreterExternV3} from "../../interface/unstable/IInterpreterExternV3.sol";
@@ -41,8 +41,8 @@ library LibSubParse {
             mstore8(add(bytecode, 0x23), column)
             mstore8(add(bytecode, 0x22), row)
 
-            // 0 inputs.
-            mstore8(add(bytecode, 0x21), 0)
+            // 0 inputs 1 output.
+            mstore8(add(bytecode, 0x21), 0x10)
 
             mstore8(add(bytecode, 0x20), opIndex)
 
@@ -83,6 +83,9 @@ library LibSubParse {
             // never being more than 2 bytes.
             mstore(add(bytecode, 4), constantsHeight)
 
+            // 0 inputs 1 output.
+            mstore8(add(bytecode, 0x21), 0x10)
+
             // Main opcode is constant.
             mstore8(add(bytecode, 0x20), opIndex)
 
@@ -109,15 +112,14 @@ library LibSubParse {
     function subParserExtern(
         IInterpreterExternV3 extern,
         uint256 constantsHeight,
-        uint256 inputsByte,
-        uint256 outputsByte,
+        uint256 ioByte,
         Operand operand,
         uint256 opcodeIndex
     ) internal pure returns (bool, bytes memory, uint256[] memory) {
         // The constants height is an error check because the main parser can
         // provide two bytes for it. Everything else is expected to be more
         // directly controlled by the subparser itself.
-        if (constantsHeight > 0xFF) {
+        if (constantsHeight > 0xFFFF) {
             revert ExternDispatchConstantsHeightOverflow(constantsHeight);
         }
         // Build an extern call that dials back into the current contract at eval
@@ -129,17 +131,13 @@ library LibSubParse {
             // This is an UNALIGNED allocation.
             bytecode := mload(0x40)
             mstore(0x40, add(bytecode, 0x24))
-            mstore(bytecode, 4)
-
+            mstore(add(bytecode, 4), constantsHeight)
+            // The IO byte is inputs merged with outputs.
+            mstore8(add(bytecode, 0x21), ioByte)
             // Main opcode is extern, to call back into current contract.
             mstore8(add(bytecode, 0x20), opIndex)
-            // Use the io byte as is for inputs.
-            mstore8(add(bytecode, 0x21), inputsByte)
-            // The outputs are encoded to their own byte for extern opcode.
-            mstore8(add(bytecode, 0x22), outputsByte)
-            // The extern dispatch is the index to the new constant that we will
-            // add to the constants array.
-            mstore8(add(bytecode, 0x23), constantsHeight)
+            // The bytes length is 4.
+            mstore(bytecode, 4)
         }
 
         uint256 externDispatch = EncodedExternDispatch.unwrap(
@@ -210,7 +208,7 @@ library LibSubParse {
                         }
 
                         (bool success, bytes memory subBytecode, uint256[] memory subConstants) =
-                            subParser.subParseWord(COMPATIBLITY_V2, data);
+                            subParser.subParseWord(COMPATIBLITY_V3, data);
                         if (success) {
                             // The sub bytecode must be exactly 4 bytes to
                             // represent an op.
@@ -305,7 +303,7 @@ library LibSubParse {
                     deref := mload(shr(0xf0, deref))
                 }
 
-                (bool success, uint256 value) = subParser.subParseLiteral(COMPATIBLITY_V2, data);
+                (bool success, uint256 value) = subParser.subParseLiteral(COMPATIBLITY_V3, data);
                 if (success) {
                     return value;
                 }

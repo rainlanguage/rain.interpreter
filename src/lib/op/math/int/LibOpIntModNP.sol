@@ -13,7 +13,7 @@ library LibOpIntModNP {
 
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
-        uint256 inputs = Operand.unwrap(operand) >> 0x10;
+        uint256 inputs = (Operand.unwrap(operand) >> 0x10) & 0x0F;
         inputs = inputs > 1 ? inputs : 2;
         return (inputs, 1);
     }
@@ -31,7 +31,7 @@ library LibOpIntModNP {
         a %= b;
 
         {
-            uint256 inputs = Operand.unwrap(operand) >> 0x10;
+            uint256 inputs = (Operand.unwrap(operand) >> 0x10) & 0x0F;
             uint256 i = 2;
             while (i < inputs) {
                 assembly ("memory-safe") {

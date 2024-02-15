@@ -15,7 +15,7 @@ error OutOfBoundsStackRead(uint256 opIndex, uint256 stackTopIndex, uint256 stack
 /// to be present at a known opcode index.
 library LibOpStackNP {
     function integrity(IntegrityCheckStateNP memory state, Operand operand) internal pure returns (uint256, uint256) {
-        uint256 readIndex = Operand.unwrap(operand);
+        uint256 readIndex = Operand.unwrap(operand) & 0xFFFF;
         // Operand is the index so ensure it doesn't exceed the stack index.
         if (readIndex >= state.stackIndex) {
             revert OutOfBoundsStackRead(state.opIndex, state.stackIndex, readIndex);
@@ -33,7 +33,7 @@ library LibOpStackNP {
         uint256 sourceIndex = state.sourceIndex;
         assembly ("memory-safe") {
             let stackBottom := mload(add(mload(state), mul(0x20, add(sourceIndex, 1))))
-            let stackValue := mload(sub(stackBottom, mul(0x20, add(operand, 1))))
+            let stackValue := mload(sub(stackBottom, mul(0x20, add(and(operand, 0xFFFF), 1))))
             stackTop := sub(stackTop, 0x20)
             mstore(stackTop, stackValue)
         }

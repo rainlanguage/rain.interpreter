@@ -38,6 +38,15 @@ import {Operand} from "./IInterpreterV2.sol";
 ///   values. The first word of the array is the array length.
 bytes32 constant COMPATIBLITY_V2 = keccak256("2023.12.28 Rainlang ISubParserV2");
 
+/// @dev A compatibility version for the subparser interface.
+///
+/// Identical to COMPATIBLITY_V2, except the IO byte in word parsing now encodes
+/// both the inputs and outputs. The IO byte is [2,2] in the word parsing data.
+/// The high/leftmost 4 bits of the IO byte encode the number of outputs, and the
+/// low/rightmost 4 bits of the IO byte encode the number of inputs. This implies
+/// that the number of inputs and outputs must each be less than 16.
+bytes32 constant COMPATIBLITY_V3 = keccak256("2024.02.15 Rainlang ISubParserV3");
+
 interface ISubParserV2 {
     /// The sub parser is being asked to attempt to parse a literal that the main
     /// parser has failed to parse. The sub parser MUST ONLY attempt to parse a

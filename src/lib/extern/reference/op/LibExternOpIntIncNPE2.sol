@@ -35,20 +35,14 @@ library LibExternOpIntIncNPE2 {
     /// The sub parser for the extern increment opcode. It has no special logic
     /// so uses the default sub parser from `LibSubParse`.
     //slither-disable-next-line dead-code
-    function subParser(uint256 constantsHeight, uint256 inputsByte, Operand operand)
+    function subParser(uint256 constantsHeight, uint256 ioByte, Operand operand)
         internal
         view
         returns (bool, bytes memory, uint256[] memory)
     {
         //slither-disable-next-line unused-return
         return LibSubParse.subParserExtern(
-            IInterpreterExternV3(address(this)),
-            constantsHeight,
-            inputsByte,
-            // Same number of outputs as inputs for inc.
-            inputsByte,
-            operand,
-            OP_INDEX_INCREMENT
+            IInterpreterExternV3(address(this)), constantsHeight, ioByte, operand, OP_INDEX_INCREMENT
         );
     }
 }
