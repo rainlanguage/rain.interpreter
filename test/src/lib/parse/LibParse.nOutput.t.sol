@@ -53,6 +53,7 @@ contract LibParseNOutputTest is Test {
     }
 
     /// A single RHS item can have multiple outputs. This RHS item has nesting.
+    /// Nested words are always treated as a single output.
     function testParseNOutputNestedRHS() external {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(":,_ _:a(b());").parse();
         assertEq(
@@ -69,7 +70,7 @@ contract LibParseNOutputTest is Test {
             hex"00"
             // 2 outputs
             hex"02"
-            // b
+            // b 1 output
             hex"03100000"
             // a 1 input
             hex"02210000"

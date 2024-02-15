@@ -14,6 +14,7 @@ import {OpTest, PRE, POST} from "test/abstract/OpTest.sol";
 import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {BadOpOutputsLength} from "src/error/ErrIntegrity.sol";
 
 /// @title LibOpStackNPTest
 /// @notice Test the runtime and integrity time logic of LibOpStackNP.
@@ -221,5 +222,25 @@ contract LibOpStackNPTest is OpTest {
         assertEq(stack[4], 1);
         assertEq(stack[5], 1);
         assertEq(kvs.length, 0);
+    }
+
+    /// It is an error to have multiple outputs for a stack item.
+    function testOpStackNPMultipleOutputErrorSugared() external {
+        checkUnhappyDeploy("foo: 1, _ _: foo;", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 2));
+    }
+
+    /// It is an error to have multiple outputs for a stack item.
+    function testOpStackNPMultipleOutputErrorUnsugared() external {
+        checkUnhappyDeploy("foo: 1, _ _: stack<0>();", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 2));
+    }
+
+    /// It is an error to have zero outputs for a stack item.
+    function testOpStackNPZeroOutputErrorSugared() external {
+        checkUnhappyDeploy("foo: 1,: foo;", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 0));
+    }
+
+    /// It is an error to have zero outputs for a stack item.
+    function testOpStackNPZeroOutputErrorUnsugared() external {
+        checkUnhappyDeploy("foo: 1,: stack<0>();", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 0));
     }
 }
