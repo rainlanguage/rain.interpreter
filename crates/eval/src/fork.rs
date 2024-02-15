@@ -9,6 +9,7 @@ use foundry_evm::{
     opts::EvmOpts,
 };
 use revm::primitives::{Bytes, Env, TransactTo, U256};
+use thiserror::Error;
 
 /// A forked EVM instance.
 /// This is a wrapper around the `foundry_evm` crate, providing a simplified
@@ -26,10 +27,14 @@ pub struct ForkTypedReturn<C: SolCall> {
     pub typed_return: C::Return,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum ForkCallError {
+    #[error("Executor error")]
     ExecutorError,
+    #[error("Typed error: {0}")]
     TypedError(String),
+    #[error("Revert: {:#?}", .0)]
+    Revert(RawCallResult),
 }
 
 #[derive(Debug, Clone)]
@@ -133,6 +138,10 @@ impl ForkedEvm {
             .call_raw_with_env(env)
             .map_err(|_e| ForkCallError::ExecutorError)?;
 
+        if raw.reverted {
+            return Err(ForkCallError::Revert(raw));
+        }
+
         let typed_return =
             C::abi_decode_returns(raw.result.to_vec().as_slice(), true).map_err(|e| {
                 ForkCallError::TypedError(format!(
@@ -177,6 +186,10 @@ impl ForkedEvm {
                 value,
             )
             .map_err(|_e| ForkCallError::ExecutorError)?;
+
+        if raw.reverted {
+            return Err(ForkCallError::Revert(raw));
+        }
 
         let typed_return =
             C::abi_decode_returns(raw.result.to_vec().as_slice(), true).map_err(|e| {
