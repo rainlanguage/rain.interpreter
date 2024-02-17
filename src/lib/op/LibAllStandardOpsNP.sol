@@ -94,7 +94,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 70;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 72;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -303,11 +303,19 @@ library LibAllStandardOpsNP {
             // the same function pointer. This is intentional.
             AuthoringMetaV2(
                 "int-sub",
-                "Subtracts all inputs from the first input as non-negative integers. The operand controls whether subtraction will saturate at 0. The default behaviour, and what will happen if the operand is 0, is that the word will revert if the subtraction would result in a negative value. If the operand is 1, the word will saturate at 0 (e.g. 1-2=0)."
+                "Subtracts all inputs from the first input as non-negative integers. The optional operand controls whether subtraction will saturate at 0. The default behaviour, and what will happen if the operand is 0, is that the word will revert if the subtraction would result in a negative value. If the operand is 1, the word will saturate at 0 (e.g. 1-2=0)."
+            ),
+            AuthoringMetaV2(
+                "int-saturating-sub",
+                "Subtracts all inputs from the first input as non-negative integers. Saturates at 0 (e.g. 1-2=0)."
             ),
             AuthoringMetaV2(
                 "decimal18-sub",
-                "Subtracts all inputs from the first input as fixed point 18 decimal numbers (i.e. 'one' is 1e18). The operand controls whether subtraction will saturate at 0. The default behaviour, and what will happen if the operand is 0, is that the word will revert if the subtraction would result in a negative value. If the operand is 1, the word will saturate at 0 (e.g. 1-2=0)."
+                "Subtracts all inputs from the first input as fixed point 18 decimal numbers (i.e. 'one' is 1e18). The optional operand controls whether subtraction will saturate at 0. The default behaviour, and what will happen if the operand is 0, is that the word will revert if the subtraction would result in a negative value. If the operand is 1, the word will saturate at 0 (e.g. 1e18-2e18=0)."
+            ),
+            AuthoringMetaV2(
+                "decimal18-saturating-sub",
+                "Subtracts all inputs from the first input as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Saturates at 0 (e.g. 1e18-2e18=0)."
             ),
             AuthoringMetaV2("get", "Gets a value from storage. The first operand is the key to lookup."),
             AuthoringMetaV2(
@@ -496,8 +504,12 @@ library LibAllStandardOpsNP {
                     LibParseOperand.handleOperandDisallowed,
                     // Int sub
                     LibParseOperand.handleOperandSingleFull,
+                    // Int saturating sub
+                    LibParseOperand.handleOperandDisallowedAlwaysOne,
                     // Decimal18 sub
                     LibParseOperand.handleOperandSingleFull,
+                    // Decimal18 saturating sub
+                    LibParseOperand.handleOperandDisallowedAlwaysOne,
                     // Get
                     LibParseOperand.handleOperandDisallowed,
                     // Set
@@ -614,7 +626,11 @@ library LibAllStandardOpsNP {
                     // int and decimal18 sub have identical implementations and
                     // point to the same function pointer. This is intentional.
                     LibOpIntSubNP.integrity,
+                    // int saturating sub.
+                    LibOpIntSubNP.integrity,
                     // decimal18 sub.
+                    LibOpIntSubNP.integrity,
+                    // decimal18 saturating sub.
                     LibOpIntSubNP.integrity,
                     LibOpGetNP.integrity,
                     LibOpSetNP.integrity
@@ -733,7 +749,11 @@ library LibAllStandardOpsNP {
                     // int and decimal18 sub have identical implementations and
                     // point to the same function pointer. This is intentional.
                     LibOpIntSubNP.run,
+                    // int saturating sub.
+                    LibOpIntSubNP.run,
                     // decimal18 sub.
+                    LibOpIntSubNP.run,
+                    // decimal18 saturating sub.
                     LibOpIntSubNP.run,
                     LibOpGetNP.run,
                     LibOpSetNP.run
