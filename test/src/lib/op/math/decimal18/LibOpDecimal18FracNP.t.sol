@@ -61,7 +61,7 @@ contract LibOpDecimal18FracNPTest is OpTest {
     }
 
     /// Test that operand is disallowed.
-    function testOpDecimal18ExpNPEvalOperandDisallowed() external {
+    function testOpDecimal18FracNPEvalOperandDisallowed() external {
         checkUnhappyParse("_: decimal18-frac<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }
