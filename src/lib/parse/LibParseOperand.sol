@@ -141,6 +141,13 @@ library LibParseOperand {
         return Operand.wrap(0);
     }
 
+    function handleOperandDisallowedAlwaysOne(uint256[] memory values) internal pure returns (Operand) {
+        if (values.length != 0) {
+            revert UnexpectedOperand();
+        }
+        return Operand.wrap(1);
+    }
+
     /// There must be one or zero values. The fallback is 0 if nothing is
     /// provided, else the provided value MUST fit in two bytes and is used as
     /// is.
