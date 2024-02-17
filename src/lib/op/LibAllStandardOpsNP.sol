@@ -63,6 +63,7 @@ import {LibOpDecimal18Exp2NP} from "./math/decimal18/LibOpDecimal18Exp2NP.sol";
 import {LibOpDecimal18FloorNP} from "./math/decimal18/LibOpDecimal18FloorNP.sol";
 import {LibOpDecimal18FracNP} from "./math/decimal18/LibOpDecimal18FracNP.sol";
 import {LibOpDecimal18GmNP} from "./math/decimal18/LibOpDecimal18GmNP.sol";
+import {LibOpDecimal18HeadroomNP} from "./math/decimal18/LibOpDecimal18HeadroomNP.sol";
 import {LibOpDecimal18InvNP} from "./math/decimal18/LibOpDecimal18InvNP.sol";
 import {LibOpDecimal18LnNP} from "./math/decimal18/LibOpDecimal18LnNP.sol";
 import {LibOpDecimal18Log10NP} from "./math/decimal18/LibOpDecimal18Log10NP.sol";
@@ -94,7 +95,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 72;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 73;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -206,6 +207,10 @@ library LibAllStandardOpsNP {
             AuthoringMetaV2(
                 "decimal18-gm",
                 "Calculates the geometric mean of all inputs as fixed point 18 decimal numbers (i.e. 'one' is 1e18). Errors if any input is zero."
+            ),
+            AuthoringMetaV2(
+                "decimal18-headroom",
+                "18 decimal fixed point headroom of a number. I.e. the distance to the next whole number (1e18 - frac(x)). The headroom at any whole decimal 18 number is 1e18 (not 0)."
             ),
             AuthoringMetaV2(
                 "decimal18-inv",
@@ -456,6 +461,8 @@ library LibAllStandardOpsNP {
                     LibParseOperand.handleOperandDisallowed,
                     // Decimal18 gm
                     LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 headroom
+                    LibParseOperand.handleOperandDisallowed,
                     // Decimal18 inv
                     LibParseOperand.handleOperandDisallowed,
                     // Decimal18 ln
@@ -590,6 +597,7 @@ library LibAllStandardOpsNP {
                     LibOpDecimal18FloorNP.integrity,
                     LibOpDecimal18FracNP.integrity,
                     LibOpDecimal18GmNP.integrity,
+                    LibOpDecimal18HeadroomNP.integrity,
                     LibOpDecimal18InvNP.integrity,
                     LibOpDecimal18LnNP.integrity,
                     LibOpDecimal18Log10NP.integrity,
@@ -713,6 +721,7 @@ library LibAllStandardOpsNP {
                     LibOpDecimal18FloorNP.run,
                     LibOpDecimal18FracNP.run,
                     LibOpDecimal18GmNP.run,
+                    LibOpDecimal18HeadroomNP.run,
                     LibOpDecimal18InvNP.run,
                     LibOpDecimal18LnNP.run,
                     LibOpDecimal18Log10NP.run,
