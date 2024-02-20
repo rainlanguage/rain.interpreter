@@ -258,7 +258,7 @@ impl Forker {
         }
         let mut env = Env::default();
         env.tx.caller = Addr::from_slice(from_address);
-        env.tx.data = Bytes::from(calldata.to_vec());
+        env.tx.data = Bytes::copy_from_slice(calldata);
         env.tx.transact_to = TransactTo::Call(Addr::from_slice(to_address));
         // env.tx.gas_limit = 1000;
         // env.tx.gas_price = U256::from(20000);
@@ -292,7 +292,7 @@ impl Forker {
             .call_raw_committing(
                 Addr::from_slice(from_address),
                 Addr::from_slice(to_address),
-                Bytes::from(calldata.to_vec()),
+                Bytes::copy_from_slice(calldata),
                 value,
             )
             .map_err(|e| ForkCallError::ExecutorError(e.to_string()))
