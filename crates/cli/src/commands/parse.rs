@@ -1,15 +1,23 @@
-use alloy_sol_types::SolCall;
-use anyhow::anyhow;
-use rain_interpreter_bindings::IParserV1::parseCall;
-use std::path::PathBuf;
-
 use crate::execute::Execute;
 use crate::fork::NewForkedEvmCliArgs;
 use crate::output::SupportedOutputEncoding;
 use alloy_primitives::Address;
+use alloy_sol_types::SolCall;
+use anyhow::anyhow;
 use anyhow::Result;
 use clap::Args;
+use rain_interpreter_bindings::IParserV1::parseCall;
 use rain_interpreter_eval::fork::Forker;
+use std::path::PathBuf;
+
+#[derive(Args, Clone, Debug)]
+pub struct ForkParseArgsCli {
+    #[arg(short, long, help = "The address of the deployer")]
+    deployer: Address,
+
+    #[arg(short, long, help = "The Rainlang string to parse")]
+    rainlang_string: String,
+}
 
 #[derive(Args, Clone)]
 pub struct Parse {
@@ -23,11 +31,8 @@ pub struct Parse {
     #[command(flatten)]
     forked_evm: NewForkedEvmCliArgs,
 
-    #[arg(short, long, help = "The address of the deployer")]
-    deployer: Address,
-
-    #[arg(short, long, help = "The Rainlang string to parse")]
-    rainlang_string: String,
+    #[command(flatten)]
+    fork_parse_args: ForkParseArgsCli,
 }
 
 impl Execute for Parse {
@@ -40,7 +45,10 @@ impl Execute for Parse {
         )
         .await;
         let result = forker
-            .fork_parse(&self.rainlang_string, self.deployer)
+            .fork_parse(
+                &self.fork_parse_args.rainlang_string,
+                self.fork_parse_args.deployer,
+            )
             .await;
 
         match result {

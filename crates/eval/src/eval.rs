@@ -12,6 +12,15 @@ use crate::dispatch::CreateEncodedDispatch;
 use crate::error::{abi_decode_error, ForkCallError};
 use crate::fork::{ForkTypedReturn, Forker};
 
+#[derive(Debug, Clone)]
+pub struct ForkEvalArgs {
+    pub rainlang_string: String,
+    pub source_index: u16,
+    pub deployer: Address,
+    pub namespace: FullyQualifiedNamespace,
+    pub context: Vec<Vec<U256>>,
+}
+
 impl Forker {
     /// Parses Rainlang string and returns the parsed result.
     ///
@@ -88,13 +97,16 @@ impl Forker {
     /// The typed return of the eval, plus Foundry's RawCallResult struct, including the trace.
     pub async fn fork_eval(
         &mut self,
-        rainlang_string: &str,
-        source_index: u16,
-        deployer: Address,
-        namespace: FullyQualifiedNamespace,
-        context: Vec<Vec<U256>>,
+        args: ForkEvalArgs,
     ) -> Result<ForkTypedReturn<eval2Call>, ForkCallError> {
-        let expression_config = self.fork_parse(rainlang_string, deployer).await?;
+        let ForkEvalArgs {
+            rainlang_string,
+            source_index,
+            deployer,
+            namespace,
+            context,
+        } = args;
+        let expression_config = self.fork_parse(&rainlang_string, deployer).await?;
 
         let store = self
             .alloy_read(Address::default(), deployer, iStoreCall {})?
@@ -140,12 +152,12 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_parse() {
-        let deployer_address: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
+        let deployer: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
             .parse::<Address>()
             .unwrap();
         let mut fork = Forker::new_with_fork(FORK_URL, Some(FORK_BLOCK_NUMBER), None, None).await;
         let res = fork
-            .fork_parse(r"_: int-add(1 2);", deployer_address)
+            .fork_parse(r"_: int-add(1 2);", deployer)
             .await
             .unwrap();
 
@@ -165,18 +177,18 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_eval() {
-        let deployer_address: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
+        let deployer: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
             .parse::<Address>()
             .unwrap();
         let mut fork = Forker::new_with_fork(FORK_URL, Some(FORK_BLOCK_NUMBER), None, None).await;
         let res = fork
-            .fork_eval(
-                r"_: int-add(1 2);",
-                0,
-                deployer_address,
-                FullyQualifiedNamespace::default(),
-                vec![],
-            )
+            .fork_eval(ForkEvalArgs {
+                rainlang_string: r"_: int-add(1 2);".into(),
+                source_index: 0,
+                deployer,
+                namespace: FullyQualifiedNamespace::default(),
+                context: vec![],
+            })
             .await
             .unwrap();
 

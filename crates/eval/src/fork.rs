@@ -1,3 +1,4 @@
+use crate::error::ForkCallError;
 use alloy_primitives::{Address, U256};
 use alloy_sol_types::SolCall;
 use foundry_evm::{
@@ -11,8 +12,6 @@ use revm::{
     JournaledState,
 };
 use std::{any::type_name, collections::HashMap};
-
-use crate::error::ForkCallError;
 
 /// Forker is thin wrapper around foundry for easily forking multiple evm
 /// networks with in-memory cache that provides easy to use read/write
@@ -31,7 +30,6 @@ impl Forker {
     /// Creates a new empty instance of `Forker`.
     pub async fn new(env: Option<Env>, gas_limit: Option<u64>) -> Forker {
         let db = Backend::spawn(None).await;
-
         let builder = if let Some(gas) = gas_limit {
             ExecutorBuilder::default()
                 .gas_limit(Uint256::from(gas))
@@ -125,6 +123,10 @@ impl Forker {
             .call_raw_with_env(env)
             .map_err(|e| ForkCallError::ExecutorError(e.to_string()))?;
 
+        if raw.reverted {
+            return Err(ForkCallError::Revert(raw));
+        }
+
         let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
             ForkCallError::TypedError(format!(
                 "Call:{:?} Error:{:?} Raw:{:?}",
@@ -160,6 +162,10 @@ impl Forker {
                 value,
             )
             .map_err(|e| ForkCallError::ExecutorError(e.to_string()))?;
+
+        if raw.reverted {
+            return Err(ForkCallError::Revert(raw));
+        }
 
         let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
             ForkCallError::TypedError(format!("Call:{:?} Error:{:?}", type_name::<T>(), e))

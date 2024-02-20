@@ -54,6 +54,7 @@ import {LibOpIsZeroNP} from "./logic/LibOpIsZeroNP.sol";
 import {LibOpLessThanNP} from "./logic/LibOpLessThanNP.sol";
 import {LibOpLessThanOrEqualToNP} from "./logic/LibOpLessThanOrEqualToNP.sol";
 
+import {LibOpDecimal18ExponentialGrowthNP} from "./math/decimal18/growth/LibOpDecimal18ExponentialGrowthNP.sol";
 import {LibOpDecimal18AvgNP} from "./math/decimal18/LibOpDecimal18AvgNP.sol";
 import {LibOpDecimal18CeilNP} from "./math/decimal18/LibOpDecimal18CeilNP.sol";
 import {LibOpDecimal18MulNP} from "./math/decimal18/LibOpDecimal18MulNP.sol";
@@ -95,7 +96,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 73;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 74;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -187,6 +188,10 @@ library LibAllStandardOpsNP {
             AuthoringMetaV2("less-than", "1 if the first input is less than the second input, 0 otherwise."),
             AuthoringMetaV2(
                 "less-than-or-equal-to", "1 if the first input is less than or equal to the second input, 0 otherwise."
+            ),
+            AuthoringMetaV2(
+                "decimal18-exponential-growth",
+                "Calculates an exponential growth curve as `a(1 + r)^t` where `a` is the initial value, `r` is the rate of growth and `t` is units of time. Inputs in order are `a`, `r`, and `t` respectively as decimal 18 values."
             ),
             AuthoringMetaV2("decimal18-avg", "18 decimal fixed point arithmetic average of two numbers."),
             AuthoringMetaV2("decimal18-ceil", "18 decimal fixed point ceiling of a number."),
@@ -445,6 +450,8 @@ library LibAllStandardOpsNP {
                     LibParseOperand.handleOperandDisallowed,
                     // Less than or equal to
                     LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 exponential growth
+                    LibParseOperand.handleOperandDisallowed,
                     // Decimal18 avg
                     LibParseOperand.handleOperandDisallowed,
                     // Decimal18 ceil
@@ -589,6 +596,7 @@ library LibAllStandardOpsNP {
                     LibOpIsZeroNP.integrity,
                     LibOpLessThanNP.integrity,
                     LibOpLessThanOrEqualToNP.integrity,
+                    LibOpDecimal18ExponentialGrowthNP.integrity,
                     LibOpDecimal18AvgNP.integrity,
                     LibOpDecimal18CeilNP.integrity,
                     LibOpDecimal18DivNP.integrity,
@@ -713,6 +721,7 @@ library LibAllStandardOpsNP {
                     LibOpIsZeroNP.run,
                     LibOpLessThanNP.run,
                     LibOpLessThanOrEqualToNP.run,
+                    LibOpDecimal18ExponentialGrowthNP.run,
                     LibOpDecimal18AvgNP.run,
                     LibOpDecimal18CeilNP.run,
                     LibOpDecimal18DivNP.run,
