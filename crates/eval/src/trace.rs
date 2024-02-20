@@ -88,23 +88,18 @@ impl From<ForkTypedReturn<eval2Call>> for RainEvalResult {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::fork::{ForkedEvm, NewForkedEvm};
-    use alloy_primitives::BlockNumber;
+    use crate::fork::Forker;
     use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
 
     const FORK_URL: &str = "https://rpc.ankr.com/polygon_mumbai";
-    const FORK_BLOCK_NUMBER: BlockNumber = 45806808;
+    const FORK_BLOCK_NUMBER: u64 = 45806808;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_eval() {
         let deployer_address: Address = "0x83aA87e8773bBE65DD34c5C5895948ce9f6cd2af"
             .parse::<Address>()
             .unwrap();
-        let mut fork = ForkedEvm::new(NewForkedEvm {
-            fork_url: FORK_URL.into(),
-            fork_block_number: Some(FORK_BLOCK_NUMBER),
-        })
-        .await;
+        let mut fork = Forker::new_with_fork(FORK_URL, Some(FORK_BLOCK_NUMBER), None, None).await;
 
         let res = fork
             .fork_eval(

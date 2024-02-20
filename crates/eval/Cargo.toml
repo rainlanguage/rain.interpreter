@@ -12,8 +12,14 @@ thiserror = { workspace = true }
 alloy-primitives = {workspace = true}
 rain_interpreter_bindings = { workspace = true }
 alloy-sol-types = { workspace = true }
+alloy-json-abi = { workspace = true }
+alloy-dyn-abi = { workspace = true }
 foundry-evm = { workspace = true }
 revm = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+reqwest = { workspace = true }
+once_cell = { workspace = true }
 
 [dev-dependencies]
 tokio = { workspace = true }

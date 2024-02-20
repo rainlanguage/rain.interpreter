@@ -1,4 +1,6 @@
+use alloy_sol_types::SolCall;
 use anyhow::anyhow;
+use rain_interpreter_bindings::IParserV1::parseCall;
 use std::path::PathBuf;
 
 use crate::execute::Execute;
@@ -7,7 +9,7 @@ use crate::output::SupportedOutputEncoding;
 use alloy_primitives::Address;
 use anyhow::Result;
 use clap::Args;
-use rain_interpreter_eval::fork::ForkedEvm;
+use rain_interpreter_eval::fork::Forker;
 
 #[derive(Args, Clone)]
 pub struct Parse {
@@ -30,8 +32,14 @@ pub struct Parse {
 
 impl Execute for Parse {
     async fn execute(&self) -> Result<()> {
-        let mut forked_evm = ForkedEvm::new(self.forked_evm.clone().into()).await;
-        let result = forked_evm
+        let mut forker = Forker::new_with_fork(
+            &self.forked_evm.fork_url,
+            self.forked_evm.fork_block_number,
+            None,
+            None,
+        )
+        .await;
+        let result = forker
             .fork_parse(&self.rainlang_string, self.deployer)
             .await;
 
@@ -39,7 +47,7 @@ impl Execute for Parse {
             Ok(res) => crate::output::output(
                 &self.output_path,
                 self.output_encoding.clone(),
-                res.raw.result.to_owned().to_vec().as_slice(),
+                parseCall::abi_encode_returns(&(res.bytecode, res.constants)).as_slice(),
             ),
             Err(e) => Err(anyhow!("Error: {:?}", e)),
         }
