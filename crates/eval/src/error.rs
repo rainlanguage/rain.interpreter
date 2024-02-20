@@ -65,10 +65,9 @@ impl From<AbiDecodedErrorType> for String {
 impl std::fmt::Display for AbiDecodedErrorType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            AbiDecodedErrorType::Unknown(b) => f.write_str(&format!(
-                "native parser panicked with unknown error, raw returned data: {:?}",
-                b
-            )),
+            AbiDecodedErrorType::Unknown(_) => {
+                f.write_str("native parser panicked with unknown error!")
+            }
             AbiDecodedErrorType::Known { name, args, .. } => f.write_str(&format!(
                 "native parser panicked with: {}\n{}",
                 name,
