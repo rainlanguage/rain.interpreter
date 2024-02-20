@@ -1,5 +1,6 @@
 use alloy_dyn_abi::JsonAbiExt;
 use alloy_json_abi::Error as AlloyError;
+use foundry_evm::executors::RawCallResult;
 use once_cell::sync::Lazy;
 use reqwest::Client;
 use serde_json::Value;
@@ -21,38 +22,33 @@ pub const SELECTOR_REGISTRY_URL: &str = "https://api.openchain.xyz/signature-dat
 pub static SELECTORS: Lazy<Mutex<HashMap<[u8; 4], AlloyError>>> =
     Lazy::new(|| Mutex::new(HashMap::new()));
 
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum ForkCallError {
+    #[error("Executor error: {0}")]
     ExecutorError(String),
+    #[error("Revert: {:#?}", .0)]
+    Revert(RawCallResult),
+    #[error("Typed error: {0}")]
     TypedError(String),
-    AbiDecodeFailed(AbiDecodeFailedErrors),
+    #[error("Failed to abi decode: {0}")]
+    AbiDecodeFailed(#[from] AbiDecodeFailedErrors),
+    #[error("{0}")]
     AbiDecodedError(AbiDecodedErrorType),
-}
-impl std::fmt::Display for ForkCallError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::ExecutorError(v) => write!(f, "{}", v),
-            Self::TypedError(v) => write!(f, "{}", v),
-            Self::AbiDecodeFailed(v) => write!(f, "{}", v),
-            Self::AbiDecodedError(v) => write!(f, "{}", v),
-        }
-    }
-}
-impl std::error::Error for ForkCallError {}
-impl From<AbiDecodeFailedErrors> for ForkCallError {
-    fn from(value: AbiDecodeFailedErrors) -> Self {
-        Self::AbiDecodeFailed(value)
-    }
 }
 impl From<AbiDecodedErrorType> for ForkCallError {
     fn from(value: AbiDecodedErrorType) -> Self {
         Self::AbiDecodedError(value)
     }
 }
+impl From<RawCallResult> for ForkCallError {
+    fn from(value: RawCallResult) -> Self {
+        Self::Revert(value)
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum AbiDecodedErrorType {
-    Unknown,
+    Unknown(Vec<u8>),
     Known {
         name: String,
         args: Vec<String>,
@@ -69,9 +65,10 @@ impl From<AbiDecodedErrorType> for String {
 impl std::fmt::Display for AbiDecodedErrorType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            AbiDecodedErrorType::Unknown => {
-                f.write_str("native parser panicked with unknown error!")
-            }
+            AbiDecodedErrorType::Unknown(b) => f.write_str(&format!(
+                "native parser panicked with unknown error, raw returned data: {:?}",
+                b
+            )),
             AbiDecodedErrorType::Known { name, args, .. } => f.write_str(&format!(
                 "native parser panicked with: {}\n{}",
                 name,
@@ -99,9 +96,8 @@ pub async fn abi_decode_error(
                     args: result.iter().map(|v| format!("{:?}", v)).collect(),
                     sig: error.signature(),
                 });
-            } else {
-                return Ok(AbiDecodedErrorType::Unknown);
             }
+            return Ok(AbiDecodedErrorType::Unknown(error_data.to_vec()));
         }
     };
 
@@ -137,9 +133,9 @@ pub async fn abi_decode_error(
                 }
             }
         }
-        Ok(AbiDecodedErrorType::Unknown)
+        Ok(AbiDecodedErrorType::Unknown(error_data.to_vec()))
     } else {
-        Ok(AbiDecodedErrorType::Unknown)
+        Ok(AbiDecodedErrorType::Unknown(error_data.to_vec()))
     }
 }
 
