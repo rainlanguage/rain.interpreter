@@ -7,6 +7,7 @@ use rain_interpreter_bindings::IExpressionDeployerV3::deployExpression2Call;
 use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
 use rain_interpreter_bindings::IInterpreterV2::eval2Call;
 use rain_interpreter_bindings::IParserV1::{parseCall, parseReturn};
+use revm::interpreter::InstructionResult;
 
 use crate::dispatch::CreateEncodedDispatch;
 use crate::error::{selector_registry_abi_decode, ForkCallError};
@@ -53,11 +54,14 @@ impl Forker {
             &parse_call.abi_encode(),
         )?;
 
-        if result.reverted {
+        if result.exit_reason == InstructionResult::Revert {
             // decode result bytes to error selectors if it was a revert
             return Err(ForkCallError::AbiDecodedError(
                 selector_registry_abi_decode(&result.result).await?,
             ));
+        }
+        if !result.exit_reason.is_ok() {
+            return Err(ForkCallError::Failed(result));
         }
 
         // Call deployer: deployExpression2Call
@@ -69,11 +73,14 @@ impl Forker {
             &calldata,
         )?;
 
-        if integrity_result.reverted {
+        if integrity_result.exit_reason == InstructionResult::Revert {
             // decode result bytes to error selectors if it was a revert
             return Err(ForkCallError::AbiDecodedError(
                 selector_registry_abi_decode(&integrity_result.result).await?,
             ));
+        }
+        if !integrity_result.exit_reason.is_ok() {
+            return Err(ForkCallError::Failed(integrity_result));
         }
 
         let exp_config = parseCall::abi_decode_returns(&result.result.0, true).map_err(|e| {

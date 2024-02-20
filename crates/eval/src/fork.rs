@@ -123,8 +123,8 @@ impl Forker {
             .call_raw_with_env(env)
             .map_err(|e| ForkCallError::ExecutorError(e.to_string()))?;
 
-        if raw.reverted {
-            return Err(ForkCallError::Revert(raw));
+        if !raw.exit_reason.is_ok() {
+            return Err(ForkCallError::Failed(raw));
         }
 
         let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
@@ -163,8 +163,8 @@ impl Forker {
             )
             .map_err(|e| ForkCallError::ExecutorError(e.to_string()))?;
 
-        if raw.reverted {
-            return Err(ForkCallError::Revert(raw));
+        if !raw.exit_reason.is_ok() {
+            return Err(ForkCallError::Failed(raw));
         }
 
         let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {

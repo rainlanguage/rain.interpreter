@@ -26,8 +26,8 @@ pub static SELECTORS: Lazy<Mutex<HashMap<[u8; 4], AlloyError>>> =
 pub enum ForkCallError {
     #[error("Executor error: {0}")]
     ExecutorError(String),
-    #[error("Revert: {:#?}", .0)]
-    Revert(RawCallResult),
+    #[error("Call failed: {:#?}", .0)]
+    Failed(RawCallResult),
     #[error("Typed error: {0}")]
     TypedError(String),
     #[error("Failed to abi decode: {0}")]
@@ -42,7 +42,7 @@ impl From<AbiDecodedErrorType> for ForkCallError {
 }
 impl From<RawCallResult> for ForkCallError {
     fn from(value: RawCallResult) -> Self {
-        Self::Revert(value)
+        Self::Failed(value)
     }
 }
 
