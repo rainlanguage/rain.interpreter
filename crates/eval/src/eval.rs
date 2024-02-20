@@ -9,7 +9,7 @@ use rain_interpreter_bindings::IInterpreterV2::eval2Call;
 use rain_interpreter_bindings::IParserV1::{parseCall, parseReturn};
 
 use crate::dispatch::CreateEncodedDispatch;
-use crate::error::{abi_decode_error, ForkCallError};
+use crate::error::{selector_registry_abi_decode, ForkCallError};
 use crate::fork::{ForkTypedReturn, Forker};
 
 #[derive(Debug, Clone)]
@@ -56,7 +56,7 @@ impl Forker {
         if result.reverted {
             // decode result bytes to error selectors if it was a revert
             return Err(ForkCallError::AbiDecodedError(
-                abi_decode_error(&result.result).await?,
+                selector_registry_abi_decode(&result.result).await?,
             ));
         }
 
@@ -72,7 +72,7 @@ impl Forker {
         if integrity_result.reverted {
             // decode result bytes to error selectors if it was a revert
             return Err(ForkCallError::AbiDecodedError(
-                abi_decode_error(&integrity_result.result).await?,
+                selector_registry_abi_decode(&integrity_result.result).await?,
             ));
         }
 
