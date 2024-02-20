@@ -8,6 +8,30 @@ use rain_interpreter_bindings::IParserV1::parseCall;
 use crate::dispatch::CreateEncodedDispatch;
 use crate::fork::{ForkCallError, ForkTypedReturn, ForkedEvm};
 
+#[derive(Debug, Clone)]
+pub struct ForkParseArgs {
+    pub rainlang_string: String,
+    pub deployer: Address,
+}
+
+impl From<ForkEvalArgs> for ForkParseArgs {
+    fn from(args: ForkEvalArgs) -> Self {
+        ForkParseArgs {
+            rainlang_string: args.rainlang_string,
+            deployer: args.deployer,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ForkEvalArgs {
+    pub rainlang_string: String,
+    pub source_index: u16,
+    pub deployer: Address,
+    pub namespace: FullyQualifiedNamespace,
+    pub context: Vec<Vec<U256>>,
+}
+
 impl ForkedEvm {
     /// Parses Rainlang string and returns the parsed result.
     ///
@@ -22,9 +46,12 @@ impl ForkedEvm {
     /// The typed return of the parse, plus Foundry's RawCallResult struct.
     pub async fn fork_parse(
         self: &mut ForkedEvm,
-        rainlang_string: &str,
-        deployer: Address,
+        args: ForkParseArgs,
     ) -> Result<ForkTypedReturn<parseCall>, ForkCallError> {
+        let ForkParseArgs {
+            rainlang_string,
+            deployer,
+        } = args;
         let mut executor = self.build_executor();
         let parser = self
             .read(
@@ -60,17 +87,17 @@ impl ForkedEvm {
     /// The typed return of the eval, plus Foundry's RawCallResult struct, including the trace.
     pub async fn fork_eval(
         self: &mut ForkedEvm,
-        rainlang_string: &str,
-        source_index: u16,
-        deployer: Address,
-        namespace: FullyQualifiedNamespace,
-        context: Vec<Vec<U256>>,
+        args: ForkEvalArgs,
     ) -> Result<ForkTypedReturn<eval2Call>, ForkCallError> {
+        let ForkEvalArgs {
+            rainlang_string: _,
+            source_index,
+            deployer,
+            namespace,
+            context,
+        } = args.clone();
         let mut executor = self.build_executor();
-        let expression_config = self
-            .fork_parse(rainlang_string, deployer)
-            .await?
-            .typed_return;
+        let expression_config = self.fork_parse(args.into()).await?.typed_return;
 
         let store = self
             .read(
@@ -139,7 +166,7 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_parse() {
-        let deployer_address: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
+        let deployer: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
             .parse::<Address>()
             .unwrap();
         let mut fork = ForkedEvm::new(NewForkedEvm {
@@ -148,7 +175,10 @@ mod tests {
         })
         .await;
         let res = fork
-            .fork_parse(r"_: int-add(1 2);", deployer_address)
+            .fork_parse(ForkParseArgs {
+                rainlang_string: r"_: int-add(1 2);".into(),
+                deployer,
+            })
             .await
             .unwrap();
 
@@ -168,7 +198,7 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_eval() {
-        let deployer_address: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
+        let deployer: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
             .parse::<Address>()
             .unwrap();
         let mut fork = ForkedEvm::new(NewForkedEvm {
@@ -177,13 +207,13 @@ mod tests {
         })
         .await;
         let res = fork
-            .fork_eval(
-                r"_: int-add(1 2);",
-                0,
-                deployer_address,
-                FullyQualifiedNamespace::default(),
-                vec![],
-            )
+            .fork_eval(ForkEvalArgs {
+                rainlang_string: r"_: int-add(1 2);".into(),
+                source_index: 0,
+                deployer,
+                namespace: FullyQualifiedNamespace::default(),
+                context: vec![],
+            })
             .await
             .unwrap();
 
