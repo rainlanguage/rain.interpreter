@@ -18,12 +18,18 @@ use std::{any::type_name, collections::HashMap};
 /// functionalities.
 pub struct Forker {
     pub executor: Executor,
-    forks: HashMap<ForkId, (LocalForkId, SpecId)>,
+    forks: HashMap<ForkId, (LocalForkId, SpecId, U256)>,
 }
 
 pub struct ForkTypedReturn<C: SolCall> {
     pub raw: RawCallResult,
     pub typed_return: C::Return,
+}
+
+#[derive(Debug, Clone)]
+pub struct NewForkedEvm {
+    pub fork_url: String,
+    pub fork_block_number: Option<u64>,
 }
 
 impl Default for Forker {
@@ -80,6 +86,11 @@ impl Forker {
             env: evm_opts.fork_evm_env(fork_url).await.unwrap().0,
             evm_opts,
         };
+        let block_number = if let Some(v) = fork_block_number {
+            U256::from(v)
+        } else {
+            create_fork.env.block.number
+        };
 
         let db = Backend::spawn(Some(create_fork.clone())).await;
 
@@ -92,7 +103,10 @@ impl Forker {
         };
 
         let mut forks_map = HashMap::new();
-        forks_map.insert(fork_id, (U256::from(0), create_fork.env.cfg.spec_id));
+        forks_map.insert(
+            fork_id,
+            (U256::from(0), create_fork.env.cfg.spec_id, block_number),
+        );
         Self {
             executor: builder.build(env.unwrap_or(create_fork.env.clone()), db),
             forks: forks_map,
@@ -121,6 +135,11 @@ impl Forker {
             .executor
             .call_raw_with_env(env)
             .map_err(|e| ForkCallError::ExecutorError(e.to_string()))?;
+
+        // remove to_address from persisted accounts
+        self.executor
+            .backend
+            .remove_persistent_account(&to_address.0 .0.into());
 
         if !raw.exit_reason.is_ok() {
             return Err(ForkCallError::Failed(raw));
@@ -162,6 +181,11 @@ impl Forker {
             )
             .map_err(|e| ForkCallError::ExecutorError(e.to_string()))?;
 
+        // remove to_address from persisted accounts
+        self.executor
+            .backend
+            .remove_persistent_account(&to_address.0 .0.into());
+
         if !raw.exit_reason.is_ok() {
             return Err(ForkCallError::Failed(raw));
         }
@@ -187,7 +211,7 @@ impl Forker {
             return Ok(());
         }
         let fork_id = ForkId::new(fork_url, fork_block_number);
-        if let Some((local_fork_id, spec_id)) = self.forks.get(&fork_id) {
+        if let Some((local_fork_id, spec_id, _)) = self.forks.get(&fork_id) {
             if self.executor.backend.is_active_fork(*local_fork_id) {
                 Ok(())
             } else {
@@ -221,10 +245,19 @@ impl Forker {
                 env: evm_opts.fork_evm_env(fork_url).await.unwrap().0,
                 evm_opts,
             };
+            let block_number = if let Some(v) = fork_block_number {
+                U256::from(v)
+            } else {
+                create_fork.env.block.number
+            };
             let mut journaled_state = JournaledState::new(create_fork.env.cfg.spec_id, vec![]);
             self.forks.insert(
                 fork_id,
-                (U256::from(self.forks.len()), create_fork.env.cfg.spec_id),
+                (
+                    U256::from(self.forks.len()),
+                    create_fork.env.cfg.spec_id,
+                    block_number,
+                ),
             );
             let default_env = create_fork.env.clone();
             self.executor
@@ -263,9 +296,17 @@ impl Forker {
         // env.tx.gas_price = U256::from(20000);
         // env.tx.gas_priority_fee = Some(U256::from(20000));
 
-        self.executor
+        let result = self
+            .executor
             .call_raw_with_env(env)
-            .map_err(|e| ForkCallError::ExecutorError(e.to_string()))
+            .map_err(|e| ForkCallError::ExecutorError(e.to_string()));
+
+        // remove to_address from persisted accounts
+        self.executor
+            .backend
+            .remove_persistent_account(&Addr::from_slice(to_address));
+
+        result
     }
 
     /// Writes to the forked EVM.
@@ -287,14 +328,59 @@ impl Forker {
             return Err(ForkCallError::ExecutorError("invalid address!".to_owned()));
         }
 
-        self.executor
+        let result = self
+            .executor
             .call_raw_committing(
                 Addr::from_slice(from_address),
                 Addr::from_slice(to_address),
                 Bytes::copy_from_slice(calldata),
                 value,
             )
-            .map_err(|e| ForkCallError::ExecutorError(e.to_string()))
+            .map_err(|e| ForkCallError::ExecutorError(e.to_string()));
+
+        // remove to_address from persisted accounts
+        self.executor
+            .backend
+            .remove_persistent_account(&Addr::from_slice(to_address));
+
+        result
+    }
+
+    /// resets the active fork to a given block number or to original fork block number if not provided
+    pub fn reset_fork(
+        &mut self,
+        block_number: Option<u64>,
+        env: Option<Env>,
+    ) -> Result<(), ForkCallError> {
+        let active_fork_local_id = self
+            .executor
+            .backend
+            .active_fork_id()
+            .ok_or(ForkCallError::ExecutorError("no active fork!".to_owned()))?;
+        let mut org_block_number = None;
+        let mut spec_id = SpecId::LATEST;
+        #[allow(clippy::for_kv_map)]
+        for (_fork_id, (local_id, sid, bnumber)) in &self.forks {
+            if *local_id == active_fork_local_id {
+                spec_id = *sid;
+                org_block_number = Some(*bnumber);
+            }
+        }
+        if org_block_number.is_none() {
+            return Err(ForkCallError::ExecutorError("no active fork!".to_owned()));
+        }
+        let block_number = block_number
+            .map(U256::from)
+            .unwrap_or(org_block_number.unwrap());
+        self.executor
+            .backend
+            .roll_fork(
+                None,
+                block_number,
+                &mut env.unwrap_or_default(),
+                &mut JournaledState::new(spec_id, vec![]),
+            )
+            .map_err(|v| ForkCallError::ExecutorError(v.to_string()))
     }
 }
 
@@ -391,7 +477,7 @@ mod tests {
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
-    async fn test_multi_fork_read_write_switch() -> Result<(), ForkCallError> {
+    async fn test_multi_fork_read_write_switch_reset() -> Result<(), ForkCallError> {
         let mut forker =
             Forker::new_with_fork(POLYGON_FORK_URL, Some(POLYGON_FORK_NUMBER), None, None).await;
 
@@ -402,6 +488,7 @@ mod tests {
         };
         let result = forker.alloy_read(from_address, to_address, call).unwrap();
         let old_balance = result.typed_return._0;
+        let polygon_old_balance = old_balance;
 
         let from_address = POLYGON_ACC.parse::<Address>().unwrap();
         let to_address: Address = USDT_POLYGON.parse::<Address>().unwrap();
@@ -470,6 +557,15 @@ mod tests {
         let result = forker.alloy_read(from_address, to_address, call).unwrap();
         let balance = result.typed_return._0;
         assert_eq!(balance, polygon_balance);
+
+        // reset fork
+        forker.reset_fork(Some(POLYGON_FORK_NUMBER), None)?;
+        let call = IERC20::balanceOfCall {
+            account: POLYGON_ACC.parse::<Address>().unwrap(),
+        };
+        let result = forker.alloy_read(from_address, to_address, call).unwrap();
+        let balance = result.typed_return._0;
+        assert_eq!(balance, polygon_old_balance);
 
         Ok(())
     }
