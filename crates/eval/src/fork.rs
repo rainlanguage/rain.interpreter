@@ -4,7 +4,7 @@ use alloy_sol_types::SolCall;
 use foundry_evm::{
     backend::{Backend, DatabaseExt, LocalForkId},
     executors::{Executor, ExecutorBuilder, RawCallResult},
-    fork::{CreateFork, ForkId},
+    fork::{CreateFork, ForkId, MultiFork},
     opts::EvmOpts,
 };
 use revm::{
@@ -26,19 +26,18 @@ pub struct ForkTypedReturn<C: SolCall> {
     pub typed_return: C::Return,
 }
 
+impl Default for Forker {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 impl Forker {
     /// Creates a new empty instance of `Forker`.
-    pub async fn new(env: Option<Env>, gas_limit: Option<u64>) -> Forker {
-        let db = Backend::spawn(None).await;
-        let builder = if let Some(gas) = gas_limit {
-            ExecutorBuilder::default()
-                .gas_limit(Uint256::from(gas))
-                .inspectors(|stack| stack.trace(true).debug(false))
-        } else {
-            ExecutorBuilder::default().inspectors(|stack| stack.trace(true).debug(false))
-        };
+    pub fn new() -> Forker {
+        let db = Backend::new(MultiFork::new().0, None);
+        let builder = ExecutorBuilder::default().inspectors(|stack| stack.trace(true).debug(false));
         Self {
-            executor: builder.build(env.unwrap_or_default(), db),
+            executor: builder.build(Env::default(), db),
             forks: HashMap::new(),
         }
     }
