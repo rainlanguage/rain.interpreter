@@ -60,6 +60,16 @@ impl Forker {
     /// # Returns
     ///
     /// A new instance of `Forker`.
+    /// # Examples
+    ///
+    /// ```
+    /// use rain_interpreter_eval::fork::Forker;
+    ///
+    /// let fork_url = "https://example.com/fork";
+    /// let fork_block_number = Some(12345u64);
+    ///
+    /// let forker = Forker::new_with_fork(fork_url, fork_block_number, None, None);
+    /// ```
     pub async fn new_with_fork(
         fork_url: &str,
         fork_block_number: Option<u64>,
@@ -113,14 +123,14 @@ impl Forker {
         }
     }
 
-    /// Reads from the forked EVM using alloy typed arguments.
+    /// Calls the forked EVM without commiting to state using alloy typed arguments.
     /// # Arguments
     /// * `from_address` - The address to call from.
     /// * `to_address` - The address to call to.
     /// * `call` - The call to make.
     /// # Returns
     /// A result containing the raw call result and the typed return.
-    pub fn alloy_read<T: SolCall>(
+    pub fn alloy_call_no_commit<T: SolCall>(
         &mut self,
         from_address: Address,
         to_address: Address,
@@ -272,14 +282,14 @@ impl Forker {
         }
     }
 
-    /// Reads from the forked EVM.
+    /// Calls the forked EVM without commiting to state.
     /// # Arguments
     /// * `from_address` - The address to call from.
     /// * `to_address` - The address to call to.
     /// * `calldata` - The calldata.
     /// # Returns
     /// A result containing the raw call result.
-    pub fn read(
+    pub fn call_no_commit(
         &mut self,
         from_address: &[u8],
         to_address: &[u8],
@@ -292,9 +302,6 @@ impl Forker {
         env.tx.caller = Addr::from_slice(from_address);
         env.tx.data = Bytes::copy_from_slice(calldata);
         env.tx.transact_to = TransactTo::Call(Addr::from_slice(to_address));
-        // env.tx.gas_limit = 1000;
-        // env.tx.gas_price = U256::from(20000);
-        // env.tx.gas_priority_fee = Some(U256::from(20000));
 
         let result = self
             .executor
@@ -427,7 +434,9 @@ mod tests {
             .parse::<Address>()
             .unwrap();
         let call = iParserCall {};
-        let result = forker.alloy_read(from_address, to_address, call).unwrap();
+        let result = forker
+            .alloy_call_no_commit(from_address, to_address, call)
+            .unwrap();
         let parser_address = result.typed_return._0;
         let expected_address = "0x4f8024FB052DbE76b156C6C262Ad27e0F436AF98"
             .parse::<Address>()
@@ -462,7 +471,7 @@ mod tests {
             CreateNamespace::qualify_namespace(namespace.into(), from_address);
 
         let get = forker
-            .alloy_read(
+            .alloy_call_no_commit(
                 from_address,
                 to_address,
                 getCall {
@@ -486,7 +495,9 @@ mod tests {
         let call = IERC20::balanceOfCall {
             account: POLYGON_ACC.parse::<Address>().unwrap(),
         };
-        let result = forker.alloy_read(from_address, to_address, call).unwrap();
+        let result = forker
+            .alloy_call_no_commit(from_address, to_address, call)
+            .unwrap();
         let old_balance = result.typed_return._0;
         let polygon_old_balance = old_balance;
 
@@ -506,7 +517,9 @@ mod tests {
         let call = IERC20::balanceOfCall {
             account: POLYGON_ACC.parse::<Address>().unwrap(),
         };
-        let result = forker.alloy_read(from_address, to_address, call).unwrap();
+        let result = forker
+            .alloy_call_no_commit(from_address, to_address, call)
+            .unwrap();
         let new_balance = result.typed_return._0;
         assert_eq!(new_balance, old_balance - send_amount);
         let polygon_balance = new_balance;
@@ -521,7 +534,9 @@ mod tests {
         let call = IERC20::balanceOfCall {
             account: BSC_ACC.parse::<Address>().unwrap(),
         };
-        let result = forker.alloy_read(from_address, to_address, call).unwrap();
+        let result = forker
+            .alloy_call_no_commit(from_address, to_address, call)
+            .unwrap();
         let old_balance = result.typed_return._0;
 
         let from_address = BSC_ACC.parse::<Address>().unwrap();
@@ -540,7 +555,9 @@ mod tests {
         let call = IERC20::balanceOfCall {
             account: BSC_ACC.parse::<Address>().unwrap(),
         };
-        let result = forker.alloy_read(from_address, to_address, call).unwrap();
+        let result = forker
+            .alloy_call_no_commit(from_address, to_address, call)
+            .unwrap();
         let new_balance = result.typed_return._0;
         assert_eq!(new_balance, old_balance - send_amount);
 
@@ -554,7 +571,9 @@ mod tests {
         let call = IERC20::balanceOfCall {
             account: POLYGON_ACC.parse::<Address>().unwrap(),
         };
-        let result = forker.alloy_read(from_address, to_address, call).unwrap();
+        let result = forker
+            .alloy_call_no_commit(from_address, to_address, call)
+            .unwrap();
         let balance = result.typed_return._0;
         assert_eq!(balance, polygon_balance);
 
@@ -563,7 +582,9 @@ mod tests {
         let call = IERC20::balanceOfCall {
             account: POLYGON_ACC.parse::<Address>().unwrap(),
         };
-        let result = forker.alloy_read(from_address, to_address, call).unwrap();
+        let result = forker
+            .alloy_call_no_commit(from_address, to_address, call)
+            .unwrap();
         let balance = result.typed_return._0;
         assert_eq!(balance, polygon_old_balance);
 
