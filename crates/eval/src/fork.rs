@@ -371,6 +371,7 @@ impl Forker {
             if *local_id == active_fork_local_id {
                 spec_id = *sid;
                 org_block_number = Some(*bnumber);
+                break;
             }
         }
         if org_block_number.is_none() {
