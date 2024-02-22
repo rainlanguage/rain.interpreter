@@ -26,12 +26,6 @@ pub struct ForkTypedReturn<C: SolCall> {
     pub typed_return: C::Return,
 }
 
-#[derive(Debug, Clone)]
-pub struct NewForkedEvm {
-    pub fork_url: String,
-    pub fork_block_number: Option<u64>,
-}
-
 impl Default for Forker {
     fn default() -> Self {
         Self::new()
