@@ -124,30 +124,17 @@ impl Forker {
     /// * `call` - The call to make.
     /// # Returns
     /// A result containing the raw call result and the typed return.
-    pub fn alloy_call_no_commit<T: SolCall>(
+    pub fn alloy_call<T: SolCall>(
         &mut self,
         from_address: Address,
         to_address: Address,
         call: T,
     ) -> Result<ForkTypedReturn<T>, ForkCallError> {
-        let mut env = Env::default();
-        env.tx.caller = from_address.0 .0.into();
-        env.tx.data = Bytes::from(call.abi_encode());
-        env.tx.transact_to = TransactTo::Call(to_address.0 .0.into());
-
-        let raw = self
-            .executor
-            .call_raw_with_env(env)
-            .map_err(|e| ForkCallError::ExecutorError(e.to_string()))?;
-
-        // remove to_address from persisted accounts
-        self.executor
-            .backend
-            .remove_persistent_account(&to_address.0 .0.into());
-
-        if !raw.exit_reason.is_ok() {
-            return Err(ForkCallError::Failed(raw));
-        }
+        let raw = self.call(
+            from_address.as_slice(),
+            to_address.as_slice(),
+            &call.abi_encode(),
+        )?;
 
         let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
             ForkCallError::TypedError(format!(
@@ -168,27 +155,19 @@ impl Forker {
     /// * `value` - The value to send with the call.
     /// # Returns
     /// A result containing the raw call result and the typed return.
-    pub fn alloy_write<T: SolCall>(
+    pub fn alloy_call_committing<T: SolCall>(
         &mut self,
         from_address: Address,
         to_address: Address,
         call: T,
         value: U256,
     ) -> Result<ForkTypedReturn<T>, ForkCallError> {
-        let raw = self
-            .executor
-            .call_raw_committing(
-                from_address.0 .0.into(),
-                to_address.0 .0.into(),
-                Bytes::from(call.abi_encode()),
-                value,
-            )
-            .map_err(|e| ForkCallError::ExecutorError(e.to_string()))?;
-
-        // remove to_address from persisted accounts
-        self.executor
-            .backend
-            .remove_persistent_account(&to_address.0 .0.into());
+        let raw: RawCallResult = self.call_committing(
+            from_address.as_slice(),
+            to_address.as_slice(),
+            &call.abi_encode(),
+            value,
+        )?;
 
         if !raw.exit_reason.is_ok() {
             return Err(ForkCallError::Failed(raw));
@@ -283,7 +262,7 @@ impl Forker {
     /// * `calldata` - The calldata.
     /// # Returns
     /// A result containing the raw call result.
-    pub fn call_no_commit(
+    pub fn call(
         &mut self,
         from_address: &[u8],
         to_address: &[u8],
@@ -318,7 +297,7 @@ impl Forker {
     /// * `value` - The value to send with the call.
     /// # Returns
     /// A result containing the raw call result.
-    pub fn write(
+    pub fn call_committing(
         &mut self,
         from_address: &[u8],
         to_address: &[u8],
@@ -348,7 +327,7 @@ impl Forker {
     }
 
     /// resets the active fork to a given block number or to original fork block number if not provided
-    pub fn reset_fork(
+    pub fn roll_fork(
         &mut self,
         block_number: Option<u64>,
         env: Option<Env>,
@@ -377,7 +356,7 @@ impl Forker {
         self.executor
             .backend
             .roll_fork(
-                None,
+                Some(active_fork_local_id),
                 block_number,
                 &mut env.unwrap_or_default(),
                 &mut JournaledState::new(spec_id, vec![]),
@@ -429,9 +408,7 @@ mod tests {
             .parse::<Address>()
             .unwrap();
         let call = iParserCall {};
-        let result = forker
-            .alloy_call_no_commit(from_address, to_address, call)
-            .unwrap();
+        let result = forker.alloy_call(from_address, to_address, call).unwrap();
         let parser_address = result.typed_return._0;
         let expected_address = "0x4f8024FB052DbE76b156C6C262Ad27e0F436AF98"
             .parse::<Address>()
@@ -451,7 +428,7 @@ mod tests {
         let key = U256::from(3);
         let value = U256::from(4);
         let _set = forker
-            .alloy_write(
+            .alloy_call_committing(
                 from_address,
                 to_address,
                 setCall {
@@ -466,7 +443,7 @@ mod tests {
             CreateNamespace::qualify_namespace(namespace.into(), from_address);
 
         let get = forker
-            .alloy_call_no_commit(
+            .alloy_call(
                 from_address,
                 to_address,
                 getCall {
@@ -490,9 +467,7 @@ mod tests {
         let call = IERC20::balanceOfCall {
             account: POLYGON_ACC.parse::<Address>().unwrap(),
         };
-        let result = forker
-            .alloy_call_no_commit(from_address, to_address, call)
-            .unwrap();
+        let result = forker.alloy_call(from_address, to_address, call).unwrap();
         let old_balance = result.typed_return._0;
         let polygon_old_balance = old_balance;
 
@@ -504,7 +479,7 @@ mod tests {
             amount: send_amount,
         };
         forker
-            .alloy_write(from_address, to_address, transfer_call, U256::from(0))
+            .alloy_call_committing(from_address, to_address, transfer_call, U256::from(0))
             .unwrap();
 
         let from_address = Address::default();
@@ -512,9 +487,7 @@ mod tests {
         let call = IERC20::balanceOfCall {
             account: POLYGON_ACC.parse::<Address>().unwrap(),
         };
-        let result = forker
-            .alloy_call_no_commit(from_address, to_address, call)
-            .unwrap();
+        let result = forker.alloy_call(from_address, to_address, call).unwrap();
         let new_balance = result.typed_return._0;
         assert_eq!(new_balance, old_balance - send_amount);
         let polygon_balance = new_balance;
@@ -529,9 +502,7 @@ mod tests {
         let call = IERC20::balanceOfCall {
             account: BSC_ACC.parse::<Address>().unwrap(),
         };
-        let result = forker
-            .alloy_call_no_commit(from_address, to_address, call)
-            .unwrap();
+        let result = forker.alloy_call(from_address, to_address, call).unwrap();
         let old_balance = result.typed_return._0;
 
         let from_address = BSC_ACC.parse::<Address>().unwrap();
@@ -542,7 +513,7 @@ mod tests {
             amount: send_amount,
         };
         forker
-            .alloy_write(from_address, to_address, transfer_call, U256::from(0))
+            .alloy_call_committing(from_address, to_address, transfer_call, U256::from(0))
             .unwrap();
 
         let from_address = Address::default();
@@ -550,9 +521,7 @@ mod tests {
         let call = IERC20::balanceOfCall {
             account: BSC_ACC.parse::<Address>().unwrap(),
         };
-        let result = forker
-            .alloy_call_no_commit(from_address, to_address, call)
-            .unwrap();
+        let result = forker.alloy_call(from_address, to_address, call).unwrap();
         let new_balance = result.typed_return._0;
         assert_eq!(new_balance, old_balance - send_amount);
 
@@ -566,20 +535,16 @@ mod tests {
         let call = IERC20::balanceOfCall {
             account: POLYGON_ACC.parse::<Address>().unwrap(),
         };
-        let result = forker
-            .alloy_call_no_commit(from_address, to_address, call)
-            .unwrap();
+        let result = forker.alloy_call(from_address, to_address, call).unwrap();
         let balance = result.typed_return._0;
         assert_eq!(balance, polygon_balance);
 
         // reset fork
-        forker.reset_fork(Some(POLYGON_FORK_NUMBER), None)?;
+        forker.roll_fork(Some(POLYGON_FORK_NUMBER), None)?;
         let call = IERC20::balanceOfCall {
             account: POLYGON_ACC.parse::<Address>().unwrap(),
         };
-        let result = forker
-            .alloy_call_no_commit(from_address, to_address, call)
-            .unwrap();
+        let result = forker.alloy_call(from_address, to_address, call).unwrap();
         let balance = result.typed_return._0;
         assert_eq!(balance, polygon_old_balance);
 

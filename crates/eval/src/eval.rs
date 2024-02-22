@@ -40,7 +40,7 @@ impl Forker {
         deployer: Address,
     ) -> Result<parseReturn, ForkCallError> {
         let parser = self
-            .alloy_call_no_commit(Address::default(), deployer, iParserCall {})?
+            .alloy_call(Address::default(), deployer, iParserCall {})?
             .typed_return
             ._0;
 
@@ -48,7 +48,7 @@ impl Forker {
             data: rainlang_string.as_bytes().to_vec(),
         };
 
-        let result = self.call_no_commit(
+        let result = self.call(
             Address::default().as_slice(),
             parser.as_slice(),
             &parse_call.abi_encode(),
@@ -67,7 +67,7 @@ impl Forker {
         // Call deployer: deployExpression2Call
         let mut calldata = deployExpression2Call::SELECTOR.to_vec();
         calldata.extend_from_slice(&result.result);
-        let integrity_result = self.call_no_commit(
+        let integrity_result = self.call(
             Address::default().as_slice(),
             deployer.as_slice(),
             &calldata,
@@ -116,12 +116,12 @@ impl Forker {
         let expression_config = self.fork_parse(&rainlang_string, deployer).await?;
 
         let store = self
-            .alloy_call_no_commit(Address::default(), deployer, iStoreCall {})?
+            .alloy_call(Address::default(), deployer, iStoreCall {})?
             .typed_return
             ._0;
 
         let interpreter = self
-            .alloy_call_no_commit(Address::default(), deployer, iInterpreterCall {})?
+            .alloy_call(Address::default(), deployer, iInterpreterCall {})?
             .typed_return
             ._0;
 
@@ -131,7 +131,7 @@ impl Forker {
         };
 
         let deploy_return = self
-            .alloy_write(Address::default(), deployer, deploy_call, U256::from(0))?
+            .alloy_call_committing(Address::default(), deployer, deploy_call, U256::from(0))?
             .typed_return;
 
         let dispatch =
@@ -145,7 +145,7 @@ impl Forker {
             inputs: vec![],
         };
 
-        self.alloy_call_no_commit(Address::default(), interpreter, eval_args)
+        self.alloy_call(Address::default(), interpreter, eval_args)
     }
 }
 
