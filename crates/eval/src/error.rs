@@ -81,6 +81,9 @@ impl std::fmt::Display for AbiDecodedErrorType {
 pub async fn selector_registry_abi_decode(
     error_data: &[u8],
 ) -> Result<AbiDecodedErrorType, AbiDecodeFailedErrors> {
+    if error_data.len() < 4 {
+        return Err(AbiDecodeFailedErrors::InvalidSelectorHash);
+    }
     let (hash_bytes, args_data) = error_data.split_at(4);
     let selector_hash = alloy_primitives::hex::encode_prefixed(hash_bytes);
     let selector_hash_bytes: [u8; 4] = hash_bytes.try_into()?;
@@ -142,10 +145,15 @@ pub async fn selector_registry_abi_decode(
 pub enum AbiDecodeFailedErrors {
     #[error("Reqwest error: {0}")]
     ReqwestError(#[from] reqwest::Error),
-    #[error("InvalidSelectorHash error: {0}")]
-    InvalidSelectorHash(#[from] std::array::TryFromSliceError),
+    #[error("Invalid SelectorHash")]
+    InvalidSelectorHash,
     #[error("Selectors Cache Poisoned")]
     SelectorsCachePoisoned,
+}
+impl From<std::array::TryFromSliceError> for AbiDecodeFailedErrors {
+    fn from(_value: std::array::TryFromSliceError) -> Self {
+        Self::InvalidSelectorHash
+    }
 }
 
 impl<'a> From<PoisonError<MutexGuard<'a, HashMap<[u8; 4], AlloyError>>>> for AbiDecodeFailedErrors {
