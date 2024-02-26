@@ -21,6 +21,21 @@ pub struct ForkEvalArgs {
     pub context: Vec<Vec<U256>>,
 }
 
+#[derive(Debug, Clone)]
+pub struct ForkParseArgs {
+    pub rainlang_string: String,
+    pub deployer: Address,
+}
+
+impl From<ForkEvalArgs> for ForkParseArgs {
+    fn from(args: ForkEvalArgs) -> Self {
+        ForkParseArgs {
+            rainlang_string: args.rainlang_string,
+            deployer: args.deployer,
+        }
+    }
+}
+
 impl Forker {
     /// Parses Rainlang string and returns the parsed result.
     ///
@@ -33,11 +48,11 @@ impl Forker {
     /// # Returns
     ///
     /// The typed return of the parse, plus Foundry's RawCallResult struct.
-    pub async fn fork_parse(
-        &mut self,
-        rainlang_string: &str,
-        deployer: Address,
-    ) -> Result<parseReturn, ForkCallError> {
+    pub async fn fork_parse(&mut self, args: ForkParseArgs) -> Result<parseReturn, ForkCallError> {
+        let ForkParseArgs {
+            rainlang_string,
+            deployer,
+        } = args;
         let parser = self
             .alloy_call(Address::default(), deployer, iParserCall {})?
             .typed_return
@@ -100,7 +115,12 @@ impl Forker {
             namespace,
             context,
         } = args;
-        let expression_config = self.fork_parse(&rainlang_string, deployer).await?;
+        let expression_config = self
+            .fork_parse(ForkParseArgs {
+                rainlang_string: rainlang_string.clone(),
+                deployer,
+            })
+            .await?;
 
         let store = self
             .alloy_call(Address::default(), deployer, iStoreCall {})?
@@ -151,7 +171,10 @@ mod tests {
             .unwrap();
         let mut fork = Forker::new_with_fork(FORK_URL, Some(FORK_BLOCK_NUMBER), None, None).await;
         let res = fork
-            .fork_parse(r"_: int-add(1 2);", deployer)
+            .fork_parse(ForkParseArgs {
+                rainlang_string: r"_: int-add(1 2);".to_owned(),
+                deployer,
+            })
             .await
             .unwrap();
 

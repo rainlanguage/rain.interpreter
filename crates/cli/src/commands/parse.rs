@@ -7,6 +7,7 @@ use anyhow::anyhow;
 use anyhow::Result;
 use clap::Args;
 use rain_interpreter_bindings::IParserV1::parseCall;
+use rain_interpreter_eval::eval::ForkParseArgs;
 use rain_interpreter_eval::fork::Forker;
 use std::path::PathBuf;
 
@@ -35,6 +36,15 @@ pub struct Parse {
     fork_parse_args: ForkParseArgsCli,
 }
 
+impl From<ForkParseArgsCli> for ForkParseArgs {
+    fn from(args: ForkParseArgsCli) -> Self {
+        ForkParseArgs {
+            deployer: args.deployer,
+            rainlang_string: args.rainlang_string,
+        }
+    }
+}
+
 impl Execute for Parse {
     async fn execute(&self) -> Result<()> {
         let mut forker = Forker::new_with_fork(
@@ -44,12 +54,7 @@ impl Execute for Parse {
             None,
         )
         .await;
-        let result = forker
-            .fork_parse(
-                &self.fork_parse_args.rainlang_string,
-                self.fork_parse_args.deployer,
-            )
-            .await;
+        let result = forker.fork_parse(self.fork_parse_args.clone().into()).await;
 
         match result {
             Ok(res) => crate::output::output(
