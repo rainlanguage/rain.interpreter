@@ -325,6 +325,44 @@ impl Forker {
 
         result
     }
+
+    /// resets the active fork to a given block number or to original fork block number if not provided
+    pub fn roll_fork(
+        &mut self,
+        block_number: Option<u64>,
+        env: Option<Env>,
+    ) -> Result<(), ForkCallError> {
+        let active_fork_local_id = self
+            .executor
+            .backend
+            .active_fork_id()
+            .ok_or(ForkCallError::ExecutorError("no active fork!".to_owned()))?;
+        let mut org_block_number = None;
+        let mut spec_id = SpecId::LATEST;
+        #[allow(clippy::for_kv_map)]
+        for (_fork_id, (local_id, sid, bnumber)) in &self.forks {
+            if *local_id == active_fork_local_id {
+                spec_id = *sid;
+                org_block_number = Some(*bnumber);
+                break;
+            }
+        }
+        if org_block_number.is_none() {
+            return Err(ForkCallError::ExecutorError("no active fork!".to_owned()));
+        }
+        let block_number = block_number
+            .map(U256::from)
+            .unwrap_or(org_block_number.unwrap());
+        self.executor
+            .backend
+            .roll_fork(
+                Some(active_fork_local_id),
+                block_number,
+                &mut env.unwrap_or_default(),
+                &mut JournaledState::new(spec_id, vec![]),
+            )
+            .map_err(|v| ForkCallError::ExecutorError(v.to_string()))
+    }
 }
 
 #[cfg(test)]
@@ -500,6 +538,15 @@ mod tests {
         let result = forker.alloy_call(from_address, to_address, call).unwrap();
         let balance = result.typed_return._0;
         assert_eq!(balance, polygon_balance);
+
+        // reset fork
+        forker.roll_fork(Some(POLYGON_FORK_NUMBER), None)?;
+        let call = IERC20::balanceOfCall {
+            account: POLYGON_ACC.parse::<Address>().unwrap(),
+        };
+        let result = forker.alloy_call(from_address, to_address, call).unwrap();
+        let balance = result.typed_return._0;
+        assert_eq!(balance, polygon_old_balance);
 
         Ok(())
     }
