@@ -89,7 +89,7 @@ impl From<ForkTypedReturn<eval2Call>> for RainEvalResult {
 mod tests {
     use super::*;
     use crate::eval::ForkEvalArgs;
-    use crate::fork::Forker;
+    use crate::fork::{Forker, NewForkedEvm};
     use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
 
     const FORK_URL: &str = "https://rpc.ankr.com/polygon_mumbai";
@@ -100,7 +100,11 @@ mod tests {
         let deployer_address: Address = "0x83aA87e8773bBE65DD34c5C5895948ce9f6cd2af"
             .parse::<Address>()
             .unwrap();
-        let mut fork = Forker::new_with_fork(FORK_URL, Some(FORK_BLOCK_NUMBER), None, None).await;
+        let args = NewForkedEvm {
+            fork_url: FORK_URL.to_owned(),
+            fork_block_number: Some(FORK_BLOCK_NUMBER),
+        };
+        let mut fork = Forker::new_with_fork(args, None, None).await;
 
         let res = fork
             .fork_eval(ForkEvalArgs {

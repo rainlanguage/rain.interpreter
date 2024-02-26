@@ -159,6 +159,7 @@ impl Forker {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::fork::NewForkedEvm;
     use alloy_primitives::Bytes;
 
     const FORK_URL: &str = "https://rpc.ankr.com/polygon_mumbai";
@@ -169,7 +170,11 @@ mod tests {
         let deployer: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
             .parse::<Address>()
             .unwrap();
-        let mut fork = Forker::new_with_fork(FORK_URL, Some(FORK_BLOCK_NUMBER), None, None).await;
+        let args = NewForkedEvm {
+            fork_url: FORK_URL.to_owned(),
+            fork_block_number: Some(FORK_BLOCK_NUMBER),
+        };
+        let mut fork = Forker::new_with_fork(args, None, None).await;
         let res = fork
             .fork_parse(ForkParseArgs {
                 rainlang_string: r"_: int-add(1 2);".to_owned(),
@@ -197,7 +202,11 @@ mod tests {
         let deployer: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
             .parse::<Address>()
             .unwrap();
-        let mut fork = Forker::new_with_fork(FORK_URL, Some(FORK_BLOCK_NUMBER), None, None).await;
+        let args = NewForkedEvm {
+            fork_url: FORK_URL.to_owned(),
+            fork_block_number: Some(FORK_BLOCK_NUMBER),
+        };
+        let mut fork = Forker::new_with_fork(args, None, None).await;
         let res = fork
             .fork_eval(ForkEvalArgs {
                 rainlang_string: r"_: int-add(1 2);".into(),

@@ -86,13 +86,7 @@ pub struct Eval {
 
 impl Execute for Eval {
     async fn execute(&self) -> Result<()> {
-        let mut forker = Forker::new_with_fork(
-            &self.forked_evm.fork_url,
-            self.forked_evm.fork_block_number,
-            None,
-            None,
-        )
-        .await;
+        let mut forker = Forker::new_with_fork(self.forked_evm.clone().into(), None, None).await;
         let result = forker
             .fork_eval(self.fork_eval_args.clone().try_into()?)
             .await;
