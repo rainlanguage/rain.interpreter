@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {IExpressionDeployerV3} from "../../interface/unstable/IExpressionDeployerV3.sol";
-import {IInterpreterStoreV1} from "../../interface/IInterpreterStoreV1.sol";
-import {IInterpreterV2} from "../../interface/unstable/IInterpreterV2.sol";
+import {IExpressionDeployerV3} from "rain.interpreter.interface/interface/unstable/IExpressionDeployerV3.sol";
+import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
+import {IInterpreterV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 
 library LibDeployerDiscoverable {
     /// Hack so that some deployer will emit an event with the sender as the
@@ -18,7 +18,7 @@ library LibDeployerDiscoverable {
     /// transaction as the caller meta, there only needs to be one expression on
     /// ANY deployer known to ERC1820.
     function touchDeployerV3(address deployer) internal {
-        (IInterpreterV2 interpreter, IInterpreterStoreV1 store, address expression, bytes memory io) =
+        (IInterpreterV2 interpreter, IInterpreterStoreV2 store, address expression, bytes memory io) =
             IExpressionDeployerV3(deployer).deployExpression2("", new uint256[](0));
         (interpreter, store, expression, io);
     }

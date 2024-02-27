@@ -8,9 +8,14 @@ import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 import {LibOpAnyNP} from "src/lib/op/logic/LibOpAnyNP.sol";
-import {IInterpreterV2, Operand, SourceIndexV2} from "src/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1, FullyQualifiedNamespace} from "src/interface/IInterpreterStoreV1.sol";
-import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+import {
+    IInterpreterV2, Operand, SourceIndexV2
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {
+    IInterpreterStoreV2,
+    FullyQualifiedNamespace
+} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
@@ -75,7 +80,7 @@ contract LibOpAnyNPTest is OpTest {
             0,
             MemoryKV.wrap(0),
             FullyQualifiedNamespace.wrap(0),
-            IInterpreterStoreV1(address(0)),
+            IInterpreterStoreV2(address(0)),
             new uint256[][](0),
             "",
             ""
@@ -89,7 +94,7 @@ contract LibOpAnyNPTest is OpTest {
     /// Test the eval of any opcode parsed from a string. Tests 1 true input.
     function testOpAnyNPEval1TrueInput() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: any(5);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -108,7 +113,7 @@ contract LibOpAnyNPTest is OpTest {
     /// Test the eval of any opcode parsed from a string. Tests 1 false input.
     function testOpAnyNPEval1FalseInput() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: any(0);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -128,7 +133,7 @@ contract LibOpAnyNPTest is OpTest {
     /// The first true input should be the overall result.
     function testOpAnyNPEval2TrueInputs() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: any(5 6);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -147,7 +152,7 @@ contract LibOpAnyNPTest is OpTest {
     /// Test the eval of any opcode parsed from a string. Tests 2 false inputs.
     function testOpAnyNPEval2FalseInputs() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: any(0 0);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -168,7 +173,7 @@ contract LibOpAnyNPTest is OpTest {
     /// The first value is the true value.
     function testOpAnyNPEval2MixedInputs() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: any(5 0);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -189,7 +194,7 @@ contract LibOpAnyNPTest is OpTest {
     /// The first value is the false value.
     function testOpAnyNPEval2MixedInputs2() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: any(0 5);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,

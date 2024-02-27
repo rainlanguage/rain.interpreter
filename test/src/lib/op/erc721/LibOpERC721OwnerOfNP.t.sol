@@ -6,12 +6,15 @@ import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibInt
 import {LibOpERC721OwnerOfNP} from "src/lib/op/erc721/LibOpERC721OwnerOfNP.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import {
-    IInterpreterV2, FullyQualifiedNamespace, SourceIndexV2, Operand
-} from "src/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
+    IInterpreterV2,
+    FullyQualifiedNamespace,
+    SourceIndexV2,
+    Operand
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
-import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
@@ -55,7 +58,7 @@ contract LibOpERC721OwnerOfNPTest is OpTest {
         assertEq(constants[1], 1);
         constants[0] = uint256(uint160(token));
         constants[1] = tokenId;
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
 
         assumeEtchable(token, expression);

@@ -6,11 +6,16 @@ import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {Pointer, LibPointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {LibInterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {IInterpreterV2, Operand, SourceIndexV2} from "src/interface/unstable/IInterpreterV2.sol";
+import {
+    IInterpreterV2, Operand, SourceIndexV2
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
-import {IInterpreterStoreV1, FullyQualifiedNamespace} from "src/interface/IInterpreterStoreV1.sol";
-import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+import {
+    IInterpreterStoreV2,
+    FullyQualifiedNamespace
+} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 
 import {LibOpTimestampNP} from "src/lib/op/evm/LibOpTimestampNP.sol";
@@ -55,7 +60,7 @@ contract LibOpTimestampNPTest is OpTest {
     function testOpTimestampNPEval(uint256 blockTimestamp) external {
         vm.warp(blockTimestamp);
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: block-timestamp();");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,

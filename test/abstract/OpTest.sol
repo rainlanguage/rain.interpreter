@@ -15,11 +15,17 @@ import {IntegrityCheckStateNP, LibIntegrityCheckNP} from "../../src/lib/integrit
 import {LibContext} from "../../src/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "../../src/error/ErrParse.sol";
 import {BadOpInputsLength, BadOpOutputsLength} from "../../src/lib/integrity/LibIntegrityCheckNP.sol";
-import {Operand, IInterpreterV2, SourceIndexV2} from "../../src/interface/unstable/IInterpreterV2.sol";
 import {
-    IInterpreterStoreV1, FullyQualifiedNamespace, StateNamespace
-} from "../../src/interface/IInterpreterStoreV1.sol";
-import {SignedContextV1} from "../../src/interface/IInterpreterCallerV2.sol";
+    Operand,
+    IInterpreterV2,
+    SourceIndexV2,
+    IInterpreterStoreV2
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {
+    FullyQualifiedNamespace,
+    StateNamespace
+} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "../../src/lib/caller/LibEncodedDispatch.sol";
 import {LibNamespace} from "../../src/lib/ns/LibNamespace.sol";
 
@@ -71,7 +77,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
             // Treat ourselves as the sender as we eval internally to directly
             // test the opcode logic.
             LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
-            IInterpreterStoreV1(address(iStore)),
+            IInterpreterStoreV2(address(iStore)),
             new uint256[][](0),
             "",
             ""
@@ -189,7 +195,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         returns (uint256[] memory, uint256[] memory)
     {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (io);
 
@@ -250,7 +256,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
 
     function checkUnhappy(bytes memory rainString, bytes memory err) internal {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (io);
         vm.expectRevert(err);
@@ -267,7 +273,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     function checkUnhappyDeploy(bytes memory rainString, bytes memory err) internal {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
         vm.expectRevert(err);
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (interpreterDeployer, storeDeployer, expression, io);
     }

@@ -3,14 +3,14 @@ pragma solidity ^0.8.18;
 
 import {NotAnExternContract} from "../../../error/ErrExtern.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
-import {Operand} from "../../../interface/unstable/IInterpreterV2.sol";
+import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {
     IInterpreterExternV3,
     ExternDispatch,
     EncodedExternDispatch
-} from "../../../interface/unstable/IInterpreterExternV3.sol";
+} from "rain.interpreter.interface/interface/unstable/IInterpreterExternV3.sol";
 import {LibExtern} from "../../extern/LibExtern.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";

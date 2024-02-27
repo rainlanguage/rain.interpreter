@@ -9,7 +9,7 @@ import {
     UnexpectedOperand,
     UnexpectedOperandValue
 } from "../../error/ErrParse.sol";
-import {Operand} from "../../interface/unstable/IInterpreterV2.sol";
+import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {LibParse} from "./LibParse.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 import {CMASK_OPERAND_END, CMASK_WHITESPACE, CMASK_OPERAND_START} from "./LibParseCMask.sol";

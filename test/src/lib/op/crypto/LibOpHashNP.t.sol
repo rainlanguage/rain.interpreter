@@ -10,9 +10,14 @@ import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
-import {IInterpreterV2, Operand, SourceIndexV2} from "src/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1, FullyQualifiedNamespace} from "src/interface/IInterpreterStoreV1.sol";
-import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+import {
+    IInterpreterV2, Operand, SourceIndexV2
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {
+    IInterpreterStoreV2,
+    FullyQualifiedNamespace
+} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP, LibInterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
@@ -53,7 +58,7 @@ contract LibOpHashNPTest is OpTest {
     /// Test the eval of a hash opcode parsed from a string. Tests 0 inputs.
     function testOpHashNPEval0Inputs() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: hash();");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -71,7 +76,7 @@ contract LibOpHashNPTest is OpTest {
     /// Test the eval of a hash opcode parsed from a string. Tests 1 input.
     function testOpHashNPEval1Input() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: hash(0x1234567890abcdef);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -91,7 +96,7 @@ contract LibOpHashNPTest is OpTest {
     function testOpHashNPEval2Inputs() external {
         (bytes memory bytecode, uint256[] memory constants) =
             iParser.parse("_: hash(0x1234567890abcdef 0x1234567890abcdef);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -113,7 +118,7 @@ contract LibOpHashNPTest is OpTest {
     function testOpHashNPEval2InputsDifferent() external {
         (bytes memory bytecode, uint256[] memory constants) =
             iParser.parse("_: hash(0x1234567890abcdef 0xfedcba0987654321);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -135,7 +140,7 @@ contract LibOpHashNPTest is OpTest {
     function testOpHashNPEval2InputsOtherStack() external {
         (bytes memory bytecode, uint256[] memory constants) =
             iParser.parse("_ _ _: 5 hash(0x1234567890abcdef 0xfedcba0987654321) 9;");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,

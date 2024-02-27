@@ -6,11 +6,14 @@ import {LibContext} from "src/lib/caller/LibContext.sol";
 import {LibOpGreaterThanOrEqualToNP} from "src/lib/op/logic/LibOpGreaterThanOrEqualToNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
-    IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace
-} from "src/interface/unstable/IInterpreterV2.sol";
+    IInterpreterV2,
+    Operand,
+    SourceIndexV2,
+    FullyQualifiedNamespace
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
-import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
@@ -48,7 +51,7 @@ contract LibOpGreaterThanOrEqualToNPTest is OpTest {
     /// Tests 2 inputs. Both inputs are 0.
     function testOpGreaterThanOrEqualToNPEval2ZeroInputs() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: greater-than-or-equal-to(0 0);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -68,7 +71,7 @@ contract LibOpGreaterThanOrEqualToNPTest is OpTest {
     /// Tests 2 inputs. The first input is 0, the second input is 1.
     function testOpGreaterThanOrEqualToNPEval2InputsFirstZeroSecondOne() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: greater-than-or-equal-to(0 1);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -88,7 +91,7 @@ contract LibOpGreaterThanOrEqualToNPTest is OpTest {
     /// Tests 2 inputs. The first input is 1, the second input is 0.
     function testOpGreaterThanOrEqualToNPEval2InputsFirstOneSecondZero() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: greater-than-or-equal-to(1 0);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -108,7 +111,7 @@ contract LibOpGreaterThanOrEqualToNPTest is OpTest {
     /// Tests 2 inputs. Both inputs are 1.
     function testOpGreaterThanOrEqualToNPEval2InputsBothOne() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: greater-than-or-equal-to(1 1);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,

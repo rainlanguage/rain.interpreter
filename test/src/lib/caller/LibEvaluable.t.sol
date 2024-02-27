@@ -2,11 +2,11 @@
 pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
-import {EvaluableV2} from "src/interface/IInterpreterCallerV2.sol";
+import {EvaluableV2} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibEvaluable} from "src/lib/caller/LibEvaluable.sol";
 import {LibEvaluableSlow} from "./LibEvaluableSlow.sol";
-import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
-import {IInterpreterV2} from "src/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
+import {IInterpreterV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 
 contract LibEvaluableTest is Test {
     using LibEvaluable for EvaluableV2;
@@ -47,7 +47,7 @@ contract LibEvaluableTest is Test {
         // Check hash doesn't include extraneous data
         uint256 v0 = type(uint256).max;
         uint256 v1 = 0;
-        EvaluableV2 memory d = EvaluableV2(IInterpreterV2(address(0)), IInterpreterStoreV1(address(0)), address(0));
+        EvaluableV2 memory d = EvaluableV2(IInterpreterV2(address(0)), IInterpreterStoreV2(address(0)), address(0));
         assembly ("memory-safe") {
             mstore(mload(0x40), v0)
         }
@@ -60,11 +60,11 @@ contract LibEvaluableTest is Test {
     }
 
     function testEvaluableHashGas0() public pure {
-        EvaluableV2(IInterpreterV2(address(0)), IInterpreterStoreV1(address(0)), address(0)).hash();
+        EvaluableV2(IInterpreterV2(address(0)), IInterpreterStoreV2(address(0)), address(0)).hash();
     }
 
     function testEvaluableHashGasSlow0() public pure {
-        LibEvaluableSlow.hashSlow(EvaluableV2(IInterpreterV2(address(0)), IInterpreterStoreV1(address(0)), address(0)));
+        LibEvaluableSlow.hashSlow(EvaluableV2(IInterpreterV2(address(0)), IInterpreterStoreV2(address(0)), address(0)));
     }
 
     function testEvaluableReferenceImplementation(EvaluableV2 memory evaluable) public {

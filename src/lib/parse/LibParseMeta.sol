@@ -2,10 +2,10 @@
 pragma solidity ^0.8.18;
 
 import {LibCtPop} from "../bitwise/LibCtPop.sol";
-import {Operand} from "../../interface/unstable/IInterpreterV2.sol";
+import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {LibParseOperand} from "./LibParseOperand.sol";
 import {ParseState} from "./LibParseState.sol";
-import {AuthoringMetaV2} from "../../interface/IParserV1.sol";
+import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV1.sol";
 
 /// @dev For metadata builder.
 error DuplicateFingerprint();

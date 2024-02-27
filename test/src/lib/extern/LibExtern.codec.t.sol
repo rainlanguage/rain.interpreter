@@ -2,8 +2,11 @@
 pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
-import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterExternV3, EncodedExternDispatch} from "src/interface/unstable/IInterpreterExternV3.sol";
+import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {
+    IInterpreterExternV3,
+    EncodedExternDispatch
+} from "rain.interpreter.interface/interface/unstable/IInterpreterExternV3.sol";
 import {LibExtern, ExternDispatch} from "src/lib/extern/LibExtern.sol";
 
 /// @title LibExternCodecTest

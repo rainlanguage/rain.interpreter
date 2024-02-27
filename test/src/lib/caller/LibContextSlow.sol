@@ -5,7 +5,7 @@ import "rain.lib.hash/LibHashNoAlloc.sol";
 import "rain.lib.typecast/LibCast.sol";
 import "rain.solmem/lib/LibUint256Array.sol";
 
-import "src/interface/IInterpreterCallerV2.sol";
+import "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 
 library LibContextSlow {
     using LibUint256Array for uint256;

@@ -6,7 +6,7 @@ import {INVALID_BYTECODE} from "test/lib/etch/LibEtch.sol";
 import {EXPRESSION_DEPLOYER_NP_META_PATH} from "test/lib/constants/ExpressionDeployerNPConstants.sol";
 import {IERC1820Registry} from "openzeppelin-contracts/contracts/utils/introspection/IERC1820Registry.sol";
 import {IERC1820_REGISTRY} from "rain.erc1820/lib/LibIERC1820.sol";
-import {IInterpreterV2} from "src/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 
 import {
     RainterpreterExpressionDeployerNPE2,

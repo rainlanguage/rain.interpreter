@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {Operand, OPCODE_CONSTANT} from "../../interface/unstable/IInterpreterV2.sol";
+import {Operand, OPCODE_CONSTANT} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {LibParseStackTracker, ParseStackTracker} from "./LibParseStackTracker.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";

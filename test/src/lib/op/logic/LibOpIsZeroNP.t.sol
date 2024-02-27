@@ -8,10 +8,13 @@ import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibOpIsZeroNP} from "src/lib/op/logic/LibOpIsZeroNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {
-    IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace
-} from "src/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
-import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+    IInterpreterV2,
+    Operand,
+    SourceIndexV2,
+    FullyQualifiedNamespace
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
@@ -48,7 +51,7 @@ contract LibOpIsZeroNPTest is OpTest {
     /// Test the eval of isZero opcode parsed from a string. Tests 1 nonzero input.
     function testOpIsZeroNPEval1NonZeroInput() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: is-zero(30);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -67,7 +70,7 @@ contract LibOpIsZeroNPTest is OpTest {
     /// Test the eval of isZero opcode parsed from a string. Tests 1 zero input.
     function testOpIsZeroNPEval1ZeroInput() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: is-zero(0);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,

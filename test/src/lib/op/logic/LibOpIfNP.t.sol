@@ -6,11 +6,14 @@ import {LibContext} from "src/lib/caller/LibContext.sol";
 import {LibOpIfNP} from "src/lib/op/logic/LibOpIfNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
-    IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace
-} from "src/interface/unstable/IInterpreterV2.sol";
+    IInterpreterV2,
+    Operand,
+    SourceIndexV2,
+    FullyQualifiedNamespace
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
-import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
@@ -49,7 +52,7 @@ contract LibOpIfNPTest is OpTest {
     /// is 0, the second input is 1, the third input is 2.
     function testOpIfNPEval3InputsFirstZeroSecondOneThirdTwo() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: if(0 1 2);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -69,7 +72,7 @@ contract LibOpIfNPTest is OpTest {
     /// is 1, the second input is 2, the third input is 3.
     function testOpIfNPEval3InputsFirstOneSecondTwoThirdThree() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: if(1 2 3);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -89,7 +92,7 @@ contract LibOpIfNPTest is OpTest {
     /// is 0, the second input is 0, the third input is 3.
     function testOpIfNPEval3InputsFirstZeroSecondZeroThirdThree() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: if(0 0 3);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -109,7 +112,7 @@ contract LibOpIfNPTest is OpTest {
     /// is 1, the second input is 0, the third input is 3.
     function testOpIfNPEval3InputsFirstOneSecondZeroThirdThree() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: if(1 0 3);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -129,7 +132,7 @@ contract LibOpIfNPTest is OpTest {
     /// is 0, the second input is 1, the third input is 0.
     function testOpIfNPEval3InputsFirstZeroSecondOneThirdZero() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: if(0 1 0);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -149,7 +152,7 @@ contract LibOpIfNPTest is OpTest {
     /// is 0, the second input is 0, the third input is 1.
     function testOpIfNPEval3InputsFirstZeroSecondZeroThirdOne() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: if(0 0 1);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -169,7 +172,7 @@ contract LibOpIfNPTest is OpTest {
     /// is 2, the second input is 3, the third input is 4.
     function testOpIfNPEval3InputsFirstTwoSecondThreeThirdFour() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: if(2 3 4);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -189,7 +192,7 @@ contract LibOpIfNPTest is OpTest {
     /// is 2, the second input is 0, the third input is 4.
     function testOpIfNPEval3InputsFirstTwoSecondZeroThirdFour() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: if(2 0 4);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
