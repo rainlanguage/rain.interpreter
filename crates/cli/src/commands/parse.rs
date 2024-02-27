@@ -2,11 +2,9 @@ use crate::execute::Execute;
 use crate::fork::NewForkedEvmCliArgs;
 use crate::output::SupportedOutputEncoding;
 use alloy_primitives::Address;
-use alloy_sol_types::SolCall;
 use anyhow::anyhow;
 use anyhow::Result;
 use clap::Args;
-use rain_interpreter_bindings::IParserV1::parseCall;
 use rain_interpreter_eval::eval::ForkParseArgs;
 use rain_interpreter_eval::fork::Forker;
 use std::path::PathBuf;
@@ -51,14 +49,10 @@ impl Execute for Parse {
         let result = forker.fork_parse(self.fork_parse_args.clone().into()).await;
 
         match result {
-            Ok(res) => crate::output::output(
+            Ok((res, _)) => crate::output::output(
                 &self.output_path,
                 self.output_encoding.clone(),
-                parseCall::abi_encode_returns(&(
-                    res.0.typed_return.bytecode,
-                    res.0.typed_return.constants,
-                ))
-                .as_slice(),
+                res.raw.result.to_owned().to_vec().as_slice(),
             ),
             Err(e) => Err(anyhow!("Error: {:?}", e)),
         }

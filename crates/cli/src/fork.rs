@@ -1,3 +1,4 @@
+use alloy_primitives::BlockNumber;
 use clap::Args;
 use rain_interpreter_eval::fork::NewForkedEvm;
 
@@ -6,7 +7,7 @@ pub struct NewForkedEvmCliArgs {
     #[arg(short = 'i', long, help = "RPC url for the fork")]
     pub fork_url: String,
     #[arg(short = 'i', long, help = "Optional block number to fork from")]
-    pub fork_block_number: Option<u64>,
+    pub fork_block_number: Option<BlockNumber>,
 }
 
 impl From<NewForkedEvmCliArgs> for NewForkedEvm {

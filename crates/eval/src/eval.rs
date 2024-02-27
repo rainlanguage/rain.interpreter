@@ -157,10 +157,10 @@ impl Forker {
 mod tests {
     use super::*;
     use crate::fork::NewForkedEvm;
-    use alloy_primitives::Bytes;
+    use alloy_primitives::{BlockNumber, Bytes};
 
     const FORK_URL: &str = "https://rpc.ankr.com/polygon_mumbai";
-    const FORK_BLOCK_NUMBER: u64 = 45658085;
+    const FORK_BLOCK_NUMBER: BlockNumber = 45658085;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_parse() {

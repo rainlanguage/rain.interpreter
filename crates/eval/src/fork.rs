@@ -127,74 +127,8 @@ impl Forker {
         }
     }
 
-    /// Calls the forked EVM without commiting to state using alloy typed arguments.
-    /// # Arguments
-    /// * `from_address` - The address to call from.
-    /// * `to_address` - The address to call to.
-    /// * `call` - The call to make.
-    /// # Returns
-    /// A result containing the raw call result and the typed return.
-    pub fn alloy_call<T: SolCall>(
-        &mut self,
-        from_address: Address,
-        to_address: Address,
-        call: T,
-    ) -> Result<ForkTypedReturn<T>, ForkCallError> {
-        let raw = self.call(
-            from_address.as_slice(),
-            to_address.as_slice(),
-            &call.abi_encode(),
-        )?;
-
-        if !raw.exit_reason.is_ok() {
-            return Err(ForkCallError::Failed(raw));
-        }
-
-        let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
-            ForkCallError::TypedError(format!(
-                "Call:{:?} Error:{:?} Raw:{:?}",
-                type_name::<T>(),
-                e,
-                raw
-            ))
-        })?;
-        Ok(ForkTypedReturn { raw, typed_return })
-    }
-
-    /// Writes to the forked EVM using alloy typed arguments.
-    /// # Arguments
-    /// * `from_address` - The address to call from.
-    /// * `to_address` - The address to call to.
-    /// * `call` - The call to make.
-    /// * `value` - The value to send with the call.
-    /// # Returns
-    /// A result containing the raw call result and the typed return.
-    pub fn alloy_call_committing<T: SolCall>(
-        &mut self,
-        from_address: Address,
-        to_address: Address,
-        call: T,
-        value: U256,
-    ) -> Result<ForkTypedReturn<T>, ForkCallError> {
-        let raw: RawCallResult = self.call_committing(
-            from_address.as_slice(),
-            to_address.as_slice(),
-            &call.abi_encode(),
-            value,
-        )?;
-
-        if !raw.exit_reason.is_ok() {
-            return Err(ForkCallError::Failed(raw));
-        }
-
-        let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
-            ForkCallError::TypedError(format!("Call:{:?} Error:{:?}", type_name::<T>(), e))
-        })?;
-        Ok(ForkTypedReturn { raw, typed_return })
-    }
-
-    /// adds new fork and sets it as active or if the fork already exists, selects it as active,
-    /// does nothing if the fork is already the active fork.
+    /// Adds new fork and sets it as active or if the fork already exists, selects it as active.
+    /// Does nothing if the fork is already the active fork.
     pub async fn add_or_select(
         &mut self,
         args: NewForkedEvm,
@@ -270,6 +204,72 @@ impl Forker {
                 .map(|_| ())
                 .map_err(|e| ForkCallError::ExecutorError(e.to_string()))
         }
+    }
+
+    /// Calls the forked EVM without commiting to state using alloy typed arguments.
+    /// # Arguments
+    /// * `from_address` - The address to call from.
+    /// * `to_address` - The address to call to.
+    /// * `call` - The call to make.
+    /// # Returns
+    /// A result containing the raw call result and the typed return.
+    pub fn alloy_call<T: SolCall>(
+        &mut self,
+        from_address: Address,
+        to_address: Address,
+        call: T,
+    ) -> Result<ForkTypedReturn<T>, ForkCallError> {
+        let raw = self.call(
+            from_address.as_slice(),
+            to_address.as_slice(),
+            &call.abi_encode(),
+        )?;
+
+        if !raw.exit_reason.is_ok() {
+            return Err(ForkCallError::Failed(raw));
+        }
+
+        let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
+            ForkCallError::TypedError(format!(
+                "Call:{:?} Error:{:?} Raw:{:?}",
+                type_name::<T>(),
+                e,
+                raw
+            ))
+        })?;
+        Ok(ForkTypedReturn { raw, typed_return })
+    }
+
+    /// Writes to the forked EVM using alloy typed arguments.
+    /// # Arguments
+    /// * `from_address` - The address to call from.
+    /// * `to_address` - The address to call to.
+    /// * `call` - The call to make.
+    /// * `value` - The value to send with the call.
+    /// # Returns
+    /// A result containing the raw call result and the typed return.
+    pub fn alloy_call_committing<T: SolCall>(
+        &mut self,
+        from_address: Address,
+        to_address: Address,
+        call: T,
+        value: U256,
+    ) -> Result<ForkTypedReturn<T>, ForkCallError> {
+        let raw: RawCallResult = self.call_committing(
+            from_address.as_slice(),
+            to_address.as_slice(),
+            &call.abi_encode(),
+            value,
+        )?;
+
+        if !raw.exit_reason.is_ok() {
+            return Err(ForkCallError::Failed(raw));
+        }
+
+        let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
+            ForkCallError::TypedError(format!("Call:{:?} Error:{:?}", type_name::<T>(), e))
+        })?;
+        Ok(ForkTypedReturn { raw, typed_return })
     }
 
     /// Calls the forked EVM without commiting to state.
