@@ -2,11 +2,10 @@ use crate::execute::Execute;
 use crate::fork::NewForkedEvmCliArgs;
 use crate::output::SupportedOutputEncoding;
 use alloy_primitives::Address;
-use alloy_sol_types::SolCall;
 use anyhow::anyhow;
 use anyhow::Result;
 use clap::Args;
-use rain_interpreter_bindings::IParserV1::parseCall;
+use rain_interpreter_eval::eval::ForkParseArgs;
 use rain_interpreter_eval::fork::Forker;
 use std::path::PathBuf;
 
@@ -35,27 +34,25 @@ pub struct Parse {
     fork_parse_args: ForkParseArgsCli,
 }
 
+impl From<ForkParseArgsCli> for ForkParseArgs {
+    fn from(args: ForkParseArgsCli) -> Self {
+        ForkParseArgs {
+            deployer: args.deployer,
+            rainlang_string: args.rainlang_string,
+        }
+    }
+}
+
 impl Execute for Parse {
     async fn execute(&self) -> Result<()> {
-        let mut forker = Forker::new_with_fork(
-            &self.forked_evm.fork_url,
-            self.forked_evm.fork_block_number,
-            None,
-            None,
-        )
-        .await;
-        let result = forker
-            .fork_parse(
-                &self.fork_parse_args.rainlang_string,
-                self.fork_parse_args.deployer,
-            )
-            .await;
+        let mut forker = Forker::new_with_fork(self.forked_evm.clone().into(), None, None).await;
+        let result = forker.fork_parse(self.fork_parse_args.clone().into()).await;
 
         match result {
-            Ok(res) => crate::output::output(
+            Ok((res, _)) => crate::output::output(
                 &self.output_path,
                 self.output_encoding.clone(),
-                parseCall::abi_encode_returns(&(res.bytecode, res.constants)).as_slice(),
+                res.raw.result.to_owned().to_vec().as_slice(),
             ),
             Err(e) => Err(anyhow!("Error: {:?}", e)),
         }

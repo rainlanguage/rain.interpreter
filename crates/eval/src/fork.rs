@@ -26,6 +26,12 @@ pub struct ForkTypedReturn<C: SolCall> {
     pub typed_return: C::Return,
 }
 
+#[derive(Debug, Clone)]
+pub struct NewForkedEvm {
+    pub fork_url: String,
+    pub fork_block_number: Option<u64>,
+}
+
 impl Default for Forker {
     fn default() -> Self {
         Self::new()
@@ -57,20 +63,24 @@ impl Forker {
     /// # Examples
     ///
     /// ```
-    /// use rain_interpreter_eval::fork::Forker;
+    /// use rain_interpreter_eval::fork::{Forker, NewForkedEvm};
     ///
-    /// let fork_url = "https://example.com/fork";
+    /// let fork_url = "https://example.com/fork".to_owned();
     /// let fork_block_number = Some(12345u64);
+    /// let args = NewForkedEvm { fork_url, fork_block_number };
     ///
-    /// let forker = Forker::new_with_fork(fork_url, fork_block_number, None, None);
+    /// let forker = Forker::new_with_fork(args, None, None);
     /// ```
     pub async fn new_with_fork(
-        fork_url: &str,
-        fork_block_number: Option<u64>,
+        args: NewForkedEvm,
         env: Option<Env>,
         gas_limit: Option<u64>,
     ) -> Forker {
-        let fork_id = ForkId::new(fork_url, fork_block_number);
+        let NewForkedEvm {
+            fork_url,
+            fork_block_number,
+        } = args;
+        let fork_id = ForkId::new(&fork_url, fork_block_number);
         let evm_opts = EvmOpts {
             fork_url: Some(fork_url.to_string()),
             fork_block_number,
@@ -117,83 +127,24 @@ impl Forker {
         }
     }
 
-    /// Calls the forked EVM without commiting to state using alloy typed arguments.
-    /// # Arguments
-    /// * `from_address` - The address to call from.
-    /// * `to_address` - The address to call to.
-    /// * `call` - The call to make.
-    /// # Returns
-    /// A result containing the raw call result and the typed return.
-    pub fn alloy_call<T: SolCall>(
-        &mut self,
-        from_address: Address,
-        to_address: Address,
-        call: T,
-    ) -> Result<ForkTypedReturn<T>, ForkCallError> {
-        let raw = self.call(
-            from_address.as_slice(),
-            to_address.as_slice(),
-            &call.abi_encode(),
-        )?;
-
-        let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
-            ForkCallError::TypedError(format!(
-                "Call:{:?} Error:{:?} Raw:{:?}",
-                type_name::<T>(),
-                e,
-                raw
-            ))
-        })?;
-        Ok(ForkTypedReturn { raw, typed_return })
-    }
-
-    /// Writes to the forked EVM using alloy typed arguments.
-    /// # Arguments
-    /// * `from_address` - The address to call from.
-    /// * `to_address` - The address to call to.
-    /// * `call` - The call to make.
-    /// * `value` - The value to send with the call.
-    /// # Returns
-    /// A result containing the raw call result and the typed return.
-    pub fn alloy_call_committing<T: SolCall>(
-        &mut self,
-        from_address: Address,
-        to_address: Address,
-        call: T,
-        value: U256,
-    ) -> Result<ForkTypedReturn<T>, ForkCallError> {
-        let raw: RawCallResult = self.call_committing(
-            from_address.as_slice(),
-            to_address.as_slice(),
-            &call.abi_encode(),
-            value,
-        )?;
-
-        if !raw.exit_reason.is_ok() {
-            return Err(ForkCallError::Failed(raw));
-        }
-
-        let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
-            ForkCallError::TypedError(format!("Call:{:?} Error:{:?}", type_name::<T>(), e))
-        })?;
-        Ok(ForkTypedReturn { raw, typed_return })
-    }
-
-    /// adds new fork and sets it as active or if the fork already exists, selects it as active,
-    /// does nothing if the fork is already the active fork.
+    /// Adds new fork and sets it as active or if the fork already exists, selects it as active.
+    /// Does nothing if the fork is already the active fork.
     pub async fn add_or_select(
         &mut self,
-        fork_url: &str,
-        fork_block_number: Option<u64>,
+        args: NewForkedEvm,
         env: Option<Env>,
     ) -> Result<(), ForkCallError> {
         if self.forks.is_empty() {
-            let forker = Self::new_with_fork(fork_url, fork_block_number, env, None).await;
+            let forker = Self::new_with_fork(args, env, None).await;
             self.executor = forker.executor;
             self.forks = forker.forks;
             return Ok(());
         }
-        let fork_id = ForkId::new(fork_url, fork_block_number);
+        let NewForkedEvm {
+            fork_url,
+            fork_block_number,
+        } = args;
+        let fork_id = ForkId::new(&fork_url, fork_block_number);
         if let Some((local_fork_id, spec_id, _)) = self.forks.get(&fork_id) {
             if self.executor.backend.is_active_fork(*local_fork_id) {
                 Ok(())
@@ -253,6 +204,72 @@ impl Forker {
                 .map(|_| ())
                 .map_err(|e| ForkCallError::ExecutorError(e.to_string()))
         }
+    }
+
+    /// Calls the forked EVM without commiting to state using alloy typed arguments.
+    /// # Arguments
+    /// * `from_address` - The address to call from.
+    /// * `to_address` - The address to call to.
+    /// * `call` - The call to make.
+    /// # Returns
+    /// A result containing the raw call result and the typed return.
+    pub fn alloy_call<T: SolCall>(
+        &mut self,
+        from_address: Address,
+        to_address: Address,
+        call: T,
+    ) -> Result<ForkTypedReturn<T>, ForkCallError> {
+        let raw = self.call(
+            from_address.as_slice(),
+            to_address.as_slice(),
+            &call.abi_encode(),
+        )?;
+
+        if !raw.exit_reason.is_ok() {
+            return Err(ForkCallError::Failed(raw));
+        }
+
+        let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
+            ForkCallError::TypedError(format!(
+                "Call:{:?} Error:{:?} Raw:{:?}",
+                type_name::<T>(),
+                e,
+                raw
+            ))
+        })?;
+        Ok(ForkTypedReturn { raw, typed_return })
+    }
+
+    /// Writes to the forked EVM using alloy typed arguments.
+    /// # Arguments
+    /// * `from_address` - The address to call from.
+    /// * `to_address` - The address to call to.
+    /// * `call` - The call to make.
+    /// * `value` - The value to send with the call.
+    /// # Returns
+    /// A result containing the raw call result and the typed return.
+    pub fn alloy_call_committing<T: SolCall>(
+        &mut self,
+        from_address: Address,
+        to_address: Address,
+        call: T,
+        value: U256,
+    ) -> Result<ForkTypedReturn<T>, ForkCallError> {
+        let raw: RawCallResult = self.call_committing(
+            from_address.as_slice(),
+            to_address.as_slice(),
+            &call.abi_encode(),
+            value,
+        )?;
+
+        if !raw.exit_reason.is_ok() {
+            return Err(ForkCallError::Failed(raw));
+        }
+
+        let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
+            ForkCallError::TypedError(format!("Call:{:?} Error:{:?}", type_name::<T>(), e))
+        })?;
+        Ok(ForkTypedReturn { raw, typed_return })
     }
 
     /// Calls the forked EVM without commiting to state.
@@ -362,8 +379,11 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_forker_read() {
-        let mut forker =
-            Forker::new_with_fork(MUMBAI_FORK_URL, Some(MUMBAI_FORK_NUMBER), None, None).await;
+        let args = NewForkedEvm {
+            fork_url: MUMBAI_FORK_URL.to_owned(),
+            fork_block_number: Some(MUMBAI_FORK_NUMBER),
+        };
+        let mut forker = Forker::new_with_fork(args, None, None).await;
 
         let from_address = Address::default();
         let to_address: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
@@ -380,8 +400,11 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_forker_write() {
-        let mut forker =
-            Forker::new_with_fork(MUMBAI_FORK_URL, Some(MUMBAI_FORK_NUMBER), None, None).await;
+        let args = NewForkedEvm {
+            fork_url: MUMBAI_FORK_URL.to_owned(),
+            fork_block_number: Some(MUMBAI_FORK_NUMBER),
+        };
+        let mut forker = Forker::new_with_fork(args, None, None).await;
         let from_address = Address::repeat_byte(0x02);
         let to_address: Address = "0xF34e1f2BCeC2baD9c7bE8Aec359691839B784861"
             .parse::<Address>()
@@ -421,8 +444,11 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_multi_fork_read_write_switch_reset() -> Result<(), ForkCallError> {
-        let mut forker =
-            Forker::new_with_fork(POLYGON_FORK_URL, Some(POLYGON_FORK_NUMBER), None, None).await;
+        let args = NewForkedEvm {
+            fork_url: POLYGON_FORK_URL.to_owned(),
+            fork_block_number: Some(POLYGON_FORK_NUMBER),
+        };
+        let mut forker = Forker::new_with_fork(args, None, None).await;
 
         let from_address = Address::default();
         let to_address: Address = USDT_POLYGON.parse::<Address>().unwrap();
@@ -454,9 +480,11 @@ mod tests {
         let polygon_balance = new_balance;
 
         // switch fork
-        forker
-            .add_or_select(BSC_FORK_URL, Some(BSC_FORK_NUMBER), None)
-            .await?;
+        let args = NewForkedEvm {
+            fork_url: BSC_FORK_URL.to_owned(),
+            fork_block_number: Some(BSC_FORK_NUMBER),
+        };
+        forker.add_or_select(args, None).await?;
 
         let from_address = Address::default();
         let to_address: Address = USDT_BSC.parse::<Address>().unwrap();
@@ -487,9 +515,11 @@ mod tests {
         assert_eq!(new_balance, old_balance - send_amount);
 
         // switch fork
-        forker
-            .add_or_select(POLYGON_FORK_URL, Some(POLYGON_FORK_NUMBER), None)
-            .await?;
+        let args = NewForkedEvm {
+            fork_url: POLYGON_FORK_URL.to_owned(),
+            fork_block_number: Some(POLYGON_FORK_NUMBER),
+        };
+        forker.add_or_select(args, None).await?;
 
         let from_address = Address::default();
         let to_address: Address = USDT_POLYGON.parse::<Address>().unwrap();
