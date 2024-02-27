@@ -1,6 +1,6 @@
-use ::rain_interpreter_eval::fork::NewForkedEvm;
 use alloy_primitives::BlockNumber;
 use clap::Args;
+use rain_interpreter_eval::fork::NewForkedEvm;
 
 #[derive(Args, Clone, Debug)]
 pub struct NewForkedEvmCliArgs {

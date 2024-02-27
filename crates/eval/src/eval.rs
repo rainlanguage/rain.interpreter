@@ -6,7 +6,17 @@ use rain_interpreter_bindings::IInterpreterV2::eval2Call;
 use rain_interpreter_bindings::IParserV1::parseCall;
 
 use crate::dispatch::CreateEncodedDispatch;
-use crate::fork::{ForkCallError, ForkTypedReturn, ForkedEvm};
+use crate::error::ForkCallError;
+use crate::fork::{ForkTypedReturn, Forker};
+
+#[derive(Debug, Clone)]
+pub struct ForkEvalArgs {
+    pub rainlang_string: String,
+    pub source_index: u16,
+    pub deployer: Address,
+    pub namespace: FullyQualifiedNamespace,
+    pub context: Vec<Vec<U256>>,
+}
 
 #[derive(Debug, Clone)]
 pub struct ForkParseArgs {
@@ -23,16 +33,7 @@ impl From<ForkEvalArgs> for ForkParseArgs {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct ForkEvalArgs {
-    pub rainlang_string: String,
-    pub source_index: u16,
-    pub deployer: Address,
-    pub namespace: FullyQualifiedNamespace,
-    pub context: Vec<Vec<U256>>,
-}
-
-impl ForkedEvm {
+impl Forker {
     /// Parses Rainlang string and returns the parsed result.
     ///
     /// # Arguments
@@ -43,23 +44,23 @@ impl ForkedEvm {
     ///
     /// # Returns
     ///
-    /// The typed return of the parse, plus Foundry's RawCallResult struct.
+    /// The typed return of the parse and deployExpression2, plus Foundry's RawCallResult struct.
     pub async fn fork_parse(
-        self: &mut ForkedEvm,
+        &mut self,
         args: ForkParseArgs,
-    ) -> Result<ForkTypedReturn<parseCall>, ForkCallError> {
+    ) -> Result<
+        (
+            ForkTypedReturn<parseCall>,
+            ForkTypedReturn<deployExpression2Call>,
+        ),
+        ForkCallError,
+    > {
         let ForkParseArgs {
             rainlang_string,
             deployer,
         } = args;
-        let mut executor = self.build_executor();
         let parser = self
-            .read(
-                Some(&mut executor),
-                Address::default(),
-                deployer,
-                iParserCall {},
-            )?
+            .alloy_call(Address::default(), deployer, iParserCall {})?
             .typed_return
             ._0;
 
@@ -67,10 +68,24 @@ impl ForkedEvm {
             data: rainlang_string.as_bytes().to_vec(),
         };
 
-        let parse_result =
-            self.read(Some(&mut executor), Address::default(), parser, parse_call)?;
+        let parse_result = self.alloy_call(Address::default(), parser, parse_call)?;
 
-        Ok(parse_result)
+        if !parse_result.raw.exit_reason.is_ok() {
+            return Err(ForkCallError::Failed(parse_result.raw));
+        }
+
+        // Call deployer: deployExpression2Call
+        let call = deployExpression2Call {
+            constants: parse_result.typed_return.constants.clone(),
+            bytecode: parse_result.typed_return.bytecode.clone(),
+        };
+        let integrity_result = self.alloy_call(Address::default(), deployer, call)?;
+
+        if !integrity_result.raw.exit_reason.is_ok() {
+            return Err(ForkCallError::Failed(integrity_result.raw));
+        }
+
+        Ok((parse_result, integrity_result))
     }
 
     /// Evaluates the Rain language string and returns the evaluation result.
@@ -86,36 +101,31 @@ impl ForkedEvm {
     ///
     /// The typed return of the eval, plus Foundry's RawCallResult struct, including the trace.
     pub async fn fork_eval(
-        self: &mut ForkedEvm,
+        &mut self,
         args: ForkEvalArgs,
     ) -> Result<ForkTypedReturn<eval2Call>, ForkCallError> {
         let ForkEvalArgs {
-            rainlang_string: _,
+            rainlang_string,
             source_index,
             deployer,
             namespace,
             context,
-        } = args.clone();
-        let mut executor = self.build_executor();
-        let expression_config = self.fork_parse(args.into()).await?.typed_return;
+        } = args;
+        let (expression_config_result, _) = self
+            .fork_parse(ForkParseArgs {
+                rainlang_string: rainlang_string.clone(),
+                deployer,
+            })
+            .await?;
+        let expression_config = expression_config_result.typed_return;
 
         let store = self
-            .read(
-                Some(&mut executor),
-                Address::default(),
-                deployer,
-                iStoreCall {},
-            )?
+            .alloy_call(Address::default(), deployer, iStoreCall {})?
             .typed_return
             ._0;
 
         let interpreter = self
-            .read(
-                Some(&mut executor),
-                Address::default(),
-                deployer,
-                iInterpreterCall {},
-            )?
+            .alloy_call(Address::default(), deployer, iInterpreterCall {})?
             .typed_return
             ._0;
 
@@ -125,13 +135,7 @@ impl ForkedEvm {
         };
 
         let deploy_return = self
-            .write(
-                Some(&mut executor),
-                Address::default(),
-                deployer,
-                deploy_call,
-                U256::from(0),
-            )?
+            .alloy_call_committing(Address::default(), deployer, deploy_call, U256::from(0))?
             .typed_return;
 
         let dispatch =
@@ -145,20 +149,14 @@ impl ForkedEvm {
             inputs: vec![],
         };
 
-        self.read(
-            Some(&mut executor),
-            Address::default(),
-            interpreter,
-            eval_args,
-        )
+        self.alloy_call(Address::default(), interpreter, eval_args)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::fork::NewForkedEvm;
-
     use super::*;
+    use crate::fork::NewForkedEvm;
     use alloy_primitives::{BlockNumber, Bytes};
 
     const FORK_URL: &str = "https://rpc.ankr.com/polygon_mumbai";
@@ -169,20 +167,20 @@ mod tests {
         let deployer: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
             .parse::<Address>()
             .unwrap();
-        let mut fork = ForkedEvm::new(NewForkedEvm {
-            fork_url: FORK_URL.into(),
+        let args = NewForkedEvm {
+            fork_url: FORK_URL.to_owned(),
             fork_block_number: Some(FORK_BLOCK_NUMBER),
-        })
-        .await;
+        };
+        let mut fork = Forker::new_with_fork(args, None, None).await;
         let res = fork
             .fork_parse(ForkParseArgs {
-                rainlang_string: r"_: int-add(1 2);".into(),
+                rainlang_string: r"_: int-add(1 2);".to_owned(),
                 deployer,
             })
             .await
             .unwrap();
 
-        let res_bytecode = res.typed_return.bytecode;
+        let res_bytecode = res.0.typed_return.bytecode;
         let expected_bytes = "0x01000003020001010000010100000038020000"
             .parse::<Bytes>()
             .unwrap()
@@ -190,7 +188,7 @@ mod tests {
 
         assert_eq!(res_bytecode, expected_bytes);
 
-        let res_constants = res.typed_return.constants;
+        let res_constants = res.0.typed_return.constants;
         let expected_constants = vec![U256::from(1), U256::from(2)];
 
         assert_eq!(res_constants, expected_constants);
@@ -201,11 +199,11 @@ mod tests {
         let deployer: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
             .parse::<Address>()
             .unwrap();
-        let mut fork = ForkedEvm::new(NewForkedEvm {
-            fork_url: FORK_URL.into(),
+        let args = NewForkedEvm {
+            fork_url: FORK_URL.to_owned(),
             fork_block_number: Some(FORK_BLOCK_NUMBER),
-        })
-        .await;
+        };
+        let mut fork = Forker::new_with_fork(args, None, None).await;
         let res = fork
             .fork_eval(ForkEvalArgs {
                 rainlang_string: r"_: int-add(1 2);".into(),

@@ -9,4 +9,4 @@ homepage.workspace = true
 
 [dependencies]
 alloy-sol-types = { workspace = true }
-alloy-primitives = "0.5.4"
+alloy-primitives = { workspace = true }

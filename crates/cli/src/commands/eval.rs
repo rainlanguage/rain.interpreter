@@ -7,9 +7,8 @@ use anyhow::Context;
 use anyhow::Result;
 use clap::Args;
 use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
-use rain_interpreter_eval::eval::ForkEvalArgs;
-use rain_interpreter_eval::fork::ForkedEvm;
 use rain_interpreter_eval::trace::RainEvalResult;
+use rain_interpreter_eval::{eval::ForkEvalArgs, fork::Forker};
 use std::path::PathBuf;
 
 #[derive(Args, Clone, Debug)]
@@ -87,8 +86,8 @@ pub struct Eval {
 
 impl Execute for Eval {
     async fn execute(&self) -> Result<()> {
-        let mut forked_evm = ForkedEvm::new(self.forked_evm.clone().into()).await;
-        let result = forked_evm
+        let mut forker = Forker::new_with_fork(self.forked_evm.clone().into(), None, None).await;
+        let result = forker
             .fork_eval(self.fork_eval_args.clone().try_into()?)
             .await;
 

@@ -6,7 +6,7 @@ use anyhow::anyhow;
 use anyhow::Result;
 use clap::Args;
 use rain_interpreter_eval::eval::ForkParseArgs;
-use rain_interpreter_eval::fork::ForkedEvm;
+use rain_interpreter_eval::fork::Forker;
 use std::path::PathBuf;
 
 #[derive(Args, Clone, Debug)]
@@ -16,15 +16,6 @@ pub struct ForkParseArgsCli {
 
     #[arg(short, long, help = "The Rainlang string to parse")]
     rainlang_string: String,
-}
-
-impl From<ForkParseArgsCli> for ForkParseArgs {
-    fn from(args: ForkParseArgsCli) -> Self {
-        ForkParseArgs {
-            deployer: args.deployer,
-            rainlang_string: args.rainlang_string,
-        }
-    }
 }
 
 #[derive(Args, Clone)]
@@ -43,15 +34,22 @@ pub struct Parse {
     fork_parse_args: ForkParseArgsCli,
 }
 
+impl From<ForkParseArgsCli> for ForkParseArgs {
+    fn from(args: ForkParseArgsCli) -> Self {
+        ForkParseArgs {
+            deployer: args.deployer,
+            rainlang_string: args.rainlang_string,
+        }
+    }
+}
+
 impl Execute for Parse {
     async fn execute(&self) -> Result<()> {
-        let mut forked_evm = ForkedEvm::new(self.forked_evm.clone().into()).await;
-        let result = forked_evm
-            .fork_parse(self.fork_parse_args.clone().into())
-            .await;
+        let mut forker = Forker::new_with_fork(self.forked_evm.clone().into(), None, None).await;
+        let result = forker.fork_parse(self.fork_parse_args.clone().into()).await;
 
         match result {
-            Ok(res) => crate::output::output(
+            Ok((res, _)) => crate::output::output(
                 &self.output_path,
                 self.output_encoding.clone(),
                 res.raw.result.to_owned().to_vec().as_slice(),
