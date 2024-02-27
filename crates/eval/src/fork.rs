@@ -146,6 +146,10 @@ impl Forker {
             &call.abi_encode(),
         )?;
 
+        if !raw.exit_reason.is_ok() {
+            return Err(ForkCallError::Failed(raw));
+        }
+
         let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
             ForkCallError::TypedError(format!(
                 "Call:{:?} Error:{:?} Raw:{:?}",
