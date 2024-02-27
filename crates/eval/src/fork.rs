@@ -495,6 +495,7 @@ mod tests {
         };
         let result = forker.alloy_call(from_address, to_address, call).unwrap();
         let old_balance = result.typed_return._0;
+        let polygon_old_balance = result.typed_return._0;
 
         let from_address = POLYGON_ACC.parse::<Address>().unwrap();
         let to_address: Address = USDT_POLYGON.parse::<Address>().unwrap();

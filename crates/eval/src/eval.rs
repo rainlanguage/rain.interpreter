@@ -1,12 +1,14 @@
 use alloy_primitives::{Address, U256};
+use alloy_sol_types::SolCall;
 use rain_interpreter_bindings::DeployerISP::{iInterpreterCall, iParserCall, iStoreCall};
 use rain_interpreter_bindings::IExpressionDeployerV3::deployExpression2Call;
 use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
 use rain_interpreter_bindings::IInterpreterV2::eval2Call;
 use rain_interpreter_bindings::IParserV1::parseCall;
+use revm::interpreter::InstructionResult;
 
 use crate::dispatch::CreateEncodedDispatch;
-use crate::error::ForkCallError;
+use crate::error::{selector_registry_abi_decode, ForkCallError};
 use crate::fork::{ForkTypedReturn, Forker};
 
 #[derive(Debug, Clone)]
@@ -68,22 +70,60 @@ impl Forker {
             data: rainlang_string.as_bytes().to_vec(),
         };
 
-        let parse_result = self.alloy_call(Address::default(), parser, parse_call)?;
+        let parse_raw_result = self.call(
+            Address::default().as_slice(),
+            parser.as_slice(),
+            &parse_call.abi_encode(),
+        )?;
 
-        if !parse_result.raw.exit_reason.is_ok() {
-            return Err(ForkCallError::Failed(parse_result.raw));
+        if parse_raw_result.exit_reason == InstructionResult::Revert {
+            // decode result bytes to error selectors if it was a revert
+            return Err(ForkCallError::AbiDecodedError(
+                selector_registry_abi_decode(&parse_raw_result.result).await?,
+            ));
         }
+        if !parse_raw_result.exit_reason.is_ok() {
+            return Err(ForkCallError::Failed(parse_raw_result));
+        }
+
+        let parse_result: ForkTypedReturn<parseCall> = ForkTypedReturn {
+            typed_return: parseCall::abi_decode_returns(&parse_raw_result.result.0, true).map_err(
+                |e| ForkCallError::TypedError(format!("Call:\"parseCall\" Error:{:?}", e)),
+            )?,
+            raw: parse_raw_result,
+        };
 
         // Call deployer: deployExpression2Call
         let call = deployExpression2Call {
             constants: parse_result.typed_return.constants.clone(),
             bytecode: parse_result.typed_return.bytecode.clone(),
         };
-        let integrity_result = self.alloy_call(Address::default(), deployer, call)?;
+        let integrity_raw_result = self.call(
+            Address::default().as_slice(),
+            deployer.as_slice(),
+            &call.abi_encode(),
+        )?;
 
-        if !integrity_result.raw.exit_reason.is_ok() {
-            return Err(ForkCallError::Failed(integrity_result.raw));
+        if integrity_raw_result.exit_reason == InstructionResult::Revert {
+            // decode result bytes to error selectors if it was a revert
+            return Err(ForkCallError::AbiDecodedError(
+                selector_registry_abi_decode(&integrity_raw_result.result).await?,
+            ));
         }
+        if !integrity_raw_result.exit_reason.is_ok() {
+            return Err(ForkCallError::Failed(integrity_raw_result));
+        }
+
+        let integrity_result: ForkTypedReturn<deployExpression2Call> = ForkTypedReturn {
+            typed_return: deployExpression2Call::abi_decode_returns(
+                &integrity_raw_result.result.0,
+                true,
+            )
+            .map_err(|e| {
+                ForkCallError::TypedError(format!("Call:\"deployExpression2Call\" Error:{:?}", e))
+            })?,
+            raw: integrity_raw_result,
+        };
 
         Ok((parse_result, integrity_result))
     }
