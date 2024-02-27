@@ -1,12 +1,9 @@
-use std::any::type_name;
-
 use alloy_primitives::{Address, U256};
-use alloy_sol_types::SolCall;
 use rain_interpreter_bindings::DeployerISP::{iInterpreterCall, iParserCall, iStoreCall};
 use rain_interpreter_bindings::IExpressionDeployerV3::deployExpression2Call;
 use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
 use rain_interpreter_bindings::IInterpreterV2::eval2Call;
-use rain_interpreter_bindings::IParserV1::{parseCall, parseReturn};
+use rain_interpreter_bindings::IParserV1::parseCall;
 
 use crate::dispatch::CreateEncodedDispatch;
 use crate::error::ForkCallError;
@@ -47,8 +44,17 @@ impl Forker {
     ///
     /// # Returns
     ///
-    /// The typed return of the parse, plus Foundry's RawCallResult struct.
-    pub async fn fork_parse(&mut self, args: ForkParseArgs) -> Result<parseReturn, ForkCallError> {
+    /// The typed return of the parse and deployExpression2, plus Foundry's RawCallResult struct.
+    pub async fn fork_parse(
+        &mut self,
+        args: ForkParseArgs,
+    ) -> Result<
+        (
+            ForkTypedReturn<parseCall>,
+            ForkTypedReturn<deployExpression2Call>,
+        ),
+        ForkCallError,
+    > {
         let ForkParseArgs {
             rainlang_string,
             deployer,
@@ -62,34 +68,24 @@ impl Forker {
             data: rainlang_string.as_bytes().to_vec(),
         };
 
-        let result = self.call(
-            Address::default().as_slice(),
-            parser.as_slice(),
-            &parse_call.abi_encode(),
-        )?;
+        let parse_result = self.alloy_call(Address::default(), parser, parse_call)?;
 
-        if !result.exit_reason.is_ok() {
-            return Err(ForkCallError::Failed(result));
+        if !parse_result.raw.exit_reason.is_ok() {
+            return Err(ForkCallError::Failed(parse_result.raw));
         }
 
         // Call deployer: deployExpression2Call
-        let mut calldata = deployExpression2Call::SELECTOR.to_vec();
-        calldata.extend_from_slice(&result.result);
-        let integrity_result = self.call(
-            Address::default().as_slice(),
-            deployer.as_slice(),
-            &calldata,
-        )?;
+        let call = deployExpression2Call {
+            constants: parse_result.typed_return.constants.clone(),
+            bytecode: parse_result.typed_return.bytecode.clone(),
+        };
+        let integrity_result = self.alloy_call(Address::default(), deployer, call)?;
 
-        if !integrity_result.exit_reason.is_ok() {
-            return Err(ForkCallError::Failed(integrity_result));
+        if !integrity_result.raw.exit_reason.is_ok() {
+            return Err(ForkCallError::Failed(integrity_result.raw));
         }
 
-        let exp_config = parseCall::abi_decode_returns(&result.result.0, true).map_err(|e| {
-            ForkCallError::TypedError(format!("Call:{:?} Error:{:?}", type_name::<parseCall>(), e))
-        })?;
-
-        Ok(exp_config)
+        Ok((parse_result, integrity_result))
     }
 
     /// Evaluates the Rain language string and returns the evaluation result.
@@ -115,12 +111,13 @@ impl Forker {
             namespace,
             context,
         } = args;
-        let expression_config = self
+        let (expression_config_result, _) = self
             .fork_parse(ForkParseArgs {
                 rainlang_string: rainlang_string.clone(),
                 deployer,
             })
             .await?;
+        let expression_config = expression_config_result.typed_return;
 
         let store = self
             .alloy_call(Address::default(), deployer, iStoreCall {})?
@@ -183,7 +180,7 @@ mod tests {
             .await
             .unwrap();
 
-        let res_bytecode = res.bytecode;
+        let res_bytecode = res.0.typed_return.bytecode;
         let expected_bytes = "0x01000003020001010000010100000038020000"
             .parse::<Bytes>()
             .unwrap()
@@ -191,7 +188,7 @@ mod tests {
 
         assert_eq!(res_bytecode, expected_bytes);
 
-        let res_constants = res.constants;
+        let res_constants = res.0.typed_return.constants;
         let expected_constants = vec![U256::from(1), U256::from(2)];
 
         assert_eq!(res_constants, expected_constants);

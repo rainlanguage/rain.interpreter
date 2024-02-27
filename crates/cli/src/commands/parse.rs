@@ -54,7 +54,11 @@ impl Execute for Parse {
             Ok(res) => crate::output::output(
                 &self.output_path,
                 self.output_encoding.clone(),
-                parseCall::abi_encode_returns(&(res.bytecode, res.constants)).as_slice(),
+                parseCall::abi_encode_returns(&(
+                    res.0.typed_return.bytecode,
+                    res.0.typed_return.constants,
+                ))
+                .as_slice(),
             ),
             Err(e) => Err(anyhow!("Error: {:?}", e)),
         }
