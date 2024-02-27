@@ -8,8 +8,8 @@ import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 import {LibEvalNP} from "src/lib/eval/LibEvalNP.sol";
 import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {
-    IInterpreterStoreV1, FullyQualifiedNamespace
-} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
+    IInterpreterStoreV2, FullyQualifiedNamespace
+} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
 
 contract LibEvalNPFBoundsTest is Test {
     /// Due to the mod of indexes to function pointers the indexes wrap at the
@@ -119,7 +119,7 @@ contract LibEvalNPFBoundsTest is Test {
             0,
             MemoryKV.wrap(0),
             FullyQualifiedNamespace.wrap(0),
-            IInterpreterStoreV1(address(0)),
+            IInterpreterStoreV2(address(0)),
             context,
             bytecode,
             fs

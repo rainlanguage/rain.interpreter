@@ -12,8 +12,8 @@ import {OutOfBoundsStackRead, LibOpStackNP} from "src/lib/op/00/LibOpStackNP.sol
 import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {
-    IInterpreterStoreV1, FullyQualifiedNamespace
-} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
+    IInterpreterStoreV2, FullyQualifiedNamespace
+} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
 import {OpTest, PRE, POST} from "test/abstract/OpTest.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
@@ -158,7 +158,7 @@ contract LibOpStackNPTest is OpTest {
         assertEq(constants.length, 1);
         assertEq(constants[0], 1);
 
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (io);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
@@ -208,7 +208,7 @@ contract LibOpStackNPTest is OpTest {
             hex"00100003"
         );
 
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (io);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(

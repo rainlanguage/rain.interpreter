@@ -8,7 +8,7 @@ import {
     Operand,
     SourceIndexV2
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
+import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
 import {BytecodeTest} from "test/abstract/BytecodeTest.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
@@ -105,7 +105,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
     function checkSourceDoesNotExist(bytes memory rainlang, uint256 sourceIndex) internal {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainlang);
         vm.expectRevert(abi.encodeWithSelector(SourceIndexOutOfBounds.selector, bytecode, sourceIndex));
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (interpreterDeployer, storeDeployer, expression, io);
     }
@@ -147,7 +147,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
             );
         }
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainlang);
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (io);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
@@ -209,7 +209,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
     /// Boilerplate for checking the stack and kvs of a call.
     function checkCallNPRun(bytes memory rainlang, uint256[] memory stack, uint256[] memory kvs) internal {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainlang);
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (io);
         (uint256[] memory actualStack, uint256[] memory actualKVs) = interpreterDeployer.eval2(
@@ -284,7 +284,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
     function checkCallNPRunRecursive(bytes memory rainlang) internal {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainlang);
         // Recursion isn't caught at deploy time.
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (io);
         // But it will unconditionally happen at runtime.
@@ -313,7 +313,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
     function testOpCallNPRunInputsMismatch() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("a: call<1>(10 11); ten:,a b c:ten 11 12;");
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 2, 1, 2));
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (interpreterDeployer, storeDeployer, expression, io);
     }
@@ -323,7 +323,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         (bytes memory bytecode, uint256[] memory constants) =
             iParser.parse("ten eleven a b: call<1>(10 11); ten eleven:,a:9;");
         vm.expectRevert(abi.encodeWithSelector(CallOutputsExceedSource.selector, 3, 4));
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (interpreterDeployer, storeDeployer, expression, io);
     }

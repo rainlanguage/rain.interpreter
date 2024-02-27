@@ -18,7 +18,7 @@ import {RainterpreterExpressionDeployerNPE2} from "src/concrete/RainterpreterExp
 import {
     Operand, IInterpreterV2, SourceIndexV2
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
+import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
@@ -61,7 +61,7 @@ contract LibOpChainIdNPTest is OpTest {
     function testOpChainIDNPEval(uint64 chainId, FullyQualifiedNamespace namespace) public {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: chain-id();");
 
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
 
         vm.chainId(chainId);

@@ -7,7 +7,7 @@ import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC
 
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibMemoryKV, MemoryKV, MemoryKVVal, MemoryKVKey} from "rain.lib.memkv/lib/LibMemoryKV.sol";
-import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
+import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
 import {LibNamespace, StateNamespace} from "src/lib/ns/LibNamespace.sol";
 import {RainterpreterStoreNPE2, OddSetLength} from "src/concrete/RainterpreterStoreNPE2.sol";
 
@@ -18,18 +18,18 @@ contract RainterpreterStoreNPE2Test is Test {
     using LibMemoryKV for MemoryKV;
     using Address for address;
 
-    /// Store should introspect support for `IERC165` and `IInterpreterStoreV1`.
+    /// Store should introspect support for `IERC165` and `IInterpreterStoreV2`.
     /// It should not support any other interface.
     function testRainterpreterStoreNPE2IERC165(uint32 badInterfaceIdUint) external {
         // https://github.com/foundry-rs/foundry/issues/6115
         bytes4 badInterfaceId = bytes4(badInterfaceIdUint);
 
         vm.assume(badInterfaceId != type(IERC165).interfaceId);
-        vm.assume(badInterfaceId != type(IInterpreterStoreV1).interfaceId);
+        vm.assume(badInterfaceId != type(IInterpreterStoreV2).interfaceId);
 
         RainterpreterStoreNPE2 store = new RainterpreterStoreNPE2();
         assertTrue(store.supportsInterface(type(IERC165).interfaceId));
-        assertTrue(store.supportsInterface(type(IInterpreterStoreV1).interfaceId));
+        assertTrue(store.supportsInterface(type(IInterpreterStoreV2).interfaceId));
         assertFalse(store.supportsInterface(badInterfaceId));
     }
 

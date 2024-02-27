@@ -6,7 +6,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
 import {FullyQualifiedNamespace} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
+import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
 
 import {InterpreterStateNP} from "./LibInterpreterStateNP.sol";
 
@@ -40,7 +40,7 @@ library LibInterpreterStateDataContractNP {
         bytes memory serialized,
         uint256 sourceIndex,
         FullyQualifiedNamespace namespace,
-        IInterpreterStoreV1 store,
+        IInterpreterStoreV2 store,
         uint256[][] memory context,
         bytes memory fs
     ) internal pure returns (InterpreterStateNP memory) {

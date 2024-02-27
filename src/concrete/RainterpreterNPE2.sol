@@ -19,9 +19,9 @@ import {
     IInterpreterV2,
     StateNamespace,
     EncodedDispatch,
-    FullyQualifiedNamespace
+    FullyQualifiedNamespace,
+    IInterpreterStoreV2
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
 
 /// @dev Hash of the known interpreter bytecode.
 bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xbdc3b8364573bdaeb6b287500497797ccf53be54baaac4fb7ba52941815e5e70);
@@ -60,7 +60,7 @@ contract RainterpreterNPE2 is IInterpreterV2, ERC165 {
     ///
     /// @inheritdoc IInterpreterV2
     function eval2(
-        IInterpreterStoreV1 store,
+        IInterpreterStoreV2 store,
         FullyQualifiedNamespace namespace,
         EncodedDispatch dispatch,
         uint256[][] memory context,

@@ -12,8 +12,8 @@ import {
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
-    IInterpreterStoreV1, FullyQualifiedNamespace
-} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
+    IInterpreterStoreV2, FullyQualifiedNamespace
+} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 
@@ -59,7 +59,7 @@ contract LibOpTimestampNPTest is OpTest {
     function testOpTimestampNPEval(uint256 blockTimestamp) external {
         vm.warp(blockTimestamp);
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: block-timestamp();");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,

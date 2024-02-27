@@ -14,7 +14,7 @@ import {
     SourceIndexV2,
     FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
+import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibIntOrAString, IntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
@@ -98,7 +98,7 @@ contract LibOpConditionsNPTest is OpTest {
     /// Test the eval of conditions opcode parsed from a string. Tests 1 true input 1 zero output.
     function testOpConditionsNPEval1TrueInputZeroOutput() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: conditions(5 0);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -118,7 +118,7 @@ contract LibOpConditionsNPTest is OpTest {
     /// input 1 nonzero output.
     function testOpConditionsNPEval2MixedInputs() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: conditions(5 6);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -137,7 +137,7 @@ contract LibOpConditionsNPTest is OpTest {
     /// Test that if conditions are NOT met, the expression reverts.
     function testOpConditionsNPEval1FalseInputRevert() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: conditions(0 5);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (io);
         vm.expectRevert(bytes(""));
@@ -156,7 +156,7 @@ contract LibOpConditionsNPTest is OpTest {
     function testOpConditionsNPEvalErrorCode() external {
         (bytes memory bytecode, uint256[] memory constants) =
             iParser.parse("_: conditions(0x00 0x00 0x00 0x00 \"fail\");");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (io);
         vm.expectRevert(abi.encodeWithSelector("fail"));
@@ -175,7 +175,7 @@ contract LibOpConditionsNPTest is OpTest {
     /// then 1 nonzero condition.
     function testOpConditionsNPEval1FalseInput1TrueInput() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: conditions(0 9 3 4);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -195,7 +195,7 @@ contract LibOpConditionsNPTest is OpTest {
     /// conditions. The first should be used.
     function testOpConditionsNPEval2TrueInputs() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: conditions(5 6 7 8);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -215,7 +215,7 @@ contract LibOpConditionsNPTest is OpTest {
     /// condition then 1 zero condition.
     function testOpConditionsNPEval1TrueInput1FalseInput() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: conditions(5 6 0 9);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,

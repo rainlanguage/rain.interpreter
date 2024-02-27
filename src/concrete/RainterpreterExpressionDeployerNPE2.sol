@@ -21,7 +21,7 @@ import {
 } from "rain.interpreter.interface/interface/unstable/IExpressionDeployerV3.sol";
 import {IParserV1} from "rain.interpreter.interface/interface/IParserV1.sol";
 import {IInterpreterV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
+import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
 
 import {LibIntegrityCheckNP} from "../lib/integrity/LibIntegrityCheckNP.sol";
 import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
@@ -60,13 +60,13 @@ contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, ERC165 {
     /// for.
     IInterpreterV2 public immutable iInterpreter;
     /// The store with known bytecode that this deployer is constructed for.
-    IInterpreterStoreV1 public immutable iStore;
+    IInterpreterStoreV2 public immutable iStore;
     IParserV1 public immutable iParser;
 
     constructor(RainterpreterExpressionDeployerNPE2ConstructionConfig memory config) {
         // Set the immutables.
         IInterpreterV2 interpreter = IInterpreterV2(config.interpreter);
-        IInterpreterStoreV1 store = IInterpreterStoreV1(config.store);
+        IInterpreterStoreV2 store = IInterpreterStoreV2(config.store);
         IParserV1 parser = IParserV1(config.parser);
 
         iInterpreter = interpreter;
@@ -133,7 +133,7 @@ contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, ERC165 {
     function deployExpression2(bytes memory bytecode, uint256[] memory constants)
         external
         virtual
-        returns (IInterpreterV2, IInterpreterStoreV1, address, bytes memory)
+        returns (IInterpreterV2, IInterpreterStoreV2, address, bytes memory)
     {
         bytes memory io = LibIntegrityCheckNP.integrityCheck2(INTEGRITY_FUNCTION_POINTERS, bytecode, constants);
 

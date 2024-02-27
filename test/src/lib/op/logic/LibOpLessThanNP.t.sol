@@ -9,9 +9,9 @@ import {
     IInterpreterV2,
     Operand,
     SourceIndexV2,
-    FullyQualifiedNamespace
+    FullyQualifiedNamespace,
+    IInterpreterStoreV2
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
@@ -53,7 +53,7 @@ contract LibOpLessThanNPTest is OpTest {
     /// Both inputs are 0.
     function testOpLessThanNPEval2ZeroInputs() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: less-than(0 0);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -73,7 +73,7 @@ contract LibOpLessThanNPTest is OpTest {
     /// The first input is 0, the second input is 1.
     function testOpLessThanNPEval2InputsFirstZeroSecondOne() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: less-than(0 1);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -93,7 +93,7 @@ contract LibOpLessThanNPTest is OpTest {
     /// The first input is 1, the second input is 0.
     function testOpLessThanNPEval2InputsFirstOneSecondZero() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: less-than(1 0);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -113,7 +113,7 @@ contract LibOpLessThanNPTest is OpTest {
     /// Both inputs are 1.
     function testOpLessThanNPEval2InputsBothOne() external {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: less-than(1 1);");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
             storeDeployer,
@@ -133,7 +133,7 @@ contract LibOpLessThanNPTest is OpTest {
     function testOpLessThanToNPEvalFail0Inputs() public {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: less-than();");
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (interpreterDeployer, storeDeployer, expression, io);
     }
@@ -142,7 +142,7 @@ contract LibOpLessThanNPTest is OpTest {
     function testOpLessThanToNPEvalFail1Input() public {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: less-than(0x00);");
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 2, 1));
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (io);
         (interpreterDeployer, storeDeployer, expression, io);
@@ -152,7 +152,7 @@ contract LibOpLessThanNPTest is OpTest {
     function testOpLessThanToNPEvalFail3Inputs() public {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: less-than(0x00 0x00 0x00);");
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV1 storeDeployer, address expression, bytes memory io) =
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
         (interpreterDeployer, storeDeployer, expression, io);
     }
