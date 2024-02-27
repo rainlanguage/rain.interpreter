@@ -4,7 +4,8 @@ pragma solidity ^0.8.18;
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {
-    FullyQualifiedNamespace, IInterpreterStoreV2
+    FullyQualifiedNamespace,
+    IInterpreterStoreV2
 } from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
 
 address constant STACK_TRACER = address(uint160(uint256(keccak256("rain.interpreter.stack-tracer.0"))));

@@ -14,7 +14,8 @@ import {
     IInterpreterV2, Operand, SourceIndexV2
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {
-    IInterpreterStoreV2, FullyQualifiedNamespace
+    IInterpreterStoreV2,
+    FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
