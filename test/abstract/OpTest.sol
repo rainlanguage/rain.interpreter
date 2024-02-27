@@ -15,9 +15,13 @@ import {IntegrityCheckStateNP, LibIntegrityCheckNP} from "../../src/lib/integrit
 import {LibContext} from "../../src/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "../../src/error/ErrParse.sol";
 import {BadOpInputsLength, BadOpOutputsLength} from "../../src/lib/integrity/LibIntegrityCheckNP.sol";
-import {Operand, IInterpreterV2, SourceIndexV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {
-    IInterpreterStoreV1, FullyQualifiedNamespace, StateNamespace
+    Operand, IInterpreterV2, SourceIndexV2
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {
+    IInterpreterStoreV1,
+    FullyQualifiedNamespace,
+    StateNamespace
 } from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "../../src/lib/caller/LibEncodedDispatch.sol";

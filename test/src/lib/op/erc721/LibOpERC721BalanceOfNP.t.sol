@@ -6,7 +6,10 @@ import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibInt
 import {LibOpERC721BalanceOfNP} from "src/lib/op/erc721/LibOpERC721BalanceOfNP.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import {
-    IInterpreterV2, FullyQualifiedNamespace, Operand, SourceIndexV2
+    IInterpreterV2,
+    FullyQualifiedNamespace,
+    Operand,
+    SourceIndexV2
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";

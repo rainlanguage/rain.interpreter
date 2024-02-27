@@ -6,7 +6,10 @@ import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibOpCtPopNP} from "src/lib/op/bitwise/LibOpCtPopNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {
-    IInterpreterV2, FullyQualifiedNamespace, Operand, SourceIndexV2
+    IInterpreterV2,
+    FullyQualifiedNamespace,
+    Operand,
+    SourceIndexV2
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";

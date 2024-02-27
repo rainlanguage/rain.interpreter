@@ -9,7 +9,10 @@ import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
 import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterExternV3, ExternDispatch} from "rain.interpreter.interface/interface/unstable/IInterpreterExternV3.sol";
+import {
+    IInterpreterExternV3,
+    ExternDispatch
+} from "rain.interpreter.interface/interface/unstable/IInterpreterExternV3.sol";
 
 /// @dev Empty opcode function pointers constant. Inheriting contracts should
 /// create their own constant and override `opcodeFunctionPointers` to use

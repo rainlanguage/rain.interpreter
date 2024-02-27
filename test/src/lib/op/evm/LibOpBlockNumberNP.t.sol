@@ -5,7 +5,10 @@ import {OpTest} from "test/abstract/OpTest.sol";
 
 import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {
-    IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace
+    IInterpreterV2,
+    Operand,
+    SourceIndexV2,
+    FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {IMetaV1} from "rain.metadata/interface/IMetaV1.sol";

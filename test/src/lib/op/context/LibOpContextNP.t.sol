@@ -7,7 +7,10 @@ import {LibOpContextNP} from "src/lib/op/context/LibOpContextNP.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
-    IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace
+    IInterpreterV2,
+    Operand,
+    SourceIndexV2,
+    FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";

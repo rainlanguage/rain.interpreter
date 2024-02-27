@@ -5,7 +5,10 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {LibOpMaxUint256NP} from "src/lib/op/evm/LibOpMaxUint256NP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
-    IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace
+    IInterpreterV2,
+    Operand,
+    SourceIndexV2,
+    FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {InterpreterStateNP, LibInterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";

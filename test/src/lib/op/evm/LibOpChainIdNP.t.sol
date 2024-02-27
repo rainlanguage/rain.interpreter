@@ -15,7 +15,9 @@ import {LibOpChainIdNP} from "src/lib/op/evm/LibOpChainIdNP.sol";
 import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
 import {RainterpreterStoreNPE2, FullyQualifiedNamespace} from "src/concrete/RainterpreterStoreNPE2.sol";
 import {RainterpreterExpressionDeployerNPE2} from "src/concrete/RainterpreterExpressionDeployerNPE2.sol";
-import {Operand, IInterpreterV2, SourceIndexV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {
+    Operand, IInterpreterV2, SourceIndexV2
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";

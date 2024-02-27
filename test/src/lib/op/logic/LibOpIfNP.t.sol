@@ -6,7 +6,10 @@ import {LibContext} from "src/lib/caller/LibContext.sol";
 import {LibOpIfNP} from "src/lib/op/logic/LibOpIfNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
-    IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace
+    IInterpreterV2,
+    Operand,
+    SourceIndexV2,
+    FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";

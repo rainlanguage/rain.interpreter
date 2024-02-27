@@ -6,7 +6,10 @@ import {LibContext} from "src/lib/caller/LibContext.sol";
 import {LibOpLessThanNP} from "src/lib/op/logic/LibOpLessThanNP.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {
-    IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace
+    IInterpreterV2,
+    Operand,
+    SourceIndexV2,
+    FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
