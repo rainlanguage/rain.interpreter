@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import {Operand} from "../../../../interface/unstable/IInterpreterV2.sol";
+import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {LibSubParse} from "../../../parse/LibSubParse.sol";
-import {IInterpreterExternV3} from "../../../../interface/unstable/IInterpreterExternV3.sol";
+import {IInterpreterExternV3} from "rain.interpreter.interface/interface/unstable/IInterpreterExternV3.sol";
 
 /// @dev Opcode index of the extern increment opcode. Needs to be manually kept
 /// in sync with the extern opcode function pointers. Definitely write tests for

@@ -20,8 +20,8 @@ import {
     StateNamespace,
     EncodedDispatch,
     FullyQualifiedNamespace
-} from "../interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1} from "../interface/IInterpreterStoreV1.sol";
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
 
 /// @dev Hash of the known interpreter bytecode.
 bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xbdc3b8364573bdaeb6b287500497797ccf53be54baaac4fb7ba52941815e5e70);

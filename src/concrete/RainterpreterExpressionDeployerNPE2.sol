@@ -18,10 +18,10 @@ import {
 import {
     IExpressionDeployerV3,
     IERC1820_NAME_IEXPRESSION_DEPLOYER_V3
-} from "../interface/unstable/IExpressionDeployerV3.sol";
-import {IParserV1} from "../interface/IParserV1.sol";
-import {IInterpreterV2} from "../interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1} from "../interface/IInterpreterStoreV1.sol";
+} from "rain.interpreter.interface/interface/unstable/IExpressionDeployerV3.sol";
+import {IParserV1} from "rain.interpreter.interface/interface/IParserV1.sol";
+import {IInterpreterV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
 
 import {LibIntegrityCheckNP} from "../lib/integrity/LibIntegrityCheckNP.sol";
 import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
