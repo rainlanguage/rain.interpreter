@@ -4,8 +4,8 @@ pragma solidity =0.8.19;
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {
     IInterpreterV2, FullyQualifiedNamespace, Operand, SourceIndexV2
-} from "src/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
 import {BytecodeTest} from "test/abstract/BytecodeTest.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";

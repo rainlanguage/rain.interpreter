@@ -7,7 +7,7 @@ import {Test, console2, stdError} from "forge-std/Test.sol";
 import {INVALID_BYTECODE} from "../lib/etch/LibEtch.sol";
 import {EXPRESSION_DEPLOYER_NP_META_PATH} from "../lib/constants/ExpressionDeployerNPConstants.sol";
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
-import {AuthoringMetaV2} from "src/interface/IParserV1.sol";
+import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV1.sol";
 import {RainterpreterStoreNPE2, STORE_BYTECODE_HASH} from "src/concrete/RainterpreterStoreNPE2.sol";
 import {
     RainterpreterParserNPE2,

@@ -2,10 +2,10 @@
 pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
-import {IExpressionDeployerV3} from "src/interface/unstable/IExpressionDeployerV3.sol";
+import {IExpressionDeployerV3} from "rain.interpreter.interface/interface/unstable/IExpressionDeployerV3.sol";
 import {LibDeployerDiscoverable} from "src/lib/caller/LibDeployerDiscoverable.sol";
-import {IInterpreterV2} from "src/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
+import {IInterpreterV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
 
 contract TestDeployerV3 is IExpressionDeployerV3 {
     function deployExpression2(bytes memory, uint256[] memory)

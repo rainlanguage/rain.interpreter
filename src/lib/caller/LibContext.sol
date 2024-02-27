@@ -7,7 +7,7 @@ import "rain.lib.hash/LibHashNoAlloc.sol";
 import {SignatureChecker} from "openzeppelin-contracts/contracts/utils/cryptography/SignatureChecker.sol";
 import {ECDSA} from "openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol";
 
-import "../../interface/IInterpreterCallerV2.sol";
+import "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 
 /// Thrown when the ith signature from a list of signed contexts is invalid.
 error InvalidSignature(uint256 i);

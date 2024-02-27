@@ -2,11 +2,11 @@
 pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
-import {EvaluableV2} from "src/interface/IInterpreterCallerV2.sol";
+import {EvaluableV2} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibEvaluable} from "src/lib/caller/LibEvaluable.sol";
 import {LibEvaluableSlow} from "./LibEvaluableSlow.sol";
-import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
-import {IInterpreterV2} from "src/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
+import {IInterpreterV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 
 contract LibEvaluableTest is Test {
     using LibEvaluable for EvaluableV2;

@@ -7,9 +7,9 @@ import {LibOpCtPopNP} from "src/lib/op/bitwise/LibOpCtPopNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {
     IInterpreterV2, FullyQualifiedNamespace, Operand, SourceIndexV2
-} from "src/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
-import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibCtPop} from "src/lib/bitwise/LibCtPop.sol";

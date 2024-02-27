@@ -13,12 +13,12 @@ import {
     ExternDispatch,
     EncodedExternDispatch,
     IInterpreterExternV3
-} from "src/interface/unstable/IInterpreterExternV3.sol";
-import {Operand} from "src/interface/unstable/IInterpreterV2.sol";
+} from "rain.interpreter.interface/interface/unstable/IInterpreterExternV3.sol";
+import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
-import {COMPATIBLITY_V3} from "src/interface/unstable/ISubParserV2.sol";
-import {OPCODE_EXTERN} from "src/interface/unstable/IInterpreterV2.sol";
+import {COMPATIBLITY_V3} from "rain.interpreter.interface/interface/unstable/ISubParserV2.sol";
+import {OPCODE_EXTERN} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {ExternDispatchConstantsHeightOverflow} from "src/error/ErrSubParse.sol";
 
 contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {

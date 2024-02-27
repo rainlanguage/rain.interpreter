@@ -4,7 +4,7 @@ pragma solidity =0.8.19;
 import {Test} from "forge-std/Test.sol";
 
 import {ExpectedOperand, UnclosedOperand} from "src/error/ErrParse.sol";
-import {AuthoringMetaV2} from "src/interface/IParserV1.sol";
+import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV1.sol";
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 import {LibParse, DuplicateLHSItem, WordSize} from "src/lib/parse/LibParse.sol";
 import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";

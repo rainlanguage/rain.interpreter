@@ -3,7 +3,7 @@ pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 
-import {AuthoringMetaV2} from "src/interface/IParserV1.sol";
+import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV1.sol";
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibBloom} from "test/lib/bloom/LibBloom.sol";

@@ -24,7 +24,7 @@ import {LibCtPop} from "../bitwise/LibCtPop.sol";
 import {LibParseMeta} from "./LibParseMeta.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 import {LibParseOperand} from "./LibParseOperand.sol";
-import {Operand, OPCODE_STACK, OPCODE_UNKNOWN} from "../../interface/unstable/IInterpreterV2.sol";
+import {Operand, OPCODE_STACK, OPCODE_UNKNOWN} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 import {LibParseStackName} from "./LibParseStackName.sol";
 import {
     ExcessLHSItems,

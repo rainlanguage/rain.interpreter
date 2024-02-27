@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {StateNamespace, FullyQualifiedNamespace} from "../../interface/unstable/IInterpreterV2.sol";
+import {StateNamespace, FullyQualifiedNamespace} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 
 library LibNamespace {
     /// Standard way to elevate a caller-provided state namespace to a universal

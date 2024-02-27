@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {IExpressionDeployerV3} from "../../interface/unstable/IExpressionDeployerV3.sol";
-import {IInterpreterStoreV1} from "../../interface/IInterpreterStoreV1.sol";
-import {IInterpreterV2} from "../../interface/unstable/IInterpreterV2.sol";
+import {IExpressionDeployerV3} from "rain.interpreter.interface/interface/unstable/IExpressionDeployerV3.sol";
+import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
+import {IInterpreterV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 
 library LibDeployerDiscoverable {
     /// Hack so that some deployer will emit an event with the sender as the

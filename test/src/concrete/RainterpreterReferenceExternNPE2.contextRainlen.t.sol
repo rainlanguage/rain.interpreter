@@ -4,7 +4,7 @@ pragma solidity =0.8.19;
 import {OpTest} from "test/abstract/OpTest.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {RainterpreterReferenceExternNPE2} from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
-import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibContext} from "src/lib/caller/LibContext.sol";
 
 contract RainterpreterReferenceExternNPE2ContextRainlenTest is OpTest {

@@ -7,7 +7,7 @@ import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC
 
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibMemoryKV, MemoryKV, MemoryKVVal, MemoryKVKey} from "rain.lib.memkv/lib/LibMemoryKV.sol";
-import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
+import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
 import {LibNamespace, StateNamespace} from "src/lib/ns/LibNamespace.sol";
 import {RainterpreterStoreNPE2, OddSetLength} from "src/concrete/RainterpreterStoreNPE2.sol";
 

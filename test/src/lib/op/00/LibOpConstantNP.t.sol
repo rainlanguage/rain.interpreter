@@ -10,9 +10,9 @@ import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterp
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
     IInterpreterV2, Operand, SourceIndexV2, FullyQualifiedNamespace
-} from "src/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1} from "src/interface/IInterpreterStoreV1.sol";
-import {SignedContextV1} from "src/interface/IInterpreterCallerV2.sol";
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterStoreV1} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {BadOpOutputsLength} from "src/error/ErrIntegrity.sol";
