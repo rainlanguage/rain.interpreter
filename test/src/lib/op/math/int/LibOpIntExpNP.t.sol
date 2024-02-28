@@ -6,12 +6,12 @@ import {stdError} from "forge-std/Test.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {LibContext} from "src/lib/caller/LibContext.sol";
+import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOpIntExpNP} from "src/lib/op/math/int/LibOpIntExpNP.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpIntExpNPTest is OpTest {

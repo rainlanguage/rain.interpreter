@@ -25,7 +25,7 @@ import {
     RainterpreterExpressionDeployerNPE2
 } from "../../src/concrete/RainterpreterExpressionDeployerNPE2.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
-import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
+import {LibEncodedDispatch} from "rain.interpreter.interface/lib/caller/LibEncodedDispatch.sol";
 
 /// @title RainterpreterExpressionDeployerNPD2DeploymentTest
 /// Tests that the RainterpreterExpressionDeployerNPE2 meta is correct. Also

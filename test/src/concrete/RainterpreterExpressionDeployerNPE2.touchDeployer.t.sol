@@ -3,10 +3,10 @@ pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 
-import {LibDeployerDiscoverable} from "src/lib/caller/LibDeployerDiscoverable.sol";
+import {LibDeployerDiscoverable} from "rain.interpreter.interface/lib/caller/LibDeployerDiscoverable.sol";
 import {RainterpreterExpressionDeployerNPE2DeploymentTest} from
     "test/abstract/RainterpreterExpressionDeployerNPE2DeploymentTest.sol";
-import {IExpressionDeployerV3} from "rain.interpreter.interface/interface/unstable/IExpressionDeployerV3.sol";
+import {IExpressionDeployerV3} from "rain.interpreter.interface/interface/IExpressionDeployerV3.sol";
 
 contract RainterpreterExpressionDeployerNPE2TouchDeployer is RainterpreterExpressionDeployerNPE2DeploymentTest {
     /// MUST be possible to test a real deployer with 0 data to support discovery.

@@ -2,7 +2,7 @@
 pragma solidity =0.8.19;
 
 import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {LibContext} from "src/lib/caller/LibContext.sol";
+import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {ExcessRHSItems} from "src/lib/parse/LibParse.sol";
 import {LibOpEnsureNP} from "src/lib/op/logic/LibOpEnsureNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
@@ -11,7 +11,7 @@ import {
     Operand,
     SourceIndexV2,
     FullyQualifiedNamespace
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {LibIntOrAString, IntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";

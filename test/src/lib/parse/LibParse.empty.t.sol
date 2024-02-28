@@ -4,7 +4,7 @@ pragma solidity =0.8.19;
 import {Test} from "forge-std/Test.sol";
 
 import {LibParse} from "src/lib/parse/LibParse.sol";
-import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
+import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
 import {MaxSources} from "src/error/ErrParse.sol";

@@ -4,7 +4,7 @@ pragma solidity =0.8.19;
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
 import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {LibContext} from "src/lib/caller/LibContext.sol";
+import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibOpConditionsNP} from "src/lib/op/logic/LibOpConditionsNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
@@ -13,10 +13,10 @@ import {
     Operand,
     SourceIndexV2,
     FullyQualifiedNamespace
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
+} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
+import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
-import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
+import {LibEncodedDispatch} from "rain.interpreter.interface/lib/caller/LibEncodedDispatch.sol";
 import {LibIntOrAString, IntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 

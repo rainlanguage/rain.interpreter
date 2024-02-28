@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {LibSubParse} from "../../../parse/LibSubParse.sol";
-import {IInterpreterExternV3} from "rain.interpreter.interface/interface/unstable/IInterpreterExternV3.sol";
-import {CONTEXT_BASE_COLUMN, CONTEXT_BASE_ROW_CALLING_CONTRACT} from "../../../caller/LibContext.sol";
+import {IInterpreterExternV3} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
+import {
+    CONTEXT_BASE_COLUMN,
+    CONTEXT_BASE_ROW_CALLING_CONTRACT
+} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 
 /// @title LibExternOpContextCallingContractNPE2
 /// This op is a simple reference to the contract that called the interpreter.

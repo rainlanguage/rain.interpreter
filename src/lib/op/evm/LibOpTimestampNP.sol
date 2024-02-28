@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {InterpreterStateNP, LibInterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 

@@ -3,7 +3,7 @@ pragma solidity =0.8.19;
 
 import {Test} from "forge-std/Test.sol";
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
-import {IInterpreterExternV3} from "rain.interpreter.interface/interface/unstable/IInterpreterExternV3.sol";
+import {IInterpreterExternV3} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
 import {BaseRainterpreterExternNPE2} from "src/abstract/BaseRainterpreterExternNPE2.sol";
 
 /// @dev We need a contract that is deployable in order to test the abstract

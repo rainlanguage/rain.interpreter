@@ -2,21 +2,18 @@
 pragma solidity =0.8.19;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
+import {LibEncodedDispatch} from "rain.interpreter.interface/lib/caller/LibEncodedDispatch.sol";
 import {Pointer, LibPointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {LibInterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {
-    IInterpreterV2, Operand, SourceIndexV2
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {IInterpreterV2, Operand, SourceIndexV2} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
-    IInterpreterStoreV2,
-    FullyQualifiedNamespace
-} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
+    IInterpreterStoreV2, FullyQualifiedNamespace
+} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
-import {LibContext} from "src/lib/caller/LibContext.sol";
+import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 
 import {LibOpTimestampNP} from "src/lib/op/evm/LibOpTimestampNP.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";

@@ -11,10 +11,10 @@ import {
     BadOpInputsLength,
     BadOpOutputsLength
 } from "../../error/ErrIntegrity.sol";
-import {IInterpreterV2, SourceIndexV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
-import {LibBytecode} from "../../lib/bytecode/LibBytecode.sol";
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
-import {IInterpreterStoreV1, StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV1.sol";
+import {IInterpreterV2, SourceIndexV2} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
+import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
+import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
+import {IInterpreterStoreV2, StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {BadOpInputsLength} from "../../lib/integrity/LibIntegrityCheckNP.sol";
 
 struct IntegrityCheckStateNP {

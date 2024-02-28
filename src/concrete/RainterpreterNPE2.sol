@@ -11,7 +11,7 @@ import {LibDataContract} from "rain.datacontract/lib/LibDataContract.sol";
 
 import {LibEvalNP} from "../lib/eval/LibEvalNP.sol";
 import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
-import {LibEncodedDispatch} from "../lib/caller/LibEncodedDispatch.sol";
+import {LibEncodedDispatch} from "rain.interpreter.interface/lib/caller/LibEncodedDispatch.sol";
 import {InterpreterStateNP} from "../lib/state/LibInterpreterStateNP.sol";
 import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
 import {
@@ -21,7 +21,7 @@ import {
     EncodedDispatch,
     FullyQualifiedNamespace,
     IInterpreterStoreV2
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 
 /// @dev Hash of the known interpreter bytecode.
 bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xbdc3b8364573bdaeb6b287500497797ccf53be54baaac4fb7ba52941815e5e70);

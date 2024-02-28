@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {LibCtPop} from "../bitwise/LibCtPop.sol";
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {LibParseOperand} from "./LibParseOperand.sol";
 import {ParseState} from "./LibParseState.sol";
 import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV1.sol";

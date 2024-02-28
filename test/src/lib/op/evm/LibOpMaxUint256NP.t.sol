@@ -9,11 +9,11 @@ import {
     Operand,
     SourceIndexV2,
     FullyQualifiedNamespace
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {InterpreterStateNP, LibInterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {LibContext} from "src/lib/caller/LibContext.sol";
-import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
-import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
+import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
+import {LibEncodedDispatch} from "rain.interpreter.interface/lib/caller/LibEncodedDispatch.sol";
+import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
