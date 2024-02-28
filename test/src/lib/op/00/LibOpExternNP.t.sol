@@ -6,14 +6,14 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {NotAnExternContract} from "src/error/ErrExtern.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {LibOpExternNP} from "src/lib/op/00/LibOpExternNP.sol";
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {
     EncodedExternDispatch,
     IInterpreterExternV3,
     ExternDispatch
-} from "rain.interpreter.interface/interface/unstable/IInterpreterExternV3.sol";
+} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";

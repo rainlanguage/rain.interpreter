@@ -5,17 +5,14 @@ import {Test} from "forge-std/Test.sol";
 import {UnexpectedMetaHash, META_MAGIC_NUMBER_V1, NotRainMetaV1} from "rain.metadata/interface/IMetaV1.sol";
 import {LibMeta} from "rain.metadata/lib/LibMeta.sol";
 
-import {
-    IExpressionDeployerV3,
-    IInterpreterV2
-} from "rain.interpreter.interface/interface/unstable/IExpressionDeployerV3.sol";
+import {IExpressionDeployerV3, IInterpreterV2} from "rain.interpreter.interface/interface/IExpressionDeployerV3.sol";
 import {
     DeployerDiscoverableMetaV3,
     DeployerDiscoverableMetaV3ConstructionConfig
 } from "src/abstract/DeployerDiscoverableMetaV3.sol";
 import {RainterpreterExpressionDeployerNPE2DeploymentTest} from
     "../../abstract/RainterpreterExpressionDeployerNPE2DeploymentTest.sol";
-import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
+import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 
 contract TestDeployer is IExpressionDeployerV3 {
     function deployExpression2(bytes memory, uint256[] memory)

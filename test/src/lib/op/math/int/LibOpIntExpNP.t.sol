@@ -11,7 +11,7 @@ import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOpIntExpNP} from "src/lib/op/math/int/LibOpIntExpNP.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpIntExpNPTest is OpTest {

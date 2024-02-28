@@ -11,7 +11,7 @@ import {
     SourceIndexV2,
     FullyQualifiedNamespace,
     IInterpreterStoreV2
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
