@@ -2,9 +2,9 @@
 pragma solidity =0.8.19;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {LibContext} from "src/lib/caller/LibContext.sol";
+import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibOpLessThanNP} from "src/lib/op/logic/LibOpLessThanNP.sol";
-import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
+import {LibEncodedDispatch} from "rain.interpreter.interface/lib/caller/LibEncodedDispatch.sol";
 import {
     IInterpreterV2,
     Operand,

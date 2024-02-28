@@ -11,7 +11,7 @@ import {LibDataContract} from "rain.datacontract/lib/LibDataContract.sol";
 
 import {LibEvalNP} from "../lib/eval/LibEvalNP.sol";
 import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
-import {LibEncodedDispatch} from "../lib/caller/LibEncodedDispatch.sol";
+import {LibEncodedDispatch} from "rain.interpreter.interface/lib/caller/LibEncodedDispatch.sol";
 import {InterpreterStateNP} from "../lib/state/LibInterpreterStateNP.sol";
 import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
 import {

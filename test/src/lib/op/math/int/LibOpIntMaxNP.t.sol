@@ -4,7 +4,7 @@ pragma solidity =0.8.19;
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {LibContext} from "src/lib/caller/LibContext.sol";
+import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOpIntMaxNP} from "src/lib/op/math/int/LibOpIntMaxNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";

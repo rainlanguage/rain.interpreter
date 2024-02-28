@@ -7,7 +7,7 @@ import {ExpectedOperand, UnclosedOperand} from "src/error/ErrParse.sol";
 import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV1.sol";
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 import {LibParse, DuplicateLHSItem, WordSize} from "src/lib/parse/LibParse.sol";
-import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
+import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";

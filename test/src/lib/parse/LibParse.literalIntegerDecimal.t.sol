@@ -6,7 +6,7 @@ import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 
 import {DecimalLiteralOverflow} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibParse, UnexpectedRHSChar, UnexpectedRightParen} from "src/lib/parse/LibParse.sol";
-import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
+import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseLiteralIntegerDecimalTest

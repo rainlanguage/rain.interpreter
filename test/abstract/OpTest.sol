@@ -12,7 +12,7 @@ import {RainterpreterExpressionDeployerNPE2DeploymentTest} from
 import {LibInterpreterStateNP, InterpreterStateNP} from "../../src/lib/state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP, LibIntegrityCheckNP} from "../../src/lib/integrity/LibIntegrityCheckNP.sol";
 
-import {LibContext} from "../../src/lib/caller/LibContext.sol";
+import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "../../src/error/ErrParse.sol";
 import {BadOpInputsLength, BadOpOutputsLength} from "../../src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
@@ -26,7 +26,7 @@ import {
     StateNamespace
 } from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
-import {LibEncodedDispatch} from "../../src/lib/caller/LibEncodedDispatch.sol";
+import {LibEncodedDispatch} from "rain.interpreter.interface/lib/caller/LibEncodedDispatch.sol";
 import {LibNamespace} from "../../src/lib/ns/LibNamespace.sol";
 
 uint256 constant PRE = uint256(keccak256(abi.encodePacked("pre")));

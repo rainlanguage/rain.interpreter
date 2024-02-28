@@ -2,7 +2,7 @@
 pragma solidity =0.8.19;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, stdError} from "test/abstract/OpTest.sol";
-import {LibContext} from "src/lib/caller/LibContext.sol";
+import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOpIntDivNP} from "src/lib/op/math/int/LibOpIntDivNP.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
