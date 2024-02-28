@@ -3,7 +3,7 @@ pragma solidity =0.8.19;
 
 import "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
-import "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
+import "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import "rain.interpreter.interface/lib/ns/LibNamespace.sol";
 
 /// Thrown when a `set` call is made with an odd number of arguments.

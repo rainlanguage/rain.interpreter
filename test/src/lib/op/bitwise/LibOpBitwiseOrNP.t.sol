@@ -3,7 +3,7 @@ pragma solidity =0.8.19;
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
+import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {LibOpBitwiseOrNP} from "src/lib/op/bitwise/LibOpBitwiseOrNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
