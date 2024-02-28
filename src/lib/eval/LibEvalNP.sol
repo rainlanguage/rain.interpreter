@@ -5,7 +5,7 @@ import {LibInterpreterStateNP, InterpreterStateNP} from "../state/LibInterpreter
 
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibMemoryKV, MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
-import {LibBytecode} from "../bytecode/LibBytecode.sol";
+import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
 

@@ -5,7 +5,7 @@ import {Operand} from "rain.interpreter.interface/interface/unstable/IInterprete
 import {LibInterpreterStateNP, InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 import {Pointer, LibPointer} from "rain.solmem/lib/LibPointer.sol";
-import {LibBytecode} from "../../bytecode/LibBytecode.sol";
+import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {LibEvalNP} from "../../eval/LibEvalNP.sol";
 
 /// Thrown when the outputs requested by the operand exceed the outputs

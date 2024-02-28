@@ -6,8 +6,8 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {
     IInterpreterV2, Operand, SourceIndexV2
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV2.sol";
-import {LibContext} from "src/lib/caller/LibContext.sol";
-import {LibBytecode} from "src/lib/bytecode/LibBytecode.sol";
+import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
+import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {OutOfBoundsStackRead, LibOpStackNP} from "src/lib/op/00/LibOpStackNP.sol";
 import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
@@ -17,7 +17,7 @@ import {
 } from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV2.sol";
 import {OpTest, PRE, POST} from "test/abstract/OpTest.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
-import {LibEncodedDispatch} from "src/lib/caller/LibEncodedDispatch.sol";
+import {LibEncodedDispatch} from "rain.interpreter.interface/lib/caller/LibEncodedDispatch.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {BadOpOutputsLength} from "src/error/ErrIntegrity.sol";
 
