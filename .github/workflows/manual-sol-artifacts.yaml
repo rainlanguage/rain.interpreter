@@ -10,6 +10,7 @@ on:
           - polygon
           - songbird
           - flare
+          - base
 
 jobs:
   deploy:
@@ -31,7 +32,7 @@ jobs:
       - name: deploy to ${{ inputs.network }}
         run: nix develop --command rainix-sol-artifacts
         env:
-          ETH_RPC_URL: ${{ inputs.network == 'polygon' && secrets.CI_DEPLOY_POLYGON_RPC_URL || inputs.network == 'songbird' && secrets.CI_DEPLOY_SONGBIRD_RPC_URL || inputs.network == 'flare' && secrets.CI_DEPLOY_FLARE_RPC_URL || '' }}
+          ETH_RPC_URL: ${{ inputs.network == 'polygon' && secrets.CI_DEPLOY_POLYGON_RPC_URL || inputs.network == 'songbird' && secrets.CI_DEPLOY_SONGBIRD_RPC_URL || inputs.network == 'flare' && secrets.CI_DEPLOY_FLARE_RPC_URL ||  inputs.network == 'base' && secrets.CI_DEPLOY_BASE_RPC_URL || '' }}
           # Flare has hardcoded api key https://flarescan.com/documentation/recipes/foundry-verification
           ETHERSCAN_API_KEY: ${{ inputs.network == 'flare' && 'verifyContract' || secrets.EXPLORER_VERIFICATION_KEY }}
           DEPLOY_VERIFIER: ${{ inputs.network == 'songbird' && 'blockscout' || inputs.network == 'polygon' && 'etherscan' || '' }}
