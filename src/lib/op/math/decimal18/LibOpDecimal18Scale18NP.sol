@@ -16,7 +16,7 @@ library LibOpDecimal18Scale18NP {
         return (1, 1);
     }
 
-    /// decimal18-scale18
+    /// decimal18-scale-18
     /// 18 decimal fixed point scaling.
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;

@@ -25,7 +25,7 @@ contract LibBloomTest is Test {
 
     /// With random words the chance of false positives is much higher. Described
     /// by the birthday paradox.
-    function testLibBloomVaguelyAvoidsFalsePositives(uint256 start, uint8 len) external view {
+    function testLibBloomVaguelyAvoidsFalsePositives(uint256 start, uint8 len) external pure {
         start = bound(start, 0, type(uint256).max - len - 1);
         // The ability for the bloom filter to avoid saturation starts to max out
         // around 180 words. This is a very loose bound.
