@@ -55,6 +55,7 @@ import {LibOpLessThanNP} from "./logic/LibOpLessThanNP.sol";
 import {LibOpLessThanOrEqualToNP} from "./logic/LibOpLessThanOrEqualToNP.sol";
 
 import {LibOpDecimal18ExponentialGrowthNP} from "./math/decimal18/growth/LibOpDecimal18ExponentialGrowthNP.sol";
+import {LibOpDecimal18LinearGrowthNP} from "./math/decimal18/growth/LibOpDecimal18LinearGrowthNP.sol";
 import {LibOpDecimal18AvgNP} from "./math/decimal18/LibOpDecimal18AvgNP.sol";
 import {LibOpDecimal18CeilNP} from "./math/decimal18/LibOpDecimal18CeilNP.sol";
 import {LibOpDecimal18MulNP} from "./math/decimal18/LibOpDecimal18MulNP.sol";
@@ -97,7 +98,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 75;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 76;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -192,7 +193,11 @@ library LibAllStandardOpsNP {
             ),
             AuthoringMetaV2(
                 "decimal18-exponential-growth",
-                "Calculates an exponential growth curve as `a(1 + r)^t` where `a` is the initial value, `r` is the rate of growth and `t` is units of time. Inputs in order are `a`, `r`, and `t` respectively as decimal 18 values."
+                "Calculates an exponential growth curve as `base(1 + rate)^t` where `base` is the initial value, `rate` is the rate of growth and `t` is units of time. Inputs in order are `base`, `rate`, and `t` respectively as decimal 18 values."
+            ),
+            AuthoringMetaV2(
+                "decimal18-linear-growth",
+                "Calculates a linear growth curve as `base + (rate * t)` where `base` is the initial value, `rate` is the rate of growth and `t` is units of time. Inputs in order are `base`, `rate`, and `t` respectively as decimal 18 values."
             ),
             AuthoringMetaV2("decimal18-avg", "18 decimal fixed point arithmetic average of two numbers."),
             AuthoringMetaV2("decimal18-ceil", "18 decimal fixed point ceiling of a number."),
@@ -457,6 +462,8 @@ library LibAllStandardOpsNP {
                     LibParseOperand.handleOperandDisallowed,
                     // Decimal18 exponential growth
                     LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 linear growth
+                    LibParseOperand.handleOperandDisallowed,
                     // Decimal18 avg
                     LibParseOperand.handleOperandDisallowed,
                     // Decimal18 ceil
@@ -604,6 +611,7 @@ library LibAllStandardOpsNP {
                     LibOpLessThanNP.integrity,
                     LibOpLessThanOrEqualToNP.integrity,
                     LibOpDecimal18ExponentialGrowthNP.integrity,
+                    LibOpDecimal18LinearGrowthNP.integrity,
                     LibOpDecimal18AvgNP.integrity,
                     LibOpDecimal18CeilNP.integrity,
                     LibOpDecimal18DivNP.integrity,
@@ -730,6 +738,7 @@ library LibAllStandardOpsNP {
                     LibOpLessThanNP.run,
                     LibOpLessThanOrEqualToNP.run,
                     LibOpDecimal18ExponentialGrowthNP.run,
+                    LibOpDecimal18LinearGrowthNP.run,
                     LibOpDecimal18AvgNP.run,
                     LibOpDecimal18CeilNP.run,
                     LibOpDecimal18DivNP.run,
