@@ -73,6 +73,7 @@ import {LibOpDecimal18PowNP} from "./math/decimal18/LibOpDecimal18PowNP.sol";
 import {LibOpDecimal18PowUNP} from "./math/decimal18/LibOpDecimal18PowUNP.sol";
 import {LibOpDecimal18Scale18DynamicNP} from "./math/decimal18/LibOpDecimal18Scale18DynamicNP.sol";
 import {LibOpDecimal18Scale18NP} from "./math/decimal18/LibOpDecimal18Scale18NP.sol";
+import {LibOpDecimal18ScaleNDynamicNP} from "./math/decimal18/LibOpDecimal18ScaleNDynamicNP.sol";
 import {LibOpDecimal18ScaleNNP} from "./math/decimal18/LibOpDecimal18ScaleNNP.sol";
 import {LibOpDecimal18SnapToUnitNP} from "./math/decimal18/LibOpDecimal18SnapToUnitNP.sol";
 import {LibOpDecimal18SqrtNP} from "./math/decimal18/LibOpDecimal18SqrtNP.sol";
@@ -96,7 +97,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 74;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 75;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -246,16 +247,20 @@ library LibAllStandardOpsNP {
                 "Raises the first input as a fixed point 18 decimal value to the power of the second input as an integer."
             ),
             AuthoringMetaV2(
-                "decimal18-scale18-dynamic",
-                "Scales a value from some fixed point decimal scale to 18 decimal fixed point. The first input is the scale to scale from and the second is the value to scale. The two optional operands control rounding and saturation respectively as per `decimal18-scale18`."
+                "decimal18-scale-18-dynamic",
+                "Scales a value from some fixed point decimal scale to 18 decimal fixed point. The first input is the scale to scale from and the second is the value to scale. The two optional operands control rounding and saturation respectively as per `decimal18-scale-18`."
             ),
             AuthoringMetaV2(
-                "decimal18-scale18",
+                "decimal18-scale-18",
                 "Scales an input value from some fixed point decimal scale to 18 decimal fixed point. The first operand is the scale to scale from. The second (optional) operand controls rounding where 0 (default) rounds down and 1 rounds up. The third (optional) operand controls saturation where 0 (default) errors on overflow and 1 saturates at max-decimal-value."
             ),
             AuthoringMetaV2(
                 "int-to-decimal18",
-                "Scales an integer value to 18 decimal fixed point, E.g. 1 becomes 1e18 and 10 becomes 1e19. Identical to `decimal18-scale18` with an input scale of 0, but perhaps more legible. Does NOT support saturation."
+                "Scales an integer value to 18 decimal fixed point, E.g. 1 becomes 1e18 and 10 becomes 1e19. Identical to `decimal18-scale-18` with an input scale of 0, but perhaps more legible. Does NOT support saturation."
+            ),
+            AuthoringMetaV2(
+                "decimal18-scale-n-dynamic",
+                "Scales an input value from 18 decimal fixed point to some other fixed point scale N. The first input is the scale to scale to and the second is the value to scale. The two optional operand controls rounding and saturation respectively as per `decimal18-scale-n`."
             ),
             AuthoringMetaV2(
                 "decimal18-scale-n",
@@ -490,6 +495,8 @@ library LibAllStandardOpsNP {
                     LibParseOperand.handleOperand8M1M1,
                     // Int to decimal18
                     LibParseOperand.handleOperandDisallowed,
+                    // Decimal18 scale n dynamic
+                    LibParseOperand.handleOperandM1M1,
                     // Decimal18 scale n
                     LibParseOperand.handleOperand8M1M1,
                     // Decimal18 snap to unit
@@ -617,6 +624,7 @@ library LibAllStandardOpsNP {
                     LibOpDecimal18Scale18NP.integrity,
                     // Int to decimal18 is a repeat of decimal18 scale18.
                     LibOpDecimal18Scale18NP.integrity,
+                    LibOpDecimal18ScaleNDynamicNP.integrity,
                     LibOpDecimal18ScaleNNP.integrity,
                     LibOpDecimal18SnapToUnitNP.integrity,
                     LibOpDecimal18SqrtNP.integrity,
@@ -742,6 +750,7 @@ library LibAllStandardOpsNP {
                     LibOpDecimal18Scale18NP.run,
                     // Int to decimal18 is a repeat of decimal18 scale18.
                     LibOpDecimal18Scale18NP.run,
+                    LibOpDecimal18ScaleNDynamicNP.run,
                     LibOpDecimal18ScaleNNP.run,
                     LibOpDecimal18SnapToUnitNP.run,
                     LibOpDecimal18SqrtNP.run,
