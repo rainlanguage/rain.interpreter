@@ -14,7 +14,7 @@ serde_json = "1.0.111"
 tokio = { version = "1.28.0", features = ["full"] }
 alloy-primitives = {workspace = true}
 alloy-sol-types = { version = "0.5.4" }
-ethers = { git = "https://github.com/gakonst/ethers-rs.git", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107", features = [
+ethers = { version = "2.0.14", features = [
   "legacy",
 ] }
 tracing = "0.1.37"

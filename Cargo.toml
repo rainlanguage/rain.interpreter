@@ -14,8 +14,8 @@ alloy-dyn-abi = "0.5.4"
 alloy-sol-types = { version = "0.5.4", features = ["json"] }
 anyhow = "1.0.70"
 clap = { version = "4.2.5", features = ["cargo", "derive"] }
-ethers = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107", default-features = false }
-foundry-evm = { git = "https://github.com/foundry-rs/foundry", rev = "a5efe4f8f425e2f6fb35b0e298f0f46acce11dad" }
+ethers = { git = "https://github.com/gakonst/ethers-rs", version = "2.0.14", default-features = false }
+foundry-evm = { git = "https://github.com/foundry-rs/foundry", rev = "ebb71622b4720908d4b7aa3b82362fbb78984495" }
 revm = { version = "3", default-features = false, features = [
     "std",
     "serde",
@@ -49,15 +49,6 @@ path = "crates/bindings"
 path = "crates/eval"
 
 [patch.crates-io]
-ethers = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
-ethers-core = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
-ethers-contract = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
-ethers-contract-abigen = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
-ethers-providers = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
-ethers-signers = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
-ethers-middleware = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
-ethers-solc = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
-
 revm = { git = "https://github.com/bluealloy/revm", branch = "reth_freeze" }
 revm-primitives = { git = "https://github.com/bluealloy/revm", branch = "reth_freeze" }
 revm-interpreter = { git = "https://github.com/bluealloy/revm", branch = "reth_freeze" }
