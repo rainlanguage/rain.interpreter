@@ -8,10 +8,10 @@ license = "CAL-1.0"
 homepage = "https://github.com/rainprotocol/rain.interpreter"
 
 [workspace.dependencies]
-alloy-primitives = "0.5.4"
-alloy-json-abi = "0.5.4"
-alloy-dyn-abi = "0.5.4"
-alloy-sol-types = { version = "0.5.4", features = ["json"] }
+alloy-primitives = "0.6.3"
+alloy-json-abi = "0.6.3"
+alloy-dyn-abi = "0.6.3"
+alloy-sol-types = { version = "0.6.3", features = ["json"] }
 anyhow = "1.0.70"
 clap = { version = "4.2.5", features = ["cargo", "derive"] }
 ethers = { git = "https://github.com/gakonst/ethers-rs", version = "2.0.14", default-features = false }
