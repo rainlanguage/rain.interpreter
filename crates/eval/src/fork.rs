@@ -8,7 +8,11 @@ use foundry_evm::{
     opts::EvmOpts,
 };
 use revm::{
-    primitives::{Address as Addr, Bytes, Env, EnvWithHandlerCfg, HandlerCfg, HashSet, SpecId, TransactTo, U256 as Uint256}, JournaledState
+    primitives::{
+        Address as Addr, Bytes, Env, EnvWithHandlerCfg, HandlerCfg, HashSet, SpecId, TransactTo,
+        U256 as Uint256,
+    },
+    JournaledState,
 };
 use std::{any::type_name, collections::HashMap};
 
@@ -116,10 +120,7 @@ impl Forker {
         };
 
         let mut forks_map = HashMap::new();
-        forks_map.insert(
-            fork_id,
-            (U256::from(0), SpecId::LATEST, block_number),
-        );
+        forks_map.insert(fork_id, (U256::from(0), SpecId::LATEST, block_number));
         Self {
             executor: builder.build(env.unwrap_or(create_fork.env.clone()), db),
             forks: forks_map,
@@ -186,11 +187,7 @@ impl Forker {
             let mut journaled_state = JournaledState::new(SpecId::LATEST, HashSet::new());
             self.forks.insert(
                 fork_id,
-                (
-                    U256::from(self.forks.len()),
-                    SpecId::LATEST,
-                    block_number,
-                ),
+                (U256::from(self.forks.len()), SpecId::LATEST, block_number),
             );
             let default_env = create_fork.env.clone();
             self.executor
@@ -291,7 +288,8 @@ impl Forker {
         env.tx.caller = Addr::from_slice(from_address);
         env.tx.data = Bytes::copy_from_slice(calldata);
         env.tx.transact_to = TransactTo::Call(Addr::from_slice(to_address));
-        let env_with_handler_cfg = EnvWithHandlerCfg::new(Box::new(env), HandlerCfg::new(SpecId::LATEST));
+        let env_with_handler_cfg =
+            EnvWithHandlerCfg::new(Box::new(env), HandlerCfg::new(SpecId::LATEST));
 
         let result = self
             .executor
