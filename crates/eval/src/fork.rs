@@ -8,8 +8,7 @@ use foundry_evm::{
     opts::EvmOpts,
 };
 use revm::{
-    primitives::{Address as Addr, Bytes, Env, SpecId, TransactTo, U256 as Uint256},
-    JournaledState,
+    primitives::{Address as Addr, Bytes, Env, EnvWithHandlerCfg, HandlerCfg, HashSet, SpecId, TransactTo, U256 as Uint256}, JournaledState
 };
 use std::{any::type_name, collections::HashMap};
 
@@ -106,7 +105,7 @@ impl Forker {
             create_fork.env.block.number
         };
 
-        let db = Backend::spawn(Some(create_fork.clone())).await;
+        let db = Backend::spawn(Some(create_fork.clone()));
 
         let builder = if let Some(gas) = gas_limit {
             ExecutorBuilder::default()
@@ -119,7 +118,7 @@ impl Forker {
         let mut forks_map = HashMap::new();
         forks_map.insert(
             fork_id,
-            (U256::from(0), create_fork.env.cfg.spec_id, block_number),
+            (U256::from(0), SpecId::LATEST, block_number),
         );
         Self {
             executor: builder.build(env.unwrap_or(create_fork.env.clone()), db),
@@ -149,7 +148,7 @@ impl Forker {
             if self.executor.backend.is_active_fork(*local_fork_id) {
                 Ok(())
             } else {
-                let mut journaled_state = JournaledState::new(*spec_id, vec![]);
+                let mut journaled_state = JournaledState::new(*spec_id, HashSet::new());
                 self.executor
                     .backend
                     .select_fork(
@@ -184,12 +183,12 @@ impl Forker {
             } else {
                 create_fork.env.block.number
             };
-            let mut journaled_state = JournaledState::new(create_fork.env.cfg.spec_id, vec![]);
+            let mut journaled_state = JournaledState::new(SpecId::LATEST, HashSet::new());
             self.forks.insert(
                 fork_id,
                 (
                     U256::from(self.forks.len()),
-                    create_fork.env.cfg.spec_id,
+                    SpecId::LATEST,
                     block_number,
                 ),
             );
@@ -292,10 +291,11 @@ impl Forker {
         env.tx.caller = Addr::from_slice(from_address);
         env.tx.data = Bytes::copy_from_slice(calldata);
         env.tx.transact_to = TransactTo::Call(Addr::from_slice(to_address));
+        let env_with_handler_cfg = EnvWithHandlerCfg::new(Box::new(env), HandlerCfg::new(SpecId::LATEST));
 
         let result = self
             .executor
-            .call_raw_with_env(env)
+            .call_raw_with_env(env_with_handler_cfg)
             .map_err(|e| ForkCallError::ExecutorError(e.to_string()));
 
         // remove to_address from persisted accounts
@@ -376,7 +376,7 @@ impl Forker {
                 Some(active_fork_local_id),
                 block_number,
                 &mut env.unwrap_or_default(),
-                &mut JournaledState::new(spec_id, vec![]),
+                &mut JournaledState::new(spec_id, HashSet::new()),
             )
             .map_err(|v| ForkCallError::ExecutorError(v.to_string()))
     }
