@@ -8,15 +8,15 @@ license = "CAL-1.0"
 homepage = "https://github.com/rainprotocol/rain.interpreter"
 
 [workspace.dependencies]
-alloy-primitives = "0.5.4"
-alloy-json-abi = "0.5.4"
-alloy-dyn-abi = "0.5.4"
-alloy-sol-types = { version = "0.5.4", features = ["json"] }
+alloy-primitives = "0.6.3"
+alloy-json-abi = "0.6.3"
+alloy-dyn-abi = "0.6.3"
+alloy-sol-types = { version = "0.6.3", features = ["json"] }
 anyhow = "1.0.70"
 clap = { version = "4.2.5", features = ["cargo", "derive"] }
-ethers = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107", default-features = false }
-foundry-evm = { git = "https://github.com/foundry-rs/foundry", rev = "a5efe4f8f425e2f6fb35b0e298f0f46acce11dad" }
-revm = { version = "3", default-features = false, features = [
+ethers = { version = "2.0.14", default-features = false }
+foundry-evm = { git = "https://github.com/foundry-rs/foundry", rev = "0ab9e3c6fbeaa921c503c2ba1f319834b23f424b" }
+revm = { version = "6.1", default-features = false, features = [
     "std",
     "serde",
     "memory_limit",
@@ -34,7 +34,7 @@ tracing = "0.1.37"
 tracing-subscriber = "0.3.17"
 reqwest = { version = "0.11.17", features = ["json"] }
 once_cell = "1.17.1"
-
+alloy-ethers-typecast = { git = "https://github.com/rainlanguage/alloy-ethers-typecast", rev = "a6bcb86b9b61a56d2440d33313f024297ce737bb" }
 
 [workspace.dependencies.rain_interpreter_parser]
 path = "crates/parser"
@@ -47,18 +47,3 @@ path = "crates/bindings"
 
 [workspace.dependencies.rain-interpreter-eval]
 path = "crates/eval"
-
-[patch.crates-io]
-ethers = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
-ethers-core = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
-ethers-contract = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
-ethers-contract-abigen = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
-ethers-providers = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
-ethers-signers = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
-ethers-middleware = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
-ethers-solc = { git = "https://github.com/gakonst/ethers-rs", rev = "f0e5b194f09c533feb10d1a686ddb9e5946ec107" }
-
-revm = { git = "https://github.com/bluealloy/revm", branch = "reth_freeze" }
-revm-primitives = { git = "https://github.com/bluealloy/revm", branch = "reth_freeze" }
-revm-interpreter = { git = "https://github.com/bluealloy/revm", branch = "reth_freeze" }
-revm-precompile = { git = "https://github.com/bluealloy/revm", branch = "reth_freeze" }
