@@ -7,6 +7,7 @@ import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {LibDataContract, DataContractMemoryContainer} from "rain.datacontract/lib/LibDataContract.sol";
 import {IERC1820_REGISTRY} from "rain.erc1820/lib/LibIERC1820.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
+import {IParserV2} from "rain.interpreter.interface/interface/unstable/IParserV2.sol";
 
 import {
     UnexpectedConstructionMetaHash,
@@ -33,7 +34,7 @@ import {STORE_BYTECODE_HASH} from "./RainterpreterStoreNPE2.sol";
 
 /// @dev The function pointers for the integrity check fns.
 bytes constant INTEGRITY_FUNCTION_POINTERS =
-    hex"0b510bcf0c340dae0db80db80dc20dcb0de60e8c0e8c0ee80f620f6f0db80dc20db80db80dc20dae0dae0dae0dae0dae0f790f9e0fb80db80f790db80db80f6f0dc20db80db80f6f0f6f0db80dc20fc20dc20dc20dc20dc20db80dc20dc20dc20dc20dc20fc20db80db80db80dc20dc20db80dc20db80dc20fc20fc20fc20fc20fc20fc20fc20fc20fc20fc20fc20fc20fc20fc20dc20fb8";
+    hex"0c980d160d7b0ef50eff0eff0f090f120f2d0fd30fd3102f10a910b60eff0f090eff0eff0f090ef50ef50ef50ef50ef510c010e510ff0eff10c00eff0eff10b60f090eff0eff10b610b60eff0f0911090f090f090f090f090eff0f090f090f090f090f0911090eff0eff0eff0f090f090eff0f090eff0f09110911091109110911091109110911091109110911091109110911090f0910ff";
 
 /// @dev Hash of the known construction meta.
 bytes32 constant CONSTRUCTION_META_HASH = bytes32(0xa0ab42a89d6d54533dd43b6ba6bdbc722137a3155830987ff60835565aa2f543);
@@ -51,7 +52,7 @@ struct RainterpreterExpressionDeployerNPE2ConstructionConfig {
 }
 
 /// @title RainterpreterExpressionDeployerNPE2
-contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, ERC165 {
+contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, IParserV2, ERC165 {
     using LibPointer for Pointer;
     using LibStackPointer for Pointer;
     using LibUint256Array for uint256[];
@@ -153,6 +154,25 @@ contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, ERC165 {
         emit DeployedExpression(msg.sender, iInterpreter, iStore, expression, io);
 
         return (iInterpreter, iStore, expression, io);
+    }
+
+    /// @inheritdoc IParserV2
+    function parse2(bytes calldata data) external view virtual override returns (bytes memory serialized) {
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(data);
+
+        bytes memory io = LibIntegrityCheckNP.integrityCheck2(INTEGRITY_FUNCTION_POINTERS, bytecode, constants);
+        // Nothing is done with IO in IParserV2. LibBytecode can be used to
+        // inspect this from the bytecode.
+        (io);
+
+        uint256 size = LibInterpreterStateDataContractNP.serializeSizeNP(bytecode, constants);
+        Pointer cursor;
+        assembly ("memory-safe") {
+            cursor := mload(0x40)
+            serialized := cursor
+            mstore(0x40, add(cursor, size))
+        }
+        LibInterpreterStateDataContractNP.unsafeSerializeNP(cursor, bytecode, constants);
     }
 
     /// Defines all the function pointers to integrity checks. This is the

@@ -22,21 +22,22 @@ import {
     FullyQualifiedNamespace,
     IInterpreterStoreV2
 } from "rain.interpreter.interface/interface/IInterpreterV2.sol";
+import {IInterpreterV3} from "rain.interpreter.interface/interface/unstable/IInterpreterV3.sol";
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x5e084dbcc252e1db75b6a4d09f9be7f4b62f370cca5beaa1f32951ec8ee78f63);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x2e7e7e620179d6ce025f219edd774cd870048b3330ae2f024b15a59801868d28);
 
 /// @dev The function pointers known to the interpreter for dynamic dispatch.
 /// By setting these as a constant they can be inlined into the interpreter
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
 bytes constant OPCODE_FUNCTION_POINTERS =
-    hex"0ce70d380d7a0f46102d103f1051106a10ac10fe110f112011c211ff12bd136d12bd13f11493150b153a1569156915b815e7164c17201773178717e017f418091823182e18421857188f18b618ce18dc195c196a1978199319a819c019d919e719f51a031a111a5f1a771a8f1aa91aa91ac01add1af41b491b571b571ba51bf31c411c411c8f1c8f1cdd1d2b1d791d791d791d791e1d1f04";
+    hex"0deb0e3c0e7e104a113111431155116e11b012021213122412c6130313c1147113c114f51597160f163e166d166d16bc16eb175018241877188b18e418f8190d192719321946195b199319ba19d219e01a601a6e1a7c1a971aac1ac41add1aeb1af91b071b151b631b7b1b931bad1bad1bc41be11bf81c4d1c5b1c5b1ca91cf71d451d451d931d931de11e2f1e7d1e7d1e7d1e7d1f212008";
 
 /// @title RainterpreterNPE2
 /// @notice Implementation of a Rainlang interpreter that is compatible with
 /// native onchain Rainlang parsing.
-contract RainterpreterNPE2 is IInterpreterV2, ERC165 {
+contract RainterpreterNPE2 is IInterpreterV2, IInterpreterV3, ERC165 {
     using LibEvalNP for InterpreterStateNP;
     using LibInterpreterStateDataContractNP for bytes;
 
@@ -78,13 +79,30 @@ contract RainterpreterNPE2 is IInterpreterV2, ERC165 {
         return state.eval2(inputs, maxOutputs);
     }
 
+    /// @inheritdoc IInterpreterV3
+    function eval3(
+        IInterpreterStoreV2 store,
+        FullyQualifiedNamespace namespace,
+        bytes calldata bytecode,
+        SourceIndexV2 sourceIndex,
+        uint256[][] calldata context,
+        uint256[] calldata inputs
+    ) external view virtual override returns (uint256[] memory, uint256[] memory) {
+        InterpreterStateNP memory state = bytecode.unsafeDeserializeNP(
+            SourceIndexV2.unwrap(sourceIndex), namespace, store, context, OPCODE_FUNCTION_POINTERS
+        );
+        // We use the return by returning it. Slither false positive.
+        //slither-disable-next-line unused-return
+        return state.eval2(inputs, type(uint256).max);
+    }
+
     /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(IInterpreterV2).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /// @inheritdoc IInterpreterV2
-    function functionPointers() external view virtual returns (bytes memory) {
+    function functionPointers() external view virtual override(IInterpreterV2, IInterpreterV3) returns (bytes memory) {
         return LibAllStandardOpsNP.opcodeFunctionPointers();
     }
 }
