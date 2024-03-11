@@ -113,6 +113,17 @@ contract LibOpDecimal18ScaleNNPTest is OpTest {
         checkUnhappy("_: decimal18-scale-n<36>(1e70);", stdError.arithmeticError);
     }
 
+    /// Test the eval of `decimal18-to-int` which is an alias of `decimal18-scale-n<0>`.
+    function testOpDecimal18ToIntNPEval() external {
+        checkHappy("_: decimal18-to-int(0);", 0, "0 0 0 0");
+        checkHappy("_: decimal18-to-int(1);", 0, "0 1 0 0");
+        checkHappy("_: decimal18-to-int(5e17);", 0, "0 5e17 0 0");
+        checkHappy("_: decimal18-to-int(1e18);", 1, "0 1e18 0 0");
+        checkHappy("_: decimal18-to-int(15e17);", 1, "0 15e17 0 0");
+        checkHappy("_: decimal18-to-int(19e17);", 1, "0 19e17 0 0");
+        checkHappy("_: decimal18-to-int(2e18);", 2, "0 2e18 0 0");
+    }
+
     /// Test the eval of `decimal18-scale-n` opcode parsed from a string.
     /// Tests zero inputs.
     function testOpDecimal18ScaleNNPEvalZeroInputs() external {
