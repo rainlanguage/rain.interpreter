@@ -95,7 +95,7 @@ pub enum TraceSearchError {
 }
 
 impl RainEvalResult {
-    pub fn parse_extract_trace(&self, path: &str) -> Result<U256, TraceSearchError> {
+    pub fn search_trace_by_path(&self, path: &str) -> Result<U256, TraceSearchError> {
         let mut parts = path.split('.').collect::<Vec<_>>();
 
         if parts.len() < 2 {
@@ -245,7 +245,7 @@ mod tests {
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
-    async fn test_parse_extract_trace() {
+    async fn test_search_trace_by_path() {
         let deployer_address: Address = "0x83aA87e8773bBE65DD34c5C5895948ce9f6cd2af"
             .parse::<Address>()
             .unwrap();
@@ -279,22 +279,22 @@ mod tests {
 
         let rain_eval_result = RainEvalResult::from(res);
 
-        // parse_extract_trace
-        let trace_0 = rain_eval_result.parse_extract_trace("0.1").unwrap();
+        // search_trace_by_path
+        let trace_0 = rain_eval_result.search_trace_by_path("0.1").unwrap();
         assert_eq!(trace_0, U256::from(2));
-        let trace_1 = rain_eval_result.parse_extract_trace("0.1.3").unwrap();
+        let trace_1 = rain_eval_result.search_trace_by_path("0.1.3").unwrap();
         assert_eq!(trace_1, U256::from(3));
-        let trace_2 = rain_eval_result.parse_extract_trace("0.1.2").unwrap();
+        let trace_2 = rain_eval_result.search_trace_by_path("0.1.2").unwrap();
         assert_eq!(trace_2, U256::from(2));
 
         // test the various errors
         // bad trace path
-        let result = rain_eval_result.parse_extract_trace("0");
+        let result = rain_eval_result.search_trace_by_path("0");
         assert!(matches!(result, Err(TraceSearchError::BadTracePath(_))));
-        let result = rain_eval_result.parse_extract_trace("0.1.");
+        let result = rain_eval_result.search_trace_by_path("0.1.");
         assert!(matches!(result, Err(TraceSearchError::BadTracePath(_))));
 
-        let result = rain_eval_result.parse_extract_trace("0.1.12");
+        let result = rain_eval_result.search_trace_by_path("0.1.12");
         assert!(matches!(result, Err(TraceSearchError::TraceNotFound(_))));
     }
 
