@@ -87,7 +87,7 @@ impl From<ForkTypedReturn<eval2Call>> for RainEvalResult {
 }
 
 #[derive(Error, Debug)]
-pub enum ParseTraceError {
+pub enum TraceSearchError {
     #[error("Unparseable trace path: {0}")]
     BadTracePath(String),
     #[error("Trace not found: {0}")]
@@ -95,30 +95,30 @@ pub enum ParseTraceError {
 }
 
 impl RainEvalResult {
-    pub fn parse_extract_trace(&self, path: &str) -> Result<U256, ParseTraceError> {
+    pub fn parse_extract_trace(&self, path: &str) -> Result<U256, TraceSearchError> {
         let mut parts = path.split('.').collect::<Vec<_>>();
 
         if parts.len() < 2 {
-            return Err(ParseTraceError::BadTracePath(path.to_string()));
+            return Err(TraceSearchError::BadTracePath(path.to_string()));
         }
 
         let stack_index = parts
             .pop()
             .unwrap()
             .parse::<usize>()
-            .map_err(|_| ParseTraceError::BadTracePath(path.to_string()))?;
+            .map_err(|_| TraceSearchError::BadTracePath(path.to_string()))?;
 
         let mut current_parent_index = parts[0]
             .parse::<u16>()
-            .map_err(|_| ParseTraceError::BadTracePath(path.to_string()))?;
+            .map_err(|_| TraceSearchError::BadTracePath(path.to_string()))?;
         let mut current_source_index = parts[0]
             .parse::<u16>()
-            .map_err(|_| ParseTraceError::BadTracePath(path.to_string()))?;
+            .map_err(|_| TraceSearchError::BadTracePath(path.to_string()))?;
 
         for part in parts.iter().skip(1) {
             let next_source_index = part
                 .parse::<u16>()
-                .map_err(|_| ParseTraceError::BadTracePath(path.to_string()))?;
+                .map_err(|_| TraceSearchError::BadTracePath(path.to_string()))?;
 
             if let Some(trace) = self.traces.iter().find(|t| {
                 t.parent_source_index == current_parent_index && t.source_index == next_source_index
@@ -126,7 +126,7 @@ impl RainEvalResult {
                 current_parent_index = trace.parent_source_index;
                 current_source_index = trace.source_index;
             } else {
-                return Err(ParseTraceError::TraceNotFound(format!(
+                return Err(TraceSearchError::TraceNotFound(format!(
                     "Trace with parent {}.{} not found",
                     current_parent_index, next_source_index
                 )));
@@ -139,7 +139,7 @@ impl RainEvalResult {
                     && t.source_index == current_source_index
             })
             .ok_or_else(|| {
-                ParseTraceError::TraceNotFound(format!(
+                TraceSearchError::TraceNotFound(format!(
                     "Trace with parent {}.{} not found",
                     current_parent_index, current_source_index
                 ))
@@ -147,14 +147,14 @@ impl RainEvalResult {
             .and_then(|trace| {
                 // Reverse the stack order to account for the last item being at index 0
                 let reversed_stack_index = trace.stack.len().checked_sub(stack_index + 1).ok_or(
-                    ParseTraceError::TraceNotFound(format!(
+                    TraceSearchError::TraceNotFound(format!(
                         "Stack index {} out of bounds in trace {}.{}",
                         stack_index, current_parent_index, current_source_index
                     )),
                 )?;
 
                 trace.stack.get(reversed_stack_index).cloned().ok_or(
-                    ParseTraceError::TraceNotFound(format!(
+                    TraceSearchError::TraceNotFound(format!(
                         "Reversed stack index {} not found in trace {}.{}",
                         reversed_stack_index, current_parent_index, current_source_index
                     )),
@@ -290,12 +290,12 @@ mod tests {
         // test the various errors
         // bad trace path
         let result = rain_eval_result.parse_extract_trace("0");
-        assert!(matches!(result, Err(ParseTraceError::BadTracePath(_))));
+        assert!(matches!(result, Err(TraceSearchError::BadTracePath(_))));
         let result = rain_eval_result.parse_extract_trace("0.1.");
-        assert!(matches!(result, Err(ParseTraceError::BadTracePath(_))));
+        assert!(matches!(result, Err(TraceSearchError::BadTracePath(_))));
 
         let result = rain_eval_result.parse_extract_trace("0.1.12");
-        assert!(matches!(result, Err(ParseTraceError::TraceNotFound(_))));
+        assert!(matches!(result, Err(TraceSearchError::TraceNotFound(_))));
     }
 
     fn vec_i32_to_u256(vec: Vec<i32>) -> Vec<U256> {
