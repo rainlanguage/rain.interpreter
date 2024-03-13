@@ -7,6 +7,11 @@ sol!(
 );
 sol!(
     #![sol(all_derives = true)]
+    IInterpreterV3,
+    "../../out/IInterpreterV3.sol/IInterpreterV3.json"
+);
+sol!(
+    #![sol(all_derives = true)]
     IInterpreterStoreV1,
     "../../out/IInterpreterStoreV1.sol/IInterpreterStoreV1.json"
 );

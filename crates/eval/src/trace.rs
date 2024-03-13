@@ -1,6 +1,7 @@
 use crate::fork::ForkTypedReturn;
 use alloy_primitives::{Address, U256};
-use rain_interpreter_bindings::IInterpreterV2::{eval2Call, eval2Return};
+use rain_interpreter_bindings::IInterpreterV3::{eval3Call, eval3Return};
+
 use thiserror::Error;
 
 pub const RAIN_TRACER_ADDRESS: &str = "0xF06Cd48c98d7321649dB7D8b2C396A81A2046555";
@@ -46,7 +47,7 @@ impl RainSourceTrace {
 }
 
 /// A struct representing the result of a Rain eval call. Contains the stack,
-/// writes, and traces. Can be constructed from a `ForkTypedReturn<eval2Call>`.
+/// writes, and traces. Can be constructed from a `ForkTypedReturn<eval3Call>`.
 #[derive(Debug, Clone)]
 pub struct RainEvalResult {
     pub reverted: bool,
@@ -55,9 +56,9 @@ pub struct RainEvalResult {
     pub traces: Vec<RainSourceTrace>,
 }
 
-impl From<ForkTypedReturn<eval2Call>> for RainEvalResult {
-    fn from(typed_return: ForkTypedReturn<eval2Call>) -> Self {
-        let eval2Return { stack, writes } = typed_return.typed_return;
+impl From<ForkTypedReturn<eval3Call>> for RainEvalResult {
+    fn from(typed_return: ForkTypedReturn<eval3Call>) -> Self {
+        let eval3Return { stack, writes } = typed_return.typed_return;
 
         let tracer_address = RAIN_TRACER_ADDRESS.parse::<Address>().unwrap();
         let mut traces: Vec<RainSourceTrace> = typed_return
@@ -171,11 +172,11 @@ mod tests {
     use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
 
     const FORK_URL: &str = "https://rpc.ankr.com/polygon_mumbai";
-    const FORK_BLOCK_NUMBER: u64 = 45806808;
+    const FORK_BLOCK_NUMBER: u64 = 46995226;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_eval() {
-        let deployer_address: Address = "0x83aA87e8773bBE65DD34c5C5895948ce9f6cd2af"
+        let deployer_address: Address = "0x9F83166c8BCB340D494f7cd1313cC36A59E9e75B"
             .parse::<Address>()
             .unwrap();
         let args = NewForkedEvm {

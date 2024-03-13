@@ -1,15 +1,13 @@
+use crate::error::{selector_registry_abi_decode, ForkCallError};
+use crate::fork::{ForkTypedReturn, Forker};
 use alloy_primitives::{Address, U256};
 use alloy_sol_types::SolCall;
 use rain_interpreter_bindings::DeployerISP::{iInterpreterCall, iParserCall, iStoreCall};
 use rain_interpreter_bindings::IExpressionDeployerV3::deployExpression2Call;
 use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
-use rain_interpreter_bindings::IInterpreterV2::eval2Call;
+use rain_interpreter_bindings::IInterpreterV3::eval3Call;
 use rain_interpreter_bindings::IParserV1::parseCall;
 use revm::interpreter::InstructionResult;
-
-use crate::dispatch::CreateEncodedDispatch;
-use crate::error::{selector_registry_abi_decode, ForkCallError};
-use crate::fork::{ForkTypedReturn, Forker};
 
 #[derive(Debug, Clone)]
 pub struct ForkEvalArgs {
@@ -143,7 +141,7 @@ impl Forker {
     pub async fn fork_eval(
         &mut self,
         args: ForkEvalArgs,
-    ) -> Result<ForkTypedReturn<eval2Call>, ForkCallError> {
+    ) -> Result<ForkTypedReturn<eval3Call>, ForkCallError> {
         let ForkEvalArgs {
             rainlang_string,
             source_index,
@@ -157,7 +155,6 @@ impl Forker {
                 deployer,
             })
             .await?;
-        let expression_config = expression_config_result.typed_return;
 
         let store = self
             .alloy_call(Address::default(), deployer, iStoreCall {})?
@@ -169,22 +166,16 @@ impl Forker {
             .typed_return
             ._0;
 
-        let deploy_call = deployExpression2Call {
-            bytecode: expression_config.bytecode,
-            constants: expression_config.constants,
-        };
+        println!(
+            "expression_config_result: {:?}",
+            expression_config_result.raw.result
+        );
 
-        let deploy_return = self
-            .alloy_call_committing(Address::default(), deployer, deploy_call, U256::from(0))?
-            .typed_return;
-
-        let dispatch =
-            CreateEncodedDispatch::encode(&deploy_return.expression, source_index, u16::MAX);
-
-        let eval_args = eval2Call {
+        let eval_args = eval3Call {
+            bytecode: expression_config_result.raw.result.to_vec(),
+            sourceIndex: U256::from(source_index),
             store,
             namespace: namespace.into(),
-            dispatch: dispatch.into(),
             context,
             inputs: vec![],
         };
@@ -200,11 +191,11 @@ mod tests {
     use alloy_primitives::{BlockNumber, Bytes};
 
     const FORK_URL: &str = "https://rpc.ankr.com/polygon_mumbai";
-    const FORK_BLOCK_NUMBER: BlockNumber = 45658085;
+    const FORK_BLOCK_NUMBER: BlockNumber = 46995226;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_parse() {
-        let deployer: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
+        let deployer: Address = "0x9F83166c8BCB340D494f7cd1313cC36A59E9e75B"
             .parse::<Address>()
             .unwrap();
         let args = NewForkedEvm {
@@ -221,11 +212,8 @@ mod tests {
             .unwrap();
 
         let res_bytecode = res.0.typed_return.bytecode;
-        let expected_bytes = "0x01000003020001010000010100000038020000"
-            .parse::<Bytes>()
-            .unwrap()
-            .to_vec();
-
+        let expected_bytes: Vec<u8> =
+            vec![1, 0, 0, 3, 2, 0, 1, 1, 16, 0, 1, 1, 16, 0, 0, 61, 18, 0, 0];
         assert_eq!(res_bytecode, expected_bytes);
 
         let res_constants = res.0.typed_return.constants;
@@ -236,7 +224,7 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_eval() {
-        let deployer: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
+        let deployer: Address = "0x9F83166c8BCB340D494f7cd1313cC36A59E9e75B"
             .parse::<Address>()
             .unwrap();
         let args = NewForkedEvm {
