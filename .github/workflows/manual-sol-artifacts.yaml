@@ -18,6 +18,10 @@ jobs:
     env:
       DEPLOYMENT_KEY: ${{ github.ref == 'refs/heads/main' && secrets.PRIVATE_KEY || secrets.PRIVATE_KEY_DEV }}
     steps:
+      - run: |
+          network=${{ inputs.network }}
+          echo "rpc_secret_name=CI_DEPLOY_${network^^}_RPC_URL" >> $GITHUB_ENV
+
       - uses: actions/checkout@v4
         with:
           submodules: recursive
@@ -32,7 +36,7 @@ jobs:
       - name: deploy to ${{ inputs.network }}
         run: nix develop --command rainix-sol-artifacts
         env:
-          ETH_RPC_URL: ${{ inputs.network == 'polygon' && secrets.CI_DEPLOY_POLYGON_RPC_URL || inputs.network == 'songbird' && secrets.CI_DEPLOY_SONGBIRD_RPC_URL || inputs.network == 'flare' && secrets.CI_DEPLOY_FLARE_RPC_URL ||  inputs.network == 'base' && secrets.CI_DEPLOY_BASE_RPC_URL || '' }}
+          ETH_RPC_URL: ${{ secrets[env.rpc_secret_name] || '' }}
           # Flare has hardcoded api key https://flarescan.com/documentation/recipes/foundry-verification
           ETHERSCAN_API_KEY: ${{ inputs.network == 'flare' && 'verifyContract' || secrets.EXPLORER_VERIFICATION_KEY }}
           DEPLOY_VERIFIER: ${{ inputs.network == 'songbird' && 'blockscout' || inputs.network == 'polygon' && 'etherscan' || '' }}
