@@ -18,6 +18,10 @@ sol!(
 sol!(
     #![sol(all_derives = true)]
     IParserV1, "../../out/IParserV1.sol/IParserV1.json");
+
+sol!(
+    #![sol(all_derives = true)]
+    IParserV2, "../../out/IParserV2.sol/IParserV2.json");
 sol!(
     #![sol(all_derives = true)]
     IExpressionDeployerV3,

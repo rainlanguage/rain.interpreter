@@ -6,7 +6,7 @@ use rain_interpreter_bindings::DeployerISP::{iInterpreterCall, iParserCall, iSto
 use rain_interpreter_bindings::IExpressionDeployerV3::deployExpression2Call;
 use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
 use rain_interpreter_bindings::IInterpreterV3::eval3Call;
-use rain_interpreter_bindings::IParserV1::parseCall;
+use rain_interpreter_bindings::IParserV2::parse2Call;
 use revm::interpreter::InstructionResult;
 
 #[derive(Debug, Clone)]
@@ -50,7 +50,7 @@ impl Forker {
         args: ForkParseArgs,
     ) -> Result<
         (
-            ForkTypedReturn<parseCall>,
+            ForkTypedReturn<parse2Call>,
             ForkTypedReturn<deployExpression2Call>,
         ),
         ForkCallError,
@@ -59,18 +59,14 @@ impl Forker {
             rainlang_string,
             deployer,
         } = args;
-        let parser = self
-            .alloy_call(Address::default(), deployer, iParserCall {})?
-            .typed_return
-            ._0;
 
-        let parse_call = parseCall {
+        let parse_call = parse2Call {
             data: rainlang_string.as_bytes().to_vec(),
         };
 
         let parse_raw_result = self.call(
             Address::default().as_slice(),
-            parser.as_slice(),
+            deployer.as_slice(),
             &parse_call.abi_encode(),
         )?;
 
@@ -80,21 +76,27 @@ impl Forker {
                 selector_registry_abi_decode(&parse_raw_result.result).await?,
             ));
         }
+
         if !parse_raw_result.exit_reason.is_ok() {
             return Err(ForkCallError::Failed(parse_raw_result));
         }
 
-        let parse_result: ForkTypedReturn<parseCall> = ForkTypedReturn {
-            typed_return: parseCall::abi_decode_returns(&parse_raw_result.result.0, true).map_err(
-                |e| ForkCallError::TypedError(format!("Call:\"parseCall\" Error:{:?}", e)),
-            )?,
+        let parse_result: ForkTypedReturn<parse2Call> = ForkTypedReturn {
+            typed_return: parse2Call::abi_decode_returns(&parse_raw_result.result.0, true)
+                .map_err(|e| {
+                    ForkCallError::TypedError(format!("Call:\"parseCall\" Error:{:?}", e))
+                })?,
             raw: parse_raw_result,
         };
 
+        println!("parse_result: {:?}", parse_result.raw);
+
+        let (bytecode, constants) = Forker::deserialize(&parse_result.raw.result)?;
+
         // Call deployer: deployExpression2Call
         let call = deployExpression2Call {
-            constants: parse_result.typed_return.constants.clone(),
-            bytecode: parse_result.typed_return.bytecode.clone(),
+            constants,
+            bytecode: bytecode.clone(),
         };
         let integrity_raw_result = self.call(
             Address::default().as_slice(),
@@ -182,6 +184,36 @@ impl Forker {
 
         self.alloy_call(Address::default(), interpreter, eval_args)
     }
+
+    fn deserialize(bytecode_and_constants: &[u8]) -> Result<(Vec<u8>, Vec<U256>), ForkCallError> {
+        if bytecode_and_constants.len() < 64 {
+            // Ensure there's enough data for at least one constant and the 0x40 bytes
+            return Err(ForkCallError::DeserializeFailed("Data too short".into()));
+        }
+
+        // Calculate the start of the constants section, assuming the last 64 bytes are for constants count and alignment
+        let constants_start = bytecode_and_constants.len() - 64;
+        let constants_bytes = &bytecode_and_constants[constants_start..(constants_start + 32)]; // Assuming the 32 bytes before the last 32 bytes represent the constants
+
+        // Calculate the number of constants. Assuming each constant is 32 bytes and the total size includes the 0x40 bytes metadata.
+        let constants_count = (constants_bytes.len() - 64) / 32;
+
+        // Extract the bytecode
+        let bytecode = bytecode_and_constants[..constants_start].to_vec();
+
+        // Extract the constants
+        let mut constants = Vec::new();
+        for i in 0..constants_count {
+            let start = constants_start + i * 32;
+            let end = start + 32;
+            let mut constant = [0u8; 32];
+            constant.copy_from_slice(&bytecode_and_constants[start..end]);
+            let u256 = U256::from_be_bytes(constant);
+            constants.push(u256);
+        }
+
+        Ok((bytecode, constants))
+    }
 }
 
 #[cfg(test)]
@@ -212,14 +244,16 @@ mod tests {
             .unwrap();
 
         let res_bytecode = res.0.typed_return.bytecode;
+
+        let (bytecode, constants) = Forker::deserialize(&res_bytecode).unwrap();
+
         let expected_bytes: Vec<u8> =
             vec![1, 0, 0, 3, 2, 0, 1, 1, 16, 0, 1, 1, 16, 0, 0, 61, 18, 0, 0];
-        assert_eq!(res_bytecode, expected_bytes);
+        assert_eq!(bytecode, expected_bytes);
 
-        let res_constants = res.0.typed_return.constants;
         let expected_constants = vec![U256::from(1), U256::from(2)];
 
-        assert_eq!(res_constants, expected_constants);
+        assert_eq!(constants, expected_constants);
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
@@ -234,7 +268,7 @@ mod tests {
         let mut fork = Forker::new_with_fork(args, None, None).await;
         let res = fork
             .fork_eval(ForkEvalArgs {
-                rainlang_string: r"_: int-add(1 2);".into(),
+                rainlang_string: r"_: int-add(1 6);".into(),
                 source_index: 0,
                 deployer,
                 namespace: FullyQualifiedNamespace::default(),

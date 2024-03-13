@@ -34,6 +34,8 @@ pub enum ForkCallError {
     AbiDecodeFailed(#[from] AbiDecodeFailedErrors),
     #[error("{0}")]
     AbiDecodedError(AbiDecodedErrorType),
+    #[error("Failed to deserialize serialized expression: {0}")]
+    DeserializeFailed(String),
 }
 impl From<AbiDecodedErrorType> for ForkCallError {
     fn from(value: AbiDecodedErrorType) -> Self {
