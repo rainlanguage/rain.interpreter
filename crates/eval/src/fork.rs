@@ -9,10 +9,7 @@ use foundry_evm::{
 };
 use revm::{
     interpreter::InstructionResult,
-    primitives::{
-        Address as Addr, Bytes, Env, EnvWithHandlerCfg, HandlerCfg, HashSet, SpecId, TransactTo,
-        U256 as Uint256,
-    },
+    primitives::{Address as Addr, Bytes, Env, HashSet, SpecId, U256 as Uint256},
     JournaledState,
 };
 use std::{any::type_name, collections::HashMap};
@@ -211,7 +208,7 @@ impl Forker {
     /// # Returns
     /// A result containing the raw call result and the typed return.
     pub async fn alloy_call<T: SolCall>(
-        &mut self,
+        &self,
         from_address: Address,
         to_address: Address,
         call: T,
@@ -293,7 +290,7 @@ impl Forker {
     /// # Returns
     /// A result containing the raw call result.
     pub fn call(
-        &mut self,
+        &self,
         from_address: &[u8],
         to_address: &[u8],
         calldata: &[u8],
@@ -301,22 +298,16 @@ impl Forker {
         if from_address.len() != 20 || to_address.len() != 20 {
             return Err(ForkCallError::ExecutorError("invalid address!".to_owned()));
         }
-        let mut env = Env::default();
-        env.tx.caller = Addr::from_slice(from_address);
-        env.tx.data = Bytes::copy_from_slice(calldata);
-        env.tx.transact_to = TransactTo::Call(Addr::from_slice(to_address));
-        let env_with_handler_cfg =
-            EnvWithHandlerCfg::new(Box::new(env), HandlerCfg::new(SpecId::LATEST));
 
         let result = self
             .executor
-            .call_raw_with_env(env_with_handler_cfg)
+            .call_raw(
+                Addr::from_slice(from_address),
+                Addr::from_slice(to_address),
+                Bytes::copy_from_slice(calldata),
+                U256::from(0),
+            )
             .map_err(|e| ForkCallError::ExecutorError(e.to_string()));
-
-        // remove to_address from persisted accounts
-        self.executor
-            .backend
-            .remove_persistent_account(&Addr::from_slice(to_address));
 
         result
     }
@@ -436,7 +427,7 @@ mod tests {
             fork_url: MUMBAI_FORK_URL.to_owned(),
             fork_block_number: Some(MUMBAI_FORK_NUMBER),
         };
-        let mut forker = Forker::new_with_fork(args, None, None).await;
+        let forker = Forker::new_with_fork(args, None, None).await;
 
         let from_address = Address::default();
         let to_address: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"

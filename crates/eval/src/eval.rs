@@ -46,7 +46,7 @@ impl Forker {
     ///
     /// The typed return of the parse and deployExpression2, plus Foundry's RawCallResult struct.
     pub async fn fork_parse(
-        &mut self,
+        &self,
         args: ForkParseArgs,
     ) -> Result<ForkTypedReturn<parse2Call>, ForkCallError> {
         let ForkParseArgs {
@@ -79,7 +79,7 @@ impl Forker {
     ///
     /// The typed return of the eval, plus Foundry's RawCallResult struct, including the trace.
     pub async fn fork_eval(
-        &mut self,
+        &self,
         args: ForkEvalArgs,
     ) -> Result<ForkTypedReturn<eval3Call>, ForkCallError> {
         let ForkEvalArgs {
@@ -134,9 +134,11 @@ impl Forker {
 
 #[cfg(test)]
 mod tests {
+    use std::sync::Arc;
+
     use super::*;
     use crate::fork::NewForkedEvm;
-    use alloy_primitives::{BlockNumber, Bytes};
+    use alloy_primitives::BlockNumber;
 
     const FORK_URL: &str = "https://rpc.ankr.com/polygon_mumbai";
     const FORK_BLOCK_NUMBER: BlockNumber = 47023593;
@@ -150,7 +152,7 @@ mod tests {
             fork_url: FORK_URL.to_owned(),
             fork_block_number: Some(FORK_BLOCK_NUMBER),
         };
-        let mut fork = Forker::new_with_fork(args, None, None).await;
+        let fork = Forker::new_with_fork(args, None, None).await;
         let res = fork
             .fork_parse(ForkParseArgs {
                 rainlang_string: r"_: int-add(1 2);".to_owned(),
@@ -180,7 +182,7 @@ mod tests {
             fork_url: FORK_URL.to_owned(),
             fork_block_number: Some(FORK_BLOCK_NUMBER),
         };
-        let mut fork = Forker::new_with_fork(args, None, None).await;
+        let fork = Forker::new_with_fork(args, None, None).await;
         let res = fork
             .fork_eval(ForkEvalArgs {
                 rainlang_string: r"_: int-add(1 2);".into(),
@@ -213,5 +215,42 @@ mod tests {
             .unwrap();
         let trace_address = Address::from(source_index_zero_trace.address.into_array());
         assert_eq!(trace_address, expected_trace_address);
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 10)]
+    async fn test_fork_eval_parallel() {
+        let deployer: Address = "0x122ff0445BaE2a88C6f5F344733029E0d669D624"
+            .parse::<Address>()
+            .unwrap();
+        let args = NewForkedEvm {
+            fork_url: FORK_URL.to_owned(),
+            fork_block_number: Some(FORK_BLOCK_NUMBER),
+        };
+        let fork = Forker::new_with_fork(args, None, None).await;
+        let fork = Arc::new(fork); // Wrap in Arc for shared ownership
+
+        let mut handles = vec![];
+        for _ in 0..1000 {
+            let fork_clone = Arc::clone(&fork); // Clone the Arc for each thread
+            let handle = tokio::spawn(async move {
+                fork_clone
+                    .fork_eval(ForkEvalArgs {
+                        rainlang_string: r"_: int-add(1 2);".into(),
+                        source_index: 0,
+                        deployer,
+                        namespace: FullyQualifiedNamespace::default(),
+                        context: vec![],
+                        decode_errors: true,
+                    })
+                    .await
+                    .unwrap()
+            });
+            handles.push(handle);
+        }
+
+        for handle in handles {
+            let res = handle.await.unwrap();
+            assert_eq!(res.typed_return.stack, vec![U256::from(3)]);
+        }
     }
 }

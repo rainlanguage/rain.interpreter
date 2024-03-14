@@ -183,7 +183,7 @@ mod tests {
             fork_url: FORK_URL.to_owned(),
             fork_block_number: Some(FORK_BLOCK_NUMBER),
         };
-        let mut fork = Forker::new_with_fork(args, None, None).await;
+        let fork = Forker::new_with_fork(args, None, None).await;
 
         let res = fork
             .fork_eval(ForkEvalArgs {
@@ -255,7 +255,7 @@ mod tests {
             fork_url: FORK_URL.to_owned(),
             fork_block_number: Some(FORK_BLOCK_NUMBER),
         };
-        let mut fork = Forker::new_with_fork(args, None, None).await;
+        let fork = Forker::new_with_fork(args, None, None).await;
 
         let res = fork
             .fork_eval(ForkEvalArgs {
