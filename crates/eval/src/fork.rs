@@ -17,6 +17,7 @@ use std::{any::type_name, collections::HashMap};
 /// Forker is thin wrapper around foundry for easily forking multiple evm
 /// networks with in-memory cache that provides easy to use read/write
 /// functionalities.
+#[derive(Clone)]
 pub struct Forker {
     pub executor: Executor,
     forks: HashMap<ForkId, (LocalForkId, SpecId, U256)>,
