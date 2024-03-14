@@ -34,7 +34,7 @@ import {STORE_BYTECODE_HASH} from "./RainterpreterStoreNPE2.sol";
 
 /// @dev The function pointers for the integrity check fns.
 bytes constant INTEGRITY_FUNCTION_POINTERS =
-    hex"0ca00d1e0d830efd0f070f070f110f1a0f350fdb0fdb103710b110be0f070f110f070f070f110efd0efd0efd0efd0efd10c810ed11070f0710c80f070f0710be0f110f070f0710be10be0f070f1111110f110f110f110f110f070f110f110f110f110f1111110f070f070f070f110f110f070f110f110f070f11111111111111111111111111111111111111111111111111111111110f111107";
+    hex"0ca50d230d880f020f0c0f0c0f160f1f0f3a0fe00fe0103c10b610c30f0c0f160f0c0f0c0f160f020f020f020f020f0210cd10f2110c0f0c10cd0f0c0f0c10c30f160f0c0f0c10c310c30f0c0f1611160f160f160f160f160f0c0f160f160f160f160f1611160f0c0f0c0f0c0f160f160f0c0f160f160f0c0f16111611161116111611161116111611161116111611161116111611160f16110c";
 
 /// @dev Hash of the known construction meta.
 bytes32 constant CONSTRUCTION_META_HASH = bytes32(0xc37d63d859e8ee0f20308854945274926324ed2871ac1522dc8365befd4c6c5e);
@@ -157,22 +157,26 @@ contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, IParserV2
     }
 
     /// @inheritdoc IParserV2
-    function parse2(bytes calldata data) external view virtual override returns (bytes memory serialized) {
+    function parse2(bytes memory data) external view virtual override returns (bytes memory) {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(data);
+
+        uint256 size = LibInterpreterStateDataContractNP.serializeSizeNP(bytecode, constants);
+        bytes memory serialized;
+        Pointer cursor;
+        assembly ("memory-safe") {
+            serialized := mload(0x40)
+            mstore(0x40, add(serialized, add(0x20, size)))
+            mstore(serialized, size)
+            cursor := add(serialized, 0x20)
+        }
+        LibInterpreterStateDataContractNP.unsafeSerializeNP(cursor, bytecode, constants);
 
         bytes memory io = LibIntegrityCheckNP.integrityCheck2(INTEGRITY_FUNCTION_POINTERS, bytecode, constants);
         // Nothing is done with IO in IParserV2. LibBytecode can be used to
         // inspect this from the bytecode.
         (io);
 
-        uint256 size = LibInterpreterStateDataContractNP.serializeSizeNP(bytecode, constants);
-        Pointer cursor;
-        assembly ("memory-safe") {
-            cursor := mload(0x40)
-            serialized := cursor
-            mstore(0x40, add(cursor, size))
-        }
-        LibInterpreterStateDataContractNP.unsafeSerializeNP(cursor, bytecode, constants);
+        return serialized;
     }
 
     /// Defines all the function pointers to integrity checks. This is the
