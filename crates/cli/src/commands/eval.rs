@@ -35,7 +35,7 @@ pub struct ForkEvalCliArgs {
     pub context: Vec<String>,
 
     #[arg(short, long, help = "Decode errors using the openchain.xyz database")]
-    pub decode_errors: bool
+    pub decode_errors: bool,
 }
 
 impl TryFrom<ForkEvalCliArgs> for ForkEvalArgs {
