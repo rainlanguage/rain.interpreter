@@ -1,13 +1,10 @@
-use crate::error::{selector_registry_abi_decode, ForkCallError};
+use crate::error::ForkCallError;
 use crate::fork::{ForkTypedReturn, Forker};
 use alloy_primitives::{Address, U256};
-use alloy_sol_types::SolCall;
-use rain_interpreter_bindings::DeployerISP::{iInterpreterCall, iParserCall, iStoreCall};
-use rain_interpreter_bindings::IExpressionDeployerV3::deployExpression2Call;
+use rain_interpreter_bindings::DeployerISP::{iInterpreterCall, iStoreCall};
 use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
 use rain_interpreter_bindings::IInterpreterV3::eval3Call;
 use rain_interpreter_bindings::IParserV2::parse2Call;
-use revm::interpreter::InstructionResult;
 
 #[derive(Debug, Clone)]
 pub struct ForkEvalArgs {
@@ -58,20 +55,9 @@ impl Forker {
             data: rainlang_string.as_bytes().to_vec(),
         };
 
-        let parse_result = self.alloy_call(Address::default(), deployer, parse_call)?;
-
-        println!("parse_result: {:?}", parse_result.raw);
-
-        if parse_result.raw.exit_reason == InstructionResult::Revert {
-            // decode result bytes to error selectors if it was a revert
-            return Err(ForkCallError::AbiDecodedError(
-                selector_registry_abi_decode(&parse_result.raw.result).await?,
-            ));
-        }
-
-        if !parse_result.raw.exit_reason.is_ok() {
-            return Err(ForkCallError::Failed(parse_result.raw));
-        }
+        let parse_result = self
+            .alloy_call(Address::default(), deployer, parse_call)
+            .await?;
 
         Ok(parse_result)
     }
@@ -107,19 +93,16 @@ impl Forker {
             .await?;
 
         let store = self
-            .alloy_call(Address::default(), deployer, iStoreCall {})?
+            .alloy_call(Address::default(), deployer, iStoreCall {})
+            .await?
             .typed_return
             ._0;
 
         let interpreter = self
-            .alloy_call(Address::default(), deployer, iInterpreterCall {})?
+            .alloy_call(Address::default(), deployer, iInterpreterCall {})
+            .await?
             .typed_return
             ._0;
-
-        println!(
-            "expression_config_result: {:?}",
-            expression_config_result.raw.result
-        );
 
         let eval_args = eval3Call {
             bytecode: expression_config_result.raw.result.to_vec(),
@@ -130,7 +113,11 @@ impl Forker {
             inputs: vec![],
         };
 
-        self.alloy_call(Address::default(), interpreter, eval_args)
+        let res = self
+            .alloy_call(Address::default(), interpreter, eval_args)
+            .await?;
+
+        Ok(res)
     }
 }
 
