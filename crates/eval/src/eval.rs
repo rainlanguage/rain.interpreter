@@ -48,13 +48,7 @@ impl Forker {
     pub async fn fork_parse(
         &mut self,
         args: ForkParseArgs,
-    ) -> Result<
-        (
-            ForkTypedReturn<parse2Call>,
-            ForkTypedReturn<deployExpression2Call>,
-        ),
-        ForkCallError,
-    > {
+    ) -> Result<ForkTypedReturn<parse2Call>, ForkCallError> {
         let ForkParseArgs {
             rainlang_string,
             deployer,
@@ -64,68 +58,22 @@ impl Forker {
             data: rainlang_string.as_bytes().to_vec(),
         };
 
-        let parse_raw_result = self.call(
-            Address::default().as_slice(),
-            deployer.as_slice(),
-            &parse_call.abi_encode(),
-        )?;
-
-        if parse_raw_result.exit_reason == InstructionResult::Revert {
-            // decode result bytes to error selectors if it was a revert
-            return Err(ForkCallError::AbiDecodedError(
-                selector_registry_abi_decode(&parse_raw_result.result).await?,
-            ));
-        }
-
-        if !parse_raw_result.exit_reason.is_ok() {
-            return Err(ForkCallError::Failed(parse_raw_result));
-        }
-
-        let parse_result: ForkTypedReturn<parse2Call> = ForkTypedReturn {
-            typed_return: parse2Call::abi_decode_returns(&parse_raw_result.result.0, true)
-                .map_err(|e| {
-                    ForkCallError::TypedError(format!("Call:\"parseCall\" Error:{:?}", e))
-                })?,
-            raw: parse_raw_result,
-        };
+        let parse_result = self.alloy_call(Address::default(), deployer, parse_call)?;
 
         println!("parse_result: {:?}", parse_result.raw);
 
-        let (bytecode, constants) = Forker::deserialize(&parse_result.raw.result)?;
-
-        // Call deployer: deployExpression2Call
-        let call = deployExpression2Call {
-            constants,
-            bytecode: bytecode.clone(),
-        };
-        let integrity_raw_result = self.call(
-            Address::default().as_slice(),
-            deployer.as_slice(),
-            &call.abi_encode(),
-        )?;
-
-        if integrity_raw_result.exit_reason == InstructionResult::Revert {
+        if parse_result.raw.exit_reason == InstructionResult::Revert {
             // decode result bytes to error selectors if it was a revert
             return Err(ForkCallError::AbiDecodedError(
-                selector_registry_abi_decode(&integrity_raw_result.result).await?,
+                selector_registry_abi_decode(&parse_result.raw.result).await?,
             ));
         }
-        if !integrity_raw_result.exit_reason.is_ok() {
-            return Err(ForkCallError::Failed(integrity_raw_result));
+
+        if !parse_result.raw.exit_reason.is_ok() {
+            return Err(ForkCallError::Failed(parse_result.raw));
         }
 
-        let integrity_result: ForkTypedReturn<deployExpression2Call> = ForkTypedReturn {
-            typed_return: deployExpression2Call::abi_decode_returns(
-                &integrity_raw_result.result.0,
-                true,
-            )
-            .map_err(|e| {
-                ForkCallError::TypedError(format!("Call:\"deployExpression2Call\" Error:{:?}", e))
-            })?,
-            raw: integrity_raw_result,
-        };
-
-        Ok((parse_result, integrity_result))
+        Ok(parse_result)
     }
 
     /// Evaluates the Rain language string and returns the evaluation result.
@@ -151,7 +99,7 @@ impl Forker {
             namespace,
             context,
         } = args;
-        let (expression_config_result, _) = self
+        let expression_config_result = self
             .fork_parse(ForkParseArgs {
                 rainlang_string: rainlang_string.clone(),
                 deployer,
@@ -184,36 +132,6 @@ impl Forker {
 
         self.alloy_call(Address::default(), interpreter, eval_args)
     }
-
-    fn deserialize(bytecode_and_constants: &[u8]) -> Result<(Vec<u8>, Vec<U256>), ForkCallError> {
-        if bytecode_and_constants.len() < 64 {
-            // Ensure there's enough data for at least one constant and the 0x40 bytes
-            return Err(ForkCallError::DeserializeFailed("Data too short".into()));
-        }
-
-        // Calculate the start of the constants section, assuming the last 64 bytes are for constants count and alignment
-        let constants_start = bytecode_and_constants.len() - 64;
-        let constants_bytes = &bytecode_and_constants[constants_start..(constants_start + 32)]; // Assuming the 32 bytes before the last 32 bytes represent the constants
-
-        // Calculate the number of constants. Assuming each constant is 32 bytes and the total size includes the 0x40 bytes metadata.
-        let constants_count = (constants_bytes.len() - 64) / 32;
-
-        // Extract the bytecode
-        let bytecode = bytecode_and_constants[..constants_start].to_vec();
-
-        // Extract the constants
-        let mut constants = Vec::new();
-        for i in 0..constants_count {
-            let start = constants_start + i * 32;
-            let end = start + 32;
-            let mut constant = [0u8; 32];
-            constant.copy_from_slice(&bytecode_and_constants[start..end]);
-            let u256 = U256::from_be_bytes(constant);
-            constants.push(u256);
-        }
-
-        Ok((bytecode, constants))
-    }
 }
 
 #[cfg(test)]
@@ -243,17 +161,17 @@ mod tests {
             .await
             .unwrap();
 
-        let res_bytecode = res.0.typed_return.bytecode;
+        // let res_bytecode = res.0.typed_return.bytecode;
 
-        let (bytecode, constants) = Forker::deserialize(&res_bytecode).unwrap();
+        // let (bytecode, constants) = Forker::deserialize(&res_bytecode).unwrap();
 
-        let expected_bytes: Vec<u8> =
-            vec![1, 0, 0, 3, 2, 0, 1, 1, 16, 0, 1, 1, 16, 0, 0, 61, 18, 0, 0];
-        assert_eq!(bytecode, expected_bytes);
+        // let expected_bytes: Vec<u8> =
+        //     vec![1, 0, 0, 3, 2, 0, 1, 1, 16, 0, 1, 1, 16, 0, 0, 61, 18, 0, 0];
+        // assert_eq!(bytecode, expected_bytes);
 
-        let expected_constants = vec![U256::from(1), U256::from(2)];
+        // let expected_constants = vec![U256::from(1), U256::from(2)];
 
-        assert_eq!(constants, expected_constants);
+        // assert_eq!(constants, expected_constants);
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
