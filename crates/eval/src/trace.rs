@@ -172,11 +172,11 @@ mod tests {
     use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
 
     const FORK_URL: &str = "https://rpc.ankr.com/polygon_mumbai";
-    const FORK_BLOCK_NUMBER: u64 = 46995226;
+    const FORK_BLOCK_NUMBER: u64 = 47023593;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_trace() {
-        let deployer_address: Address = "0x9F83166c8BCB340D494f7cd1313cC36A59E9e75B"
+        let deployer_address: Address = "0x122ff0445BaE2a88C6f5F344733029E0d669D624"
             .parse::<Address>()
             .unwrap();
         let args = NewForkedEvm {
@@ -191,11 +191,11 @@ mod tests {
                 a: int-add(1 2),
                 b: 2,
                 c: 4,
-                _: call<1 1>(1 2),
+                _: call<1>(1 2),
                 :set(1 2),
                 :set(3 4);
                 a b:,
-                c: call<2 1>(a b),
+                c: call<2>(a b),
                 d: int-add(a b);
                 a b:,
                 c: int-mul(a b);
@@ -205,6 +205,7 @@ mod tests {
                 deployer: deployer_address,
                 namespace: FullyQualifiedNamespace::default(),
                 context: vec![],
+                decode_errors: true,
             })
             .await
             .unwrap();
@@ -247,7 +248,7 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_search_trace_by_path() {
-        let deployer_address: Address = "0x83aA87e8773bBE65DD34c5C5895948ce9f6cd2af"
+        let deployer_address: Address = "0x122ff0445BaE2a88C6f5F344733029E0d669D624"
             .parse::<Address>()
             .unwrap();
         let args = NewForkedEvm {
@@ -262,9 +263,9 @@ mod tests {
                 a: int-add(1 2),
                 b: 2,
                 c: 4,
-                _: call<1 1>(1 2);  
+                _: call<1>(1 2);  
                 a b:,
-                c: call<2 1>(a b),
+                c: call<2>(a b),
                 d: int-add(a b);
                 a b:,
                 c: int-mul(a b);
@@ -274,6 +275,7 @@ mod tests {
                 deployer: deployer_address,
                 namespace: FullyQualifiedNamespace::default(),
                 context: vec![],
+                decode_errors: true,
             })
             .await
             .unwrap();

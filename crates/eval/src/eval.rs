@@ -13,12 +13,14 @@ pub struct ForkEvalArgs {
     pub deployer: Address,
     pub namespace: FullyQualifiedNamespace,
     pub context: Vec<Vec<U256>>,
+    pub decode_errors: bool,
 }
 
 #[derive(Debug, Clone)]
 pub struct ForkParseArgs {
     pub rainlang_string: String,
     pub deployer: Address,
+    pub decode_errors: bool,
 }
 
 impl From<ForkEvalArgs> for ForkParseArgs {
@@ -26,6 +28,7 @@ impl From<ForkEvalArgs> for ForkParseArgs {
         ForkParseArgs {
             rainlang_string: args.rainlang_string,
             deployer: args.deployer,
+            decode_errors: args.decode_errors,
         }
     }
 }
@@ -49,6 +52,7 @@ impl Forker {
         let ForkParseArgs {
             rainlang_string,
             deployer,
+            decode_errors,
         } = args;
 
         let parse_call = parse2Call {
@@ -56,7 +60,7 @@ impl Forker {
         };
 
         let parse_result = self
-            .alloy_call(Address::default(), deployer, parse_call)
+            .alloy_call(Address::default(), deployer, parse_call, decode_errors)
             .await?;
 
         Ok(parse_result)
@@ -84,28 +88,35 @@ impl Forker {
             deployer,
             namespace,
             context,
+            decode_errors,
         } = args;
-        let expression_config_result = self
+        let parse_result = self
             .fork_parse(ForkParseArgs {
                 rainlang_string: rainlang_string.clone(),
                 deployer,
+                decode_errors,
             })
             .await?;
 
         let store = self
-            .alloy_call(Address::default(), deployer, iStoreCall {})
+            .alloy_call(Address::default(), deployer, iStoreCall {}, decode_errors)
             .await?
             .typed_return
             ._0;
 
         let interpreter = self
-            .alloy_call(Address::default(), deployer, iInterpreterCall {})
+            .alloy_call(
+                Address::default(),
+                deployer,
+                iInterpreterCall {},
+                decode_errors,
+            )
             .await?
             .typed_return
             ._0;
 
         let eval_args = eval3Call {
-            bytecode: expression_config_result.raw.result.to_vec(),
+            bytecode: parse_result.typed_return.bytecode,
             sourceIndex: U256::from(source_index),
             store,
             namespace: namespace.into(),
@@ -114,7 +125,7 @@ impl Forker {
         };
 
         let res = self
-            .alloy_call(Address::default(), interpreter, eval_args)
+            .alloy_call(Address::default(), interpreter, eval_args, decode_errors)
             .await?;
 
         Ok(res)
@@ -128,11 +139,11 @@ mod tests {
     use alloy_primitives::{BlockNumber, Bytes};
 
     const FORK_URL: &str = "https://rpc.ankr.com/polygon_mumbai";
-    const FORK_BLOCK_NUMBER: BlockNumber = 46995226;
+    const FORK_BLOCK_NUMBER: BlockNumber = 47023593;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_parse() {
-        let deployer: Address = "0x9F83166c8BCB340D494f7cd1313cC36A59E9e75B"
+        let deployer: Address = "0x122ff0445BaE2a88C6f5F344733029E0d669D624"
             .parse::<Address>()
             .unwrap();
         let args = NewForkedEvm {
@@ -144,26 +155,25 @@ mod tests {
             .fork_parse(ForkParseArgs {
                 rainlang_string: r"_: int-add(1 2);".to_owned(),
                 deployer,
+                decode_errors: true,
             })
             .await
             .unwrap();
 
-        // let res_bytecode = res.0.typed_return.bytecode;
-
-        // let (bytecode, constants) = Forker::deserialize(&res_bytecode).unwrap();
-
-        // let expected_bytes: Vec<u8> =
-        //     vec![1, 0, 0, 3, 2, 0, 1, 1, 16, 0, 1, 1, 16, 0, 0, 61, 18, 0, 0];
-        // assert_eq!(bytecode, expected_bytes);
-
-        // let expected_constants = vec![U256::from(1), U256::from(2)];
-
-        // assert_eq!(constants, expected_constants);
+        let expected_bytes: Vec<u8> = vec![
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 1, 0, 0, 3, 2, 0, 1, 1, 16, 0, 1, 1, 16, 0, 0, 61,
+            18, 0, 0,
+        ];
+        assert_eq!(res.typed_return.bytecode, expected_bytes);
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_eval() {
-        let deployer: Address = "0x9F83166c8BCB340D494f7cd1313cC36A59E9e75B"
+        let deployer: Address = "0x122ff0445BaE2a88C6f5F344733029E0d669D624"
             .parse::<Address>()
             .unwrap();
         let args = NewForkedEvm {
@@ -173,11 +183,12 @@ mod tests {
         let mut fork = Forker::new_with_fork(args, None, None).await;
         let res = fork
             .fork_eval(ForkEvalArgs {
-                rainlang_string: r"_: int-add(1 6);".into(),
+                rainlang_string: r"_: int-add(1 2);".into(),
                 source_index: 0,
                 deployer,
                 namespace: FullyQualifiedNamespace::default(),
                 context: vec![],
+                decode_errors: true,
             })
             .await
             .unwrap();

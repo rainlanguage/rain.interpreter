@@ -16,6 +16,9 @@ pub struct ForkParseArgsCli {
 
     #[arg(short, long, help = "The Rainlang string to parse")]
     rainlang_string: String,
+
+    #[arg(short, long, help = "Decode errors using the openchain.xyz database")]
+    decode_errors: bool,
 }
 
 #[derive(Args, Clone)]
@@ -39,6 +42,7 @@ impl From<ForkParseArgsCli> for ForkParseArgs {
         ForkParseArgs {
             deployer: args.deployer,
             rainlang_string: args.rainlang_string,
+            decode_errors: args.decode_errors,
         }
     }
 }

@@ -215,6 +215,7 @@ impl Forker {
         from_address: Address,
         to_address: Address,
         call: T,
+        decode_error: bool,
     ) -> Result<ForkTypedReturn<T>, ForkCallError> {
         let raw = self.call(
             from_address.as_slice(),
@@ -222,7 +223,7 @@ impl Forker {
             &call.abi_encode(),
         )?;
 
-        if raw.exit_reason == InstructionResult::Revert {
+        if decode_error && raw.exit_reason == InstructionResult::Revert {
             // decode result bytes to error selectors if it was a revert
             return Err(ForkCallError::AbiDecodedError(
                 selector_registry_abi_decode(&raw.result).await?,
@@ -258,6 +259,7 @@ impl Forker {
         to_address: Address,
         call: T,
         value: U256,
+        decode_error: bool,
     ) -> Result<ForkTypedReturn<T>, ForkCallError> {
         let raw: RawCallResult = self.call_committing(
             from_address.as_slice(),
@@ -266,7 +268,7 @@ impl Forker {
             value,
         )?;
 
-        if raw.exit_reason == InstructionResult::Revert {
+        if decode_error && raw.exit_reason == InstructionResult::Revert {
             // decode result bytes to error selectors if it was a revert
             return Err(ForkCallError::AbiDecodedError(
                 selector_registry_abi_decode(&raw.result).await?,
@@ -442,7 +444,7 @@ mod tests {
             .unwrap();
         let call = iParserCall {};
         let result = forker
-            .alloy_call(from_address, to_address, call)
+            .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
         let parser_address = result.typed_return._0;
@@ -475,6 +477,7 @@ mod tests {
                     kvs: vec![key, value],
                 },
                 U256::from(0),
+                false,
             )
             .await
             .unwrap();
@@ -490,6 +493,7 @@ mod tests {
                     namespace: fully_quallified_namespace.into(),
                     key: U256::from(3),
                 },
+                false,
             )
             .await
             .unwrap()
@@ -512,7 +516,7 @@ mod tests {
             account: POLYGON_ACC.parse::<Address>().unwrap(),
         };
         let result = forker
-            .alloy_call(from_address, to_address, call)
+            .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
         let old_balance = result.typed_return._0;
@@ -526,7 +530,13 @@ mod tests {
             amount: send_amount,
         };
         forker
-            .alloy_call_committing(from_address, to_address, transfer_call, U256::from(0))
+            .alloy_call_committing(
+                from_address,
+                to_address,
+                transfer_call,
+                U256::from(0),
+                false,
+            )
             .await
             .unwrap();
 
@@ -536,7 +546,7 @@ mod tests {
             account: POLYGON_ACC.parse::<Address>().unwrap(),
         };
         let result = forker
-            .alloy_call(from_address, to_address, call)
+            .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
         let new_balance = result.typed_return._0;
@@ -556,7 +566,7 @@ mod tests {
             account: BSC_ACC.parse::<Address>().unwrap(),
         };
         let result = forker
-            .alloy_call(from_address, to_address, call)
+            .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
         let old_balance = result.typed_return._0;
@@ -569,7 +579,13 @@ mod tests {
             amount: send_amount,
         };
         forker
-            .alloy_call_committing(from_address, to_address, transfer_call, U256::from(0))
+            .alloy_call_committing(
+                from_address,
+                to_address,
+                transfer_call,
+                U256::from(0),
+                false,
+            )
             .await
             .unwrap();
 
@@ -579,7 +595,7 @@ mod tests {
             account: BSC_ACC.parse::<Address>().unwrap(),
         };
         let result = forker
-            .alloy_call(from_address, to_address, call)
+            .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
         let new_balance = result.typed_return._0;
@@ -598,7 +614,7 @@ mod tests {
             account: POLYGON_ACC.parse::<Address>().unwrap(),
         };
         let result = forker
-            .alloy_call(from_address, to_address, call)
+            .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
         let balance = result.typed_return._0;
@@ -610,7 +626,7 @@ mod tests {
             account: POLYGON_ACC.parse::<Address>().unwrap(),
         };
         let result = forker
-            .alloy_call(from_address, to_address, call)
+            .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
         let balance = result.typed_return._0;
