@@ -175,7 +175,7 @@ mod tests {
     const FORK_BLOCK_NUMBER: u64 = 46995226;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
-    async fn test_fork_eval() {
+    async fn test_fork_trace() {
         let deployer_address: Address = "0x9F83166c8BCB340D494f7cd1313cC36A59E9e75B"
             .parse::<Address>()
             .unwrap();

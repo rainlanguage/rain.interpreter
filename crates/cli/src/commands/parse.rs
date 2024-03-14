@@ -49,7 +49,7 @@ impl Execute for Parse {
         let result = forker.fork_parse(self.fork_parse_args.clone().into()).await;
 
         match result {
-            Ok((res, _)) => crate::output::output(
+            Ok(res) => crate::output::output(
                 &self.output_path,
                 self.output_encoding.clone(),
                 res.raw.result.to_owned().to_vec().as_slice(),
