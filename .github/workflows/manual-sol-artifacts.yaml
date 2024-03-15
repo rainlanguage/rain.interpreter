@@ -7,13 +7,14 @@ on:
         required: true
         type: choice
         options:
+          - arbitrum
+          - avalanche
+          - base
           - ethereum
+          - flare
           - mumbai
           - polygon
           - songbird
-          - flare
-          - base
-          - avalanche
 
 jobs:
   deploy:
