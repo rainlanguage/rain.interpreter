@@ -10,6 +10,7 @@ on:
           - arbitrum
           - avalanche
           - base
+          - bsc
           - ethereum
           - flare
           - mumbai
