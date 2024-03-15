@@ -1,15 +1,10 @@
-use alloy_primitives::{Address, U256};
-use alloy_sol_types::SolCall;
-use rain_interpreter_bindings::DeployerISP::{iInterpreterCall, iParserCall, iStoreCall};
-use rain_interpreter_bindings::IExpressionDeployerV3::deployExpression2Call;
-use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
-use rain_interpreter_bindings::IInterpreterV2::eval2Call;
-use rain_interpreter_bindings::IParserV1::parseCall;
-use revm::interpreter::InstructionResult;
-
-use crate::dispatch::CreateEncodedDispatch;
-use crate::error::{selector_registry_abi_decode, ForkCallError};
+use crate::error::ForkCallError;
 use crate::fork::{ForkTypedReturn, Forker};
+use alloy_primitives::{Address, U256};
+use rain_interpreter_bindings::DeployerISP::{iInterpreterCall, iStoreCall};
+use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
+use rain_interpreter_bindings::IInterpreterV3::eval3Call;
+use rain_interpreter_bindings::IParserV2::parse2Call;
 
 #[derive(Debug, Clone)]
 pub struct ForkEvalArgs {
@@ -18,12 +13,14 @@ pub struct ForkEvalArgs {
     pub deployer: Address,
     pub namespace: FullyQualifiedNamespace,
     pub context: Vec<Vec<U256>>,
+    pub decode_errors: bool,
 }
 
 #[derive(Debug, Clone)]
 pub struct ForkParseArgs {
     pub rainlang_string: String,
     pub deployer: Address,
+    pub decode_errors: bool,
 }
 
 impl From<ForkEvalArgs> for ForkParseArgs {
@@ -31,6 +28,7 @@ impl From<ForkEvalArgs> for ForkParseArgs {
         ForkParseArgs {
             rainlang_string: args.rainlang_string,
             deployer: args.deployer,
+            decode_errors: args.decode_errors,
         }
     }
 }
@@ -48,84 +46,24 @@ impl Forker {
     ///
     /// The typed return of the parse and deployExpression2, plus Foundry's RawCallResult struct.
     pub async fn fork_parse(
-        &mut self,
+        &self,
         args: ForkParseArgs,
-    ) -> Result<
-        (
-            ForkTypedReturn<parseCall>,
-            ForkTypedReturn<deployExpression2Call>,
-        ),
-        ForkCallError,
-    > {
+    ) -> Result<ForkTypedReturn<parse2Call>, ForkCallError> {
         let ForkParseArgs {
             rainlang_string,
             deployer,
+            decode_errors,
         } = args;
-        let parser = self
-            .alloy_call(Address::default(), deployer, iParserCall {})?
-            .typed_return
-            ._0;
 
-        let parse_call = parseCall {
+        let parse_call = parse2Call {
             data: rainlang_string.as_bytes().to_vec(),
         };
 
-        let parse_raw_result = self.call(
-            Address::default().as_slice(),
-            parser.as_slice(),
-            &parse_call.abi_encode(),
-        )?;
+        let parse_result = self
+            .alloy_call(Address::default(), deployer, parse_call, decode_errors)
+            .await?;
 
-        if parse_raw_result.exit_reason == InstructionResult::Revert {
-            // decode result bytes to error selectors if it was a revert
-            return Err(ForkCallError::AbiDecodedError(
-                selector_registry_abi_decode(&parse_raw_result.result).await?,
-            ));
-        }
-        if !parse_raw_result.exit_reason.is_ok() {
-            return Err(ForkCallError::Failed(parse_raw_result));
-        }
-
-        let parse_result: ForkTypedReturn<parseCall> = ForkTypedReturn {
-            typed_return: parseCall::abi_decode_returns(&parse_raw_result.result.0, true).map_err(
-                |e| ForkCallError::TypedError(format!("Call:\"parseCall\" Error:{:?}", e)),
-            )?,
-            raw: parse_raw_result,
-        };
-
-        // Call deployer: deployExpression2Call
-        let call = deployExpression2Call {
-            constants: parse_result.typed_return.constants.clone(),
-            bytecode: parse_result.typed_return.bytecode.clone(),
-        };
-        let integrity_raw_result = self.call(
-            Address::default().as_slice(),
-            deployer.as_slice(),
-            &call.abi_encode(),
-        )?;
-
-        if integrity_raw_result.exit_reason == InstructionResult::Revert {
-            // decode result bytes to error selectors if it was a revert
-            return Err(ForkCallError::AbiDecodedError(
-                selector_registry_abi_decode(&integrity_raw_result.result).await?,
-            ));
-        }
-        if !integrity_raw_result.exit_reason.is_ok() {
-            return Err(ForkCallError::Failed(integrity_raw_result));
-        }
-
-        let integrity_result: ForkTypedReturn<deployExpression2Call> = ForkTypedReturn {
-            typed_return: deployExpression2Call::abi_decode_returns(
-                &integrity_raw_result.result.0,
-                true,
-            )
-            .map_err(|e| {
-                ForkCallError::TypedError(format!("Call:\"deployExpression2Call\" Error:{:?}", e))
-            })?,
-            raw: integrity_raw_result,
-        };
-
-        Ok((parse_result, integrity_result))
+        Ok(parse_result)
     }
 
     /// Evaluates the Rain language string and returns the evaluation result.
@@ -141,109 +79,110 @@ impl Forker {
     ///
     /// The typed return of the eval, plus Foundry's RawCallResult struct, including the trace.
     pub async fn fork_eval(
-        &mut self,
+        &self,
         args: ForkEvalArgs,
-    ) -> Result<ForkTypedReturn<eval2Call>, ForkCallError> {
+    ) -> Result<ForkTypedReturn<eval3Call>, ForkCallError> {
         let ForkEvalArgs {
             rainlang_string,
             source_index,
             deployer,
             namespace,
             context,
+            decode_errors,
         } = args;
-        let (expression_config_result, _) = self
+        let parse_result = self
             .fork_parse(ForkParseArgs {
                 rainlang_string: rainlang_string.clone(),
                 deployer,
+                decode_errors,
             })
             .await?;
-        let expression_config = expression_config_result.typed_return;
 
         let store = self
-            .alloy_call(Address::default(), deployer, iStoreCall {})?
+            .alloy_call(Address::default(), deployer, iStoreCall {}, decode_errors)
+            .await?
             .typed_return
             ._0;
 
         let interpreter = self
-            .alloy_call(Address::default(), deployer, iInterpreterCall {})?
+            .alloy_call(
+                Address::default(),
+                deployer,
+                iInterpreterCall {},
+                decode_errors,
+            )
+            .await?
             .typed_return
             ._0;
 
-        let deploy_call = deployExpression2Call {
-            bytecode: expression_config.bytecode,
-            constants: expression_config.constants,
-        };
-
-        let deploy_return = self
-            .alloy_call_committing(Address::default(), deployer, deploy_call, U256::from(0))?
-            .typed_return;
-
-        let dispatch =
-            CreateEncodedDispatch::encode(&deploy_return.expression, source_index, u16::MAX);
-
-        let eval_args = eval2Call {
+        let eval_args = eval3Call {
+            bytecode: parse_result.typed_return.bytecode,
+            sourceIndex: U256::from(source_index),
             store,
             namespace: namespace.into(),
-            dispatch: dispatch.into(),
             context,
             inputs: vec![],
         };
 
-        self.alloy_call(Address::default(), interpreter, eval_args)
+        let res = self
+            .alloy_call(Address::default(), interpreter, eval_args, decode_errors)
+            .await?;
+
+        Ok(res)
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::sync::Arc;
+
     use super::*;
     use crate::fork::NewForkedEvm;
-    use alloy_primitives::{BlockNumber, Bytes};
+    use alloy_primitives::BlockNumber;
 
     const FORK_URL: &str = "https://rpc.ankr.com/polygon_mumbai";
-    const FORK_BLOCK_NUMBER: BlockNumber = 45658085;
+    const FORK_BLOCK_NUMBER: BlockNumber = 47023593;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_parse() {
-        let deployer: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
+        let deployer: Address = "0x122ff0445BaE2a88C6f5F344733029E0d669D624"
             .parse::<Address>()
             .unwrap();
         let args = NewForkedEvm {
             fork_url: FORK_URL.to_owned(),
             fork_block_number: Some(FORK_BLOCK_NUMBER),
         };
-        let mut fork = Forker::new_with_fork(args, None, None).await;
+        let fork = Forker::new_with_fork(args, None, None).await;
         let res = fork
             .fork_parse(ForkParseArgs {
                 rainlang_string: r"_: int-add(1 2);".to_owned(),
                 deployer,
+                decode_errors: true,
             })
             .await
             .unwrap();
 
-        let res_bytecode = res.0.typed_return.bytecode;
-        let expected_bytes = "0x01000003020001010000010100000038020000"
-            .parse::<Bytes>()
-            .unwrap()
-            .to_vec();
-
-        assert_eq!(res_bytecode, expected_bytes);
-
-        let res_constants = res.0.typed_return.constants;
-        let expected_constants = vec![U256::from(1), U256::from(2)];
-
-        assert_eq!(res_constants, expected_constants);
+        let expected_bytes: Vec<u8> = vec![
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 1, 0, 0, 3, 2, 0, 1, 1, 16, 0, 1, 1, 16, 0, 0, 61,
+            18, 0, 0,
+        ];
+        assert_eq!(res.typed_return.bytecode, expected_bytes);
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_eval() {
-        let deployer: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
+        let deployer: Address = "0x122ff0445BaE2a88C6f5F344733029E0d669D624"
             .parse::<Address>()
             .unwrap();
         let args = NewForkedEvm {
             fork_url: FORK_URL.to_owned(),
             fork_block_number: Some(FORK_BLOCK_NUMBER),
         };
-        let mut fork = Forker::new_with_fork(args, None, None).await;
+        let fork = Forker::new_with_fork(args, None, None).await;
         let res = fork
             .fork_eval(ForkEvalArgs {
                 rainlang_string: r"_: int-add(1 2);".into(),
@@ -251,6 +190,7 @@ mod tests {
                 deployer,
                 namespace: FullyQualifiedNamespace::default(),
                 context: vec![],
+                decode_errors: true,
             })
             .await
             .unwrap();
@@ -275,5 +215,42 @@ mod tests {
             .unwrap();
         let trace_address = Address::from(source_index_zero_trace.address.into_array());
         assert_eq!(trace_address, expected_trace_address);
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 10)]
+    async fn test_fork_eval_parallel() {
+        let deployer: Address = "0x122ff0445BaE2a88C6f5F344733029E0d669D624"
+            .parse::<Address>()
+            .unwrap();
+        let args = NewForkedEvm {
+            fork_url: FORK_URL.to_owned(),
+            fork_block_number: Some(FORK_BLOCK_NUMBER),
+        };
+        let fork = Forker::new_with_fork(args, None, None).await;
+        let fork = Arc::new(fork); // Wrap in Arc for shared ownership
+
+        let mut handles = vec![];
+        for _ in 0..1000 {
+            let fork_clone = Arc::clone(&fork); // Clone the Arc for each thread
+            let handle = tokio::spawn(async move {
+                fork_clone
+                    .fork_eval(ForkEvalArgs {
+                        rainlang_string: r"_: int-add(1 2);".into(),
+                        source_index: 0,
+                        deployer,
+                        namespace: FullyQualifiedNamespace::default(),
+                        context: vec![],
+                        decode_errors: true,
+                    })
+                    .await
+                    .unwrap()
+            });
+            handles.push(handle);
+        }
+
+        for handle in handles {
+            let res = handle.await.unwrap();
+            assert_eq!(res.typed_return.stack, vec![U256::from(3)]);
+        }
     }
 }

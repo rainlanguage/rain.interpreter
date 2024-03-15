@@ -7,12 +7,21 @@ sol!(
 );
 sol!(
     #![sol(all_derives = true)]
+    IInterpreterV3,
+    "../../out/IInterpreterV3.sol/IInterpreterV3.json"
+);
+sol!(
+    #![sol(all_derives = true)]
     IInterpreterStoreV1,
     "../../out/IInterpreterStoreV1.sol/IInterpreterStoreV1.json"
 );
 sol!(
     #![sol(all_derives = true)]
     IParserV1, "../../out/IParserV1.sol/IParserV1.json");
+
+sol!(
+    #![sol(all_derives = true)]
+    IParserV2, "../../out/IParserV2.sol/IParserV2.json");
 sol!(
     #![sol(all_derives = true)]
     IExpressionDeployerV3,

@@ -1,6 +1,7 @@
 use crate::fork::ForkTypedReturn;
 use alloy_primitives::{Address, U256};
-use rain_interpreter_bindings::IInterpreterV2::{eval2Call, eval2Return};
+use rain_interpreter_bindings::IInterpreterV3::{eval3Call, eval3Return};
+
 use thiserror::Error;
 
 pub const RAIN_TRACER_ADDRESS: &str = "0xF06Cd48c98d7321649dB7D8b2C396A81A2046555";
@@ -46,7 +47,7 @@ impl RainSourceTrace {
 }
 
 /// A struct representing the result of a Rain eval call. Contains the stack,
-/// writes, and traces. Can be constructed from a `ForkTypedReturn<eval2Call>`.
+/// writes, and traces. Can be constructed from a `ForkTypedReturn<eval3Call>`.
 #[derive(Debug, Clone)]
 pub struct RainEvalResult {
     pub reverted: bool,
@@ -55,9 +56,9 @@ pub struct RainEvalResult {
     pub traces: Vec<RainSourceTrace>,
 }
 
-impl From<ForkTypedReturn<eval2Call>> for RainEvalResult {
-    fn from(typed_return: ForkTypedReturn<eval2Call>) -> Self {
-        let eval2Return { stack, writes } = typed_return.typed_return;
+impl From<ForkTypedReturn<eval3Call>> for RainEvalResult {
+    fn from(typed_return: ForkTypedReturn<eval3Call>) -> Self {
+        let eval3Return { stack, writes } = typed_return.typed_return;
 
         let tracer_address = RAIN_TRACER_ADDRESS.parse::<Address>().unwrap();
         let mut traces: Vec<RainSourceTrace> = typed_return
@@ -171,18 +172,18 @@ mod tests {
     use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
 
     const FORK_URL: &str = "https://rpc.ankr.com/polygon_mumbai";
-    const FORK_BLOCK_NUMBER: u64 = 45806808;
+    const FORK_BLOCK_NUMBER: u64 = 47023593;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
-    async fn test_fork_eval() {
-        let deployer_address: Address = "0x83aA87e8773bBE65DD34c5C5895948ce9f6cd2af"
+    async fn test_fork_trace() {
+        let deployer_address: Address = "0x122ff0445BaE2a88C6f5F344733029E0d669D624"
             .parse::<Address>()
             .unwrap();
         let args = NewForkedEvm {
             fork_url: FORK_URL.to_owned(),
             fork_block_number: Some(FORK_BLOCK_NUMBER),
         };
-        let mut fork = Forker::new_with_fork(args, None, None).await;
+        let fork = Forker::new_with_fork(args, None, None).await;
 
         let res = fork
             .fork_eval(ForkEvalArgs {
@@ -190,11 +191,11 @@ mod tests {
                 a: int-add(1 2),
                 b: 2,
                 c: 4,
-                _: call<1 1>(1 2),
+                _: call<1>(1 2),
                 :set(1 2),
                 :set(3 4);
                 a b:,
-                c: call<2 1>(a b),
+                c: call<2>(a b),
                 d: int-add(a b);
                 a b:,
                 c: int-mul(a b);
@@ -204,6 +205,7 @@ mod tests {
                 deployer: deployer_address,
                 namespace: FullyQualifiedNamespace::default(),
                 context: vec![],
+                decode_errors: true,
             })
             .await
             .unwrap();
@@ -246,14 +248,14 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_search_trace_by_path() {
-        let deployer_address: Address = "0x83aA87e8773bBE65DD34c5C5895948ce9f6cd2af"
+        let deployer_address: Address = "0x122ff0445BaE2a88C6f5F344733029E0d669D624"
             .parse::<Address>()
             .unwrap();
         let args = NewForkedEvm {
             fork_url: FORK_URL.to_owned(),
             fork_block_number: Some(FORK_BLOCK_NUMBER),
         };
-        let mut fork = Forker::new_with_fork(args, None, None).await;
+        let fork = Forker::new_with_fork(args, None, None).await;
 
         let res = fork
             .fork_eval(ForkEvalArgs {
@@ -261,9 +263,9 @@ mod tests {
                 a: int-add(1 2),
                 b: 2,
                 c: 4,
-                _: call<1 1>(1 2);  
+                _: call<1>(1 2);  
                 a b:,
-                c: call<2 1>(a b),
+                c: call<2>(a b),
                 d: int-add(a b);
                 a b:,
                 c: int-mul(a b);
@@ -273,6 +275,7 @@ mod tests {
                 deployer: deployer_address,
                 namespace: FullyQualifiedNamespace::default(),
                 context: vec![],
+                decode_errors: true,
             })
             .await
             .unwrap();

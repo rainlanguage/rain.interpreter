@@ -16,6 +16,9 @@ pub struct ForkParseArgsCli {
 
     #[arg(short, long, help = "The Rainlang string to parse")]
     rainlang_string: String,
+
+    #[arg(short, long, help = "Decode errors using the openchain.xyz database")]
+    decode_errors: bool,
 }
 
 #[derive(Args, Clone)]
@@ -39,17 +42,18 @@ impl From<ForkParseArgsCli> for ForkParseArgs {
         ForkParseArgs {
             deployer: args.deployer,
             rainlang_string: args.rainlang_string,
+            decode_errors: args.decode_errors,
         }
     }
 }
 
 impl Execute for Parse {
     async fn execute(&self) -> Result<()> {
-        let mut forker = Forker::new_with_fork(self.forked_evm.clone().into(), None, None).await;
+        let forker = Forker::new_with_fork(self.forked_evm.clone().into(), None, None).await;
         let result = forker.fork_parse(self.fork_parse_args.clone().into()).await;
 
         match result {
-            Ok((res, _)) => crate::output::output(
+            Ok(res) => crate::output::output(
                 &self.output_path,
                 self.output_encoding.clone(),
                 res.raw.result.to_owned().to_vec().as_slice(),

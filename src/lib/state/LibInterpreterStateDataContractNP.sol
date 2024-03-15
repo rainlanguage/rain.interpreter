@@ -15,6 +15,7 @@ library LibInterpreterStateDataContractNP {
 
     function serializeSizeNP(bytes memory bytecode, uint256[] memory constants) internal pure returns (uint256 size) {
         unchecked {
+            // bytecode length + constants length * 0x20 + 0x40 for both the bytecode and constants length words.
             size = bytecode.length + constants.length * 0x20 + 0x40;
         }
     }

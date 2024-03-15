@@ -33,6 +33,9 @@ pub struct ForkEvalCliArgs {
         help = "The context in key=value format, key is the context column name and value is the context rows as a comma separated list"
     )]
     pub context: Vec<String>,
+
+    #[arg(short, long, help = "Decode errors using the openchain.xyz database")]
+    pub decode_errors: bool,
 }
 
 impl TryFrom<ForkEvalCliArgs> for ForkEvalArgs {
@@ -58,6 +61,7 @@ impl TryFrom<ForkEvalCliArgs> for ForkEvalArgs {
             deployer: args.deployer,
             namespace: FullyQualifiedNamespace::from(namespace),
             context,
+            decode_errors: args.decode_errors,
         })
     }
 }
@@ -86,7 +90,7 @@ pub struct Eval {
 
 impl Execute for Eval {
     async fn execute(&self) -> Result<()> {
-        let mut forker = Forker::new_with_fork(self.forked_evm.clone().into(), None, None).await;
+        let forker = Forker::new_with_fork(self.forked_evm.clone().into(), None, None).await;
         let result = forker
             .fork_eval(self.fork_eval_args.clone().try_into()?)
             .await;
@@ -123,16 +127,17 @@ mod tests {
             output_path: None,
             forked_evm: NewForkedEvmCliArgs {
                 fork_url: "https://rpc.ankr.com/polygon_mumbai".into(),
-                fork_block_number: Some(45658085),
+                fork_block_number: Some(47023593),
             },
             fork_eval_args: ForkEvalCliArgs {
                 rainlang_string: r"_: int-add(10 2), _: context<0 0>(), _:context<0 1>();".into(),
                 source_index: 0,
-                deployer: "0x0754030e91F316B2d0b992fe7867291E18200A77"
+                deployer: "0x122ff0445BaE2a88C6f5F344733029E0d669D624"
                     .parse()
                     .unwrap(),
                 namespace: "0x123".into(),
                 context: vec!["0x06,99".into()],
+                decode_errors: true,
             },
         };
 
