@@ -172,8 +172,7 @@ contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, IParserV2
         LibInterpreterStateDataContractNP.unsafeSerializeNP(cursor, bytecode, constants);
 
         bytes memory io = LibIntegrityCheckNP.integrityCheck2(INTEGRITY_FUNCTION_POINTERS, bytecode, constants);
-        // Nothing is done with IO in IParserV2. LibBytecode can be used to
-        // inspect this from the bytecode.
+        // Nothing is done with IO in IParserV2.
         (io);
 
         return serialized;
