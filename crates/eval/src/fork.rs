@@ -300,17 +300,14 @@ impl Forker {
             return Err(ForkCallError::ExecutorError("invalid address!".to_owned()));
         }
 
-        let result = self
-            .executor
+        self.executor
             .call_raw(
                 Addr::from_slice(from_address),
                 Addr::from_slice(to_address),
                 Bytes::copy_from_slice(calldata),
                 U256::from(0),
             )
-            .map_err(|e| ForkCallError::ExecutorError(e.to_string()));
-
-        result
+            .map_err(|e| ForkCallError::ExecutorError(e.to_string()))
     }
 
     /// Writes to the forked EVM.
