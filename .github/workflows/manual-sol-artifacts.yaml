@@ -14,6 +14,7 @@ on:
           - ethereum
           - flare
           - mumbai
+          - oasis_sapphire
           - polygon
           - songbird
 
