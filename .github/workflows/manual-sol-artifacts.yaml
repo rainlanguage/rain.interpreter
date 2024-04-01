@@ -29,7 +29,7 @@ jobs:
           echo "verifier_secret_name=CI_DEPLOY_${network^^}_VERIFIER" >> $GITHUB_ENV
           echo "verifier_url_secret_name=CI_DEPLOY_${network^^}_VERIFIER_URL" >> $GITHUB_ENV
 
-      - run: echo "verifier url ${{ secrets[env.verifier_url_secret_name] || env[env.verifier_url_secret_name] || '' }}"
+      - run: echo "verifier url ${{ secrets[env.verifier_url_secret_name] || vars[env.verifier_url_secret_name] || '' }}"
 
       - run: echo "$GITHUB_ENV"
 
