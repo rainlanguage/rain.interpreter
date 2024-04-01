@@ -45,7 +45,7 @@ jobs:
       - name: deploy to ${{ inputs.network }}
         run: nix develop --command rainix-sol-artifacts
         env:
-          ETH_RPC_URL: ${{ secrets[env.rpc_secret_name] || '' }}
-          ETHERSCAN_API_KEY: ${{ secrets[env.etherscan_api_key_secret_name] || ''}}
-          DEPLOY_VERIFIER: ${{ secrets[env.verifier_secret_name] || '' }}
-          DEPLOY_VERIFIER_URL: ${{ secrets[env.verifier_url_secret_name] || '' }}
+          ETH_RPC_URL: ${{ secrets[env.rpc_secret_name] || env[env.rpc_secret_name] || '' }}
+          ETHERSCAN_API_KEY: ${{ secrets[env.etherscan_api_key_secret_name] || env[env.etherscan_api_key_secret_name] || ''}}
+          DEPLOY_VERIFIER: ${{ secrets[env.verifier_secret_name] || env[env.verifier_secret_name] || '' }}
+          DEPLOY_VERIFIER_URL: ${{ secrets[env.verifier_url_secret_name] || env[env.verifier_url_secret_name] || '' }}
