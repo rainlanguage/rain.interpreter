@@ -21,8 +21,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      DEPLOYMENT_KEY: ${{ github.ref == 'refs/heads/main' && secrets.PRIVATE_KEY || secrets.PRIVATE_KEY_DEV }}
     steps:
       - run: |
           network=${{ inputs.network }}
@@ -30,6 +28,10 @@ jobs:
           echo "rpc_secret_name=CI_DEPLOY_${network^^}_RPC_URL" >> $GITHUB_ENV
           echo "verifier_secret_name=CI_DEPLOY_${network^^}_VERIFIER" >> $GITHUB_ENV
           echo "verifier_url_secret_name=CI_DEPLOY_${network^^}_VERIFIER_URL" >> $GITHUB_ENV
+
+      - run: echo "verifier url ${{ secrets[env.verifier_url_secret_name] || env[env.verifier_url_secret_name] || '' }}"
+
+      - run: echo "$GITHUB_ENV"
 
       - uses: actions/checkout@v4
         with:
@@ -45,6 +47,7 @@ jobs:
       - name: deploy to ${{ inputs.network }}
         run: nix develop --command rainix-sol-artifacts
         env:
+          DEPLOYMENT_KEY: ${{ github.ref == 'refs/heads/main' && secrets.PRIVATE_KEY || secrets.PRIVATE_KEY_DEV }}
           ETH_RPC_URL: ${{ secrets[env.rpc_secret_name] || env[env.rpc_secret_name] || '' }}
           ETHERSCAN_API_KEY: ${{ secrets[env.etherscan_api_key_secret_name] || env[env.etherscan_api_key_secret_name] || ''}}
           DEPLOY_VERIFIER: ${{ secrets[env.verifier_secret_name] || env[env.verifier_secret_name] || '' }}
