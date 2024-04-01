@@ -40,7 +40,6 @@ jobs:
 
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
-      - uses: DeterminateSystems/flake-checker-action@main
 
       - run: nix develop --command rainix-sol-prelude
       - run: nix develop --command rainix-rs-prelude
