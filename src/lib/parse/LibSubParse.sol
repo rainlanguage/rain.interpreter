@@ -174,13 +174,8 @@ library LibSubParse {
                         // subparser some minimal additional contextual information
                         // then the rest of the data is the original string that the
                         // main parser could not understand.
-                        // The header is:
-                        // - 2 bytes: The current constant builder height. MAY be
-                        //   used by the subparser to calculate indexes for the
-                        //   constants it pushes.
-                        // - 1 byte: The IO byte from the unknown op. MAY be used
-                        //   by the subparser to calculate the IO byte for the op
-                        //   it builds.
+                        // The header is structured and versioned according to
+                        // the compatibility version.
                         bytes memory data;
                         // The operand of the unknown opcode directly points at the
                         // data that we need to subparse.
@@ -243,7 +238,19 @@ library LibSubParse {
                     memoryAtCursor := mload(cursor)
                 }
                 if (memoryAtCursor >> 0xf8 == OPCODE_UNKNOWN) {
-                    revert UnknownWord();
+                    string memory word;
+                    // The operand of the unknown opcode directly points at the
+                    // unknown word subparsing data.
+                    assembly ("memory-safe") {
+                        word := and(shr(0xe0, memoryAtCursor), 0xFFFF)
+                        // Zero out the sub parsing header data other than the
+                        // string length.
+                        mstore(add(word, 3), 0)
+                        // Use the 2 byte length in the sub parse data as the
+                        // string length for the error.
+                        word := add(word, 5)
+                    }
+                    revert UnknownWord(word);
                 }
             }
         }

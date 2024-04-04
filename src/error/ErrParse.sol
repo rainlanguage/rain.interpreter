@@ -106,7 +106,7 @@ error ExcessRHSItems(uint256 offset);
 error WordSize(string word);
 
 /// Parsed a word that is not in the meta.
-error UnknownWord();
+error UnknownWord(string word);
 
 /// The parser exceeded the maximum number of sources that it can build.
 error MaxSources();
