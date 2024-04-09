@@ -18,7 +18,7 @@ contract Deploy is Script {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("DEPLOYMENT_KEY");
         bytes memory constructionMeta = vm.readFileBinary("meta/RainterpreterExpressionDeployerNPE2.rain.meta");
-        IMetaBoardV1 metaboard = IMetaBoardV1(vm.envAddress("DEPLOYMENT_META_BOARD"));
+        IMetaBoardV1 metaboard = IMetaBoardV1(vm.envAddress("DEPLOY_METABOARD_ADDRESS"));
 
         vm.startBroadcast(deployerPrivateKey);
 
