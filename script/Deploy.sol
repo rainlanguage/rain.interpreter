@@ -9,6 +9,7 @@ import {
     RainterpreterExpressionDeployerNPE2,
     RainterpreterExpressionDeployerNPE2ConstructionConfig
 } from "../src/concrete/RainterpreterExpressionDeployerNPE2.sol";
+import {IMetaBoardV1} from "rain.metadata/interface/IMetaBoardV1.sol";
 
 /// @title Deploy
 /// This is intended to be run on every commit by CI to a testnet such as mumbai,
@@ -17,6 +18,7 @@ contract Deploy is Script {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("DEPLOYMENT_KEY");
         bytes memory constructionMeta = vm.readFileBinary("meta/RainterpreterExpressionDeployerNPE2.rain.meta");
+        IMetaBoardV1 metaboard = IMetaBoardV1(vm.envAddress("DEPLOYMENT_META_BOARD"));
 
         vm.startBroadcast(deployerPrivateKey);
 
@@ -34,6 +36,7 @@ contract Deploy is Script {
                 address(interpreter), address(store), address(parser), constructionMeta
             )
         );
+        metaboard.emitMeta(uint256(uint160(address(deployer))), constructionMeta);
         vm.writeFile("deployments/latest/RainterpreterExpressionDeployerNPE2", vm.toString(address(deployer)));
 
         vm.stopBroadcast();
