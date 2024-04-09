@@ -23,6 +23,7 @@ import {
 import {IParserV1} from "rain.interpreter.interface/interface/IParserV1.sol";
 import {IInterpreterV2} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
+import {IDescribedByMetaV1} from "rain.metadata/interface/unstable/IDescribedByMetaV1.sol";
 
 import {LibIntegrityCheckNP} from "../lib/integrity/LibIntegrityCheckNP.sol";
 import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
@@ -52,7 +53,7 @@ struct RainterpreterExpressionDeployerNPE2ConstructionConfig {
 }
 
 /// @title RainterpreterExpressionDeployerNPE2
-contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, IParserV2, ERC165 {
+contract RainterpreterExpressionDeployerNPE2 is IDescribedByMetaV1, IExpressionDeployerV3, IParserV2, ERC165 {
     using LibPointer for Pointer;
     using LibStackPointer for Pointer;
     using LibUint256Array for uint256[];
@@ -198,6 +199,11 @@ contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, IParserV2
     /// evm to deploy the full dispair and reads the hashes from errors using a
     /// trail/error approach until a full dispair is deployed.
     function expectedConstructionMetaHash() public pure virtual returns (bytes32) {
+        return CONSTRUCTION_META_HASH;
+    }
+
+    ///@inheritdoc IDescribedByMetaV1
+    function describedByMetaV1() external pure returns (bytes32) {
         return CONSTRUCTION_META_HASH;
     }
 
