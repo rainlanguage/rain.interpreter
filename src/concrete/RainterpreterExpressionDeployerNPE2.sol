@@ -43,12 +43,10 @@ bytes32 constant CONSTRUCTION_META_HASH = bytes32(0xc37d63d859e8ee0f203088549452
 /// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match
 /// known bytecode.
 /// @param store The `IInterpreterStoreV2`. MUST match known bytecode.
-/// @param meta Contract meta for tooling.
-struct RainterpreterExpressionDeployerNPE2ConstructionConfig {
+struct RainterpreterExpressionDeployerNPE2ConstructionConfigV2 {
     address interpreter;
     address store;
     address parser;
-    bytes meta;
 }
 
 /// @title RainterpreterExpressionDeployerNPE2
@@ -64,7 +62,7 @@ contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, IParserV2
     IInterpreterStoreV2 public immutable iStore;
     IParserV1 public immutable iParser;
 
-    constructor(RainterpreterExpressionDeployerNPE2ConstructionConfig memory config) {
+    constructor(RainterpreterExpressionDeployerNPE2ConstructionConfigV2 memory config) {
         // Set the immutables.
         IInterpreterV2 interpreter = IInterpreterV2(config.interpreter);
         IInterpreterStoreV2 store = IInterpreterStoreV2(config.store);
@@ -73,14 +71,6 @@ contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, IParserV2
         iInterpreter = interpreter;
         iStore = store;
         iParser = parser;
-
-        /// This IS a security check. This prevents someone making an exact
-        /// bytecode copy of the interpreter and shipping different meta for
-        /// the copy to lie about what each op does in the interpreter.
-        bytes32 constructionMetaHash = keccak256(config.meta);
-        if (constructionMetaHash != expectedConstructionMetaHash()) {
-            revert UnexpectedConstructionMetaHash(expectedConstructionMetaHash(), constructionMetaHash);
-        }
 
         // Guard against an interpreter with unknown bytecode.
         bytes32 interpreterHash;
@@ -109,10 +99,10 @@ contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, IParserV2
             revert UnexpectedParserBytecodeHash(expectedParserBytecodeHash(), parserHash);
         }
 
-        // Emit the DISPair.
+        // Emit the DISPairV2.
         // The parser is this contract as it implements both
-        // `IExpressionDeployerV3` and `IParserV1`.
-        emit DISPair(msg.sender, address(interpreter), address(store), address(parser), config.meta);
+        // `IExpressionDeployerV3` and `IParserV2`.
+        emit DISPairV2(msg.sender, address(interpreter), address(store), address(parser));
 
         // Register the interface for the deployer.
         // We have to check that the 1820 registry has bytecode at the address
@@ -193,10 +183,6 @@ contract RainterpreterExpressionDeployerNPE2 is IExpressionDeployerV3, IParserV2
     }
 
     /// Virtual function to return the expected construction meta hash.
-    /// Public so that external tooling can read it, although this should be
-    /// considered deprecated. The intended workflow is that tooling uses a real
-    /// evm to deploy the full dispair and reads the hashes from errors using a
-    /// trail/error approach until a full dispair is deployed.
     function expectedConstructionMetaHash() public pure virtual returns (bytes32) {
         return CONSTRUCTION_META_HASH;
     }

@@ -21,7 +21,7 @@ import {
 import {
     CONSTRUCTION_META_HASH,
     INTEGRITY_FUNCTION_POINTERS,
-    RainterpreterExpressionDeployerNPE2ConstructionConfig,
+    RainterpreterExpressionDeployerNPE2ConstructionConfigV2,
     RainterpreterExpressionDeployerNPE2
 } from "../../src/concrete/RainterpreterExpressionDeployerNPE2.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
@@ -121,10 +121,16 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
             address(IERC1820_REGISTRY), abi.encodeWithSelector(IERC1820Registry.setInterfaceImplementer.selector), ""
         );
         iDeployer = new RainterpreterExpressionDeployerNPE2(
-            RainterpreterExpressionDeployerNPE2ConstructionConfig(
-                address(iInterpreter), address(iStore), address(iParser), constructionMeta
+            RainterpreterExpressionDeployerNPE2ConstructionConfigV2(
+                address(iInterpreter), address(iStore), address(iParser)
             )
         );
+
+        if (constructionMetaHash != iDeployer.expectedConstructionMetaHash()) {
+            console2.log("current deployer construction meta hash:");
+            console2.logBytes32(iDeployer.expectedConstructionMetaHash());
+            revert("unexpected deployer construction meta hash");
+        }
 
         // Sanity check the deployer's integrity function pointers.
         bytes memory integrityFunctionPointers = iDeployer.integrityFunctionPointers();

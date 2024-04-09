@@ -10,7 +10,7 @@ import {IInterpreterV2} from "rain.interpreter.interface/interface/IInterpreterV
 
 import {
     RainterpreterExpressionDeployerNPE2,
-    RainterpreterExpressionDeployerNPE2ConstructionConfig,
+    RainterpreterExpressionDeployerNPE2ConstructionConfigV2,
     CONSTRUCTION_META_HASH,
     UnexpectedConstructionMetaHash,
     UnexpectedPointers
@@ -38,43 +38,22 @@ contract RainterpreterExpressionDeployerNPE2DeployCheckTest is Test {
         vm.expectCall(
             address(IERC1820_REGISTRY), abi.encodeWithSelector(IERC1820Registry.setInterfaceImplementer.selector), 1
         );
-        bytes memory constructionMeta = vm.readFileBinary(EXPRESSION_DEPLOYER_NP_META_PATH);
         new RainterpreterExpressionDeployerNPE2(
-            RainterpreterExpressionDeployerNPE2ConstructionConfig(
+            RainterpreterExpressionDeployerNPE2ConstructionConfigV2(
                 address(new RainterpreterNPE2()),
                 address(new RainterpreterStoreNPE2()),
-                address(new RainterpreterParserNPE2()),
-                constructionMeta
+                address(new RainterpreterParserNPE2())
             )
         );
     }
 
     /// Test the deployer can deploy to a chain that does not support EIP-1820.
     function testRainterpreterExpressionDeployerDeployNoEIP1820() external {
-        bytes memory constructionMeta = vm.readFileBinary(EXPRESSION_DEPLOYER_NP_META_PATH);
         new RainterpreterExpressionDeployerNPE2(
-            RainterpreterExpressionDeployerNPE2ConstructionConfig(
+            RainterpreterExpressionDeployerNPE2ConstructionConfigV2(
                 address(new RainterpreterNPE2()),
                 address(new RainterpreterStoreNPE2()),
-                address(new RainterpreterParserNPE2()),
-                constructionMeta
-            )
-        );
-    }
-
-    /// If everything is invalid the construction meta hash should be the error
-    /// as this makes it easier to implement tooling that needs to access the
-    /// meta hash but may not have access to the dependencies.
-    function testRainterpreterExpressionDeployerDeployInvalidEverything() external {
-        bytes memory badConstructionMeta = hex"DEADBEEF";
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                UnexpectedConstructionMetaHash.selector, CONSTRUCTION_META_HASH, keccak256(badConstructionMeta)
-            )
-        );
-        new RainterpreterExpressionDeployerNPE2(
-            RainterpreterExpressionDeployerNPE2ConstructionConfig(
-                address(0), address(0), address(0), badConstructionMeta
+                address(new RainterpreterParserNPE2())
             )
         );
     }
