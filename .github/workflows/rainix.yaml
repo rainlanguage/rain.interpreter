@@ -40,4 +40,5 @@ jobs:
           ETHERSCAN_API_KEY: ${{ secrets.EXPLORER_VERIFICATION_KEY }}
           DEPLOY_BROADCAST: ''
           DEPLOY_VERIFIER: ''
+          DEPLOY_METABOARD_ADDRESS: ${{ vars.CI_DEPLOY_SEPOLIA_METABOARD_ADDRESS }}
         run: nix develop --command ${{ matrix.task }}
