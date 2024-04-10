@@ -8,7 +8,11 @@ import {BaseRainterpreterSubParserNPE2} from "src/abstract/BaseRainterpreterSubP
 
 /// @dev We need a contract that is deployable in order to test the abstract
 /// base contract.
-contract ChildRainterpreterSubParserNPE2 is BaseRainterpreterSubParserNPE2 {}
+contract ChildRainterpreterSubParserNPE2 is BaseRainterpreterSubParserNPE2 {
+    function describedByMetaV1() external pure override returns (bytes32) {
+        return 0;
+    }
+}
 
 /// @title BaseRainterpreterSubParserNPE2Test
 /// Test suite for BaseRainterpreterSubParserNPE2.

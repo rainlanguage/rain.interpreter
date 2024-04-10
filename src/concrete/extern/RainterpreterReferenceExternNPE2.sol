@@ -22,6 +22,9 @@ import {LibExternOpContextRainlenNPE2} from "../../lib/extern/reference/op/LibEx
 import {LibParseLiteralRepeat} from "../../lib/extern/reference/literal/LibParseLiteralRepeat.sol";
 import {LibParseLiteralDecimal} from "../../lib/parse/literal/LibParseLiteralDecimal.sol";
 
+/// @dev The hash of the meta that describes this contract.
+bytes32 constant DESCRIBED_BY_META_HASH = 0x127c30251dc5dcab573a0261a1e21684a85d7ce868fb54c826280ba2266cc034;
+
 /// @dev The number of subparser functions available to the parser. This is NOT
 /// 1:1 with the number of opcodes provided by the extern component of this
 /// contract. It is possible to subparse words into opcodes that run entirely
@@ -169,6 +172,10 @@ library LibRainterpreterReferenceExternNPE2 {
 /// undefined behaviour in production, so ALWAYS test this, preferably in an
 /// automated way.
 contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, BaseRainterpreterExternNPE2 {
+    function describedByMetaV1() external pure override returns (bytes32) {
+        return DESCRIBED_BY_META_HASH;
+    }
+
     /// Overrides the base parse meta for sub parsing. Simply returns the known
     /// constant value, which should allow the compiler to optimise the entire
     /// function call away.
