@@ -22,14 +22,23 @@
 
               # Build metadata that is needed for deployments.
               mkdir -p meta;
+              forge script --silent ./script/BuildAuthoringMeta.sol;
               rain meta build \
-                -i <(forge script --silent ./script/BuildAuthoringMeta.sol && cat ./meta/AuthoringMeta.rain.meta) \
+                -i <(cat ./meta/AuthoringMeta.rain.meta) \
                 -m authoring-meta-v1 \
                 -t cbor \
                 -e deflate \
                 -l none \
                 -o meta/RainterpreterExpressionDeployerNPE2.rain.meta \
               ;
+
+              rain meta build \
+                -i <(cat ./meta/RainterpreterReferenceExternNPE2AuthoringMeta.rain.meta) \
+                -m authoring-meta-v1 \
+                -t cbor \
+                -e deflate \
+                -l none \
+                -o meta/RainterpreterReferenceExternNPE2.rain.meta \
             '';
             additionalBuildInputs = rainix.sol-build-inputs.${system};
           };

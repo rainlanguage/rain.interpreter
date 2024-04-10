@@ -22,6 +22,9 @@ import {LibExternOpContextRainlenNPE2} from "../../lib/extern/reference/op/LibEx
 import {LibParseLiteralRepeat} from "../../lib/extern/reference/literal/LibParseLiteralRepeat.sol";
 import {LibParseLiteralDecimal} from "../../lib/parse/literal/LibParseLiteralDecimal.sol";
 
+/// @dev The hash of the meta that describes this contract.
+bytes32 constant DESCRIBED_BY_META_HASH = 0x127c30251dc5dcab573a0261a1e21684a85d7ce868fb54c826280ba2266cc034;
+
 /// @dev The number of subparser functions available to the parser. This is NOT
 /// 1:1 with the number of opcodes provided by the extern component of this
 /// contract. It is possible to subparse words into opcodes that run entirely
@@ -33,7 +36,7 @@ uint256 constant SUB_PARSER_WORD_PARSERS_LENGTH = 5;
 /// bytecode that dials back into this contract at eval time, and creating
 /// to things that happen entirely on the interpreter such as well known
 /// constants and references to the context grid.
-bytes constant SUB_PARSER_WORD_PARSERS = hex"07340756076507750786";
+bytes constant SUB_PARSER_WORD_PARSERS = hex"076d078f079e07ae07bf";
 
 /// @dev Real sub parser meta bytes that map parsed strings to the functions that
 /// know how to parse those strings into opcodes for the main parser. Structured
@@ -44,12 +47,12 @@ bytes constant SUB_PARSER_PARSE_META =
 /// @dev Real function pointers to the operand parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
 /// the rightmost position is a pointer to an operand parser function.
-bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"08a508ea08a508a508a5";
+bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"08de092308de08de08de";
 
 /// @dev Real function pointers to the literal parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
 /// the rightmost position is a pointer to a literal parser function.
-bytes constant SUB_PARSER_LITERAL_PARSERS = hex"0876";
+bytes constant SUB_PARSER_LITERAL_PARSERS = hex"08af";
 
 /// @dev The number of literal parsers provided by the sub parser.
 uint256 constant SUB_PARSER_LITERAL_PARSERS_LENGTH = 1;
@@ -79,7 +82,7 @@ error InvalidRepeatCount(uint256 value);
 /// @dev Real function pointers to the opcodes for the extern component of this
 /// contract. These get run at eval time wehen the interpreter calls into the
 /// contract as an `IInterpreterExternV3`.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"0828";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"0861";
 
 /// @dev Number of opcode function pointers available to run at eval time.
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
@@ -88,7 +91,7 @@ uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
 /// of this contract. These get run at deploy time when the main integrity checks
 /// are run, the extern opcode integrity on the deployer will delegate integrity
 /// checks to the extern contract.
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"097f";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"09b8";
 
 /// @title LibRainterpreterReferenceExternNPE2
 /// This library allows code SEPARATE FROM the implementation contract to do
@@ -169,6 +172,10 @@ library LibRainterpreterReferenceExternNPE2 {
 /// undefined behaviour in production, so ALWAYS test this, preferably in an
 /// automated way.
 contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, BaseRainterpreterExternNPE2 {
+    function describedByMetaV1() external pure override returns (bytes32) {
+        return DESCRIBED_BY_META_HASH;
+    }
+
     /// Overrides the base parse meta for sub parsing. Simply returns the known
     /// constant value, which should allow the compiler to optimise the entire
     /// function call away.
