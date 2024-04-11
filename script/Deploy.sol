@@ -10,6 +10,7 @@ import {
     RainterpreterExpressionDeployerNPE2ConstructionConfig
 } from "../src/concrete/RainterpreterExpressionDeployerNPE2.sol";
 import {IMetaBoardV1} from "rain.metadata/interface/IMetaBoardV1.sol";
+import {LibDescribedByMeta} from "rain.metadata/lib/LibDescribedByMeta.sol";
 
 /// @title Deploy
 /// This is intended to be run on every commit by CI to a testnet such as mumbai,
@@ -36,7 +37,8 @@ contract Deploy is Script {
                 address(interpreter), address(store), address(parser), constructionMeta
             )
         );
-        metaboard.emitMeta(uint256(uint160(address(deployer))), constructionMeta);
+        LibDescribedByMeta.emitForDescribedAddress(metaboard, deployer, constructionMeta);
+
         vm.writeFile("deployments/latest/RainterpreterExpressionDeployerNPE2", vm.toString(address(deployer)));
 
         vm.stopBroadcast();
