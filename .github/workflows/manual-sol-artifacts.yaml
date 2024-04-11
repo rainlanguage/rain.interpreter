@@ -17,6 +17,7 @@ on:
           - mumbai
           - oasis_sapphire
           - polygon
+          - sepolia
           - songbird
 
 jobs:
