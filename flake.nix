@@ -25,7 +25,7 @@
               forge script --silent ./script/BuildAuthoringMeta.sol;
               rain meta build \
                 -i <(cat ./meta/AuthoringMeta.rain.meta) \
-                -m authoring-meta-v1 \
+                -m authoring-meta-v2 \
                 -t cbor \
                 -e deflate \
                 -l none \
@@ -34,7 +34,7 @@
 
               rain meta build \
                 -i <(cat ./meta/RainterpreterReferenceExternNPE2AuthoringMeta.rain.meta) \
-                -m authoring-meta-v1 \
+                -m authoring-meta-v2 \
                 -t cbor \
                 -e deflate \
                 -l none \
