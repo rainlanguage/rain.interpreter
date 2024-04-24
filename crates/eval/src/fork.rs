@@ -410,25 +410,23 @@ mod tests {
     }
     const USDT_POLYGON: &str = "0xc2132d05d31c914a87c6611c10748aeb04b58e8f";
     const USDT_BSC: &str = "0x55d398326f99059fF775485246999027B3197955";
-    const POLYGON_FORK_NUMBER: u64 = 53717900;
+    const POLYGON_FORK_NUMBER: u64 = 54697866;
     const BSC_FORK_NUMBER: u64 = 36281780;
     const POLYGON_FORK_URL: &str = "https://rpc.ankr.com/polygon";
     const BSC_FORK_URL: &str = "https://rpc.ankr.com/bsc";
     const BSC_ACC: &str = "0xee5B5B923fFcE93A870B3104b7CA09c3db80047A";
     const POLYGON_ACC: &str = "0xF977814e90dA44bFA03b6295A0616a897441aceC";
-    const MUMBAI_FORK_URL: &str = "https://rpc.ankr.com/polygon_mumbai";
-    const MUMBAI_FORK_NUMBER: u64 = 45658085;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_forker_read() {
         let args = NewForkedEvm {
-            fork_url: MUMBAI_FORK_URL.to_owned(),
-            fork_block_number: Some(MUMBAI_FORK_NUMBER),
+            fork_url: POLYGON_FORK_URL.to_owned(),
+            fork_block_number: Some(POLYGON_FORK_NUMBER),
         };
         let forker = Forker::new_with_fork(args, None, None).await;
 
         let from_address = Address::default();
-        let to_address: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
+        let to_address: Address = "0xF77b3c3f61af5a3cE7f7CE3cfFc117491104432E"
             .parse::<Address>()
             .unwrap();
         let call = iParserCall {};
@@ -437,7 +435,7 @@ mod tests {
             .await
             .unwrap();
         let parser_address = result.typed_return._0;
-        let expected_address = "0x4f8024FB052DbE76b156C6C262Ad27e0F436AF98"
+        let expected_address = "0x8F61d274aaB5D8CFD82dc266529EAe33020386a9"
             .parse::<Address>()
             .unwrap();
         assert_eq!(parser_address, expected_address);
@@ -446,12 +444,12 @@ mod tests {
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_forker_write() {
         let args = NewForkedEvm {
-            fork_url: MUMBAI_FORK_URL.to_owned(),
-            fork_block_number: Some(MUMBAI_FORK_NUMBER),
+            fork_url: POLYGON_FORK_URL.to_owned(),
+            fork_block_number: Some(POLYGON_FORK_NUMBER),
         };
         let mut forker = Forker::new_with_fork(args, None, None).await;
         let from_address = Address::repeat_byte(0x02);
-        let to_address: Address = "0xF34e1f2BCeC2baD9c7bE8Aec359691839B784861"
+        let to_address: Address = "0x0eA6d458488d1cf51695e1D6e4744e6FB715d37C"
             .parse::<Address>()
             .unwrap();
         let namespace = U256::from(1);
