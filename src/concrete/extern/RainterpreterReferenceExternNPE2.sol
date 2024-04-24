@@ -23,7 +23,7 @@ import {LibParseLiteralRepeat} from "../../lib/extern/reference/literal/LibParse
 import {LibParseLiteralDecimal} from "../../lib/parse/literal/LibParseLiteralDecimal.sol";
 
 /// @dev The hash of the meta that describes this contract.
-bytes32 constant DESCRIBED_BY_META_HASH = 0x127c30251dc5dcab573a0261a1e21684a85d7ce868fb54c826280ba2266cc034;
+bytes32 constant DESCRIBED_BY_META_HASH = 0xadf71693c6ecf3fd560904bc46973d1b6e651440d15366673f9b3984749e7c16;
 
 /// @dev The number of subparser functions available to the parser. This is NOT
 /// 1:1 with the number of opcodes provided by the extern component of this

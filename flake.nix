@@ -3,7 +3,7 @@
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-    rainix.url = "github:rainprotocol/rainix/5d9cd739180d9f7d7421228eddf7eb77126d3235";
+    rainix.url = "github:rainprotocol/rainix";
   };
 
   outputs = { self, flake-utils, rainix, ... }:
@@ -25,7 +25,7 @@
               forge script --silent ./script/BuildAuthoringMeta.sol;
               rain meta build \
                 -i <(cat ./meta/AuthoringMeta.rain.meta) \
-                -m authoring-meta-v1 \
+                -m authoring-meta-v2 \
                 -t cbor \
                 -e deflate \
                 -l none \
@@ -34,7 +34,7 @@
 
               rain meta build \
                 -i <(cat ./meta/RainterpreterReferenceExternNPE2AuthoringMeta.rain.meta) \
-                -m authoring-meta-v1 \
+                -m authoring-meta-v2 \
                 -t cbor \
                 -e deflate \
                 -l none \
