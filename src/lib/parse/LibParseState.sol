@@ -232,6 +232,10 @@ library LibParseState {
         return state;
     }
 
+    /// Pushes a `uint256` representation of a sub parser onto the linked list of
+    /// sub parsers in memory. The sub parser is expected to be an `address` so
+    /// the pointer for the linked list is ORed in the 16 high bits of the
+    /// `uint256`.
     function pushSubParser(ParseState memory state, uint256 cursor, uint256 subParser) internal pure {
         if (subParser > uint256(type(uint160).max)) {
             revert InvalidSubParser(state.parseErrorOffset(cursor));
@@ -247,6 +251,27 @@ library LibParseState {
         }
         // Put the tail pointer in the high bits of the new head.
         state.subParsers = subParser | tailPointer << 0xF0;
+    }
+
+    /// Builds a memory array of sub parsers from the linked list of sub parsers.
+    function exportSubParsers(ParseState memory state) internal pure returns (address[] memory) {
+        uint256 tail = state.subParsers;
+        address[] memory subParsersArray;
+        uint256 addressMask = type(uint160).max;
+        assembly ("memory-safe") {
+            subParsersArray := mload(0x40)
+            let cursor := add(subParsersArray, 0x20)
+            let len := 0
+            for {} gt(tail, 0) {} {
+                mstore(cursor, and(tail, addressMask))
+                cursor := add(cursor, 0x20)
+                tail := mload(shr(0xF0, tail))
+                len := add(len, 1)
+            }
+            mstore(subParsersArray, len)
+            mstore(0x40, cursor)
+        }
+        return subParsersArray;
     }
 
     // Find the pointer to the first opcode in the source LL. Put it in the line
