@@ -113,6 +113,10 @@ impl Execute for Eval {
 mod tests {
     use super::*;
 
+    use rain_interpreter_env::{
+        CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
+    };
+
     #[test]
     fn test_parse_int_or_hex() {
         assert_eq!(parse_int_or_hex("123").unwrap(), U256::from(123));
@@ -126,15 +130,13 @@ mod tests {
         let eval = Eval {
             output_path: None,
             forked_evm: NewForkedEvmCliArgs {
-                fork_url: "https://rpc.ankr.com/polygon_mumbai".into(),
-                fork_block_number: Some(47023593),
+                fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
+                fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
             },
             fork_eval_args: ForkEvalCliArgs {
                 rainlang_string: r"_: int-add(10 2), _: context<0 0>(), _:context<0 1>();".into(),
                 source_index: 0,
-                deployer: "0x122ff0445BaE2a88C6f5F344733029E0d669D624"
-                    .parse()
-                    .unwrap(),
+                deployer: *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
                 namespace: "0x123".into(),
                 context: vec!["0x06,99".into()],
                 decode_errors: true,
