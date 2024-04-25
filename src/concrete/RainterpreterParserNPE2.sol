@@ -14,7 +14,7 @@ import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 
 /// @dev The known hash of the parser bytecode. This is used by the deployer to
 /// check that it is deploying a parser that is compatible with the interpreter.
-bytes32 constant PARSER_BYTECODE_HASH = bytes32(0xefffcdf1505bb7a603f4d77487012ee7c11a41c0823f76881f91228f42e576ab);
+bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x641bc2171178f96fb430aea983aed8cc60f281e4cbab5a03fd82b18f878a99c6);
 
 /// @dev Encodes the parser meta that is used to lookup word definitions.
 /// The structure of the parser meta is:

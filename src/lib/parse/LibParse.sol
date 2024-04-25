@@ -402,13 +402,15 @@ library LibParse {
         }
     }
 
-    function parse(ParseState memory state, uint256 cursor, uint256 end)
+    function parse(ParseState memory state)
         internal
         pure
         returns (bytes memory bytecode, uint256[] memory)
     {
         unchecked {
             if (state.data.length > 0) {
+                uint256 cursor = Pointer.unwrap(state.data.dataPointer());
+                uint256 end = Pointer.unwrap(state.data.endDataPointer());
                 cursor = state.parseInterstitial(cursor, end);
                 cursor = state.parsePragma(cursor, end);
                 while (cursor < end) {
@@ -426,9 +428,5 @@ library LibParse {
             //slither-disable-next-line unused-return
             return state.subParseWords(state.buildBytecode());
         }
-    }
-
-    function parse(ParseState memory state) internal pure returns (bytes memory bytecode, uint256[] memory) {
-        return parse(state, Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
     }
 }
