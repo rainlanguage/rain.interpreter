@@ -1,5 +1,5 @@
 use crate::error::{selector_registry_abi_decode, ForkCallError};
-use alloy_primitives::{Address, U256};
+use alloy_primitives::{Address, U256, BlockNumber};
 use alloy_sol_types::SolCall;
 use foundry_evm::{
     backend::{Backend, DatabaseExt, LocalForkId},
@@ -31,7 +31,7 @@ pub struct ForkTypedReturn<C: SolCall> {
 #[derive(Debug, Clone)]
 pub struct NewForkedEvm {
     pub fork_url: String,
-    pub fork_block_number: Option<u64>,
+    pub fork_block_number: Option<BlockNumber>,
 }
 
 impl Default for Forker {
@@ -390,6 +390,9 @@ impl Forker {
 
 mod tests {
     use crate::namespace::CreateNamespace;
+    use rain_interpreter_env::{
+        CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER,
+    };
 
     use super::*;
     use alloy_primitives::U256;
@@ -416,14 +419,12 @@ mod tests {
     const BSC_FORK_URL: &str = "https://rpc.ankr.com/bsc";
     const BSC_ACC: &str = "0xee5B5B923fFcE93A870B3104b7CA09c3db80047A";
     const POLYGON_ACC: &str = "0xF977814e90dA44bFA03b6295A0616a897441aceC";
-    const MUMBAI_FORK_URL: &str = "https://rpc.ankr.com/polygon_mumbai";
-    const MUMBAI_FORK_NUMBER: u64 = 45658085;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_forker_read() {
         let args = NewForkedEvm {
-            fork_url: MUMBAI_FORK_URL.to_owned(),
-            fork_block_number: Some(MUMBAI_FORK_NUMBER),
+            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
+            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
         };
         let forker = Forker::new_with_fork(args, None, None).await;
 
@@ -446,8 +447,8 @@ mod tests {
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_forker_write() {
         let args = NewForkedEvm {
-            fork_url: MUMBAI_FORK_URL.to_owned(),
-            fork_block_number: Some(MUMBAI_FORK_NUMBER),
+            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
+            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
         };
         let mut forker = Forker::new_with_fork(args, None, None).await;
         let from_address = Address::repeat_byte(0x02);

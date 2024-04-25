@@ -170,18 +170,14 @@ mod tests {
     use crate::eval::ForkEvalArgs;
     use crate::fork::{Forker, NewForkedEvm};
     use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
-
-    const FORK_URL: &str = "https://rpc.ankr.com/polygon_mumbai";
-    const FORK_BLOCK_NUMBER: u64 = 47023593;
+    use rain_interpreter_env::{CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS};
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_trace() {
-        let deployer_address: Address = "0x122ff0445BaE2a88C6f5F344733029E0d669D624"
-            .parse::<Address>()
-            .unwrap();
+        let deployer_address: Address = *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS;
         let args = NewForkedEvm {
-            fork_url: FORK_URL.to_owned(),
-            fork_block_number: Some(FORK_BLOCK_NUMBER),
+            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
+            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
         };
         let fork = Forker::new_with_fork(args, None, None).await;
 
@@ -248,12 +244,9 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_search_trace_by_path() {
-        let deployer_address: Address = "0x122ff0445BaE2a88C6f5F344733029E0d669D624"
-            .parse::<Address>()
-            .unwrap();
         let args = NewForkedEvm {
-            fork_url: FORK_URL.to_owned(),
-            fork_block_number: Some(FORK_BLOCK_NUMBER),
+            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
+            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
         };
         let fork = Forker::new_with_fork(args, None, None).await;
 
@@ -263,7 +256,7 @@ mod tests {
                 a: int-add(1 2),
                 b: 2,
                 c: 4,
-                _: call<1>(1 2);  
+                _: call<1>(1 2);
                 a b:,
                 c: call<2>(a b),
                 d: int-add(a b);
@@ -272,7 +265,7 @@ mod tests {
                 "
                 .into(),
                 source_index: 0,
-                deployer: deployer_address,
+                deployer: *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
                 namespace: FullyQualifiedNamespace::default(),
                 context: vec![],
                 decode_errors: true,

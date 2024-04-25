@@ -45,6 +45,7 @@
         } // rainix.packages.${system};
 
         devShells.default = pkgs.mkShell {
+          shellHook = rainix.devShells.${system}.default.shellHook;
           packages = [ packages.i9r-prelude ];
           inputsFrom = [ rainix.devShells.${system}.default ];
         };
