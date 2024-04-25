@@ -249,6 +249,27 @@ library LibParseState {
         state.subParsers = subParser | tailPointer << 0xF0;
     }
 
+    function exportSubParsers(ParseState memory state) internal pure returns (address[] memory) {
+        uint256 tail = state.subParsers;
+        address[] memory subParsersArray;
+        uint256 addressMask = type(uint160).max;
+        assembly ("memory-safe") {
+            subParsersArray := mload(0x40)
+            let cursor := add(subParsersArray, 0x20)
+            let len := 0
+            for {} gt(tail, 0) {} {
+                let subParser := and(tail, addressMask)
+                mstore(cursor, subParser)
+                cursor := add(cursor, 0x20)
+                tail := shr(0xF0, tail)
+                len := add(len, 1)
+            }
+            mstore(subParsersArray, len)
+            mstore(0x40, cursor)
+        }
+        return subParsersArray;
+    }
+
     // Find the pointer to the first opcode in the source LL. Put it in the line
     // tracker at the appropriate offset.
     function snapshotSourceHeadToLineTracker(ParseState memory state) internal pure {

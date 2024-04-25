@@ -402,18 +402,13 @@ library LibParse {
         }
     }
 
-    function parse(ParseState memory state) internal pure returns (bytes memory bytecode, uint256[] memory) {
+    function parse(ParseState memory state, uint256 cursor, uint256 end)
+        internal
+        pure
+        returns (bytes memory bytecode, uint256[] memory)
+    {
         unchecked {
             if (state.data.length > 0) {
-                uint256 cursor;
-                uint256 end;
-                {
-                    bytes memory data = state.data;
-                    assembly ("memory-safe") {
-                        cursor := add(data, 0x20)
-                        end := add(cursor, mload(data))
-                    }
-                }
                 cursor = state.parseInterstitial(cursor, end);
                 cursor = state.parsePragma(cursor, end);
                 while (cursor < end) {
@@ -430,6 +425,18 @@ library LibParse {
             }
             //slither-disable-next-line unused-return
             return state.subParseWords(state.buildBytecode());
+        }
+    }
+
+    function parse(ParseState memory state) internal pure returns (bytes memory bytecode, uint256[] memory) {
+        (uint256 cursor, uint256 end) = dataBounds(state.data);
+        return parse(state, cursor, end);
+    }
+
+    function dataBounds(bytes memory data) internal pure returns (uint256 cursor, uint256 end) {
+        assembly ("memory-safe") {
+            cursor := add(data, 0x20)
+            end := add(cursor, mload(data))
         }
     }
 }
