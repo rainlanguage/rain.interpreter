@@ -14,7 +14,7 @@ import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 
 /// @dev The known hash of the parser bytecode. This is used by the deployer to
 /// check that it is deploying a parser that is compatible with the interpreter.
-bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x641bc2171178f96fb430aea983aed8cc60f281e4cbab5a03fd82b18f878a99c6);
+bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x74dc71dec36b2e4dd17aefc6cc7afe44981330799f4c1b65850403033e205cfb);
 
 /// @dev Encodes the parser meta that is used to lookup word definitions.
 /// The structure of the parser meta is:
@@ -41,13 +41,13 @@ uint8 constant PARSE_META_BUILD_DEPTH = 2;
 /// @dev Every two bytes is a function pointer for an operand handler. These
 /// positional indexes all map to the same indexes looked up in the parse meta.
 bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
-    hex"146b146b146b150015a115a115a115001500146b146b146b15a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115e6167a15a115e6167a15a115a115a115a115a115a115a115a115a115a115a115a115a1146b1770146b177015a115a1";
+    hex"158415841584161916ba16ba16ba1619161915841584158416ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ff179316ba16ff179316ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba158418891584188916ba16ba";
 
 /// @dev Every two bytes is a function pointer for a literal parser. Literal
 /// dispatches are determined by the first byte(s) of the literal rather than a
 /// full word lookup, and are done with simple conditional jumps as the
 /// possibilities are limited compared to the number of words we have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0bfd0ec511c2127a";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0d160fde12db1393";
 
 /// @title RainterpreterParserNPE2
 /// @dev The parser implementation.
