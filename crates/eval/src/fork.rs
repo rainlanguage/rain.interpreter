@@ -391,14 +391,14 @@ impl Forker {
 mod tests {
     use crate::namespace::CreateNamespace;
     use rain_interpreter_env::{
-        CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER,
+        CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS
     };
 
     use super::*;
     use alloy_primitives::U256;
     use alloy_sol_types::sol;
     use rain_interpreter_bindings::{
-        DeployerISP::iParserCall,
+        DeployerISP::{iParserCall, iStoreCall},
         IInterpreterStoreV1::{getCall, setCall},
     };
 
@@ -429,16 +429,14 @@ mod tests {
         let forker = Forker::new_with_fork(args, None, None).await;
 
         let from_address = Address::default();
-        let to_address: Address = "0x0754030e91F316B2d0b992fe7867291E18200A77"
-            .parse::<Address>()
-            .unwrap();
+        let to_address: Address = *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS;
         let call = iParserCall {};
         let result = forker
             .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
         let parser_address = result.typed_return._0;
-        let expected_address = "0x4f8024FB052DbE76b156C6C262Ad27e0F436AF98"
+        let expected_address = "0x90caf23ea7e507bb722647b0674e50d8d6468234"
             .parse::<Address>()
             .unwrap();
         assert_eq!(parser_address, expected_address);
@@ -451,17 +449,22 @@ mod tests {
             fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
         };
         let mut forker = Forker::new_with_fork(args, None, None).await;
+
         let from_address = Address::repeat_byte(0x02);
-        let to_address: Address = "0xF34e1f2BCeC2baD9c7bE8Aec359691839B784861"
-            .parse::<Address>()
+        let store_call = iStoreCall {};
+        let store_result = forker
+            .alloy_call(from_address, *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS, store_call, false)
+            .await
             .unwrap();
+        let store_address: Address = store_result.typed_return._0;
+
         let namespace = U256::from(1);
         let key = U256::from(3);
         let value = U256::from(4);
         let _set = forker
             .alloy_call_committing(
                 from_address,
-                to_address,
+                store_address,
                 setCall {
                     namespace,
                     kvs: vec![key, value],
@@ -478,7 +481,7 @@ mod tests {
         let get = forker
             .alloy_call(
                 from_address,
-                to_address,
+                store_address,
                 getCall {
                     namespace: fully_quallified_namespace.into(),
                     key: U256::from(3),
