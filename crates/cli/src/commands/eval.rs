@@ -113,7 +113,9 @@ impl Execute for Eval {
 mod tests {
     use super::*;
 
-    use rain_interpreter_env::{CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS};
+    use rain_interpreter_env::{
+        CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
+    };
 
     #[test]
     fn test_parse_int_or_hex() {

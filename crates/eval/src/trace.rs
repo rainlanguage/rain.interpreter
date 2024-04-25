@@ -170,7 +170,9 @@ mod tests {
     use crate::eval::ForkEvalArgs;
     use crate::fork::{Forker, NewForkedEvm};
     use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
-    use rain_interpreter_env::{CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS};
+    use rain_interpreter_env::{
+        CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
+    };
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_trace() {

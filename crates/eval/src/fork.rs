@@ -1,5 +1,5 @@
 use crate::error::{selector_registry_abi_decode, ForkCallError};
-use alloy_primitives::{Address, U256, BlockNumber};
+use alloy_primitives::{Address, BlockNumber, U256};
 use alloy_sol_types::SolCall;
 use foundry_evm::{
     backend::{Backend, DatabaseExt, LocalForkId},
@@ -391,7 +391,7 @@ impl Forker {
 mod tests {
     use crate::namespace::CreateNamespace;
     use rain_interpreter_env::{
-        CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS
+        CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
     };
 
     use super::*;
@@ -453,7 +453,12 @@ mod tests {
         let from_address = Address::repeat_byte(0x02);
         let store_call = iStoreCall {};
         let store_result = forker
-            .alloy_call(from_address, *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS, store_call, false)
+            .alloy_call(
+                from_address,
+                *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
+                store_call,
+                false,
+            )
             .await
             .unwrap();
         let store_address: Address = store_result.typed_return._0;
