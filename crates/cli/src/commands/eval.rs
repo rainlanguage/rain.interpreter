@@ -126,13 +126,13 @@ mod tests {
         let eval = Eval {
             output_path: None,
             forked_evm: NewForkedEvmCliArgs {
-                fork_url: "https://rpc.ankr.com/polygon_mumbai".into(),
-                fork_block_number: Some(47023593),
+                fork_url: "https://rpc.ankr.com/polygon".into(),
+                fork_block_number: Some(54697866),
             },
             fork_eval_args: ForkEvalCliArgs {
                 rainlang_string: r"_: int-add(10 2), _: context<0 0>(), _:context<0 1>();".into(),
                 source_index: 0,
-                deployer: "0x122ff0445BaE2a88C6f5F344733029E0d669D624"
+                deployer: "0xF77b3c3f61af5a3cE7f7CE3cfFc117491104432E"
                     .parse()
                     .unwrap(),
                 namespace: "0x123".into(),
