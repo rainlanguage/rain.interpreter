@@ -40,13 +40,13 @@ uint8 constant PARSE_META_BUILD_DEPTH = 2;
 /// @dev Every two bytes is a function pointer for an operand handler. These
 /// positional indexes all map to the same indexes looked up in the parse meta.
 bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
-    hex"15191519151915ae164f164f164f15ae15ae151915191519164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f164f16941728164f16941728164f164f164f164f164f164f164f164f164f164f164f164f164f1519181e1519181e164f164f";
+    hex"151a151a151a15af16501650165015af15af151a151a151a16501650165016501650165016501650165016501650165016501650165016501650165016501650165016501650165016501650165016501650165016501650165016501650165016501650165016501650169517291650169517291650165016501650165016501650165016501650165016501650151a181f151a181f16501650";
 
 /// @dev Every two bytes is a function pointer for a literal parser. Literal
 /// dispatches are determined by the first byte(s) of the literal rather than a
 /// full word lookup, and are done with simple conditional jumps as the
 /// possibilities are limited compared to the number of words we have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0cac0f7312701328";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0cad0f7412711329";
 
 /// @title RainterpreterParserNPE2
 /// @dev The parser implementation.
