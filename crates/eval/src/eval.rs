@@ -134,23 +134,21 @@ impl Forker {
 
 #[cfg(test)]
 mod tests {
+    use rain_interpreter_env::{
+        CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
+    };
+
     use std::sync::Arc;
 
     use super::*;
     use crate::fork::NewForkedEvm;
-    use alloy_primitives::BlockNumber;
-
-    const FORK_URL: &str = "https://rpc.ankr.com/polygon_mumbai";
-    const FORK_BLOCK_NUMBER: BlockNumber = 47023593;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_parse() {
-        let deployer: Address = "0x122ff0445BaE2a88C6f5F344733029E0d669D624"
-            .parse::<Address>()
-            .unwrap();
+        let deployer: Address = *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS;
         let args = NewForkedEvm {
-            fork_url: FORK_URL.to_owned(),
-            fork_block_number: Some(FORK_BLOCK_NUMBER),
+            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
+            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
         };
         let fork = Forker::new_with_fork(args, None, None).await;
         let res = fork
@@ -175,12 +173,10 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_eval() {
-        let deployer: Address = "0x122ff0445BaE2a88C6f5F344733029E0d669D624"
-            .parse::<Address>()
-            .unwrap();
+        let deployer: Address = *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS;
         let args = NewForkedEvm {
-            fork_url: FORK_URL.to_owned(),
-            fork_block_number: Some(FORK_BLOCK_NUMBER),
+            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_owned(),
+            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
         };
         let fork = Forker::new_with_fork(args, None, None).await;
         let res = fork
@@ -219,12 +215,10 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 10)]
     async fn test_fork_eval_parallel() {
-        let deployer: Address = "0x122ff0445BaE2a88C6f5F344733029E0d669D624"
-            .parse::<Address>()
-            .unwrap();
+        let deployer: Address = *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS;
         let args = NewForkedEvm {
-            fork_url: FORK_URL.to_owned(),
-            fork_block_number: Some(FORK_BLOCK_NUMBER),
+            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
+            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
         };
         let fork = Forker::new_with_fork(args, None, None).await;
         let fork = Arc::new(fork); // Wrap in Arc for shared ownership
