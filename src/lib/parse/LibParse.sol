@@ -429,14 +429,6 @@ library LibParse {
     }
 
     function parse(ParseState memory state) internal pure returns (bytes memory bytecode, uint256[] memory) {
-        (uint256 cursor, uint256 end) = dataBounds(state.data);
-        return parse(state, cursor, end);
-    }
-
-    function dataBounds(bytes memory data) internal pure returns (uint256 cursor, uint256 end) {
-        assembly ("memory-safe") {
-            cursor := add(data, 0x20)
-            end := add(cursor, mload(data))
-        }
+        return parse(state, Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
     }
 }

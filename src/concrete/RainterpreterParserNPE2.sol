@@ -10,10 +10,11 @@ import {LibParseState, ParseState} from "../lib/parse/LibParseState.sol";
 import {LibParsePragma} from "../lib/parse/LibParsePragma.sol";
 import {LibParseLiteral} from "../lib/parse/literal/LibParseLiteral.sol";
 import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
+import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 
 /// @dev The known hash of the parser bytecode. This is used by the deployer to
 /// check that it is deploying a parser that is compatible with the interpreter.
-bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x1a2abf6a34145ca552910795da3469861e9b76abc2ad82d854da2fbde275aec4);
+bytes32 constant PARSER_BYTECODE_HASH = bytes32(0xefffcdf1505bb7a603f4d77487012ee7c11a41c0823f76881f91228f42e576ab);
 
 /// @dev Encodes the parser meta that is used to lookup word definitions.
 /// The structure of the parser meta is:
@@ -40,13 +41,13 @@ uint8 constant PARSE_META_BUILD_DEPTH = 2;
 /// @dev Every two bytes is a function pointer for an operand handler. These
 /// positional indexes all map to the same indexes looked up in the parse meta.
 bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
-    hex"151a151a151a15af16501650165015af15af151a151a151a16501650165016501650165016501650165016501650165016501650165016501650165016501650165016501650165016501650165016501650165016501650165016501650165016501650165016501650169517291650169517291650165016501650165016501650165016501650165016501650151a181f151a181f16501650";
+    hex"146b146b146b150015a115a115a115001500146b146b146b15a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115a115e6167a15a115e6167a15a115a115a115a115a115a115a115a115a115a115a115a115a1146b1770146b177015a115a1";
 
 /// @dev Every two bytes is a function pointer for a literal parser. Literal
 /// dispatches are determined by the first byte(s) of the literal rather than a
 /// full word lookup, and are done with simple conditional jumps as the
 /// possibilities are limited compared to the number of words we have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0cad0f7412711329";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0bfd0ec511c2127a";
 
 /// @title RainterpreterParserNPE2
 /// @dev The parser implementation.
@@ -54,6 +55,7 @@ contract RainterpreterParserNPE2 is IParserV1, IParserPragmaV1, ERC165 {
     using LibParse for ParseState;
     using LibParseState for ParseState;
     using LibParsePragma for ParseState;
+    using LibBytes for bytes;
 
     /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
@@ -62,20 +64,20 @@ contract RainterpreterParserNPE2 is IParserV1, IParserPragmaV1, ERC165 {
 
     /// @inheritdoc IParserV1
     function parse(bytes memory data) external pure virtual override returns (bytes memory, uint256[] memory) {
-        (uint256 cursor, uint256 end) = LibParse.dataBounds(data);
         // The return is used by returning it, so this is a false positive.
         //slither-disable-next-line unused-return
         return LibParseState.newState(
             data, parseMeta(), operandHandlerFunctionPointers(), literalParserFunctionPointers()
-        ).parse(cursor, end);
+        ).parse();
     }
 
     /// @inheritdoc IParserPragmaV1
     function parsePragma1(bytes memory data) external pure virtual override returns (PragmaV1 memory) {
-        (uint256 cursor, uint256 end) = LibParse.dataBounds(data);
         ParseState memory parseState =
             LibParseState.newState(data, parseMeta(), operandHandlerFunctionPointers(), literalParserFunctionPointers());
-        cursor = parseState.parsePragma(cursor, end);
+        uint256 cursor =
+            parseState.parsePragma(Pointer.unwrap(data.dataPointer()), Pointer.unwrap(data.endDataPointer()));
+        (cursor);
         return PragmaV1(parseState.exportSubParsers());
     }
 

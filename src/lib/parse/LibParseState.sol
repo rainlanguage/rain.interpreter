@@ -5,6 +5,7 @@ import {Operand, OPCODE_CONSTANT} from "rain.interpreter.interface/interface/IIn
 import {LibParseStackTracker, ParseStackTracker} from "./LibParseStackTracker.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
+import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {
     DanglingSource,
     MaxSources,
@@ -147,6 +148,7 @@ library LibParseState {
     using LibParseStackTracker for ParseStackTracker;
     using LibParseError for ParseState;
     using LibParseLiteral for ParseState;
+    using LibUint256Array for uint256[];
 
     function newActiveSourcePointer(uint256 oldActiveSourcePointer) internal pure returns (uint256) {
         uint256 activeSourcePtr;
@@ -256,11 +258,11 @@ library LibParseState {
     /// Builds a memory array of sub parsers from the linked list of sub parsers.
     function exportSubParsers(ParseState memory state) internal pure returns (address[] memory) {
         uint256 tail = state.subParsers;
-        address[] memory subParsersArray;
+        uint256[] memory subParsersUint256;
         uint256 addressMask = type(uint160).max;
         assembly ("memory-safe") {
-            subParsersArray := mload(0x40)
-            let cursor := add(subParsersArray, 0x20)
+            subParsersUint256 := mload(0x40)
+            let cursor := add(subParsersUint256, 0x20)
             let len := 0
             for {} gt(tail, 0) {} {
                 mstore(cursor, and(tail, addressMask))
@@ -268,10 +270,15 @@ library LibParseState {
                 tail := mload(shr(0xF0, tail))
                 len := add(len, 1)
             }
-            mstore(subParsersArray, len)
+            mstore(subParsersUint256, len)
             mstore(0x40, cursor)
         }
-        return subParsersArray;
+        subParsersUint256.reverse();
+        address[] memory subParsers;
+        assembly ("memory-safe") {
+            subParsers := subParsersUint256
+        }
+        return subParsers;
     }
 
     // Find the pointer to the first opcode in the source LL. Put it in the line

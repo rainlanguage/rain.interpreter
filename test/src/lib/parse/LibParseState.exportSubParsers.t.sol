@@ -21,8 +21,7 @@ contract LibParseStateExportSubParsersTest is Test {
         address[] memory exported = state.exportSubParsers();
         assertEq(exported.length, values.length);
         for (uint256 i = 0; i < values.length; i++) {
-            // The values are exported in reverse order from pushes.
-            assertEq(exported[i], values[values.length - i - 1]);
+            assertEq(exported[i], values[i]);
         }
     }
 }
