@@ -11,6 +11,7 @@ import {LibParsePragma} from "../lib/parse/LibParsePragma.sol";
 import {LibParseLiteral} from "../lib/parse/literal/LibParseLiteral.sol";
 import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
+import {LibParseInterstitial} from "../lib/parse/LibParseInterstitial.sol";
 
 /// @dev The known hash of the parser bytecode. This is used by the deployer to
 /// check that it is deploying a parser that is compatible with the interpreter.
@@ -41,13 +42,13 @@ uint8 constant PARSE_META_BUILD_DEPTH = 2;
 /// @dev Every two bytes is a function pointer for an operand handler. These
 /// positional indexes all map to the same indexes looked up in the parse meta.
 bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
-    hex"158415841584161916ba16ba16ba1619161915841584158416ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ff179316ba16ff179316ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba158418891584188916ba16ba";
+    hex"17a817a817a8183d18de18de18de183d183d17a817a817a818de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de18de192319b718de192319b718de18de18de18de18de18de18de18de18de18de18de18de18de17a81aad17a81aad18de18de";
 
 /// @dev Every two bytes is a function pointer for a literal parser. Literal
 /// dispatches are determined by the first byte(s) of the literal rather than a
 /// full word lookup, and are done with simple conditional jumps as the
 /// possibilities are limited compared to the number of words we have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0d160fde12db1393";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0f3a120214ff15b7";
 
 /// @title RainterpreterParserNPE2
 /// @dev The parser implementation.
@@ -55,6 +56,7 @@ contract RainterpreterParserNPE2 is IParserV1, IParserPragmaV1, ERC165 {
     using LibParse for ParseState;
     using LibParseState for ParseState;
     using LibParsePragma for ParseState;
+    using LibParseInterstitial for ParseState;
     using LibBytes for bytes;
 
     /// @inheritdoc ERC165
@@ -75,8 +77,10 @@ contract RainterpreterParserNPE2 is IParserV1, IParserPragmaV1, ERC165 {
     function parsePragma1(bytes memory data) external pure virtual override returns (PragmaV1 memory) {
         ParseState memory parseState =
             LibParseState.newState(data, parseMeta(), operandHandlerFunctionPointers(), literalParserFunctionPointers());
-        uint256 cursor =
-            parseState.parsePragma(Pointer.unwrap(data.dataPointer()), Pointer.unwrap(data.endDataPointer()));
+        uint256 cursor = Pointer.unwrap(data.dataPointer());
+        uint256 end = Pointer.unwrap(data.endDataPointer());
+        cursor = parseState.parseInterstitial(cursor, end);
+        cursor = parseState.parsePragma(cursor, end);
         (cursor);
         return PragmaV1(parseState.exportSubParsers());
     }

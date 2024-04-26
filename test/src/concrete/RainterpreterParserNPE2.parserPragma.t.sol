@@ -37,4 +37,22 @@ contract RainterpreterParserNPE2ParserPragma is Test {
             addresses
         );
     }
+
+    function testParsePragmaWithInterstitial() external {
+        address[] memory addresses = new address[](1);
+
+        addresses[0] = address(0);
+        checkPragma("   using-words-from 0x0000000000000000000000000000000000000000 foo:1;", addresses);
+
+        addresses[0] = address(0x4050b49bA93f5774f66f54F06a6042552d76308A);
+        checkPragma("/*   foo    */ \n using-words-from 0x4050b49bA93f5774f66f54F06a6042552d76308A foo:1;", addresses);
+
+        addresses = new address[](2);
+        addresses[0] = address(0x4050b49bA93f5774f66f54F06a6042552d76308A);
+        addresses[1] = address(0xfa56232Df6ABea43Dda27C197DFECe8383CF1368);
+        checkPragma(
+            "/* */ using-words-from 0x4050b49bA93f5774f66f54F06a6042552d76308A 0xfa56232Df6ABea43Dda27C197DFECe8383CF1368 foo:1;",
+            addresses
+        );
+    }
 }
