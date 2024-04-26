@@ -248,6 +248,9 @@ contract LibParsePragmaKeywordTest is Test {
         str = "using-words-from 0x1234567890123456789012345678901234567890  \n\n";
         checkPragmaParsing(str, 63, values, "should parse one address with trailing whitespace and newlines");
 
+        str = "/* calculate-io */ \n\nusing-words-from 0x1234567890123456789012345678901234567890";
+        checkPragmaParsing(str, 63, values, "should parse one address with comments before");
+
         values = new address[](0);
         str = "using-words-from ";
         checkPragmaParsing(str, 17, values, "should parse no addresses with trailing whitespace");
