@@ -405,15 +405,8 @@ library LibParse {
     function parse(ParseState memory state) internal pure returns (bytes memory bytecode, uint256[] memory) {
         unchecked {
             if (state.data.length > 0) {
-                uint256 cursor;
-                uint256 end;
-                {
-                    bytes memory data = state.data;
-                    assembly ("memory-safe") {
-                        cursor := add(data, 0x20)
-                        end := add(cursor, mload(data))
-                    }
-                }
+                uint256 cursor = Pointer.unwrap(state.data.dataPointer());
+                uint256 end = Pointer.unwrap(state.data.endDataPointer());
                 cursor = state.parseInterstitial(cursor, end);
                 cursor = state.parsePragma(cursor, end);
                 while (cursor < end) {

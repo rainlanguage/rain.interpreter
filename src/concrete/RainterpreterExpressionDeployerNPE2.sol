@@ -8,6 +8,7 @@ import {LibDataContract, DataContractMemoryContainer} from "rain.datacontract/li
 import {IERC1820_REGISTRY} from "rain.erc1820/lib/LibIERC1820.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {IParserV2} from "rain.interpreter.interface/interface/unstable/IParserV2.sol";
+import {IParserPragmaV1, PragmaV1} from "rain.interpreter.interface/interface/unstable/IParserPragmaV1.sol";
 
 import {
     UnexpectedConstructionMetaHash,
@@ -35,7 +36,7 @@ import {STORE_BYTECODE_HASH} from "./RainterpreterStoreNPE2.sol";
 
 /// @dev The function pointers for the integrity check fns.
 bytes constant INTEGRITY_FUNCTION_POINTERS =
-    hex"0cc00d3e0da30f1d0f270f270f310f3a0f550ffb0ffb105710d110de0f270f310f270f270f310f1d0f1d0f1d0f1d0f1d10e8110d11270f2710e80f270f2710de0f310f270f2710de10de0f270f3111310f310f310f310f310f270f310f310f310f310f3111310f270f270f270f310f310f270f310f310f270f31113111311131113111311131113111311131113111311131113111310f311127";
+    hex"0de60e640ec91043104d104d10571060107b11211121117d11f71204104d1057104d104d105710431043104310431043120e1233124d104d120e104d104d12041057104d104d12041204104d105712571057105710571057104d105710571057105710571257104d104d104d10571057104d10571057104d1057125712571257125712571257125712571257125712571257125712571057124d";
 
 /// @dev Hash of the known construction meta.
 bytes32 constant CONSTRUCTION_META_HASH = bytes32(0xe81773d61cd559e0f1a070476e736a0c9f3d38f058b821fb77e191909408231b);
@@ -53,7 +54,13 @@ struct RainterpreterExpressionDeployerNPE2ConstructionConfig {
 }
 
 /// @title RainterpreterExpressionDeployerNPE2
-contract RainterpreterExpressionDeployerNPE2 is IDescribedByMetaV1, IExpressionDeployerV3, IParserV2, ERC165 {
+contract RainterpreterExpressionDeployerNPE2 is
+    IDescribedByMetaV1,
+    IExpressionDeployerV3,
+    IParserV2,
+    IParserPragmaV1,
+    ERC165
+{
     using LibPointer for Pointer;
     using LibStackPointer for Pointer;
     using LibUint256Array for uint256[];
@@ -177,6 +184,15 @@ contract RainterpreterExpressionDeployerNPE2 is IDescribedByMetaV1, IExpressionD
         (io);
 
         return serialized;
+    }
+
+    /// This is just here for convenience for `IParserV2` consumers, it would be
+    /// more gas efficient to call the parser directly.
+    /// @inheritdoc IParserPragmaV1
+    function parsePragma1(bytes calldata data) external view virtual override returns (PragmaV1 memory) {
+        // We know the iParser is also an IParserPragmaV1 because we enforced
+        // the bytecode hash in the constructor.
+        return IParserPragmaV1(address(iParser)).parsePragma1(data);
     }
 
     /// Defines all the function pointers to integrity checks. This is the

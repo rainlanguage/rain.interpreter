@@ -4,14 +4,17 @@ pragma solidity =0.8.19;
 import {IERC165, ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
 import {LibParse} from "../lib/parse/LibParse.sol";
+import {IParserPragmaV1, PragmaV1} from "rain.interpreter.interface/interface/unstable/IParserPragmaV1.sol";
 import {IParserV1} from "rain.interpreter.interface/interface/IParserV1.sol";
 import {LibParseState, ParseState} from "../lib/parse/LibParseState.sol";
+import {LibParsePragma} from "../lib/parse/LibParsePragma.sol";
 import {LibParseLiteral} from "../lib/parse/literal/LibParseLiteral.sol";
 import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
+import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 
 /// @dev The known hash of the parser bytecode. This is used by the deployer to
 /// check that it is deploying a parser that is compatible with the interpreter.
-bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x7644ae9748640e3b48ddd63718152b66363ffc11423154c42492648acfe31f35);
+bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x74dc71dec36b2e4dd17aefc6cc7afe44981330799f4c1b65850403033e205cfb);
 
 /// @dev Encodes the parser meta that is used to lookup word definitions.
 /// The structure of the parser meta is:
@@ -38,18 +41,21 @@ uint8 constant PARSE_META_BUILD_DEPTH = 2;
 /// @dev Every two bytes is a function pointer for an operand handler. These
 /// positional indexes all map to the same indexes looked up in the parse meta.
 bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
-    hex"10f410f410f41189122a122a122a1189118910f410f410f4122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a122a126f1303122a126f1303122a122a122a122a122a122a122a122a122a122a122a122a122a10f413f910f413f9122a122a";
+    hex"158415841584161916ba16ba16ba1619161915841584158416ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ff179316ba16ff179316ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba16ba158418891584188916ba16ba";
 
 /// @dev Every two bytes is a function pointer for a literal parser. Literal
 /// dispatches are determined by the first byte(s) of the literal rather than a
 /// full word lookup, and are done with simple conditional jumps as the
 /// possibilities are limited compared to the number of words we have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"08860b4e0e4b0f03";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0d160fde12db1393";
 
 /// @title RainterpreterParserNPE2
 /// @dev The parser implementation.
-contract RainterpreterParserNPE2 is IParserV1, ERC165 {
+contract RainterpreterParserNPE2 is IParserV1, IParserPragmaV1, ERC165 {
     using LibParse for ParseState;
+    using LibParseState for ParseState;
+    using LibParsePragma for ParseState;
+    using LibBytes for bytes;
 
     /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
@@ -63,6 +69,16 @@ contract RainterpreterParserNPE2 is IParserV1, ERC165 {
         return LibParseState.newState(
             data, parseMeta(), operandHandlerFunctionPointers(), literalParserFunctionPointers()
         ).parse();
+    }
+
+    /// @inheritdoc IParserPragmaV1
+    function parsePragma1(bytes memory data) external pure virtual override returns (PragmaV1 memory) {
+        ParseState memory parseState =
+            LibParseState.newState(data, parseMeta(), operandHandlerFunctionPointers(), literalParserFunctionPointers());
+        uint256 cursor =
+            parseState.parsePragma(Pointer.unwrap(data.dataPointer()), Pointer.unwrap(data.endDataPointer()));
+        (cursor);
+        return PragmaV1(parseState.exportSubParsers());
     }
 
     /// Virtual function to return the parse meta.
