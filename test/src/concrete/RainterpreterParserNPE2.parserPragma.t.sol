@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.19;
 
+import {Test} from "forge-std/Test.sol";
 import {RainterpreterParserNPE2} from "src/concrete/RainterpreterParserNPE2.sol";
 import {IParserPragmaV1, PragmaV1} from "rain.interpreter.interface/interface/unstable/IParserPragmaV1.sol";
 
-contract RainterpreterParserNPE2ParserPragma {
+contract RainterpreterParserNPE2ParserPragma is Test {
     function checkPragma(bytes memory source, address[] memory expectedAddresses) internal {
         RainterpreterParserNPE2 parser = new RainterpreterParserNPE2();
         PragmaV1 memory pragmaV2 = parser.parsePragma1(source);
