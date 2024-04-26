@@ -413,7 +413,7 @@ mod tests {
     }
     const USDT_POLYGON: &str = "0xc2132d05d31c914a87c6611c10748aeb04b58e8f";
     const USDT_BSC: &str = "0x55d398326f99059fF775485246999027B3197955";
-    const POLYGON_FORK_NUMBER: u64 = 53717900;
+    const POLYGON_FORK_NUMBER: u64 = 54697866;
     const BSC_FORK_NUMBER: u64 = 36281780;
     const POLYGON_FORK_URL: &str = "https://rpc.ankr.com/polygon";
     const BSC_FORK_URL: &str = "https://rpc.ankr.com/bsc";
