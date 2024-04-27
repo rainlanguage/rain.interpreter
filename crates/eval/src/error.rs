@@ -1,5 +1,6 @@
 use alloy_dyn_abi::JsonAbiExt;
 use alloy_json_abi::Error as AlloyError;
+use alloy_primitives::ruint::FromUintError;
 use foundry_evm::executors::RawCallResult;
 use once_cell::sync::Lazy;
 use reqwest::Client;
@@ -18,7 +19,7 @@ pub enum EncodingError {
 
 pub const SELECTOR_REGISTRY_URL: &str = "https://api.openchain.xyz/signature-database/v1/lookup";
 
-/// hashmap of cached error selectors    
+/// hashmap of cached error selectors
 pub static SELECTORS: Lazy<Mutex<HashMap<[u8; 4], AlloyError>>> =
     Lazy::new(|| Mutex::new(HashMap::new()));
 
@@ -36,6 +37,10 @@ pub enum ForkCallError {
     AbiDecodedError(AbiDecodedErrorType),
     #[error("Failed to deserialize serialized expression: {0}")]
     DeserializeFailed(String),
+    #[error(transparent)]
+    U64FromUint256(#[from] FromUintError<u64>),
+    #[error(transparent)]
+    Eyre(#[from] eyre::Report),
 }
 impl From<AbiDecodedErrorType> for ForkCallError {
     fn from(value: AbiDecodedErrorType) -> Self {
