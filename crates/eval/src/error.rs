@@ -1,5 +1,6 @@
 use alloy_dyn_abi::JsonAbiExt;
 use alloy_json_abi::Error as AlloyError;
+use alloy_primitives::ruint::FromUintError;
 use foundry_evm::executors::RawCallResult;
 use once_cell::sync::Lazy;
 use reqwest::Client;
@@ -9,7 +10,6 @@ use std::{
     sync::{Mutex, MutexGuard, PoisonError},
 };
 use thiserror::Error;
-use alloy_primitives::ruint::FromUintError;
 
 #[derive(Error, Debug, PartialEq)]
 pub enum EncodingError {
