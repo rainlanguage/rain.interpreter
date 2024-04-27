@@ -20,7 +20,7 @@ use std::{any::type_name, collections::HashMap};
 #[derive(Clone)]
 pub struct Forker {
     pub executor: Executor,
-    forks: HashMap<ForkId, (LocalForkId, SpecId, U256)>,
+    forks: HashMap<ForkId, (LocalForkId, SpecId, BlockNumber)>,
 }
 
 pub struct ForkTypedReturn<C: SolCall> {
@@ -77,7 +77,7 @@ impl Forker {
         args: NewForkedEvm,
         env: Option<Env>,
         gas_limit: Option<u64>,
-    ) -> Forker {
+    ) -> Result<Forker, ForkCallError> {
         let NewForkedEvm {
             fork_url,
             fork_block_number,
@@ -99,13 +99,13 @@ impl Forker {
         let create_fork = CreateFork {
             url: fork_url.to_string(),
             enable_caching: true,
-            env: evm_opts.fork_evm_env(fork_url).await.unwrap().0,
+            env: evm_opts.fork_evm_env(fork_url).await?.0,
             evm_opts,
         };
         let block_number = if let Some(v) = fork_block_number {
-            U256::from(v)
+            BlockNumber::from(v)
         } else {
-            create_fork.env.block.number
+            create_fork.env.block.number.try_into()?
         };
 
         let db = Backend::spawn(Some(create_fork.clone()));
@@ -120,10 +120,10 @@ impl Forker {
 
         let mut forks_map = HashMap::new();
         forks_map.insert(fork_id, (U256::from(0), SpecId::LATEST, block_number));
-        Self {
+        Ok(Self {
             executor: builder.build(env.unwrap_or(create_fork.env.clone()), db),
             forks: forks_map,
-        }
+        })
     }
 
     /// Adds new fork and sets it as active or if the fork already exists, selects it as active.
@@ -134,7 +134,7 @@ impl Forker {
         env: Option<Env>,
     ) -> Result<(), ForkCallError> {
         if self.forks.is_empty() {
-            let forker = Self::new_with_fork(args, env, None).await;
+            let forker = Self::new_with_fork(args, env, None).await?;
             self.executor = forker.executor;
             self.forks = forker.forks;
             return Ok(());
@@ -179,9 +179,9 @@ impl Forker {
                 evm_opts,
             };
             let block_number = if let Some(v) = fork_block_number {
-                U256::from(v)
+                BlockNumber::from(v)
             } else {
-                create_fork.env.block.number
+                create_fork.env.block.number.try_into()?
             };
             let mut journaled_state = JournaledState::new(SpecId::LATEST, HashSet::new());
             self.forks.insert(
@@ -350,7 +350,7 @@ impl Forker {
     /// resets the active fork to a given block number or to original fork block number if not provided
     pub fn roll_fork(
         &mut self,
-        block_number: Option<u64>,
+        block_number: Option<BlockNumber>,
         env: Option<Env>,
     ) -> Result<(), ForkCallError> {
         let active_fork_local_id = self
@@ -372,7 +372,7 @@ impl Forker {
             return Err(ForkCallError::ExecutorError("no active fork!".to_owned()));
         }
         let block_number = block_number
-            .map(U256::from)
+            .map(BlockNumber::from)
             .unwrap_or(org_block_number.unwrap());
         self.executor
             .backend
