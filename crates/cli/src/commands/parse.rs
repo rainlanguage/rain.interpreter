@@ -49,7 +49,7 @@ impl From<ForkParseArgsCli> for ForkParseArgs {
 
 impl Execute for Parse {
     async fn execute(&self) -> Result<()> {
-        let forker = Forker::new_with_fork(self.forked_evm.clone().into(), None, None).await;
+        let forker = Forker::new_with_fork(self.forked_evm.clone().into(), None, None).await?;
         let result = forker.fork_parse(self.fork_parse_args.clone().into()).await;
 
         match result {
