@@ -2,6 +2,7 @@ use crate::error::ParserError;
 use alloy_ethers_typecast::transaction::{ReadContractParametersBuilder, ReadableClient};
 use alloy_primitives::*;
 use ethers::providers::JsonRpcClient;
+use rain_interpreter_bindings::IParserPragmaV1::*;
 use rain_interpreter_bindings::IParserV2::*;
 use rain_interpreter_dispair::DISPair;
 
@@ -25,6 +26,14 @@ pub trait Parser2 {
         data: Vec<u8>,
         client: ReadableClient<T>,
     ) -> impl std::future::Future<Output = Result<parse2Return, ParserError>> + Send;
+
+    /// Call Parser contract to parse the provided rainlang text and provide the pragma.
+    /// The provided rainlang text must be valid UTF-8 encoding of valid rainlang text.
+    fn parse_pragma<T: JsonRpcClient>(
+        &self,
+        data: Vec<u8>,
+        client: ReadableClient<T>,
+    ) -> impl std::future::Future<Output = Result<parsePragma1Return, ParserError>> + Send;
 }
 /// ParserV2
 /// Struct representing ParserV2 instances.
@@ -38,6 +47,20 @@ impl From<DISPair> for ParserV2 {
         Self {
             deployer_address: val.deployer,
         }
+    }
+}
+
+impl From<Address> for ParserV2 {
+    fn from(val: Address) -> Self {
+        Self {
+            deployer_address: val,
+        }
+    }
+}
+
+impl ParserV2 {
+    pub fn new(deployer_address: Address) -> Self {
+        Self { deployer_address }
     }
 }
 
@@ -57,6 +80,38 @@ impl Parser2 for ParserV2 {
             )
             .await
             .map_err(ParserError::ReadableClientError)
+    }
+
+    async fn parse_pragma<T: JsonRpcClient>(
+        &self,
+        data: Vec<u8>,
+        client: ReadableClient<T>,
+    ) -> Result<parsePragma1Return, ParserError> {
+        client
+            .read(
+                ReadContractParametersBuilder::default()
+                    .address(self.deployer_address)
+                    .call(parsePragma1Call { data })
+                    .build()
+                    .map_err(ParserError::ReadContractParametersBuilderError)?,
+            )
+            .await
+            .map_err(ParserError::ReadableClientError)
+    }
+}
+
+impl ParserV2 {
+    /// Call Parser contract to parse the provided rainlang text and provide the pragma.
+    pub async fn parse_pragma_text<T: JsonRpcClient>(
+        &self,
+        text: &str,
+        client: ReadableClient<T>,
+    ) -> Result<Vec<Address>, ParserError>
+    where
+        Self: Sync,
+    {
+        let res = self.parse_pragma(text.as_bytes().to_vec(), client).await?;
+        Ok(res._0.usingWordsFrom)
     }
 }
 
@@ -127,5 +182,35 @@ mod tests {
         let result = parser.parse_text(rainlang, client).await.unwrap();
 
         assert_eq!(result.bytecode, hex!("6d79207261696e6c616e67"));
+    }
+
+    #[tokio::test]
+    async fn test_parse_pragma_text() {
+        let rainlang = "my rainlang"; // we aren't actually using the onchian parser so this could be anything
+
+        let pragma1 = Address::repeat_byte(0x11);
+        let pragma2 = Address::repeat_byte(0x22);
+
+        let transport = MockProvider::default();
+        transport.push_response(MockResponse::Value(serde_json::Value::String(
+            [
+                "0000000000000000000000000000000000000000000000000000000000000020", // offset
+                "0000000000000000000000000000000000000000000000000000000000000020", // offset
+                "0000000000000000000000000000000000000000000000000000000000000002", // array length
+                "0000000000000000000000001111111111111111111111111111111111111111",
+                "0000000000000000000000002222222222222222222222222222222222222222", // array of addresses
+            ]
+            .concat(),
+        )));
+
+        let client = ReadableClient::new(Provider::new(transport));
+        let parser = ParserV2 {
+            deployer_address: Address::repeat_byte(0x1),
+        };
+
+        let result = parser.parse_pragma_text(rainlang, client).await.unwrap();
+
+        assert_eq!(result[0], pragma1);
+        assert_eq!(result[1], pragma2);
     }
 }
