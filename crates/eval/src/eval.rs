@@ -150,7 +150,7 @@ mod tests {
             fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
             fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
         };
-        let fork = Forker::new_with_fork(args, None, None).await;
+        let fork = Forker::new_with_fork(args, None, None).await.unwrap();
         let res = fork
             .fork_parse(ForkParseArgs {
                 rainlang_string: r"_: int-add(1 2);".to_owned(),
@@ -178,7 +178,7 @@ mod tests {
             fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_owned(),
             fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
         };
-        let fork = Forker::new_with_fork(args, None, None).await;
+        let fork = Forker::new_with_fork(args, None, None).await.unwrap();
         let res = fork
             .fork_eval(ForkEvalArgs {
                 rainlang_string: r"_: int-add(1 2);".into(),
@@ -220,7 +220,7 @@ mod tests {
             fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
             fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
         };
-        let fork = Forker::new_with_fork(args, None, None).await;
+        let fork = Forker::new_with_fork(args, None, None).await.unwrap();
         let fork = Arc::new(fork); // Wrap in Arc for shared ownership
 
         let mut handles = vec![];

@@ -426,7 +426,7 @@ mod tests {
             fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
             fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
         };
-        let forker = Forker::new_with_fork(args, None, None).await;
+        let forker = Forker::new_with_fork(args, None, None).await.unwrap();
 
         let from_address = Address::default();
         let to_address: Address = *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS;
@@ -448,7 +448,7 @@ mod tests {
             fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
             fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
         };
-        let mut forker = Forker::new_with_fork(args, None, None).await;
+        let mut forker = Forker::new_with_fork(args, None, None).await.unwrap();
 
         let from_address = Address::repeat_byte(0x02);
         let store_call = iStoreCall {};
@@ -506,7 +506,7 @@ mod tests {
             fork_url: POLYGON_FORK_URL.to_owned(),
             fork_block_number: Some(POLYGON_FORK_NUMBER),
         };
-        let mut forker = Forker::new_with_fork(args, None, None).await;
+        let mut forker = Forker::new_with_fork(args, None, None).await.unwrap();
 
         let from_address = Address::default();
         let to_address: Address = USDT_POLYGON.parse::<Address>().unwrap();

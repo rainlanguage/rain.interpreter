@@ -181,7 +181,7 @@ mod tests {
             fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
             fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
         };
-        let fork = Forker::new_with_fork(args, None, None).await;
+        let fork = Forker::new_with_fork(args, None, None).await.unwrap();
 
         let res = fork
             .fork_eval(ForkEvalArgs {
@@ -250,7 +250,7 @@ mod tests {
             fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
             fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
         };
-        let fork = Forker::new_with_fork(args, None, None).await;
+        let fork = Forker::new_with_fork(args, None, None).await.unwrap();
 
         let res = fork
             .fork_eval(ForkEvalArgs {
