@@ -4,7 +4,7 @@ pragma solidity =0.8.19;
 import {Test} from "forge-std/Test.sol";
 import {
     RainterpreterExpressionDeployerNPE2,
-    RainterpreterExpressionDeployerNPE2ConstructionConfig
+    RainterpreterExpressionDeployerNPE2ConstructionConfigV2
 } from "src/concrete/RainterpreterExpressionDeployerNPE2.sol";
 import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
 import {RainterpreterStoreNPE2} from "src/concrete/RainterpreterStoreNPE2.sol";
@@ -14,11 +14,10 @@ contract RainterpreterExpressionDeployerNPE2DescribedByMetaV1Test is Test {
     function testRainterpreterExpressionDeployerNPE2DescribedByMetaV1Happy() external {
         bytes memory describedByMeta = vm.readFileBinary("meta/RainterpreterExpressionDeployerNPE2.rain.meta");
         RainterpreterExpressionDeployerNPE2 deployer = new RainterpreterExpressionDeployerNPE2(
-            RainterpreterExpressionDeployerNPE2ConstructionConfig(
+            RainterpreterExpressionDeployerNPE2ConstructionConfigV2(
                 address(new RainterpreterNPE2()),
                 address(new RainterpreterStoreNPE2()),
-                address(new RainterpreterParserNPE2()),
-                describedByMeta
+                address(new RainterpreterParserNPE2())
             )
         );
 

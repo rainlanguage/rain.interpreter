@@ -7,7 +7,7 @@ import {RainterpreterNPE2} from "../src/concrete/RainterpreterNPE2.sol";
 import {RainterpreterParserNPE2} from "../src/concrete/RainterpreterParserNPE2.sol";
 import {
     RainterpreterExpressionDeployerNPE2,
-    RainterpreterExpressionDeployerNPE2ConstructionConfig
+    RainterpreterExpressionDeployerNPE2ConstructionConfigV2
 } from "../src/concrete/RainterpreterExpressionDeployerNPE2.sol";
 import {IMetaBoardV1} from "rain.metadata/interface/IMetaBoardV1.sol";
 import {LibDescribedByMeta} from "rain.metadata/lib/LibDescribedByMeta.sol";
@@ -33,8 +33,8 @@ contract Deploy is Script {
         vm.writeFile("deployments/latest/RainterpreterNPE2", vm.toString(address(interpreter)));
 
         RainterpreterExpressionDeployerNPE2 deployer = new RainterpreterExpressionDeployerNPE2(
-            RainterpreterExpressionDeployerNPE2ConstructionConfig(
-                address(interpreter), address(store), address(parser), constructionMeta
+            RainterpreterExpressionDeployerNPE2ConstructionConfigV2(
+                address(interpreter), address(store), address(parser)
             )
         );
         LibDescribedByMeta.emitForDescribedAddress(metaboard, deployer, constructionMeta);
