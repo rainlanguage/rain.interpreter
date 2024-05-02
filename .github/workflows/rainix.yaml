@@ -36,7 +36,7 @@ jobs:
       - run: nix develop --command i9r-prelude
       - name: Run ${{ matrix.task }}
         env:
-          ETH_RPC_URL: $${{ secrets.CI_DEPLOY_SEPOLIA_RPC_URL || vars.CI_DEPLOY_SEPOLIA_RPC_URL }}
+          ETH_RPC_URL: ${{ secrets.CI_DEPLOY_SEPOLIA_RPC_URL || vars.CI_DEPLOY_SEPOLIA_RPC_URL }}
           ETHERSCAN_API_KEY: ${{ secrets.EXPLORER_VERIFICATION_KEY }}
           DEPLOY_BROADCAST: ''
           DEPLOY_VERIFIER: ''
