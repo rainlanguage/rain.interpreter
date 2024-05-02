@@ -3,10 +3,11 @@
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-    rainix.url = "github:rainprotocol/rainix";
+    rainix.url = "github:rainlanguage/rainix";
+    rain.url = "github:rainlanguage/rain.cli";
   };
 
-  outputs = { self, flake-utils, rainix, ... }:
+  outputs = { self, flake-utils, rainix, rain }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = rainix.pkgs.${system};
@@ -40,7 +41,7 @@
                 -l none \
                 -o meta/RainterpreterReferenceExternNPE2.rain.meta \
             '';
-            additionalBuildInputs = rainix.sol-build-inputs.${system};
+            additionalBuildInputs = rainix.sol-build-inputs.${system} ++ [rain.defaultPackage.${system}];
           };
         } // rainix.packages.${system};
 
