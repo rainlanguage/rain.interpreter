@@ -17,9 +17,7 @@ contract RainterpreterExpressionDeployerNPE2Parse2Test is Test {
         RainterpreterParserNPE2 parser = new RainterpreterParserNPE2();
         RainterpreterExpressionDeployerNPE2 deployer = new RainterpreterExpressionDeployerNPE2(
             RainterpreterExpressionDeployerNPE2ConstructionConfigV2(
-                address(new RainterpreterNPE2()),
-                address(new RainterpreterStoreNPE2()),
-                address(parser)
+                address(new RainterpreterNPE2()), address(new RainterpreterStoreNPE2()), address(parser)
             )
         );
 
