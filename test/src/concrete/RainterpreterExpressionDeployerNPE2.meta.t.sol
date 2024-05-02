@@ -13,7 +13,7 @@ contract RainterpreterExpressionDeployerNPE2MetaTest is RainterpreterExpressionD
     /// Test that the expected construction meta hash can be read from the
     /// deployer.
     function testRainterpreterExpressionDeployerNPE2ExpectedConstructionMetaHash() external {
-        bytes32 actualConstructionMetaHash = iDeployer.expectedConstructionMetaHash();
+        bytes32 actualConstructionMetaHash = iDeployer.describedByMetaV1();
         assertEq(actualConstructionMetaHash, DESCRIBED_BY_META_HASH);
     }
 }

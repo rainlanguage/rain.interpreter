@@ -22,6 +22,5 @@ contract RainterpreterExpressionDeployerNPE2DescribedByMetaV1Test is Test {
         );
 
         assertEq(keccak256(describedByMeta), deployer.describedByMetaV1());
-        assertEq(deployer.describedByMetaV1(), deployer.expectedConstructionMetaHash());
     }
 }
