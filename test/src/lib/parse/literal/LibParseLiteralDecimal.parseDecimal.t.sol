@@ -248,6 +248,50 @@ contract LibParseLiteralDecimalTest is Test {
         checkParseDecimal("3.0101e10", 3.0101e28, 9);
     }
 
+    /// Test some negative exponents.
+    function testParseLiteralDecimalNegativeExponents() external {
+        checkParseDecimal("0.0e-0", 0, 6);
+        checkParseDecimal("1.0e-0", 1e18, 6);
+        checkParseDecimal("2.0e-0", 2e18, 6);
+        checkParseDecimal("3.0e-0", 3e18, 6);
+        checkParseDecimal("4.0e-0", 4e18, 6);
+        checkParseDecimal("5.0e-0", 5e18, 6);
+        checkParseDecimal("6.0e-0", 6e18, 6);
+        checkParseDecimal("7.0e-0", 7e18, 6);
+        checkParseDecimal("8.0e-0", 8e18, 6);
+        checkParseDecimal("9.0e-0", 9e18, 6);
+        checkParseDecimal("10.0e-0", 10e18, 7);
+
+        checkParseDecimal("0.1e-0", 0.1e18, 6);
+        checkParseDecimal("1.1e-0", 1.1e18, 6);
+        checkParseDecimal("2.1e-0", 2.1e18, 6);
+        checkParseDecimal("3.1e-0", 3.1e18, 6);
+        checkParseDecimal("4.1e-0", 4.1e18, 6);
+        checkParseDecimal("5.1e-0", 5.1e18, 6);
+        checkParseDecimal("6.1e-0", 6.1e18, 6);
+        checkParseDecimal("7.1e-0", 7.1e18, 6);
+        checkParseDecimal("8.1e-0", 8.1e18, 6);
+        checkParseDecimal("9.1e-0", 9.1e18, 6);
+        checkParseDecimal("10.1e-0", 10.1e18, 7);
+
+        checkParseDecimal("0.01e-0", 0.01e18, 7);
+
+        checkParseDecimal("0.0e-1", 0.0e17, 6);
+        checkParseDecimal("1.0e-1", 1.0e17, 6);
+        checkParseDecimal("2.0e-1", 2.0e17, 6);
+        checkParseDecimal("3.0e-1", 3.0e17, 6);
+        checkParseDecimal("4.0e-1", 4.0e17, 6);
+
+        checkParseDecimal("0.0e-2", 0.0e16, 6);
+        checkParseDecimal("1.0e-2", 1.0e16, 6);
+        checkParseDecimal("2.0e-2", 2.0e16, 6);
+        checkParseDecimal("3.0e-2", 3.0e16, 6);
+
+        checkParseDecimal("0.0101e-10", 0.0101e8, 10);
+        checkParseDecimal("1.0101e-10", 1.0101e8, 10);
+        checkParseDecimal("2.0101e-10", 2.0101e8, 10);
+    }
+
     // e without a digit is an error.
     function testParseLiteralDecimalExponentsError() external {
         ParseState memory state = LibParseState.newState("e", "", "", "");
