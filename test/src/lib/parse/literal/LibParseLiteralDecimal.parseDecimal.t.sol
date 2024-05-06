@@ -197,6 +197,57 @@ contract LibParseLiteralDecimalTest is Test {
         checkParseDecimal("10e10", 10e10, 5);
     }
 
+    // Test decimals with exponents.
+    function testParseLiteralDecimalExponents3() external {
+        checkParseDecimal("0.0e0", 0, 5);
+        checkParseDecimal("1.0e0", 1e18, 5);
+        checkParseDecimal("2.0e0", 2e18, 5);
+        checkParseDecimal("3.0e0", 3e18, 5);
+        checkParseDecimal("4.0e0", 4e18, 5);
+        checkParseDecimal("5.0e0", 5e18, 5);
+        checkParseDecimal("6.0e0", 6e18, 5);
+        checkParseDecimal("7.0e0", 7e18, 5);
+        checkParseDecimal("8.0e0", 8e18, 5);
+        checkParseDecimal("9.0e0", 9e18, 5);
+        checkParseDecimal("10.0e0", 10e18, 6);
+
+        checkParseDecimal("0.1e0", 0.1e18, 5);
+        checkParseDecimal("1.1e0", 1.1e18, 5);
+        checkParseDecimal("2.1e0", 2.1e18, 5);
+        checkParseDecimal("3.1e0", 3.1e18, 5);
+        checkParseDecimal("4.1e0", 4.1e18, 5);
+        checkParseDecimal("5.1e0", 5.1e18, 5);
+        checkParseDecimal("6.1e0", 6.1e18, 5);
+        checkParseDecimal("7.1e0", 7.1e18, 5);
+        checkParseDecimal("8.1e0", 8.1e18, 5);
+        checkParseDecimal("9.1e0", 9.1e18, 5);
+        checkParseDecimal("10.1e0", 10.1e18, 6);
+
+        checkParseDecimal("0.01e0", 0.01e18, 6);
+        checkParseDecimal("1.01e0", 1.01e18, 6);
+        checkParseDecimal("2.01e0", 2.01e18, 6);
+        checkParseDecimal("3.01e0", 3.01e18, 6);
+
+        checkParseDecimal("0.0e1", 0.0e19, 5);
+        checkParseDecimal("1.0e1", 1.0e19, 5);
+        checkParseDecimal("2.0e1", 2.0e19, 5);
+        checkParseDecimal("3.0e1", 3.0e19, 5);
+        checkParseDecimal("4.0e1", 4.0e19, 5);
+        checkParseDecimal("5.0e1", 5.0e19, 5);
+
+        checkParseDecimal("0.0e2", 0.0e20, 5);
+        checkParseDecimal("1.0e2", 1.0e20, 5);
+        checkParseDecimal("2.0e2", 2.0e20, 5);
+        checkParseDecimal("3.0e2", 3.0e20, 5);
+        checkParseDecimal("4.0e2", 4.0e20, 5);
+        checkParseDecimal("5.0e2", 5.0e20, 5);
+
+        checkParseDecimal("0.0101e10", 0.0101e28, 9);
+        checkParseDecimal("1.0101e10", 1.0101e28, 9);
+        checkParseDecimal("2.0101e10", 2.0101e28, 9);
+        checkParseDecimal("3.0101e10", 3.0101e28, 9);
+    }
+
     // e without a digit is an error.
     function testParseLiteralDecimalExponentsError() external {
         ParseState memory state = LibParseState.newState("e", "", "", "");
@@ -218,7 +269,7 @@ contract LibParseLiteralDecimalTest is Test {
     // e with a left digit but not a right digit is an error.
     function testParseLiteralDecimalExponentsError3() external {
         ParseState memory state = LibParseState.newState("1e", "", "", "");
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 1));
+        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 2));
         (uint256 cursorAfter, uint256 value) =
             state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
         (cursorAfter, value);
@@ -230,7 +281,7 @@ contract LibParseLiteralDecimalTest is Test {
     // Tests e in the 2nd place.
     function testParseLiteralDecimalExponentsError4() external {
         ParseState memory state = LibParseState.newState("e0", "", "", "");
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 0));
+        vm.expectRevert(abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
         (uint256 cursorAfter, uint256 value) =
             state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
         (cursorAfter, value);
@@ -242,7 +293,7 @@ contract LibParseLiteralDecimalTest is Test {
     // Tests e in the 3rd place.
     function testParseLiteralDecimalExponentsError5() external {
         ParseState memory state = LibParseState.newState("e00", "", "", "");
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 0));
+        vm.expectRevert(abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
         (uint256 cursorAfter, uint256 value) =
             state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
         (cursorAfter, value);
