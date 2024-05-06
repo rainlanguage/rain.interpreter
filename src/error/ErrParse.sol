@@ -58,6 +58,9 @@ error DecimalLiteralOverflow(uint256 offset);
 /// digits.
 error MalformedExponentDigits(uint256 offset);
 
+/// Encountered a decimal literal with a malformed decimal point.
+error MalformedDecimalPoint(uint256 offset);
+
 /// Encountered a zero length decimal literal.
 error ZeroLengthDecimal(uint256 offset);
 
