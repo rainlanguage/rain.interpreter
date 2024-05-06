@@ -207,6 +207,24 @@ contract LibOpIfNPTest is OpTest {
         assertEq(io, hex"0001");
     }
 
+    /// Test that empty strings are truthy values.
+    function testOpIfNPEvalEmptyStringTruthy() external {
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: if(\"\" 5 50);");
+        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
+            iDeployer.deployExpression2(bytecode, constants);
+        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
+            storeDeployer,
+            FullyQualifiedNamespace.wrap(0),
+            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
+            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0)
+        );
+        assertEq(stack.length, 1);
+        assertEq(stack[0], 5);
+        assertEq(kvs.length, 0);
+        assertEq(io, hex"0001");
+    }
+
     /// Test that an if without inputs fails integrity check.
     function testOpIfNPEvalFail0Inputs() public {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: if();");
