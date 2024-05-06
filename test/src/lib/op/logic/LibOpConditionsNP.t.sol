@@ -84,7 +84,7 @@ contract LibOpConditionsNPTest is OpTest {
         }
 
         if (inputs.length % 2 != 0) {
-            inputs[inputs.length - 1] = IntOrAString.unwrap(LibIntOrAString.fromString(reason));
+            inputs[inputs.length - 1] = IntOrAString.unwrap(LibIntOrAString.fromString2(reason));
         } else {
             reason = "";
         }

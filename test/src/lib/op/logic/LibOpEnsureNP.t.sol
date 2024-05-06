@@ -47,7 +47,7 @@ contract LibOpEnsureNPTest is OpTest {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = condition;
-        inputs[1] = IntOrAString.unwrap(LibIntOrAString.fromString(reason));
+        inputs[1] = IntOrAString.unwrap(LibIntOrAString.fromString2(reason));
 
         Operand operand = LibOperand.build(2, 0, 0);
         if (condition == 0) {
