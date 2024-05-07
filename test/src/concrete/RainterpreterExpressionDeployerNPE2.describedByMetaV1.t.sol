@@ -9,10 +9,11 @@ import {
 import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
 import {RainterpreterStoreNPE2} from "src/concrete/RainterpreterStoreNPE2.sol";
 import {RainterpreterParserNPE2} from "src/concrete/RainterpreterParserNPE2.sol";
+import {EXPRESSION_DEPLOYER_NP_META_PATH} from "../../lib/constants/ExpressionDeployerNPConstants.sol";
 
 contract RainterpreterExpressionDeployerNPE2DescribedByMetaV1Test is Test {
     function testRainterpreterExpressionDeployerNPE2DescribedByMetaV1Happy() external {
-        bytes memory describedByMeta = vm.readFileBinary("meta/RainterpreterExpressionDeployerNPE2.rain.meta");
+        bytes memory describedByMeta = vm.readFileBinary(EXPRESSION_DEPLOYER_NP_META_PATH);
         RainterpreterExpressionDeployerNPE2 deployer = new RainterpreterExpressionDeployerNPE2(
             RainterpreterExpressionDeployerNPE2ConstructionConfigV2(
                 address(new RainterpreterNPE2()),
