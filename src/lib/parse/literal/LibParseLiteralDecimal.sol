@@ -17,70 +17,70 @@ library LibParseLiteralDecimal {
     using LibParseLiteralDecimal for ParseState;
 
     function unsafeStrToInt(ParseState memory state, uint256 start, uint256 end) internal pure returns (uint256) {
-        // The ASCII byte can be translated to a numeric digit by subtracting
-        // the digit offset.
-        uint256 digitOffset = uint256(uint8(bytes1("0")));
-        uint256 exponent = 0;
-        uint256 cursor;
         unchecked {
+            // The ASCII byte can be translated to a numeric digit by subtracting
+            // the digit offset.
+            uint256 digitOffset = uint256(uint8(bytes1("0")));
+            uint256 exponent = 0;
+            uint256 cursor;
             cursor = end - 1;
-        }
-        uint256 value = 0;
+            uint256 value = 0;
 
-        // Anything under 10^77 is safe to raise to its power of 10 without
-        // overflowing a uint256.
-        while (cursor >= start && exponent < 77) {
-            // We don't need to check the bounds of the byte because
-            // we know it is a decimal literal as long as the bounds
-            // are correct (calculated in `boundLiteral`).
-            assembly ("memory-safe") {
-                value := add(value, mul(sub(byte(0, mload(cursor)), digitOffset), exp(10, exponent)))
-            }
-            exponent++;
-            cursor--;
-        }
-
-        // If we didn't consume the entire literal, then we have
-        // to check if the remaining digit is safe to multiply
-        // by 10 without overflowing a uint256.
-        if (cursor >= start) {
-            {
-                uint256 digit;
+            // Anything under 10^77 is safe to raise to its power of 10 without
+            // overflowing a uint256.
+            while (cursor >= start && exponent < 77) {
+                // We don't need to check the bounds of the byte because
+                // we know it is a decimal literal as long as the bounds
+                // are correct (calculated in `boundLiteral`).
                 assembly ("memory-safe") {
-                    digit := sub(byte(0, mload(cursor)), digitOffset)
+                    value := add(value, mul(sub(byte(0, mload(cursor)), digitOffset), exp(10, exponent)))
                 }
-                // If the digit is greater than 1, then we know that
-                // multiplying it by 10^77 will overflow a uint256.
-                if (digit > 1) {
-                    revert DecimalLiteralOverflow(state.parseErrorOffset(cursor));
-                } else {
-                    uint256 scaled = digit * (10 ** exponent);
-                    if (value + scaled < value) {
-                        revert DecimalLiteralOverflow(state.parseErrorOffset(cursor));
-                    }
-                    value += scaled;
-                }
+                exponent++;
                 cursor--;
             }
 
-            {
-                // If we didn't consume the entire literal, then only
-                // leading zeros are allowed.
-                while (cursor >= start) {
-                    //slither-disable-next-line similar-names
-                    uint256 decimalCharByte;
+            // If we didn't consume the entire literal, then we have
+            // to check if the remaining digit is safe to multiply
+            // by 10 without overflowing a uint256.
+            if (cursor >= start) {
+                {
+                    uint256 digit;
                     assembly ("memory-safe") {
-                        decimalCharByte := byte(0, mload(cursor))
+                        digit := sub(byte(0, mload(cursor)), digitOffset)
                     }
-                    if (decimalCharByte != uint256(uint8(bytes1("0")))) {
+                    // If the digit is greater than 1, then we know that
+                    // multiplying it by 10^77 will overflow a uint256.
+                    if (digit > 1) {
                         revert DecimalLiteralOverflow(state.parseErrorOffset(cursor));
+                    } else {
+                        uint256 scaled = digit * (10 ** exponent);
+                        if (value + scaled < value) {
+                            revert DecimalLiteralOverflow(state.parseErrorOffset(cursor));
+                        }
+                        value += scaled;
                     }
                     cursor--;
                 }
-            }
-        }
 
-        return value;
+                {
+                    // If we didn't consume the entire literal, then only
+                    // leading zeros are allowed.
+                    while (cursor >= start) {
+                        //slither-disable-next-line similar-names
+                        uint256 decimalCharByte;
+                        assembly ("memory-safe") {
+                            decimalCharByte := byte(0, mload(cursor))
+                        }
+                        if (decimalCharByte != uint256(uint8(bytes1("0")))) {
+                            revert DecimalLiteralOverflow(state.parseErrorOffset(cursor));
+                        }
+                        cursor--;
+                    }
+                }
+            }
+
+            return value;
+        }
     }
 
     /// Returns cursor after, value

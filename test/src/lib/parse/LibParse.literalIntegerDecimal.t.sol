@@ -200,7 +200,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
     }
 
     /// Check that decimal literals will revert if they overflow uint256.
-    function testParseIntegerLiteralDecimalUint256Overflow() external {
+    function testParseIntegerLiteralDecimalUint256OverflowSimple() external {
         vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 3));
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(
             "_: 115792089237316195423570985008687907853269984665640564039457584007913129639936;"

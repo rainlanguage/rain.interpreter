@@ -9,7 +9,7 @@ import {LibParseLiteral, ZeroLengthDecimal} from "src/lib/parse/literal/LibParse
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 import {LibParseLiteralDecimal} from "src/lib/parse/literal/LibParseLiteralDecimal.sol";
-import {MalformedExponentDigits} from "src/error/ErrParse.sol";
+import {MalformedExponentDigits, MalformedDecimalPoint} from "src/error/ErrParse.sol";
 import {console2} from "forge-std/console2.sol";
 
 /// @title LibParseLiteralDecimalTest
@@ -25,6 +25,14 @@ contract LibParseLiteralDecimalTest is Test {
         (uint256 cursorAfter, uint256 value) = state.parseDecimal(cursor, Pointer.unwrap(state.data.endDataPointer()));
         assertEq(cursorAfter - cursor, expectedCursorAfter);
         assertEq(value, expectedValue);
+    }
+
+    function checkParseDecimalRevert(string memory data, bytes memory err) internal {
+        ParseState memory state = LibParseState.newState(bytes(data), "", "", "");
+        vm.expectRevert(err);
+        (uint256 cursorAfter, uint256 value) =
+            state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
+        (cursorAfter, value);
     }
 
     /// Check that an empty string literal is an error.
@@ -298,20 +306,12 @@ contract LibParseLiteralDecimalTest is Test {
 
     // e without a digit is an error.
     function testParseLiteralDecimalExponentsError() external {
-        ParseState memory state = LibParseState.newState("e", "", "", "");
-        vm.expectRevert(abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
-        (uint256 cursorAfter, uint256 value) =
-            state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
-        (cursorAfter, value);
+        checkParseDecimalRevert("e", abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
     }
 
     // e with a left digit but not a right digit is an error.
     function testParseLiteralDecimalExponentsError3() external {
-        ParseState memory state = LibParseState.newState("1e", "", "", "");
-        vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 2));
-        (uint256 cursorAfter, uint256 value) =
-            state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
-        (cursorAfter, value);
+        checkParseDecimalRevert("1e", abi.encodeWithSelector(MalformedExponentDigits.selector, 2));
     }
 
     // e with a right digit but not a left digit is an error.
@@ -319,11 +319,7 @@ contract LibParseLiteralDecimalTest is Test {
     // a literal.
     // Tests e in the 2nd place.
     function testParseLiteralDecimalExponentsError4() external {
-        ParseState memory state = LibParseState.newState("e0", "", "", "");
-        vm.expectRevert(abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
-        (uint256 cursorAfter, uint256 value) =
-            state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
-        (cursorAfter, value);
+        checkParseDecimalRevert("e0", abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
     }
 
     // e with a right digit but not a left digit is an error.
@@ -331,10 +327,36 @@ contract LibParseLiteralDecimalTest is Test {
     // a literal.
     // Tests e in the 3rd place.
     function testParseLiteralDecimalExponentsError5() external {
-        ParseState memory state = LibParseState.newState("e00", "", "", "");
-        vm.expectRevert(abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
-        (uint256 cursorAfter, uint256 value) =
-            state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
-        (cursorAfter, value);
+        checkParseDecimalRevert("e00", abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
+    }
+
+    /// Dot without digits is an error.
+    function testParseLiteralDecimalDotError() external {
+        checkParseDecimalRevert(".", abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
+    }
+
+    /// Dot without leading digits is an error.
+    function testParseLiteralDecimalDotError2() external {
+        checkParseDecimalRevert(".0", abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
+    }
+
+    /// Dot without trailing digits is an error.
+    function testParseLiteralDecimalDotError3() external {
+        checkParseDecimalRevert("0.", abi.encodeWithSelector(MalformedDecimalPoint.selector, 2));
+    }
+
+    /// Dot e is an error.
+    function testParseLiteralDecimalDotError4() external {
+        checkParseDecimalRevert(".e", abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
+    }
+
+    /// Dot e0 is an error.
+    function testParseLiteralDecimalDotError5() external {
+        checkParseDecimalRevert(".e0", abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
+    }
+
+    /// e Dot is an error.
+    function testParseLiteralDecimalDotError6() external {
+        checkParseDecimalRevert("e.", abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
     }
 }
