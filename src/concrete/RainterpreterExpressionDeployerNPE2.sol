@@ -18,9 +18,9 @@ import {
     UnexpectedPointers
 } from "../error/ErrDeploy.sol";
 import {
-    IExpressionDeployerV3,
-    IERC1820_NAME_IEXPRESSION_DEPLOYER_V3
-} from "rain.interpreter.interface/interface/IExpressionDeployerV3.sol";
+    IExpressionDeployerV4,
+    IERC1820_NAME_IEXPRESSION_DEPLOYER_V4
+} from "rain.interpreter.interface/interface/unstable/IExpressionDeployerV4.sol";
 import {IParserV1} from "rain.interpreter.interface/interface/IParserV1.sol";
 import {IInterpreterV2} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
@@ -36,27 +36,26 @@ import {STORE_BYTECODE_HASH} from "./RainterpreterStoreNPE2.sol";
 
 /// @dev The function pointers for the integrity check fns.
 bytes constant INTEGRITY_FUNCTION_POINTERS =
-    hex"0de60e640ec91043104d104d10571060107b11211121117d11f71204104d1057104d104d105710431043104310431043120e1233124d104d120e104d104d12041057104d104d12041204104d105712571057105710571057104d105710571057105710571257104d104d104d10571057104d10571057104d1057125712571257125712571257125712571257125712571257125712571057124d";
+    hex"0dcc0e4a0eaf102910331033103d1046106111071107116311dd11ea1033103d10331033103d1029102910291029102911f412191233103311f41033103311ea103d1033103311ea11ea1033103d123d103d103d103d103d1033103d103d103d103d103d123d103310331033103d103d1033103d103d1033103d123d123d123d123d123d123d123d123d123d123d123d123d123d123d103d1233";
 
-/// @dev Hash of the known construction meta.
-bytes32 constant CONSTRUCTION_META_HASH = bytes32(0xe81773d61cd559e0f1a070476e736a0c9f3d38f058b821fb77e191909408231b);
+/// @dev Hash of the metadata that describes the deployer (parsing).
+bytes32 constant DESCRIBED_BY_META_HASH = bytes32(0xe81773d61cd559e0f1a070476e736a0c9f3d38f058b821fb77e191909408231b);
 
 /// All config required to construct a `RainterpreterNPE2`.
 /// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match
 /// known bytecode.
 /// @param store The `IInterpreterStoreV2`. MUST match known bytecode.
-/// @param meta Contract meta for tooling.
-struct RainterpreterExpressionDeployerNPE2ConstructionConfig {
+/// @param parser The `IParserV1`. MUST match known bytecode.
+struct RainterpreterExpressionDeployerNPE2ConstructionConfigV2 {
     address interpreter;
     address store;
     address parser;
-    bytes meta;
 }
 
 /// @title RainterpreterExpressionDeployerNPE2
 contract RainterpreterExpressionDeployerNPE2 is
     IDescribedByMetaV1,
-    IExpressionDeployerV3,
+    IExpressionDeployerV4,
     IParserV2,
     IParserPragmaV1,
     ERC165
@@ -72,7 +71,7 @@ contract RainterpreterExpressionDeployerNPE2 is
     IInterpreterStoreV2 public immutable iStore;
     IParserV1 public immutable iParser;
 
-    constructor(RainterpreterExpressionDeployerNPE2ConstructionConfig memory config) {
+    constructor(RainterpreterExpressionDeployerNPE2ConstructionConfigV2 memory config) {
         // Set the immutables.
         IInterpreterV2 interpreter = IInterpreterV2(config.interpreter);
         IInterpreterStoreV2 store = IInterpreterStoreV2(config.store);
@@ -81,14 +80,6 @@ contract RainterpreterExpressionDeployerNPE2 is
         iInterpreter = interpreter;
         iStore = store;
         iParser = parser;
-
-        /// This IS a security check. This prevents someone making an exact
-        /// bytecode copy of the interpreter and shipping different meta for
-        /// the copy to lie about what each op does in the interpreter.
-        bytes32 constructionMetaHash = keccak256(config.meta);
-        if (constructionMetaHash != expectedConstructionMetaHash()) {
-            revert UnexpectedConstructionMetaHash(expectedConstructionMetaHash(), constructionMetaHash);
-        }
 
         // Guard against an interpreter with unknown bytecode.
         bytes32 interpreterHash;
@@ -117,10 +108,10 @@ contract RainterpreterExpressionDeployerNPE2 is
             revert UnexpectedParserBytecodeHash(expectedParserBytecodeHash(), parserHash);
         }
 
-        // Emit the DISPair.
+        // Emit the DISPairV2.
         // The parser is this contract as it implements both
-        // `IExpressionDeployerV3` and `IParserV1`.
-        emit DISPair(msg.sender, address(interpreter), address(store), address(parser), config.meta);
+        // `IExpressionDeployerV4` and `IParserV1`.
+        emit DISPairV2(msg.sender, address(interpreter), address(store), address(parser));
 
         // Register the interface for the deployer.
         // We have to check that the 1820 registry has bytecode at the address
@@ -128,17 +119,17 @@ contract RainterpreterExpressionDeployerNPE2 is
         // we are deploying to has 1820 deployed.
         if (address(IERC1820_REGISTRY).code.length > 0) {
             IERC1820_REGISTRY.setInterfaceImplementer(
-                address(this), IERC1820_REGISTRY.interfaceHash(IERC1820_NAME_IEXPRESSION_DEPLOYER_V3), address(this)
+                address(this), IERC1820_REGISTRY.interfaceHash(IERC1820_NAME_IEXPRESSION_DEPLOYER_V4), address(this)
             );
         }
     }
 
     /// @inheritdoc IERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IExpressionDeployerV3).interfaceId || interfaceId == type(IERC165).interfaceId;
+        return interfaceId == type(IExpressionDeployerV4).interfaceId || interfaceId == type(IERC165).interfaceId;
     }
 
-    /// @inheritdoc IExpressionDeployerV3
+    /// @inheritdoc IExpressionDeployerV4
     function deployExpression2(bytes memory bytecode, uint256[] memory constants)
         external
         virtual
@@ -209,18 +200,9 @@ contract RainterpreterExpressionDeployerNPE2 is
         return LibAllStandardOpsNP.integrityFunctionPointers();
     }
 
-    /// Virtual function to return the expected construction meta hash.
-    /// Public so that external tooling can read it, although this should be
-    /// considered deprecated. The intended workflow is that tooling uses a real
-    /// evm to deploy the full dispair and reads the hashes from errors using a
-    /// trail/error approach until a full dispair is deployed.
-    function expectedConstructionMetaHash() public pure virtual returns (bytes32) {
-        return CONSTRUCTION_META_HASH;
-    }
-
     ///@inheritdoc IDescribedByMetaV1
     function describedByMetaV1() external pure returns (bytes32) {
-        return CONSTRUCTION_META_HASH;
+        return DESCRIBED_BY_META_HASH;
     }
 
     /// Virtual function to return the expected interpreter bytecode hash.

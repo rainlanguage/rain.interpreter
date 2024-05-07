@@ -22,7 +22,9 @@ contract LibParseLiteralStringTest is Test {
         ParseState memory state = LibParseState.newState("\"\"", "", "", "");
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         (uint256 cursorAfter, uint256 value) = state.parseString(cursor, Pointer.unwrap(state.data.endDataPointer()));
-        assertEq(value, 0);
+        // Empty string is represented by 0 with the highest bit set to make it
+        // a truthy value.
+        assertEq(value, 1 << 0xFF);
         assertEq(cursorAfter, cursor + 2);
     }
 
@@ -32,7 +34,7 @@ contract LibParseLiteralStringTest is Test {
         vm.assume(data.length < 32);
         ParseState memory state = LibParseState.newState(bytes(string.concat("\"", string(data), "\"")), "", "", "");
 
-        uint256 expectedValue = IntOrAString.unwrap(LibIntOrAString.fromString(string(data)));
+        uint256 expectedValue = IntOrAString.unwrap(LibIntOrAString.fromString2(string(data)));
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         (uint256 cursorAfter, uint256 value) =
             state.parseString(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));

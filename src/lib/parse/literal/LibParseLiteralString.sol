@@ -90,7 +90,7 @@ library LibParseLiteralString {
             memSnapshot := mload(str)
             mstore(str, length)
         }
-        intOrAString = LibIntOrAString.fromString(str);
+        intOrAString = LibIntOrAString.fromString2(str);
         assembly ("memory-safe") {
             mstore(str, memSnapshot)
         }

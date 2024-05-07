@@ -19,9 +19,9 @@ import {
     RainterpreterNPE2, OPCODE_FUNCTION_POINTERS, INTERPRETER_BYTECODE_HASH
 } from "src/concrete/RainterpreterNPE2.sol";
 import {
-    CONSTRUCTION_META_HASH,
+    DESCRIBED_BY_META_HASH,
     INTEGRITY_FUNCTION_POINTERS,
-    RainterpreterExpressionDeployerNPE2ConstructionConfig,
+    RainterpreterExpressionDeployerNPE2ConstructionConfigV2,
     RainterpreterExpressionDeployerNPE2
 } from "../../src/concrete/RainterpreterExpressionDeployerNPE2.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
@@ -42,7 +42,7 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
 
     function beforeOpTestConstructor() internal virtual {}
 
-    function constructionMetaPath() internal view virtual returns (string memory) {
+    function describedByMetaPath() internal view virtual returns (string memory) {
         return EXPRESSION_DEPLOYER_NP_META_PATH;
     }
 
@@ -103,12 +103,12 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
             revert("unexpected parse meta");
         }
 
-        bytes memory constructionMeta = vm.readFileBinary(constructionMetaPath());
-        bytes32 constructionMetaHash = keccak256(constructionMeta);
-        if (constructionMetaHash != CONSTRUCTION_META_HASH) {
-            console2.log("current construction meta hash:");
-            console2.logBytes32(constructionMetaHash);
-            revert("unexpected construction meta hash");
+        bytes memory describedByMeta = vm.readFileBinary(describedByMetaPath());
+        bytes32 describedByMetaHash = keccak256(describedByMeta);
+        if (describedByMetaHash != DESCRIBED_BY_META_HASH) {
+            console2.log("current described by meta hash:");
+            console2.logBytes32(describedByMetaHash);
+            revert("unexpected described by meta hash");
         }
 
         vm.etch(address(IERC1820_REGISTRY), INVALID_BYTECODE);
@@ -121,8 +121,8 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
             address(IERC1820_REGISTRY), abi.encodeWithSelector(IERC1820Registry.setInterfaceImplementer.selector), ""
         );
         iDeployer = new RainterpreterExpressionDeployerNPE2(
-            RainterpreterExpressionDeployerNPE2ConstructionConfig(
-                address(iInterpreter), address(iStore), address(iParser), constructionMeta
+            RainterpreterExpressionDeployerNPE2ConstructionConfigV2(
+                address(iInterpreter), address(iStore), address(iParser)
             )
         );
 
