@@ -6,9 +6,16 @@ import {
     DecimalLiteralOverflow,
     ZeroLengthDecimal,
     MalformedExponentDigits,
-    MalformedDecimalPoint
+    MalformedDecimalPoint,
+    DecimalLiteralPrecisionLoss
 } from "../../../error/ErrParse.sol";
-import {CMASK_E_NOTATION, CMASK_NUMERIC_0_9, CMASK_DECIMAL_POINT, CMASK_NEGATIVE_SIGN} from "../LibParseCMask.sol";
+import {
+    CMASK_E_NOTATION,
+    CMASK_NUMERIC_0_9,
+    CMASK_DECIMAL_POINT,
+    CMASK_NEGATIVE_SIGN,
+    CMASK_ZERO
+} from "../LibParseCMask.sol";
 import {LibParseError} from "../LibParseError.sol";
 import {LibParse} from "../LibParse.sol";
 
@@ -89,60 +96,76 @@ library LibParseLiteralDecimal {
         pure
         returns (uint256, uint256)
     {
-        uint256 intValue;
-        {
-            uint256 start = cursor;
-            cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
-            if (cursor == start) {
-                revert ZeroLengthDecimal(state.parseErrorOffset(cursor));
-            }
-            intValue = state.unsafeStrToInt(start, cursor);
-        }
-
-        uint256 isFrac = LibParse.isMask(cursor, end, CMASK_DECIMAL_POINT);
-        uint256 fracValue = 0;
         uint256 fracOffset = 0;
-        if (isFrac == 1) {
-            unchecked {
-                cursor++;
-            }
-            uint256 fracStart = cursor;
-            cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
-            if (cursor == fracStart) {
-                revert MalformedDecimalPoint(state.parseErrorOffset(cursor));
-            }
-            fracValue = state.unsafeStrToInt(fracStart, cursor);
-            fracOffset = cursor - fracStart;
-        }
+        uint256 fracValue = 0;
+        uint256 scale = 0;
+        uint256 intValue = 0;
 
-        uint256 eValue = 0;
-        uint256 eNeg = 0;
-        if (LibParse.isMask(cursor, end, CMASK_E_NOTATION) > 0) {
-            unchecked {
-                cursor++;
-            }
-            eNeg = LibParse.isMask(cursor, end, CMASK_NEGATIVE_SIGN);
-            unchecked {
-                cursor += eNeg;
-            }
-
-            uint256 eStart = cursor;
-            cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
-            if (cursor == eStart) {
-                revert MalformedExponentDigits(state.parseErrorOffset(cursor));
-            }
-            eValue = state.unsafeStrToInt(eStart, cursor);
-        }
-
-        uint256 scale;
         unchecked {
-            uint256 fracScale = isFrac * 18;
-            // If this is a fractional number, then we need to scale it up to
-            // 1e18 being "one". Otherwise we treat as an integer.
-            if (eNeg > 0) {
-                scale = fracScale - eValue;
-            } else {
-                scale = fracScale + eValue;
+            {
+                uint256 start = cursor;
+                cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
+                if (cursor == start) {
+                    revert ZeroLengthDecimal(state.parseErrorOffset(cursor));
+                }
+                intValue = state.unsafeStrToInt(start, cursor);
+            }
+
+            uint256 isFrac = LibParse.isMask(cursor, end, CMASK_DECIMAL_POINT);
+            if (isFrac == 1) {
+                cursor++;
+                uint256 fracStart = cursor;
+                cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
+                if (cursor == fracStart) {
+                    revert MalformedDecimalPoint(state.parseErrorOffset(cursor));
+                }
+
+                // Trailing zeros are allowed in fractional literals but should
+                // not be counted in the precision.
+                uint256 nonZeroCursor = cursor;
+                while (LibParse.isMask(nonZeroCursor - 1, end, CMASK_ZERO) == 1) {
+                    nonZeroCursor--;
+                }
+
+                fracValue = state.unsafeStrToInt(fracStart, nonZeroCursor);
+                fracOffset = nonZeroCursor - fracStart;
+            }
+
+            uint256 eValue = 0;
+            uint256 eNeg = 0;
+            if (LibParse.isMask(cursor, end, CMASK_E_NOTATION) > 0) {
+                cursor++;
+                eNeg = LibParse.isMask(cursor, end, CMASK_NEGATIVE_SIGN);
+                cursor += eNeg;
+
+                uint256 eStart = cursor;
+                cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
+                if (cursor == eStart) {
+                    revert MalformedExponentDigits(state.parseErrorOffset(cursor));
+                }
+                eValue = state.unsafeStrToInt(eStart, cursor);
+            }
+
+            {
+                uint256 fracScale = isFrac * 18;
+                // If this is a fractional number, then we need to scale it up to
+                // 1e18 being "one". Otherwise we treat as an integer.
+                if (eNeg > 0) {
+                    if (fracScale < eValue) {
+                        revert DecimalLiteralPrecisionLoss(state.parseErrorOffset(cursor));
+                    }
+                    scale = fracScale - eValue;
+                } else {
+                    scale = fracScale + eValue;
+                }
+            }
+
+            if (scale >= 77) {
+                revert DecimalLiteralOverflow(state.parseErrorOffset(cursor));
+            }
+
+            if (scale < fracOffset) {
+                revert DecimalLiteralPrecisionLoss(state.parseErrorOffset(cursor));
             }
         }
 

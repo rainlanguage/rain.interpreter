@@ -9,7 +9,12 @@ import {LibParseLiteral, ZeroLengthDecimal} from "src/lib/parse/literal/LibParse
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 import {LibParseLiteralDecimal} from "src/lib/parse/literal/LibParseLiteralDecimal.sol";
-import {MalformedExponentDigits, MalformedDecimalPoint} from "src/error/ErrParse.sol";
+import {
+    MalformedExponentDigits,
+    MalformedDecimalPoint,
+    DecimalLiteralOverflow,
+    DecimalLiteralPrecisionLoss
+} from "src/error/ErrParse.sol";
 import {console2} from "forge-std/console2.sol";
 
 /// @title LibParseLiteralDecimalTest
@@ -205,6 +210,44 @@ contract LibParseLiteralDecimalTest is Test {
         checkParseDecimal("10e10", 10e10, 5);
     }
 
+    // Test integer with capital E
+    function testParseLiteralDecimalExponents2Capital() external {
+        checkParseDecimal("0E00", 0, 4);
+        checkParseDecimal("1E00", 1, 4);
+        checkParseDecimal("2E00", 2, 4);
+        checkParseDecimal("3E00", 3, 4);
+        checkParseDecimal("4E00", 4, 4);
+        checkParseDecimal("5E00", 5, 4);
+        checkParseDecimal("6E00", 6, 4);
+        checkParseDecimal("7E00", 7, 4);
+        checkParseDecimal("8E00", 8, 4);
+        checkParseDecimal("9E00", 9, 4);
+        checkParseDecimal("10E00", 10, 5);
+
+        checkParseDecimal("0E01", 0, 4);
+        checkParseDecimal("1E01", 10, 4);
+        checkParseDecimal("2E01", 20, 4);
+        checkParseDecimal("3E01", 30, 4);
+        checkParseDecimal("4E01", 40, 4);
+        checkParseDecimal("5E01", 50, 4);
+        checkParseDecimal("6E01", 60, 4);
+        checkParseDecimal("7E01", 70, 4);
+        checkParseDecimal("8E01", 80, 4);
+        checkParseDecimal("9E01", 90, 4);
+        checkParseDecimal("10E01", 100, 5);
+
+        checkParseDecimal("0E02", 0, 4);
+        checkParseDecimal("1E02", 100, 4);
+        checkParseDecimal("2E02", 200, 4);
+        checkParseDecimal("3E02", 300, 4);
+        checkParseDecimal("4E02", 400, 4);
+        checkParseDecimal("5E02", 500, 4);
+        checkParseDecimal("6E02", 600, 4);
+        checkParseDecimal("7E02", 700, 4);
+        checkParseDecimal("8E02", 800, 4);
+        checkParseDecimal("9E02", 900, 4);
+    }
+
     // Test decimals with exponents.
     function testParseLiteralDecimalExponents3() external {
         checkParseDecimal("0.0e0", 0, 5);
@@ -260,6 +303,37 @@ contract LibParseLiteralDecimalTest is Test {
         checkParseDecimal("3.0101e10", 3.0101e28, 9);
     }
 
+    /// Test capital E
+    function testParseLiteralDecimalExponents4() external {
+        checkParseDecimal("0.0E0", 0, 5);
+        checkParseDecimal("1.0E0", 1e18, 5);
+        checkParseDecimal("2.0E0", 2e18, 5);
+        checkParseDecimal("3.0E0", 3e18, 5);
+        checkParseDecimal("4.0E0", 4e18, 5);
+        checkParseDecimal("5.0E0", 5e18, 5);
+        checkParseDecimal("6.0E0", 6e18, 5);
+        checkParseDecimal("7.0E0", 7e18, 5);
+        checkParseDecimal("8.0E0", 8e18, 5);
+        checkParseDecimal("9.0E0", 9e18, 5);
+        checkParseDecimal("10.0E0", 10e18, 6);
+
+        checkParseDecimal("0.1E0", 0.1e18, 5);
+        checkParseDecimal("1.1E0", 1.1e18, 5);
+        checkParseDecimal("2.1E0", 2.1e18, 5);
+        checkParseDecimal("3.1E0", 3.1e18, 5);
+        checkParseDecimal("4.1E0", 4.1e18, 5);
+        checkParseDecimal("5.1E0", 5.1e18, 5);
+        checkParseDecimal("6.1E0", 6.1e18, 5);
+        checkParseDecimal("7.1E0", 7.1e18, 5);
+        checkParseDecimal("8.1E0", 8.1e18, 5);
+        checkParseDecimal("9.1E0", 9.1e18, 5);
+        checkParseDecimal("10.1E0", 10.1e18, 6);
+
+        checkParseDecimal("0.01E000", 0.01e18, 8);
+
+        checkParseDecimal("0.01E0", 0.01e18, 6);
+    }
+
     /// Test some negative exponents.
     function testParseLiteralDecimalNegativeExponents() external {
         checkParseDecimal("0.0e-0", 0, 6);
@@ -302,6 +376,60 @@ contract LibParseLiteralDecimalTest is Test {
         checkParseDecimal("0.0101e-10", 0.0101e8, 10);
         checkParseDecimal("1.0101e-10", 1.0101e8, 10);
         checkParseDecimal("2.0101e-10", 2.0101e8, 10);
+
+        checkParseDecimal("0.0e-18", 0, 7);
+        checkParseDecimal("1.0e-18", 1, 7);
+        checkParseDecimal("2.0e-18", 2, 7);
+    }
+
+    /// Test trailing zeros.
+    function testParseLiteralDecimalTrailingZeros() external {
+        checkParseDecimal("0.000000000000000000", 0, 20);
+        checkParseDecimal("1.000000000000000000", 1e18, 20);
+        checkParseDecimal("2.000000000000000000", 2e18, 20);
+        checkParseDecimal("3.000000000000000000", 3e18, 20);
+        checkParseDecimal("4.000000000000000000", 4e18, 20);
+        checkParseDecimal("5.000000000000000000", 5e18, 20);
+        checkParseDecimal("6.000000000000000000", 6e18, 20);
+        checkParseDecimal("7.000000000000000000", 7e18, 20);
+        checkParseDecimal("8.000000000000000000", 8e18, 20);
+        checkParseDecimal("9.000000000000000000", 9e18, 20);
+        checkParseDecimal("10.000000000000000000", 10e18, 21);
+
+        checkParseDecimal("0.100000000000000000", 0.1e18, 20);
+        checkParseDecimal("1.100000000000000000", 1.1e18, 20);
+        checkParseDecimal("2.100000000000000000", 2.1e18, 20);
+        checkParseDecimal("3.100000000000000000", 3.1e18, 20);
+        checkParseDecimal("4.100000000000000000", 4.1e18, 20);
+        checkParseDecimal("5.100000000000000000", 5.1e18, 20);
+        checkParseDecimal("6.100000000000000000", 6.1e18, 20);
+        checkParseDecimal("7.100000000000000000", 7.1e18, 20);
+        checkParseDecimal("8.100000000000000000", 8.1e18, 20);
+        checkParseDecimal("9.100000000000000000", 9.1e18, 20);
+
+        checkParseDecimal("0.010000000000000000e5", 0.01e23, 22);
+        checkParseDecimal("1.010000000000000000e-5", 1.01e13, 23);
+        checkParseDecimal("2.000000000000000000e-18", 2, 24);
+    }
+
+    // Test some unrelated data after the decimal.
+    function testParseLiteralDecimalUnrelated() external {
+        checkParseDecimal("0.0hello", 0, 3);
+        checkParseDecimal("1.0hello", 1e18, 3);
+        checkParseDecimal("2.0hello", 2e18, 3);
+        checkParseDecimal("3.0hello", 3e18, 3);
+
+        checkParseDecimal("0.0e0e10", 0, 5);
+        checkParseDecimal("1.0e0e10", 1e18, 5);
+        checkParseDecimal("2.0e0e10", 2e18, 5);
+
+        checkParseDecimal("0.0e0.5", 0, 5);
+        checkParseDecimal("1.0e0.5", 1e18, 5);
+        checkParseDecimal("2.0e0.5", 2e18, 5);
+
+        checkParseDecimal("0.0e1.5", 0, 5);
+        checkParseDecimal("1.0e1.5", 1e19, 5);
+        checkParseDecimal("2.0e1.5", 2e19, 5);
     }
 
     // e without a digit is an error.
@@ -362,6 +490,35 @@ contract LibParseLiteralDecimalTest is Test {
 
     /// Negative e with no digits is an error.
     function testParseLiteralDecimalNegativeExponentsError() external {
-        checkParseDecimalRevert("0.0e-", abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
+        checkParseDecimalRevert("0.0e-", abi.encodeWithSelector(MalformedExponentDigits.selector, 5));
+    }
+
+    /// Large e will cause overflow.
+    function testParseLiteralDecimalOverflow() external {
+        checkParseDecimalRevert("1.0e100", abi.encodeWithSelector(DecimalLiteralOverflow.selector, 7));
+    }
+
+    /// Integer precision loss will revert.
+    function testParseLiteralDecimalPrecisionLossInteger() external {
+        checkParseDecimalRevert("1.0e-19", abi.encodeWithSelector(DecimalLiteralPrecisionLoss.selector, 7));
+    }
+
+    /// Decimal precision loss will revert.
+    function testParseLiteralDecimalPrecisionLossDecimal() external {
+        checkParseDecimalRevert("1.5e-18", abi.encodeWithSelector(DecimalLiteralPrecisionLoss.selector, 7));
+    }
+
+    /// Decimal precision loss will revert. Max zeros.
+    function testParseLiteralDecimalPrecisionLossDecimalMax() external {
+        checkParseDecimalRevert(
+            "1.000000000000000001e-1", abi.encodeWithSelector(DecimalLiteralPrecisionLoss.selector, 23)
+        );
+    }
+
+    /// Decimal precision loss will revert. No e, just too small.
+    function testParseLiteralDecimalPrecisionLossDecimalSmall() external {
+        checkParseDecimalRevert(
+            "0.0000000000000000001", abi.encodeWithSelector(DecimalLiteralPrecisionLoss.selector, 21)
+        );
     }
 }
