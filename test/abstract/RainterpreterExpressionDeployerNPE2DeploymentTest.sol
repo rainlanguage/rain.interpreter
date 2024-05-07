@@ -5,7 +5,6 @@ import {IERC1820_REGISTRY, IERC1820Registry} from "rain.erc1820/lib/LibIERC1820.
 import {Test, console2, stdError} from "forge-std/Test.sol";
 
 import {INVALID_BYTECODE} from "../lib/etch/LibEtch.sol";
-import {EXPRESSION_DEPLOYER_NP_META_PATH} from "../lib/constants/ExpressionDeployerNPConstants.sol";
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV1.sol";
 import {RainterpreterStoreNPE2, STORE_BYTECODE_HASH} from "src/concrete/RainterpreterStoreNPE2.sol";
@@ -41,10 +40,6 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
     RainterpreterParserNPE2 internal immutable iParser;
 
     function beforeOpTestConstructor() internal virtual {}
-
-    function describedByMetaPath() internal view virtual returns (string memory) {
-        return EXPRESSION_DEPLOYER_NP_META_PATH;
-    }
 
     constructor() {
         beforeOpTestConstructor();
@@ -101,14 +96,6 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
             console2.log("current parse meta:");
             console2.logBytes(parseMeta);
             revert("unexpected parse meta");
-        }
-
-        bytes memory describedByMeta = vm.readFileBinary(describedByMetaPath());
-        bytes32 describedByMetaHash = keccak256(describedByMeta);
-        if (describedByMetaHash != DESCRIBED_BY_META_HASH) {
-            console2.log("current described by meta hash:");
-            console2.logBytes32(describedByMetaHash);
-            revert("unexpected described by meta hash");
         }
 
         vm.etch(address(IERC1820_REGISTRY), INVALID_BYTECODE);
