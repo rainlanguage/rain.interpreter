@@ -10,21 +10,11 @@ import {
 } from "../../../error/ErrParse.sol";
 import {CMASK_E_NOTATION, CMASK_NUMERIC_0_9, CMASK_DECIMAL_POINT, CMASK_NEGATIVE_SIGN} from "../LibParseCMask.sol";
 import {LibParseError} from "../LibParseError.sol";
+import {LibParse} from "../LibParse.sol";
 
 library LibParseLiteralDecimal {
     using LibParseError for ParseState;
     using LibParseLiteralDecimal for ParseState;
-
-    function skipDigits(uint256 cursor, uint256 end) internal pure returns (uint256) {
-        uint256 decimalCharMask = CMASK_NUMERIC_0_9;
-        assembly ("memory-safe") {
-            //slither-disable-next-line incorrect-shift
-            for {} and(iszero(iszero(and(shl(byte(0, mload(cursor)), 1), decimalCharMask))), lt(cursor, end)) {} {
-                cursor := add(cursor, 1)
-            }
-        }
-        return cursor;
-    }
 
     function unsafeStrToInt(ParseState memory state, uint256 start, uint256 end) internal pure returns (uint256) {
         // The ASCII byte can be translated to a numeric digit by subtracting
@@ -102,7 +92,7 @@ library LibParseLiteralDecimal {
         uint256 intValue;
         {
             uint256 start = cursor;
-            cursor = skipDigits(cursor, end);
+            cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
             if (cursor == start) {
                 revert ZeroLengthDecimal(state.parseErrorOffset(cursor));
             }
@@ -121,7 +111,7 @@ library LibParseLiteralDecimal {
             if (isFrac == 1) {
                 cursor++;
                 uint256 fracStart = cursor;
-                cursor = skipDigits(cursor, end);
+                cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
                 if (cursor == fracStart) {
                     revert MalformedDecimalPoint(state.parseErrorOffset(cursor));
                 }
@@ -156,7 +146,7 @@ library LibParseLiteralDecimal {
                 }
 
                 uint256 eStart = cursor;
-                cursor = skipDigits(cursor, end);
+                cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
                 if (cursor == eStart) {
                     revert MalformedExponentDigits(state.parseErrorOffset(cursor));
                 }
