@@ -359,4 +359,9 @@ contract LibParseLiteralDecimalTest is Test {
     function testParseLiteralDecimalDotError6() external {
         checkParseDecimalRevert("e.", abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
     }
+
+    /// Negative e with no digits is an error.
+    function testParseLiteralDecimalNegativeExponentsError() external {
+        checkParseDecimalRevert("0.0e-", abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
+    }
 }
