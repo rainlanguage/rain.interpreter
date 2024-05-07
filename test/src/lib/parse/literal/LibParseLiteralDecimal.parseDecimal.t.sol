@@ -59,28 +59,29 @@ contract LibParseLiteralDecimalTest is Test {
 
     /// Fuzz and round trip.
     function testParseLiteralDecimalRoundTrip(uint256 value) external {
+        value = bound(value, 0, type(uint256).max / 1e18);
         string memory valueStr = Strings.toString(value);
-        checkParseDecimal(valueStr, value, bytes(valueStr).length);
+        checkParseDecimal(valueStr, value * 1e18, bytes(valueStr).length);
     }
 
     /// Check some specific examples.
     function testParseLiteralDecimalSpecific() external {
-        checkParseDecimal("0", 0, 1);
-        checkParseDecimal("1", 1, 1);
-        checkParseDecimal("2", 2, 1);
-        checkParseDecimal("3", 3, 1);
-        checkParseDecimal("4", 4, 1);
-        checkParseDecimal("5", 5, 1);
-        checkParseDecimal("6", 6, 1);
-        checkParseDecimal("7", 7, 1);
-        checkParseDecimal("8", 8, 1);
-        checkParseDecimal("9", 9, 1);
-        checkParseDecimal("10", 10, 2);
+        checkParseDecimal("0", 0e18, 1);
+        checkParseDecimal("1", 1e18, 1);
+        checkParseDecimal("2", 2e18, 1);
+        checkParseDecimal("3", 3e18, 1);
+        checkParseDecimal("4", 4e18, 1);
+        checkParseDecimal("5", 5e18, 1);
+        checkParseDecimal("6", 6e18, 1);
+        checkParseDecimal("7", 7e18, 1);
+        checkParseDecimal("8", 8e18, 1);
+        checkParseDecimal("9", 9e18, 1);
+        checkParseDecimal("10", 10e18, 2);
     }
 
     /// Check some examples of decimals.
     function testParseLiteralDecimalDecimals() external {
-        checkParseDecimal("0.0", 0, 3);
+        checkParseDecimal("0.0", 0e18, 3);
         checkParseDecimal("1.0", 1e18, 3);
         checkParseDecimal("2.0", 2e18, 3);
         checkParseDecimal("3.0", 3e18, 3);
@@ -120,131 +121,131 @@ contract LibParseLiteralDecimalTest is Test {
     /// Check some examples of exponents.
     /// Checks e in the 2nd position.
     function testParseLiteralDecimalExponents() external {
-        checkParseDecimal("0e0", 0, 3);
-        checkParseDecimal("1e0", 1, 3);
-        checkParseDecimal("2e0", 2, 3);
-        checkParseDecimal("3e0", 3, 3);
-        checkParseDecimal("4e0", 4, 3);
-        checkParseDecimal("5e0", 5, 3);
-        checkParseDecimal("6e0", 6, 3);
-        checkParseDecimal("7e0", 7, 3);
-        checkParseDecimal("8e0", 8, 3);
-        checkParseDecimal("9e0", 9, 3);
-        checkParseDecimal("10e0", 10, 4);
+        checkParseDecimal("0e0", 0e18, 3);
+        checkParseDecimal("1e0", 1e18, 3);
+        checkParseDecimal("2e0", 2e18, 3);
+        checkParseDecimal("3e0", 3e18, 3);
+        checkParseDecimal("4e0", 4e18, 3);
+        checkParseDecimal("5e0", 5e18, 3);
+        checkParseDecimal("6e0", 6e18, 3);
+        checkParseDecimal("7e0", 7e18, 3);
+        checkParseDecimal("8e0", 8e18, 3);
+        checkParseDecimal("9e0", 9e18, 3);
+        checkParseDecimal("10e0", 10e18, 4);
 
-        checkParseDecimal("0e1", 0, 3);
-        checkParseDecimal("1e1", 10, 3);
-        checkParseDecimal("2e1", 20, 3);
-        checkParseDecimal("3e1", 30, 3);
-        checkParseDecimal("4e1", 40, 3);
-        checkParseDecimal("5e1", 50, 3);
-        checkParseDecimal("6e1", 60, 3);
-        checkParseDecimal("7e1", 70, 3);
-        checkParseDecimal("8e1", 80, 3);
-        checkParseDecimal("9e1", 90, 3);
-        checkParseDecimal("10e1", 100, 4);
+        checkParseDecimal("0e1", 0e18, 3);
+        checkParseDecimal("1e1", 10e18, 3);
+        checkParseDecimal("2e1", 20e18, 3);
+        checkParseDecimal("3e1", 30e18, 3);
+        checkParseDecimal("4e1", 40e18, 3);
+        checkParseDecimal("5e1", 50e18, 3);
+        checkParseDecimal("6e1", 60e18, 3);
+        checkParseDecimal("7e1", 70e18, 3);
+        checkParseDecimal("8e1", 80e18, 3);
+        checkParseDecimal("9e1", 90e18, 3);
+        checkParseDecimal("10e1", 100e18, 4);
 
-        checkParseDecimal("0e2", 0, 3);
-        checkParseDecimal("1e2", 100, 3);
-        checkParseDecimal("2e2", 200, 3);
-        checkParseDecimal("3e2", 300, 3);
-        checkParseDecimal("4e2", 400, 3);
-        checkParseDecimal("5e2", 500, 3);
-        checkParseDecimal("6e2", 600, 3);
-        checkParseDecimal("7e2", 700, 3);
-        checkParseDecimal("8e2", 800, 3);
-        checkParseDecimal("9e2", 900, 3);
-        checkParseDecimal("10e2", 1000, 4);
+        checkParseDecimal("0e2", 0e18, 3);
+        checkParseDecimal("1e2", 100e18, 3);
+        checkParseDecimal("2e2", 200e18, 3);
+        checkParseDecimal("3e2", 300e18, 3);
+        checkParseDecimal("4e2", 400e18, 3);
+        checkParseDecimal("5e2", 500e18, 3);
+        checkParseDecimal("6e2", 600e18, 3);
+        checkParseDecimal("7e2", 700e18, 3);
+        checkParseDecimal("8e2", 800e18, 3);
+        checkParseDecimal("9e2", 900e18, 3);
+        checkParseDecimal("10e2", 1000e18, 4);
     }
 
     /// Check some examples of exponents.
     /// Checks e in the 3rd position.
     function testParseLiteralDecimalExponents2() external {
-        checkParseDecimal("0e00", 0, 4);
-        checkParseDecimal("1e00", 1, 4);
-        checkParseDecimal("2e00", 2, 4);
-        checkParseDecimal("3e00", 3, 4);
-        checkParseDecimal("4e00", 4, 4);
-        checkParseDecimal("5e00", 5, 4);
-        checkParseDecimal("6e00", 6, 4);
-        checkParseDecimal("7e00", 7, 4);
-        checkParseDecimal("8e00", 8, 4);
-        checkParseDecimal("9e00", 9, 4);
-        checkParseDecimal("10e00", 10, 5);
+        checkParseDecimal("0e00", 0e18, 4);
+        checkParseDecimal("1e00", 1e18, 4);
+        checkParseDecimal("2e00", 2e18, 4);
+        checkParseDecimal("3e00", 3e18, 4);
+        checkParseDecimal("4e00", 4e18, 4);
+        checkParseDecimal("5e00", 5e18, 4);
+        checkParseDecimal("6e00", 6e18, 4);
+        checkParseDecimal("7e00", 7e18, 4);
+        checkParseDecimal("8e00", 8e18, 4);
+        checkParseDecimal("9e00", 9e18, 4);
+        checkParseDecimal("10e00", 10e18, 5);
 
-        checkParseDecimal("0e01", 0, 4);
-        checkParseDecimal("1e01", 10, 4);
-        checkParseDecimal("2e01", 20, 4);
-        checkParseDecimal("3e01", 30, 4);
-        checkParseDecimal("4e01", 40, 4);
-        checkParseDecimal("5e01", 50, 4);
-        checkParseDecimal("6e01", 60, 4);
-        checkParseDecimal("7e01", 70, 4);
-        checkParseDecimal("8e01", 80, 4);
-        checkParseDecimal("9e01", 90, 4);
-        checkParseDecimal("10e01", 100, 5);
+        checkParseDecimal("0e01", 0e18, 4);
+        checkParseDecimal("1e01", 10e18, 4);
+        checkParseDecimal("2e01", 20e18, 4);
+        checkParseDecimal("3e01", 30e18, 4);
+        checkParseDecimal("4e01", 40e18, 4);
+        checkParseDecimal("5e01", 50e18, 4);
+        checkParseDecimal("6e01", 60e18, 4);
+        checkParseDecimal("7e01", 70e18, 4);
+        checkParseDecimal("8e01", 80e18, 4);
+        checkParseDecimal("9e01", 90e18, 4);
+        checkParseDecimal("10e01", 100e18, 5);
 
-        checkParseDecimal("0e02", 0, 4);
-        checkParseDecimal("1e02", 100, 4);
-        checkParseDecimal("2e02", 200, 4);
-        checkParseDecimal("3e02", 300, 4);
-        checkParseDecimal("4e02", 400, 4);
-        checkParseDecimal("5e02", 500, 4);
-        checkParseDecimal("6e02", 600, 4);
-        checkParseDecimal("7e02", 700, 4);
-        checkParseDecimal("8e02", 800, 4);
-        checkParseDecimal("9e02", 900, 4);
-        checkParseDecimal("10e02", 1000, 5);
+        checkParseDecimal("0e02", 0e18, 4);
+        checkParseDecimal("1e02", 100e18, 4);
+        checkParseDecimal("2e02", 200e18, 4);
+        checkParseDecimal("3e02", 300e18, 4);
+        checkParseDecimal("4e02", 400e18, 4);
+        checkParseDecimal("5e02", 500e18, 4);
+        checkParseDecimal("6e02", 600e18, 4);
+        checkParseDecimal("7e02", 700e18, 4);
+        checkParseDecimal("8e02", 800e18, 4);
+        checkParseDecimal("9e02", 900e18, 4);
+        checkParseDecimal("10e02", 1000e18, 5);
 
-        checkParseDecimal("0e10", 0, 4);
-        checkParseDecimal("1e10", 1e10, 4);
-        checkParseDecimal("2e10", 2e10, 4);
-        checkParseDecimal("3e10", 3e10, 4);
-        checkParseDecimal("4e10", 4e10, 4);
-        checkParseDecimal("5e10", 5e10, 4);
-        checkParseDecimal("6e10", 6e10, 4);
-        checkParseDecimal("7e10", 7e10, 4);
-        checkParseDecimal("8e10", 8e10, 4);
-        checkParseDecimal("9e10", 9e10, 4);
-        checkParseDecimal("10e10", 10e10, 5);
+        checkParseDecimal("0e10", 0e18, 4);
+        checkParseDecimal("1e10", 1e28, 4);
+        checkParseDecimal("2e10", 2e28, 4);
+        checkParseDecimal("3e10", 3e28, 4);
+        checkParseDecimal("4e10", 4e28, 4);
+        checkParseDecimal("5e10", 5e28, 4);
+        checkParseDecimal("6e10", 6e28, 4);
+        checkParseDecimal("7e10", 7e28, 4);
+        checkParseDecimal("8e10", 8e28, 4);
+        checkParseDecimal("9e10", 9e28, 4);
+        checkParseDecimal("10e10", 10e28, 5);
     }
 
     // Test integer with capital E
     function testParseLiteralDecimalExponents2Capital() external {
-        checkParseDecimal("0E00", 0, 4);
-        checkParseDecimal("1E00", 1, 4);
-        checkParseDecimal("2E00", 2, 4);
-        checkParseDecimal("3E00", 3, 4);
-        checkParseDecimal("4E00", 4, 4);
-        checkParseDecimal("5E00", 5, 4);
-        checkParseDecimal("6E00", 6, 4);
-        checkParseDecimal("7E00", 7, 4);
-        checkParseDecimal("8E00", 8, 4);
-        checkParseDecimal("9E00", 9, 4);
-        checkParseDecimal("10E00", 10, 5);
+        checkParseDecimal("0E00", 0e18, 4);
+        checkParseDecimal("1E00", 1e18, 4);
+        checkParseDecimal("2E00", 2e18, 4);
+        checkParseDecimal("3E00", 3e18, 4);
+        checkParseDecimal("4E00", 4e18, 4);
+        checkParseDecimal("5E00", 5e18, 4);
+        checkParseDecimal("6E00", 6e18, 4);
+        checkParseDecimal("7E00", 7e18, 4);
+        checkParseDecimal("8E00", 8e18, 4);
+        checkParseDecimal("9E00", 9e18, 4);
+        checkParseDecimal("10E00", 10e18, 5);
 
-        checkParseDecimal("0E01", 0, 4);
-        checkParseDecimal("1E01", 10, 4);
-        checkParseDecimal("2E01", 20, 4);
-        checkParseDecimal("3E01", 30, 4);
-        checkParseDecimal("4E01", 40, 4);
-        checkParseDecimal("5E01", 50, 4);
-        checkParseDecimal("6E01", 60, 4);
-        checkParseDecimal("7E01", 70, 4);
-        checkParseDecimal("8E01", 80, 4);
-        checkParseDecimal("9E01", 90, 4);
-        checkParseDecimal("10E01", 100, 5);
+        checkParseDecimal("0E01", 0e18, 4);
+        checkParseDecimal("1E01", 10e18, 4);
+        checkParseDecimal("2E01", 20e18, 4);
+        checkParseDecimal("3E01", 30e18, 4);
+        checkParseDecimal("4E01", 40e18, 4);
+        checkParseDecimal("5E01", 50e18, 4);
+        checkParseDecimal("6E01", 60e18, 4);
+        checkParseDecimal("7E01", 70e18, 4);
+        checkParseDecimal("8E01", 80e18, 4);
+        checkParseDecimal("9E01", 90e18, 4);
+        checkParseDecimal("10E01", 100e18, 5);
 
-        checkParseDecimal("0E02", 0, 4);
-        checkParseDecimal("1E02", 100, 4);
-        checkParseDecimal("2E02", 200, 4);
-        checkParseDecimal("3E02", 300, 4);
-        checkParseDecimal("4E02", 400, 4);
-        checkParseDecimal("5E02", 500, 4);
-        checkParseDecimal("6E02", 600, 4);
-        checkParseDecimal("7E02", 700, 4);
-        checkParseDecimal("8E02", 800, 4);
-        checkParseDecimal("9E02", 900, 4);
+        checkParseDecimal("0E02", 0e18, 4);
+        checkParseDecimal("1E02", 100e18, 4);
+        checkParseDecimal("2E02", 200e18, 4);
+        checkParseDecimal("3E02", 300e18, 4);
+        checkParseDecimal("4E02", 400e18, 4);
+        checkParseDecimal("5E02", 500e18, 4);
+        checkParseDecimal("6E02", 600e18, 4);
+        checkParseDecimal("7E02", 700e18, 4);
+        checkParseDecimal("8E02", 800e18, 4);
+        checkParseDecimal("9E02", 900e18, 4);
     }
 
     // Test decimals with exponents.

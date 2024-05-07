@@ -15,7 +15,7 @@ import {LibParseInterstitial} from "../lib/parse/LibParseInterstitial.sol";
 
 /// @dev The known hash of the parser bytecode. This is used by the deployer to
 /// check that it is deploying a parser that is compatible with the interpreter.
-bytes32 constant PARSER_BYTECODE_HASH = bytes32(0xedebe2f9d01b5e9c588c578348293bd9014be08f31c374f4203be68adebb8f76);
+bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x9382b7873ec8c1f7cb5bfdc682347ae112afeeea3b45a1ea03c3955a9932cae6);
 
 /// @dev Encodes the parser meta that is used to lookup word definitions.
 /// The structure of the parser meta is:
@@ -42,13 +42,13 @@ uint8 constant PARSE_META_BUILD_DEPTH = 2;
 /// @dev Every two bytes is a function pointer for an operand handler. These
 /// positional indexes all map to the same indexes looked up in the parse meta.
 bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
-    hex"18d918d918d9196e1a0f1a0f1a0f196e196e18d918d918d91a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a541ae81a0f1a541ae81a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f1a0f18d91bde18d91bde1a0f1a0f";
+    hex"18d718d718d7196c1a0d1a0d1a0d196c196c18d718d718d71a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a521ae61a0d1a521ae61a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d1a0d18d71bdc18d71bdc1a0d1a0d";
 
 /// @dev Every two bytes is a function pointer for a literal parser. Literal
 /// dispatches are determined by the first byte(s) of the literal rather than a
 /// full word lookup, and are done with simple conditional jumps as the
 /// possibilities are limited compared to the number of words we have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0f3a1202161e16f8";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0f3a1202161c16f6";
 
 /// @title RainterpreterParserNPE2
 /// @dev The parser implementation.

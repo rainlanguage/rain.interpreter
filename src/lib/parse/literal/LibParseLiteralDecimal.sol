@@ -19,6 +19,9 @@ import {
 import {LibParseError} from "../LibParseError.sol";
 import {LibParse} from "../LibParse.sol";
 
+/// @dev The default is 18 decimal places for a fractional number.
+uint256 constant DECIMAL_SCALE = 18;
+
 library LibParseLiteralDecimal {
     using LibParseError for ParseState;
     using LibParseLiteralDecimal for ParseState;
@@ -147,16 +150,15 @@ library LibParseLiteralDecimal {
             }
 
             {
-                uint256 fracScale = isFrac * 18;
                 // If this is a fractional number, then we need to scale it up to
                 // 1e18 being "one". Otherwise we treat as an integer.
                 if (eNeg > 0) {
-                    if (fracScale < eValue) {
+                    if (DECIMAL_SCALE < eValue) {
                         revert DecimalLiteralPrecisionLoss(state.parseErrorOffset(cursor));
                     }
-                    scale = fracScale - eValue;
+                    scale = DECIMAL_SCALE - eValue;
                 } else {
-                    scale = fracScale + eValue;
+                    scale = DECIMAL_SCALE + eValue;
                 }
             }
 
