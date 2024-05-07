@@ -115,6 +115,7 @@ library LibParseLiteralDecimal {
         {
             uint256 dMask = CMASK_DECIMAL_POINT;
             assembly ("memory-safe") {
+                //slither-disable-next-line incorrect-shift
                 isFrac := and(iszero(iszero(and(shl(byte(0, mload(cursor)), 1), dMask))), lt(cursor, end))
             }
             if (isFrac == 1) {
@@ -136,6 +137,7 @@ library LibParseLiteralDecimal {
             {
                 uint256 eMask = CMASK_E_NOTATION;
                 assembly ("memory-safe") {
+                    //slither-disable-next-line incorrect-shift
                     isE := and(iszero(iszero(and(shl(byte(0, mload(cursor)), 1), eMask))), lt(cursor, end))
                 }
             }
@@ -145,6 +147,7 @@ library LibParseLiteralDecimal {
                 {
                     uint256 negativeMask = CMASK_NEGATIVE_SIGN;
                     assembly ("memory-safe") {
+                        //slither-disable-next-line incorrect-shift
                         eNeg := and(iszero(iszero(and(shl(byte(0, mload(cursor)), 1), negativeMask))), lt(cursor, end))
                     }
                     if (eNeg == 1) {
