@@ -15,7 +15,6 @@ import {
     DecimalLiteralOverflow,
     DecimalLiteralPrecisionLoss
 } from "src/error/ErrParse.sol";
-import {console2} from "forge-std/console2.sol";
 
 /// @title LibParseLiteralDecimalTest
 /// Tests parsing decimal literal values with the LibParseLiteral library.

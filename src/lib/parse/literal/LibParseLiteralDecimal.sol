@@ -58,11 +58,11 @@ library LibParseLiteralDecimal {
                     // If the digit is greater than 1, then we know that
                     // multiplying it by 10^77 will overflow a uint256.
                     if (digit > 1) {
-                        revert DecimalLiteralOverflow(state.parseErrorOffset(cursor));
+                        revert DecimalLiteralOverflow(state.parseErrorOffset(start));
                     } else {
                         uint256 scaled = digit * (10 ** exponent);
                         if (value + scaled < value) {
-                            revert DecimalLiteralOverflow(state.parseErrorOffset(cursor));
+                            revert DecimalLiteralOverflow(state.parseErrorOffset(start));
                         }
                         value += scaled;
                     }
@@ -79,7 +79,7 @@ library LibParseLiteralDecimal {
                             decimalCharByte := byte(0, mload(cursor))
                         }
                         if (decimalCharByte != uint256(uint8(bytes1("0")))) {
-                            revert DecimalLiteralOverflow(state.parseErrorOffset(cursor));
+                            revert DecimalLiteralOverflow(state.parseErrorOffset(start));
                         }
                         cursor--;
                     }
@@ -169,6 +169,8 @@ library LibParseLiteralDecimal {
             }
         }
 
+        // Do this bit with checked math in case we missed an edge case above
+        // that causes overflow.
         return (cursor, intValue * (10 ** scale) + fracValue * (10 ** (scale - fracOffset)));
     }
 }

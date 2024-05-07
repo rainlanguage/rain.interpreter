@@ -15,7 +15,7 @@ import {LibParseInterstitial} from "../lib/parse/LibParseInterstitial.sol";
 
 /// @dev The known hash of the parser bytecode. This is used by the deployer to
 /// check that it is deploying a parser that is compatible with the interpreter.
-bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x018d864e3c35e55bb469b17f7cef5f0512533ed167befd6d0b67290a054ab483);
+bytes32 constant PARSER_BYTECODE_HASH = bytes32(0xedebe2f9d01b5e9c588c578348293bd9014be08f31c374f4203be68adebb8f76);
 
 /// @dev Encodes the parser meta that is used to lookup word definitions.
 /// The structure of the parser meta is:

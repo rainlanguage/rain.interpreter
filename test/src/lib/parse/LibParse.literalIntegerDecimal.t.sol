@@ -212,7 +212,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
     /// Check that decimal literals will revert if they overflow uint256 with
     /// leading zeros.
     function testParseIntegerLiteralDecimalUint256OverflowLeadingZeros() external {
-        vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 5));
+        vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 3));
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(
             "_: 00115792089237316195423570985008687907853269984665640564039457584007913129639936;"
         ).parse();
@@ -234,7 +234,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
     /// Check that decimal literals will revert if they overflow uint256 with
     /// a non-one leading digit and leading zeros.
     function testParseIntegerLiteralDecimalUint256OverflowLeadingDigitLeadingZeros() external {
-        vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 5));
+        vm.expectRevert(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 3));
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(
             "_: 00215792089237316195423570985008687907853269984665640564039457584007913129639935;"
         ).parse();
