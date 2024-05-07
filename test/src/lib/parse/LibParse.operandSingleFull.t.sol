@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {ExpectedOperand, UnclosedOperand, OperandOverflow, UnexpectedOperandValue} from "src/error/ErrParse.sol";

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {LibPointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibOpDecimal18MulNP} from "src/lib/op/math/decimal18/LibOpDecimal18MulNP.sol";

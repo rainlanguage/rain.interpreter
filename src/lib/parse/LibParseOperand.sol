@@ -16,6 +16,7 @@ import {CMASK_OPERAND_END, CMASK_WHITESPACE, CMASK_OPERAND_START} from "./LibPar
 import {ParseState, OPERAND_VALUES_LENGTH, FSM_YANG_MASK} from "./LibParseState.sol";
 import {LibParseError} from "./LibParseError.sol";
 import {LibParseInterstitial} from "./LibParseInterstitial.sol";
+import {LibFixedPointDecimalScale} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 
 library LibParseOperand {
     using LibParseError for ParseState;
@@ -154,9 +155,11 @@ library LibParseOperand {
     function handleOperandSingleFull(uint256[] memory values) internal pure returns (Operand operand) {
         // Happy path at the top for efficiency.
         if (values.length == 1) {
+            uint256 value18;
             assembly ("memory-safe") {
-                operand := mload(add(values, 0x20))
+                value18 := mload(add(values, 0x20))
             }
+            operand = Operand.wrap(LibFixedPointDecimalScale.scaleToIntegerLossless(value18));
             if (Operand.unwrap(operand) > uint256(type(uint16).max)) {
                 revert OperandOverflow();
             }

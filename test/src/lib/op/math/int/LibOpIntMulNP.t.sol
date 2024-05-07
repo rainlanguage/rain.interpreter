@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, stdError} from "test/abstract/OpTest.sol";
 import {LibOpIntMulNP} from "src/lib/op/math/int/LibOpIntMulNP.sol";
