@@ -99,59 +99,39 @@ library LibParseLiteralDecimal {
             intValue = state.unsafeStrToInt(start, cursor);
         }
 
-        uint256 isFrac = 0;
+        uint256 isFrac = LibParse.isMask(cursor, end, CMASK_DECIMAL_POINT);
         uint256 fracValue = 0;
         uint256 fracOffset = 0;
-        {
-            uint256 dMask = CMASK_DECIMAL_POINT;
-            assembly ("memory-safe") {
-                //slither-disable-next-line incorrect-shift
-                isFrac := and(iszero(iszero(and(shl(byte(0, mload(cursor)), 1), dMask))), lt(cursor, end))
-            }
-            if (isFrac == 1) {
+        if (isFrac == 1) {
+            unchecked {
                 cursor++;
-                uint256 fracStart = cursor;
-                cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
-                if (cursor == fracStart) {
-                    revert MalformedDecimalPoint(state.parseErrorOffset(cursor));
-                }
-                fracValue = state.unsafeStrToInt(fracStart, cursor);
-                fracOffset = cursor - fracStart;
             }
+            uint256 fracStart = cursor;
+            cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
+            if (cursor == fracStart) {
+                revert MalformedDecimalPoint(state.parseErrorOffset(cursor));
+            }
+            fracValue = state.unsafeStrToInt(fracStart, cursor);
+            fracOffset = cursor - fracStart;
         }
 
         uint256 eValue = 0;
         uint256 eNeg = 0;
-        {
-            uint256 isE = 0;
-            {
-                uint256 eMask = CMASK_E_NOTATION;
-                assembly ("memory-safe") {
-                    //slither-disable-next-line incorrect-shift
-                    isE := and(iszero(iszero(and(shl(byte(0, mload(cursor)), 1), eMask))), lt(cursor, end))
-                }
-            }
-
-            if (isE == 1) {
+        if (LibParse.isMask(cursor, end, CMASK_E_NOTATION) > 0) {
+            unchecked {
                 cursor++;
-                {
-                    uint256 negativeMask = CMASK_NEGATIVE_SIGN;
-                    assembly ("memory-safe") {
-                        //slither-disable-next-line incorrect-shift
-                        eNeg := and(iszero(iszero(and(shl(byte(0, mload(cursor)), 1), negativeMask))), lt(cursor, end))
-                    }
-                    if (eNeg == 1) {
-                        cursor++;
-                    }
-                }
-
-                uint256 eStart = cursor;
-                cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
-                if (cursor == eStart) {
-                    revert MalformedExponentDigits(state.parseErrorOffset(cursor));
-                }
-                eValue = state.unsafeStrToInt(eStart, cursor);
             }
+            eNeg = LibParse.isMask(cursor, end, CMASK_NEGATIVE_SIGN);
+            unchecked {
+                cursor += eNeg;
+            }
+
+            uint256 eStart = cursor;
+            cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
+            if (cursor == eStart) {
+                revert MalformedExponentDigits(state.parseErrorOffset(cursor));
+            }
+            eValue = state.unsafeStrToInt(eStart, cursor);
         }
 
         uint256 scale;

@@ -131,6 +131,15 @@ library LibParse {
         return cursor;
     }
 
+    /// Checks if the cursor points at a char of the given mask, and is in range
+    /// of end.
+    function isMask(uint256 cursor, uint256 end, uint256 mask) internal pure returns (uint256 result) {
+        assembly ("memory-safe") {
+            //slither-disable-next-line incorrect-shift
+            result := and(iszero(iszero(and(shl(byte(0, mload(cursor)), 1), mask))), lt(cursor, end))
+        }
+    }
+
     function parseLHS(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
             while (cursor < end) {
