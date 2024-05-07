@@ -223,6 +223,8 @@ contract LibParseLiteralDecimalTest is Test {
         checkParseDecimal("9.1e0", 9.1e18, 5);
         checkParseDecimal("10.1e0", 10.1e18, 6);
 
+        checkParseDecimal("0.01e000", 0.01e18, 8);
+
         checkParseDecimal("0.01e0", 0.01e18, 6);
         checkParseDecimal("1.01e0", 1.01e18, 6);
         checkParseDecimal("2.01e0", 2.01e18, 6);
@@ -234,6 +236,8 @@ contract LibParseLiteralDecimalTest is Test {
         checkParseDecimal("3.0e1", 3.0e19, 5);
         checkParseDecimal("4.0e1", 4.0e19, 5);
         checkParseDecimal("5.0e1", 5.0e19, 5);
+
+        checkParseDecimal("0.0e001", 0.0e20, 7);
 
         checkParseDecimal("0.0e2", 0.0e20, 5);
         checkParseDecimal("1.0e2", 1.0e20, 5);
@@ -300,15 +304,6 @@ contract LibParseLiteralDecimalTest is Test {
             state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
         (cursorAfter, value);
     }
-
-    // // e with more than 2 digits is an error.
-    // function testParseLiteralDecimalExponentsError2() external {
-    //     ParseState memory state = LibParseState.newState("1e000", "", "", "");
-    //     vm.expectRevert(abi.encodeWithSelector(MalformedExponentDigits.selector, 1));
-    //     (uint256 cursorAfter, uint256 value) =
-    //         state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
-    //     (cursorAfter, value);
-    // }
 
     // e with a left digit but not a right digit is an error.
     function testParseLiteralDecimalExponentsError3() external {
