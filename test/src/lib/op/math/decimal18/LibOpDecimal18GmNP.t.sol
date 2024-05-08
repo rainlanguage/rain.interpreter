@@ -39,14 +39,14 @@ contract LibOpDecimal18GmNPTest is OpTest {
     /// Test the eval of `decimal18-gm`.
     function testOpDecimal18GmNPEval() external {
         checkHappy("_: decimal18-gm(0 0);", 0, "0 0");
-        checkHappy("_: decimal18-gm(0 1e18);", 0, "0 1");
-        checkHappy("_: decimal18-gm(1e18 0);", 0, "1e18 0");
-        checkHappy("_: decimal18-gm(1e18 1e18);", 1e18, "1e18 1");
-        checkHappy("_: decimal18-gm(1e18 2e18);", 1414213562373095048, "1e18 2");
-        checkHappy("_: decimal18-gm(2e18 2e18);", 2e18, "2e18 2");
-        checkHappy("_: decimal18-gm(2e18 3e18);", 2449489742783178098, "2e18 3");
-        checkHappy("_: decimal18-gm(2e18 4e18);", 2828427124746190097, "2e18 4");
-        checkHappy("_: decimal18-gm(4e18 5e17);", 1414213562373095048, "4e18 5");
+        checkHappy("_: decimal18-gm(0 1);", 0, "0 1");
+        checkHappy("_: decimal18-gm(1 0);", 0, "1 0");
+        checkHappy("_: decimal18-gm(1 1);", 1e18, "1 1");
+        checkHappy("_: decimal18-gm(1 2);", 1414213562373095048, "1 2");
+        checkHappy("_: decimal18-gm(2 2);", 2e18, "2 2");
+        checkHappy("_: decimal18-gm(2 3);", 2449489742783178098, "2 3");
+        checkHappy("_: decimal18-gm(2 4);", 2828427124746190097, "2 4");
+        checkHappy("_: decimal18-gm(4 0.5);", 1414213562373095048, "4 0.5");
     }
 
     /// Test the eval of `decimal18-gm` for bad inputs.
