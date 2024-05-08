@@ -69,9 +69,9 @@ contract LibOpIntMaxNPTest is OpTest {
 
     /// Test the eval of `int-max` opcode parsed from a string. Tests one input.
     function testOpIntMaxNPEvalOneInput() external {
-        checkBadInputs("_: int-max(5);", 1, 2, 1);
+        checkBadInputs("_: int-max(5e-18);", 1, 2, 1);
         checkBadInputs("_: int-max(0);", 1, 2, 1);
-        checkBadInputs("_: int-max(1);", 1, 2, 1);
+        checkBadInputs("_: int-max(1e-18);", 1, 2, 1);
         checkBadInputs("_: int-max(max-int-value());", 1, 2, 1);
     }
 
@@ -96,21 +96,21 @@ contract LibOpIntMaxNPTest is OpTest {
     /// Test the eval of `int-max` opcode parsed from a string. Tests two inputs.
     function testOpIntMaxNPEval2InputsHappy() external {
         checkHappy("_: int-max(0 0);", 0, "0 > 0 ? 0 : 1");
-        checkHappy("_: int-max(1 0);", 1, "1 > 0 ? 1 : 0");
+        checkHappy("_: int-max(1e-18 0);", 1, "1 > 0 ? 1 : 0");
         checkHappy("_: int-max(max-int-value() 0);", type(uint256).max, "max-int-value() > 0 ? max-int-value() : 0");
-        checkHappy("_: int-max(0 1);", 1, "0 > 1 ? 0 : 1");
-        checkHappy("_: int-max(1 1);", 1, "1 > 1 ? 1 : 1");
+        checkHappy("_: int-max(0 1e-18);", 1, "0 > 1 ? 0 : 1");
+        checkHappy("_: int-max(1e-18 1e-18);", 1, "1 > 1 ? 1 : 1");
         checkHappy("_: int-max(0 max-int-value());", type(uint256).max, "0 > max-int-value() ? 0 : max-int-value()");
-        checkHappy("_: int-max(1 max-int-value());", type(uint256).max, "1 > max-int-value() ? 1 : max-int-value()");
-        checkHappy("_: int-max(max-int-value() 1);", type(uint256).max, "1 > max-int-value() ? 1 : max-int-value()");
+        checkHappy("_: int-max(1e-18 max-int-value());", type(uint256).max, "1 > max-int-value() ? 1 : max-int-value()");
+        checkHappy("_: int-max(max-int-value() 1e-18);", type(uint256).max, "1 > max-int-value() ? 1 : max-int-value()");
         checkHappy(
             "_: int-max(max-int-value() max-int-value());",
             type(uint256).max,
             "max-int-value() > max-int-value() ? max-int-value() : max-int-value()"
         );
-        checkHappy("_: int-max(0 2);", 2, "0 > 2 ? 0 : 2");
-        checkHappy("_: int-max(1 2);", 2, "1 > 2 ? 1 : 2");
-        checkHappy("_: int-max(2 2);", 2, "2 > 2 ? 2 : 2");
+        checkHappy("_: int-max(0 2e-18);", 2, "0 > 2 ? 0 : 2");
+        checkHappy("_: int-max(1e-18 2e-18);", 2, "1 > 2 ? 1 : 2");
+        checkHappy("_: int-max(2e-18 2e-18);", 2, "2 > 2 ? 2 : 2");
     }
 
     /// Test the eval of `decimal18-max` opcode parsed from a string.
@@ -118,69 +118,77 @@ contract LibOpIntMaxNPTest is OpTest {
     /// MUST be identical to `int-max`.
     function testOpDecimal18MaxNPEval2InputsHappy() external {
         checkHappy("_: decimal18-max(0 0);", 0, "0 > 0 ? 0 : 1");
-        checkHappy("_: decimal18-max(1 0);", 1, "1 > 0 ? 1 : 0");
+        checkHappy("_: decimal18-max(1 0);", 1e18, "1 > 0 ? 1 : 0");
         checkHappy(
-            "_: decimal18-max(max-int-value() 0);", type(uint256).max, "max-int-value() > 0 ? max-int-value() : 0"
-        );
-        checkHappy("_: decimal18-max(0 1);", 1, "0 > 1 ? 0 : 1");
-        checkHappy("_: decimal18-max(1 1);", 1, "1 > 1 ? 1 : 1");
-        checkHappy(
-            "_: decimal18-max(0 max-int-value());", type(uint256).max, "0 > max-int-value() ? 0 : max-int-value()"
-        );
-        checkHappy(
-            "_: decimal18-max(1 max-int-value());", type(uint256).max, "1 > max-int-value() ? 1 : max-int-value()"
-        );
-        checkHappy(
-            "_: decimal18-max(max-int-value() 1);", type(uint256).max, "1 > max-int-value() ? 1 : max-int-value()"
-        );
-        checkHappy(
-            "_: decimal18-max(max-int-value() max-int-value());",
+            "_: decimal18-max(max-decimal18-value() 0);",
             type(uint256).max,
-            "max-int-value() > max-int-value() ? max-int-value() : max-int-value()"
+            "max-decimal18-value() > 0 ? max-decimal18-value() : 0"
         );
-        checkHappy("_: decimal18-max(0 2);", 2, "0 > 2 ? 0 : 2");
-        checkHappy("_: decimal18-max(1 2);", 2, "1 > 2 ? 1 : 2");
-        checkHappy("_: decimal18-max(2 2);", 2, "2 > 2 ? 2 : 2");
+        checkHappy("_: decimal18-max(0 1);", 1e18, "0 > 1 ? 0 : 1");
+        checkHappy("_: decimal18-max(1 1);", 1e18, "1 > 1 ? 1 : 1");
+        checkHappy(
+            "_: decimal18-max(0 max-decimal18-value());",
+            type(uint256).max,
+            "0 > max-decimal18-value() ? 0 : max-decimal18-value()"
+        );
+        checkHappy(
+            "_: decimal18-max(1 max-decimal18-value());",
+            type(uint256).max,
+            "1 > max-decimal18-value() ? 1 : max-decimal18-value()"
+        );
+        checkHappy(
+            "_: decimal18-max(max-decimal18-value() 1);",
+            type(uint256).max,
+            "1 > max-decimal18-value() ? 1 : max-decimal18-value()"
+        );
+        checkHappy(
+            "_: decimal18-max(max-decimal18-value() max-decimal18-value());",
+            type(uint256).max,
+            "max-decimal18-value() > max-decimal18-value() ? max-decimal18-value() : max-decimal18-value()"
+        );
+        checkHappy("_: decimal18-max(0 2);", 2e18, "0 > 2 ? 0 : 2");
+        checkHappy("_: decimal18-max(1 2);", 2e18, "1 > 2 ? 1 : 2");
+        checkHappy("_: decimal18-max(2 2);", 2e18, "2 > 2 ? 2 : 2");
     }
 
     /// Test the eval of `int-max` opcode parsed from a string. Tests three inputs.
     function testOpIntMaxNPEval3InputsHappy() external {
         checkHappy("_: int-max(0 0 0);", 0, "0 0 0");
-        checkHappy("_: int-max(1 0 0);", 1, "1 0 0");
-        checkHappy("_: int-max(2 0 0);", 2, "2 0 0");
-        checkHappy("_: int-max(0 1 0);", 1, "0 1 0");
-        checkHappy("_: int-max(1 1 0);", 1, "1 1 0");
-        checkHappy("_: int-max(2 1 0);", 2, "2 1 0");
-        checkHappy("_: int-max(0 2 0);", 2, "0 2 0");
-        checkHappy("_: int-max(1 2 0);", 2, "1 2 0");
-        checkHappy("_: int-max(2 2 0);", 2, "2 2 0");
-        checkHappy("_: int-max(0 0 1);", 1, "0 0 1");
-        checkHappy("_: int-max(1 0 1);", 1, "1 0 1");
-        checkHappy("_: int-max(2 0 1);", 2, "2 0 1");
-        checkHappy("_: int-max(0 1 1);", 1, "0 1 1");
-        checkHappy("_: int-max(1 1 1);", 1, "1 1 1");
-        checkHappy("_: int-max(2 1 1);", 2, "2 1 1");
-        checkHappy("_: int-max(0 2 1);", 2, "0 2 1");
-        checkHappy("_: int-max(1 2 1);", 2, "1 2 1");
-        checkHappy("_: int-max(2 2 1);", 2, "2 2 1");
-        checkHappy("_: int-max(0 0 2);", 2, "0 0 2");
-        checkHappy("_: int-max(1 0 2);", 2, "1 0 2");
-        checkHappy("_: int-max(2 0 2);", 2, "2 0 2");
-        checkHappy("_: int-max(0 1 2);", 2, "0 1 2");
-        checkHappy("_: int-max(1 1 2);", 2, "1 1 2");
-        checkHappy("_: int-max(2 1 2);", 2, "2 1 2");
-        checkHappy("_: int-max(0 2 2);", 2, "0 2 2");
-        checkHappy("_: int-max(1 2 2);", 2, "1 2 2");
-        checkHappy("_: int-max(2 2 2);", 2, "2 2 2");
+        checkHappy("_: int-max(1e-18 0 0);", 1, "1 0 0");
+        checkHappy("_: int-max(2e-18 0 0);", 2, "2 0 0");
+        checkHappy("_: int-max(0 1e-18 0);", 1, "0 1 0");
+        checkHappy("_: int-max(1e-18 1e-18 0);", 1, "1 1 0");
+        checkHappy("_: int-max(2e-18 1e-18 0);", 2, "2 1 0");
+        checkHappy("_: int-max(0 2e-18 0);", 2, "0 2 0");
+        checkHappy("_: int-max(1e-18 2e-18 0);", 2, "1 2 0");
+        checkHappy("_: int-max(2e-18 2e-18 0);", 2, "2 2 0");
+        checkHappy("_: int-max(0 0 1e-18);", 1, "0 0 1");
+        checkHappy("_: int-max(1e-18 0 1e-18);", 1, "1 0 1");
+        checkHappy("_: int-max(2e-18 0 1e-18);", 2, "2 0 1");
+        checkHappy("_: int-max(0 1e-18 1e-18);", 1, "0 1 1");
+        checkHappy("_: int-max(1e-18 1e-18 1e-18);", 1, "1 1 1");
+        checkHappy("_: int-max(2e-18 1e-18 1e-18);", 2, "2 1 1");
+        checkHappy("_: int-max(0 2e-18 1e-18);", 2, "0 2 1");
+        checkHappy("_: int-max(1e-18 2e-18 1e-18);", 2, "1 2 1");
+        checkHappy("_: int-max(2e-18 2e-18 1e-18);", 2, "2 2 1");
+        checkHappy("_: int-max(0 0 2e-18);", 2, "0 0 2");
+        checkHappy("_: int-max(1e-18 0 2e-18);", 2, "1 0 2");
+        checkHappy("_: int-max(2e-18 0 2e-18);", 2, "2 0 2");
+        checkHappy("_: int-max(0 1e-18 2e-18);", 2, "0 1 2");
+        checkHappy("_: int-max(1e-18 1e-18 2e-18);", 2, "1 1 2");
+        checkHappy("_: int-max(2e-18 1e-18 2e-18);", 2, "2 1 2");
+        checkHappy("_: int-max(0 2e-18 2e-18);", 2, "0 2 2");
+        checkHappy("_: int-max(1e-18 2e-18 2e-18);", 2, "1 2 2");
+        checkHappy("_: int-max(2e-18 2e-18 2e-18);", 2, "2 2 2");
         checkHappy("_: int-max(0 0 max-int-value());", type(uint256).max, "0 0 max-int-value()");
-        checkHappy("_: int-max(1 0 max-int-value());", type(uint256).max, "1 0 max-int-value()");
-        checkHappy("_: int-max(2 0 max-int-value());", type(uint256).max, "2 0 max-int-value()");
-        checkHappy("_: int-max(0 1 max-int-value());", type(uint256).max, "0 1 max-int-value()");
-        checkHappy("_: int-max(1 1 max-int-value());", type(uint256).max, "1 1 max-int-value()");
-        checkHappy("_: int-max(2 1 max-int-value());", type(uint256).max, "2 1 max-int-value()");
-        checkHappy("_: int-max(0 2 max-int-value());", type(uint256).max, "0 2 max-int-value()");
-        checkHappy("_: int-max(1 2 max-int-value());", type(uint256).max, "1 2 max-int-value()");
-        checkHappy("_: int-max(2 2 max-int-value());", type(uint256).max, "2 2 max-int-value()");
+        checkHappy("_: int-max(1e-18 0 max-int-value());", type(uint256).max, "1 0 max-int-value()");
+        checkHappy("_: int-max(2e-18 0 max-int-value());", type(uint256).max, "2 0 max-int-value()");
+        checkHappy("_: int-max(0 1e-18 max-int-value());", type(uint256).max, "0 1 max-int-value()");
+        checkHappy("_: int-max(1e-18 1e-18 max-int-value());", type(uint256).max, "1 1 max-int-value()");
+        checkHappy("_: int-max(2e-18 1e-18 max-int-value());", type(uint256).max, "2 1 max-int-value()");
+        checkHappy("_: int-max(0 2e-18 max-int-value());", type(uint256).max, "0 2 max-int-value()");
+        checkHappy("_: int-max(1e-18 2e-18 max-int-value());", type(uint256).max, "1 2 max-int-value()");
+        checkHappy("_: int-max(2e-18 2e-18 max-int-value());", type(uint256).max, "2 2 max-int-value()");
     }
 
     /// Test the eval of `decimal18-max` opcode parsed from a string.
@@ -188,32 +196,32 @@ contract LibOpIntMaxNPTest is OpTest {
     /// MUST be identical to `int-max`.
     function testOpDecimal18MaxNPEval3InputsHappy() external {
         checkHappy("_: decimal18-max(0 0 0);", 0, "0 0 0");
-        checkHappy("_: decimal18-max(1 0 0);", 1, "1 0 0");
-        checkHappy("_: decimal18-max(2 0 0);", 2, "2 0 0");
-        checkHappy("_: decimal18-max(0 1 0);", 1, "0 1 0");
-        checkHappy("_: decimal18-max(1 1 0);", 1, "1 1 0");
-        checkHappy("_: decimal18-max(2 1 0);", 2, "2 1 0");
-        checkHappy("_: decimal18-max(0 2 0);", 2, "0 2 0");
-        checkHappy("_: decimal18-max(1 2 0);", 2, "1 2 0");
-        checkHappy("_: decimal18-max(2 2 0);", 2, "2 2 0");
-        checkHappy("_: decimal18-max(0 0 1);", 1, "0 0 1");
-        checkHappy("_: decimal18-max(1 0 1);", 1, "1 0 1");
-        checkHappy("_: decimal18-max(2 0 1);", 2, "2 0 1");
-        checkHappy("_: decimal18-max(0 1 1);", 1, "0 1 1");
-        checkHappy("_: decimal18-max(1 1 1);", 1, "1 1 1");
-        checkHappy("_: decimal18-max(2 1 1);", 2, "2 1 1");
-        checkHappy("_: decimal18-max(0 2 1);", 2, "0 2 1");
-        checkHappy("_: decimal18-max(1 2 1);", 2, "1 2 1");
-        checkHappy("_: decimal18-max(2 2 1);", 2, "2 2 1");
-        checkHappy("_: decimal18-max(0 0 2);", 2, "0 0 2");
-        checkHappy("_: decimal18-max(1 0 2);", 2, "1 0 2");
-        checkHappy("_: decimal18-max(2 0 2);", 2, "2 0 2");
-        checkHappy("_: decimal18-max(0 1 2);", 2, "0 1 2");
-        checkHappy("_: decimal18-max(1 1 2);", 2, "1 1 2");
-        checkHappy("_: decimal18-max(2 1 2);", 2, "2 1 2");
-        checkHappy("_: decimal18-max(0 2 2);", 2, "0 2 2");
-        checkHappy("_: decimal18-max(1 2 2);", 2, "1 2 2");
-        checkHappy("_: decimal18-max(2 2 2);", 2, "2 2 2");
+        checkHappy("_: decimal18-max(1 0 0);", 1e18, "1 0 0");
+        checkHappy("_: decimal18-max(2 0 0);", 2e18, "2 0 0");
+        checkHappy("_: decimal18-max(0 1 0);", 1e18, "0 1 0");
+        checkHappy("_: decimal18-max(1 1 0);", 1e18, "1 1 0");
+        checkHappy("_: decimal18-max(2 1 0);", 2e18, "2 1 0");
+        checkHappy("_: decimal18-max(0 2 0);", 2e18, "0 2 0");
+        checkHappy("_: decimal18-max(1 2 0);", 2e18, "1 2 0");
+        checkHappy("_: decimal18-max(2 2 0);", 2e18, "2 2 0");
+        checkHappy("_: decimal18-max(0 0 1);", 1e18, "0 0 1");
+        checkHappy("_: decimal18-max(1 0 1);", 1e18, "1 0 1");
+        checkHappy("_: decimal18-max(2 0 1);", 2e18, "2 0 1");
+        checkHappy("_: decimal18-max(0 1 1);", 1e18, "0 1 1");
+        checkHappy("_: decimal18-max(1 1 1);", 1e18, "1 1 1");
+        checkHappy("_: decimal18-max(2 1 1);", 2e18, "2 1 1");
+        checkHappy("_: decimal18-max(0 2 1);", 2e18, "0 2 1");
+        checkHappy("_: decimal18-max(1 2 1);", 2e18, "1 2 1");
+        checkHappy("_: decimal18-max(2 2 1);", 2e18, "2 2 1");
+        checkHappy("_: decimal18-max(0 0 2);", 2e18, "0 0 2");
+        checkHappy("_: decimal18-max(1 0 2);", 2e18, "1 0 2");
+        checkHappy("_: decimal18-max(2 0 2);", 2e18, "2 0 2");
+        checkHappy("_: decimal18-max(0 1 2);", 2e18, "0 1 2");
+        checkHappy("_: decimal18-max(1 1 2);", 2e18, "1 1 2");
+        checkHappy("_: decimal18-max(2 1 2);", 2e18, "2 1 2");
+        checkHappy("_: decimal18-max(0 2 2);", 2e18, "0 2 2");
+        checkHappy("_: decimal18-max(1 2 2);", 2e18, "1 2 2");
+        checkHappy("_: decimal18-max(2 2 2);", 2e18, "2 2 2");
         checkHappy("_: decimal18-max(0 0 max-int-value());", type(uint256).max, "0 0 max-int-value()");
         checkHappy("_: decimal18-max(1 0 max-int-value());", type(uint256).max, "1 0 max-int-value()");
         checkHappy("_: decimal18-max(2 0 max-int-value());", type(uint256).max, "2 0 max-int-value()");

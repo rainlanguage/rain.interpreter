@@ -2,7 +2,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {ExpectedOperand, UnclosedOperand, OperandOverflow, UnexpectedOperandValue} from "src/error/ErrParse.sol";
+import {ExpectedOperand, UnclosedOperand, IntegerOverflow, UnexpectedOperandValue} from "src/error/ErrParse.sol";
 import {LibParse} from "src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
@@ -152,7 +152,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
 
     /// 2 literals are expected for this operand parser. Tests 256 256.
     function testOperandDoublePerByteNoDefaultSecondOverflow() external {
-        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
+        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector));
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<256 256>();").parse();
         (bytecode);
         (constants);
@@ -160,7 +160,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
 
     /// 2 literals are expected for this operand parser. Tests 256 255.
     function testOperandDoublePerByteNoDefaultSecondOverflowFirst() external {
-        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
+        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector));
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<256 255>();").parse();
         (bytecode);
         (constants);

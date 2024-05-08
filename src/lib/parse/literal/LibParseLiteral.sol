@@ -25,12 +25,14 @@ import {
     ZeroLengthDecimal,
     ZeroLengthHexLiteral,
     UnsupportedLiteralType,
-    UnclosedSubParseableLiteral
+    UnclosedSubParseableLiteral,
+    IntegerOverflow
 } from "../../../error/ErrParse.sol";
 import {ParseState} from "../LibParseState.sol";
 import {LibParseError} from "../LibParseError.sol";
 import {LibParseInterstitial} from "../LibParseInterstitial.sol";
 import {LibSubParse} from "../LibSubParse.sol";
+import {LibFixedPointDecimalScale} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 
 uint256 constant LITERAL_PARSERS_LENGTH = 4;
 
@@ -45,6 +47,18 @@ library LibParseLiteral {
     using LibParseLiteral for ParseState;
     using LibParseInterstitial for ParseState;
     using LibSubParse for ParseState;
+
+    function decimalOrIntToInt(uint256 value, uint256 max) internal pure returns (uint256) {
+        if (value >= 1e18) {
+            value = LibFixedPointDecimalScale.scaleToIntegerLossless(value);
+        }
+
+        if (value > max) {
+            revert IntegerOverflow(value, max);
+        }
+
+        return value;
+    }
 
     function selectLiteralParserByIndex(ParseState memory state, uint256 index)
         internal

@@ -16,10 +16,6 @@ error UnexpectedOperandValue();
 /// not found in the source string.
 error ExpectedOperand();
 
-/// Thrown when parsing an operand and the literal in the source string is too
-/// large to fit in the bits allocated for it in the operand.
-error OperandOverflow();
-
 /// Thrown when the number of values encountered in a single operand parsing is
 /// longer than the memory allocated to hold them.
 /// @param offset The offset in the source string where the error occurred.
@@ -152,3 +148,8 @@ error BadSubParserResult(bytes bytecode);
 
 /// Thrown when there are more than 16 inputs or outputs for a given opcode.
 error OpcodeIOOverflow(uint256 offset);
+
+/// Thrown when an integer is too large to fit in the range allowed for it.
+/// @param integer The integer that is too large.
+/// @param max The maximum value that the integer can be.
+error IntegerOverflow(uint256 integer, uint256 max);

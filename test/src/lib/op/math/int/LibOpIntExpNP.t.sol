@@ -93,9 +93,9 @@ contract LibOpIntExpNPTest is OpTest {
 
     /// Test the eval of `int-exp` opcode parsed from a string. Tests one input.
     function testOpIntExpNPEvalOneInput() external {
-        checkBadInputs("_: int-exp(5);", 1, 2, 1);
+        checkBadInputs("_: int-exp(5e-18);", 1, 2, 1);
         checkBadInputs("_: int-exp(0);", 1, 2, 1);
-        checkBadInputs("_: int-exp(1);", 1, 2, 1);
+        checkBadInputs("_: int-exp(1e-18);", 1, 2, 1);
         checkBadInputs("_: int-exp(max-int-value());", 1, 2, 1);
     }
 
@@ -112,39 +112,39 @@ contract LibOpIntExpNPTest is OpTest {
     function testOpIntExpNPEval2InputsHappy() external {
         // Anything exp 0 is 1.
         checkHappy("_: int-exp(0 0);", 1, "0 ** 0");
-        checkHappy("_: int-exp(1 0);", 1, "1 ** 0");
+        checkHappy("_: int-exp(1e-18 0);", 1, "1 ** 0");
         checkHappy("_: int-exp(max-int-value() 0);", 1, "max-int-value() ** 0");
 
         // 1 exp anything is 1.
-        checkHappy("_: int-exp(1 0);", 1, "1 ** 0");
-        checkHappy("_: int-exp(1 1);", 1, "1 ** 1");
-        checkHappy("_: int-exp(1 2);", 1, "1 ** 2");
-        checkHappy("_: int-exp(1 3);", 1, "1 ** 3");
-        checkHappy("_: int-exp(1 max-int-value());", 1, "1 ** max-int-value()");
+        checkHappy("_: int-exp(1e-18 0);", 1, "1 ** 0");
+        checkHappy("_: int-exp(1e-18 1e-18);", 1, "1 ** 1");
+        checkHappy("_: int-exp(1e-18 2e-18);", 1, "1 ** 2");
+        checkHappy("_: int-exp(1e-18 3e-18);", 1, "1 ** 3");
+        checkHappy("_: int-exp(1e-18 max-int-value());", 1, "1 ** max-int-value()");
 
         // Anything exp 1 is itself.
-        checkHappy("_: int-exp(0 1);", 0, "0 ** 1");
-        checkHappy("_: int-exp(1 1);", 1, "1 ** 1");
-        checkHappy("_: int-exp(max-int-value() 1);", type(uint256).max, "max-int-value() ** 1");
+        checkHappy("_: int-exp(0 1e-18);", 0, "0 ** 1");
+        checkHappy("_: int-exp(1e-18 1e-18);", 1, "1 ** 1");
+        checkHappy("_: int-exp(max-int-value() 1e-18);", type(uint256).max, "max-int-value() ** 1");
 
         // Anything exp 2 is itself squared.
-        checkHappy("_: int-exp(0 2);", 0, "0 ** 2");
-        checkHappy("_: int-exp(1 2);", 1, "1 ** 2");
-        checkHappy("_: int-exp(2 2);", 4, "2 ** 2");
-        checkHappy("_: int-exp(3 2);", 9, "3 ** 2");
+        checkHappy("_: int-exp(0 2e-18);", 0, "0 ** 2");
+        checkHappy("_: int-exp(1e-18 2e-18);", 1, "1 ** 2");
+        checkHappy("_: int-exp(2e-18 2e-18);", 4, "2 ** 2");
+        checkHappy("_: int-exp(3e-18 2e-18);", 9, "3 ** 2");
 
         // Anything exp 3 is itself cubed.
-        checkHappy("_: int-exp(0 3);", 0, "0 ** 3");
-        checkHappy("_: int-exp(1 3);", 1, "1 ** 3");
-        checkHappy("_: int-exp(2 3);", 8, "2 ** 3");
-        checkHappy("_: int-exp(3 3);", 27, "3 ** 3");
+        checkHappy("_: int-exp(0 3e-18);", 0, "0 ** 3");
+        checkHappy("_: int-exp(1e-18 3e-18);", 1, "1 ** 3");
+        checkHappy("_: int-exp(2e-18 3e-18);", 8, "2 ** 3");
+        checkHappy("_: int-exp(3e-18 3e-18);", 27, "3 ** 3");
     }
 
     /// Test the eval of `int-exp` opcode parsed from a string. Tests two inputs.
     /// Tests the unhappy path where we overflow.
     function testOpIntExpNPEval2InputsUnhappy() external {
-        checkUnhappyOverflow("_: int-exp(2 max-int-value());");
-        checkUnhappyOverflow("_: int-exp(3 max-int-value());");
+        checkUnhappyOverflow("_: int-exp(2e-18 max-int-value());");
+        checkUnhappyOverflow("_: int-exp(3e-18 max-int-value());");
         checkUnhappyOverflow("_: int-exp(max-int-value() max-int-value());");
     }
 
@@ -153,75 +153,75 @@ contract LibOpIntExpNPTest is OpTest {
     function testOpIntExpNPEval3InputsHappy() external {
         // Anything exp 0 is 1.
         checkHappy("_: int-exp(0 0 0);", 1, "0 ** 0 ** 0");
-        checkHappy("_: int-exp(1 0 0);", 1, "1 ** 0 ** 0");
+        checkHappy("_: int-exp(1e-18 0 0);", 1, "1 ** 0 ** 0");
         checkHappy("_: int-exp(max-int-value() 0 0);", 1, "max-int-value() ** 0 ** 0");
-        checkHappy("_: int-exp(0 1 0);", 1, "0 ** 1 ** 0");
-        checkHappy("_: int-exp(1 1 0);", 1, "1 ** 1 ** 0");
-        checkHappy("_: int-exp(0 0 1);", 1, "0 ** 0 ** 1");
-        checkHappy("_: int-exp(1 0 1);", 1, "1 ** 0 ** 1");
-        checkHappy("_: int-exp(max-int-value() 0 1);", 1, "max-int-value() ** 0 ** 1");
+        checkHappy("_: int-exp(0 1e-18 0);", 1, "0 ** 1 ** 0");
+        checkHappy("_: int-exp(1e-18 1e-18 0);", 1, "1 ** 1 ** 0");
+        checkHappy("_: int-exp(0 0 1e-18);", 1, "0 ** 0 ** 1");
+        checkHappy("_: int-exp(1e-18 0 1e-18);", 1, "1 ** 0 ** 1");
+        checkHappy("_: int-exp(max-int-value() 0 1e-18);", 1, "max-int-value() ** 0 ** 1");
 
         // 1 exp anything is 1.
-        checkHappy("_: int-exp(1 0 0);", 1, "1 ** 0 ** 0");
-        checkHappy("_: int-exp(1 0 1);", 1, "1 ** 0 ** 1");
-        checkHappy("_: int-exp(1 1 0);", 1, "1 ** 1 ** 0");
-        checkHappy("_: int-exp(1 1 1);", 1, "1 ** 1 ** 1");
-        checkHappy("_: int-exp(1 2 0);", 1, "1 ** 2 ** 0");
-        checkHappy("_: int-exp(1 2 1);", 1, "1 ** 2 ** 1");
-        checkHappy("_: int-exp(1 2 2);", 1, "1 ** 2 ** 2");
-        checkHappy("_: int-exp(1 3 0);", 1, "1 ** 3 ** 0");
+        checkHappy("_: int-exp(1e-18 0 0);", 1, "1 ** 0 ** 0");
+        checkHappy("_: int-exp(1e-18 0 1e-18);", 1, "1 ** 0 ** 1");
+        checkHappy("_: int-exp(1e-18 1e-18 0);", 1, "1 ** 1 ** 0");
+        checkHappy("_: int-exp(1e-18 1e-18 1e-18);", 1, "1 ** 1 ** 1");
+        checkHappy("_: int-exp(1e-18 2e-18 0);", 1, "1 ** 2 ** 0");
+        checkHappy("_: int-exp(1e-18 2e-18 1e-18);", 1, "1 ** 2 ** 1");
+        checkHappy("_: int-exp(1e-18 2e-18 2e-18);", 1, "1 ** 2 ** 2");
+        checkHappy("_: int-exp(1e-18 3e-18 0);", 1, "1 ** 3 ** 0");
 
         // Anything exp 1 is itself.
-        checkHappy("_: int-exp(0 1 1);", 0, "0 ** 1 ** 1");
-        checkHappy("_: int-exp(1 1 1);", 1, "1 ** 1 ** 1");
-        checkHappy("_: int-exp(max-int-value() 1 1);", type(uint256).max, "max-int-value() ** 1 ** 1");
+        checkHappy("_: int-exp(0 1e-18 1e-18);", 0, "0 ** 1 ** 1");
+        checkHappy("_: int-exp(1e-18 1e-18 1e-18);", 1, "1 ** 1 ** 1");
+        checkHappy("_: int-exp(max-int-value() 1e-18 1e-18);", type(uint256).max, "max-int-value() ** 1 ** 1");
 
         // Anything exp 2 1 is itself squared.
-        checkHappy("_: int-exp(0 2 1);", 0, "0 ** 2 ** 0");
-        checkHappy("_: int-exp(1 2 1);", 1, "1 ** 2 ** 0");
-        checkHappy("_: int-exp(2 2 1);", 4, "2 ** 2 ** 0");
-        checkHappy("_: int-exp(3 2 1);", 9, "3 ** 2 ** 0");
+        checkHappy("_: int-exp(0 2e-18 1e-18);", 0, "0 ** 2 ** 0");
+        checkHappy("_: int-exp(1e-18 2e-18 1e-18);", 1, "1 ** 2 ** 0");
+        checkHappy("_: int-exp(2e-18 2e-18 1e-18);", 4, "2 ** 2 ** 0");
+        checkHappy("_: int-exp(3e-18 2e-18 1e-18);", 9, "3 ** 2 ** 0");
 
         // Anything exp 2 2 is itself squared squared.
-        checkHappy("_: int-exp(0 2 2);", 0, "0 ** 2 ** 2");
-        checkHappy("_: int-exp(1 2 2);", 1, "1 ** 2 ** 2");
-        checkHappy("_: int-exp(2 2 2);", 16, "2 ** 2 ** 2");
-        checkHappy("_: int-exp(3 2 2);", 81, "3 ** 2 ** 2");
+        checkHappy("_: int-exp(0 2e-18 2e-18);", 0, "0 ** 2 ** 2");
+        checkHappy("_: int-exp(1e-18 2e-18 2e-18);", 1, "1 ** 2 ** 2");
+        checkHappy("_: int-exp(2e-18 2e-18 2e-18);", 16, "2 ** 2 ** 2");
+        checkHappy("_: int-exp(3e-18 2e-18 2e-18);", 81, "3 ** 2 ** 2");
 
         // Anything exp 3 1 is itself cubed.
-        checkHappy("_: int-exp(0 3 1);", 0, "0 ** 3 ** 0");
-        checkHappy("_: int-exp(1 3 1);", 1, "1 ** 3 ** 0");
-        checkHappy("_: int-exp(2 3 1);", 8, "2 ** 3 ** 0");
-        checkHappy("_: int-exp(3 3 1);", 27, "3 ** 3 ** 0");
+        checkHappy("_: int-exp(0 3e-18 1e-18);", 0, "0 ** 3 ** 0");
+        checkHappy("_: int-exp(1e-18 3e-18 1e-18);", 1, "1 ** 3 ** 0");
+        checkHappy("_: int-exp(2e-18 3e-18 1e-18);", 8, "2 ** 3 ** 0");
+        checkHappy("_: int-exp(3e-18 3e-18 1e-18);", 27, "3 ** 3 ** 0");
 
         // Anything exp 3 2 is itself cubed squared.
-        checkHappy("_: int-exp(0 3 2);", 0, "0 ** 3 ** 2");
-        checkHappy("_: int-exp(1 3 2);", 1, "1 ** 3 ** 2");
-        checkHappy("_: int-exp(2 3 2);", 64, "2 ** 3 ** 2");
-        checkHappy("_: int-exp(3 3 2);", 729, "3 ** 3 ** 2");
+        checkHappy("_: int-exp(0 3e-18 2e-18);", 0, "0 ** 3 ** 2");
+        checkHappy("_: int-exp(1e-18 3e-18 2e-18);", 1, "1 ** 3 ** 2");
+        checkHappy("_: int-exp(2e-18 3e-18 2e-18);", 64, "2 ** 3 ** 2");
+        checkHappy("_: int-exp(3e-18 3e-18 2e-18);", 729, "3 ** 3 ** 2");
 
         // Anything exp 3 3 is itself cubed cubed.
-        checkHappy("_: int-exp(0 3 3);", 0, "0 ** 3 ** 3");
-        checkHappy("_: int-exp(1 3 3);", 1, "1 ** 3 ** 3");
-        checkHappy("_: int-exp(2 3 3);", 512, "2 ** 3 ** 3");
-        checkHappy("_: int-exp(3 3 3);", 19683, "3 ** 3 ** 3");
+        checkHappy("_: int-exp(0 3e-18 3e-18);", 0, "0 ** 3 ** 3");
+        checkHappy("_: int-exp(1e-18 3e-18 3e-18);", 1, "1 ** 3 ** 3");
+        checkHappy("_: int-exp(2e-18 3e-18 3e-18);", 512, "2 ** 3 ** 3");
+        checkHappy("_: int-exp(3e-18 3e-18 3e-18);", 19683, "3 ** 3 ** 3");
     }
 
     /// Test the eval of `int-exp` opcode parsed from a string. Tests three inputs.
     /// Tests the unhappy path where we overflow.
     function testOpIntExpNPEval3InputsUnhappy() external {
-        checkUnhappyOverflow("_: int-exp(2 max-int-value() 0);");
-        checkUnhappyOverflow("_: int-exp(3 max-int-value() 0);");
+        checkUnhappyOverflow("_: int-exp(2e-18 max-int-value() 0);");
+        checkUnhappyOverflow("_: int-exp(3e-18 max-int-value() 0);");
         checkUnhappyOverflow("_: int-exp(max-int-value() max-int-value() 0);");
-        checkUnhappyOverflow("_: int-exp(2 max-int-value() 1);");
-        checkUnhappyOverflow("_: int-exp(3 max-int-value() 1);");
-        checkUnhappyOverflow("_: int-exp(max-int-value() max-int-value() 1);");
-        checkUnhappyOverflow("_: int-exp(2 max-int-value() 2);");
-        checkUnhappyOverflow("_: int-exp(3 max-int-value() 2);");
-        checkUnhappyOverflow("_: int-exp(max-int-value() max-int-value() 2);");
-        checkUnhappyOverflow("_: int-exp(2 max-int-value() 3);");
-        checkUnhappyOverflow("_: int-exp(3 max-int-value() 3);");
-        checkUnhappyOverflow("_: int-exp(max-int-value() max-int-value() 3);");
+        checkUnhappyOverflow("_: int-exp(2e-18 max-int-value() 1e-18);");
+        checkUnhappyOverflow("_: int-exp(3e-18 max-int-value() 1e-18);");
+        checkUnhappyOverflow("_: int-exp(max-int-value() max-int-value() 1e-18);");
+        checkUnhappyOverflow("_: int-exp(2e-18 max-int-value() 2e-18);");
+        checkUnhappyOverflow("_: int-exp(3e-18 max-int-value() 2e-18);");
+        checkUnhappyOverflow("_: int-exp(max-int-value() max-int-value() 2e-18);");
+        checkUnhappyOverflow("_: int-exp(2e-18 max-int-value() 3e-18);");
+        checkUnhappyOverflow("_: int-exp(3e-18 max-int-value() 3e-18);");
+        checkUnhappyOverflow("_: int-exp(max-int-value() max-int-value() 3e-18);");
     }
 
     /// Test the eval of `int-exp` opcode parsed from a string.

@@ -3,7 +3,7 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {LibParseOperand, Operand} from "src/lib/parse/LibParseOperand.sol";
-import {UnexpectedOperandValue, OperandOverflow} from "src/error/ErrParse.sol";
+import {UnexpectedOperandValue, IntegerOverflow} from "src/error/ErrParse.sol";
 
 contract LibParseOperandHandleOperandSingleFullTest is Test {
     // No values falls back to zero.
@@ -26,7 +26,7 @@ contract LibParseOperandHandleOperandSingleFullTest is Test {
         value *= 1e18;
         uint256[] memory values = new uint256[](1);
         values[0] = value;
-        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
+        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector));
         LibParseOperand.handleOperandSingleFull(values);
     }
 

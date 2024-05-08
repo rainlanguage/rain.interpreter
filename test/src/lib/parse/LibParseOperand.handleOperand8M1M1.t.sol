@@ -3,7 +3,7 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {LibParseOperand, Operand} from "src/lib/parse/LibParseOperand.sol";
-import {ExpectedOperand, UnexpectedOperandValue, OperandOverflow} from "src/error/ErrParse.sol";
+import {ExpectedOperand, UnexpectedOperandValue, IntegerOverflow} from "src/error/ErrParse.sol";
 
 contract LibParseOperandHandleOperand8M1M1Test is Test {
     // The first value must be 1 byte and is mandatory. Zero values is an error.
@@ -25,7 +25,7 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
         value = bound(value, uint256(type(uint8).max) + 1, type(uint256).max);
         uint256[] memory values = new uint256[](1);
         values[0] = value;
-        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
+        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector));
         LibParseOperand.handleOperand8M1M1(values);
     }
 
@@ -48,7 +48,7 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
         uint256[] memory values = new uint256[](2);
         values[0] = a;
         values[1] = b;
-        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
+        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector));
         LibParseOperand.handleOperand8M1M1(values);
     }
 
@@ -75,7 +75,7 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
         values[0] = a;
         values[1] = b;
         values[2] = c;
-        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
+        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector));
         LibParseOperand.handleOperand8M1M1(values);
     }
 

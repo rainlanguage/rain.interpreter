@@ -2,7 +2,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {ExpectedOperand, UnclosedOperand, OperandOverflow, UnexpectedOperandValue} from "src/error/ErrParse.sol";
+import {ExpectedOperand, UnclosedOperand, IntegerOverflow, UnexpectedOperandValue} from "src/error/ErrParse.sol";
 import {LibParse, ExpectedLeftParen} from "src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
@@ -204,7 +204,7 @@ contract LibParseOperandSingleFullTest is Test {
 
     /// Overflowing decimal uint16 max as single full operand reverts.
     function testOperandSingleFullUint16MaxOverflow() external {
-        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
+        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector));
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:b<65536>();").parse();
         (bytecode);
         (constants);
@@ -212,7 +212,7 @@ contract LibParseOperandSingleFullTest is Test {
 
     /// Overflowing hexadecimal uint16 max as a single full operand reverts.
     function testOperandSingleFullHexUint16MaxOverflow() external {
-        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
+        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector));
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:b<0x010000>();").parse();
         (bytecode);
         (constants);

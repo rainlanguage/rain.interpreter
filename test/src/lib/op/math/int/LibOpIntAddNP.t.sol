@@ -75,29 +75,29 @@ contract LibOpIntAddNPTest is OpTest {
 
     /// Test the eval of `int-add` opcode parsed from a string. Tests one input.
     function testOpIntAddNPEvalOneInput() external {
-        checkBadInputs("_: int-add(5);", 1, 2, 1);
+        checkBadInputs("_: int-add(5e-18);", 1, 2, 1);
     }
 
     function testOpIntAddNPEvalZeroOutputs() external {
-        checkBadOutputs(": int-add(5 6);", 2, 1, 0);
+        checkBadOutputs(": int-add(5e-18 6e-18);", 2, 1, 0);
     }
 
     function testOpIntAddNPEvalTwoOutput() external {
-        checkBadOutputs("_ _: int-add(5 6);", 2, 1, 2);
+        checkBadOutputs("_ _: int-add(5e-18 6e-18);", 2, 1, 2);
     }
 
     /// Test the eval of `decimal18-add` opcode parsed from a string.
     /// MUST behave identically to `int-add`.
     /// Tests one input.
     function testOpDecimal18AddNPEvalOneInput() external {
-        checkBadInputs("_: decimal18-add(5);", 1, 2, 1);
+        checkBadInputs("_: decimal18-add(5e-18);", 1, 2, 1);
     }
 
     /// Test the eval of `int-add` opcode parsed from a string. Tests two inputs.
     /// Tests the happy path where the addition does not overflow.
     function testOpIntAddNPEval2InputsHappy() external {
-        checkHappy("_: int-add(5 6);", 11, "5 + 6");
-        checkHappy("_: int-add(6 5);", 11, "6 + 5");
+        checkHappy("_: int-add(5e-18 6e-18);", 11, "5 + 6");
+        checkHappy("_: int-add(6e-18 5e-18);", 11, "6 + 5");
     }
 
     /// Test the eval of `decimal18-add` opcode parsed from a string.
@@ -105,8 +105,8 @@ contract LibOpIntAddNPTest is OpTest {
     /// Tests two inputs.
     /// Tests the happy path where the addition does not overflow.
     function testOpDecimal18AddNPEval2InputsHappy() external {
-        checkHappy("_: decimal18-add(5 6);", 11, "5 + 6");
-        checkHappy("_: decimal18-add(6 5);", 11, "6 + 5");
+        checkHappy("_: decimal18-add(5e-18 6e-18);", 11, "5 + 6");
+        checkHappy("_: decimal18-add(6e-18 5e-18);", 11, "6 + 5");
     }
 
     /// Test the eval of `int-add` opcode parsed from a string. Tests two inputs.
@@ -126,8 +126,8 @@ contract LibOpIntAddNPTest is OpTest {
     /// Test the eval of `int-add` opcode parsed from a string. Tests two inputs.
     /// Tests that adding 0 to 1 is 1.
     function testOpIntAddNPEval2InputsHappyZeroOne() external {
-        checkHappy("_: int-add(0 1);", 1, "0 + 1");
-        checkHappy("_: int-add(1 0);", 1, "1 + 0");
+        checkHappy("_: int-add(0 1e-18);", 1, "0 + 1");
+        checkHappy("_: int-add(1e-18 0);", 1, "1 + 0");
     }
 
     /// Test the eval of `decimal18-add` opcode parsed from a string.
@@ -135,8 +135,8 @@ contract LibOpIntAddNPTest is OpTest {
     /// Tests two inputs.
     /// Tests that adding 0 to 1 is 1.
     function testOpDecimal18AddNPEval2InputsHappyZeroOne() external {
-        checkHappy("_: decimal18-add(0 1);", 1, "0 + 1");
-        checkHappy("_: decimal18-add(1 0);", 1, "1 + 0");
+        checkHappy("_: decimal18-add(0 1e-18);", 1, "0 + 1");
+        checkHappy("_: decimal18-add(1e-18 0);", 1, "1 + 0");
     }
 
     /// Test the eval of `int-add` opcode parsed from a string. Tests two inputs.
@@ -158,8 +158,8 @@ contract LibOpIntAddNPTest is OpTest {
     /// Test the eval of `int-add` opcode parsed from a string. Tests two inputs.
     /// Tests the unhappy path where the addition does overflow.
     function testOpIntAddNPEval2InputsUnhappy() external {
-        checkUnhappyOverflow("_: int-add(max-int-value() 1);");
-        checkUnhappyOverflow("_: int-add(1 max-int-value());");
+        checkUnhappyOverflow("_: int-add(max-int-value() 1e-18);");
+        checkUnhappyOverflow("_: int-add(1e-18 max-int-value());");
     }
 
     /// Test the eval of `decimal18-add` opcode parsed from a string.
@@ -167,19 +167,19 @@ contract LibOpIntAddNPTest is OpTest {
     /// Tests two inputs.
     /// Tests the unhappy path where the addition does overflow.
     function testOpDecimal18AddNPEval2InputsUnhappy() external {
-        checkUnhappyOverflow("_: decimal18-add(max-int-value() 1);");
-        checkUnhappyOverflow("_: decimal18-add(1 max-int-value());");
+        checkUnhappyOverflow("_: decimal18-add(max-int-value() 1e-18);");
+        checkUnhappyOverflow("_: decimal18-add(1e-18 max-int-value());");
     }
 
     /// Test the eval of `int-add` opcode parsed from a string. Tests three inputs.
     /// Tests the happy path where the addition does not overflow.
     function testOpIntAddNPEval3InputsHappy() external {
-        checkHappy("_: int-add(5 6 7);", 18, "5 + 6 + 7");
-        checkHappy("_: int-add(6 5 7);", 18, "6 + 5 + 7");
-        checkHappy("_: int-add(7 6 5);", 18, "7 + 6 + 5");
-        checkHappy("_: int-add(5 7 6);", 18, "5 + 7 + 6");
-        checkHappy("_: int-add(6 7 5);", 18, "6 + 7 + 5");
-        checkHappy("_: int-add(7 5 6);", 18, "7 + 5 + 6");
+        checkHappy("_: int-add(5e-18 6e-18 7e-18);", 18, "5 + 6 + 7");
+        checkHappy("_: int-add(6e-18 5e-18 7e-18);", 18, "6 + 5 + 7");
+        checkHappy("_: int-add(7e-18 6e-18 5e-18);", 18, "7 + 6 + 5");
+        checkHappy("_: int-add(5e-18 7e-18 6e-18);", 18, "5 + 7 + 6");
+        checkHappy("_: int-add(6e-18 7e-18 5e-18);", 18, "6 + 7 + 5");
+        checkHappy("_: int-add(7e-18 5e-18 6e-18);", 18, "7 + 5 + 6");
     }
 
     /// Test the eval of `decimal18-add` opcode parsed from a string.
@@ -187,27 +187,27 @@ contract LibOpIntAddNPTest is OpTest {
     /// Tests three inputs.
     /// Tests the happy path where the addition does not overflow.
     function testOpDecimal18AddNPEval3InputsHappy() external {
-        checkHappy("_: decimal18-add(5 6 7);", 18, "5 + 6 + 7");
-        checkHappy("_: decimal18-add(6 5 7);", 18, "6 + 5 + 7");
-        checkHappy("_: decimal18-add(7 6 5);", 18, "7 + 6 + 5");
-        checkHappy("_: decimal18-add(5 7 6);", 18, "5 + 7 + 6");
-        checkHappy("_: decimal18-add(6 7 5);", 18, "6 + 7 + 5");
-        checkHappy("_: decimal18-add(7 5 6);", 18, "7 + 5 + 6");
+        checkHappy("_: decimal18-add(5e-18 6e-18 7e-18);", 18, "5 + 6 + 7");
+        checkHappy("_: decimal18-add(6e-18 5e-18 7e-18);", 18, "6 + 5 + 7");
+        checkHappy("_: decimal18-add(7e-18 6e-18 5e-18);", 18, "7 + 6 + 5");
+        checkHappy("_: decimal18-add(5e-18 7e-18 6e-18);", 18, "5 + 7 + 6");
+        checkHappy("_: decimal18-add(6e-18 7e-18 5e-18);", 18, "6 + 7 + 5");
+        checkHappy("_: decimal18-add(7e-18 5e-18 6e-18);", 18, "7 + 5 + 6");
     }
 
     /// Test the eval of `int-add` opcode parsed from a string. Tests three inputs.
     /// Tests the unhappy path where the addition does overflow.
     function testOpIntAddNPEval3InputsUnhappy() external {
-        checkUnhappyOverflow("_: int-add(max-int-value() 1 1);");
-        checkUnhappyOverflow("_: int-add(1 max-int-value() 1);");
-        checkUnhappyOverflow("_: int-add(1 1 max-int-value());");
-        checkUnhappyOverflow("_: int-add(max-int-value() max-int-value() 1);");
-        checkUnhappyOverflow("_: int-add(max-int-value() 1 max-int-value());");
-        checkUnhappyOverflow("_: int-add(1 max-int-value() max-int-value());");
+        checkUnhappyOverflow("_: int-add(max-int-value() 1e-18 1e-18);");
+        checkUnhappyOverflow("_: int-add(1e-18 max-int-value() 1e-18);");
+        checkUnhappyOverflow("_: int-add(1e-18 1e-18 max-int-value());");
+        checkUnhappyOverflow("_: int-add(max-int-value() max-int-value() 1e-18);");
+        checkUnhappyOverflow("_: int-add(max-int-value() 1e-18 max-int-value());");
+        checkUnhappyOverflow("_: int-add(1e-18 max-int-value() max-int-value());");
         checkUnhappyOverflow("_: int-add(max-int-value() max-int-value() max-int-value());");
-        checkUnhappyOverflow("_: int-add(max-int-value() 1 0);");
-        checkUnhappyOverflow("_: int-add(1 max-int-value() 0);");
-        checkUnhappyOverflow("_: int-add(1 0 max-int-value());");
+        checkUnhappyOverflow("_: int-add(max-int-value() 1e-18 0);");
+        checkUnhappyOverflow("_: int-add(1e-18 max-int-value() 0);");
+        checkUnhappyOverflow("_: int-add(1e-18 0 max-int-value());");
         checkUnhappyOverflow("_: int-add(max-int-value() max-int-value() 0);");
         checkUnhappyOverflow("_: int-add(max-int-value() 0 max-int-value());");
         checkUnhappyOverflow("_: int-add(0 max-int-value() max-int-value());");
@@ -218,16 +218,16 @@ contract LibOpIntAddNPTest is OpTest {
     /// Tests three inputs.
     /// Tests the unhappy path where the addition does overflow.
     function testOpDecimal18AddNPEval3InputsUnhappy() external {
-        checkUnhappyOverflow("_: decimal18-add(max-int-value() 1 1);");
-        checkUnhappyOverflow("_: decimal18-add(1 max-int-value() 1);");
-        checkUnhappyOverflow("_: decimal18-add(1 1 max-int-value());");
-        checkUnhappyOverflow("_: decimal18-add(max-int-value() max-int-value() 1);");
-        checkUnhappyOverflow("_: decimal18-add(max-int-value() 1 max-int-value());");
-        checkUnhappyOverflow("_: decimal18-add(1 max-int-value() max-int-value());");
+        checkUnhappyOverflow("_: decimal18-add(max-int-value() 1e-18 1e-18);");
+        checkUnhappyOverflow("_: decimal18-add(1e-18 max-int-value() 1e-18);");
+        checkUnhappyOverflow("_: decimal18-add(1e-18 1e-18 max-int-value());");
+        checkUnhappyOverflow("_: decimal18-add(max-int-value() max-int-value() 1e-18);");
+        checkUnhappyOverflow("_: decimal18-add(max-int-value() 1e-18 max-int-value());");
+        checkUnhappyOverflow("_: decimal18-add(1e-18 max-int-value() max-int-value());");
         checkUnhappyOverflow("_: decimal18-add(max-int-value() max-int-value() max-int-value());");
-        checkUnhappyOverflow("_: decimal18-add(max-int-value() 1 0);");
-        checkUnhappyOverflow("_: decimal18-add(1 max-int-value() 0);");
-        checkUnhappyOverflow("_: decimal18-add(1 0 max-int-value());");
+        checkUnhappyOverflow("_: decimal18-add(max-int-value() 1e-18 0);");
+        checkUnhappyOverflow("_: decimal18-add(1e-18 max-int-value() 0);");
+        checkUnhappyOverflow("_: decimal18-add(1e-18 0 max-int-value());");
         checkUnhappyOverflow("_: decimal18-add(max-int-value() max-int-value() 0);");
         checkUnhappyOverflow("_: decimal18-add(max-int-value() 0 max-int-value());");
         checkUnhappyOverflow("_: decimal18-add(0 max-int-value() max-int-value());");

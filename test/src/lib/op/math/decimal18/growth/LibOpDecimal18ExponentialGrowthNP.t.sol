@@ -46,20 +46,20 @@ contract LibOpDecimal18ExponentialGrowthNPTest is OpTest {
     /// Test the eval of `decimal18-exponential-growth`.
     function testOpDecimal18ExponentialGrowthNPEval() external {
         checkHappy("_: decimal18-exponential-growth(0 0 0);", 0, "0 0 0");
-        checkHappy("_: decimal18-exponential-growth(0 1e17 0);", 0, "0 1e17 0");
-        checkHappy("_: decimal18-exponential-growth(0 1e17 1e18);", 0, "0 1e17 1e18");
-        checkHappy("_: decimal18-exponential-growth(1e18 1e17 0);", 1e18, "1e18 1e17 0");
-        checkHappy("_: decimal18-exponential-growth(1e18 1e17 1e18);", 1.1e18, "1e18 1e17 1e18");
+        checkHappy("_: decimal18-exponential-growth(0 0.1 0);", 0, "0 0.1 0");
+        checkHappy("_: decimal18-exponential-growth(0 0.1 1);", 0, "0 0.1 1");
+        checkHappy("_: decimal18-exponential-growth(1 0.1 0);", 1e18, "1 0.1 0");
+        checkHappy("_: decimal18-exponential-growth(1 0.1 1);", 1.1e18, "1 0.1 1");
         // Not exactly 1.21
-        checkHappy("_: decimal18-exponential-growth(1e18 1e17 2e18);", 1209999999999999974, "1e18 1e17 2e18");
+        checkHappy("_: decimal18-exponential-growth(1 0.1 2);", 1209999999999999974, "1 0.1 2");
         // Not exactly 1.26905870629
-        checkHappy("_: decimal18-exponential-growth(1e18 1e17 25e17);", 1269058706285883337, "1e18 1e17 25e17");
-        checkHappy("_: decimal18-exponential-growth(1e18 0 2e18);", 1e18, "1e18 0 2e18");
-        checkHappy("_: decimal18-exponential-growth(1e18 1e17 5e17);", 1048808848170151541, "1e18 1e17 5e17");
-        checkHappy("_: decimal18-exponential-growth(2e18 1e17 0);", 2e18, "2e18 1e17 0");
-        checkHappy("_: decimal18-exponential-growth(2e18 1e17 1e18);", 2.2e18, "2e18 1e17 1e18");
+        checkHappy("_: decimal18-exponential-growth(1 0.1 2.5);", 1269058706285883337, "1 0.1 2.5");
+        checkHappy("_: decimal18-exponential-growth(1 0 2);", 1e18, "1 0 2");
+        checkHappy("_: decimal18-exponential-growth(1 0.1 0.5);", 1048808848170151541, "1 0.1 0.5");
+        checkHappy("_: decimal18-exponential-growth(2 0.1 0);", 2e18, "2 0.1 0");
+        checkHappy("_: decimal18-exponential-growth(2 0.1 1);", 2.2e18, "2 0.1 1");
         // Not exactly 2.42
-        checkHappy("_: decimal18-exponential-growth(2e18 1e17 2e18);", 2419999999999999948, "2e18 1e17 2e18");
+        checkHappy("_: decimal18-exponential-growth(2 0.1 2);", 2419999999999999948, "2 0.1 2");
     }
 
     function testOpDecimal18ExponentialGrowthNPEvalZeroInputs() external {

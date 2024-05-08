@@ -33,11 +33,11 @@ contract LibOpDecimal18LnNPTest is OpTest {
     function testOpDecimal18LnNPEval() external {
         // Any number less than e other than 1 is negative which doesn't exist
         // in unsigned integers.
-        checkHappy("_: decimal18-ln(1e18);", 0, "ln 1");
-        checkHappy("_: decimal18-ln(2718281828459045235);", 999999999999999990, "ln e");
-        checkHappy("_: decimal18-ln(3e18);", 1098612288668109680, "ln 3");
-        checkHappy("_: decimal18-ln(4e18);", 1386294361119890619, "ln 4");
-        checkHappy("_: decimal18-ln(5e18);", 1609437912434100365, "ln 5");
+        checkHappy("_: decimal18-ln(1);", 0, "ln 1");
+        checkHappy("_: decimal18-ln(2.718281828459045235);", 999999999999999990, "ln e");
+        checkHappy("_: decimal18-ln(3);", 1098612288668109680, "ln 3");
+        checkHappy("_: decimal18-ln(4);", 1386294361119890619, "ln 4");
+        checkHappy("_: decimal18-ln(5);", 1609437912434100365, "ln 5");
     }
 
     /// Test the eval of `decimal18-ln` for bad inputs.

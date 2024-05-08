@@ -4,7 +4,6 @@ pragma solidity ^0.8.18;
 import {
     ExpectedOperand,
     UnclosedOperand,
-    OperandOverflow,
     OperandValuesOverflow,
     UnexpectedOperand,
     UnexpectedOperandValue
@@ -16,25 +15,12 @@ import {CMASK_OPERAND_END, CMASK_WHITESPACE, CMASK_OPERAND_START} from "./LibPar
 import {ParseState, OPERAND_VALUES_LENGTH, FSM_YANG_MASK} from "./LibParseState.sol";
 import {LibParseError} from "./LibParseError.sol";
 import {LibParseInterstitial} from "./LibParseInterstitial.sol";
-import {LibFixedPointDecimalScale} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 
 library LibParseOperand {
     using LibParseError for ParseState;
     using LibParseLiteral for ParseState;
     using LibParseOperand for ParseState;
     using LibParseInterstitial for ParseState;
-
-    function fitASmallOrLargeNumberIntoASmallSpace(uint256 value, uint256 max) internal pure returns (uint256) {
-        if (value >= 1e18) {
-            value = LibFixedPointDecimalScale.scaleToIntegerLossless(value);
-        }
-
-        if (value > max) {
-            revert OperandOverflow();
-        }
-
-        return value;
-    }
 
     function parseOperand(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         uint256 char;
@@ -171,7 +157,7 @@ library LibParseOperand {
                 operand := mload(add(values, 0x20))
             }
             operand =
-                Operand.wrap(fitASmallOrLargeNumberIntoASmallSpace(Operand.unwrap(operand), uint256(type(uint16).max)));
+                Operand.wrap(LibParseLiteral.decimalOrIntToInt(Operand.unwrap(operand), uint256(type(uint16).max)));
         } else if (values.length == 0) {
             operand = Operand.wrap(0);
         } else {
@@ -187,7 +173,7 @@ library LibParseOperand {
                 operand := mload(add(values, 0x20))
             }
             operand =
-                Operand.wrap(fitASmallOrLargeNumberIntoASmallSpace(Operand.unwrap(operand), uint256(type(uint16).max)));
+                Operand.wrap(LibParseLiteral.decimalOrIntToInt(Operand.unwrap(operand), uint256(type(uint16).max)));
         } else if (values.length == 0) {
             revert ExpectedOperand();
         } else {
@@ -206,8 +192,8 @@ library LibParseOperand {
                 a := mload(add(values, 0x20))
                 b := mload(add(values, 0x40))
             }
-            a = fitASmallOrLargeNumberIntoASmallSpace(a, type(uint8).max);
-            b = fitASmallOrLargeNumberIntoASmallSpace(b, type(uint8).max);
+            a = LibParseLiteral.decimalOrIntToInt(a, type(uint8).max);
+            b = LibParseLiteral.decimalOrIntToInt(b, type(uint8).max);
 
             operand = Operand.wrap(a | (b << 8));
         } else if (values.length < 2) {
@@ -246,9 +232,9 @@ library LibParseOperand {
                 c = 0;
             }
 
-            a = fitASmallOrLargeNumberIntoASmallSpace(a, type(uint8).max);
-            b = fitASmallOrLargeNumberIntoASmallSpace(b, 1);
-            c = fitASmallOrLargeNumberIntoASmallSpace(c, 1);
+            a = LibParseLiteral.decimalOrIntToInt(a, type(uint8).max);
+            b = LibParseLiteral.decimalOrIntToInt(b, 1);
+            c = LibParseLiteral.decimalOrIntToInt(c, 1);
 
             operand = Operand.wrap(a | (b << 8) | (c << 9));
         } else if (length == 0) {
@@ -282,8 +268,8 @@ library LibParseOperand {
                 b = 0;
             }
 
-            a = fitASmallOrLargeNumberIntoASmallSpace(a, 1);
-            b = fitASmallOrLargeNumberIntoASmallSpace(b, 1);
+            a = LibParseLiteral.decimalOrIntToInt(a, 1);
+            b = LibParseLiteral.decimalOrIntToInt(b, 1);
 
             operand = Operand.wrap(a | (b << 1));
         } else {

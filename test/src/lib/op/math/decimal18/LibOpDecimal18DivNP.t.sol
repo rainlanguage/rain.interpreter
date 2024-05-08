@@ -115,15 +115,15 @@ contract LibOpDecimal18DivNPTest is OpTest {
     /// Tests two inputs.
     /// Tests the happy path where we do not divide by zero or overflow.
     function testOpDecimal18DivNPEvalTwoInputsHappy() external {
-        checkHappy("_: decimal18-div(0 1e18);", 0, "0 1");
-        checkHappy("_: decimal18-div(1e18 1e18);", 1e18, "1 1");
-        checkHappy("_: decimal18-div(1e18 2e18);", 5e17, "1 2");
-        checkHappy("_: decimal18-div(2e18 1e18);", 2e18, "2 1");
-        checkHappy("_: decimal18-div(2e18 2e18);", 1e18, "2 2");
-        checkHappy("_: decimal18-div(2e18 1e17);", 2e19, "2 0.1");
+        checkHappy("_: decimal18-div(0 1);", 0, "0 1");
+        checkHappy("_: decimal18-div(1 1);", 1e18, "1 1");
+        checkHappy("_: decimal18-div(1 2);", 5e17, "1 2");
+        checkHappy("_: decimal18-div(2 1);", 2e18, "2 1");
+        checkHappy("_: decimal18-div(2 2);", 1e18, "2 2");
+        checkHappy("_: decimal18-div(2 0.1);", 2e19, "2 0.1");
         // This one is interesting because it overflows internally before
         // reaching a final result.
-        checkHappy("_: decimal18-div(max-int-value() 1e18);", type(uint256).max, "max-int-value() 1");
+        checkHappy("_: decimal18-div(max-int-value() 1);", type(uint256).max, "max-int-value() 1");
     }
 
     /// Test the eval of `decimal18-div` opcode parsed from a string.
@@ -131,7 +131,7 @@ contract LibOpDecimal18DivNPTest is OpTest {
     /// Tests the unhappy path where we divide by zero.
     function testOpDecimal18DivNPEvalTwoInputsUnhappy() external {
         checkUnhappy("_: decimal18-div(0 0);", stdError.divisionError);
-        checkUnhappy("_: decimal18-div(1e18 0);", stdError.divisionError);
+        checkUnhappy("_: decimal18-div(1 0);", stdError.divisionError);
         checkUnhappy(
             "_: decimal18-div(max-int-value() 0);",
             abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, type(uint256).max, 1e18, 0)
@@ -143,11 +143,11 @@ contract LibOpDecimal18DivNPTest is OpTest {
     /// Tests the unhappy path where the final result overflows.
     function testOpDecimal18DivNPEvalTwoInputsUnhappyOverflow() external {
         checkUnhappy(
-            "_: decimal18-div(max-int-value() 1);",
+            "_: decimal18-div(max-int-value() 1e-18);",
             abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, type(uint256).max, 1e18, 1)
         );
         checkUnhappy(
-            "_: decimal18-div(1e70 1e10);", abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, 1e70, 1e18, 1e10)
+            "_: decimal18-div(1e52 1e-8);", abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, 1e70, 1e18, 1e10)
         );
     }
 
@@ -155,15 +155,15 @@ contract LibOpDecimal18DivNPTest is OpTest {
     /// Tests three inputs.
     /// Tests the happy path where we do not divide by zero or overflow.
     function testOpDecimal18DivNPEvalThreeInputsHappy() external {
-        checkHappy("_: decimal18-div(0 1e18 1e18);", 0, "0 1 1");
-        checkHappy("_: decimal18-div(1e18 1e18 1e18);", 1e18, "1 1 1");
-        checkHappy("_: decimal18-div(1e18 1e18 2e18);", 5e17, "1 1 2");
-        checkHappy("_: decimal18-div(1e18 2e18 1e18);", 5e17, "1 2 1");
-        checkHappy("_: decimal18-div(1e18 2e18 2e18);", 25e16, "1 2 2");
-        checkHappy("_: decimal18-div(1e18 2e18 1e17);", 5e18, "1 2 0.1");
+        checkHappy("_: decimal18-div(0 1 1);", 0, "0 1 1");
+        checkHappy("_: decimal18-div(1 1 1);", 1e18, "1 1 1");
+        checkHappy("_: decimal18-div(1 1 2);", 5e17, "1 1 2");
+        checkHappy("_: decimal18-div(1 2 1);", 5e17, "1 2 1");
+        checkHappy("_: decimal18-div(1 2 2);", 25e16, "1 2 2");
+        checkHappy("_: decimal18-div(1 2 0.1);", 5e18, "1 2 0.1");
         // This one is interesting because it overflows internally before
         // reaching a final result.
-        checkHappy("_: decimal18-div(max-int-value() 1e18 1e18);", type(uint256).max, "max-int-value() 1 1");
+        checkHappy("_: decimal18-div(max-int-value() 1 1);", type(uint256).max, "max-int-value() 1 1");
     }
 
     /// Test the eval of `decimal18-div` opcode parsed from a string.
@@ -171,8 +171,8 @@ contract LibOpDecimal18DivNPTest is OpTest {
     /// Tests the unhappy path where we divide by zero.
     function testOpDecimal18DivNPEvalThreeInputsUnhappy() external {
         checkUnhappy("_: decimal18-div(0 0 0);", stdError.divisionError);
-        checkUnhappy("_: decimal18-div(1e18 0 0);", stdError.divisionError);
-        checkUnhappy("_: decimal18-div(1e18 1e18 0);", stdError.divisionError);
+        checkUnhappy("_: decimal18-div(1 0 0);", stdError.divisionError);
+        checkUnhappy("_: decimal18-div(1 1 0);", stdError.divisionError);
         checkUnhappy(
             "_: decimal18-div(max-int-value() 0 0);",
             abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, type(uint256).max, 1e18, 0)
@@ -184,28 +184,26 @@ contract LibOpDecimal18DivNPTest is OpTest {
     /// Tests the unhappy path where the final result overflows.
     function testOpDecimal18DivNPEvalThreeInputsUnhappyOverflow() external {
         checkUnhappy(
-            "_: decimal18-div(max-int-value() 1 1);",
+            "_: decimal18-div(max-int-value() 1e-18 1e-18);",
             abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, type(uint256).max, 1e18, 1)
         );
         checkUnhappy(
-            "_: decimal18-div(1e70 1e18 1e10);",
-            abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, 1e70, 1e18, 1e10)
+            "_: decimal18-div(1e52 1 1e-8);", abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, 1e70, 1e18, 1e10)
         );
         checkUnhappy(
-            "_: decimal18-div(1e70 1e10 1e18);",
-            abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, 1e70, 1e18, 1e10)
+            "_: decimal18-div(1e52 1e-8 1);", abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, 1e70, 1e18, 1e10)
         );
     }
 
     /// Test the eval of `decimal18-div` opcode parsed from a string.
     /// Tests that operands are disallowed.
     function testOpDecimal18DivNPEvalOperandsDisallowed() external {
-        checkDisallowedOperand("_: decimal18-div<0>(1e18 1e18 1e18);");
-        checkDisallowedOperand("_: decimal18-div<1>(1e18 1e18 1e18);");
-        checkDisallowedOperand("_: decimal18-div<2>(1e18 1e18 1e18);");
-        checkDisallowedOperand("_: decimal18-div<0 0>(1e18 1e18 1e18);");
-        checkDisallowedOperand("_: decimal18-div<0 1>(1e18 1e18 1e18);");
-        checkDisallowedOperand("_: decimal18-div<1 0>(1e18 1e18 1e18);");
+        checkDisallowedOperand("_: decimal18-div<0>(1 1 1);");
+        checkDisallowedOperand("_: decimal18-div<1>(1 1 1);");
+        checkDisallowedOperand("_: decimal18-div<2>(1 1 1);");
+        checkDisallowedOperand("_: decimal18-div<0 0>(1 1 1);");
+        checkDisallowedOperand("_: decimal18-div<0 1>(1 1 1);");
+        checkDisallowedOperand("_: decimal18-div<1 0>(1 1 1);");
     }
 
     function testOpDecimal18DivNPEvalZeroOutputs() external {

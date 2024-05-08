@@ -7,6 +7,7 @@ import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
+import {LibParseLiteral} from "../../../parse/literal/LibParseLiteral.sol";
 
 /// @title LibOpDecimal18Scale18DynamicNP
 /// @notice Opcode for scaling a number to 18 decimal fixed point based on
@@ -28,6 +29,9 @@ library LibOpDecimal18Scale18DynamicNP {
             stackTop := add(stackTop, 0x20)
             a := mload(stackTop)
         }
+        // There's no upper bound because we might be saturating all the way to
+        // infinity. `scale18` will handle catching such things.
+        scale = LibParseLiteral.decimalOrIntToInt(scale, type(uint256).max);
         a = a.scale18(scale, Operand.unwrap(operand));
         assembly ("memory-safe") {
             mstore(stackTop, a)
@@ -41,6 +45,8 @@ library LibOpDecimal18Scale18DynamicNP {
         returns (uint256[] memory outputs)
     {
         outputs = new uint256[](1);
-        outputs[0] = inputs[1].scale18(inputs[0], Operand.unwrap(operand) & MASK_2BIT);
+        outputs[0] = inputs[1].scale18(
+            LibParseLiteral.decimalOrIntToInt(inputs[0], type(uint256).max), Operand.unwrap(operand) & MASK_2BIT
+        );
     }
 }
