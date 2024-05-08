@@ -24,6 +24,18 @@ library LibParseOperand {
     using LibParseOperand for ParseState;
     using LibParseInterstitial for ParseState;
 
+    function fitASmallOrLargeNumberIntoASmallSpace(uint256 value, uint256 max) internal pure returns (uint256) {
+        if (value >= 1e18) {
+            value = LibFixedPointDecimalScale.scaleToIntegerLossless(value);
+        }
+
+        if (value > max) {
+            revert OperandOverflow();
+        }
+
+        return value;
+    }
+
     function parseOperand(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         uint256 char;
         assembly ("memory-safe") {
@@ -155,14 +167,11 @@ library LibParseOperand {
     function handleOperandSingleFull(uint256[] memory values) internal pure returns (Operand operand) {
         // Happy path at the top for efficiency.
         if (values.length == 1) {
-            uint256 value18;
             assembly ("memory-safe") {
-                value18 := mload(add(values, 0x20))
+                operand := mload(add(values, 0x20))
             }
-            operand = Operand.wrap(LibFixedPointDecimalScale.scaleToIntegerLossless(value18));
-            if (Operand.unwrap(operand) > uint256(type(uint16).max)) {
-                revert OperandOverflow();
-            }
+            operand =
+                Operand.wrap(fitASmallOrLargeNumberIntoASmallSpace(Operand.unwrap(operand), uint256(type(uint16).max)));
         } else if (values.length == 0) {
             operand = Operand.wrap(0);
         } else {
@@ -174,15 +183,11 @@ library LibParseOperand {
     function handleOperandSingleFullNoDefault(uint256[] memory values) internal pure returns (Operand operand) {
         // Happy path at the top for efficiency.
         if (values.length == 1) {
-            uint256 value18;
             assembly ("memory-safe") {
-                value18 := mload(add(values, 0x20))
+                operand := mload(add(values, 0x20))
             }
-            operand = Operand.wrap(LibFixedPointDecimalScale.scaleToIntegerLossless(value18));
-
-            if (Operand.unwrap(operand) > uint256(type(uint16).max)) {
-                revert OperandOverflow();
-            }
+            operand =
+                Operand.wrap(fitASmallOrLargeNumberIntoASmallSpace(Operand.unwrap(operand), uint256(type(uint16).max)));
         } else if (values.length == 0) {
             revert ExpectedOperand();
         } else {
@@ -195,18 +200,15 @@ library LibParseOperand {
     function handleOperandDoublePerByteNoDefault(uint256[] memory values) internal pure returns (Operand operand) {
         // Happy path at the top for efficiency.
         if (values.length == 2) {
-            uint256 a18;
-            uint256 b18;
+            uint256 a;
+            uint256 b;
             assembly ("memory-safe") {
-                a18 := mload(add(values, 0x20))
-                b18 := mload(add(values, 0x40))
+                a := mload(add(values, 0x20))
+                b := mload(add(values, 0x40))
             }
-            uint256 a = LibFixedPointDecimalScale.scaleToIntegerLossless(a18);
-            uint256 b = LibFixedPointDecimalScale.scaleToIntegerLossless(b18);
+            a = fitASmallOrLargeNumberIntoASmallSpace(a, type(uint8).max);
+            b = fitASmallOrLargeNumberIntoASmallSpace(b, type(uint8).max);
 
-            if (a > type(uint8).max || b > type(uint8).max) {
-                revert OperandOverflow();
-            }
             operand = Operand.wrap(a | (b << 8));
         } else if (values.length < 2) {
             revert ExpectedOperand();
@@ -244,9 +246,9 @@ library LibParseOperand {
                 c = 0;
             }
 
-            if (a > type(uint8).max || b > 1 || c > 1) {
-                revert OperandOverflow();
-            }
+            a = fitASmallOrLargeNumberIntoASmallSpace(a, type(uint8).max);
+            b = fitASmallOrLargeNumberIntoASmallSpace(b, 1);
+            c = fitASmallOrLargeNumberIntoASmallSpace(c, 1);
 
             operand = Operand.wrap(a | (b << 8) | (c << 9));
         } else if (length == 0) {
@@ -280,9 +282,8 @@ library LibParseOperand {
                 b = 0;
             }
 
-            if (a > 1 || b > 1) {
-                revert OperandOverflow();
-            }
+            a = fitASmallOrLargeNumberIntoASmallSpace(a, 1);
+            b = fitASmallOrLargeNumberIntoASmallSpace(b, 1);
 
             operand = Operand.wrap(a | (b << 1));
         } else {

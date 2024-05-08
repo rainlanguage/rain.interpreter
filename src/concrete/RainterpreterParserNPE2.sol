@@ -15,7 +15,7 @@ import {LibParseInterstitial} from "../lib/parse/LibParseInterstitial.sol";
 
 /// @dev The known hash of the parser bytecode. This is used by the deployer to
 /// check that it is deploying a parser that is compatible with the interpreter.
-bytes32 constant PARSER_BYTECODE_HASH = bytes32(0xcdb49ad39358386c134b1922e8429b640fe370acb2b1a9c068030832d7f4d3e0);
+bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x364fa0b71c2a7fb4bdb87ff867be5707c2fbe37a282f2504c38ff2b3951ae234);
 
 /// @dev Encodes the parser meta that is used to lookup word definitions.
 /// The structure of the parser meta is:
@@ -42,7 +42,7 @@ uint8 constant PARSE_META_BUILD_DEPTH = 2;
 /// @dev Every two bytes is a function pointer for an operand handler. These
 /// positional indexes all map to the same indexes looked up in the parse meta.
 bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
-    hex"18cf18cf18cf19741a331a331a331974197418cf18cf18cf1a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a331a781b0a1a331a781b0a1a331a331a331a331a331a331a331a331a331a331a331a331a3318cf1c0018cf1c001a331a33";
+    hex"18cf18cf18cf193419ad19ad19ad1934193418cf18cf18cf19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19f21a6119ad19f21a6119ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad18cf1b2d18cf1b2d19ad19ad";
 
 /// @dev Every two bytes is a function pointer for a literal parser. Literal
 /// dispatches are determined by the first byte(s) of the literal rather than a

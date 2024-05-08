@@ -34,21 +34,21 @@ contract LibOpBitwiseAndNPTest is OpTest {
     /// Test the eval of bitwise AND parsed from a string.
     function testOpBitwiseAndNPEvalHappy() external {
         checkHappy("_: bitwise-and(0 0);", 0, "0 0");
-        checkHappy("_: bitwise-and(0 1);", 0, "0 1");
-        checkHappy("_: bitwise-and(1 0);", 0, "1 0");
-        checkHappy("_: bitwise-and(1 1);", 1, "1 1");
-        checkHappy("_: bitwise-and(0 2);", 0, "0 2");
-        checkHappy("_: bitwise-and(2 0);", 0, "2 0");
-        checkHappy("_: bitwise-and(1 2);", 0, "1 2");
-        checkHappy("_: bitwise-and(2 1);", 0, "2 1");
-        checkHappy("_: bitwise-and(2 2);", 2, "2 2");
-        checkHappy("_: bitwise-and(0 3);", 0, "0 3");
-        checkHappy("_: bitwise-and(3 0);", 0, "3 0");
-        checkHappy("_: bitwise-and(1 3);", 1, "1 3");
-        checkHappy("_: bitwise-and(3 1);", 1, "3 1");
-        checkHappy("_: bitwise-and(2 3);", 2, "2 3");
-        checkHappy("_: bitwise-and(3 2);", 2, "3 2");
-        checkHappy("_: bitwise-and(3 3);", 3, "3 3");
+        checkHappy("_: bitwise-and(0 1e-18);", 0, "0 1");
+        checkHappy("_: bitwise-and(1e-18 0);", 0, "1 0");
+        checkHappy("_: bitwise-and(1e-18 1e-18);", 1, "1 1");
+        checkHappy("_: bitwise-and(0 2e-18);", 0, "0 2");
+        checkHappy("_: bitwise-and(2e-18 0);", 0, "2 0");
+        checkHappy("_: bitwise-and(1e-18 2e-18);", 0, "1 2");
+        checkHappy("_: bitwise-and(2e-18 1e-18);", 0, "2 1");
+        checkHappy("_: bitwise-and(2e-18 2e-18);", 2, "2 2");
+        checkHappy("_: bitwise-and(0 3e-18);", 0, "0 3");
+        checkHappy("_: bitwise-and(3e-18 0);", 0, "3 0");
+        checkHappy("_: bitwise-and(1e-18 3e-18);", 1, "1 3");
+        checkHappy("_: bitwise-and(3e-18 1e-18);", 1, "3 1");
+        checkHappy("_: bitwise-and(2e-18 3e-18);", 2, "2 3");
+        checkHappy("_: bitwise-and(3e-18 2e-18);", 2, "3 2");
+        checkHappy("_: bitwise-and(3e-18 3e-18);", 3, "3 3");
     }
 
     /// Test that a bitwise OR with bad inputs fails integrity.
