@@ -36,10 +36,10 @@ contract LibOpDecimal18Exp2NPTest is OpTest {
     /// Test the eval of `decimal18-exp2`.
     function testOpDecimal18Exp2NPEval() external {
         checkHappy("_: decimal18-exp2(0);", 1e18, "2^0");
-        checkHappy("_: decimal18-exp2(1e18);", 2e18, "2^1");
-        checkHappy("_: decimal18-exp2(5e17);", 1414213562373095048, "2^0.5");
-        checkHappy("_: decimal18-exp2(2e18);", 4e18, "2^2");
-        checkHappy("_: decimal18-exp2(3e18);", 8e18, "2^3");
+        checkHappy("_: decimal18-exp2(1);", 2e18, "2^1");
+        checkHappy("_: decimal18-exp2(0.5);", 1414213562373095048, "2^0.5");
+        checkHappy("_: decimal18-exp2(2);", 4e18, "2^2");
+        checkHappy("_: decimal18-exp2(3);", 8e18, "2^3");
     }
 
     /// Test the eval of `decimal18-exp2` for bad inputs.

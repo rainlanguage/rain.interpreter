@@ -13,13 +13,13 @@ contract RainterpreterReferenceExternNPE2RepeatTest is OpTest {
         string memory baseStr = string.concat("using-words-from ", address(extern).toHexString(), " ");
 
         uint256[] memory expectedStack = new uint256[](1);
-        expectedStack[0] = 999;
+        expectedStack[0] = 999e18;
 
         checkHappy(
             bytes(string.concat(baseStr, "nineninenine: [ref-extern-repeat-9 abc];")), expectedStack, "repeat 9 abc"
         );
 
-        expectedStack[0] = 88;
+        expectedStack[0] = 88e18;
         checkHappy(bytes(string.concat(baseStr, "eighteight: [ref-extern-repeat-8 zz];")), expectedStack, "repeat 8 zz");
     }
 }

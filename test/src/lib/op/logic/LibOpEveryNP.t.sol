@@ -68,7 +68,7 @@ contract LibOpEveryNPTest is OpTest {
         );
 
         assertEq(stack.length, 1);
-        assertEq(stack[0], 5);
+        assertEq(stack[0], 5e18);
         assertEq(kvs.length, 0);
         assertEq(io, hex"0001");
     }
@@ -107,7 +107,7 @@ contract LibOpEveryNPTest is OpTest {
         );
 
         assertEq(stack.length, 1);
-        assertEq(stack[0], 6);
+        assertEq(stack[0], 6e18);
         assertEq(kvs.length, 0);
         assertEq(io, hex"0001");
     }
