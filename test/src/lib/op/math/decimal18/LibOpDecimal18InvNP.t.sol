@@ -36,10 +36,10 @@ contract LibOpDecimal18InvNPTest is OpTest {
 
     /// Test the eval of `decimal18-inv`.
     function testOpDecimal18InvNPEval() external {
-        checkHappy("_: decimal18-inv(1e18);", 1e18, "1");
-        checkHappy("_: decimal18-inv(5e17);", 2e18, "0.5");
-        checkHappy("_: decimal18-inv(2e18);", 0.5e18, "2");
-        checkHappy("_: decimal18-inv(3e18);", 333333333333333333, "3");
+        checkHappy("_: decimal18-inv(1);", 1e18, "1");
+        checkHappy("_: decimal18-inv(0.5);", 2e18, "0.5");
+        checkHappy("_: decimal18-inv(2);", 0.5e18, "2");
+        checkHappy("_: decimal18-inv(3);", 333333333333333333, "3");
     }
 
     /// Test the eval of `decimal18-inv` for bad inputs.

@@ -174,9 +174,12 @@ library LibParseOperand {
     function handleOperandSingleFullNoDefault(uint256[] memory values) internal pure returns (Operand operand) {
         // Happy path at the top for efficiency.
         if (values.length == 1) {
+            uint256 value18;
             assembly ("memory-safe") {
-                operand := mload(add(values, 0x20))
+                value18 := mload(add(values, 0x20))
             }
+            operand = Operand.wrap(LibFixedPointDecimalScale.scaleToIntegerLossless(value18));
+
             if (Operand.unwrap(operand) > uint256(type(uint16).max)) {
                 revert OperandOverflow();
             }
@@ -192,12 +195,15 @@ library LibParseOperand {
     function handleOperandDoublePerByteNoDefault(uint256[] memory values) internal pure returns (Operand operand) {
         // Happy path at the top for efficiency.
         if (values.length == 2) {
-            uint256 a;
-            uint256 b;
+            uint256 a18;
+            uint256 b18;
             assembly ("memory-safe") {
-                a := mload(add(values, 0x20))
-                b := mload(add(values, 0x40))
+                a18 := mload(add(values, 0x20))
+                b18 := mload(add(values, 0x40))
             }
+            uint256 a = LibFixedPointDecimalScale.scaleToIntegerLossless(a18);
+            uint256 b = LibFixedPointDecimalScale.scaleToIntegerLossless(b18);
+
             if (a > type(uint8).max || b > type(uint8).max) {
                 revert OperandOverflow();
             }

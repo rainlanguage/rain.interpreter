@@ -36,11 +36,11 @@ contract LibOpDecimal18FloorNPTest is OpTest {
     /// Test the eval of `decimal18-floor`.
     function testOpDecimal18FloorNPEval() external {
         checkHappy("_: decimal18-floor(0);", 0, "0");
-        checkHappy("_: decimal18-floor(1e18);", 1e18, "1");
-        checkHappy("_: decimal18-floor(5e17);", 0, "0.5");
-        checkHappy("_: decimal18-floor(2e18);", 2e18, "2");
-        checkHappy("_: decimal18-floor(3e18);", 3e18, "3");
-        checkHappy("_: decimal18-floor(38e17);", 3e18, "3.8");
+        checkHappy("_: decimal18-floor(1);", 1e18, "1");
+        checkHappy("_: decimal18-floor(0.5);", 0, "0.5");
+        checkHappy("_: decimal18-floor(2);", 2e18, "2");
+        checkHappy("_: decimal18-floor(3);", 3e18, "3");
+        checkHappy("_: decimal18-floor(3.8);", 3e18, "3.8");
     }
 
     /// Test the eval of `decimal18-floor` for bad inputs.

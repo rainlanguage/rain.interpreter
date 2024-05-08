@@ -36,11 +36,11 @@ contract LibOpDecimal18FracNPTest is OpTest {
     /// Test the eval of `decimal18-frac`.
     function testOpDecimal18FracNPEval() external {
         checkHappy("_: decimal18-frac(0);", 0, "0");
-        checkHappy("_: decimal18-frac(1e18);", 0, "1");
-        checkHappy("_: decimal18-frac(5e17);", 0.5e18, "0.5");
-        checkHappy("_: decimal18-frac(2e18);", 0, "2");
-        checkHappy("_: decimal18-frac(3e18);", 0, "3");
-        checkHappy("_: decimal18-frac(38e17);", 0.8e18, "3.8");
+        checkHappy("_: decimal18-frac(1);", 0, "1");
+        checkHappy("_: decimal18-frac(0.5);", 0.5e18, "0.5");
+        checkHappy("_: decimal18-frac(2);", 0, "2");
+        checkHappy("_: decimal18-frac(3);", 0, "3");
+        checkHappy("_: decimal18-frac(3.8);", 0.8e18, "3.8");
     }
 
     /// Test the eval of `decimal18-frac` for bad inputs.

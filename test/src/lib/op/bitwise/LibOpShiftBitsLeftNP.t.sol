@@ -87,23 +87,23 @@ contract LibOpShiftBitsLeftNPTest is OpTest {
         checkHappy("_: bitwise-shift-left<3>(0);", 0, "3, 0");
         checkHappy("_: bitwise-shift-left<255>(0);", 0, "255, 0");
 
-        checkHappy("_: bitwise-shift-left<1>(1);", 1 << 1, "1, 1");
-        checkHappy("_: bitwise-shift-left<2>(1);", 1 << 2, "2, 1");
-        checkHappy("_: bitwise-shift-left<3>(1);", 1 << 3, "3, 1");
-        checkHappy("_: bitwise-shift-left<255>(1);", 1 << 255, "255, 1");
+        checkHappy("_: bitwise-shift-left<1>(1e-18);", 1 << 1, "1, 1");
+        checkHappy("_: bitwise-shift-left<2>(1e-18);", 1 << 2, "2, 1");
+        checkHappy("_: bitwise-shift-left<3>(1e-18);", 1 << 3, "3, 1");
+        checkHappy("_: bitwise-shift-left<255>(1e-18);", 1 << 255, "255, 1");
 
-        checkHappy("_: bitwise-shift-left<1>(2);", 2 << 1, "1, 2");
-        checkHappy("_: bitwise-shift-left<2>(2);", 2 << 2, "2, 2");
-        checkHappy("_: bitwise-shift-left<3>(2);", 2 << 3, "3, 2");
+        checkHappy("_: bitwise-shift-left<1>(2e-18);", 2 << 1, "1, 2");
+        checkHappy("_: bitwise-shift-left<2>(2e-18);", 2 << 2, "2, 2");
+        checkHappy("_: bitwise-shift-left<3>(2e-18);", 2 << 3, "3, 2");
         // 2 gets shifted out of the 256 bit word, so this is 0.
-        checkHappy("_: bitwise-shift-left<255>(2);", 0, "255, 2");
+        checkHappy("_: bitwise-shift-left<255>(2e-18);", 0, "255, 2");
 
-        checkHappy("_: bitwise-shift-left<1>(3);", 3 << 1, "1, 3");
-        checkHappy("_: bitwise-shift-left<2>(3);", 3 << 2, "2, 3");
-        checkHappy("_: bitwise-shift-left<3>(3);", 3 << 3, "3, 3");
+        checkHappy("_: bitwise-shift-left<1>(3e-18);", 3 << 1, "1, 3");
+        checkHappy("_: bitwise-shift-left<2>(3e-18);", 3 << 2, "2, 3");
+        checkHappy("_: bitwise-shift-left<3>(3e-18);", 3 << 3, "3, 3");
         // The high bit of 3 gets shifted out of the 256 bit word, so this is the
         // same as shifting 1.
-        checkHappy("_: bitwise-shift-left<255>(3);", 1 << 255, "255, 3");
+        checkHappy("_: bitwise-shift-left<255>(3e-18);", 1 << 255, "255, 3");
 
         checkHappy("_: bitwise-shift-left<1>(max-int-value());", type(uint256).max << 1, "1, max");
         checkHappy("_: bitwise-shift-left<2>(max-int-value());", type(uint256).max << 2, "2, max");

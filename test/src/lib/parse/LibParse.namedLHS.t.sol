@@ -158,9 +158,9 @@ contract LibParseNamedLHSTest is Test {
             hex"00100003"
         );
         assertEq(constants.length, 3);
-        assertEq(constants[0], 1);
-        assertEq(constants[1], 2);
-        assertEq(constants[2], 3);
+        assertEq(constants[0], 1e18);
+        assertEq(constants[1], 2e18);
+        assertEq(constants[2], 3e18);
     }
 
     /// Duplicate names are disallowed in the same source.
@@ -212,9 +212,9 @@ contract LibParseNamedLHSTest is Test {
             hex"00100001"
         );
         assertEq(constants.length, 4);
-        assertEq(constants[0], 1);
-        assertEq(constants[1], 2);
-        assertEq(constants[2], 3);
-        assertEq(constants[3], 4);
+        assertEq(constants[0], 1e18);
+        assertEq(constants[1], 2e18);
+        assertEq(constants[2], 3e18);
+        assertEq(constants[3], 4e18);
     }
 }

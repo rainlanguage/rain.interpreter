@@ -86,25 +86,25 @@ contract LibOpShiftBitsRightNPTest is OpTest {
         checkHappy("_: bitwise-shift-right<3>(0);", 0, "3, 0");
         checkHappy("_: bitwise-shift-right<255>(0);", 0, "255, 0");
 
-        checkHappy("_: bitwise-shift-right<1>(1);", 0, "1, 1");
-        checkHappy("_: bitwise-shift-right<2>(1);", 0, "2, 1");
-        checkHappy("_: bitwise-shift-right<3>(1);", 0, "3, 1");
-        checkHappy("_: bitwise-shift-right<255>(1);", 0, "255, 1");
+        checkHappy("_: bitwise-shift-right<1>(1e-18);", 0, "1, 1");
+        checkHappy("_: bitwise-shift-right<2>(1e-18);", 0, "2, 1");
+        checkHappy("_: bitwise-shift-right<3>(1e-18);", 0, "3, 1");
+        checkHappy("_: bitwise-shift-right<255>(1e-18);", 0, "255, 1");
 
-        checkHappy("_: bitwise-shift-right<1>(2);", 1, "1, 2");
-        checkHappy("_: bitwise-shift-right<2>(2);", 0, "2, 2");
-        checkHappy("_: bitwise-shift-right<3>(2);", 0, "3, 2");
-        checkHappy("_: bitwise-shift-right<255>(2);", 0, "255, 2");
+        checkHappy("_: bitwise-shift-right<1>(2e-18);", 1, "1, 2");
+        checkHappy("_: bitwise-shift-right<2>(2e-18);", 0, "2, 2");
+        checkHappy("_: bitwise-shift-right<3>(2e-18);", 0, "3, 2");
+        checkHappy("_: bitwise-shift-right<255>(2e-18);", 0, "255, 2");
 
-        checkHappy("_: bitwise-shift-right<1>(3);", 1, "1, 3");
-        checkHappy("_: bitwise-shift-right<2>(3);", 0, "2, 3");
-        checkHappy("_: bitwise-shift-right<3>(3);", 0, "3, 3");
-        checkHappy("_: bitwise-shift-right<255>(3);", 0, "255, 3");
+        checkHappy("_: bitwise-shift-right<1>(3e-18);", 1, "1, 3");
+        checkHappy("_: bitwise-shift-right<2>(3e-18);", 0, "2, 3");
+        checkHappy("_: bitwise-shift-right<3>(3e-18);", 0, "3, 3");
+        checkHappy("_: bitwise-shift-right<255>(3e-18);", 0, "255, 3");
 
-        checkHappy("_: bitwise-shift-right<1>(4);", 2, "1, 4");
-        checkHappy("_: bitwise-shift-right<2>(4);", 1, "2, 4");
-        checkHappy("_: bitwise-shift-right<3>(4);", 0, "3, 4");
-        checkHappy("_: bitwise-shift-right<255>(4);", 0, "255, 4");
+        checkHappy("_: bitwise-shift-right<1>(4e-18);", 2, "1, 4");
+        checkHappy("_: bitwise-shift-right<2>(4e-18);", 1, "2, 4");
+        checkHappy("_: bitwise-shift-right<3>(4e-18);", 0, "3, 4");
+        checkHappy("_: bitwise-shift-right<255>(4e-18);", 0, "255, 4");
 
         checkHappy("_: bitwise-shift-right<1>(max-int-value());", type(uint256).max >> 1, "1, max");
         checkHappy("_: bitwise-shift-right<2>(max-int-value());", type(uint256).max >> 2, "2, max");
