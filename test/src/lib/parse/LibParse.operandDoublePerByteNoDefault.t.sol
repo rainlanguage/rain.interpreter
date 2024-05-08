@@ -152,7 +152,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
 
     /// 2 literals are expected for this operand parser. Tests 256 256.
     function testOperandDoublePerByteNoDefaultSecondOverflow() external {
-        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector));
+        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector, 256, 255));
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<256 256>();").parse();
         (bytecode);
         (constants);
@@ -160,7 +160,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
 
     /// 2 literals are expected for this operand parser. Tests 256 255.
     function testOperandDoublePerByteNoDefaultSecondOverflowFirst() external {
-        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector));
+        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector, 256, 255));
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<256 255>();").parse();
         (bytecode);
         (constants);
