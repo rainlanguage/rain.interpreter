@@ -4,6 +4,7 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std/Test.sol";
 import {LibParseOperand, Operand} from "src/lib/parse/LibParseOperand.sol";
 import {ExpectedOperand, UnexpectedOperandValue, IntegerOverflow} from "src/error/ErrParse.sol";
+import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 
 contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
     // There must be exactly two values so zero values is an error.
@@ -32,10 +33,22 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
     function testHandleOperandDoublePerByteNoDefaultFirstValueTooLarge(uint256 a, uint256 b) external {
         a = bound(a, uint256(type(uint8).max) + 1, type(uint256).max);
         b = bound(b, 0, type(uint8).max);
+
+        // If a is a decimal, scale it above 256 as a decimal.
+        if (a >= 1e18) {
+            a = bound(a, 256e18, type(uint256).max);
+            a = a - (a % 1e18);
+        }
+
         uint256[] memory values = new uint256[](2);
         values[0] = a;
         values[1] = b;
-        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector));
+
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                IntegerOverflow.selector, LibParseLiteral.decimalOrIntToInt(a, type(uint256).max), 255
+            )
+        );
         LibParseOperand.handleOperandDoublePerByteNoDefault(values);
     }
 
@@ -43,10 +56,21 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
     function testHandleOperandDoublePerByteNoDefaultSecondValueTooLarge(uint256 a, uint256 b) external {
         a = bound(a, 0, type(uint8).max);
         b = bound(b, uint256(type(uint8).max) + 1, type(uint256).max);
+
+        // If b is a decimal, scale it above 256 as a decimal.
+        if (b >= 1e18) {
+            b = bound(b, 256e18, type(uint256).max);
+            b = b - (b % 1e18);
+        }
+
         uint256[] memory values = new uint256[](2);
         values[0] = a;
         values[1] = b;
-        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector));
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                IntegerOverflow.selector, LibParseLiteral.decimalOrIntToInt(b, type(uint256).max), 255
+            )
+        );
         LibParseOperand.handleOperandDoublePerByteNoDefault(values);
     }
 

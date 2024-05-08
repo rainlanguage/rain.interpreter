@@ -4,6 +4,7 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std/Test.sol";
 import {LibParseOperand, Operand} from "src/lib/parse/LibParseOperand.sol";
 import {ExpectedOperand, UnexpectedOperandValue, IntegerOverflow} from "src/error/ErrParse.sol";
+import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 
 contract LibParseOperandHandleOperandM1M1Test is Test {
     // Both values are optional so if nothing is provided everything falls back
@@ -23,9 +24,20 @@ contract LibParseOperandHandleOperandM1M1Test is Test {
     // If one value is provided and it is greater than 1 bit, it is an error.
     function testHandleOperandM1M1OneValueTooLarge(uint256 value) external {
         value = bound(value, 2, type(uint256).max);
+
+        // If value is a decimal, scale it above 256 as a decimal.
+        if (value >= 1e18) {
+            value = bound(value, 256e18, type(uint256).max);
+            value = value - (value % 1e18);
+        }
+
         uint256[] memory values = new uint256[](1);
         values[0] = value;
-        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector));
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                IntegerOverflow.selector, LibParseLiteral.decimalOrIntToInt(value, type(uint256).max), 1
+            )
+        );
         LibParseOperand.handleOperandM1M1(values);
     }
 
@@ -44,10 +56,19 @@ contract LibParseOperandHandleOperandM1M1Test is Test {
     function testHandleOperandM1M1TwoValuesSecondValueTooLarge(uint256 a, uint256 b) external {
         a = bound(a, 0, 1);
         b = bound(b, 2, type(uint256).max);
+
+        // If b is a decimal, scale it above 256 as a decimal.
+        if (b >= 1e18) {
+            b = bound(b, 256e18, type(uint256).max);
+            b = b - (b % 1e18);
+        }
+
         uint256[] memory values = new uint256[](2);
         values[0] = a;
         values[1] = b;
-        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector));
+        vm.expectRevert(
+            abi.encodeWithSelector(IntegerOverflow.selector, LibParseLiteral.decimalOrIntToInt(b, type(uint256).max), 1)
+        );
         LibParseOperand.handleOperandM1M1(values);
     }
 

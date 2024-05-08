@@ -230,7 +230,7 @@ contract LibOpExternNPTest is OpTest {
             "_: 0x00000000000000000005001000000000000000000000000000000000deadbeef,"
             // Operand is the constant index of the dispatch then the number of outputs.
             // 2 inputs and 1 output matches the mocked integrity check.
-            "_: extern<0>(20 83);",
+            "_: extern<0>(20e-18 83e-18);",
             expectedStack,
             "0xdeadbeef 20 83 99"
         );
@@ -295,7 +295,7 @@ contract LibOpExternNPTest is OpTest {
             "_: 0x00000000000000000005001000000000000000000000000000000000deadbeef,"
             // Operand is the constant index of the dispatch then the number of outputs.
             // 3 inputs and 3 outputs matches the mocked integrity check.
-            "four five six: extern<0>(1 2 3);",
+            "four five six: extern<0>(1e-18 2e-18 3e-18);",
             expectedStack,
             "0xdeadbeef 1 2 3 4 5 6"
         );

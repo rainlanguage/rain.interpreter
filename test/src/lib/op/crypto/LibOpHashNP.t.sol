@@ -147,11 +147,11 @@ contract LibOpHashNPTest is OpTest {
             new uint256[](0)
         );
         assertEq(stack.length, 3);
-        assertEq(stack[0], uint256(9));
+        assertEq(stack[0], uint256(9e18));
         assertEq(
             stack[1], uint256(keccak256(abi.encodePacked(uint256(0x1234567890abcdef), uint256(0xfedcba0987654321))))
         );
-        assertEq(stack[2], uint256(5));
+        assertEq(stack[2], uint256(5e18));
         assertEq(kvs.length, 0);
         assertEq(io, hex"0003");
     }

@@ -63,7 +63,7 @@ contract LibOpIfNPTest is OpTest {
         );
 
         assertEq(stack.length, 1);
-        assertEq(stack[0], 2);
+        assertEq(stack[0], 2e18);
         assertEq(kvs.length, 0);
         assertEq(io, hex"0001");
     }
@@ -83,7 +83,7 @@ contract LibOpIfNPTest is OpTest {
         );
 
         assertEq(stack.length, 1);
-        assertEq(stack[0], 2);
+        assertEq(stack[0], 2e18);
         assertEq(kvs.length, 0);
         assertEq(io, hex"0001");
     }
@@ -103,7 +103,7 @@ contract LibOpIfNPTest is OpTest {
         );
 
         assertEq(stack.length, 1);
-        assertEq(stack[0], 3);
+        assertEq(stack[0], 3e18);
         assertEq(kvs.length, 0);
         assertEq(io, hex"0001");
     }
@@ -163,7 +163,7 @@ contract LibOpIfNPTest is OpTest {
         );
 
         assertEq(stack.length, 1);
-        assertEq(stack[0], 1);
+        assertEq(stack[0], 1e18);
         assertEq(kvs.length, 0);
         assertEq(io, hex"0001");
     }
@@ -183,7 +183,7 @@ contract LibOpIfNPTest is OpTest {
         );
 
         assertEq(stack.length, 1);
-        assertEq(stack[0], 3);
+        assertEq(stack[0], 3e18);
         assertEq(kvs.length, 0);
         assertEq(io, hex"0001");
     }
@@ -220,7 +220,7 @@ contract LibOpIfNPTest is OpTest {
             new uint256[](0)
         );
         assertEq(stack.length, 1);
-        assertEq(stack[0], 5);
+        assertEq(stack[0], 5e18);
         assertEq(kvs.length, 0);
         assertEq(io, hex"0001");
     }
