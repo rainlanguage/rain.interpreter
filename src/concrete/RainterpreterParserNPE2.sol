@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {IERC165, ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
@@ -15,7 +15,7 @@ import {LibParseInterstitial} from "../lib/parse/LibParseInterstitial.sol";
 
 /// @dev The known hash of the parser bytecode. This is used by the deployer to
 /// check that it is deploying a parser that is compatible with the interpreter.
-bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x86e46d41aa6b6557b67f8db4683239954c184b02a0fd08fea9fcfa5622280635);
+bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x2fbf0cf7d8907015b1db689d63743523270add5276d1c48b5348ae84dc99feef);
 
 /// @dev Encodes the parser meta that is used to lookup word definitions.
 /// The structure of the parser meta is:
@@ -34,7 +34,7 @@ bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x86e46d41aa6b6557b67f8db4683239
 /// bit count of the previous bloom filter. If we reach the end of the bloom
 /// filters then we have a miss.
 bytes constant PARSE_META =
-    hex"02588423482a0a64a4805a093a0046408a2000483db0020941044cd10693108128940000000000000000000800000000100000000000000000100000000000000000001f49c6a348b005fd0c1dc53744b46c3a1a6b5d512cc697651ba56d9d416380a84768119145bf1f411c9320384025b20727767586017788743d54ad3411facaed0bf793d92a5dd6b80ac51f7f13de413210b7896422844b300fd8f7982b7c1ad31611585907980f123846207d420085742d567a1d4ab12847126e57172f75b953212a4b6e332c3f7f31f3a7222e87d7c63e201236435fbbfc32e281ae25b491eb3f7af18839b31297302973c128b94d704b1ec042237d449e18a0265d3c2223f20482963a035436e60205c2140075eca1152558bb061fa22149a5e8dd144329870d6598183bbd10093462c9701ee60c073664e22009880be535267cb3269879ba1d7d424b4654aa05197e9c533ae38ebd372dd7b205e7bf522908ea4b202f3f5e0e52726c08783df917448fdb248cf8244c9232f7";
+    hex"02588423482a0a6424805a093a0046408a2000483db0020941044cd10693108128940000000000000000000800000000100000000000000000100000000000000000001f49c6a347b005fd0c1dc53743b46c3a1a6b5d512cc697651ba56d9d406380a84668119144bf1f411c9320383f25b20727767586017788743c54ad3411facaed0bf793d92a5dd6b80ac51f7f13de413210b7896422844b300fd8f7982b7c1ad31611585907980f123746207d410085742d567a1d49b12847126e57172f75b953212a4b6e332c3f7f31f3a7222e87d7c63d201236425fbbfc32e281ae25b491eb3e7af18838b31297302973c128b94d704a1ec042237d449e18a0265d3b2223f20482963a035436e60205c2140075eca1152558bb061fa22148a5e8dd144329870d6598183abd10091ee60c073564e22009880be534267cb3269879ba1d7d424b4554aa05197e9c5339e38ebd362dd7b205e7bf522908ea4b202f3f5e0e52726c08783df917448fdb248cf8244b9232f7";
 
 /// @dev The build depth of the parser meta.
 uint8 constant PARSE_META_BUILD_DEPTH = 2;
@@ -42,13 +42,13 @@ uint8 constant PARSE_META_BUILD_DEPTH = 2;
 /// @dev Every two bytes is a function pointer for an operand handler. These
 /// positional indexes all map to the same indexes looked up in the parse meta.
 bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
-    hex"17ca17ca17ca185f190019001900185f185f17ca17ca17ca19001900190019001900190019001900190019001900190019001900190019001900190019001900190019001900190019001900190019001900190019001900190019001900190019001900190019001900194519d91900194519d9190019001900190019001900190019001900190019001900190017ca1acf17ca1acf19001900";
+    hex"18bc18bc18bc1921199a199a199a1921192118bc18bc18bc199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a19df1a4e199a19df1a4e199a199a199a199a199a199a199a199a199a199a199a199a199a18bc1b1a18bc1b1a199a199a";
 
 /// @dev Every two bytes is a function pointer for a literal parser. Literal
 /// dispatches are determined by the first byte(s) of the literal rather than a
 /// full word lookup, and are done with simple conditional jumps as the
 /// possibilities are limited compared to the number of words we have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0f3a120214ff15d9";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0f3211fa160116db";
 
 /// @title RainterpreterParserNPE2
 /// @dev The parser implementation.

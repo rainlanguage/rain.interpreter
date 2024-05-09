@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpDecimal18Log2NP} from "src/lib/op/math/decimal18/LibOpDecimal18Log2NP.sol";
@@ -38,12 +38,12 @@ contract LibOpDecimal18Log2NPTest is OpTest {
     function testOpDecimal18Log2NPEval() external {
         // Any number less than 2 other than 1 is negative which doesn't exist
         // in unsigned integers.
-        checkHappy("_: decimal18-log2(1e18);", 0, "log2 1");
-        checkHappy("_: decimal18-log2(2e18);", 1e18, "log2 2");
-        checkHappy("_: decimal18-log2(2718281828459045235);", 1442695040888963394, "log2 e");
-        checkHappy("_: decimal18-log2(3e18);", 1584962500721156166, "log2 3");
-        checkHappy("_: decimal18-log2(4e18);", 2000000000000000000, "log2 4");
-        checkHappy("_: decimal18-log2(5e18);", 2321928094887362334, "log2 5");
+        checkHappy("_: decimal18-log2(1);", 0, "log2 1");
+        checkHappy("_: decimal18-log2(2);", 1e18, "log2 2");
+        checkHappy("_: decimal18-log2(2.718281828459045235);", 1442695040888963394, "log2 e");
+        checkHappy("_: decimal18-log2(3);", 1584962500721156166, "log2 3");
+        checkHappy("_: decimal18-log2(4);", 2000000000000000000, "log2 4");
+        checkHappy("_: decimal18-log2(5);", 2321928094887362334, "log2 5");
     }
 
     /// Test the eval of `decimal18-log2` for bad inputs.

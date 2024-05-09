@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {UnsupportedLiteralType} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {ParserOutOfBounds} from "src/lib/parse/LibParse.sol";
-import {ExpectedOperand, OperandOverflow, UnclosedOperand} from "src/error/ErrParse.sol";
+import {ExpectedOperand, UnclosedOperand} from "src/error/ErrParse.sol";
+import {IntegerOverflow} from "rain.math.fixedpoint/error/ErrScale.sol";
 import {OperandTest} from "test/abstract/OperandTest.sol";
 
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
@@ -24,7 +25,7 @@ contract LibParseOperand8M1M1Test is OperandTest {
         checkOperandParse("_:e<255>();", hex"061000ff");
 
         // Above uint8 max will overflow.
-        checkParseError("_:e<256>();", abi.encodeWithSelector(OperandOverflow.selector));
+        checkParseError("_:e<256>();", abi.encodeWithSelector(IntegerOverflow.selector, 256, 255));
     }
 
     /// Single value and one bit can be provided, other bit will default to zero.
@@ -37,10 +38,10 @@ contract LibParseOperand8M1M1Test is OperandTest {
         checkOperandParse("_:e<255 1>();", hex"061001ff");
 
         // Non binary bit will overflow.
-        checkParseError("_:e<1 2>();", abi.encodeWithSelector(OperandOverflow.selector));
-        checkParseError("_:e<1 3>();", abi.encodeWithSelector(OperandOverflow.selector));
-        checkParseError("_:e<2 2>();", abi.encodeWithSelector(OperandOverflow.selector));
-        checkParseError("_:e<255 2>();", abi.encodeWithSelector(OperandOverflow.selector));
+        checkParseError("_:e<1 2>();", abi.encodeWithSelector(IntegerOverflow.selector, 2, 1));
+        checkParseError("_:e<1 3>();", abi.encodeWithSelector(IntegerOverflow.selector, 3, 1));
+        checkParseError("_:e<2 2>();", abi.encodeWithSelector(IntegerOverflow.selector, 2, 1));
+        checkParseError("_:e<255 2>();", abi.encodeWithSelector(IntegerOverflow.selector, 2, 1));
     }
 
     /// Single value and two bits can be provided.
@@ -59,21 +60,21 @@ contract LibParseOperand8M1M1Test is OperandTest {
         checkOperandParse("_:e<255 1 1>();", hex"061003ff");
 
         // Non binary bit will overflow.
-        checkParseError("_:e<1 0 2>();", abi.encodeWithSelector(OperandOverflow.selector));
-        checkParseError("_:e<1 1 2>();", abi.encodeWithSelector(OperandOverflow.selector));
-        checkParseError("_:e<1 2 0>();", abi.encodeWithSelector(OperandOverflow.selector));
-        checkParseError("_:e<1 2 1>();", abi.encodeWithSelector(OperandOverflow.selector));
-        checkParseError("_:e<1 2 2>();", abi.encodeWithSelector(OperandOverflow.selector));
-        checkParseError("_:e<2 0 2>();", abi.encodeWithSelector(OperandOverflow.selector));
-        checkParseError("_:e<2 1 2>();", abi.encodeWithSelector(OperandOverflow.selector));
-        checkParseError("_:e<2 2 0>();", abi.encodeWithSelector(OperandOverflow.selector));
-        checkParseError("_:e<2 2 1>();", abi.encodeWithSelector(OperandOverflow.selector));
-        checkParseError("_:e<2 2 2>();", abi.encodeWithSelector(OperandOverflow.selector));
-        checkParseError("_:e<255 0 2>();", abi.encodeWithSelector(OperandOverflow.selector));
-        checkParseError("_:e<255 1 2>();", abi.encodeWithSelector(OperandOverflow.selector));
-        checkParseError("_:e<255 2 0>();", abi.encodeWithSelector(OperandOverflow.selector));
-        checkParseError("_:e<255 2 1>();", abi.encodeWithSelector(OperandOverflow.selector));
-        checkParseError("_:e<255 2 2>();", abi.encodeWithSelector(OperandOverflow.selector));
+        checkParseError("_:e<1 0 2>();", abi.encodeWithSelector(IntegerOverflow.selector, 2, 1));
+        checkParseError("_:e<1 1 2>();", abi.encodeWithSelector(IntegerOverflow.selector, 2, 1));
+        checkParseError("_:e<1 2 0>();", abi.encodeWithSelector(IntegerOverflow.selector, 2, 1));
+        checkParseError("_:e<1 2 1>();", abi.encodeWithSelector(IntegerOverflow.selector, 2, 1));
+        checkParseError("_:e<1 2 2>();", abi.encodeWithSelector(IntegerOverflow.selector, 2, 1));
+        checkParseError("_:e<2 0 2>();", abi.encodeWithSelector(IntegerOverflow.selector, 2, 1));
+        checkParseError("_:e<2 1 2>();", abi.encodeWithSelector(IntegerOverflow.selector, 2, 1));
+        checkParseError("_:e<2 2 0>();", abi.encodeWithSelector(IntegerOverflow.selector, 2, 1));
+        checkParseError("_:e<2 2 1>();", abi.encodeWithSelector(IntegerOverflow.selector, 2, 1));
+        checkParseError("_:e<2 2 2>();", abi.encodeWithSelector(IntegerOverflow.selector, 2, 1));
+        checkParseError("_:e<255 0 2>();", abi.encodeWithSelector(IntegerOverflow.selector, 2, 1));
+        checkParseError("_:e<255 1 2>();", abi.encodeWithSelector(IntegerOverflow.selector, 2, 1));
+        checkParseError("_:e<255 2 0>();", abi.encodeWithSelector(IntegerOverflow.selector, 2, 1));
+        checkParseError("_:e<255 2 1>();", abi.encodeWithSelector(IntegerOverflow.selector, 2, 1));
+        checkParseError("_:e<255 2 2>();", abi.encodeWithSelector(IntegerOverflow.selector, 2, 1));
     }
 
     /// Unclosed operand is disallowed.

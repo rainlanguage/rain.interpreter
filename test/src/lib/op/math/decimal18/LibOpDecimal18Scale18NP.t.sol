@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, InterpreterStateNP, Operand, stdError} from "test/abstract/OpTest.sol";
 import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
@@ -54,13 +54,13 @@ contract LibOpDecimal18Scale18NPTest is OpTest {
         // Scale 0 value 0 round 1 saturate 1
         checkHappy("_: decimal18-scale-18<0 1 1>(0);", 0, "0 0 1 1");
         // Scale 0 value 1 round 0 saturate 0
-        checkHappy("_: decimal18-scale-18<0>(1);", 1e18, "0 1 0 0");
+        checkHappy("_: decimal18-scale-18<0>(1e-18);", 1e18, "0 1 0 0");
         // Scale 0 value 1 round 0 saturate 1
-        checkHappy("_: decimal18-scale-18<0 0 1>(1);", 1e18, "0 1 0 1");
+        checkHappy("_: decimal18-scale-18<0 0 1>(1e-18);", 1e18, "0 1 0 1");
         // Scale 0 value 1 round 1 saturate 0
-        checkHappy("_: decimal18-scale-18<0 1 0>(1);", 1e18, "0 1 1 0");
+        checkHappy("_: decimal18-scale-18<0 1 0>(1e-18);", 1e18, "0 1 1 0");
         // Scale 0 value 1 round 1 saturate 1
-        checkHappy("_: decimal18-scale-18<0 1 1>(1);", 1e18, "0 1 1 1");
+        checkHappy("_: decimal18-scale-18<0 1 1>(1e-18);", 1e18, "0 1 1 1");
         // Scale 1 value 0 round 0 saturate 0
         checkHappy("_: decimal18-scale-18<1>(0);", 0, "1 0 0 0");
         // Scale 1 value 0 round 0 saturate 1
@@ -70,54 +70,54 @@ contract LibOpDecimal18Scale18NPTest is OpTest {
         // Scale 1 value 0 round 1 saturate 1
         checkHappy("_: decimal18-scale-18<1 1 1>(0);", 0, "1 0 1 1");
         // Scale 1 value 1 round 0 saturate 0
-        checkHappy("_: decimal18-scale-18<1>(1);", 1e17, "1 1 0 0");
+        checkHappy("_: decimal18-scale-18<1>(1e-18);", 1e17, "1 1 0 0");
         // Scale 1 value 1 round 0 saturate 1
-        checkHappy("_: decimal18-scale-18<1 0 1>(1);", 1e17, "1 1 0 1");
+        checkHappy("_: decimal18-scale-18<1 0 1>(1e-18);", 1e17, "1 1 0 1");
         // Scale 1 value 1 round 1 saturate 0
-        checkHappy("_: decimal18-scale-18<1 1 0>(1);", 1e17, "1 1 1 0");
+        checkHappy("_: decimal18-scale-18<1 1 0>(1e-18);", 1e17, "1 1 1 0");
         // Scale 1 value 1 round 1 saturate 1
-        checkHappy("_: decimal18-scale-18<1 1 1>(1);", 1e17, "1 1 1 1");
+        checkHappy("_: decimal18-scale-18<1 1 1>(1e-18);", 1e17, "1 1 1 1");
         // Scale 18 value 1 round 0 saturate 0
-        checkHappy("_: decimal18-scale-18<18>(1);", 1, "18 1 0 0");
+        checkHappy("_: decimal18-scale-18<18>(1e-18);", 1, "18 1 0 0");
         // Scale 18 value 1 round 0 saturate 1
-        checkHappy("_: decimal18-scale-18<18 0 1>(1);", 1, "18 1 0 1");
+        checkHappy("_: decimal18-scale-18<18 0 1>(1e-18);", 1, "18 1 0 1");
         // Scale 18 value 1 round 1 saturate 0
-        checkHappy("_: decimal18-scale-18<18 1 0>(1);", 1, "18 1 1 0");
+        checkHappy("_: decimal18-scale-18<18 1 0>(1e-18);", 1, "18 1 1 0");
         // Scale 18 value 1 round 1 saturate 1
-        checkHappy("_: decimal18-scale-18<18 1 1>(1);", 1, "18 1 1 1");
+        checkHappy("_: decimal18-scale-18<18 1 1>(1e-18);", 1, "18 1 1 1");
         // Scale 18 value 1e18 round 0 saturate 0
-        checkHappy("_: decimal18-scale-18<18>(1e18);", 1e18, "18 1e18 0 0");
+        checkHappy("_: decimal18-scale-18<18>(1);", 1e18, "18 1e18 0 0");
         // Scale 18 value 1e18 round 0 saturate 1
-        checkHappy("_: decimal18-scale-18<18 0 1>(1e18);", 1e18, "18 1e18 0 1");
+        checkHappy("_: decimal18-scale-18<18 0 1>(1);", 1e18, "18 1e18 0 1");
         // Scale 18 value 1e18 round 1 saturate 0
-        checkHappy("_: decimal18-scale-18<18 1 0>(1e18);", 1e18, "18 1e18 1 0");
+        checkHappy("_: decimal18-scale-18<18 1 0>(1);", 1e18, "18 1e18 1 0");
         // Scale 18 value 1e18 round 1 saturate 1
-        checkHappy("_: decimal18-scale-18<18 1 1>(1e18);", 1e18, "18 1e18 1 1");
+        checkHappy("_: decimal18-scale-18<18 1 1>(1);", 1e18, "18 1e18 1 1");
         // Scale 19 value 1e18 round 0 saturate 0
-        checkHappy("_: decimal18-scale-18<19>(1e18);", 1e17, "19 1e18 0 0");
+        checkHappy("_: decimal18-scale-18<19>(1);", 1e17, "19 1e18 0 0");
         // Scale 19 value 1e18 round 0 saturate 1
-        checkHappy("_: decimal18-scale-18<19 0 1>(1e18);", 1e17, "19 1e18 0 1");
+        checkHappy("_: decimal18-scale-18<19 0 1>(1);", 1e17, "19 1e18 0 1");
         // Scale 19 value 1e18 round 1 saturate 0
-        checkHappy("_: decimal18-scale-18<19 1 0>(1e18);", 1e17, "19 1e18 1 0");
+        checkHappy("_: decimal18-scale-18<19 1 0>(1);", 1e17, "19 1e18 1 0");
         // Scale 19 value 1e18 round 1 saturate 1
-        checkHappy("_: decimal18-scale-18<19 1 1>(1e18);", 1e17, "19 1e18 1 1");
+        checkHappy("_: decimal18-scale-18<19 1 1>(1);", 1e17, "19 1e18 1 1");
 
         // Test rounding down while scaling down.
-        checkHappy("_: decimal18-scale-18<19>(1);", 0, "19 1 0 0");
+        checkHappy("_: decimal18-scale-18<19>(1e-18);", 0, "19 1 0 0");
         // Test rounding up while scaling down.
-        checkHappy("_: decimal18-scale-18<19 1>(1);", 1, "19 1 1 0");
+        checkHappy("_: decimal18-scale-18<19 1>(1e-18);", 1, "19 1 1 0");
         // Test saturating while scaling up.
-        checkHappy("_: decimal18-scale-18<0 0 1>(1e70);", type(uint256).max, "0 1e70 0 1");
+        checkHappy("_: decimal18-scale-18<0 0 1>(1e52);", type(uint256).max, "0 1e70 0 1");
         // Test error while scaling up.
-        checkUnhappy("_: decimal18-scale-18<0>(1e70);", stdError.arithmeticError);
+        checkUnhappy("_: decimal18-scale-18<0>(1e52);", stdError.arithmeticError);
     }
 
     /// Test the eval of `int-to-decimal18` which is an alias of `decimal18-scale-18<0>`.
     function testOpIntToDecimal18NPEval() external {
         checkHappy("_: int-to-decimal18(0);", 0, "0");
-        checkHappy("_: int-to-decimal18(1);", 1e18, "1");
-        checkHappy("_: int-to-decimal18(2);", 2e18, "2");
-        checkHappy("_: int-to-decimal18(1e18);", 1e36, "1e18");
+        checkHappy("_: int-to-decimal18(1e-18);", 1e18, "1");
+        checkHappy("_: int-to-decimal18(2e-18);", 2e18, "2");
+        checkHappy("_: int-to-decimal18(1);", 1e36, "1e18");
     }
 
     /// Test the eval of `decimal18-scale-18` opcode parsed from a string.

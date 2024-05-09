@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, InterpreterStateNP, Operand, stdError} from "test/abstract/OpTest.sol";
 import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
 import {LibOpDecimal18Scale18DynamicNP} from "src/lib/op/math/decimal18/LibOpDecimal18Scale18DynamicNP.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
+import {LibFixedPointDecimalScale, DECIMAL_MAX_SAFE_INT} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 
 contract LibOpDecimal18Scale18DynamicNPTest is OpTest {
     /// Directly test the integrity logic of LibOpDecimal18Scale18DynamicNP.
@@ -21,17 +23,26 @@ contract LibOpDecimal18Scale18DynamicNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpDecimal18Scale18DynamicNP.
     function testOpDecimal18Scale18DynamicNPRun(uint256 scale, uint256 round, uint256 saturate, uint256 value) public {
+        scale = bound(scale, 0, DECIMAL_MAX_SAFE_INT * 1e18);
         round = bound(round, 0, 1);
         saturate = bound(saturate, 0, 1);
         uint256 flags = round | (saturate << 1);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
+
+        if (scale >= 1e18) {
+            scale = scale - (scale % 1e18);
+        }
 
         Operand operand = LibOperand.build(2, 1, uint16(flags));
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = scale;
         inputs[1] = value;
 
-        if (LibWillOverflow.scale18WillOverflow(value, scale, flags)) {
+        if (
+            LibWillOverflow.scale18WillOverflow(
+                value, LibFixedPointDecimalScale.decimalOrIntToInt(scale, DECIMAL_MAX_SAFE_INT), flags
+            )
+        ) {
             vm.expectRevert(stdError.arithmeticError);
         }
 
@@ -56,13 +67,13 @@ contract LibOpDecimal18Scale18DynamicNPTest is OpTest {
         // Scale 0 value 0 round 1 saturate 1
         checkHappy("_: decimal18-scale-18-dynamic<1 1>(0 0);", 0, "0 0 1 1");
         // Scale 0 value 1 round 0 saturate 0
-        checkHappy("_: decimal18-scale-18-dynamic(0 1);", 1e18, "0 1 0 0");
+        checkHappy("_: decimal18-scale-18-dynamic(0 1e-18);", 1e18, "0 1 0 0");
         // Scale 0 value 1 round 0 saturate 1
-        checkHappy("_: decimal18-scale-18-dynamic<0 1>(0 1);", 1e18, "0 1 0 1");
+        checkHappy("_: decimal18-scale-18-dynamic<0 1>(0 1e-18);", 1e18, "0 1 0 1");
         // Scale 0 value 1 round 1 saturate 0
-        checkHappy("_: decimal18-scale-18-dynamic<1 0>(0 1);", 1e18, "0 1 1 0");
+        checkHappy("_: decimal18-scale-18-dynamic<1 0>(0 1e-18);", 1e18, "0 1 1 0");
         // Scale 0 value 1 round 1 saturate 1
-        checkHappy("_: decimal18-scale-18-dynamic<1 1>(0 1);", 1e18, "0 1 1 1");
+        checkHappy("_: decimal18-scale-18-dynamic<1 1>(0 1e-18);", 1e18, "0 1 1 1");
         // Scale 1 value 0 round 0 saturate 0
         checkHappy("_: decimal18-scale-18-dynamic(1 0);", 0, "1 0 0 0");
         // Scale 1 value 0 round 0 saturate 1
@@ -72,46 +83,46 @@ contract LibOpDecimal18Scale18DynamicNPTest is OpTest {
         // Scale 1 value 0 round 1 saturate 1
         checkHappy("_: decimal18-scale-18-dynamic<1 1>(1 0);", 0, "1 0 1 1");
         // Scale 1 value 1 round 0 saturate 0
-        checkHappy("_: decimal18-scale-18-dynamic(1 1);", 1e17, "1 1 0 0");
+        checkHappy("_: decimal18-scale-18-dynamic(1 1e-18);", 1e17, "1 1 0 0");
         // Scale 1 value 1 round 0 saturate 1
-        checkHappy("_: decimal18-scale-18-dynamic<0 1>(1 1);", 1e17, "1 1 0 1");
+        checkHappy("_: decimal18-scale-18-dynamic<0 1>(1 1e-18);", 1e17, "1 1 0 1");
         // Scale 1 value 1 round 1 saturate 0
-        checkHappy("_: decimal18-scale-18-dynamic<1 0>(1 1);", 1e17, "1 1 1 0");
+        checkHappy("_: decimal18-scale-18-dynamic<1 0>(1 1e-18);", 1e17, "1 1 1 0");
         // Scale 1 value 1 round 1 saturate 1
-        checkHappy("_: decimal18-scale-18-dynamic<1 1>(1 1);", 1e17, "1 1 1 1");
+        checkHappy("_: decimal18-scale-18-dynamic<1 1>(1 1e-18);", 1e17, "1 1 1 1");
         // Scale 18 value 1 round 0 saturate 0
-        checkHappy("_: decimal18-scale-18-dynamic(18 1);", 1, "18 1 0 0");
+        checkHappy("_: decimal18-scale-18-dynamic(18 1e-18);", 1, "18 1 0 0");
         // Scale 18 value 1 round 0 saturate 1
-        checkHappy("_: decimal18-scale-18-dynamic<0 1>(18 1);", 1, "18 1 0 1");
+        checkHappy("_: decimal18-scale-18-dynamic<0 1>(18 1e-18);", 1, "18 1 0 1");
         // Scale 18 value 1 round 1 saturate 0
-        checkHappy("_: decimal18-scale-18-dynamic<1 0>(18 1);", 1, "18 1 1 0");
+        checkHappy("_: decimal18-scale-18-dynamic<1 0>(18 1e-18);", 1, "18 1 1 0");
         // Scale 18 value 1 round 1 saturate 1
-        checkHappy("_: decimal18-scale-18-dynamic<1 1>(18 1);", 1, "18 1 1 1");
+        checkHappy("_: decimal18-scale-18-dynamic<1 1>(18 1e-18);", 1, "18 1 1 1");
         // Scale 18 value 1e18 round 0 saturate 0
-        checkHappy("_: decimal18-scale-18-dynamic(18 1e18);", 1e18, "18 1e18 0 0");
+        checkHappy("_: decimal18-scale-18-dynamic(18 1);", 1e18, "18 1e18 0 0");
         // Scale 18 value 1e18 round 0 saturate 1
-        checkHappy("_: decimal18-scale-18-dynamic<0 1>(18 1e18);", 1e18, "18 1e18 0 1");
+        checkHappy("_: decimal18-scale-18-dynamic<0 1>(18 1);", 1e18, "18 1e18 0 1");
         // Scale 18 value 1e18 round 1 saturate 0
-        checkHappy("_: decimal18-scale-18-dynamic<1 0>(18 1e18);", 1e18, "18 1e18 1 0");
+        checkHappy("_: decimal18-scale-18-dynamic<1 0>(18 1);", 1e18, "18 1e18 1 0");
         // Scale 18 value 1e18 round 1 saturate 1
-        checkHappy("_: decimal18-scale-18-dynamic<1 1>(18 1e18);", 1e18, "18 1e18 1 1");
+        checkHappy("_: decimal18-scale-18-dynamic<1 1>(18 1);", 1e18, "18 1e18 1 1");
         // Scale 19 value 1e18 round 0 saturate 0
-        checkHappy("_: decimal18-scale-18-dynamic(19 1e18);", 1e17, "19 1e18 0 0");
+        checkHappy("_: decimal18-scale-18-dynamic(19 1);", 1e17, "19 1e18 0 0");
         // Scale 19 value 1e18 round 0 saturate 1
-        checkHappy("_: decimal18-scale-18-dynamic<0 1>(19 1e18);", 1e17, "19 1e18 0 1");
+        checkHappy("_: decimal18-scale-18-dynamic<0 1>(19 1);", 1e17, "19 1e18 0 1");
         // Scale 19 value 1e18 round 1 saturate 0
-        checkHappy("_: decimal18-scale-18-dynamic<1 0>(19 1e18);", 1e17, "19 1e18 1 0");
+        checkHappy("_: decimal18-scale-18-dynamic<1 0>(19 1);", 1e17, "19 1e18 1 0");
         // Scale 19 value 1e18 round 1 saturate 1
-        checkHappy("_: decimal18-scale-18-dynamic<1 1>(19 1e18);", 1e17, "19 1e18 1 1");
+        checkHappy("_: decimal18-scale-18-dynamic<1 1>(19 1);", 1e17, "19 1e18 1 1");
 
         // Test rounding down while scaling down.
-        checkHappy("_: decimal18-scale-18-dynamic(19 1);", 0, "19 1 0 0");
+        checkHappy("_: decimal18-scale-18-dynamic(19 1e-18);", 0, "19 1 0 0");
         // Test rounding up while scaling down.
-        checkHappy("_: decimal18-scale-18-dynamic<1>(19 1);", 1, "19 1 1 0");
+        checkHappy("_: decimal18-scale-18-dynamic<1>(19 1e-18);", 1, "19 1 1 0");
         // Test saturating while scaling up.
-        checkHappy("_: decimal18-scale-18-dynamic<0 1>(0 1e70);", type(uint256).max, "0 1e70 0 1");
+        checkHappy("_: decimal18-scale-18-dynamic<0 1>(0 1e52);", type(uint256).max, "0 1e70 0 1");
         // Test error while scaling up.
-        checkUnhappy("_: decimal18-scale-18-dynamic(0 1e70);", stdError.arithmeticError);
+        checkUnhappy("_: decimal18-scale-18-dynamic(0 1e52);", stdError.arithmeticError);
     }
 
     /// Test the eval of `decimal18-scale-18-dynamic` opcode parsed from a string.

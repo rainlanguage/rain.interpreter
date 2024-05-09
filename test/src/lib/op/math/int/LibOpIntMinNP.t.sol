@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
@@ -66,9 +66,9 @@ contract LibOpIntMinNPTest is OpTest {
 
     /// Test the eval of `int-min` opcode parsed from a string. Tests one input.
     function testOpIntMinNPEvalOneInput() external {
-        checkBadInputs("_: int-min(5);", 1, 2, 1);
+        checkBadInputs("_: int-min(5e-18);", 1, 2, 1);
         checkBadInputs("_: int-min(0);", 1, 2, 1);
-        checkBadInputs("_: int-min(1);", 1, 2, 1);
+        checkBadInputs("_: int-min(1e-18);", 1, 2, 1);
         checkBadInputs("_: int-min(max-int-value());", 1, 2, 1);
     }
 
@@ -76,9 +76,9 @@ contract LibOpIntMinNPTest is OpTest {
     /// Tests one input.
     /// MUST be identical to `int-min`.
     function testOpDecimal18MinNPEvalOneInput() external {
-        checkBadInputs("_: decimal18-min(5);", 1, 2, 1);
+        checkBadInputs("_: decimal18-min(5e-18);", 1, 2, 1);
         checkBadInputs("_: decimal18-min(0);", 1, 2, 1);
-        checkBadInputs("_: decimal18-min(1);", 1, 2, 1);
+        checkBadInputs("_: decimal18-min(1e-18);", 1, 2, 1);
         checkBadInputs("_: decimal18-min(max-int-value());", 1, 2, 1);
     }
 
@@ -93,21 +93,21 @@ contract LibOpIntMinNPTest is OpTest {
     /// Test the eval of `int-min` opcode parsed from a string. Tests two inputs.
     function testOpIntMinNPEval2InputsHappy() external {
         checkHappy("_: int-min(0 0);", 0, "0 > 0 ? 0 : 1");
-        checkHappy("_: int-min(1 0);", 0, "1 > 0 ? 1 : 0");
+        checkHappy("_: int-min(1e-18 0);", 0, "1 > 0 ? 1 : 0");
         checkHappy("_: int-min(max-int-value() 0);", 0, "max-int-value() > 0 ? max-int-value() : 0");
-        checkHappy("_: int-min(0 1);", 0, "0 > 1 ? 0 : 1");
-        checkHappy("_: int-min(1 1);", 1, "1 > 1 ? 1 : 1");
+        checkHappy("_: int-min(0 1e-18);", 0, "0 > 1 ? 0 : 1");
+        checkHappy("_: int-min(1e-18 1e-18);", 1, "1 > 1 ? 1 : 1");
         checkHappy("_: int-min(0 max-int-value());", 0, "0 > max-int-value() ? 0 : max-int-value()");
-        checkHappy("_: int-min(1 max-int-value());", 1, "1 > max-int-value() ? 1 : max-int-value()");
-        checkHappy("_: int-min(max-int-value() 1);", 1, "1 > max-int-value() ? 1 : max-int-value()");
+        checkHappy("_: int-min(1e-18 max-int-value());", 1, "1 > max-int-value() ? 1 : max-int-value()");
+        checkHappy("_: int-min(max-int-value() 1e-18);", 1, "1 > max-int-value() ? 1 : max-int-value()");
         checkHappy(
             "_: int-min(max-int-value() max-int-value());",
             type(uint256).max,
             "max-int-value() > max-int-value() ? max-int-value() : max-int-value()"
         );
-        checkHappy("_: int-min(0 2);", 0, "0 > 2 ? 0 : 2");
-        checkHappy("_: int-min(1 2);", 1, "1 > 2 ? 1 : 2");
-        checkHappy("_: int-min(2 2);", 2, "2 > 2 ? 2 : 2");
+        checkHappy("_: int-min(0 2e-18);", 0, "0 > 2 ? 0 : 2");
+        checkHappy("_: int-min(1e-18 2e-18);", 1, "1 > 2 ? 1 : 2");
+        checkHappy("_: int-min(2e-18 2e-18);", 2, "2 > 2 ? 2 : 2");
     }
 
     /// Test the eval of `decimal18-min` opcode parsed from a string.
@@ -120,15 +120,15 @@ contract LibOpIntMinNPTest is OpTest {
             "_: decimal18-min(max-decimal18-value() 0);", 0, "max-decimal18-value() > 0 ? max-decimal18-value() : 0"
         );
         checkHappy("_: decimal18-min(0 1);", 0, "0 > 1 ? 0 : 1");
-        checkHappy("_: decimal18-min(1 1);", 1, "1 > 1 ? 1 : 1");
+        checkHappy("_: decimal18-min(1 1);", 1e18, "1 > 1 ? 1 : 1");
         checkHappy(
             "_: decimal18-min(0 max-decimal18-value());", 0, "0 > max-decimal18-value() ? 0 : max-decimal18-value()"
         );
         checkHappy(
-            "_: decimal18-min(1 max-decimal18-value());", 1, "1 > max-decimal18-value() ? 1 : max-decimal18-value()"
+            "_: decimal18-min(1 max-decimal18-value());", 1e18, "1 > max-decimal18-value() ? 1 : max-decimal18-value()"
         );
         checkHappy(
-            "_: decimal18-min(max-decimal18-value() 1);", 1, "1 > max-decimal18-value() ? 1 : max-decimal18-value()"
+            "_: decimal18-min(max-decimal18-value() 1);", 1e18, "1 > max-decimal18-value() ? 1 : max-decimal18-value()"
         );
         checkHappy(
             "_: decimal18-min(max-decimal18-value() max-decimal18-value());",
@@ -136,75 +136,75 @@ contract LibOpIntMinNPTest is OpTest {
             "max-decimal18-value() > max-decimal18-value() ? max-decimal18-value() : max-decimal18-value()"
         );
         checkHappy("_: decimal18-min(0 2);", 0, "0 > 2 ? 0 : 2");
-        checkHappy("_: decimal18-min(1 2);", 1, "1 > 2 ? 1 : 2");
-        checkHappy("_: decimal18-min(2 2);", 2, "2 > 2 ? 2 : 2");
+        checkHappy("_: decimal18-min(1 2);", 1e18, "1 > 2 ? 1 : 2");
+        checkHappy("_: decimal18-min(2 2);", 2e18, "2 > 2 ? 2 : 2");
     }
 
     /// Test the eval of `int-min` opcode parsed from a string. Tests three inputs.
     function testOpIntMinNPEval3InputsHappy() external {
         checkHappy("_: int-min(0 0 0);", 0, "0 0 0");
-        checkHappy("_: int-min(1 0 0);", 0, "1 0 0");
-        checkHappy("_: int-min(2 0 0);", 0, "2 0 0");
-        checkHappy("_: int-min(0 1 0);", 0, "0 1 0");
-        checkHappy("_: int-min(1 1 0);", 0, "1 1 0");
-        checkHappy("_: int-min(2 1 0);", 0, "2 1 0");
-        checkHappy("_: int-min(0 2 0);", 0, "0 2 0");
-        checkHappy("_: int-min(1 2 0);", 0, "1 2 0");
-        checkHappy("_: int-min(2 2 0);", 0, "2 2 0");
-        checkHappy("_: int-min(0 0 1);", 0, "0 0 1");
-        checkHappy("_: int-min(1 0 1);", 0, "1 0 1");
-        checkHappy("_: int-min(2 0 1);", 0, "2 0 1");
-        checkHappy("_: int-min(0 1 1);", 0, "0 1 1");
-        checkHappy("_: int-min(1 1 1);", 1, "1 1 1");
-        checkHappy("_: int-min(2 1 1);", 1, "2 1 1");
-        checkHappy("_: int-min(0 2 1);", 0, "0 2 1");
-        checkHappy("_: int-min(1 2 1);", 1, "1 2 1");
-        checkHappy("_: int-min(2 2 1);", 1, "2 2 1");
-        checkHappy("_: int-min(0 0 2);", 0, "0 0 2");
-        checkHappy("_: int-min(1 0 2);", 0, "1 0 2");
-        checkHappy("_: int-min(2 0 2);", 0, "2 0 2");
-        checkHappy("_: int-min(0 1 2);", 0, "0 1 2");
-        checkHappy("_: int-min(1 1 2);", 1, "1 1 2");
-        checkHappy("_: int-min(2 1 2);", 1, "2 1 2");
-        checkHappy("_: int-min(0 2 2);", 0, "0 2 2");
-        checkHappy("_: int-min(1 2 2);", 1, "1 2 2");
-        checkHappy("_: int-min(2 2 2);", 2, "2 2 2");
+        checkHappy("_: int-min(1e-18 0 0);", 0, "1 0 0");
+        checkHappy("_: int-min(2e-18 0 0);", 0, "2 0 0");
+        checkHappy("_: int-min(0 1e-18 0);", 0, "0 1 0");
+        checkHappy("_: int-min(1e-18 1e-18 0);", 0, "1 1 0");
+        checkHappy("_: int-min(2e-18 1e-18 0);", 0, "2 1 0");
+        checkHappy("_: int-min(0 2e-18 0);", 0, "0 2 0");
+        checkHappy("_: int-min(1e-18 2e-18 0);", 0, "1 2 0");
+        checkHappy("_: int-min(2e-18 2e-18 0);", 0, "2 2 0");
+        checkHappy("_: int-min(0 0 1e-18);", 0, "0 0 1");
+        checkHappy("_: int-min(1e-18 0 1e-18);", 0, "1 0 1");
+        checkHappy("_: int-min(2e-18 0 1e-18);", 0, "2 0 1");
+        checkHappy("_: int-min(0 1e-18 1e-18);", 0, "0 1 1");
+        checkHappy("_: int-min(1e-18 1e-18 1e-18);", 1, "1 1 1");
+        checkHappy("_: int-min(2e-18 1e-18 1e-18);", 1, "2 1 1");
+        checkHappy("_: int-min(0 2e-18 1e-18);", 0, "0 2 1");
+        checkHappy("_: int-min(1e-18 2e-18 1e-18);", 1, "1 2 1");
+        checkHappy("_: int-min(2e-18 2e-18 1e-18);", 1, "2 2 1");
+        checkHappy("_: int-min(0 0 2e-18);", 0, "0 0 2");
+        checkHappy("_: int-min(1e-18 0 2e-18);", 0, "1 0 2");
+        checkHappy("_: int-min(2e-18 0 2e-18);", 0, "2 0 2");
+        checkHappy("_: int-min(0 1e-18 2e-18);", 0, "0 1 2");
+        checkHappy("_: int-min(1e-18 1e-18 2e-18);", 1, "1 1 2");
+        checkHappy("_: int-min(2e-18 1e-18 2e-18);", 1, "2 1 2");
+        checkHappy("_: int-min(0 2e-18 2e-18);", 0, "0 2 2");
+        checkHappy("_: int-min(1e-18 2e-18 2e-18);", 1, "1 2 2");
+        checkHappy("_: int-min(2e-18 2e-18 2e-18);", 2, "2 2 2");
         checkHappy("_: int-min(0 0 max-int-value());", 0, "0 0 max-int-value()");
-        checkHappy("_: int-min(1 0 max-int-value());", 0, "1 0 max-int-value()");
-        checkHappy("_: int-min(2 0 max-int-value());", 0, "2 0 max-int-value()");
-        checkHappy("_: int-min(0 1 max-int-value());", 0, "0 1 max-int-value()");
-        checkHappy("_: int-min(1 1 max-int-value());", 1, "1 1 max-int-value()");
-        checkHappy("_: int-min(2 1 max-int-value());", 1, "2 1 max-int-value()");
-        checkHappy("_: int-min(0 2 max-int-value());", 0, "0 2 max-int-value()");
-        checkHappy("_: int-min(1 2 max-int-value());", 1, "1 2 max-int-value()");
-        checkHappy("_: int-min(2 2 max-int-value());", 2, "2 2 max-int-value()");
+        checkHappy("_: int-min(1e-18 0 max-int-value());", 0, "1 0 max-int-value()");
+        checkHappy("_: int-min(2e-18 0 max-int-value());", 0, "2 0 max-int-value()");
+        checkHappy("_: int-min(0 1e-18 max-int-value());", 0, "0 1 max-int-value()");
+        checkHappy("_: int-min(1e-18 1e-18 max-int-value());", 1, "1 1 max-int-value()");
+        checkHappy("_: int-min(2e-18 1e-18 max-int-value());", 1, "2 1 max-int-value()");
+        checkHappy("_: int-min(0 2e-18 max-int-value());", 0, "0 2 max-int-value()");
+        checkHappy("_: int-min(1e-18 2e-18 max-int-value());", 1, "1 2 max-int-value()");
+        checkHappy("_: int-min(2e-18 2e-18 max-int-value());", 2, "2 2 max-int-value()");
         checkHappy("_: int-min(0 max-int-value() 0);", 0, "0 max-int-value() 0");
-        checkHappy("_: int-min(1 max-int-value() 0);", 0, "1 max-int-value() 0");
-        checkHappy("_: int-min(2 max-int-value() 0);", 0, "2 max-int-value() 0");
-        checkHappy("_: int-min(0 max-int-value() 1);", 0, "0 max-int-value() 1");
-        checkHappy("_: int-min(1 max-int-value() 1);", 1, "1 max-int-value() 1");
-        checkHappy("_: int-min(2 max-int-value() 1);", 1, "2 max-int-value() 1");
-        checkHappy("_: int-min(0 max-int-value() 2);", 0, "0 max-int-value() 2");
-        checkHappy("_: int-min(1 max-int-value() 2);", 1, "1 max-int-value() 2");
-        checkHappy("_: int-min(2 max-int-value() 2);", 2, "2 max-int-value() 2");
+        checkHappy("_: int-min(1e-18 max-int-value() 0);", 0, "1 max-int-value() 0");
+        checkHappy("_: int-min(2e-18 max-int-value() 0);", 0, "2 max-int-value() 0");
+        checkHappy("_: int-min(0 max-int-value() 1e-18);", 0, "0 max-int-value() 1");
+        checkHappy("_: int-min(1e-18 max-int-value() 1e-18);", 1, "1 max-int-value() 1");
+        checkHappy("_: int-min(2e-18 max-int-value() 1e-18);", 1, "2 max-int-value() 1");
+        checkHappy("_: int-min(0 max-int-value() 2e-18);", 0, "0 max-int-value() 2");
+        checkHappy("_: int-min(1e-18 max-int-value() 2e-18);", 1, "1 max-int-value() 2");
+        checkHappy("_: int-min(2e-18 max-int-value() 2e-18);", 2, "2 max-int-value() 2");
         checkHappy("_: int-min(0 max-int-value() max-int-value());", 0, "0 max-int-value() max-int-value()");
-        checkHappy("_: int-min(1 max-int-value() max-int-value());", 1, "1 max-int-value() max-int-value()");
-        checkHappy("_: int-min(2 max-int-value() max-int-value());", 2, "2 max-int-value() max-int-value()");
+        checkHappy("_: int-min(1e-18 max-int-value() max-int-value());", 1, "1 max-int-value() max-int-value()");
+        checkHappy("_: int-min(2e-18 max-int-value() max-int-value());", 2, "2 max-int-value() max-int-value()");
         checkHappy("_: int-min(max-int-value() 0 0);", 0, "max-int-value() 0 0");
-        checkHappy("_: int-min(max-int-value() 1 0);", 0, "max-int-value() 1 0");
-        checkHappy("_: int-min(max-int-value() 2 0);", 0, "max-int-value() 2 0");
-        checkHappy("_: int-min(max-int-value() 0 1);", 0, "max-int-value() 0 1");
-        checkHappy("_: int-min(max-int-value() 1 1);", 1, "max-int-value() 1 1");
-        checkHappy("_: int-min(max-int-value() 2 1);", 1, "max-int-value() 2 1");
-        checkHappy("_: int-min(max-int-value() 0 2);", 0, "max-int-value() 0 2");
-        checkHappy("_: int-min(max-int-value() 1 2);", 1, "max-int-value() 1 2");
-        checkHappy("_: int-min(max-int-value() 2 2);", 2, "max-int-value() 2 2");
+        checkHappy("_: int-min(max-int-value() 1e-18 0);", 0, "max-int-value() 1 0");
+        checkHappy("_: int-min(max-int-value() 2e-18 0);", 0, "max-int-value() 2 0");
+        checkHappy("_: int-min(max-int-value() 0 1e-18);", 0, "max-int-value() 0 1");
+        checkHappy("_: int-min(max-int-value() 1e-18 1e-18);", 1, "max-int-value() 1 1");
+        checkHappy("_: int-min(max-int-value() 2e-18 1e-18);", 1, "max-int-value() 2 1");
+        checkHappy("_: int-min(max-int-value() 0 2e-18);", 0, "max-int-value() 0 2");
+        checkHappy("_: int-min(max-int-value() 1e-18 2e-18);", 1, "max-int-value() 1 2");
+        checkHappy("_: int-min(max-int-value() 2e-18 2e-18);", 2, "max-int-value() 2 2");
         checkHappy("_: int-min(max-int-value() 0 max-int-value());", 0, "max-int-value() 0 max-int-value()");
-        checkHappy("_: int-min(max-int-value() 1 max-int-value());", 1, "max-int-value() 1 max-int-value()");
-        checkHappy("_: int-min(max-int-value() 2 max-int-value());", 2, "max-int-value() 2 max-int-value()");
+        checkHappy("_: int-min(max-int-value() 1e-18 max-int-value());", 1, "max-int-value() 1 max-int-value()");
+        checkHappy("_: int-min(max-int-value() 2e-18 max-int-value());", 2, "max-int-value() 2 max-int-value()");
         checkHappy("_: int-min(max-int-value() max-int-value() 0);", 0, "max-int-value() max-int-value() 0");
-        checkHappy("_: int-min(max-int-value() max-int-value() 1);", 1, "max-int-value() max-int-value() 1");
-        checkHappy("_: int-min(max-int-value() max-int-value() 2);", 2, "max-int-value() max-int-value() 2");
+        checkHappy("_: int-min(max-int-value() max-int-value() 1e-18);", 1, "max-int-value() max-int-value() 1");
+        checkHappy("_: int-min(max-int-value() max-int-value() 2e-18);", 2, "max-int-value() max-int-value() 2");
         checkHappy(
             "_: int-min(max-int-value() max-int-value() max-int-value());",
             type(uint256).max,
@@ -229,38 +229,38 @@ contract LibOpIntMinNPTest is OpTest {
         checkHappy("_: decimal18-min(1 0 1);", 0, "1 0 1");
         checkHappy("_: decimal18-min(2 0 1);", 0, "2 0 1");
         checkHappy("_: decimal18-min(0 1 1);", 0, "0 1 1");
-        checkHappy("_: decimal18-min(1 1 1);", 1, "1 1 1");
-        checkHappy("_: decimal18-min(2 1 1);", 1, "2 1 1");
+        checkHappy("_: decimal18-min(1 1 1);", 1e18, "1 1 1");
+        checkHappy("_: decimal18-min(2 1 1);", 1e18, "2 1 1");
         checkHappy("_: decimal18-min(0 2 1);", 0, "0 2 1");
-        checkHappy("_: decimal18-min(1 2 1);", 1, "1 2 1");
-        checkHappy("_: decimal18-min(2 2 1);", 1, "2 2 1");
+        checkHappy("_: decimal18-min(1 2 1);", 1e18, "1 2 1");
+        checkHappy("_: decimal18-min(2 2 1);", 1e18, "2 2 1");
         checkHappy("_: decimal18-min(0 0 2);", 0, "0 0 2");
         checkHappy("_: decimal18-min(1 0 2);", 0, "1 0 2");
         checkHappy("_: decimal18-min(2 0 2);", 0, "2 0 2");
         checkHappy("_: decimal18-min(0 1 2);", 0, "0 1 2");
-        checkHappy("_: decimal18-min(1 1 2);", 1, "1 1 2");
-        checkHappy("_: decimal18-min(2 1 2);", 1, "2 1 2");
+        checkHappy("_: decimal18-min(1 1 2);", 1e18, "1 1 2");
+        checkHappy("_: decimal18-min(2 1 2);", 1e18, "2 1 2");
         checkHappy("_: decimal18-min(0 2 2);", 0, "0 2 2");
-        checkHappy("_: decimal18-min(1 2 2);", 1, "1 2 2");
-        checkHappy("_: decimal18-min(2 2 2);", 2, "2 2 2");
+        checkHappy("_: decimal18-min(1 2 2);", 1e18, "1 2 2");
+        checkHappy("_: decimal18-min(2 2 2);", 2e18, "2 2 2");
         checkHappy("_: decimal18-min(0 0 max-decimal18-value());", 0, "0 0 max-decimal18-value()");
         checkHappy("_: decimal18-min(1 0 max-decimal18-value());", 0, "1 0 max-decimal18-value()");
         checkHappy("_: decimal18-min(2 0 max-decimal18-value());", 0, "2 0 max-decimal18-value()");
         checkHappy("_: decimal18-min(0 1 max-decimal18-value());", 0, "0 1 max-decimal18-value()");
-        checkHappy("_: decimal18-min(1 1 max-decimal18-value());", 1, "1 1 max-decimal18-value()");
-        checkHappy("_: decimal18-min(2 1 max-decimal18-value());", 1, "2 1 max-decimal18-value()");
+        checkHappy("_: decimal18-min(1 1 max-decimal18-value());", 1e18, "1 1 max-decimal18-value()");
+        checkHappy("_: decimal18-min(2 1 max-decimal18-value());", 1e18, "2 1 max-decimal18-value()");
         checkHappy("_: decimal18-min(0 2 max-decimal18-value());", 0, "0 2 max-decimal18-value()");
-        checkHappy("_: decimal18-min(1 2 max-decimal18-value());", 1, "1 2 max-decimal18-value()");
-        checkHappy("_: decimal18-min(2 2 max-decimal18-value());", 2, "2 2 max-decimal18-value()");
+        checkHappy("_: decimal18-min(1 2 max-decimal18-value());", 1e18, "1 2 max-decimal18-value()");
+        checkHappy("_: decimal18-min(2 2 max-decimal18-value());", 2e18, "2 2 max-decimal18-value()");
         checkHappy("_: decimal18-min(0 max-decimal18-value() 0);", 0, "0 max-decimal18-value() 0");
         checkHappy("_: decimal18-min(1 max-decimal18-value() 0);", 0, "1 max-decimal18-value() 0");
         checkHappy("_: decimal18-min(2 max-decimal18-value() 0);", 0, "2 max-decimal18-value() 0");
         checkHappy("_: decimal18-min(0 max-decimal18-value() 1);", 0, "0 max-decimal18-value() 1");
-        checkHappy("_: decimal18-min(1 max-decimal18-value() 1);", 1, "1 max-decimal18-value() 1");
-        checkHappy("_: decimal18-min(2 max-decimal18-value() 1);", 1, "2 max-decimal18-value() 1");
+        checkHappy("_: decimal18-min(1 max-decimal18-value() 1);", 1e18, "1 max-decimal18-value() 1");
+        checkHappy("_: decimal18-min(2 max-decimal18-value() 1);", 1e18, "2 max-decimal18-value() 1");
         checkHappy("_: decimal18-min(0 max-decimal18-value() 2);", 0, "0 max-decimal18-value() 2");
-        checkHappy("_: decimal18-min(1 max-decimal18-value() 2);", 1, "1 max-decimal18-value() 2");
-        checkHappy("_: decimal18-min(2 max-decimal18-value() 2);", 2, "2 max-decimal18-value() 2");
+        checkHappy("_: decimal18-min(1 max-decimal18-value() 2);", 1e18, "1 max-decimal18-value() 2");
+        checkHappy("_: decimal18-min(2 max-decimal18-value() 2);", 2e18, "2 max-decimal18-value() 2");
         checkHappy(
             "_: decimal18-min(0 max-decimal18-value() max-decimal18-value());",
             0,
@@ -268,23 +268,23 @@ contract LibOpIntMinNPTest is OpTest {
         );
         checkHappy(
             "_: decimal18-min(1 max-decimal18-value() max-decimal18-value());",
-            1,
+            1e18,
             "1 max-decimal18-value() max-decimal18-value()"
         );
         checkHappy(
             "_: decimal18-min(2 max-decimal18-value() max-decimal18-value());",
-            2,
+            2e18,
             "2 max-decimal18-value() max-decimal18-value()"
         );
         checkHappy("_: decimal18-min(max-decimal18-value() 0 0);", 0, "max-decimal18-value() 0 0");
         checkHappy("_: decimal18-min(max-decimal18-value() 1 0);", 0, "max-decimal18-value() 1 0");
         checkHappy("_: decimal18-min(max-decimal18-value() 2 0);", 0, "max-decimal18-value() 2 0");
         checkHappy("_: decimal18-min(max-decimal18-value() 0 1);", 0, "max-decimal18-value() 0 1");
-        checkHappy("_: decimal18-min(max-decimal18-value() 1 1);", 1, "max-decimal18-value() 1 1");
-        checkHappy("_: decimal18-min(max-decimal18-value() 2 1);", 1, "max-decimal18-value() 2 1");
+        checkHappy("_: decimal18-min(max-decimal18-value() 1 1);", 1e18, "max-decimal18-value() 1 1");
+        checkHappy("_: decimal18-min(max-decimal18-value() 2 1);", 1e18, "max-decimal18-value() 2 1");
         checkHappy("_: decimal18-min(max-decimal18-value() 0 2);", 0, "max-decimal18-value() 0 2");
-        checkHappy("_: decimal18-min(max-decimal18-value() 1 2);", 1, "max-decimal18-value() 1 2");
-        checkHappy("_: decimal18-min(max-decimal18-value() 2 2);", 2, "max-decimal18-value() 2 2");
+        checkHappy("_: decimal18-min(max-decimal18-value() 1 2);", 1e18, "max-decimal18-value() 1 2");
+        checkHappy("_: decimal18-min(max-decimal18-value() 2 2);", 2e18, "max-decimal18-value() 2 2");
         checkHappy(
             "_: decimal18-min(max-decimal18-value() 0 max-decimal18-value());",
             0,
@@ -292,12 +292,12 @@ contract LibOpIntMinNPTest is OpTest {
         );
         checkHappy(
             "_: decimal18-min(max-decimal18-value() 1 max-decimal18-value());",
-            1,
+            1e18,
             "max-decimal18-value() 1 max-decimal18-value()"
         );
         checkHappy(
             "_: decimal18-min(max-decimal18-value() 2 max-decimal18-value());",
-            2,
+            2e18,
             "max-decimal18-value() 2 max-decimal18-value()"
         );
         checkHappy(
@@ -307,12 +307,12 @@ contract LibOpIntMinNPTest is OpTest {
         );
         checkHappy(
             "_: decimal18-min(max-decimal18-value() max-decimal18-value() 1);",
-            1,
+            1e18,
             "max-decimal18-value() max-decimal18-value() 1"
         );
         checkHappy(
             "_: decimal18-min(max-decimal18-value() max-decimal18-value() 2);",
-            2,
+            2e18,
             "max-decimal18-value() max-decimal18-value() 2"
         );
         checkHappy(

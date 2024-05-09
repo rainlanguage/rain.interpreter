@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpDecimal18HeadroomNP} from "src/lib/op/math/decimal18/LibOpDecimal18HeadroomNP.sol";
@@ -36,11 +36,11 @@ contract LibOpDecimal18HeadroomNPTest is OpTest {
     /// Test the eval of `decimal18-headroom`.
     function testOpDecimal18HeadroomNPEval() external {
         checkHappy("_: decimal18-headroom(0);", 1e18, "0");
-        checkHappy("_: decimal18-headroom(1e18);", 1e18, "1");
-        checkHappy("_: decimal18-headroom(5e17);", 0.5e18, "0.5");
-        checkHappy("_: decimal18-headroom(2e18);", 1e18, "2");
-        checkHappy("_: decimal18-headroom(3e18);", 1e18, "3");
-        checkHappy("_: decimal18-headroom(38e17);", 0.2e18, "3.8");
+        checkHappy("_: decimal18-headroom(1);", 1e18, "1");
+        checkHappy("_: decimal18-headroom(0.5);", 0.5e18, "0.5");
+        checkHappy("_: decimal18-headroom(2);", 1e18, "2");
+        checkHappy("_: decimal18-headroom(3);", 1e18, "3");
+        checkHappy("_: decimal18-headroom(3.8);", 0.2e18, "3.8");
     }
 
     /// Test the eval of `decimal18-headroom` for bad inputs.

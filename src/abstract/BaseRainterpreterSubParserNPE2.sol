@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 
-import {ISubParserV2, COMPATIBLITY_V3} from "rain.interpreter.interface/interface/ISubParserV2.sol";
+import {ISubParserV2, COMPATIBILITY_V4} from "rain.interpreter.interface/interface/ISubParserV2.sol";
 import {IncompatibleSubParser} from "../error/ErrSubParse.sol";
 import {LibSubParse, ParseState} from "../lib/parse/LibSubParse.sol";
 import {CMASK_RHS_WORD_TAIL} from "../lib/parse/LibParseCMask.sol";
@@ -110,7 +110,7 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV2, IDescr
     /// same commit the abstract sub parser is pulled from.
     //slither-disable-next-line dead-code
     function subParserCompatibility() internal pure virtual returns (bytes32) {
-        return COMPATIBLITY_V3;
+        return COMPATIBILITY_V4;
     }
 
     /// Overrideable function to allow implementations to define their

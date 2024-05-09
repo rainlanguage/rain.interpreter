@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
@@ -68,7 +68,7 @@ contract LibOpEveryNPTest is OpTest {
         );
 
         assertEq(stack.length, 1);
-        assertEq(stack[0], 5);
+        assertEq(stack[0], 5e18);
         assertEq(kvs.length, 0);
         assertEq(io, hex"0001");
     }
@@ -107,7 +107,7 @@ contract LibOpEveryNPTest is OpTest {
         );
 
         assertEq(stack.length, 1);
-        assertEq(stack[0], 6);
+        assertEq(stack[0], 6e18);
         assertEq(kvs.length, 0);
         assertEq(io, hex"0001");
     }

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpDecimal18CeilNP} from "src/lib/op/math/decimal18/LibOpDecimal18CeilNP.sol";
@@ -36,10 +36,10 @@ contract LibOpDecimal18CeilNPTest is OpTest {
     /// Test the eval of `decimal18-ceil`.
     function testOpDecimal18CeilNPEval() external {
         checkHappy("_: decimal18-ceil(0);", 0, "0");
-        checkHappy("_: decimal18-ceil(1e18);", 1e18, "1e18");
-        checkHappy("_: decimal18-ceil(5e17);", 1e18, "5e17");
-        checkHappy("_: decimal18-ceil(2e18);", 2e18, "2e18");
-        checkHappy("_: decimal18-ceil(25e17);", 3e18, "25e17");
+        checkHappy("_: decimal18-ceil(1);", 1e18, "1");
+        checkHappy("_: decimal18-ceil(0.5);", 1e18, "0.5");
+        checkHappy("_: decimal18-ceil(2);", 2e18, "2");
+        checkHappy("_: decimal18-ceil(2.5);", 3e18, "2.5");
     }
 
     /// Test the eval of `decimal18-ceil` for bad inputs.

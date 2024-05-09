@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
@@ -66,19 +66,19 @@ contract LibOpEncodeBitsNPTest is OpTest {
     /// Test the eval of encoding bits parsed from a string.
     function testOpEncodeBitsNPEvalHappy() external {
         checkHappy("_:bitwise-encode<0 1>(0 0);", 0, "0 0");
-        checkHappy("_:bitwise-encode<0 1>(0 1);", 0, "0 1");
-        checkHappy("_:bitwise-encode<0 1>(1 0);", 1, "1 0");
-        checkHappy("_:bitwise-encode<0 1>(1 1);", 1, "1 1");
-        checkHappy("_:bitwise-encode<0 1>(0 2);", 2, "0 2");
-        checkHappy("_:bitwise-encode<0 1>(1 2);", 3, "1 2");
+        checkHappy("_:bitwise-encode<0 1>(0 1e-18);", 0, "0 1");
+        checkHappy("_:bitwise-encode<0 1>(1e-18 0);", 1, "1 0");
+        checkHappy("_:bitwise-encode<0 1>(1e-18 1e-18);", 1, "1 1");
+        checkHappy("_:bitwise-encode<0 1>(0 2e-18);", 2, "0 2");
+        checkHappy("_:bitwise-encode<0 1>(1e-18 2e-18);", 3, "1 2");
         checkHappy("_:bitwise-encode<0 1>(max-int-value() 0);", 1, "max-int-value 0");
-        checkHappy("_:bitwise-encode<0 1>(max-int-value() 1);", 1, "max-int-value 1");
-        checkHappy("_:bitwise-encode<0 1>(max-int-value() 2);", 3, "max-int-value 2");
-        checkHappy("_:bitwise-encode<0 1>(max-int-value() 3);", 3, "max-int-value 3");
+        checkHappy("_:bitwise-encode<0 1>(max-int-value() 1e-18);", 1, "max-int-value 1");
+        checkHappy("_:bitwise-encode<0 1>(max-int-value() 2e-18);", 3, "max-int-value 2");
+        checkHappy("_:bitwise-encode<0 1>(max-int-value() 3e-18);", 3, "max-int-value 3");
         checkHappy("_:bitwise-encode<0 2>(max-int-value() 0);", 3, "max-int-value 0 0 2");
         checkHappy("_:bitwise-encode<1 1>(max-int-value() 0);", 2, "max-int-value 1 1 1");
-        checkHappy("_:bitwise-encode<1 1>(max-int-value() 1);", 3, "max-int-value 1 1 1");
-        checkHappy("_:bitwise-encode<1 1>(max-int-value() 2);", 2, "max-int-value 2 1 1");
+        checkHappy("_:bitwise-encode<1 1>(max-int-value() 1e-18);", 3, "max-int-value 1 1 1");
+        checkHappy("_:bitwise-encode<1 1>(max-int-value() 2e-18);", 2, "max-int-value 2 1 1");
         checkHappy("_:bitwise-encode<0xFF 1>(max-int-value() 0);", 1 << 255, "max-int-value 2 0xFF 1");
         checkHappy("_:bitwise-encode<0 0xFF>(max-int-value() 0);", type(uint256).max >> 1, "max-int-value 2 0xFF 1");
     }

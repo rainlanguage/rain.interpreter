@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpDecimal18PowNP} from "src/lib/op/math/decimal18/LibOpDecimal18PowNP.sol";
@@ -46,26 +46,26 @@ contract LibOpDecimal18PowNPTest is OpTest {
         // 0 ^ 0
         checkHappy("_: decimal18-power(0 0);", 1e18, "0 0");
         // 0 ^ 1
-        checkHappy("_: decimal18-power(0 1e18);", 0, "0 1");
+        checkHappy("_: decimal18-power(0 1);", 0, "0 1");
         // 1e18 ^ 0
-        checkHappy("_: decimal18-power(1e18 0);", 1e18, "1e18 0");
+        checkHappy("_: decimal18-power(1 0);", 1e18, "1e18 0");
         // 1 ^ 1
-        checkHappy("_: decimal18-power(1e18 1e18);", 1e18, "1e18 1");
+        checkHappy("_: decimal18-power(1 1);", 1e18, "1e18 1");
         // 1 ^ 2
-        checkHappy("_: decimal18-power(1e18 2e18);", 1e18, "1e18 2");
+        checkHappy("_: decimal18-power(1 2);", 1e18, "1e18 2");
         // 2 ^ 2
-        checkHappy("_: decimal18-power(2e18 2e18);", 4e18, "2e18 2");
+        checkHappy("_: decimal18-power(2 2);", 4e18, "2e18 2");
         // 2 ^ 3
-        checkHappy("_: decimal18-power(2e18 3e18);", 8e18, "2e18 3");
+        checkHappy("_: decimal18-power(2 3);", 8e18, "2e18 3");
         // 2 ^ 4
-        checkHappy("_: decimal18-power(2e18 4e18);", 16e18, "2e18 4");
+        checkHappy("_: decimal18-power(2 4);", 16e18, "2e18 4");
         // sqrt 4 = 2
-        checkHappy("_: decimal18-power(4e18 5e17);", 2e18, "4e18 5");
+        checkHappy("_: decimal18-power(4 0.5);", 2e18, "4e18 5");
     }
 
     /// Test the eval of `decimal18-power` for bad inputs.
     function testOpDecimal18PowNPEvalOneInput() external {
-        checkBadInputs("_: decimal18-power(1e18);", 1, 2, 1);
+        checkBadInputs("_: decimal18-power(1);", 1, 2, 1);
     }
 
     function testOpDecimal18PowNPThreeInputs() external {

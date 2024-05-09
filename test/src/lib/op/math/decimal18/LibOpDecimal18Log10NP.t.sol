@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpDecimal18Log10NP} from "src/lib/op/math/decimal18/LibOpDecimal18Log10NP.sol";
@@ -36,12 +36,12 @@ contract LibOpDecimal18Log10NPTest is OpTest {
 
     /// Test the eval of `decimal18-log10`.
     function testOpDecimal18Log10NPEval() external {
-        checkHappy("_: decimal18-log10(1e18);", 0, "log10 1");
-        checkHappy("_: decimal18-log10(2e18);", 301029995663981195, "log10 2");
-        checkHappy("_: decimal18-log10(2718281828459045235);", 434294481903251823, "log2 e");
-        checkHappy("_: decimal18-log10(3e18);", 477121254719662432, "log2 3");
-        checkHappy("_: decimal18-log10(4e18);", 602059991327962390, "log2 4");
-        checkHappy("_: decimal18-log10(5e18);", 698970004336018800, "log2 5");
+        checkHappy("_: decimal18-log10(1);", 0, "log10 1");
+        checkHappy("_: decimal18-log10(2);", 301029995663981195, "log10 2");
+        checkHappy("_: decimal18-log10(2.718281828459045235);", 434294481903251823, "log2 e");
+        checkHappy("_: decimal18-log10(3);", 477121254719662432, "log2 3");
+        checkHappy("_: decimal18-log10(4);", 602059991327962390, "log2 4");
+        checkHappy("_: decimal18-log10(5);", 698970004336018800, "log2 5");
     }
 
     /// Test the eval of `decimal18-log10` for bad inputs.

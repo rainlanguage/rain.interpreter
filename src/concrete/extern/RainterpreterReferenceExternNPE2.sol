@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {BadDynamicLength} from "../../error/ErrOpList.sol";
@@ -12,7 +12,7 @@ import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV1.so
 import {LibParseState, ParseState} from "../../lib/parse/LibParseState.sol";
 import {LibParseOperand} from "../../lib/parse/LibParseOperand.sol";
 import {LibParseLiteral} from "../../lib/parse/literal/LibParseLiteral.sol";
-import {COMPATIBLITY_V3} from "rain.interpreter.interface/interface/ISubParserV2.sol";
+import {COMPATIBILITY_V4} from "rain.interpreter.interface/interface/ISubParserV2.sol";
 import {LibExternOpIntIncNPE2, OP_INDEX_INCREMENT} from "../../lib/extern/reference/op/LibExternOpIntIncNPE2.sol";
 import {LibExternOpStackOperandNPE2} from "../../lib/extern/reference/op/LibExternOpStackOperandNPE2.sol";
 import {LibExternOpContextSenderNPE2} from "../../lib/extern/reference/op/LibExternOpContextSenderNPE2.sol";
@@ -21,6 +21,7 @@ import {LibExternOpContextCallingContractNPE2} from
 import {LibExternOpContextRainlenNPE2} from "../../lib/extern/reference/op/LibExternOpContextRainlenNPE2.sol";
 import {LibParseLiteralRepeat} from "../../lib/extern/reference/literal/LibParseLiteralRepeat.sol";
 import {LibParseLiteralDecimal} from "../../lib/parse/literal/LibParseLiteralDecimal.sol";
+import {LibFixedPointDecimalScale} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 
 /// @dev The hash of the meta that describes this contract.
 bytes32 constant DESCRIBED_BY_META_HASH = 0xadf71693c6ecf3fd560904bc46973d1b6e651440d15366673f9b3984749e7c16;
@@ -47,12 +48,12 @@ bytes constant SUB_PARSER_PARSE_META =
 /// @dev Real function pointers to the operand parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
 /// the rightmost position is a pointer to an operand parser function.
-bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"08de092308de08de08de";
+bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"08d4091908d408d408d4";
 
 /// @dev Real function pointers to the literal parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
 /// the rightmost position is a pointer to a literal parser function.
-bytes constant SUB_PARSER_LITERAL_PARSERS = hex"08af";
+bytes constant SUB_PARSER_LITERAL_PARSERS = hex"08a5";
 
 /// @dev The number of literal parsers provided by the sub parser.
 uint256 constant SUB_PARSER_LITERAL_PARSERS_LENGTH = 1;
@@ -91,7 +92,7 @@ uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
 /// of this contract. These get run at deploy time when the main integrity checks
 /// are run, the extern opcode integrity on the deployer will delegate integrity
 /// checks to the extern contract.
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"09b8";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0979";
 
 /// @title LibRainterpreterReferenceExternNPE2
 /// This library allows code SEPARATE FROM the implementation contract to do
@@ -208,7 +209,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// known constant value, which should allow the compiler to optimise the
     /// entire function call away.
     function subParserCompatibility() internal pure override returns (bytes32) {
-        return COMPATIBLITY_V3;
+        return COMPATIBILITY_V4;
     }
 
     /// Overrides the base function pointers for opcodes. Simply returns the
@@ -272,6 +273,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
                 (cursor, value) = LibParseLiteralDecimal.parseDecimal(
                     state, cursor + SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH, end
                 );
+                value = LibFixedPointDecimalScale.scaleToIntegerLossless(value);
                 // We can only repeat a single digit.
                 if (value > 9) {
                     revert InvalidRepeatCount(value);

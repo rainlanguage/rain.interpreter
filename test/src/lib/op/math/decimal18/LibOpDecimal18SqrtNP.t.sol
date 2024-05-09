@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpDecimal18SqrtNP} from "src/lib/op/math/decimal18/LibOpDecimal18SqrtNP.sol";
@@ -36,10 +36,10 @@ contract LibOpDecimal18SqrtNPTest is OpTest {
     /// Test the eval of `decimal18-sqrt`.
     function testOpDecimal18SqrtNPEval() external {
         checkHappy("_: decimal18-sqrt(0);", 0, "0");
-        checkHappy("_: decimal18-sqrt(1e18);", 1e18, "1e18");
-        checkHappy("_: decimal18-sqrt(5e17);", 707106781186547524, "5e17");
-        checkHappy("_: decimal18-sqrt(2e18);", 1414213562373095048, "2e18");
-        checkHappy("_: decimal18-sqrt(25e17);", 1581138830084189665, "25e17");
+        checkHappy("_: decimal18-sqrt(1);", 1e18, "1");
+        checkHappy("_: decimal18-sqrt(0.5);", 707106781186547524, "0.5");
+        checkHappy("_: decimal18-sqrt(2);", 1414213562373095048, "2");
+        checkHappy("_: decimal18-sqrt(2.5);", 1581138830084189665, "2.5");
     }
 
     /// Test the eval of `decimal18-sqrt` for bad inputs.

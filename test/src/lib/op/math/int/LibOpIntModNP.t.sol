@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
@@ -68,9 +68,9 @@ contract LibOpIntModNPTest is OpTest {
 
     /// Test the eval of `int-mod` opcode parsed from a string. Tests one input.
     function testOpIntModNPEvalOneInput() external {
-        checkBadInputs("_: int-mod(5);", 1, 2, 1);
+        checkBadInputs("_: int-mod(5e-18);", 1, 2, 1);
         checkBadInputs("_: int-mod(0);", 1, 2, 1);
-        checkBadInputs("_: int-mod(1);", 1, 2, 1);
+        checkBadInputs("_: int-mod(1e-18);", 1, 2, 1);
         checkBadInputs("_: int-mod(max-int-value());", 1, 2, 1);
     }
 
@@ -86,26 +86,26 @@ contract LibOpIntModNPTest is OpTest {
     /// Tests the happy path where we do not mod by zero.
     function testOpIntModNPEval2InputsHappy() external {
         // Show that the modulo truncates (rounds down).
-        checkHappy("_: int-mod(6 1);", 0, "6 1");
-        checkHappy("_: int-mod(6 2);", 0, "6 2");
-        checkHappy("_: int-mod(6 3);", 0, "6 3");
-        checkHappy("_: int-mod(6 4);", 2, "6 4");
-        checkHappy("_: int-mod(6 5);", 1, "6 5");
-        checkHappy("_: int-mod(6 6);", 0, "6 6");
-        checkHappy("_: int-mod(6 7);", 6, "6 7");
-        checkHappy("_: int-mod(6 max-int-value());", 6, "6 max-int-value()");
+        checkHappy("_: int-mod(6e-18 1e-18);", 0, "6 1");
+        checkHappy("_: int-mod(6e-18 2e-18);", 0, "6 2");
+        checkHappy("_: int-mod(6e-18 3e-18);", 0, "6 3");
+        checkHappy("_: int-mod(6e-18 4e-18);", 2, "6 4");
+        checkHappy("_: int-mod(6e-18 5e-18);", 1, "6 5");
+        checkHappy("_: int-mod(6e-18 6e-18);", 0, "6 6");
+        checkHappy("_: int-mod(6e-18 7e-18);", 6, "6 7");
+        checkHappy("_: int-mod(6e-18 max-int-value());", 6, "6 max-int-value()");
 
         // Anything module by 1 is 0.
-        checkHappy("_: int-mod(0 1);", 0, "0 1");
-        checkHappy("_: int-mod(1 1);", 0, "1 1");
-        checkHappy("_: int-mod(2 1);", 0, "2 1");
-        checkHappy("_: int-mod(3 1);", 0, "3 1");
-        checkHappy("_: int-mod(max-int-value() 1);", 0, "max-int-value() 1");
+        checkHappy("_: int-mod(0 1e-18);", 0, "0 1");
+        checkHappy("_: int-mod(1e-18 1e-18);", 0, "1 1");
+        checkHappy("_: int-mod(2e-18 1e-18);", 0, "2 1");
+        checkHappy("_: int-mod(3e-18 1e-18);", 0, "3 1");
+        checkHappy("_: int-mod(max-int-value() 1e-18);", 0, "max-int-value() 1");
 
         // Anything mod by itself is 0 (except 0).
-        checkHappy("_: int-mod(1 1);", 0, "1 1");
-        checkHappy("_: int-mod(2 2);", 0, "2 2");
-        checkHappy("_: int-mod(3 3);", 0, "3 3");
+        checkHappy("_: int-mod(1e-18 1e-18);", 0, "1 1");
+        checkHappy("_: int-mod(2e-18 2e-18);", 0, "2 2");
+        checkHappy("_: int-mod(3e-18 3e-18);", 0, "3 3");
         checkHappy("_: int-mod(max-int-value() max-int-value());", 0, "max-int-value() max-int-value()");
     }
 
@@ -113,7 +113,7 @@ contract LibOpIntModNPTest is OpTest {
     /// Tests the unhappy path where we modulo by zero.
     function testOpIntModNPEval2InputsUnhappy() external {
         checkUnhappy("_: int-mod(0 0);", stdError.divisionError);
-        checkUnhappy("_: int-mod(1 0);", stdError.divisionError);
+        checkUnhappy("_: int-mod(1e-18 0);", stdError.divisionError);
         checkUnhappy("_: int-mod(max-int-value() 0);", stdError.divisionError);
     }
 
@@ -121,53 +121,53 @@ contract LibOpIntModNPTest is OpTest {
     /// Tests the happy path where we do not modulo by zero.
     function testOpIntModNPEval3InputsHappy() external {
         // Show that the modulo truncates (rounds down).
-        checkHappy("_: int-mod(6 1 1);", 0, "6 1 1");
-        checkHappy("_: int-mod(6 2 1);", 0, "6 2 1");
-        checkHappy("_: int-mod(6 3 1);", 0, "6 3 1");
-        checkHappy("_: int-mod(26 20 4);", 2, "26 20 4");
-        checkHappy("_: int-mod(6 4 1);", 0, "6 4 1");
-        checkHappy("_: int-mod(6 5 1);", 0, "6 5 1");
-        checkHappy("_: int-mod(6 6 1);", 0, "6 6 1");
-        checkHappy("_: int-mod(6 7 1);", 0, "6 7 1");
-        checkHappy("_: int-mod(6 max-int-value() 1);", 0, "6 max-int-value() 1");
-        checkHappy("_: int-mod(6 1 2);", 0, "6 1 2");
-        checkHappy("_: int-mod(6 2 2);", 0, "6 2 2");
-        checkHappy("_: int-mod(6 3 2);", 0, "6 3 2");
-        checkHappy("_: int-mod(6 4 2);", 0, "6 4 2");
-        checkHappy("_: int-mod(6 5 2);", 1, "6 5 2");
-        checkHappy("_: int-mod(6 6 2);", 0, "6 6 2");
-        checkHappy("_: int-mod(6 7 2);", 0, "6 7 2");
-        checkHappy("_: int-mod(6 max-int-value() 2);", 0, "6 max-int-value() 2");
+        checkHappy("_: int-mod(6e-18 1e-18 1e-18);", 0, "6 1 1");
+        checkHappy("_: int-mod(6e-18 2e-18 1e-18);", 0, "6 2 1");
+        checkHappy("_: int-mod(6e-18 3e-18 1e-18);", 0, "6 3 1");
+        checkHappy("_: int-mod(26e-18 20e-18 4e-18);", 2, "26 20 4");
+        checkHappy("_: int-mod(6e-18 4e-18 1e-18);", 0, "6 4 1");
+        checkHappy("_: int-mod(6e-18 5e-18 1e-18);", 0, "6 5 1");
+        checkHappy("_: int-mod(6e-18 6e-18 1e-18);", 0, "6 6 1");
+        checkHappy("_: int-mod(6e-18 7e-18 1e-18);", 0, "6 7 1");
+        checkHappy("_: int-mod(6e-18 max-int-value() 1e-18);", 0, "6 max-int-value() 1");
+        checkHappy("_: int-mod(6e-18 1e-18 2e-18);", 0, "6 1 2");
+        checkHappy("_: int-mod(6e-18 2e-18 2e-18);", 0, "6 2 2");
+        checkHappy("_: int-mod(6e-18 3e-18 2e-18);", 0, "6 3 2");
+        checkHappy("_: int-mod(6e-18 4e-18 2e-18);", 0, "6 4 2");
+        checkHappy("_: int-mod(6e-18 5e-18 2e-18);", 1, "6 5 2");
+        checkHappy("_: int-mod(6e-18 6e-18 2e-18);", 0, "6 6 2");
+        checkHappy("_: int-mod(6e-18 7e-18 2e-18);", 0, "6 7 2");
+        checkHappy("_: int-mod(6e-18 max-int-value() 2e-18);", 0, "6 max-int-value() 2");
 
         // Anything modulo by 1 is 0.
-        checkHappy("_: int-mod(0 1 1);", 0, "0 1 1");
-        checkHappy("_: int-mod(1 1 1);", 0, "1 1 1");
-        checkHappy("_: int-mod(2 1 1);", 0, "2 1 1");
-        checkHappy("_: int-mod(3 1 1);", 0, "3 1 1");
-        checkHappy("_: int-mod(max-int-value() 1 1);", 0, "max-int-value() 1 1");
+        checkHappy("_: int-mod(0 1e-18 1e-18);", 0, "0 1 1");
+        checkHappy("_: int-mod(1e-18 1e-18 1e-18);", 0, "1 1 1");
+        checkHappy("_: int-mod(2e-18 1e-18 1e-18);", 0, "2 1 1");
+        checkHappy("_: int-mod(3e-18 1e-18 1e-18);", 0, "3 1 1");
+        checkHappy("_: int-mod(max-int-value() 1e-18 1e-18);", 0, "max-int-value() 1 1");
 
         // Anything modulo by itself is 0 (except 0).
-        checkHappy("_: int-mod(1 1 1);", 0, "1 1 1");
-        checkHappy("_: int-mod(2 2 1);", 0, "2 2 1");
-        checkHappy("_: int-mod(2 1 2);", 0, "2 1 2");
-        checkHappy("_: int-mod(3 3 1);", 0, "3 3 1");
-        checkHappy("_: int-mod(3 1 3);", 0, "3 1 3");
-        checkHappy("_: int-mod(max-int-value() max-int-value() 1);", 0, "max-int-value() max-int-value() 1");
-        checkHappy("_: int-mod(max-int-value() 1 max-int-value());", 0, "max-int-value() 1 max-int-value()");
+        checkHappy("_: int-mod(1e-18 1e-18 1e-18);", 0, "1 1 1");
+        checkHappy("_: int-mod(2e-18 2e-18 1e-18);", 0, "2 2 1");
+        checkHappy("_: int-mod(2e-18 1e-18 2e-18);", 0, "2 1 2");
+        checkHappy("_: int-mod(3e-18 3e-18 1e-18);", 0, "3 3 1");
+        checkHappy("_: int-mod(3e-18 1e-18 3e-18);", 0, "3 1 3");
+        checkHappy("_: int-mod(max-int-value() max-int-value() 1e-18);", 0, "max-int-value() max-int-value() 1");
+        checkHappy("_: int-mod(max-int-value() 1e-18 max-int-value());", 0, "max-int-value() 1 max-int-value()");
     }
 
     /// Test the eval of `int-mod` opcode parsed from a string. Tests three inputs.
     /// Tests the unhappy path where we modulo by zero.
     function testOpIntModNPEval3InputsUnhappy() external {
         checkUnhappy("_: int-mod(0 0 0);", stdError.divisionError);
-        checkUnhappy("_: int-mod(1 0 0);", stdError.divisionError);
+        checkUnhappy("_: int-mod(1e-18 0 0);", stdError.divisionError);
         checkUnhappy("_: int-mod(max-int-value() 0 0);", stdError.divisionError);
-        checkUnhappy("_: int-mod(0 1 0);", stdError.divisionError);
-        checkUnhappy("_: int-mod(1 1 0);", stdError.divisionError);
+        checkUnhappy("_: int-mod(0 1e-18 0);", stdError.divisionError);
+        checkUnhappy("_: int-mod(1e-18 1e-18 0);", stdError.divisionError);
         checkUnhappy("_: int-mod(max-int-value() max-int-value() 0);", stdError.divisionError);
-        checkUnhappy("_: int-mod(0 0 1);", stdError.divisionError);
-        checkUnhappy("_: int-mod(1 0 1);", stdError.divisionError);
-        checkUnhappy("_: int-mod(max-int-value() 0 1);", stdError.divisionError);
+        checkUnhappy("_: int-mod(0 0 1e-18);", stdError.divisionError);
+        checkUnhappy("_: int-mod(1e-18 0 1e-18);", stdError.divisionError);
+        checkUnhappy("_: int-mod(max-int-value() 0 1e-18);", stdError.divisionError);
     }
 
     /// Test the eval of `int-mod` opcode parsed from a string.

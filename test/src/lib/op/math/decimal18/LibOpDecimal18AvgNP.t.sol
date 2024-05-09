@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpDecimal18AvgNP} from "src/lib/op/math/decimal18/LibOpDecimal18AvgNP.sol";
@@ -44,14 +44,14 @@ contract LibOpDecimal18AvgNPTest is OpTest {
     /// Test the eval of `decimal18-avg`.
     function testOpDecimal18AvgNPEval() external {
         checkHappy("_: decimal18-avg(0 0);", 0, "0 0");
-        checkHappy("_: decimal18-avg(0 1e18);", 5e17, "0 1");
-        checkHappy("_: decimal18-avg(1e18 0);", 5e17, "1e18 0");
-        checkHappy("_: decimal18-avg(1e18 1e18);", 1e18, "1e18 1");
-        checkHappy("_: decimal18-avg(1e18 2e18);", 1.5e18, "1e18 2");
-        checkHappy("_: decimal18-avg(2e18 2e18);", 2e18, "2e18 2");
-        checkHappy("_: decimal18-avg(2e18 3e18);", 2.5e18, "2e18 3");
-        checkHappy("_: decimal18-avg(2e18 4e18);", 3e18, "2e18 4");
-        checkHappy("_: decimal18-avg(4e18 5e17);", 2.25e18, "4e18 5");
+        checkHappy("_: decimal18-avg(0 1);", 5e17, "0 1");
+        checkHappy("_: decimal18-avg(1 0);", 5e17, "1 0");
+        checkHappy("_: decimal18-avg(1 1);", 1e18, "1 1");
+        checkHappy("_: decimal18-avg(1 2);", 1.5e18, "1 2");
+        checkHappy("_: decimal18-avg(2 2);", 2e18, "2 2");
+        checkHappy("_: decimal18-avg(2 3);", 2.5e18, "2 3");
+        checkHappy("_: decimal18-avg(2 4);", 3e18, "2 4");
+        checkHappy("_: decimal18-avg(4 0.5);", 2.25e18, "4 5");
     }
 
     /// Test the eval of `decimal18-avg` for bad inputs.

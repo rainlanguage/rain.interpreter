@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
@@ -129,7 +129,7 @@ contract LibOpConditionsNPTest is OpTest {
         );
 
         assertEq(stack.length, 1);
-        assertEq(stack[0], 6);
+        assertEq(stack[0], 6e18);
         assertEq(kvs.length, 0);
         assertEq(io, hex"0001");
     }
@@ -186,7 +186,7 @@ contract LibOpConditionsNPTest is OpTest {
         );
 
         assertEq(stack.length, 1);
-        assertEq(stack[0], 4);
+        assertEq(stack[0], 4e18);
         assertEq(kvs.length, 0);
         assertEq(io, hex"0001");
     }
@@ -206,7 +206,7 @@ contract LibOpConditionsNPTest is OpTest {
         );
 
         assertEq(stack.length, 1);
-        assertEq(stack[0], 6);
+        assertEq(stack[0], 6e18);
         assertEq(kvs.length, 0);
         assertEq(io, hex"0001");
     }
@@ -226,7 +226,7 @@ contract LibOpConditionsNPTest is OpTest {
         );
 
         assertEq(stack.length, 1);
-        assertEq(stack[0], 6);
+        assertEq(stack[0], 6e18);
         assertEq(kvs.length, 0);
         assertEq(io, hex"0001");
     }

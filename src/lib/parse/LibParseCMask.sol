@@ -406,6 +406,12 @@ uint128 constant CMASK_NUMERIC_0_9 = CMASK_ZERO | CMASK_ONE | CMASK_TWO | CMASK_
 /// @dev e notation eE
 uint128 constant CMASK_E_NOTATION = CMASK_LOWER_E | CMASK_UPPER_E;
 
+/// @dev decimal point .
+uint128 constant CMASK_DECIMAL_POINT = CMASK_FULL_STOP;
+
+/// @dev negative sign -
+uint128 constant CMASK_NEGATIVE_SIGN = CMASK_DASH;
+
 /// @dev lower alpha a-z
 uint128 constant CMASK_LOWER_ALPHA_A_Z = CMASK_LOWER_A | CMASK_LOWER_B | CMASK_LOWER_C | CMASK_LOWER_D | CMASK_LOWER_E
     | CMASK_LOWER_F | CMASK_LOWER_G | CMASK_LOWER_H | CMASK_LOWER_I | CMASK_LOWER_J | CMASK_LOWER_K | CMASK_LOWER_L

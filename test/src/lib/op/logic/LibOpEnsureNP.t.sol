@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
@@ -94,11 +94,11 @@ contract LibOpEnsureNPTest is OpTest {
     /// Test the eval of `ensure` parsed from a string. Tests the happy path
     /// where all inputs are nonzero.
     function testOpEnsureNPEvalHappy() external {
-        checkHappy(":ensure(1 \"always 1\"), _:1;", 1, "1");
-        checkHappy(":ensure(5 \"always 5\"), _:1;", 1, "5");
+        checkHappy(":ensure(1 \"always 1\"), _:1;", 1e18, "1");
+        checkHappy(":ensure(5 \"always 5\"), _:1;", 1e18, "5");
 
         // Empty reason should be fine.
-        checkHappy(":ensure(1 \"\"), _:1;", 1, "");
+        checkHappy(":ensure(1 \"\"), _:1;", 1e18, "");
     }
 
     /// Test the eval of `ensure` parsed from a string. Tests the unhappy path

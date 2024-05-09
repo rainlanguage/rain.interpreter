@@ -5,8 +5,9 @@ import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {LibFixedPointDecimalScale} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
+import {LibFixedPointDecimalScale, DECIMAL_MAX_SAFE_INT} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 import {MASK_2BIT} from "sol.lib.binmaskflag/Binary.sol";
+import {LibParseLiteral} from "../../../parse/literal/LibParseLiteral.sol";
 
 /// @title LibOpDecimal18ScaleNDynamicNP
 /// @notice Opcode for scaling a number from 18 decimal fixed point based on
@@ -28,7 +29,10 @@ library LibOpDecimal18ScaleNDynamicNP {
             stackTop := add(stackTop, 0x20)
             a := mload(stackTop)
         }
-        a = a.scaleN(scale, Operand.unwrap(operand) & MASK_2BIT);
+        a = a.scaleN(
+            LibFixedPointDecimalScale.decimalOrIntToInt(scale, DECIMAL_MAX_SAFE_INT),
+            Operand.unwrap(operand) & MASK_2BIT
+        );
         assembly ("memory-safe") {
             mstore(stackTop, a)
         }
@@ -41,6 +45,9 @@ library LibOpDecimal18ScaleNDynamicNP {
         returns (uint256[] memory outputs)
     {
         outputs = new uint256[](1);
-        outputs[0] = inputs[1].scaleN(inputs[0], Operand.unwrap(operand) & MASK_2BIT);
+        outputs[0] = inputs[1].scaleN(
+            LibFixedPointDecimalScale.decimalOrIntToInt(inputs[0], DECIMAL_MAX_SAFE_INT),
+            Operand.unwrap(operand) & MASK_2BIT
+        );
     }
 }

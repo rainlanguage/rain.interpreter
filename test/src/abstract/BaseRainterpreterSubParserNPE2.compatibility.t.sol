@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
-import {BaseRainterpreterSubParserNPE2, COMPATIBLITY_V3} from "src/abstract/BaseRainterpreterSubParserNPE2.sol";
+import {BaseRainterpreterSubParserNPE2, COMPATIBILITY_V4} from "src/abstract/BaseRainterpreterSubParserNPE2.sol";
 import {ISubParserV2} from "rain.interpreter.interface/interface/ISubParserV2.sol";
 import {IncompatibleSubParser} from "src/error/ErrSubParse.sol";
 
@@ -19,7 +19,7 @@ contract ChildRainterpreterSubParserNPE2 is BaseRainterpreterSubParserNPE2 {
 contract BaseRainterpreterSubParserNPE2CompatibilityTest is Test {
     /// Test that any compatibility ID other than the correct one will revert.
     function testRainterpreterSubParserNPE2Compatibility(bytes32 badCompatibility, bytes memory data) external {
-        vm.assume(badCompatibility != COMPATIBLITY_V3);
+        vm.assume(badCompatibility != COMPATIBILITY_V4);
 
         ChildRainterpreterSubParserNPE2 subParser = new ChildRainterpreterSubParserNPE2();
         vm.expectRevert(abi.encodeWithSelector(IncompatibleSubParser.selector));

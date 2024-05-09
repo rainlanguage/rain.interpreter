@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpDecimal18SnapToUnitNP} from "src/lib/op/math/decimal18/LibOpDecimal18SnapToUnitNP.sol";
@@ -37,22 +37,22 @@ contract LibOpDecimal18SnapToUnitNPTest is OpTest {
     /// Test the eval of `decimal18-snap-to-unit`.
     function testOpDecimal18SnapToUnitNPEval() external {
         // If the threshold is 1 then we always floor.
-        checkHappy("_: decimal18-snap-to-unit(1e18 1e18);", 1e18, "1e18 1e18");
-        checkHappy("_: decimal18-snap-to-unit(1e18 5e17);", 0, "1e18 5e17");
-        checkHappy("_: decimal18-snap-to-unit(1e18 2e18);", 2e18, "1e18 2e18");
-        checkHappy("_: decimal18-snap-to-unit(1e18 25e17);", 2e18, "1e18 25e17");
+        checkHappy("_: decimal18-snap-to-unit(1 1);", 1e18, "1 1");
+        checkHappy("_: decimal18-snap-to-unit(1 0.5);", 0, "1 0.5");
+        checkHappy("_: decimal18-snap-to-unit(1 2);", 2e18, "1 2");
+        checkHappy("_: decimal18-snap-to-unit(1 2.5);", 2e18, "1 2.5");
 
         // If the threshold is 0.2 then we floor or ceil anything within the
         // threshold.
-        checkHappy("_: decimal18-snap-to-unit(2e17 1e18);", 1e18, "2e17 1e18");
-        checkHappy("_: decimal18-snap-to-unit(2e17 5e17);", 5e17, "2e17 5e17");
-        checkHappy("_: decimal18-snap-to-unit(2e17 2e18);", 2e18, "2e17 2e18");
-        checkHappy("_: decimal18-snap-to-unit(2e17 2e17);", 0, "2e17 2e17");
-        checkHappy("_: decimal18-snap-to-unit(2e17 8e17);", 1e18, "2e17 8e17");
-        checkHappy("_: decimal18-snap-to-unit(2e17 25e17);", 2.5e18, "2e17 25e17");
-        checkHappy("_: decimal18-snap-to-unit(2e17 3e18);", 3e18, "2e17 3e18");
-        checkHappy("_: decimal18-snap-to-unit(2e17 31e17);", 3e18, "2e17 31e17");
-        checkHappy("_: decimal18-snap-to-unit(2e17 39e17);", 4e18, "2e17 39e17");
+        checkHappy("_: decimal18-snap-to-unit(0.2 1);", 1e18, "0.2 1");
+        checkHappy("_: decimal18-snap-to-unit(0.2 0.5);", 5e17, "0.2 0.5");
+        checkHappy("_: decimal18-snap-to-unit(0.2 2);", 2e18, "0.2 2");
+        checkHappy("_: decimal18-snap-to-unit(0.2 0.2);", 0, "0.2 0.2");
+        checkHappy("_: decimal18-snap-to-unit(0.2 0.8);", 1e18, "0.2 0.8");
+        checkHappy("_: decimal18-snap-to-unit(0.2 2.5);", 2.5e18, "0.2 2.5");
+        checkHappy("_: decimal18-snap-to-unit(0.2 3);", 3e18, "0.2 3");
+        checkHappy("_: decimal18-snap-to-unit(0.2 3.1);", 3e18, "0.2 3.1");
+        checkHappy("_: decimal18-snap-to-unit(0.2 3.9);", 4e18, "0.2 3.9");
     }
 
     /// Test the eval of `decimal18-snap-to-unit` for bad inputs.

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpDecimal18LinearGrowthNP} from "src/lib/op/math/decimal18/growth/LibOpDecimal18LinearGrowthNP.sol";
@@ -44,17 +44,17 @@ contract LibOpDecimal18LinearGrowthNPTest is OpTest {
     /// Test the eval of `decimal18-linear-growth`.
     function testOpDecimal18LinearGrowthNPEval() external {
         checkHappy("_: decimal18-linear-growth(0 0 0);", 0, "0 0 0");
-        checkHappy("_: decimal18-linear-growth(0 1e17 0);", 0, "0 1e17 0");
-        checkHappy("_: decimal18-linear-growth(0 1e17 1e18);", 1e17, "0 1e17 1e18");
-        checkHappy("_: decimal18-linear-growth(1e18 1e17 0);", 1e18, "1e18 1e17 0");
-        checkHappy("_: decimal18-linear-growth(1e18 1e17 1e18);", 1.1e18, "1e18 1e17 1e18");
-        checkHappy("_: decimal18-linear-growth(1e18 1e17 2e18);", 1.2e18, "1e18 1e17 2e18");
-        checkHappy("_: decimal18-linear-growth(1e18 1e17 25e17);", 1.25e18, "1e18 1e17 25e17");
-        checkHappy("_: decimal18-linear-growth(1e18 0 2e18);", 1e18, "1e18 0 2e18");
-        checkHappy("_: decimal18-linear-growth(1e18 1e17 5e17);", 1.05e18, "1e18 1e17 5e17");
-        checkHappy("_: decimal18-linear-growth(2e18 1e17 0);", 2e18, "2e18 1e17 0");
-        checkHappy("_: decimal18-linear-growth(2e18 1e17 1e18);", 2.1e18, "2e18 1e17 1e18");
-        checkHappy("_: decimal18-linear-growth(2e18 1e17 2e18);", 2.2e18, "2e18 1e17 2e18");
+        checkHappy("_: decimal18-linear-growth(0 0.1 0);", 0, "0 0.1 0");
+        checkHappy("_: decimal18-linear-growth(0 0.1 1);", 1e17, "0 0.1 1");
+        checkHappy("_: decimal18-linear-growth(1 0.1 0);", 1e18, "1 0.1 0");
+        checkHappy("_: decimal18-linear-growth(1 0.1 1);", 1.1e18, "1 0.1 1");
+        checkHappy("_: decimal18-linear-growth(1 0.1 2);", 1.2e18, "1 0.1 2");
+        checkHappy("_: decimal18-linear-growth(1 0.1 2.5);", 1.25e18, "1 0.1 2.5");
+        checkHappy("_: decimal18-linear-growth(1 0 2);", 1e18, "1 0 2");
+        checkHappy("_: decimal18-linear-growth(1 0.1 0.5);", 1.05e18, "1 0.1 0.5");
+        checkHappy("_: decimal18-linear-growth(2 0.1 0);", 2e18, "2 0.1 0");
+        checkHappy("_: decimal18-linear-growth(2 0.1 1);", 2.1e18, "2 0.1 1");
+        checkHappy("_: decimal18-linear-growth(2 0.1 2);", 2.2e18, "2 0.1 2");
     }
 
     function testOpDecimal18LinearGrowthNPEvalZeroInputs() external {
