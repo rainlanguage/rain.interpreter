@@ -136,7 +136,7 @@ library LibParse {
     function isMask(uint256 cursor, uint256 end, uint256 mask) internal pure returns (uint256 result) {
         assembly ("memory-safe") {
             //slither-disable-next-line incorrect-shift
-            result := and(iszero(iszero(and(shl(byte(0, mload(cursor)), 1), mask))), lt(cursor, end))
+            result := and(lt(cursor, end), iszero(iszero(and(shl(byte(0, mload(cursor)), 1), mask))))
         }
     }
 
