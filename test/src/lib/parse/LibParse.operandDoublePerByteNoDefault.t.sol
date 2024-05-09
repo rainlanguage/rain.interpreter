@@ -2,10 +2,11 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {ExpectedOperand, UnclosedOperand, IntegerOverflow, UnexpectedOperandValue} from "src/error/ErrParse.sol";
+import {ExpectedOperand, UnclosedOperand, UnexpectedOperandValue} from "src/error/ErrParse.sol";
 import {LibParse} from "src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
+import {IntegerOverflow} from "rain.math.fixedpoint/error/ErrScale.sol";
 
 contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     using LibParse for ParseState;

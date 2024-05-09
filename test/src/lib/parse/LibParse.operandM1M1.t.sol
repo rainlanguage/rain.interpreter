@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {
-    IntegerOverflow, UnclosedOperand, UnsupportedLiteralType, UnexpectedOperandValue
-} from "src/error/ErrParse.sol";
+import {UnclosedOperand, UnsupportedLiteralType, UnexpectedOperandValue} from "src/error/ErrParse.sol";
 import {ParserOutOfBounds, LibParse, ExpectedLeftParen} from "src/lib/parse/LibParse.sol";
 import {OperandTest} from "test/abstract/OperandTest.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
+import {IntegerOverflow} from "rain.math.fixedpoint/error/ErrScale.sol";
 
 contract LibParseOperandM1M1Test is OperandTest {
     using LibParse for ParseState;

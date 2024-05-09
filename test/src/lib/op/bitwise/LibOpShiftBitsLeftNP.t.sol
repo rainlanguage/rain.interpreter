@@ -16,7 +16,7 @@ import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreter
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibEncodedDispatch} from "rain.interpreter.interface/lib/caller/LibEncodedDispatch.sol";
 import {UnsupportedBitwiseShiftAmount} from "src/error/ErrBitwise.sol";
-import {IntegerOverflow} from "src/error/ErrParse.sol";
+import {IntegerOverflow} from "rain.math.fixedpoint/error/ErrScale.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpShiftBitsLeftNPTest is OpTest {

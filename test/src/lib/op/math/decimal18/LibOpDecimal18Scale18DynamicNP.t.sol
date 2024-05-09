@@ -6,6 +6,7 @@ import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
 import {LibOpDecimal18Scale18DynamicNP} from "src/lib/op/math/decimal18/LibOpDecimal18Scale18DynamicNP.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
+import {LibFixedPointDecimalScale, DECIMAL_MAX_SAFE_INT} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 
 contract LibOpDecimal18Scale18DynamicNPTest is OpTest {
     /// Directly test the integrity logic of LibOpDecimal18Scale18DynamicNP.
@@ -22,6 +23,7 @@ contract LibOpDecimal18Scale18DynamicNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpDecimal18Scale18DynamicNP.
     function testOpDecimal18Scale18DynamicNPRun(uint256 scale, uint256 round, uint256 saturate, uint256 value) public {
+        scale = bound(scale, 0, DECIMAL_MAX_SAFE_INT * 1e18);
         round = bound(round, 0, 1);
         saturate = bound(saturate, 0, 1);
         uint256 flags = round | (saturate << 1);
@@ -38,7 +40,7 @@ contract LibOpDecimal18Scale18DynamicNPTest is OpTest {
 
         if (
             LibWillOverflow.scale18WillOverflow(
-                value, LibParseLiteral.decimalOrIntToInt(scale, type(uint256).max), flags
+                value, LibFixedPointDecimalScale.decimalOrIntToInt(scale, DECIMAL_MAX_SAFE_INT), flags
             )
         ) {
             vm.expectRevert(stdError.arithmeticError);

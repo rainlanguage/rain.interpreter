@@ -148,8 +148,3 @@ error BadSubParserResult(bytes bytecode);
 
 /// Thrown when there are more than 16 inputs or outputs for a given opcode.
 error OpcodeIOOverflow(uint256 offset);
-
-/// Thrown when an integer is too large to fit in the range allowed for it.
-/// @param integer The integer that is too large.
-/// @param max The maximum value that the integer can be.
-error IntegerOverflow(uint256 integer, uint256 max);

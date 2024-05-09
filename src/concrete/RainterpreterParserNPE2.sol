@@ -15,7 +15,7 @@ import {LibParseInterstitial} from "../lib/parse/LibParseInterstitial.sol";
 
 /// @dev The known hash of the parser bytecode. This is used by the deployer to
 /// check that it is deploying a parser that is compatible with the interpreter.
-bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x0d0e0e28a801b54c91ca8b16c0f5e9d66e763ea9e77c045f8fbef342c28e3c84);
+bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x2fbf0cf7d8907015b1db689d63743523270add5276d1c48b5348ae84dc99feef);
 
 /// @dev Encodes the parser meta that is used to lookup word definitions.
 /// The structure of the parser meta is:
@@ -42,13 +42,13 @@ uint8 constant PARSE_META_BUILD_DEPTH = 2;
 /// @dev Every two bytes is a function pointer for an operand handler. These
 /// positional indexes all map to the same indexes looked up in the parse meta.
 bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
-    hex"18cf18cf18cf193419ad19ad19ad1934193418cf18cf18cf19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19f21a6119ad19f21a6119ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad19ad18cf1b2d18cf1b2d19ad19ad";
+    hex"18bc18bc18bc1921199a199a199a1921192118bc18bc18bc199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a199a19df1a4e199a19df1a4e199a199a199a199a199a199a199a199a199a199a199a199a199a18bc1b1a18bc1b1a199a199a";
 
 /// @dev Every two bytes is a function pointer for a literal parser. Literal
 /// dispatches are determined by the first byte(s) of the literal rather than a
 /// full word lookup, and are done with simple conditional jumps as the
 /// possibilities are limited compared to the number of words we have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0f3211fa161416ee";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0f3211fa160116db";
 
 /// @title RainterpreterParserNPE2
 /// @dev The parser implementation.

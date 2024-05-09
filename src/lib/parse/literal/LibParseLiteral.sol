@@ -25,8 +25,7 @@ import {
     ZeroLengthDecimal,
     ZeroLengthHexLiteral,
     UnsupportedLiteralType,
-    UnclosedSubParseableLiteral,
-    IntegerOverflow
+    UnclosedSubParseableLiteral
 } from "../../../error/ErrParse.sol";
 import {ParseState} from "../LibParseState.sol";
 import {LibParseError} from "../LibParseError.sol";
@@ -47,18 +46,6 @@ library LibParseLiteral {
     using LibParseLiteral for ParseState;
     using LibParseInterstitial for ParseState;
     using LibSubParse for ParseState;
-
-    function decimalOrIntToInt(uint256 value, uint256 max) internal pure returns (uint256) {
-        if (value >= 1e18) {
-            value = LibFixedPointDecimalScale.scaleToIntegerLossless(value);
-        }
-
-        if (value > max) {
-            revert IntegerOverflow(value, max);
-        }
-
-        return value;
-    }
 
     function selectLiteralParserByIndex(ParseState memory state, uint256 index)
         internal

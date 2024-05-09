@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {LibFixedPointDecimalScale} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
+import {LibFixedPointDecimalScale, DECIMAL_MAX_SAFE_INT} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 import {MASK_2BIT} from "sol.lib.binmaskflag/Binary.sol";
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
@@ -31,7 +31,7 @@ library LibOpDecimal18Scale18DynamicNP {
         }
         // There's no upper bound because we might be saturating all the way to
         // infinity. `scale18` will handle catching such things.
-        scale = LibParseLiteral.decimalOrIntToInt(scale, type(uint256).max);
+        scale = LibFixedPointDecimalScale.decimalOrIntToInt(scale, DECIMAL_MAX_SAFE_INT);
         a = a.scale18(scale, Operand.unwrap(operand));
         assembly ("memory-safe") {
             mstore(stackTop, a)
@@ -46,7 +46,8 @@ library LibOpDecimal18Scale18DynamicNP {
     {
         outputs = new uint256[](1);
         outputs[0] = inputs[1].scale18(
-            LibParseLiteral.decimalOrIntToInt(inputs[0], type(uint256).max), Operand.unwrap(operand) & MASK_2BIT
+            LibFixedPointDecimalScale.decimalOrIntToInt(inputs[0], DECIMAL_MAX_SAFE_INT),
+            Operand.unwrap(operand) & MASK_2BIT
         );
     }
 }

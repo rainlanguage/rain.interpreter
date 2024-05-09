@@ -5,7 +5,7 @@ import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {LibFixedPointDecimalScale} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
+import {LibFixedPointDecimalScale, DECIMAL_MAX_SAFE_INT} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 import {MASK_2BIT} from "sol.lib.binmaskflag/Binary.sol";
 import {LibParseLiteral} from "../../../parse/literal/LibParseLiteral.sol";
 
@@ -29,7 +29,10 @@ library LibOpDecimal18ScaleNDynamicNP {
             stackTop := add(stackTop, 0x20)
             a := mload(stackTop)
         }
-        a = a.scaleN(LibParseLiteral.decimalOrIntToInt(scale, type(uint256).max), Operand.unwrap(operand) & MASK_2BIT);
+        a = a.scaleN(
+            LibFixedPointDecimalScale.decimalOrIntToInt(scale, DECIMAL_MAX_SAFE_INT),
+            Operand.unwrap(operand) & MASK_2BIT
+        );
         assembly ("memory-safe") {
             mstore(stackTop, a)
         }
@@ -43,7 +46,8 @@ library LibOpDecimal18ScaleNDynamicNP {
     {
         outputs = new uint256[](1);
         outputs[0] = inputs[1].scaleN(
-            LibParseLiteral.decimalOrIntToInt(inputs[0], type(uint256).max), Operand.unwrap(operand) & MASK_2BIT
+            LibFixedPointDecimalScale.decimalOrIntToInt(inputs[0], DECIMAL_MAX_SAFE_INT),
+            Operand.unwrap(operand) & MASK_2BIT
         );
     }
 }
