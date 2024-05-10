@@ -3,13 +3,12 @@ pragma solidity ^0.8.18;
 
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
+import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
 
-/// @title LibOpIntDivNP
-/// @notice Opcode to divide N integers. Errors on divide by zero. Truncates
-/// towards zero.
-library LibOpIntDivNP {
+/// @title LibOpAdd
+/// @notice Opcode to add N numbers. Errors on overflow.
+library LibOpAdd {
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
         uint256 inputs = (Operand.unwrap(operand) >> 0x10) & 0x0F;
@@ -17,8 +16,8 @@ library LibOpIntDivNP {
         return (inputs, 1);
     }
 
-    /// int-div
-    /// Division with implied checks from the Solidity 0.8.x compiler.
+    /// add
+    /// Addition with implied overflow checks from the Solidity 0.8.x compiler.
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;
         uint256 b;
@@ -27,7 +26,7 @@ library LibOpIntDivNP {
             b := mload(add(stackTop, 0x20))
             stackTop := add(stackTop, 0x40)
         }
-        a /= b;
+        a += b;
 
         {
             uint256 inputs = (Operand.unwrap(operand) >> 0x10) & 0x0F;
@@ -37,7 +36,7 @@ library LibOpIntDivNP {
                     b := mload(stackTop)
                     stackTop := add(stackTop, 0x20)
                 }
-                a /= b;
+                a += b;
                 unchecked {
                     i++;
                 }
@@ -51,7 +50,7 @@ library LibOpIntDivNP {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of division for testing.
+    /// Gas intensive reference implementation of addition for testing.
     function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
         internal
         pure
@@ -62,7 +61,7 @@ library LibOpIntDivNP {
         unchecked {
             uint256 acc = inputs[0];
             for (uint256 i = 1; i < inputs.length; i++) {
-                acc /= inputs[i];
+                acc += inputs[i];
             }
             outputs = new uint256[](1);
             outputs[0] = acc;

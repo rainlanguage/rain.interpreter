@@ -6,9 +6,9 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
 
-/// @title LibOpIntExpNP
+/// @title LibOpUint256Power
 /// @notice Opcode to raise x successively to N integers. Errors on overflow.
-library LibOpIntExpNP {
+library LibOpUint256Power {
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
         uint256 inputs = (Operand.unwrap(operand) >> 0x10) & 0x0F;
@@ -16,7 +16,7 @@ library LibOpIntExpNP {
         return (inputs, 1);
     }
 
-    /// int-exp
+    /// uint256-power
     /// Exponentiation with implied overflow checks from the Solidity 0.8.x
     /// compiler.
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {

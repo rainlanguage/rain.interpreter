@@ -6,9 +6,10 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
 
-/// @title LibOpIntMulNP
-/// @notice Opcode to mul N integers. Errors on overflow.
-library LibOpIntMulNP {
+/// @title LibOpUint256Div
+/// @notice Opcode to divide N integers. Errors on divide by zero. Truncates
+/// towards zero.
+library LibOpUint256Div {
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
         uint256 inputs = (Operand.unwrap(operand) >> 0x10) & 0x0F;
@@ -16,9 +17,8 @@ library LibOpIntMulNP {
         return (inputs, 1);
     }
 
-    /// int-mul
-    /// Multiplication with implied overflow checks from the Solidity 0.8.x
-    /// compiler.
+    /// uint256-div
+    /// Division with implied checks from the Solidity 0.8.x compiler.
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;
         uint256 b;
@@ -27,7 +27,7 @@ library LibOpIntMulNP {
             b := mload(add(stackTop, 0x20))
             stackTop := add(stackTop, 0x40)
         }
-        a *= b;
+        a /= b;
 
         {
             uint256 inputs = (Operand.unwrap(operand) >> 0x10) & 0x0F;
@@ -37,12 +37,13 @@ library LibOpIntMulNP {
                     b := mload(stackTop)
                     stackTop := add(stackTop, 0x20)
                 }
-                a *= b;
+                a /= b;
                 unchecked {
                     i++;
                 }
             }
         }
+
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
             mstore(stackTop, a)
@@ -50,7 +51,7 @@ library LibOpIntMulNP {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of multiplication for testing.
+    /// Gas intensive reference implementation of division for testing.
     function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
         internal
         pure
@@ -61,7 +62,7 @@ library LibOpIntMulNP {
         unchecked {
             uint256 acc = inputs[0];
             for (uint256 i = 1; i < inputs.length; i++) {
-                acc *= inputs[i];
+                acc /= inputs[i];
             }
             outputs = new uint256[](1);
             outputs[0] = acc;

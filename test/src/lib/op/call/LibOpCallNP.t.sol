@@ -186,7 +186,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         traces[1].sourceIndex = 1;
         traces[1].stack = new uint256[](1);
         traces[1].stack[0] = 1e18;
-        checkCallNPTraces("_:int-add(call<1>() 1);_:1;", traces);
+        checkCallNPTraces("_:add(call<1>() 1);_:1;", traces);
     }
 
     function testCallTraceOuterAndTwoInner() external {
@@ -203,7 +203,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         traces[2].sourceIndex = 2;
         traces[2].stack = new uint256[](1);
         traces[2].stack[0] = 10e18;
-        checkCallNPTraces("_:int-add(call<1>(2) 1);two:,_:int-add(call<2>() 1);_:10;", traces);
+        checkCallNPTraces("_:add(call<1>(2) 1);two:,_:add(call<2>() 1);_:10;", traces);
     }
 
     /// Boilerplate for checking the stack and kvs of a call.
