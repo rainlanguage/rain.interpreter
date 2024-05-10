@@ -34,35 +34,35 @@ contract LibOpDecimal18Log10NPTest is OpTest {
         );
     }
 
-    /// Test the eval of `decimal18-log10`.
+    /// Test the eval of `log10`.
     function testOpDecimal18Log10NPEval() external {
-        checkHappy("_: decimal18-log10(1);", 0, "log10 1");
-        checkHappy("_: decimal18-log10(2);", 301029995663981195, "log10 2");
-        checkHappy("_: decimal18-log10(2.718281828459045235);", 434294481903251823, "log2 e");
-        checkHappy("_: decimal18-log10(3);", 477121254719662432, "log2 3");
-        checkHappy("_: decimal18-log10(4);", 602059991327962390, "log2 4");
-        checkHappy("_: decimal18-log10(5);", 698970004336018800, "log2 5");
+        checkHappy("_: log10(1);", 0, "log10 1");
+        checkHappy("_: log10(2);", 301029995663981195, "log10 2");
+        checkHappy("_: log10(2.718281828459045235);", 434294481903251823, "log2 e");
+        checkHappy("_: log10(3);", 477121254719662432, "log2 3");
+        checkHappy("_: log10(4);", 602059991327962390, "log2 4");
+        checkHappy("_: log10(5);", 698970004336018800, "log2 5");
     }
 
-    /// Test the eval of `decimal18-log10` for bad inputs.
+    /// Test the eval of `log10` for bad inputs.
     function testOpDecimal18Log10NPZeroInputs() external {
-        checkBadInputs("_: decimal18-log10();", 0, 1, 0);
+        checkBadInputs("_: log10();", 0, 1, 0);
     }
 
     function testOpDecimal18Log10NPTwoInputs() external {
-        checkBadInputs("_: decimal18-log10(1 1);", 2, 1, 2);
+        checkBadInputs("_: log10(1 1);", 2, 1, 2);
     }
 
     function testOpDecimal18Log10NPZeroOutputs() external {
-        checkBadOutputs(": decimal18-log10(1);", 1, 1, 0);
+        checkBadOutputs(": log10(1);", 1, 1, 0);
     }
 
     function testOpDecimal18Log10NPTwoOutputs() external {
-        checkBadOutputs("_ _: decimal18-log10(1);", 1, 1, 2);
+        checkBadOutputs("_ _: log10(1);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.
     function testOpDecimal18Log10NPEvalOperandDisallowed() external {
-        checkUnhappyParse("_: decimal18-log10<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
+        checkUnhappyParse("_: log10<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

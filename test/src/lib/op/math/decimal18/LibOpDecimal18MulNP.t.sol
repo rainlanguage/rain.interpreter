@@ -69,105 +69,105 @@ contract LibOpDecimal18MulNPTest is OpTest {
         );
     }
 
-    /// Test the eval of `decimal18-mul` opcode parsed from a string.
+    /// Test the eval of `mul` opcode parsed from a string.
     /// Tests zero inputs.
     function testOpDecimal18MulNPEvalZeroInputs() external {
-        checkBadInputs("_: decimal18-mul();", 0, 2, 0);
+        checkBadInputs("_: mul();", 0, 2, 0);
     }
 
-    /// Test the eval of `decimal18-mul` opcode parsed from a string.
+    /// Test the eval of `mul` opcode parsed from a string.
     /// Tests one input.
     function testOpDecimal18MulNPEvalOneInput() external {
-        checkBadInputs("_: decimal18-mul(5);", 1, 2, 1);
-        checkBadInputs("_: decimal18-mul(0);", 1, 2, 1);
-        checkBadInputs("_: decimal18-mul(1);", 1, 2, 1);
-        checkBadInputs("_: decimal18-mul(max-decimal18-value());", 1, 2, 1);
+        checkBadInputs("_: mul(5);", 1, 2, 1);
+        checkBadInputs("_: mul(0);", 1, 2, 1);
+        checkBadInputs("_: mul(1);", 1, 2, 1);
+        checkBadInputs("_: mul(max-value());", 1, 2, 1);
     }
 
     function testOpDecimal18MulNPZeroOutputs() external {
-        checkBadOutputs(": decimal18-mul(0 0);", 2, 1, 0);
+        checkBadOutputs(": mul(0 0);", 2, 1, 0);
     }
 
     function testOpDecimal18MulNPTwoOutputs() external {
-        checkBadOutputs("_ _: decimal18-mul(0 0);", 2, 1, 2);
+        checkBadOutputs("_ _: mul(0 0);", 2, 1, 2);
     }
 
-    /// Test the eval of `decimal18-mul` opcode parsed from a string.
+    /// Test the eval of `mul` opcode parsed from a string.
     /// Tests two inputs.
     /// Tests the happy path where we do not overflow.
     function testOpDecimal18MulNPEvalTwoInputsHappy() external {
-        checkHappy("_: decimal18-mul(0 1);", 0, "0 1");
-        checkHappy("_: decimal18-mul(1 1);", 1e18, "1 1");
-        checkHappy("_: decimal18-mul(1 2);", 2e18, "1 2");
-        checkHappy("_: decimal18-mul(2 1);", 2e18, "2 1");
-        checkHappy("_: decimal18-mul(2 2);", 4e18, "2 2");
-        checkHappy("_: decimal18-mul(2 0.1);", 2e17, "2 0.1");
-        checkHappy("_: decimal18-mul(1 0.1);", 1e17, "1 0.1");
-        checkHappy("_: decimal18-mul(1 0.01);", 1e16, "1 0.01");
-        checkHappy("_: decimal18-mul(0.001 0.001);", 1e12, "0.001 0.001");
-        checkHappy("_: decimal18-mul(10 10);", 1e20, "10 10");
+        checkHappy("_: mul(0 1);", 0, "0 1");
+        checkHappy("_: mul(1 1);", 1e18, "1 1");
+        checkHappy("_: mul(1 2);", 2e18, "1 2");
+        checkHappy("_: mul(2 1);", 2e18, "2 1");
+        checkHappy("_: mul(2 2);", 4e18, "2 2");
+        checkHappy("_: mul(2 0.1);", 2e17, "2 0.1");
+        checkHappy("_: mul(1 0.1);", 1e17, "1 0.1");
+        checkHappy("_: mul(1 0.01);", 1e16, "1 0.01");
+        checkHappy("_: mul(0.001 0.001);", 1e12, "0.001 0.001");
+        checkHappy("_: mul(10 10);", 1e20, "10 10");
         // Test an intermediate overflow.
-        checkHappy("_: decimal18-mul(1 max-decimal18-value());", type(uint256).max, "1 max-decimal18-value()");
+        checkHappy("_: mul(1 max-value());", type(uint256).max, "1 max-value()");
     }
 
-    /// Test the eval of `decimal18-mul` opcode parsed from a string.
+    /// Test the eval of `mul` opcode parsed from a string.
     /// Tests two inputs.
     /// Tests the unhappy path where the final result overflows.
     function testOpDecimal18MulNPEvalTwoInputsUnhappyOverflow() external {
         checkUnhappy(
-            "_: decimal18-mul(max-decimal18-value() 10);",
+            "_: mul(max-value() 10);",
             abi.encodeWithSelector(PRBMath_MulDiv18_Overflow.selector, type(uint256).max, 1e19)
         );
         checkUnhappy(
-            "_: decimal18-mul(1e52 1e12);", abi.encodeWithSelector(PRBMath_MulDiv18_Overflow.selector, 1e70, 1e30)
+            "_: mul(1e52 1e12);", abi.encodeWithSelector(PRBMath_MulDiv18_Overflow.selector, 1e70, 1e30)
         );
     }
 
-    /// Test the eval of `decimal18-mul` opcode parsed from a string.
+    /// Test the eval of `mul` opcode parsed from a string.
     /// Tests three inputs.
     /// Tests the happy path where we do not divide by zero or overflow.
     function testOpDecimal18MulNPEvalThreeInputsHappy() external {
-        checkHappy("_: decimal18-mul(0 0 0);", 0, "0 0 0");
-        checkHappy("_: decimal18-mul(1 0 0);", 0, "1 0 0");
-        checkHappy("_: decimal18-mul(1 1 0);", 0, "1 1 0");
-        checkHappy("_: decimal18-mul(1 1 1);", 1e18, "1 1 1");
-        checkHappy("_: decimal18-mul(1 1 2);", 2e18, "1 1 2");
-        checkHappy("_: decimal18-mul(1 2 1);", 2e18, "1 2 1");
-        checkHappy("_: decimal18-mul(2 1 1);", 2e18, "2 1 1");
-        checkHappy("_: decimal18-mul(2 2 2);", 8e18, "2 2 2");
-        checkHappy("_: decimal18-mul(2 0.1 1);", 2e17, "2 0.1 1");
-        checkHappy("_: decimal18-mul(1 0.1 1);", 1e17, "1 0.1 1");
-        checkHappy("_: decimal18-mul(1 0.01 1);", 1e16, "1 0.01 1");
-        checkHappy("_: decimal18-mul(0.001 0.001 0.001);", 1e9, "0.001 0.001 0.001");
-        checkHappy("_: decimal18-mul(10 10 10);", 1e21, "10 10 10");
+        checkHappy("_: mul(0 0 0);", 0, "0 0 0");
+        checkHappy("_: mul(1 0 0);", 0, "1 0 0");
+        checkHappy("_: mul(1 1 0);", 0, "1 1 0");
+        checkHappy("_: mul(1 1 1);", 1e18, "1 1 1");
+        checkHappy("_: mul(1 1 2);", 2e18, "1 1 2");
+        checkHappy("_: mul(1 2 1);", 2e18, "1 2 1");
+        checkHappy("_: mul(2 1 1);", 2e18, "2 1 1");
+        checkHappy("_: mul(2 2 2);", 8e18, "2 2 2");
+        checkHappy("_: mul(2 0.1 1);", 2e17, "2 0.1 1");
+        checkHappy("_: mul(1 0.1 1);", 1e17, "1 0.1 1");
+        checkHappy("_: mul(1 0.01 1);", 1e16, "1 0.01 1");
+        checkHappy("_: mul(0.001 0.001 0.001);", 1e9, "0.001 0.001 0.001");
+        checkHappy("_: mul(10 10 10);", 1e21, "10 10 10");
         // Test an intermediate overflow.
-        checkHappy("_: decimal18-mul(1 max-decimal18-value() 1);", type(uint256).max, "1 max-decimal18-value() 1");
+        checkHappy("_: mul(1 max-value() 1);", type(uint256).max, "1 max-value() 1");
     }
 
-    /// Test the eval of `decimal18-mul` opcode parsed from a string.
+    /// Test the eval of `mul` opcode parsed from a string.
     /// Tests three inputs.
     /// Tests the unhappy path where the final result overflows.
     function testOpDecimal18MulNPEvalThreeInputsUnhappyOverflow() external {
         checkUnhappy(
-            "_: decimal18-mul(max-decimal18-value() 1 10);",
+            "_: mul(max-value() 1 10);",
             abi.encodeWithSelector(PRBMath_MulDiv18_Overflow.selector, type(uint256).max, 1e19)
         );
         checkUnhappy(
-            "_: decimal18-mul(1e52 1 1e8);", abi.encodeWithSelector(PRBMath_MulDiv18_Overflow.selector, 1e70, 1e26)
+            "_: mul(1e52 1 1e8);", abi.encodeWithSelector(PRBMath_MulDiv18_Overflow.selector, 1e70, 1e26)
         );
         checkUnhappy(
-            "_: decimal18-mul(1e52 1e8 1);", abi.encodeWithSelector(PRBMath_MulDiv18_Overflow.selector, 1e70, 1e26)
+            "_: mul(1e52 1e8 1);", abi.encodeWithSelector(PRBMath_MulDiv18_Overflow.selector, 1e70, 1e26)
         );
     }
 
-    /// Test the eval of `decimal18-mul` opcode parsed from a string.
+    /// Test the eval of `mul` opcode parsed from a string.
     /// Tests that operands are disallowed.
     function testOpDecimal18MulNPEvalOperandsDisallowed() external {
-        checkDisallowedOperand("_: decimal18-mul<0>(1 1 1);");
-        checkDisallowedOperand("_: decimal18-mul<1>(1 1 1);");
-        checkDisallowedOperand("_: decimal18-mul<2>(1 1 1);");
-        checkDisallowedOperand("_: decimal18-mul<0 0>(1 1 1);");
-        checkDisallowedOperand("_: decimal18-mul<0 1>(1 1 1);");
-        checkDisallowedOperand("_: decimal18-mul<1 0>(1 1 1);");
+        checkDisallowedOperand("_: mul<0>(1 1 1);");
+        checkDisallowedOperand("_: mul<1>(1 1 1);");
+        checkDisallowedOperand("_: mul<2>(1 1 1);");
+        checkDisallowedOperand("_: mul<0 0>(1 1 1);");
+        checkDisallowedOperand("_: mul<0 1>(1 1 1);");
+        checkDisallowedOperand("_: mul<1 0>(1 1 1);");
     }
 }

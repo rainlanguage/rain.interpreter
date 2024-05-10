@@ -33,34 +33,34 @@ contract LibOpDecimal18ExpNPTest is OpTest {
         );
     }
 
-    /// Test the eval of `decimal18-exp`.
+    /// Test the eval of `exp`.
     function testOpDecimal18ExpNPEval() external {
-        checkHappy("_: decimal18-exp(0);", 1e18, "e^0");
-        checkHappy("_: decimal18-exp(1);", 2718281828459045234, "e^1");
-        checkHappy("_: decimal18-exp(0.5);", 1648721270700128145, "e^0.5");
-        checkHappy("_: decimal18-exp(2);", 7389056098930650223, "e^2");
-        checkHappy("_: decimal18-exp(3);", 20085536923187667724, "e^3");
+        checkHappy("_: exp(0);", 1e18, "e^0");
+        checkHappy("_: exp(1);", 2718281828459045234, "e^1");
+        checkHappy("_: exp(0.5);", 1648721270700128145, "e^0.5");
+        checkHappy("_: exp(2);", 7389056098930650223, "e^2");
+        checkHappy("_: exp(3);", 20085536923187667724, "e^3");
     }
 
-    /// Test the eval of `decimal18-exp` for bad inputs.
+    /// Test the eval of `exp` for bad inputs.
     function testOpDecimal18ExpNPEvalZeroInputs() external {
-        checkBadInputs("_: decimal18-exp();", 0, 1, 0);
+        checkBadInputs("_: exp();", 0, 1, 0);
     }
 
     function testOpDecimal18ExpNPEvalTwoInputs() external {
-        checkBadInputs("_: decimal18-exp(1 1);", 2, 1, 2);
+        checkBadInputs("_: exp(1 1);", 2, 1, 2);
     }
 
     function testOpDecimal18ExpNPZeroOutputs() external {
-        checkBadOutputs(": decimal18-exp(1);", 1, 1, 0);
+        checkBadOutputs(": exp(1);", 1, 1, 0);
     }
 
     function testOpDecimal18ExpNPTwoOutputs() external {
-        checkBadOutputs("_ _: decimal18-exp(1);", 1, 1, 2);
+        checkBadOutputs("_ _: exp(1);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.
     function testOpDecimal18ExpNPEvalOperandDisallowed() external {
-        checkUnhappyParse("_: decimal18-exp<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
+        checkUnhappyParse("_: exp<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

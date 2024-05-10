@@ -36,38 +36,38 @@ contract LibOpDecimal18GmNPTest is OpTest {
         );
     }
 
-    /// Test the eval of `decimal18-gm`.
+    /// Test the eval of `gm`.
     function testOpDecimal18GmNPEval() external {
-        checkHappy("_: decimal18-gm(0 0);", 0, "0 0");
-        checkHappy("_: decimal18-gm(0 1);", 0, "0 1");
-        checkHappy("_: decimal18-gm(1 0);", 0, "1 0");
-        checkHappy("_: decimal18-gm(1 1);", 1e18, "1 1");
-        checkHappy("_: decimal18-gm(1 2);", 1414213562373095048, "1 2");
-        checkHappy("_: decimal18-gm(2 2);", 2e18, "2 2");
-        checkHappy("_: decimal18-gm(2 3);", 2449489742783178098, "2 3");
-        checkHappy("_: decimal18-gm(2 4);", 2828427124746190097, "2 4");
-        checkHappy("_: decimal18-gm(4 0.5);", 1414213562373095048, "4 0.5");
+        checkHappy("_: gm(0 0);", 0, "0 0");
+        checkHappy("_: gm(0 1);", 0, "0 1");
+        checkHappy("_: gm(1 0);", 0, "1 0");
+        checkHappy("_: gm(1 1);", 1e18, "1 1");
+        checkHappy("_: gm(1 2);", 1414213562373095048, "1 2");
+        checkHappy("_: gm(2 2);", 2e18, "2 2");
+        checkHappy("_: gm(2 3);", 2449489742783178098, "2 3");
+        checkHappy("_: gm(2 4);", 2828427124746190097, "2 4");
+        checkHappy("_: gm(4 0.5);", 1414213562373095048, "4 0.5");
     }
 
-    /// Test the eval of `decimal18-gm` for bad inputs.
+    /// Test the eval of `gm` for bad inputs.
     function testOpDecimal18GmNPOneInput() external {
-        checkBadInputs("_: decimal18-gm(1e18);", 1, 2, 1);
+        checkBadInputs("_: gm(1e18);", 1, 2, 1);
     }
 
     function testOpDecimal18GmNPThreeInputs() external {
-        checkBadInputs("_: decimal18-gm(1 1 1);", 3, 2, 3);
+        checkBadInputs("_: gm(1 1 1);", 3, 2, 3);
     }
 
     function testOpDecimal18GmNPZeroOutputs() external {
-        checkBadOutputs(": decimal18-gm(1 1);", 2, 1, 0);
+        checkBadOutputs(": gm(1 1);", 2, 1, 0);
     }
 
     function testOpDecimal18GmNPTwoOutputs() external {
-        checkBadOutputs("_ _: decimal18-gm(1 1);", 2, 1, 2);
+        checkBadOutputs("_ _: gm(1 1);", 2, 1, 2);
     }
 
     /// Test that operand is disallowed.
     function testOpDecimal18GmNPEvalOperandDisallowed() external {
-        checkUnhappyParse("_: decimal18-gm<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector));
+        checkUnhappyParse("_: gm<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

@@ -41,47 +41,47 @@ contract LibOpDecimal18PowNPTest is OpTest {
         );
     }
 
-    /// Test the eval of `decimal18-power`.
+    /// Test the eval of `power`.
     function testOpDecimal18PowNPEval() external {
         // 0 ^ 0
-        checkHappy("_: decimal18-power(0 0);", 1e18, "0 0");
+        checkHappy("_: power(0 0);", 1e18, "0 0");
         // 0 ^ 1
-        checkHappy("_: decimal18-power(0 1);", 0, "0 1");
+        checkHappy("_: power(0 1);", 0, "0 1");
         // 1e18 ^ 0
-        checkHappy("_: decimal18-power(1 0);", 1e18, "1e18 0");
+        checkHappy("_: power(1 0);", 1e18, "1e18 0");
         // 1 ^ 1
-        checkHappy("_: decimal18-power(1 1);", 1e18, "1e18 1");
+        checkHappy("_: power(1 1);", 1e18, "1e18 1");
         // 1 ^ 2
-        checkHappy("_: decimal18-power(1 2);", 1e18, "1e18 2");
+        checkHappy("_: power(1 2);", 1e18, "1e18 2");
         // 2 ^ 2
-        checkHappy("_: decimal18-power(2 2);", 4e18, "2e18 2");
+        checkHappy("_: power(2 2);", 4e18, "2e18 2");
         // 2 ^ 3
-        checkHappy("_: decimal18-power(2 3);", 8e18, "2e18 3");
+        checkHappy("_: power(2 3);", 8e18, "2e18 3");
         // 2 ^ 4
-        checkHappy("_: decimal18-power(2 4);", 16e18, "2e18 4");
+        checkHappy("_: power(2 4);", 16e18, "2e18 4");
         // sqrt 4 = 2
-        checkHappy("_: decimal18-power(4 0.5);", 2e18, "4e18 5");
+        checkHappy("_: power(4 0.5);", 2e18, "4e18 5");
     }
 
-    /// Test the eval of `decimal18-power` for bad inputs.
+    /// Test the eval of `power` for bad inputs.
     function testOpDecimal18PowNPEvalOneInput() external {
-        checkBadInputs("_: decimal18-power(1);", 1, 2, 1);
+        checkBadInputs("_: power(1);", 1, 2, 1);
     }
 
     function testOpDecimal18PowNPThreeInputs() external {
-        checkBadInputs("_: decimal18-power(1 1 1);", 3, 2, 3);
+        checkBadInputs("_: power(1 1 1);", 3, 2, 3);
     }
 
     function testOpDecimal18PowNPZeroOutputs() external {
-        checkBadOutputs(": decimal18-power(1 1);", 2, 1, 0);
+        checkBadOutputs(": power(1 1);", 2, 1, 0);
     }
 
     function testOpDecimal18PowNPTwoOutputs() external {
-        checkBadOutputs("_ _: decimal18-power(1 1);", 2, 1, 2);
+        checkBadOutputs("_ _: power(1 1);", 2, 1, 2);
     }
 
     /// Test that operand is disallowed.
     function testOpDecimal18PowNPEvalOperandDisallowed() external {
-        checkUnhappyParse("_: decimal18-power<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector));
+        checkUnhappyParse("_: power<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

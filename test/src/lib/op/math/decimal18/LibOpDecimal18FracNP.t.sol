@@ -33,35 +33,35 @@ contract LibOpDecimal18FracNPTest is OpTest {
         );
     }
 
-    /// Test the eval of `decimal18-frac`.
+    /// Test the eval of `frac`.
     function testOpDecimal18FracNPEval() external {
-        checkHappy("_: decimal18-frac(0);", 0, "0");
-        checkHappy("_: decimal18-frac(1);", 0, "1");
-        checkHappy("_: decimal18-frac(0.5);", 0.5e18, "0.5");
-        checkHappy("_: decimal18-frac(2);", 0, "2");
-        checkHappy("_: decimal18-frac(3);", 0, "3");
-        checkHappy("_: decimal18-frac(3.8);", 0.8e18, "3.8");
+        checkHappy("_: frac(0);", 0, "0");
+        checkHappy("_: frac(1);", 0, "1");
+        checkHappy("_: frac(0.5);", 0.5e18, "0.5");
+        checkHappy("_: frac(2);", 0, "2");
+        checkHappy("_: frac(3);", 0, "3");
+        checkHappy("_: frac(3.8);", 0.8e18, "3.8");
     }
 
-    /// Test the eval of `decimal18-frac` for bad inputs.
+    /// Test the eval of `frac` for bad inputs.
     function testOpDecimal18FracNPZeroInputs() external {
-        checkBadInputs("_: decimal18-frac();", 0, 1, 0);
+        checkBadInputs("_: frac();", 0, 1, 0);
     }
 
     function testOpDecimal18FracNPTwoInputs() external {
-        checkBadInputs("_: decimal18-frac(1 1);", 2, 1, 2);
+        checkBadInputs("_: frac(1 1);", 2, 1, 2);
     }
 
     function testOpDecimal18FracNPZeroOutputs() external {
-        checkBadOutputs(": decimal18-frac(1);", 1, 1, 0);
+        checkBadOutputs(": frac(1);", 1, 1, 0);
     }
 
     function testOpDecimal18FracNPTwoOutputs() external {
-        checkBadOutputs("_ _: decimal18-frac(1);", 1, 1, 2);
+        checkBadOutputs("_ _: frac(1);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.
     function testOpDecimal18FracNPEvalOperandDisallowed() external {
-        checkUnhappyParse("_: decimal18-frac<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
+        checkUnhappyParse("_: frac<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

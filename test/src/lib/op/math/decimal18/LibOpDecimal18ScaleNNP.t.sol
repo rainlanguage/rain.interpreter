@@ -44,106 +44,106 @@ contract LibOpDecimal18ScaleNNPTest is OpTest {
         );
     }
 
-    /// Test the eval of `decimal18-scale-n`.
+    /// Test the eval of `scale-n`.
     function testOpDecimal18ScaleNNPEval() external {
         // Scale 0 value 0 round 0 saturate 0
-        checkHappy("_: decimal18-scale-n<0>(0);", 0, "0 0 0 0");
+        checkHappy("_: scale-n<0>(0);", 0, "0 0 0 0");
         // Scale 0 value 0 round 0 saturate 1
-        checkHappy("_: decimal18-scale-n<0 0 1>(0);", 0, "0 0 0 1");
+        checkHappy("_: scale-n<0 0 1>(0);", 0, "0 0 0 1");
         // Scale 0 value 0 round 1 saturate 0
-        checkHappy("_: decimal18-scale-n<0 1 0>(0);", 0, "0 0 1 0");
+        checkHappy("_: scale-n<0 1 0>(0);", 0, "0 0 1 0");
         // Scale 0 value 0 round 1 saturate 1
-        checkHappy("_: decimal18-scale-n<0 1 1>(0);", 0, "0 0 1 1");
+        checkHappy("_: scale-n<0 1 1>(0);", 0, "0 0 1 1");
         // Scale 0 value 1 round 0 saturate 0
-        checkHappy("_: decimal18-scale-n<0>(1e-18);", 0, "0 1 0 0");
+        checkHappy("_: scale-n<0>(1e-18);", 0, "0 1 0 0");
         // Scale 0 value 1 round 0 saturate 1
-        checkHappy("_: decimal18-scale-n<0 0 1>(1e-18);", 0, "0 1 0 1");
+        checkHappy("_: scale-n<0 0 1>(1e-18);", 0, "0 1 0 1");
         // Scale 0 value 1 round 1 saturate 0
-        checkHappy("_: decimal18-scale-n<0 1 0>(1e-18);", 1, "0 1 1 0");
+        checkHappy("_: scale-n<0 1 0>(1e-18);", 1, "0 1 1 0");
         // Scale 0 value 1 round 1 saturate 1
-        checkHappy("_: decimal18-scale-n<0 1 1>(1e-18);", 1, "0 1 1 1");
+        checkHappy("_: scale-n<0 1 1>(1e-18);", 1, "0 1 1 1");
         // Scale 1 value 0 round 0 saturate 0
-        checkHappy("_: decimal18-scale-n<1>(0);", 0, "1 0 0 0");
+        checkHappy("_: scale-n<1>(0);", 0, "1 0 0 0");
         // Scale 1 value 0 round 0 saturate 1
-        checkHappy("_: decimal18-scale-n<1 0 1>(0);", 0, "1 0 0 1");
+        checkHappy("_: scale-n<1 0 1>(0);", 0, "1 0 0 1");
         // Scale 1 value 0 round 1 saturate 0
-        checkHappy("_: decimal18-scale-n<1 1 0>(0);", 0, "1 0 1 0");
+        checkHappy("_: scale-n<1 1 0>(0);", 0, "1 0 1 0");
         // Scale 1 value 0 round 1 saturate 1
-        checkHappy("_: decimal18-scale-n<1 1 1>(0);", 0, "1 0 1 1");
+        checkHappy("_: scale-n<1 1 1>(0);", 0, "1 0 1 1");
         // Scale 1 value 1 round 0 saturate 0
-        checkHappy("_: decimal18-scale-n<1>(1e-18);", 0, "1 1 0 0");
+        checkHappy("_: scale-n<1>(1e-18);", 0, "1 1 0 0");
         // Scale 1 value 1 round 0 saturate 1
-        checkHappy("_: decimal18-scale-n<1 0 1>(1e-18);", 0, "1 1 0 1");
+        checkHappy("_: scale-n<1 0 1>(1e-18);", 0, "1 1 0 1");
         // Scale 1 value 1 round 1 saturate 0
-        checkHappy("_: decimal18-scale-n<1 1 0>(1e-18);", 1, "1 1 1 0");
+        checkHappy("_: scale-n<1 1 0>(1e-18);", 1, "1 1 1 0");
         // Scale 1 value 1 round 1 saturate 1
-        checkHappy("_: decimal18-scale-n<1 1 1>(1e-18);", 1, "1 1 1 1");
+        checkHappy("_: scale-n<1 1 1>(1e-18);", 1, "1 1 1 1");
         // Scale 18 value 1 round 0 saturate 0
-        checkHappy("_: decimal18-scale-n<18>(1e-18);", 1, "18 1 0 0");
+        checkHappy("_: scale-n<18>(1e-18);", 1, "18 1 0 0");
         // Scale 18 value 1 round 0 saturate 1
-        checkHappy("_: decimal18-scale-n<18 0 1>(1e-18);", 1, "18 1 0 1");
+        checkHappy("_: scale-n<18 0 1>(1e-18);", 1, "18 1 0 1");
         // Scale 18 value 1 round 1 saturate 0
-        checkHappy("_: decimal18-scale-n<18 1 0>(1e-18);", 1, "18 1 1 0");
+        checkHappy("_: scale-n<18 1 0>(1e-18);", 1, "18 1 1 0");
         // Scale 18 value 1 round 1 saturate 1
-        checkHappy("_: decimal18-scale-n<18 1 1>(1e-18);", 1, "18 1 1 1");
+        checkHappy("_: scale-n<18 1 1>(1e-18);", 1, "18 1 1 1");
         // Scale 18 value 1e18 round 0 saturate 0
-        checkHappy("_: decimal18-scale-n<18>(1);", 1e18, "18 1e18 0 0");
+        checkHappy("_: scale-n<18>(1);", 1e18, "18 1e18 0 0");
         // Scale 18 value 1e18 round 0 saturate 1
-        checkHappy("_: decimal18-scale-n<18 0 1>(1);", 1e18, "18 1e18 0 1");
+        checkHappy("_: scale-n<18 0 1>(1);", 1e18, "18 1e18 0 1");
         // Scale 18 value 1e18 round 1 saturate 0
-        checkHappy("_: decimal18-scale-n<18 1 0>(1);", 1e18, "18 1e18 1 0");
+        checkHappy("_: scale-n<18 1 0>(1);", 1e18, "18 1e18 1 0");
         // Scale 18 value 1e18 round 1 saturate 1
-        checkHappy("_: decimal18-scale-n<18 1 1>(1);", 1e18, "18 1e18 1 1");
+        checkHappy("_: scale-n<18 1 1>(1);", 1e18, "18 1e18 1 1");
         // Scale 19 value 1e18 round 0 saturate 0
-        checkHappy("_: decimal18-scale-n<19>(1);", 1e19, "19 1e18 0 0");
+        checkHappy("_: scale-n<19>(1);", 1e19, "19 1e18 0 0");
         // Scale 19 value 1e18 round 0 saturate 1
-        checkHappy("_: decimal18-scale-n<19 0 1>(1);", 1e19, "19 1e18 0 1");
+        checkHappy("_: scale-n<19 0 1>(1);", 1e19, "19 1e18 0 1");
         // Scale 19 value 1e18 round 1 saturate 0
-        checkHappy("_: decimal18-scale-n<19 1 0>(1);", 1e19, "19 1e18 1 0");
+        checkHappy("_: scale-n<19 1 0>(1);", 1e19, "19 1e18 1 0");
         // Scale 19 value 1e18 round 1 saturate 1
-        checkHappy("_: decimal18-scale-n<19 1 1>(1);", 1e19, "19 1e18 1 1");
+        checkHappy("_: scale-n<19 1 1>(1);", 1e19, "19 1e18 1 1");
 
         // Test rounding down while scaling down.
-        checkHappy("_: decimal18-scale-n<17>(1e-18);", 0, "19 1 0 0");
+        checkHappy("_: scale-n<17>(1e-18);", 0, "19 1 0 0");
         // Test rounding up while scaling down.
-        checkHappy("_: decimal18-scale-n<17 1>(1e-18);", 1, "19 1 1 0");
+        checkHappy("_: scale-n<17 1>(1e-18);", 1, "19 1 1 0");
         // Test saturating while scaling up.
-        checkHappy("_: decimal18-scale-n<36 0 1>(1e52);", type(uint256).max, "0 1e70 0 1");
+        checkHappy("_: scale-n<36 0 1>(1e52);", type(uint256).max, "0 1e70 0 1");
         // Test error while scaling up.
-        checkUnhappy("_: decimal18-scale-n<36>(1e52);", stdError.arithmeticError);
+        checkUnhappy("_: scale-n<36>(1e52);", stdError.arithmeticError);
     }
 
-    /// Test the eval of `decimal18-to-int` which is an alias of `decimal18-scale-n<0>`.
+    /// Test the eval of `decimal18-to-uint256` which is an alias of `scale-n<0>`.
     function testOpDecimal18ToIntNPEval() external {
-        checkHappy("_: decimal18-to-int(0);", 0, "0 0 0 0");
-        checkHappy("_: decimal18-to-int(1e-18);", 0, "0 1 0 0");
-        checkHappy("_: decimal18-to-int(0.5);", 0, "0 5e17 0 0");
-        checkHappy("_: decimal18-to-int(1);", 1, "0 1e18 0 0");
-        checkHappy("_: decimal18-to-int(1.5);", 1, "0 15e17 0 0");
-        checkHappy("_: decimal18-to-int(1.9);", 1, "0 19e17 0 0");
-        checkHappy("_: decimal18-to-int(2);", 2, "0 2e18 0 0");
+        checkHappy("_: decimal18-to-uint256(0);", 0, "0 0 0 0");
+        checkHappy("_: decimal18-to-uint256(1e-18);", 0, "0 1 0 0");
+        checkHappy("_: decimal18-to-uint256(0.5);", 0, "0 5e17 0 0");
+        checkHappy("_: decimal18-to-uint256(1);", 1, "0 1e18 0 0");
+        checkHappy("_: decimal18-to-uint256(1.5);", 1, "0 15e17 0 0");
+        checkHappy("_: decimal18-to-uint256(1.9);", 1, "0 19e17 0 0");
+        checkHappy("_: decimal18-to-uint256(2);", 2, "0 2e18 0 0");
     }
 
-    /// Test the eval of `decimal18-scale-n` opcode parsed from a string.
+    /// Test the eval of `scale-n` opcode parsed from a string.
     /// Tests zero inputs.
     function testOpDecimal18ScaleNNPEvalZeroInputs() external {
-        checkBadInputs("_: decimal18-scale-n<0>();", 0, 1, 0);
+        checkBadInputs("_: scale-n<0>();", 0, 1, 0);
     }
 
-    /// Test the eval of `decimal18-scale-n` opcode parsed from a string.
+    /// Test the eval of `scale-n` opcode parsed from a string.
     /// Tests two inputs.
     function testOpDecimal18ScaleNNPEvalOneInput() external {
-        checkBadInputs("_: decimal18-scale-n<0>(0 5);", 2, 1, 2);
-        checkBadInputs("_: decimal18-scale-n<0>(0 0);", 2, 1, 2);
-        checkBadInputs("_: decimal18-scale-n<0>(0 1);", 2, 1, 2);
-        checkBadInputs("_: decimal18-scale-n<0>(0 max-int-value());", 2, 1, 2);
+        checkBadInputs("_: scale-n<0>(0 5);", 2, 1, 2);
+        checkBadInputs("_: scale-n<0>(0 0);", 2, 1, 2);
+        checkBadInputs("_: scale-n<0>(0 1);", 2, 1, 2);
+        checkBadInputs("_: scale-n<0>(0 max-value());", 2, 1, 2);
     }
 
     function testOpDecimal18ScaleNNPEvalZeroOutputs() external {
-        checkBadOutputs(": decimal18-scale-n<0>(0);", 1, 1, 0);
+        checkBadOutputs(": scale-n<0>(0);", 1, 1, 0);
     }
 
     function testOpDecimal18ScaleNNPTwoOutputs() external {
-        checkBadOutputs("_ _: decimal18-scale-n<0>(0);", 1, 1, 2);
+        checkBadOutputs("_ _: scale-n<0>(0);", 1, 1, 2);
     }
 }

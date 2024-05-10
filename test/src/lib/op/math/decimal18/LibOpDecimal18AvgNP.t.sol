@@ -41,38 +41,38 @@ contract LibOpDecimal18AvgNPTest is OpTest {
         );
     }
 
-    /// Test the eval of `decimal18-avg`.
+    /// Test the eval of `avg`.
     function testOpDecimal18AvgNPEval() external {
-        checkHappy("_: decimal18-avg(0 0);", 0, "0 0");
-        checkHappy("_: decimal18-avg(0 1);", 5e17, "0 1");
-        checkHappy("_: decimal18-avg(1 0);", 5e17, "1 0");
-        checkHappy("_: decimal18-avg(1 1);", 1e18, "1 1");
-        checkHappy("_: decimal18-avg(1 2);", 1.5e18, "1 2");
-        checkHappy("_: decimal18-avg(2 2);", 2e18, "2 2");
-        checkHappy("_: decimal18-avg(2 3);", 2.5e18, "2 3");
-        checkHappy("_: decimal18-avg(2 4);", 3e18, "2 4");
-        checkHappy("_: decimal18-avg(4 0.5);", 2.25e18, "4 5");
+        checkHappy("_: avg(0 0);", 0, "0 0");
+        checkHappy("_: avg(0 1);", 5e17, "0 1");
+        checkHappy("_: avg(1 0);", 5e17, "1 0");
+        checkHappy("_: avg(1 1);", 1e18, "1 1");
+        checkHappy("_: avg(1 2);", 1.5e18, "1 2");
+        checkHappy("_: avg(2 2);", 2e18, "2 2");
+        checkHappy("_: avg(2 3);", 2.5e18, "2 3");
+        checkHappy("_: avg(2 4);", 3e18, "2 4");
+        checkHappy("_: avg(4 0.5);", 2.25e18, "4 5");
     }
 
-    /// Test the eval of `decimal18-avg` for bad inputs.
+    /// Test the eval of `avg` for bad inputs.
     function testOpDecimal18AvgNPEvalOneInput() external {
-        checkBadInputs("_: decimal18-avg(1e18);", 1, 2, 1);
+        checkBadInputs("_: avg(1);", 1, 2, 1);
     }
 
     function testOpDecimal18AvgNPEvalThreeInputs() external {
-        checkBadInputs("_: decimal18-avg(1 1 1);", 3, 2, 3);
+        checkBadInputs("_: avg(1 1 1);", 3, 2, 3);
     }
 
     function testOpDecimal18AvgNPEvalZeroOutputs() external {
-        checkBadOutputs(": decimal18-avg(0 0);", 2, 1, 0);
+        checkBadOutputs(": avg(0 0);", 2, 1, 0);
     }
 
     function testOpDecimal18AvgNPEvalTwoOutputs() external {
-        checkBadOutputs("_ _: decimal18-avg(0 0);", 2, 1, 2);
+        checkBadOutputs("_ _: avg(0 0);", 2, 1, 2);
     }
 
     /// Test that operand is disallowed.
     function testOpDecimal18AvgNPEvalOperandDisallowed() external {
-        checkUnhappyParse("_: decimal18-avg<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector));
+        checkUnhappyParse("_: avg<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

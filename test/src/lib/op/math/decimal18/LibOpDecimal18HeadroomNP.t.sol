@@ -33,35 +33,35 @@ contract LibOpDecimal18HeadroomNPTest is OpTest {
         );
     }
 
-    /// Test the eval of `decimal18-headroom`.
+    /// Test the eval of `headroom`.
     function testOpDecimal18HeadroomNPEval() external {
-        checkHappy("_: decimal18-headroom(0);", 1e18, "0");
-        checkHappy("_: decimal18-headroom(1);", 1e18, "1");
-        checkHappy("_: decimal18-headroom(0.5);", 0.5e18, "0.5");
-        checkHappy("_: decimal18-headroom(2);", 1e18, "2");
-        checkHappy("_: decimal18-headroom(3);", 1e18, "3");
-        checkHappy("_: decimal18-headroom(3.8);", 0.2e18, "3.8");
+        checkHappy("_: headroom(0);", 1e18, "0");
+        checkHappy("_: headroom(1);", 1e18, "1");
+        checkHappy("_: headroom(0.5);", 0.5e18, "0.5");
+        checkHappy("_: headroom(2);", 1e18, "2");
+        checkHappy("_: headroom(3);", 1e18, "3");
+        checkHappy("_: headroom(3.8);", 0.2e18, "3.8");
     }
 
-    /// Test the eval of `decimal18-headroom` for bad inputs.
+    /// Test the eval of `headroom` for bad inputs.
     function testOpDecimal18HeadroomNPZeroInputs() external {
-        checkBadInputs("_: decimal18-headroom();", 0, 1, 0);
+        checkBadInputs("_: headroom();", 0, 1, 0);
     }
 
     function testOpDecimal18HeadroomNPTwoInputs() external {
-        checkBadInputs("_: decimal18-headroom(1 1);", 2, 1, 2);
+        checkBadInputs("_: headroom(1 1);", 2, 1, 2);
     }
 
     function testOpDecimal18HeadroomNPZeroOutputs() external {
-        checkBadOutputs(": decimal18-headroom(1);", 1, 1, 0);
+        checkBadOutputs(": headroom(1);", 1, 1, 0);
     }
 
     function testOpDecimal18HeadroomNPTwoOutputs() external {
-        checkBadOutputs("_ _: decimal18-headroom(1);", 1, 1, 2);
+        checkBadOutputs("_ _: headroom(1);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.
     function testOpDecimal18HeadroomNPEvalOperandDisallowed() external {
-        checkUnhappyParse("_: decimal18-headroom<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
+        checkUnhappyParse("_: headroom<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

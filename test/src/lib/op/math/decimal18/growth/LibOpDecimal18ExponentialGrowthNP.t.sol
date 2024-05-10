@@ -43,53 +43,53 @@ contract LibOpDecimal18ExponentialGrowthNPTest is OpTest {
         );
     }
 
-    /// Test the eval of `decimal18-exponential-growth`.
+    /// Test the eval of `exponential-growth`.
     function testOpDecimal18ExponentialGrowthNPEval() external {
-        checkHappy("_: decimal18-exponential-growth(0 0 0);", 0, "0 0 0");
-        checkHappy("_: decimal18-exponential-growth(0 0.1 0);", 0, "0 0.1 0");
-        checkHappy("_: decimal18-exponential-growth(0 0.1 1);", 0, "0 0.1 1");
-        checkHappy("_: decimal18-exponential-growth(1 0.1 0);", 1e18, "1 0.1 0");
-        checkHappy("_: decimal18-exponential-growth(1 0.1 1);", 1.1e18, "1 0.1 1");
+        checkHappy("_: exponential-growth(0 0 0);", 0, "0 0 0");
+        checkHappy("_: exponential-growth(0 0.1 0);", 0, "0 0.1 0");
+        checkHappy("_: exponential-growth(0 0.1 1);", 0, "0 0.1 1");
+        checkHappy("_: exponential-growth(1 0.1 0);", 1e18, "1 0.1 0");
+        checkHappy("_: exponential-growth(1 0.1 1);", 1.1e18, "1 0.1 1");
         // Not exactly 1.21
-        checkHappy("_: decimal18-exponential-growth(1 0.1 2);", 1209999999999999974, "1 0.1 2");
+        checkHappy("_: exponential-growth(1 0.1 2);", 1209999999999999974, "1 0.1 2");
         // Not exactly 1.26905870629
-        checkHappy("_: decimal18-exponential-growth(1 0.1 2.5);", 1269058706285883337, "1 0.1 2.5");
-        checkHappy("_: decimal18-exponential-growth(1 0 2);", 1e18, "1 0 2");
-        checkHappy("_: decimal18-exponential-growth(1 0.1 0.5);", 1048808848170151541, "1 0.1 0.5");
-        checkHappy("_: decimal18-exponential-growth(2 0.1 0);", 2e18, "2 0.1 0");
-        checkHappy("_: decimal18-exponential-growth(2 0.1 1);", 2.2e18, "2 0.1 1");
+        checkHappy("_: exponential-growth(1 0.1 2.5);", 1269058706285883337, "1 0.1 2.5");
+        checkHappy("_: exponential-growth(1 0 2);", 1e18, "1 0 2");
+        checkHappy("_: exponential-growth(1 0.1 0.5);", 1048808848170151541, "1 0.1 0.5");
+        checkHappy("_: exponential-growth(2 0.1 0);", 2e18, "2 0.1 0");
+        checkHappy("_: exponential-growth(2 0.1 1);", 2.2e18, "2 0.1 1");
         // Not exactly 2.42
-        checkHappy("_: decimal18-exponential-growth(2 0.1 2);", 2419999999999999948, "2 0.1 2");
+        checkHappy("_: exponential-growth(2 0.1 2);", 2419999999999999948, "2 0.1 2");
     }
 
     function testOpDecimal18ExponentialGrowthNPEvalZeroInputs() external {
-        checkBadInputs(": decimal18-exponential-growth();", 0, 3, 0);
+        checkBadInputs(": exponential-growth();", 0, 3, 0);
     }
 
     function testOpDecimal18ExponentialGrowthNPEvalOneInput() external {
-        checkBadInputs("_: decimal18-exponential-growth(1e18);", 1, 3, 1);
+        checkBadInputs("_: exponential-growth(1);", 1, 3, 1);
     }
 
     function testOpDecimal18ExponentialGrowthNPEvalTwoInputs() external {
-        checkBadInputs("_: decimal18-exponential-growth(1e18 0);", 2, 3, 2);
+        checkBadInputs("_: exponential-growth(1 0);", 2, 3, 2);
     }
 
     function testOpDecimal18ExponentialGrowthNPEvalFourInputs() external {
-        checkBadInputs("_: decimal18-exponential-growth(1e18 0 0 1e18);", 4, 3, 4);
+        checkBadInputs("_: exponential-growth(1 0 0 1);", 4, 3, 4);
     }
 
     function testOpDecimal18ExponentialGrowthNPEvalZeroOutputs() external {
-        checkBadOutputs(": decimal18-exponential-growth(1e18 0 0);", 3, 1, 0);
+        checkBadOutputs(": exponential-growth(1 0 0);", 3, 1, 0);
     }
 
     function testOpDecimal18ExponentialGrowthNPEvalTwoOutputs() external {
-        checkBadOutputs("_ _: decimal18-exponential-growth(1e18 0 0);", 3, 1, 2);
+        checkBadOutputs("_ _: exponential-growth(1 0 0);", 3, 1, 2);
     }
 
     /// Test that operand is disallowed.
     function testOpDecimal18ExponentialGrowthNPEvalOperandDisallowed() external {
         checkUnhappyParse(
-            "_: decimal18-exponential-growth<0>(1e18 0 0);", abi.encodeWithSelector(UnexpectedOperand.selector)
+            "_: exponential-growth<0>(1 0 0);", abi.encodeWithSelector(UnexpectedOperand.selector)
         );
     }
 }

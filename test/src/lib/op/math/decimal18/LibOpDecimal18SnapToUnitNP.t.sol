@@ -34,44 +34,44 @@ contract LibOpDecimal18SnapToUnitNPTest is OpTest {
         );
     }
 
-    /// Test the eval of `decimal18-snap-to-unit`.
+    /// Test the eval of `snap-to-unit`.
     function testOpDecimal18SnapToUnitNPEval() external {
         // If the threshold is 1 then we always floor.
-        checkHappy("_: decimal18-snap-to-unit(1 1);", 1e18, "1 1");
-        checkHappy("_: decimal18-snap-to-unit(1 0.5);", 0, "1 0.5");
-        checkHappy("_: decimal18-snap-to-unit(1 2);", 2e18, "1 2");
-        checkHappy("_: decimal18-snap-to-unit(1 2.5);", 2e18, "1 2.5");
+        checkHappy("_: snap-to-unit(1 1);", 1e18, "1 1");
+        checkHappy("_: snap-to-unit(1 0.5);", 0, "1 0.5");
+        checkHappy("_: snap-to-unit(1 2);", 2e18, "1 2");
+        checkHappy("_: snap-to-unit(1 2.5);", 2e18, "1 2.5");
 
         // If the threshold is 0.2 then we floor or ceil anything within the
         // threshold.
-        checkHappy("_: decimal18-snap-to-unit(0.2 1);", 1e18, "0.2 1");
-        checkHappy("_: decimal18-snap-to-unit(0.2 0.5);", 5e17, "0.2 0.5");
-        checkHappy("_: decimal18-snap-to-unit(0.2 2);", 2e18, "0.2 2");
-        checkHappy("_: decimal18-snap-to-unit(0.2 0.2);", 0, "0.2 0.2");
-        checkHappy("_: decimal18-snap-to-unit(0.2 0.8);", 1e18, "0.2 0.8");
-        checkHappy("_: decimal18-snap-to-unit(0.2 2.5);", 2.5e18, "0.2 2.5");
-        checkHappy("_: decimal18-snap-to-unit(0.2 3);", 3e18, "0.2 3");
-        checkHappy("_: decimal18-snap-to-unit(0.2 3.1);", 3e18, "0.2 3.1");
-        checkHappy("_: decimal18-snap-to-unit(0.2 3.9);", 4e18, "0.2 3.9");
+        checkHappy("_: snap-to-unit(0.2 1);", 1e18, "0.2 1");
+        checkHappy("_: snap-to-unit(0.2 0.5);", 5e17, "0.2 0.5");
+        checkHappy("_: snap-to-unit(0.2 2);", 2e18, "0.2 2");
+        checkHappy("_: snap-to-unit(0.2 0.2);", 0, "0.2 0.2");
+        checkHappy("_: snap-to-unit(0.2 0.8);", 1e18, "0.2 0.8");
+        checkHappy("_: snap-to-unit(0.2 2.5);", 2.5e18, "0.2 2.5");
+        checkHappy("_: snap-to-unit(0.2 3);", 3e18, "0.2 3");
+        checkHappy("_: snap-to-unit(0.2 3.1);", 3e18, "0.2 3.1");
+        checkHappy("_: snap-to-unit(0.2 3.9);", 4e18, "0.2 3.9");
     }
 
-    /// Test the eval of `decimal18-snap-to-unit` for bad inputs.
+    /// Test the eval of `snap-to-unit` for bad inputs.
     function testOpDecimal18SnapToUnitNPEvalBad() external {
-        checkBadInputs("_: decimal18-snap-to-unit();", 0, 2, 0);
-        checkBadInputs("_: decimal18-snap-to-unit(1);", 1, 2, 1);
-        checkBadInputs("_: decimal18-snap-to-unit(1 1 1);", 3, 2, 3);
+        checkBadInputs("_: snap-to-unit();", 0, 2, 0);
+        checkBadInputs("_: snap-to-unit(1);", 1, 2, 1);
+        checkBadInputs("_: snap-to-unit(1 1 1);", 3, 2, 3);
     }
 
     function testOpDecimal18SnapToUnitNPEvalZeroOutputs() external {
-        checkBadOutputs(": decimal18-snap-to-unit(1 1);", 2, 1, 0);
+        checkBadOutputs(": snap-to-unit(1 1);", 2, 1, 0);
     }
 
     function testOpDecimal18SnapToUnitNPEvalTwoOutputs() external {
-        checkBadOutputs("_ _: decimal18-snap-to-unit(1 1);", 2, 1, 2);
+        checkBadOutputs("_ _: snap-to-unit(1 1);", 2, 1, 2);
     }
 
     /// Test that operand is disallowed.
     function testOpDecimal18SnapToUnitNPEvalOperandDisallowed() external {
-        checkUnhappyParse("_: decimal18-snap-to-unit<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector));
+        checkUnhappyParse("_: snap-to-unit<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

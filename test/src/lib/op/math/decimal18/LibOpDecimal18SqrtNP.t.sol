@@ -33,31 +33,31 @@ contract LibOpDecimal18SqrtNPTest is OpTest {
         );
     }
 
-    /// Test the eval of `decimal18-sqrt`.
+    /// Test the eval of `sqrt`.
     function testOpDecimal18SqrtNPEval() external {
-        checkHappy("_: decimal18-sqrt(0);", 0, "0");
-        checkHappy("_: decimal18-sqrt(1);", 1e18, "1");
-        checkHappy("_: decimal18-sqrt(0.5);", 707106781186547524, "0.5");
-        checkHappy("_: decimal18-sqrt(2);", 1414213562373095048, "2");
-        checkHappy("_: decimal18-sqrt(2.5);", 1581138830084189665, "2.5");
+        checkHappy("_: sqrt(0);", 0, "0");
+        checkHappy("_: sqrt(1);", 1e18, "1");
+        checkHappy("_: sqrt(0.5);", 707106781186547524, "0.5");
+        checkHappy("_: sqrt(2);", 1414213562373095048, "2");
+        checkHappy("_: sqrt(2.5);", 1581138830084189665, "2.5");
     }
 
-    /// Test the eval of `decimal18-sqrt` for bad inputs.
+    /// Test the eval of `sqrt` for bad inputs.
     function testOpDecimal18SqrtNPEvalBad() external {
-        checkBadInputs("_: decimal18-sqrt();", 0, 1, 0);
-        checkBadInputs("_: decimal18-sqrt(1 1);", 2, 1, 2);
+        checkBadInputs("_: sqrt();", 0, 1, 0);
+        checkBadInputs("_: sqrt(1 1);", 2, 1, 2);
     }
 
     function testOpDecimal18SqrtNPEvalZeroOutputs() external {
-        checkBadOutputs(": decimal18-sqrt(1);", 1, 1, 0);
+        checkBadOutputs(": sqrt(1);", 1, 1, 0);
     }
 
     function testOpDecimal18SqrtNPEvalTwoOutputs() external {
-        checkBadOutputs("_ _: decimal18-sqrt(1);", 1, 1, 2);
+        checkBadOutputs("_ _: sqrt(1);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.
     function testOpDecimal18SqrtNPEvalOperandDisallowed() external {
-        checkUnhappyParse("_: decimal18-sqrt<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
+        checkUnhappyParse("_: sqrt<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

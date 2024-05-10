@@ -41,50 +41,50 @@ contract LibOpDecimal18LinearGrowthNPTest is OpTest {
         );
     }
 
-    /// Test the eval of `decimal18-linear-growth`.
+    /// Test the eval of `linear-growth`.
     function testOpDecimal18LinearGrowthNPEval() external {
-        checkHappy("_: decimal18-linear-growth(0 0 0);", 0, "0 0 0");
-        checkHappy("_: decimal18-linear-growth(0 0.1 0);", 0, "0 0.1 0");
-        checkHappy("_: decimal18-linear-growth(0 0.1 1);", 1e17, "0 0.1 1");
-        checkHappy("_: decimal18-linear-growth(1 0.1 0);", 1e18, "1 0.1 0");
-        checkHappy("_: decimal18-linear-growth(1 0.1 1);", 1.1e18, "1 0.1 1");
-        checkHappy("_: decimal18-linear-growth(1 0.1 2);", 1.2e18, "1 0.1 2");
-        checkHappy("_: decimal18-linear-growth(1 0.1 2.5);", 1.25e18, "1 0.1 2.5");
-        checkHappy("_: decimal18-linear-growth(1 0 2);", 1e18, "1 0 2");
-        checkHappy("_: decimal18-linear-growth(1 0.1 0.5);", 1.05e18, "1 0.1 0.5");
-        checkHappy("_: decimal18-linear-growth(2 0.1 0);", 2e18, "2 0.1 0");
-        checkHappy("_: decimal18-linear-growth(2 0.1 1);", 2.1e18, "2 0.1 1");
-        checkHappy("_: decimal18-linear-growth(2 0.1 2);", 2.2e18, "2 0.1 2");
+        checkHappy("_: linear-growth(0 0 0);", 0, "0 0 0");
+        checkHappy("_: linear-growth(0 0.1 0);", 0, "0 0.1 0");
+        checkHappy("_: linear-growth(0 0.1 1);", 1e17, "0 0.1 1");
+        checkHappy("_: linear-growth(1 0.1 0);", 1e18, "1 0.1 0");
+        checkHappy("_: linear-growth(1 0.1 1);", 1.1e18, "1 0.1 1");
+        checkHappy("_: linear-growth(1 0.1 2);", 1.2e18, "1 0.1 2");
+        checkHappy("_: linear-growth(1 0.1 2.5);", 1.25e18, "1 0.1 2.5");
+        checkHappy("_: linear-growth(1 0 2);", 1e18, "1 0 2");
+        checkHappy("_: linear-growth(1 0.1 0.5);", 1.05e18, "1 0.1 0.5");
+        checkHappy("_: linear-growth(2 0.1 0);", 2e18, "2 0.1 0");
+        checkHappy("_: linear-growth(2 0.1 1);", 2.1e18, "2 0.1 1");
+        checkHappy("_: linear-growth(2 0.1 2);", 2.2e18, "2 0.1 2");
     }
 
     function testOpDecimal18LinearGrowthNPEvalZeroInputs() external {
-        checkBadInputs(": decimal18-linear-growth();", 0, 3, 0);
+        checkBadInputs(": linear-growth();", 0, 3, 0);
     }
 
     function testOpDecimal18LinearGrowthNPEvalOneInput() external {
-        checkBadInputs("_: decimal18-linear-growth(1e18);", 1, 3, 1);
+        checkBadInputs("_: linear-growth(1);", 1, 3, 1);
     }
 
     function testOpDecimal18LinearGrowthNPEvalTwoInputs() external {
-        checkBadInputs("_: decimal18-linear-growth(1e18 0);", 2, 3, 2);
+        checkBadInputs("_: linear-growth(1 0);", 2, 3, 2);
     }
 
     function testOpDecimal18LinearGrowthNPEvalFourInputs() external {
-        checkBadInputs("_: decimal18-linear-growth(1e18 0 0 1e18);", 4, 3, 4);
+        checkBadInputs("_: linear-growth(1 0 0 1);", 4, 3, 4);
     }
 
     function testOpDecimal18LinearGrowthNPEvalZeroOutputs() external {
-        checkBadOutputs(": decimal18-linear-growth(1e18 0 0);", 3, 1, 0);
+        checkBadOutputs(": linear-growth(1 0 0);", 3, 1, 0);
     }
 
     function testOpDecimal18LinearGrowthNPEvalTwoOutputs() external {
-        checkBadOutputs("_ _: decimal18-linear-growth(1e18 0 0);", 3, 1, 2);
+        checkBadOutputs("_ _: linear-growth(1 0 0);", 3, 1, 2);
     }
 
     /// Test that operand is disallowed.
     function testOpDecimal18LinearGrowthNPEvalOperandDisallowed() external {
         checkUnhappyParse(
-            "_: decimal18-linear-growth<0>(1e18 0 0);", abi.encodeWithSelector(UnexpectedOperand.selector)
+            "_: linear-growth<0>(1 0 0);", abi.encodeWithSelector(UnexpectedOperand.selector)
         );
     }
 }

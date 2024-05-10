@@ -33,35 +33,35 @@ contract LibOpDecimal18FloorNPTest is OpTest {
         );
     }
 
-    /// Test the eval of `decimal18-floor`.
+    /// Test the eval of `floor`.
     function testOpDecimal18FloorNPEval() external {
-        checkHappy("_: decimal18-floor(0);", 0, "0");
-        checkHappy("_: decimal18-floor(1);", 1e18, "1");
-        checkHappy("_: decimal18-floor(0.5);", 0, "0.5");
-        checkHappy("_: decimal18-floor(2);", 2e18, "2");
-        checkHappy("_: decimal18-floor(3);", 3e18, "3");
-        checkHappy("_: decimal18-floor(3.8);", 3e18, "3.8");
+        checkHappy("_: floor(0);", 0, "0");
+        checkHappy("_: floor(1);", 1e18, "1");
+        checkHappy("_: floor(0.5);", 0, "0.5");
+        checkHappy("_: floor(2);", 2e18, "2");
+        checkHappy("_: floor(3);", 3e18, "3");
+        checkHappy("_: floor(3.8);", 3e18, "3.8");
     }
 
-    /// Test the eval of `decimal18-floor` for bad inputs.
+    /// Test the eval of `floor` for bad inputs.
     function testOpDecimal18FloorNPZeroInputs() external {
-        checkBadInputs("_: decimal18-floor();", 0, 1, 0);
+        checkBadInputs("_: floor();", 0, 1, 0);
     }
 
     function testOpDecimal18FloorNPTwoInputs() external {
-        checkBadInputs("_: decimal18-floor(1 1);", 2, 1, 2);
+        checkBadInputs("_: floor(1 1);", 2, 1, 2);
     }
 
     function testOpDecimal18FloorNPZeroOutputs() external {
-        checkBadOutputs(": decimal18-floor(1);", 1, 1, 0);
+        checkBadOutputs(": floor(1);", 1, 1, 0);
     }
 
     function testOpDecimal18FloorNPTwoOutputs() external {
-        checkBadOutputs("_ _: decimal18-floor(1);", 1, 1, 2);
+        checkBadOutputs("_ _: floor(1);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.
     function testOpDecimal18ExpNPEvalOperandDisallowed() external {
-        checkUnhappyParse("_: decimal18-floor<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
+        checkUnhappyParse("_: floor<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

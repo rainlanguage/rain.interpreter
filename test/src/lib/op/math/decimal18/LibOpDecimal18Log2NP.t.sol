@@ -34,37 +34,37 @@ contract LibOpDecimal18Log2NPTest is OpTest {
         );
     }
 
-    /// Test the eval of `decimal18-log2`.
+    /// Test the eval of `log2`.
     function testOpDecimal18Log2NPEval() external {
         // Any number less than 2 other than 1 is negative which doesn't exist
         // in unsigned integers.
-        checkHappy("_: decimal18-log2(1);", 0, "log2 1");
-        checkHappy("_: decimal18-log2(2);", 1e18, "log2 2");
-        checkHappy("_: decimal18-log2(2.718281828459045235);", 1442695040888963394, "log2 e");
-        checkHappy("_: decimal18-log2(3);", 1584962500721156166, "log2 3");
-        checkHappy("_: decimal18-log2(4);", 2000000000000000000, "log2 4");
-        checkHappy("_: decimal18-log2(5);", 2321928094887362334, "log2 5");
+        checkHappy("_: log2(1);", 0, "log2 1");
+        checkHappy("_: log2(2);", 1e18, "log2 2");
+        checkHappy("_: log2(2.718281828459045235);", 1442695040888963394, "log2 e");
+        checkHappy("_: log2(3);", 1584962500721156166, "log2 3");
+        checkHappy("_: log2(4);", 2000000000000000000, "log2 4");
+        checkHappy("_: log2(5);", 2321928094887362334, "log2 5");
     }
 
-    /// Test the eval of `decimal18-log2` for bad inputs.
+    /// Test the eval of `log2` for bad inputs.
     function testOpDecimal18Log2NPZeroInputs() external {
-        checkBadInputs("_: decimal18-log2();", 0, 1, 0);
+        checkBadInputs("_: log2();", 0, 1, 0);
     }
 
     function testOpDecimal18Log2NPTwoInputs() external {
-        checkBadInputs("_: decimal18-log2(1 1);", 2, 1, 2);
+        checkBadInputs("_: log2(1 1);", 2, 1, 2);
     }
 
     function testOpDecimal18Log2NPZeroOutputs() external {
-        checkBadOutputs(": decimal18-log2(1);", 1, 1, 0);
+        checkBadOutputs(": log2(1);", 1, 1, 0);
     }
 
     function testOpDecimal18Log2NPTwoOutputs() external {
-        checkBadOutputs("_ _: decimal18-log2(1);", 1, 1, 2);
+        checkBadOutputs("_ _: log2(1);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.
     function testOpDecimal18Log2NPEvalOperandDisallowed() external {
-        checkUnhappyParse("_: decimal18-log2<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
+        checkUnhappyParse("_: log2<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

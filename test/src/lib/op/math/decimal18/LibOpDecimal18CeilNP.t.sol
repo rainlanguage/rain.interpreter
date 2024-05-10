@@ -33,34 +33,34 @@ contract LibOpDecimal18CeilNPTest is OpTest {
         );
     }
 
-    /// Test the eval of `decimal18-ceil`.
+    /// Test the eval of `ceil`.
     function testOpDecimal18CeilNPEval() external {
-        checkHappy("_: decimal18-ceil(0);", 0, "0");
-        checkHappy("_: decimal18-ceil(1);", 1e18, "1");
-        checkHappy("_: decimal18-ceil(0.5);", 1e18, "0.5");
-        checkHappy("_: decimal18-ceil(2);", 2e18, "2");
-        checkHappy("_: decimal18-ceil(2.5);", 3e18, "2.5");
+        checkHappy("_: ceil(0);", 0, "0");
+        checkHappy("_: ceil(1);", 1e18, "1");
+        checkHappy("_: ceil(0.5);", 1e18, "0.5");
+        checkHappy("_: ceil(2);", 2e18, "2");
+        checkHappy("_: ceil(2.5);", 3e18, "2.5");
     }
 
-    /// Test the eval of `decimal18-ceil` for bad inputs.
+    /// Test the eval of `ceil` for bad inputs.
     function testOpDecimal18CeilNPZeroInputs() external {
-        checkBadInputs("_: decimal18-ceil();", 0, 1, 0);
+        checkBadInputs("_: ceil();", 0, 1, 0);
     }
 
     function testOpDecimal18CeilNPTwoInputs() external {
-        checkBadInputs("_: decimal18-ceil(1 1);", 2, 1, 2);
+        checkBadInputs("_: ceil(1 1);", 2, 1, 2);
     }
 
     function testOpDecimal18CeilNPZeroOutputs() external {
-        checkBadOutputs(": decimal18-ceil(1);", 1, 1, 0);
+        checkBadOutputs(": ceil(1);", 1, 1, 0);
     }
 
     function testOpDecimal18CeilNPTwoOutputs() external {
-        checkBadOutputs("_ _: decimal18-ceil(1);", 1, 1, 2);
+        checkBadOutputs("_ _: ceil(1);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.
     function testOpDecimal18CeilNPEvalOperandDisallowed() external {
-        checkUnhappyParse("_: decimal18-ceil<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
+        checkUnhappyParse("_: ceil<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }
