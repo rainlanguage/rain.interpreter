@@ -2,20 +2,20 @@
 pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {LibOpDecimal18Log10NP} from "src/lib/op/math/decimal18/LibOpDecimal18Log10NP.sol";
+import {LibOpLog10} from "src/lib/op/math/LibOpLog10.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-contract LibOpDecimal18Log10NPTest is OpTest {
-    /// Directly test the integrity logic of LibOpDecimal18Log10NP.
+contract LibOpLog10Test is OpTest {
+    /// Directly test the integrity logic of LibOpLog10.
     /// Inputs are always 1, outputs are always 1.
-    function testOpDecimal18Log10NPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpDecimal18Log10NP.integrity(state, operand);
+    function testOpLog10Integrity(IntegrityCheckStateNP memory state, Operand operand) external {
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpLog10.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpDecimal18Log10NP.
-    function testOpDecimal18Log10NPRun(uint256 a, uint16 operandData) public {
+    /// Directly test the runtime logic of LibOpLog10.
+    function testOpLog10Run(uint256 a, uint16 operandData) public {
         // e lifted from prb math.
         a = bound(a, 2_718281828459045235, type(uint64).max - 1e18);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
@@ -24,18 +24,11 @@ contract LibOpDecimal18Log10NPTest is OpTest {
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = a;
 
-        opReferenceCheck(
-            state,
-            operand,
-            LibOpDecimal18Log10NP.referenceFn,
-            LibOpDecimal18Log10NP.integrity,
-            LibOpDecimal18Log10NP.run,
-            inputs
-        );
+        opReferenceCheck(state, operand, LibOpLog10.referenceFn, LibOpLog10.integrity, LibOpLog10.run, inputs);
     }
 
     /// Test the eval of `log10`.
-    function testOpDecimal18Log10NPEval() external {
+    function testOpLog10Eval() external {
         checkHappy("_: log10(1);", 0, "log10 1");
         checkHappy("_: log10(2);", 301029995663981195, "log10 2");
         checkHappy("_: log10(2.718281828459045235);", 434294481903251823, "log2 e");
@@ -45,24 +38,24 @@ contract LibOpDecimal18Log10NPTest is OpTest {
     }
 
     /// Test the eval of `log10` for bad inputs.
-    function testOpDecimal18Log10NPZeroInputs() external {
+    function testOpLog10ZeroInputs() external {
         checkBadInputs("_: log10();", 0, 1, 0);
     }
 
-    function testOpDecimal18Log10NPTwoInputs() external {
+    function testOpLog10TwoInputs() external {
         checkBadInputs("_: log10(1 1);", 2, 1, 2);
     }
 
-    function testOpDecimal18Log10NPZeroOutputs() external {
+    function testOpLog10ZeroOutputs() external {
         checkBadOutputs(": log10(1);", 1, 1, 0);
     }
 
-    function testOpDecimal18Log10NPTwoOutputs() external {
+    function testOpLog10TwoOutputs() external {
         checkBadOutputs("_ _: log10(1);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.
-    function testOpDecimal18Log10NPEvalOperandDisallowed() external {
+    function testOpLog10EvalOperandDisallowed() external {
         checkUnhappyParse("_: log10<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

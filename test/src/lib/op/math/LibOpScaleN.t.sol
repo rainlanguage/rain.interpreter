@@ -3,22 +3,21 @@ pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, InterpreterStateNP, Operand, stdError} from "test/abstract/OpTest.sol";
 import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
-import {LibOpDecimal18ScaleNNP} from "src/lib/op/math/decimal18/LibOpDecimal18ScaleNNP.sol";
+import {LibOpScaleN} from "src/lib/op/math/LibOpScaleN.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-contract LibOpDecimal18ScaleNNPTest is OpTest {
-    /// Directly test the integrity logic of LibOpDecimal18ScaleNNP.
+contract LibOpScaleNTest is OpTest {
+    /// Directly test the integrity logic of LibOpScaleN.
     /// Inputs are always 1, outputs are always 1.
-    function testOpDecimal18ScaleNNPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs, uint16 op) external {
+    function testOpScaleNIntegrity(IntegrityCheckStateNP memory state, uint8 inputs, uint16 op) external {
         inputs = uint8(bound(inputs, 1, 0x0F));
-        (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpDecimal18ScaleNNP.integrity(state, LibOperand.build(inputs, 1, op));
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpScaleN.integrity(state, LibOperand.build(inputs, 1, op));
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpDecimal18ScaleNNP.
-    function testOpDecimal18ScaleNNPRun(uint256 scale, uint256 round, uint256 saturate, uint256 value) public {
+    /// Directly test the runtime logic of LibOpScaleN.
+    function testOpScaleNRun(uint256 scale, uint256 round, uint256 saturate, uint256 value) public {
         scale = bound(scale, 0, type(uint8).max);
         round = bound(round, 0, 1);
         saturate = bound(saturate, 0, 1);
@@ -34,18 +33,11 @@ contract LibOpDecimal18ScaleNNPTest is OpTest {
             vm.expectRevert(stdError.arithmeticError);
         }
 
-        opReferenceCheck(
-            state,
-            operand,
-            LibOpDecimal18ScaleNNP.referenceFn,
-            LibOpDecimal18ScaleNNP.integrity,
-            LibOpDecimal18ScaleNNP.run,
-            inputs
-        );
+        opReferenceCheck(state, operand, LibOpScaleN.referenceFn, LibOpScaleN.integrity, LibOpScaleN.run, inputs);
     }
 
     /// Test the eval of `scale-n`.
-    function testOpDecimal18ScaleNNPEval() external {
+    function testOpScaleNEval() external {
         // Scale 0 value 0 round 0 saturate 0
         checkHappy("_: scale-n<0>(0);", 0, "0 0 0 0");
         // Scale 0 value 0 round 0 saturate 1
@@ -126,24 +118,24 @@ contract LibOpDecimal18ScaleNNPTest is OpTest {
 
     /// Test the eval of `scale-n` opcode parsed from a string.
     /// Tests zero inputs.
-    function testOpDecimal18ScaleNNPEvalZeroInputs() external {
+    function testOpScaleNEvalZeroInputs() external {
         checkBadInputs("_: scale-n<0>();", 0, 1, 0);
     }
 
     /// Test the eval of `scale-n` opcode parsed from a string.
     /// Tests two inputs.
-    function testOpDecimal18ScaleNNPEvalOneInput() external {
+    function testOpScaleNEvalOneInput() external {
         checkBadInputs("_: scale-n<0>(0 5);", 2, 1, 2);
         checkBadInputs("_: scale-n<0>(0 0);", 2, 1, 2);
         checkBadInputs("_: scale-n<0>(0 1);", 2, 1, 2);
         checkBadInputs("_: scale-n<0>(0 max-value());", 2, 1, 2);
     }
 
-    function testOpDecimal18ScaleNNPEvalZeroOutputs() external {
+    function testOpScaleNEvalZeroOutputs() external {
         checkBadOutputs(": scale-n<0>(0);", 1, 1, 0);
     }
 
-    function testOpDecimal18ScaleNNPTwoOutputs() external {
+    function testOpScaleNTwoOutputs() external {
         checkBadOutputs("_ _: scale-n<0>(0);", 1, 1, 2);
     }
 }

@@ -2,20 +2,20 @@
 pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {LibOpDecimal18FloorNP} from "src/lib/op/math/decimal18/LibOpDecimal18FloorNP.sol";
+import {LibOpFloor} from "src/lib/op/math/LibOpFloor.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-contract LibOpDecimal18FloorNPTest is OpTest {
-    /// Directly test the integrity logic of LibOpDecimal18FloorNP.
+contract LibOpFloorTest is OpTest {
+    /// Directly test the integrity logic of LibOpFloor.
     /// Inputs are always 1, outputs are always 1.
-    function testOpDecimal18FloorNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpDecimal18FloorNP.integrity(state, operand);
+    function testOpFloorIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpFloor.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpDecimal18FloorNP.
-    function testOpDecimal18FloorNPRun(uint256 a, uint16 operandData) public {
+    /// Directly test the runtime logic of LibOpFloor.
+    function testOpFloorRun(uint256 a, uint16 operandData) public {
         a = bound(a, 0, type(uint64).max - 1e18);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
@@ -23,18 +23,11 @@ contract LibOpDecimal18FloorNPTest is OpTest {
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = a;
 
-        opReferenceCheck(
-            state,
-            operand,
-            LibOpDecimal18FloorNP.referenceFn,
-            LibOpDecimal18FloorNP.integrity,
-            LibOpDecimal18FloorNP.run,
-            inputs
-        );
+        opReferenceCheck(state, operand, LibOpFloor.referenceFn, LibOpFloor.integrity, LibOpFloor.run, inputs);
     }
 
     /// Test the eval of `floor`.
-    function testOpDecimal18FloorNPEval() external {
+    function testOpFloorEval() external {
         checkHappy("_: floor(0);", 0, "0");
         checkHappy("_: floor(1);", 1e18, "1");
         checkHappy("_: floor(0.5);", 0, "0.5");
@@ -44,24 +37,24 @@ contract LibOpDecimal18FloorNPTest is OpTest {
     }
 
     /// Test the eval of `floor` for bad inputs.
-    function testOpDecimal18FloorNPZeroInputs() external {
+    function testOpFloorZeroInputs() external {
         checkBadInputs("_: floor();", 0, 1, 0);
     }
 
-    function testOpDecimal18FloorNPTwoInputs() external {
+    function testOpFloorTwoInputs() external {
         checkBadInputs("_: floor(1 1);", 2, 1, 2);
     }
 
-    function testOpDecimal18FloorNPZeroOutputs() external {
+    function testOpFloorZeroOutputs() external {
         checkBadOutputs(": floor(1);", 1, 1, 0);
     }
 
-    function testOpDecimal18FloorNPTwoOutputs() external {
+    function testOpFloorTwoOutputs() external {
         checkBadOutputs("_ _: floor(1);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.
-    function testOpDecimal18ExpNPEvalOperandDisallowed() external {
+    function testOpFloorEvalOperandDisallowed() external {
         checkUnhappyParse("_: floor<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

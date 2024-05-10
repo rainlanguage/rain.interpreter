@@ -7,8 +7,8 @@ import {Math as OZMath} from "openzeppelin-contracts/contracts/utils/math/Math.s
 import {UD60x18, mul} from "prb-math/UD60x18.sol";
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
-import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
+import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
+import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
 
 /// @title LibOpMul

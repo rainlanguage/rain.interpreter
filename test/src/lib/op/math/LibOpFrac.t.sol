@@ -2,20 +2,20 @@
 pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {LibOpDecimal18FracNP} from "src/lib/op/math/decimal18/LibOpDecimal18FracNP.sol";
+import {LibOpFrac} from "src/lib/op/math/LibOpFrac.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-contract LibOpDecimal18FracNPTest is OpTest {
-    /// Directly test the integrity logic of LibOpDecimal18FracNP.
+contract LibOpFracTest is OpTest {
+    /// Directly test the integrity logic of LibOpFrac.
     /// Inputs are always 1, outputs are always 1.
-    function testOpDecimal18FracNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpDecimal18FracNP.integrity(state, operand);
+    function testOpFracIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpFrac.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpDecimal18FracNP.
-    function testOpDecimal18FracNPRun(uint256 a, uint16 operandData) public {
+    /// Directly test the runtime logic of LibOpFrac.
+    function testOpFracRun(uint256 a, uint16 operandData) public {
         a = bound(a, 0, type(uint64).max - 1e18);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
@@ -23,18 +23,11 @@ contract LibOpDecimal18FracNPTest is OpTest {
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = a;
 
-        opReferenceCheck(
-            state,
-            operand,
-            LibOpDecimal18FracNP.referenceFn,
-            LibOpDecimal18FracNP.integrity,
-            LibOpDecimal18FracNP.run,
-            inputs
-        );
+        opReferenceCheck(state, operand, LibOpFrac.referenceFn, LibOpFrac.integrity, LibOpFrac.run, inputs);
     }
 
     /// Test the eval of `frac`.
-    function testOpDecimal18FracNPEval() external {
+    function testOpFracEval() external {
         checkHappy("_: frac(0);", 0, "0");
         checkHappy("_: frac(1);", 0, "1");
         checkHappy("_: frac(0.5);", 0.5e18, "0.5");
@@ -44,24 +37,24 @@ contract LibOpDecimal18FracNPTest is OpTest {
     }
 
     /// Test the eval of `frac` for bad inputs.
-    function testOpDecimal18FracNPZeroInputs() external {
+    function testOpFracZeroInputs() external {
         checkBadInputs("_: frac();", 0, 1, 0);
     }
 
-    function testOpDecimal18FracNPTwoInputs() external {
+    function testOpFracTwoInputs() external {
         checkBadInputs("_: frac(1 1);", 2, 1, 2);
     }
 
-    function testOpDecimal18FracNPZeroOutputs() external {
+    function testOpFracZeroOutputs() external {
         checkBadOutputs(": frac(1);", 1, 1, 0);
     }
 
-    function testOpDecimal18FracNPTwoOutputs() external {
+    function testOpFracTwoOutputs() external {
         checkBadOutputs("_ _: frac(1);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.
-    function testOpDecimal18FracNPEvalOperandDisallowed() external {
+    function testOpFracEvalOperandDisallowed() external {
         checkUnhappyParse("_: frac<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

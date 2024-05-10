@@ -94,7 +94,7 @@ contract LibOpIntSubNPTest is OpTest {
         checkBadInputs("_: int-sub(5e-18);", 1, 2, 1);
         checkBadInputs("_: int-sub(0);", 1, 2, 1);
         checkBadInputs("_: int-sub(1e-18);", 1, 2, 1);
-        checkBadInputs("_: int-sub(max-int-value());", 1, 2, 1);
+        checkBadInputs("_: int-sub(max-value());", 1, 2, 1);
     }
 
     /// Test the eval of `int-sub` opcode parsed from a string. Tests one input.
@@ -103,12 +103,12 @@ contract LibOpIntSubNPTest is OpTest {
         checkBadInputs("_: int-sub<1>(5e-18);", 1, 2, 1);
         checkBadInputs("_: int-sub<1>(0);", 1, 2, 1);
         checkBadInputs("_: int-sub<1>(1e-18);", 1, 2, 1);
-        checkBadInputs("_: int-sub<1>(max-int-value());", 1, 2, 1);
+        checkBadInputs("_: int-sub<1>(max-value());", 1, 2, 1);
 
         checkBadInputs("_: int-saturating-sub(5e-18);", 1, 2, 1);
         checkBadInputs("_: int-saturating-sub(0);", 1, 2, 1);
         checkBadInputs("_: int-saturating-sub(1e-18);", 1, 2, 1);
-        checkBadInputs("_: int-saturating-sub(max-int-value());", 1, 2, 1);
+        checkBadInputs("_: int-saturating-sub(max-value());", 1, 2, 1);
     }
 
     /// Test the eval of `decimal18-sub` opcode parsed from a string.
@@ -118,7 +118,7 @@ contract LibOpIntSubNPTest is OpTest {
         checkBadInputs("_: decimal18-sub(5);", 1, 2, 1);
         checkBadInputs("_: decimal18-sub(0);", 1, 2, 1);
         checkBadInputs("_: decimal18-sub(1);", 1, 2, 1);
-        checkBadInputs("_: decimal18-sub(max-int-value());", 1, 2, 1);
+        checkBadInputs("_: decimal18-sub(max-value());", 1, 2, 1);
     }
 
     /// Test the eval of `decimal18-sub` opcode parsed from a string.
@@ -129,12 +129,12 @@ contract LibOpIntSubNPTest is OpTest {
         checkBadInputs("_: decimal18-sub<1>(5);", 1, 2, 1);
         checkBadInputs("_: decimal18-sub<1>(0);", 1, 2, 1);
         checkBadInputs("_: decimal18-sub<1>(1);", 1, 2, 1);
-        checkBadInputs("_: decimal18-sub<1>(max-int-value());", 1, 2, 1);
+        checkBadInputs("_: decimal18-sub<1>(max-value());", 1, 2, 1);
 
         checkBadInputs("_: decimal18-saturating-sub(5);", 1, 2, 1);
         checkBadInputs("_: decimal18-saturating-sub(0);", 1, 2, 1);
         checkBadInputs("_: decimal18-saturating-sub(1);", 1, 2, 1);
-        checkBadInputs("_: decimal18-saturating-sub(max-int-value());", 1, 2, 1);
+        checkBadInputs("_: decimal18-saturating-sub(max-value());", 1, 2, 1);
     }
 
     function testOpDecimal18SubNPEvalZeroOutputs() external {
@@ -151,9 +151,9 @@ contract LibOpIntSubNPTest is OpTest {
         checkHappy("_: int-sub(1e-18 1e-18);", 0, "1 1");
         checkHappy("_: int-sub(2e-18 1e-18);", 1, "2 1");
         checkHappy("_: int-sub(2e-18 2e-18);", 0, "2 2");
-        checkHappy("_: int-sub(max-int-value() 0);", type(uint256).max, "max-int-value() 0");
-        checkHappy("_: int-sub(max-int-value() 1e-18);", type(uint256).max - 1, "max-int-value() 1");
-        checkHappy("_: int-sub(max-int-value() max-int-value());", 0, "max-int-value() max-int-value()");
+        checkHappy("_: int-sub(max-value() 0);", type(uint256).max, "max-value() 0");
+        checkHappy("_: int-sub(max-value() 1e-18);", type(uint256).max - 1, "max-value() 1");
+        checkHappy("_: int-sub(max-value() max-value());", 0, "max-value() max-value()");
     }
 
     /// Test the eval of `int-sub` opcode parsed from a string. Tests two inputs.
@@ -163,17 +163,17 @@ contract LibOpIntSubNPTest is OpTest {
         checkHappy("_: int-sub<1>(1e-18 1e-18);", 0, "1 1");
         checkHappy("_: int-sub<1>(2e-18 1e-18);", 1, "2 1");
         checkHappy("_: int-sub<1>(2e-18 2e-18);", 0, "2 2");
-        checkHappy("_: int-sub<1>(max-int-value() 0);", type(uint256).max, "max-int-value() 0");
-        checkHappy("_: int-sub<1>(max-int-value() 1e-18);", type(uint256).max - 1, "max-int-value() 1");
-        checkHappy("_: int-sub<1>(max-int-value() max-int-value());", 0, "max-int-value() max-int-value()");
+        checkHappy("_: int-sub<1>(max-value() 0);", type(uint256).max, "max-value() 0");
+        checkHappy("_: int-sub<1>(max-value() 1e-18);", type(uint256).max - 1, "max-value() 1");
+        checkHappy("_: int-sub<1>(max-value() max-value());", 0, "max-value() max-value()");
 
         checkHappy("_: int-saturating-sub(1e-18 0);", 1, "1 0");
         checkHappy("_: int-saturating-sub(1e-18 1e-18);", 0, "1 1");
         checkHappy("_: int-saturating-sub(2e-18 1e-18);", 1, "2 1");
         checkHappy("_: int-saturating-sub(2e-18 2e-18);", 0, "2 2");
-        checkHappy("_: int-saturating-sub(max-int-value() 0);", type(uint256).max, "max-int-value() 0");
-        checkHappy("_: int-saturating-sub(max-int-value() 1e-18);", type(uint256).max - 1, "max-int-value() 1");
-        checkHappy("_: int-saturating-sub(max-int-value() max-int-value());", 0, "max-int-value() max-int-value()");
+        checkHappy("_: int-saturating-sub(max-value() 0);", type(uint256).max, "max-value() 0");
+        checkHappy("_: int-saturating-sub(max-value() 1e-18);", type(uint256).max - 1, "max-value() 1");
+        checkHappy("_: int-saturating-sub(max-value() max-value());", 0, "max-value() max-value()");
     }
 
     /// Test the eval of `decimal18-sub` opcode parsed from a string.
@@ -184,9 +184,9 @@ contract LibOpIntSubNPTest is OpTest {
         checkHappy("_: decimal18-sub(1 1);", 0, "1 1");
         checkHappy("_: decimal18-sub(2 1);", 1e18, "2 1");
         checkHappy("_: decimal18-sub(2 2);", 0, "2 2");
-        checkHappy("_: decimal18-sub(max-int-value() 0);", type(uint256).max, "max-int-value() 0");
-        checkHappy("_: decimal18-sub(max-int-value() 1);", type(uint256).max - 1e18, "max-int-value() 1");
-        checkHappy("_: decimal18-sub(max-int-value() max-int-value());", 0, "max-int-value() max-int-value()");
+        checkHappy("_: decimal18-sub(max-value() 0);", type(uint256).max, "max-value() 0");
+        checkHappy("_: decimal18-sub(max-value() 1);", type(uint256).max - 1e18, "max-value() 1");
+        checkHappy("_: decimal18-sub(max-value() max-value());", 0, "max-value() max-value()");
     }
 
     /// Test the eval of `decimal18-sub` opcode parsed from a string.
@@ -198,18 +198,18 @@ contract LibOpIntSubNPTest is OpTest {
         checkHappy("_: decimal18-sub<1>(1 1);", 0, "1 1");
         checkHappy("_: decimal18-sub<1>(2 1);", 1e18, "2 1");
         checkHappy("_: decimal18-sub<1>(2 2);", 0, "2 2");
-        checkHappy("_: decimal18-sub<1>(max-int-value() 0);", type(uint256).max, "max-int-value() 0");
-        checkHappy("_: decimal18-sub<1>(max-int-value() 1);", type(uint256).max - 1e18, "max-int-value() 1");
-        checkHappy("_: decimal18-sub<1>(max-int-value() max-int-value());", 0, "max-int-value() max-int-value()");
+        checkHappy("_: decimal18-sub<1>(max-value() 0);", type(uint256).max, "max-value() 0");
+        checkHappy("_: decimal18-sub<1>(max-value() 1);", type(uint256).max - 1e18, "max-value() 1");
+        checkHappy("_: decimal18-sub<1>(max-value() max-value());", 0, "max-value() max-value()");
 
         checkHappy("_: decimal18-saturating-sub(1 0);", 1e18, "1 0");
         checkHappy("_: decimal18-saturating-sub(1 1);", 0, "1 1");
         checkHappy("_: decimal18-saturating-sub(2 1);", 1e18, "2 1");
         checkHappy("_: decimal18-saturating-sub(2 2);", 0, "2 2");
-        checkHappy("_: decimal18-saturating-sub(max-int-value() 0);", type(uint256).max, "max-int-value() 0");
-        checkHappy("_: decimal18-saturating-sub(max-int-value() 1);", type(uint256).max - 1e18, "max-int-value() 1");
+        checkHappy("_: decimal18-saturating-sub(max-value() 0);", type(uint256).max, "max-value() 0");
+        checkHappy("_: decimal18-saturating-sub(max-value() 1);", type(uint256).max - 1e18, "max-value() 1");
         checkHappy(
-            "_: decimal18-saturating-sub(max-int-value() max-int-value());", 0, "max-int-value() max-int-value()"
+            "_: decimal18-saturating-sub(max-value() max-value());", 0, "max-value() max-value()"
         );
     }
 

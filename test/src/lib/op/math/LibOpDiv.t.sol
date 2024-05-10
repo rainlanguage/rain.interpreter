@@ -7,43 +7,40 @@ import {Math as OZMath} from "openzeppelin-contracts/contracts/utils/math/Math.s
 import {OpTest, IntegrityCheckStateNP, InterpreterStateNP, Operand, stdError} from "test/abstract/OpTest.sol";
 import {PRBMath_MulDiv_Overflow} from "prb-math/Common.sol";
 import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
-import {LibOpDecimal18DivNP} from "src/lib/op/math/decimal18/LibOpDecimal18DivNP.sol";
+import {LibOpDiv} from "src/lib/op/math/LibOpDiv.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-contract LibOpDecimal18DivNPTest is OpTest {
-    /// Directly test the integrity logic of LibOpDecimal18DivNP. This tests the
+contract LibOpDivTest is OpTest {
+    /// Directly test the integrity logic of LibOpDiv. This tests the
     /// happy path where the inputs input and calc match.
-    function testOpDecimal18DivNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData)
-        external
-    {
+    function testOpDivIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData) external {
         inputs = uint8(bound(inputs, 2, 0x0F));
-        (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpDecimal18DivNP.integrity(state, LibOperand.build(inputs, 1, operandData));
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpDiv.integrity(state, LibOperand.build(inputs, 1, operandData));
 
         assertEq(calcInputs, inputs);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the integrity logic of LibOpDecimal18DivNP. This tests the
+    /// Directly test the integrity logic of LibOpDiv. This tests the
     /// unhappy path where the operand is invalid due to 0 inputs.
-    function testOpDecimal18DivNPIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpDecimal18DivNP.integrity(state, Operand.wrap(0));
+    function testOpDivIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external {
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpDiv.integrity(state, Operand.wrap(0));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the integrity logic of LibOpDecimal18DivNP. This tests the
+    /// Directly test the integrity logic of LibOpDiv. This tests the
     /// unhappy path where the operand is invalid due to 1 inputs.
-    function testOpDecimal18DivNPIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpDecimal18DivNP.integrity(state, Operand.wrap(0x110000));
+    function testOpDivIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external {
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpDiv.integrity(state, Operand.wrap(0x110000));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpDecimal18DivNP.
-    function testOpDecimal18DivNPRun(uint256[] memory inputs) public {
+    /// Directly test the runtime logic of LibOpDiv.
+    function testOpDivRun(uint256[] memory inputs) public {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
         vm.assume(inputs.length <= 0x0F);
@@ -80,31 +77,24 @@ contract LibOpDecimal18DivNPTest is OpTest {
             }
             a = OZMath.mulDiv(a, 1e18, b);
         }
-        opReferenceCheck(
-            state,
-            operand,
-            LibOpDecimal18DivNP.referenceFn,
-            LibOpDecimal18DivNP.integrity,
-            LibOpDecimal18DivNP.run,
-            inputs
-        );
+        opReferenceCheck(state, operand, LibOpDiv.referenceFn, LibOpDiv.integrity, LibOpDiv.run, inputs);
     }
 
-    function testDebugOpDecimal18DivNPRun() external {
+    function testDebugOpDivRun() external {
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = 115792089237316195423570985008687907853269984665640564039458;
-        testOpDecimal18DivNPRun(inputs);
+        testOpDivRun(inputs);
     }
 
     /// Test the eval of `div` opcode parsed from a string.
     /// Tests zero inputs.
-    function testOpDecimal18DivNPEvalZeroInputs() external {
+    function testOpDivEvalZeroInputs() external {
         checkBadInputs("_: div();", 0, 2, 0);
     }
 
     /// Test the eval of `div` opcode parsed from a string.
     /// Tests one input.
-    function testOpDecimal18DivNPEvalOneInput() external {
+    function testOpDivEvalOneInput() external {
         checkBadInputs("_: div(5);", 1, 2, 1);
         checkBadInputs("_: div(0);", 1, 2, 1);
         checkBadInputs("_: div(1);", 1, 2, 1);
@@ -114,7 +104,7 @@ contract LibOpDecimal18DivNPTest is OpTest {
     /// Test the eval of `div` opcode parsed from a string.
     /// Tests two inputs.
     /// Tests the happy path where we do not divide by zero or overflow.
-    function testOpDecimal18DivNPEvalTwoInputsHappy() external {
+    function testOpDivEvalTwoInputsHappy() external {
         checkHappy("_: div(0 1);", 0, "0 1");
         checkHappy("_: div(1 1);", 1e18, "1 1");
         checkHappy("_: div(1 2);", 5e17, "1 2");
@@ -129,7 +119,7 @@ contract LibOpDecimal18DivNPTest is OpTest {
     /// Test the eval of `div` opcode parsed from a string.
     /// Tests two inputs.
     /// Tests the unhappy path where we divide by zero.
-    function testOpDecimal18DivNPEvalTwoInputsUnhappy() external {
+    function testOpDivEvalTwoInputsUnhappy() external {
         checkUnhappy("_: div(0 0);", stdError.divisionError);
         checkUnhappy("_: div(1 0);", stdError.divisionError);
         checkUnhappy(
@@ -141,20 +131,18 @@ contract LibOpDecimal18DivNPTest is OpTest {
     /// Test the eval of `div` opcode parsed from a string.
     /// Tests two inputs.
     /// Tests the unhappy path where the final result overflows.
-    function testOpDecimal18DivNPEvalTwoInputsUnhappyOverflow() external {
+    function testOpDivEvalTwoInputsUnhappyOverflow() external {
         checkUnhappy(
             "_: div(max-value() 1e-18);",
             abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, type(uint256).max, 1e18, 1)
         );
-        checkUnhappy(
-            "_: div(1e52 1e-8);", abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, 1e70, 1e18, 1e10)
-        );
+        checkUnhappy("_: div(1e52 1e-8);", abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, 1e70, 1e18, 1e10));
     }
 
     /// Test the eval of `div` opcode parsed from a string.
     /// Tests three inputs.
     /// Tests the happy path where we do not divide by zero or overflow.
-    function testOpDecimal18DivNPEvalThreeInputsHappy() external {
+    function testOpDivEvalThreeInputsHappy() external {
         checkHappy("_: div(0 1 1);", 0, "0 1 1");
         checkHappy("_: div(1 1 1);", 1e18, "1 1 1");
         checkHappy("_: div(1 1 2);", 5e17, "1 1 2");
@@ -169,7 +157,7 @@ contract LibOpDecimal18DivNPTest is OpTest {
     /// Test the eval of `div` opcode parsed from a string.
     /// Tests three inputs.
     /// Tests the unhappy path where we divide by zero.
-    function testOpDecimal18DivNPEvalThreeInputsUnhappy() external {
+    function testOpDivEvalThreeInputsUnhappy() external {
         checkUnhappy("_: div(0 0 0);", stdError.divisionError);
         checkUnhappy("_: div(1 0 0);", stdError.divisionError);
         checkUnhappy("_: div(1 1 0);", stdError.divisionError);
@@ -182,22 +170,18 @@ contract LibOpDecimal18DivNPTest is OpTest {
     /// Test the eval of `div` opcode parsed from a string.
     /// Tests three inputs.
     /// Tests the unhappy path where the final result overflows.
-    function testOpDecimal18DivNPEvalThreeInputsUnhappyOverflow() external {
+    function testOpDivEvalThreeInputsUnhappyOverflow() external {
         checkUnhappy(
             "_: div(max-value() 1e-18 1e-18);",
             abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, type(uint256).max, 1e18, 1)
         );
-        checkUnhappy(
-            "_: div(1e52 1 1e-8);", abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, 1e70, 1e18, 1e10)
-        );
-        checkUnhappy(
-            "_: div(1e52 1e-8 1);", abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, 1e70, 1e18, 1e10)
-        );
+        checkUnhappy("_: div(1e52 1 1e-8);", abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, 1e70, 1e18, 1e10));
+        checkUnhappy("_: div(1e52 1e-8 1);", abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, 1e70, 1e18, 1e10));
     }
 
     /// Test the eval of `div` opcode parsed from a string.
     /// Tests that operands are disallowed.
-    function testOpDecimal18DivNPEvalOperandsDisallowed() external {
+    function testOpDivEvalOperandsDisallowed() external {
         checkDisallowedOperand("_: div<0>(1 1 1);");
         checkDisallowedOperand("_: div<1>(1 1 1);");
         checkDisallowedOperand("_: div<2>(1 1 1);");
@@ -206,11 +190,11 @@ contract LibOpDecimal18DivNPTest is OpTest {
         checkDisallowedOperand("_: div<1 0>(1 1 1);");
     }
 
-    function testOpDecimal18DivNPEvalZeroOutputs() external {
+    function testOpDivEvalZeroOutputs() external {
         checkBadOutputs(": div(0 1);", 2, 1, 0);
     }
 
-    function testOpDecimal18DivNPEvalTwoOutputs() external {
+    function testOpDivEvalTwoOutputs() external {
         checkBadOutputs("_ _: div(0 1);", 2, 1, 2);
     }
 }

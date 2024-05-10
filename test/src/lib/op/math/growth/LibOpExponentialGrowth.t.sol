@@ -8,9 +8,7 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 contract LibOpExponentialGrowthTest is OpTest {
     /// Directly test the integrity logic of LibOpExponentialGrowth.
     /// Inputs are always 3, outputs are always 1.
-    function testOpExponentialGrowthIntegrity(IntegrityCheckStateNP memory state, Operand operand)
-        external
-    {
+    function testOpExponentialGrowthIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpExponentialGrowth.integrity(state, operand);
         assertEq(calcInputs, 3);
         assertEq(calcOutputs, 1);
@@ -36,9 +34,9 @@ contract LibOpExponentialGrowthTest is OpTest {
         opReferenceCheck(
             state,
             operand,
-            LibOpExponentialGrowthNP.referenceFn,
-            LibOpExponentialGrowthNP.integrity,
-            LibOpExponentialGrowthNP.run,
+            LibOpExponentialGrowth.referenceFn,
+            LibOpExponentialGrowth.integrity,
+            LibOpExponentialGrowth.run,
             inputs
         );
     }
@@ -88,8 +86,6 @@ contract LibOpExponentialGrowthTest is OpTest {
 
     /// Test that operand is disallowed.
     function testOpExponentialGrowthEvalOperandDisallowed() external {
-        checkUnhappyParse(
-            "_: exponential-growth<0>(1 0 0);", abi.encodeWithSelector(UnexpectedOperand.selector)
-        );
+        checkUnhappyParse("_: exponential-growth<0>(1 0 0);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

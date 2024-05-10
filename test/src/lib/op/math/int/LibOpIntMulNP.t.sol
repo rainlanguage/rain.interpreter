@@ -74,7 +74,7 @@ contract LibOpIntMulNPTest is OpTest {
         checkBadInputs("_: int-mul(5e-18);", 1, 2, 1);
         checkBadInputs("_: int-mul(0);", 1, 2, 1);
         checkBadInputs("_: int-mul(1e-18);", 1, 2, 1);
-        checkBadInputs("_: int-mul(max-int-value());", 1, 2, 1);
+        checkBadInputs("_: int-mul(max-value());", 1, 2, 1);
     }
 
     function testOpIntMulNPEvalZeroOutputs() external {
@@ -95,16 +95,16 @@ contract LibOpIntMulNPTest is OpTest {
         checkHappy("_: int-mul(1e-18 2e-18);", 2, "1 2");
         checkHappy("_: int-mul(2e-18 1e-18);", 2, "2 1");
         checkHappy("_: int-mul(2e-18 2e-18);", 4, "2 2");
-        checkHappy("_: int-mul(max-int-value() 0);", 0, "max-int-value() 0");
-        checkHappy("_: int-mul(max-int-value() 1e-18);", type(uint256).max, "max-int-value() 1");
+        checkHappy("_: int-mul(max-value() 0);", 0, "max-value() 0");
+        checkHappy("_: int-mul(max-value() 1e-18);", type(uint256).max, "max-value() 1");
     }
 
     /// Test the eval of `int-mul` opcode parsed from a string. Tests two inputs.
     /// Tests the unhappy path where multiplication overflows.
     function testOpIntMulNPEvalTwoInputsUnhappy() external {
-        checkUnhappyOverflow("_: int-mul(max-int-value() 2e-18);");
-        checkUnhappyOverflow("_: int-mul(2e-18 max-int-value());");
-        checkUnhappyOverflow("_: int-mul(max-int-value() max-int-value());");
+        checkUnhappyOverflow("_: int-mul(max-value() 2e-18);");
+        checkUnhappyOverflow("_: int-mul(2e-18 max-value());");
+        checkUnhappyOverflow("_: int-mul(max-value() max-value());");
     }
 
     /// Test the eval of `int-mul` opcode parsed from a string. Tests three inputs.
@@ -125,30 +125,30 @@ contract LibOpIntMulNPTest is OpTest {
         checkHappy("_: int-mul(2e-18 1e-18 2e-18);", 4, "2 1 2");
         checkHappy("_: int-mul(2e-18 2e-18 1e-18);", 4, "2 2 1");
         checkHappy("_: int-mul(2e-18 2e-18 2e-18);", 8, "2 2 2");
-        checkHappy("_: int-mul(max-int-value() 0 0);", 0, "max-int-value() 0 0");
-        checkHappy("_: int-mul(max-int-value() 0 1e-18);", 0, "max-int-value() 0 1");
-        checkHappy("_: int-mul(max-int-value() 0 2e-18);", 0, "max-int-value() 0 2");
-        checkHappy("_: int-mul(max-int-value() 1e-18 0);", 0, "max-int-value() 1 0");
-        checkHappy("_: int-mul(max-int-value() 1e-18 1e-18);", type(uint256).max, "max-int-value() 1 1");
+        checkHappy("_: int-mul(max-value() 0 0);", 0, "max-value() 0 0");
+        checkHappy("_: int-mul(max-value() 0 1e-18);", 0, "max-value() 0 1");
+        checkHappy("_: int-mul(max-value() 0 2e-18);", 0, "max-value() 0 2");
+        checkHappy("_: int-mul(max-value() 1e-18 0);", 0, "max-value() 1 0");
+        checkHappy("_: int-mul(max-value() 1e-18 1e-18);", type(uint256).max, "max-value() 1 1");
     }
 
     /// Test the eval of `int-mul` opcode parsed from a string. Tests three inputs.
     /// Tests the unhappy path where multiplication overflows.
     function testOpIntMulNPEvalThreeInputsUnhappy() external {
-        checkUnhappyOverflow("_: int-mul(max-int-value() 2e-18 2e-18);");
-        checkUnhappyOverflow("_: int-mul(2e-18 max-int-value() 2e-18);");
-        checkUnhappyOverflow("_: int-mul(2e-18 2e-18 max-int-value());");
-        checkUnhappyOverflow("_: int-mul(max-int-value() max-int-value() 2e-18);");
-        checkUnhappyOverflow("_: int-mul(max-int-value() 2e-18 max-int-value());");
-        checkUnhappyOverflow("_: int-mul(2e-18 max-int-value() max-int-value());");
-        checkUnhappyOverflow("_: int-mul(max-int-value() max-int-value() max-int-value());");
+        checkUnhappyOverflow("_: int-mul(max-value() 2e-18 2e-18);");
+        checkUnhappyOverflow("_: int-mul(2e-18 max-value() 2e-18);");
+        checkUnhappyOverflow("_: int-mul(2e-18 2e-18 max-value());");
+        checkUnhappyOverflow("_: int-mul(max-value() max-value() 2e-18);");
+        checkUnhappyOverflow("_: int-mul(max-value() 2e-18 max-value());");
+        checkUnhappyOverflow("_: int-mul(2e-18 max-value() max-value());");
+        checkUnhappyOverflow("_: int-mul(max-value() max-value() max-value());");
 
         // Show that overflow can happen in the middle of the calculation.
-        checkUnhappyOverflow("_: int-mul(2e-18 max-int-value() 2e-18 2e-18);");
-        checkUnhappyOverflow("_: int-mul(2e-18 2e-18 max-int-value() 2e-18);");
-        checkUnhappyOverflow("_: int-mul(2e-18 2e-18 2e-18 max-int-value());");
-        checkUnhappyOverflow("_: int-mul(max-int-value() 2e-18 2e-18 2e-18);");
-        checkUnhappyOverflow("_: int-mul(2e-18 max-int-value() 0);");
+        checkUnhappyOverflow("_: int-mul(2e-18 max-value() 2e-18 2e-18);");
+        checkUnhappyOverflow("_: int-mul(2e-18 2e-18 max-value() 2e-18);");
+        checkUnhappyOverflow("_: int-mul(2e-18 2e-18 2e-18 max-value());");
+        checkUnhappyOverflow("_: int-mul(max-value() 2e-18 2e-18 2e-18);");
+        checkUnhappyOverflow("_: int-mul(2e-18 max-value() 0);");
     }
 
     /// Test the eval of `int-mul` opcode parsed from a string.

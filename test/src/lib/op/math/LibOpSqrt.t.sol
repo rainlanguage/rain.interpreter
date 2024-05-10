@@ -2,20 +2,20 @@
 pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {LibOpDecimal18SqrtNP} from "src/lib/op/math/decimal18/LibOpDecimal18SqrtNP.sol";
+import {LibOpSqrt} from "src/lib/op/math/LibOpSqrt.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-contract LibOpDecimal18SqrtNPTest is OpTest {
-    /// Directly test the integrity logic of LibOpDecimal18SqrtNP.
+contract LibOpSqrtTest is OpTest {
+    /// Directly test the integrity logic of LibOpSqrt.
     /// Inputs are always 1, outputs are always 1.
-    function testOpDecimal18SqrtNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpDecimal18SqrtNP.integrity(state, operand);
+    function testOpSqrtIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpSqrt.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpDecimal18SqrtNP.
-    function testOpDecimal18SqrtNPRun(uint256 a) public {
+    /// Directly test the runtime logic of LibOpSqrt.
+    function testOpSqrtRun(uint256 a) public {
         a = bound(a, 0, type(uint64).max - 1e18);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
@@ -23,18 +23,11 @@ contract LibOpDecimal18SqrtNPTest is OpTest {
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = a;
 
-        opReferenceCheck(
-            state,
-            operand,
-            LibOpDecimal18SqrtNP.referenceFn,
-            LibOpDecimal18SqrtNP.integrity,
-            LibOpDecimal18SqrtNP.run,
-            inputs
-        );
+        opReferenceCheck(state, operand, LibOpSqrt.referenceFn, LibOpSqrt.integrity, LibOpSqrt.run, inputs);
     }
 
     /// Test the eval of `sqrt`.
-    function testOpDecimal18SqrtNPEval() external {
+    function testOpSqrtEval() external {
         checkHappy("_: sqrt(0);", 0, "0");
         checkHappy("_: sqrt(1);", 1e18, "1");
         checkHappy("_: sqrt(0.5);", 707106781186547524, "0.5");
@@ -43,21 +36,21 @@ contract LibOpDecimal18SqrtNPTest is OpTest {
     }
 
     /// Test the eval of `sqrt` for bad inputs.
-    function testOpDecimal18SqrtNPEvalBad() external {
+    function testOpSqrtEvalBad() external {
         checkBadInputs("_: sqrt();", 0, 1, 0);
         checkBadInputs("_: sqrt(1 1);", 2, 1, 2);
     }
 
-    function testOpDecimal18SqrtNPEvalZeroOutputs() external {
+    function testOpSqrtEvalZeroOutputs() external {
         checkBadOutputs(": sqrt(1);", 1, 1, 0);
     }
 
-    function testOpDecimal18SqrtNPEvalTwoOutputs() external {
+    function testOpSqrtEvalTwoOutputs() external {
         checkBadOutputs("_ _: sqrt(1);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.
-    function testOpDecimal18SqrtNPEvalOperandDisallowed() external {
+    function testOpSqrtEvalOperandDisallowed() external {
         checkUnhappyParse("_: sqrt<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

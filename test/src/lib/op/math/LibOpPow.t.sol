@@ -2,20 +2,20 @@
 pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {LibOpDecimal18PowNP} from "src/lib/op/math/decimal18/LibOpDecimal18PowNP.sol";
+import {LibOpPow} from "src/lib/op/math/LibOpPow.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-contract LibOpDecimal18PowNPTest is OpTest {
-    /// Directly test the integrity logic of LibOpDecimal18PowNP.
+contract LibOpPowTest is OpTest {
+    /// Directly test the integrity logic of LibOpPow.
     /// Inputs are always 2, outputs are always 1.
-    function testOpDecimal18PowNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpDecimal18PowNP.integrity(state, operand);
+    function testOpPowIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpPow.integrity(state, operand);
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpDecimal18PowNP.
-    function testOpDecimal18PowNPRun(uint256 a, uint256 b) public {
+    /// Directly test the runtime logic of LibOpPow.
+    function testOpPowRun(uint256 a, uint256 b) public {
         // @TODO This is a hack to get around the fact that we are very likely
         // to overflow uint256 if we just fuzz it, and that it's clunky to
         // determine whether it will overflow or not. Basically the overflow
@@ -31,18 +31,11 @@ contract LibOpDecimal18PowNPTest is OpTest {
         inputs[0] = a;
         inputs[1] = b;
 
-        opReferenceCheck(
-            state,
-            operand,
-            LibOpDecimal18PowNP.referenceFn,
-            LibOpDecimal18PowNP.integrity,
-            LibOpDecimal18PowNP.run,
-            inputs
-        );
+        opReferenceCheck(state, operand, LibOpPow.referenceFn, LibOpPow.integrity, LibOpPow.run, inputs);
     }
 
     /// Test the eval of `power`.
-    function testOpDecimal18PowNPEval() external {
+    function testOpPowEval() external {
         // 0 ^ 0
         checkHappy("_: power(0 0);", 1e18, "0 0");
         // 0 ^ 1
@@ -64,24 +57,24 @@ contract LibOpDecimal18PowNPTest is OpTest {
     }
 
     /// Test the eval of `power` for bad inputs.
-    function testOpDecimal18PowNPEvalOneInput() external {
+    function testOpPowEvalOneInput() external {
         checkBadInputs("_: power(1);", 1, 2, 1);
     }
 
-    function testOpDecimal18PowNPThreeInputs() external {
+    function testOpPowThreeInputs() external {
         checkBadInputs("_: power(1 1 1);", 3, 2, 3);
     }
 
-    function testOpDecimal18PowNPZeroOutputs() external {
+    function testOpPowZeroOutputs() external {
         checkBadOutputs(": power(1 1);", 2, 1, 0);
     }
 
-    function testOpDecimal18PowNPTwoOutputs() external {
+    function testOpPowTwoOutputs() external {
         checkBadOutputs("_ _: power(1 1);", 2, 1, 2);
     }
 
     /// Test that operand is disallowed.
-    function testOpDecimal18PowNPEvalOperandDisallowed() external {
+    function testOpPowEvalOperandDisallowed() external {
         checkUnhappyParse("_: power<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

@@ -5,9 +5,9 @@ import {LibFixedPointDecimalScale, DECIMAL_MAX_SAFE_INT} from "rain.math.fixedpo
 import {MASK_2BIT} from "sol.lib.binmaskflag/Binary.sol";
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
-import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
-import {LibParseLiteral} from "../../../parse/literal/LibParseLiteral.sol";
+import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
+import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
+import {LibParseLiteral} from "../../parse/literal/LibParseLiteral.sol";
 
 /// @title LibOpScale18Dynamic
 /// @notice Opcode for scaling a number to 18 decimal fixed point based on

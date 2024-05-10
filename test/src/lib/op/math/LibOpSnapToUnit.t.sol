@@ -2,20 +2,20 @@
 pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {LibOpDecimal18SnapToUnitNP} from "src/lib/op/math/decimal18/LibOpDecimal18SnapToUnitNP.sol";
+import {LibOpSnapToUnit} from "src/lib/op/math/LibOpSnapToUnit.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-contract LibOpDecimal18SnapToUnitNPTest is OpTest {
-    /// Directly test the integrity logic of LibOpDecimal18SnapToUnitNP.
+contract LibOpSnapToUnitTest is OpTest {
+    /// Directly test the integrity logic of LibOpSnapToUnit.
     /// Inputs are always 2, outputs are always 1.
-    function testOpDecimal18SnapToUnitNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpDecimal18SnapToUnitNP.integrity(state, operand);
+    function testOpSnapToUnitIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpSnapToUnit.integrity(state, operand);
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpDecimal18SnapToUnitNP.
-    function testOpDecimal18SnapToUnitNPRun(uint256 threshold, uint256 value) public {
+    /// Directly test the runtime logic of LibOpSnapToUnit.
+    function testOpSnapToUnitRun(uint256 threshold, uint256 value) public {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         value = bound(value, 0, type(uint64).max - 1e18);
 
@@ -25,17 +25,12 @@ contract LibOpDecimal18SnapToUnitNPTest is OpTest {
         inputs[1] = value;
 
         opReferenceCheck(
-            state,
-            operand,
-            LibOpDecimal18SnapToUnitNP.referenceFn,
-            LibOpDecimal18SnapToUnitNP.integrity,
-            LibOpDecimal18SnapToUnitNP.run,
-            inputs
+            state, operand, LibOpSnapToUnit.referenceFn, LibOpSnapToUnit.integrity, LibOpSnapToUnit.run, inputs
         );
     }
 
     /// Test the eval of `snap-to-unit`.
-    function testOpDecimal18SnapToUnitNPEval() external {
+    function testOpSnapToUnitEval() external {
         // If the threshold is 1 then we always floor.
         checkHappy("_: snap-to-unit(1 1);", 1e18, "1 1");
         checkHappy("_: snap-to-unit(1 0.5);", 0, "1 0.5");
@@ -56,22 +51,22 @@ contract LibOpDecimal18SnapToUnitNPTest is OpTest {
     }
 
     /// Test the eval of `snap-to-unit` for bad inputs.
-    function testOpDecimal18SnapToUnitNPEvalBad() external {
+    function testOpSnapToUnitEvalBad() external {
         checkBadInputs("_: snap-to-unit();", 0, 2, 0);
         checkBadInputs("_: snap-to-unit(1);", 1, 2, 1);
         checkBadInputs("_: snap-to-unit(1 1 1);", 3, 2, 3);
     }
 
-    function testOpDecimal18SnapToUnitNPEvalZeroOutputs() external {
+    function testOpSnapToUnitEvalZeroOutputs() external {
         checkBadOutputs(": snap-to-unit(1 1);", 2, 1, 0);
     }
 
-    function testOpDecimal18SnapToUnitNPEvalTwoOutputs() external {
+    function testOpSnapToUnitEvalTwoOutputs() external {
         checkBadOutputs("_ _: snap-to-unit(1 1);", 2, 1, 2);
     }
 
     /// Test that operand is disallowed.
-    function testOpDecimal18SnapToUnitNPEvalOperandDisallowed() external {
+    function testOpSnapToUnitEvalOperandDisallowed() external {
         checkUnhappyParse("_: snap-to-unit<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

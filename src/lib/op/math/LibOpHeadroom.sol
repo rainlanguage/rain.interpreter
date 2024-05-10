@@ -4,13 +4,13 @@ pragma solidity ^0.8.18;
 import {UD60x18, frac} from "prb-math/UD60x18.sol";
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
-import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
+import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
+import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 
-/// @title LibOpDecimal18Headroom
+/// @title LibOpHeadroom
 /// @notice Opcode for the headroom (distance to ceil) of an decimal 18 fixed
 /// point number.
-library LibOpDecimal18Headroom {
+library LibOpHeadroom {
     function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
         // There must be one input and one output.
         return (1, 1);

@@ -3,26 +3,24 @@ pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, InterpreterStateNP, Operand, stdError} from "test/abstract/OpTest.sol";
 import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
-import {LibOpDecimal18Scale18DynamicNP} from "src/lib/op/math/decimal18/LibOpDecimal18Scale18DynamicNP.sol";
+import {LibOpScale18Dynamic} from "src/lib/op/math/LibOpScale18Dynamic.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibFixedPointDecimalScale, DECIMAL_MAX_SAFE_INT} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 
-contract LibOpDecimal18Scale18DynamicNPTest is OpTest {
-    /// Directly test the integrity logic of LibOpDecimal18Scale18DynamicNP.
+contract LibOpScale18DynamicTest is OpTest {
+    /// Directly test the integrity logic of LibOpScale18Dynamic.
     /// Inputs are always 2, outputs are always 1.
-    function testOpDecimal18Scale18DynamicNPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs, uint16 op)
-        external
-    {
+    function testOpScale18DynamicIntegrity(IntegrityCheckStateNP memory state, uint8 inputs, uint16 op) external {
         inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpDecimal18Scale18DynamicNP.integrity(state, LibOperand.build(inputs, 1, op));
+            LibOpScale18Dynamic.integrity(state, LibOperand.build(inputs, 1, op));
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpDecimal18Scale18DynamicNP.
-    function testOpDecimal18Scale18DynamicNPRun(uint256 scale, uint256 round, uint256 saturate, uint256 value) public {
+    /// Directly test the runtime logic of LibOpScale18Dynamic.
+    function testOpScale18DynamicRun(uint256 scale, uint256 round, uint256 saturate, uint256 value) public {
         scale = bound(scale, 0, DECIMAL_MAX_SAFE_INT * 1e18);
         round = bound(round, 0, 1);
         saturate = bound(saturate, 0, 1);
@@ -49,15 +47,15 @@ contract LibOpDecimal18Scale18DynamicNPTest is OpTest {
         opReferenceCheck(
             state,
             operand,
-            LibOpDecimal18Scale18DynamicNP.referenceFn,
-            LibOpDecimal18Scale18DynamicNP.integrity,
-            LibOpDecimal18Scale18DynamicNP.run,
+            LibOpScale18Dynamic.referenceFn,
+            LibOpScale18Dynamic.integrity,
+            LibOpScale18Dynamic.run,
             inputs
         );
     }
 
     /// Test the eval of `scale-18-dynamic`.
-    function testOpDecimal18Scale18DynamicNPEval() external {
+    function testOpScale18DynamicEval() external {
         // Scale 0 value 0 round 0 saturate 0
         checkHappy("_: scale-18-dynamic(0 0);", 0, "0 0 0 0");
         // Scale 0 value 0 round 0 saturate 1
@@ -127,13 +125,13 @@ contract LibOpDecimal18Scale18DynamicNPTest is OpTest {
 
     /// Test the eval of `scale-18-dynamic` opcode parsed from a string.
     /// Tests zero inputs.
-    function testOpDecimal18Scale18DynamicNPEvalZeroInputs() external {
+    function testOpScale18DynamicEvalZeroInputs() external {
         checkBadInputs("_: scale-18-dynamic();", 0, 2, 0);
     }
 
     /// Test the eval of `scale-18-dynamic` opcode parsed from a string.
     /// Tests one input.
-    function testOpDecimal18Scale18DynamicNPEvalOneInput() external {
+    function testOpScale18DynamicEvalOneInput() external {
         checkBadInputs("_: scale-18-dynamic(5);", 1, 2, 1);
         checkBadInputs("_: scale-18-dynamic(0);", 1, 2, 1);
         checkBadInputs("_: scale-18-dynamic(1);", 1, 2, 1);
@@ -142,7 +140,7 @@ contract LibOpDecimal18Scale18DynamicNPTest is OpTest {
 
     /// Test the eval of `scale-18-dynamic` opcode parsed from a string.
     /// Tests three inputs.
-    function testOpDecimal18Scale18DynamicNPEvalThreeInputs() external {
+    function testOpScale18DynamicEvalThreeInputs() external {
         checkBadInputs("_: scale-18-dynamic(0 0 0);", 3, 2, 3);
         checkBadInputs("_: scale-18-dynamic(0 0 1);", 3, 2, 3);
         checkBadInputs("_: scale-18-dynamic(0 1 0);", 3, 2, 3);
@@ -153,11 +151,11 @@ contract LibOpDecimal18Scale18DynamicNPTest is OpTest {
         checkBadInputs("_: scale-18-dynamic(1 1 1);", 3, 2, 3);
     }
 
-    function testOpDecimal18Scale18DynamicNPZeroOutputs() external {
+    function testOpScale18DynamicZeroOutputs() external {
         checkBadOutputs(": scale-18-dynamic(0 0);", 2, 1, 0);
     }
 
-    function testOpDecimal18Scale18DynamicNPTwoOutputs() external {
+    function testOpScale18DynamicTwoOutputs() external {
         checkBadOutputs("_ _: scale-18-dynamic(0 0);", 2, 1, 2);
     }
 }

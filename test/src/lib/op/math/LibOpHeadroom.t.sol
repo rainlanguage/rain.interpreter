@@ -2,20 +2,20 @@
 pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {LibOpDecimal18HeadroomNP} from "src/lib/op/math/decimal18/LibOpDecimal18HeadroomNP.sol";
+import {LibOpHeadroom} from "src/lib/op/math/LibOpHeadroom.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-contract LibOpDecimal18HeadroomNPTest is OpTest {
-    /// Directly test the integrity logic of LibOpDecimal18HeadroomNP.
+contract LibOpHeadroomTest is OpTest {
+    /// Directly test the integrity logic of LibOpHeadroom.
     /// Inputs are always 1, outputs are always 1.
-    function testOpDecimal18HeadroomNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpDecimal18HeadroomNP.integrity(state, operand);
+    function testOpHeadroomIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpHeadroom.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpDecimal18HeadroomNP.
-    function testOpDecimal18HeadroomNPRun(uint256 a, uint16 operandData) public {
+    /// Directly test the runtime logic of LibOpHeadroom.
+    function testOpHeadroomRun(uint256 a, uint16 operandData) public {
         a = bound(a, 0, type(uint64).max - 1e18);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
@@ -23,18 +23,11 @@ contract LibOpDecimal18HeadroomNPTest is OpTest {
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = a;
 
-        opReferenceCheck(
-            state,
-            operand,
-            LibOpDecimal18HeadroomNP.referenceFn,
-            LibOpDecimal18HeadroomNP.integrity,
-            LibOpDecimal18HeadroomNP.run,
-            inputs
-        );
+        opReferenceCheck(state, operand, LibOpHeadroom.referenceFn, LibOpHeadroom.integrity, LibOpHeadroom.run, inputs);
     }
 
     /// Test the eval of `headroom`.
-    function testOpDecimal18HeadroomNPEval() external {
+    function testOpHeadroomEval() external {
         checkHappy("_: headroom(0);", 1e18, "0");
         checkHappy("_: headroom(1);", 1e18, "1");
         checkHappy("_: headroom(0.5);", 0.5e18, "0.5");
@@ -44,24 +37,24 @@ contract LibOpDecimal18HeadroomNPTest is OpTest {
     }
 
     /// Test the eval of `headroom` for bad inputs.
-    function testOpDecimal18HeadroomNPZeroInputs() external {
+    function testOpHeadroomZeroInputs() external {
         checkBadInputs("_: headroom();", 0, 1, 0);
     }
 
-    function testOpDecimal18HeadroomNPTwoInputs() external {
+    function testOpHeadroomTwoInputs() external {
         checkBadInputs("_: headroom(1 1);", 2, 1, 2);
     }
 
-    function testOpDecimal18HeadroomNPZeroOutputs() external {
+    function testOpHeadroomZeroOutputs() external {
         checkBadOutputs(": headroom(1);", 1, 1, 0);
     }
 
-    function testOpDecimal18HeadroomNPTwoOutputs() external {
+    function testOpHeadroomTwoOutputs() external {
         checkBadOutputs("_ _: headroom(1);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.
-    function testOpDecimal18HeadroomNPEvalOperandDisallowed() external {
+    function testOpHeadroomEvalOperandDisallowed() external {
         checkUnhappyParse("_: headroom<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

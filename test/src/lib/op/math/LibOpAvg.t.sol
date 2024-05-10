@@ -2,20 +2,20 @@
 pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {LibOpAvgNP} from "src/lib/op/math/LibOpAvgNP.sol";
+import {LibOpAvg} from "src/lib/op/math/LibOpAvg.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-contract LibOpAvgNPTest is OpTest {
-    /// Directly test the integrity logic of LibOpAvgNP.
+contract LibOpAvgTest is OpTest {
+    /// Directly test the integrity logic of LibOpAvg.
     /// Inputs are always 2, outputs are always 1.
-    function testOpAvgNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpAvgNP.integrity(state, operand);
+    function testOpAvgIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpAvg.integrity(state, operand);
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpAvgNP.
-    function testOpAvgNPRun(uint256 a, uint256 b, uint16 operandData) public {
+    /// Directly test the runtime logic of LibOpAvg.
+    function testOpAvgRun(uint256 a, uint256 b, uint16 operandData) public {
         // @TODO This is a hack to get around the fact that we are very likely
         // to overflow uint256 if we just fuzz it, and that it's clunky to
         // determine whether it will overflow or not. Basically the overflow
@@ -31,18 +31,11 @@ contract LibOpAvgNPTest is OpTest {
         inputs[0] = a;
         inputs[1] = b;
 
-        opReferenceCheck(
-            state,
-            operand,
-            LibOpAvgNP.referenceFn,
-            LibOpAvgNP.integrity,
-            LibOpAvgNP.run,
-            inputs
-        );
+        opReferenceCheck(state, operand, LibOpAvg.referenceFn, LibOpAvg.integrity, LibOpAvg.run, inputs);
     }
 
     /// Test the eval of `avg`.
-    function testOpAvgNPEval() external {
+    function testOpAvgEval() external {
         checkHappy("_: avg(0 0);", 0, "0 0");
         checkHappy("_: avg(0 1);", 5e17, "0 1");
         checkHappy("_: avg(1 0);", 5e17, "1 0");
@@ -55,24 +48,24 @@ contract LibOpAvgNPTest is OpTest {
     }
 
     /// Test the eval of `avg` for bad inputs.
-    function testOpAvgNPEvalOneInput() external {
+    function testOpAvgEvalOneInput() external {
         checkBadInputs("_: avg(1);", 1, 2, 1);
     }
 
-    function testOpAvgNPEvalThreeInputs() external {
+    function testOpAvgEvalThreeInputs() external {
         checkBadInputs("_: avg(1 1 1);", 3, 2, 3);
     }
 
-    function testOpAvgNPEvalZeroOutputs() external {
+    function testOpAvgEvalZeroOutputs() external {
         checkBadOutputs(": avg(0 0);", 2, 1, 0);
     }
 
-    function testOpAvgNPEvalTwoOutputs() external {
+    function testOpAvgEvalTwoOutputs() external {
         checkBadOutputs("_ _: avg(0 0);", 2, 1, 2);
     }
 
     /// Test that operand is disallowed.
-    function testOpAvgNPEvalOperandDisallowed() external {
+    function testOpAvgEvalOperandDisallowed() external {
         checkUnhappyParse("_: avg<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

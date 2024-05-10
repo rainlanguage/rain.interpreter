@@ -32,12 +32,7 @@ contract LibOpLinearGrowthTest is OpTest {
         inputs[2] = t;
 
         opReferenceCheck(
-            state,
-            operand,
-            LibOpLinearGrowthNP.referenceFn,
-            LibOpLinearGrowthNP.integrity,
-            LibOpLinearGrowthNP.run,
-            inputs
+            state, operand, LibOpLinearGrowth.referenceFn, LibOpLinearGrowth.integrity, LibOpLinearGrowth.run, inputs
         );
     }
 
@@ -83,8 +78,6 @@ contract LibOpLinearGrowthTest is OpTest {
 
     /// Test that operand is disallowed.
     function testOpLinearGrowthEvalOperandDisallowed() external {
-        checkUnhappyParse(
-            "_: linear-growth<0>(1 0 0);", abi.encodeWithSelector(UnexpectedOperand.selector)
-        );
+        checkUnhappyParse("_: linear-growth<0>(1 0 0);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

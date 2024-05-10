@@ -51,7 +51,7 @@ contract LibOpMaxUint256NPTest is OpTest {
 
     /// Test the eval of LibOpMaxUint256NP parsed from a string.
     function testOpMaxUint256NPEval(FullyQualifiedNamespace namespace) external {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: max-int-value();");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: max-value();");
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
 
@@ -69,18 +69,18 @@ contract LibOpMaxUint256NPTest is OpTest {
         assertEq(io, hex"0001");
     }
 
-    /// Test that a max-int-value with inputs fails integrity check.
+    /// Test that a max-value with inputs fails integrity check.
     function testOpMaxUint256NPEvalFail() public {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: max-int-value(0x00);");
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: max-value(0x00);");
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
         iDeployer.deployExpression2(bytecode, constants);
     }
 
     function testOpMaxUint256NPZeroOutputs() external {
-        checkBadOutputs(": max-int-value();", 0, 1, 0);
+        checkBadOutputs(": max-value();", 0, 1, 0);
     }
 
     function testOpMaxUint256NPTwoOutputs() external {
-        checkBadOutputs("_ _: max-int-value();", 0, 1, 2);
+        checkBadOutputs("_ _: max-value();", 0, 1, 2);
     }
 }

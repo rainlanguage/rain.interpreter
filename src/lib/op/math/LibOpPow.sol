@@ -4,8 +4,8 @@ pragma solidity ^0.8.18;
 import {UD60x18, pow} from "prb-math/UD60x18.sol";
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
-import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
+import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
+import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 
 /// @title LibOpPow
 /// @notice Opcode to pow N 18 decimal fixed point values to an 18 decimal power.

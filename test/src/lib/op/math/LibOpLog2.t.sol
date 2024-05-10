@@ -2,20 +2,20 @@
 pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {LibOpDecimal18Log2NP} from "src/lib/op/math/decimal18/LibOpDecimal18Log2NP.sol";
+import {LibOpLog2} from "src/lib/op/math/LibOpLog2.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-contract LibOpDecimal18Log2NPTest is OpTest {
-    /// Directly test the integrity logic of LibOpDecimal18Log2NP.
+contract LibOpLog2Test is OpTest {
+    /// Directly test the integrity logic of LibOpLog2.
     /// Inputs are always 1, outputs are always 1.
-    function testOpDecimal18Log2NPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpDecimal18Log2NP.integrity(state, operand);
+    function testOpLog2Integrity(IntegrityCheckStateNP memory state, Operand operand) external {
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpLog2.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpDecimal18Log2NP.
-    function testOpDecimal18Log2NPRun(uint256 a) public {
+    /// Directly test the runtime logic of LibOpLog2.
+    function testOpLog2Run(uint256 a) public {
         // e lifted from prb math.
         a = bound(a, 2_718281828459045235, type(uint64).max - 1e18);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
@@ -24,18 +24,11 @@ contract LibOpDecimal18Log2NPTest is OpTest {
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = a;
 
-        opReferenceCheck(
-            state,
-            operand,
-            LibOpDecimal18Log2NP.referenceFn,
-            LibOpDecimal18Log2NP.integrity,
-            LibOpDecimal18Log2NP.run,
-            inputs
-        );
+        opReferenceCheck(state, operand, LibOpLog2.referenceFn, LibOpLog2.integrity, LibOpLog2.run, inputs);
     }
 
     /// Test the eval of `log2`.
-    function testOpDecimal18Log2NPEval() external {
+    function testOpLog2Eval() external {
         // Any number less than 2 other than 1 is negative which doesn't exist
         // in unsigned integers.
         checkHappy("_: log2(1);", 0, "log2 1");
@@ -47,24 +40,24 @@ contract LibOpDecimal18Log2NPTest is OpTest {
     }
 
     /// Test the eval of `log2` for bad inputs.
-    function testOpDecimal18Log2NPZeroInputs() external {
+    function testOpLog2ZeroInputs() external {
         checkBadInputs("_: log2();", 0, 1, 0);
     }
 
-    function testOpDecimal18Log2NPTwoInputs() external {
+    function testOpLog2TwoInputs() external {
         checkBadInputs("_: log2(1 1);", 2, 1, 2);
     }
 
-    function testOpDecimal18Log2NPZeroOutputs() external {
+    function testOpLog2ZeroOutputs() external {
         checkBadOutputs(": log2(1);", 1, 1, 0);
     }
 
-    function testOpDecimal18Log2NPTwoOutputs() external {
+    function testOpLog2TwoOutputs() external {
         checkBadOutputs("_ _: log2(1);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.
-    function testOpDecimal18Log2NPEvalOperandDisallowed() external {
+    function testOpLog2EvalOperandDisallowed() external {
         checkUnhappyParse("_: log2<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }
