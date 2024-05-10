@@ -2,20 +2,20 @@
 pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {LibOpDecimal18AvgNP} from "src/lib/op/math/decimal18/LibOpDecimal18AvgNP.sol";
+import {LibOpAvgNP} from "src/lib/op/math/LibOpAvgNP.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-contract LibOpDecimal18AvgNPTest is OpTest {
-    /// Directly test the integrity logic of LibOpDecimal18AvgNP.
+contract LibOpAvgNPTest is OpTest {
+    /// Directly test the integrity logic of LibOpAvgNP.
     /// Inputs are always 2, outputs are always 1.
-    function testOpDecimal18AvgNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpDecimal18AvgNP.integrity(state, operand);
+    function testOpAvgNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpAvgNP.integrity(state, operand);
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpDecimal18AvgNP.
-    function testOpDecimal18AvgNPRun(uint256 a, uint256 b, uint16 operandData) public {
+    /// Directly test the runtime logic of LibOpAvgNP.
+    function testOpAvgNPRun(uint256 a, uint256 b, uint16 operandData) public {
         // @TODO This is a hack to get around the fact that we are very likely
         // to overflow uint256 if we just fuzz it, and that it's clunky to
         // determine whether it will overflow or not. Basically the overflow
@@ -34,15 +34,15 @@ contract LibOpDecimal18AvgNPTest is OpTest {
         opReferenceCheck(
             state,
             operand,
-            LibOpDecimal18AvgNP.referenceFn,
-            LibOpDecimal18AvgNP.integrity,
-            LibOpDecimal18AvgNP.run,
+            LibOpAvgNP.referenceFn,
+            LibOpAvgNP.integrity,
+            LibOpAvgNP.run,
             inputs
         );
     }
 
     /// Test the eval of `avg`.
-    function testOpDecimal18AvgNPEval() external {
+    function testOpAvgNPEval() external {
         checkHappy("_: avg(0 0);", 0, "0 0");
         checkHappy("_: avg(0 1);", 5e17, "0 1");
         checkHappy("_: avg(1 0);", 5e17, "1 0");
@@ -55,24 +55,24 @@ contract LibOpDecimal18AvgNPTest is OpTest {
     }
 
     /// Test the eval of `avg` for bad inputs.
-    function testOpDecimal18AvgNPEvalOneInput() external {
+    function testOpAvgNPEvalOneInput() external {
         checkBadInputs("_: avg(1);", 1, 2, 1);
     }
 
-    function testOpDecimal18AvgNPEvalThreeInputs() external {
+    function testOpAvgNPEvalThreeInputs() external {
         checkBadInputs("_: avg(1 1 1);", 3, 2, 3);
     }
 
-    function testOpDecimal18AvgNPEvalZeroOutputs() external {
+    function testOpAvgNPEvalZeroOutputs() external {
         checkBadOutputs(": avg(0 0);", 2, 1, 0);
     }
 
-    function testOpDecimal18AvgNPEvalTwoOutputs() external {
+    function testOpAvgNPEvalTwoOutputs() external {
         checkBadOutputs("_ _: avg(0 0);", 2, 1, 2);
     }
 
     /// Test that operand is disallowed.
-    function testOpDecimal18AvgNPEvalOperandDisallowed() external {
+    function testOpAvgNPEvalOperandDisallowed() external {
         checkUnhappyParse("_: avg<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

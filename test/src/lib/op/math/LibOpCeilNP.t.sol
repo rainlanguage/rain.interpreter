@@ -2,7 +2,7 @@
 pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {LibOpDecimal18CeilNP} from "src/lib/op/math/decimal18/LibOpDecimal18CeilNP.sol";
+import {LibOpCeilNP} from "src/lib/op/math/LibOpCeilNP.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpDecimal18CeilNPTest is OpTest {

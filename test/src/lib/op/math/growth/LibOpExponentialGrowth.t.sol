@@ -2,22 +2,22 @@
 pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {LibOpDecimal18ExponentialGrowthNP} from "src/lib/op/math/decimal18/growth/LibOpDecimal18ExponentialGrowthNP.sol";
+import {LibOpExponentialGrowth} from "src/lib/op/math/growth/LibOpExponentialGrowth.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-contract LibOpDecimal18ExponentialGrowthNPTest is OpTest {
-    /// Directly test the integrity logic of LibOpDecimal18ExponentialGrowthNP.
+contract LibOpExponentialGrowthTest is OpTest {
+    /// Directly test the integrity logic of LibOpExponentialGrowth.
     /// Inputs are always 3, outputs are always 1.
-    function testOpDecimal18ExponentialGrowthNPIntegrity(IntegrityCheckStateNP memory state, Operand operand)
+    function testOpExponentialGrowthIntegrity(IntegrityCheckStateNP memory state, Operand operand)
         external
     {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpDecimal18ExponentialGrowthNP.integrity(state, operand);
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpExponentialGrowth.integrity(state, operand);
         assertEq(calcInputs, 3);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpDecimal18ExponentialGrowthNP.
-    function testOpDecimal18ExponentialGrowthNPRun(uint256 a, uint256 r, uint256 t, uint16 operandData) public {
+    /// Directly test the runtime logic of LibOpExponentialGrowth.
+    function testOpExponentialGrowthRun(uint256 a, uint256 r, uint256 t, uint16 operandData) public {
         // @TODO This is a hack to cover some range that we can definitely
         // handle but it doesn't cover the full range of the function.
         a = bound(a, 0, type(uint64).max);
@@ -36,15 +36,15 @@ contract LibOpDecimal18ExponentialGrowthNPTest is OpTest {
         opReferenceCheck(
             state,
             operand,
-            LibOpDecimal18ExponentialGrowthNP.referenceFn,
-            LibOpDecimal18ExponentialGrowthNP.integrity,
-            LibOpDecimal18ExponentialGrowthNP.run,
+            LibOpExponentialGrowthNP.referenceFn,
+            LibOpExponentialGrowthNP.integrity,
+            LibOpExponentialGrowthNP.run,
             inputs
         );
     }
 
     /// Test the eval of `exponential-growth`.
-    function testOpDecimal18ExponentialGrowthNPEval() external {
+    function testOpExponentialGrowthEval() external {
         checkHappy("_: exponential-growth(0 0 0);", 0, "0 0 0");
         checkHappy("_: exponential-growth(0 0.1 0);", 0, "0 0.1 0");
         checkHappy("_: exponential-growth(0 0.1 1);", 0, "0 0.1 1");
@@ -62,32 +62,32 @@ contract LibOpDecimal18ExponentialGrowthNPTest is OpTest {
         checkHappy("_: exponential-growth(2 0.1 2);", 2419999999999999948, "2 0.1 2");
     }
 
-    function testOpDecimal18ExponentialGrowthNPEvalZeroInputs() external {
+    function testOpExponentialGrowthEvalZeroInputs() external {
         checkBadInputs(": exponential-growth();", 0, 3, 0);
     }
 
-    function testOpDecimal18ExponentialGrowthNPEvalOneInput() external {
+    function testOpExponentialGrowthEvalOneInput() external {
         checkBadInputs("_: exponential-growth(1);", 1, 3, 1);
     }
 
-    function testOpDecimal18ExponentialGrowthNPEvalTwoInputs() external {
+    function testOpExponentialGrowthEvalTwoInputs() external {
         checkBadInputs("_: exponential-growth(1 0);", 2, 3, 2);
     }
 
-    function testOpDecimal18ExponentialGrowthNPEvalFourInputs() external {
+    function testOpExponentialGrowthEvalFourInputs() external {
         checkBadInputs("_: exponential-growth(1 0 0 1);", 4, 3, 4);
     }
 
-    function testOpDecimal18ExponentialGrowthNPEvalZeroOutputs() external {
+    function testOpExponentialGrowthEvalZeroOutputs() external {
         checkBadOutputs(": exponential-growth(1 0 0);", 3, 1, 0);
     }
 
-    function testOpDecimal18ExponentialGrowthNPEvalTwoOutputs() external {
+    function testOpExponentialGrowthEvalTwoOutputs() external {
         checkBadOutputs("_ _: exponential-growth(1 0 0);", 3, 1, 2);
     }
 
     /// Test that operand is disallowed.
-    function testOpDecimal18ExponentialGrowthNPEvalOperandDisallowed() external {
+    function testOpExponentialGrowthEvalOperandDisallowed() external {
         checkUnhappyParse(
             "_: exponential-growth<0>(1 0 0);", abi.encodeWithSelector(UnexpectedOperand.selector)
         );

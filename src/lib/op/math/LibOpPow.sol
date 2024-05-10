@@ -1,32 +1,32 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {UD60x18, frac} from "prb-math/UD60x18.sol";
+import {UD60x18, pow} from "prb-math/UD60x18.sol";
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
 
-/// @title LibOpDecimal18HeadroomNP
-/// @notice Opcode for the headroom (distance to ceil) of an decimal 18 fixed
-/// point number.
-library LibOpDecimal18HeadroomNP {
+/// @title LibOpPow
+/// @notice Opcode to pow N 18 decimal fixed point values to an 18 decimal power.
+library LibOpPow {
     function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
-        // There must be one input and one output.
-        return (1, 1);
+        // There must be two inputs and one output.
+        return (2, 1);
     }
 
-    /// decimal18-headroom
-    /// 18 decimal fixed point headroom of a number.
+    /// pow
+    /// 18 decimal fixed point exponentiation with implied overflow checks from
+    /// PRB Math.
     function run(InterpreterStateNP memory, Operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;
+        uint256 b;
         assembly ("memory-safe") {
             a := mload(stackTop)
+            stackTop := add(stackTop, 0x20)
+            b := mload(stackTop)
         }
-        // Can't underflow as frac is always less than 1e18.
-        unchecked {
-            a = 1e18 - UD60x18.unwrap(frac(UD60x18.wrap(a)));
-        }
+        a = UD60x18.unwrap(pow(UD60x18.wrap(a), UD60x18.wrap(b)));
 
         assembly ("memory-safe") {
             mstore(stackTop, a)
@@ -34,14 +34,14 @@ library LibOpDecimal18HeadroomNP {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of headroom for testing.
+    /// Gas intensive reference implementation of pow for testing.
     function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
         internal
         pure
         returns (uint256[] memory)
     {
         uint256[] memory outputs = new uint256[](1);
-        outputs[0] = 1e18 - UD60x18.unwrap(frac(UD60x18.wrap(inputs[0])));
+        outputs[0] = UD60x18.unwrap(pow(UD60x18.wrap(inputs[0]), UD60x18.wrap(inputs[1])));
         return outputs;
     }
 }

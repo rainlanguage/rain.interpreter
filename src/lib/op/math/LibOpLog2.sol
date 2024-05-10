@@ -7,15 +7,15 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
 
-/// @title LibOpDecimal18Log2NP
+/// @title LibOpLog2
 /// @notice Opcode for the binary logarithm of an decimal 18 fixed point number.
-library LibOpDecimal18Log2NP {
+library LibOpLog2 {
     function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
         // There must be one inputs and one output.
         return (1, 1);
     }
 
-    /// decimal18-log2
+    /// log2
     /// 18 decimal fixed point binary logarithm of a number.
     function run(InterpreterStateNP memory, Operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;

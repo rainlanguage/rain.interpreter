@@ -9,17 +9,17 @@ import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol"
 import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
 import {LibParseLiteral} from "../../../parse/literal/LibParseLiteral.sol";
 
-/// @title LibOpDecimal18Scale18DynamicNP
+/// @title LibOpScale18Dynamic
 /// @notice Opcode for scaling a number to 18 decimal fixed point based on
 /// runtime scale input.
-library LibOpDecimal18Scale18DynamicNP {
+library LibOpScale18Dynamic {
     using LibFixedPointDecimalScale for uint256;
 
     function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
         return (2, 1);
     }
 
-    /// decimal18-scale-18-dynamic
+    /// scale-18-dynamic
     /// 18 decimal fixed point scaling from runtime value.
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;

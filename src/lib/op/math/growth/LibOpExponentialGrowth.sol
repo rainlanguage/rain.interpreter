@@ -1,43 +1,49 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {UD60x18, log10} from "prb-math/UD60x18.sol";
+import {UD60x18, mul, pow} from "prb-math/UD60x18.sol";
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
 
-/// @title LibOpDecimal18Log10NP
-/// @notice Opcode for the common logarithm of an decimal 18 fixed point number.
-library LibOpDecimal18Log10NP {
+/// @title LibOpExponentialGrowth
+/// @notice Exponential growth is base(1 + rate)^t where base is the initial
+/// value, rate is the growth rate, and t is time.
+library LibOpExponentialGrowth {
     function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
-        // There must be one inputs and one output.
-        return (1, 1);
+        // There must be three inputs and one output.
+        return (3, 1);
     }
 
-    /// decimal18-log10
-    /// 18 decimal fixed point common logarithm of a number.
+    /// exponential-growth
     function run(InterpreterStateNP memory, Operand, Pointer stackTop) internal pure returns (Pointer) {
-        uint256 a;
+        uint256 base;
+        uint256 rate;
+        uint256 t;
         assembly ("memory-safe") {
-            a := mload(stackTop)
+            base := mload(stackTop)
+            rate := mload(add(stackTop, 0x20))
+            stackTop := add(stackTop, 0x40)
+            t := mload(stackTop)
         }
-        a = UD60x18.unwrap(log10(UD60x18.wrap(a)));
+        base = UD60x18.unwrap(mul(UD60x18.wrap(base), pow(UD60x18.wrap(1e18 + rate), UD60x18.wrap(t))));
 
         assembly ("memory-safe") {
-            mstore(stackTop, a)
+            mstore(stackTop, base)
         }
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of log10 for testing.
+    /// Gas intensive reference implementation for testing.
     function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
         internal
         pure
         returns (uint256[] memory)
     {
         uint256[] memory outputs = new uint256[](1);
-        outputs[0] = UD60x18.unwrap(log10(UD60x18.wrap(inputs[0])));
+        outputs[0] =
+            UD60x18.unwrap(mul(UD60x18.wrap(inputs[0]), pow(UD60x18.wrap(1e18 + inputs[1]), UD60x18.wrap(inputs[2]))));
         return outputs;
     }
 }

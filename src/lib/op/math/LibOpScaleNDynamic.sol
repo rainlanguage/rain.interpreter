@@ -9,17 +9,17 @@ import {LibFixedPointDecimalScale, DECIMAL_MAX_SAFE_INT} from "rain.math.fixedpo
 import {MASK_2BIT} from "sol.lib.binmaskflag/Binary.sol";
 import {LibParseLiteral} from "../../../parse/literal/LibParseLiteral.sol";
 
-/// @title LibOpDecimal18ScaleNDynamicNP
+/// @title LibOpScaleNDynamic
 /// @notice Opcode for scaling a number from 18 decimal fixed point based on
 /// runtime scale input.
-library LibOpDecimal18ScaleNDynamicNP {
+library LibOpScaleNDynamic {
     using LibFixedPointDecimalScale for uint256;
 
     function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
         return (2, 1);
     }
 
-    /// decimal18-scaleN-dynamic
+    /// scaleN-dynamic
     /// 18 decimal fixed point scaling from runtime value.
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;

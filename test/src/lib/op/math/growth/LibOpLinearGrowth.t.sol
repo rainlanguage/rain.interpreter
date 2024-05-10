@@ -2,20 +2,20 @@
 pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckStateNP, Operand, InterpreterStateNP, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {LibOpDecimal18LinearGrowthNP} from "src/lib/op/math/decimal18/growth/LibOpDecimal18LinearGrowthNP.sol";
+import {LibOpLinearGrowth} from "src/lib/op/math/growth/LibOpLinearGrowth.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-contract LibOpDecimal18LinearGrowthNPTest is OpTest {
-    /// Directly test the integrity logic of LibOpDecimal18LinearGrowthNP.
+contract LibOpLinearGrowthTest is OpTest {
+    /// Directly test the integrity logic of LibOpLinearGrowth.
     /// Inputs are always 3, outputs are always 1.
-    function testOpDecimal18LinearGrowthNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpDecimal18LinearGrowthNP.integrity(state, operand);
+    function testOpLinearGrowthIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpLinearGrowth.integrity(state, operand);
         assertEq(calcInputs, 3);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpDecimal18LinearGrowthNP.
-    function testOpDecimal18LinearGrowthNPRun(uint256 a, uint256 r, uint256 t, uint16 operandData) public {
+    /// Directly test the runtime logic of LibOpLinearGrowth.
+    function testOpLinearGrowthRun(uint256 a, uint256 r, uint256 t, uint16 operandData) public {
         // @TODO This is a hack to cover some range that we can definitely
         // handle but it doesn't cover the full range of the function.
         a = bound(a, 0, type(uint128).max);
@@ -34,15 +34,15 @@ contract LibOpDecimal18LinearGrowthNPTest is OpTest {
         opReferenceCheck(
             state,
             operand,
-            LibOpDecimal18LinearGrowthNP.referenceFn,
-            LibOpDecimal18LinearGrowthNP.integrity,
-            LibOpDecimal18LinearGrowthNP.run,
+            LibOpLinearGrowthNP.referenceFn,
+            LibOpLinearGrowthNP.integrity,
+            LibOpLinearGrowthNP.run,
             inputs
         );
     }
 
     /// Test the eval of `linear-growth`.
-    function testOpDecimal18LinearGrowthNPEval() external {
+    function testOpLinearGrowthEval() external {
         checkHappy("_: linear-growth(0 0 0);", 0, "0 0 0");
         checkHappy("_: linear-growth(0 0.1 0);", 0, "0 0.1 0");
         checkHappy("_: linear-growth(0 0.1 1);", 1e17, "0 0.1 1");
@@ -57,32 +57,32 @@ contract LibOpDecimal18LinearGrowthNPTest is OpTest {
         checkHappy("_: linear-growth(2 0.1 2);", 2.2e18, "2 0.1 2");
     }
 
-    function testOpDecimal18LinearGrowthNPEvalZeroInputs() external {
+    function testOpLinearGrowthEvalZeroInputs() external {
         checkBadInputs(": linear-growth();", 0, 3, 0);
     }
 
-    function testOpDecimal18LinearGrowthNPEvalOneInput() external {
+    function testOpLinearGrowthEvalOneInput() external {
         checkBadInputs("_: linear-growth(1);", 1, 3, 1);
     }
 
-    function testOpDecimal18LinearGrowthNPEvalTwoInputs() external {
+    function testOpLinearGrowthEvalTwoInputs() external {
         checkBadInputs("_: linear-growth(1 0);", 2, 3, 2);
     }
 
-    function testOpDecimal18LinearGrowthNPEvalFourInputs() external {
+    function testOpLinearGrowthEvalFourInputs() external {
         checkBadInputs("_: linear-growth(1 0 0 1);", 4, 3, 4);
     }
 
-    function testOpDecimal18LinearGrowthNPEvalZeroOutputs() external {
+    function testOpLinearGrowthEvalZeroOutputs() external {
         checkBadOutputs(": linear-growth(1 0 0);", 3, 1, 0);
     }
 
-    function testOpDecimal18LinearGrowthNPEvalTwoOutputs() external {
+    function testOpLinearGrowthEvalTwoOutputs() external {
         checkBadOutputs("_ _: linear-growth(1 0 0);", 3, 1, 2);
     }
 
     /// Test that operand is disallowed.
-    function testOpDecimal18LinearGrowthNPEvalOperandDisallowed() external {
+    function testOpLinearGrowthEvalOperandDisallowed() external {
         checkUnhappyParse(
             "_: linear-growth<0>(1 0 0);", abi.encodeWithSelector(UnexpectedOperand.selector)
         );

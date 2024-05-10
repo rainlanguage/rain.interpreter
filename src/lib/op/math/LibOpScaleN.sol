@@ -7,23 +7,23 @@ import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
-/// @title LibOpDecimal18Scale18NP
-/// @notice Opcode for scaling a number to 18 decimal fixed point.
-library LibOpDecimal18Scale18NP {
+/// @title LibOpScaleN
+/// @notice Opcode for scaling a decimal18 number to some other scale N.
+library LibOpScaleN {
     using LibFixedPointDecimalScale for uint256;
 
     function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
         return (1, 1);
     }
 
-    /// decimal18-scale-18
-    /// 18 decimal fixed point scaling.
+    /// scale-n
+    /// Scale from 18 decimal to n decimal.
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;
         assembly ("memory-safe") {
             a := mload(stackTop)
         }
-        a = a.scale18(Operand.unwrap(operand) & 0xFF, Operand.unwrap(operand) >> 8);
+        a = a.scaleN(Operand.unwrap(operand) & 0xFF, Operand.unwrap(operand) >> 8);
         assembly ("memory-safe") {
             mstore(stackTop, a)
         }
@@ -36,6 +36,6 @@ library LibOpDecimal18Scale18NP {
         returns (uint256[] memory outputs)
     {
         outputs = new uint256[](1);
-        outputs[0] = inputs[0].scale18(Operand.unwrap(operand) & 0xFF, Operand.unwrap(operand) >> 8);
+        outputs[0] = inputs[0].scaleN(Operand.unwrap(operand) & 0xFF, Operand.unwrap(operand) >> 8);
     }
 }

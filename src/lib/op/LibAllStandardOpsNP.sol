@@ -54,29 +54,29 @@ import {LibOpIsZeroNP} from "./logic/LibOpIsZeroNP.sol";
 import {LibOpLessThanNP} from "./logic/LibOpLessThanNP.sol";
 import {LibOpLessThanOrEqualToNP} from "./logic/LibOpLessThanOrEqualToNP.sol";
 
-import {LibOpDecimal18ExponentialGrowthNP} from "./math/decimal18/growth/LibOpDecimal18ExponentialGrowthNP.sol";
-import {LibOpDecimal18LinearGrowthNP} from "./math/decimal18/growth/LibOpDecimal18LinearGrowthNP.sol";
-import {LibOpDecimal18AvgNP} from "./math/decimal18/LibOpDecimal18AvgNP.sol";
-import {LibOpDecimal18CeilNP} from "./math/decimal18/LibOpDecimal18CeilNP.sol";
-import {LibOpDecimal18MulNP} from "./math/decimal18/LibOpDecimal18MulNP.sol";
-import {LibOpDecimal18DivNP} from "./math/decimal18/LibOpDecimal18DivNP.sol";
-import {LibOpDecimal18ExpNP} from "./math/decimal18/LibOpDecimal18ExpNP.sol";
-import {LibOpDecimal18Exp2NP} from "./math/decimal18/LibOpDecimal18Exp2NP.sol";
-import {LibOpDecimal18FloorNP} from "./math/decimal18/LibOpDecimal18FloorNP.sol";
-import {LibOpDecimal18FracNP} from "./math/decimal18/LibOpDecimal18FracNP.sol";
-import {LibOpDecimal18GmNP} from "./math/decimal18/LibOpDecimal18GmNP.sol";
-import {LibOpDecimal18HeadroomNP} from "./math/decimal18/LibOpDecimal18HeadroomNP.sol";
-import {LibOpDecimal18InvNP} from "./math/decimal18/LibOpDecimal18InvNP.sol";
-import {LibOpDecimal18LnNP} from "./math/decimal18/LibOpDecimal18LnNP.sol";
-import {LibOpDecimal18Log10NP} from "./math/decimal18/LibOpDecimal18Log10NP.sol";
-import {LibOpDecimal18Log2NP} from "./math/decimal18/LibOpDecimal18Log2NP.sol";
-import {LibOpDecimal18PowNP} from "./math/decimal18/LibOpDecimal18PowNP.sol";
-import {LibOpDecimal18Scale18DynamicNP} from "./math/decimal18/LibOpDecimal18Scale18DynamicNP.sol";
-import {LibOpDecimal18Scale18NP} from "./math/decimal18/LibOpDecimal18Scale18NP.sol";
-import {LibOpDecimal18ScaleNDynamicNP} from "./math/decimal18/LibOpDecimal18ScaleNDynamicNP.sol";
-import {LibOpDecimal18ScaleNNP} from "./math/decimal18/LibOpDecimal18ScaleNNP.sol";
-import {LibOpDecimal18SnapToUnitNP} from "./math/decimal18/LibOpDecimal18SnapToUnitNP.sol";
-import {LibOpDecimal18SqrtNP} from "./math/decimal18/LibOpDecimal18SqrtNP.sol";
+import {LibOpExponentialGrowthNP} from "./math/growth/LibOpExponentialGrowthNP.sol";
+import {LibOpLinearGrowthNP} from "./math/growth/LibOpLinearGrowthNP.sol";
+import {LibOpAvgNP} from "./math/LibOpAvgNP.sol";
+import {LibOpCeilNP} from "./math/LibOpCeilNP.sol";
+import {LibOpMulNP} from "./math/LibOpMulNP.sol";
+import {LibOpDivNP} from "./math/LibOpDivNP.sol";
+import {LibOpExpNP} from "./math/LibOpExpNP.sol";
+import {LibOpExp2NP} from "./math/LibOpExp2NP.sol";
+import {LibOpFloorNP} from "./math/LibOpFloorNP.sol";
+import {LibOpFracNP} from "./math/LibOpFracNP.sol";
+import {LibOpGmNP} from "./math/LibOpGmNP.sol";
+import {LibOpHeadroomNP} from "./math/LibOpHeadroomNP.sol";
+import {LibOpInvNP} from "./math/LibOpInvNP.sol";
+import {LibOpLnNP} from "./math/LibOpLnNP.sol";
+import {LibOpLog10NP} from "./math/LibOpLog10NP.sol";
+import {LibOpLog2NP} from "./math/LibOpLog2NP.sol";
+import {LibOpPowNP} from "./math/LibOpPowNP.sol";
+import {LibOpScale18DynamicNP} from "./math/LibOpScale18DynamicNP.sol";
+import {LibOpScale18NP} from "./math/LibOpScale18NP.sol";
+import {LibOpScaleNDynamicNP} from "./math/LibOpScaleNDynamicNP.sol";
+import {LibOpScaleNNP} from "./math/LibOpScaleNNP.sol";
+import {LibOpSnapToUnitNP} from "./math/LibOpSnapToUnitNP.sol";
+import {LibOpSqrtNP} from "./math/LibOpSqrtNP.sol";
 
 import {LibOpIntAddNP} from "./math/int/LibOpIntAddNP.sol";
 import {LibOpIntDivNP} from "./math/int/LibOpIntDivNP.sol";
@@ -525,9 +525,9 @@ library LibAllStandardOpsNP {
                     LibOpIsZeroNP.integrity,
                     LibOpLessThanNP.integrity,
                     LibOpLessThanOrEqualToNP.integrity,
-                    LibOpDecimal18ExponentialGrowthNP.integrity,
-                    LibOpDecimal18LinearGrowthNP.integrity,
-                    LibOpDecimal18AvgNP.integrity,
+                    LibOpExponentialGrowthNP.integrity,
+                    LibOpLinearGrowthNP.integrity,
+                    LibOpAvgNP.integrity,
                     LibOpDecimal18CeilNP.integrity,
                     LibOpDecimal18DivNP.integrity,
                     LibOpDecimal18ExpNP.integrity,
@@ -631,9 +631,9 @@ library LibAllStandardOpsNP {
                     LibOpIsZeroNP.run,
                     LibOpLessThanNP.run,
                     LibOpLessThanOrEqualToNP.run,
-                    LibOpDecimal18ExponentialGrowthNP.run,
-                    LibOpDecimal18LinearGrowthNP.run,
-                    LibOpDecimal18AvgNP.run,
+                    LibOpExponentialGrowthNP.run,
+                    LibOpLinearGrowthNP.run,
+                    LibOpAvgNP.run,
                     LibOpDecimal18CeilNP.run,
                     LibOpDecimal18DivNP.run,
                     LibOpDecimal18ExpNP.run,

@@ -7,9 +7,9 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
 
-/// @title LibOpDecimal18SqrtNP
+/// @title LibOpSqrt
 /// @notice Opcode for the square root of an decimal 18 fixed point number.
-library LibOpDecimal18SqrtNP {
+library LibOpSqrt {
     function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
         // There must be one inputs and one output.
         return (1, 1);

@@ -7,15 +7,15 @@ import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {UD60x18, frac, ceil, floor} from "prb-math/UD60x18.sol";
 
-/// @title LibOpDecimal18SnapToUnitNP
+/// @title LibOpSnapToUnit
 /// @notice Opcode for the snap to unit of an decimal 18 fixed point number.
-library LibOpDecimal18SnapToUnitNP {
+library LibOpSnapToUnit {
     function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
         // There must be two inputs and one output.
         return (2, 1);
     }
 
-    /// decimal18-snap-to-unit
+    /// snap-to-unit
     function run(InterpreterStateNP memory, Operand, Pointer stackTop) internal pure returns (Pointer) {
         unchecked {
             uint256 threshold;
