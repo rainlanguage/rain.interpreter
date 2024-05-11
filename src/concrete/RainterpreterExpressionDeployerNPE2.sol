@@ -39,7 +39,7 @@ bytes constant INTEGRITY_FUNCTION_POINTERS =
     hex"0d940e120e770ff10ffb0ffb1005100e102910cf10cf112b11a511b20ffb10050ffb0ffb10050ff10ff10ff10ff111bc11e111fb0ffb11bc0ffb0ffb11b210050ffb0ffb11b211b212051205120512050ffb1005120510051005100510050ffb1005100510051005100512051205120512050ffb100510050ffb100510050ffb0ffb100512051205100511fb";
 
 /// @dev Hash of the metadata that describes the deployer (parsing).
-bytes32 constant DESCRIBED_BY_META_HASH = bytes32(0x500c32bf4cbd462f40ff5c3319187b1a8e393bc9ac49248e2fda1648dbb6c6aa);
+bytes32 constant DESCRIBED_BY_META_HASH = bytes32(0xdaefc51add96722d31941d783f342cd84df168c76f277d90c3631f891d494943);
 
 /// All config required to construct a `RainterpreterNPE2`.
 /// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match
