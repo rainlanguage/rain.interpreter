@@ -2,13 +2,15 @@
 pragma solidity ^0.8.18;
 
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
-import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
-import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
+import {Pointer, LibPointer} from "rain.solmem/lib/LibPointer.sol";
+import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
+import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 
-/// @title LibOpIntMaxNP
-/// @notice Opcode to find the max from N integers.
-library LibOpIntMaxNP {
+/// @title LibOpMod
+/// @notice Opcode to modulo N integers. Errors on modulo by zero.
+library LibOpMod {
+    using LibPointer for Pointer;
+
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
         uint256 inputs = (Operand.unwrap(operand) >> 0x10) & 0x0F;
@@ -16,8 +18,8 @@ library LibOpIntMaxNP {
         return (inputs, 1);
     }
 
-    /// int-max
-    /// Finds the maximum value from N integers.
+    /// mod
+    /// Modulo with implied checks from the Solidity 0.8.x compiler.
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;
         uint256 b;
@@ -26,9 +28,7 @@ library LibOpIntMaxNP {
             b := mload(add(stackTop, 0x20))
             stackTop := add(stackTop, 0x40)
         }
-        if (a < b) {
-            a = b;
-        }
+        a %= b;
 
         {
             uint256 inputs = (Operand.unwrap(operand) >> 0x10) & 0x0F;
@@ -38,9 +38,7 @@ library LibOpIntMaxNP {
                     b := mload(stackTop)
                     stackTop := add(stackTop, 0x20)
                 }
-                if (a < b) {
-                    a = b;
-                }
+                a %= b;
                 unchecked {
                     i++;
                 }
@@ -54,7 +52,7 @@ library LibOpIntMaxNP {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of maximum for testing.
+    /// Gas intensive reference implementation of modulo for testing.
     function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
         internal
         pure
@@ -65,7 +63,7 @@ library LibOpIntMaxNP {
         unchecked {
             uint256 acc = inputs[0];
             for (uint256 i = 1; i < inputs.length; i++) {
-                acc = acc < inputs[i] ? inputs[i] : acc;
+                acc %= inputs[i];
             }
             outputs = new uint256[](1);
             outputs[0] = acc;

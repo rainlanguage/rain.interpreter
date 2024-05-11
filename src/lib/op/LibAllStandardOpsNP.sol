@@ -10,8 +10,10 @@ import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "../integrity/LibIntegr
 import {LibInterpreterStateNP, InterpreterStateNP} from "../state/LibInterpreterStateNP.sol";
 import {LibParseOperand} from "../parse/LibParseOperand.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
+
 import {LibOpStackNP} from "./00/LibOpStackNP.sol";
 import {LibOpConstantNP} from "./00/LibOpConstantNP.sol";
+import {LibOpContextNP} from "./00/LibOpContextNP.sol";
 import {LibOpExternNP} from "./00/LibOpExternNP.sol";
 
 import {LibOpBitwiseAndNP} from "./bitwise/LibOpBitwiseAndNP.sol";
@@ -23,8 +25,6 @@ import {LibOpShiftBitsLeftNP} from "./bitwise/LibOpShiftBitsLeftNP.sol";
 import {LibOpShiftBitsRightNP} from "./bitwise/LibOpShiftBitsRightNP.sol";
 
 import {LibOpCallNP} from "./call/LibOpCallNP.sol";
-
-import {LibOpContextNP} from "./context/LibOpContextNP.sol";
 
 import {LibOpHashNP} from "./crypto/LibOpHashNP.sol";
 
@@ -56,6 +56,12 @@ import {LibOpLessThanOrEqualToNP} from "./logic/LibOpLessThanOrEqualToNP.sol";
 
 import {LibOpExponentialGrowth} from "./math/growth/LibOpExponentialGrowth.sol";
 import {LibOpLinearGrowth} from "./math/growth/LibOpLinearGrowth.sol";
+
+import {LibOpUint256Div} from "./math/uint256/LibOpUint256Div.sol";
+import {LibOpUint256Mul} from "./math/uint256/LibOpUint256Mul.sol";
+import {LibOpUint256Pow} from "./math/uint256/LibOpUint256Pow.sol";
+
+import {LibOpAdd} from "./math/LibOpAdd.sol";
 import {LibOpAvg} from "./math/LibOpAvg.sol";
 import {LibOpCeil} from "./math/LibOpCeil.sol";
 import {LibOpMul} from "./math/LibOpMul.sol";
@@ -69,6 +75,9 @@ import {LibOpHeadroom} from "./math/LibOpHeadroom.sol";
 import {LibOpInv} from "./math/LibOpInv.sol";
 import {LibOpLn} from "./math/LibOpLn.sol";
 import {LibOpLog10} from "./math/LibOpLog10.sol";
+import {LibOpMax} from "./math/LibOpMax.sol";
+import {LibOpMin} from "./math/LibOpMin.sol";
+import {LibOpMod} from "./math/LibOpMod.sol";
 import {LibOpLog2} from "./math/LibOpLog2.sol";
 import {LibOpPow} from "./math/LibOpPow.sol";
 import {LibOpScale18Dynamic} from "./math/LibOpScale18Dynamic.sol";
@@ -77,15 +86,7 @@ import {LibOpScaleNDynamic} from "./math/LibOpScaleNDynamic.sol";
 import {LibOpScaleN} from "./math/LibOpScaleN.sol";
 import {LibOpSnapToUnit} from "./math/LibOpSnapToUnit.sol";
 import {LibOpSqrt} from "./math/LibOpSqrt.sol";
-
-import {LibOpIntAddNP} from "./math/int/LibOpIntAddNP.sol";
-import {LibOpIntDivNP} from "./math/int/LibOpIntDivNP.sol";
-import {LibOpIntExpNP} from "./math/int/LibOpIntExpNP.sol";
-import {LibOpIntMaxNP} from "./math/int/LibOpIntMaxNP.sol";
-import {LibOpIntMinNP} from "./math/int/LibOpIntMinNP.sol";
-import {LibOpIntModNP} from "./math/int/LibOpIntModNP.sol";
-import {LibOpIntMulNP} from "./math/int/LibOpIntMulNP.sol";
-import {LibOpIntSubNP} from "./math/int/LibOpIntSubNP.sol";
+import {LibOpSub} from "./math/LibOpSub.sol";
 
 import {LibOpGetNP} from "./store/LibOpGetNP.sol";
 import {LibOpSetNP} from "./store/LibOpSetNP.sol";
@@ -197,6 +198,19 @@ library LibAllStandardOpsNP {
                 "linear-growth",
                 "Calculates a linear growth curve as `base + (rate * t)` where `base` is the initial value, `rate` is the rate of growth and `t` is units of time. Inputs in order are `base`, `rate`, and `t` respectively."
             ),
+            AuthoringMetaV2(
+                "uint256-div",
+                "Divides the first input by all other inputs as uint256 values. Errors if any divisor is zero. Rounds down."
+            ),
+            AuthoringMetaV2(
+                "uint256-mul",
+                "Multiplies all inputs together as uint256 values. Errors if the multiplication exceeds `max-value()`."
+            ),
+            AuthoringMetaV2(
+                "uint256-power",
+                "Raises the first input to the power of all other inputs as uint256 values. Errors if the exponentiation exceeds `max-value()`."
+            ),
+            AuthoringMetaV2("add", "Adds all numbers together. Errors if the addition exceeds `max-value()`."),
             AuthoringMetaV2("avg", "Arithmetic average (mean) of two numbers."),
             AuthoringMetaV2("ceil", "Ceiling of a number."),
             AuthoringMetaV2("div", "Divides the first number by all other numbers. Errors if any divisor is zero."),
@@ -211,16 +225,15 @@ library LibAllStandardOpsNP {
             ),
             AuthoringMetaV2("inv", "The inverse (1 / x) of a number. Errors if the number is zero."),
             AuthoringMetaV2("ln", "Natural logarithm ln(x). Errors if the number is zero."),
-            AuthoringMetaV2("log10", "Base 10 logarithm log10(x). Errors if the number is zero."),
             AuthoringMetaV2("log2", "Base 2 logarithm log2(x). Errors if the number is zero."),
+            AuthoringMetaV2("log10", "Base 10 logarithm log10(x). Errors if the number is zero."),
+            AuthoringMetaV2("max", "Finds the maximum number from all inputs."),
+            AuthoringMetaV2("min", "Finds the minimum number from all inputs."),
+            AuthoringMetaV2("mod", "Modulos the first number by all other numbers. Errors if any divisor is zero."),
             AuthoringMetaV2("mul", "Multiplies all numbers together. Errors if the multiplication exceeds `max-value()`."),
             AuthoringMetaV2(
                 "power",
                 "Raises the first number to the power of the second number. Errors if the exponentiation exceeds `max-value()`."
-            ),
-            AuthoringMetaV2(
-                "scale-18-dynamic",
-                "Scales a number from some fixed point decimal scale to 18 decimal fixed point. The first number is the scale to scale from and the second is the number to scale. The two optional operands control rounding and saturation respectively as per `scale-18`."
             ),
             AuthoringMetaV2(
                 "scale-18",
@@ -231,8 +244,8 @@ library LibAllStandardOpsNP {
                 "Scales an unsigned integer value to 18 decimal fixed point, E.g. uint256 1 becomes 1e18 and 10 becomes 1e19. Identical to scale-18 with an input scale of 0, but perhaps more legible. Does NOT support saturation."
             ),
             AuthoringMetaV2(
-                "scale-n-dynamic",
-                "Scales an input number from 18 decimal fixed point to some other fixed point scale N. The first input is the scale to scale to and the second is the value to scale. The two optional operand controls rounding and saturation respectively as per `scale-n`."
+                "scale-18-dynamic",
+                "Scales a number from some fixed point decimal scale to 18 decimal fixed point. The first number is the scale to scale from and the second is the number to scale. The two optional operands control rounding and saturation respectively as per `scale-18`."
             ),
             AuthoringMetaV2(
                 "scale-n",
@@ -243,26 +256,14 @@ library LibAllStandardOpsNP {
                 "Scales a number to a uint256 value. Always floors/rounds down any fractional part to the nearest whole integer. Identical to `scale-n` with an input scale of 0, but perhaps more legible."
             ),
             AuthoringMetaV2(
+                "scale-n-dynamic",
+                "Scales an input number from 18 decimal fixed point to some other fixed point scale N. The first input is the scale to scale to and the second is the value to scale. The two optional operand controls rounding and saturation respectively as per `scale-n`."
+            ),
+            AuthoringMetaV2(
                 "snap-to-unit",
                 "Rounds a number to the nearest whole number if it is within the threshold distance from that whole number. The first input is the threshold and the second is the value to snap to the nearest unit."
             ),
             AuthoringMetaV2("sqrt", "Calculates the square root of the input. Errors if the input is negative."),
-            AuthoringMetaV2("add", "Adds all numbers together. Errors if the addition exceeds `max-value()`."),
-            AuthoringMetaV2(
-                "uint256-div",
-                "Divides the first input by all other inputs as uint256 values. Errors if any divisor is zero. Rounds down."
-            ),
-            AuthoringMetaV2(
-                "uint256-power",
-                "Raises the first input to the power of all other inputs as uint256 values. Errors if the exponentiation exceeds `max-value()`."
-            ),
-            AuthoringMetaV2("max", "Finds the maximum number from all inputs."),
-            AuthoringMetaV2("min", "Finds the minimum number from all inputs."),
-            AuthoringMetaV2("mod", "Modulos the first number by all other numbers. Errors if any divisor is zero."),
-            AuthoringMetaV2(
-                "uint256-mul",
-                "Multiplies all inputs together as uint256 values. Errors if the multiplication exceeds `max-value()`."
-            ),
             AuthoringMetaV2(
                 "sub",
                 "Subtracts all numbers from the first number. The optional operand controls whether subtraction will saturate at 0. The default behaviour, and what will happen if the operand is 0, is that negative values are an error. If the operand is 1, the word will saturate at 0 (e.g. 1-2=0)."
@@ -321,145 +322,145 @@ library LibAllStandardOpsNP {
             function (uint256[] memory) internal pure returns (Operand)[ALL_STANDARD_OPS_LENGTH + 1] memory
                 pointersFixed = [
                     lengthPointer,
-                    // Stack
+                    // stack
                     LibParseOperand.handleOperandSingleFull,
-                    // Constant
+                    // constant
                     LibParseOperand.handleOperandSingleFull,
-                    // Extern
+                    // extern
                     LibParseOperand.handleOperandSingleFull,
-                    // Context
+                    // context
                     LibParseOperand.handleOperandDoublePerByteNoDefault,
-                    // Bitwise and
+                    // bitwise-and
                     LibParseOperand.handleOperandDisallowed,
-                    // Bitwise or
+                    // bitwise-or
                     LibParseOperand.handleOperandDisallowed,
-                    // Bitwise count ones
+                    // bitwise-count-ones
                     LibParseOperand.handleOperandDisallowed,
-                    // Bitwise decode
+                    // bitwise-decode
                     LibParseOperand.handleOperandDoublePerByteNoDefault,
-                    // Bitwise encode
+                    // bitwise-encode
                     LibParseOperand.handleOperandDoublePerByteNoDefault,
-                    // Bitwise shift left
+                    // bitwise-shift-left
                     LibParseOperand.handleOperandSingleFull,
-                    // Bitwise shift right
+                    // bitwise-shift-right
                     LibParseOperand.handleOperandSingleFull,
-                    // Call
+                    // call
                     LibParseOperand.handleOperandSingleFull,
-                    // Hash
+                    // hash
                     LibParseOperand.handleOperandDisallowed,
-                    // ERC20 allowance
+                    // erc20-allowance
                     LibParseOperand.handleOperandDisallowed,
-                    // ERC20 balance of
+                    // erc20-balance-of
                     LibParseOperand.handleOperandDisallowed,
-                    // ERC20 total supply
+                    // erc20-total-supply
                     LibParseOperand.handleOperandDisallowed,
-                    // ERC721 balance of
+                    // erc721-balance-of
                     LibParseOperand.handleOperandDisallowed,
-                    // ERC721 owner of
+                    // erc721-owner-of
                     LibParseOperand.handleOperandDisallowed,
-                    // ERC5313 owner
+                    // erc5313-owner
                     LibParseOperand.handleOperandDisallowed,
-                    // Block number
+                    // block-number
                     LibParseOperand.handleOperandDisallowed,
-                    // Chain id
+                    // chain-id
                     LibParseOperand.handleOperandDisallowed,
-                    // Max int value
+                    // max-value
                     LibParseOperand.handleOperandDisallowed,
-                    // Block timestamp
+                    // block-timestamp
                     LibParseOperand.handleOperandDisallowed,
-                    // Any
+                    // any
                     LibParseOperand.handleOperandDisallowed,
-                    // Conditions
+                    // conditions
                     LibParseOperand.handleOperandDisallowed,
-                    // Ensure
+                    // ensure
                     LibParseOperand.handleOperandDisallowed,
-                    // Equal to
+                    // equal-to
                     LibParseOperand.handleOperandDisallowed,
-                    // Every
+                    // every
                     LibParseOperand.handleOperandDisallowed,
-                    // Greater than
+                    // greater-than
                     LibParseOperand.handleOperandDisallowed,
-                    // Greater than or equal to
+                    // greater-than-or-equal-to
                     LibParseOperand.handleOperandDisallowed,
-                    // If
+                    // if
                     LibParseOperand.handleOperandDisallowed,
-                    // Is zero
+                    // is-zero
                     LibParseOperand.handleOperandDisallowed,
-                    // Less than
+                    // less-than
                     LibParseOperand.handleOperandDisallowed,
-                    // Less than or equal to
+                    // less-than-or-equal-to
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 exponential growth
+                    // exponential-growth
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 linear growth
+                    // linear-growth
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 avg
+                    // uint256-div
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 ceil
+                    // uint256-mul
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 div
+                    // uint256-power
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 exp
+                    // add
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 exp2
+                    // avg
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 floor
+                    // ceil
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 frac
+                    // div
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 gm
+                    // exp
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 headroom
+                    // exp2
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 inv
+                    // floor
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 ln
+                    // frac
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 log10
+                    // gm
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 log2
+                    // headroom
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 mul
+                    // inv
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 power
+                    // ln
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 scale18 dynamic
-                    LibParseOperand.handleOperandM1M1,
-                    // Decimal18 scale18
+                    // log2
+                    LibParseOperand.handleOperandDisallowed,
+                    // log10
+                    LibParseOperand.handleOperandDisallowed,
+                    // max
+                    LibParseOperand.handleOperandDisallowed,
+                    // min
+                    LibParseOperand.handleOperandDisallowed,
+                    // mod
+                    LibParseOperand.handleOperandDisallowed,
+                    // mul
+                    LibParseOperand.handleOperandDisallowed,
+                    // power
+                    LibParseOperand.handleOperandDisallowed,
+                    // scale-18
                     LibParseOperand.handleOperand8M1M1,
-                    // Int to decimal18
+                    // uint256-to-decimal18
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 scale n dynamic
+                    // scale-18-dynamic
                     LibParseOperand.handleOperandM1M1,
-                    // Decimal18 scale n
+                    // scale-n
                     LibParseOperand.handleOperand8M1M1,
-                    // Decimal18 to int
+                    // decimal18-to-uint256
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 snap to unit
+                    // scale-n-dynamic
+                    LibParseOperand.handleOperandM1M1,
+                    // snap-to-unit
                     LibParseOperand.handleOperandDisallowed,
-                    // Decimal18 sqrt
-                    LibParseOperand.handleOperandDisallowed,
-                    // Int add
-                    LibParseOperand.handleOperandDisallowed,
-                    // Int div
-                    LibParseOperand.handleOperandDisallowed,
-                    // Int exp
-                    LibParseOperand.handleOperandDisallowed,
-                    // Int max
-                    LibParseOperand.handleOperandDisallowed,
-                    // Int min
-                    LibParseOperand.handleOperandDisallowed,
-                    // Int mod
-                    LibParseOperand.handleOperandDisallowed,
-                    // Int mul
+                    // sqrt
                     LibParseOperand.handleOperandDisallowed,
                     // sub
                     LibParseOperand.handleOperandSingleFull,
-                    // saturating sub
+                    // saturating-sub
                     LibParseOperand.handleOperandDisallowedAlwaysOne,
-                    // Get
+                    // get
                     LibParseOperand.handleOperandDisallowed,
-                    // Set
+                    // set
                     LibParseOperand.handleOperandDisallowed
                 ];
             uint256[] memory pointersDynamic;
@@ -527,6 +528,10 @@ library LibAllStandardOpsNP {
                     LibOpLessThanOrEqualToNP.integrity,
                     LibOpExponentialGrowth.integrity,
                     LibOpLinearGrowth.integrity,
+                    LibOpUint256Div.integrity,
+                    LibOpUint256Mul.integrity,
+                    LibOpUint256Pow.integrity,
+                    LibOpAdd.integrity,
                     LibOpAvg.integrity,
                     LibOpCeil.integrity,
                     LibOpDiv.integrity,
@@ -538,30 +543,26 @@ library LibAllStandardOpsNP {
                     LibOpHeadroom.integrity,
                     LibOpInv.integrity,
                     LibOpLn.integrity,
-                    LibOpLog10.integrity,
                     LibOpLog2.integrity,
+                    LibOpLog10.integrity,
+                    LibOpMax.integrity,
+                    LibOpMin.integrity,
+                    LibOpMod.integrity,
                     LibOpMul.integrity,
                     LibOpPow.integrity,
+                    LibOpScale18.integrity,
+                    // uint256-to-decimal18 is a repeat of scale18.
+                    LibOpScale18.integrity,
                     LibOpScale18Dynamic.integrity,
-                    LibOpScale18.integrity,
-                    // Int to decimal18 is a repeat of decimal18 scale18.
-                    LibOpScale18.integrity,
+                    LibOpScaleN.integrity,
+                    // decimal18-to-uint256 is a repeat of scaleN.
+                    LibOpScaleN.integrity,
                     LibOpScaleNDynamic.integrity,
-                    LibOpScaleN.integrity,
-                    // Decimal18 to int is a repeat of decimal18 scaleN.
-                    LibOpScaleN.integrity,
                     LibOpSnapToUnit.integrity,
                     LibOpSqrt.integrity,
-                    LibOpIntAddNP.integrity,
-                    LibOpIntDivNP.integrity,
-                    LibOpIntExpNP.integrity,
-                    LibOpIntMaxNP.integrity,
-                    LibOpIntMinNP.integrity,
-                    LibOpIntModNP.integrity,
-                    LibOpIntMulNP.integrity,
-                    LibOpIntSubNP.integrity,
-                    // saturating sub.
-                    LibOpIntSubNP.integrity,
+                    LibOpSub.integrity,
+                    // saturating-sub is a repeat of sub.
+                    LibOpSub.integrity,
                     LibOpGetNP.integrity,
                     LibOpSetNP.integrity
                 ];
@@ -633,6 +634,10 @@ library LibAllStandardOpsNP {
                     LibOpLessThanOrEqualToNP.run,
                     LibOpExponentialGrowth.run,
                     LibOpLinearGrowth.run,
+                    LibOpUint256Div.run,
+                    LibOpUint256Mul.run,
+                    LibOpUint256Pow.run,
+                    LibOpAdd.run,
                     LibOpAvg.run,
                     LibOpCeil.run,
                     LibOpDiv.run,
@@ -644,30 +649,26 @@ library LibAllStandardOpsNP {
                     LibOpHeadroom.run,
                     LibOpInv.run,
                     LibOpLn.run,
-                    LibOpLog10.run,
                     LibOpLog2.run,
+                    LibOpLog10.run,
+                    LibOpMax.run,
+                    LibOpMin.run,
+                    LibOpMod.run,
                     LibOpMul.run,
                     LibOpPow.run,
+                    LibOpScale18.run,
+                    // uint256-to-decimal18 is a repeat of scale18.
+                    LibOpScale18.run,
                     LibOpScale18Dynamic.run,
-                    LibOpScale18.run,
-                    // Int to decimal18 is a repeat of decimal18 scale18.
-                    LibOpScale18.run,
+                    LibOpScaleN.run,
+                    // decimal18-to-uint256 is a repeat of scaleN.
+                    LibOpScaleN.run,
                     LibOpScaleNDynamic.run,
-                    LibOpScaleN.run,
-                    // Decimal18 to int is a repeat of decimal18 scaleN.
-                    LibOpScaleN.run,
                     LibOpSnapToUnit.run,
                     LibOpSqrt.run,
-                    LibOpIntAddNP.run,
-                    LibOpIntDivNP.run,
-                    LibOpIntExpNP.run,
-                    LibOpIntMaxNP.run,
-                    LibOpIntMinNP.run,
-                    LibOpIntModNP.run,
-                    LibOpIntMulNP.run,
-                    LibOpIntSubNP.run,
-                    // saturating sub.
-                    LibOpIntSubNP.run,
+                    LibOpSub.run,
+                    // saturating-sub is a repeat of sub.
+                    LibOpSub.run,
                     LibOpGetNP.run,
                     LibOpSetNP.run
                 ];

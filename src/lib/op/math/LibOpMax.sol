@@ -3,13 +3,12 @@ pragma solidity ^0.8.18;
 
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
-import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
-import {SaturatingMath} from "rain.math.saturating/SaturatingMath.sol";
+import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
+import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 
-/// @title LibOpIntSubNP
-/// @notice Opcode to subtract N integers.
-library LibOpIntSubNP {
+/// @title LibOpMax
+/// @notice Opcode to find the max from N integers.
+library LibOpMax {
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
         uint256 inputs = (Operand.unwrap(operand) >> 0x10) & 0x0F;
@@ -17,25 +16,19 @@ library LibOpIntSubNP {
         return (inputs, 1);
     }
 
-    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
-        return a - b;
-    }
-
-    /// int-sub
-    /// Subtraction with implied overflow checks from the Solidity 0.8.x compiler.
+    /// max
+    /// Finds the maximum value from N integers.
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;
         uint256 b;
-        uint256 saturate;
         assembly ("memory-safe") {
             a := mload(stackTop)
             b := mload(add(stackTop, 0x20))
             stackTop := add(stackTop, 0x40)
-            saturate := and(operand, 1)
         }
-        function (uint256, uint256) internal pure returns (uint256) f =
-            saturate > 0 ? SaturatingMath.saturatingSub : sub;
-        a = f(a, b);
+        if (a < b) {
+            a = b;
+        }
 
         {
             uint256 inputs = (Operand.unwrap(operand) >> 0x10) & 0x0F;
@@ -45,7 +38,9 @@ library LibOpIntSubNP {
                     b := mload(stackTop)
                     stackTop := add(stackTop, 0x20)
                 }
-                a = f(a, b);
+                if (a < b) {
+                    a = b;
+                }
                 unchecked {
                     i++;
                 }
@@ -59,7 +54,7 @@ library LibOpIntSubNP {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of subtraction for testing.
+    /// Gas intensive reference implementation of maximum for testing.
     function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
         internal
         pure
@@ -70,7 +65,7 @@ library LibOpIntSubNP {
         unchecked {
             uint256 acc = inputs[0];
             for (uint256 i = 1; i < inputs.length; i++) {
-                acc -= inputs[i];
+                acc = acc < inputs[i] ? inputs[i] : acc;
             }
             outputs = new uint256[](1);
             outputs[0] = acc;

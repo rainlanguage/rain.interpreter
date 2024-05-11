@@ -3,7 +3,7 @@ pragma solidity =0.8.25;
 
 import {stdError} from "forge-std/Test.sol";
 
-import {LibOpContextNP} from "src/lib/op/context/LibOpContextNP.sol";
+import {LibOpContextNP} from "src/lib/op/00/LibOpContextNP.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {

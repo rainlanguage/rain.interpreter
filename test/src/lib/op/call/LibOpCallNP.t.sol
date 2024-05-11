@@ -255,7 +255,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         // Order dependent inputs and outputs.
         stack[0] = 9e18;
         stack[1] = 2e18;
-        checkCallNPRun("a b: call<1>(10 5); ten five:, a b: decimal18-div(ten five) 9;", stack, kvs);
+        checkCallNPRun("a b: call<1>(10 5); ten five:, a b: div(ten five) 9;", stack, kvs);
 
         // One input two outputs.
         stack[0] = 11e18;
@@ -272,7 +272,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         // Can call for side effects and also get a stack based on IO.
         stack = new uint256[](1);
         stack[0] = 10e18;
-        checkCallNPRun("a:call<1>(9);nine:,:set(10 11),ret:decimal18-add(nine 1);", stack, kvs);
+        checkCallNPRun("a:call<1>(9);nine:,:set(10 11),ret:add(nine 1);", stack, kvs);
 
         // Can call a few different things without a final stack.
         stack = new uint256[](0);

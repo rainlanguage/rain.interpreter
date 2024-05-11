@@ -3,12 +3,12 @@ pragma solidity ^0.8.18;
 
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
-import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
+import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
+import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 
-/// @title LibOpUint256Power
-/// @notice Opcode to raise x successively to N integers. Errors on overflow.
-library LibOpUint256Power {
+/// @title LibOpMin
+/// @notice Opcode to find the min from N integers.
+library LibOpMin {
     function integrity(IntegrityCheckStateNP memory, Operand operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
         uint256 inputs = (Operand.unwrap(operand) >> 0x10) & 0x0F;
@@ -16,9 +16,8 @@ library LibOpUint256Power {
         return (inputs, 1);
     }
 
-    /// uint256-power
-    /// Exponentiation with implied overflow checks from the Solidity 0.8.x
-    /// compiler.
+    /// min
+    /// Finds the minimum value from N integers.
     function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;
         uint256 b;
@@ -27,7 +26,9 @@ library LibOpUint256Power {
             b := mload(add(stackTop, 0x20))
             stackTop := add(stackTop, 0x40)
         }
-        a = a ** b;
+        if (a > b) {
+            a = b;
+        }
 
         {
             uint256 inputs = (Operand.unwrap(operand) >> 0x10) & 0x0F;
@@ -37,12 +38,15 @@ library LibOpUint256Power {
                     b := mload(stackTop)
                     stackTop := add(stackTop, 0x20)
                 }
-                a = a ** b;
+                if (a > b) {
+                    a = b;
+                }
                 unchecked {
                     i++;
                 }
             }
         }
+
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
             mstore(stackTop, a)
@@ -50,7 +54,7 @@ library LibOpUint256Power {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of exponentiation for testing.
+    /// Gas intensive reference implementation of minimum for testing.
     function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
         internal
         pure
@@ -61,7 +65,7 @@ library LibOpUint256Power {
         unchecked {
             uint256 acc = inputs[0];
             for (uint256 i = 1; i < inputs.length; i++) {
-                acc = acc ** inputs[i];
+                acc = acc > inputs[i] ? inputs[i] : acc;
             }
             outputs = new uint256[](1);
             outputs[0] = acc;

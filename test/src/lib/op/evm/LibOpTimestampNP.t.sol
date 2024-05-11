@@ -44,6 +44,7 @@ contract LibOpTimestampNPTest is OpTest {
     /// Directly test the runtime logic of LibOpTimestamp. This tests that the
     /// opcode correctly pushes the timestamp onto the stack.
     function testOpTimestampNPRun(uint256 blockTimestamp) external {
+        blockTimestamp = bound(blockTimestamp, 0, type(uint256).max / 1e18);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.warp(blockTimestamp);
         uint256[] memory inputs = new uint256[](0);
@@ -55,6 +56,7 @@ contract LibOpTimestampNPTest is OpTest {
 
     /// Test the eval of a timestamp opcode parsed from a string.
     function testOpTimestampNPEval(uint256 blockTimestamp) external {
+        blockTimestamp = bound(blockTimestamp, 0, type(uint256).max / 1e18);
         vm.warp(blockTimestamp);
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: block-timestamp();");
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
@@ -67,7 +69,7 @@ contract LibOpTimestampNPTest is OpTest {
             new uint256[](0)
         );
         assertEq(stack.length, 1);
-        assertEq(stack[0], blockTimestamp);
+        assertEq(stack[0], blockTimestamp * 1e18);
         assertEq(kvs.length, 0);
         assertEq(io, hex"0001");
     }
