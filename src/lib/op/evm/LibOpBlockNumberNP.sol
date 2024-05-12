@@ -5,6 +5,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
+import {FIXED_POINT_ONE} from "rain.math.fixedpoint/lib/FixedPointDecimalConstants.sol";
 
 /// @title LibOpBlockNumberNP
 /// Implementation of the EVM `BLOCKNUMBER` opcode as a standard Rainlang opcode.
@@ -14,9 +15,10 @@ library LibOpBlockNumberNP {
     }
 
     function run(InterpreterStateNP memory, Operand, Pointer stackTop) internal view returns (Pointer) {
+        uint256 decimalOne = FIXED_POINT_ONE;
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
-            mstore(stackTop, number())
+            mstore(stackTop, mul(number(), decimalOne))
         }
         return stackTop;
     }
@@ -27,7 +29,7 @@ library LibOpBlockNumberNP {
         returns (uint256[] memory)
     {
         uint256[] memory outputs = new uint256[](1);
-        outputs[0] = block.number;
+        outputs[0] = block.number * FIXED_POINT_ONE;
         return outputs;
     }
 }

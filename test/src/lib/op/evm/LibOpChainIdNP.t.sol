@@ -71,7 +71,7 @@ contract LibOpChainIdNPTest is OpTest {
             new uint256[](0)
         );
         assertEq(stack.length, 1, "stack length");
-        assertEq(stack[0], chainId, "stack item");
+        assertEq(stack[0], uint256(chainId) * 1e18, "stack item");
         assertEq(kvs.length, 0, "kvs length");
         assertEq(io, hex"0001", "io");
     }
