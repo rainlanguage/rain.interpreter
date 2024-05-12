@@ -15,7 +15,7 @@ library LibOpSqrt {
         return (1, 1);
     }
 
-    /// decimal18-sqrt
+    /// sqrt
     /// 18 decimal fixed point square root of a number.
     function run(InterpreterStateNP memory, Operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;
