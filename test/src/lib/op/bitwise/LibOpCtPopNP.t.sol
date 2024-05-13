@@ -54,7 +54,7 @@ contract LibOpCtPopNPTest is OpTest {
             new uint256[](0)
         );
         assertEq(stack.length, 1);
-        assertEq(stack[0], LibCtPop.ctpop(x));
+        assertEq(stack[0], LibCtPop.ctpop(x) * 1e18);
         assertEq(kvs.length, 0);
         assertEq(io, hex"0001");
     }
