@@ -6,6 +6,7 @@ import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 import {LibCtPop} from "../../bitwise/LibCtPop.sol";
+import {FIXED_POINT_ONE} from "rain.math.fixedpoint/lib/FixedPointDecimalConstants.sol";
 
 /// @title LibOpCtPopNP
 /// @notice An opcode that counts the number of bits set in a word. This is
@@ -27,7 +28,9 @@ library LibOpCtPopNP {
         assembly ("memory-safe") {
             value := mload(stackTop)
         }
-        value = LibCtPop.ctpop(value);
+        unchecked {
+            value = LibCtPop.ctpop(value) * FIXED_POINT_ONE;
+        }
         assembly ("memory-safe") {
             mstore(stackTop, value)
         }
@@ -40,7 +43,7 @@ library LibOpCtPopNP {
         pure
         returns (uint256[] memory)
     {
-        inputs[0] = LibCtPop.ctpopSlow(inputs[0]);
+        inputs[0] = LibCtPop.ctpopSlow(inputs[0]) * FIXED_POINT_ONE;
         return inputs;
     }
 }
