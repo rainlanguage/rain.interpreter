@@ -126,9 +126,9 @@ contract RainterpreterExpressionDeployerNPE2 is
 
     /// @inheritdoc IERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IExpressionDeployerV4).interfaceId || interfaceId == type(IERC165).interfaceId
+        return interfaceId == type(IExpressionDeployerV4).interfaceId
             || interfaceId == type(IDescribedByMetaV1).interfaceId || interfaceId == type(IParserV2).interfaceId
-            || interfaceId == type(IParserPragmaV1).interfaceId;
+            || interfaceId == type(IParserPragmaV1).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /// @inheritdoc IExpressionDeployerV4
