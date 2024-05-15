@@ -36,7 +36,7 @@ import {STORE_BYTECODE_HASH} from "./RainterpreterStoreNPE2.sol";
 
 /// @dev The function pointers for the integrity check fns.
 bytes constant INTEGRITY_FUNCTION_POINTERS =
-    hex"0d940e120e770ff10ffb0ffb1005100e102910cf10cf112b11a511b20ffb10050ffb0ffb10050ff10ff10ff10ff111bc11e111fb0ffb11bc0ffb0ffb11b210050ffb0ffb11b211b212051205120512050ffb1005120510051005100510050ffb1005100510051005100512051205120512050ffb100510050ffb100510050ffb0ffb100512051205100511fb";
+    hex"0e780ef60f5b10d510df10df10e910f2110d11b311b3120f1289129610df10e910df10df10e910d510d510d510d512a012c512df10df12a010df10df129610e910df10df1296129612e912e912e912e910df10e912e910e910e910e910e910df10e910e910e910e910e912e912e912e912e910df10e910e910df10e910e910df10df10e912e912e910e912df";
 
 /// @dev Hash of the metadata that describes the deployer (parsing).
 bytes32 constant DESCRIBED_BY_META_HASH = bytes32(0xdaefc51add96722d31941d783f342cd84df168c76f277d90c3631f891d494943);
@@ -126,7 +126,9 @@ contract RainterpreterExpressionDeployerNPE2 is
 
     /// @inheritdoc IERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IExpressionDeployerV4).interfaceId || interfaceId == type(IERC165).interfaceId;
+        return interfaceId == type(IExpressionDeployerV4).interfaceId
+            || interfaceId == type(IDescribedByMetaV1).interfaceId || interfaceId == type(IParserV2).interfaceId
+            || interfaceId == type(IParserPragmaV1).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /// @inheritdoc IExpressionDeployerV4

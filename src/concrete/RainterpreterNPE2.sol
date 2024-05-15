@@ -25,14 +25,14 @@ import {
 import {IInterpreterV3} from "rain.interpreter.interface/interface/unstable/IInterpreterV3.sol";
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xcfa5994360859e19809dd1e4b42758ef0605aa2e9320a11421d5cdb6a8ac99fd);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x082edcc97843fd74ff6dc51867110b8633b0e419bac46f53765f5a833f36d024);
 
 /// @dev The function pointers known to the interpreter for dynamic dispatch.
 /// By setting these as a constant they can be inlined into the interpreter
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
 bytes constant OPCODE_FUNCTION_POINTERS =
-    hex"0dba0e0b0e4d10191100111211241147118911db11ec11fd129f12dc139a144a139a14ce157015e81621165a16a916e21747181b186e188218db18ef1904191e1929193d1952198a19b11a311a7f1acd1b1b1b331b4c1b9a1ba81bb61bd11be61bfe1c171c251c331c411c4f1c9d1ceb1d391d871d9f1d9f1db61de41de41dfb1e2a1e7f1e8d1e8d1f312018";
+    hex"0e060e570e991065114c115e1170119311d512271238124912eb132813e6149613e6151a15bc1634166d16a616f5172e1793186718ba18ce1927193b1950196a19751989199e19d619fd1a7d1acb1b191b671b7f1b981be61bf41c021c1d1c321c4a1c631c711c7f1c8d1c9b1ce91d371d851dd31deb1deb1e021e301e301e471e761ecb1ed91ed91f7d2064";
 
 /// @title RainterpreterNPE2
 /// @notice Implementation of a Rainlang interpreter that is compatible with
@@ -98,7 +98,8 @@ contract RainterpreterNPE2 is IInterpreterV2, IInterpreterV3, ERC165 {
 
     /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IInterpreterV2).interfaceId || super.supportsInterface(interfaceId);
+        return interfaceId == type(IInterpreterV2).interfaceId || interfaceId == type(IInterpreterV3).interfaceId
+            || super.supportsInterface(interfaceId);
     }
 
     /// @inheritdoc IInterpreterV2
