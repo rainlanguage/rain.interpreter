@@ -3,13 +3,13 @@ pragma solidity ^0.8.18;
 
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
-import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
+import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
 
-/// @title OpERC20AllowanceNP
+/// @title LibOpUint256ERC20Allowance
 /// @notice Opcode for getting the current erc20 allowance of an account.
-library LibOpERC20AllowanceNP {
+library LibOpUint256ERC20Allowance {
     function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
         // Always 3 inputs, the token, the owner and the spender.
         // Always 1 output, the allowance.

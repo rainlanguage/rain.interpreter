@@ -3,7 +3,7 @@ pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
-import {LibOpERC721OwnerOfNP} from "src/lib/op/erc721/LibOpERC721OwnerOfNP.sol";
+import {LibOpERC721OwnerOf} from "src/lib/op/erc721/LibOpERC721OwnerOf.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import {
     IInterpreterV2,
@@ -18,12 +18,12 @@ import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreter
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-/// @title LibOpERC721OwnerOfNPTest
+/// @title LibOpERC721OwnerOfTest
 /// @notice Test the opcode for getting the owner of an erc721 token.
-contract LibOpERC721OwnerOfNPTest is OpTest {
+contract LibOpERC721OwnerOfTest is OpTest {
     function testOpERC721OwnerOfNPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs) external {
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpERC721OwnerOfNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
+            LibOpERC721OwnerOf.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
 
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
@@ -44,9 +44,9 @@ contract LibOpERC721OwnerOfNPTest is OpTest {
         opReferenceCheck(
             opTestDefaultInterpreterState(),
             operand,
-            LibOpERC721OwnerOfNP.referenceFn,
-            LibOpERC721OwnerOfNP.integrity,
-            LibOpERC721OwnerOfNP.run,
+            LibOpERC721OwnerOf.referenceFn,
+            LibOpERC721OwnerOf.integrity,
+            LibOpERC721OwnerOf.run,
             inputs
         );
     }

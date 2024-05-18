@@ -7,9 +7,9 @@ import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 
-/// @title LibOpERC721OwnerOfNP
+/// @title LibOpERC721OwnerOf
 /// @notice Opcode for getting the current owner of an erc721 token.
-library LibOpERC721OwnerOfNP {
+library LibOpERC721OwnerOf {
     function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
         // Always 2 inputs, the token and the tokenId.
         // Always 1 output, the owner.

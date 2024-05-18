@@ -3,13 +3,13 @@ pragma solidity ^0.8.25;
 
 import {IERC20} from "openzeppelin-contracts/contracts/interfaces/IERC20.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
-import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
+import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
 
-/// @title LibOpERC20TotalSupplyNP
+/// @title LibOpUint256ERC20TotalSupply
 /// @notice Opcode for ERC20 `totalSupply`.
-library LibOpERC20TotalSupplyNP {
+library LibOpUint256ERC20TotalSupply {
     function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
         // Always 1 input, the contract.
         // Always 1 output, the total supply.

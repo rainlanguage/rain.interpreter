@@ -4,16 +4,16 @@ pragma solidity =0.8.25;
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
-import {LibOpERC20AllowanceNP} from "src/lib/op/erc20/LibOpERC20AllowanceNP.sol";
+import {LibOpUint256ERC20Allowance} from "src/lib/op/erc20/uint256/LibOpUint256ERC20Allowance.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-/// @title LibOpERC20AllowanceNPTest
+/// @title LibOpUint256ERC20AllowanceTest
 /// @notice Test the opcode for getting the allowance of an erc20 token.
-contract LibOpERC20AllowanceNPTest is OpTest {
+contract LibOpUint256ERC20AllowanceTest is OpTest {
     function testOpERC20AllowanceNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpERC20AllowanceNP.integrity(state, operand);
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256ERC20Allowance.integrity(state, operand);
 
         assertEq(calcInputs, 3);
         assertEq(calcOutputs, 1);
@@ -36,9 +36,9 @@ contract LibOpERC20AllowanceNPTest is OpTest {
         opReferenceCheck(
             opTestDefaultInterpreterState(),
             operand,
-            LibOpERC20AllowanceNP.referenceFn,
-            LibOpERC20AllowanceNP.integrity,
-            LibOpERC20AllowanceNP.run,
+            LibOpUint256ERC20Allowance.referenceFn,
+            LibOpUint256ERC20Allowance.integrity,
+            LibOpUint256ERC20Allowance.run,
             inputs
         );
     }
@@ -51,39 +51,39 @@ contract LibOpERC20AllowanceNPTest is OpTest {
             abi.encode(allowance)
         );
         checkHappy(
-            "_: erc20-allowance(0xdeadbeef 0xdeadc0de 0xdeaddead);", allowance, "0xdeadbeef 0xdeadc0de 0xdeaddead"
+            "_: uint256-erc20-allowance(0xdeadbeef 0xdeadc0de 0xdeaddead);", allowance, "0xdeadbeef 0xdeadc0de 0xdeaddead"
         );
     }
 
     /// Test that a allowance with bad inputs fails integrity.
     function testOpERC20AllowanceNPEvalZeroInputs() external {
-        checkBadInputs("_: erc20-allowance();", 0, 3, 0);
+        checkBadInputs("_: uint256-erc20-allowance();", 0, 3, 0);
     }
 
     function testOpERC20AllowanceNPEvalOneInput() external {
-        checkBadInputs("_: erc20-allowance(0xdeadbeef);", 1, 3, 1);
+        checkBadInputs("_: uint256-erc20-allowance(0xdeadbeef);", 1, 3, 1);
     }
 
     function testOpERC20AllowanceNPEvalTwoInputs() external {
-        checkBadInputs("_: erc20-allowance(0xdeadbeef 0xdeadc0de);", 2, 3, 2);
+        checkBadInputs("_: uint256-erc20-allowance(0xdeadbeef 0xdeadc0de);", 2, 3, 2);
     }
 
     function testOpERC20AllowanceNPEvalFourInputs() external {
-        checkBadInputs("_: erc20-allowance(0xdeadbeef 0xdeadc0de 0xdeaddead 0xdeaddead);", 4, 3, 4);
+        checkBadInputs("_: uint256-erc20-allowance(0xdeadbeef 0xdeadc0de 0xdeaddead 0xdeaddead);", 4, 3, 4);
     }
 
     function testOpERC20AllowanceNPEvalZeroOutputs() external {
-        checkBadOutputs(": erc20-allowance(0xdeadbeef 0xdeadc0de 0xdeaddead);", 3, 1, 0);
+        checkBadOutputs(": uint256-erc20-allowance(0xdeadbeef 0xdeadc0de 0xdeaddead);", 3, 1, 0);
     }
 
     function testOpERC20AllowanceNPEvalTwoOutputs() external {
-        checkBadOutputs("_ _: erc20-allowance(0xdeadbeef 0xdeadc0de 0xdeaddead);", 3, 1, 2);
+        checkBadOutputs("_ _: uint256-erc20-allowance(0xdeadbeef 0xdeadc0de 0xdeaddead);", 3, 1, 2);
     }
 
     /// Test that operand is disallowed.
     function testOpERC20AllowanceNPEvalOperandDisallowed() external {
         checkUnhappyParse(
-            "_: erc20-allowance<0>(0xdeadbeef 0xdeadc0de 0xdeaddead);",
+            "_: uint256-erc20-allowance<0>(0xdeadbeef 0xdeadc0de 0xdeaddead);",
             abi.encodeWithSelector(UnexpectedOperand.selector)
         );
     }
