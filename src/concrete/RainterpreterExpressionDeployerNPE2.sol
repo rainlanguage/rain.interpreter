@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {ERC165, IERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 import {Pointer, LibPointer} from "rain.solmem/lib/LibPointer.sol";
@@ -36,10 +36,10 @@ import {STORE_BYTECODE_HASH} from "./RainterpreterStoreNPE2.sol";
 
 /// @dev The function pointers for the integrity check fns.
 bytes constant INTEGRITY_FUNCTION_POINTERS =
-    hex"0dcc0e4a0eaf102910331033103d1046106111071107116311dd11ea1033103d10331033103d1029102910291029102911f412191233103311f41033103311ea103d1033103311ea11ea1033103d123d103d103d103d103d1033103d103d103d103d103d123d103310331033103d103d1033103d103d1033103d123d123d123d123d123d123d123d123d123d123d123d123d123d123d103d1233";
+    hex"0e780ef60f5b10d510df10df10e910f2110d11b311b3120f1289129610df10e910df10df10e910d510d510d510d512a012c512df10df12a010df10df129610e910df10df1296129612e912e912e912e910df10e912e910e910e910e910e910df10e910e910e910e910e912e912e912e912e910df10e910e910df10e910e910df10df10e912e912e910e912df";
 
 /// @dev Hash of the metadata that describes the deployer (parsing).
-bytes32 constant DESCRIBED_BY_META_HASH = bytes32(0xe81773d61cd559e0f1a070476e736a0c9f3d38f058b821fb77e191909408231b);
+bytes32 constant DESCRIBED_BY_META_HASH = bytes32(0xdaefc51add96722d31941d783f342cd84df168c76f277d90c3631f891d494943);
 
 /// All config required to construct a `RainterpreterNPE2`.
 /// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match
@@ -126,7 +126,9 @@ contract RainterpreterExpressionDeployerNPE2 is
 
     /// @inheritdoc IERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IExpressionDeployerV4).interfaceId || interfaceId == type(IERC165).interfaceId;
+        return interfaceId == type(IExpressionDeployerV4).interfaceId
+            || interfaceId == type(IDescribedByMetaV1).interfaceId || interfaceId == type(IParserV2).interfaceId
+            || interfaceId == type(IParserPragmaV1).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /// @inheritdoc IExpressionDeployerV4

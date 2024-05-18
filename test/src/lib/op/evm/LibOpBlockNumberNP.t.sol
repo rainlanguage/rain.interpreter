@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
 
@@ -47,6 +47,7 @@ contract LibOpBlockNumberNPTest is OpTest {
     /// Directly test the runtime logic of LibOpBlockNumberNP. This tests that the
     /// opcode correctly pushes the block number onto the stack.
     function testOpBlockNumberNPRun(uint256 blockNumber, uint16 operandData) external {
+        blockNumber = bound(blockNumber, 0, type(uint256).max / 1e18);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.roll(blockNumber);
         uint256[] memory inputs = new uint256[](0);
@@ -58,6 +59,7 @@ contract LibOpBlockNumberNPTest is OpTest {
 
     /// Test the eval of a block number opcode parsed from a string.
     function testOpBlockNumberNPEval(uint256 blockNumber) public {
+        blockNumber = bound(blockNumber, 0, type(uint256).max / 1e18);
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: block-number();");
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
@@ -71,7 +73,7 @@ contract LibOpBlockNumberNPTest is OpTest {
             new uint256[](0)
         );
         assertEq(stack.length, 1);
-        assertEq(stack[0], blockNumber);
+        assertEq(stack[0], blockNumber * 1e18);
         assertEq(kvs.length, 0);
         assertEq(io, hex"0001");
     }

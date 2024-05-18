@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
@@ -34,21 +34,21 @@ contract LibOpBitwiseOrNPTest is OpTest {
     /// Test the eval of bitwise OR parsed from a string.
     function testOpBitwiseORNPEval() external {
         checkHappy("_: bitwise-or(0 0);", 0, "0 0");
-        checkHappy("_: bitwise-or(0 1);", 1, "0 1");
-        checkHappy("_: bitwise-or(1 0);", 1, "1 0");
-        checkHappy("_: bitwise-or(1 1);", 1, "1 1");
-        checkHappy("_: bitwise-or(0 2);", 2, "0 2");
-        checkHappy("_: bitwise-or(2 0);", 2, "2 0");
-        checkHappy("_: bitwise-or(1 2);", 3, "1 2");
-        checkHappy("_: bitwise-or(2 1);", 3, "2 1");
-        checkHappy("_: bitwise-or(2 2);", 2, "2 2");
-        checkHappy("_: bitwise-or(0 3);", 3, "0 3");
-        checkHappy("_: bitwise-or(3 0);", 3, "3 0");
-        checkHappy("_: bitwise-or(1 3);", 3, "1 3");
-        checkHappy("_: bitwise-or(3 1);", 3, "3 1");
-        checkHappy("_: bitwise-or(2 3);", 3, "2 3");
-        checkHappy("_: bitwise-or(3 2);", 3, "3 2");
-        checkHappy("_: bitwise-or(3 3);", 3, "3 3");
+        checkHappy("_: bitwise-or(0 1e-18);", 1, "0 1");
+        checkHappy("_: bitwise-or(1e-18 0);", 1, "1 0");
+        checkHappy("_: bitwise-or(1e-18 1e-18);", 1, "1 1");
+        checkHappy("_: bitwise-or(0 2e-18);", 2, "0 2");
+        checkHappy("_: bitwise-or(2e-18 0);", 2, "2 0");
+        checkHappy("_: bitwise-or(1e-18 2e-18);", 3, "1 2");
+        checkHappy("_: bitwise-or(2e-18 1e-18);", 3, "2 1");
+        checkHappy("_: bitwise-or(2e-18 2e-18);", 2, "2 2");
+        checkHappy("_: bitwise-or(0 3e-18);", 3, "0 3");
+        checkHappy("_: bitwise-or(3e-18 0);", 3, "3 0");
+        checkHappy("_: bitwise-or(1e-18 3e-18);", 3, "1 3");
+        checkHappy("_: bitwise-or(3e-18 1e-18);", 3, "3 1");
+        checkHappy("_: bitwise-or(2e-18 3e-18);", 3, "2 3");
+        checkHappy("_: bitwise-or(3e-18 2e-18);", 3, "3 2");
+        checkHappy("_: bitwise-or(3e-18 3e-18);", 3, "3 3");
     }
 
     /// Test that a bitwise OR with bad inputs fails integrity.

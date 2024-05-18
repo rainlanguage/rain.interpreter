@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
@@ -71,7 +71,7 @@ contract LibOpChainIdNPTest is OpTest {
             new uint256[](0)
         );
         assertEq(stack.length, 1, "stack length");
-        assertEq(stack[0], chainId, "stack item");
+        assertEq(stack[0], uint256(chainId) * 1e18, "stack item");
         assertEq(kvs.length, 0, "kvs length");
         assertEq(io, hex"0001", "io");
     }

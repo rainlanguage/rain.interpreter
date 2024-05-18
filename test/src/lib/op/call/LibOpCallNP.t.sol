@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {LibEncodedDispatch} from "rain.interpreter.interface/lib/caller/LibEncodedDispatch.sol";
 import {
@@ -164,7 +164,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         ExpectedTrace[] memory traces = new ExpectedTrace[](1);
         traces[0].sourceIndex = 0;
         traces[0].stack = new uint256[](1);
-        traces[0].stack[0] = 1;
+        traces[0].stack[0] = 1e18;
         checkCallNPTraces("_: 1;", traces);
     }
 
@@ -174,7 +174,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         traces[0].stack = new uint256[](0);
         traces[1].sourceIndex = 1;
         traces[1].stack = new uint256[](1);
-        traces[1].stack[0] = 1;
+        traces[1].stack[0] = 1e18;
         checkCallNPTraces(":call<1>();_:1;", traces);
     }
 
@@ -182,28 +182,28 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         ExpectedTrace[] memory traces = new ExpectedTrace[](2);
         traces[0].sourceIndex = 0;
         traces[0].stack = new uint256[](1);
-        traces[0].stack[0] = 2;
+        traces[0].stack[0] = 2e18;
         traces[1].sourceIndex = 1;
         traces[1].stack = new uint256[](1);
-        traces[1].stack[0] = 1;
-        checkCallNPTraces("_:int-add(call<1>() 1);_:1;", traces);
+        traces[1].stack[0] = 1e18;
+        checkCallNPTraces("_:add(call<1>() 1);_:1;", traces);
     }
 
     function testCallTraceOuterAndTwoInner() external {
         ExpectedTrace[] memory traces = new ExpectedTrace[](3);
         traces[0].sourceIndex = 0;
         traces[0].stack = new uint256[](1);
-        traces[0].stack[0] = 12;
+        traces[0].stack[0] = 12e18;
         traces[1].parentSourceIndex = 0;
         traces[1].sourceIndex = 1;
         traces[1].stack = new uint256[](2);
-        traces[1].stack[1] = 2;
-        traces[1].stack[0] = 11;
+        traces[1].stack[1] = 2e18;
+        traces[1].stack[0] = 11e18;
         traces[2].parentSourceIndex = 1;
         traces[2].sourceIndex = 2;
         traces[2].stack = new uint256[](1);
-        traces[2].stack[0] = 10;
-        checkCallNPTraces("_:int-add(call<1>(2) 1);two:,_:int-add(call<2>() 1);_:10;", traces);
+        traces[2].stack[0] = 10e18;
+        checkCallNPTraces("_:add(call<1>(2) 1);two:,_:add(call<2>() 1);_:10;", traces);
     }
 
     /// Boilerplate for checking the stack and kvs of a call.
@@ -242,37 +242,37 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         // Check evals that result in a stack of one item but no kvs.
         stack = new uint256[](1);
         // Single input and single output.
-        stack[0] = 10;
+        stack[0] = 10e18;
         checkCallNPRun("ten:call<1>(10);ten:;", stack, kvs);
         // zero input single output.
         checkCallNPRun("ten:call<1>();ten:10;", stack, kvs);
         // Two inputs and one output.
-        stack[0] = 12;
+        stack[0] = 12e18;
         checkCallNPRun("a: call<1>(10 11); ten eleven:,a b c:ten eleven 12;", stack, kvs);
 
         // Check evals that result in a stack of two items but no kvs.
         stack = new uint256[](2);
         // Order dependent inputs and outputs.
-        stack[0] = 9;
-        stack[1] = 2;
-        checkCallNPRun("a b: call<1>(10 5); ten five:, a b: int-div(ten five) 9;", stack, kvs);
+        stack[0] = 9e18;
+        stack[1] = 2e18;
+        checkCallNPRun("a b: call<1>(10 5); ten five:, a b: div(ten five) 9;", stack, kvs);
 
         // One input two outputs.
-        stack[0] = 11;
-        stack[1] = 10;
+        stack[0] = 11e18;
+        stack[1] = 10e18;
         checkCallNPRun("a b: call<1>(10); ten:,a b:ten 11;", stack, kvs);
 
         // Can call something with no IO purely for the kv side effects.
         stack = new uint256[](0);
         kvs = new uint256[](2);
-        kvs[0] = 10;
-        kvs[1] = 11;
+        kvs[0] = 10e18;
+        kvs[1] = 11e18;
         checkCallNPRun(":call<1>();:set(10 11);", stack, kvs);
 
         // Can call for side effects and also get a stack based on IO.
         stack = new uint256[](1);
-        stack[0] = 10;
-        checkCallNPRun("a:call<1>(9);nine:,:set(10 11),ret:int-add(nine 1);", stack, kvs);
+        stack[0] = 10e18;
+        checkCallNPRun("a:call<1>(9);nine:,:set(10 11),ret:add(nine 1);", stack, kvs);
 
         // Can call a few different things without a final stack.
         stack = new uint256[](0);

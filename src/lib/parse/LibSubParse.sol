@@ -10,7 +10,7 @@ import {
     Operand
 } from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {LibBytecode, Pointer} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
-import {ISubParserV2, COMPATIBLITY_V3} from "rain.interpreter.interface/interface/ISubParserV2.sol";
+import {ISubParserV2, COMPATIBILITY_V4} from "rain.interpreter.interface/interface/ISubParserV2.sol";
 import {BadSubParserResult, UnknownWord, UnsupportedLiteralType} from "../../error/ErrParse.sol";
 import {LibExtern, EncodedExternDispatch} from "../extern/LibExtern.sol";
 import {IInterpreterExternV3} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
@@ -203,7 +203,7 @@ library LibSubParse {
                         }
 
                         (bool success, bytes memory subBytecode, uint256[] memory subConstants) =
-                            subParser.subParseWord(COMPATIBLITY_V3, data);
+                            subParser.subParseWord(COMPATIBILITY_V4, data);
                         if (success) {
                             // The sub bytecode must be exactly 4 bytes to
                             // represent an op.
@@ -310,7 +310,7 @@ library LibSubParse {
                     deref := mload(shr(0xf0, deref))
                 }
 
-                (bool success, uint256 value) = subParser.subParseLiteral(COMPATIBLITY_V3, data);
+                (bool success, uint256 value) = subParser.subParseLiteral(COMPATIBILITY_V4, data);
                 if (success) {
                     return value;
                 }

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity ^0.8.25;
 
 import {IERC20} from "openzeppelin-contracts/contracts/interfaces/IERC20.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";

@@ -16,10 +16,6 @@ error UnexpectedOperandValue();
 /// not found in the source string.
 error ExpectedOperand();
 
-/// Thrown when parsing an operand and the literal in the source string is too
-/// large to fit in the bits allocated for it in the operand.
-error OperandOverflow();
-
 /// Thrown when the number of values encountered in a single operand parsing is
 /// longer than the memory allocated to hold them.
 /// @param offset The offset in the source string where the error occurred.
@@ -54,9 +50,15 @@ error MalformedHexLiteral(uint256 offset);
 /// Encountered a decimal literal that is larger than supported.
 error DecimalLiteralOverflow(uint256 offset);
 
+/// Encountered a decimal literal with precision loss.
+error DecimalLiteralPrecisionLoss(uint256 offset);
+
 /// Encountered a decimal literal with an exponent that has too many or no
 /// digits.
 error MalformedExponentDigits(uint256 offset);
+
+/// Encountered a decimal literal with a malformed decimal point.
+error MalformedDecimalPoint(uint256 offset);
 
 /// Encountered a zero length decimal literal.
 error ZeroLengthDecimal(uint256 offset);

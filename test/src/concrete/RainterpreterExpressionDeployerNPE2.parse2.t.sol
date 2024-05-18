@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {EXPRESSION_DEPLOYER_NP_META_PATH} from "test/lib/constants/ExpressionDeployerNPConstants.sol";
@@ -21,7 +21,7 @@ contract RainterpreterExpressionDeployerNPE2Parse2Test is Test {
             )
         );
 
-        bytes memory rainlangString = "a b c: 1 2 3, _: int-add(a b c);";
+        bytes memory rainlangString = "a b c: 1 2 3, _: add(a b c);";
 
         (bytes memory bytecodeV1, uint256[] memory constantsV1) = parser.parse(rainlangString);
         (,, address expression,) = deployer.deployExpression2(bytecodeV1, constantsV1);

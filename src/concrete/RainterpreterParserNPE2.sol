@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {IERC165, ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
@@ -15,7 +15,7 @@ import {LibParseInterstitial} from "../lib/parse/LibParseInterstitial.sol";
 
 /// @dev The known hash of the parser bytecode. This is used by the deployer to
 /// check that it is deploying a parser that is compatible with the interpreter.
-bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x86e46d41aa6b6557b67f8db4683239954c184b02a0fd08fea9fcfa5622280635);
+bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x63df383ee2349455a770275e9c476ea94fcd6a20c1f5de69572c85f036e456aa);
 
 /// @dev Encodes the parser meta that is used to lookup word definitions.
 /// The structure of the parser meta is:
@@ -34,7 +34,7 @@ bytes32 constant PARSER_BYTECODE_HASH = bytes32(0x86e46d41aa6b6557b67f8db4683239
 /// bit count of the previous bloom filter. If we reach the end of the bloom
 /// filters then we have a miss.
 bytes constant PARSE_META =
-    hex"02588423482a0a64a4805a093a0046408a2000483db0020941044cd10693108128940000000000000000000800000000100000000000000000100000000000000000001f49c6a348b005fd0c1dc53744b46c3a1a6b5d512cc697651ba56d9d416380a84768119145bf1f411c9320384025b20727767586017788743d54ad3411facaed0bf793d92a5dd6b80ac51f7f13de413210b7896422844b300fd8f7982b7c1ad31611585907980f123846207d420085742d567a1d4ab12847126e57172f75b953212a4b6e332c3f7f31f3a7222e87d7c63e201236435fbbfc32e281ae25b491eb3f7af18839b31297302973c128b94d704b1ec042237d449e18a0265d3c2223f20482963a035436e60205c2140075eca1152558bb061fa22149a5e8dd144329870d6598183bbd10093462c9701ee60c073664e22009880be535267cb3269879ba1d7d424b4654aa05197e9c533ae38ebd372dd7b205e7bf522908ea4b202f3f5e0e52726c08783df917448fdb248cf8244c9232f7";
+    hex"029280d0000430610132c412e1426060706098a2144a04900817008118207c1122080000400000000000000000000000000000000000000000000000004000000000000b5e49bb380578dd354d94b70369074e10212ea109609a690dbdd2601ab661e606e9a0f11e79a3c019a3bf081571cbb03a253a5641142dec43939f82322fe3673f8bd71b1114140208a6bbfd22b37cbc37fe60ab2bd890881b00e7793df9f87b1783810e287eb62d2165d32307a294af2df7d93e2336225029e1166b4502286c2fde1fc436d9b5932cedb4ad2627277e12db71382a77ab82166e13b00c9d78f61409a0b03b0c6db8135dfecc0ea46b263ebb5ab92012325b1cd0e81840b898c418f0b3c82e49f5b3443326d604095a090f9e8635026d7b0d245b862742b77f3d25b47f030a2081ac310a9c5e278d28c1003a80e53064dd3133a5359601571cc305b71f5d1db3cf3739c6e9c61f86455b3c8cf0fc34ae0940";
 
 /// @dev The build depth of the parser meta.
 uint8 constant PARSE_META_BUILD_DEPTH = 2;
@@ -42,13 +42,13 @@ uint8 constant PARSE_META_BUILD_DEPTH = 2;
 /// @dev Every two bytes is a function pointer for an operand handler. These
 /// positional indexes all map to the same indexes looked up in the parse meta.
 bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
-    hex"17ca17ca17ca185f190019001900185f185f17ca17ca17ca19001900190019001900190019001900190019001900190019001900190019001900190019001900190019001900190019001900190019001900190019001900190019001900190019001900190019001900194519d91900194519d9190019001900190019001900190019001900190019001900190017ca1acf17ca1acf19001900";
+    hex"18d818d818d8193d19b619b619b6193d193d18d818d818d819b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619fb19b61acd19fb19b61acd19b619b618d81b3619b619b6";
 
 /// @dev Every two bytes is a function pointer for a literal parser. Literal
 /// dispatches are determined by the first byte(s) of the literal rather than a
 /// full word lookup, and are done with simple conditional jumps as the
 /// possibilities are limited compared to the number of words we have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0f3a120214ff15d9";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0f4e1216161d16f7";
 
 /// @title RainterpreterParserNPE2
 /// @dev The parser implementation.
@@ -61,7 +61,8 @@ contract RainterpreterParserNPE2 is IParserV1, IParserPragmaV1, ERC165 {
 
     /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
-        return interfaceId == type(IParserV1).interfaceId || super.supportsInterface(interfaceId);
+        return interfaceId == type(IParserV1).interfaceId || interfaceId == type(IParserPragmaV1).interfaceId
+            || super.supportsInterface(interfaceId);
     }
 
     /// @inheritdoc IParserV1

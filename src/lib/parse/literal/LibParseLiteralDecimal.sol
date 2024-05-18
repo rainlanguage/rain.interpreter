@@ -2,133 +2,43 @@
 pragma solidity ^0.8.18;
 
 import {ParseState} from "../LibParseState.sol";
-import {DecimalLiteralOverflow, ZeroLengthDecimal, MalformedExponentDigits} from "../../../error/ErrParse.sol";
-import {CMASK_E_NOTATION, CMASK_NUMERIC_0_9} from "../LibParseCMask.sol";
+import {
+    DecimalLiteralOverflow,
+    ZeroLengthDecimal,
+    MalformedExponentDigits,
+    MalformedDecimalPoint,
+    DecimalLiteralPrecisionLoss
+} from "../../../error/ErrParse.sol";
+import {
+    CMASK_E_NOTATION,
+    CMASK_NUMERIC_0_9,
+    CMASK_DECIMAL_POINT,
+    CMASK_NEGATIVE_SIGN,
+    CMASK_ZERO
+} from "../LibParseCMask.sol";
 import {LibParseError} from "../LibParseError.sol";
+import {LibParse} from "../LibParse.sol";
+
+/// @dev The default is 18 decimal places for a fractional number.
+uint256 constant DECIMAL_SCALE = 18;
 
 library LibParseLiteralDecimal {
     using LibParseError for ParseState;
     using LibParseLiteralDecimal for ParseState;
 
-    function boundDecimal(ParseState memory state, uint256 cursor, uint256 end)
-        internal
-        pure
-        returns (uint256, uint256, uint256)
-    {
-        uint256 innerStart = cursor;
-        uint256 innerEnd = innerStart;
-        uint256 ePosition = 0;
-        uint256 eExists = 0;
-
-        {
-            uint256 decimalCharMask = CMASK_NUMERIC_0_9;
-            uint256 eMask = CMASK_E_NOTATION;
-            assembly ("memory-safe") {
-                //slither-disable-next-line incorrect-shift
-                for {} and(iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), decimalCharMask))), lt(innerEnd, end)) {}
-                {
-                    innerEnd := add(innerEnd, 1)
-                }
-
-                // If we're now pointing at an e notation, then we need
-                // to move past it. Negative exponents are not supported.
-                //slither-disable-next-line incorrect-shift
-                if and(iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), eMask))), lt(innerEnd, end)) {
-                    ePosition := innerEnd
-                    innerEnd := add(innerEnd, 1)
-                    eExists := 1
-
-                    // Move past the exponent digits.
-                    //slither-disable-next-line incorrect-shift
-                    for {} and(
-                        iszero(iszero(and(shl(byte(0, mload(innerEnd)), 1), decimalCharMask))), lt(innerEnd, end)
-                    ) {} { innerEnd := add(innerEnd, 1) }
-                }
-            }
-        }
-        if (
-            (ePosition != 0 && (innerEnd > ePosition + 3 || innerEnd == ePosition + 1))
-            // if e is found at the start of the literal, with no digits before
-            // it that is malformed.
-            || (ePosition == innerStart && eExists == 1)
-        ) {
-            revert MalformedExponentDigits(state.parseErrorOffset(ePosition));
-        }
-
-        return (innerStart, innerEnd, innerEnd);
-    }
-
-    /// Algorithm for parsing decimal literals:
-    /// - start at the end of the literal
-    /// - for each digit:
-    ///   - multiply the digit by 10^digit position
-    ///   - add the result to the total
-    /// - return the total
-    ///
-    /// This algorithm is ONLY safe if the caller has already checked that the
-    /// start/end span a non-zero length of valid decimal chars. The caller
-    /// can most easily do this by using the `boundLiteral` function.
-    ///
-    /// Unsafe behavior is undefined and can easily result in out of bounds
-    /// reads as there are no checks that start/end are within `data`.
-    function parseDecimal(ParseState memory state, uint256 cursor, uint256 end)
-        internal
-        pure
-        returns (uint256, uint256)
-    {
+    function unsafeStrToInt(ParseState memory state, uint256 start, uint256 end) internal pure returns (uint256) {
         unchecked {
-            uint256 value;
             // The ASCII byte can be translated to a numeric digit by subtracting
             // the digit offset.
             uint256 digitOffset = uint256(uint8(bytes1("0")));
-            // Tracks the exponent of the current digit. Can start above 0 if
-            // the literal is in e notation.
-            uint256 exponent;
-            (uint256 decimalStart, uint256 decimalEnd, uint256 outerEnd) = state.boundDecimal(cursor, end);
-            {
-                uint256 word;
-                //slither-disable-next-line similar-names
-                uint256 decimalCharByte;
-                uint256 decimalLength = decimalEnd - decimalStart;
-                assembly ("memory-safe") {
-                    word := mload(sub(decimalEnd, 3))
-                    decimalCharByte := byte(0, word)
-                }
-                // If the last 3 bytes are e notation, then we need to parse
-                // the exponent as a 2 digit number.
-                //slither-disable-next-line incorrect-shift
-                if (decimalLength > 3 && ((1 << decimalCharByte) & CMASK_E_NOTATION) != 0) {
-                    cursor = decimalEnd - 4;
-                    assembly ("memory-safe") {
-                        exponent := add(sub(byte(2, word), digitOffset), mul(sub(byte(1, word), digitOffset), 10))
-                    }
-                } else {
-                    assembly ("memory-safe") {
-                        decimalCharByte := byte(1, word)
-                    }
-                    // If the last 2 bytes are e notation, then we need to parse
-                    // the exponent as a 1 digit number.
-                    //slither-disable-next-line incorrect-shift
-                    if (decimalLength > 2 && ((1 << decimalCharByte) & CMASK_E_NOTATION) != 0) {
-                        cursor = decimalEnd - 3;
-                        assembly ("memory-safe") {
-                            exponent := sub(byte(2, word), digitOffset)
-                        }
-                    }
-                    // Otherwise, we're not in e notation and we can start at the
-                    // decimalEnd of the literal with 0 starting exponent.
-                    else if (decimalLength > 0) {
-                        cursor = decimalEnd - 1;
-                        exponent = 0;
-                    } else {
-                        revert ZeroLengthDecimal(state.parseErrorOffset(decimalStart));
-                    }
-                }
-            }
+            uint256 exponent = 0;
+            uint256 cursor;
+            cursor = end - 1;
+            uint256 value = 0;
 
             // Anything under 10^77 is safe to raise to its power of 10 without
             // overflowing a uint256.
-            while (cursor >= decimalStart && exponent < 77) {
+            while (cursor >= start && exponent < 77) {
                 // We don't need to check the bounds of the byte because
                 // we know it is a decimal literal as long as the bounds
                 // are correct (calculated in `boundLiteral`).
@@ -142,7 +52,7 @@ library LibParseLiteralDecimal {
             // If we didn't consume the entire literal, then we have
             // to check if the remaining digit is safe to multiply
             // by 10 without overflowing a uint256.
-            if (cursor >= decimalStart) {
+            if (cursor >= start) {
                 {
                     uint256 digit;
                     assembly ("memory-safe") {
@@ -151,11 +61,11 @@ library LibParseLiteralDecimal {
                     // If the digit is greater than 1, then we know that
                     // multiplying it by 10^77 will overflow a uint256.
                     if (digit > 1) {
-                        revert DecimalLiteralOverflow(state.parseErrorOffset(cursor));
+                        revert DecimalLiteralOverflow(state.parseErrorOffset(start));
                     } else {
                         uint256 scaled = digit * (10 ** exponent);
                         if (value + scaled < value) {
-                            revert DecimalLiteralOverflow(state.parseErrorOffset(cursor));
+                            revert DecimalLiteralOverflow(state.parseErrorOffset(start));
                         }
                         value += scaled;
                     }
@@ -165,20 +75,104 @@ library LibParseLiteralDecimal {
                 {
                     // If we didn't consume the entire literal, then only
                     // leading zeros are allowed.
-                    while (cursor >= decimalStart) {
+                    while (cursor >= start) {
                         //slither-disable-next-line similar-names
                         uint256 decimalCharByte;
                         assembly ("memory-safe") {
                             decimalCharByte := byte(0, mload(cursor))
                         }
                         if (decimalCharByte != uint256(uint8(bytes1("0")))) {
-                            revert DecimalLiteralOverflow(state.parseErrorOffset(cursor));
+                            revert DecimalLiteralOverflow(state.parseErrorOffset(start));
                         }
                         cursor--;
                     }
                 }
             }
-            return (outerEnd, value);
+
+            return value;
         }
+    }
+
+    /// Returns cursor after, value
+    function parseDecimal(ParseState memory state, uint256 cursor, uint256 end)
+        internal
+        pure
+        returns (uint256, uint256)
+    {
+        uint256 fracOffset = 0;
+        uint256 fracValue = 0;
+        uint256 scale = 0;
+        uint256 intValue = 0;
+
+        unchecked {
+            {
+                uint256 start = cursor;
+                cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
+                if (cursor == start) {
+                    revert ZeroLengthDecimal(state.parseErrorOffset(cursor));
+                }
+                intValue = state.unsafeStrToInt(start, cursor);
+            }
+
+            uint256 isFrac = LibParse.isMask(cursor, end, CMASK_DECIMAL_POINT);
+            if (isFrac == 1) {
+                cursor++;
+                uint256 fracStart = cursor;
+                cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
+                if (cursor == fracStart) {
+                    revert MalformedDecimalPoint(state.parseErrorOffset(cursor));
+                }
+
+                // Trailing zeros are allowed in fractional literals but should
+                // not be counted in the precision.
+                uint256 nonZeroCursor = cursor;
+                while (LibParse.isMask(nonZeroCursor - 1, end, CMASK_ZERO) == 1) {
+                    nonZeroCursor--;
+                }
+
+                fracValue = state.unsafeStrToInt(fracStart, nonZeroCursor);
+                fracOffset = nonZeroCursor - fracStart;
+            }
+
+            uint256 eValue = 0;
+            uint256 eNeg = 0;
+            if (LibParse.isMask(cursor, end, CMASK_E_NOTATION) > 0) {
+                cursor++;
+                eNeg = LibParse.isMask(cursor, end, CMASK_NEGATIVE_SIGN);
+                cursor += eNeg;
+
+                uint256 eStart = cursor;
+                cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
+                if (cursor == eStart) {
+                    revert MalformedExponentDigits(state.parseErrorOffset(cursor));
+                }
+                eValue = state.unsafeStrToInt(eStart, cursor);
+            }
+
+            {
+                // If this is a fractional number, then we need to scale it up to
+                // 1e18 being "one". Otherwise we treat as an integer.
+                if (eNeg > 0) {
+                    if (DECIMAL_SCALE < eValue) {
+                        revert DecimalLiteralPrecisionLoss(state.parseErrorOffset(cursor));
+                    }
+                    scale = DECIMAL_SCALE - eValue;
+                } else {
+                    scale = DECIMAL_SCALE + eValue;
+                }
+            }
+
+            if (scale >= 77) {
+                revert DecimalLiteralOverflow(state.parseErrorOffset(cursor));
+            }
+
+            if (scale < fracOffset) {
+                revert DecimalLiteralPrecisionLoss(state.parseErrorOffset(cursor));
+            }
+        }
+
+        // Do this bit with checked math in case we missed an edge case above
+        // that causes overflow.
+        return (cursor, intValue * (10 ** scale) + fracValue * (10 ** (scale - fracOffset)));
     }
 }

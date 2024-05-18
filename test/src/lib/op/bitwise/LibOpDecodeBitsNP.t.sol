@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
@@ -71,23 +71,23 @@ contract LibOpDecodeBitsNPTest is OpTest {
     /// Test the eval of decoding bits parsed from a string.
     function testOpDecodeBitsNPEvalHappy() external {
         checkHappy("_:bitwise-decode<0 1>(0);", 0, "0 1 0");
-        checkHappy("_:bitwise-decode<0 1>(1);", 1, "0 1 1");
-        checkHappy("_:bitwise-decode<0 1>(2);", 0, "0 1 2");
-        checkHappy("_:bitwise-decode<0 1>(3);", 1, "0 1 3");
-        checkHappy("_:bitwise-decode<0 1>(4);", 0, "0 1 4");
-        checkHappy("_:bitwise-decode<0 1>(5);", 1, "0 1 5");
-        checkHappy("_:bitwise-decode<0 1>(6);", 0, "0 1 6");
-        checkHappy("_:bitwise-decode<0 1>(7);", 1, "0 1 7");
+        checkHappy("_:bitwise-decode<0 1>(1e-18);", 1, "0 1 1");
+        checkHappy("_:bitwise-decode<0 1>(2e-18);", 0, "0 1 2");
+        checkHappy("_:bitwise-decode<0 1>(3e-18);", 1, "0 1 3");
+        checkHappy("_:bitwise-decode<0 1>(4e-18);", 0, "0 1 4");
+        checkHappy("_:bitwise-decode<0 1>(5e-18);", 1, "0 1 5");
+        checkHappy("_:bitwise-decode<0 1>(6e-18);", 0, "0 1 6");
+        checkHappy("_:bitwise-decode<0 1>(7e-18);", 1, "0 1 7");
         checkHappy("_:bitwise-decode<0 2>(0);", 0, "0 2 0");
-        checkHappy("_:bitwise-decode<0 2>(1);", 1, "0 2 1");
-        checkHappy("_:bitwise-decode<0 2>(2);", 2, "0 2 2");
-        checkHappy("_:bitwise-decode<0 2>(3);", 3, "0 2 3");
-        checkHappy("_:bitwise-decode<0 2>(4);", 0, "0 2 4");
-        checkHappy("_:bitwise-decode<0 2>(max-int-value());", 3, "0 2 max-int-value");
-        checkHappy("_:bitwise-decode<0 0xFF>(max-int-value());", type(uint256).max >> 1, "0 0xFF max-int-value");
-        checkHappy("_:bitwise-decode<0xFF 1>(max-int-value());", 1, "0xFF 1 max-int-value");
-        checkHappy("_:bitwise-decode<1 0xFF>(max-int-value());", type(uint256).max >> 1, "1 0xFF max-int-value");
-        checkHappy("_:bitwise-decode<20 2>(max-int-value());", 3, "20 2 max-int-value");
+        checkHappy("_:bitwise-decode<0 2>(1e-18);", 1, "0 2 1");
+        checkHappy("_:bitwise-decode<0 2>(2e-18);", 2, "0 2 2");
+        checkHappy("_:bitwise-decode<0 2>(3e-18);", 3, "0 2 3");
+        checkHappy("_:bitwise-decode<0 2>(4e-18);", 0, "0 2 4");
+        checkHappy("_:bitwise-decode<0 2>(max-value());", 3, "0 2 max-value");
+        checkHappy("_:bitwise-decode<0 0xFF>(max-value());", type(uint256).max >> 1, "0 0xFF max-value");
+        checkHappy("_:bitwise-decode<0xFF 1>(max-value());", 1, "0xFF 1 max-value");
+        checkHappy("_:bitwise-decode<1 0xFF>(max-value());", type(uint256).max >> 1, "1 0xFF max-value");
+        checkHappy("_:bitwise-decode<20 2>(max-value());", 3, "20 2 max-value");
     }
 
     /// Check bad inputs.

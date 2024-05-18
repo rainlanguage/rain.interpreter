@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
@@ -16,7 +16,7 @@ import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreter
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibEncodedDispatch} from "rain.interpreter.interface/lib/caller/LibEncodedDispatch.sol";
 import {UnsupportedBitwiseShiftAmount} from "src/error/ErrBitwise.sol";
-import {OperandOverflow} from "src/error/ErrParse.sol";
+import {IntegerOverflow} from "rain.math.fixedpoint/error/ErrScale.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpShiftBitsLeftNPTest is OpTest {
@@ -87,30 +87,30 @@ contract LibOpShiftBitsLeftNPTest is OpTest {
         checkHappy("_: bitwise-shift-left<3>(0);", 0, "3, 0");
         checkHappy("_: bitwise-shift-left<255>(0);", 0, "255, 0");
 
-        checkHappy("_: bitwise-shift-left<1>(1);", 1 << 1, "1, 1");
-        checkHappy("_: bitwise-shift-left<2>(1);", 1 << 2, "2, 1");
-        checkHappy("_: bitwise-shift-left<3>(1);", 1 << 3, "3, 1");
-        checkHappy("_: bitwise-shift-left<255>(1);", 1 << 255, "255, 1");
+        checkHappy("_: bitwise-shift-left<1>(1e-18);", 1 << 1, "1, 1");
+        checkHappy("_: bitwise-shift-left<2>(1e-18);", 1 << 2, "2, 1");
+        checkHappy("_: bitwise-shift-left<3>(1e-18);", 1 << 3, "3, 1");
+        checkHappy("_: bitwise-shift-left<255>(1e-18);", 1 << 255, "255, 1");
 
-        checkHappy("_: bitwise-shift-left<1>(2);", 2 << 1, "1, 2");
-        checkHappy("_: bitwise-shift-left<2>(2);", 2 << 2, "2, 2");
-        checkHappy("_: bitwise-shift-left<3>(2);", 2 << 3, "3, 2");
+        checkHappy("_: bitwise-shift-left<1>(2e-18);", 2 << 1, "1, 2");
+        checkHappy("_: bitwise-shift-left<2>(2e-18);", 2 << 2, "2, 2");
+        checkHappy("_: bitwise-shift-left<3>(2e-18);", 2 << 3, "3, 2");
         // 2 gets shifted out of the 256 bit word, so this is 0.
-        checkHappy("_: bitwise-shift-left<255>(2);", 0, "255, 2");
+        checkHappy("_: bitwise-shift-left<255>(2e-18);", 0, "255, 2");
 
-        checkHappy("_: bitwise-shift-left<1>(3);", 3 << 1, "1, 3");
-        checkHappy("_: bitwise-shift-left<2>(3);", 3 << 2, "2, 3");
-        checkHappy("_: bitwise-shift-left<3>(3);", 3 << 3, "3, 3");
+        checkHappy("_: bitwise-shift-left<1>(3e-18);", 3 << 1, "1, 3");
+        checkHappy("_: bitwise-shift-left<2>(3e-18);", 3 << 2, "2, 3");
+        checkHappy("_: bitwise-shift-left<3>(3e-18);", 3 << 3, "3, 3");
         // The high bit of 3 gets shifted out of the 256 bit word, so this is the
         // same as shifting 1.
-        checkHappy("_: bitwise-shift-left<255>(3);", 1 << 255, "255, 3");
+        checkHappy("_: bitwise-shift-left<255>(3e-18);", 1 << 255, "255, 3");
 
-        checkHappy("_: bitwise-shift-left<1>(max-int-value());", type(uint256).max << 1, "1, max");
-        checkHappy("_: bitwise-shift-left<2>(max-int-value());", type(uint256).max << 2, "2, max");
-        checkHappy("_: bitwise-shift-left<3>(max-int-value());", type(uint256).max << 3, "3, max");
+        checkHappy("_: bitwise-shift-left<1>(max-value());", type(uint256).max << 1, "1, max");
+        checkHappy("_: bitwise-shift-left<2>(max-value());", type(uint256).max << 2, "2, max");
+        checkHappy("_: bitwise-shift-left<3>(max-value());", type(uint256).max << 3, "3, max");
         // The high bit of max gets shifted out of the 256 bit word, so this is the
         // same as shifting 1.
-        checkHappy("_: bitwise-shift-left<255>(max-int-value());", 1 << 255, "255, max");
+        checkHappy("_: bitwise-shift-left<255>(max-value());", 1 << 255, "255, max");
     }
 
     /// Test that a bitwise shift with bad inputs fails integrity.
@@ -144,6 +144,8 @@ contract LibOpShiftBitsLeftNPTest is OpTest {
             "_: bitwise-shift-left<65535>(0);", abi.encodeWithSelector(UnsupportedBitwiseShiftAmount.selector, 65535)
         );
         // Lets go ahead and overflow the operand.
-        checkUnhappyParse("_: bitwise-shift-left<65536>(0);", abi.encodeWithSelector(OperandOverflow.selector));
+        checkUnhappyParse(
+            "_: bitwise-shift-left<65536>(0);", abi.encodeWithSelector(IntegerOverflow.selector, 65536, 65535)
+        );
     }
 }

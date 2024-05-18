@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
@@ -75,8 +75,8 @@ contract LibOpEnsureNPTest is OpTest {
     /// be used on the same line as another word as it has non-one outputs.
     /// Tests ensuring with an addition on the same line.
     function testOpEnsureNPEvalBadOutputs() external {
-        vm.expectRevert(abi.encodeWithSelector(ExcessRHSItems.selector, 24));
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_:ensure(1) int-add(1 1);");
+        vm.expectRevert(abi.encodeWithSelector(ExcessRHSItems.selector, 34));
+        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_:ensure(1 \"always true\") add(1 1);");
         (bytecode);
         (constants);
     }
@@ -85,8 +85,9 @@ contract LibOpEnsureNPTest is OpTest {
     /// be used on the same line as another word as it has non-one outputs.
     /// Tests ensuring with another ensure on the same line.
     function testOpEnsureNPEvalBadOutputs2() external {
-        vm.expectRevert(abi.encodeWithSelector(ExcessRHSItems.selector, 20));
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(":ensure(1) ensure(1);");
+        vm.expectRevert(abi.encodeWithSelector(ExcessRHSItems.selector, 48));
+        (bytes memory bytecode, uint256[] memory constants) =
+            iParser.parse(":ensure(1 \"always true\") ensure(1 \"always true\");");
         (bytecode);
         (constants);
     }
@@ -94,11 +95,11 @@ contract LibOpEnsureNPTest is OpTest {
     /// Test the eval of `ensure` parsed from a string. Tests the happy path
     /// where all inputs are nonzero.
     function testOpEnsureNPEvalHappy() external {
-        checkHappy(":ensure(1 \"always 1\"), _:1;", 1, "1");
-        checkHappy(":ensure(5 \"always 5\"), _:1;", 1, "5");
+        checkHappy(":ensure(1 \"always 1\"), _:1;", 1e18, "1");
+        checkHappy(":ensure(5 \"always 5\"), _:1;", 1e18, "5");
 
         // Empty reason should be fine.
-        checkHappy(":ensure(1 \"\"), _:1;", 1, "");
+        checkHappy(":ensure(1 \"\"), _:1;", 1e18, "");
     }
 
     /// Test the eval of `ensure` parsed from a string. Tests the unhappy path

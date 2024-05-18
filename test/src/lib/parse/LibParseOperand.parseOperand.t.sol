@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {LibParseOperand, Operand} from "src/lib/parse/LibParseOperand.sol";
@@ -9,6 +9,7 @@ import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {LibLiteralString} from "test/lib/literal/LibLiteralString.sol";
 import {OperandValuesOverflow, UnclosedOperand} from "src/error/ErrParse.sol";
+import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 
 contract LibParseOperandParseOperandTest is Test {
     using LibBytes for bytes;
@@ -66,10 +67,15 @@ contract LibParseOperandParseOperandTest is Test {
     ) external {
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceA);
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceB);
+
+        value = bound(value, 0, type(uint256).max / 1e18);
+
         string memory valueString = asHex ? value.toHexString() : value.toString();
         string memory s = string.concat("<", maybeWhitespaceA, valueString, maybeWhitespaceB, ">", suffix);
+
         uint256[] memory expectedValues = new uint256[](1);
-        expectedValues[0] = value;
+        expectedValues[0] = value * (asHex ? 1 : 1e18);
+
         checkParsingOperandFromData(
             s,
             expectedValues,
@@ -89,17 +95,25 @@ contract LibParseOperandParseOperandTest is Test {
         string memory suffix
     ) external {
         vm.assume(bytes(maybeWhitespaceB).length > 0);
+
+        valueA = bound(valueA, 0, type(uint256).max / 1e18);
+        valueB = bound(valueB, 0, type(uint256).max / 1e18);
+
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceA);
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceB);
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceC);
+
         string memory valueAString = asHexA ? valueA.toHexString() : valueA.toString();
         string memory valueBString = asHexB ? valueB.toHexString() : valueB.toString();
+
         string memory s = string.concat(
             "<", maybeWhitespaceA, valueAString, maybeWhitespaceB, valueBString, maybeWhitespaceC, ">", suffix
         );
         uint256[] memory expectedValues = new uint256[](2);
-        expectedValues[0] = valueA;
-        expectedValues[1] = valueB;
+
+        expectedValues[0] = valueA * (asHexA ? 1 : 1e18);
+        expectedValues[1] = valueB * (asHexB ? 1 : 1e18);
+
         checkParsingOperandFromData(
             s,
             expectedValues,
@@ -124,13 +138,20 @@ contract LibParseOperandParseOperandTest is Test {
     ) external {
         vm.assume(bytes(maybeWhitespaceB).length > 0);
         vm.assume(bytes(maybeWhitespaceC).length > 0);
+
+        valueA = bound(valueA, 0, type(uint256).max / 1e18);
+        valueB = bound(valueB, 0, type(uint256).max / 1e18);
+        valueC = bound(valueC, 0, type(uint256).max / 1e18);
+
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceA);
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceB);
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceC);
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceD);
+
         string memory valueAString = asHexA ? valueA.toHexString() : valueA.toString();
         string memory valueBString = asHexB ? valueB.toHexString() : valueB.toString();
         string memory valueCString = asHexC ? valueC.toHexString() : valueC.toString();
+
         string memory s = string.concat(
             "<",
             maybeWhitespaceA,
@@ -143,10 +164,12 @@ contract LibParseOperandParseOperandTest is Test {
             ">",
             suffix
         );
+
         uint256[] memory expectedValues = new uint256[](3);
-        expectedValues[0] = valueA;
-        expectedValues[1] = valueB;
-        expectedValues[2] = valueC;
+        expectedValues[0] = valueA * (asHexA ? 1 : 1e18);
+        expectedValues[1] = valueB * (asHexB ? 1 : 1e18);
+        expectedValues[2] = valueC * (asHexC ? 1 : 1e18);
+
         checkParsingOperandFromData(
             s,
             expectedValues,
@@ -172,6 +195,10 @@ contract LibParseOperandParseOperandTest is Test {
             LibLiteralString.conformStringToWhitespace(maybeWhitespace[2]);
             LibLiteralString.conformStringToWhitespace(maybeWhitespace[3]);
             LibLiteralString.conformStringToWhitespace(maybeWhitespace[4]);
+        }
+
+        for (uint256 i = 0; i < 4; i++) {
+            values[i] = bound(values[i], 0, type(uint256).max / 1e18);
         }
 
         uint256 expectedLength;
@@ -207,7 +234,7 @@ contract LibParseOperandParseOperandTest is Test {
 
         uint256[] memory expectedValues = new uint256[](4);
         for (uint256 i = 0; i < 4; i++) {
-            expectedValues[i] = values[i];
+            expectedValues[i] = values[i] * (asHex[i] ? 1 : 1e18);
         }
         checkParsingOperandFromData(s, expectedValues, expectedLength);
     }

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {
@@ -17,7 +17,7 @@ import {
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
-import {COMPATIBLITY_V3} from "rain.interpreter.interface/interface/ISubParserV2.sol";
+import {COMPATIBILITY_V4} from "rain.interpreter.interface/interface/ISubParserV2.sol";
 import {OPCODE_EXTERN} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {ExternDispatchConstantsHeightOverflow} from "src/error/ErrSubParse.sol";
 
@@ -46,7 +46,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
             // Need the constant in the constant array to be indexable in the operand.
             "_: 0x000000000000000000000000c7183455a4c133ae270771860664b6b7ec320bb1,"
             // Operand is the constant index of the dispatch.
-            "three four: extern<0>(2 3);",
+            "three four: extern<0>(2e-18 3e-18);",
             expectedStack,
             "inc 2 3 = 3 4"
         );
@@ -61,7 +61,9 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
 
         checkHappy(
             bytes(
-                string.concat("using-words-from ", address(extern).toHexString(), " three four: ref-extern-inc(2 3);")
+                string.concat(
+                    "using-words-from ", address(extern).toHexString(), " three four: ref-extern-inc(2e-18 3e-18);"
+                )
             ),
             expectedStack,
             "sugared inc 2 3 = 3 4"
@@ -78,7 +80,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
 
         bytes memory wordToParse = bytes("ref-extern-inc");
         (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParseWord(
-            COMPATIBLITY_V3,
+            COMPATIBILITY_V4,
             bytes.concat(bytes2(constantsHeight), ioByte, bytes2(uint16(wordToParse.length)), wordToParse, bytes32(0))
         );
         assertTrue(success);
@@ -118,7 +120,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
         RainterpreterReferenceExternNPE2 subParser = new RainterpreterReferenceExternNPE2();
 
         (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParseWord(
-            COMPATIBLITY_V3,
+            COMPATIBILITY_V4,
             bytes.concat(bytes2(constantsHeight), ioByte, bytes2(uint16(unknownWord.length)), unknownWord, bytes32(0))
         );
         assertFalse(success);

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {Test, stdError} from "forge-std/Test.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";

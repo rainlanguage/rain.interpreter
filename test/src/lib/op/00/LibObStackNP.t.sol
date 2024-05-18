@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
@@ -154,7 +154,7 @@ contract LibOpStackNPTest is OpTest {
         );
 
         assertEq(constants.length, 1);
-        assertEq(constants[0], 1);
+        assertEq(constants[0], 1e18);
 
         (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
             iDeployer.deployExpression2(bytecode, constants);
@@ -167,8 +167,8 @@ contract LibOpStackNPTest is OpTest {
             new uint256[](0)
         );
         assertEq(stack.length, 2);
-        assertEq(stack[0], 1);
-        assertEq(stack[1], 1);
+        assertEq(stack[0], 1e18);
+        assertEq(stack[1], 1e18);
         assertEq(kvs.length, 0);
     }
 
@@ -177,7 +177,7 @@ contract LibOpStackNPTest is OpTest {
         (bytes memory bytecode, uint256[] memory constants) =
             iParser.parse("foo: 1, bar: foo, _ baz: bar bar, bing _:foo baz;");
         assertEq(constants.length, 1);
-        assertEq(constants[0], 1);
+        assertEq(constants[0], 1e18);
         assertEq(
             bytecode,
             // 1 source
@@ -217,12 +217,12 @@ contract LibOpStackNPTest is OpTest {
             new uint256[](0)
         );
         assertEq(stack.length, 6);
-        assertEq(stack[0], 1);
-        assertEq(stack[1], 1);
-        assertEq(stack[2], 1);
-        assertEq(stack[3], 1);
-        assertEq(stack[4], 1);
-        assertEq(stack[5], 1);
+        assertEq(stack[0], 1e18);
+        assertEq(stack[1], 1e18);
+        assertEq(stack[2], 1e18);
+        assertEq(stack[3], 1e18);
+        assertEq(stack[4], 1e18);
+        assertEq(stack[5], 1e18);
         assertEq(kvs.length, 0);
     }
 

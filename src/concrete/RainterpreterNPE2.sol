@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.19;
+pragma solidity =0.8.25;
 
 import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
@@ -25,14 +25,14 @@ import {
 import {IInterpreterV3} from "rain.interpreter.interface/interface/unstable/IInterpreterV3.sol";
 
 /// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xa1800a933bfbd35dc240c332da3c4770f290260673872fb013e86c8478b12fd7);
+bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0x082edcc97843fd74ff6dc51867110b8633b0e419bac46f53765f5a833f36d024);
 
 /// @dev The function pointers known to the interpreter for dynamic dispatch.
 /// By setting these as a constant they can be inlined into the interpreter
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
 bytes constant OPCODE_FUNCTION_POINTERS =
-    hex"0df30e440e8610521139114b115d117611b8120a121b122c12ce130b13c9147913c914fd159f161716461675167516c416f31758182c187f189318ec19001915192f193a194e1963199b19c219da19e81a681a761a841a9f1ab41acc1ae51af31b011b0f1b1d1b6b1b831b9b1bb51bb51bcc1be91be91c001c551c631c631cb11cff1d4d1d4d1d9b1d9b1de91e371e851e851e851e851f292010";
+    hex"0e060e570e991065114c115e1170119311d512271238124912eb132813e6149613e6151a15bc1634166d16a616f5172e1793186718ba18ce1927193b1950196a19751989199e19d619fd1a7d1acb1b191b671b7f1b981be61bf41c021c1d1c321c4a1c631c711c7f1c8d1c9b1ce91d371d851dd31deb1deb1e021e301e301e471e761ecb1ed91ed91f7d2064";
 
 /// @title RainterpreterNPE2
 /// @notice Implementation of a Rainlang interpreter that is compatible with
@@ -98,7 +98,8 @@ contract RainterpreterNPE2 is IInterpreterV2, IInterpreterV3, ERC165 {
 
     /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IInterpreterV2).interfaceId || super.supportsInterface(interfaceId);
+        return interfaceId == type(IInterpreterV2).interfaceId || interfaceId == type(IInterpreterV3).interfaceId
+            || super.supportsInterface(interfaceId);
     }
 
     /// @inheritdoc IInterpreterV2

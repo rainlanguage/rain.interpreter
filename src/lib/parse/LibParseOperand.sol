@@ -4,7 +4,6 @@ pragma solidity ^0.8.18;
 import {
     ExpectedOperand,
     UnclosedOperand,
-    OperandOverflow,
     OperandValuesOverflow,
     UnexpectedOperand,
     UnexpectedOperandValue
@@ -16,6 +15,7 @@ import {CMASK_OPERAND_END, CMASK_WHITESPACE, CMASK_OPERAND_START} from "./LibPar
 import {ParseState, OPERAND_VALUES_LENGTH, FSM_YANG_MASK} from "./LibParseState.sol";
 import {LibParseError} from "./LibParseError.sol";
 import {LibParseInterstitial} from "./LibParseInterstitial.sol";
+import {LibFixedPointDecimalScale, DECIMAL_MAX_SAFE_INT} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 
 library LibParseOperand {
     using LibParseError for ParseState;
@@ -157,9 +157,9 @@ library LibParseOperand {
             assembly ("memory-safe") {
                 operand := mload(add(values, 0x20))
             }
-            if (Operand.unwrap(operand) > uint256(type(uint16).max)) {
-                revert OperandOverflow();
-            }
+            operand = Operand.wrap(
+                LibFixedPointDecimalScale.decimalOrIntToInt(Operand.unwrap(operand), uint256(type(uint16).max))
+            );
         } else if (values.length == 0) {
             operand = Operand.wrap(0);
         } else {
@@ -174,9 +174,9 @@ library LibParseOperand {
             assembly ("memory-safe") {
                 operand := mload(add(values, 0x20))
             }
-            if (Operand.unwrap(operand) > uint256(type(uint16).max)) {
-                revert OperandOverflow();
-            }
+            operand = Operand.wrap(
+                LibFixedPointDecimalScale.decimalOrIntToInt(Operand.unwrap(operand), uint256(type(uint16).max))
+            );
         } else if (values.length == 0) {
             revert ExpectedOperand();
         } else {
@@ -195,9 +195,9 @@ library LibParseOperand {
                 a := mload(add(values, 0x20))
                 b := mload(add(values, 0x40))
             }
-            if (a > type(uint8).max || b > type(uint8).max) {
-                revert OperandOverflow();
-            }
+            a = LibFixedPointDecimalScale.decimalOrIntToInt(a, type(uint8).max);
+            b = LibFixedPointDecimalScale.decimalOrIntToInt(b, type(uint8).max);
+
             operand = Operand.wrap(a | (b << 8));
         } else if (values.length < 2) {
             revert ExpectedOperand();
@@ -235,9 +235,9 @@ library LibParseOperand {
                 c = 0;
             }
 
-            if (a > type(uint8).max || b > 1 || c > 1) {
-                revert OperandOverflow();
-            }
+            a = LibFixedPointDecimalScale.decimalOrIntToInt(a, type(uint8).max);
+            b = LibFixedPointDecimalScale.decimalOrIntToInt(b, 1);
+            c = LibFixedPointDecimalScale.decimalOrIntToInt(c, 1);
 
             operand = Operand.wrap(a | (b << 8) | (c << 9));
         } else if (length == 0) {
@@ -271,9 +271,8 @@ library LibParseOperand {
                 b = 0;
             }
 
-            if (a > 1 || b > 1) {
-                revert OperandOverflow();
-            }
+            a = LibFixedPointDecimalScale.decimalOrIntToInt(a, 1);
+            b = LibFixedPointDecimalScale.decimalOrIntToInt(b, 1);
 
             operand = Operand.wrap(a | (b << 1));
         } else {
