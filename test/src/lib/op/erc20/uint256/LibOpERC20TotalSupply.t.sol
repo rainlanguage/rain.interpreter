@@ -66,6 +66,8 @@ contract LibOpUint256ERC20TotalSupplyTest is OpTest {
 
     /// Test that operand is disallowed.
     function testOpERC20TotalSupplyNPEvalOperandDisallowed() external {
-        checkUnhappyParse("_: uint256-erc20-total-supply<0>(0xdeadbeef);", abi.encodeWithSelector(UnexpectedOperand.selector));
+        checkUnhappyParse(
+            "_: uint256-erc20-total-supply<0>(0xdeadbeef);", abi.encodeWithSelector(UnexpectedOperand.selector)
+        );
     }
 }

@@ -51,7 +51,9 @@ contract LibOpUint256ERC20AllowanceTest is OpTest {
             abi.encode(allowance)
         );
         checkHappy(
-            "_: uint256-erc20-allowance(0xdeadbeef 0xdeadc0de 0xdeaddead);", allowance, "0xdeadbeef 0xdeadc0de 0xdeaddead"
+            "_: uint256-erc20-allowance(0xdeadbeef 0xdeadc0de 0xdeaddead);",
+            allowance,
+            "0xdeadbeef 0xdeadc0de 0xdeaddead"
         );
     }
 

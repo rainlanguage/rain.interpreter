@@ -104,7 +104,8 @@ contract LibOpUint256ERC721BalanceOfTest is OpTest {
 
     /// Test that balance of with three inputs fails integrity check.
     function testOpERC721BalanceOfIntegrityFail3() external {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: uint256-erc721-balance-of(0x00 0x01 0x02);");
+        (bytes memory bytecode, uint256[] memory constants) =
+            iParser.parse("_: uint256-erc721-balance-of(0x00 0x01 0x02);");
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
         iDeployer.deployExpression2(bytecode, constants);
     }
@@ -112,7 +113,8 @@ contract LibOpUint256ERC721BalanceOfTest is OpTest {
     /// Test that operand fails integrity check.
     function testOpERC721BalanceOfIntegrityFailOperand() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: uint256-erc721-balance-of<0>(0x00 0x01);");
+        (bytes memory bytecode, uint256[] memory constants) =
+            iParser.parse("_: uint256-erc721-balance-of<0>(0x00 0x01);");
         (bytecode, constants);
     }
 
