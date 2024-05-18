@@ -4,16 +4,16 @@ pragma solidity =0.8.25;
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
-import {LibOpERC20TotalSupplyNP} from "src/lib/op/erc20/LibOpERC20TotalSupplyNP.sol";
+import {LibOpUint256ERC20TotalSupply} from "src/lib/op/erc20/uint256/LibOpUint256ERC20TotalSupply.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/interfaces/IERC20.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-/// @title LibOpERC20TotalSupplyNPTest
+/// @title LibOpUint256ERC20TotalSupplyTest
 /// @notice Test the opcode for getting the total supply of an erc20 contract.
-contract LibOpERC20TotalSupplyNPTest is OpTest {
+contract LibOpUint256ERC20TotalSupplyTest is OpTest {
     function testOpERC20TotalSupplyNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpERC20TotalSupplyNP.integrity(state, operand);
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256ERC20TotalSupply.integrity(state, operand);
 
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
@@ -34,9 +34,9 @@ contract LibOpERC20TotalSupplyNPTest is OpTest {
         opReferenceCheck(
             opTestDefaultInterpreterState(),
             operand,
-            LibOpERC20TotalSupplyNP.referenceFn,
-            LibOpERC20TotalSupplyNP.integrity,
-            LibOpERC20TotalSupplyNP.run,
+            LibOpUint256ERC20TotalSupply.referenceFn,
+            LibOpUint256ERC20TotalSupply.integrity,
+            LibOpUint256ERC20TotalSupply.run,
             inputs
         );
     }
@@ -44,28 +44,30 @@ contract LibOpERC20TotalSupplyNPTest is OpTest {
     /// Test the eval of totalSupply parsed from a string.
     function testOpERC20TotalSupplyNPEvalHappy(uint256 totalSupply) external {
         vm.mockCall(address(0xdeadbeef), abi.encodeWithSelector(IERC20.totalSupply.selector), abi.encode(totalSupply));
-        checkHappy("_: erc20-total-supply(0xdeadbeef);", totalSupply, "0xdeadbeef 0xdeadc0de");
+        checkHappy("_: uint256-erc20-total-supply(0xdeadbeef);", totalSupply, "0xdeadbeef 0xdeadc0de");
     }
 
     /// Test that a totalSupply with bad inputs fails integrity.
     function testOpERC20TotalSupplyNPEvalZeroInputs() external {
-        checkBadInputs("_: erc20-total-supply();", 0, 1, 0);
+        checkBadInputs("_: uint256-erc20-total-supply();", 0, 1, 0);
     }
 
     function testOpERC20TotalSupplyNPEvalTwoInputs() external {
-        checkBadInputs("_: erc20-total-supply(0xdeadbeef 0xdeadc0de);", 2, 1, 2);
+        checkBadInputs("_: uint256-erc20-total-supply(0xdeadbeef 0xdeadc0de);", 2, 1, 2);
     }
 
     function testOpERC20TotalSupplyNPEvalZeroOutputs() external {
-        checkBadOutputs(": erc20-total-supply(0xdeadbeef);", 1, 1, 0);
+        checkBadOutputs(": uint256-erc20-total-supply(0xdeadbeef);", 1, 1, 0);
     }
 
     function testOpERC20TotalSupplyNPEvalTwoOutputs() external {
-        checkBadOutputs("_ _: erc20-total-supply(0xdeadbeef);", 1, 1, 2);
+        checkBadOutputs("_ _: uint256-erc20-total-supply(0xdeadbeef);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.
     function testOpERC20TotalSupplyNPEvalOperandDisallowed() external {
-        checkUnhappyParse("_: erc20-total-supply<0>(0xdeadbeef);", abi.encodeWithSelector(UnexpectedOperand.selector));
+        checkUnhappyParse(
+            "_: uint256-erc20-total-supply<0>(0xdeadbeef);", abi.encodeWithSelector(UnexpectedOperand.selector)
+        );
     }
 }
