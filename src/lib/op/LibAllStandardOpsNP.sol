@@ -163,8 +163,7 @@ library LibAllStandardOpsNP {
                 "Gets the balance of an erc20 token for an account. The first input is the token address and the second is the account address."
             ),
             AuthoringMetaV2(
-                "erc20-total-supply",
-                "Gets the total supply of an erc20 token. The input is the token address."
+                "erc20-total-supply", "Gets the total supply of an erc20 token. The input is the token address."
             ),
             AuthoringMetaV2(
                 "uint256-erc721-balance-of",
