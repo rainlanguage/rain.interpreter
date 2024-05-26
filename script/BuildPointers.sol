@@ -5,7 +5,9 @@ import {Script} from "forge-std/Script.sol";
 import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
 import {RainterpreterStoreNPE2} from "src/concrete/RainterpreterStoreNPE2.sol";
 import {IInterpreterV2} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
-import {RainterpreterParserNPE2} from "src/concrete/RainterpreterParserNPE2.sol";
+import {RainterpreterParserNPE2, PARSE_META_BUILD_DEPTH} from "src/concrete/RainterpreterParserNPE2.sol";
+import {LibAllStandardOpsNP, AuthoringMetaV2} from "src/lib/op/LibAllStandardOpsNP.sol";
+import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 
 contract BuildPointers is Script {
     function filePrefix() internal pure returns (string memory) {
@@ -85,7 +87,7 @@ contract BuildPointers is Script {
         );
     }
 
-    function operatorHandlerFunctionPointersConstantString(RainterpreterParserNPE2 instance)
+    function operandHandlerFunctionPointersConstantString(RainterpreterParserNPE2 instance)
         internal
         pure
         returns (string memory)
@@ -98,6 +100,38 @@ contract BuildPointers is Script {
             "bytes constant OPERAND_HANDLER_FUNCTION_POINTERS = hex\"",
             bytesToHex(instance.buildOperandHandlerFunctionPointers()),
             "\";\n"
+        );
+    }
+
+    function parseMetaConstantString(bytes memory authoringMetaBytes) internal pure returns (string memory) {
+        AuthoringMetaV2[] memory authoringMeta = abi.decode(authoringMetaBytes, (AuthoringMetaV2[]));
+        bytes memory parseMeta = LibParseMeta.buildParseMetaV2(authoringMeta, PARSE_META_BUILD_DEPTH);
+        return string.concat(
+            "\n",
+            "/// @dev Encodes the parser meta that is used to lookup word definitions.\n",
+            "/// The structure of the parser meta is:\n",
+            "/// - 1 byte: The depth of the bloom filters\n",
+            "/// - 1 byte: The hashing seed\n",
+            "/// - The bloom filters, each is 32 bytes long, one for each build depth.\n",
+            "/// - All the items for each word, each is 4 bytes long. Each item's first byte\n",
+            "///   is its opcode index, the remaining 3 bytes are the word fingerprint.\n",
+            "/// To do a lookup, the word is hashed with the seed, then the first byte of the\n",
+            "/// hash is compared against the bloom filter. If there is a hit then we count\n",
+            "/// the number of 1 bits in the bloom filter up to this item's 1 bit. We then\n",
+            "/// treat this a the index of the item in the items array. We then compare the\n",
+            "/// word fingerprint against the fingerprint of the item at this index. If the\n",
+            "/// fingerprints equal then we have a match, else we increment the seed and try\n",
+            "/// again with the next bloom filter, offsetting all the indexes by the total\n",
+            "/// bit count of the previous bloom filter. If we reach the end of the bloom\n",
+            "/// filters then we have a miss.\n",
+            "bytes constant PARSE_META =\n",
+            "    hex\"",
+            bytesToHex(parseMeta),
+            "\";\n\n",
+            "/// @dev The build depth of the parser meta.\n",
+            "uint8 constant PARSE_META_BUILD_DEPTH = ",
+            vm.toString(PARSE_META_BUILD_DEPTH),
+            ";\n"
         );
     }
 
@@ -129,7 +163,8 @@ contract BuildPointers is Script {
 
         buildFileForContract(
             address(parser), "RainterpreterParserNPE2", string.concat(
-                operatorHandlerFunctionPointersConstantString(parser),
+                parseMetaConstantString(LibAllStandardOpsNP.authoringMetaV2()),
+                operandHandlerFunctionPointersConstantString(parser),
                 literalParserFunctionPointersConstantString(parser)
             )
         );
