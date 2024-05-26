@@ -11,8 +11,14 @@ pragma solidity =0.8.25;
 /// @dev Hash of the known bytecode.
 bytes32 constant BYTECODE_HASH = bytes32(0x458b319779ec46db91b9a23ad6cef12479a4e05fa05f5c0094fa3211b1c937cd);
 
+/// @dev Every two bytes is a function pointer for an operand handler.
+/// These positional indexes all map to the same indexes looked up in the parse
+/// meta.
+bytes constant OPERAND_HANDLER_FUNCTION_POINTERS = hex"18d818d818d8193d19b619b619b6193d193d18d818d818d819b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619b619fb19b61acd19fb19b61acd19b619b618d81b3619b619b6";
+
 /// @dev Every two bytes is a function pointer for a literal parser.
 /// Literal dispatches are determined by the first byte(s) of the literal
 /// rather than a full word lookup, and are done with simple conditional
-/// jumps as the possibilities are limited compared to the number of words we have.
+/// jumps as the possibilities are limited compared to the number of words we
+/// have.
 bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0f4e1216161d16f7";

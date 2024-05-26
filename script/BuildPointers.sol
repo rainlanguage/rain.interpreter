@@ -77,9 +77,26 @@ contract BuildPointers is Script {
             "/// @dev Every two bytes is a function pointer for a literal parser.\n",
             "/// Literal dispatches are determined by the first byte(s) of the literal\n",
             "/// rather than a full word lookup, and are done with simple conditional\n",
-            "/// jumps as the possibilities are limited compared to the number of words we have.\n",
+            "/// jumps as the possibilities are limited compared to the number of words we\n"
+            "/// have.\n",
             "bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex\"",
             bytesToHex(instance.buildLiteralParserFunctionPointers()),
+            "\";\n"
+        );
+    }
+
+    function operatorHandlerFunctionPointersConstantString(RainterpreterParserNPE2 instance)
+        internal
+        pure
+        returns (string memory)
+    {
+        return string.concat(
+            "\n",
+            "/// @dev Every two bytes is a function pointer for an operand handler.\n",
+            "/// These positional indexes all map to the same indexes looked up in the parse\n",
+            "/// meta.\n",
+            "bytes constant OPERAND_HANDLER_FUNCTION_POINTERS = hex\"",
+            bytesToHex(instance.buildOperandHandlerFunctionPointers()),
             "\";\n"
         );
     }
@@ -111,7 +128,10 @@ contract BuildPointers is Script {
         RainterpreterParserNPE2 parser = new RainterpreterParserNPE2();
 
         buildFileForContract(
-            address(parser), "RainterpreterParserNPE2", literalParserFunctionPointersConstantString(parser)
+            address(parser), "RainterpreterParserNPE2", string.concat(
+                operatorHandlerFunctionPointersConstantString(parser),
+                literalParserFunctionPointersConstantString(parser)
+            )
         );
     }
 
