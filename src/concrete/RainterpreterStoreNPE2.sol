@@ -4,7 +4,9 @@ pragma solidity =0.8.25;
 import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {LibNamespace, FullyQualifiedNamespace, StateNamespace} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
+import {
+    LibNamespace, FullyQualifiedNamespace, StateNamespace
+} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
 
 import {BYTECODE_HASH as STORE_BYTECODE_HASH} from "../generated/RainterpreterStoreNPE2.pointers.sol";
 

@@ -4,6 +4,7 @@ pragma solidity =0.8.25;
 import {Script} from "forge-std/Script.sol";
 import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
 import {RainterpreterStoreNPE2} from "src/concrete/RainterpreterStoreNPE2.sol";
+import {IInterpreterV2} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 
 contract BuildPointers is Script {
     function filePrefix() internal pure returns (string memory) {
@@ -36,20 +37,40 @@ contract BuildPointers is Script {
         );
     }
 
+    function interpreterFunctionPointersConstantString(IInterpreterV2 interpreter)
+        internal
+        view
+        returns (string memory)
+    {
+        bytes memory pointers = interpreter.functionPointers();
+
+        string memory hexString = vm.toString(pointers);
+        assembly ("memory-safe") {
+            // Remove the leading 0x
+            let newHexString := add(hexString, 2)
+            mstore(newHexString, sub(mload(hexString), 2))
+            hexString := newHexString
+        }
+
+        return string.concat(
+            "\n",
+            "/// @dev The function pointers known to the interpreter for dynamic dispatch.\n",
+            "/// By setting these as a constant they can be inlined into the interpreter\n",
+            "/// and loaded at eval time for very low gas (~100) due to the compiler\n",
+            "/// optimising it to a single `codecopy` to build the in memory bytes array.\n",
+            "bytes constant OPCODE_FUNCTION_POINTERS = hex\"",
+            hexString,
+            "\";\n"
+        );
+    }
+
     function buildFileForContract(address instance, string memory contractName, string memory body) internal {
         string memory path = pathForContract(contractName);
 
         if (vm.exists(path)) {
             vm.removeFile(path);
         }
-        vm.writeFile(
-            path,
-            string.concat(
-                filePrefix(),
-                bytecodeHashConstantString(instance),
-                body
-            )
-        );
+        vm.writeFile(path, string.concat(filePrefix(), bytecodeHashConstantString(instance), body));
     }
 
     function buildRainterpreterNPE2Pointers() internal {
@@ -65,18 +86,7 @@ contract BuildPointers is Script {
         }
 
         buildFileForContract(
-            address(interpreter),
-            "RainterpreterNPE2",
-            string.concat(
-                "\n",
-                "/// @dev The function pointers known to the interpreter for dynamic dispatch.\n",
-                "/// By setting these as a constant they can be inlined into the interpreter\n",
-                "/// and loaded at eval time for very low gas (~100) due to the compiler\n",
-                "/// optimising it to a single `codecopy` to build the in memory bytes array.\n",
-                "bytes constant OPCODE_FUNCTION_POINTERS = hex\"",
-                hexString,
-                "\";\n"
-            )
+            address(interpreter), "RainterpreterNPE2", interpreterFunctionPointersConstantString(interpreter)
         );
     }
 

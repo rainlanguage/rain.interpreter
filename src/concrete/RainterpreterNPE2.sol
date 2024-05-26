@@ -23,7 +23,10 @@ import {
     IInterpreterStoreV2
 } from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {IInterpreterV3} from "rain.interpreter.interface/interface/unstable/IInterpreterV3.sol";
-import {INTERPRETER_BYTECODE_HASH, OPCODE_FUNCTION_POINTERS} from "../generated/RainterpreterNPE2.pointers.sol";
+import {
+    BYTECODE_HASH as INTERPRETER_BYTECODE_HASH,
+    OPCODE_FUNCTION_POINTERS
+} from "../generated/RainterpreterNPE2.pointers.sol";
 
 /// @title RainterpreterNPE2
 /// @notice Implementation of a Rainlang interpreter that is compatible with
