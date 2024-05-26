@@ -5,6 +5,7 @@ import {Script} from "forge-std/Script.sol";
 import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
 import {RainterpreterStoreNPE2} from "src/concrete/RainterpreterStoreNPE2.sol";
 import {IInterpreterV2} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
+import {RainterpreterParserNPE2} from "src/concrete/RainterpreterParserNPE2.sol";
 
 contract BuildPointers is Script {
     function filePrefix() internal pure returns (string memory) {
@@ -21,6 +22,17 @@ contract BuildPointers is Script {
 
     function pathForContract(string memory contractName) internal pure returns (string memory) {
         return string.concat("src/generated/", contractName, ".pointers.sol");
+    }
+
+    function bytesToHex(bytes memory data) internal pure returns (string memory) {
+        string memory hexString = vm.toString(data);
+        assembly ("memory-safe") {
+            // Remove the leading 0x
+            let newHexString := add(hexString, 2)
+            mstore(newHexString, sub(mload(hexString), 2))
+            hexString := newHexString
+        }
+        return hexString;
     }
 
     function bytecodeHashConstantString(address instance) internal view returns (string memory) {
@@ -42,16 +54,6 @@ contract BuildPointers is Script {
         view
         returns (string memory)
     {
-        bytes memory pointers = interpreter.functionPointers();
-
-        string memory hexString = vm.toString(pointers);
-        assembly ("memory-safe") {
-            // Remove the leading 0x
-            let newHexString := add(hexString, 2)
-            mstore(newHexString, sub(mload(hexString), 2))
-            hexString := newHexString
-        }
-
         return string.concat(
             "\n",
             "/// @dev The function pointers known to the interpreter for dynamic dispatch.\n",
@@ -60,7 +62,24 @@ contract BuildPointers is Script {
             "/// optimising it to a single `codecopy` to build the in memory bytes array.\n",
             "bytes constant OPCODE_FUNCTION_POINTERS =\n",
             "    hex\"",
-            hexString,
+            bytesToHex(interpreter.functionPointers()),
+            "\";\n"
+        );
+    }
+
+    function literalParserFunctionPointersConstantString(RainterpreterParserNPE2 instance)
+        internal
+        pure
+        returns (string memory)
+    {
+        return string.concat(
+            "\n",
+            "/// @dev Every two bytes is a function pointer for a literal parser.\n",
+            "/// Literal dispatches are determined by the first byte(s) of the literal\n",
+            "/// rather than a full word lookup, and are done with simple conditional\n",
+            "/// jumps as the possibilities are limited compared to the number of words we have.\n",
+            "bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex\"",
+            bytesToHex(instance.buildLiteralParserFunctionPointers()),
             "\";\n"
         );
     }
@@ -76,15 +95,6 @@ contract BuildPointers is Script {
 
     function buildRainterpreterNPE2Pointers() internal {
         RainterpreterNPE2 interpreter = new RainterpreterNPE2();
-        bytes memory pointers = interpreter.functionPointers();
-
-        string memory hexString = vm.toString(pointers);
-        assembly ("memory-safe") {
-            // Remove the leading 0x
-            let newHexString := add(hexString, 2)
-            mstore(newHexString, sub(mload(hexString), 2))
-            hexString := newHexString
-        }
 
         buildFileForContract(
             address(interpreter), "RainterpreterNPE2", interpreterFunctionPointersConstantString(interpreter)
@@ -97,8 +107,17 @@ contract BuildPointers is Script {
         buildFileForContract(address(store), "RainterpreterStoreNPE2", "");
     }
 
+    function buildRainterpreterParserNPE2Pointers() internal {
+        RainterpreterParserNPE2 parser = new RainterpreterParserNPE2();
+
+        buildFileForContract(
+            address(parser), "RainterpreterParserNPE2", literalParserFunctionPointersConstantString(parser)
+        );
+    }
+
     function run() external {
         buildRainterpreterNPE2Pointers();
         buildRainterpreterStoreNPE2Pointers();
+        buildRainterpreterParserNPE2Pointers();
     }
 }
