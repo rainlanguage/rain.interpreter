@@ -58,7 +58,8 @@ contract BuildPointers is Script {
             "/// By setting these as a constant they can be inlined into the interpreter\n",
             "/// and loaded at eval time for very low gas (~100) due to the compiler\n",
             "/// optimising it to a single `codecopy` to build the in memory bytes array.\n",
-            "bytes constant OPCODE_FUNCTION_POINTERS = hex\"",
+            "bytes constant OPCODE_FUNCTION_POINTERS = \n",
+            "    hex\"",
             hexString,
             "\";\n"
         );
