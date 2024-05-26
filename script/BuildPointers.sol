@@ -6,8 +6,13 @@ import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
 import {RainterpreterStoreNPE2} from "src/concrete/RainterpreterStoreNPE2.sol";
 import {IInterpreterV2} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {RainterpreterParserNPE2, PARSE_META_BUILD_DEPTH} from "src/concrete/RainterpreterParserNPE2.sol";
+import {
+    RainterpreterExpressionDeployerNPE2,
+    RainterpreterExpressionDeployerNPE2ConstructionConfigV2
+} from "src/concrete/RainterpreterExpressionDeployerNPE2.sol";
 import {LibAllStandardOpsNP, AuthoringMetaV2} from "src/lib/op/LibAllStandardOpsNP.sol";
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
+import {EXPRESSION_DEPLOYER_NP_META_PATH} from "src/lib/constants/ExpressionDeployerNPConstants.sol";
 
 contract BuildPointers is Script {
     function filePrefix() internal pure returns (string memory) {
@@ -134,6 +139,31 @@ contract BuildPointers is Script {
         );
     }
 
+    function integrityFunctionPointersConstantString(RainterpreterExpressionDeployerNPE2 deployer)
+        internal
+        view
+        returns (string memory)
+    {
+        return string.concat(
+            "\n",
+            "/// @dev The function pointers for the integrity check fns.\n",
+            "bytes constant INTEGRITY_FUNCTION_POINTERS =\n",
+            "    hex\"",
+            bytesToHex(deployer.integrityFunctionPointers()),
+            "\";\n"
+        );
+    }
+
+    function describedByMetaHashConstantString(bytes memory describedByMeta) internal pure returns (string memory) {
+        return string.concat(
+            "\n",
+            "/// @dev The hash of the meta that describes the contract.\n",
+            "bytes32 constant DESCRIBED_BY_META_HASH = bytes32(",
+            vm.toString(keccak256(describedByMeta)),
+            ");\n"
+        );
+    }
+
     function buildFileForContract(address instance, string memory contractName, string memory body) internal {
         string memory path = pathForContract(contractName);
 
@@ -171,9 +201,29 @@ contract BuildPointers is Script {
         );
     }
 
+    function buildRainterpreterExpressionDeployerNPE2Pointers() internal {
+        RainterpreterNPE2 interpreter = new RainterpreterNPE2();
+        RainterpreterStoreNPE2 store = new RainterpreterStoreNPE2();
+        RainterpreterParserNPE2 parser = new RainterpreterParserNPE2();
+
+        RainterpreterExpressionDeployerNPE2 deployer = new RainterpreterExpressionDeployerNPE2(
+            RainterpreterExpressionDeployerNPE2ConstructionConfigV2(
+                address(interpreter), address(store), address(parser)
+            )
+        );
+
+        buildFileForContract(
+            address(deployer), "RainterpreterExpressionDeployerNPE2", string.concat(
+                describedByMetaHashConstantString(vm.readFileBinary(EXPRESSION_DEPLOYER_NP_META_PATH)),
+                integrityFunctionPointersConstantString(deployer)
+            )
+        );
+    }
+
     function run() external {
         buildRainterpreterNPE2Pointers();
         buildRainterpreterStoreNPE2Pointers();
         buildRainterpreterParserNPE2Pointers();
+        buildRainterpreterExpressionDeployerNPE2Pointers();
     }
 }
