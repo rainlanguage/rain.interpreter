@@ -101,7 +101,8 @@ contract BuildPointers is Script {
             "/// @dev Every two bytes is a function pointer for an operand handler.\n",
             "/// These positional indexes all map to the same indexes looked up in the parse\n",
             "/// meta.\n",
-            "bytes constant OPERAND_HANDLER_FUNCTION_POINTERS = hex\"",
+            "bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =\n",
+            "    hex\"",
             bytesToHex(instance.buildOperandHandlerFunctionPointers()),
             "\";\n"
         );
@@ -213,7 +214,9 @@ contract BuildPointers is Script {
         );
 
         buildFileForContract(
-            address(deployer), "RainterpreterExpressionDeployerNPE2", string.concat(
+            address(deployer),
+            "RainterpreterExpressionDeployerNPE2",
+            string.concat(
                 describedByMetaHashConstantString(vm.readFileBinary(EXPRESSION_DEPLOYER_NP_META_PATH)),
                 integrityFunctionPointersConstantString(deployer)
             )

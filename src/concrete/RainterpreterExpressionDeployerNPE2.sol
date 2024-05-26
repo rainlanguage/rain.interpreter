@@ -33,7 +33,10 @@ import {LibParse, LibParseMeta} from "../lib/parse/LibParse.sol";
 import {RainterpreterNPE2, INTERPRETER_BYTECODE_HASH} from "./RainterpreterNPE2.sol";
 import {PARSER_BYTECODE_HASH} from "./RainterpreterParserNPE2.sol";
 import {STORE_BYTECODE_HASH} from "./RainterpreterStoreNPE2.sol";
-import {INTEGRITY_FUNCTION_POINTERS, DESCRIBED_BY_META_HASH} from "../generated/RainterpreterExpressionDeployerNPE2.pointers.sol";
+import {
+    INTEGRITY_FUNCTION_POINTERS,
+    DESCRIBED_BY_META_HASH
+} from "../generated/RainterpreterExpressionDeployerNPE2.pointers.sol";
 
 /// All config required to construct a `RainterpreterNPE2`.
 /// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match
