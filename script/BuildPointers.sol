@@ -56,7 +56,6 @@ contract BuildPointers is Script {
         RainterpreterNPE2 interpreter = new RainterpreterNPE2();
         bytes memory pointers = interpreter.functionPointers();
 
-        string memory path = pathForContract("RainterpreterNPE2");
         string memory hexString = vm.toString(pointers);
         assembly ("memory-safe") {
             // Remove the leading 0x
@@ -65,23 +64,11 @@ contract BuildPointers is Script {
             hexString := newHexString
         }
 
-        bytes32 interpreterBytecodeHash;
-        assembly {
-            interpreterBytecodeHash := extcodehash(interpreter)
-        }
-        string memory interpreterBytecodeHashString = vm.toString(interpreterBytecodeHash);
-
-        if (vm.exists(path)) {
-            vm.removeFile(path);
-        }
-        vm.writeFile(
-            path,
+        buildFileForContract(
+            address(interpreter),
+            "RainterpreterNPE2",
             string.concat(
-                filePrefix(),
-                "/// @dev Hash of the known interpreter bytecode.\n",
-                "bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(",
-                interpreterBytecodeHashString,
-                ");\n\n",
+                "\n",
                 "/// @dev The function pointers known to the interpreter for dynamic dispatch.\n",
                 "/// By setting these as a constant they can be inlined into the interpreter\n",
                 "/// and loaded at eval time for very low gas (~100) due to the compiler\n",
