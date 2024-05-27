@@ -9,7 +9,7 @@ import {
 import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
 import {RainterpreterStoreNPE2} from "src/concrete/RainterpreterStoreNPE2.sol";
 import {RainterpreterParserNPE2} from "src/concrete/RainterpreterParserNPE2.sol";
-import {EXPRESSION_DEPLOYER_NP_META_PATH} from "../../lib/constants/ExpressionDeployerNPConstants.sol";
+import {EXPRESSION_DEPLOYER_NP_META_PATH} from "src/lib/constants/ExpressionDeployerNPConstants.sol";
 
 contract RainterpreterExpressionDeployerNPE2DescribedByMetaV1Test is Test {
     function testRainterpreterExpressionDeployerNPE2DescribedByMetaV1Happy() external {

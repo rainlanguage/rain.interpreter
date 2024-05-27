@@ -33,13 +33,10 @@ import {LibParse, LibParseMeta} from "../lib/parse/LibParse.sol";
 import {RainterpreterNPE2, INTERPRETER_BYTECODE_HASH} from "./RainterpreterNPE2.sol";
 import {PARSER_BYTECODE_HASH} from "./RainterpreterParserNPE2.sol";
 import {STORE_BYTECODE_HASH} from "./RainterpreterStoreNPE2.sol";
-
-/// @dev The function pointers for the integrity check fns.
-bytes constant INTEGRITY_FUNCTION_POINTERS =
-    hex"0e780ef60f5b10d510df10df10e910f2110d11b311b3120f1289129610df10e910df10df10e910d510d510d510d512a012c512df10df12a010df10df129610e910df10df1296129612e912e912e912e910df10e912e910e910e910e910e910df10e910e910e910e910e912e912e912e912e910df10e910e910df10e910e910df10df10e912e912e910e912df";
-
-/// @dev Hash of the metadata that describes the deployer (parsing).
-bytes32 constant DESCRIBED_BY_META_HASH = bytes32(0x89148873ea148e1c312c3c6cffbc5fb012194570f04ed1177db6002901e7bf38);
+import {
+    INTEGRITY_FUNCTION_POINTERS,
+    DESCRIBED_BY_META_HASH
+} from "../generated/RainterpreterExpressionDeployerNPE2.pointers.sol";
 
 /// All config required to construct a `RainterpreterNPE2`.
 /// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match

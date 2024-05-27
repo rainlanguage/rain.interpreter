@@ -1,16 +1,17 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
+import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
-import "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import "rain.interpreter.interface/lib/ns/LibNamespace.sol";
+import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
+import {
+    LibNamespace, FullyQualifiedNamespace, StateNamespace
+} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
+
+import {BYTECODE_HASH as STORE_BYTECODE_HASH} from "../generated/RainterpreterStoreNPE2.pointers.sol";
 
 /// Thrown when a `set` call is made with an odd number of arguments.
 error OddSetLength(uint256 length);
-
-/// @dev Hash of the known store bytecode.
-bytes32 constant STORE_BYTECODE_HASH = bytes32(0x2a4559222e2f3600b2d393715de8af57620439684463f745059c653bbfe3727f);
 
 /// @title RainterpreterStore
 /// @notice Simplest possible `IInterpreterStoreV2` that could work.
