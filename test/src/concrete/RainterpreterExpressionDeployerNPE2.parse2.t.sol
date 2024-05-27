@@ -2,7 +2,6 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {EXPRESSION_DEPLOYER_NP_META_PATH} from "test/lib/constants/ExpressionDeployerNPConstants.sol";
 import {
     RainterpreterExpressionDeployerNPE2,
     RainterpreterExpressionDeployerNPE2ConstructionConfigV2
