@@ -519,6 +519,7 @@ library LibAllStandardOpsNP {
                     LibOpChainIdNP.integrity,
                     LibOpMaxUint256NP.integrity,
                     LibOpTimestampNP.integrity,
+                    // now
                     LibOpTimestampNP.integrity,
                     LibOpAnyNP.integrity,
                     LibOpConditionsNP.integrity,
@@ -626,6 +627,7 @@ library LibAllStandardOpsNP {
                     LibOpChainIdNP.run,
                     LibOpMaxUint256NP.run,
                     LibOpTimestampNP.run,
+                    // now
                     LibOpTimestampNP.run,
                     LibOpAnyNP.run,
                     LibOpConditionsNP.run,
