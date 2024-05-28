@@ -25,7 +25,8 @@ import {LibFixedPointDecimalScale} from "rain.math.fixedpoint/lib/LibFixedPointD
 import {
     DESCRIBED_BY_META_HASH,
     PARSE_META as SUB_PARSER_PARSE_META,
-    PARSE_META_BUILD_DEPTH as EXTERN_PARSE_META_BUILD_DEPTH
+    PARSE_META_BUILD_DEPTH as EXTERN_PARSE_META_BUILD_DEPTH,
+    SUB_PARSER_WORD_PARSERS
 } from "../../generated/RainterpreterReferenceExternNPE2.pointers.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
@@ -33,13 +34,6 @@ import {
 /// contract. It is possible to subparse words into opcodes that run entirely
 /// within the interpreter, and do not have an associated extern dispatch.
 uint256 constant SUB_PARSER_WORD_PARSERS_LENGTH = 5;
-
-/// @dev Real function pointers to the sub parser functions that produce the
-/// bytecode that this contract knows about. This is both constructing the extern
-/// bytecode that dials back into this contract at eval time, and creating
-/// to things that happen entirely on the interpreter such as well known
-/// constants and references to the context grid.
-bytes constant SUB_PARSER_WORD_PARSERS = hex"076d078f079e07ae07bf";
 
 /// @dev Real function pointers to the operand parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from

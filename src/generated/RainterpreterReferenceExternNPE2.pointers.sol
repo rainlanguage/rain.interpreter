@@ -35,3 +35,10 @@ bytes constant PARSE_META =
 
 /// @dev The build depth of the parser meta.
 uint8 constant PARSE_META_BUILD_DEPTH = 1;
+
+/// @dev Real function pointers to the sub parser functions that produce the
+/// bytecode that this contract knows about. This is both constructing the extern
+/// bytecode that dials back into this contract at eval time, and mapping
+/// to things that happen entirely on the interpreter such as well known
+/// constants and references to the context grid.
+bytes constant SUB_PARSER_WORD_PARSERS = hex"076d078f079e07ae07bf";

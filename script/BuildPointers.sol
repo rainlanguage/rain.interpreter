@@ -149,6 +149,24 @@ contract BuildPointers is Script {
         );
     }
 
+    function subParserWordParsersConstantString(RainterpreterReferenceExternNPE2 extern)
+        internal
+        pure
+        returns (string memory)
+    {
+        return string.concat(
+            "\n",
+            "/// @dev Real function pointers to the sub parser functions that produce the\n",
+            "/// bytecode that this contract knows about. This is both constructing the extern\n",
+            "/// bytecode that dials back into this contract at eval time, and mapping\n",
+            "/// to things that happen entirely on the interpreter such as well known\n",
+            "/// constants and references to the context grid.\n",
+            "bytes constant SUB_PARSER_WORD_PARSERS = hex\"",
+            bytesToHex(extern.buildSubParserWordParsers()),
+            "\";\n"
+        );
+    }
+
     function integrityFunctionPointersConstantString(RainterpreterExpressionDeployerNPE2 deployer)
         internal
         view
@@ -244,7 +262,8 @@ contract BuildPointers is Script {
                 describedByMetaHashConstantString(name),
                 parseMetaConstantString(
                     LibRainterpreterReferenceExternNPE2.authoringMetaV2(), EXTERN_PARSE_META_BUILD_DEPTH
-                )
+                ),
+                subParserWordParsersConstantString(extern)
             )
         );
     }
