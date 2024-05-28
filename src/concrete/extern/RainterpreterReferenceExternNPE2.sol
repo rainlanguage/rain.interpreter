@@ -28,7 +28,8 @@ import {
     PARSE_META_BUILD_DEPTH as EXTERN_PARSE_META_BUILD_DEPTH,
     SUB_PARSER_WORD_PARSERS,
     OPERAND_HANDLER_FUNCTION_POINTERS,
-    LITERAL_PARSER_FUNCTION_POINTERS
+    LITERAL_PARSER_FUNCTION_POINTERS,
+    INTEGRITY_FUNCTION_POINTERS
 } from "../../generated/RainterpreterReferenceExternNPE2.pointers.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
@@ -69,12 +70,6 @@ bytes constant OPCODE_FUNCTION_POINTERS = hex"0861";
 
 /// @dev Number of opcode function pointers available to run at eval time.
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
-
-/// @dev Real function pointers to the integrity checks for the extern component
-/// of this contract. These get run at deploy time when the main integrity checks
-/// are run, the extern opcode integrity on the deployer will delegate integrity
-/// checks to the extern contract.
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0979";
 
 /// @title LibRainterpreterReferenceExternNPE2
 /// This library allows code SEPARATE FROM the implementation contract to do

@@ -19,6 +19,7 @@ import {LibAllStandardOpsNP, AuthoringMetaV2} from "src/lib/op/LibAllStandardOps
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 import {EXPRESSION_DEPLOYER_NP_META_PATH} from "src/lib/constants/ExpressionDeployerNPConstants.sol";
 import {IParserToolingV1} from "src/interface/IParserToolingV1.sol";
+import {IIntegrityToolingV1} from "src/interface/IIntegrityToolingV1.sol";
 
 contract BuildPointers is Script {
     function filePrefix() internal pure returns (string memory) {
@@ -168,7 +169,7 @@ contract BuildPointers is Script {
         );
     }
 
-    function integrityFunctionPointersConstantString(RainterpreterExpressionDeployerNPE2 deployer)
+    function integrityFunctionPointersConstantString(IIntegrityToolingV1 deployer)
         internal
         view
         returns (string memory)
@@ -178,7 +179,7 @@ contract BuildPointers is Script {
             "/// @dev The function pointers for the integrity check fns.\n",
             "bytes constant INTEGRITY_FUNCTION_POINTERS =\n",
             "    hex\"",
-            bytesToHex(deployer.integrityFunctionPointers()),
+            bytesToHex(deployer.buildIntegrityFunctionPointers()),
             "\";\n"
         );
     }
@@ -266,7 +267,8 @@ contract BuildPointers is Script {
                 ),
                 subParserWordParsersConstantString(extern),
                 operandHandlerFunctionPointersConstantString(extern),
-                literalParserFunctionPointersConstantString(extern)
+                literalParserFunctionPointersConstantString(extern),
+                integrityFunctionPointersConstantString(extern)
             )
         );
     }
