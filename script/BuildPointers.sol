@@ -10,6 +10,7 @@ import {
     RainterpreterExpressionDeployerNPE2,
     RainterpreterExpressionDeployerNPE2ConstructionConfigV2
 } from "src/concrete/RainterpreterExpressionDeployerNPE2.sol";
+import {RainterpreterReferenceExternNPE2} from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
 import {LibAllStandardOpsNP, AuthoringMetaV2} from "src/lib/op/LibAllStandardOpsNP.sol";
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 import {EXPRESSION_DEPLOYER_NP_META_PATH} from "src/lib/constants/ExpressionDeployerNPConstants.sol";
@@ -223,10 +224,17 @@ contract BuildPointers is Script {
         );
     }
 
+    function buildRainterpreterReferenceExternNPE2Pointers() internal {
+        RainterpreterReferenceExternNPE2 extern = new RainterpreterReferenceExternNPE2();
+
+        buildFileForContract(address(extern), "RainterpreterReferenceExternNPE2", "");
+    }
+
     function run() external {
         buildRainterpreterNPE2Pointers();
         buildRainterpreterStoreNPE2Pointers();
         buildRainterpreterParserNPE2Pointers();
         buildRainterpreterExpressionDeployerNPE2Pointers();
+        buildRainterpreterReferenceExternNPE2Pointers();
     }
 }
