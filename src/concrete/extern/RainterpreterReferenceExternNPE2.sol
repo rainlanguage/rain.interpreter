@@ -22,7 +22,11 @@ import {LibExternOpContextRainlenNPE2} from "../../lib/extern/reference/op/LibEx
 import {LibParseLiteralRepeat} from "../../lib/extern/reference/literal/LibParseLiteralRepeat.sol";
 import {LibParseLiteralDecimal} from "../../lib/parse/literal/LibParseLiteralDecimal.sol";
 import {LibFixedPointDecimalScale} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
-import {DESCRIBED_BY_META_HASH} from "../../generated/RainterpreterReferenceExternNPE2.pointers.sol";
+import {
+    DESCRIBED_BY_META_HASH,
+    PARSE_META as SUB_PARSER_PARSE_META,
+    PARSE_META_BUILD_DEPTH as EXTERN_PARSE_META_BUILD_DEPTH
+} from "../../generated/RainterpreterReferenceExternNPE2.pointers.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
 /// 1:1 with the number of opcodes provided by the extern component of this
@@ -36,12 +40,6 @@ uint256 constant SUB_PARSER_WORD_PARSERS_LENGTH = 5;
 /// to things that happen entirely on the interpreter such as well known
 /// constants and references to the context grid.
 bytes constant SUB_PARSER_WORD_PARSERS = hex"076d078f079e07ae07bf";
-
-/// @dev Real sub parser meta bytes that map parsed strings to the functions that
-/// know how to parse those strings into opcodes for the main parser. Structured
-/// identically to parse meta for the main parser.
-bytes constant SUB_PARSER_PARSE_META =
-    hex"0100000000008000000000000000000000110000000000000020000000000000008000e438fc04aafc63025be81c0384254101285ca1";
 
 /// @dev Real function pointers to the operand parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from

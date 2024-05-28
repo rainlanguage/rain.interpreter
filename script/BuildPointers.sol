@@ -10,7 +10,11 @@ import {
     RainterpreterExpressionDeployerNPE2,
     RainterpreterExpressionDeployerNPE2ConstructionConfigV2
 } from "src/concrete/RainterpreterExpressionDeployerNPE2.sol";
-import {RainterpreterReferenceExternNPE2} from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
+import {
+    RainterpreterReferenceExternNPE2,
+    LibRainterpreterReferenceExternNPE2,
+    EXTERN_PARSE_META_BUILD_DEPTH
+} from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
 import {LibAllStandardOpsNP, AuthoringMetaV2} from "src/lib/op/LibAllStandardOpsNP.sol";
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 import {EXPRESSION_DEPLOYER_NP_META_PATH} from "src/lib/constants/ExpressionDeployerNPConstants.sol";
@@ -109,9 +113,13 @@ contract BuildPointers is Script {
         );
     }
 
-    function parseMetaConstantString(bytes memory authoringMetaBytes) internal pure returns (string memory) {
+    function parseMetaConstantString(bytes memory authoringMetaBytes, uint8 buildDepth)
+        internal
+        pure
+        returns (string memory)
+    {
         AuthoringMetaV2[] memory authoringMeta = abi.decode(authoringMetaBytes, (AuthoringMetaV2[]));
-        bytes memory parseMeta = LibParseMeta.buildParseMetaV2(authoringMeta, PARSE_META_BUILD_DEPTH);
+        bytes memory parseMeta = LibParseMeta.buildParseMetaV2(authoringMeta, buildDepth);
         return string.concat(
             "\n",
             "/// @dev Encodes the parser meta that is used to lookup word definitions.\n",
@@ -136,7 +144,7 @@ contract BuildPointers is Script {
             "\";\n\n",
             "/// @dev The build depth of the parser meta.\n",
             "uint8 constant PARSE_META_BUILD_DEPTH = ",
-            vm.toString(PARSE_META_BUILD_DEPTH),
+            vm.toString(buildDepth),
             ";\n"
         );
     }
@@ -157,10 +165,7 @@ contract BuildPointers is Script {
     }
 
     function describedByMetaHashConstantString(string memory name) internal view returns (string memory) {
-        bytes memory describedByMeta = vm.readFileBinary(string.concat(
-            "meta/", name, ".rain.meta"
-
-        ));
+        bytes memory describedByMeta = vm.readFileBinary(string.concat("meta/", name, ".rain.meta"));
         return string.concat(
             "\n",
             "/// @dev The hash of the meta that describes the contract.\n",
@@ -200,7 +205,7 @@ contract BuildPointers is Script {
             address(parser),
             "RainterpreterParserNPE2",
             string.concat(
-                parseMetaConstantString(LibAllStandardOpsNP.authoringMetaV2()),
+                parseMetaConstantString(LibAllStandardOpsNP.authoringMetaV2(), PARSE_META_BUILD_DEPTH),
                 operandHandlerFunctionPointersConstantString(parser),
                 literalParserFunctionPointersConstantString(parser)
             )
@@ -223,10 +228,7 @@ contract BuildPointers is Script {
         buildFileForContract(
             address(deployer),
             name,
-            string.concat(
-                describedByMetaHashConstantString(name),
-                integrityFunctionPointersConstantString(deployer)
-            )
+            string.concat(describedByMetaHashConstantString(name), integrityFunctionPointersConstantString(deployer))
         );
     }
 
@@ -235,7 +237,16 @@ contract BuildPointers is Script {
 
         string memory name = "RainterpreterReferenceExternNPE2";
 
-        buildFileForContract(address(extern), "RainterpreterReferenceExternNPE2", describedByMetaHashConstantString(name));
+        buildFileForContract(
+            address(extern),
+            "RainterpreterReferenceExternNPE2",
+            string.concat(
+                describedByMetaHashConstantString(name),
+                parseMetaConstantString(
+                    LibRainterpreterReferenceExternNPE2.authoringMetaV2(), EXTERN_PARSE_META_BUILD_DEPTH
+                )
+            )
+        );
     }
 
     function run() external {
