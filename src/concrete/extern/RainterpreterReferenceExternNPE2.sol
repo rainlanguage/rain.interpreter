@@ -22,9 +22,7 @@ import {LibExternOpContextRainlenNPE2} from "../../lib/extern/reference/op/LibEx
 import {LibParseLiteralRepeat} from "../../lib/extern/reference/literal/LibParseLiteralRepeat.sol";
 import {LibParseLiteralDecimal} from "../../lib/parse/literal/LibParseLiteralDecimal.sol";
 import {LibFixedPointDecimalScale} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
-
-/// @dev The hash of the meta that describes this contract.
-bytes32 constant DESCRIBED_BY_META_HASH = 0xadf71693c6ecf3fd560904bc46973d1b6e651440d15366673f9b3984749e7c16;
+import {DESCRIBED_BY_META_HASH} from "../../generated/RainterpreterReferenceExternNPE2.pointers.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
 /// 1:1 with the number of opcodes provided by the extern component of this

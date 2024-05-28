@@ -156,7 +156,11 @@ contract BuildPointers is Script {
         );
     }
 
-    function describedByMetaHashConstantString(bytes memory describedByMeta) internal pure returns (string memory) {
+    function describedByMetaHashConstantString(string memory name) internal view returns (string memory) {
+        bytes memory describedByMeta = vm.readFileBinary(string.concat(
+            "meta/", name, ".rain.meta"
+
+        ));
         return string.concat(
             "\n",
             "/// @dev The hash of the meta that describes the contract.\n",
@@ -214,11 +218,13 @@ contract BuildPointers is Script {
             )
         );
 
+        string memory name = "RainterpreterExpressionDeployerNPE2";
+
         buildFileForContract(
             address(deployer),
-            "RainterpreterExpressionDeployerNPE2",
+            name,
             string.concat(
-                describedByMetaHashConstantString(vm.readFileBinary(EXPRESSION_DEPLOYER_NP_META_PATH)),
+                describedByMetaHashConstantString(name),
                 integrityFunctionPointersConstantString(deployer)
             )
         );
@@ -227,7 +233,9 @@ contract BuildPointers is Script {
     function buildRainterpreterReferenceExternNPE2Pointers() internal {
         RainterpreterReferenceExternNPE2 extern = new RainterpreterReferenceExternNPE2();
 
-        buildFileForContract(address(extern), "RainterpreterReferenceExternNPE2", "");
+        string memory name = "RainterpreterReferenceExternNPE2";
+
+        buildFileForContract(address(extern), "RainterpreterReferenceExternNPE2", describedByMetaHashConstantString(name));
     }
 
     function run() external {
