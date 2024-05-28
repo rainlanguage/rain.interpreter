@@ -10,7 +10,7 @@ import {
     AuthoringMetaV2,
     SUB_PARSER_PARSE_META,
     LibRainterpreterReferenceExternNPE2,
-    SUB_PARSER_LITERAL_PARSERS,
+    LITERAL_PARSER_FUNCTION_POINTERS,
     OPERAND_HANDLER_FUNCTION_POINTERS
 } from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
@@ -40,8 +40,8 @@ contract RainterpreterReferenceExternNPE2PointersTest is Test {
 
     function testSubParserLiteralParsers() external {
         RainterpreterReferenceExternNPE2 subParser = new RainterpreterReferenceExternNPE2();
-        bytes memory expected = subParser.buildSubParserLiteralParsers();
-        bytes memory actual = SUB_PARSER_LITERAL_PARSERS;
+        bytes memory expected = subParser.buildLiteralParserFunctionPointers();
+        bytes memory actual = LITERAL_PARSER_FUNCTION_POINTERS;
         assertEq(actual, expected);
     }
 

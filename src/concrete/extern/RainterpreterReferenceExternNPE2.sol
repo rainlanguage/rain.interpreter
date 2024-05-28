@@ -4,7 +4,7 @@ pragma solidity =0.8.25;
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {BadDynamicLength} from "../../error/ErrOpList.sol";
 import {BaseRainterpreterExternNPE2, Operand} from "../../abstract/BaseRainterpreterExternNPE2.sol";
-import {BaseRainterpreterSubParserNPE2} from "../../abstract/BaseRainterpreterSubParserNPE2.sol";
+import {BaseRainterpreterSubParserNPE2, IParserToolingV1} from "../../abstract/BaseRainterpreterSubParserNPE2.sol";
 import {LibExtern, EncodedExternDispatch} from "../../lib/extern/LibExtern.sol";
 import {IInterpreterExternV3} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
 import {LibSubParse} from "../../lib/parse/LibSubParse.sol";
@@ -27,7 +27,8 @@ import {
     PARSE_META as SUB_PARSER_PARSE_META,
     PARSE_META_BUILD_DEPTH as EXTERN_PARSE_META_BUILD_DEPTH,
     SUB_PARSER_WORD_PARSERS,
-    OPERAND_HANDLER_FUNCTION_POINTERS
+    OPERAND_HANDLER_FUNCTION_POINTERS,
+    LITERAL_PARSER_FUNCTION_POINTERS
 } from "../../generated/RainterpreterReferenceExternNPE2.pointers.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
@@ -35,11 +36,6 @@ import {
 /// contract. It is possible to subparse words into opcodes that run entirely
 /// within the interpreter, and do not have an associated extern dispatch.
 uint256 constant SUB_PARSER_WORD_PARSERS_LENGTH = 5;
-
-/// @dev Real function pointers to the literal parsers that are available at
-/// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
-/// the rightmost position is a pointer to a literal parser function.
-bytes constant SUB_PARSER_LITERAL_PARSERS = hex"08a5";
 
 /// @dev The number of literal parsers provided by the sub parser.
 uint256 constant SUB_PARSER_LITERAL_PARSERS_LENGTH = 1;
@@ -188,7 +184,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// known constant value, which should allow the compiler to optimise the
     /// entire function call away.
     function subParserLiteralParsers() internal pure override returns (bytes memory) {
-        return SUB_PARSER_LITERAL_PARSERS;
+        return LITERAL_PARSER_FUNCTION_POINTERS;
     }
 
     /// Overrides the compatibility version for sub parsing. Simply returns the
@@ -213,7 +209,8 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     }
 
     /// The literal parsers are the same as the main parser.
-    function buildSubParserLiteralParsers() external pure returns (bytes memory) {
+    /// @inheritdoc IParserToolingV1
+    function buildLiteralParserFunctionPointers() external pure returns (bytes memory) {
         unchecked {
             function (uint256, uint256, uint256) internal pure returns (uint256) lengthPointer;
             uint256 length = SUB_PARSER_LITERAL_PARSERS_LENGTH;
@@ -274,7 +271,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
 
     /// There's only one operand parser for this implementation, the disallowed
     /// parser. We haven't implemented any words with meaningful operands yet.
-    /// @inheritdoc BaseRainterpreterSubParserNPE2
+    /// @inheritdoc IParserToolingV1
     function buildOperandHandlerFunctionPointers() external pure override returns (bytes memory) {
         unchecked {
             function(uint256[] memory) internal pure returns (Operand) lengthPointer;

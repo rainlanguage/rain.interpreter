@@ -12,6 +12,14 @@ contract ChildRainterpreterSubParserNPE2 is BaseRainterpreterSubParserNPE2 {
     function describedByMetaV1() external pure override returns (bytes32) {
         return 0;
     }
+
+    function buildLiteralParserFunctionPointers() external pure returns (bytes memory) {
+        return new bytes(0);
+    }
+
+    function buildOperandHandlerFunctionPointers() external pure returns (bytes memory) {
+        return new bytes(0);
+    }
 }
 
 /// @title BaseRainterpreterSubParserNPE2Test

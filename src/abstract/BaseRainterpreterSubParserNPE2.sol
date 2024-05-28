@@ -225,7 +225,4 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV2, IDescr
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(ISubParserV2).interfaceId || super.supportsInterface(interfaceId);
     }
-
-    /// @inheritdoc IParserToolingV1
-    function buildOperandHandlerFunctionPointers() external pure virtual returns (bytes memory) {}
 }

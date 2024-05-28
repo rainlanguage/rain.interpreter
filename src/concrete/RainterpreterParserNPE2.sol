@@ -79,6 +79,7 @@ contract RainterpreterParserNPE2 is IParserV1, IParserPragmaV1, ERC165, IParserT
     }
 
     /// External function to build the literal parser function pointers.
+    /// @inheritdoc IParserToolingV1
     function buildLiteralParserFunctionPointers() external pure returns (bytes memory) {
         return LibAllStandardOpsNP.literalParserFunctionPointers();
     }

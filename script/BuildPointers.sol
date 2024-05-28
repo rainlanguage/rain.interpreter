@@ -80,7 +80,7 @@ contract BuildPointers is Script {
         );
     }
 
-    function literalParserFunctionPointersConstantString(RainterpreterParserNPE2 instance)
+    function literalParserFunctionPointersConstantString(IParserToolingV1 instance)
         internal
         pure
         returns (string memory)
@@ -265,7 +265,8 @@ contract BuildPointers is Script {
                     LibRainterpreterReferenceExternNPE2.authoringMetaV2(), EXTERN_PARSE_META_BUILD_DEPTH
                 ),
                 subParserWordParsersConstantString(extern),
-                operandHandlerFunctionPointersConstantString(extern)
+                operandHandlerFunctionPointersConstantString(extern),
+                literalParserFunctionPointersConstantString(extern)
             )
         );
     }
