@@ -26,7 +26,8 @@ import {
     DESCRIBED_BY_META_HASH,
     PARSE_META as SUB_PARSER_PARSE_META,
     PARSE_META_BUILD_DEPTH as EXTERN_PARSE_META_BUILD_DEPTH,
-    SUB_PARSER_WORD_PARSERS
+    SUB_PARSER_WORD_PARSERS,
+    OPERAND_HANDLER_FUNCTION_POINTERS
 } from "../../generated/RainterpreterReferenceExternNPE2.pointers.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
@@ -34,11 +35,6 @@ import {
 /// contract. It is possible to subparse words into opcodes that run entirely
 /// within the interpreter, and do not have an associated extern dispatch.
 uint256 constant SUB_PARSER_WORD_PARSERS_LENGTH = 5;
-
-/// @dev Real function pointers to the operand parsers that are available at
-/// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
-/// the rightmost position is a pointer to an operand parser function.
-bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"08d4091908d408d408d4";
 
 /// @dev Real function pointers to the literal parsers that are available at
 /// parse time, encoded into a single 256 bit word. Each 2 bytes starting from
@@ -185,7 +181,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// known constant value, which should allow the compiler to optimise the
     /// entire function call away.
     function subParserOperandHandlers() internal pure override returns (bytes memory) {
-        return SUB_PARSER_OPERAND_HANDLERS;
+        return OPERAND_HANDLER_FUNCTION_POINTERS;
     }
 
     /// Overrides the base literal parsers for sub parsing. Simply returns the
@@ -278,7 +274,8 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
 
     /// There's only one operand parser for this implementation, the disallowed
     /// parser. We haven't implemented any words with meaningful operands yet.
-    function buildSubParserOperandHandlers() external pure returns (bytes memory) {
+    /// @inheritdoc BaseRainterpreterSubParserNPE2
+    function buildOperandHandlerFunctionPointers() external pure override returns (bytes memory) {
         unchecked {
             function(uint256[] memory) internal pure returns (Operand) lengthPointer;
             uint256 length = SUB_PARSER_WORD_PARSERS_LENGTH;

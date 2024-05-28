@@ -18,6 +18,7 @@ import {
 import {LibAllStandardOpsNP, AuthoringMetaV2} from "src/lib/op/LibAllStandardOpsNP.sol";
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 import {EXPRESSION_DEPLOYER_NP_META_PATH} from "src/lib/constants/ExpressionDeployerNPConstants.sol";
+import {IParserToolingV1} from "src/interface/IParserToolingV1.sol";
 
 contract BuildPointers is Script {
     function filePrefix() internal pure returns (string memory) {
@@ -96,7 +97,7 @@ contract BuildPointers is Script {
         );
     }
 
-    function operandHandlerFunctionPointersConstantString(RainterpreterParserNPE2 instance)
+    function operandHandlerFunctionPointersConstantString(IParserToolingV1 instance)
         internal
         pure
         returns (string memory)
@@ -263,7 +264,8 @@ contract BuildPointers is Script {
                 parseMetaConstantString(
                     LibRainterpreterReferenceExternNPE2.authoringMetaV2(), EXTERN_PARSE_META_BUILD_DEPTH
                 ),
-                subParserWordParsersConstantString(extern)
+                subParserWordParsersConstantString(extern),
+                operandHandlerFunctionPointersConstantString(extern)
             )
         );
     }

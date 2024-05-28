@@ -9,7 +9,7 @@
 pragma solidity =0.8.25;
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0x56fcbe9be56615ce7c9c75ecfdba18b4a8e4b514d3766a5f344bfb7ae94c410f);
+bytes32 constant BYTECODE_HASH = bytes32(0xd59d1011c367c6a13b88e483e9d6d8244c66154ab92191154175c0410418a2df);
 
 /// @dev The hash of the meta that describes the contract.
 bytes32 constant DESCRIBED_BY_META_HASH = bytes32(0xadf71693c6ecf3fd560904bc46973d1b6e651440d15366673f9b3984749e7c16);
@@ -42,3 +42,9 @@ uint8 constant PARSE_META_BUILD_DEPTH = 1;
 /// to things that happen entirely on the interpreter such as well known
 /// constants and references to the context grid.
 bytes constant SUB_PARSER_WORD_PARSERS = hex"076d078f079e07ae07bf";
+
+/// @dev Every two bytes is a function pointer for an operand handler.
+/// These positional indexes all map to the same indexes looked up in the parse
+/// meta.
+bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
+    hex"0a1f0a640a1f0a1f0a1f";
