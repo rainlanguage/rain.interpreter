@@ -46,8 +46,7 @@ bytes constant SUB_PARSER_WORD_PARSERS = hex"076d078f079e07ae07bf";
 /// @dev Every two bytes is a function pointer for an operand handler.
 /// These positional indexes all map to the same indexes looked up in the parse
 /// meta.
-bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
-    hex"0a1f0a640a1f0a1f0a1f";
+bytes constant OPERAND_HANDLER_FUNCTION_POINTERS = hex"0a1f0a640a1f0a1f0a1f";
 
 /// @dev Every two bytes is a function pointer for a literal parser.
 /// Literal dispatches are determined by the first byte(s) of the literal
@@ -57,5 +56,10 @@ bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
 bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"09f0";
 
 /// @dev The function pointers for the integrity check fns.
-bytes constant INTEGRITY_FUNCTION_POINTERS =
-    hex"08a5";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"08a5";
+
+/// @dev The function pointers known to the interpreter for dynamic dispatch.
+/// By setting these as a constant they can be inlined into the interpreter
+/// and loaded at eval time for very low gas (~100) due to the compiler
+/// optimising it to a single `codecopy` to build the in memory bytes array.
+bytes constant OPCODE_FUNCTION_POINTERS = hex"0861";

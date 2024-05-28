@@ -27,11 +27,12 @@ import {
     BYTECODE_HASH as INTERPRETER_BYTECODE_HASH,
     OPCODE_FUNCTION_POINTERS
 } from "../generated/RainterpreterNPE2.pointers.sol";
+import {IOpcodeToolingV1} from "../interface/IOpcodeToolingV1.sol";
 
 /// @title RainterpreterNPE2
 /// @notice Implementation of a Rainlang interpreter that is compatible with
 /// native onchain Rainlang parsing.
-contract RainterpreterNPE2 is IInterpreterV2, IInterpreterV3, ERC165 {
+contract RainterpreterNPE2 is IInterpreterV2, IInterpreterV3, IOpcodeToolingV1, ERC165 {
     using LibEvalNP for InterpreterStateNP;
     using LibInterpreterStateDataContractNP for bytes;
 
@@ -98,6 +99,11 @@ contract RainterpreterNPE2 is IInterpreterV2, IInterpreterV3, ERC165 {
 
     /// @inheritdoc IInterpreterV2
     function functionPointers() external view virtual override(IInterpreterV2, IInterpreterV3) returns (bytes memory) {
+        return this.buildOpcodeFunctionPointers();
+    }
+
+    /// @inheritdoc IOpcodeToolingV1
+    function buildOpcodeFunctionPointers() public view virtual override returns (bytes memory) {
         return LibAllStandardOpsNP.opcodeFunctionPointers();
     }
 }

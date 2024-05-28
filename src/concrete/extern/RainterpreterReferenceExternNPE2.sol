@@ -29,7 +29,8 @@ import {
     SUB_PARSER_WORD_PARSERS,
     OPERAND_HANDLER_FUNCTION_POINTERS,
     LITERAL_PARSER_FUNCTION_POINTERS,
-    INTEGRITY_FUNCTION_POINTERS
+    INTEGRITY_FUNCTION_POINTERS,
+    OPCODE_FUNCTION_POINTERS
 } from "../../generated/RainterpreterReferenceExternNPE2.pointers.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
@@ -62,11 +63,6 @@ uint256 constant SUB_PARSER_LITERAL_REPEAT_INDEX = 0;
 
 /// @dev Thrown when the repeat literal parser is not a single digit.
 error InvalidRepeatCount(uint256 value);
-
-/// @dev Real function pointers to the opcodes for the extern component of this
-/// contract. These get run at eval time wehen the interpreter calls into the
-/// contract as an `IInterpreterExternV3`.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"0861";
 
 /// @dev Number of opcode function pointers available to run at eval time.
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;

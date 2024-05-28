@@ -12,6 +12,10 @@ contract ChildRainterpreterExternNPE2 is BaseRainterpreterExternNPE2 {
     function buildIntegrityFunctionPointers() external pure returns (bytes memory) {
         return new bytes(0);
     }
+
+    function buildOpcodeFunctionPointers() external pure returns (bytes memory) {
+        return new bytes(0);
+    }
 }
 
 /// @title BaseRainterpreterExternNPE2Test
