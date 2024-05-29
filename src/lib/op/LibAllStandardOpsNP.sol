@@ -98,7 +98,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 70;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 71;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -166,6 +166,7 @@ library LibAllStandardOpsNP {
             AuthoringMetaV2("chain-id", "The current chain id."),
             AuthoringMetaV2("max-value", "The maximum possible value."),
             AuthoringMetaV2("block-timestamp", "The current block timestamp."),
+            AuthoringMetaV2("now", "The current block timestamp."),
             AuthoringMetaV2("any", "The first non-zero value out of all inputs, or 0 if every input is 0."),
             AuthoringMetaV2(
                 "conditions",
@@ -369,6 +370,8 @@ library LibAllStandardOpsNP {
                     LibParseOperand.handleOperandDisallowed,
                     // block-timestamp
                     LibParseOperand.handleOperandDisallowed,
+                    // now
+                    LibParseOperand.handleOperandDisallowed,
                     // any
                     LibParseOperand.handleOperandDisallowed,
                     // conditions
@@ -516,6 +519,8 @@ library LibAllStandardOpsNP {
                     LibOpChainIdNP.integrity,
                     LibOpMaxUint256NP.integrity,
                     LibOpTimestampNP.integrity,
+                    // now
+                    LibOpTimestampNP.integrity,
                     LibOpAnyNP.integrity,
                     LibOpConditionsNP.integrity,
                     LibOpEnsureNP.integrity,
@@ -621,6 +626,8 @@ library LibAllStandardOpsNP {
                     LibOpBlockNumberNP.run,
                     LibOpChainIdNP.run,
                     LibOpMaxUint256NP.run,
+                    LibOpTimestampNP.run,
+                    // now
                     LibOpTimestampNP.run,
                     LibOpAnyNP.run,
                     LibOpConditionsNP.run,

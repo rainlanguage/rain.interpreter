@@ -25,6 +25,13 @@ contract LibOpTimestampNPTest is OpTest {
     using LibStackPointer for Pointer;
     using LibInterpreterStateNP for InterpreterStateNP;
 
+    function timestampWords() internal pure returns (string[] memory) {
+        string[] memory words = new string[](2);
+        words[0] = "block-timestamp";
+        words[1] = "now";
+        return words;
+    }
+
     /// Directly test the integrity logic of LibOpTimestampNP.
     function testOpTimestampNPIntegrity(
         IntegrityCheckStateNP memory state,
@@ -56,36 +63,54 @@ contract LibOpTimestampNPTest is OpTest {
 
     /// Test the eval of a timestamp opcode parsed from a string.
     function testOpTimestampNPEval(uint256 blockTimestamp) external {
-        blockTimestamp = bound(blockTimestamp, 0, type(uint256).max / 1e18);
-        vm.warp(blockTimestamp);
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: block-timestamp();");
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
-            iDeployer.deployExpression2(bytecode, constants);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
-            storeDeployer,
-            FullyQualifiedNamespace.wrap(0),
-            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
-        );
-        assertEq(stack.length, 1);
-        assertEq(stack[0], blockTimestamp * 1e18);
-        assertEq(kvs.length, 0);
-        assertEq(io, hex"0001");
+        string[] memory words = timestampWords();
+
+        for (uint256 i; i < words.length; ++i) {
+            blockTimestamp = bound(blockTimestamp, 0, type(uint256).max / 1e18);
+            vm.warp(blockTimestamp);
+            (bytes memory bytecode, uint256[] memory constants) =
+                iParser.parse(bytes(string.concat("_: ", words[i], "();")));
+            (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io)
+            = iDeployer.deployExpression2(bytecode, constants);
+            (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
+                storeDeployer,
+                FullyQualifiedNamespace.wrap(0),
+                LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
+                LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+                new uint256[](0)
+            );
+            assertEq(stack.length, 1);
+            assertEq(stack[0], blockTimestamp * 1e18);
+            assertEq(kvs.length, 0);
+            assertEq(io, hex"0001");
+        }
     }
 
     /// Test that a block timestamp with inputs fails integrity check.
-    function testOpBlockTimestampNPEvalFail() public {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: block-timestamp(0x00);");
-        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
-        iDeployer.deployExpression2(bytecode, constants);
+    function testOpBlockTimestampNPEvalFail() external {
+        string[] memory words = timestampWords();
+
+        for (uint256 i; i < words.length; ++i) {
+            (bytes memory bytecode, uint256[] memory constants) =
+                iParser.parse(bytes(string.concat("_: ", words[i], "(0x00);")));
+            vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
+            iDeployer.deployExpression2(bytecode, constants);
+        }
     }
 
     function testOpBlockTimestampNPZeroOutputs() external {
-        checkBadOutputs(": block-timestamp();", 0, 1, 0);
+        string[] memory words = timestampWords();
+
+        for (uint256 i; i < words.length; ++i) {
+            checkBadOutputs(bytes(string.concat(": ", words[i], "();")), 0, 1, 0);
+        }
     }
 
     function testOpBlockTimestampNPTwoOutputs() external {
-        checkBadOutputs("_ _: block-timestamp();", 0, 1, 2);
+        string[] memory words = timestampWords();
+
+        for (uint256 i; i < words.length; ++i) {
+            checkBadOutputs(bytes(string.concat("_ _: ", words[i], "();")), 0, 1, 2);
+        }
     }
 }
