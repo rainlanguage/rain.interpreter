@@ -67,11 +67,7 @@ contract BuildPointers is Script {
         );
     }
 
-    function opcodeFunctionPointersConstantString(IOpcodeToolingV1 interpreter)
-        internal
-        view
-        returns (string memory)
-    {
+    function opcodeFunctionPointersConstantString(IOpcodeToolingV1 interpreter) internal view returns (string memory) {
         string memory functionPointers = bytesToHex(interpreter.buildOpcodeFunctionPointers());
         return string.concat(
             "\n",
