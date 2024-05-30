@@ -99,7 +99,7 @@ contract RainterpreterNPE2 is IInterpreterV2, IInterpreterV3, IOpcodeToolingV1, 
 
     /// @inheritdoc IInterpreterV2
     function functionPointers() external view virtual override(IInterpreterV2, IInterpreterV3) returns (bytes memory) {
-        return this.buildOpcodeFunctionPointers();
+        return buildOpcodeFunctionPointers();
     }
 
     /// @inheritdoc IOpcodeToolingV1
