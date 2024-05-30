@@ -8,7 +8,15 @@ import {BaseRainterpreterExternNPE2} from "src/abstract/BaseRainterpreterExternN
 
 /// @dev We need a contract that is deployable in order to test the abstract
 /// base contract.
-contract ChildRainterpreterExternNPE2 is BaseRainterpreterExternNPE2 {}
+contract ChildRainterpreterExternNPE2 is BaseRainterpreterExternNPE2 {
+    function buildIntegrityFunctionPointers() external pure returns (bytes memory) {
+        return new bytes(0);
+    }
+
+    function buildOpcodeFunctionPointers() external pure returns (bytes memory) {
+        return new bytes(0);
+    }
+}
 
 /// @title BaseRainterpreterExternNPE2Test
 /// Test suite for BaseRainterpreterExternNPE2.

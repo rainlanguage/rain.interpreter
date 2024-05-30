@@ -10,9 +10,20 @@ import {
     RainterpreterExpressionDeployerNPE2,
     RainterpreterExpressionDeployerNPE2ConstructionConfigV2
 } from "src/concrete/RainterpreterExpressionDeployerNPE2.sol";
+import {
+    RainterpreterReferenceExternNPE2,
+    LibRainterpreterReferenceExternNPE2,
+    EXTERN_PARSE_META_BUILD_DEPTH
+} from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
 import {LibAllStandardOpsNP, AuthoringMetaV2} from "src/lib/op/LibAllStandardOpsNP.sol";
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 import {EXPRESSION_DEPLOYER_NP_META_PATH} from "src/lib/constants/ExpressionDeployerNPConstants.sol";
+import {IParserToolingV1} from "src/interface/IParserToolingV1.sol";
+import {IIntegrityToolingV1} from "src/interface/IIntegrityToolingV1.sol";
+import {IOpcodeToolingV1} from "src/interface/IOpcodeToolingV1.sol";
+
+uint256 constant MAX_LINE_LENGTH = 120;
+string constant NEWLINE_DUE_TO_MAX_LENGTH = "\n    ";
 
 contract BuildPointers is Script {
     function filePrefix() internal pure returns (string memory) {
@@ -56,25 +67,23 @@ contract BuildPointers is Script {
         );
     }
 
-    function interpreterFunctionPointersConstantString(IInterpreterV2 interpreter)
-        internal
-        view
-        returns (string memory)
-    {
+    function opcodeFunctionPointersConstantString(IOpcodeToolingV1 interpreter) internal view returns (string memory) {
+        string memory functionPointers = bytesToHex(interpreter.buildOpcodeFunctionPointers());
         return string.concat(
             "\n",
             "/// @dev The function pointers known to the interpreter for dynamic dispatch.\n",
             "/// By setting these as a constant they can be inlined into the interpreter\n",
             "/// and loaded at eval time for very low gas (~100) due to the compiler\n",
             "/// optimising it to a single `codecopy` to build the in memory bytes array.\n",
-            "bytes constant OPCODE_FUNCTION_POINTERS =\n",
-            "    hex\"",
-            bytesToHex(interpreter.functionPointers()),
+            "bytes constant OPCODE_FUNCTION_POINTERS =",
+            bytes(functionPointers).length + 43 > MAX_LINE_LENGTH ? NEWLINE_DUE_TO_MAX_LENGTH : " ",
+            "hex\"",
+            functionPointers,
             "\";\n"
         );
     }
 
-    function literalParserFunctionPointersConstantString(RainterpreterParserNPE2 instance)
+    function literalParserFunctionPointersConstantString(IParserToolingV1 instance)
         internal
         pure
         returns (string memory)
@@ -91,26 +100,32 @@ contract BuildPointers is Script {
         );
     }
 
-    function operandHandlerFunctionPointersConstantString(RainterpreterParserNPE2 instance)
+    function operandHandlerFunctionPointersConstantString(IParserToolingV1 instance)
         internal
         pure
         returns (string memory)
     {
+        string memory operandHandlerFunctionPointers = bytesToHex(instance.buildOperandHandlerFunctionPointers());
         return string.concat(
             "\n",
             "/// @dev Every two bytes is a function pointer for an operand handler.\n",
             "/// These positional indexes all map to the same indexes looked up in the parse\n",
             "/// meta.\n",
-            "bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =\n",
-            "    hex\"",
-            bytesToHex(instance.buildOperandHandlerFunctionPointers()),
+            "bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =",
+            bytes(operandHandlerFunctionPointers).length + 52 > MAX_LINE_LENGTH ? NEWLINE_DUE_TO_MAX_LENGTH : " ",
+            "hex\"",
+            operandHandlerFunctionPointers,
             "\";\n"
         );
     }
 
-    function parseMetaConstantString(bytes memory authoringMetaBytes) internal pure returns (string memory) {
+    function parseMetaConstantString(bytes memory authoringMetaBytes, uint8 buildDepth)
+        internal
+        pure
+        returns (string memory)
+    {
         AuthoringMetaV2[] memory authoringMeta = abi.decode(authoringMetaBytes, (AuthoringMetaV2[]));
-        bytes memory parseMeta = LibParseMeta.buildParseMetaV2(authoringMeta, PARSE_META_BUILD_DEPTH);
+        bytes memory parseMeta = LibParseMeta.buildParseMetaV2(authoringMeta, buildDepth);
         return string.concat(
             "\n",
             "/// @dev Encodes the parser meta that is used to lookup word definitions.\n",
@@ -135,27 +150,48 @@ contract BuildPointers is Script {
             "\";\n\n",
             "/// @dev The build depth of the parser meta.\n",
             "uint8 constant PARSE_META_BUILD_DEPTH = ",
-            vm.toString(PARSE_META_BUILD_DEPTH),
+            vm.toString(buildDepth),
             ";\n"
         );
     }
 
-    function integrityFunctionPointersConstantString(RainterpreterExpressionDeployerNPE2 deployer)
+    function subParserWordParsersConstantString(RainterpreterReferenceExternNPE2 extern)
         internal
-        view
+        pure
         returns (string memory)
     {
         return string.concat(
             "\n",
-            "/// @dev The function pointers for the integrity check fns.\n",
-            "bytes constant INTEGRITY_FUNCTION_POINTERS =\n",
-            "    hex\"",
-            bytesToHex(deployer.integrityFunctionPointers()),
+            "/// @dev Real function pointers to the sub parser functions that produce the\n",
+            "/// bytecode that this contract knows about. This is both constructing the extern\n",
+            "/// bytecode that dials back into this contract at eval time, and mapping\n",
+            "/// to things that happen entirely on the interpreter such as well known\n",
+            "/// constants and references to the context grid.\n",
+            "bytes constant SUB_PARSER_WORD_PARSERS = hex\"",
+            bytesToHex(extern.buildSubParserWordParsers()),
             "\";\n"
         );
     }
 
-    function describedByMetaHashConstantString(bytes memory describedByMeta) internal pure returns (string memory) {
+    function integrityFunctionPointersConstantString(IIntegrityToolingV1 deployer)
+        internal
+        view
+        returns (string memory)
+    {
+        string memory integrityFunctionPointers = bytesToHex(deployer.buildIntegrityFunctionPointers());
+        return string.concat(
+            "\n",
+            "/// @dev The function pointers for the integrity check fns.\n",
+            "bytes constant INTEGRITY_FUNCTION_POINTERS =",
+            bytes(integrityFunctionPointers).length + 46 > MAX_LINE_LENGTH ? NEWLINE_DUE_TO_MAX_LENGTH : " ",
+            "hex\"",
+            integrityFunctionPointers,
+            "\";\n"
+        );
+    }
+
+    function describedByMetaHashConstantString(string memory name) internal view returns (string memory) {
+        bytes memory describedByMeta = vm.readFileBinary(string.concat("meta/", name, ".rain.meta"));
         return string.concat(
             "\n",
             "/// @dev The hash of the meta that describes the contract.\n",
@@ -178,7 +214,7 @@ contract BuildPointers is Script {
         RainterpreterNPE2 interpreter = new RainterpreterNPE2();
 
         buildFileForContract(
-            address(interpreter), "RainterpreterNPE2", interpreterFunctionPointersConstantString(interpreter)
+            address(interpreter), "RainterpreterNPE2", opcodeFunctionPointersConstantString(interpreter)
         );
     }
 
@@ -195,7 +231,7 @@ contract BuildPointers is Script {
             address(parser),
             "RainterpreterParserNPE2",
             string.concat(
-                parseMetaConstantString(LibAllStandardOpsNP.authoringMetaV2()),
+                parseMetaConstantString(LibAllStandardOpsNP.authoringMetaV2(), PARSE_META_BUILD_DEPTH),
                 operandHandlerFunctionPointersConstantString(parser),
                 literalParserFunctionPointersConstantString(parser)
             )
@@ -213,12 +249,33 @@ contract BuildPointers is Script {
             )
         );
 
+        string memory name = "RainterpreterExpressionDeployerNPE2";
+
         buildFileForContract(
             address(deployer),
-            "RainterpreterExpressionDeployerNPE2",
+            name,
+            string.concat(describedByMetaHashConstantString(name), integrityFunctionPointersConstantString(deployer))
+        );
+    }
+
+    function buildRainterpreterReferenceExternNPE2Pointers() internal {
+        RainterpreterReferenceExternNPE2 extern = new RainterpreterReferenceExternNPE2();
+
+        string memory name = "RainterpreterReferenceExternNPE2";
+
+        buildFileForContract(
+            address(extern),
+            "RainterpreterReferenceExternNPE2",
             string.concat(
-                describedByMetaHashConstantString(vm.readFileBinary(EXPRESSION_DEPLOYER_NP_META_PATH)),
-                integrityFunctionPointersConstantString(deployer)
+                describedByMetaHashConstantString(name),
+                parseMetaConstantString(
+                    LibRainterpreterReferenceExternNPE2.authoringMetaV2(), EXTERN_PARSE_META_BUILD_DEPTH
+                ),
+                subParserWordParsersConstantString(extern),
+                operandHandlerFunctionPointersConstantString(extern),
+                literalParserFunctionPointersConstantString(extern),
+                integrityFunctionPointersConstantString(extern),
+                opcodeFunctionPointersConstantString(extern)
             )
         );
     }
@@ -228,5 +285,6 @@ contract BuildPointers is Script {
         buildRainterpreterStoreNPE2Pointers();
         buildRainterpreterParserNPE2Pointers();
         buildRainterpreterExpressionDeployerNPE2Pointers();
+        buildRainterpreterReferenceExternNPE2Pointers();
     }
 }

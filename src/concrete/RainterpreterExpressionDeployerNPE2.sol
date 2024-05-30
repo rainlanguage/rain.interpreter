@@ -37,6 +37,7 @@ import {
     INTEGRITY_FUNCTION_POINTERS,
     DESCRIBED_BY_META_HASH
 } from "../generated/RainterpreterExpressionDeployerNPE2.pointers.sol";
+import {IIntegrityToolingV1} from "../interface/IIntegrityToolingV1.sol";
 
 /// All config required to construct a `RainterpreterNPE2`.
 /// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match
@@ -55,6 +56,7 @@ contract RainterpreterExpressionDeployerNPE2 is
     IExpressionDeployerV4,
     IParserV2,
     IParserPragmaV1,
+    IIntegrityToolingV1,
     ERC165
 {
     using LibPointer for Pointer;
@@ -195,7 +197,8 @@ contract RainterpreterExpressionDeployerNPE2 is
     /// pointers. This function is `virtual` so that it can be overridden
     /// pairwise with overrides to `functionPointers` on `Rainterpreter`.
     /// @return The list of integrity function pointers.
-    function integrityFunctionPointers() external view virtual returns (bytes memory) {
+    /// @inheritdoc IIntegrityToolingV1
+    function buildIntegrityFunctionPointers() external view virtual returns (bytes memory) {
         return LibAllStandardOpsNP.integrityFunctionPointers();
     }
 

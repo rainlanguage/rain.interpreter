@@ -19,10 +19,11 @@ import {
     PARSE_META,
     PARSE_META_BUILD_DEPTH
 } from "../generated/RainterpreterParserNPE2.pointers.sol";
+import {IParserToolingV1} from "../interface/IParserToolingV1.sol";
 
 /// @title RainterpreterParserNPE2
 /// @dev The parser implementation.
-contract RainterpreterParserNPE2 is IParserV1, IParserPragmaV1, ERC165 {
+contract RainterpreterParserNPE2 is IParserV1, IParserPragmaV1, ERC165, IParserToolingV1 {
     using LibParse for ParseState;
     using LibParseState for ParseState;
     using LibParsePragma for ParseState;
@@ -72,11 +73,13 @@ contract RainterpreterParserNPE2 is IParserV1, IParserPragmaV1, ERC165 {
     }
 
     /// External function to build the operand handler function pointers.
+    /// @inheritdoc IParserToolingV1
     function buildOperandHandlerFunctionPointers() external pure returns (bytes memory) {
         return LibAllStandardOpsNP.operandHandlerFunctionPointers();
     }
 
     /// External function to build the literal parser function pointers.
+    /// @inheritdoc IParserToolingV1
     function buildLiteralParserFunctionPointers() external pure returns (bytes memory) {
         return LibAllStandardOpsNP.literalParserFunctionPointers();
     }
