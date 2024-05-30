@@ -23,21 +23,16 @@ import {
     IInterpreterStoreV2
 } from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {IInterpreterV3} from "rain.interpreter.interface/interface/unstable/IInterpreterV3.sol";
-
-/// @dev Hash of the known interpreter bytecode.
-bytes32 constant INTERPRETER_BYTECODE_HASH = bytes32(0xa70ee20520ea20d7a9a7669a135c8dd808af8cd3acb2710a1bf0392a19ad1d89);
-
-/// @dev The function pointers known to the interpreter for dynamic dispatch.
-/// By setting these as a constant they can be inlined into the interpreter
-/// and loaded at eval time for very low gas (~100) due to the compiler
-/// optimising it to a single `codecopy` to build the in memory bytes array.
-bytes constant OPCODE_FUNCTION_POINTERS =
-    hex"0e210e720eb4108011671179118b11ae11f012421253126413061343140114b115351678179f1401189b193d19b519ee1a271a761aaf1b141be81c3b1c4f1ca81cbc1cd11ceb1cf61d0a1d1f1d571d7e1dfe1e4c1e9a1ee81f001f191f671f751f831f9e1fb31fcb1fe41ff22000200e201c206a20b821062154216c216c218321b121b121c821f7224c225a225a22fe23e5";
+import {
+    BYTECODE_HASH as INTERPRETER_BYTECODE_HASH,
+    OPCODE_FUNCTION_POINTERS
+} from "../generated/RainterpreterNPE2.pointers.sol";
+import {IOpcodeToolingV1} from "../interface/IOpcodeToolingV1.sol";
 
 /// @title RainterpreterNPE2
 /// @notice Implementation of a Rainlang interpreter that is compatible with
 /// native onchain Rainlang parsing.
-contract RainterpreterNPE2 is IInterpreterV2, IInterpreterV3, ERC165 {
+contract RainterpreterNPE2 is IInterpreterV2, IInterpreterV3, IOpcodeToolingV1, ERC165 {
     using LibEvalNP for InterpreterStateNP;
     using LibInterpreterStateDataContractNP for bytes;
 
@@ -104,6 +99,11 @@ contract RainterpreterNPE2 is IInterpreterV2, IInterpreterV3, ERC165 {
 
     /// @inheritdoc IInterpreterV2
     function functionPointers() external view virtual override(IInterpreterV2, IInterpreterV3) returns (bytes memory) {
+        return buildOpcodeFunctionPointers();
+    }
+
+    /// @inheritdoc IOpcodeToolingV1
+    function buildOpcodeFunctionPointers() public view virtual override returns (bytes memory) {
         return LibAllStandardOpsNP.opcodeFunctionPointers();
     }
 }

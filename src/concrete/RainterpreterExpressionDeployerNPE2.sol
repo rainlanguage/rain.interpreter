@@ -33,13 +33,11 @@ import {LibParse, LibParseMeta} from "../lib/parse/LibParse.sol";
 import {RainterpreterNPE2, INTERPRETER_BYTECODE_HASH} from "./RainterpreterNPE2.sol";
 import {PARSER_BYTECODE_HASH} from "./RainterpreterParserNPE2.sol";
 import {STORE_BYTECODE_HASH} from "./RainterpreterStoreNPE2.sol";
-
-/// @dev The function pointers for the integrity check fns.
-bytes constant INTEGRITY_FUNCTION_POINTERS =
-    hex"0e900f0e0f7310ed10f710f71101110a112511cb11cb122712a112ae10f7110112ae10f7110110f710f7110110ed10ed10ed10ed12b812dd12f710f712b810f710f712ae110110f710f712ae12ae130113011301130110f711011301110111011101110110f711011101110111011101130113011301130110f71101110110f71101110110f710f7110113011301110112f7";
-
-/// @dev Hash of the metadata that describes the deployer (parsing).
-bytes32 constant DESCRIBED_BY_META_HASH = bytes32(0x89148873ea148e1c312c3c6cffbc5fb012194570f04ed1177db6002901e7bf38);
+import {
+    INTEGRITY_FUNCTION_POINTERS,
+    DESCRIBED_BY_META_HASH
+} from "../generated/RainterpreterExpressionDeployerNPE2.pointers.sol";
+import {IIntegrityToolingV1} from "../interface/IIntegrityToolingV1.sol";
 
 /// All config required to construct a `RainterpreterNPE2`.
 /// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match
@@ -58,6 +56,7 @@ contract RainterpreterExpressionDeployerNPE2 is
     IExpressionDeployerV4,
     IParserV2,
     IParserPragmaV1,
+    IIntegrityToolingV1,
     ERC165
 {
     using LibPointer for Pointer;
@@ -198,7 +197,8 @@ contract RainterpreterExpressionDeployerNPE2 is
     /// pointers. This function is `virtual` so that it can be overridden
     /// pairwise with overrides to `functionPointers` on `Rainterpreter`.
     /// @return The list of integrity function pointers.
-    function integrityFunctionPointers() external view virtual returns (bytes memory) {
+    /// @inheritdoc IIntegrityToolingV1
+    function buildIntegrityFunctionPointers() external view virtual returns (bytes memory) {
         return LibAllStandardOpsNP.integrityFunctionPointers();
     }
 

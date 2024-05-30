@@ -8,6 +8,8 @@ import {LibOpERC20Allowance} from "src/lib/op/erc20/LibOpERC20Allowance.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {IERC20Metadata} from "openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import {FLAG_SATURATE, LibFixedPointDecimalScale} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 
 /// @title LibOpERC20AllowanceTest
 /// @notice Test the opcode for getting the allowance of an erc20 token.
@@ -19,7 +21,9 @@ contract LibOpERC20AllowanceTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    function testOpERC20AllowanceNPRun(address token, address owner, address spender, uint256 allowance) external {
+    function testOpERC20AllowanceNPRun(address token, address owner, address spender, uint256 allowance, uint8 decimals)
+        external
+    {
         assumeEtchable(token);
         vm.etch(token, hex"fe");
 
@@ -33,6 +37,8 @@ contract LibOpERC20AllowanceTest is OpTest {
         // called once for reference, once for run
         vm.expectCall(token, abi.encodeWithSelector(IERC20.allowance.selector, owner, spender), 2);
 
+        vm.mockCall(token, abi.encodeWithSelector(IERC20Metadata.decimals.selector), abi.encode(decimals));
+
         opReferenceCheck(
             opTestDefaultInterpreterState(),
             operand,
@@ -44,12 +50,14 @@ contract LibOpERC20AllowanceTest is OpTest {
     }
 
     /// Test the eval of allowance parsed from a string.
-    function testOpERC20AllowanceNPEvalHappy(uint256 allowance) external {
+    function testOpERC20AllowanceNPEvalHappy(uint256 allowance, uint8 decimals) external {
         vm.mockCall(
             address(0xdeadbeef),
             abi.encodeWithSelector(IERC20.allowance.selector, address(0xdeadc0de), address(0xdeaddead)),
             abi.encode(allowance)
         );
+        vm.mockCall(address(0xdeadbeef), abi.encodeWithSelector(IERC20Metadata.decimals.selector), abi.encode(decimals));
+        allowance = LibFixedPointDecimalScale.scale18(allowance, decimals, FLAG_SATURATE);
         checkHappy(
             "_: erc20-allowance(0xdeadbeef 0xdeadc0de 0xdeaddead);", allowance, "0xdeadbeef 0xdeadc0de 0xdeaddead"
         );

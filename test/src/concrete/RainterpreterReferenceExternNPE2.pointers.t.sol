@@ -9,9 +9,9 @@ import {
     SUB_PARSER_WORD_PARSERS,
     AuthoringMetaV2,
     SUB_PARSER_PARSE_META,
-    SUB_PARSER_OPERAND_HANDLERS,
     LibRainterpreterReferenceExternNPE2,
-    SUB_PARSER_LITERAL_PARSERS
+    LITERAL_PARSER_FUNCTION_POINTERS,
+    OPERAND_HANDLER_FUNCTION_POINTERS
 } from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
 import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
 
@@ -40,8 +40,8 @@ contract RainterpreterReferenceExternNPE2PointersTest is Test {
 
     function testSubParserLiteralParsers() external {
         RainterpreterReferenceExternNPE2 subParser = new RainterpreterReferenceExternNPE2();
-        bytes memory expected = subParser.buildSubParserLiteralParsers();
-        bytes memory actual = SUB_PARSER_LITERAL_PARSERS;
+        bytes memory expected = subParser.buildLiteralParserFunctionPointers();
+        bytes memory actual = LITERAL_PARSER_FUNCTION_POINTERS;
         assertEq(actual, expected);
     }
 
@@ -54,8 +54,8 @@ contract RainterpreterReferenceExternNPE2PointersTest is Test {
 
     function testSubParserOperandParsers() external {
         RainterpreterReferenceExternNPE2 extern = new RainterpreterReferenceExternNPE2();
-        bytes memory expected = extern.buildSubParserOperandHandlers();
-        bytes memory actual = SUB_PARSER_OPERAND_HANDLERS;
+        bytes memory expected = extern.buildOperandHandlerFunctionPointers();
+        bytes memory actual = OPERAND_HANDLER_FUNCTION_POINTERS;
         assertEq(actual, expected);
     }
 }

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
+import {stdError} from "forge-std/Test.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
@@ -8,6 +9,9 @@ import {LibOpERC20BalanceOf} from "src/lib/op/erc20/LibOpERC20BalanceOf.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {LibFixedPointDecimalScale} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
+import {IERC20Metadata} from "openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
 
 /// @title LibOpERC20BalanceOfTest
 /// @notice Test the opcode for getting the balance of an erc20 token.
@@ -19,9 +23,17 @@ contract LibOpERC20BalanceOfTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    function testOpERC20BalanceOfNPRun(address token, address account, uint256 balance, uint16 operandData) external {
+    function testOpERC20BalanceOfNPRun(
+        address token,
+        address account,
+        uint256 balance,
+        uint16 operandData,
+        uint8 decimals
+    ) external {
         assumeEtchable(token);
         vm.etch(token, hex"fe");
+
+        vm.assume(!LibWillOverflow.scale18WillOverflow(balance, decimals, 0));
 
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = uint256(uint160(token));
@@ -31,6 +43,8 @@ contract LibOpERC20BalanceOfTest is OpTest {
         vm.mockCall(token, abi.encodeWithSelector(IERC20.balanceOf.selector, account), abi.encode(balance));
         // called once for reference, once for run
         vm.expectCall(token, abi.encodeWithSelector(IERC20.balanceOf.selector, account), 2);
+
+        vm.mockCall(token, abi.encodeWithSelector(IERC20Metadata.decimals.selector), abi.encode(decimals));
 
         opReferenceCheck(
             opTestDefaultInterpreterState(),
@@ -43,13 +57,28 @@ contract LibOpERC20BalanceOfTest is OpTest {
     }
 
     /// Test the eval of balanceOf parsed from a string.
-    function testOpERC20BalanceOfNPEvalHappy(uint256 balance) external {
+    function testOpERC20BalanceOfNPEvalHappy(uint256 balance, uint8 decimals) external {
+        vm.assume(!LibWillOverflow.scale18WillOverflow(balance, decimals, 0));
         vm.mockCall(
             address(0xdeadbeef),
             abi.encodeWithSelector(IERC20.balanceOf.selector, address(0xdeadc0de)),
             abi.encode(balance)
         );
+        vm.mockCall(address(0xdeadbeef), abi.encodeWithSelector(IERC20Metadata.decimals.selector), abi.encode(decimals));
+        balance = LibFixedPointDecimalScale.scale18(balance, decimals, 0);
         checkHappy("_: erc20-balance-of(0xdeadbeef 0xdeadc0de);", balance, "0xdeadbeef 0xdeadc0de");
+    }
+
+    /// Test overflow errors when rescaling.
+    function testOpERC20BalanceOfNPEvalOverflow(uint256 balance, uint8 decimals) external {
+        vm.assume(LibWillOverflow.scale18WillOverflow(balance, decimals, 0));
+        vm.mockCall(
+            address(0xdeadbeef),
+            abi.encodeWithSelector(IERC20.balanceOf.selector, address(0xdeadc0de)),
+            abi.encode(balance)
+        );
+        vm.mockCall(address(0xdeadbeef), abi.encodeWithSelector(IERC20Metadata.decimals.selector), abi.encode(decimals));
+        checkUnhappy("_: erc20-balance-of(0xdeadbeef 0xdeadc0de);", stdError.arithmeticError);
     }
 
     /// Test that a balanceOf with bad inputs fails integrity.

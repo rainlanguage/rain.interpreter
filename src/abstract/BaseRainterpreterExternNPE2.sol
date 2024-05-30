@@ -10,6 +10,8 @@ import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {IInterpreterExternV3, ExternDispatch} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
+import {IIntegrityToolingV1} from "../interface/IIntegrityToolingV1.sol";
+import {IOpcodeToolingV1} from "../interface/IOpcodeToolingV1.sol";
 
 /// @dev Empty opcode function pointers constant. Inheriting contracts should
 /// create their own constant and override `opcodeFunctionPointers` to use
@@ -22,7 +24,7 @@ bytes constant INTEGRITY_FUNCTION_POINTERS = hex"";
 
 /// Base implementation of `IInterpreterExternV3`. Inherit from this contract,
 /// and override `functionPointers` to provide a list of function pointers.
-abstract contract BaseRainterpreterExternNPE2 is IInterpreterExternV3, ERC165 {
+abstract contract BaseRainterpreterExternNPE2 is IInterpreterExternV3, IIntegrityToolingV1, IOpcodeToolingV1, ERC165 {
     using LibStackPointer for uint256[];
     using LibStackPointer for Pointer;
     using LibUint256Array for uint256;
