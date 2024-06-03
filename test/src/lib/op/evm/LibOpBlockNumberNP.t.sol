@@ -78,13 +78,6 @@ contract LibOpBlockNumberNPTest is OpTest {
         assertEq(io, hex"0001");
     }
 
-    /// Test that a block number with inputs fails integrity check.
-    function testOpBlockNumberNPEvalFail() public {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: block-number(0x00);");
-        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
-        iDeployer.deployExpression2(bytecode, constants);
-    }
-
     function testOpBlockNumberNPEvalOneInput() external {
         checkBadInputs("_: block-number(0x00);", 1, 0, 1);
     }
