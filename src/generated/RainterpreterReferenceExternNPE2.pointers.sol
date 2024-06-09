@@ -9,7 +9,7 @@
 pragma solidity =0.8.25;
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0x9f3b0b8601491d58b76383f625372fef92cb411bf5451e33ad0035f053163d52);
+bytes32 constant BYTECODE_HASH = bytes32(0x7126946dc9f1b89366bf722fc67ab495e881e6222e4d6d5ddd9e99cd9ceac5c3);
 
 /// @dev The hash of the meta that describes the contract.
 bytes32 constant DESCRIBED_BY_META_HASH = bytes32(0xadf71693c6ecf3fd560904bc46973d1b6e651440d15366673f9b3984749e7c16);
@@ -37,29 +37,29 @@ bytes constant PARSE_META =
 uint8 constant PARSE_META_BUILD_DEPTH = 1;
 
 /// @dev Real function pointers to the sub parser functions that produce the
-/// bytecode that this contract knows about. This is both constructing the extern
+/// bytecode that this contract knows about. This is both constructing the subParser
 /// bytecode that dials back into this contract at eval time, and mapping
 /// to things that happen entirely on the interpreter such as well known
 /// constants and references to the context grid.
-bytes constant SUB_PARSER_WORD_PARSERS = hex"076d078f079e07ae07bf";
+bytes constant SUB_PARSER_WORD_PARSERS = hex"0775079707a607b607c7";
 
 /// @dev Every two bytes is a function pointer for an operand handler.
 /// These positional indexes all map to the same indexes looked up in the parse
 /// meta.
-bytes constant OPERAND_HANDLER_FUNCTION_POINTERS = hex"0a1f0a640a1f0a1f0a1f";
+bytes constant OPERAND_HANDLER_FUNCTION_POINTERS = hex"0a270a6c0a270a270a27";
 
 /// @dev Every two bytes is a function pointer for a literal parser.
 /// Literal dispatches are determined by the first byte(s) of the literal
 /// rather than a full word lookup, and are done with simple conditional
 /// jumps as the possibilities are limited compared to the number of words we
 /// have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"09f0";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"09f8";
 
 /// @dev The function pointers for the integrity check fns.
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"08a5";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"08ad";
 
 /// @dev The function pointers known to the interpreter for dynamic dispatch.
 /// By setting these as a constant they can be inlined into the interpreter
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"0861";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"0869";
