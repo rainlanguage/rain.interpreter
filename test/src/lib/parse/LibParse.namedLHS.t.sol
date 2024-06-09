@@ -5,7 +5,7 @@ import {Test} from "forge-std/Test.sol";
 
 import {ExpectedOperand, UnclosedOperand} from "src/error/ErrParse.sol";
 import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV1.sol";
-import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
+import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {LibParse, DuplicateLHSItem, WordSize} from "src/lib/parse/LibParse.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
@@ -14,6 +14,7 @@ import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {Operand, LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
+import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
 
 /// @title LibParseNamedLHSTest
 contract LibParseNamedLHSTest is Test {
@@ -111,7 +112,7 @@ contract LibParseNamedLHSTest is Test {
         meta[0] = AuthoringMetaV2("stack", "stack");
         meta[1] = AuthoringMetaV2("constant", "constant");
         meta[2] = AuthoringMetaV2("c", "c");
-        bytes memory parseMeta = LibParseMeta.buildParseMetaV2(meta, 1);
+        bytes memory parseMeta = LibGenParseMeta.buildParseMetaV2(meta, 1);
 
         function (uint256[] memory) internal pure returns (Operand)[] memory operandHandlers =
             new function (uint256[] memory) internal pure returns (Operand)[](3);

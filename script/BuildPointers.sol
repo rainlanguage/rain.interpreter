@@ -16,33 +16,38 @@ import {
     EXTERN_PARSE_META_BUILD_DEPTH
 } from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
 import {LibAllStandardOpsNP, AuthoringMetaV2} from "src/lib/op/LibAllStandardOpsNP.sol";
-import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
+import {LibCodeGen} from "rain.sol.codegen/lib/LibCodeGen.sol";
+import {LibFs} from "rain.sol.codegen/lib/LibFs.sol";
 
 contract BuildPointers is Script {
     function buildRainterpreterNPE2Pointers() internal {
         RainterpreterNPE2 interpreter = new RainterpreterNPE2();
 
-        buildFileForContract(
-            address(interpreter), "RainterpreterNPE2", opcodeFunctionPointersConstantString(interpreter)
+        LibFs.buildFileForContract(
+            vm,
+            address(interpreter),
+            "RainterpreterNPE2",
+            LibCodeGen.opcodeFunctionPointersConstantString(vm, interpreter)
         );
     }
 
     function buildRainterpreterStoreNPE2Pointers() internal {
         RainterpreterStoreNPE2 store = new RainterpreterStoreNPE2();
 
-        buildFileForContract(address(store), "RainterpreterStoreNPE2", "");
+        LibFs.buildFileForContract(vm, address(store), "RainterpreterStoreNPE2", "");
     }
 
     function buildRainterpreterParserNPE2Pointers() internal {
         RainterpreterParserNPE2 parser = new RainterpreterParserNPE2();
 
-        buildFileForContract(
+        LibFs.buildFileForContract(
+            vm,
             address(parser),
             "RainterpreterParserNPE2",
             string.concat(
-                parseMetaConstantString(LibAllStandardOpsNP.authoringMetaV2(), PARSE_META_BUILD_DEPTH),
-                operandHandlerFunctionPointersConstantString(parser),
-                literalParserFunctionPointersConstantString(parser)
+                LibCodeGen.parseMetaConstantString(vm, LibAllStandardOpsNP.authoringMetaV2(), PARSE_META_BUILD_DEPTH),
+                LibCodeGen.operandHandlerFunctionPointersConstantString(vm, parser),
+                LibCodeGen.literalParserFunctionPointersConstantString(vm, parser)
             )
         );
     }
@@ -60,10 +65,14 @@ contract BuildPointers is Script {
 
         string memory name = "RainterpreterExpressionDeployerNPE2";
 
-        buildFileForContract(
+        LibFs.buildFileForContract(
+            vm,
             address(deployer),
             name,
-            string.concat(describedByMetaHashConstantString(name), integrityFunctionPointersConstantString(deployer))
+            string.concat(
+                LibCodeGen.describedByMetaHashConstantString(vm, name),
+                LibCodeGen.integrityFunctionPointersConstantString(vm, deployer)
+            )
         );
     }
 
@@ -72,19 +81,20 @@ contract BuildPointers is Script {
 
         string memory name = "RainterpreterReferenceExternNPE2";
 
-        buildFileForContract(
+        LibFs.buildFileForContract(
+            vm,
             address(extern),
             "RainterpreterReferenceExternNPE2",
             string.concat(
-                describedByMetaHashConstantString(name),
-                parseMetaConstantString(
-                    LibRainterpreterReferenceExternNPE2.authoringMetaV2(), EXTERN_PARSE_META_BUILD_DEPTH
+                LibCodeGen.describedByMetaHashConstantString(vm, name),
+                LibCodeGen.parseMetaConstantString(
+                    vm, LibRainterpreterReferenceExternNPE2.authoringMetaV2(), EXTERN_PARSE_META_BUILD_DEPTH
                 ),
-                subParserWordParsersConstantString(extern),
-                operandHandlerFunctionPointersConstantString(extern),
-                literalParserFunctionPointersConstantString(extern),
-                integrityFunctionPointersConstantString(extern),
-                opcodeFunctionPointersConstantString(extern)
+                LibCodeGen.subParserWordParsersConstantString(vm, extern),
+                LibCodeGen.operandHandlerFunctionPointersConstantString(vm, extern),
+                LibCodeGen.literalParserFunctionPointersConstantString(vm, extern),
+                LibCodeGen.integrityFunctionPointersConstantString(vm, extern),
+                LibCodeGen.opcodeFunctionPointersConstantString(vm, extern)
             )
         );
     }

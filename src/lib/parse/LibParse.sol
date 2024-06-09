@@ -20,8 +20,8 @@ import {
     COMMENT_END_SEQUENCE,
     CMASK_IDENTIFIER_HEAD
 } from "./LibParseCMask.sol";
-import {LibCtPop} from "../bitwise/LibCtPop.sol";
-import {LibParseMeta} from "./LibParseMeta.sol";
+import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
+import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 import {LibParseOperand} from "./LibParseOperand.sol";
 import {Operand, OPCODE_STACK, OPCODE_UNKNOWN} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
@@ -222,7 +222,7 @@ library LibParse {
                     (cursor, word) = parseWord(cursor, end, CMASK_RHS_WORD_TAIL);
 
                     // First check if this word is in meta.
-                    (bool exists, uint256 opcodeIndex) = state.lookupWord(word);
+                    (bool exists, uint256 opcodeIndex) = LibParseMeta.lookupWord(state.meta, word);
                     if (exists) {
                         cursor = state.parseOperand(cursor, end);
                         Operand operand = state.handleOperand(opcodeIndex);

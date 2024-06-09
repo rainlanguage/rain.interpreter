@@ -2,12 +2,13 @@
 pragma solidity ^0.8.18;
 
 import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV1.sol";
-import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
+import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {Operand, LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
+import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
 
 uint256 constant FIXTURE_OPS_LENGTH = 18;
 
@@ -45,7 +46,7 @@ library LibMetaFixture {
     }
 
     function parseMetaV2() internal pure returns (bytes memory) {
-        return LibParseMeta.buildParseMetaV2(authoringMetaV2(), 1);
+        return LibGenParseMeta.buildParseMetaV2(authoringMetaV2(), 1);
     }
 
     function operandHandlerFunctionPointers() internal pure returns (bytes memory) {

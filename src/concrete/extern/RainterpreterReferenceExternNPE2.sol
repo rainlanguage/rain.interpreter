@@ -4,7 +4,11 @@ pragma solidity =0.8.25;
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {BadDynamicLength} from "../../error/ErrOpList.sol";
 import {BaseRainterpreterExternNPE2, Operand} from "../../abstract/BaseRainterpreterExternNPE2.sol";
-import {BaseRainterpreterSubParserNPE2, IParserToolingV1} from "../../abstract/BaseRainterpreterSubParserNPE2.sol";
+import {
+    BaseRainterpreterSubParserNPE2,
+    IParserToolingV1,
+    ISubParserToolingV1
+} from "../../abstract/BaseRainterpreterSubParserNPE2.sol";
 import {LibExtern, EncodedExternDispatch} from "../../lib/extern/LibExtern.sol";
 import {IInterpreterExternV3} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
 import {LibSubParse} from "../../lib/parse/LibSubParse.sol";
@@ -305,6 +309,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// gas efficient by allowing it to be constant. The reason this can't be
     /// done within the test itself is that the pointers need to be calculated
     /// relative to the bytecode of the current contract, not the test contract.
+    /// @inheritdoc ISubParserToolingV1
     function buildSubParserWordParsers() external pure returns (bytes memory) {
         unchecked {
             function(uint256, uint256, Operand) internal view returns (bool, bytes memory, uint256[] memory)

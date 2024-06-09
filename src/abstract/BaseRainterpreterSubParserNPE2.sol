@@ -9,10 +9,11 @@ import {IncompatibleSubParser} from "../error/ErrSubParse.sol";
 import {LibSubParse, ParseState} from "../lib/parse/LibSubParse.sol";
 import {CMASK_RHS_WORD_TAIL} from "../lib/parse/LibParseCMask.sol";
 import {LibParse, Operand} from "../lib/parse/LibParse.sol";
-import {LibParseMeta} from "../lib/parse/LibParseMeta.sol";
+import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {LibParseOperand} from "../lib/parse/LibParseOperand.sol";
 import {IDescribedByMetaV1} from "rain.metadata/interface/unstable/IDescribedByMetaV1.sol";
-import {IParserToolingV1} from "../interface/IParserToolingV1.sol";
+import {IParserToolingV1} from "rain.sol.codegen/interface/IParserToolingV1.sol";
+import {ISubParserToolingV1} from "rain.sol.codegen/interface/ISubParserToolingV1.sol";
 
 /// @dev This is a placeholder for the subparser function pointers.
 /// The subparser function pointers are a list of 16 bit function pointers,
@@ -71,7 +72,13 @@ bytes constant SUB_PARSER_LITERAL_PARSERS = hex"";
 ///   of the main parser. The expectation on failure is that there may be some
 ///   other subparser that can parse the data, so the main parser will handle
 ///   fallback logic.
-abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV2, IDescribedByMetaV1, IParserToolingV1 {
+abstract contract BaseRainterpreterSubParserNPE2 is
+    ERC165,
+    ISubParserV2,
+    IDescribedByMetaV1,
+    IParserToolingV1,
+    ISubParserToolingV1
+{
     using LibBytes for bytes;
     using LibParse for ParseState;
     using LibParseMeta for ParseState;
@@ -207,7 +214,7 @@ abstract contract BaseRainterpreterSubParserNPE2 is ERC165, ISubParserV2, IDescr
 
         bytes32 word;
         (cursor, word) = LibParse.parseWord(cursor, end, CMASK_RHS_WORD_TAIL);
-        (bool exists, uint256 index) = state.lookupWord(word);
+        (bool exists, uint256 index) = LibParseMeta.lookupWord(state.meta, word);
         if (exists) {
             Operand operand = state.handleOperand(index);
             function (uint256, uint256, Operand) internal pure returns (bool, bytes memory, uint256[] memory) subParser;

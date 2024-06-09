@@ -27,7 +27,7 @@ import {
     BYTECODE_HASH as INTERPRETER_BYTECODE_HASH,
     OPCODE_FUNCTION_POINTERS
 } from "../generated/RainterpreterNPE2.pointers.sol";
-import {IOpcodeToolingV1} from "../interface/IOpcodeToolingV1.sol";
+import {IOpcodeToolingV1} from "rain.sol.codegen/interface/IOpcodeToolingV1.sol";
 
 /// @title RainterpreterNPE2
 /// @notice Implementation of a Rainlang interpreter that is compatible with
