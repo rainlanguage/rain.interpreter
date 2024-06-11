@@ -3,7 +3,7 @@ pragma solidity ^0.8.18;
 
 import {Test} from "forge-std/Test.sol";
 import {LibParseState} from "src/lib/parse/LibParseState.sol";
-import {LibCtPop} from "src/lib/bitwise/LibCtPop.sol";
+import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
 
 /// @title LibParseStateConstantValueBloomTest
 contract LibParseStateConstantValueBloomTest is Test {

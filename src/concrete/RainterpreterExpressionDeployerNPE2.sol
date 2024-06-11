@@ -37,7 +37,7 @@ import {
     INTEGRITY_FUNCTION_POINTERS,
     DESCRIBED_BY_META_HASH
 } from "../generated/RainterpreterExpressionDeployerNPE2.pointers.sol";
-import {IIntegrityToolingV1} from "../interface/IIntegrityToolingV1.sol";
+import {IIntegrityToolingV1} from "rain.sol.codegen/interface/IIntegrityToolingV1.sol";
 
 /// All config required to construct a `RainterpreterNPE2`.
 /// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match

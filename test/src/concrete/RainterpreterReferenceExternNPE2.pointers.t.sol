@@ -13,7 +13,8 @@ import {
     LITERAL_PARSER_FUNCTION_POINTERS,
     OPERAND_HANDLER_FUNCTION_POINTERS
 } from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
-import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
+import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
+import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
 
 contract RainterpreterReferenceExternNPE2PointersTest is Test {
     function testOpcodeFunctionPointers() external {
@@ -33,7 +34,7 @@ contract RainterpreterReferenceExternNPE2PointersTest is Test {
     function testSubParserParseMeta() external {
         bytes memory authoringMetaBytes = LibRainterpreterReferenceExternNPE2.authoringMetaV2();
         AuthoringMetaV2[] memory authoringMeta = abi.decode(authoringMetaBytes, (AuthoringMetaV2[]));
-        bytes memory expected = LibParseMeta.buildParseMetaV2(authoringMeta, 2);
+        bytes memory expected = LibGenParseMeta.buildParseMetaV2(authoringMeta, 2);
         bytes memory actual = SUB_PARSER_PARSE_META;
         assertEq(actual, expected);
     }

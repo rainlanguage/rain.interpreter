@@ -5,7 +5,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
-import {LibCtPop} from "../../bitwise/LibCtPop.sol";
+import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
 import {FIXED_POINT_ONE} from "rain.math.fixedpoint/lib/FixedPointDecimalConstants.sol";
 
 /// @title LibOpCtPopNP

@@ -5,7 +5,7 @@ import {IERC1820_REGISTRY, IERC1820Registry} from "rain.erc1820/lib/LibIERC1820.
 import {Test, console2, stdError} from "forge-std/Test.sol";
 
 import {INVALID_BYTECODE} from "../lib/etch/LibEtch.sol";
-import {LibParseMeta} from "src/lib/parse/LibParseMeta.sol";
+import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV1.sol";
 import {RainterpreterStoreNPE2, STORE_BYTECODE_HASH} from "src/concrete/RainterpreterStoreNPE2.sol";
 import {
@@ -25,6 +25,7 @@ import {
 } from "../../src/concrete/RainterpreterExpressionDeployerNPE2.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 import {LibEncodedDispatch} from "rain.interpreter.interface/lib/caller/LibEncodedDispatch.sol";
+import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
 
 /// @title RainterpreterExpressionDeployerNPD2DeploymentTest
 /// Tests that the RainterpreterExpressionDeployerNPE2 meta is correct. Also
@@ -91,7 +92,7 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
         }
 
         AuthoringMetaV2[] memory authoringMeta = abi.decode(LibAllStandardOpsNP.authoringMetaV2(), (AuthoringMetaV2[]));
-        bytes memory parseMeta = LibParseMeta.buildParseMetaV2(authoringMeta, PARSE_META_BUILD_DEPTH);
+        bytes memory parseMeta = LibGenParseMeta.buildParseMetaV2(authoringMeta, PARSE_META_BUILD_DEPTH);
         if (keccak256(parseMeta) != keccak256(PARSE_META)) {
             console2.log("current parse meta:");
             console2.logBytes(parseMeta);

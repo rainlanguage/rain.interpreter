@@ -21,6 +21,10 @@ contract ChildRainterpreterSubParserNPE2 is BaseRainterpreterSubParserNPE2 {
     function buildOperandHandlerFunctionPointers() external pure returns (bytes memory) {
         return new bytes(0);
     }
+
+    function buildSubParserWordParsers() external pure returns (bytes memory) {
+        return new bytes(0);
+    }
 }
 
 /// @title BaseRainterpreterSubParserNPE2CompatibilityTest
