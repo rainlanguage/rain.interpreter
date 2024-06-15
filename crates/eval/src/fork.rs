@@ -374,6 +374,9 @@ impl Forker {
         let block_number = block_number
             .map(BlockNumber::from)
             .unwrap_or(org_block_number.unwrap());
+
+        self.executor.env.block.number = U256::from(block_number);
+
         self.executor
             .backend
             .roll_fork(
