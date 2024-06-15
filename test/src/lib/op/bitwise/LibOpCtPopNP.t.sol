@@ -15,7 +15,7 @@ import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpr
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibEncodedDispatch} from "rain.interpreter.interface/lib/caller/LibEncodedDispatch.sol";
-import {LibCtPop} from "src/lib/bitwise/LibCtPop.sol";
+import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpCtPopNPTest is OpTest {

@@ -1,27 +1,35 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
+import {stdError} from "forge-std/Test.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
-import {LibOpERC20TotalSupplyNP} from "src/lib/op/erc20/LibOpERC20TotalSupplyNP.sol";
+import {LibOpERC20TotalSupply} from "src/lib/op/erc20/LibOpERC20TotalSupply.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/interfaces/IERC20.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
+import {IERC20Metadata} from "openzeppelin-contracts/contracts/interfaces/IERC20Metadata.sol";
+import {LibFixedPointDecimalScale} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 
-/// @title LibOpERC20TotalSupplyNPTest
+/// @title LibOpERC20TotalSupplyTest
 /// @notice Test the opcode for getting the total supply of an erc20 contract.
-contract LibOpERC20TotalSupplyNPTest is OpTest {
+contract LibOpERC20TotalSupplyTest is OpTest {
     function testOpERC20TotalSupplyNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpERC20TotalSupplyNP.integrity(state, operand);
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpERC20TotalSupply.integrity(state, operand);
 
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
     }
 
-    function testOpERC20TotalSupplyNPRun(address account, uint256 totalSupply, uint16 operandData) external {
+    function testOpERC20TotalSupplyNPRun(address account, uint256 totalSupply, uint16 operandData, uint8 decimals)
+        external
+    {
         assumeEtchable(account);
         vm.etch(account, hex"fe");
+
+        vm.assume(!LibWillOverflow.scale18WillOverflow(totalSupply, decimals, 0));
 
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = uint256(uint160(account));
@@ -31,20 +39,33 @@ contract LibOpERC20TotalSupplyNPTest is OpTest {
         // called once for reference, once for run
         vm.expectCall(account, abi.encodeWithSelector(IERC20.totalSupply.selector), 2);
 
+        vm.mockCall(account, abi.encodeWithSelector(IERC20Metadata.decimals.selector), abi.encode(decimals));
+
         opReferenceCheck(
             opTestDefaultInterpreterState(),
             operand,
-            LibOpERC20TotalSupplyNP.referenceFn,
-            LibOpERC20TotalSupplyNP.integrity,
-            LibOpERC20TotalSupplyNP.run,
+            LibOpERC20TotalSupply.referenceFn,
+            LibOpERC20TotalSupply.integrity,
+            LibOpERC20TotalSupply.run,
             inputs
         );
     }
 
     /// Test the eval of totalSupply parsed from a string.
-    function testOpERC20TotalSupplyNPEvalHappy(uint256 totalSupply) external {
+    function testOpERC20TotalSupplyNPEvalHappy(uint256 totalSupply, uint8 decimals) external {
+        vm.assume(!LibWillOverflow.scale18WillOverflow(totalSupply, decimals, 0));
         vm.mockCall(address(0xdeadbeef), abi.encodeWithSelector(IERC20.totalSupply.selector), abi.encode(totalSupply));
+        vm.mockCall(address(0xdeadbeef), abi.encodeWithSelector(IERC20Metadata.decimals.selector), abi.encode(decimals));
+        totalSupply = LibFixedPointDecimalScale.scale18(totalSupply, decimals, 0);
         checkHappy("_: erc20-total-supply(0xdeadbeef);", totalSupply, "0xdeadbeef 0xdeadc0de");
+    }
+
+    /// Test overflow of totalSupply.
+    function testOpERC20TotalSupplyNPEvalOverflow(uint256 totalSupply, uint8 decimals) external {
+        vm.assume(LibWillOverflow.scale18WillOverflow(totalSupply, decimals, 0));
+        vm.mockCall(address(0xdeadbeef), abi.encodeWithSelector(IERC20.totalSupply.selector), abi.encode(totalSupply));
+        vm.mockCall(address(0xdeadbeef), abi.encodeWithSelector(IERC20Metadata.decimals.selector), abi.encode(decimals));
+        checkUnhappy("_: erc20-total-supply(0xdeadbeef);", stdError.arithmeticError);
     }
 
     /// Test that a totalSupply with bad inputs fails integrity.
