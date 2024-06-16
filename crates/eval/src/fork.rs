@@ -637,7 +637,7 @@ mod tests {
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
-    async fn test_fork_rolls() -> () {
+    async fn test_fork_rolls() {
         // we need to roll the fork forwards and check that the env block number is updated
         let args = NewForkedEvm {
             fork_url: POLYGON_FORK_URL.to_owned(),
