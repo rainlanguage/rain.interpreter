@@ -374,6 +374,9 @@ impl Forker {
         let block_number = block_number
             .map(BlockNumber::from)
             .unwrap_or(org_block_number.unwrap());
+
+        self.executor.env.block.number = U256::from(block_number);
+
         self.executor
             .backend
             .roll_fork(
@@ -631,5 +634,32 @@ mod tests {
         assert_eq!(balance, polygon_old_balance);
 
         Ok(())
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+    async fn test_fork_rolls() {
+        // we need to roll the fork forwards and check that the env block number is updated
+        let args = NewForkedEvm {
+            fork_url: POLYGON_FORK_URL.to_owned(),
+            fork_block_number: Some(POLYGON_FORK_NUMBER),
+        };
+        let mut forker = Forker::new_with_fork(args, None, None).await.unwrap();
+
+        // check the env block number is the same as the fork block number
+        assert_eq!(
+            forker.executor.env.block.number,
+            U256::from(POLYGON_FORK_NUMBER)
+        );
+
+        // roll the fork forwards by 1 block
+        forker
+            .roll_fork(Some(POLYGON_FORK_NUMBER + 1), None)
+            .unwrap();
+
+        // check the env block number is updated
+        assert_eq!(
+            forker.executor.env.block.number,
+            U256::from(POLYGON_FORK_NUMBER + 1)
+        );
     }
 }
