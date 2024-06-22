@@ -29,7 +29,7 @@ contract ChildRainterpreterSubParserNPE2 is BaseRainterpreterSubParserNPE2 {
 /// @title BaseRainterpreterSubParserNPE2Test
 /// Test suite for BaseRainterpreterSubParserNPE2.
 contract BaseRainterpreterSubParserNPE2IERC165Test is Test {
-    /// Test that ERC165 and ISubParserV2 are supported interfaces as
+    /// Test that ERC165 and ISubParserV3 are supported interfaces as
     /// per ERC165.
     function testRainterpreterSubParserNPE2IERC165(uint32 badInterfaceIdUint) external {
         // https://github.com/foundry-rs/foundry/issues/6115

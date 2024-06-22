@@ -29,7 +29,7 @@ library LibParseLiteralSubParseable {
     /// of the body.
     function parseSubParseable(ParseState memory state, uint256 cursor, uint256 end)
         internal
-        pure
+        view
         returns (uint256, uint256)
     {
         unchecked {

@@ -6,7 +6,7 @@ import {Test, console2, stdError} from "forge-std/Test.sol";
 
 import {INVALID_BYTECODE} from "../lib/etch/LibEtch.sol";
 import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
-import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV1.sol";
+import {AuthoringMetaV2} from "rain.interpreter.interface/interface/unstable/IParserV1View.sol";
 import {RainterpreterStoreNPE2, STORE_BYTECODE_HASH} from "src/concrete/RainterpreterStoreNPE2.sol";
 import {
     RainterpreterParserNPE2,
@@ -29,7 +29,7 @@ import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
 
 /// @title RainterpreterExpressionDeployerNPD2DeploymentTest
 /// Tests that the RainterpreterExpressionDeployerNPE2 meta is correct. Also
-/// tests basic functionality of the `IParserV1` interface implementation.
+/// tests basic functionality of the `IParserV1View` interface implementation.
 abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
     //solhint-disable-next-line private-vars-leading-underscore
     RainterpreterExpressionDeployerNPE2 internal immutable iDeployer;

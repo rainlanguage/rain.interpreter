@@ -5,7 +5,7 @@ import {IERC165, ERC165} from "openzeppelin-contracts/contracts/utils/introspect
 
 import {LibParse} from "../lib/parse/LibParse.sol";
 import {IParserPragmaV1, PragmaV1} from "rain.interpreter.interface/interface/unstable/IParserPragmaV1.sol";
-import {IParserV1} from "rain.interpreter.interface/interface/IParserV1.sol";
+import {IParserV1View} from "rain.interpreter.interface/interface/unstable/IParserV1View.sol";
 import {LibParseState, ParseState} from "../lib/parse/LibParseState.sol";
 import {LibParsePragma} from "../lib/parse/LibParsePragma.sol";
 import {LibParseLiteral} from "../lib/parse/literal/LibParseLiteral.sol";
@@ -23,7 +23,7 @@ import {IParserToolingV1} from "rain.sol.codegen/interface/IParserToolingV1.sol"
 
 /// @title RainterpreterParserNPE2
 /// @dev The parser implementation.
-contract RainterpreterParserNPE2 is IParserV1, IParserPragmaV1, ERC165, IParserToolingV1 {
+contract RainterpreterParserNPE2 is IParserV1View, IParserPragmaV1, ERC165, IParserToolingV1 {
     using LibParse for ParseState;
     using LibParseState for ParseState;
     using LibParsePragma for ParseState;
@@ -32,12 +32,12 @@ contract RainterpreterParserNPE2 is IParserV1, IParserPragmaV1, ERC165, IParserT
 
     /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
-        return interfaceId == type(IParserV1).interfaceId || interfaceId == type(IParserPragmaV1).interfaceId
+        return interfaceId == type(IParserV1View).interfaceId || interfaceId == type(IParserPragmaV1).interfaceId
             || super.supportsInterface(interfaceId);
     }
 
-    /// @inheritdoc IParserV1
-    function parse(bytes memory data) external pure virtual override returns (bytes memory, uint256[] memory) {
+    /// @inheritdoc IParserV1View
+    function parse(bytes memory data) external view virtual override returns (bytes memory, uint256[] memory) {
         // The return is used by returning it, so this is a false positive.
         //slither-disable-next-line unused-return
         return LibParseState.newState(

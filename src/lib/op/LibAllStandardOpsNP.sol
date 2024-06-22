@@ -305,12 +305,12 @@ library LibAllStandardOpsNP {
 
     function literalParserFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
-            function (ParseState memory, uint256, uint256) pure returns (uint256, uint256) lengthPointer;
+            function (ParseState memory, uint256, uint256) view returns (uint256, uint256) lengthPointer;
             uint256 length = LITERAL_PARSERS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function (ParseState memory, uint256, uint256) pure returns (uint256, uint256)[LITERAL_PARSERS_LENGTH + 1]
+            function (ParseState memory, uint256, uint256) view returns (uint256, uint256)[LITERAL_PARSERS_LENGTH + 1]
                 memory pointersFixed = [
                     lengthPointer,
                     LibParseLiteralHex.parseHex,
