@@ -2,7 +2,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV1.sol";
+import {AuthoringMetaV2} from "rain.interpreter.interface/interface/unstable/IParserV1View.sol";
 import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {LibParse} from "src/lib/parse/LibParse.sol";
 import {Operand, LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
@@ -105,217 +105,217 @@ contract LibParseSingleRHSNamedGasTest is Test {
     }
 
     /// Test parsing "a" (1 char) as the RHS.
-    function testParseGasRHS00() external pure {
+    function testParseGasRHS00() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:a();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aa" (2 chars) as the RHS.
-    function testParseGasRHS01() external pure {
+    function testParseGasRHS01() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaa" (3 chars) as the RHS.
-    function testParseGasRHS02() external pure {
+    function testParseGasRHS02() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaa" (4 chars) as the RHS.
-    function testParseGasRHS03() external pure {
+    function testParseGasRHS03() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaa" (5 chars) as the RHS.
-    function testParseGasRHS04() external pure {
+    function testParseGasRHS04() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaa" (6 chars) as the RHS.
-    function testParseGasRHS05() external pure {
+    function testParseGasRHS05() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaa" (7 chars) as the RHS.
-    function testParseGasRHS06() external pure {
+    function testParseGasRHS06() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaa" (8 chars) as the RHS.
-    function testParseGasRHS07() external pure {
+    function testParseGasRHS07() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaa" (9 chars) as the RHS.
-    function testParseGasRHS08() external pure {
+    function testParseGasRHS08() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaa" (10 chars) as the RHS.
-    function testParseGasRHS09() external pure {
+    function testParseGasRHS09() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaa" (11 chars) as the RHS.
-    function testParseGasRHS10() external pure {
+    function testParseGasRHS10() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaa" (12 chars) as the RHS.
-    function testParseGasRHS11() external pure {
+    function testParseGasRHS11() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaa" (13 chars) as the RHS.
-    function testParseGasRHS12() external pure {
+    function testParseGasRHS12() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaa" (14 chars) as the RHS.
-    function testParseGasRHS13() external pure {
+    function testParseGasRHS13() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaa" (15 chars) as the RHS.
-    function testParseGasRHS14() external pure {
+    function testParseGasRHS14() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaa" (16 chars) as the RHS.
-    function testParseGasRHS15() external pure {
+    function testParseGasRHS15() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaa" (17 chars) as the RHS.
-    function testParseGasRHS16() external pure {
+    function testParseGasRHS16() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaa" (18 chars) as the RHS.
-    function testParseGasRHS17() external pure {
+    function testParseGasRHS17() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaa" (19 chars) as the RHS.
-    function testParseGasRHS18() external pure {
+    function testParseGasRHS18() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaa" (20 chars) as the RHS.
-    function testParseGasRHS19() external pure {
+    function testParseGasRHS19() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaaaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaa" (21 chars) as the RHS.
-    function testParseGasRHS20() external pure {
+    function testParseGasRHS20() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaaaaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaa" (22 chars) as the RHS.
-    function testParseGasRHS21() external pure {
+    function testParseGasRHS21() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaaaaaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaa" (23 chars) as the RHS.
-    function testParseGasRHS22() external pure {
+    function testParseGasRHS22() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaaaaaaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaa" (24 chars) as the RHS.
-    function testParseGasRHS23() external pure {
+    function testParseGasRHS23() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaaaaaaaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaaa" (25 chars) as the RHS.
-    function testParseGasRHS24() external pure {
+    function testParseGasRHS24() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaaaaaaaaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaaaa" (26 chars) as the RHS.
-    function testParseGasRHS25() external pure {
+    function testParseGasRHS25() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaaaaaaaaaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaaaaa" (27 chars) as the RHS.
-    function testParseGasRHS26() external pure {
+    function testParseGasRHS26() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaaaaaaaaaaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaaaaaa" (28 chars) as the RHS.
-    function testParseGasRHS27() external pure {
+    function testParseGasRHS27() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaaaaaaaaaaaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaaaaaaa" (29 chars) as the RHS.
-    function testParseGasRHS28() external pure {
+    function testParseGasRHS28() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaaaaaaaaaaaaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" (30 chars) as the RHS.
-    function testParseGasRHS29() external pure {
+    function testParseGasRHS29() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa();").parse();
         (bytecode);
         (constants);
     }
 
     /// Test parsing "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" (31 chars) as the RHS.
-    function testParseGasRHS30() external pure {
+    function testParseGasRHS30() external view {
         (bytes memory bytecode, uint256[] memory constants) = newState("_:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa();").parse();
         (bytecode);
         (constants);

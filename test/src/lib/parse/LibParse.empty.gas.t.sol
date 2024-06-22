@@ -14,27 +14,27 @@ contract LibParseEmptyGasTest is Test {
     using LibParse for ParseState;
 
     /// Test parsing "" (0 chars) an empty expression.
-    function testParseGasEmpty00() external pure {
+    function testParseGasEmpty00() external view {
         LibMetaFixture.newState("").parse();
     }
 
     /// Test parsing ":;" (2 chars) an empty expression.
-    function testParseGasEmpty01() external pure {
+    function testParseGasEmpty01() external view {
         LibMetaFixture.newState(":;").parse();
     }
 
     /// Test parsing ":;:;" (4 chars) an empty expression.
-    function testParseGasEmpty02() external pure {
+    function testParseGasEmpty02() external view {
         LibMetaFixture.newState(":;:;").parse();
     }
 
     /// Test parsing ":;:;:;" (6 chars) an empty expression.
-    function testParseGasEmpty03() external pure {
+    function testParseGasEmpty03() external view {
         LibMetaFixture.newState(":;:;:;").parse();
     }
 
     /// Test parsing ":;:;:;:;" (8 chars) an empty expression.
-    function testParseGasEmpty04() external pure {
+    function testParseGasEmpty04() external view {
         LibMetaFixture.newState(":;:;:;:;").parse();
     }
 }

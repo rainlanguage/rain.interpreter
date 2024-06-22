@@ -15,7 +15,7 @@ contract LibParseLiteralStringTest is Test {
     using LibParse for ParseState;
 
     /// External parse function to allow us to assert reverts.
-    function externalParse(string memory str) external pure returns (bytes memory, uint256[] memory) {
+    function externalParse(string memory str) external view returns (bytes memory, uint256[] memory) {
         return LibMetaFixture.newState(str).parse();
     }
 

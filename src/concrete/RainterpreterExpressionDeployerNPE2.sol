@@ -21,7 +21,7 @@ import {
     IExpressionDeployerV4,
     IERC1820_NAME_IEXPRESSION_DEPLOYER_V4
 } from "rain.interpreter.interface/interface/unstable/IExpressionDeployerV4.sol";
-import {IParserV1} from "rain.interpreter.interface/interface/IParserV1.sol";
+import {IParserV1View} from "rain.interpreter.interface/interface/unstable/IParserV1View.sol";
 import {IInterpreterV2} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {IDescribedByMetaV1} from "rain.metadata/interface/unstable/IDescribedByMetaV1.sol";
@@ -43,7 +43,7 @@ import {IIntegrityToolingV1} from "rain.sol.codegen/interface/IIntegrityToolingV
 /// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match
 /// known bytecode.
 /// @param store The `IInterpreterStoreV2`. MUST match known bytecode.
-/// @param parser The `IParserV1`. MUST match known bytecode.
+/// @param parser The `IParserV1View`. MUST match known bytecode.
 struct RainterpreterExpressionDeployerNPE2ConstructionConfigV2 {
     address interpreter;
     address store;
@@ -68,13 +68,13 @@ contract RainterpreterExpressionDeployerNPE2 is
     IInterpreterV2 public immutable iInterpreter;
     /// The store with known bytecode that this deployer is constructed for.
     IInterpreterStoreV2 public immutable iStore;
-    IParserV1 public immutable iParser;
+    IParserV1View public immutable iParser;
 
     constructor(RainterpreterExpressionDeployerNPE2ConstructionConfigV2 memory config) {
         // Set the immutables.
         IInterpreterV2 interpreter = IInterpreterV2(config.interpreter);
         IInterpreterStoreV2 store = IInterpreterStoreV2(config.store);
-        IParserV1 parser = IParserV1(config.parser);
+        IParserV1View parser = IParserV1View(config.parser);
 
         iInterpreter = interpreter;
         iStore = store;
@@ -109,7 +109,7 @@ contract RainterpreterExpressionDeployerNPE2 is
 
         // Emit the DISPairV2.
         // The parser is this contract as it implements both
-        // `IExpressionDeployerV4` and `IParserV1`.
+        // `IExpressionDeployerV4` and `IParserV1View`.
         emit DISPairV2(msg.sender, address(interpreter), address(store), address(parser));
 
         // Register the interface for the deployer.
