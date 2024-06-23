@@ -20,6 +20,7 @@ reqwest = { workspace = true }
 once_cell = { workspace = true }
 rain-interpreter-env = { workspace = true }
 eyre = { workspace = true }
+rain-error-decoding = { workspace = true }
 
 [dev-dependencies]
 tokio = { workspace = true }

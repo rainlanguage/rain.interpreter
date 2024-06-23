@@ -1,4 +1,4 @@
-use crate::error::{selector_registry_abi_decode, ForkCallError};
+use crate::error::ForkCallError;
 use alloy_primitives::{Address, BlockNumber, U256};
 use alloy_sol_types::SolCall;
 use foundry_evm::{
@@ -7,6 +7,7 @@ use foundry_evm::{
     fork::{CreateFork, ForkId, MultiFork},
     opts::EvmOpts,
 };
+use rain_error_decoding::AbiDecodedErrorType;
 use revm::{
     interpreter::InstructionResult,
     primitives::{Address as Addr, Bytes, Env, HashSet, SpecId, U256 as Uint256},
@@ -224,7 +225,7 @@ impl Forker {
         if decode_error && raw.exit_reason == InstructionResult::Revert {
             // decode result bytes to error selectors if it was a revert
             return Err(ForkCallError::AbiDecodedError(
-                selector_registry_abi_decode(&raw.result).await?,
+                AbiDecodedErrorType::selector_registry_abi_decode(&raw.result).await?,
             ));
         }
 
@@ -269,7 +270,7 @@ impl Forker {
         if decode_error && raw.exit_reason == InstructionResult::Revert {
             // decode result bytes to error selectors if it was a revert
             return Err(ForkCallError::AbiDecodedError(
-                selector_registry_abi_decode(&raw.result).await?,
+                AbiDecodedErrorType::selector_registry_abi_decode(&raw.result).await?,
             ));
         }
 
