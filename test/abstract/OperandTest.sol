@@ -11,7 +11,7 @@ abstract contract OperandTest is Test {
 
     // External version of parse for testing. Expect revert only works properly
     // when called externally.
-    function parse(bytes memory rainString) external pure returns (bytes memory bytecode, uint256[] memory constants) {
+    function parse(bytes memory rainString) external view returns (bytes memory bytecode, uint256[] memory constants) {
         return LibMetaFixture.newState(string(rainString)).parse();
     }
 
