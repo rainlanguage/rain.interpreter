@@ -5,6 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 import {ISubParserV3} from "rain.interpreter.interface/interface/unstable/ISubParserV3.sol";
 import {BaseRainterpreterSubParserNPE2} from "src/abstract/BaseRainterpreterSubParserNPE2.sol";
+import {IDescribedByMetaV1} from "rain.metadata/interface/unstable/IDescribedByMetaV1.sol";
 
 /// @dev We need a contract that is deployable in order to test the abstract
 /// base contract.
@@ -37,10 +38,12 @@ contract BaseRainterpreterSubParserNPE2IERC165Test is Test {
 
         vm.assume(badInterfaceId != type(IERC165).interfaceId);
         vm.assume(badInterfaceId != type(ISubParserV3).interfaceId);
+        vm.assume(badInterfaceId != type(IDescribedByMetaV1).interfaceId);
 
         ChildRainterpreterSubParserNPE2 subParser = new ChildRainterpreterSubParserNPE2();
         assertTrue(subParser.supportsInterface(type(IERC165).interfaceId));
         assertTrue(subParser.supportsInterface(type(ISubParserV3).interfaceId));
+        assertTrue(subParser.supportsInterface(type(IDescribedByMetaV1).interfaceId));
         assertFalse(subParser.supportsInterface(badInterfaceId));
     }
 }
