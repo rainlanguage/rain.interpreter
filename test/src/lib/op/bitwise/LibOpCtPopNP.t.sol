@@ -20,6 +20,8 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 
+import {console2} from "forge-std/Test.sol";
+
 contract LibOpCtPopNPTest is OpTest {
     /// Directly test the integrity logic of LibOpCtPopNP. All possible operands
     /// result in the same number of inputs and outputs, (1, 1).
@@ -43,7 +45,7 @@ contract LibOpCtPopNPTest is OpTest {
     function testOpCtPopNPEval(uint256 x) external {
         uint256[] memory stack = new uint256[](1);
         stack[0] = LibCtPop.ctpop(x) * 1e18;
-        checkHappy(bytes.concat("_: bitwise-count-ones(", bytes(Strings.toString(x)), ");"), stack, "");
+        checkHappy(bytes(string.concat("_: bitwise-count-ones(", Strings.toString(x), "e-18);")), stack, "");
     }
 
     /// Test that a bitwise count with bad inputs fails integrity.
