@@ -20,8 +20,6 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 
-import {console2} from "forge-std/Test.sol";
-
 contract LibOpCtPopNPTest is OpTest {
     /// Directly test the integrity logic of LibOpCtPopNP. All possible operands
     /// result in the same number of inputs and outputs, (1, 1).
