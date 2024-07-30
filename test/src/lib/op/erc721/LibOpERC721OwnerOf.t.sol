@@ -18,6 +18,8 @@ import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreter
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
+import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
+
 /// @title LibOpERC721OwnerOfTest
 /// @notice Test the opcode for getting the owner of an erc721 token.
 contract LibOpERC721OwnerOfTest is OpTest {
@@ -51,8 +53,14 @@ contract LibOpERC721OwnerOfTest is OpTest {
         );
     }
 
-    function testOpERC721OwnerOfNPEval(address token, uint256 tokenId, address owner) public {
-        bytes memory bytecode = iDeployer.parse2("_: erc721-owner-of(0x00 0x01);");
+    function testOpERC721OwnerOfNPEvalHappy(address token, uint256 tokenId, address owner) public {
+        bytes memory bytecode = iDeployer.parse2(
+            bytes(
+                string.concat(
+                    "_: erc721-owner-of(", Strings.toHexString(token), " ", Strings.toHexString(tokenId), ");"
+                )
+            )
+        );
 
         assumeEtchable(token);
         vm.etch(token, hex"fe");

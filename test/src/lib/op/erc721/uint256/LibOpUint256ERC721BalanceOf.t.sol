@@ -18,6 +18,8 @@ import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreter
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
+import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
+
 /// @title LibOpUint256ERC721BalanceOfTest
 /// @notice Test the opcode for getting the balance of an erc721 token.
 contract LibOpUint256ERC721BalanceOfTest is OpTest {
@@ -60,8 +62,14 @@ contract LibOpUint256ERC721BalanceOfTest is OpTest {
         );
     }
 
-    function testOpERC721BalanceOfEval(address token, address account, uint256 balance) public {
-        bytes memory bytecode = iDeployer.parse2("_: uint256-erc721-balance-of(0x00 0x01);");
+    function testOpERC721BalanceOfEvalHappy(address token, address account, uint256 balance) public {
+        bytes memory bytecode = iDeployer.parse2(
+            bytes(
+                string.concat(
+                    "_: uint256-erc721-balance-of(", Strings.toHexString(token), " ", Strings.toHexString(account), ");"
+                )
+            )
+        );
 
         assumeEtchable(token);
         vm.etch(token, hex"fe");
