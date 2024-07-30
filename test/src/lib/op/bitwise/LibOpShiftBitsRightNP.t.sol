@@ -131,15 +131,15 @@ contract LibOpShiftBitsRightNPTest is OpTest {
 
     /// Test that a bitwise shift with bad shift amount fails integrity.
     function testOpShiftBitsRightNPIntegrityFailBadShiftAmount() external {
-        checkUnhappyDeploy(
+        checkUnhappyParse2(
             "_: bitwise-shift-right<0>(0);", abi.encodeWithSelector(UnsupportedBitwiseShiftAmount.selector, 0)
         );
-        checkUnhappyDeploy(
+        checkUnhappyParse2(
             "_: bitwise-shift-right<256>(0);", abi.encodeWithSelector(UnsupportedBitwiseShiftAmount.selector, 256)
         );
         // Something even bigger than 256, but without overflowing the uint16
         // for the operand itself.
-        checkUnhappyDeploy(
+        checkUnhappyParse2(
             "_: bitwise-shift-right<65535>(0);", abi.encodeWithSelector(UnsupportedBitwiseShiftAmount.selector, 65535)
         );
         // Lets go ahead and overflow the operand.

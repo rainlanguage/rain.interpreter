@@ -189,17 +189,16 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
 
     function parseAndEval(bytes memory rainString, uint256[][] memory context)
         internal
+        view
         returns (uint256[] memory, uint256[] memory)
     {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
-            iDeployer.deployExpression2(bytecode, constants);
-        (io);
+        bytes memory bytecode = iDeployer.parse2(rainString);
 
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
-            storeDeployer,
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+            iStore,
             LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
-            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), type(uint16).max),
+            bytecode,
+            SourceIndexV2.wrap(0),
             context,
             new uint256[](0)
         );
@@ -208,7 +207,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
 
     /// 90%+ of the time we don't need to pass a context. This overloads a
     /// simplified interface to parse and eval.
-    function parseAndEval(bytes memory rainString) internal returns (uint256[] memory, uint256[] memory) {
+    function parseAndEval(bytes memory rainString) internal view returns (uint256[] memory, uint256[] memory) {
         return parseAndEval(rainString, LibContext.build(new uint256[][](0), new SignedContextV1[](0)));
     }
 
@@ -252,27 +251,23 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     }
 
     function checkUnhappy(bytes memory rainString, bytes memory err) internal {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
-            iDeployer.deployExpression2(bytecode, constants);
-        (io);
+        bytes memory bytecode = iDeployer.parse2(rainString);
         vm.expectRevert(err);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
-            storeDeployer,
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+            iStore,
             FullyQualifiedNamespace.wrap(0),
-            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
+            bytecode,
+            SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)
         );
         (stack, kvs);
     }
 
-    function checkUnhappyDeploy(bytes memory rainString, bytes memory err) internal {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
+    function checkUnhappyParse2(bytes memory rainString, bytes memory err) internal {
         vm.expectRevert(err);
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
-            iDeployer.deployExpression2(bytecode, constants);
-        (interpreterDeployer, storeDeployer, expression, io);
+        bytes memory bytecode = iDeployer.parse2(rainString);
+        (bytecode);
     }
 
     function checkUnhappyParse(bytes memory rainString, bytes memory err) internal {
@@ -285,7 +280,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     function checkBadInputs(bytes memory rainString, uint256 opIndex, uint256 calcInputs, uint256 bytecodeInputs)
         internal
     {
-        checkUnhappyDeploy(
+        checkUnhappyParse2(
             rainString, abi.encodeWithSelector(BadOpInputsLength.selector, opIndex, calcInputs, bytecodeInputs)
         );
     }
@@ -293,7 +288,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     function checkBadOutputs(bytes memory rainString, uint256 opIndex, uint256 calcOutputs, uint256 bytecodeOutputs)
         internal
     {
-        checkUnhappyDeploy(
+        checkUnhappyParse2(
             rainString, abi.encodeWithSelector(BadOpOutputsLength.selector, opIndex, calcOutputs, bytecodeOutputs)
         );
     }

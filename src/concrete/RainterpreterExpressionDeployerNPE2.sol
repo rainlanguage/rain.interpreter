@@ -17,10 +17,6 @@ import {
     UnexpectedParserBytecodeHash,
     UnexpectedPointers
 } from "../error/ErrDeploy.sol";
-import {
-    IExpressionDeployerV4,
-    IERC1820_NAME_IEXPRESSION_DEPLOYER_V4
-} from "rain.interpreter.interface/interface/unstable/IExpressionDeployerV4.sol";
 import {IParserV1View} from "rain.interpreter.interface/interface/unstable/IParserV1View.sol";
 import {IInterpreterV2} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
@@ -53,7 +49,6 @@ struct RainterpreterExpressionDeployerNPE2ConstructionConfigV2 {
 /// @title RainterpreterExpressionDeployerNPE2
 contract RainterpreterExpressionDeployerNPE2 is
     IDescribedByMetaV1,
-    IExpressionDeployerV4,
     IParserV2,
     IParserPragmaV1,
     IIntegrityToolingV1,
@@ -106,54 +101,12 @@ contract RainterpreterExpressionDeployerNPE2 is
         if (parserHash != expectedParserBytecodeHash()) {
             revert UnexpectedParserBytecodeHash(expectedParserBytecodeHash(), parserHash);
         }
-
-        // Emit the DISPairV2.
-        // The parser is this contract as it implements both
-        // `IExpressionDeployerV4` and `IParserV1View`.
-        emit DISPairV2(msg.sender, address(interpreter), address(store), address(parser));
-
-        // Register the interface for the deployer.
-        // We have to check that the 1820 registry has bytecode at the address
-        // before we can register the interface. We can't assume that the chain
-        // we are deploying to has 1820 deployed.
-        if (address(IERC1820_REGISTRY).code.length > 0) {
-            IERC1820_REGISTRY.setInterfaceImplementer(
-                address(this), IERC1820_REGISTRY.interfaceHash(IERC1820_NAME_IEXPRESSION_DEPLOYER_V4), address(this)
-            );
-        }
     }
 
     /// @inheritdoc IERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IExpressionDeployerV4).interfaceId
-            || interfaceId == type(IDescribedByMetaV1).interfaceId || interfaceId == type(IParserV2).interfaceId
+        return interfaceId == type(IDescribedByMetaV1).interfaceId || interfaceId == type(IParserV2).interfaceId
             || interfaceId == type(IParserPragmaV1).interfaceId || super.supportsInterface(interfaceId);
-    }
-
-    /// @inheritdoc IExpressionDeployerV4
-    function deployExpression2(bytes memory bytecode, uint256[] memory constants)
-        external
-        virtual
-        returns (IInterpreterV2, IInterpreterStoreV2, address, bytes memory)
-    {
-        bytes memory io = LibIntegrityCheckNP.integrityCheck2(INTEGRITY_FUNCTION_POINTERS, bytecode, constants);
-
-        emit NewExpression(msg.sender, bytecode, constants);
-
-        (DataContractMemoryContainer container, Pointer pointer) =
-            LibDataContract.newContainer(LibInterpreterStateDataContractNP.serializeSizeNP(bytecode, constants));
-
-        // Serialize the state config into bytes that can be deserialized later
-        // by the interpreter.
-        LibInterpreterStateDataContractNP.unsafeSerializeNP(pointer, bytecode, constants);
-
-        // Deploy the serialized expression onchain.
-        address expression = LibDataContract.write(container);
-
-        // Emit and return the address of the deployed expression.
-        emit DeployedExpression(msg.sender, iInterpreter, iStore, expression, io);
-
-        return (iInterpreter, iStore, expression, io);
     }
 
     /// @inheritdoc IParserV2
