@@ -125,19 +125,34 @@ library LibAllStandardOpsNP {
                 "Copies a value from the context. The first operand is the context column and second is the context row."
             ),
             // These are all ordered according to how they appear in the file system.
-            AuthoringMetaV2("bitwise-and", "Bitwise AND the top two items on the stack."),
-            AuthoringMetaV2("bitwise-or", "Bitwise OR the top two items on the stack."),
-            AuthoringMetaV2("bitwise-count-ones", "Counts the number of binary bits set to 1 in the input."),
+            AuthoringMetaV2(
+                "bitwise-and",
+                "Bitwise AND the top two items on the stack. Probably does NOT do what you expect for decimal numbers."
+            ),
+            AuthoringMetaV2(
+                "bitwise-or",
+                "Bitwise OR the top two items on the stack. Probably does NOT do what you expect for decimal numbers."
+            ),
+            AuthoringMetaV2(
+                "bitwise-count-ones",
+                "Counts the number of binary bits set to 1 in the input. Probably does NOT do what you expect for decimal numbers."
+            ),
             AuthoringMetaV2(
                 "bitwise-decode",
-                "Decodes a value from a 256 bit value that was encoded with bitwise-encode. The first operand is the start bit and the second is the length."
+                "Decodes a value from a 256 bit value that was encoded with bitwise-encode. The first operand is the start bit and the second is the length. Probably does NOT do what you expect for decimal numbers."
             ),
             AuthoringMetaV2(
                 "bitwise-encode",
-                "Encodes a value into a 256 bit value. The first operand is the start bit and the second is the length."
+                "Encodes a value into a 256 bit value. The first operand is the start bit and the second is the length. Probably does NOT do what you expect for decimal numbers."
             ),
-            AuthoringMetaV2("bitwise-shift-left", "Shifts the input left by the number of bits specified in the operand."),
-            AuthoringMetaV2("bitwise-shift-right", "Shifts the input right by the number of bits specified in the operand."),
+            AuthoringMetaV2(
+                "bitwise-shift-left",
+                "Shifts the input left by the number of bits specified in the operand. Probably does NOT do what you expect for decimal numbers."
+            ),
+            AuthoringMetaV2(
+                "bitwise-shift-right",
+                "Shifts the input right by the number of bits specified in the operand. Probably does NOT do what you expect for decimal numbers."
+            ),
             AuthoringMetaV2(
                 "call",
                 "Calls a source by index in the same Rain bytecode. The inputs to call are copied to the top of the called stack and the outputs are copied back to the calling stack according to the LHS items. The first operand is the source index."

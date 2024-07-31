@@ -124,45 +124,12 @@ contract LibOpStackNPTest is OpTest {
 
     /// Test the eval of a stack opcode parsed from a string.
     function testOpStackEval() external {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("foo: 1, bar: foo;");
-        uint256 sourceIndex = 0;
-        assertEq(LibBytecode.sourceCount(bytecode), 1);
-        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 2);
-        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 2);
-        (uint256 sourceInputs, uint256 sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
-        assertEq(sourceInputs, 0);
-        assertEq(sourceOutputs, 2);
-        assertEq(
-            bytecode,
-            // 1 source
-            hex"01"
-            // 0 offset
-            hex"0000"
-            // 2 ops
-            hex"02"
-            // 2 stack allocation
-            hex"02"
-            // 0 inputs
-            hex"00"
-            // 2 outputs
-            hex"02"
-            // constant 0
-            hex"01100000"
-            // stack 0
-            hex"00100000"
-        );
-
-        assertEq(constants.length, 1);
-        assertEq(constants[0], 1e18);
-
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
-            iDeployer.deployExpression2(bytecode, constants);
-        (io);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
-            storeDeployer,
+        bytes memory bytecode = iDeployer.parse2("foo: 1, bar: foo;");
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+            iStore,
             FullyQualifiedNamespace.wrap(0),
-            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 2),
+            bytecode,
+            SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)
         );
@@ -174,45 +141,13 @@ contract LibOpStackNPTest is OpTest {
 
     /// Test the eval of several stack opcodes parsed from a string.
     function testOpStackEvalSeveral() external {
-        (bytes memory bytecode, uint256[] memory constants) =
-            iParser.parse("foo: 1, bar: foo, _ baz: bar bar, bing _:foo baz;");
-        assertEq(constants.length, 1);
-        assertEq(constants[0], 1e18);
-        assertEq(
-            bytecode,
-            // 1 source
-            hex"01"
-            // 0 offset
-            hex"0000"
-            // 6 ops
-            hex"06"
-            // 6 stack allocation
-            hex"06"
-            // 0 inputs
-            hex"00"
-            // 6 outputs
-            hex"06"
-            // constant 0 (1)
-            hex"01100000"
-            // stack 0 (foo)
-            hex"00100000"
-            // stack 1 (bar)
-            hex"00100001"
-            // stack 1 (bar)
-            hex"00100001"
-            // stack 0 (foo)
-            hex"00100000"
-            // stack 3 (baz)
-            hex"00100003"
-        );
+        bytes memory bytecode = iDeployer.parse2("foo: 1, bar: foo, _ baz: bar bar, bing _:foo baz;");
 
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
-            iDeployer.deployExpression2(bytecode, constants);
-        (io);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
-            storeDeployer,
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+            iStore,
             FullyQualifiedNamespace.wrap(0),
-            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 6),
+            bytecode,
+            SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)
         );
@@ -228,21 +163,21 @@ contract LibOpStackNPTest is OpTest {
 
     /// It is an error to have multiple outputs for a stack item.
     function testOpStackNPMultipleOutputErrorSugared() external {
-        checkUnhappyDeploy("foo: 1, _ _: foo;", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 2));
+        checkUnhappyParse2("foo: 1, _ _: foo;", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 2));
     }
 
     /// It is an error to have multiple outputs for a stack item.
     function testOpStackNPMultipleOutputErrorUnsugared() external {
-        checkUnhappyDeploy("foo: 1, _ _: stack<0>();", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 2));
+        checkUnhappyParse2("foo: 1, _ _: stack<0>();", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 2));
     }
 
     /// It is an error to have zero outputs for a stack item.
     function testOpStackNPZeroOutputErrorSugared() external {
-        checkUnhappyDeploy("foo: 1,: foo;", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 0));
+        checkUnhappyParse2("foo: 1,: foo;", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 0));
     }
 
     /// It is an error to have zero outputs for a stack item.
     function testOpStackNPZeroOutputErrorUnsugared() external {
-        checkUnhappyDeploy("foo: 1,: stack<0>();", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 0));
+        checkUnhappyParse2("foo: 1,: stack<0>();", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 0));
     }
 }

@@ -57,30 +57,27 @@ contract LibOpChainIdNPTest is OpTest {
 
     /// Test the eval of a chain ID opcode parsed from a string.
     function testOpChainIDNPEval(uint64 chainId, FullyQualifiedNamespace namespace) public {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: chain-id();");
-
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
-            iDeployer.deployExpression2(bytecode, constants);
+        bytes memory bytecode = iDeployer.parse2("_: chain-id();");
 
         vm.chainId(chainId);
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
-            storeDeployer,
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+            iStore,
             namespace,
-            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
+            bytecode,
+            SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)
         );
         assertEq(stack.length, 1, "stack length");
         assertEq(stack[0], uint256(chainId) * 1e18, "stack item");
         assertEq(kvs.length, 0, "kvs length");
-        assertEq(io, hex"0001", "io");
     }
 
     /// Test that a chain ID with inputs fails integrity check.
     function testOpChainIdNPEvalFail() public {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: chain-id(0x00);");
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
-        iDeployer.deployExpression2(bytecode, constants);
+        bytes memory bytecode = iDeployer.parse2("_: chain-id(0x00);");
+        (bytecode);
     }
 
     function testOpChainIdNPZeroOutputs() external {

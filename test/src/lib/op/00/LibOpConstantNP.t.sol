@@ -75,64 +75,20 @@ contract LibOpConstantNPTest is OpTest {
     /// Test the case of an empty constants array via. an end to end test. We
     /// expect the deployer to revert, as the integrity check MUST fail.
     function testOpConstantEvalZeroConstants() external {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_ _ _: constant() constant() constant();");
-        uint256 sourceIndex = 0;
-        assertEq(LibBytecode.sourceCount(bytecode), 1);
-        assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
-        assertEq(LibBytecode.sourceOpsCount(bytecode, sourceIndex), 3);
-        assertEq(LibBytecode.sourceStackAllocation(bytecode, sourceIndex), 3);
-        (uint256 sourceInputs, uint256 sourceOutputs) = LibBytecode.sourceInputsOutputsLength(bytecode, sourceIndex);
-        assertEq(sourceInputs, 0);
-        assertEq(sourceOutputs, 3);
-
-        assertEq(
-            bytecode,
-            // 1 source.
-            hex"01"
-            // offset 0
-            hex"0000"
-            // 3 ops
-            hex"03"
-            // 3 stack allocation
-            hex"03"
-            // 0 inputs
-            hex"00"
-            // 3 outputs
-            hex"03"
-            // constant 0
-            hex"01100000"
-            // constant 0
-            hex"01100000"
-            // constant 0
-            hex"01100000"
-        );
-
-        assertEq(constants.length, 0);
-
         vm.expectRevert(abi.encodeWithSelector(OutOfBoundsConstantRead.selector, 0, 0, 0));
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
-            iDeployer.deployExpression2(bytecode, constants);
-        (interpreterDeployer);
-        (storeDeployer);
-        (expression);
-        (io);
+        bytes memory bytecode = iDeployer.parse2("_ _ _: constant() constant() constant();");
+        (bytecode);
     }
 
     /// Test the eval of a constant opcode parsed from a string.
     function testOpConstantEvalNPE2E() external {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_ _: max-value() 1.001;");
+        bytes memory bytecode = iDeployer.parse2("_ _: max-value() 1.001;");
 
-        assertEq(constants.length, 1);
-        assertEq(constants[0], 1001e15);
-
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
-            iDeployer.deployExpression2(bytecode, constants);
-        (io);
-
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
-            storeDeployer,
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+            iStore,
             FullyQualifiedNamespace.wrap(0),
-            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 2),
+            bytecode,
+            SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)
         );
@@ -144,21 +100,21 @@ contract LibOpConstantNPTest is OpTest {
 
     /// It is an error to have multiple outputs for a constant.
     function testOpConstantNPMultipleOutputErrorSugared() external {
-        checkUnhappyDeploy("_ _: 1;", abi.encodeWithSelector(BadOpOutputsLength.selector, 0, 1, 2));
+        checkUnhappyParse2("_ _: 1;", abi.encodeWithSelector(BadOpOutputsLength.selector, 0, 1, 2));
     }
 
     /// It is an error to have multiple outputs for a constant.
     function testOpConstantNPMultipleOutputErrorUnsugared() external {
-        checkUnhappyDeploy("_:1,_ _: constant<0>();", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 2));
+        checkUnhappyParse2("_:1,_ _: constant<0>();", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 2));
     }
 
     /// It is an error to have zero outputs for a constant.
     function testOpConstantNPZeroOutputErrorSugared() external {
-        checkUnhappyDeploy(":1;", abi.encodeWithSelector(BadOpOutputsLength.selector, 0, 1, 0));
+        checkUnhappyParse2(":1;", abi.encodeWithSelector(BadOpOutputsLength.selector, 0, 1, 0));
     }
 
     /// It is an error to have zero outputs for a constant.
     function testOpConstantNPZeroOutputErrorUnsugared() external {
-        checkUnhappyDeploy("_:1,:constant<0>();", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 0));
+        checkUnhappyParse2("_:1,:constant<0>();", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 0));
     }
 }

@@ -68,21 +68,18 @@ contract LibOpTimestampNPTest is OpTest {
         for (uint256 i; i < words.length; ++i) {
             blockTimestamp = bound(blockTimestamp, 0, type(uint256).max / 1e18);
             vm.warp(blockTimestamp);
-            (bytes memory bytecode, uint256[] memory constants) =
-                iParser.parse(bytes(string.concat("_: ", words[i], "();")));
-            (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io)
-            = iDeployer.deployExpression2(bytecode, constants);
-            (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
-                storeDeployer,
+            bytes memory bytecode = iDeployer.parse2(bytes(string.concat("_: ", words[i], "();")));
+            (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+                iStore,
                 FullyQualifiedNamespace.wrap(0),
-                LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
+                bytecode,
+                SourceIndexV2.wrap(0),
                 LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
                 new uint256[](0)
             );
             assertEq(stack.length, 1);
             assertEq(stack[0], blockTimestamp * 1e18);
             assertEq(kvs.length, 0);
-            assertEq(io, hex"0001");
         }
     }
 
@@ -91,10 +88,9 @@ contract LibOpTimestampNPTest is OpTest {
         string[] memory words = timestampWords();
 
         for (uint256 i; i < words.length; ++i) {
-            (bytes memory bytecode, uint256[] memory constants) =
-                iParser.parse(bytes(string.concat("_: ", words[i], "(0x00);")));
             vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
-            iDeployer.deployExpression2(bytecode, constants);
+            bytes memory bytecode = iDeployer.parse2(bytes(string.concat("_: ", words[i], "(0x00);")));
+            (bytecode);
         }
     }
 

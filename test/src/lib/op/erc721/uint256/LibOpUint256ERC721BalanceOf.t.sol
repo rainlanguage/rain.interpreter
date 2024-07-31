@@ -18,6 +18,8 @@ import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreter
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
+import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
+
 /// @title LibOpUint256ERC721BalanceOfTest
 /// @notice Test the opcode for getting the balance of an erc721 token.
 contract LibOpUint256ERC721BalanceOfTest is OpTest {
@@ -60,62 +62,59 @@ contract LibOpUint256ERC721BalanceOfTest is OpTest {
         );
     }
 
-    function testOpERC721BalanceOfEval(address token, address account, uint256 balance) public {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: uint256-erc721-balance-of(0x00 0x01);");
-        assertEq(constants.length, 2);
-        assertEq(constants[0], 0);
-        assertEq(constants[1], 1);
-        constants[0] = uint256(uint160(token));
-        constants[1] = uint256(uint160(account));
-        (IInterpreterV2 interpreterDeployer, IInterpreterStoreV2 storeDeployer, address expression, bytes memory io) =
-            iDeployer.deployExpression2(bytecode, constants);
+    function testOpERC721BalanceOfEvalHappy(address token, address account, uint256 balance) public {
+        bytes memory bytecode = iDeployer.parse2(
+            bytes(
+                string.concat(
+                    "_: uint256-erc721-balance-of(", Strings.toHexString(token), " ", Strings.toHexString(account), ");"
+                )
+            )
+        );
 
-        assumeEtchable(token, expression);
+        assumeEtchable(token);
         vm.etch(token, hex"fe");
         vm.mockCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), abi.encode(balance));
         vm.expectCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), 1);
 
-        (uint256[] memory stack, uint256[] memory kvs) = interpreterDeployer.eval2(
-            storeDeployer,
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+            iStore,
             FullyQualifiedNamespace.wrap(0),
-            LibEncodedDispatch.encode2(expression, SourceIndexV2.wrap(0), 1),
+            bytecode,
+            SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
             new uint256[](0)
         );
         assertEq(stack.length, 1);
         assertEq(stack[0], balance);
         assertEq(kvs.length, 0);
-        assertEq(io, hex"0001");
     }
 
     /// Test that balance of without inputs fails integrity check.
     function testOpERC721BalanceOfIntegrityFail0() external {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: uint256-erc721-balance-of();");
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));
-        iDeployer.deployExpression2(bytecode, constants);
+        bytes memory bytecode = iDeployer.parse2("_: uint256-erc721-balance-of();");
+        (bytecode);
     }
 
     /// Test that balance of with one input fails integrity check.
     function testOpERC721BalanceOfIntegrityFail1() external {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: uint256-erc721-balance-of(0x00);");
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 2, 1));
-        iDeployer.deployExpression2(bytecode, constants);
+        bytes memory bytecode = iDeployer.parse2("_: uint256-erc721-balance-of(0x00);");
+        (bytecode);
     }
 
     /// Test that balance of with three inputs fails integrity check.
     function testOpERC721BalanceOfIntegrityFail3() external {
-        (bytes memory bytecode, uint256[] memory constants) =
-            iParser.parse("_: uint256-erc721-balance-of(0x00 0x01 0x02);");
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
-        iDeployer.deployExpression2(bytecode, constants);
+        bytes memory bytecode = iDeployer.parse2("_: uint256-erc721-balance-of(0x00 0x01 0x02);");
+        (bytecode);
     }
 
     /// Test that operand fails integrity check.
     function testOpERC721BalanceOfIntegrityFailOperand() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
-        (bytes memory bytecode, uint256[] memory constants) =
-            iParser.parse("_: uint256-erc721-balance-of<0>(0x00 0x01);");
-        (bytecode, constants);
+        bytes memory bytecode = iDeployer.parse2("_: uint256-erc721-balance-of<0>(0x00 0x01);");
+        (bytecode);
     }
 
     function testOpERC721BalanceOfZeroInputs() external {
