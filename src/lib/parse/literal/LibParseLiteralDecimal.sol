@@ -93,6 +93,29 @@ library LibParseLiteralDecimal {
         }
     }
 
+    function unsafeStrToSignedInt(ParseState memory state, uint256 start, uint256 end) internal pure returns (int256) {
+        unchecked {
+            uint256 cursor = start;
+            uint256 isNeg = LibParse.isMask(cursor, end, CMASK_NEGATIVE_SIGN);
+            cursor += isNeg;
+
+            uint256 value = state.unsafeStrToInt(cursor, end);
+
+            if (isNeg > 0) {
+                if (value > uint256(type(int256).max) + 1) {
+                    revert DecimalLiteralOverflow(state.parseErrorOffset(start));
+                }
+                return -int256(value);
+            }
+            else {
+                if (value > uint256(type(int256).max)) {
+                    revert DecimalLiteralOverflow(state.parseErrorOffset(start));
+                }
+                return int256(value);
+            }
+        }
+    }
+
     /// Returns cursor after, value
     function parseDecimal(ParseState memory state, uint256 cursor, uint256 end)
         internal
