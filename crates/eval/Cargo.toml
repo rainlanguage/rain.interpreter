@@ -12,8 +12,6 @@ rain_interpreter_bindings = { workspace = true }
 alloy-sol-types = { workspace = true }
 alloy-json-abi = { workspace = true }
 alloy-dyn-abi = { workspace = true }
-foundry-evm = { workspace = true }
-revm = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 reqwest = { workspace = true }
@@ -21,7 +19,11 @@ once_cell = { workspace = true }
 eyre = { workspace = true }
 rain-error-decoding = { workspace = true }
 
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+foundry-evm = { workspace = true }
+revm = { workspace = true }
+
 [dev-dependencies]
-tokio = { workspace = true }
+tokio = { version = "1.28.0", features = ["full"] }
 tracing = { workspace = true }
 rain-interpreter-env = { workspace = true }
