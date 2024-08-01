@@ -132,11 +132,14 @@ library LibParseLiteralDecimal {
             }
             signedCoefficient = state.unsafeStrToSignedInt(start, cursor);
 
-            uint256 fracValue = LibParse.isMask(cursor, end, CMASK_DECIMAL_POINT);
+            int256 fracValue = int256(LibParse.isMask(cursor, end, CMASK_DECIMAL_POINT));
             if (fracValue != 0) {
                 cursor++;
                 uint256 fracStart = cursor;
                 cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
+                if (cursor == fracStart) {
+                    revert MalformedDecimalPoint(state.parseErrorOffset(fracStart));
+                }
                 // Trailing zeros are allowed in fractional literals but should
                 // not be counted in the precision.
                 uint256 nonZeroCursor = cursor;
@@ -144,23 +147,28 @@ library LibParseLiteralDecimal {
                     nonZeroCursor--;
                 }
 
-                fracValue = unsafeStrToInt(state, fracStart, nonZeroCursor);
-                if (fracValue > uint256(type(int256).max)) {
-                    revert DecimalLiteralOverflow(state.parseErrorOffset(start));
+                fracValue = unsafeStrToSignedInt(state, fracStart, nonZeroCursor);
+                // Frac value inherits its sign from the coefficient.
+                if (fracValue < 0) {
+                    revert MalformedDecimalPoint(state.parseErrorOffset(fracStart));
                 }
+                if (signedCoefficient < 0) {
+                    fracValue = -fracValue;
+                }
+
                 // We want to _decrease_ the exponent by the number of digits in the
                 // fractional part.
                 exponent = int256(fracStart) - int256(nonZeroCursor);
                 uint256 scale = uint256(-exponent);
                 if (scale >= 77 && signedCoefficient != 0) {
-                    revert DecimalLiteralOverflow(state.parseErrorOffset(start));
+                    revert DecimalLiteralPrecisionLoss(state.parseErrorOffset(start));
                 }
                 scale = 10 ** scale;
                 int256 rescaledIntValue = signedCoefficient * int256(scale);
                 if (rescaledIntValue / int256(scale) != signedCoefficient) {
-                    revert DecimalLiteralOverflow(state.parseErrorOffset(start));
+                    revert DecimalLiteralPrecisionLoss(state.parseErrorOffset(start));
                 }
-                signedCoefficient = rescaledIntValue + int256(fracValue);
+                signedCoefficient = rescaledIntValue + fracValue;
             }
 
             int256 eValue = int256(LibParse.isMask(cursor, end, CMASK_E_NOTATION));
@@ -168,7 +176,14 @@ library LibParseLiteralDecimal {
                 cursor++;
                 uint256 eStart = cursor;
                 cursor = LibParse.skipMask(cursor, end, CMASK_NEGATIVE_SIGN);
-                cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
+                {
+                    uint256 digitsStart = cursor;
+                    cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
+                    if (cursor == digitsStart) {
+                        revert MalformedExponentDigits(state.parseErrorOffset(digitsStart));
+                    }
+                }
+
                 eValue = state.unsafeStrToSignedInt(eStart, cursor);
                 exponent += eValue;
             }
