@@ -123,7 +123,13 @@ library LibParseLiteralDecimal {
         unchecked {
             cursor = start;
             cursor = LibParse.skipMask(cursor, end, CMASK_NEGATIVE_SIGN);
-            cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
+            {
+                uint256 intStart = cursor;
+                cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
+                if (cursor == intStart) {
+                    revert ZeroLengthDecimal(state.parseErrorOffset(start));
+                }
+            }
             signedCoefficient = state.unsafeStrToSignedInt(start, cursor);
 
             uint256 fracValue = LibParse.isMask(cursor, end, CMASK_DECIMAL_POINT);
@@ -146,7 +152,7 @@ library LibParseLiteralDecimal {
                 // fractional part.
                 exponent = int256(fracStart) - int256(nonZeroCursor);
                 uint256 scale = uint256(-exponent);
-                if (scale >= 77) {
+                if (scale >= 77 && signedCoefficient != 0) {
                     revert DecimalLiteralOverflow(state.parseErrorOffset(start));
                 }
                 scale = 10 ** scale;
