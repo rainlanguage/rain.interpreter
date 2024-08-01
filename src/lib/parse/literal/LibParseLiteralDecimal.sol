@@ -101,17 +101,70 @@ library LibParseLiteralDecimal {
 
             uint256 value = state.unsafeStrToInt(cursor, end);
 
-            if (isNeg > 0) {
+            if (isNeg != 0) {
                 if (value > uint256(type(int256).max) + 1) {
                     revert DecimalLiteralOverflow(state.parseErrorOffset(start));
                 }
                 return -int256(value);
-            }
-            else {
+            } else {
                 if (value > uint256(type(int256).max)) {
                     revert DecimalLiteralOverflow(state.parseErrorOffset(start));
                 }
                 return int256(value);
+            }
+        }
+    }
+
+    function parseDecimalFloat(ParseState memory state, uint256 start, uint256 end)
+        internal
+        pure
+        returns (uint256 cursor, int256 signedCoefficient, int256 exponent)
+    {
+        unchecked {
+            cursor = start;
+            cursor = LibParse.skipMask(cursor, end, CMASK_NEGATIVE_SIGN);
+            cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
+            signedCoefficient = state.unsafeStrToSignedInt(start, cursor);
+
+            uint256 fracValue = LibParse.isMask(cursor, end, CMASK_DECIMAL_POINT);
+            if (fracValue != 0) {
+                cursor++;
+                uint256 fracStart = cursor;
+                cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
+                // Trailing zeros are allowed in fractional literals but should
+                // not be counted in the precision.
+                uint256 nonZeroCursor = cursor;
+                while (LibParse.isMask(nonZeroCursor - 1, end, CMASK_ZERO) == 1) {
+                    nonZeroCursor--;
+                }
+
+                fracValue = unsafeStrToInt(state, fracStart, nonZeroCursor);
+                if (fracValue > uint256(type(int256).max)) {
+                    revert DecimalLiteralOverflow(state.parseErrorOffset(start));
+                }
+                // We want to _decrease_ the exponent by the number of digits in the
+                // fractional part.
+                exponent = int256(fracStart) - int256(nonZeroCursor);
+                uint256 scale = uint256(-exponent);
+                if (scale >= 77) {
+                    revert DecimalLiteralOverflow(state.parseErrorOffset(start));
+                }
+                scale = 10 ** scale;
+                int256 rescaledIntValue = signedCoefficient * int256(scale);
+                if (rescaledIntValue / int256(scale) != signedCoefficient) {
+                    revert DecimalLiteralOverflow(state.parseErrorOffset(start));
+                }
+                signedCoefficient = rescaledIntValue + int256(fracValue);
+            }
+
+            int256 eValue = int256(LibParse.isMask(cursor, end, CMASK_E_NOTATION));
+            if (eValue != 0) {
+                cursor++;
+                uint256 eStart = cursor;
+                cursor = LibParse.skipMask(cursor, end, CMASK_NEGATIVE_SIGN);
+                cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
+                eValue = state.unsafeStrToSignedInt(eStart, cursor);
+                exponent += eValue;
             }
         }
     }
