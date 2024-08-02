@@ -6,6 +6,7 @@ use rain_interpreter_bindings::IParserPragmaV1::*;
 use rain_interpreter_bindings::IParserV2::*;
 use rain_interpreter_dispair::DISPair;
 
+#[cfg(not(target_family = "wasm"))]
 pub trait Parser2 {
     /// Call Parser contract to parse the provided rainlang text.
     fn parse_text<T: JsonRpcClient>(
@@ -35,6 +36,38 @@ pub trait Parser2 {
         client: ReadableClient<T>,
     ) -> impl std::future::Future<Output = Result<parsePragma1Return, ParserError>> + Send;
 }
+
+#[cfg(target_family = "wasm")]
+pub trait Parser2 {
+    /// Call Parser contract to parse the provided rainlang text.
+    fn parse_text<T: JsonRpcClient>(
+        &self,
+        text: &str,
+        client: ReadableClient<T>,
+    ) -> impl std::future::Future<Output = Result<parse2Return, ParserError>>
+    where
+        Self: Sync,
+    {
+        self.parse(text.as_bytes().to_vec(), client)
+    }
+
+    /// Call Parser contract to parse the provided data
+    /// The provided data must contain valid UTF-8 encoding of valid rainlang text.
+    fn parse<T: JsonRpcClient>(
+        &self,
+        data: Vec<u8>,
+        client: ReadableClient<T>,
+    ) -> impl std::future::Future<Output = Result<parse2Return, ParserError>>;
+
+    /// Call Parser contract to parse the provided rainlang text and provide the pragma.
+    /// The provided rainlang text must be valid UTF-8 encoding of valid rainlang text.
+    fn parse_pragma<T: JsonRpcClient>(
+        &self,
+        data: Vec<u8>,
+        client: ReadableClient<T>,
+    ) -> impl std::future::Future<Output = Result<parsePragma1Return, ParserError>>;
+}
+
 /// ParserV2
 /// Struct representing ParserV2 instances.
 #[derive(Clone, Default)]
