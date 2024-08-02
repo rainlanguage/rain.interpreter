@@ -14,7 +14,7 @@ import {
     EncodedExternDispatch,
     IInterpreterExternV3
 } from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
-import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
+import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {COMPATIBILITY_V4} from "rain.interpreter.interface/interface/unstable/ISubParserV3.sol";

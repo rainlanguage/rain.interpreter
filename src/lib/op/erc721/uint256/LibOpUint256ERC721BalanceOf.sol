@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckStateNP} from "../../../integrity/LibIntegrityCheckNP.sol";
-import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
+import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterStateNP} from "../../../state/LibInterpreterStateNP.sol";
 
 /// @title OpUint256ERC721BalanceOf
