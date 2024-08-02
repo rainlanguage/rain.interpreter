@@ -17,7 +17,7 @@ import {UnexpectedOperand} from "../../src/error/ErrParse.sol";
 import {BadOpInputsLength, BadOpOutputsLength} from "../../src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
     Operand,
-    IInterpreterV2,
+    IInterpreterV4,
     SourceIndexV2,
     IInterpreterStoreV2
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
@@ -193,12 +193,13 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     {
         bytes memory bytecode = iDeployer.parse2(rainString);
 
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
             bytecode,
             SourceIndexV2.wrap(0),
             context,
+            new uint256[](0),
             new uint256[](0)
         );
         return (stack, kvs);
@@ -252,12 +253,13 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     function checkUnhappy(bytes memory rainString, bytes memory err) internal {
         bytes memory bytecode = iDeployer.parse2(rainString);
         vm.expectRevert(err);
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
         (stack, kvs);

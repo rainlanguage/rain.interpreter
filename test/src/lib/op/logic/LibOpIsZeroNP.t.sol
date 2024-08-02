@@ -8,7 +8,7 @@ import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibOpIsZeroNP} from "src/lib/op/logic/LibOpIsZeroNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {
-    IInterpreterV2,
+    IInterpreterV4,
     Operand,
     SourceIndexV2,
     FullyQualifiedNamespace
@@ -50,12 +50,13 @@ contract LibOpIsZeroNPTest is OpTest {
     /// Test the eval of isZero opcode parsed from a string. Tests 1 nonzero input.
     function testOpIsZeroNPEval1NonZeroInput() external {
         bytes memory bytecode = iDeployer.parse2("_: is-zero(30);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
 
@@ -67,12 +68,13 @@ contract LibOpIsZeroNPTest is OpTest {
     /// Test the eval of isZero opcode parsed from a string. Tests 1 zero input.
     function testOpIsZeroNPEval1ZeroInput() external {
         bytes memory bytecode = iDeployer.parse2("_: is-zero(0);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
 

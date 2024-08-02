@@ -6,7 +6,7 @@ import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibInt
 import {LibOpUint256ERC721BalanceOf} from "src/lib/op/erc721/uint256/LibOpUint256ERC721BalanceOf.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import {
-    IInterpreterV2,
+    IInterpreterV4,
     FullyQualifiedNamespace,
     Operand,
     SourceIndexV2
@@ -75,12 +75,13 @@ contract LibOpUint256ERC721BalanceOfTest is OpTest {
         vm.mockCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), abi.encode(balance));
         vm.expectCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), 1);
 
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
         assertEq(stack.length, 1);

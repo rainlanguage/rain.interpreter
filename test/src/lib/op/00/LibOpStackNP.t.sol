@@ -3,7 +3,9 @@ pragma solidity =0.8.25;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
-import {IInterpreterV2, Operand, SourceIndexV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {
+    IInterpreterV4, Operand, SourceIndexV2
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {OutOfBoundsStackRead, LibOpStackNP} from "src/lib/op/00/LibOpStackNP.sol";
@@ -124,12 +126,13 @@ contract LibOpStackNPTest is OpTest {
     /// Test the eval of a stack opcode parsed from a string.
     function testOpStackEval() external {
         bytes memory bytecode = iDeployer.parse2("foo: 1, bar: foo;");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
         assertEq(stack.length, 2);
@@ -142,12 +145,13 @@ contract LibOpStackNPTest is OpTest {
     function testOpStackEvalSeveral() external {
         bytes memory bytecode = iDeployer.parse2("foo: 1, bar: foo, _ baz: bar bar, bing _:foo baz;");
 
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
         assertEq(stack.length, 6);

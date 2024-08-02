@@ -82,12 +82,13 @@ contract LibOpConstantNPTest is OpTest {
     function testOpConstantEvalNPE2E() external {
         bytes memory bytecode = iDeployer.parse2("_ _: max-value() 1.001;");
 
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
         assertEq(stack.length, 2);

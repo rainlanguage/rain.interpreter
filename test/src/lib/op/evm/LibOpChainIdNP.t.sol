@@ -15,7 +15,9 @@ import {LibOpChainIdNP} from "src/lib/op/evm/LibOpChainIdNP.sol";
 import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
 import {RainterpreterStoreNPE2, FullyQualifiedNamespace} from "src/concrete/RainterpreterStoreNPE2.sol";
 import {RainterpreterExpressionDeployerNPE2} from "src/concrete/RainterpreterExpressionDeployerNPE2.sol";
-import {Operand, IInterpreterV2, SourceIndexV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {
+    Operand, IInterpreterV4, SourceIndexV2
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
@@ -59,12 +61,13 @@ contract LibOpChainIdNPTest is OpTest {
         bytes memory bytecode = iDeployer.parse2("_: chain-id();");
 
         vm.chainId(chainId);
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             namespace,
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
         assertEq(stack.length, 1, "stack length");

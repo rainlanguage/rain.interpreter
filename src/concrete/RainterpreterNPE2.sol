@@ -16,7 +16,6 @@ import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
 import {
     SourceIndexV2,
     StateNamespace,
-    EncodedDispatch,
     FullyQualifiedNamespace,
     IInterpreterStoreV2,
     IInterpreterV4

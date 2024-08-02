@@ -19,6 +19,7 @@ import {
     PARSE_META_BUILD_DEPTH
 } from "../generated/RainterpreterParserNPE2.pointers.sol";
 import {IParserToolingV1} from "rain.sol.codegen/interface/IParserToolingV1.sol";
+import {IParserV1View} from "rain.interpreter.interface/interface/deprecated/IParserV1View.sol";
 
 /// @title RainterpreterParserNPE2
 /// @dev The parser implementation.

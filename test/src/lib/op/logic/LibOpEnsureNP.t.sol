@@ -7,7 +7,7 @@ import {ExcessRHSItems} from "src/lib/parse/LibParse.sol";
 import {LibOpEnsureNP} from "src/lib/op/logic/LibOpEnsureNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
-    IInterpreterV2,
+    IInterpreterV4,
     Operand,
     SourceIndexV2,
     FullyQualifiedNamespace

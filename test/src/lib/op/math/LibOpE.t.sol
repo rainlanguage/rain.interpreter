@@ -6,7 +6,7 @@ import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterp
 import {LibOpE} from "src/lib/op/math/LibOpE.sol";
 import {LibOperand, Operand} from "test/lib/operand/LibOperand.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
-import {IInterpreterV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {IInterpreterV4} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
@@ -42,12 +42,13 @@ contract LibOpETest is OpTest {
     function testOpEEval() external {
         bytes memory bytecode = iDeployer.parse2("_: e();");
 
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
         assertEq(stack.length, 1);

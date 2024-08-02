@@ -6,7 +6,7 @@ import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibOpGreaterThanNP} from "src/lib/op/logic/LibOpGreaterThanNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
-    IInterpreterV2,
+    IInterpreterV4,
     Operand,
     SourceIndexV2,
     FullyQualifiedNamespace
@@ -52,12 +52,13 @@ contract LibOpGreaterThanNPTest is OpTest {
     /// inputs. Both inputs are 0.
     function testOpGreaterThanNPEval2ZeroInputs() external {
         bytes memory bytecode = iDeployer.parse2("_: greater-than(0 0);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
 
@@ -70,12 +71,13 @@ contract LibOpGreaterThanNPTest is OpTest {
     /// inputs. The first input is 0, the second input is 1.
     function testOpGreaterThanNPEval2InputsFirstZeroSecondOne() external {
         bytes memory bytecode = iDeployer.parse2("_: greater-than(0 1);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
 
@@ -88,12 +90,13 @@ contract LibOpGreaterThanNPTest is OpTest {
     /// inputs. The first input is 1, the second input is 0.
     function testOpGreaterThanNPEval2InputsFirstOneSecondZero() external {
         bytes memory bytecode = iDeployer.parse2("_: greater-than(1 0);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
 
@@ -106,12 +109,13 @@ contract LibOpGreaterThanNPTest is OpTest {
     /// inputs. Both inputs are 1.
     function testOpGreaterThanNPEval2InputsBothOne() external {
         bytes memory bytecode = iDeployer.parse2("_: greater-than(1 1);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
 

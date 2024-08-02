@@ -6,7 +6,7 @@ import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibOpIfNP} from "src/lib/op/logic/LibOpIfNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
-    IInterpreterV2,
+    IInterpreterV4,
     Operand,
     SourceIndexV2,
     FullyQualifiedNamespace
@@ -51,12 +51,13 @@ contract LibOpIfNPTest is OpTest {
     /// is 0, the second input is 1, the third input is 2.
     function testOpIfNPEval3InputsFirstZeroSecondOneThirdTwo() external {
         bytes memory bytecode = iDeployer.parse2("_: if(0 1 2);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
 
@@ -69,12 +70,13 @@ contract LibOpIfNPTest is OpTest {
     /// is 1, the second input is 2, the third input is 3.
     function testOpIfNPEval3InputsFirstOneSecondTwoThirdThree() external {
         bytes memory bytecode = iDeployer.parse2("_: if(1 2 3);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
 
@@ -87,12 +89,13 @@ contract LibOpIfNPTest is OpTest {
     /// is 0, the second input is 0, the third input is 3.
     function testOpIfNPEval3InputsFirstZeroSecondZeroThirdThree() external {
         bytes memory bytecode = iDeployer.parse2("_: if(0 0 3);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
 
@@ -105,12 +108,13 @@ contract LibOpIfNPTest is OpTest {
     /// is 1, the second input is 0, the third input is 3.
     function testOpIfNPEval3InputsFirstOneSecondZeroThirdThree() external {
         bytes memory bytecode = iDeployer.parse2("_: if(1 0 3);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
 
@@ -123,12 +127,13 @@ contract LibOpIfNPTest is OpTest {
     /// is 0, the second input is 1, the third input is 0.
     function testOpIfNPEval3InputsFirstZeroSecondOneThirdZero() external {
         bytes memory bytecode = iDeployer.parse2("_: if(0 1 0);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
 
@@ -141,12 +146,13 @@ contract LibOpIfNPTest is OpTest {
     /// is 0, the second input is 0, the third input is 1.
     function testOpIfNPEval3InputsFirstZeroSecondZeroThirdOne() external {
         bytes memory bytecode = iDeployer.parse2("_: if(0 0 1);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
 
@@ -159,12 +165,13 @@ contract LibOpIfNPTest is OpTest {
     /// is 2, the second input is 3, the third input is 4.
     function testOpIfNPEval3InputsFirstTwoSecondThreeThirdFour() external {
         bytes memory bytecode = iDeployer.parse2("_: if(2 3 4);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
 
@@ -177,12 +184,13 @@ contract LibOpIfNPTest is OpTest {
     /// is 2, the second input is 0, the third input is 4.
     function testOpIfNPEval3InputsFirstTwoSecondZeroThirdFour() external {
         bytes memory bytecode = iDeployer.parse2("_: if(2 0 4);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
         assertEq(stack.length, 1);
@@ -193,12 +201,13 @@ contract LibOpIfNPTest is OpTest {
     /// Test that empty strings are truthy values.
     function testOpIfNPEvalEmptyStringTruthy() external {
         bytes memory bytecode = iDeployer.parse2("_: if(\"\" 5 50);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
         assertEq(stack.length, 1);

@@ -5,7 +5,7 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibOpLessThanNP} from "src/lib/op/logic/LibOpLessThanNP.sol";
 import {
-    IInterpreterV2,
+    IInterpreterV4,
     Operand,
     SourceIndexV2,
     FullyQualifiedNamespace,
@@ -52,12 +52,13 @@ contract LibOpLessThanNPTest is OpTest {
     /// Both inputs are 0.
     function testOpLessThanNPEval2ZeroInputs() external {
         bytes memory bytecode = iDeployer.parse2("_: less-than(0 0);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
 
@@ -70,12 +71,13 @@ contract LibOpLessThanNPTest is OpTest {
     /// The first input is 0, the second input is 1.
     function testOpLessThanNPEval2InputsFirstZeroSecondOne() external {
         bytes memory bytecode = iDeployer.parse2("_: less-than(0 1);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
 
@@ -88,12 +90,13 @@ contract LibOpLessThanNPTest is OpTest {
     /// The first input is 1, the second input is 0.
     function testOpLessThanNPEval2InputsFirstOneSecondZero() external {
         bytes memory bytecode = iDeployer.parse2("_: less-than(1 0);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
 
@@ -106,12 +109,13 @@ contract LibOpLessThanNPTest is OpTest {
     /// Both inputs are 1.
     function testOpLessThanNPEval2InputsBothOne() external {
         bytes memory bytecode = iDeployer.parse2("_: less-than(1 1);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             iStore,
             FullyQualifiedNamespace.wrap(0),
             bytecode,
             SourceIndexV2.wrap(0),
             LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+            new uint256[](0),
             new uint256[](0)
         );
 
