@@ -58,7 +58,8 @@ contract LibOpChainIdNPTest is OpTest {
 
     /// Test the eval of a chain ID opcode parsed from a string.
     function testOpChainIDNPEval(uint64 chainId) public {
-        checkHappy("_: chain-id();", chainId * 1e18, "");
+        vm.chainId(chainId);
+        checkHappy("_: chain-id();", uint256(chainId) * 1e18, "");
     }
 
     /// Test that a chain ID with inputs fails integrity check.
