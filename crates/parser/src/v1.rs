@@ -5,6 +5,7 @@ use ethers::providers::JsonRpcClient;
 use rain_interpreter_bindings::IParserV1::*;
 use rain_interpreter_dispair::DISPair;
 
+#[cfg(not(target_family = "wasm"))]
 pub trait Parser {
     /// Call Parser contract to parse the provided rainlang text.
     fn parse_text<T: JsonRpcClient>(
@@ -26,6 +27,30 @@ pub trait Parser {
         client: ReadableClient<T>,
     ) -> impl std::future::Future<Output = Result<parseReturn, ParserError>> + Send;
 }
+
+#[cfg(target_family = "wasm")]
+pub trait Parser {
+    /// Call Parser contract to parse the provided rainlang text.
+    fn parse_text<T: JsonRpcClient>(
+        &self,
+        text: &str,
+        client: ReadableClient<T>,
+    ) -> impl std::future::Future<Output = Result<parseReturn, ParserError>>
+    where
+        Self: Sync,
+    {
+        self.parse(text.as_bytes().to_vec(), client)
+    }
+
+    /// Call Parser contract to parse the provided data
+    /// The provided data must contain valid UTF-8 encoding of valid rainlang text.
+    fn parse<T: JsonRpcClient>(
+        &self,
+        data: Vec<u8>,
+        client: ReadableClient<T>,
+    ) -> impl std::future::Future<Output = Result<parseReturn, ParserError>>;
+}
+
 /// ParserV1
 /// Struct representing ParserV1 instances.
 #[derive(Clone, Default)]
