@@ -5,7 +5,8 @@ import {
     IInterpreterV4,
     FullyQualifiedNamespace,
     Operand,
-    SourceIndexV2
+    SourceIndexV2,
+    EvalV4
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
@@ -143,13 +144,15 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         }
         bytes memory bytecode = iDeployer.parse2(rainlang);
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            new uint256[][](0),
-            new uint256[](0),
-            new uint256[](0)
+            EvalV4({
+                store: iStore,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: new uint256[][](0),
+                inputs: new uint256[](0),
+                stateOverlay: new uint256[](0)
+            })
         );
         (stack, kvs);
     }
@@ -204,13 +207,15 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
     function checkCallNPRun(bytes memory rainlang, uint256[] memory stack, uint256[] memory kvs) internal {
         bytes memory bytecode = iDeployer.parse2(rainlang);
         (uint256[] memory actualStack, uint256[] memory actualKVs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            new uint256[][](0),
-            new uint256[](0),
-            new uint256[](0)
+            EvalV4({
+                store: iStore,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: new uint256[][](0),
+                inputs: new uint256[](0),
+                stateOverlay: new uint256[](0)
+            })
         );
         assertEq(actualStack.length, stack.length, "stack length");
         for (uint256 i = 0; i < stack.length; i++) {
@@ -279,13 +284,15 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         // But it will unconditionally happen at runtime.
         vm.expectRevert();
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            new uint256[][](0),
-            new uint256[](0),
-            new uint256[](0)
+            EvalV4({
+                store: iStore,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: new uint256[][](0),
+                inputs: new uint256[](0),
+                stateOverlay: new uint256[](0)
+            })
         );
         (stack, kvs);
     }

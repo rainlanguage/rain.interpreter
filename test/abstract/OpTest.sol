@@ -19,7 +19,8 @@ import {
     Operand,
     IInterpreterV4,
     SourceIndexV2,
-    IInterpreterStoreV2
+    IInterpreterStoreV2,
+    EvalV4
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {FullyQualifiedNamespace, StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
@@ -194,13 +195,15 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         bytes memory bytecode = iDeployer.parse2(rainString);
 
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            context,
-            new uint256[](0),
-            new uint256[](0)
+            EvalV4({
+                store: iStore,
+                namespace: LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: context,
+                inputs: new uint256[](0),
+                stateOverlay: new uint256[](0)
+            })
         );
         return (stack, kvs);
     }
@@ -254,13 +257,15 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         bytes memory bytecode = iDeployer.parse2(rainString);
         vm.expectRevert(err);
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0),
-            new uint256[](0)
+            EvalV4({
+                store: iStore,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+                inputs: new uint256[](0),
+                stateOverlay: new uint256[](0)
+            })
         );
         (stack, kvs);
     }

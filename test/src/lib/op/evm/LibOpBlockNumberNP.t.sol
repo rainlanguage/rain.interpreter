@@ -59,21 +59,8 @@ contract LibOpBlockNumberNPTest is OpTest {
     /// Test the eval of a block number opcode parsed from a string.
     function testOpBlockNumberNPEval(uint256 blockNumber) public {
         blockNumber = bound(blockNumber, 0, type(uint256).max / 1e18);
-        bytes memory bytecode = iDeployer.parse2("_: block-number();");
-
         vm.roll(blockNumber);
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0),
-            new uint256[](0)
-        );
-        assertEq(stack.length, 1);
-        assertEq(stack[0], blockNumber * 1e18);
-        assertEq(kvs.length, 0);
+        checkHappy("_: block-number();", blockNumber * 1e18, "");
     }
 
     function testOpBlockNumberNPEvalOneInput() external {

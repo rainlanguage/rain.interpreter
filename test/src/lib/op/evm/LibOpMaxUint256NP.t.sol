@@ -49,22 +49,8 @@ contract LibOpMaxUint256NPTest is OpTest {
     }
 
     /// Test the eval of LibOpMaxUint256NP parsed from a string.
-    function testOpMaxUint256NPEval(FullyQualifiedNamespace namespace) external {
-        bytes memory bytecode = iDeployer.parse2("_: max-value();");
-
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            namespace,
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], type(uint256).max);
-        assertEq(kvs.length, 0);
+    function testOpMaxUint256NPEval() external {
+        checkHappy("_: max-value();", type(uint256).max, "");
     }
 
     /// Test that a max-value with inputs fails integrity check.

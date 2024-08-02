@@ -13,13 +13,7 @@ import {LibEvalNP} from "../lib/eval/LibEvalNP.sol";
 import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
 import {InterpreterStateNP} from "../lib/state/LibInterpreterStateNP.sol";
 import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
-import {
-    SourceIndexV2,
-    StateNamespace,
-    FullyQualifiedNamespace,
-    IInterpreterStoreV2,
-    IInterpreterV4
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {IInterpreterV4, SourceIndexV2, EvalV4} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {
     BYTECODE_HASH as INTERPRETER_BYTECODE_HASH,
     OPCODE_FUNCTION_POINTERS
@@ -34,21 +28,13 @@ contract RainterpreterNPE2 is IInterpreterV4, IOpcodeToolingV1, ERC165 {
     using LibInterpreterStateDataContractNP for bytes;
 
     /// @inheritdoc IInterpreterV4
-    function eval4(
-        IInterpreterStoreV2 store,
-        FullyQualifiedNamespace namespace,
-        bytes calldata bytecode,
-        SourceIndexV2 sourceIndex,
-        uint256[][] calldata context,
-        uint256[] calldata inputs,
-        uint256[] calldata stateOverlay
-    ) external view virtual override returns (uint256[] memory, uint256[] memory) {
-        InterpreterStateNP memory state = bytecode.unsafeDeserializeNP(
-            SourceIndexV2.unwrap(sourceIndex), namespace, store, context, OPCODE_FUNCTION_POINTERS
+    function eval4(EvalV4 calldata eval) external view virtual override returns (uint256[] memory, uint256[] memory) {
+        InterpreterStateNP memory state = eval.bytecode.unsafeDeserializeNP(
+            SourceIndexV2.unwrap(eval.sourceIndex), eval.namespace, eval.store, eval.context, OPCODE_FUNCTION_POINTERS
         );
         // We use the return by returning it. Slither false positive.
         //slither-disable-next-line unused-return
-        return state.eval2(inputs, type(uint256).max);
+        return state.eval2(eval.inputs, type(uint256).max);
     }
 
     /// @inheritdoc ERC165

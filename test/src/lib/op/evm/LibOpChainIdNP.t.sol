@@ -57,22 +57,8 @@ contract LibOpChainIdNPTest is OpTest {
     }
 
     /// Test the eval of a chain ID opcode parsed from a string.
-    function testOpChainIDNPEval(uint64 chainId, FullyQualifiedNamespace namespace) public {
-        bytes memory bytecode = iDeployer.parse2("_: chain-id();");
-
-        vm.chainId(chainId);
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            namespace,
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0),
-            new uint256[](0)
-        );
-        assertEq(stack.length, 1, "stack length");
-        assertEq(stack[0], uint256(chainId) * 1e18, "stack item");
-        assertEq(kvs.length, 0, "kvs length");
+    function testOpChainIDNPEval(uint64 chainId) public {
+        checkHappy("_: chain-id();", chainId * 1e18, "");
     }
 
     /// Test that a chain ID with inputs fails integrity check.

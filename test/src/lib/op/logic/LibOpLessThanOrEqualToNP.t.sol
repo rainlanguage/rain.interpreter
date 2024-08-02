@@ -8,7 +8,8 @@ import {
     IInterpreterV4,
     Operand,
     SourceIndexV2,
-    FullyQualifiedNamespace
+    FullyQualifiedNamespace,
+    EvalV4
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
@@ -58,13 +59,15 @@ contract LibOpLessThanOrEqualToNPTest is OpTest {
     function testOpLessThanOrEqualToNPEval2ZeroInputs() external {
         bytes memory bytecode = iDeployer.parse2("_: less-than-or-equal-to(0 0);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0),
-            new uint256[](0)
+            EvalV4({
+                store: iStore,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+                inputs: new uint256[](0),
+                stateOverlay: new uint256[](0)
+            })
         );
 
         assertEq(stack.length, 1);
@@ -77,13 +80,15 @@ contract LibOpLessThanOrEqualToNPTest is OpTest {
     function testOpLessThanOrEqualToNPEval2InputsFirstZeroSecondOne() external {
         bytes memory bytecode = iDeployer.parse2("_: less-than-or-equal-to(0 1);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0),
-            new uint256[](0)
+            EvalV4({
+                store: iStore,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+                inputs: new uint256[](0),
+                stateOverlay: new uint256[](0)
+            })
         );
 
         assertEq(stack.length, 1);
@@ -96,13 +101,15 @@ contract LibOpLessThanOrEqualToNPTest is OpTest {
     function testOpLessThanOrEqualToNPEval2InputsFirstOneSecondZero() external {
         bytes memory bytecode = iDeployer.parse2("_: less-than-or-equal-to(1 0);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0),
-            new uint256[](0)
+            EvalV4({
+                store: iStore,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+                inputs: new uint256[](0),
+                stateOverlay: new uint256[](0)
+            })
         );
 
         assertEq(stack.length, 1);
@@ -115,13 +122,15 @@ contract LibOpLessThanOrEqualToNPTest is OpTest {
     function testOpLessThanOrEqualToNPEval2InputsBothOne() external {
         bytes memory bytecode = iDeployer.parse2("_: less-than-or-equal-to(1 1);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0),
-            new uint256[](0)
+            EvalV4({
+                store: iStore,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+                inputs: new uint256[](0),
+                stateOverlay: new uint256[](0)
+            })
         );
 
         assertEq(stack.length, 1);

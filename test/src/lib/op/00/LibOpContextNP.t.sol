@@ -10,7 +10,8 @@ import {
     IInterpreterV4,
     Operand,
     SourceIndexV2,
-    FullyQualifiedNamespace
+    FullyQualifiedNamespace,
+    EvalV4
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
@@ -90,13 +91,15 @@ contract LibOpContextNPTest is OpTest {
         bytes memory bytecode = iDeployer.parse2("_: context<0 0>();");
 
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            context,
-            new uint256[](0),
-            new uint256[](0)
+            EvalV4({
+                store: iStore,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: context,
+                inputs: new uint256[](0),
+                stateOverlay: new uint256[](0)
+            })
         );
 
         assertEq(stack.length, 1, "stack length");
@@ -110,13 +113,15 @@ contract LibOpContextNPTest is OpTest {
         vm.assume(context[0].length > 1);
         bytes memory bytecode = iDeployer.parse2("_: context<0 1>();");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            context,
-            new uint256[](0),
-            new uint256[](0)
+            EvalV4({
+                store: iStore,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: context,
+                inputs: new uint256[](0),
+                stateOverlay: new uint256[](0)
+            })
         );
 
         assertEq(stack.length, 1, "stack length");
@@ -131,13 +136,15 @@ contract LibOpContextNPTest is OpTest {
         bytes memory bytecode = iDeployer.parse2("_: context<1 0>();");
 
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            context,
-            new uint256[](0),
-            new uint256[](0)
+            EvalV4({
+                store: iStore,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: context,
+                inputs: new uint256[](0),
+                stateOverlay: new uint256[](0)
+            })
         );
 
         assertEq(stack.length, 1, "stack length");
@@ -152,13 +159,15 @@ contract LibOpContextNPTest is OpTest {
         bytes memory bytecode = iDeployer.parse2("_: context<1 1>();");
 
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            context,
-            new uint256[](0),
-            new uint256[](0)
+            EvalV4({
+                store: iStore,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: context,
+                inputs: new uint256[](0),
+                stateOverlay: new uint256[](0)
+            })
         );
 
         assertEq(stack.length, 1, "stack length");
@@ -174,13 +183,15 @@ contract LibOpContextNPTest is OpTest {
 
         vm.expectRevert(stdError.indexOOBError);
         iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            context,
-            new uint256[](0),
-            new uint256[](0)
+            EvalV4({
+                store: iStore,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: context,
+                inputs: new uint256[](0),
+                stateOverlay: new uint256[](0)
+            })
         );
     }
 
@@ -193,13 +204,15 @@ contract LibOpContextNPTest is OpTest {
 
         vm.expectRevert(stdError.indexOOBError);
         iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            context,
-            new uint256[](0),
-            new uint256[](0)
+            EvalV4({
+                store: iStore,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: context,
+                inputs: new uint256[](0),
+                stateOverlay: new uint256[](0)
+            })
         );
     }
 

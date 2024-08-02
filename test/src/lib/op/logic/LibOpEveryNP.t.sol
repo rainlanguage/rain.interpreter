@@ -55,113 +55,35 @@ contract LibOpEveryNPTest is OpTest {
 
     /// Test the eval of every opcode parsed from a string. Tests 1 true input.
     function testOpEveryNPEval1TrueInput() external {
-        bytes memory bytecode = iDeployer.parse2("_: every(5);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 5e18);
-        assertEq(kvs.length, 0);
+        checkHappy("_: every(5);", 5e18, "");
     }
 
     /// Test the eval of every opcode parsed from a string. Tests 1 false input.
     function testOpEveryNPEval1FalseInput() external {
-        bytes memory bytecode = iDeployer.parse2("_: every(0);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 0);
-        assertEq(kvs.length, 0);
+        checkHappy("_: every(0);", 0, "");
     }
 
     /// Test the eval of every opcode parsed from a string. Tests 2 true inputs.
     /// The last true input should be the overall result.
     function testOpEveryNPEval2TrueInputs() external {
-        bytes memory bytecode = iDeployer.parse2("_: every(5 6);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 6e18);
-        assertEq(kvs.length, 0);
+        checkHappy("_: every(5 6);", 6e18, "");
     }
 
     /// Test the eval of every opcode parsed from a string. Tests 2 false inputs.
     function testOpEveryNPEval2FalseInputs() external {
-        bytes memory bytecode = iDeployer.parse2("_: every(0 0);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 0);
-        assertEq(kvs.length, 0);
+        checkHappy("_: every(0 0);", 0, "");
     }
 
     /// Test the eval of every opcode parsed from a string. Tests 2 inputs, one
     /// true and one false. The overall result is false.
     function testOpEveryNPEval2MixedInputs() external {
-        bytes memory bytecode = iDeployer.parse2("_: every(5 0);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 0);
-        assertEq(kvs.length, 0);
+        checkHappy("_: every(5 0);", 0, "");
     }
 
     /// Test the eval of every opcode parsed from a string. Tests 2 inputs, one
     /// true and one false. The overall result is false.
     function testOpEveryNPEval2MixedInputs2() external {
-        bytes memory bytecode = iDeployer.parse2("_: every(0 5);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 0);
-        assertEq(kvs.length, 0);
+        checkHappy("_: every(0 5);", 0, "");
     }
 
     /// Test that every without inputs fails integrity check.

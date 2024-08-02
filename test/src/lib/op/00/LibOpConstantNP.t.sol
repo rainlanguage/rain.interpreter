@@ -11,7 +11,8 @@ import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
     Operand,
     SourceIndexV2,
-    FullyQualifiedNamespace
+    FullyQualifiedNamespace,
+    EvalV4
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
@@ -83,13 +84,15 @@ contract LibOpConstantNPTest is OpTest {
         bytes memory bytecode = iDeployer.parse2("_ _: max-value() 1.001;");
 
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0),
-            new uint256[](0)
+            EvalV4({
+                store: iStore,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+                inputs: new uint256[](0),
+                stateOverlay: new uint256[](0)
+            })
         );
         assertEq(stack.length, 2);
         assertEq(stack[0], 1001e15);

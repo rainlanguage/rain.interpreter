@@ -9,7 +9,8 @@ import {
     IInterpreterV4,
     FullyQualifiedNamespace,
     SourceIndexV2,
-    Operand
+    Operand,
+    EvalV4
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
@@ -67,13 +68,15 @@ contract LibOpERC721OwnerOfTest is OpTest {
         vm.expectCall(token, abi.encodeWithSelector(IERC721.ownerOf.selector, tokenId), 1);
 
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0),
-            new uint256[](0)
+            EvalV4({
+                store: iStore,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+                inputs: new uint256[](0),
+                stateOverlay: new uint256[](0)
+            })
         );
         assertEq(stack.length, 1);
         assertEq(stack[0], uint256(uint160(owner)));
