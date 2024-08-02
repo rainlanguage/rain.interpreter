@@ -46,3 +46,6 @@
 [submodule "lib/rain.sol.codegen"]
 	path = lib/rain.sol.codegen
 	url = https://github.com/rainlanguage/rain.sol.codegen
+[submodule "lib/rain.math.float"]
+	path = lib/rain.math.float
+	url = https://github.com/rainlanguage/rain.math.float
