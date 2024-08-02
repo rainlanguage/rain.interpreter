@@ -11,7 +11,6 @@ import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpr
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {FullyQualifiedNamespace} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {LibEncodedDispatch} from "rain.interpreter.interface/lib/caller/LibEncodedDispatch.sol";
 import {SourceIndexV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {FIXED_POINT_E} from "rain.math.fixedpoint/lib/FixedPointDecimalConstants.sol";
 

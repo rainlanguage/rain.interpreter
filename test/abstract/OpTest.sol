@@ -23,7 +23,6 @@ import {
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {FullyQualifiedNamespace, StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
-import {LibEncodedDispatch} from "rain.interpreter.interface/lib/caller/LibEncodedDispatch.sol";
 import {LibNamespace} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
 
 uint256 constant PRE = uint256(keccak256(abi.encodePacked("pre")));
