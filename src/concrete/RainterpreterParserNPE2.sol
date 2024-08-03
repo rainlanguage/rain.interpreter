@@ -4,8 +4,8 @@ pragma solidity =0.8.25;
 import {IERC165, ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
 import {LibParse} from "../lib/parse/LibParse.sol";
-import {IParserPragmaV1, PragmaV1} from "rain.interpreter.interface/interface/unstable/IParserPragmaV1.sol";
-import {IParserV1View} from "rain.interpreter.interface/interface/unstable/IParserV1View.sol";
+import {IParserPragmaV1, PragmaV1} from "rain.interpreter.interface/interface/IParserPragmaV1.sol";
+import {IParserV1View} from "rain.interpreter.interface/interface/deprecated/IParserV1View.sol";
 import {LibParseState, ParseState} from "../lib/parse/LibParseState.sol";
 import {LibParsePragma} from "../lib/parse/LibParsePragma.sol";
 import {LibParseLiteral} from "../lib/parse/literal/LibParseLiteral.sol";
