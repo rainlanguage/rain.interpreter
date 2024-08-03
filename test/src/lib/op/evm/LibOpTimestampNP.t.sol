@@ -12,7 +12,7 @@ import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibInt
 import {
     IInterpreterStoreV2, FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/deprecated/IInterpreterCallerV2.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 
 import {LibOpTimestampNP} from "src/lib/op/evm/LibOpTimestampNP.sol";
