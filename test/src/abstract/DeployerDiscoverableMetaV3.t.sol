@@ -5,7 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {UnexpectedMetaHash, META_MAGIC_NUMBER_V1, NotRainMetaV1} from "rain.metadata/interface/IMetaV1.sol";
 import {LibMeta} from "rain.metadata/lib/LibMeta.sol";
 
-import {IExpressionDeployerV3, IInterpreterV2} from "rain.interpreter.interface/interface/IExpressionDeployerV3.sol";
+import {IExpressionDeployerV3, IInterpreterV2} from "rain.interpreter.interface/interface/deprecated/IExpressionDeployerV3.sol";
 import {
     DeployerDiscoverableMetaV3,
     DeployerDiscoverableMetaV3ConstructionConfig

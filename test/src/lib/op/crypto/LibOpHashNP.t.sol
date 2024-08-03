@@ -10,7 +10,7 @@ import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
-import {IInterpreterV2, Operand, SourceIndexV2} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
+import {IInterpreterV2, Operand, SourceIndexV2} from "rain.interpreter.interface/interface/deprecated/IInterpreterV2.sol";
 import {
     IInterpreterStoreV2, FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";

@@ -9,7 +9,7 @@ import {
     Operand,
     SourceIndexV2,
     FullyQualifiedNamespace
-} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
+} from "rain.interpreter.interface/interface/deprecated/IInterpreterV2.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {IMetaV1} from "rain.metadata/interface/IMetaV1.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
