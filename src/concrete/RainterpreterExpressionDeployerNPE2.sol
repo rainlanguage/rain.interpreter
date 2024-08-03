@@ -18,7 +18,7 @@ import {
     UnexpectedPointers
 } from "../error/ErrDeploy.sol";
 import {IParserV1View} from "rain.interpreter.interface/interface/deprecated/IParserV1View.sol";
-import {IInterpreterV2} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
+import {IInterpreterV3} from "rain.interpreter.interface/interface/IInterpreterV3.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {IDescribedByMetaV1} from "rain.metadata/interface/unstable/IDescribedByMetaV1.sol";
 
@@ -60,7 +60,7 @@ contract RainterpreterExpressionDeployerNPE2 is
 
     /// The interpreter with known bytecode that this deployer is constructed
     /// for.
-    IInterpreterV2 public immutable iInterpreter;
+    IInterpreterV3 public immutable iInterpreter;
     /// The store with known bytecode that this deployer is constructed for.
     IInterpreterStoreV2 public immutable iStore;
     IParserV1View public immutable iParser;
