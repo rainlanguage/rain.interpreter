@@ -8,7 +8,9 @@ import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibOpAnyNP} from "src/lib/op/logic/LibOpAnyNP.sol";
-import {IInterpreterV2, Operand, SourceIndexV2} from "rain.interpreter.interface/interface/deprecated/IInterpreterV2.sol";
+import {
+    IInterpreterV2, Operand, SourceIndexV2
+} from "rain.interpreter.interface/interface/deprecated/IInterpreterV2.sol";
 import {
     IInterpreterStoreV2, FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";

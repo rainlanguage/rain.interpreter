@@ -17,7 +17,7 @@ import {UnexpectedOperand} from "../../src/error/ErrParse.sol";
 import {BadOpInputsLength, BadOpOutputsLength} from "../../src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
     Operand,
-    IInterpreterV2,
+    IInterpreterV3,
     SourceIndexV2,
     IInterpreterStoreV2
 } from "rain.interpreter.interface/interface/IInterpreterV3.sol";

@@ -67,7 +67,7 @@ contract RainterpreterExpressionDeployerNPE2 is
 
     constructor(RainterpreterExpressionDeployerNPE2ConstructionConfigV2 memory config) {
         // Set the immutables.
-        IInterpreterV2 interpreter = IInterpreterV2(config.interpreter);
+        IInterpreterV3 interpreter = IInterpreterV3(config.interpreter);
         IInterpreterStoreV2 store = IInterpreterStoreV2(config.store);
         IParserV1View parser = IParserV1View(config.parser);
 

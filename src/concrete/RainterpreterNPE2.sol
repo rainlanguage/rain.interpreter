@@ -18,7 +18,6 @@ import {
     SourceIndexV2,
     IInterpreterV3,
     StateNamespace,
-    EncodedDispatch,
     FullyQualifiedNamespace,
     IInterpreterStoreV2
 } from "rain.interpreter.interface/interface/IInterpreterV3.sol";
