@@ -8,9 +8,9 @@ import {
     OPCODE_CONSTANT,
     OPCODE_CONTEXT,
     Operand
-} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibBytecode, Pointer} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
-import {ISubParserV3, COMPATIBILITY_V4} from "rain.interpreter.interface/interface/unstable/ISubParserV3.sol";
+import {ISubParserV3, COMPATIBILITY_V4} from "rain.interpreter.interface/interface/ISubParserV3.sol";
 import {BadSubParserResult, UnknownWord, UnsupportedLiteralType} from "../../error/ErrParse.sol";
 import {LibExtern, EncodedExternDispatch} from "../extern/LibExtern.sol";
 import {IInterpreterExternV3} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";

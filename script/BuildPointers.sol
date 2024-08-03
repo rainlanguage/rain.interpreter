@@ -4,7 +4,6 @@ pragma solidity =0.8.25;
 import {Script} from "forge-std/Script.sol";
 import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
 import {RainterpreterStoreNPE2} from "src/concrete/RainterpreterStoreNPE2.sol";
-import {IInterpreterV2} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
 import {RainterpreterParserNPE2, PARSE_META_BUILD_DEPTH} from "src/concrete/RainterpreterParserNPE2.sol";
 import {
     RainterpreterExpressionDeployerNPE2,

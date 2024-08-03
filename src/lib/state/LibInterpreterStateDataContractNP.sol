@@ -5,7 +5,7 @@ import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
-import {FullyQualifiedNamespace} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
+import {FullyQualifiedNamespace} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 
 import {InterpreterStateNP} from "./LibInterpreterStateNP.sol";

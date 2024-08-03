@@ -2,7 +2,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {Operand, OPCODE_EXTERN} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
+import {Operand, OPCODE_EXTERN} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {
     IInterpreterExternV3,
     ExternDispatch,

@@ -5,8 +5,8 @@ import {Test} from "forge-std/Test.sol";
 
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 import {RainterpreterParserNPE2} from "src/concrete/RainterpreterParserNPE2.sol";
-import {IParserPragmaV1} from "rain.interpreter.interface/interface/unstable/IParserPragmaV1.sol";
-import {IParserV1View} from "rain.interpreter.interface/interface/unstable/IParserV1View.sol";
+import {IParserPragmaV1} from "rain.interpreter.interface/interface/IParserPragmaV1.sol";
+import {IParserV1View} from "rain.interpreter.interface/interface/deprecated/IParserV1View.sol";
 
 contract RainterpreterParserNPE2IERC165Test is Test {
     /// Test that ERC165 is implemented for all interfaces.

@@ -6,7 +6,7 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {NotAnExternContract} from "src/error/ErrExtern.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
+import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibOpExternNP} from "src/lib/op/00/LibOpExternNP.sol";
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {
