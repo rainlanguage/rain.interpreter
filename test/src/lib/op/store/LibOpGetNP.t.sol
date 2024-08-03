@@ -9,7 +9,7 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {LibOpGetNP} from "src/lib/op/store/LibOpGetNP.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
+import {Operand} from "rain.interpreter.interface/interface/IInterpreterV3.sol";
 import {IInterpreterStoreV2, StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 

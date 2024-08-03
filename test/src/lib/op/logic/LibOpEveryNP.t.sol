@@ -10,11 +10,11 @@ import {
     Operand,
     SourceIndexV2,
     FullyQualifiedNamespace
-} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
+} from "rain.interpreter.interface/interface/deprecated/IInterpreterV2.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
-import {LibEncodedDispatch} from "rain.interpreter.interface/lib/caller/LibEncodedDispatch.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/deprecated/IInterpreterCallerV2.sol";
+import {LibEncodedDispatch} from "rain.interpreter.interface/lib/deprecated/caller/LibEncodedDispatch.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpEveryNPTest is OpTest {

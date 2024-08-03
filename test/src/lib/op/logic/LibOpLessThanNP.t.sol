@@ -4,15 +4,15 @@ pragma solidity =0.8.25;
 import {OpTest} from "test/abstract/OpTest.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibOpLessThanNP} from "src/lib/op/logic/LibOpLessThanNP.sol";
-import {LibEncodedDispatch} from "rain.interpreter.interface/lib/caller/LibEncodedDispatch.sol";
+import {LibEncodedDispatch} from "rain.interpreter.interface/lib/deprecated/caller/LibEncodedDispatch.sol";
 import {
     IInterpreterV2,
     Operand,
     SourceIndexV2,
     FullyQualifiedNamespace,
     IInterpreterStoreV2
-} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV2.sol";
+} from "rain.interpreter.interface/interface/deprecated/IInterpreterV2.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/deprecated/IInterpreterCallerV2.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";

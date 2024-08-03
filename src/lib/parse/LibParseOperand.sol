@@ -8,7 +8,7 @@ import {
     UnexpectedOperand,
     UnexpectedOperandValue
 } from "../../error/ErrParse.sol";
-import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
+import {Operand} from "rain.interpreter.interface/interface/IInterpreterV3.sol";
 import {LibParse} from "./LibParse.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 import {CMASK_OPERAND_END, CMASK_WHITESPACE, CMASK_OPERAND_START} from "./LibParseCMask.sol";

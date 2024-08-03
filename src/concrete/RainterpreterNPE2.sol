@@ -11,18 +11,16 @@ import {LibDataContract} from "rain.datacontract/lib/LibDataContract.sol";
 
 import {LibEvalNP} from "../lib/eval/LibEvalNP.sol";
 import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
-import {LibEncodedDispatch} from "rain.interpreter.interface/lib/caller/LibEncodedDispatch.sol";
+import {LibEncodedDispatch} from "rain.interpreter.interface/lib/deprecated/caller/LibEncodedDispatch.sol";
 import {InterpreterStateNP} from "../lib/state/LibInterpreterStateNP.sol";
 import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
 import {
     SourceIndexV2,
-    IInterpreterV2,
+    IInterpreterV3,
     StateNamespace,
-    EncodedDispatch,
     FullyQualifiedNamespace,
     IInterpreterStoreV2
-} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
-import {IInterpreterV3} from "rain.interpreter.interface/interface/unstable/IInterpreterV3.sol";
+} from "rain.interpreter.interface/interface/IInterpreterV3.sol";
 import {
     BYTECODE_HASH as INTERPRETER_BYTECODE_HASH,
     OPCODE_FUNCTION_POINTERS

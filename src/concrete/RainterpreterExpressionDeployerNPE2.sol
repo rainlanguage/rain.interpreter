@@ -7,8 +7,8 @@ import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {LibDataContract, DataContractMemoryContainer} from "rain.datacontract/lib/LibDataContract.sol";
 import {IERC1820_REGISTRY} from "rain.erc1820/lib/LibIERC1820.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
-import {IParserV2} from "rain.interpreter.interface/interface/unstable/IParserV2.sol";
-import {IParserPragmaV1, PragmaV1} from "rain.interpreter.interface/interface/unstable/IParserPragmaV1.sol";
+import {IParserV2} from "rain.interpreter.interface/interface/IParserV2.sol";
+import {IParserPragmaV1, PragmaV1} from "rain.interpreter.interface/interface/IParserPragmaV1.sol";
 
 import {
     UnexpectedConstructionMetaHash,
@@ -17,8 +17,8 @@ import {
     UnexpectedParserBytecodeHash,
     UnexpectedPointers
 } from "../error/ErrDeploy.sol";
-import {IParserV1View} from "rain.interpreter.interface/interface/unstable/IParserV1View.sol";
-import {IInterpreterV2} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
+import {IParserV1View} from "rain.interpreter.interface/interface/deprecated/IParserV1View.sol";
+import {IInterpreterV3} from "rain.interpreter.interface/interface/IInterpreterV3.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {IDescribedByMetaV1} from "rain.metadata/interface/unstable/IDescribedByMetaV1.sol";
 
@@ -60,14 +60,14 @@ contract RainterpreterExpressionDeployerNPE2 is
 
     /// The interpreter with known bytecode that this deployer is constructed
     /// for.
-    IInterpreterV2 public immutable iInterpreter;
+    IInterpreterV3 public immutable iInterpreter;
     /// The store with known bytecode that this deployer is constructed for.
     IInterpreterStoreV2 public immutable iStore;
     IParserV1View public immutable iParser;
 
     constructor(RainterpreterExpressionDeployerNPE2ConstructionConfigV2 memory config) {
         // Set the immutables.
-        IInterpreterV2 interpreter = IInterpreterV2(config.interpreter);
+        IInterpreterV3 interpreter = IInterpreterV3(config.interpreter);
         IInterpreterStoreV2 store = IInterpreterStoreV2(config.store);
         IParserV1View parser = IParserV1View(config.parser);
 

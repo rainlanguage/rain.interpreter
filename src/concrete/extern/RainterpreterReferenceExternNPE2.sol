@@ -12,11 +12,11 @@ import {
 import {LibExtern, EncodedExternDispatch} from "../../lib/extern/LibExtern.sol";
 import {IInterpreterExternV3} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
 import {LibSubParse} from "../../lib/parse/LibSubParse.sol";
-import {AuthoringMetaV2} from "rain.interpreter.interface/interface/unstable/IParserV1View.sol";
+import {AuthoringMetaV2} from "rain.interpreter.interface/interface/deprecated/IParserV1View.sol";
 import {LibParseState, ParseState} from "../../lib/parse/LibParseState.sol";
 import {LibParseOperand} from "../../lib/parse/LibParseOperand.sol";
 import {LibParseLiteral} from "../../lib/parse/literal/LibParseLiteral.sol";
-import {COMPATIBILITY_V4} from "rain.interpreter.interface/interface/unstable/ISubParserV3.sol";
+import {COMPATIBILITY_V4} from "rain.interpreter.interface/interface/ISubParserV3.sol";
 import {LibExternOpIntIncNPE2, OP_INDEX_INCREMENT} from "../../lib/extern/reference/op/LibExternOpIntIncNPE2.sol";
 import {LibExternOpStackOperandNPE2} from "../../lib/extern/reference/op/LibExternOpStackOperandNPE2.sol";
 import {LibExternOpContextSenderNPE2} from "../../lib/extern/reference/op/LibExternOpContextSenderNPE2.sol";

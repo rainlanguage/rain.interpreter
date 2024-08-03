@@ -6,7 +6,7 @@ import {Test, console2, stdError} from "forge-std/Test.sol";
 
 import {INVALID_BYTECODE} from "../lib/etch/LibEtch.sol";
 import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
-import {AuthoringMetaV2} from "rain.interpreter.interface/interface/unstable/IParserV1View.sol";
+import {AuthoringMetaV2} from "rain.interpreter.interface/interface/deprecated/IParserV1View.sol";
 import {RainterpreterStoreNPE2, STORE_BYTECODE_HASH} from "src/concrete/RainterpreterStoreNPE2.sol";
 import {
     RainterpreterParserNPE2,
@@ -24,7 +24,7 @@ import {
     RainterpreterExpressionDeployerNPE2
 } from "../../src/concrete/RainterpreterExpressionDeployerNPE2.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
-import {LibEncodedDispatch} from "rain.interpreter.interface/lib/caller/LibEncodedDispatch.sol";
+import {LibEncodedDispatch} from "rain.interpreter.interface/lib/deprecated/caller/LibEncodedDispatch.sol";
 import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
 
 /// @title RainterpreterExpressionDeployerNPD2DeploymentTest

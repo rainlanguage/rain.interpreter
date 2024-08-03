@@ -3,7 +3,7 @@ pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
-import {Operand} from "rain.interpreter.interface/interface/IInterpreterV2.sol";
+import {Operand} from "rain.interpreter.interface/interface/IInterpreterV3.sol";
 import {LibOpERC5313OwnerNP} from "src/lib/op/erc5313/LibOpERC5313OwnerNP.sol";
 import {IERC5313} from "openzeppelin-contracts/contracts/interfaces/IERC5313.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
