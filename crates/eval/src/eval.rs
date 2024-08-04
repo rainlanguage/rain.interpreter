@@ -56,7 +56,7 @@ impl Forker {
         } = args;
 
         let parse_call = parse2Call {
-            data: rainlang_string.as_bytes().to_vec(),
+            data: rainlang_string.as_bytes().to_vec().into(),
         };
 
         let parse_result = self

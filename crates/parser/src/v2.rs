@@ -107,7 +107,7 @@ impl Parser2 for ParserV2 {
             .read(
                 ReadContractParametersBuilder::default()
                     .address(self.deployer_address)
-                    .call(parse2Call { data })
+                    .call(parse2Call { data: data.into() })
                     .build()
                     .map_err(ParserError::ReadContractParametersBuilderError)?,
             )
@@ -124,7 +124,7 @@ impl Parser2 for ParserV2 {
             .read(
                 ReadContractParametersBuilder::default()
                     .address(self.deployer_address)
-                    .call(parsePragma1Call { data })
+                    .call(parsePragma1Call { data: data.into() })
                     .build()
                     .map_err(ParserError::ReadContractParametersBuilderError)?,
             )

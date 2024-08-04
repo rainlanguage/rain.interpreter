@@ -76,7 +76,7 @@ impl Parser for ParserV1 {
             .read(
                 ReadContractParametersBuilder::default()
                     .address(self.address)
-                    .call(parseCall { data })
+                    .call(parseCall { data: data.into() })
                     .build()
                     .map_err(ParserError::ReadContractParametersBuilderError)?,
             )
