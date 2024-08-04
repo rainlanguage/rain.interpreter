@@ -1,6 +1,6 @@
 use crate::error::ParserError;
+use alloy::primitives::*;
 use alloy_ethers_typecast::transaction::{ReadContractParametersBuilder, ReadableClient};
-use alloy_primitives::*;
 use ethers::providers::JsonRpcClient;
 use rain_interpreter_bindings::IParserV1::*;
 use rain_interpreter_dispair::DISPair;
@@ -88,7 +88,7 @@ impl Parser for ParserV1 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloy_primitives::{Address, U256};
+    use alloy::primitives::{Address, U256};
     use ethers::providers::{MockProvider, MockResponse, Provider};
 
     #[tokio::test]

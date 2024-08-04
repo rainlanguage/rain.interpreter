@@ -1,4 +1,4 @@
-use alloy_primitives::BlockNumber;
+use alloy::primitives::BlockNumber;
 use clap::Args;
 use rain_interpreter_eval::fork::NewForkedEvm;
 

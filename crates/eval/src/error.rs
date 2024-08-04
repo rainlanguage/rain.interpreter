@@ -1,4 +1,4 @@
-use alloy_primitives::ruint::FromUintError;
+use alloy::primitives::ruint::FromUintError;
 #[cfg(not(target_family = "wasm"))]
 use foundry_evm::executors::RawCallResult;
 use rain_error_decoding::{AbiDecodeFailedErrors, AbiDecodedErrorType};

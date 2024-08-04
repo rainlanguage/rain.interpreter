@@ -1,7 +1,7 @@
 use crate::execute::Execute;
 use crate::fork::NewForkedEvmCliArgs;
 use crate::output::SupportedOutputEncoding;
-use alloy_primitives::{Address, U256};
+use alloy::primitives::{Address, U256};
 use anyhow::anyhow;
 use anyhow::Context;
 use anyhow::Result;

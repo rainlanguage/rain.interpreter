@@ -1,6 +1,6 @@
 use crate::error::ForkCallError;
 use crate::fork::{ForkTypedReturn, Forker};
-use alloy_primitives::{Address, U256};
+use alloy::primitives::{Address, U256};
 use rain_interpreter_bindings::DeployerISP::{iInterpreterCall, iStoreCall};
 use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
 use rain_interpreter_bindings::IInterpreterV3::eval3Call;

@@ -1,6 +1,6 @@
 use crate::error::ForkCallError;
-use alloy_primitives::{Address, BlockNumber, U256};
-use alloy_sol_types::SolCall;
+use alloy::primitives::{Address, BlockNumber, U256};
+use alloy::sol_types::SolCall;
 use foundry_evm::{
     backend::{Backend, DatabaseExt, LocalForkId},
     executors::{Executor, ExecutorBuilder, RawCallResult},
@@ -399,8 +399,8 @@ mod tests {
     };
 
     use super::*;
-    use alloy_primitives::U256;
-    use alloy_sol_types::sol;
+    use alloy::primitives::U256;
+    use alloy::sol;
     use rain_interpreter_bindings::{
         DeployerISP::{iParserCall, iStoreCall},
         IInterpreterStoreV1::{getCall, setCall},
