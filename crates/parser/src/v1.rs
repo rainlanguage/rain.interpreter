@@ -134,7 +134,7 @@ mod tests {
 
         let result = parser.parse_text("my rainlang", client).await.unwrap();
 
-        assert_eq!(result.bytecode.abi_encode(), hex!("1234"));
+        assert_eq!(**result.bytecode, hex!("1234"));
         assert_eq!(result.constants, vec![U256::from(3), U256::from(4)]);
     }
 
@@ -163,7 +163,7 @@ mod tests {
 
         let result = parser.parse_text(rainlang, client).await.unwrap();
 
-        assert_eq!(result.bytecode.abi_encode(), hex!("6d79207261696e6c616e67"));
+        assert_eq!(**result.bytecode, hex!("6d79207261696e6c616e67"));
         assert_eq!(result.constants, vec![U256::from(3), U256::from(4)]);
     }
 }

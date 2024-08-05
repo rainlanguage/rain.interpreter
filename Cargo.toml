@@ -8,12 +8,12 @@ license = "CAL-1.0"
 homepage = "https://github.com/rainprotocol/rain.interpreter"
 
 [workspace.dependencies]
-alloy = { version = "0.2.0", features = ["full", "node-bindings"] }
+alloy = { version = "0.2.1", features = ["full", "node-bindings"] }
 anyhow = "1.0.70"
 clap = { version = "4.2.5", features = ["cargo", "derive"] }
 ethers = { version = "2.0.14", default-features = false }
-foundry-evm = { git = "https://github.com/foundry-rs/foundry", rev = "26e6e57527497a90af1a5409484c01b5e7702a02" }
-revm = { version = "8", default-features = false, features = [
+foundry-evm = { git = "https://github.com/foundry-rs/foundry", rev = "d856669d9b614a83834c664f443e18194fcdc781" }
+revm = { version = "12.1.0", default-features = false, features = [
     "std",
     "serde",
     "memory_limit",
