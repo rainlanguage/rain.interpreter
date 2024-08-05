@@ -88,10 +88,7 @@ impl Parser for ParserV1 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloy::{
-        primitives::{Address, U256},
-        sol_types::SolValue,
-    };
+    use alloy::primitives::{Address, U256};
     use ethers::providers::{MockProvider, MockResponse, Provider};
 
     #[tokio::test]
