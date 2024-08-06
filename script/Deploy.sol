@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.25;
+pragma solidity =0.8.26;
 
 import {Script} from "forge-std/Script.sol";
 import {RainterpreterStoreNPE2} from "../src/concrete/RainterpreterStoreNPE2.sol";

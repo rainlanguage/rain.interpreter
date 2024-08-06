@@ -6,14 +6,14 @@
 // file needs the contract to exist so that it can be compiled.
 
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.25;
+pragma solidity =0.8.26;
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0xfee767105c6c61d954e857509e83c39f1352e9ad804e9e9eb297493462c784ce);
+bytes32 constant BYTECODE_HASH = bytes32(0x6061229b3f47eccd6cd172d878374c8d904a47162b0d1aa49b1a24defa961b18);
 
 /// @dev The function pointers known to the interpreter for dynamic dispatch.
 /// By setting these as a constant they can be inlined into the interpreter
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
 bytes constant OPCODE_FUNCTION_POINTERS =
-    hex"077c07cd080f09db0ac20ad40ae60b090b4b0b9d0bae0bbf0c610c9e0d5c0e0c0e900fd310fa0d5c11f6129813101349138213d113d1140a146f1543159615aa16031617162c164616511665167a16b216d9175917a717f51843185b187418c218f91907191519301945195d19761984199219a019ae19fc1a4a1a981ae61afe1afe1b151b431b431b5a1b891bde1bec1bec1c901d77";
+    hex"00050002000400030006000700080009000a000b000c000d000e001200130014000f0010001100170016001500180019001a001b001b001c001d001e001f002000210022002300240025002600430044004500460047002700280029002a002b002c002d002e002f0030003100320033003500340036003700380039003a003b003b003c003d003d003e003f00400042004200480049";

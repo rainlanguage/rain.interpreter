@@ -6,10 +6,10 @@
 // file needs the contract to exist so that it can be compiled.
 
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.25;
+pragma solidity =0.8.26;
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0x4247a5ea9bd8abcbe989b8ae09f2b9b29cafa521add389fc7b6f2b1ca3c49ecc);
+bytes32 constant BYTECODE_HASH = bytes32(0x1ad3be1d0e3e350831fdd170097e2128678520a2d1a59ea2a210d6f2ad4151d2);
 
 /// @dev The hash of the meta that describes the contract.
 bytes32 constant DESCRIBED_BY_META_HASH = bytes32(0xadf71693c6ecf3fd560904bc46973d1b6e651440d15366673f9b3984749e7c16);
@@ -42,25 +42,25 @@ uint8 constant PARSE_META_BUILD_DEPTH = 1;
 /// bytecode that dials back into this contract at eval time, and mapping
 /// to things that happen entirely on the interpreter such as well known
 /// constants and references to the context grid.
-bytes constant SUB_PARSER_WORD_PARSERS = hex"0775079707a607b607c7";
+bytes constant SUB_PARSER_WORD_PARSERS = hex"00070008000400020003";
 
 /// @dev Every two bytes is a function pointer for an operand handler.
 /// These positional indexes all map to the same indexes looked up in the parse
 /// meta.
-bytes constant OPERAND_HANDLER_FUNCTION_POINTERS = hex"0a270a6c0a270a270a27";
+bytes constant OPERAND_HANDLER_FUNCTION_POINTERS = hex"0009000a000900090009";
 
 /// @dev Every two bytes is a function pointer for a literal parser.
 /// Literal dispatches are determined by the first byte(s) of the literal
 /// rather than a full word lookup, and are done with simple conditional
 /// jumps as the possibilities are limited compared to the number of words we
 /// have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"09f8";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0001";
 
 /// @dev The function pointers for the integrity check fns.
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"08ad";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0006";
 
 /// @dev The function pointers known to the interpreter for dynamic dispatch.
 /// By setting these as a constant they can be inlined into the interpreter
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"0869";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"0005";

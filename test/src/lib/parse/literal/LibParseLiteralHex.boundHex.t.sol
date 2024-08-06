@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.25;
+pragma solidity =0.8.26;
 
 import {ParseLiteralTest} from "test/abstract/ParseLiteralTest.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";

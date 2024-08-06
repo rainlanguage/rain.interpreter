@@ -6,10 +6,10 @@
 // file needs the contract to exist so that it can be compiled.
 
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.25;
+pragma solidity =0.8.26;
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0x0913de8e0b36ea4fde9df417b198d01eba3e5cb78da1c5c6bbc50bea09444023);
+bytes32 constant BYTECODE_HASH = bytes32(0xc09339e88c6c6eefeb8b17e68790068a5a72f7a9267507fd191b0b057eeb00d2);
 
 /// @dev The parse meta that is used to lookup word definitions.
 /// The structure of the parse meta is:
@@ -38,11 +38,11 @@ uint8 constant PARSE_META_BUILD_DEPTH = 2;
 /// These positional indexes all map to the same indexes looked up in the parse
 /// meta.
 bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
-    hex"190019001900196519de19de19de1965196519001900190019de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de1a2319de1af51a2319de1af519de19de19001b5e19de19de";
+    hex"000300030003000400010001000100040004000300030003000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000100010001000500010006000500010006000100010003000200010001";
 
 /// @dev Every two bytes is a function pointer for a literal parser.
 /// Literal dispatches are determined by the first byte(s) of the literal
 /// rather than a full word lookup, and are done with simple conditional
 /// jumps as the possibilities are limited compared to the number of words we
 /// have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0f76123e1645171f";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"000800070009000a";

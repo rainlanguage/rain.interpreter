@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.25;
+pragma solidity =0.8.26;
 
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {BadDynamicLength} from "../../error/ErrOpList.sol";
@@ -112,7 +112,7 @@ library LibRainterpreterReferenceExternNPE2 {
         ];
         AuthoringMetaV2[] memory wordsDynamic;
         uint256 length = SUB_PARSER_WORD_PARSERS_LENGTH;
-        assembly {
+        assembly ("memory-safe") {
             wordsDynamic := wordsFixed
             mstore(wordsDynamic, length)
         }
@@ -215,7 +215,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
             function (uint256, uint256, uint256) internal pure returns (uint256)[SUB_PARSER_LITERAL_PARSERS_LENGTH + 1]
                 memory parsersFixed = [lengthPointer, LibParseLiteralRepeat.parseRepeat];
             uint256[] memory parsersDynamic;
-            assembly {
+            assembly ("memory-safe") {
                 parsersDynamic := parsersFixed
             }
             // Sanity check that the dynamic length is correct. Should be an
@@ -289,7 +289,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
                     LibParseOperand.handleOperandDisallowed
                 ];
             uint256[] memory handlersDynamic;
-            assembly {
+            assembly ("memory-safe") {
                 handlersDynamic := handlersFixed
             }
             // Sanity check that the dynamic length is correct. Should be an
@@ -328,7 +328,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
                     LibExternOpContextRainlenNPE2.subParser
                 ];
             uint256[] memory pointersDynamic;
-            assembly {
+            assembly ("memory-safe") {
                 pointersDynamic := pointersFixed
             }
             // Sanity check that the dynamic length is correct. Should be an
@@ -358,7 +358,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
             function(Operand, uint256[] memory) internal view returns (uint256[] memory)[OPCODE_FUNCTION_POINTERS_LENGTH
                 + 1] memory pointersFixed = [lengthPointer, LibExternOpIntIncNPE2.run];
             uint256[] memory pointersDynamic;
-            assembly {
+            assembly ("memory-safe") {
                 pointersDynamic := pointersFixed
             }
             // Sanity check that the dynamic length is correct. Should be an
@@ -388,7 +388,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
             function(Operand, uint256, uint256) internal pure returns (uint256, uint256)[OPCODE_FUNCTION_POINTERS_LENGTH
                 + 1] memory pointersFixed = [lengthPointer, LibExternOpIntIncNPE2.integrity];
             uint256[] memory pointersDynamic;
-            assembly {
+            assembly ("memory-safe") {
                 pointersDynamic := pointersFixed
             }
             // Sanity check that the dynamic length is correct. Should be an

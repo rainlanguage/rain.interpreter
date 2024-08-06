@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.25;
+pragma solidity =0.8.26;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
