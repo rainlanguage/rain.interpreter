@@ -32,6 +32,7 @@ fs_permissions = [
 
 remappings = [
     # The auto remapping wasn't appending /src/ for some reason.
+    "forge-std/=lib/rain.interpreter.interface/lib/forge-std/src/",
     "rain.metadata/=lib/rain.metadata/src/",
     "rain.math.saturating/=lib/rain.math.fixedpoint/lib/rain.math.saturating/src/",
     "rain.sol.codegen/=lib/rain.sol.codegen/src/",
