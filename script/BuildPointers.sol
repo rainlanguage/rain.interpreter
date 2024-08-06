@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.26;
+pragma solidity =0.8.25;
 
 import {Script} from "forge-std/Script.sol";
 import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
@@ -85,6 +85,7 @@ contract BuildPointers is Script {
             address(extern),
             "RainterpreterReferenceExternNPE2",
             string.concat(
+            string.concat(
                 LibCodeGen.describedByMetaHashConstantString(vm, name),
                 LibCodeGen.parseMetaConstantString(
                     vm, LibRainterpreterReferenceExternNPE2.authoringMetaV2(), EXTERN_PARSE_META_BUILD_DEPTH
@@ -92,9 +93,10 @@ contract BuildPointers is Script {
                 LibCodeGen.subParserWordParsersConstantString(vm, extern),
                 LibCodeGen.operandHandlerFunctionPointersConstantString(vm, extern),
                 LibCodeGen.literalParserFunctionPointersConstantString(vm, extern),
-                LibCodeGen.integrityFunctionPointersConstantString(vm, extern),
-                LibCodeGen.opcodeFunctionPointersConstantString(vm, extern)
-            )
+                LibCodeGen.integrityFunctionPointersConstantString(vm, extern)
+            ),
+            LibCodeGen.opcodeFunctionPointersConstantString(vm, extern)
+        )
         );
     }
 

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.26;
+pragma solidity =0.8.25;
 
 import {UnsupportedLiteralType} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {ParserOutOfBounds} from "src/lib/parse/LibParse.sol";

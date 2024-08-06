@@ -5,7 +5,7 @@ libs = ['lib']
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
 
-solc = "0.8.26"
+solc = "0.8.25"
 
 # Try to make sure the optimizer doesn't touch the output in a way that can break
 # source maps for debugging.
@@ -39,7 +39,6 @@ remappings = [
 ]
 
 evm_version = "cancun"
-
 
 [fuzz]
 runs = 2048

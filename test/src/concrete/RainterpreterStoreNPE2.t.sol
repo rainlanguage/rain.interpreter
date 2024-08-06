@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.26;
+pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {Address} from "openzeppelin-contracts/contracts/utils/Address.sol";

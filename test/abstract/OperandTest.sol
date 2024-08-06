@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.26;
+pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {LibParse} from "src/lib/parse/LibParse.sol";
@@ -24,7 +24,7 @@ abstract contract OperandTest is Test {
         (constants);
     }
 
-    function checkOperandParse(bytes memory rainString, bytes memory operand) internal {
+    function checkOperandParse(bytes memory rainString, bytes memory operand) internal view {
         (bytes memory bytecode, uint256[] memory constants) = this.parse(rainString);
         assertEq(
             bytecode,

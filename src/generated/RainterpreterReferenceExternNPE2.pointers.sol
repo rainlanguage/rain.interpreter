@@ -6,7 +6,7 @@
 // file needs the contract to exist so that it can be compiled.
 
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.26;
+pragma solidity =0.8.25;
 
 /// @dev Hash of the known bytecode.
 bytes32 constant BYTECODE_HASH = bytes32(0x1ad3be1d0e3e350831fdd170097e2128678520a2d1a59ea2a210d6f2ad4151d2);

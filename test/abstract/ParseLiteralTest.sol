@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity =0.8.26;
+pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
@@ -31,7 +31,7 @@ contract ParseLiteralTest is Test {
         uint256 expectedInnerEnd,
         uint256 expectedOuterEnd,
         uint256 expectedFinalCursor
-    ) internal {
+    ) internal pure {
         uint256 cursor = Pointer.unwrap(data.dataPointer());
         uint256 end = cursor + data.length;
 
