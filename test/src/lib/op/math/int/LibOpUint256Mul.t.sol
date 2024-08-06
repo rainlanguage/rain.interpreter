@@ -9,7 +9,7 @@ contract LibOpUint256MulTest is OpTest {
     /// Directly test the integrity logic of LibOpUint256Mul. This tests the happy
     /// path where the inputs input and calc match.
     function testOpUint256MulIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData)
-        external
+        external pure
     {
         inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
@@ -21,7 +21,7 @@ contract LibOpUint256MulTest is OpTest {
 
     /// Directly test the integrity logic of LibOpUint256Mul. This tests the unhappy
     /// path where the operand is invalid due to 0 inputs.
-    function testOpUint256MulIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external {
+    function testOpUint256MulIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256Mul.integrity(state, Operand.wrap(0));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
@@ -30,7 +30,7 @@ contract LibOpUint256MulTest is OpTest {
 
     /// Directly test the integrity logic of LibOpUint256Mul. This tests the unhappy
     /// path where the operand is invalid due to 1 inputs.
-    function testOpUint256MulIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external {
+    function testOpUint256MulIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256Mul.integrity(state, Operand.wrap(0x010000));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
@@ -89,7 +89,7 @@ contract LibOpUint256MulTest is OpTest {
 
     /// Test the eval of `uint256-mul` opcode parsed from a string. Tests two inputs.
     /// Tests the happy path where multiplication does not overflow.
-    function testOpUint256MulEvalTwoInputsHappy() external {
+    function testOpUint256MulEvalTwoInputsHappy() external view {
         checkHappy("_: uint256-mul(0 0);", 0, "0 0");
         checkHappy("_: uint256-mul(0 1e-18);", 0, "0 1");
         checkHappy("_: uint256-mul(1e-18 0);", 0, "1 0");
@@ -111,7 +111,7 @@ contract LibOpUint256MulTest is OpTest {
 
     /// Test the eval of `uint256-mul` opcode parsed from a string. Tests three inputs.
     /// Tests the happy path where multiplication does not overflow.
-    function testOpUint256MulEvalThreeInputsHappy() external {
+    function testOpUint256MulEvalThreeInputsHappy() external view {
         checkHappy("_: uint256-mul(0 0 0);", 0, "0 0 0");
         checkHappy("_: uint256-mul(0 0 1e-18);", 0, "0 0 1");
         checkHappy("_: uint256-mul(0 1e-18 0);", 0, "0 1 0");
