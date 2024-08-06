@@ -217,7 +217,10 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         checkHappy(rainString, expectedStack, errString);
     }
 
-    function checkHappy(bytes memory rainString, uint256[] memory expectedStack, string memory errString) internal view {
+    function checkHappy(bytes memory rainString, uint256[] memory expectedStack, string memory errString)
+        internal
+        view
+    {
         checkHappy(rainString, LibContext.build(new uint256[][](0), new SignedContextV1[](0)), expectedStack, errString);
     }
 
@@ -236,7 +239,10 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         assertEq(kvs.length, 0);
     }
 
-    function checkHappyKVs(bytes memory rainString, uint256[] memory expectedKVs, string memory errString) internal view {
+    function checkHappyKVs(bytes memory rainString, uint256[] memory expectedKVs, string memory errString)
+        internal
+        view
+    {
         (uint256[] memory stack, uint256[] memory kvs) = parseAndEval(rainString);
 
         assertEq(stack.length, 0);

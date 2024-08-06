@@ -18,6 +18,7 @@ contract LibParseOperandParseOperandTest is Test {
 
     function checkParsingOperandFromData(string memory s, uint256[] memory expectedValues, uint256 expectedEnd)
         internal
+        pure
     {
         ParseState memory state = LibMetaFixture.newState(s);
         // Before parsing any operand values the state gets initialized at the
@@ -153,13 +154,9 @@ contract LibParseOperandParseOperandTest is Test {
         string memory valueCString = asHexC ? valueC.toHexString() : valueC.toString();
 
         string memory s = string.concat(
-            "<",
-            maybeWhitespaceA,
-            valueAString,
-            maybeWhitespaceB,
-            valueBString,
-            maybeWhitespaceC,
-            valueCString,
+            string.concat(
+                "<", maybeWhitespaceA, valueAString, maybeWhitespaceB, valueBString, maybeWhitespaceC, valueCString
+            ),
             maybeWhitespaceD,
             ">",
             suffix

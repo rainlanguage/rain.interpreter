@@ -9,7 +9,7 @@
 pragma solidity =0.8.25;
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0x1ad3be1d0e3e350831fdd170097e2128678520a2d1a59ea2a210d6f2ad4151d2);
+bytes32 constant BYTECODE_HASH = bytes32(0x8e92e214204a744c5c6417055981536dfc349001e7ad81c1c6717525dc9b286f);
 
 /// @dev The hash of the meta that describes the contract.
 bytes32 constant DESCRIBED_BY_META_HASH = bytes32(0xadf71693c6ecf3fd560904bc46973d1b6e651440d15366673f9b3984749e7c16);
@@ -42,25 +42,25 @@ uint8 constant PARSE_META_BUILD_DEPTH = 1;
 /// bytecode that dials back into this contract at eval time, and mapping
 /// to things that happen entirely on the interpreter such as well known
 /// constants and references to the context grid.
-bytes constant SUB_PARSER_WORD_PARSERS = hex"00070008000400020003";
+bytes constant SUB_PARSER_WORD_PARSERS = hex"075707770785079307a2";
 
 /// @dev Every two bytes is a function pointer for an operand handler.
 /// These positional indexes all map to the same indexes looked up in the parse
 /// meta.
-bytes constant OPERAND_HANDLER_FUNCTION_POINTERS = hex"0009000a000900090009";
+bytes constant OPERAND_HANDLER_FUNCTION_POINTERS = hex"09f70a3909f709f709f7";
 
 /// @dev Every two bytes is a function pointer for a literal parser.
 /// Literal dispatches are determined by the first byte(s) of the literal
 /// rather than a full word lookup, and are done with simple conditional
 /// jumps as the possibilities are limited compared to the number of words we
 /// have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0001";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"09c9";
 
 /// @dev The function pointers for the integrity check fns.
-bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0006";
+bytes constant INTEGRITY_FUNCTION_POINTERS = hex"0884";
 
 /// @dev The function pointers known to the interpreter for dynamic dispatch.
 /// By setting these as a constant they can be inlined into the interpreter
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
-bytes constant OPCODE_FUNCTION_POINTERS = hex"0005";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"0841";
