@@ -37,5 +37,8 @@ remappings = [
     "rain.sol.codegen/=lib/rain.sol.codegen/src/",
 ]
 
+evm_version = "cancun"
+
+
 [fuzz]
 runs = 2048
