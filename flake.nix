@@ -48,6 +48,7 @@
             name = "test-wasm-build";
             body = ''
               set -euxo pipefail
+              
               cargo build --target wasm32-unknown-unknown --exclude rain-i9r-cli --exclude rain-interpreter-env --workspace
             '';
           };
