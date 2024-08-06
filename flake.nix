@@ -43,11 +43,22 @@
             '';
             additionalBuildInputs = rainix.sol-build-inputs.${system} ++ [rain.defaultPackage.${system}];
           };
+
+          test-wasm-build = rainix.mkTask.${system} {
+            name = "test-wasm-build";
+            body = ''
+              set -euxo pipefail
+              cargo build --target wasm32-unknown-unknown --exclude rain-i9r-cli --exclude rain-interpreter-env --workspace
+            '';
+          };
         } // rainix.packages.${system};
 
         devShells.default = pkgs.mkShell {
           shellHook = rainix.devShells.${system}.default.shellHook;
-          packages = [ packages.i9r-prelude ];
+          packages = [
+            packages.i9r-prelude
+            packages.test-wasm-build
+          ];
           inputsFrom = [ rainix.devShells.${system}.default ];
         };
       }
