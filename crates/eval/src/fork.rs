@@ -1,6 +1,6 @@
 use crate::error::ForkCallError;
-use alloy_primitives::{Address, BlockNumber, U256};
-use alloy_sol_types::SolCall;
+use alloy::primitives::{Address, BlockNumber, U256};
+use alloy::sol_types::SolCall;
 use foundry_evm::{
     backend::{Backend, DatabaseExt, LocalForkId},
     executors::{Executor, ExecutorBuilder, RawCallResult},
@@ -10,7 +10,7 @@ use foundry_evm::{
 use rain_error_decoding::AbiDecodedErrorType;
 use revm::{
     interpreter::InstructionResult,
-    primitives::{Address as Addr, Bytes, Env, HashSet, SpecId, U256 as Uint256},
+    primitives::{Address as Addr, Bytes, Env, HashSet, SpecId},
     JournaledState,
 };
 use std::{any::type_name, collections::HashMap};
@@ -44,7 +44,8 @@ impl Forker {
     /// Creates a new empty instance of `Forker`.
     pub fn new() -> Forker {
         let db = Backend::new(MultiFork::new().0, None);
-        let builder = ExecutorBuilder::default().inspectors(|stack| stack.trace(true).debug(false));
+        let builder = ExecutorBuilder::default()
+            .inspectors(|stack| stack.trace_mode(foundry_evm::traces::TraceMode::Debug));
         Self {
             executor: builder.build(Env::default(), db),
             forks: HashMap::new(),
@@ -113,10 +114,11 @@ impl Forker {
 
         let builder = if let Some(gas) = gas_limit {
             ExecutorBuilder::default()
-                .gas_limit(Uint256::from(gas))
-                .inspectors(|stack| stack.trace(true).debug(false))
+                .gas_limit(gas)
+                .inspectors(|stack| stack.trace_mode(foundry_evm::traces::TraceMode::Debug))
         } else {
-            ExecutorBuilder::default().inspectors(|stack| stack.trace(true).debug(false))
+            ExecutorBuilder::default()
+                .inspectors(|stack| stack.trace_mode(foundry_evm::traces::TraceMode::Debug))
         };
 
         let mut forks_map = HashMap::new();
@@ -146,12 +148,12 @@ impl Forker {
         } = args;
         let fork_id = ForkId::new(&fork_url, fork_block_number);
         if let Some((local_fork_id, spec_id, _)) = self.forks.get(&fork_id) {
-            if self.executor.backend.is_active_fork(*local_fork_id) {
+            if self.executor.backend().is_active_fork(*local_fork_id) {
                 Ok(())
             } else {
                 let mut journaled_state = JournaledState::new(*spec_id, HashSet::new());
                 self.executor
-                    .backend
+                    .backend_mut()
                     .select_fork(
                         *local_fork_id,
                         &mut env.unwrap_or_default(),
@@ -191,7 +193,7 @@ impl Forker {
             );
             let default_env = create_fork.env.clone();
             self.executor
-                .backend
+                .backend_mut()
                 .create_select_fork(
                     create_fork,
                     &mut env.unwrap_or(default_env),
@@ -332,7 +334,7 @@ impl Forker {
 
         let result = self
             .executor
-            .call_raw_committing(
+            .transact_raw(
                 Addr::from_slice(from_address),
                 Addr::from_slice(to_address),
                 Bytes::copy_from_slice(calldata),
@@ -342,7 +344,7 @@ impl Forker {
 
         // remove to_address from persisted accounts
         self.executor
-            .backend
+            .backend_mut()
             .remove_persistent_account(&Addr::from_slice(to_address));
 
         result
@@ -356,7 +358,7 @@ impl Forker {
     ) -> Result<(), ForkCallError> {
         let active_fork_local_id = self
             .executor
-            .backend
+            .backend()
             .active_fork_id()
             .ok_or(ForkCallError::ExecutorError("no active fork!".to_owned()))?;
         let mut org_block_number = None;
@@ -376,10 +378,10 @@ impl Forker {
             .map(BlockNumber::from)
             .unwrap_or(org_block_number.unwrap());
 
-        self.executor.env.block.number = U256::from(block_number);
+        self.executor.env_mut().block.number = U256::from(block_number);
 
         self.executor
-            .backend
+            .backend_mut()
             .roll_fork(
                 Some(active_fork_local_id),
                 block_number,
@@ -399,8 +401,8 @@ mod tests {
     };
 
     use super::*;
-    use alloy_primitives::U256;
-    use alloy_sol_types::sol;
+    use alloy::primitives::U256;
+    use alloy::sol;
     use rain_interpreter_bindings::{
         DeployerISP::{iParserCall, iStoreCall},
         IInterpreterStoreV1::{getCall, setCall},
@@ -440,7 +442,7 @@ mod tests {
             .await
             .unwrap();
         let parser_address = result.typed_return._0;
-        let expected_address = "0x90caf23ea7e507bb722647b0674e50d8d6468234"
+        let expected_address = "0xf14e09601a47552de6abd3a0b165607fafd2b5ba"
             .parse::<Address>()
             .unwrap();
         assert_eq!(parser_address, expected_address);
@@ -648,7 +650,7 @@ mod tests {
 
         // check the env block number is the same as the fork block number
         assert_eq!(
-            forker.executor.env.block.number,
+            forker.executor.env().block.number,
             U256::from(POLYGON_FORK_NUMBER)
         );
 
@@ -659,7 +661,7 @@ mod tests {
 
         // check the env block number is updated
         assert_eq!(
-            forker.executor.env.block.number,
+            forker.executor.env().block.number,
             U256::from(POLYGON_FORK_NUMBER + 1)
         );
     }

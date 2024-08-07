@@ -18,6 +18,9 @@ jobs:
           # We don't need to do rust static analysis on multiple platforms
           - os: ubuntu-latest
             task: rainix-rs-static
+          # We don't need to do build for wasm32 on multiple platforms
+          - os: ubuntu-latest
+            task: test-wasm-build
       fail-fast: false
     runs-on: ${{ matrix.os }}
     env:
@@ -45,10 +48,3 @@ jobs:
           CI_FORK_SEPOLIA_DEPLOYER_ADDRESS: ${{ vars.CI_FORK_SEPOLIA_DEPLOYER_ADDRESS }}
           CI_DEPLOY_SEPOLIA_RPC_URL: ${{ secrets.CI_DEPLOY_SEPOLIA_RPC_URL || vars.CI_DEPLOY_SEPOLIA_RPC_URL }}
         run: nix develop --command ${{ matrix.task }}
-
-      - name: Build for wasm target
-        run: nix develop -c cargo build --target wasm32-unknown-unknown --exclude rain-i9r-cli --workspace
-        env:
-          CI_FORK_SEPOLIA_BLOCK_NUMBER: ${{ vars.CI_FORK_SEPOLIA_BLOCK_NUMBER }}
-          CI_FORK_SEPOLIA_DEPLOYER_ADDRESS: ${{ vars.CI_FORK_SEPOLIA_DEPLOYER_ADDRESS }}
-          CI_DEPLOY_SEPOLIA_RPC_URL: ${{ secrets.CI_DEPLOY_SEPOLIA_RPC_URL || vars.CI_DEPLOY_SEPOLIA_RPC_URL }}

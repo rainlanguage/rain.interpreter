@@ -6,12 +6,9 @@ license.workspace = true
 homepage.workspace = true
 
 [dependencies]
+alloy = { workspace = true }
 thiserror = { workspace = true }
-alloy-primitives = {workspace = true}
 rain_interpreter_bindings = { workspace = true }
-alloy-sol-types = { workspace = true }
-alloy-json-abi = { workspace = true }
-alloy-dyn-abi = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 reqwest = { workspace = true }

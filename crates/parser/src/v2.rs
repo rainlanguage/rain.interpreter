@@ -1,6 +1,6 @@
 use crate::error::ParserError;
+use alloy::primitives::*;
 use alloy_ethers_typecast::transaction::{ReadContractParametersBuilder, ReadableClient};
-use alloy_primitives::*;
 use ethers::providers::JsonRpcClient;
 use rain_interpreter_bindings::IParserPragmaV1::*;
 use rain_interpreter_bindings::IParserV2::*;
@@ -107,7 +107,7 @@ impl Parser2 for ParserV2 {
             .read(
                 ReadContractParametersBuilder::default()
                     .address(self.deployer_address)
-                    .call(parse2Call { data })
+                    .call(parse2Call { data: data.into() })
                     .build()
                     .map_err(ParserError::ReadContractParametersBuilderError)?,
             )
@@ -124,7 +124,7 @@ impl Parser2 for ParserV2 {
             .read(
                 ReadContractParametersBuilder::default()
                     .address(self.deployer_address)
-                    .call(parsePragma1Call { data })
+                    .call(parsePragma1Call { data: data.into() })
                     .build()
                     .map_err(ParserError::ReadContractParametersBuilderError)?,
             )
@@ -151,7 +151,7 @@ impl ParserV2 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloy_primitives::Address;
+    use alloy::primitives::Address;
     use ethers::providers::{MockProvider, MockResponse, Provider};
 
     #[tokio::test]
@@ -190,7 +190,7 @@ mod tests {
 
         let result = parser.parse_text("my rainlang", client).await.unwrap();
 
-        assert_eq!(result.bytecode, hex!("1234"));
+        assert_eq!(**result.bytecode, hex!("1234"));
     }
 
     #[tokio::test]
@@ -214,7 +214,7 @@ mod tests {
 
         let result = parser.parse_text(rainlang, client).await.unwrap();
 
-        assert_eq!(result.bytecode, hex!("6d79207261696e6c616e67"));
+        assert_eq!(**result.bytecode, hex!("6d79207261696e6c616e67"));
     }
 
     #[tokio::test]

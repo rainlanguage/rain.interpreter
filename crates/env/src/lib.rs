@@ -1,4 +1,4 @@
-use alloy_primitives::{Address, BlockNumber};
+use alloy::primitives::{Address, BlockNumber};
 use once_cell::sync::Lazy;
 
 pub const CI_DEPLOY_SEPOLIA_RPC_URL: &str = env!(

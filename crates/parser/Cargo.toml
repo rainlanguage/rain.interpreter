@@ -12,8 +12,7 @@ rain_interpreter_dispair = { workspace = true }
 rain_interpreter_bindings = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-alloy-primitives =  { workspace = true }
-alloy-sol-types =  { workspace = true }
+alloy = { workspace = true }
 ethers = { workspace = true, features = [
   "legacy",
 ] }

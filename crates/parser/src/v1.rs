@@ -1,6 +1,6 @@
 use crate::error::ParserError;
+use alloy::primitives::*;
 use alloy_ethers_typecast::transaction::{ReadContractParametersBuilder, ReadableClient};
-use alloy_primitives::*;
 use ethers::providers::JsonRpcClient;
 use rain_interpreter_bindings::IParserV1::*;
 use rain_interpreter_dispair::DISPair;
@@ -76,7 +76,7 @@ impl Parser for ParserV1 {
             .read(
                 ReadContractParametersBuilder::default()
                     .address(self.address)
-                    .call(parseCall { data })
+                    .call(parseCall { data: data.into() })
                     .build()
                     .map_err(ParserError::ReadContractParametersBuilderError)?,
             )
@@ -88,7 +88,7 @@ impl Parser for ParserV1 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloy_primitives::{Address, U256};
+    use alloy::primitives::{Address, U256};
     use ethers::providers::{MockProvider, MockResponse, Provider};
 
     #[tokio::test]
@@ -131,7 +131,7 @@ mod tests {
 
         let result = parser.parse_text("my rainlang", client).await.unwrap();
 
-        assert_eq!(result.bytecode, hex!("1234"));
+        assert_eq!(**result.bytecode, hex!("1234"));
         assert_eq!(result.constants, vec![U256::from(3), U256::from(4)]);
     }
 
@@ -160,7 +160,7 @@ mod tests {
 
         let result = parser.parse_text(rainlang, client).await.unwrap();
 
-        assert_eq!(result.bytecode, hex!("6d79207261696e6c616e67"));
+        assert_eq!(**result.bytecode, hex!("6d79207261696e6c616e67"));
         assert_eq!(result.constants, vec![U256::from(3), U256::from(4)]);
     }
 }
