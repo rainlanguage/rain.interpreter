@@ -24,7 +24,7 @@ contract LibParseStatePushSubParserTest is Test {
 
     /// Pushing any value onto an empty sub parser LL should result in that value
     /// in the state with a pointer to 0.
-    function testPushSubParserZero(ParseState memory state, address value) external {
+    function testPushSubParserZero(ParseState memory state, address value) external pure {
         state.subParsers = 0;
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         state.pushSubParser(cursor, uint256(uint160(value)));
@@ -41,6 +41,7 @@ contract LibParseStatePushSubParserTest is Test {
     /// Can push multiple values onto the sub parser LL.
     function testPushSubParserMultiple(ParseState memory state, address value0, address value1, address value2)
         external
+        pure
     {
         {
             uint256 cursor = Pointer.unwrap(state.data.dataPointer());
@@ -72,7 +73,7 @@ contract LibParseStatePushSubParserTest is Test {
     }
 
     /// Pushing a whole list of values onto the sub parser LL.
-    function testPushSubParserList(ParseState memory state, address[] memory values) external {
+    function testPushSubParserList(ParseState memory state, address[] memory values) external pure {
         vm.assume(values.length > 0);
         state.subParsers = 0;
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());

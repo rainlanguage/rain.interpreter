@@ -24,7 +24,7 @@ abstract contract OperandTest is Test {
         (constants);
     }
 
-    function checkOperandParse(bytes memory rainString, bytes memory operand) internal {
+    function checkOperandParse(bytes memory rainString, bytes memory operand) internal view {
         (bytes memory bytecode, uint256[] memory constants) = this.parse(rainString);
         assertEq(
             bytecode,

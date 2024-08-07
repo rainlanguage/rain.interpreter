@@ -8,14 +8,14 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 contract LibOpCeilTest is OpTest {
     /// Directly test the integrity logic of LibOpCeil.
     /// Inputs are always 1, outputs are always 1.
-    function testOpCeilIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+    function testOpCeilIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpCeil.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
     }
 
     /// Directly test the runtime logic of LibOpCeil.
-    function testOpCeilRun(uint256 a, uint16 operandData) public {
+    function testOpCeilRun(uint256 a, uint16 operandData) public view {
         a = bound(a, 0, type(uint64).max - 1e18);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
@@ -27,7 +27,7 @@ contract LibOpCeilTest is OpTest {
     }
 
     /// Test the eval of `ceil`.
-    function testOpCeilEval() external {
+    function testOpCeilEval() external view {
         checkHappy("_: ceil(0);", 0, "0");
         checkHappy("_: ceil(1);", 1e18, "1");
         checkHappy("_: ceil(0.5);", 1e18, "0.5");

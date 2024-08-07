@@ -20,7 +20,7 @@ contract LibOpSetNPTest is OpTest {
         uint8 inputs,
         uint8 outputs,
         uint16 operandData
-    ) public {
+    ) public pure {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
@@ -30,7 +30,7 @@ contract LibOpSetNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpSetNP.
-    function testLibOpSetNP(uint256 key, uint256 value) public {
+    function testLibOpSetNP(uint256 key, uint256 value) public view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         Operand operand = Operand.wrap(uint256(2) << 0x10);
         uint256[] memory inputs = new uint256[](2);
@@ -62,7 +62,7 @@ contract LibOpSetNPTest is OpTest {
     }
 
     /// Test the eval of `set` opcode parsed from a string. Tests two inputs.
-    function testLibOpSetNPEvalTwoInputs() external {
+    function testLibOpSetNPEvalTwoInputs() external view {
         uint256[] memory expectedKVs = new uint256[](2);
         expectedKVs[0] = 0x1234;
         expectedKVs[1] = 0x5678;
@@ -87,7 +87,7 @@ contract LibOpSetNPTest is OpTest {
     }
 
     /// Test the eval of `set` opcode parsed from a string. Tests setting twice.
-    function testLibOpSetNPEvalSetTwice() external {
+    function testLibOpSetNPEvalSetTwice() external view {
         uint256[] memory expectedKVs = new uint256[](4);
         // The ordering of the expectedKVs is based on internal hashing not the
         // order of setting.

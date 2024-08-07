@@ -15,7 +15,7 @@ contract LibParseLiteralIntegerHexTest is Test {
     /// Check a single hex literal. Should not revert and return length 1
     /// sources and constants.
 
-    function testParseIntegerLiteralHex00() external {
+    function testParseIntegerLiteralHex00() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_: 0xa2;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
@@ -50,7 +50,7 @@ contract LibParseLiteralIntegerHexTest is Test {
 
     /// Check 2 hex literals. Should not revert and return one source and
     /// length 2 constants.
-    function testParseIntegerLiteralHex01() external {
+    function testParseIntegerLiteralHex01() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_ _: 0xa2 0x03;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
@@ -87,7 +87,7 @@ contract LibParseLiteralIntegerHexTest is Test {
     }
 
     /// Check 3 hex literals with 2 dupes. Should dedupe and respect ordering.
-    function testParseIntegerLiteralHex02() external {
+    function testParseIntegerLiteralHex02() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_ _ _: 0xa2 0x03 0xa2;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
@@ -127,7 +127,7 @@ contract LibParseLiteralIntegerHexTest is Test {
     }
 
     /// Check that we can parse uint256 max int in hex form.
-    function testParseIntegerLiteralHexUint256Max() external {
+    function testParseIntegerLiteralHexUint256Max() external view {
         (bytes memory bytecode, uint256[] memory constants) =
             LibMetaFixture.newState("_: 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;").parse();
         uint256 sourceIndex = 0;

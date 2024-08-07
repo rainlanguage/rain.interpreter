@@ -20,7 +20,7 @@ library LibOpERC20TotalSupply {
 
     function run(InterpreterStateNP memory, Operand, Pointer stackTop) internal view returns (Pointer) {
         uint256 token;
-        assembly {
+        assembly ("memory-safe") {
             token := mload(stackTop)
         }
         uint256 totalSupply = IERC20(address(uint160(token))).totalSupply();
@@ -34,7 +34,7 @@ library LibOpERC20TotalSupply {
             0
         );
 
-        assembly {
+        assembly ("memory-safe") {
             mstore(stackTop, totalSupply)
         }
         return stackTop;

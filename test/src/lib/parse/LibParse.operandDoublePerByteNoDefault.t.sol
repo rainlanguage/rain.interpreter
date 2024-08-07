@@ -37,7 +37,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     }
 
     /// 2 literals are expected for this operand parser. Tests 1 2.
-    function testOperandDoublePerByteNoDefaultSecond() external {
+    function testOperandDoublePerByteNoDefaultSecond() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<1 2>();").parse();
         assertEq(
             bytecode,
@@ -60,7 +60,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     }
 
     /// 2 literals are expected for this operand parser. Tests 0 0.
-    function testOperandDoublePerByteNoDefaultSecondZero() external {
+    function testOperandDoublePerByteNoDefaultSecondZero() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<0 0>();").parse();
         assertEq(
             bytecode,
@@ -83,7 +83,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     }
 
     /// 2 literals are expected for this operand parser. Tests 255 0.
-    function testOperandDoublePerByteNoDefaultSecondMaxZero() external {
+    function testOperandDoublePerByteNoDefaultSecondMaxZero() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<255 0>();").parse();
         assertEq(
             bytecode,
@@ -106,7 +106,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     }
 
     /// 2 literals are expected for this operand parser. Tests 0 255.
-    function testOperandDoublePerByteNoDefaultSecondZeroMax() external {
+    function testOperandDoublePerByteNoDefaultSecondZeroMax() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<0 255>();").parse();
         assertEq(
             bytecode,
@@ -129,7 +129,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     }
 
     /// 2 literals are expected for this operand parser. Tests 255 255.
-    function testOperandDoublePerByteNoDefaultSecondMax() external {
+    function testOperandDoublePerByteNoDefaultSecondMax() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<255 255>();").parse();
         assertEq(
             bytecode,
@@ -192,7 +192,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     }
 
     /// Prefix whitespace is allowed.
-    function testOperandDoublePerByteNoDefaultPrefixWhitespace() external {
+    function testOperandDoublePerByteNoDefaultPrefixWhitespace() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c< 1 2>();").parse();
         assertEq(
             bytecode,
@@ -215,7 +215,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     }
 
     /// Postfix whitespace is allowed.
-    function testOperandDoublePerByteNoDefaultPostfixWhitespace() external {
+    function testOperandDoublePerByteNoDefaultPostfixWhitespace() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<1 2 >();").parse();
         assertEq(
             bytecode,
@@ -238,7 +238,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     }
 
     /// Multiple sequential whitespace is allowed.
-    function testOperandDoublePerByteNoDefaultMultipleWhitespace() external {
+    function testOperandDoublePerByteNoDefaultMultipleWhitespace() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<  1   2   >();").parse();
         assertEq(
             bytecode,

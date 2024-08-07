@@ -26,7 +26,7 @@ contract LibOpAnyNPTest is OpTest {
 
     /// Directly test the integrity logic of LibOpAnyNP. This tests the happy
     /// path where the operand is valid.
-    function testOpAnyNPIntegrityHappy(uint8 inputs, uint16 operandData) external {
+    function testOpAnyNPIntegrityHappy(uint8 inputs, uint16 operandData) external pure {
         IntegrityCheckStateNP memory state = opTestDefaultIngegrityCheckState();
         inputs = uint8(bound(uint256(inputs), 1, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
@@ -50,7 +50,7 @@ contract LibOpAnyNPTest is OpTest {
 
     /// Directly test the integrity logic of LibOpAnyNP. This tests the unhappy
     /// path where the operand is invalid due to 0 inputs.
-    function testOpAnyNPIntegrityUnhappyZeroInputs() external {
+    function testOpAnyNPIntegrityUnhappyZeroInputs() external pure {
         IntegrityCheckStateNP memory state = opTestDefaultIngegrityCheckState();
         (uint256 calcInputs, uint256 calcOutputs) = LibOpAnyNP.integrity(state, Operand.wrap(0));
         // Calc inputs will be minimum 1.
@@ -59,7 +59,7 @@ contract LibOpAnyNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpAnyNP.
-    function testOpAnyNPRun(uint256[] memory inputs, uint16 operandData) external {
+    function testOpAnyNPRun(uint256[] memory inputs, uint16 operandData) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length != 0);
         vm.assume(inputs.length <= 0x0F);
@@ -91,7 +91,7 @@ contract LibOpAnyNPTest is OpTest {
     }
 
     /// Test the eval of any opcode parsed from a string. Tests 1 true input.
-    function testOpAnyNPEval1TrueInput() external {
+    function testOpAnyNPEval1TrueInput() external view {
         bytes memory bytecode = iDeployer.parse2("_: any(5);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -108,7 +108,7 @@ contract LibOpAnyNPTest is OpTest {
     }
 
     /// Test the eval of any opcode parsed from a string. Tests 1 false input.
-    function testOpAnyNPEval1FalseInput() external {
+    function testOpAnyNPEval1FalseInput() external view {
         bytes memory bytecode = iDeployer.parse2("_: any(0);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -126,7 +126,7 @@ contract LibOpAnyNPTest is OpTest {
 
     /// Test the eval of any opcode parsed from a string. Tests 2 true inputs.
     /// The first true input should be the overall result.
-    function testOpAnyNPEval2TrueInputs() external {
+    function testOpAnyNPEval2TrueInputs() external view {
         bytes memory bytecode = iDeployer.parse2("_: any(5 6);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -143,7 +143,7 @@ contract LibOpAnyNPTest is OpTest {
     }
 
     /// Test the eval of any opcode parsed from a string. Tests 2 false inputs.
-    function testOpAnyNPEval2FalseInputs() external {
+    function testOpAnyNPEval2FalseInputs() external view {
         bytes memory bytecode = iDeployer.parse2("_: any(0 0);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -162,7 +162,7 @@ contract LibOpAnyNPTest is OpTest {
     /// Test the eval of any opcode parsed from a string. Tests 2 inputs, one
     /// true and one false. The first true input should be the overall result.
     /// The first value is the true value.
-    function testOpAnyNPEval2MixedInputs() external {
+    function testOpAnyNPEval2MixedInputs() external view {
         bytes memory bytecode = iDeployer.parse2("_: any(5 0);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -181,7 +181,7 @@ contract LibOpAnyNPTest is OpTest {
     /// Test the eval of any opcode parsed from a string. Tests 2 inputs, one
     /// true and one false. The first true input should be the overall result.
     /// The first value is the false value.
-    function testOpAnyNPEval2MixedInputs2() external {
+    function testOpAnyNPEval2MixedInputs2() external view {
         bytes memory bytecode = iDeployer.parse2("_: any(0 5);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,

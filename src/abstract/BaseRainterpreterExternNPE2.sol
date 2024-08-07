@@ -49,7 +49,7 @@ abstract contract BaseRainterpreterExternNPE2 is IInterpreterExternV3, IIntegrit
             Operand operand = Operand.wrap(ExternDispatch.unwrap(dispatch) & type(uint16).max);
 
             function(Operand, uint256[] memory) internal view returns (uint256[] memory) f;
-            assembly {
+            assembly ("memory-safe") {
                 f := shr(0xf0, mload(add(fPointersStart, mul(mod(opcode, fsCount), 2))))
             }
             outputs = f(operand, inputs);
@@ -75,7 +75,7 @@ abstract contract BaseRainterpreterExternNPE2 is IInterpreterExternV3, IIntegrit
             Operand operand = Operand.wrap(ExternDispatch.unwrap(dispatch) & type(uint16).max);
 
             function(Operand, uint256, uint256) internal pure returns (uint256, uint256) f;
-            assembly {
+            assembly ("memory-safe") {
                 f := shr(0xf0, mload(add(fPointersStart, mul(mod(opcode, fsCount), 2))))
             }
             (actualInputs, actualOutputs) = f(operand, expectedInputs, expectedOutputs);

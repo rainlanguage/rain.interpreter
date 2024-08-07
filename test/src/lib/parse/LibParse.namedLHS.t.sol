@@ -21,7 +21,7 @@ contract LibParseNamedLHSTest is Test {
     using LibParse for ParseState;
 
     /// A few simple examples that should create some empty sources.
-    function testParseNamedLHSEmptySourceExamples() external {
+    function testParseNamedLHSEmptySourceExamples() external view {
         string[3] memory examples0 = ["a _:;", "a b:;", "foo bar:;"];
         for (uint256 i = 0; i < examples0.length; i++) {
             (bytes memory bytecode0, uint256[] memory constants0) = LibMetaFixture.newState(examples0[i]).parse();
@@ -38,7 +38,7 @@ contract LibParseNamedLHSTest is Test {
     }
 
     /// Two sources with one named input each.
-    function testParseNamedLHSTwoInputs() external {
+    function testParseNamedLHSTwoInputs() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("a:;b:;").parse();
         assertEq(
             bytecode,
@@ -107,7 +107,7 @@ contract LibParseNamedLHSTest is Test {
     }
 
     /// Stack needs to index items by name correctly across lines.
-    function testParseNamedLHSStackIndex() external {
+    function testParseNamedLHSStackIndex() external view {
         AuthoringMetaV2[] memory meta = new AuthoringMetaV2[](3);
         meta[0] = AuthoringMetaV2("stack", "stack");
         meta[1] = AuthoringMetaV2("constant", "constant");
@@ -171,7 +171,7 @@ contract LibParseNamedLHSTest is Test {
     }
 
     /// Duplicate names are allowed across different sources.
-    function testParseNamedDuplicateDifferentSource() external {
+    function testParseNamedDuplicateDifferentSource() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibParseState.newState(
             "a b:1 2, e:a;c d:3 4,e:d;", "", "", LibAllStandardOpsNP.literalParserFunctionPointers()
         ).parse();

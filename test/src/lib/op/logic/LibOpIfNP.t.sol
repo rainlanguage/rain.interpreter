@@ -26,7 +26,7 @@ contract LibOpIfNPTest is OpTest {
         uint8 inputs,
         uint8 outputs,
         uint16 operandData
-    ) external {
+    ) external pure {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
@@ -38,7 +38,7 @@ contract LibOpIfNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpIfNP.
-    function testOpIfNPRun(uint256 a, uint256 b, uint256 c) external {
+    function testOpIfNPRun(uint256 a, uint256 b, uint256 c) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](3);
         inputs[0] = a;
@@ -50,7 +50,7 @@ contract LibOpIfNPTest is OpTest {
 
     /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
     /// is 0, the second input is 1, the third input is 2.
-    function testOpIfNPEval3InputsFirstZeroSecondOneThirdTwo() external {
+    function testOpIfNPEval3InputsFirstZeroSecondOneThirdTwo() external view {
         bytes memory bytecode = iDeployer.parse2("_: if(0 1 2);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -68,7 +68,7 @@ contract LibOpIfNPTest is OpTest {
 
     /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
     /// is 1, the second input is 2, the third input is 3.
-    function testOpIfNPEval3InputsFirstOneSecondTwoThirdThree() external {
+    function testOpIfNPEval3InputsFirstOneSecondTwoThirdThree() external view {
         bytes memory bytecode = iDeployer.parse2("_: if(1 2 3);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -86,7 +86,7 @@ contract LibOpIfNPTest is OpTest {
 
     /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
     /// is 0, the second input is 0, the third input is 3.
-    function testOpIfNPEval3InputsFirstZeroSecondZeroThirdThree() external {
+    function testOpIfNPEval3InputsFirstZeroSecondZeroThirdThree() external view {
         bytes memory bytecode = iDeployer.parse2("_: if(0 0 3);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -104,7 +104,7 @@ contract LibOpIfNPTest is OpTest {
 
     /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
     /// is 1, the second input is 0, the third input is 3.
-    function testOpIfNPEval3InputsFirstOneSecondZeroThirdThree() external {
+    function testOpIfNPEval3InputsFirstOneSecondZeroThirdThree() external view {
         bytes memory bytecode = iDeployer.parse2("_: if(1 0 3);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -122,7 +122,7 @@ contract LibOpIfNPTest is OpTest {
 
     /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
     /// is 0, the second input is 1, the third input is 0.
-    function testOpIfNPEval3InputsFirstZeroSecondOneThirdZero() external {
+    function testOpIfNPEval3InputsFirstZeroSecondOneThirdZero() external view {
         bytes memory bytecode = iDeployer.parse2("_: if(0 1 0);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -140,7 +140,7 @@ contract LibOpIfNPTest is OpTest {
 
     /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
     /// is 0, the second input is 0, the third input is 1.
-    function testOpIfNPEval3InputsFirstZeroSecondZeroThirdOne() external {
+    function testOpIfNPEval3InputsFirstZeroSecondZeroThirdOne() external view {
         bytes memory bytecode = iDeployer.parse2("_: if(0 0 1);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -158,7 +158,7 @@ contract LibOpIfNPTest is OpTest {
 
     /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
     /// is 2, the second input is 3, the third input is 4.
-    function testOpIfNPEval3InputsFirstTwoSecondThreeThirdFour() external {
+    function testOpIfNPEval3InputsFirstTwoSecondThreeThirdFour() external view {
         bytes memory bytecode = iDeployer.parse2("_: if(2 3 4);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -176,7 +176,7 @@ contract LibOpIfNPTest is OpTest {
 
     /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
     /// is 2, the second input is 0, the third input is 4.
-    function testOpIfNPEval3InputsFirstTwoSecondZeroThirdFour() external {
+    function testOpIfNPEval3InputsFirstTwoSecondZeroThirdFour() external view {
         bytes memory bytecode = iDeployer.parse2("_: if(2 0 4);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -192,7 +192,7 @@ contract LibOpIfNPTest is OpTest {
     }
 
     /// Test that empty strings are truthy values.
-    function testOpIfNPEvalEmptyStringTruthy() external {
+    function testOpIfNPEvalEmptyStringTruthy() external view {
         bytes memory bytecode = iDeployer.parse2("_: if(\"\" 5 50);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,

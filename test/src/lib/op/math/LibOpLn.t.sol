@@ -8,14 +8,14 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 contract LibOpLnTest is OpTest {
     /// Directly test the integrity logic of LibOpLn.
     /// Inputs are always 1, outputs are always 1.
-    function testOpLnIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+    function testOpLnIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpLn.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
     }
 
     /// Directly test the runtime logic of LibOpLn.
-    function testOpLnRun(uint256 a, uint16 operandData) public {
+    function testOpLnRun(uint256 a, uint16 operandData) public view {
         // e lifted from prb math.
         a = bound(a, 2_718281828459045235, type(uint64).max - 1e18);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
@@ -28,7 +28,7 @@ contract LibOpLnTest is OpTest {
     }
 
     /// Test the eval of `ln`.
-    function testOpLnEval() external {
+    function testOpLnEval() external view {
         // Any number less than e other than 1 is negative which doesn't exist
         // in unsigned integers.
         checkHappy("_: ln(1);", 0, "ln 1");

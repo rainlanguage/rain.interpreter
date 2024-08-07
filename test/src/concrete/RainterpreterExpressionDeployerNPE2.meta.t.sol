@@ -12,7 +12,7 @@ import {DESCRIBED_BY_META_HASH} from "src/concrete/RainterpreterExpressionDeploy
 contract RainterpreterExpressionDeployerNPE2MetaTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     /// Test that the expected construction meta hash can be read from the
     /// deployer.
-    function testRainterpreterExpressionDeployerNPE2ExpectedConstructionMetaHash() external {
+    function testRainterpreterExpressionDeployerNPE2ExpectedConstructionMetaHash() external view {
         bytes32 actualConstructionMetaHash = iDeployer.describedByMetaV1();
         assertEq(actualConstructionMetaHash, DESCRIBED_BY_META_HASH);
     }

@@ -12,7 +12,7 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 contract LibOpBitwiseAndNPTest is OpTest {
     /// Directly test the integrity logic of LibOpBitwiseAndNP. All possible
     /// operands result in the same number of inputs and outputs, (2, 1).
-    function testOpBitwiseAndNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+    function testOpBitwiseAndNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpBitwiseAndNP.integrity(state, operand);
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
@@ -20,7 +20,7 @@ contract LibOpBitwiseAndNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpBitwiseAndNP. This tests that the
     /// opcode correctly pushes the bitwise AND onto the stack.
-    function testOpBitwiseAndNPRun(uint256 x, uint256 y) external {
+    function testOpBitwiseAndNPRun(uint256 x, uint256 y) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = x;
@@ -32,7 +32,7 @@ contract LibOpBitwiseAndNPTest is OpTest {
     }
 
     /// Test the eval of bitwise AND parsed from a string.
-    function testOpBitwiseAndNPEvalHappy() external {
+    function testOpBitwiseAndNPEvalHappy() external view {
         checkHappy("_: bitwise-and(0 0);", 0, "0 0");
         checkHappy("_: bitwise-and(0 1e-18);", 0, "0 1");
         checkHappy("_: bitwise-and(1e-18 0);", 0, "1 0");

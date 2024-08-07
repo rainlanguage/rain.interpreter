@@ -21,7 +21,10 @@ contract LibOpGreaterThanOrEqualToNPTest is OpTest {
     /// Directly test the integrity logic of LibOpGreaterThanOrEqualToNP. No matter the
     /// operand inputs, the calc inputs must be 2, and the calc outputs must be
     /// 1.
-    function testOpGreaterThanOrEqualToNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external {
+    function testOpGreaterThanOrEqualToNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs)
+        external
+        pure
+    {
         (uint256 calcInputs, uint256 calcOutputs) =
             LibOpGreaterThanOrEqualToNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
 
@@ -31,7 +34,7 @@ contract LibOpGreaterThanOrEqualToNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpGreaterThanOrEqualToNP.
-    function testOpGreaterThanOrEqualToNPRun(uint256 input1, uint256 input2) external {
+    function testOpGreaterThanOrEqualToNPRun(uint256 input1, uint256 input2) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = input1;
@@ -49,7 +52,7 @@ contract LibOpGreaterThanOrEqualToNPTest is OpTest {
 
     /// Test the eval of greater than or equal to opcode parsed from a string.
     /// Tests 2 inputs. Both inputs are 0.
-    function testOpGreaterThanOrEqualToNPEval2ZeroInputs() external {
+    function testOpGreaterThanOrEqualToNPEval2ZeroInputs() external view {
         bytes memory bytecode = iDeployer.parse2("_: greater-than-or-equal-to(0 0);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -67,7 +70,7 @@ contract LibOpGreaterThanOrEqualToNPTest is OpTest {
 
     /// Test the eval of greater than or equal to opcode parsed from a string.
     /// Tests 2 inputs. The first input is 0, the second input is 1.
-    function testOpGreaterThanOrEqualToNPEval2InputsFirstZeroSecondOne() external {
+    function testOpGreaterThanOrEqualToNPEval2InputsFirstZeroSecondOne() external view {
         bytes memory bytecode = iDeployer.parse2("_: greater-than-or-equal-to(0 1);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -85,7 +88,7 @@ contract LibOpGreaterThanOrEqualToNPTest is OpTest {
 
     /// Test the eval of greater than or equal to opcode parsed from a string.
     /// Tests 2 inputs. The first input is 1, the second input is 0.
-    function testOpGreaterThanOrEqualToNPEval2InputsFirstOneSecondZero() external {
+    function testOpGreaterThanOrEqualToNPEval2InputsFirstOneSecondZero() external view {
         bytes memory bytecode = iDeployer.parse2("_: greater-than-or-equal-to(1 0);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -103,7 +106,7 @@ contract LibOpGreaterThanOrEqualToNPTest is OpTest {
 
     /// Test the eval of greater than or equal to opcode parsed from a string.
     /// Tests 2 inputs. Both inputs are 1.
-    function testOpGreaterThanOrEqualToNPEval2InputsBothOne() external {
+    function testOpGreaterThanOrEqualToNPEval2InputsBothOne() external view {
         bytes memory bytecode = iDeployer.parse2("_: greater-than-or-equal-to(1 1);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
