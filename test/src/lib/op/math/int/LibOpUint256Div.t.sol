@@ -11,7 +11,8 @@ contract LibOpUint256DivTest is OpTest {
     /// Directly test the integrity logic of LibOpUint256Div. This tests the happy
     /// path where the inputs input and calc match.
     function testOpUint256DivIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData)
-        external pure
+        external
+        pure
     {
         inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =

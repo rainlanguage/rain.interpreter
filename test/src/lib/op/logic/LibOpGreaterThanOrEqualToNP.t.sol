@@ -21,7 +21,10 @@ contract LibOpGreaterThanOrEqualToNPTest is OpTest {
     /// Directly test the integrity logic of LibOpGreaterThanOrEqualToNP. No matter the
     /// operand inputs, the calc inputs must be 2, and the calc outputs must be
     /// 1.
-    function testOpGreaterThanOrEqualToNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs) external pure {
+    function testOpGreaterThanOrEqualToNPIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs)
+        external
+        pure
+    {
         (uint256 calcInputs, uint256 calcOutputs) =
             LibOpGreaterThanOrEqualToNP.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
 

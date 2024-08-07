@@ -130,7 +130,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
 
     /// Test the inc library directly. The run function should increment every
     /// value it is passed by 1.
-    function testRainterpreterReferenceExternNPE2IntIncRun(Operand operand, uint256[] memory inputs) external {
+    function testRainterpreterReferenceExternNPE2IntIncRun(Operand operand, uint256[] memory inputs) external pure {
         uint256[] memory expectedOutputs = new uint256[](inputs.length);
         for (uint256 i = 0; i < inputs.length; i++) {
             vm.assume(inputs[i] < type(uint256).max);
@@ -148,6 +148,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
     /// same inputs and outputs.
     function testRainterpreterReferenceExternNPE2IntIncIntegrity(Operand operand, uint256 inputs, uint256 outputs)
         external
+        pure
     {
         (uint256 calcInputs, uint256 calcOutputs) = LibExternOpIntIncNPE2.integrity(operand, inputs, outputs);
         assertEq(calcInputs, inputs);

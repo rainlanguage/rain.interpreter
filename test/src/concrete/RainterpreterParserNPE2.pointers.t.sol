@@ -28,7 +28,7 @@ contract RainterpreterParserNPE2PointersTest is Test {
         assertEq(actual, expected);
     }
 
-    function testParserParseMeta() external {
+    function testParserParseMeta() external pure {
         bytes memory authoringMetaBytes = LibAllStandardOpsNP.authoringMetaV2();
         AuthoringMetaV2[] memory authoringMeta = abi.decode(authoringMetaBytes, (AuthoringMetaV2[]));
         bytes memory expected = LibGenParseMeta.buildParseMetaV2(authoringMeta, PARSE_META_BUILD_DEPTH);

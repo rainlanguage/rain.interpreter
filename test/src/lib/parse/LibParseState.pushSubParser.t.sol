@@ -40,7 +40,8 @@ contract LibParseStatePushSubParserTest is Test {
 
     /// Can push multiple values onto the sub parser LL.
     function testPushSubParserMultiple(ParseState memory state, address value0, address value1, address value2)
-        external pure
+        external
+        pure
     {
         {
             uint256 cursor = Pointer.unwrap(state.data.dataPointer());

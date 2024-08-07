@@ -42,7 +42,7 @@ contract LibOpExponentialGrowthTest is OpTest {
     }
 
     /// Test the eval of `exponential-growth`.
-    function testOpExponentialGrowthEval() external  view{
+    function testOpExponentialGrowthEval() external view {
         checkHappy("_: exponential-growth(0 0 0);", 0, "0 0 0");
         checkHappy("_: exponential-growth(0 0.1 0);", 0, "0 0.1 0");
         checkHappy("_: exponential-growth(0 0.1 1);", 0, "0 0.1 1");

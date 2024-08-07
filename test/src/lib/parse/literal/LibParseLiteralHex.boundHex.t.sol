@@ -31,7 +31,8 @@ contract LibParseLiteralBoundLiteralHexTest is ParseLiteralTest {
 
     /// Fuzz the parser with hex data.
     function testParseLiteralBoundLiteralHexFuzz(string memory str, bytes1 delimByte, string memory anyOtherString)
-        external pure
+        external
+        pure
     {
         LibLiteralString.conformStringToHexDigits(str);
         string memory delimString = string(abi.encodePacked(delimByte));

@@ -20,7 +20,7 @@ contract LibOpDecodeBitsNPTest is OpTest {
         uint8 outputs,
         uint8 start8Bit,
         uint8 length8Bit
-    ) external {
+    ) external pure {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         uint256 start = bound(uint256(start8Bit), 0, type(uint8).max);
@@ -56,7 +56,7 @@ contract LibOpDecodeBitsNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpDecodeBitsNP. This tests that the
     /// opcode correctly pushes the decoded bits onto the stack.
-    function testOpDecodeBitsNPRun(uint256 value, uint8 start8Bit, uint8 length8Bit) external {
+    function testOpDecodeBitsNPRun(uint256 value, uint8 start8Bit, uint8 length8Bit) external view {
         uint256 start = uint256(start8Bit);
         uint256 length = bound(uint256(length8Bit), 1, type(uint8).max - start + 1);
         Operand operand = LibOperand.build(1, 1, uint16((uint256(length) << 8) | uint256(start)));
@@ -69,7 +69,7 @@ contract LibOpDecodeBitsNPTest is OpTest {
     }
 
     /// Test the eval of decoding bits parsed from a string.
-    function testOpDecodeBitsNPEvalHappy() external {
+    function testOpDecodeBitsNPEvalHappy() external view {
         checkHappy("_:bitwise-decode<0 1>(0);", 0, "0 1 0");
         checkHappy("_:bitwise-decode<0 1>(1e-18);", 1, "0 1 1");
         checkHappy("_:bitwise-decode<0 1>(2e-18);", 0, "0 1 2");

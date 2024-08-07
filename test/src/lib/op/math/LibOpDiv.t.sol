@@ -13,7 +13,10 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 contract LibOpDivTest is OpTest {
     /// Directly test the integrity logic of LibOpDiv. This tests the
     /// happy path where the inputs input and calc match.
-    function testOpDivIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData) external pure {
+    function testOpDivIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData)
+        external
+        pure
+    {
         inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpDiv.integrity(state, LibOperand.build(inputs, 1, operandData));
 

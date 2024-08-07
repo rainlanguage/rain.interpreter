@@ -12,7 +12,10 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 contract LibOpMulTest is OpTest {
     /// Directly test the integrity logic of LibOpMul. This tests the
     /// happy path where the inputs input and calc match.
-    function testOpMulIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData) external pure {
+    function testOpMulIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData)
+        external
+        pure
+    {
         inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpMul.integrity(state, LibOperand.build(inputs, 1, operandData));
 

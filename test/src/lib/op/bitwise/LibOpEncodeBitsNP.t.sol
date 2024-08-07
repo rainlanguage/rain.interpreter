@@ -15,7 +15,8 @@ contract LibOpEncodeBitsNPTest is OpTest {
     /// However, lengths can overflow and error so we bound the operand to avoid
     /// that here.
     function testOpEncodeBitsNPIntegrity(IntegrityCheckStateNP memory state, uint8 start8Bit, uint8 length8Bit)
-        external pure
+        external
+        pure
     {
         uint256 start = uint256(start8Bit);
         uint256 length = bound(uint256(length8Bit), 1, type(uint8).max - start + 1);

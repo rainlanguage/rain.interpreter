@@ -19,7 +19,8 @@ import {FIXED_POINT_E} from "rain.math.fixedpoint/lib/FixedPointDecimalConstants
 contract LibOpETest is OpTest {
     /// Directly test the integrity logic of LibOpE.
     function testOpEIntegrity(IntegrityCheckStateNP memory state, uint8 inputs, uint8 outputs, uint16 operandData)
-        external pure
+        external
+        pure
     {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));

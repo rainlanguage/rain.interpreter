@@ -222,7 +222,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
     }
 
     /// Test the eval of call to see various stacks.
-    function testOpCallNPRunNoIO() external {
+    function testOpCallNPRunNoIO() external view {
         // Check evals that result in no stack or kvs.
         uint256[] memory stack = new uint256[](0);
         uint256[] memory kvs = new uint256[](0);

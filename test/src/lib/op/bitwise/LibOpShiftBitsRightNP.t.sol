@@ -63,7 +63,7 @@ contract LibOpShiftBitsRightNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpShiftBitsRightNP. This tests that
     /// the opcode correctly shifts bits right.
-    function testOpShiftBitsRightNPRun(uint256 x, uint8 shiftAmount) external  view {
+    function testOpShiftBitsRightNPRun(uint256 x, uint8 shiftAmount) external view {
         vm.assume(shiftAmount != 0);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](1);
