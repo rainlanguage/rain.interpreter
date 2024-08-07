@@ -238,10 +238,7 @@ mod tests {
 
         for handle in handles {
             let res = handle.await.unwrap();
-            assert_eq!(
-                res.typed_return.stack,
-                vec![parse_ether("3".into()).unwrap()]
-            );
+            assert_eq!(res.typed_return.stack, vec![parse_ether("3").unwrap()]);
         }
     }
 }
