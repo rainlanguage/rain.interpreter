@@ -16,14 +16,14 @@ contract LibParseLiteralBoundLiteralHexTest is ParseLiteralTest {
         uint256 expectedInnerStart,
         uint256 expectedInnerEnd,
         uint256 expectedOuterEnd
-    ) internal {
+    ) internal pure {
         checkLiteralBounds(
             LibParseLiteralHex.boundHex, data, expectedInnerStart, expectedInnerEnd, expectedOuterEnd, expectedOuterEnd
         );
     }
 
     /// Check some bounds for some strings.
-    function testParseLiteralBoundLiteralHexBounds() external {
+    function testParseLiteralBoundLiteralHexBounds() external pure {
         checkHexBounds("0x", 2, 2, 2);
         checkHexBounds("0x00", 2, 4, 4);
         checkHexBounds("0x0000", 2, 6, 6);
@@ -31,7 +31,7 @@ contract LibParseLiteralBoundLiteralHexTest is ParseLiteralTest {
 
     /// Fuzz the parser with hex data.
     function testParseLiteralBoundLiteralHexFuzz(string memory str, bytes1 delimByte, string memory anyOtherString)
-        external
+        external pure
     {
         LibLiteralString.conformStringToHexDigits(str);
         string memory delimString = string(abi.encodePacked(delimByte));

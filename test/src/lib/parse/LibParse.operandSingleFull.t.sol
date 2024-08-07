@@ -12,7 +12,7 @@ contract LibParseOperandSingleFullTest is Test {
     using LibParse for ParseState;
 
     /// Fallback is 0 for elided single full operand.
-    function testOperandSingleFullElided() external {
+    function testOperandSingleFullElided() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:b();").parse();
         assertEq(
             bytecode,
@@ -35,7 +35,7 @@ contract LibParseOperandSingleFullTest is Test {
     }
 
     /// Empty operand is allowed.
-    function testOperandSingleFullEmpty() external {
+    function testOperandSingleFullEmpty() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:b<>();").parse();
         assertEq(
             bytecode,
@@ -66,7 +66,7 @@ contract LibParseOperandSingleFullTest is Test {
     }
 
     /// Can provide decimal integer 0 as single full operand.
-    function testOperandSingleFullZero() external {
+    function testOperandSingleFullZero() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:b<0>();").parse();
         assertEq(
             bytecode,
@@ -89,7 +89,7 @@ contract LibParseOperandSingleFullTest is Test {
     }
 
     /// Can provide hexadecimal 0x00 as a single full operand.
-    function testOperandSingleFullHexZero() external {
+    function testOperandSingleFullHexZero() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:b<0x00>();").parse();
         assertEq(
             bytecode,
@@ -112,7 +112,7 @@ contract LibParseOperandSingleFullTest is Test {
     }
 
     /// Can provide decimal 1 as single full operand.
-    function testOperandSingleFullOne() external {
+    function testOperandSingleFullOne() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:b<1>();").parse();
         assertEq(
             bytecode,
@@ -135,7 +135,7 @@ contract LibParseOperandSingleFullTest is Test {
     }
 
     /// Can provide hexadecimal 0x01 as a single full operand.
-    function testOperandSingleFullHexOne() external {
+    function testOperandSingleFullHexOne() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:b<0x01>();").parse();
         assertEq(
             bytecode,
@@ -158,7 +158,7 @@ contract LibParseOperandSingleFullTest is Test {
     }
 
     /// Can provide decimal uint16 max as single full operand.
-    function testOperandSingleFullUint16Max() external {
+    function testOperandSingleFullUint16Max() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:b<65535>();").parse();
         assertEq(
             bytecode,
@@ -181,7 +181,7 @@ contract LibParseOperandSingleFullTest is Test {
     }
 
     /// Can provide hexadecimal uint16 max as a single full operand.
-    function testOperandSingleFullHexUint16Max() external {
+    function testOperandSingleFullHexUint16Max() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:b<0xffff>();").parse();
         assertEq(
             bytecode,
@@ -236,7 +236,7 @@ contract LibParseOperandSingleFullTest is Test {
     }
 
     /// Leading whitespace in the operand is supported.
-    function testOperandSingleFullLeadingWhitespace() external {
+    function testOperandSingleFullLeadingWhitespace() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:b< 5>();").parse();
         assertEq(
             bytecode,
@@ -259,7 +259,7 @@ contract LibParseOperandSingleFullTest is Test {
     }
 
     /// Trailing whitespace in the operand is supported.
-    function testOperandSingleFullTrailingWhitespace() external {
+    function testOperandSingleFullTrailingWhitespace() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:b<5 >();").parse();
         assertEq(
             bytecode,
@@ -282,7 +282,7 @@ contract LibParseOperandSingleFullTest is Test {
     }
 
     /// Leading and trailing whitespace in the operand is supported.
-    function testOperandSingleFullLeadingAndTrailingWhitespace() external {
+    function testOperandSingleFullLeadingAndTrailingWhitespace() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:b< 0x05 >();").parse();
         assertEq(
             bytecode,

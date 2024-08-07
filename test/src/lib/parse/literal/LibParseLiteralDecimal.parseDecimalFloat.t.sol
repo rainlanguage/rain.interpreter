@@ -26,7 +26,7 @@ contract LibParseLiteralDecimalParseDecimalFloatTest is Test {
         int256 expectedSignedCoefficient,
         int256 expectedExponent,
         uint256 expectedCursorAfter
-    ) internal {
+    ) internal pure {
         ParseState memory state = LibParseState.newState(bytes(data), "", "", "");
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         (uint256 cursorAfter, int256 signedCoefficient, int256 exponent) =
@@ -53,7 +53,7 @@ contract LibParseLiteralDecimalParseDecimalFloatTest is Test {
     }
 
     /// Fuzz and round trip.
-    function testParseLiteralDecimalFloatFuzz(uint256 value, uint8 leadingZerosCount, bool isNeg) external {
+    function testParseLiteralDecimalFloatFuzz(uint256 value, uint8 leadingZerosCount, bool isNeg) external pure {
         value = bound(value, 0, uint256(type(int256).max) + (isNeg ? 1 : 0));
         string memory str = value.toString();
 
@@ -73,7 +73,7 @@ contract LibParseLiteralDecimalParseDecimalFloatTest is Test {
     }
 
     /// Check some specific examples.
-    function testParseLiteralDecimalFloatSpecific() external {
+    function testParseLiteralDecimalFloatSpecific() external pure {
         checkParseDecimalFloat("0", 0, 0, 1);
         checkParseDecimalFloat("1", 1, 0, 1);
         checkParseDecimalFloat("10", 10, 0, 2);
@@ -83,7 +83,7 @@ contract LibParseLiteralDecimalParseDecimalFloatTest is Test {
     }
 
     /// Check some specific examples with leading zeros.
-    function testParseLiteralDecimalFloatLeadingZeros() external {
+    function testParseLiteralDecimalFloatLeadingZeros() external pure {
         checkParseDecimalFloat("0000", 0, 0, 4);
         checkParseDecimalFloat("0001", 1, 0, 4);
         checkParseDecimalFloat("0010", 10, 0, 4);
@@ -99,7 +99,7 @@ contract LibParseLiteralDecimalParseDecimalFloatTest is Test {
     }
 
     /// Check some examples of decimals.
-    function testParseLiteralDecimalFloatDecimals() external {
+    function testParseLiteralDecimalFloatDecimals() external pure {
         checkParseDecimalFloat("0.1", 1, -1, 3);
         checkParseDecimalFloat("0.01", 1, -2, 4);
         checkParseDecimalFloat("0.001", 1, -3, 5);
@@ -159,7 +159,7 @@ contract LibParseLiteralDecimalParseDecimalFloatTest is Test {
     }
 
     /// Check some examples of exponents.
-    function testParseLiteralDecimalFloatExponents() external {
+    function testParseLiteralDecimalFloatExponents() external pure {
         checkParseDecimalFloat("0e0", 0, 0, 3);
         // A capital E.
         checkParseDecimalFloat("0E0", 0, 0, 3);
@@ -244,7 +244,7 @@ contract LibParseLiteralDecimalParseDecimalFloatTest is Test {
     }
 
     /// Test some unrelated data after the decimal.
-    function testParseLiteralDecimalFloatUnrelated() external {
+    function testParseLiteralDecimalFloatUnrelated() external pure {
         checkParseDecimalFloat("0.0hello", 0, 0, 3);
         checkParseDecimalFloat("0.0e0hello", 0, 0, 5);
         checkParseDecimalFloat("0.0e1hello", 0, 1, 5);

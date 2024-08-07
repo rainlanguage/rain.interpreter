@@ -14,7 +14,7 @@ contract LibOpModTest is OpTest {
 
     /// Directly test the integrity logic of LibOpMod. This tests the happy
     /// path where the inputs input and calc match.
-    function testOpModIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData) external {
+    function testOpModIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData) external pure {
         inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpMod.integrity(state, LibOperand.build(inputs, 1, operandData));
 
@@ -24,7 +24,7 @@ contract LibOpModTest is OpTest {
 
     /// Directly test the integrity logic of LibOpMod. This tests the unhappy
     /// path where the operand is invalid due to 0 inputs.
-    function testOpModIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external {
+    function testOpModIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpMod.integrity(state, Operand.wrap(0));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
@@ -33,7 +33,7 @@ contract LibOpModTest is OpTest {
 
     /// Directly test the integrity logic of LibOpMod. This tests the unhappy
     /// path where the operand is invalid due to 1 inputs.
-    function testOpModIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external {
+    function testOpModIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpMod.integrity(state, Operand.wrap(0x010000));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
@@ -81,7 +81,7 @@ contract LibOpModTest is OpTest {
 
     /// Test the eval of `mod` opcode parsed from a string. Tests two inputs.
     /// Tests the happy path where we do not mod by zero.
-    function testOpModEval2InputsHappy() external {
+    function testOpModEval2InputsHappy() external view {
         // Show that the modulo truncates (rounds down).
         checkHappy("_: mod(6e-18 1e-18);", 0, "6 1");
         checkHappy("_: mod(6e-18 2e-18);", 0, "6 2");
@@ -116,7 +116,7 @@ contract LibOpModTest is OpTest {
 
     /// Test the eval of `mod` opcode parsed from a string. Tests three inputs.
     /// Tests the happy path where we do not modulo by zero.
-    function testOpModEval3InputsHappy() external {
+    function testOpModEval3InputsHappy() external view {
         // Show that the modulo truncates (rounds down).
         checkHappy("_: mod(6e-18 1e-18 1e-18);", 0, "6 1 1");
         checkHappy("_: mod(6e-18 2e-18 1e-18);", 0, "6 2 1");

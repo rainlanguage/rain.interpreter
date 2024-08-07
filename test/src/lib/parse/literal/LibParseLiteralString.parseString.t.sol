@@ -18,7 +18,7 @@ contract LibParseLiteralStringTest is Test {
     using LibParseLiteralString for ParseState;
 
     /// Check that an empty string literal is parsed correctly.
-    function testParseStringLiteralEmpty() external {
+    function testParseStringLiteralEmpty() external pure {
         ParseState memory state = LibParseState.newState("\"\"", "", "", "");
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         (uint256 cursorAfter, uint256 value) = state.parseString(cursor, Pointer.unwrap(state.data.endDataPointer()));
@@ -29,7 +29,7 @@ contract LibParseLiteralStringTest is Test {
     }
 
     /// The parser will only accept strings that are valid according to the mask.
-    function testParseStringLiteralAny(bytes memory data) external {
+    function testParseStringLiteralAny(bytes memory data) external pure {
         LibLiteralString.conformStringToMask(string(data), CMASK_STRING_LITERAL_TAIL, 0x80);
         vm.assume(data.length < 32);
         ParseState memory state = LibParseState.newState(bytes(string.concat("\"", string(data), "\"")), "", "", "");

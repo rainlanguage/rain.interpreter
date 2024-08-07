@@ -21,7 +21,7 @@ contract LibParseLiteralStringTest is Test {
 
     /// Check an empty string literal. Should not revert and return length 1
     /// sources and constants.
-    function testParseStringLiteralEmpty() external {
+    function testParseStringLiteralEmpty() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_: \"\";").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
@@ -38,7 +38,7 @@ contract LibParseLiteralStringTest is Test {
 
     /// Check a simple string `"a"` literal. Should not revert and return
     /// length 1 sources and constants.
-    function testParseStringLiteralSimple() external {
+    function testParseStringLiteralSimple() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_: \"a\";").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
@@ -55,7 +55,7 @@ contract LibParseLiteralStringTest is Test {
 
     /// Any ASCII printable string shorter than 32 bytes should be parsed
     /// correctly.
-    function testParseStringLiteralShortASCII(string memory str) external {
+    function testParseStringLiteralShortASCII(string memory str) external view {
         vm.assume(bytes(str).length < 0x20);
         LibLiteralString.conformValidPrintableStringContent(str);
 
@@ -75,7 +75,7 @@ contract LibParseLiteralStringTest is Test {
     }
 
     /// Can parse 2 valid strings.
-    function testParseStringLiteralTwo(string memory strA, string memory strB) external {
+    function testParseStringLiteralTwo(string memory strA, string memory strB) external view {
         vm.assume(bytes(strA).length < 0x20);
         LibLiteralString.conformValidPrintableStringContent(strA);
         vm.assume(bytes(strB).length < 0x20);

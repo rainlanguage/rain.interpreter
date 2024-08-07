@@ -6,7 +6,7 @@ import {LibParseOperand, Operand} from "src/lib/parse/LibParseOperand.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
 
 contract LibParseOperandHandleOperandDisallowedTest is Test {
-    function testHandleOperandDisallowedNoValues() external {
+    function testHandleOperandDisallowedNoValues() external pure {
         assertEq(Operand.unwrap(LibParseOperand.handleOperandDisallowed(new uint256[](0))), 0);
     }
 

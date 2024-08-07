@@ -9,7 +9,7 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 contract LibOpScale18Test is OpTest {
     /// Directly test the integrity logic of LibOpScale18.
     /// Inputs are always 1, outputs are always 1.
-    function testOpScale18Integrity(IntegrityCheckStateNP memory state, uint8 inputs, uint16 op) external {
+    function testOpScale18Integrity(IntegrityCheckStateNP memory state, uint8 inputs, uint16 op) external pure {
         inputs = uint8(bound(inputs, 1, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpScale18.integrity(state, LibOperand.build(inputs, 1, op));
         assertEq(calcInputs, 1);
@@ -105,7 +105,7 @@ contract LibOpScale18Test is OpTest {
     }
 
     /// Test the eval of `uint256-to-decimal18` which is an alias of `scale-18<0>`.
-    function testOpUint256ToDecimal18Eval() external {
+    function testOpUint256ToDecimal18Eval() external view {
         checkHappy("_: uint256-to-decimal18(0);", 0, "0");
         checkHappy("_: uint256-to-decimal18(1e-18);", 1e18, "1");
         checkHappy("_: uint256-to-decimal18(2e-18);", 2e18, "2");

@@ -8,14 +8,14 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 contract LibOpExponentialGrowthTest is OpTest {
     /// Directly test the integrity logic of LibOpExponentialGrowth.
     /// Inputs are always 3, outputs are always 1.
-    function testOpExponentialGrowthIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+    function testOpExponentialGrowthIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpExponentialGrowth.integrity(state, operand);
         assertEq(calcInputs, 3);
         assertEq(calcOutputs, 1);
     }
 
     /// Directly test the runtime logic of LibOpExponentialGrowth.
-    function testOpExponentialGrowthRun(uint256 a, uint256 r, uint256 t, uint16 operandData) public {
+    function testOpExponentialGrowthRun(uint256 a, uint256 r, uint256 t, uint16 operandData) public view {
         // @TODO This is a hack to cover some range that we can definitely
         // handle but it doesn't cover the full range of the function.
         a = bound(a, 0, type(uint64).max);
@@ -42,7 +42,7 @@ contract LibOpExponentialGrowthTest is OpTest {
     }
 
     /// Test the eval of `exponential-growth`.
-    function testOpExponentialGrowthEval() external {
+    function testOpExponentialGrowthEval() external  view{
         checkHappy("_: exponential-growth(0 0 0);", 0, "0 0 0");
         checkHappy("_: exponential-growth(0 0.1 0);", 0, "0 0.1 0");
         checkHappy("_: exponential-growth(0 0.1 1);", 0, "0 0.1 1");

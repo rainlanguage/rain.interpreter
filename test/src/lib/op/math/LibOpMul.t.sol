@@ -12,7 +12,7 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 contract LibOpMulTest is OpTest {
     /// Directly test the integrity logic of LibOpMul. This tests the
     /// happy path where the inputs input and calc match.
-    function testOpMulIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData) external {
+    function testOpMulIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData) external pure {
         inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpMul.integrity(state, LibOperand.build(inputs, 1, operandData));
 
@@ -22,7 +22,7 @@ contract LibOpMulTest is OpTest {
 
     /// Directly test the integrity logic of LibOpMul. This tests the
     /// unhappy path where the operand is invalid due to 0 inputs.
-    function testOpMulIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external {
+    function testOpMulIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpMul.integrity(state, Operand.wrap(0));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
@@ -31,7 +31,7 @@ contract LibOpMulTest is OpTest {
 
     /// Directly test the integrity logic of LibOpMul. This tests the
     /// unhappy path where the operand is invalid due to 1 inputs.
-    function testOpDecimal18MulNPIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external {
+    function testOpDecimal18MulNPIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpMul.integrity(state, Operand.wrap(0x010000));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
@@ -85,7 +85,7 @@ contract LibOpMulTest is OpTest {
     /// Test the eval of `mul` opcode parsed from a string.
     /// Tests two inputs.
     /// Tests the happy path where we do not overflow.
-    function testOpMulEvalTwoInputsHappy() external {
+    function testOpMulEvalTwoInputsHappy() external view {
         checkHappy("_: mul(0 1);", 0, "0 1");
         checkHappy("_: mul(1 1);", 1e18, "1 1");
         checkHappy("_: mul(1 2);", 2e18, "1 2");
@@ -114,7 +114,7 @@ contract LibOpMulTest is OpTest {
     /// Test the eval of `mul` opcode parsed from a string.
     /// Tests three inputs.
     /// Tests the happy path where we do not divide by zero or overflow.
-    function testOpMulEvalThreeInputsHappy() external {
+    function testOpMulEvalThreeInputsHappy() external view {
         checkHappy("_: mul(0 0 0);", 0, "0 0 0");
         checkHappy("_: mul(1 0 0);", 0, "1 0 0");
         checkHappy("_: mul(1 1 0);", 0, "1 1 0");

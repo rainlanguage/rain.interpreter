@@ -15,7 +15,7 @@ contract LibOpEncodeBitsNPTest is OpTest {
     /// However, lengths can overflow and error so we bound the operand to avoid
     /// that here.
     function testOpEncodeBitsNPIntegrity(IntegrityCheckStateNP memory state, uint8 start8Bit, uint8 length8Bit)
-        external
+        external pure
     {
         uint256 start = uint256(start8Bit);
         uint256 length = bound(uint256(length8Bit), 1, type(uint8).max - start + 1);
@@ -50,7 +50,7 @@ contract LibOpEncodeBitsNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpEncodeBitsNP. This tests that the
     /// opcode correctly pushes the encoded bits onto the stack.
-    function testOpEncodeBitsNPRun(uint256 source, uint256 target, uint8 start8Bit, uint8 length8Bit) external {
+    function testOpEncodeBitsNPRun(uint256 source, uint256 target, uint8 start8Bit, uint8 length8Bit) external view {
         uint256 start = uint256(start8Bit);
         uint256 length = bound(uint256(length8Bit), 1, type(uint8).max - start + 1);
         Operand operand = LibOperand.build(2, 1, uint16((uint256(length) << 8) | uint256(start)));
@@ -64,7 +64,7 @@ contract LibOpEncodeBitsNPTest is OpTest {
     }
 
     /// Test the eval of encoding bits parsed from a string.
-    function testOpEncodeBitsNPEvalHappy() external {
+    function testOpEncodeBitsNPEvalHappy() external view {
         checkHappy("_:bitwise-encode<0 1>(0 0);", 0, "0 0");
         checkHappy("_:bitwise-encode<0 1>(0 1e-18);", 0, "0 1");
         checkHappy("_:bitwise-encode<0 1>(1e-18 0);", 1, "1 0");

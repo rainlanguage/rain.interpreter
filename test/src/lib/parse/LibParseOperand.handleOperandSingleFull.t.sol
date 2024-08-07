@@ -10,12 +10,12 @@ import {LibFixedPointDecimalScale, DECIMAL_MAX_SAFE_INT} from "rain.math.fixedpo
 
 contract LibParseOperandHandleOperandSingleFullTest is Test {
     // No values falls back to zero.
-    function testHandleOperandSingleFullNoValues() external {
+    function testHandleOperandSingleFullNoValues() external pure {
         assertEq(Operand.unwrap(LibParseOperand.handleOperandSingleFull(new uint256[](0))), 0);
     }
 
     // A single value of up to 2 bytes is allowed.
-    function testHandleOperandSingleFullSingleValue(uint256 value) external {
+    function testHandleOperandSingleFullSingleValue(uint256 value) external pure {
         value = bound(value, 0, type(uint16).max);
         uint256 valueScaled = value * 1e18;
         uint256[] memory values = new uint256[](1);

@@ -11,7 +11,7 @@ contract LibOpUint256DivTest is OpTest {
     /// Directly test the integrity logic of LibOpUint256Div. This tests the happy
     /// path where the inputs input and calc match.
     function testOpUint256DivIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData)
-        external
+        external pure
     {
         inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
@@ -23,7 +23,7 @@ contract LibOpUint256DivTest is OpTest {
 
     /// Directly test the integrity logic of LibOpUint256Div. This tests the unhappy
     /// path where the operand is invalid due to 0 inputs.
-    function testOpUint256DivIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external {
+    function testOpUint256DivIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256Div.integrity(state, Operand.wrap(0));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
@@ -32,7 +32,7 @@ contract LibOpUint256DivTest is OpTest {
 
     /// Directly test the integrity logic of LibOpUint256Div. This tests the unhappy
     /// path where the operand is invalid due to 1 inputs.
-    function testOpUint256DivIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external {
+    function testOpUint256DivIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256Div.integrity(state, Operand.wrap(0x010000));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
@@ -84,7 +84,7 @@ contract LibOpUint256DivTest is OpTest {
     /// Test the eval of `uint256-div` opcode parsed from a string. Tests two inputs.
     /// Tests the happy path where we do not divide by zero.
     /// Note that the division truncates (rounds down).
-    function testOpUint256DivEval2InputsHappy() external {
+    function testOpUint256DivEval2InputsHappy() external view {
         // Show that the division truncates (rounds down).
         checkHappy("_: uint256-div(6e-18 1e-18);", 6, "6 / 1");
         checkHappy("_: uint256-div(6e-18 2e-18);", 3, "6 / 2");
@@ -119,7 +119,7 @@ contract LibOpUint256DivTest is OpTest {
 
     /// Test the eval of `uint256-div` opcode parsed from a string. Tests three inputs.
     /// Tests the happy path where we do not divide by zero.
-    function testOpUint256DivEval3InputsHappy() external {
+    function testOpUint256DivEval3InputsHappy() external view {
         // Show that the division truncates (rounds down).
         checkHappy("_: uint256-div(6e-18 1e-18 1e-18);", 6, "6 / 1 / 1");
         checkHappy("_: uint256-div(6e-18 2e-18 1e-18);", 3, "6 / 2 / 1");

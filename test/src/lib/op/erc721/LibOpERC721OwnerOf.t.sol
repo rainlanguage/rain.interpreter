@@ -23,7 +23,7 @@ import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 /// @title LibOpERC721OwnerOfTest
 /// @notice Test the opcode for getting the owner of an erc721 token.
 contract LibOpERC721OwnerOfTest is OpTest {
-    function testOpERC721OwnerOfNPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs) external {
+    function testOpERC721OwnerOfNPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs) external pure {
         (uint256 calcInputs, uint256 calcOutputs) =
             LibOpERC721OwnerOf.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
 

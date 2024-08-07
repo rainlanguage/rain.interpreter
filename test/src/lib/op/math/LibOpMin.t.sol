@@ -14,7 +14,7 @@ contract LibOpMinTest is OpTest {
 
     /// Directly test the integrity logic of LibOpMin. This tests the happy
     /// path where the inputs input and calc match.
-    function testOpMinIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData) external {
+    function testOpMinIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData) external pure {
         inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpMin.integrity(state, LibOperand.build(inputs, 1, operandData));
 
@@ -24,7 +24,7 @@ contract LibOpMinTest is OpTest {
 
     /// Directly test the integrity logic of LibOpMin. This tests the unhappy
     /// path where the operand is invalid due to 0 inputs.
-    function testOpMinIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external {
+    function testOpMinIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpMin.integrity(state, Operand.wrap(0));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
@@ -33,7 +33,7 @@ contract LibOpMinTest is OpTest {
 
     /// Directly test the integrity logic of LibOpMin. This tests the unhappy
     /// path where the operand is invalid due to 1 inputs.
-    function testOpMinIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external {
+    function testOpMinIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpMin.integrity(state, Operand.wrap(0x010000));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
@@ -41,7 +41,7 @@ contract LibOpMinTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpMin.
-    function testOpMinRun(uint256[] memory inputs, uint16 operandData) external {
+    function testOpMinRun(uint256[] memory inputs, uint16 operandData) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
         vm.assume(inputs.length <= 0x0F);
@@ -63,7 +63,7 @@ contract LibOpMinTest is OpTest {
     }
 
     /// Test the eval of `min` opcode parsed from a string. Tests two inputs.
-    function testOpMinEval2InputsHappy() external {
+    function testOpMinEval2InputsHappy() external view {
         checkHappy("_: min(0 0);", 0, "0 > 0 ? 0 : 1");
         checkHappy("_: min(1e-18 0);", 0, "1 > 0 ? 1 : 0");
         checkHappy("_: min(max-value() 0);", 0, "max-value() > 0 ? max-value() : 0");
@@ -83,7 +83,7 @@ contract LibOpMinTest is OpTest {
     }
 
     /// Test the eval of `min` opcode parsed from a string. Tests three inputs.
-    function testOpMinEval3InputsHappy() external {
+    function testOpMinEval3InputsHappy() external view {
         checkHappy("_: min(0 0 0);", 0, "0 0 0");
         checkHappy("_: min(1e-18 0 0);", 0, "1 0 0");
         checkHappy("_: min(2e-18 0 0);", 0, "2 0 0");

@@ -79,7 +79,7 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
     // If both values are within 1 byte, it is not an error, the result is the
     // second value shifted left by 8 bits plus the first value. The rightmost
     // bits of the operand are the first value.
-    function testHandleOperandDoublePerByteNoDefaultBothValuesWithinOneByte(uint256 a, uint256 b) external {
+    function testHandleOperandDoublePerByteNoDefaultBothValuesWithinOneByte(uint256 a, uint256 b) external pure {
         a = bound(a, 0, type(uint8).max);
         b = bound(b, 0, type(uint8).max);
         uint256[] memory values = new uint256[](2);

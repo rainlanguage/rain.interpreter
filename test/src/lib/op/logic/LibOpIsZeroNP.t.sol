@@ -28,7 +28,7 @@ contract LibOpIsZeroNPTest is OpTest {
         uint8 inputs,
         uint8 outputs,
         uint16 operandData
-    ) external {
+    ) external pure {
         inputs = uint8(bound(inputs, 1, 0x0F));
         outputs = uint8(bound(outputs, 1, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
@@ -40,7 +40,7 @@ contract LibOpIsZeroNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpIsZeroNP.
-    function testOpIsZeroNPRun(uint256 input) external {
+    function testOpIsZeroNPRun(uint256 input) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = input;
@@ -49,7 +49,7 @@ contract LibOpIsZeroNPTest is OpTest {
     }
 
     /// Test the eval of isZero opcode parsed from a string. Tests 1 nonzero input.
-    function testOpIsZeroNPEval1NonZeroInput() external {
+    function testOpIsZeroNPEval1NonZeroInput() external view {
         bytes memory bytecode = iDeployer.parse2("_: is-zero(30);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -66,7 +66,7 @@ contract LibOpIsZeroNPTest is OpTest {
     }
 
     /// Test the eval of isZero opcode parsed from a string. Tests 1 zero input.
-    function testOpIsZeroNPEval1ZeroInput() external {
+    function testOpIsZeroNPEval1ZeroInput() external view {
         bytes memory bytecode = iDeployer.parse2("_: is-zero(0);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,

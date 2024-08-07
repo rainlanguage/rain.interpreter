@@ -26,7 +26,7 @@ contract LibOpEqualToNPTest is OpTest {
         uint8 inputs,
         uint8 outputs,
         uint16 operandData
-    ) external {
+    ) external pure {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
@@ -38,7 +38,7 @@ contract LibOpEqualToNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpEqualToNP.
-    function testOpEqualToNPRun(uint256 input1, uint256 input2) external {
+    function testOpEqualToNPRun(uint256 input1, uint256 input2) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = input1;
@@ -51,7 +51,7 @@ contract LibOpEqualToNPTest is OpTest {
 
     /// Test the eval of greater than opcode parsed from a string. Tests 2
     /// inputs. Both inputs are 0.
-    function testOpEqualToNPEval2ZeroInputs() external {
+    function testOpEqualToNPEval2ZeroInputs() external view {
         bytes memory bytecode = iDeployer.parse2("_: equal-to(0 0);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -69,7 +69,7 @@ contract LibOpEqualToNPTest is OpTest {
 
     /// Test the eval of greater than opcode parsed from a string. Tests 2
     /// inputs. The first input is 0, the second input is 1.
-    function testOpEqualToNPEval2InputsFirstZeroSecondOne() external {
+    function testOpEqualToNPEval2InputsFirstZeroSecondOne() external view {
         bytes memory bytecode = iDeployer.parse2("_: equal-to(0 1);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -87,7 +87,7 @@ contract LibOpEqualToNPTest is OpTest {
 
     /// Test the eval of greater than opcode parsed from a string. Tests 2
     /// inputs. The first input is 1, the second input is 0.
-    function testOpEqualToNPEval2InputsFirstOneSecondZero() external {
+    function testOpEqualToNPEval2InputsFirstOneSecondZero() external view {
         bytes memory bytecode = iDeployer.parse2("_: equal-to(1 0);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -105,7 +105,7 @@ contract LibOpEqualToNPTest is OpTest {
 
     /// Test the eval of greater than opcode parsed from a string. Tests 2
     /// inputs. Both inputs are 1.
-    function testOpEqualToNPEval2InputsBothOne() external {
+    function testOpEqualToNPEval2InputsBothOne() external view {
         bytes memory bytecode = iDeployer.parse2("_: equal-to(1 1);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,

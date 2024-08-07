@@ -13,7 +13,7 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 contract LibOpDivTest is OpTest {
     /// Directly test the integrity logic of LibOpDiv. This tests the
     /// happy path where the inputs input and calc match.
-    function testOpDivIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData) external {
+    function testOpDivIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData) external pure {
         inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpDiv.integrity(state, LibOperand.build(inputs, 1, operandData));
 
@@ -23,7 +23,7 @@ contract LibOpDivTest is OpTest {
 
     /// Directly test the integrity logic of LibOpDiv. This tests the
     /// unhappy path where the operand is invalid due to 0 inputs.
-    function testOpDivIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external {
+    function testOpDivIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpDiv.integrity(state, Operand.wrap(0));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
@@ -32,7 +32,7 @@ contract LibOpDivTest is OpTest {
 
     /// Directly test the integrity logic of LibOpDiv. This tests the
     /// unhappy path where the operand is invalid due to 1 inputs.
-    function testOpDivIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external {
+    function testOpDivIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpDiv.integrity(state, Operand.wrap(0x110000));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
@@ -104,7 +104,7 @@ contract LibOpDivTest is OpTest {
     /// Test the eval of `div` opcode parsed from a string.
     /// Tests two inputs.
     /// Tests the happy path where we do not divide by zero or overflow.
-    function testOpDivEvalTwoInputsHappy() external {
+    function testOpDivEvalTwoInputsHappy() external view {
         checkHappy("_: div(0 1);", 0, "0 1");
         checkHappy("_: div(1 1);", 1e18, "1 1");
         checkHappy("_: div(1 2);", 5e17, "1 2");
@@ -142,7 +142,7 @@ contract LibOpDivTest is OpTest {
     /// Test the eval of `div` opcode parsed from a string.
     /// Tests three inputs.
     /// Tests the happy path where we do not divide by zero or overflow.
-    function testOpDivEvalThreeInputsHappy() external {
+    function testOpDivEvalThreeInputsHappy() external view {
         checkHappy("_: div(0 1 1);", 0, "0 1 1");
         checkHappy("_: div(1 1 1);", 1e18, "1 1 1");
         checkHappy("_: div(1 1 2);", 5e17, "1 1 2");

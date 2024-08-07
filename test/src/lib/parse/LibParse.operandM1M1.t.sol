@@ -12,7 +12,7 @@ contract LibParseOperandM1M1Test is OperandTest {
     using LibParse for ParseState;
 
     /// Default is zero for this operand parser. Tests no operand.
-    function testOperandM1M1Elided() external {
+    function testOperandM1M1Elided() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:d();").parse();
         assertEq(
             bytecode,
@@ -35,7 +35,7 @@ contract LibParseOperandM1M1Test is OperandTest {
     }
 
     /// Default is zero for this operand parser. Tests empty operand.
-    function testOperandM1M1Empty() external {
+    function testOperandM1M1Empty() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:d<>();").parse();
         assertEq(
             bytecode,
@@ -58,7 +58,7 @@ contract LibParseOperandM1M1Test is OperandTest {
     }
 
     /// Default is zero for this operand parser. Tests first but not second operand.
-    function testOperandM1M1First() external {
+    function testOperandM1M1First() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:d<1>();").parse();
         assertEq(
             bytecode,
@@ -89,7 +89,7 @@ contract LibParseOperandM1M1Test is OperandTest {
     }
 
     /// Default is zero for this operand parser. Tests 0 1.
-    function testOperandM1M1Second() external {
+    function testOperandM1M1Second() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:d<0 1>();").parse();
         assertEq(
             bytecode,
@@ -112,7 +112,7 @@ contract LibParseOperandM1M1Test is OperandTest {
     }
 
     /// Default is zero for this operand parser. Tests 0 0.
-    function testOperandM1M1SecondZero() external {
+    function testOperandM1M1SecondZero() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:d<0 0>();").parse();
         assertEq(
             bytecode,
@@ -143,7 +143,7 @@ contract LibParseOperandM1M1Test is OperandTest {
     }
 
     /// Default is zero for this operand parser. Tests 1 1.
-    function testOperandM1M1Both() external {
+    function testOperandM1M1Both() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:d<1 1>();").parse();
         assertEq(
             bytecode,
