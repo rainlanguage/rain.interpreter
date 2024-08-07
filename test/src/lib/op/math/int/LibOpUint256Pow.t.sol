@@ -21,6 +21,7 @@ contract LibOpUint256PowTest is OpTest {
     /// path where the inputs input and calc match.
     function testOpUint256ExpIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData)
         external
+        pure
     {
         inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
@@ -32,7 +33,7 @@ contract LibOpUint256PowTest is OpTest {
 
     /// Directly test the integrity logic of LibOpUint256Pow. This tests the unhappy
     /// path where the operand is invalid due to 0 inputs.
-    function testOpUint256PowIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external {
+    function testOpUint256PowIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256Pow.integrity(state, Operand.wrap(0));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
@@ -41,7 +42,7 @@ contract LibOpUint256PowTest is OpTest {
 
     /// Directly test the integrity logic of LibOpUint256Pow. This tests the unhappy
     /// path where the operand is invalid due to 1 inputs.
-    function testOpUint256PowIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external {
+    function testOpUint256PowIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256Pow.integrity(state, Operand.wrap(0x010000));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
@@ -111,7 +112,7 @@ contract LibOpUint256PowTest is OpTest {
 
     /// Test the eval of `uint256-power` opcode parsed from a string. Tests two inputs.
     /// Tests the happy path where we do not overflow.
-    function testOpUint256PowEval2InputsHappy() external {
+    function testOpUint256PowEval2InputsHappy() external view {
         // Anything exp 0 is 1.
         checkHappy("_: uint256-power(0 0);", 1, "0 ** 0");
         checkHappy("_: uint256-power(1e-18 0);", 1, "1 ** 0");
@@ -152,7 +153,7 @@ contract LibOpUint256PowTest is OpTest {
 
     /// Test the eval of `uint256-power` opcode parsed from a string. Tests three inputs.
     /// Tests the happy path where we do not divide by zero.
-    function testOpUint256PowEval3InputsHappy() external {
+    function testOpUint256PowEval3InputsHappy() external view {
         // Anything exp 0 is 1.
         checkHappy("_: uint256-power(0 0 0);", 1, "0 ** 0 ** 0");
         checkHappy("_: uint256-power(1e-18 0 0);", 1, "1 ** 0 ** 0");

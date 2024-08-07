@@ -28,7 +28,7 @@ contract LibOpConstantNPTest is OpTest {
     /// Directly test the integrity logic of LibOpConstantNP. The operand always
     /// puts a single value on the stack. This tests the happy path where the
     /// operand points to a value in the constants array.
-    function testOpConstantNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+    function testOpConstantNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
         vm.assume(state.constants.length > 0);
         operand = Operand.wrap(bound(Operand.unwrap(operand), 0, state.constants.length - 1));
 
@@ -54,7 +54,7 @@ contract LibOpConstantNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpConstantNP. This tests that the
     /// operand always puts a single value on the stack.
-    function testOpConstantNPRun(uint256[] memory constants, uint16 constantIndex) external {
+    function testOpConstantNPRun(uint256[] memory constants, uint16 constantIndex) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         state.constants = constants;
         vm.assume(state.constants.length > 0);
@@ -81,7 +81,7 @@ contract LibOpConstantNPTest is OpTest {
     }
 
     /// Test the eval of a constant opcode parsed from a string.
-    function testOpConstantEvalNPE2E() external {
+    function testOpConstantEvalNPE2E() external view {
         bytes memory bytecode = iDeployer.parse2("_ _: max-value() 1.001;");
 
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(

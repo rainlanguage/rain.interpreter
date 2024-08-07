@@ -25,7 +25,7 @@ contract LibOpContextNPTest is OpTest {
     /// Directly test the integrity logic of LibOpContextNP. All operands are
     /// valid, so the integrity check should always pass. The inputs and
     /// outputs are always 0 and 1 respectively.
-    function testOpContextNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+    function testOpContextNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpContextNP.integrity(state, operand);
 
         assertEq(calcInputs, 0, "inputs");
@@ -34,7 +34,7 @@ contract LibOpContextNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpContextNP. This tests that the
     /// values in the context matrix can be pushed to the stack via. the operand.
-    function testOpContextNPRun(uint256[][] memory context, uint256 i, uint256 j) external {
+    function testOpContextNPRun(uint256[][] memory context, uint256 i, uint256 j) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         state.context = context;
         vm.assume(state.context.length > 0);
@@ -85,7 +85,7 @@ contract LibOpContextNPTest is OpTest {
     }
 
     /// Test the eval of context opcode parsed from a string. This tests 0 0.
-    function testOpContextNPEval00(uint256[][] memory context) external {
+    function testOpContextNPEval00(uint256[][] memory context) external view {
         vm.assume(context.length > 0);
         vm.assume(context[0].length > 0);
         bytes memory bytecode = iDeployer.parse2("_: context<0 0>();");
@@ -100,7 +100,7 @@ contract LibOpContextNPTest is OpTest {
     }
 
     /// Test the eval of context opcode parsed from a string. This tests 0 1.
-    function testOpContextNPEval01(uint256[][] memory context) external {
+    function testOpContextNPEval01(uint256[][] memory context) external view {
         vm.assume(context.length > 0);
         vm.assume(context[0].length > 1);
         bytes memory bytecode = iDeployer.parse2("_: context<0 1>();");
@@ -114,7 +114,7 @@ contract LibOpContextNPTest is OpTest {
     }
 
     /// Test the eval of context opcode parsed from a string. This tests 1 0.
-    function testOpContextNPEval10(uint256[][] memory context) external {
+    function testOpContextNPEval10(uint256[][] memory context) external view {
         vm.assume(context.length > 1);
         vm.assume(context[1].length > 0);
         bytes memory bytecode = iDeployer.parse2("_: context<1 0>();");
@@ -129,7 +129,7 @@ contract LibOpContextNPTest is OpTest {
     }
 
     /// Test the eval of context opcode parsed from a string. This tests 1 1.
-    function testOpContextNPEval11(uint256[][] memory context) external {
+    function testOpContextNPEval11(uint256[][] memory context) external view {
         vm.assume(context.length > 1);
         vm.assume(context[1].length > 1);
         bytes memory bytecode = iDeployer.parse2("_: context<1 1>();");

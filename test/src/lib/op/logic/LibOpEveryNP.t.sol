@@ -25,7 +25,7 @@ contract LibOpEveryNPTest is OpTest {
         uint8 inputs,
         uint8 outputs,
         uint16 operandData
-    ) external {
+    ) external pure {
         inputs = uint8(bound(inputs, 1, 0x0F));
         outputs = uint8(bound(outputs, 1, 0x0F));
 
@@ -38,7 +38,7 @@ contract LibOpEveryNPTest is OpTest {
 
     /// Directly test the integrity logic of LibOpEveryNP. This tests the unhappy
     /// path where the operand is invalid due to 0 inputs.
-    function testOpEveryNPIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external {
+    function testOpEveryNPIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpEveryNP.integrity(state, Operand.wrap(0));
         // Calc inputs will be minimum 1.
         assertEq(calcInputs, 1);
@@ -46,7 +46,7 @@ contract LibOpEveryNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpEveryNP.
-    function testOpEveryNPRun(uint256[] memory inputs) external {
+    function testOpEveryNPRun(uint256[] memory inputs) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length != 0);
         vm.assume(inputs.length <= 0x0F);
@@ -55,7 +55,7 @@ contract LibOpEveryNPTest is OpTest {
     }
 
     /// Test the eval of every opcode parsed from a string. Tests 1 true input.
-    function testOpEveryNPEval1TrueInput() external {
+    function testOpEveryNPEval1TrueInput() external view {
         bytes memory bytecode = iDeployer.parse2("_: every(5);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -72,7 +72,7 @@ contract LibOpEveryNPTest is OpTest {
     }
 
     /// Test the eval of every opcode parsed from a string. Tests 1 false input.
-    function testOpEveryNPEval1FalseInput() external {
+    function testOpEveryNPEval1FalseInput() external view {
         bytes memory bytecode = iDeployer.parse2("_: every(0);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -90,7 +90,7 @@ contract LibOpEveryNPTest is OpTest {
 
     /// Test the eval of every opcode parsed from a string. Tests 2 true inputs.
     /// The last true input should be the overall result.
-    function testOpEveryNPEval2TrueInputs() external {
+    function testOpEveryNPEval2TrueInputs() external view {
         bytes memory bytecode = iDeployer.parse2("_: every(5 6);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -107,7 +107,7 @@ contract LibOpEveryNPTest is OpTest {
     }
 
     /// Test the eval of every opcode parsed from a string. Tests 2 false inputs.
-    function testOpEveryNPEval2FalseInputs() external {
+    function testOpEveryNPEval2FalseInputs() external view {
         bytes memory bytecode = iDeployer.parse2("_: every(0 0);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -125,7 +125,7 @@ contract LibOpEveryNPTest is OpTest {
 
     /// Test the eval of every opcode parsed from a string. Tests 2 inputs, one
     /// true and one false. The overall result is false.
-    function testOpEveryNPEval2MixedInputs() external {
+    function testOpEveryNPEval2MixedInputs() external view {
         bytes memory bytecode = iDeployer.parse2("_: every(5 0);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -143,7 +143,7 @@ contract LibOpEveryNPTest is OpTest {
 
     /// Test the eval of every opcode parsed from a string. Tests 2 inputs, one
     /// true and one false. The overall result is false.
-    function testOpEveryNPEval2MixedInputs2() external {
+    function testOpEveryNPEval2MixedInputs2() external view {
         bytes memory bytecode = iDeployer.parse2("_: every(0 5);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,

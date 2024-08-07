@@ -11,7 +11,7 @@ import {LibFixedPointDecimalScale, DECIMAL_MAX_SAFE_INT} from "rain.math.fixedpo
 contract LibOpScaleNDynamicTest is OpTest {
     /// Directly test the integrity logic of LibOpScaleNDynamic.
     /// Inputs are always 2, outputs are always 1.
-    function testOpScaleNDynamicIntegrity(IntegrityCheckStateNP memory state, uint8 inputs, uint16 op) external {
+    function testOpScaleNDynamicIntegrity(IntegrityCheckStateNP memory state, uint8 inputs, uint16 op) external pure {
         inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpScaleNDynamic.integrity(state, LibOperand.build(inputs, 1, op));
         assertEq(calcInputs, 2);

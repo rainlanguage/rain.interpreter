@@ -9,7 +9,7 @@ solc = "0.8.25"
 
 # Try to make sure the optimizer doesn't touch the output in a way that can break
 # source maps for debugging.
-# via_ir = false
+# via_ir = true
 # optimizer = false
 # optimizer_runs = 0
 # optimizer_steps = 0
@@ -32,10 +32,14 @@ fs_permissions = [
 
 remappings = [
     # The auto remapping wasn't appending /src/ for some reason.
+    "forge-std/=lib/rain.interpreter.interface/lib/forge-std/src/",
     "rain.metadata/=lib/rain.metadata/src/",
     "rain.math.saturating/=lib/rain.math.fixedpoint/lib/rain.math.saturating/src/",
     "rain.sol.codegen/=lib/rain.sol.codegen/src/",
+    "rain.solmem/=lib/rain.interpreter.interface/lib/rain.solmem/src/",
 ]
+
+evm_version = "cancun"
 
 [fuzz]
 runs = 2048

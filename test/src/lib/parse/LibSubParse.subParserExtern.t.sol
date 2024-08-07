@@ -22,7 +22,7 @@ contract LibSubParseSubParserExternTest is Test {
         uint8 outputs,
         uint16 operandValue,
         uint8 opcodeIndex
-    ) external {
+    ) external pure {
         inputs = uint8(bound(inputs, 0, 0xF));
         outputs = uint8(bound(outputs, 0, 0xF));
         (bool success, bytes memory bytecode, uint256[] memory constants) = LibSubParse.subParserExtern(

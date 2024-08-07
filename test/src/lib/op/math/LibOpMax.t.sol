@@ -17,7 +17,10 @@ contract LibOpMaxTest is OpTest {
 
     /// Directly test the integrity logic of LibOpMax. This tests the happy
     /// path where the inputs input and calc match.
-    function testOpMaxIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData) external {
+    function testOpMaxIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData)
+        external
+        pure
+    {
         inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpMax.integrity(state, LibOperand.build(inputs, 1, operandData));
 
@@ -27,7 +30,7 @@ contract LibOpMaxTest is OpTest {
 
     /// Directly test the integrity logic of LibOpMax. This tests the unhappy
     /// path where the operand is invalid due to 0 inputs.
-    function testOpMaxIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external {
+    function testOpMaxIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpMax.integrity(state, Operand.wrap(0));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
@@ -36,7 +39,7 @@ contract LibOpMaxTest is OpTest {
 
     /// Directly test the integrity logic of LibOpMax. This tests the unhappy
     /// path where the operand is invalid due to 1 inputs.
-    function testOpMaxIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external {
+    function testOpMaxIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpMax.integrity(state, Operand.wrap(0x010000));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
@@ -44,7 +47,7 @@ contract LibOpMaxTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpMax.
-    function testOpMaxRun(uint256[] memory inputs) external {
+    function testOpMaxRun(uint256[] memory inputs) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
         vm.assume(inputs.length <= 0x0F);
@@ -70,7 +73,7 @@ contract LibOpMaxTest is OpTest {
     }
 
     /// Test the eval of `max` opcode parsed from a string. Tests two inputs.
-    function testOpMaxEval2InputsHappy() external {
+    function testOpMaxEval2InputsHappy() external view {
         checkHappy("_: max(0 0);", 0, "0 > 0 ? 0 : 1");
         checkHappy("_: max(1e-18 0);", 1, "1 > 0 ? 1 : 0");
         checkHappy("_: max(max-value() 0);", type(uint256).max, "max-value() > 0 ? max-value() : 0");
@@ -90,7 +93,7 @@ contract LibOpMaxTest is OpTest {
     }
 
     /// Test the eval of `max` opcode parsed from a string. Tests three inputs.
-    function testOpMaxEval3InputsHappy() external {
+    function testOpMaxEval3InputsHappy() external view {
         checkHappy("_: max(0 0 0);", 0, "0 0 0");
         checkHappy("_: max(1e-18 0 0);", 1, "1 0 0");
         checkHappy("_: max(2e-18 0 0);", 2, "2 0 0");

@@ -16,7 +16,7 @@ contract LibParseOperandHandleOperandSingleFullTest is Test {
     }
 
     // A single value of up to 2 bytes is allowed.
-    function testHandleOperandSingleFullNoDefaultSingleValue(uint256 value) external {
+    function testHandleOperandSingleFullNoDefaultSingleValue(uint256 value) external pure {
         value = bound(value, 0, type(uint16).max);
         uint256[] memory values = new uint256[](1);
         values[0] = value;

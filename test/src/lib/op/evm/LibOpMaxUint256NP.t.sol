@@ -28,7 +28,7 @@ contract LibOpMaxUint256NPTest is OpTest {
         uint8 inputs,
         uint8 outputs,
         uint16 operandData
-    ) external {
+    ) external pure {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
@@ -40,7 +40,7 @@ contract LibOpMaxUint256NPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpMaxUint256NP. This tests that the
     /// opcode correctly pushes the max uint256 onto the stack.
-    function testOpMaxUint256NPRun() external {
+    function testOpMaxUint256NPRun() external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](0);
         Operand operand = LibOperand.build(0, 1, 0);
@@ -50,7 +50,7 @@ contract LibOpMaxUint256NPTest is OpTest {
     }
 
     /// Test the eval of LibOpMaxUint256NP parsed from a string.
-    function testOpMaxUint256NPEval(FullyQualifiedNamespace namespace) external {
+    function testOpMaxUint256NPEval(FullyQualifiedNamespace namespace) external view {
         bytes memory bytecode = iDeployer.parse2("_: max-value();");
 
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(

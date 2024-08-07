@@ -30,7 +30,7 @@ contract LibOpConditionsNPTest is OpTest {
         uint8 inputs,
         uint8 outputs,
         uint16 operandData
-    ) external {
+    ) external pure {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
@@ -46,7 +46,7 @@ contract LibOpConditionsNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpConditionsNP.
-    function testOpConditionsNPRun(uint256[] memory inputs, uint256 finalNonZero) external {
+    function testOpConditionsNPRun(uint256[] memory inputs, uint256 finalNonZero) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
         // Ensure that we have inputs that are a valid pairwise conditions.
@@ -96,7 +96,7 @@ contract LibOpConditionsNPTest is OpTest {
     }
 
     /// Test the eval of conditions opcode parsed from a string. Tests 1 true input 1 zero output.
-    function testOpConditionsNPEval1TrueInputZeroOutput() external {
+    function testOpConditionsNPEval1TrueInputZeroOutput() external view {
         bytes memory bytecode = iDeployer.parse2("_: conditions(5 0);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -114,7 +114,7 @@ contract LibOpConditionsNPTest is OpTest {
 
     /// Test the eval of conditions opcode parsed from a string. Tests 1 nonzero
     /// input 1 nonzero output.
-    function testOpConditionsNPEval2MixedInputs() external {
+    function testOpConditionsNPEval2MixedInputs() external view {
         bytes memory bytecode = iDeployer.parse2("_: conditions(5 6);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -164,7 +164,7 @@ contract LibOpConditionsNPTest is OpTest {
 
     /// Test the eval of conditions opcode parsed from a string. Tests 1 zero
     /// then 1 nonzero condition.
-    function testOpConditionsNPEval1FalseInput1TrueInput() external {
+    function testOpConditionsNPEval1FalseInput1TrueInput() external view {
         bytes memory bytecode = iDeployer.parse2("_: conditions(0 9 3 4);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -182,7 +182,7 @@ contract LibOpConditionsNPTest is OpTest {
 
     /// Test the eval of conditions opcode parsed from a string. Tests 2 true
     /// conditions. The first should be used.
-    function testOpConditionsNPEval2TrueInputs() external {
+    function testOpConditionsNPEval2TrueInputs() external view {
         bytes memory bytecode = iDeployer.parse2("_: conditions(5 6 7 8);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -200,7 +200,7 @@ contract LibOpConditionsNPTest is OpTest {
 
     /// Test the eval of conditions opcode parsed from a string. Tests 1 nonzero
     /// condition then 1 zero condition.
-    function testOpConditionsNPEval1TrueInput1FalseInput() external {
+    function testOpConditionsNPEval1TrueInput1FalseInput() external view {
         bytes memory bytecode = iDeployer.parse2("_: conditions(5 6 0 9);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,

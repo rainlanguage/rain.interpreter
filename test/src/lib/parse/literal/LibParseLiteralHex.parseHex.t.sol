@@ -17,7 +17,7 @@ contract LibParseLiteralHexBoundHexTest is Test {
     using LibBytes for bytes;
 
     /// Fuzz and round trip.
-    function testParseLiteralHexRoundTrip(uint256 value) external {
+    function testParseLiteralHexRoundTrip(uint256 value) external pure {
         string memory hexString = Strings.toHexString(value);
         ParseState memory state = LibParseState.newState(bytes(hexString), "", "", "");
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());

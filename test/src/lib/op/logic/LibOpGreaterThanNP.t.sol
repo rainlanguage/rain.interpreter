@@ -26,7 +26,7 @@ contract LibOpGreaterThanNPTest is OpTest {
         uint8 inputs,
         uint8 outputs,
         uint16 operandData
-    ) external {
+    ) external pure {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
@@ -38,7 +38,7 @@ contract LibOpGreaterThanNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpGreaterThanNP.
-    function testOpGreaterThanNPRun(uint256 input1, uint256 input2) external {
+    function testOpGreaterThanNPRun(uint256 input1, uint256 input2) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = input1;
@@ -51,7 +51,7 @@ contract LibOpGreaterThanNPTest is OpTest {
 
     /// Test the eval of greater than opcode parsed from a string. Tests 2
     /// inputs. Both inputs are 0.
-    function testOpGreaterThanNPEval2ZeroInputs() external {
+    function testOpGreaterThanNPEval2ZeroInputs() external view {
         bytes memory bytecode = iDeployer.parse2("_: greater-than(0 0);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -69,7 +69,7 @@ contract LibOpGreaterThanNPTest is OpTest {
 
     /// Test the eval of greater than opcode parsed from a string. Tests 2
     /// inputs. The first input is 0, the second input is 1.
-    function testOpGreaterThanNPEval2InputsFirstZeroSecondOne() external {
+    function testOpGreaterThanNPEval2InputsFirstZeroSecondOne() external view {
         bytes memory bytecode = iDeployer.parse2("_: greater-than(0 1);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -87,7 +87,7 @@ contract LibOpGreaterThanNPTest is OpTest {
 
     /// Test the eval of greater than opcode parsed from a string. Tests 2
     /// inputs. The first input is 1, the second input is 0.
-    function testOpGreaterThanNPEval2InputsFirstOneSecondZero() external {
+    function testOpGreaterThanNPEval2InputsFirstOneSecondZero() external view {
         bytes memory bytecode = iDeployer.parse2("_: greater-than(1 0);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,
@@ -105,7 +105,7 @@ contract LibOpGreaterThanNPTest is OpTest {
 
     /// Test the eval of greater than opcode parsed from a string. Tests 2
     /// inputs. Both inputs are 1.
-    function testOpGreaterThanNPEval2InputsBothOne() external {
+    function testOpGreaterThanNPEval2InputsBothOne() external view {
         bytes memory bytecode = iDeployer.parse2("_: greater-than(1 1);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
             iStore,

@@ -13,7 +13,7 @@ import {LibExtern, ExternDispatch} from "src/lib/extern/LibExtern.sol";
 /// calling and internal dispatch.
 contract LibExternCodecTest is Test {
     /// Ensure `encodeExternDispatch` encodes the opcode and operand correctly.
-    function testLibExternCodecEncodeExternDispatch(uint256 opcode, uint256 operand) external {
+    function testLibExternCodecEncodeExternDispatch(uint256 opcode, uint256 operand) external pure {
         opcode = bound(opcode, 0, type(uint16).max);
         operand = bound(operand, 0, type(uint16).max);
         ExternDispatch dispatch = LibExtern.encodeExternDispatch(opcode, Operand.wrap(operand));
@@ -23,7 +23,7 @@ contract LibExternCodecTest is Test {
     }
 
     /// Ensure `encodeExternCall` encodes the address and dispatch correctly.
-    function testLibExternCodecEncodeExternCall(uint256 opcode, uint256 operand) external {
+    function testLibExternCodecEncodeExternCall(uint256 opcode, uint256 operand) external pure {
         opcode = bound(opcode, 0, type(uint16).max);
         operand = bound(operand, 0, type(uint16).max);
         IInterpreterExternV3 extern = IInterpreterExternV3(address(0x1234567890123456789012345678901234567890));
