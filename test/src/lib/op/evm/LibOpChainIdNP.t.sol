@@ -3,7 +3,7 @@ pragma solidity =0.8.25;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
-import {IMetaV1} from "rain.metadata/interface/IMetaV1.sol";
+import {IMetaV1} from "rain.metadata/interface/deprecated/IMetaV1.sol";
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {INVALID_BYTECODE} from "test/lib/etch/LibEtch.sol";
