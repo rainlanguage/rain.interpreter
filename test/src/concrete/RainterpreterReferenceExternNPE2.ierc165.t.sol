@@ -7,7 +7,7 @@ import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC
 import {IInterpreterExternV3} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
 import {ISubParserV3} from "rain.interpreter.interface/interface/ISubParserV3.sol";
 import {RainterpreterReferenceExternNPE2} from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
-import {IDescribedByMetaV1} from "rain.metadata/interface/unstable/IDescribedByMetaV1.sol";
+import {IDescribedByMetaV1} from "rain.metadata/interface/IDescribedByMetaV1.sol";
 
 contract RainterpreterReferenceExternNPE2IERC165Test is Test {
     /// Test that ERC165 is implemented for the reference extern contract.

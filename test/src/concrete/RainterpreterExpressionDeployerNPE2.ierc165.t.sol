@@ -11,7 +11,7 @@ import {
 import {IParserPragmaV1} from "rain.interpreter.interface/interface/IParserPragmaV1.sol";
 import {IParserV2} from "rain.interpreter.interface/interface/IParserV2.sol";
 import {IExpressionDeployerV4} from "rain.interpreter.interface/interface/deprecated/IExpressionDeployerV4.sol";
-import {IDescribedByMetaV1} from "rain.metadata/interface/unstable/IDescribedByMetaV1.sol";
+import {IDescribedByMetaV1} from "rain.metadata/interface/IDescribedByMetaV1.sol";
 import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
 import {RainterpreterParserNPE2} from "src/concrete/RainterpreterParserNPE2.sol";
 import {RainterpreterStoreNPE2} from "src/concrete/RainterpreterStoreNPE2.sol";
