@@ -12,8 +12,8 @@ alloy = { version = "0.2.1", features = ["sol-types", "json", "json-abi"] }
 anyhow = "1.0.70"
 clap = { version = "4.2.5", features = ["cargo", "derive"] }
 ethers = { version = "2.0.14", default-features = false }
-foundry-evm = { git = "https://github.com/foundry-rs/foundry", rev = "d856669d9b614a83834c664f443e18194fcdc781" }
-revm = { version = "12.1.0", default-features = false, features = [
+foundry-evm = { git = "https://github.com/foundry-rs/foundry", rev = "1197fbea0b0f9dde45579a61a5ff956fc0aee426" }
+revm = { version = "13.0.0", default-features = false, features = [
     "std",
     "serde",
     "memory_limit",
