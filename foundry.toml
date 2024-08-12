@@ -37,6 +37,7 @@ remappings = [
     "rain.math.saturating/=lib/rain.math.fixedpoint/lib/rain.math.saturating/src/",
     "rain.sol.codegen/=lib/rain.sol.codegen/src/",
     "rain.solmem/=lib/rain.interpreter.interface/lib/rain.solmem/src/",
+    "openzeppelin-contracts/=lib/rain.interpreter.interface/lib/openzeppelin-contracts/",
 ]
 
 evm_version = "cancun"
