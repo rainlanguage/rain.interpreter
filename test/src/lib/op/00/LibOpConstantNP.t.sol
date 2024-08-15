@@ -81,7 +81,7 @@ contract LibOpConstantNPTest is OpTest {
 
     /// Test the eval of a constant opcode parsed from a string.
     function testOpConstantEvalNPE2E() external {
-        bytes memory bytecode = iDeployer.parse2("_ _: max-value() 1.001;");
+        bytes memory bytecode = iDeployer.parse2("_ _: 2 1.001;");
 
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             EvalV4({
@@ -96,7 +96,7 @@ contract LibOpConstantNPTest is OpTest {
         );
         assertEq(stack.length, 2);
         assertEq(stack[0], 1001e15);
-        assertEq(stack[1], type(uint256).max);
+        assertEq(stack[1], 2e18);
         assertEq(kvs.length, 0);
     }
 
