@@ -30,8 +30,8 @@ bytes32 constant DESCRIBED_BY_META_HASH = bytes32(0xadf71693c6ecf3fd560904bc4697
 /// again with the next bloom filter, offsetting all the indexes by the total
 /// bit count of the previous bloom filter. If we reach the end of the bloom
 /// filters then we have a miss.
-bytes constant PARSE_META =
-    hex"0100000000008000000000000000000000110000000000000020000000000000008000e438fc04aafc63025be81c0384254101285ca1";
+bytes constant PARSE_META
+    = hex"0100000000008000000000000000000000110000000000000020000000000000008000e438fc04aafc63025be81c0384254101285ca1";
 
 /// @dev The build depth of the parser meta.
 
