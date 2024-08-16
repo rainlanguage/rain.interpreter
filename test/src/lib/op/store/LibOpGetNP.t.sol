@@ -248,7 +248,7 @@ contract LibOpGetNPTest is OpTest {
         assertEq(kvs[0], 0, "kvs[0]");
         assertEq(kvs[1], 0, "kvs[1]");
 
-        (stack, kvs) = parseAndEval("_:get(max-value());");
+        (stack, kvs) = parseAndEval("_:get(uint256-max-value());");
         assertEq(stack.length, 1, "stack.length");
         assertEq(stack[0], 0, "stack[0]");
         assertEq(kvs.length, 2, "kvs.length");
@@ -366,7 +366,7 @@ contract LibOpGetNPTest is OpTest {
         value = type(uint256).max;
         iStore.set(StateNamespace.wrap(0), LibUint256Array.arrayFrom(key, value));
 
-        (stack, kvs) = parseAndEval("_:get(max-value());");
+        (stack, kvs) = parseAndEval("_:get(uint256-max-value());");
         assertEq(stack.length, 1, "stack.length");
         assertEq(stack[0], value, "stack[0]");
         assertEq(kvs.length, 2, "kvs.length");
@@ -417,7 +417,7 @@ contract LibOpGetNPTest is OpTest {
         value = 0x5678;
         iStore.set(StateNamespace.wrap(0), LibUint256Array.arrayFrom(key, value));
 
-        (stack, kvs) = parseAndEval("_:get(max-value());");
+        (stack, kvs) = parseAndEval("_:get(uint256-max-value());");
         assertEq(stack.length, 1, "stack.length");
         assertEq(stack[0], 0x5678, "stack[0]");
         assertEq(kvs.length, 2, "kvs.length");

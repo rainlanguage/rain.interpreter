@@ -103,7 +103,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 17;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 18;
 
 /// @title LibAllStandardOpsNP
 /// @notice Every opcode available from the core repository laid out as a single
@@ -195,7 +195,7 @@ library LibAllStandardOpsNP {
             ),
             // AuthoringMetaV2("block-number", "The current block number."),
             // AuthoringMetaV2("chain-id", "The current chain id."),
-            // AuthoringMetaV2("max-value", "The maximum possible value."),
+            AuthoringMetaV2("uint256-max-value", "The maximum possible unsigned integer value (all binary bits are 1)."),
             // AuthoringMetaV2("block-timestamp", "The current block timestamp."),
             // AuthoringMetaV2("now", "The current block timestamp."),
             // AuthoringMetaV2("any", "The first non-zero value out of all inputs, or 0 if every input is 0."),
@@ -404,8 +404,8 @@ library LibAllStandardOpsNP {
                     // LibParseOperand.handleOperandDisallowed,
                     // // chain-id
                     // LibParseOperand.handleOperandDisallowed,
-                    // // max-value
-                    // LibParseOperand.handleOperandDisallowed,
+                    // max-value
+                    LibParseOperand.handleOperandDisallowed,
                     // // block-timestamp
                     // LibParseOperand.handleOperandDisallowed,
                     // // now
@@ -560,7 +560,7 @@ library LibAllStandardOpsNP {
                     LibOpERC5313OwnerNP.integrity,
                     // LibOpBlockNumberNP.integrity,
                     // LibOpChainIdNP.integrity,
-                    // LibOpMaxUint256NP.integrity,
+                    LibOpMaxUint256NP.integrity,
                     // LibOpTimestampNP.integrity,
                     // // now
                     // LibOpTimestampNP.integrity,
@@ -672,7 +672,7 @@ library LibAllStandardOpsNP {
                     LibOpERC5313OwnerNP.run,
                     // LibOpBlockNumberNP.run,
                     // LibOpChainIdNP.run,
-                    // LibOpMaxUint256NP.run,
+                    LibOpMaxUint256NP.run,
                     // LibOpTimestampNP.run,
                     // // now
                     // LibOpTimestampNP.run,

@@ -104,12 +104,12 @@ contract LibOpShiftBitsLeftNPTest is OpTest {
         // same as shifting 1.
         checkHappy("_: bitwise-shift-left<255>(3e-18);", 1 << 255, "255, 3");
 
-        checkHappy("_: bitwise-shift-left<1>(max-value());", type(uint256).max << 1, "1, max");
-        checkHappy("_: bitwise-shift-left<2>(max-value());", type(uint256).max << 2, "2, max");
-        checkHappy("_: bitwise-shift-left<3>(max-value());", type(uint256).max << 3, "3, max");
+        checkHappy("_: bitwise-shift-left<1>(uint256-max-value());", type(uint256).max << 1, "1, max");
+        checkHappy("_: bitwise-shift-left<2>(uint256-max-value());", type(uint256).max << 2, "2, max");
+        checkHappy("_: bitwise-shift-left<3>(uint256-max-value());", type(uint256).max << 3, "3, max");
         // The high bit of max gets shifted out of the 256 bit word, so this is the
         // same as shifting 1.
-        checkHappy("_: bitwise-shift-left<255>(max-value());", 1 << 255, "255, max");
+        checkHappy("_: bitwise-shift-left<255>(uint256-max-value());", 1 << 255, "255, max");
     }
 
     /// Test that a bitwise shift with bad inputs fails integrity.
