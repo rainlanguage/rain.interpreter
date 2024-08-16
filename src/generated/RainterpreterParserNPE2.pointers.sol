@@ -27,8 +27,8 @@ bytes32 constant BYTECODE_HASH = bytes32(0x2b76af53c41e816a07cc5750e27098896d9d7
 /// again with the next bloom filter, offsetting all the indexes by the total
 /// bit count of the previous bloom filter. If we reach the end of the bloom
 /// filters then we have a miss.
-bytes constant PARSE_META
-    = hex"010200000000800008000300082000000000900000402000a004000a00020a000000014832da0d028f7805527c9b0776a0de0988ed9c040b9b8a03903325117a837c00ba92eb0b7c28ea084e315a0c4f390206be54af0ffa93c7104b03a802a9c1290e858ded0aa744f9";
+bytes constant PARSE_META =
+    hex"010200000000800008000300082000000000900000402000a004000a00020a000000014832da0d028f7805527c9b0776a0de0988ed9c040b9b8a03903325117a837c00ba92eb0b7c28ea084e315a0c4f390206be54af0ffa93c7104b03a802a9c1290e858ded0aa744f9";
 
 /// @dev The build depth of the parser meta.
 
@@ -37,8 +37,8 @@ uint8 constant PARSE_META_BUILD_DEPTH = 2;
 /// @dev Every two bytes is a function pointer for an operand handler.
 /// These positional indexes all map to the same indexes looked up in the parse
 /// meta.
-bytes constant OPERAND_HANDLER_FUNCTION_POINTERS
-    = hex"173517351735179a181318131813179a179a173517351735181318131813181318131813";
+bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
+    hex"173517351735179a181318131813179a179a173517351735181318131813181318131813";
 
 /// @dev Every two bytes is a function pointer for a literal parser.
 /// Literal dispatches are determined by the first byte(s) of the literal

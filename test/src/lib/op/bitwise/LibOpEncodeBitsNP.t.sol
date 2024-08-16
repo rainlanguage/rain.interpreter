@@ -80,7 +80,9 @@ contract LibOpEncodeBitsNPTest is OpTest {
         checkHappy("_:bitwise-encode<1 1>(uint256-max-value() 1e-18);", 3, "uint256-max-value 1 1 1");
         checkHappy("_:bitwise-encode<1 1>(uint256-max-value() 2e-18);", 2, "uint256-max-value 2 1 1");
         checkHappy("_:bitwise-encode<0xFF 1>(uint256-max-value() 0);", 1 << 255, "uint256-max-value 2 0xFF 1");
-        checkHappy("_:bitwise-encode<0 0xFF>(uint256-max-value() 0);", type(uint256).max >> 1, "uint256-max-value 2 0xFF 1");
+        checkHappy(
+            "_:bitwise-encode<0 0xFF>(uint256-max-value() 0);", type(uint256).max >> 1, "uint256-max-value 2 0xFF 1"
+        );
     }
 
     /// Check bad inputs.
