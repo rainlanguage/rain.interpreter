@@ -44,8 +44,7 @@ impl Forker {
     /// Creates a new empty instance of `Forker`.
     pub fn new() -> Forker {
         let db = Backend::new(MultiFork::new().0, None);
-        let builder = ExecutorBuilder::default()
-            .inspectors(|stack| stack.trace(true).debug(false));
+        let builder = ExecutorBuilder::default().inspectors(|stack| stack.trace(true).debug(false));
         Self {
             executor: builder.build(Env::default(), db),
             forks: HashMap::new(),
@@ -117,8 +116,7 @@ impl Forker {
                 .gas_limit(gas)
                 .inspectors(|stack| stack.trace(true).debug(false))
         } else {
-            ExecutorBuilder::default()
-                .inspectors(|stack| stack.trace(true).debug(false))
+            ExecutorBuilder::default().inspectors(|stack| stack.trace(true).debug(false))
         };
 
         let mut forks_map = HashMap::new();
