@@ -40,7 +40,7 @@ impl Forker {
     ///
     /// * `rainlang_string` - The Rainlang string to parse.
     /// * `deployer` - The address of the deployer. Must be deployed before the
-    /// fork's current block.
+    ///   fork's current block.
     ///
     /// # Returns
     ///
