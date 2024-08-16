@@ -18,6 +18,7 @@ import {
 } from "../LibParseCMask.sol";
 import {LibParseError} from "../LibParseError.sol";
 import {LibParse} from "../LibParse.sol";
+import {LibDecimalFloatImplementation, LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
 
 /// @dev The default is 18 decimal places for a fractional number.
 uint256 constant DECIMAL_SCALE = 18;
@@ -113,6 +114,22 @@ library LibParseLiteralDecimal {
                 return int256(value);
             }
         }
+    }
+
+    function parseDecimalFloatPacked(ParseState memory state, uint256 start, uint256 end)
+        internal
+        pure
+        returns (uint256 cursor, uint256 packedFloat)
+    {
+        int256 signedCoefficient;
+        int256 exponent;
+        (cursor, signedCoefficient, exponent) = parseDecimalFloat(state, start, end);
+        (int256 normalizedSignedCoefficient, int256 normalizedExponent) =
+            LibDecimalFloatImplementation.normalize(signedCoefficient, exponent);
+        if (!LibDecimalFloat.eq(normalizedSignedCoefficient, normalizedExponent, signedCoefficient, exponent)) {
+            revert DecimalLiteralPrecisionLoss(state.parseErrorOffset(start));
+        }
+        packedFloat = LibDecimalFloat.pack(normalizedSignedCoefficient, normalizedExponent);
     }
 
     function parseDecimalFloat(ParseState memory state, uint256 start, uint256 end)

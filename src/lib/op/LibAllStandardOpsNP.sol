@@ -329,7 +329,7 @@ library LibAllStandardOpsNP {
                 memory pointersFixed = [
                     lengthPointer,
                     LibParseLiteralHex.parseHex,
-                    LibParseLiteralDecimal.parseDecimal,
+                    LibParseLiteralDecimal.parseDecimalFloatPacked,
                     LibParseLiteralString.parseString,
                     LibParseLiteralSubParseable.parseSubParseable
                 ];
