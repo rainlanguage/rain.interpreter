@@ -10,11 +10,14 @@ import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {LibLiteralString} from "test/lib/literal/LibLiteralString.sol";
 import {OperandValuesOverflow, UnclosedOperand} from "src/error/ErrParse.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
+import {LibDecimalFloat, LibDecimalFloatImplementation} from "rain.math.float/src/lib/LibDecimalFloat.sol";
+import {SIGNED_NORMALIZED_MAX} from "rain.math.float/src/lib/implementation/LibDecimalFloatImplementation.sol";
 
 contract LibParseOperandParseOperandTest is Test {
     using LibBytes for bytes;
     using LibParseOperand for ParseState;
     using Strings for uint256;
+    using Strings for int256;
 
     function checkParsingOperandFromData(string memory s, uint256[] memory expectedValues, uint256 expectedEnd)
         internal
@@ -60,7 +63,7 @@ contract LibParseOperandParseOperandTest is Test {
     // Test that we can parse a single literal.
     function testParseOperandSingleDecimalLiteral(
         bool asHex,
-        uint256 value,
+        int256 value,
         string memory maybeWhitespaceA,
         string memory maybeWhitespaceB,
         string memory suffix
@@ -68,13 +71,14 @@ contract LibParseOperandParseOperandTest is Test {
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceA);
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceB);
 
-        value = bound(value, 0, type(uint256).max / 1e18);
+        value = bound(value, 0, SIGNED_NORMALIZED_MAX);
 
-        string memory valueString = asHex ? value.toHexString() : value.toString();
+        string memory valueString = asHex ? uint256(value).toHexString() : value.toString();
         string memory s = string.concat("<", maybeWhitespaceA, valueString, maybeWhitespaceB, ">", suffix);
 
         uint256[] memory expectedValues = new uint256[](1);
-        expectedValues[0] = value * (asHex ? 1 : 1e18);
+        (int256 signedCoefficient, int256 exponent) = LibDecimalFloatImplementation.normalize(value, 0);
+        expectedValues[0] = asHex ? uint256(value) : LibDecimalFloat.pack(signedCoefficient, exponent);
 
         checkParsingOperandFromData(
             s,
@@ -87,8 +91,8 @@ contract LibParseOperandParseOperandTest is Test {
     function testParseOperandTwoDecimalLiterals(
         bool asHexA,
         bool asHexB,
-        uint256 valueA,
-        uint256 valueB,
+        int256 valueA,
+        int256 valueB,
         string memory maybeWhitespaceA,
         string memory maybeWhitespaceB,
         string memory maybeWhitespaceC,
@@ -96,23 +100,26 @@ contract LibParseOperandParseOperandTest is Test {
     ) external {
         vm.assume(bytes(maybeWhitespaceB).length > 0);
 
-        valueA = bound(valueA, 0, type(uint256).max / 1e18);
-        valueB = bound(valueB, 0, type(uint256).max / 1e18);
+        valueA = bound(valueA, 0, SIGNED_NORMALIZED_MAX);
+        valueB = bound(valueB, 0, SIGNED_NORMALIZED_MAX);
 
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceA);
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceB);
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceC);
 
-        string memory valueAString = asHexA ? valueA.toHexString() : valueA.toString();
-        string memory valueBString = asHexB ? valueB.toHexString() : valueB.toString();
+        string memory valueAString = asHexA ? uint256(valueA).toHexString() : valueA.toString();
+        string memory valueBString = asHexB ? uint256(valueB).toHexString() : valueB.toString();
 
         string memory s = string.concat(
             "<", maybeWhitespaceA, valueAString, maybeWhitespaceB, valueBString, maybeWhitespaceC, ">", suffix
         );
         uint256[] memory expectedValues = new uint256[](2);
 
-        expectedValues[0] = valueA * (asHexA ? 1 : 1e18);
-        expectedValues[1] = valueB * (asHexB ? 1 : 1e18);
+        (int256 signedCoefficient, int256 exponent) = LibDecimalFloatImplementation.normalize(valueA, 0);
+        expectedValues[0] = (asHexA ? uint256(valueA) : LibDecimalFloat.pack(signedCoefficient, exponent));
+
+        (signedCoefficient, exponent) = LibDecimalFloatImplementation.normalize(valueB, 0);
+        expectedValues[1] = (asHexB ? uint256(valueB) : LibDecimalFloat.pack(signedCoefficient, exponent));
 
         checkParsingOperandFromData(
             s,
@@ -127,9 +134,9 @@ contract LibParseOperandParseOperandTest is Test {
         bool asHexA,
         bool asHexB,
         bool asHexC,
-        uint256 valueA,
-        uint256 valueB,
-        uint256 valueC,
+        int256 valueA,
+        int256 valueB,
+        int256 valueC,
         string memory maybeWhitespaceA,
         string memory maybeWhitespaceB,
         string memory maybeWhitespaceC,
@@ -139,50 +146,57 @@ contract LibParseOperandParseOperandTest is Test {
         vm.assume(bytes(maybeWhitespaceB).length > 0);
         vm.assume(bytes(maybeWhitespaceC).length > 0);
 
-        valueA = bound(valueA, 0, type(uint256).max / 1e18);
-        valueB = bound(valueB, 0, type(uint256).max / 1e18);
-        valueC = bound(valueC, 0, type(uint256).max / 1e18);
+        valueA = bound(valueA, 0, SIGNED_NORMALIZED_MAX);
+        valueB = bound(valueB, 0, SIGNED_NORMALIZED_MAX);
+        valueC = bound(valueC, 0, SIGNED_NORMALIZED_MAX);
 
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceA);
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceB);
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceC);
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceD);
 
-        string memory valueAString = asHexA ? valueA.toHexString() : valueA.toString();
-        string memory valueBString = asHexB ? valueB.toHexString() : valueB.toString();
-        string memory valueCString = asHexC ? valueC.toHexString() : valueC.toString();
+        string memory s;
+        uint256 expectedLength;
+        {
+            string memory valueAString = asHexA ? uint256(valueA).toHexString() : valueA.toString();
+            string memory valueBString = asHexB ? uint256(valueB).toHexString() : valueB.toString();
+            string memory valueCString = asHexC ? uint256(valueC).toHexString() : valueC.toString();
 
-        string memory s = string.concat(
-            "<",
-            maybeWhitespaceA,
-            valueAString,
-            maybeWhitespaceB,
-            valueBString,
-            maybeWhitespaceC,
-            valueCString,
-            maybeWhitespaceD,
-            ">",
-            suffix
-        );
+            s = string.concat(
+                "<",
+                maybeWhitespaceA,
+                valueAString,
+                maybeWhitespaceB,
+                valueBString,
+                maybeWhitespaceC,
+                valueCString,
+                maybeWhitespaceD,
+                ">",
+                suffix
+            );
+
+            expectedLength = bytes(valueAString).length + bytes(valueBString).length + bytes(valueCString).length + 2
+                + bytes(maybeWhitespaceA).length + bytes(maybeWhitespaceB).length + bytes(maybeWhitespaceC).length
+                + bytes(maybeWhitespaceD).length;
+        }
 
         uint256[] memory expectedValues = new uint256[](3);
-        expectedValues[0] = valueA * (asHexA ? 1 : 1e18);
-        expectedValues[1] = valueB * (asHexB ? 1 : 1e18);
-        expectedValues[2] = valueC * (asHexC ? 1 : 1e18);
+        (int256 signedCoefficient, int256 exponent) = LibDecimalFloatImplementation.normalize(valueA, 0);
+        expectedValues[0] = (asHexA ? uint256(valueA) : LibDecimalFloat.pack(signedCoefficient, exponent));
 
-        checkParsingOperandFromData(
-            s,
-            expectedValues,
-            bytes(valueAString).length + bytes(valueBString).length + bytes(valueCString).length + 2
-                + bytes(maybeWhitespaceA).length + bytes(maybeWhitespaceB).length + bytes(maybeWhitespaceC).length
-                + bytes(maybeWhitespaceD).length
-        );
+        (signedCoefficient, exponent) = LibDecimalFloatImplementation.normalize(valueB, 0);
+        expectedValues[1] = (asHexB ? uint256(valueB) : LibDecimalFloat.pack(signedCoefficient, exponent));
+
+        (signedCoefficient, exponent) = LibDecimalFloatImplementation.normalize(valueC, 0);
+        expectedValues[2] = (asHexC ? uint256(valueC) : LibDecimalFloat.pack(signedCoefficient, exponent));
+
+        checkParsingOperandFromData(s, expectedValues, expectedLength);
     }
 
     // Test that we can parse four literals.
     function testParseOperandFourDecimalLiterals(
         bool[4] memory asHex,
-        uint256[4] memory values,
+        int256[4] memory values,
         string[5] memory maybeWhitespace,
         string memory suffix
     ) external {
@@ -198,7 +212,7 @@ contract LibParseOperandParseOperandTest is Test {
         }
 
         for (uint256 i = 0; i < 4; i++) {
-            values[i] = bound(values[i], 0, type(uint256).max / 1e18);
+            values[i] = bound(values[i], 0, SIGNED_NORMALIZED_MAX);
         }
 
         uint256 expectedLength;
@@ -207,10 +221,10 @@ contract LibParseOperandParseOperandTest is Test {
                 + bytes(maybeWhitespace[2]).length + bytes(maybeWhitespace[3]).length + bytes(maybeWhitespace[4]).length;
         }
 
-        string memory valueAString = asHex[0] ? values[0].toHexString() : values[0].toString();
-        string memory valueBString = asHex[1] ? values[1].toHexString() : values[1].toString();
-        string memory valueCString = asHex[2] ? values[2].toHexString() : values[2].toString();
-        string memory valueDString = asHex[3] ? values[3].toHexString() : values[3].toString();
+        string memory valueAString = asHex[0] ? uint256(values[0]).toHexString() : values[0].toString();
+        string memory valueBString = asHex[1] ? uint256(values[1]).toHexString() : values[1].toString();
+        string memory valueCString = asHex[2] ? uint256(values[2]).toHexString() : values[2].toString();
+        string memory valueDString = asHex[3] ? uint256(values[3]).toHexString() : values[3].toString();
 
         {
             expectedLength += bytes(valueAString).length + bytes(valueBString).length + bytes(valueCString).length
@@ -234,7 +248,8 @@ contract LibParseOperandParseOperandTest is Test {
 
         uint256[] memory expectedValues = new uint256[](4);
         for (uint256 i = 0; i < 4; i++) {
-            expectedValues[i] = values[i] * (asHex[i] ? 1 : 1e18);
+            (int256 signedCoefficient, int256 exponent) = LibDecimalFloatImplementation.normalize(values[i], 0);
+            expectedValues[i] = asHex[i] ? uint256(values[i]) : LibDecimalFloat.pack(signedCoefficient, exponent);
         }
         checkParsingOperandFromData(s, expectedValues, expectedLength);
     }
