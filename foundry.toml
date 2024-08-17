@@ -40,7 +40,5 @@ remappings = [
     "openzeppelin-contracts/=lib/rain.interpreter.interface/lib/openzeppelin-contracts/",
 ]
 
-evm_version = "cancun"
-
 [fuzz]
 runs = 2048
