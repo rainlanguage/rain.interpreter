@@ -6,15 +6,14 @@ import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibOpShiftBitsRightNP} from "src/lib/op/bitwise/LibOpShiftBitsRightNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {
-    IInterpreterV2,
+    IInterpreterV4,
     FullyQualifiedNamespace,
     Operand,
     SourceIndexV2
-} from "rain.interpreter.interface/interface/deprecated/IInterpreterV2.sol";
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/deprecated/IInterpreterCallerV2.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
-import {LibEncodedDispatch} from "rain.interpreter.interface/lib/deprecated/caller/LibEncodedDispatch.sol";
 import {UnsupportedBitwiseShiftAmount} from "src/error/ErrBitwise.sol";
 import {IntegerOverflow} from "rain.math.fixedpoint/error/ErrScale.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";

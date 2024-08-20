@@ -9,14 +9,13 @@ import {LibOpConditionsNP} from "src/lib/op/logic/LibOpConditionsNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {
-    IInterpreterV2,
+    IInterpreterV4,
     Operand,
     SourceIndexV2,
     FullyQualifiedNamespace
-} from "rain.interpreter.interface/interface/deprecated/IInterpreterV2.sol";
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/deprecated/IInterpreterCallerV2.sol";
-import {LibEncodedDispatch} from "rain.interpreter.interface/lib/deprecated/caller/LibEncodedDispatch.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibIntOrAString, IntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
@@ -96,124 +95,42 @@ contract LibOpConditionsNPTest is OpTest {
     }
 
     /// Test the eval of conditions opcode parsed from a string. Tests 1 true input 1 zero output.
-    function testOpConditionsNPEval1TrueInputZeroOutput() external view {
-        bytes memory bytecode = iDeployer.parse2("_: conditions(5 0);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 0);
-        assertEq(kvs.length, 0);
+    function testOpConditionsNPEval1TrueInputZeroOutput() external {
+        checkHappy("_: conditions(5 0);", 0, "");
     }
 
     /// Test the eval of conditions opcode parsed from a string. Tests 1 nonzero
     /// input 1 nonzero output.
-    function testOpConditionsNPEval2MixedInputs() external view {
-        bytes memory bytecode = iDeployer.parse2("_: conditions(5 6);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 6e18);
-        assertEq(kvs.length, 0);
+    function testOpConditionsNPEval2MixedInputs() external {
+        checkHappy("_: conditions(5 6);", 6e18, "");
     }
 
     /// Test that if conditions are NOT met, the expression reverts.
     function testOpConditionsNPEval1FalseInputRevert() external {
-        bytes memory bytecode = iDeployer.parse2("_: conditions(0 5);");
-        vm.expectRevert(bytes(""));
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
-        );
-        (stack);
-        (kvs);
+        checkUnhappy("_: conditions(0 5);", "");
     }
 
     /// Test that conditions can take an error code as an operand.
     function testOpConditionsNPEvalErrorCode() external {
-        bytes memory bytecode = iDeployer.parse2("_: conditions(0x00 0x00 0x00 0x00 \"fail\");");
-        vm.expectRevert(abi.encodeWithSelector("fail"));
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
-        );
-        (stack);
-        (kvs);
+        checkUnhappy("_: conditions(0x00 0x00 0x00 0x00 \"fail\");", "fail");
     }
 
     /// Test the eval of conditions opcode parsed from a string. Tests 1 zero
     /// then 1 nonzero condition.
-    function testOpConditionsNPEval1FalseInput1TrueInput() external view {
-        bytes memory bytecode = iDeployer.parse2("_: conditions(0 9 3 4);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 4e18);
-        assertEq(kvs.length, 0);
+    function testOpConditionsNPEval1FalseInput1TrueInput() external {
+        checkHappy("_: conditions(0 9 3 4);", 4e18, "");
     }
 
     /// Test the eval of conditions opcode parsed from a string. Tests 2 true
     /// conditions. The first should be used.
-    function testOpConditionsNPEval2TrueInputs() external view {
-        bytes memory bytecode = iDeployer.parse2("_: conditions(5 6 7 8);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 6e18);
-        assertEq(kvs.length, 0);
+    function testOpConditionsNPEval2TrueInputs() external {
+        checkHappy("_: conditions(5 6 7 8);", 6e18, "");
     }
 
     /// Test the eval of conditions opcode parsed from a string. Tests 1 nonzero
     /// condition then 1 zero condition.
-    function testOpConditionsNPEval1TrueInput1FalseInput() external view {
-        bytes memory bytecode = iDeployer.parse2("_: conditions(5 6 0 9);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 6e18);
-        assertEq(kvs.length, 0);
+    function testOpConditionsNPEval1TrueInput1FalseInput() external {
+        checkHappy("_: conditions(5 6 0 9);", 6e18, "");
     }
 
     /// Test that conditions without inputs fails integrity check.

@@ -14,11 +14,11 @@ import {
     EncodedExternDispatch,
     IInterpreterExternV3
 } from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
-import {Operand} from "rain.interpreter.interface/interface/IInterpreterV3.sol";
+import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {COMPATIBILITY_V4} from "rain.interpreter.interface/interface/ISubParserV3.sol";
-import {OPCODE_EXTERN} from "rain.interpreter.interface/interface/deprecated/IInterpreterV2.sol";
+import {OPCODE_EXTERN} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {ExternDispatchConstantsHeightOverflow} from "src/error/ErrSubParse.sol";
 
 contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {

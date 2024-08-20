@@ -16,12 +16,11 @@ import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
 import {RainterpreterStoreNPE2, FullyQualifiedNamespace} from "src/concrete/RainterpreterStoreNPE2.sol";
 import {RainterpreterExpressionDeployerNPE2} from "src/concrete/RainterpreterExpressionDeployerNPE2.sol";
 import {
-    Operand, IInterpreterV2, SourceIndexV2
-} from "rain.interpreter.interface/interface/deprecated/IInterpreterV2.sol";
+    Operand, IInterpreterV4, SourceIndexV2
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/deprecated/IInterpreterCallerV2.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
-import {LibEncodedDispatch} from "rain.interpreter.interface/lib/deprecated/caller/LibEncodedDispatch.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 /// @title LibOpChainIdNPTest
@@ -58,21 +57,9 @@ contract LibOpChainIdNPTest is OpTest {
     }
 
     /// Test the eval of a chain ID opcode parsed from a string.
-    function testOpChainIDNPEval(uint64 chainId, FullyQualifiedNamespace namespace) public {
-        bytes memory bytecode = iDeployer.parse2("_: chain-id();");
-
+    function testOpChainIDNPEval(uint64 chainId) public {
         vm.chainId(chainId);
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-            iStore,
-            namespace,
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
-        );
-        assertEq(stack.length, 1, "stack length");
-        assertEq(stack[0], uint256(chainId) * 1e18, "stack item");
-        assertEq(kvs.length, 0, "kvs length");
+        checkHappy("_: chain-id();", uint256(chainId) * 1e18, "");
     }
 
     /// Test that a chain ID with inputs fails integrity check.

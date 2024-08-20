@@ -9,13 +9,12 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibOpAnyNP} from "src/lib/op/logic/LibOpAnyNP.sol";
 import {
-    IInterpreterV2, Operand, SourceIndexV2
-} from "rain.interpreter.interface/interface/deprecated/IInterpreterV2.sol";
+    IInterpreterV4, Operand, SourceIndexV2
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {
     IInterpreterStoreV2, FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/deprecated/IInterpreterCallerV2.sol";
-import {LibEncodedDispatch} from "rain.interpreter.interface/lib/deprecated/caller/LibEncodedDispatch.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
@@ -91,110 +90,38 @@ contract LibOpAnyNPTest is OpTest {
     }
 
     /// Test the eval of any opcode parsed from a string. Tests 1 true input.
-    function testOpAnyNPEval1TrueInput() external view {
-        bytes memory bytecode = iDeployer.parse2("_: any(5);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 5e18);
-        assertEq(kvs.length, 0);
+    function testOpAnyNPEval1TrueInput() external {
+        checkHappy("_: any(5);", 5e18, "");
     }
 
     /// Test the eval of any opcode parsed from a string. Tests 1 false input.
-    function testOpAnyNPEval1FalseInput() external view {
-        bytes memory bytecode = iDeployer.parse2("_: any(0);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 0);
-        assertEq(kvs.length, 0);
+    function testOpAnyNPEval1FalseInput() external {
+        checkHappy("_: any(0);", 0, "");
     }
 
     /// Test the eval of any opcode parsed from a string. Tests 2 true inputs.
     /// The first true input should be the overall result.
-    function testOpAnyNPEval2TrueInputs() external view {
-        bytes memory bytecode = iDeployer.parse2("_: any(5 6);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 5e18);
-        assertEq(kvs.length, 0);
+    function testOpAnyNPEval2TrueInputs() external {
+        checkHappy("_: any(5 6);", 5e18, "");
     }
 
     /// Test the eval of any opcode parsed from a string. Tests 2 false inputs.
-    function testOpAnyNPEval2FalseInputs() external view {
-        bytes memory bytecode = iDeployer.parse2("_: any(0 0);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 0);
-        assertEq(kvs.length, 0);
+    function testOpAnyNPEval2FalseInputs() external {
+        checkHappy("_: any(0 0);", 0, "");
     }
 
     /// Test the eval of any opcode parsed from a string. Tests 2 inputs, one
     /// true and one false. The first true input should be the overall result.
     /// The first value is the true value.
-    function testOpAnyNPEval2MixedInputs() external view {
-        bytes memory bytecode = iDeployer.parse2("_: any(5 0);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 5e18);
-        assertEq(kvs.length, 0);
+    function testOpAnyNPEval2MixedInputs() external {
+        checkHappy("_: any(5 0);", 5e18, "");
     }
 
     /// Test the eval of any opcode parsed from a string. Tests 2 inputs, one
     /// true and one false. The first true input should be the overall result.
     /// The first value is the false value.
-    function testOpAnyNPEval2MixedInputs2() external view {
-        bytes memory bytecode = iDeployer.parse2("_: any(0 5);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 5e18);
-        assertEq(kvs.length, 0);
+    function testOpAnyNPEval2MixedInputs2() external {
+        checkHappy("_: any(0 5);", 5e18, "");
     }
 
     /// Test that any without inputs fails integrity check.

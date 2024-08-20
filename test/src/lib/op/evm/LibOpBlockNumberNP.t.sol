@@ -5,19 +5,18 @@ import {OpTest} from "test/abstract/OpTest.sol";
 
 import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {
-    IInterpreterV2,
+    IInterpreterV4,
     Operand,
     SourceIndexV2,
     FullyQualifiedNamespace
-} from "rain.interpreter.interface/interface/deprecated/IInterpreterV2.sol";
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {IMetaV1} from "rain.metadata/interface/deprecated/IMetaV1.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
-import {LibEncodedDispatch} from "rain.interpreter.interface/lib/deprecated/caller/LibEncodedDispatch.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/deprecated/IInterpreterCallerV2.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibOpBlockNumberNP} from "src/lib/op/evm/LibOpBlockNumberNP.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
@@ -60,20 +59,8 @@ contract LibOpBlockNumberNPTest is OpTest {
     /// Test the eval of a block number opcode parsed from a string.
     function testOpBlockNumberNPEval(uint256 blockNumber) public {
         blockNumber = bound(blockNumber, 0, type(uint256).max / 1e18);
-        bytes memory bytecode = iDeployer.parse2("_: block-number();");
-
         vm.roll(blockNumber);
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
-        );
-        assertEq(stack.length, 1);
-        assertEq(stack[0], blockNumber * 1e18);
-        assertEq(kvs.length, 0);
+        checkHappy("_: block-number();", blockNumber * 1e18, "");
     }
 
     function testOpBlockNumberNPEvalOneInput() external {

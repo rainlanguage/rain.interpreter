@@ -2,19 +2,21 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {LibEncodedDispatch} from "rain.interpreter.interface/lib/deprecated/caller/LibEncodedDispatch.sol";
 import {Pointer, LibPointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {LibInterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {
-    IInterpreterV2, Operand, SourceIndexV2
-} from "rain.interpreter.interface/interface/deprecated/IInterpreterV2.sol";
+    IInterpreterV4,
+    Operand,
+    SourceIndexV2,
+    EvalV4
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
     IInterpreterStoreV2, FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/deprecated/IInterpreterCallerV2.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 
 import {LibOpTimestampNP} from "src/lib/op/evm/LibOpTimestampNP.sol";
@@ -71,13 +73,16 @@ contract LibOpTimestampNPTest is OpTest {
             blockTimestamp = bound(blockTimestamp, 0, type(uint256).max / 1e18);
             vm.warp(blockTimestamp);
             bytes memory bytecode = iDeployer.parse2(bytes(string.concat("_: ", words[i], "();")));
-            (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-                iStore,
-                FullyQualifiedNamespace.wrap(0),
-                bytecode,
-                SourceIndexV2.wrap(0),
-                LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-                new uint256[](0)
+            (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
+                EvalV4({
+                    store: iStore,
+                    namespace: FullyQualifiedNamespace.wrap(0),
+                    bytecode: bytecode,
+                    sourceIndex: SourceIndexV2.wrap(0),
+                    context: LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+                    inputs: new uint256[](0),
+                    stateOverlay: new uint256[](0)
+                })
             );
             assertEq(stack.length, 1);
             assertEq(stack[0], blockTimestamp * 1e18);

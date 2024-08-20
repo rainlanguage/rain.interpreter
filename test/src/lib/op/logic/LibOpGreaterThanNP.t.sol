@@ -6,15 +6,14 @@ import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibOpGreaterThanNP} from "src/lib/op/logic/LibOpGreaterThanNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
-    IInterpreterV2,
+    IInterpreterV4,
     Operand,
     SourceIndexV2,
     FullyQualifiedNamespace
-} from "rain.interpreter.interface/interface/deprecated/IInterpreterV2.sol";
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/deprecated/IInterpreterCallerV2.sol";
-import {LibEncodedDispatch} from "rain.interpreter.interface/lib/deprecated/caller/LibEncodedDispatch.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpGreaterThanNPTest is OpTest {
@@ -51,74 +50,26 @@ contract LibOpGreaterThanNPTest is OpTest {
 
     /// Test the eval of greater than opcode parsed from a string. Tests 2
     /// inputs. Both inputs are 0.
-    function testOpGreaterThanNPEval2ZeroInputs() external view {
-        bytes memory bytecode = iDeployer.parse2("_: greater-than(0 0);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 0);
-        assertEq(kvs.length, 0);
+    function testOpGreaterThanNPEval2ZeroInputs() external {
+        checkHappy("_: greater-than(0 0);", 0, "");
     }
 
     /// Test the eval of greater than opcode parsed from a string. Tests 2
     /// inputs. The first input is 0, the second input is 1.
-    function testOpGreaterThanNPEval2InputsFirstZeroSecondOne() external view {
-        bytes memory bytecode = iDeployer.parse2("_: greater-than(0 1);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 0);
-        assertEq(kvs.length, 0);
+    function testOpGreaterThanNPEval2InputsFirstZeroSecondOne() external {
+        checkHappy("_: greater-than(0 1);", 0, "");
     }
 
     /// Test the eval of greater than opcode parsed from a string. Tests 2
     /// inputs. The first input is 1, the second input is 0.
-    function testOpGreaterThanNPEval2InputsFirstOneSecondZero() external view {
-        bytes memory bytecode = iDeployer.parse2("_: greater-than(1 0);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 1);
-        assertEq(kvs.length, 0);
+    function testOpGreaterThanNPEval2InputsFirstOneSecondZero() external {
+        checkHappy("_: greater-than(1 0);", 1, "");
     }
 
     /// Test the eval of greater than opcode parsed from a string. Tests 2
     /// inputs. Both inputs are 1.
-    function testOpGreaterThanNPEval2InputsBothOne() external view {
-        bytes memory bytecode = iDeployer.parse2("_: greater-than(1 1);");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
-        );
-
-        assertEq(stack.length, 1);
-        assertEq(stack[0], 0);
-        assertEq(kvs.length, 0);
+    function testOpGreaterThanNPEval2InputsBothOne() external {
+        checkHappy("_: greater-than(1 1);", 0, "");
     }
 
     /// Test that a greater than without inputs fails integrity check.
