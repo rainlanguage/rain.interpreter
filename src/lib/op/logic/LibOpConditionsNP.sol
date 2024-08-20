@@ -1,11 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-<<<<<<< HEAD
 import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-=======
-import {Operand} from "rain.interpreter.interface/interface/IInterpreterV3.sol";
->>>>>>> a29afe65b34c94b2b6dd9b99bc33061fed5878c6
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
