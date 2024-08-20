@@ -47,7 +47,7 @@ contract LibParseLiteralStringBoundTest is Test {
         uint256 expectedInnerStart,
         uint256 expectedInnerEnd,
         uint256 expectedOuterEnd
-    ) internal {
+    ) internal view {
         (uint256 outerStart, uint256 innerStart, uint256 innerEnd, uint256 outerEnd) =
             this.externalBoundString(bytes(str));
         assertEq(innerStart, outerStart + expectedInnerStart, "innerStart");
@@ -57,7 +57,7 @@ contract LibParseLiteralStringBoundTest is Test {
 
     /// All valid strings should parse with the outer start and end either side
     /// of their quotes and the inner start and end at their data bounds.
-    function testParseStringLiteralBounds(string memory str) external {
+    function testParseStringLiteralBounds(string memory str) external view {
         vm.assume(bytes(str).length < 0x20);
         LibLiteralString.conformValidPrintableStringContent(str);
 

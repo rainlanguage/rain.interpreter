@@ -8,14 +8,14 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 contract LibOpInvTest is OpTest {
     /// Directly test the integrity logic of LibOpInv.
     /// Inputs are always 1, outputs are always 1.
-    function testOpInvIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+    function testOpInvIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpInv.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
     }
 
     /// Directly test the runtime logic of LibOpInv.
-    function testOpInvRun(uint256 a, uint16 operandData) public {
+    function testOpInvRun(uint256 a, uint16 operandData) public view {
         // 0 is division by 0.
         a = bound(a, 1, type(uint64).max - 1e18);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
@@ -28,7 +28,7 @@ contract LibOpInvTest is OpTest {
     }
 
     /// Test the eval of `inv`.
-    function testOpInvEval() external {
+    function testOpInvEval() external view {
         checkHappy("_: inv(1);", 1e18, "1");
         checkHappy("_: inv(0.5);", 2e18, "0.5");
         checkHappy("_: inv(2);", 0.5e18, "2");

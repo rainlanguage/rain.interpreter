@@ -5,7 +5,6 @@ import {ERC165, IERC165} from "openzeppelin-contracts/contracts/utils/introspect
 import {Pointer, LibPointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {LibDataContract, DataContractMemoryContainer} from "rain.datacontract/lib/LibDataContract.sol";
-import {IERC1820_REGISTRY} from "rain.erc1820/lib/LibIERC1820.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {IParserV2} from "rain.interpreter.interface/interface/IParserV2.sol";
 import {IParserPragmaV1, PragmaV1} from "rain.interpreter.interface/interface/IParserPragmaV1.sol";

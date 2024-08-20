@@ -8,14 +8,14 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 contract LibOpGmTest is OpTest {
     /// Directly test the integrity logic of LibOpGm.
     /// Inputs are always 2, outputs are always 1.
-    function testOpGmIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+    function testOpGmIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpGm.integrity(state, operand);
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
     }
 
     /// Directly test the runtime logic of LibOpGm.
-    function testOpGmRun(uint256 a, uint256 b, uint16 operandData) public {
+    function testOpGmRun(uint256 a, uint256 b, uint16 operandData) public view {
         // @TODO This is a hack to get around the fact that we are very likely
         // to overflow uint256 if we just fuzz it, and that it's clunky to
         // determine whether it will overflow or not. Basically the overflow
@@ -35,7 +35,7 @@ contract LibOpGmTest is OpTest {
     }
 
     /// Test the eval of `gm`.
-    function testOpGmEval() external {
+    function testOpGmEval() external view {
         checkHappy("_: gm(0 0);", 0, "0 0");
         checkHappy("_: gm(0 1);", 0, "0 1");
         checkHappy("_: gm(1 0);", 0, "1 0");

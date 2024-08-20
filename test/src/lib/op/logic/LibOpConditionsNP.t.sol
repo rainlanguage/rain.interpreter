@@ -29,7 +29,7 @@ contract LibOpConditionsNPTest is OpTest {
         uint8 inputs,
         uint8 outputs,
         uint16 operandData
-    ) external {
+    ) external pure {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
@@ -45,7 +45,7 @@ contract LibOpConditionsNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpConditionsNP.
-    function testOpConditionsNPRun(uint256[] memory inputs, uint256 finalNonZero) external {
+    function testOpConditionsNPRun(uint256[] memory inputs, uint256 finalNonZero) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
         // Ensure that we have inputs that are a valid pairwise conditions.

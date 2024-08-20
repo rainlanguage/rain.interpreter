@@ -24,7 +24,7 @@ contract LibOpGetNPTest is OpTest {
         uint8 inputs,
         uint8 outputs,
         uint16 operandData
-    ) public {
+    ) public pure {
         inputs = uint8(bound(inputs, 1, 0x0F));
         outputs = uint8(bound(outputs, 1, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
@@ -40,7 +40,7 @@ contract LibOpGetNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpGetNP.
     /// Test that if the key is not in the store or state the value is 0.
-    function testLibOpGetNPRunUnset(uint256 key, uint16 operandData) public {
+    function testLibOpGetNPRunUnset(uint256 key, uint16 operandData) public view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         Operand operand = LibOperand.build(1, 1, operandData);
         uint256[] memory inputs = new uint256[](1);
@@ -103,7 +103,7 @@ contract LibOpGetNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpGetNP.
     /// Test that if the key is in the state the value is fetched from the state.
-    function testLibOpGetNPRunState(uint256 key, uint256 value, uint16 operandData) public {
+    function testLibOpGetNPRunState(uint256 key, uint256 value, uint16 operandData) public view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         Operand operand = LibOperand.build(1, 1, operandData);
         uint256[] memory inputs = new uint256[](1);
@@ -206,7 +206,7 @@ contract LibOpGetNPTest is OpTest {
 
     /// Test the eval of `get` opcode parsed from a string. Tests that if
     /// the key is not set in the store, the value is 0.
-    function testLibOpGetNPEvalKeyNotSet() external {
+    function testLibOpGetNPEvalKeyNotSet() external view {
         uint256[] memory stack;
         uint256[] memory kvs;
         (stack, kvs) = parseAndEval("_:get(0x1234);");
@@ -258,7 +258,7 @@ contract LibOpGetNPTest is OpTest {
 
     /// Test the eval of `get` opcode parsed from a string. Tests that if
     /// `set` is called prior then `get` can see it.
-    function testLibOpGetNPEvalSetThenGet() external {
+    function testLibOpGetNPEvalSetThenGet() external view {
         uint256[] memory stack;
         uint256[] memory kvs;
 

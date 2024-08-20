@@ -14,7 +14,7 @@ contract LibParseIsMaskTest is Test {
     using LibBytes for bytes;
 
     /// Test that cursor at or past end is always false for isMask.
-    function testIsMaskPastEnd(uint256 cursor, uint256 end, uint256 mask) external {
+    function testIsMaskPastEnd(uint256 cursor, uint256 end, uint256 mask) external pure {
         // Limit to 16-bit values to avoid OOM reads.
         end = bound(end, 0, type(uint16).max);
         cursor = bound(cursor, end, type(uint16).max);
@@ -22,7 +22,7 @@ contract LibParseIsMaskTest is Test {
     }
 
     /// Test that isMask matches a reference implementation.
-    function testIsMaskReference(string memory s, uint256 index, uint256 mask) external {
+    function testIsMaskReference(string memory s, uint256 index, uint256 mask) external pure {
         vm.assume(bytes(s).length > 0);
         index = bound(index, 0, bytes(s).length - 1);
 

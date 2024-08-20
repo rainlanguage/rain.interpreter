@@ -26,7 +26,7 @@ contract LibOpLessThanNPTest is OpTest {
         uint8 inputs,
         uint8 outputs,
         uint16 operandData
-    ) external {
+    ) external pure {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
@@ -38,7 +38,7 @@ contract LibOpLessThanNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpLessThanNP.
-    function testOpLessThanNPRun(uint256 input1, uint256 input2) external {
+    function testOpLessThanNPRun(uint256 input1, uint256 input2) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = input1;
@@ -51,7 +51,7 @@ contract LibOpLessThanNPTest is OpTest {
 
     /// Test the eval of less than opcode parsed from a string. Tests 2 inputs.
     /// Both inputs are 0.
-    function testOpLessThanNPEval2ZeroInputs() external {
+    function testOpLessThanNPEval2ZeroInputs() external view {
         bytes memory bytecode = iDeployer.parse2("_: less-than(0 0);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             EvalV4({
@@ -72,7 +72,7 @@ contract LibOpLessThanNPTest is OpTest {
 
     /// Test the eval of less than opcode parsed from a string. Tests 2 inputs.
     /// The first input is 0, the second input is 1.
-    function testOpLessThanNPEval2InputsFirstZeroSecondOne() external {
+    function testOpLessThanNPEval2InputsFirstZeroSecondOne() external view {
         bytes memory bytecode = iDeployer.parse2("_: less-than(0 1);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             EvalV4({
@@ -93,7 +93,7 @@ contract LibOpLessThanNPTest is OpTest {
 
     /// Test the eval of less than opcode parsed from a string. Tests 2 inputs.
     /// The first input is 1, the second input is 0.
-    function testOpLessThanNPEval2InputsFirstOneSecondZero() external {
+    function testOpLessThanNPEval2InputsFirstOneSecondZero() external view {
         bytes memory bytecode = iDeployer.parse2("_: less-than(1 0);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             EvalV4({
@@ -114,7 +114,7 @@ contract LibOpLessThanNPTest is OpTest {
 
     /// Test the eval of less than opcode parsed from a string. Tests 2 inputs.
     /// Both inputs are 1.
-    function testOpLessThanNPEval2InputsBothOne() external {
+    function testOpLessThanNPEval2InputsBothOne() external view {
         bytes memory bytecode = iDeployer.parse2("_: less-than(1 1);");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             EvalV4({

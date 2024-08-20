@@ -8,7 +8,10 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 contract LibOpSubTest is OpTest {
     /// Directly test the integrity logic of LibOpSub. This tests the happy
     /// path where the inputs input and calc match.
-    function testOpSubIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData) external {
+    function testOpSubIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData)
+        external
+        pure
+    {
         inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpSub.integrity(state, LibOperand.build(inputs, 1, operandData));
 
@@ -18,7 +21,7 @@ contract LibOpSubTest is OpTest {
 
     /// Directly test the integrity logic of LibOpSub. This tests the unhappy
     /// path where the operand is invalid due to 0 inputs.
-    function testOpSubIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external {
+    function testOpSubIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpSub.integrity(state, Operand.wrap(0));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
@@ -27,7 +30,7 @@ contract LibOpSubTest is OpTest {
 
     /// Directly test the integrity logic of LibOpSub. This tests the unhappy
     /// path where the operand is invalid due to 1 inputs.
-    function testOpSubIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external {
+    function testOpSubIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpSub.integrity(state, Operand.wrap(0x010000));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
@@ -93,7 +96,7 @@ contract LibOpSubTest is OpTest {
     }
 
     /// Test the eval of `sub` opcode parsed from a string. Tests two inputs.
-    function testOpSubEvalTwoInputs() external {
+    function testOpSubEvalTwoInputs() external view {
         checkHappy("_: sub(1e-18 0);", 1, "1 0");
         checkHappy("_: sub(1e-18 1e-18);", 0, "1 1");
         checkHappy("_: sub(2e-18 1e-18);", 1, "2 1");
@@ -105,7 +108,7 @@ contract LibOpSubTest is OpTest {
 
     /// Test the eval of `sub` opcode parsed from a string. Tests two inputs.
     /// Test that saturating does not change the result.
-    function testOpSubEvalTwoInputsSaturating() external {
+    function testOpSubEvalTwoInputsSaturating() external view {
         checkHappy("_: sub<1>(1e-18 0);", 1, "1 0");
         checkHappy("_: sub<1>(1e-18 1e-18);", 0, "1 1");
         checkHappy("_: sub<1>(2e-18 1e-18);", 1, "2 1");
@@ -133,7 +136,7 @@ contract LibOpSubTest is OpTest {
 
     /// Test the eval of `sub` opcode parsed from a string. Tests two inputs.
     /// Tests saturating on an underflow.
-    function testOpSubEval2InputsSaturatingUnderflow() external {
+    function testOpSubEval2InputsSaturatingUnderflow() external view {
         checkHappy("_: sub<1>(0 1e-18);", 0, "0 1");
         checkHappy("_: sub<1>(1e-18 2e-18);", 0, "1 2");
         checkHappy("_: sub<1>(2e-18 3e-18);", 0, "2 3");
@@ -144,7 +147,7 @@ contract LibOpSubTest is OpTest {
     }
 
     /// Test the eval of `sub` opcode parsed from a string. Tests three inputs.
-    function testOpSubEvalThreeInputs() external {
+    function testOpSubEvalThreeInputs() external view {
         checkHappy("_: sub(1e-18 0 0);", 1, "1 0 0");
         checkHappy("_: sub(1e-18 1e-18 0);", 0, "1 1 0");
         checkHappy("_: sub(2e-18 1e-18 1e-18);", 0, "2 1 1");
@@ -153,7 +156,7 @@ contract LibOpSubTest is OpTest {
 
     /// Test the eval of `sub` opcode parsed from a string. Tests three inputs.
     /// Test that saturating does not change the result.
-    function testOpSubEvalThreeInputsSaturating() external {
+    function testOpSubEvalThreeInputsSaturating() external view {
         checkHappy("_: sub<1>(1e-18 0 0);", 1, "1 0 0");
         checkHappy("_: sub<1>(1e-18 1e-18 0);", 0, "1 1 0");
         checkHappy("_: sub<1>(2e-18 1e-18 1e-18);", 0, "2 1 1");
@@ -179,7 +182,7 @@ contract LibOpSubTest is OpTest {
 
     /// Test the eval of `sub` opcocde parsed from a string. Tests three inputs.
     /// Tests saturating on an underflow.
-    function testOpSubEval3InputsSaturatingUnderflow() external {
+    function testOpSubEval3InputsSaturatingUnderflow() external view {
         checkHappy("_: sub<1>(0 0 1e-18);", 0, "0 0 1");
         checkHappy("_: sub<1>(0 1e-18 2e-18);", 0, "0 1 2");
         checkHappy("_: sub<1>(1e-18 1e-18 1e-18);", 0, "1 1 1");

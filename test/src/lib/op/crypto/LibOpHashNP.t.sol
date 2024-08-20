@@ -38,7 +38,7 @@ contract LibOpHashNPTest is OpTest {
         uint8 inputs,
         uint8 outputs,
         uint16 operandData
-    ) external {
+    ) external pure {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         Operand operand = LibOperand.build(inputs, outputs, operandData);
@@ -49,7 +49,7 @@ contract LibOpHashNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpHashNP.
-    function testOpHashNPRun(uint256[] memory inputs) external {
+    function testOpHashNPRun(uint256[] memory inputs) external view {
         vm.assume(inputs.length <= 0x0F);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
@@ -90,7 +90,7 @@ contract LibOpHashNPTest is OpTest {
 
     /// Test the eval of a hash opcode parsed from a string. Tests 2 inputs and
     /// other stack items.
-    function testOpHashNPEval2InputsOtherStack() external {
+    function testOpHashNPEval2InputsOtherStack() external view {
         bytes memory bytecode = iDeployer.parse2("_ _ _: 5 hash(0x1234567890abcdef 0xfedcba0987654321) 9;");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             EvalV4({

@@ -31,7 +31,7 @@ contract ParseLiteralTest is Test {
         uint256 expectedInnerEnd,
         uint256 expectedOuterEnd,
         uint256 expectedFinalCursor
-    ) internal {
+    ) internal pure {
         uint256 cursor = Pointer.unwrap(data.dataPointer());
         uint256 end = cursor + data.length;
 

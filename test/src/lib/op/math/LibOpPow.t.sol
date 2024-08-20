@@ -8,14 +8,14 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 contract LibOpPowTest is OpTest {
     /// Directly test the integrity logic of LibOpPow.
     /// Inputs are always 2, outputs are always 1.
-    function testOpPowIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+    function testOpPowIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpPow.integrity(state, operand);
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
     }
 
     /// Directly test the runtime logic of LibOpPow.
-    function testOpPowRun(uint256 a, uint256 b) public {
+    function testOpPowRun(uint256 a, uint256 b) public view {
         // @TODO This is a hack to get around the fact that we are very likely
         // to overflow uint256 if we just fuzz it, and that it's clunky to
         // determine whether it will overflow or not. Basically the overflow
@@ -35,7 +35,7 @@ contract LibOpPowTest is OpTest {
     }
 
     /// Test the eval of `power`.
-    function testOpPowEval() external {
+    function testOpPowEval() external view {
         // 0 ^ 0
         checkHappy("_: power(0 0);", 1e18, "0 0");
         // 0 ^ 1

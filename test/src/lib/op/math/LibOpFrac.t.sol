@@ -8,14 +8,14 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 contract LibOpFracTest is OpTest {
     /// Directly test the integrity logic of LibOpFrac.
     /// Inputs are always 1, outputs are always 1.
-    function testOpFracIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+    function testOpFracIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpFrac.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
     }
 
     /// Directly test the runtime logic of LibOpFrac.
-    function testOpFracRun(uint256 a, uint16 operandData) public {
+    function testOpFracRun(uint256 a, uint16 operandData) public view {
         a = bound(a, 0, type(uint64).max - 1e18);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
@@ -27,7 +27,7 @@ contract LibOpFracTest is OpTest {
     }
 
     /// Test the eval of `frac`.
-    function testOpFracEval() external {
+    function testOpFracEval() external view {
         checkHappy("_: frac(0);", 0, "0");
         checkHappy("_: frac(1);", 0, "1");
         checkHappy("_: frac(0.5);", 0.5e18, "0.5");

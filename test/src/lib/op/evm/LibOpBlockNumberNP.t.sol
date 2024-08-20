@@ -11,7 +11,7 @@ import {
     FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
-import {IMetaV1} from "rain.metadata/interface/IMetaV1.sol";
+import {IMetaV1} from "rain.metadata/interface/deprecated/IMetaV1.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
@@ -33,7 +33,7 @@ contract LibOpBlockNumberNPTest is OpTest {
         uint8 inputs,
         uint8 outputs,
         uint16 operandData
-    ) external {
+    ) external pure {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =

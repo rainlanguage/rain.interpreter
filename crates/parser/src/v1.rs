@@ -1,10 +1,11 @@
 use crate::error::ParserError;
+use alloy::primitives::*;
 use alloy_ethers_typecast::transaction::{ReadContractParametersBuilder, ReadableClient};
-use alloy_primitives::*;
 use ethers::providers::JsonRpcClient;
 use rain_interpreter_bindings::IParserV1::*;
 use rain_interpreter_dispair::DISPair;
 
+#[cfg(not(target_family = "wasm"))]
 pub trait Parser {
     /// Call Parser contract to parse the provided rainlang text.
     fn parse_text<T: JsonRpcClient>(
@@ -26,6 +27,30 @@ pub trait Parser {
         client: ReadableClient<T>,
     ) -> impl std::future::Future<Output = Result<parseReturn, ParserError>> + Send;
 }
+
+#[cfg(target_family = "wasm")]
+pub trait Parser {
+    /// Call Parser contract to parse the provided rainlang text.
+    fn parse_text<T: JsonRpcClient>(
+        &self,
+        text: &str,
+        client: ReadableClient<T>,
+    ) -> impl std::future::Future<Output = Result<parseReturn, ParserError>>
+    where
+        Self: Sync,
+    {
+        self.parse(text.as_bytes().to_vec(), client)
+    }
+
+    /// Call Parser contract to parse the provided data
+    /// The provided data must contain valid UTF-8 encoding of valid rainlang text.
+    fn parse<T: JsonRpcClient>(
+        &self,
+        data: Vec<u8>,
+        client: ReadableClient<T>,
+    ) -> impl std::future::Future<Output = Result<parseReturn, ParserError>>;
+}
+
 /// ParserV1
 /// Struct representing ParserV1 instances.
 #[derive(Clone, Default)]
@@ -51,7 +76,7 @@ impl Parser for ParserV1 {
             .read(
                 ReadContractParametersBuilder::default()
                     .address(self.address)
-                    .call(parseCall { data })
+                    .call(parseCall { data: data.into() })
                     .build()
                     .map_err(ParserError::ReadContractParametersBuilderError)?,
             )
@@ -63,7 +88,7 @@ impl Parser for ParserV1 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloy_primitives::{Address, U256};
+    use alloy::primitives::{Address, U256};
     use ethers::providers::{MockProvider, MockResponse, Provider};
 
     #[tokio::test]
@@ -106,7 +131,7 @@ mod tests {
 
         let result = parser.parse_text("my rainlang", client).await.unwrap();
 
-        assert_eq!(result.bytecode, hex!("1234"));
+        assert_eq!(**result.bytecode, hex!("1234"));
         assert_eq!(result.constants, vec![U256::from(3), U256::from(4)]);
     }
 
@@ -135,7 +160,7 @@ mod tests {
 
         let result = parser.parse_text(rainlang, client).await.unwrap();
 
-        assert_eq!(result.bytecode, hex!("6d79207261696e6c616e67"));
+        assert_eq!(**result.bytecode, hex!("6d79207261696e6c616e67"));
         assert_eq!(result.constants, vec![U256::from(3), U256::from(4)]);
     }
 }

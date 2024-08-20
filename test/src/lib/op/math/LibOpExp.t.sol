@@ -8,14 +8,14 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 contract LibOpExpTest is OpTest {
     /// Directly test the integrity logic of LibOpExp.
     /// Inputs are always 1, outputs are always 1.
-    function testOpExpIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+    function testOpExpIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpExp.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
     }
 
     /// Directly test the runtime logic of LibOpExp.
-    function testOpExpRun(uint256 a, uint16 operandData) public {
+    function testOpExpRun(uint256 a, uint16 operandData) public view {
         a = bound(a, 0, type(uint64).max - 1e18);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
@@ -27,7 +27,7 @@ contract LibOpExpTest is OpTest {
     }
 
     /// Test the eval of `exp`.
-    function testOpExpEval() external {
+    function testOpExpEval() external view {
         checkHappy("_: exp(0);", 1e18, "e^0");
         checkHappy("_: exp(1);", 2718281828459045234, "e^1");
         checkHappy("_: exp(0.5);", 1648721270700128145, "e^0.5");

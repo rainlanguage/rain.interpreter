@@ -15,7 +15,7 @@ contract LibEvalNPFBoundsTest is Test {
     /// Due to the mod of indexes to function pointers the indexes wrap at the
     /// length of the function pointers. Test that the length of the fn pointers
     /// + 1 is the constant op.
-    function testEvalNPFBoundsModConstant(uint256 c) public {
+    function testEvalNPFBoundsModConstant(uint256 c) public view {
         bytes memory fs = LibAllStandardOpsNP.opcodeFunctionPointers();
 
         bytes memory bytecode =

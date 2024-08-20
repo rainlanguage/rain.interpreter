@@ -14,7 +14,7 @@ contract LibParseStatePushConstantValueTest is Test {
         bytes memory meta,
         bytes memory operandHandlers,
         bytes memory literalParsers
-    ) external {
+    ) external pure {
         // Start with a fresh state.
         ParseState memory state = LibParseState.newState(data, meta, operandHandlers, literalParsers);
 
@@ -24,7 +24,7 @@ contract LibParseStatePushConstantValueTest is Test {
 
     /// Pushing any value onto an empty constants LL should result in that value
     /// in the state with a pointer to 0.
-    function testPushConstantValueSingle(uint256 value) external {
+    function testPushConstantValueSingle(uint256 value) external pure {
         // Start with a fresh state.
         ParseState memory state = LibParseState.newState("", "", "", "");
 
@@ -53,7 +53,7 @@ contract LibParseStatePushConstantValueTest is Test {
     }
 
     /// Can push many values to the constants LL.
-    function testPushConstantValueMany(uint256[] memory values) external {
+    function testPushConstantValueMany(uint256[] memory values) external pure {
         vm.assume(values.length > 0);
         // Start with a fresh state.
         ParseState memory state = LibParseState.newState("", "", "", "");
