@@ -8,14 +8,14 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 contract LibOpLog2Test is OpTest {
     /// Directly test the integrity logic of LibOpLog2.
     /// Inputs are always 1, outputs are always 1.
-    function testOpLog2Integrity(IntegrityCheckStateNP memory state, Operand operand) external {
+    function testOpLog2Integrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpLog2.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
     }
 
     /// Directly test the runtime logic of LibOpLog2.
-    function testOpLog2Run(uint256 a) public {
+    function testOpLog2Run(uint256 a) public view {
         // e lifted from prb math.
         a = bound(a, 2_718281828459045235, type(uint64).max - 1e18);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
@@ -28,7 +28,7 @@ contract LibOpLog2Test is OpTest {
     }
 
     /// Test the eval of `log2`.
-    function testOpLog2Eval() external {
+    function testOpLog2Eval() external view {
         // Any number less than 2 other than 1 is negative which doesn't exist
         // in unsigned integers.
         checkHappy("_: log2(1);", 0, "log2 1");

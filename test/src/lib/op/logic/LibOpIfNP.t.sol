@@ -25,7 +25,7 @@ contract LibOpIfNPTest is OpTest {
         uint8 inputs,
         uint8 outputs,
         uint16 operandData
-    ) external {
+    ) external pure {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
@@ -37,7 +37,7 @@ contract LibOpIfNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpIfNP.
-    function testOpIfNPRun(uint256 a, uint256 b, uint256 c) external {
+    function testOpIfNPRun(uint256 a, uint256 b, uint256 c) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](3);
         inputs[0] = a;

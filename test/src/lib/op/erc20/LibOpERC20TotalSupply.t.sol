@@ -16,7 +16,7 @@ import {LibFixedPointDecimalScale} from "rain.math.fixedpoint/lib/LibFixedPointD
 /// @title LibOpERC20TotalSupplyTest
 /// @notice Test the opcode for getting the total supply of an erc20 contract.
 contract LibOpERC20TotalSupplyTest is OpTest {
-    function testOpERC20TotalSupplyNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+    function testOpERC20TotalSupplyNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpERC20TotalSupply.integrity(state, operand);
 
         assertEq(calcInputs, 1);

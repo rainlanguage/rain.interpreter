@@ -27,7 +27,7 @@ contract LibOpIsZeroNPTest is OpTest {
         uint8 inputs,
         uint8 outputs,
         uint16 operandData
-    ) external {
+    ) external pure {
         inputs = uint8(bound(inputs, 1, 0x0F));
         outputs = uint8(bound(outputs, 1, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
@@ -39,7 +39,7 @@ contract LibOpIsZeroNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpIsZeroNP.
-    function testOpIsZeroNPRun(uint256 input) external {
+    function testOpIsZeroNPRun(uint256 input) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = input;

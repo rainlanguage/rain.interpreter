@@ -24,7 +24,7 @@ contract LibOpEnsureNPTest is OpTest {
         uint8 inputs,
         uint8 outputs,
         uint16 operandData
-    ) external {
+    ) external pure {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
@@ -35,7 +35,7 @@ contract LibOpEnsureNPTest is OpTest {
 
     /// Directly test the integrity logic of LibOpEnsureNP. This tests the
     /// unhappy path where there are no inputs.
-    function testOpEnsureNPIntegrityUnhappy(IntegrityCheckStateNP memory state) external {
+    function testOpEnsureNPIntegrityUnhappy(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpEnsureNP.integrity(state, Operand.wrap(0));
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 0);
@@ -94,7 +94,7 @@ contract LibOpEnsureNPTest is OpTest {
 
     /// Test the eval of `ensure` parsed from a string. Tests the happy path
     /// where all inputs are nonzero.
-    function testOpEnsureNPEvalHappy() external {
+    function testOpEnsureNPEvalHappy() external view {
         checkHappy(":ensure(1 \"always 1\"), _:1;", 1e18, "1");
         checkHappy(":ensure(5 \"always 5\"), _:1;", 1e18, "5");
 

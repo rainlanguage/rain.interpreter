@@ -31,7 +31,7 @@ contract RainterpreterReferenceExternNPE2PointersTest is Test {
         assertEq(actual, expected);
     }
 
-    function testSubParserParseMeta() external {
+    function testSubParserParseMeta() external pure {
         bytes memory authoringMetaBytes = LibRainterpreterReferenceExternNPE2.authoringMetaV2();
         AuthoringMetaV2[] memory authoringMeta = abi.decode(authoringMetaBytes, (AuthoringMetaV2[]));
         bytes memory expected = LibGenParseMeta.buildParseMetaV2(authoringMeta, 2);

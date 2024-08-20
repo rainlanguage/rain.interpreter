@@ -3,7 +3,7 @@ pragma solidity =0.8.25;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
-import {IMetaV1} from "rain.metadata/interface/IMetaV1.sol";
+import {IMetaV1} from "rain.metadata/interface/deprecated/IMetaV1.sol";
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {INVALID_BYTECODE} from "test/lib/etch/LibEtch.sol";
@@ -34,7 +34,7 @@ contract LibOpChainIdNPTest is OpTest {
         uint8 inputs,
         uint8 outputs,
         uint16 operandData
-    ) external {
+    ) external pure {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =

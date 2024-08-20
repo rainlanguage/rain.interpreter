@@ -16,7 +16,7 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
     }
 
     // If only the first value is provided, the others default to zero.
-    function testHandleOperand8M1M1FirstValueOnly(uint256 value) external {
+    function testHandleOperand8M1M1FirstValueOnly(uint256 value) external pure {
         value = bound(value, 0, type(uint8).max);
         uint256[] memory values = new uint256[](1);
         values[0] = value;
@@ -45,7 +45,7 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
 
     // If the first and second values are provided, the third defaults to zero.
     // The first value is 1 byte and the second is 1 bit.
-    function testHandleOperand8M1M1FirstAndSecondValue(uint256 a, uint256 b) external {
+    function testHandleOperand8M1M1FirstAndSecondValue(uint256 a, uint256 b) external pure {
         a = bound(a, 0, type(uint8).max);
         b = bound(b, 0, 1);
         uint256[] memory values = new uint256[](2);
@@ -79,7 +79,7 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
 
     // If all the values are provided they all appear in the operand.
     // The first value is 1 byte and the second is 1 bit, the third is 1 bit.
-    function testHandleOperand8M1M1AllValues(uint256 a, uint256 b, uint256 c) external {
+    function testHandleOperand8M1M1AllValues(uint256 a, uint256 b, uint256 c) external pure {
         a = bound(a, 0, type(uint8).max);
         b = bound(b, 0, 1);
         c = bound(c, 0, 1);

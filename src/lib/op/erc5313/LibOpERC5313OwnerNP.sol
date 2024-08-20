@@ -18,11 +18,11 @@ library LibOpERC5313OwnerNP {
 
     function run(InterpreterStateNP memory, Operand, Pointer stackTop) internal view returns (Pointer) {
         uint256 account;
-        assembly {
+        assembly ("memory-safe") {
             account := mload(stackTop)
         }
         address owner = IERC5313(address(uint160(account))).owner();
-        assembly {
+        assembly ("memory-safe") {
             mstore(stackTop, owner)
         }
         return stackTop;

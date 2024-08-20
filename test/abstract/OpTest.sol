@@ -86,7 +86,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         Operand operand,
         uint256[] memory constants,
         uint256[] memory inputs
-    ) internal returns (uint256) {
+    ) internal view returns (uint256) {
         IntegrityCheckStateNP memory integrityState = LibIntegrityCheckNP.newState("", 0, constants);
         (uint256 calcInputs, uint256 calcOutputs) = integrityFn(integrityState, operand);
         assertEq(calcInputs, inputs.length, "inputs length");
@@ -140,7 +140,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         Operand operand,
         ReferenceCheckPointers memory pointers,
         function(InterpreterStateNP memory, Operand, Pointer) view returns (Pointer) runFn
-    ) internal {
+    ) internal view {
         bytes32 stateFingerprintBefore = state.fingerprint();
         pointers.actualStackTopAfter = runFn(state, operand, pointers.stackTop);
         bytes32 stateFingerprintAfter = state.fingerprint();
@@ -155,7 +155,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         ReferenceCheckPointers memory pointers,
         uint256[] memory inputs,
         uint256 calcOutputs
-    ) internal {
+    ) internal view {
         uint256[] memory expectedOutputs = referenceFn(state, operand, inputs);
         assertEq(expectedOutputs.length, calcOutputs, "expected outputs length");
 
@@ -179,7 +179,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         function(IntegrityCheckStateNP memory, Operand) view returns (uint256, uint256) integrityFn,
         function(InterpreterStateNP memory, Operand, Pointer) view returns (Pointer) runFn,
         uint256[] memory inputs
-    ) internal {
+    ) internal view {
         uint256 calcOutputs = opReferenceCheckIntegrity(integrityFn, operand, state.constants, inputs);
         ReferenceCheckPointers memory pointers = opReferenceCheckPointers(inputs, calcOutputs);
 
@@ -214,13 +214,16 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         return parseAndEval(rainString, LibContext.build(new uint256[][](0), new SignedContextV1[](0)));
     }
 
-    function checkHappy(bytes memory rainString, uint256 expectedValue, string memory errString) internal {
+    function checkHappy(bytes memory rainString, uint256 expectedValue, string memory errString) internal view {
         uint256[] memory expectedStack = new uint256[](1);
         expectedStack[0] = expectedValue;
         checkHappy(rainString, expectedStack, errString);
     }
 
-    function checkHappy(bytes memory rainString, uint256[] memory expectedStack, string memory errString) internal {
+    function checkHappy(bytes memory rainString, uint256[] memory expectedStack, string memory errString)
+        internal
+        view
+    {
         checkHappy(rainString, LibContext.build(new uint256[][](0), new SignedContextV1[](0)), expectedStack, errString);
     }
 
@@ -229,7 +232,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         uint256[][] memory context,
         uint256[] memory expectedStack,
         string memory errString
-    ) internal {
+    ) internal view {
         (uint256[] memory stack, uint256[] memory kvs) = parseAndEval(rainString, context);
 
         assertEq(stack.length, expectedStack.length, errString);
@@ -239,7 +242,10 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         assertEq(kvs.length, 0);
     }
 
-    function checkHappyKVs(bytes memory rainString, uint256[] memory expectedKVs, string memory errString) internal {
+    function checkHappyKVs(bytes memory rainString, uint256[] memory expectedKVs, string memory errString)
+        internal
+        view
+    {
         (uint256[] memory stack, uint256[] memory kvs) = parseAndEval(rainString);
 
         assertEq(stack.length, 0);

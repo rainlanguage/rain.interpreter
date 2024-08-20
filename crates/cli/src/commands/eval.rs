@@ -1,7 +1,7 @@
 use crate::execute::Execute;
 use crate::fork::NewForkedEvmCliArgs;
 use crate::output::SupportedOutputEncoding;
-use alloy_primitives::{Address, U256};
+use alloy::primitives::{Address, U256};
 use anyhow::anyhow;
 use anyhow::Context;
 use anyhow::Result;
@@ -134,7 +134,7 @@ mod tests {
                 fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
             },
             fork_eval_args: ForkEvalCliArgs {
-                rainlang_string: r"_: int-add(10 2), _: context<0 0>(), _:context<0 1>();".into(),
+                rainlang_string: r"_: add(10 2), _: context<0 0>(), _:context<0 1>();".into(),
                 source_index: 0,
                 deployer: *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
                 namespace: "0x123".into(),

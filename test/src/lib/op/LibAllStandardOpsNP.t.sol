@@ -12,13 +12,13 @@ import "src/lib/op/LibAllStandardOpsNP.sol";
 /// logic can only be tested by deploying an interpreter and running it.
 contract LibAllStandardOpsNPTest is Test {
     /// Test that the dynamic length of the function pointers is correct.
-    function testIntegrityFunctionPointersLength() external {
+    function testIntegrityFunctionPointersLength() external pure {
         bytes memory integrityFunctionPointers = LibAllStandardOpsNP.integrityFunctionPointers();
         assertEq(integrityFunctionPointers.length, ALL_STANDARD_OPS_LENGTH * 2);
     }
 
     /// Test that the dynamic length of the function pointers is correct.
-    function testOpcodeFunctionPointersLength() external {
+    function testOpcodeFunctionPointersLength() external pure {
         bytes memory functionPointers = LibAllStandardOpsNP.opcodeFunctionPointers();
         // Each function pointer is 2 bytes.
         assertEq(functionPointers.length, ALL_STANDARD_OPS_LENGTH * 2);
@@ -26,7 +26,7 @@ contract LibAllStandardOpsNPTest is Test {
 
     /// Test that the integrity function pointers length and opcode function
     /// pointers length are the same.
-    function testIntegrityAndOpcodeFunctionPointersLength() external {
+    function testIntegrityAndOpcodeFunctionPointersLength() external pure {
         bytes memory integrityFunctionPointers = LibAllStandardOpsNP.integrityFunctionPointers();
         bytes memory functionPointers = LibAllStandardOpsNP.opcodeFunctionPointers();
 

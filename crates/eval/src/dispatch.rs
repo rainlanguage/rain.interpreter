@@ -1,4 +1,4 @@
-use alloy_primitives::{Address, U256};
+use alloy::primitives::{Address, U256};
 use rain_interpreter_bindings::IInterpreterV2::EncodedDispatch;
 
 #[derive(Debug, PartialEq)]

@@ -24,7 +24,7 @@ contract LibOpEveryNPTest is OpTest {
         uint8 inputs,
         uint8 outputs,
         uint16 operandData
-    ) external {
+    ) external pure {
         inputs = uint8(bound(inputs, 1, 0x0F));
         outputs = uint8(bound(outputs, 1, 0x0F));
 
@@ -37,7 +37,7 @@ contract LibOpEveryNPTest is OpTest {
 
     /// Directly test the integrity logic of LibOpEveryNP. This tests the unhappy
     /// path where the operand is invalid due to 0 inputs.
-    function testOpEveryNPIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external {
+    function testOpEveryNPIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpEveryNP.integrity(state, Operand.wrap(0));
         // Calc inputs will be minimum 1.
         assertEq(calcInputs, 1);
@@ -45,7 +45,7 @@ contract LibOpEveryNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpEveryNP.
-    function testOpEveryNPRun(uint256[] memory inputs) external {
+    function testOpEveryNPRun(uint256[] memory inputs) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length != 0);
         vm.assume(inputs.length <= 0x0F);

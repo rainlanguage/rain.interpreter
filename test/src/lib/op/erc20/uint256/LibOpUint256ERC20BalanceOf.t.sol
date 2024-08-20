@@ -12,7 +12,7 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 /// @title LibOpUint256ERC20BalanceOfTest
 /// @notice Test the opcode for getting the balance of an erc20 token.
 contract LibOpUint256ERC20BalanceOfTest is OpTest {
-    function testOpERC20BalanceOfNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+    function testOpERC20BalanceOfNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256ERC20BalanceOf.integrity(state, operand);
 
         assertEq(calcInputs, 2);

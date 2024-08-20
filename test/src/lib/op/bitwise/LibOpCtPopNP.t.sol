@@ -22,7 +22,7 @@ import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 contract LibOpCtPopNPTest is OpTest {
     /// Directly test the integrity logic of LibOpCtPopNP. All possible operands
     /// result in the same number of inputs and outputs, (1, 1).
-    function testOpCtPopNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+    function testOpCtPopNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpCtPopNP.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
@@ -30,7 +30,7 @@ contract LibOpCtPopNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpCtPopNP. This tests that the
     /// opcode correctly pushes the ct pop onto the stack.
-    function testOpCtPopNPRun(uint256 x) external {
+    function testOpCtPopNPRun(uint256 x) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = x;
@@ -39,7 +39,7 @@ contract LibOpCtPopNPTest is OpTest {
     }
 
     /// Test the eval of a ct pop opcode parsed from a string.
-    function testOpCtPopNPEval(uint256 x) external {
+    function testOpCtPopNPEval(uint256 x) external view {
         uint256[] memory stack = new uint256[](1);
         stack[0] = LibCtPop.ctpop(x) * 1e18;
         checkHappy(bytes(string.concat("_: bitwise-count-ones(", Strings.toString(x), "e-18);")), stack, "");

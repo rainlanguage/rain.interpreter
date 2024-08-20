@@ -23,7 +23,7 @@ contract LibParseLiteralDecimalTest is Test {
     using LibParseLiteral for ParseState;
     using LibParseLiteralDecimal for ParseState;
 
-    function checkParseDecimal(string memory data, uint256 expectedValue, uint256 expectedCursorAfter) internal {
+    function checkParseDecimal(string memory data, uint256 expectedValue, uint256 expectedCursorAfter) internal pure {
         ParseState memory state = LibParseState.newState(bytes(data), "", "", "");
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         (uint256 cursorAfter, uint256 value) = state.parseDecimal(cursor, Pointer.unwrap(state.data.endDataPointer()));
@@ -58,14 +58,14 @@ contract LibParseLiteralDecimalTest is Test {
     }
 
     /// Fuzz and round trip.
-    function testParseLiteralDecimalRoundTrip(uint256 value) external {
+    function testParseLiteralDecimalRoundTrip(uint256 value) external pure {
         value = bound(value, 0, type(uint256).max / 1e18);
         string memory valueStr = Strings.toString(value);
         checkParseDecimal(valueStr, value * 1e18, bytes(valueStr).length);
     }
 
     /// Check some specific examples.
-    function testParseLiteralDecimalSpecific() external {
+    function testParseLiteralDecimalSpecific() external pure {
         checkParseDecimal("0", 0e18, 1);
         checkParseDecimal("1", 1e18, 1);
         checkParseDecimal("2", 2e18, 1);
@@ -80,7 +80,7 @@ contract LibParseLiteralDecimalTest is Test {
     }
 
     /// Check some examples of decimals.
-    function testParseLiteralDecimalDecimals() external {
+    function testParseLiteralDecimalDecimals() external pure {
         checkParseDecimal("0.0", 0e18, 3);
         checkParseDecimal("1.0", 1e18, 3);
         checkParseDecimal("2.0", 2e18, 3);
@@ -120,7 +120,7 @@ contract LibParseLiteralDecimalTest is Test {
 
     /// Check some examples of exponents.
     /// Checks e in the 2nd position.
-    function testParseLiteralDecimalExponents() external {
+    function testParseLiteralDecimalExponents() external pure {
         checkParseDecimal("0e0", 0e18, 3);
         checkParseDecimal("1e0", 1e18, 3);
         checkParseDecimal("2e0", 2e18, 3);
@@ -160,7 +160,7 @@ contract LibParseLiteralDecimalTest is Test {
 
     /// Check some examples of exponents.
     /// Checks e in the 3rd position.
-    function testParseLiteralDecimalExponents2() external {
+    function testParseLiteralDecimalExponents2() external pure {
         checkParseDecimal("0e00", 0e18, 4);
         checkParseDecimal("1e00", 1e18, 4);
         checkParseDecimal("2e00", 2e18, 4);
@@ -211,7 +211,7 @@ contract LibParseLiteralDecimalTest is Test {
     }
 
     // Test integer with capital E
-    function testParseLiteralDecimalExponents2Capital() external {
+    function testParseLiteralDecimalExponents2Capital() external pure {
         checkParseDecimal("0E00", 0e18, 4);
         checkParseDecimal("1E00", 1e18, 4);
         checkParseDecimal("2E00", 2e18, 4);
@@ -249,7 +249,7 @@ contract LibParseLiteralDecimalTest is Test {
     }
 
     // Test decimals with exponents.
-    function testParseLiteralDecimalExponents3() external {
+    function testParseLiteralDecimalExponents3() external pure {
         checkParseDecimal("0.0e0", 0, 5);
         checkParseDecimal("1.0e0", 1e18, 5);
         checkParseDecimal("2.0e0", 2e18, 5);
@@ -304,7 +304,7 @@ contract LibParseLiteralDecimalTest is Test {
     }
 
     /// Test capital E
-    function testParseLiteralDecimalExponents4() external {
+    function testParseLiteralDecimalExponents4() external pure {
         checkParseDecimal("0.0E0", 0, 5);
         checkParseDecimal("1.0E0", 1e18, 5);
         checkParseDecimal("2.0E0", 2e18, 5);
@@ -335,7 +335,7 @@ contract LibParseLiteralDecimalTest is Test {
     }
 
     /// Test some negative exponents.
-    function testParseLiteralDecimalNegativeExponents() external {
+    function testParseLiteralDecimalNegativeExponents() external pure {
         checkParseDecimal("0.0e-0", 0, 6);
         checkParseDecimal("1.0e-0", 1e18, 6);
         checkParseDecimal("2.0e-0", 2e18, 6);
@@ -383,7 +383,7 @@ contract LibParseLiteralDecimalTest is Test {
     }
 
     /// Test trailing zeros.
-    function testParseLiteralDecimalTrailingZeros() external {
+    function testParseLiteralDecimalTrailingZeros() external pure {
         checkParseDecimal("0.000000000000000000", 0, 20);
         checkParseDecimal("1.000000000000000000", 1e18, 20);
         checkParseDecimal("2.000000000000000000", 2e18, 20);
@@ -413,7 +413,7 @@ contract LibParseLiteralDecimalTest is Test {
     }
 
     // Test some unrelated data after the decimal.
-    function testParseLiteralDecimalUnrelated() external {
+    function testParseLiteralDecimalUnrelated() external pure {
         checkParseDecimal("0.0hello", 0, 3);
         checkParseDecimal("1.0hello", 1e18, 3);
         checkParseDecimal("2.0hello", 2e18, 3);

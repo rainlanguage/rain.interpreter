@@ -19,6 +19,7 @@ contract LibOpETest is OpTest {
     /// Directly test the integrity logic of LibOpE.
     function testOpEIntegrity(IntegrityCheckStateNP memory state, uint8 inputs, uint8 outputs, uint16 operandData)
         external
+        pure
     {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
@@ -31,7 +32,7 @@ contract LibOpETest is OpTest {
 
     /// Directly test the runtime logic of LibOpE. This tests that the
     /// opcode correctly pushes the mathematical constant e onto the stack.
-    function testOpERun(uint16 operandData) external {
+    function testOpERun(uint16 operandData) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         Operand operand = LibOperand.build(0, 1, operandData);
         uint256[] memory inputs = new uint256[](0);
@@ -39,7 +40,7 @@ contract LibOpETest is OpTest {
     }
 
     /// Test the eval of a mathematical constant e opcode parsed from a string.
-    function testOpEEval() external {
+    function testOpEEval() external view {
         bytes memory bytecode = iDeployer.parse2("_: e();");
 
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(

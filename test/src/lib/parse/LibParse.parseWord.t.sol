@@ -17,7 +17,7 @@ contract LibParseParseWordTest is Test {
     /// For all input bytes length [1,31] the two implementations will agree.
     /// Length 0 is undefined behaviour for word parsing so is not tested.
     /// Length 32+ will error on the real implementation so is not tested.
-    function testLibParseParseWordReferenceImplementation(bytes memory data, uint256 mask) external {
+    function testLibParseParseWordReferenceImplementation(bytes memory data, uint256 mask) external pure {
         vm.assume(data.length <= 31);
         vm.assume(data.length > 0);
         uint256 cursor = Pointer.unwrap(data.dataPointer());
@@ -37,7 +37,7 @@ contract LibParseParseWordTest is Test {
         assertEq(word, expectedWord);
     }
 
-    function checkParseWord(bytes memory data, uint256 mask, uint256 expectedI, bytes32 expectedWord) public {
+    function checkParseWord(bytes memory data, uint256 mask, uint256 expectedI, bytes32 expectedWord) public pure {
         uint256 cursor = Pointer.unwrap(data.dataPointer());
         uint256 end = cursor + data.length;
 
@@ -81,7 +81,7 @@ contract LibParseParseWordTest is Test {
 
     /// Ensure that parse word can't exceed the end even if there are valid
     /// looking bytes in memory.
-    function testLibParseParseWordEnd(uint256 length) external {
+    function testLibParseParseWordEnd(uint256 length) external pure {
         length = bound(length, 1, 0x1F);
         bytes memory data = "01234567890123456789012345678901";
         assembly ("memory-safe") {

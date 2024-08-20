@@ -8,14 +8,14 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 contract LibOpHeadroomTest is OpTest {
     /// Directly test the integrity logic of LibOpHeadroom.
     /// Inputs are always 1, outputs are always 1.
-    function testOpHeadroomIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+    function testOpHeadroomIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpHeadroom.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
     }
 
     /// Directly test the runtime logic of LibOpHeadroom.
-    function testOpHeadroomRun(uint256 a, uint16 operandData) public {
+    function testOpHeadroomRun(uint256 a, uint16 operandData) public view {
         a = bound(a, 0, type(uint64).max - 1e18);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
@@ -27,7 +27,7 @@ contract LibOpHeadroomTest is OpTest {
     }
 
     /// Test the eval of `headroom`.
-    function testOpHeadroomEval() external {
+    function testOpHeadroomEval() external view {
         checkHappy("_: headroom(0);", 1e18, "0");
         checkHappy("_: headroom(1);", 1e18, "1");
         checkHappy("_: headroom(0.5);", 0.5e18, "0.5");

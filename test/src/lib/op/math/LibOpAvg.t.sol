@@ -8,14 +8,14 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 contract LibOpAvgTest is OpTest {
     /// Directly test the integrity logic of LibOpAvg.
     /// Inputs are always 2, outputs are always 1.
-    function testOpAvgIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+    function testOpAvgIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpAvg.integrity(state, operand);
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
     }
 
     /// Directly test the runtime logic of LibOpAvg.
-    function testOpAvgRun(uint256 a, uint256 b, uint16 operandData) public {
+    function testOpAvgRun(uint256 a, uint256 b, uint16 operandData) public view {
         // @TODO This is a hack to get around the fact that we are very likely
         // to overflow uint256 if we just fuzz it, and that it's clunky to
         // determine whether it will overflow or not. Basically the overflow
@@ -35,7 +35,7 @@ contract LibOpAvgTest is OpTest {
     }
 
     /// Test the eval of `avg`.
-    function testOpAvgEval() external {
+    function testOpAvgEval() external view {
         checkHappy("_: avg(0 0);", 0, "0 0");
         checkHappy("_: avg(0 1);", 5e17, "0 1");
         checkHappy("_: avg(1 0);", 5e17, "1 0");
