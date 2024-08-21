@@ -26,15 +26,15 @@
 //         opReferenceCheck(state, operand, LibOpFloor.referenceFn, LibOpFloor.integrity, LibOpFloor.run, inputs);
 //     }
 
-    // /// Test the eval of `floor`.
-    // function testOpFloorEval() external view {
-    //     checkHappy("_: floor(0);", 0, "0");
-    //     checkHappy("_: floor(1);", 1e18, "1");
-    //     checkHappy("_: floor(0.5);", 0, "0.5");
-    //     checkHappy("_: floor(2);", 2e18, "2");
-    //     checkHappy("_: floor(3);", 3e18, "3");
-    //     checkHappy("_: floor(3.8);", 3e18, "3.8");
-    // }
+// /// Test the eval of `floor`.
+// function testOpFloorEval() external view {
+//     checkHappy("_: floor(0);", 0, "0");
+//     checkHappy("_: floor(1);", 1e18, "1");
+//     checkHappy("_: floor(0.5);", 0, "0.5");
+//     checkHappy("_: floor(2);", 2e18, "2");
+//     checkHappy("_: floor(3);", 3e18, "3");
+//     checkHappy("_: floor(3.8);", 3e18, "3.8");
+// }
 
 //     /// Test the eval of `floor` for bad inputs.
 //     function testOpFloorZeroInputs() external {

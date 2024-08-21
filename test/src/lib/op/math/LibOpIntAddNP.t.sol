@@ -20,23 +20,23 @@
 //         assertEq(calcOutputs, 1);
 //     }
 
-    // /// Directly test the integrity logic of LibOpAdd. This tests the unhappy
-    // /// path where the operand is invalid due to 0 inputs.
-    // function testOpAddIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
-    //     (uint256 calcInputs, uint256 calcOutputs) = LibOpAdd.integrity(state, Operand.wrap(0));
-    //     // Calc inputs will be minimum 2.
-    //     assertEq(calcInputs, 2);
-    //     assertEq(calcOutputs, 1);
-    // }
+// /// Directly test the integrity logic of LibOpAdd. This tests the unhappy
+// /// path where the operand is invalid due to 0 inputs.
+// function testOpAddIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
+//     (uint256 calcInputs, uint256 calcOutputs) = LibOpAdd.integrity(state, Operand.wrap(0));
+//     // Calc inputs will be minimum 2.
+//     assertEq(calcInputs, 2);
+//     assertEq(calcOutputs, 1);
+// }
 
-    // /// Directly test the integrity logic of LibOpAdd. This tests the unhappy
-    // /// path where the operand is invalid due to 1 inputs.
-    // function testOpAddIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external pure {
-    //     (uint256 calcInputs, uint256 calcOutputs) = LibOpAdd.integrity(state, Operand.wrap(0x010000));
-    //     // Calc inputs will be minimum 2.
-    //     assertEq(calcInputs, 2);
-    //     assertEq(calcOutputs, 1);
-    // }
+// /// Directly test the integrity logic of LibOpAdd. This tests the unhappy
+// /// path where the operand is invalid due to 1 inputs.
+// function testOpAddIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external pure {
+//     (uint256 calcInputs, uint256 calcOutputs) = LibOpAdd.integrity(state, Operand.wrap(0x010000));
+//     // Calc inputs will be minimum 2.
+//     assertEq(calcInputs, 2);
+//     assertEq(calcOutputs, 1);
+// }
 
 //     /// Directly test the runtime logic of LibOpAdd.
 //     function testOpAddRun(uint256[] memory inputs) external {
@@ -79,32 +79,32 @@
 //         checkBadOutputs("_ _: add(5e-18 6e-18);", 2, 1, 2);
 //     }
 
-    // /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
-    // /// Tests the happy path where the addition does not overflow.
-    // function testOpAddEval2InputsHappy() external view {
-    //     checkHappy("_: add(5e-18 6e-18);", 11, "5 + 6");
-    //     checkHappy("_: add(6e-18 5e-18);", 11, "6 + 5");
-    // }
+// /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
+// /// Tests the happy path where the addition does not overflow.
+// function testOpAddEval2InputsHappy() external view {
+//     checkHappy("_: add(5e-18 6e-18);", 11, "5 + 6");
+//     checkHappy("_: add(6e-18 5e-18);", 11, "6 + 5");
+// }
 
-    // /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
-    // /// Tests that adding 0 to 0 is 0.
-    // function testOpAddEval2InputsHappyZero() external view {
-    //     checkHappy("_: add(0 0);", 0, "0 + 0");
-    // }
+// /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
+// /// Tests that adding 0 to 0 is 0.
+// function testOpAddEval2InputsHappyZero() external view {
+//     checkHappy("_: add(0 0);", 0, "0 + 0");
+// }
 
-    // /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
-    // /// Tests that adding 0 to 1 is 1.
-    // function testOpAddEval2InputsHappyZeroOne() external view {
-    //     checkHappy("_: add(0 1e-18);", 1, "0 + 1");
-    //     checkHappy("_: add(1e-18 0);", 1, "1 + 0");
-    // }
+// /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
+// /// Tests that adding 0 to 1 is 1.
+// function testOpAddEval2InputsHappyZeroOne() external view {
+//     checkHappy("_: add(0 1e-18);", 1, "0 + 1");
+//     checkHappy("_: add(1e-18 0);", 1, "1 + 0");
+// }
 
-    // /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
-    // /// Tests that adding 0 to max-value() is max-value().
-    // function testOpAddEval2InputsHappyZeroMax() external view {
-    //     checkHappy("_: add(0 max-value());", type(uint256).max, "0 + max-value()");
-    //     checkHappy("_: add(max-value() 0);", type(uint256).max, "max-value() + 0");
-    // }
+// /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
+// /// Tests that adding 0 to max-value() is max-value().
+// function testOpAddEval2InputsHappyZeroMax() external view {
+//     checkHappy("_: add(0 max-value());", type(uint256).max, "0 + max-value()");
+//     checkHappy("_: add(max-value() 0);", type(uint256).max, "max-value() + 0");
+// }
 
 //     /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
 //     /// Tests the unhappy path where the addition does overflow.
@@ -113,16 +113,16 @@
 //         checkUnhappyOverflow("_: add(1e-18 max-value());");
 //     }
 
-    // /// Test the eval of `add` opcode parsed from a string. Tests three inputs.
-    // /// Tests the happy path where the addition does not overflow.
-    // function testOpAddEval3InputsHappy() external view {
-    //     checkHappy("_: add(5e-18 6e-18 7e-18);", 18, "5 + 6 + 7");
-    //     checkHappy("_: add(6e-18 5e-18 7e-18);", 18, "6 + 5 + 7");
-    //     checkHappy("_: add(7e-18 6e-18 5e-18);", 18, "7 + 6 + 5");
-    //     checkHappy("_: add(5e-18 7e-18 6e-18);", 18, "5 + 7 + 6");
-    //     checkHappy("_: add(6e-18 7e-18 5e-18);", 18, "6 + 7 + 5");
-    //     checkHappy("_: add(7e-18 5e-18 6e-18);", 18, "7 + 5 + 6");
-    // }
+// /// Test the eval of `add` opcode parsed from a string. Tests three inputs.
+// /// Tests the happy path where the addition does not overflow.
+// function testOpAddEval3InputsHappy() external view {
+//     checkHappy("_: add(5e-18 6e-18 7e-18);", 18, "5 + 6 + 7");
+//     checkHappy("_: add(6e-18 5e-18 7e-18);", 18, "6 + 5 + 7");
+//     checkHappy("_: add(7e-18 6e-18 5e-18);", 18, "7 + 6 + 5");
+//     checkHappy("_: add(5e-18 7e-18 6e-18);", 18, "5 + 7 + 6");
+//     checkHappy("_: add(6e-18 7e-18 5e-18);", 18, "6 + 7 + 5");
+//     checkHappy("_: add(7e-18 5e-18 6e-18);", 18, "7 + 5 + 6");
+// }
 
 //     /// Test the eval of `add` opcode parsed from a string. Tests three inputs.
 //     /// Tests the unhappy path where the addition does overflow.

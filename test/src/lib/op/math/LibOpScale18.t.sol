@@ -104,13 +104,13 @@
 //         checkUnhappy("_: scale-18<0>(1e52);", stdError.arithmeticError);
 //     }
 
-    // /// Test the eval of `uint256-to-decimal18` which is an alias of `scale-18<0>`.
-    // function testOpUint256ToDecimal18Eval() external view {
-    //     checkHappy("_: uint256-to-decimal18(0);", 0, "0");
-    //     checkHappy("_: uint256-to-decimal18(1e-18);", 1e18, "1");
-    //     checkHappy("_: uint256-to-decimal18(2e-18);", 2e18, "2");
-    //     checkHappy("_: uint256-to-decimal18(1);", 1e36, "1e18");
-    // }
+// /// Test the eval of `uint256-to-decimal18` which is an alias of `scale-18<0>`.
+// function testOpUint256ToDecimal18Eval() external view {
+//     checkHappy("_: uint256-to-decimal18(0);", 0, "0");
+//     checkHappy("_: uint256-to-decimal18(1e-18);", 1e18, "1");
+//     checkHappy("_: uint256-to-decimal18(2e-18);", 2e18, "2");
+//     checkHappy("_: uint256-to-decimal18(1);", 1e36, "1e18");
+// }
 
 //     /// Test the eval of `scale-18` opcode parsed from a string.
 //     /// Tests zero inputs.

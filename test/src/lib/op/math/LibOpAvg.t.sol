@@ -34,18 +34,18 @@
 //         opReferenceCheck(state, operand, LibOpAvg.referenceFn, LibOpAvg.integrity, LibOpAvg.run, inputs);
 //     }
 
-    // /// Test the eval of `avg`.
-    // function testOpAvgEval() external view {
-    //     checkHappy("_: avg(0 0);", 0, "0 0");
-    //     checkHappy("_: avg(0 1);", 5e17, "0 1");
-    //     checkHappy("_: avg(1 0);", 5e17, "1 0");
-    //     checkHappy("_: avg(1 1);", 1e18, "1 1");
-    //     checkHappy("_: avg(1 2);", 1.5e18, "1 2");
-    //     checkHappy("_: avg(2 2);", 2e18, "2 2");
-    //     checkHappy("_: avg(2 3);", 2.5e18, "2 3");
-    //     checkHappy("_: avg(2 4);", 3e18, "2 4");
-    //     checkHappy("_: avg(4 0.5);", 2.25e18, "4 5");
-    // }
+// /// Test the eval of `avg`.
+// function testOpAvgEval() external view {
+//     checkHappy("_: avg(0 0);", 0, "0 0");
+//     checkHappy("_: avg(0 1);", 5e17, "0 1");
+//     checkHappy("_: avg(1 0);", 5e17, "1 0");
+//     checkHappy("_: avg(1 1);", 1e18, "1 1");
+//     checkHappy("_: avg(1 2);", 1.5e18, "1 2");
+//     checkHappy("_: avg(2 2);", 2e18, "2 2");
+//     checkHappy("_: avg(2 3);", 2.5e18, "2 3");
+//     checkHappy("_: avg(2 4);", 3e18, "2 4");
+//     checkHappy("_: avg(4 0.5);", 2.25e18, "4 5");
+// }
 
 //     /// Test the eval of `avg` for bad inputs.
 //     function testOpAvgEvalOneInput() external {

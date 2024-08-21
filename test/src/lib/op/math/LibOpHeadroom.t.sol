@@ -26,15 +26,15 @@
 //         opReferenceCheck(state, operand, LibOpHeadroom.referenceFn, LibOpHeadroom.integrity, LibOpHeadroom.run, inputs);
 //     }
 
-    // /// Test the eval of `headroom`.
-    // function testOpHeadroomEval() external view {
-    //     checkHappy("_: headroom(0);", 1e18, "0");
-    //     checkHappy("_: headroom(1);", 1e18, "1");
-    //     checkHappy("_: headroom(0.5);", 0.5e18, "0.5");
-    //     checkHappy("_: headroom(2);", 1e18, "2");
-    //     checkHappy("_: headroom(3);", 1e18, "3");
-    //     checkHappy("_: headroom(3.8);", 0.2e18, "3.8");
-    // }
+// /// Test the eval of `headroom`.
+// function testOpHeadroomEval() external view {
+//     checkHappy("_: headroom(0);", 1e18, "0");
+//     checkHappy("_: headroom(1);", 1e18, "1");
+//     checkHappy("_: headroom(0.5);", 0.5e18, "0.5");
+//     checkHappy("_: headroom(2);", 1e18, "2");
+//     checkHappy("_: headroom(3);", 1e18, "3");
+//     checkHappy("_: headroom(3.8);", 0.2e18, "3.8");
+// }
 
 //     /// Test the eval of `headroom` for bad inputs.
 //     function testOpHeadroomZeroInputs() external {

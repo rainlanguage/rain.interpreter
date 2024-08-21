@@ -26,14 +26,14 @@
 //         opReferenceCheck(state, operand, LibOpExp2.referenceFn, LibOpExp2.integrity, LibOpExp2.run, inputs);
 //     }
 
-    // /// Test the eval of `exp2`.
-    // function testOpExp2Eval() external view {
-    //     checkHappy("_: exp2(0);", 1e18, "2^0");
-    //     checkHappy("_: exp2(1);", 2e18, "2^1");
-    //     checkHappy("_: exp2(0.5);", 1414213562373095048, "2^0.5");
-    //     checkHappy("_: exp2(2);", 4e18, "2^2");
-    //     checkHappy("_: exp2(3);", 8e18, "2^3");
-    // }
+// /// Test the eval of `exp2`.
+// function testOpExp2Eval() external view {
+//     checkHappy("_: exp2(0);", 1e18, "2^0");
+//     checkHappy("_: exp2(1);", 2e18, "2^1");
+//     checkHappy("_: exp2(0.5);", 1414213562373095048, "2^0.5");
+//     checkHappy("_: exp2(2);", 4e18, "2^2");
+//     checkHappy("_: exp2(3);", 8e18, "2^3");
+// }
 
 //     /// Test the eval of `exp2` for bad inputs.
 //     function testOpExp2EvalBad() external {

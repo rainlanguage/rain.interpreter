@@ -34,27 +34,27 @@ pragma solidity =0.8.25;
 //         opReferenceCheck(state, operand, LibOpPow.referenceFn, LibOpPow.integrity, LibOpPow.run, inputs);
 //     }
 
-    // /// Test the eval of `power`.
-    // function testOpPowEval() external view {
-    //     // 0 ^ 0
-    //     checkHappy("_: power(0 0);", 1e18, "0 0");
-    //     // 0 ^ 1
-    //     checkHappy("_: power(0 1);", 0, "0 1");
-    //     // 1e18 ^ 0
-    //     checkHappy("_: power(1 0);", 1e18, "1e18 0");
-    //     // 1 ^ 1
-    //     checkHappy("_: power(1 1);", 1e18, "1e18 1");
-    //     // 1 ^ 2
-    //     checkHappy("_: power(1 2);", 1e18, "1e18 2");
-    //     // 2 ^ 2
-    //     checkHappy("_: power(2 2);", 4e18, "2e18 2");
-    //     // 2 ^ 3
-    //     checkHappy("_: power(2 3);", 8e18, "2e18 3");
-    //     // 2 ^ 4
-    //     checkHappy("_: power(2 4);", 16e18, "2e18 4");
-    //     // sqrt 4 = 2
-    //     checkHappy("_: power(4 0.5);", 2e18, "4e18 5");
-    // }
+// /// Test the eval of `power`.
+// function testOpPowEval() external view {
+//     // 0 ^ 0
+//     checkHappy("_: power(0 0);", 1e18, "0 0");
+//     // 0 ^ 1
+//     checkHappy("_: power(0 1);", 0, "0 1");
+//     // 1e18 ^ 0
+//     checkHappy("_: power(1 0);", 1e18, "1e18 0");
+//     // 1 ^ 1
+//     checkHappy("_: power(1 1);", 1e18, "1e18 1");
+//     // 1 ^ 2
+//     checkHappy("_: power(1 2);", 1e18, "1e18 2");
+//     // 2 ^ 2
+//     checkHappy("_: power(2 2);", 4e18, "2e18 2");
+//     // 2 ^ 3
+//     checkHappy("_: power(2 3);", 8e18, "2e18 3");
+//     // 2 ^ 4
+//     checkHappy("_: power(2 4);", 16e18, "2e18 4");
+//     // sqrt 4 = 2
+//     checkHappy("_: power(4 0.5);", 2e18, "4e18 5");
+// }
 
 //     /// Test the eval of `power` for bad inputs.
 //     function testOpPowEvalOneInput() external {

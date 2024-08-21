@@ -26,15 +26,15 @@
 //         opReferenceCheck(state, operand, LibOpFrac.referenceFn, LibOpFrac.integrity, LibOpFrac.run, inputs);
 //     }
 
-    // /// Test the eval of `frac`.
-    // function testOpFracEval() external view {
-    //     checkHappy("_: frac(0);", 0, "0");
-    //     checkHappy("_: frac(1);", 0, "1");
-    //     checkHappy("_: frac(0.5);", 0.5e18, "0.5");
-    //     checkHappy("_: frac(2);", 0, "2");
-    //     checkHappy("_: frac(3);", 0, "3");
-    //     checkHappy("_: frac(3.8);", 0.8e18, "3.8");
-    // }
+// /// Test the eval of `frac`.
+// function testOpFracEval() external view {
+//     checkHappy("_: frac(0);", 0, "0");
+//     checkHappy("_: frac(1);", 0, "1");
+//     checkHappy("_: frac(0.5);", 0.5e18, "0.5");
+//     checkHappy("_: frac(2);", 0, "2");
+//     checkHappy("_: frac(3);", 0, "3");
+//     checkHappy("_: frac(3.8);", 0.8e18, "3.8");
+// }
 
 //     /// Test the eval of `frac` for bad inputs.
 //     function testOpFracZeroInputs() external {

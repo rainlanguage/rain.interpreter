@@ -29,13 +29,13 @@
 //         );
 //     }
 
-    // /// Test the eval of `snap-to-unit`.
-    // function testOpSnapToUnitEval() external view {
-    //     // If the threshold is 1 then we always floor.
-    //     checkHappy("_: snap-to-unit(1 1);", 1e18, "1 1");
-    //     checkHappy("_: snap-to-unit(1 0.5);", 0, "1 0.5");
-    //     checkHappy("_: snap-to-unit(1 2);", 2e18, "1 2");
-    //     checkHappy("_: snap-to-unit(1 2.5);", 2e18, "1 2.5");
+// /// Test the eval of `snap-to-unit`.
+// function testOpSnapToUnitEval() external view {
+//     // If the threshold is 1 then we always floor.
+//     checkHappy("_: snap-to-unit(1 1);", 1e18, "1 1");
+//     checkHappy("_: snap-to-unit(1 0.5);", 0, "1 0.5");
+//     checkHappy("_: snap-to-unit(1 2);", 2e18, "1 2");
+//     checkHappy("_: snap-to-unit(1 2.5);", 2e18, "1 2.5");
 
 //         // If the threshold is 0.2 then we floor or ceil anything within the
 //         // threshold.

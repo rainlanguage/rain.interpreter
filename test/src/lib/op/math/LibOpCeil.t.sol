@@ -26,14 +26,14 @@
 //         opReferenceCheck(state, operand, LibOpCeil.referenceFn, LibOpCeil.integrity, LibOpCeil.run, inputs);
 //     }
 
-    // /// Test the eval of `ceil`.
-    // function testOpCeilEval() external view {
-    //     checkHappy("_: ceil(0);", 0, "0");
-    //     checkHappy("_: ceil(1);", 1e18, "1");
-    //     checkHappy("_: ceil(0.5);", 1e18, "0.5");
-    //     checkHappy("_: ceil(2);", 2e18, "2");
-    //     checkHappy("_: ceil(2.5);", 3e18, "2.5");
-    // }
+// /// Test the eval of `ceil`.
+// function testOpCeilEval() external view {
+//     checkHappy("_: ceil(0);", 0, "0");
+//     checkHappy("_: ceil(1);", 1e18, "1");
+//     checkHappy("_: ceil(0.5);", 1e18, "0.5");
+//     checkHappy("_: ceil(2);", 2e18, "2");
+//     checkHappy("_: ceil(2.5);", 3e18, "2.5");
+// }
 
 //     /// Test the eval of `ceil` for bad inputs.
 //     function testOpCeilZeroInputs() external {

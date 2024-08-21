@@ -27,15 +27,15 @@
 //         opReferenceCheck(state, operand, LibOpLog10.referenceFn, LibOpLog10.integrity, LibOpLog10.run, inputs);
 //     }
 
-    // /// Test the eval of `log10`.
-    // function testOpLog10Eval() external view {
-    //     checkHappy("_: log10(1);", 0, "log10 1");
-    //     checkHappy("_: log10(2);", 301029995663981195, "log10 2");
-    //     checkHappy("_: log10(2.718281828459045235);", 434294481903251823, "log2 e");
-    //     checkHappy("_: log10(3);", 477121254719662432, "log2 3");
-    //     checkHappy("_: log10(4);", 602059991327962390, "log2 4");
-    //     checkHappy("_: log10(5);", 698970004336018800, "log2 5");
-    // }
+// /// Test the eval of `log10`.
+// function testOpLog10Eval() external view {
+//     checkHappy("_: log10(1);", 0, "log10 1");
+//     checkHappy("_: log10(2);", 301029995663981195, "log10 2");
+//     checkHappy("_: log10(2.718281828459045235);", 434294481903251823, "log2 e");
+//     checkHappy("_: log10(3);", 477121254719662432, "log2 3");
+//     checkHappy("_: log10(4);", 602059991327962390, "log2 4");
+//     checkHappy("_: log10(5);", 698970004336018800, "log2 5");
+// }
 
 //     /// Test the eval of `log10` for bad inputs.
 //     function testOpLog10ZeroInputs() external {

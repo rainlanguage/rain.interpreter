@@ -23,23 +23,23 @@
 //         assertEq(calcOutputs, 1);
 //     }
 
-    // /// Directly test the integrity logic of LibOpMul. This tests the
-    // /// unhappy path where the operand is invalid due to 0 inputs.
-    // function testOpMulIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
-    //     (uint256 calcInputs, uint256 calcOutputs) = LibOpMul.integrity(state, Operand.wrap(0));
-    //     // Calc inputs will be minimum 2.
-    //     assertEq(calcInputs, 2);
-    //     assertEq(calcOutputs, 1);
-    // }
+// /// Directly test the integrity logic of LibOpMul. This tests the
+// /// unhappy path where the operand is invalid due to 0 inputs.
+// function testOpMulIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
+//     (uint256 calcInputs, uint256 calcOutputs) = LibOpMul.integrity(state, Operand.wrap(0));
+//     // Calc inputs will be minimum 2.
+//     assertEq(calcInputs, 2);
+//     assertEq(calcOutputs, 1);
+// }
 
-    // /// Directly test the integrity logic of LibOpMul. This tests the
-    // /// unhappy path where the operand is invalid due to 1 inputs.
-    // function testOpDecimal18MulNPIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external pure {
-    //     (uint256 calcInputs, uint256 calcOutputs) = LibOpMul.integrity(state, Operand.wrap(0x010000));
-    //     // Calc inputs will be minimum 2.
-    //     assertEq(calcInputs, 2);
-    //     assertEq(calcOutputs, 1);
-    // }
+// /// Directly test the integrity logic of LibOpMul. This tests the
+// /// unhappy path where the operand is invalid due to 1 inputs.
+// function testOpDecimal18MulNPIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external pure {
+//     (uint256 calcInputs, uint256 calcOutputs) = LibOpMul.integrity(state, Operand.wrap(0x010000));
+//     // Calc inputs will be minimum 2.
+//     assertEq(calcInputs, 2);
+//     assertEq(calcOutputs, 1);
+// }
 
 //     /// Directly test the runtime logic of LibOpMul.
 //     function testOpMulRun(uint256[] memory inputs) public {
@@ -85,23 +85,23 @@
 //         checkBadOutputs("_ _: mul(0 0);", 2, 1, 2);
 //     }
 
-    // /// Test the eval of `mul` opcode parsed from a string.
-    // /// Tests two inputs.
-    // /// Tests the happy path where we do not overflow.
-    // function testOpMulEvalTwoInputsHappy() external view {
-    //     checkHappy("_: mul(0 1);", 0, "0 1");
-    //     checkHappy("_: mul(1 1);", 1e18, "1 1");
-    //     checkHappy("_: mul(1 2);", 2e18, "1 2");
-    //     checkHappy("_: mul(2 1);", 2e18, "2 1");
-    //     checkHappy("_: mul(2 2);", 4e18, "2 2");
-    //     checkHappy("_: mul(2 0.1);", 2e17, "2 0.1");
-    //     checkHappy("_: mul(1 0.1);", 1e17, "1 0.1");
-    //     checkHappy("_: mul(1 0.01);", 1e16, "1 0.01");
-    //     checkHappy("_: mul(0.001 0.001);", 1e12, "0.001 0.001");
-    //     checkHappy("_: mul(10 10);", 1e20, "10 10");
-    //     // Test an intermediate overflow.
-    //     checkHappy("_: mul(1 max-value());", type(uint256).max, "1 max-value()");
-    // }
+// /// Test the eval of `mul` opcode parsed from a string.
+// /// Tests two inputs.
+// /// Tests the happy path where we do not overflow.
+// function testOpMulEvalTwoInputsHappy() external view {
+//     checkHappy("_: mul(0 1);", 0, "0 1");
+//     checkHappy("_: mul(1 1);", 1e18, "1 1");
+//     checkHappy("_: mul(1 2);", 2e18, "1 2");
+//     checkHappy("_: mul(2 1);", 2e18, "2 1");
+//     checkHappy("_: mul(2 2);", 4e18, "2 2");
+//     checkHappy("_: mul(2 0.1);", 2e17, "2 0.1");
+//     checkHappy("_: mul(1 0.1);", 1e17, "1 0.1");
+//     checkHappy("_: mul(1 0.01);", 1e16, "1 0.01");
+//     checkHappy("_: mul(0.001 0.001);", 1e12, "0.001 0.001");
+//     checkHappy("_: mul(10 10);", 1e20, "10 10");
+//     // Test an intermediate overflow.
+//     checkHappy("_: mul(1 max-value());", type(uint256).max, "1 max-value()");
+// }
 
 //     /// Test the eval of `mul` opcode parsed from a string.
 //     /// Tests two inputs.
@@ -114,26 +114,26 @@
 //         checkUnhappy("_: mul(1e52 1e12);", abi.encodeWithSelector(PRBMath_MulDiv18_Overflow.selector, 1e70, 1e30));
 //     }
 
-    // /// Test the eval of `mul` opcode parsed from a string.
-    // /// Tests three inputs.
-    // /// Tests the happy path where we do not divide by zero or overflow.
-    // function testOpMulEvalThreeInputsHappy() external view {
-    //     checkHappy("_: mul(0 0 0);", 0, "0 0 0");
-    //     checkHappy("_: mul(1 0 0);", 0, "1 0 0");
-    //     checkHappy("_: mul(1 1 0);", 0, "1 1 0");
-    //     checkHappy("_: mul(1 1 1);", 1e18, "1 1 1");
-    //     checkHappy("_: mul(1 1 2);", 2e18, "1 1 2");
-    //     checkHappy("_: mul(1 2 1);", 2e18, "1 2 1");
-    //     checkHappy("_: mul(2 1 1);", 2e18, "2 1 1");
-    //     checkHappy("_: mul(2 2 2);", 8e18, "2 2 2");
-    //     checkHappy("_: mul(2 0.1 1);", 2e17, "2 0.1 1");
-    //     checkHappy("_: mul(1 0.1 1);", 1e17, "1 0.1 1");
-    //     checkHappy("_: mul(1 0.01 1);", 1e16, "1 0.01 1");
-    //     checkHappy("_: mul(0.001 0.001 0.001);", 1e9, "0.001 0.001 0.001");
-    //     checkHappy("_: mul(10 10 10);", 1e21, "10 10 10");
-    //     // Test an intermediate overflow.
-    //     checkHappy("_: mul(1 max-value() 1);", type(uint256).max, "1 max-value() 1");
-    // }
+// /// Test the eval of `mul` opcode parsed from a string.
+// /// Tests three inputs.
+// /// Tests the happy path where we do not divide by zero or overflow.
+// function testOpMulEvalThreeInputsHappy() external view {
+//     checkHappy("_: mul(0 0 0);", 0, "0 0 0");
+//     checkHappy("_: mul(1 0 0);", 0, "1 0 0");
+//     checkHappy("_: mul(1 1 0);", 0, "1 1 0");
+//     checkHappy("_: mul(1 1 1);", 1e18, "1 1 1");
+//     checkHappy("_: mul(1 1 2);", 2e18, "1 1 2");
+//     checkHappy("_: mul(1 2 1);", 2e18, "1 2 1");
+//     checkHappy("_: mul(2 1 1);", 2e18, "2 1 1");
+//     checkHappy("_: mul(2 2 2);", 8e18, "2 2 2");
+//     checkHappy("_: mul(2 0.1 1);", 2e17, "2 0.1 1");
+//     checkHappy("_: mul(1 0.1 1);", 1e17, "1 0.1 1");
+//     checkHappy("_: mul(1 0.01 1);", 1e16, "1 0.01 1");
+//     checkHappy("_: mul(0.001 0.001 0.001);", 1e9, "0.001 0.001 0.001");
+//     checkHappy("_: mul(10 10 10);", 1e21, "10 10 10");
+//     // Test an intermediate overflow.
+//     checkHappy("_: mul(1 max-value() 1);", type(uint256).max, "1 max-value() 1");
+// }
 
 //     /// Test the eval of `mul` opcode parsed from a string.
 //     /// Tests three inputs.

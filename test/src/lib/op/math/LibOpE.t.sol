@@ -30,18 +30,18 @@
 //         assertEq(calcOutputs, 1);
 //     }
 
-    // /// Directly test the runtime logic of LibOpE. This tests that the
-    // /// opcode correctly pushes the mathematical constant e onto the stack.
-    // function testOpERun(uint16 operandData) external view {
-    //     InterpreterStateNP memory state = opTestDefaultInterpreterState();
-    //     Operand operand = LibOperand.build(0, 1, operandData);
-    //     uint256[] memory inputs = new uint256[](0);
-    //     opReferenceCheck(state, operand, LibOpE.referenceFn, LibOpE.integrity, LibOpE.run, inputs);
-    // }
+// /// Directly test the runtime logic of LibOpE. This tests that the
+// /// opcode correctly pushes the mathematical constant e onto the stack.
+// function testOpERun(uint16 operandData) external view {
+//     InterpreterStateNP memory state = opTestDefaultInterpreterState();
+//     Operand operand = LibOperand.build(0, 1, operandData);
+//     uint256[] memory inputs = new uint256[](0);
+//     opReferenceCheck(state, operand, LibOpE.referenceFn, LibOpE.integrity, LibOpE.run, inputs);
+// }
 
-    // /// Test the eval of a mathematical constant e opcode parsed from a string.
-    // function testOpEEval() external view {
-    //     bytes memory bytecode = iDeployer.parse2("_: e();");
+// /// Test the eval of a mathematical constant e opcode parsed from a string.
+// function testOpEEval() external view {
+//     bytes memory bytecode = iDeployer.parse2("_: e();");
 
 //         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
 //             EvalV4({

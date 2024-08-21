@@ -27,16 +27,16 @@
 //         opReferenceCheck(state, operand, LibOpLn.referenceFn, LibOpLn.integrity, LibOpLn.run, inputs);
 //     }
 
-    // /// Test the eval of `ln`.
-    // function testOpLnEval() external view {
-    //     // Any number less than e other than 1 is negative which doesn't exist
-    //     // in unsigned integers.
-    //     checkHappy("_: ln(1);", 0, "ln 1");
-    //     checkHappy("_: ln(2.718281828459045235);", 999999999999999990, "ln e");
-    //     checkHappy("_: ln(3);", 1098612288668109680, "ln 3");
-    //     checkHappy("_: ln(4);", 1386294361119890619, "ln 4");
-    //     checkHappy("_: ln(5);", 1609437912434100365, "ln 5");
-    // }
+// /// Test the eval of `ln`.
+// function testOpLnEval() external view {
+//     // Any number less than e other than 1 is negative which doesn't exist
+//     // in unsigned integers.
+//     checkHappy("_: ln(1);", 0, "ln 1");
+//     checkHappy("_: ln(2.718281828459045235);", 999999999999999990, "ln e");
+//     checkHappy("_: ln(3);", 1098612288668109680, "ln 3");
+//     checkHappy("_: ln(4);", 1386294361119890619, "ln 4");
+//     checkHappy("_: ln(5);", 1609437912434100365, "ln 5");
+// }
 
 //     /// Test the eval of `ln` for bad inputs.
 //     function testOpLnZeroInputs() external {

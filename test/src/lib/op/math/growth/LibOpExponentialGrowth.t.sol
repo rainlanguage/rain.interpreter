@@ -41,24 +41,24 @@
 //         );
 //     }
 
-    // /// Test the eval of `exponential-growth`.
-    // function testOpExponentialGrowthEval() external view {
-    //     checkHappy("_: exponential-growth(0 0 0);", 0, "0 0 0");
-    //     checkHappy("_: exponential-growth(0 0.1 0);", 0, "0 0.1 0");
-    //     checkHappy("_: exponential-growth(0 0.1 1);", 0, "0 0.1 1");
-    //     checkHappy("_: exponential-growth(1 0.1 0);", 1e18, "1 0.1 0");
-    //     checkHappy("_: exponential-growth(1 0.1 1);", 1.1e18, "1 0.1 1");
-    //     // Not exactly 1.21
-    //     checkHappy("_: exponential-growth(1 0.1 2);", 1209999999999999974, "1 0.1 2");
-    //     // Not exactly 1.26905870629
-    //     checkHappy("_: exponential-growth(1 0.1 2.5);", 1269058706285883337, "1 0.1 2.5");
-    //     checkHappy("_: exponential-growth(1 0 2);", 1e18, "1 0 2");
-    //     checkHappy("_: exponential-growth(1 0.1 0.5);", 1048808848170151541, "1 0.1 0.5");
-    //     checkHappy("_: exponential-growth(2 0.1 0);", 2e18, "2 0.1 0");
-    //     checkHappy("_: exponential-growth(2 0.1 1);", 2.2e18, "2 0.1 1");
-    //     // Not exactly 2.42
-    //     checkHappy("_: exponential-growth(2 0.1 2);", 2419999999999999948, "2 0.1 2");
-    // }
+// /// Test the eval of `exponential-growth`.
+// function testOpExponentialGrowthEval() external view {
+//     checkHappy("_: exponential-growth(0 0 0);", 0, "0 0 0");
+//     checkHappy("_: exponential-growth(0 0.1 0);", 0, "0 0.1 0");
+//     checkHappy("_: exponential-growth(0 0.1 1);", 0, "0 0.1 1");
+//     checkHappy("_: exponential-growth(1 0.1 0);", 1e18, "1 0.1 0");
+//     checkHappy("_: exponential-growth(1 0.1 1);", 1.1e18, "1 0.1 1");
+//     // Not exactly 1.21
+//     checkHappy("_: exponential-growth(1 0.1 2);", 1209999999999999974, "1 0.1 2");
+//     // Not exactly 1.26905870629
+//     checkHappy("_: exponential-growth(1 0.1 2.5);", 1269058706285883337, "1 0.1 2.5");
+//     checkHappy("_: exponential-growth(1 0 2);", 1e18, "1 0 2");
+//     checkHappy("_: exponential-growth(1 0.1 0.5);", 1048808848170151541, "1 0.1 0.5");
+//     checkHappy("_: exponential-growth(2 0.1 0);", 2e18, "2 0.1 0");
+//     checkHappy("_: exponential-growth(2 0.1 1);", 2.2e18, "2 0.1 1");
+//     // Not exactly 2.42
+//     checkHappy("_: exponential-growth(2 0.1 2);", 2419999999999999948, "2 0.1 2");
+// }
 
 //     function testOpExponentialGrowthEvalZeroInputs() external {
 //         checkBadInputs(": exponential-growth();", 0, 3, 0);

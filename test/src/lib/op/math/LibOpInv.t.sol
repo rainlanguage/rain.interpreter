@@ -27,13 +27,13 @@
 //         opReferenceCheck(state, operand, LibOpInv.referenceFn, LibOpInv.integrity, LibOpInv.run, inputs);
 //     }
 
-    // /// Test the eval of `inv`.
-    // function testOpInvEval() external view {
-    //     checkHappy("_: inv(1);", 1e18, "1");
-    //     checkHappy("_: inv(0.5);", 2e18, "0.5");
-    //     checkHappy("_: inv(2);", 0.5e18, "2");
-    //     checkHappy("_: inv(3);", 333333333333333333, "3");
-    // }
+// /// Test the eval of `inv`.
+// function testOpInvEval() external view {
+//     checkHappy("_: inv(1);", 1e18, "1");
+//     checkHappy("_: inv(0.5);", 2e18, "0.5");
+//     checkHappy("_: inv(2);", 0.5e18, "2");
+//     checkHappy("_: inv(3);", 333333333333333333, "3");
+// }
 
 //     /// Test the eval of `inv` for bad inputs.
 //     function testOpInvZeroInputs() external {

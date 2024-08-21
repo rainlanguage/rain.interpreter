@@ -22,23 +22,23 @@
 //         assertEq(calcOutputs, 1);
 //     }
 
-    // /// Directly test the integrity logic of LibOpUint256Div. This tests the unhappy
-    // /// path where the operand is invalid due to 0 inputs.
-    // function testOpUint256DivIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
-    //     (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256Div.integrity(state, Operand.wrap(0));
-    //     // Calc inputs will be minimum 2.
-    //     assertEq(calcInputs, 2);
-    //     assertEq(calcOutputs, 1);
-    // }
+// /// Directly test the integrity logic of LibOpUint256Div. This tests the unhappy
+// /// path where the operand is invalid due to 0 inputs.
+// function testOpUint256DivIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
+//     (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256Div.integrity(state, Operand.wrap(0));
+//     // Calc inputs will be minimum 2.
+//     assertEq(calcInputs, 2);
+//     assertEq(calcOutputs, 1);
+// }
 
-    // /// Directly test the integrity logic of LibOpUint256Div. This tests the unhappy
-    // /// path where the operand is invalid due to 1 inputs.
-    // function testOpUint256DivIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external pure {
-    //     (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256Div.integrity(state, Operand.wrap(0x010000));
-    //     // Calc inputs will be minimum 2.
-    //     assertEq(calcInputs, 2);
-    //     assertEq(calcOutputs, 1);
-    // }
+// /// Directly test the integrity logic of LibOpUint256Div. This tests the unhappy
+// /// path where the operand is invalid due to 1 inputs.
+// function testOpUint256DivIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external pure {
+//     (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256Div.integrity(state, Operand.wrap(0x010000));
+//     // Calc inputs will be minimum 2.
+//     assertEq(calcInputs, 2);
+//     assertEq(calcOutputs, 1);
+// }
 
 //     /// Directly test the runtime logic of LibOpUint256Div.
 //     function testOpUint256DivRun(uint256[] memory inputs) external {
@@ -82,19 +82,19 @@
 //         checkBadOutputs("_ _: uint256-div(0 0);", 2, 1, 2);
 //     }
 
-    // /// Test the eval of `uint256-div` opcode parsed from a string. Tests two inputs.
-    // /// Tests the happy path where we do not divide by zero.
-    // /// Note that the division truncates (rounds down).
-    // function testOpUint256DivEval2InputsHappy() external view {
-    //     // Show that the division truncates (rounds down).
-    //     checkHappy("_: uint256-div(6e-18 1e-18);", 6, "6 / 1");
-    //     checkHappy("_: uint256-div(6e-18 2e-18);", 3, "6 / 2");
-    //     checkHappy("_: uint256-div(6e-18 3e-18);", 2, "6 / 3");
-    //     checkHappy("_: uint256-div(6e-18 4e-18);", 1, "6 / 4");
-    //     checkHappy("_: uint256-div(6e-18 5e-18);", 1, "6 / 5");
-    //     checkHappy("_: uint256-div(6e-18 6e-18);", 1, "6 / 6");
-    //     checkHappy("_: uint256-div(6e-18 7e-18);", 0, "6 / 7");
-    //     checkHappy("_: uint256-div(6e-18 max-value());", 0, "6 / max-value()");
+// /// Test the eval of `uint256-div` opcode parsed from a string. Tests two inputs.
+// /// Tests the happy path where we do not divide by zero.
+// /// Note that the division truncates (rounds down).
+// function testOpUint256DivEval2InputsHappy() external view {
+//     // Show that the division truncates (rounds down).
+//     checkHappy("_: uint256-div(6e-18 1e-18);", 6, "6 / 1");
+//     checkHappy("_: uint256-div(6e-18 2e-18);", 3, "6 / 2");
+//     checkHappy("_: uint256-div(6e-18 3e-18);", 2, "6 / 3");
+//     checkHappy("_: uint256-div(6e-18 4e-18);", 1, "6 / 4");
+//     checkHappy("_: uint256-div(6e-18 5e-18);", 1, "6 / 5");
+//     checkHappy("_: uint256-div(6e-18 6e-18);", 1, "6 / 6");
+//     checkHappy("_: uint256-div(6e-18 7e-18);", 0, "6 / 7");
+//     checkHappy("_: uint256-div(6e-18 max-value());", 0, "6 / max-value()");
 
 //         // Anything divided by 1 is itself.
 //         checkHappy("_: uint256-div(0 1e-18);", 0, "0 / 1");
@@ -118,26 +118,26 @@
 //         checkUnhappy("_: uint256-div(max-value() 0);", stdError.divisionError);
 //     }
 
-    // /// Test the eval of `uint256-div` opcode parsed from a string. Tests three inputs.
-    // /// Tests the happy path where we do not divide by zero.
-    // function testOpUint256DivEval3InputsHappy() external view {
-    //     // Show that the division truncates (rounds down).
-    //     checkHappy("_: uint256-div(6e-18 1e-18 1e-18);", 6, "6 / 1 / 1");
-    //     checkHappy("_: uint256-div(6e-18 2e-18 1e-18);", 3, "6 / 2 / 1");
-    //     checkHappy("_: uint256-div(6e-18 3e-18 1e-18);", 2, "6 / 3 / 1");
-    //     checkHappy("_: uint256-div(6e-18 4e-18 1e-18);", 1, "6 / 4 / 1");
-    //     checkHappy("_: uint256-div(6e-18 5e-18 1e-18);", 1, "6 / 5 / 1");
-    //     checkHappy("_: uint256-div(6e-18 6e-18 1e-18);", 1, "6 / 6 / 1");
-    //     checkHappy("_: uint256-div(6e-18 7e-18 1e-18);", 0, "6 / 7 / 1");
-    //     checkHappy("_: uint256-div(6e-18 max-value() 1e-18);", 0, "6 / max-value() / 1");
-    //     checkHappy("_: uint256-div(6e-18 1e-18 2e-18);", 3, "6 / 1 / 2");
-    //     checkHappy("_: uint256-div(6e-18 2e-18 2e-18);", 1, "6 / 2 / 2");
-    //     checkHappy("_: uint256-div(6e-18 3e-18 2e-18);", 1, "6 / 3 / 2");
-    //     checkHappy("_: uint256-div(6e-18 4e-18 2e-18);", 0, "6 / 4 / 2");
-    //     checkHappy("_: uint256-div(6e-18 5e-18 2e-18);", 0, "6 / 5 / 2");
-    //     checkHappy("_: uint256-div(6e-18 6e-18 2e-18);", 0, "6 / 6 / 2");
-    //     checkHappy("_: uint256-div(6e-18 7e-18 2e-18);", 0, "6 / 7 / 2");
-    //     checkHappy("_: uint256-div(6e-18 max-value() 2e-18);", 0, "6 / max-value() / 2");
+// /// Test the eval of `uint256-div` opcode parsed from a string. Tests three inputs.
+// /// Tests the happy path where we do not divide by zero.
+// function testOpUint256DivEval3InputsHappy() external view {
+//     // Show that the division truncates (rounds down).
+//     checkHappy("_: uint256-div(6e-18 1e-18 1e-18);", 6, "6 / 1 / 1");
+//     checkHappy("_: uint256-div(6e-18 2e-18 1e-18);", 3, "6 / 2 / 1");
+//     checkHappy("_: uint256-div(6e-18 3e-18 1e-18);", 2, "6 / 3 / 1");
+//     checkHappy("_: uint256-div(6e-18 4e-18 1e-18);", 1, "6 / 4 / 1");
+//     checkHappy("_: uint256-div(6e-18 5e-18 1e-18);", 1, "6 / 5 / 1");
+//     checkHappy("_: uint256-div(6e-18 6e-18 1e-18);", 1, "6 / 6 / 1");
+//     checkHappy("_: uint256-div(6e-18 7e-18 1e-18);", 0, "6 / 7 / 1");
+//     checkHappy("_: uint256-div(6e-18 max-value() 1e-18);", 0, "6 / max-value() / 1");
+//     checkHappy("_: uint256-div(6e-18 1e-18 2e-18);", 3, "6 / 1 / 2");
+//     checkHappy("_: uint256-div(6e-18 2e-18 2e-18);", 1, "6 / 2 / 2");
+//     checkHappy("_: uint256-div(6e-18 3e-18 2e-18);", 1, "6 / 3 / 2");
+//     checkHappy("_: uint256-div(6e-18 4e-18 2e-18);", 0, "6 / 4 / 2");
+//     checkHappy("_: uint256-div(6e-18 5e-18 2e-18);", 0, "6 / 5 / 2");
+//     checkHappy("_: uint256-div(6e-18 6e-18 2e-18);", 0, "6 / 6 / 2");
+//     checkHappy("_: uint256-div(6e-18 7e-18 2e-18);", 0, "6 / 7 / 2");
+//     checkHappy("_: uint256-div(6e-18 max-value() 2e-18);", 0, "6 / max-value() / 2");
 
 //         // Anything divided by 1 is itself.
 //         checkHappy("_: uint256-div(0 1e-18 1e-18);", 0, "0 / 1 / 1");

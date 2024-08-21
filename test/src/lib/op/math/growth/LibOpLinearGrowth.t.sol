@@ -36,21 +36,21 @@
 //         );
 //     }
 
-    // /// Test the eval of `linear-growth`.
-    // function testOpLinearGrowthEval() external view {
-    //     checkHappy("_: linear-growth(0 0 0);", 0, "0 0 0");
-    //     checkHappy("_: linear-growth(0 0.1 0);", 0, "0 0.1 0");
-    //     checkHappy("_: linear-growth(0 0.1 1);", 1e17, "0 0.1 1");
-    //     checkHappy("_: linear-growth(1 0.1 0);", 1e18, "1 0.1 0");
-    //     checkHappy("_: linear-growth(1 0.1 1);", 1.1e18, "1 0.1 1");
-    //     checkHappy("_: linear-growth(1 0.1 2);", 1.2e18, "1 0.1 2");
-    //     checkHappy("_: linear-growth(1 0.1 2.5);", 1.25e18, "1 0.1 2.5");
-    //     checkHappy("_: linear-growth(1 0 2);", 1e18, "1 0 2");
-    //     checkHappy("_: linear-growth(1 0.1 0.5);", 1.05e18, "1 0.1 0.5");
-    //     checkHappy("_: linear-growth(2 0.1 0);", 2e18, "2 0.1 0");
-    //     checkHappy("_: linear-growth(2 0.1 1);", 2.1e18, "2 0.1 1");
-    //     checkHappy("_: linear-growth(2 0.1 2);", 2.2e18, "2 0.1 2");
-    // }
+// /// Test the eval of `linear-growth`.
+// function testOpLinearGrowthEval() external view {
+//     checkHappy("_: linear-growth(0 0 0);", 0, "0 0 0");
+//     checkHappy("_: linear-growth(0 0.1 0);", 0, "0 0.1 0");
+//     checkHappy("_: linear-growth(0 0.1 1);", 1e17, "0 0.1 1");
+//     checkHappy("_: linear-growth(1 0.1 0);", 1e18, "1 0.1 0");
+//     checkHappy("_: linear-growth(1 0.1 1);", 1.1e18, "1 0.1 1");
+//     checkHappy("_: linear-growth(1 0.1 2);", 1.2e18, "1 0.1 2");
+//     checkHappy("_: linear-growth(1 0.1 2.5);", 1.25e18, "1 0.1 2.5");
+//     checkHappy("_: linear-growth(1 0 2);", 1e18, "1 0 2");
+//     checkHappy("_: linear-growth(1 0.1 0.5);", 1.05e18, "1 0.1 0.5");
+//     checkHappy("_: linear-growth(2 0.1 0);", 2e18, "2 0.1 0");
+//     checkHappy("_: linear-growth(2 0.1 1);", 2.1e18, "2 0.1 1");
+//     checkHappy("_: linear-growth(2 0.1 2);", 2.2e18, "2 0.1 2");
+// }
 
 //     function testOpLinearGrowthEvalZeroInputs() external {
 //         checkBadInputs(": linear-growth();", 0, 3, 0);

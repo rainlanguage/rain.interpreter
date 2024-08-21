@@ -105,16 +105,16 @@
 //         checkUnhappy("_: scale-n<36>(1e52);", stdError.arithmeticError);
 //     }
 
-    // /// Test the eval of `decimal18-to-uint256` which is an alias of `scale-n<0>`.
-    // function testOpDecimal18ToIntNPEval() external view {
-    //     checkHappy("_: decimal18-to-uint256(0);", 0, "0 0 0 0");
-    //     checkHappy("_: decimal18-to-uint256(1e-18);", 0, "0 1 0 0");
-    //     checkHappy("_: decimal18-to-uint256(0.5);", 0, "0 5e17 0 0");
-    //     checkHappy("_: decimal18-to-uint256(1);", 1, "0 1e18 0 0");
-    //     checkHappy("_: decimal18-to-uint256(1.5);", 1, "0 15e17 0 0");
-    //     checkHappy("_: decimal18-to-uint256(1.9);", 1, "0 19e17 0 0");
-    //     checkHappy("_: decimal18-to-uint256(2);", 2, "0 2e18 0 0");
-    // }
+// /// Test the eval of `decimal18-to-uint256` which is an alias of `scale-n<0>`.
+// function testOpDecimal18ToIntNPEval() external view {
+//     checkHappy("_: decimal18-to-uint256(0);", 0, "0 0 0 0");
+//     checkHappy("_: decimal18-to-uint256(1e-18);", 0, "0 1 0 0");
+//     checkHappy("_: decimal18-to-uint256(0.5);", 0, "0 5e17 0 0");
+//     checkHappy("_: decimal18-to-uint256(1);", 1, "0 1e18 0 0");
+//     checkHappy("_: decimal18-to-uint256(1.5);", 1, "0 15e17 0 0");
+//     checkHappy("_: decimal18-to-uint256(1.9);", 1, "0 19e17 0 0");
+//     checkHappy("_: decimal18-to-uint256(2);", 2, "0 2e18 0 0");
+// }
 
 //     /// Test the eval of `scale-n` opcode parsed from a string.
 //     /// Tests zero inputs.

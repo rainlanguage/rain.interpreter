@@ -19,23 +19,23 @@
 //         assertEq(calcOutputs, 1);
 //     }
 
-    // /// Directly test the integrity logic of LibOpSub. This tests the unhappy
-    // /// path where the operand is invalid due to 0 inputs.
-    // function testOpSubIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
-    //     (uint256 calcInputs, uint256 calcOutputs) = LibOpSub.integrity(state, Operand.wrap(0));
-    //     // Calc inputs will be minimum 2.
-    //     assertEq(calcInputs, 2);
-    //     assertEq(calcOutputs, 1);
-    // }
+// /// Directly test the integrity logic of LibOpSub. This tests the unhappy
+// /// path where the operand is invalid due to 0 inputs.
+// function testOpSubIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
+//     (uint256 calcInputs, uint256 calcOutputs) = LibOpSub.integrity(state, Operand.wrap(0));
+//     // Calc inputs will be minimum 2.
+//     assertEq(calcInputs, 2);
+//     assertEq(calcOutputs, 1);
+// }
 
-    // /// Directly test the integrity logic of LibOpSub. This tests the unhappy
-    // /// path where the operand is invalid due to 1 inputs.
-    // function testOpSubIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external pure {
-    //     (uint256 calcInputs, uint256 calcOutputs) = LibOpSub.integrity(state, Operand.wrap(0x010000));
-    //     // Calc inputs will be minimum 2.
-    //     assertEq(calcInputs, 2);
-    //     assertEq(calcOutputs, 1);
-    // }
+// /// Directly test the integrity logic of LibOpSub. This tests the unhappy
+// /// path where the operand is invalid due to 1 inputs.
+// function testOpSubIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external pure {
+//     (uint256 calcInputs, uint256 calcOutputs) = LibOpSub.integrity(state, Operand.wrap(0x010000));
+//     // Calc inputs will be minimum 2.
+//     assertEq(calcInputs, 2);
+//     assertEq(calcOutputs, 1);
+// }
 
 //     /// Directly test the runtime logic of LibOpSub.
 //     function testOpSubRun(uint256[] memory inputs) external {
@@ -95,27 +95,27 @@
 //         checkBadInputs("_: saturating-sub(max-value());", 1, 2, 1);
 //     }
 
-    // /// Test the eval of `sub` opcode parsed from a string. Tests two inputs.
-    // function testOpSubEvalTwoInputs() external view {
-    //     checkHappy("_: sub(1e-18 0);", 1, "1 0");
-    //     checkHappy("_: sub(1e-18 1e-18);", 0, "1 1");
-    //     checkHappy("_: sub(2e-18 1e-18);", 1, "2 1");
-    //     checkHappy("_: sub(2e-18 2e-18);", 0, "2 2");
-    //     checkHappy("_: sub(max-value() 0);", type(uint256).max, "max-value() 0");
-    //     checkHappy("_: sub(max-value() 1e-18);", type(uint256).max - 1, "max-value() 1");
-    //     checkHappy("_: sub(max-value() max-value());", 0, "max-value() max-value()");
-    // }
+// /// Test the eval of `sub` opcode parsed from a string. Tests two inputs.
+// function testOpSubEvalTwoInputs() external view {
+//     checkHappy("_: sub(1e-18 0);", 1, "1 0");
+//     checkHappy("_: sub(1e-18 1e-18);", 0, "1 1");
+//     checkHappy("_: sub(2e-18 1e-18);", 1, "2 1");
+//     checkHappy("_: sub(2e-18 2e-18);", 0, "2 2");
+//     checkHappy("_: sub(max-value() 0);", type(uint256).max, "max-value() 0");
+//     checkHappy("_: sub(max-value() 1e-18);", type(uint256).max - 1, "max-value() 1");
+//     checkHappy("_: sub(max-value() max-value());", 0, "max-value() max-value()");
+// }
 
-    // /// Test the eval of `sub` opcode parsed from a string. Tests two inputs.
-    // /// Test that saturating does not change the result.
-    // function testOpSubEvalTwoInputsSaturating() external view {
-    //     checkHappy("_: sub<1>(1e-18 0);", 1, "1 0");
-    //     checkHappy("_: sub<1>(1e-18 1e-18);", 0, "1 1");
-    //     checkHappy("_: sub<1>(2e-18 1e-18);", 1, "2 1");
-    //     checkHappy("_: sub<1>(2e-18 2e-18);", 0, "2 2");
-    //     checkHappy("_: sub<1>(max-value() 0);", type(uint256).max, "max-value() 0");
-    //     checkHappy("_: sub<1>(max-value() 1e-18);", type(uint256).max - 1, "max-value() 1");
-    //     checkHappy("_: sub<1>(max-value() max-value());", 0, "max-value() max-value()");
+// /// Test the eval of `sub` opcode parsed from a string. Tests two inputs.
+// /// Test that saturating does not change the result.
+// function testOpSubEvalTwoInputsSaturating() external view {
+//     checkHappy("_: sub<1>(1e-18 0);", 1, "1 0");
+//     checkHappy("_: sub<1>(1e-18 1e-18);", 0, "1 1");
+//     checkHappy("_: sub<1>(2e-18 1e-18);", 1, "2 1");
+//     checkHappy("_: sub<1>(2e-18 2e-18);", 0, "2 2");
+//     checkHappy("_: sub<1>(max-value() 0);", type(uint256).max, "max-value() 0");
+//     checkHappy("_: sub<1>(max-value() 1e-18);", type(uint256).max - 1, "max-value() 1");
+//     checkHappy("_: sub<1>(max-value() max-value());", 0, "max-value() max-value()");
 
 //         checkHappy("_: saturating-sub(1e-18 0);", 1, "1 0");
 //         checkHappy("_: saturating-sub(1e-18 1e-18);", 0, "1 1");
@@ -134,33 +134,33 @@
 //         checkUnhappyOverflow("_: sub(2e-18 3e-18);");
 //     }
 
-    // /// Test the eval of `sub` opcode parsed from a string. Tests two inputs.
-    // /// Tests saturating on an underflow.
-    // function testOpSubEval2InputsSaturatingUnderflow() external view {
-    //     checkHappy("_: sub<1>(0 1e-18);", 0, "0 1");
-    //     checkHappy("_: sub<1>(1e-18 2e-18);", 0, "1 2");
-    //     checkHappy("_: sub<1>(2e-18 3e-18);", 0, "2 3");
+// /// Test the eval of `sub` opcode parsed from a string. Tests two inputs.
+// /// Tests saturating on an underflow.
+// function testOpSubEval2InputsSaturatingUnderflow() external view {
+//     checkHappy("_: sub<1>(0 1e-18);", 0, "0 1");
+//     checkHappy("_: sub<1>(1e-18 2e-18);", 0, "1 2");
+//     checkHappy("_: sub<1>(2e-18 3e-18);", 0, "2 3");
 
 //         checkHappy("_: saturating-sub(0 1e-18);", 0, "0 1");
 //         checkHappy("_: saturating-sub(1e-18 2e-18);", 0, "1 2");
 //         checkHappy("_: saturating-sub(2e-18 3e-18);", 0, "2 3");
 //     }
 
-    // /// Test the eval of `sub` opcode parsed from a string. Tests three inputs.
-    // function testOpSubEvalThreeInputs() external view {
-    //     checkHappy("_: sub(1e-18 0 0);", 1, "1 0 0");
-    //     checkHappy("_: sub(1e-18 1e-18 0);", 0, "1 1 0");
-    //     checkHappy("_: sub(2e-18 1e-18 1e-18);", 0, "2 1 1");
-    //     checkHappy("_: sub(2e-18 2e-18 0);", 0, "2 2 0");
-    // }
+// /// Test the eval of `sub` opcode parsed from a string. Tests three inputs.
+// function testOpSubEvalThreeInputs() external view {
+//     checkHappy("_: sub(1e-18 0 0);", 1, "1 0 0");
+//     checkHappy("_: sub(1e-18 1e-18 0);", 0, "1 1 0");
+//     checkHappy("_: sub(2e-18 1e-18 1e-18);", 0, "2 1 1");
+//     checkHappy("_: sub(2e-18 2e-18 0);", 0, "2 2 0");
+// }
 
-    // /// Test the eval of `sub` opcode parsed from a string. Tests three inputs.
-    // /// Test that saturating does not change the result.
-    // function testOpSubEvalThreeInputsSaturating() external view {
-    //     checkHappy("_: sub<1>(1e-18 0 0);", 1, "1 0 0");
-    //     checkHappy("_: sub<1>(1e-18 1e-18 0);", 0, "1 1 0");
-    //     checkHappy("_: sub<1>(2e-18 1e-18 1e-18);", 0, "2 1 1");
-    //     checkHappy("_: sub<1>(2e-18 2e-18 0);", 0, "2 2 0");
+// /// Test the eval of `sub` opcode parsed from a string. Tests three inputs.
+// /// Test that saturating does not change the result.
+// function testOpSubEvalThreeInputsSaturating() external view {
+//     checkHappy("_: sub<1>(1e-18 0 0);", 1, "1 0 0");
+//     checkHappy("_: sub<1>(1e-18 1e-18 0);", 0, "1 1 0");
+//     checkHappy("_: sub<1>(2e-18 1e-18 1e-18);", 0, "2 1 1");
+//     checkHappy("_: sub<1>(2e-18 2e-18 0);", 0, "2 2 0");
 
 //         checkHappy("_: saturating-sub(1e-18 0 0);", 1, "1 0 0");
 //         checkHappy("_: saturating-sub(1e-18 1e-18 0);", 0, "1 1 0");
@@ -180,16 +180,16 @@
 //         checkUnhappyOverflow("_: sub(2e-18 2e-18 1e-18);");
 //     }
 
-    // /// Test the eval of `sub` opcocde parsed from a string. Tests three inputs.
-    // /// Tests saturating on an underflow.
-    // function testOpSubEval3InputsSaturatingUnderflow() external view {
-    //     checkHappy("_: sub<1>(0 0 1e-18);", 0, "0 0 1");
-    //     checkHappy("_: sub<1>(0 1e-18 2e-18);", 0, "0 1 2");
-    //     checkHappy("_: sub<1>(1e-18 1e-18 1e-18);", 0, "1 1 1");
-    //     checkHappy("_: sub<1>(1e-18 2e-18 3e-18);", 0, "1 2 3");
-    //     checkHappy("_: sub<1>(2e-18 3e-18 4e-18);", 0, "2 3 4");
-    //     checkHappy("_: sub<1>(3e-18 4e-18 5e-18);", 0, "3 4 5");
-    //     checkHappy("_: sub<1>(2e-18 2e-18 1e-18);", 0, "2 2 1");
+// /// Test the eval of `sub` opcocde parsed from a string. Tests three inputs.
+// /// Tests saturating on an underflow.
+// function testOpSubEval3InputsSaturatingUnderflow() external view {
+//     checkHappy("_: sub<1>(0 0 1e-18);", 0, "0 0 1");
+//     checkHappy("_: sub<1>(0 1e-18 2e-18);", 0, "0 1 2");
+//     checkHappy("_: sub<1>(1e-18 1e-18 1e-18);", 0, "1 1 1");
+//     checkHappy("_: sub<1>(1e-18 2e-18 3e-18);", 0, "1 2 3");
+//     checkHappy("_: sub<1>(2e-18 3e-18 4e-18);", 0, "2 3 4");
+//     checkHappy("_: sub<1>(3e-18 4e-18 5e-18);", 0, "3 4 5");
+//     checkHappy("_: sub<1>(2e-18 2e-18 1e-18);", 0, "2 2 1");
 
 //         checkHappy("_: saturating-sub(0 0 1e-18);", 0, "0 0 1");
 //         checkHappy("_: saturating-sub(0 1e-18 2e-18);", 0, "0 1 2");

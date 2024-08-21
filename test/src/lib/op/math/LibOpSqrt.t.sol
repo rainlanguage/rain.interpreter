@@ -26,14 +26,14 @@
 //         opReferenceCheck(state, operand, LibOpSqrt.referenceFn, LibOpSqrt.integrity, LibOpSqrt.run, inputs);
 //     }
 
-    // /// Test the eval of `sqrt`.
-    // function testOpSqrtEval() external view {
-    //     checkHappy("_: sqrt(0);", 0, "0");
-    //     checkHappy("_: sqrt(1);", 1e18, "1");
-    //     checkHappy("_: sqrt(0.5);", 707106781186547524, "0.5");
-    //     checkHappy("_: sqrt(2);", 1414213562373095048, "2");
-    //     checkHappy("_: sqrt(2.5);", 1581138830084189665, "2.5");
-    // }
+// /// Test the eval of `sqrt`.
+// function testOpSqrtEval() external view {
+//     checkHappy("_: sqrt(0);", 0, "0");
+//     checkHappy("_: sqrt(1);", 1e18, "1");
+//     checkHappy("_: sqrt(0.5);", 707106781186547524, "0.5");
+//     checkHappy("_: sqrt(2);", 1414213562373095048, "2");
+//     checkHappy("_: sqrt(2.5);", 1581138830084189665, "2.5");
+// }
 
 //     /// Test the eval of `sqrt` for bad inputs.
 //     function testOpSqrtEvalBad() external {
