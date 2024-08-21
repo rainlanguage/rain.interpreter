@@ -16,7 +16,7 @@
 // /// @title LibOpERC20BalanceOfTest
 // /// @notice Test the opcode for getting the balance of an erc20 token.
 // contract LibOpERC20BalanceOfTest is OpTest {
-//     function testOpERC20BalanceOfNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+//     function testOpERC20BalanceOfNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
 //         (uint256 calcInputs, uint256 calcOutputs) = LibOpERC20BalanceOf.integrity(state, operand);
 
 //         assertEq(calcInputs, 2);

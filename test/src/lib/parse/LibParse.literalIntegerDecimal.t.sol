@@ -16,7 +16,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
 
     /// Check a single decimal literal. Should not revert and return length 1
     /// sources and constants.
-    function testParseIntegerLiteralDecimal00() external {
+    function testParseIntegerLiteralDecimal00() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_: 1;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
@@ -51,7 +51,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
 
     /// Check 2 decimal literals. Should not revert and return one source and
     /// length 2 constants.
-    function testParseIntegerLiteralDecimal01() external {
+    function testParseIntegerLiteralDecimal01() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_ _: 10 25;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
@@ -88,7 +88,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
     }
 
     /// Check 3 decimal literals with 2 dupes. Should dedupe and respect ordering.
-    function testParseIntegerLiteralDecimal02() external {
+    function testParseIntegerLiteralDecimal02() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_ _ _: 11 233 11;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
@@ -128,7 +128,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
     }
 
     /// Check that we can parse uint256 max int in decimal form.
-    function testParseIntegerLiteralDecimalUint256Max() external {
+    function testParseIntegerLiteralDecimalUint256Max() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(
             "_: 115792089237316195423570985008687907853269984665640564039457584007913129639935e-18;"
         ).parse();
@@ -165,7 +165,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
 
     /// Check that we can parse uint256 max int in decimal form with leading
     /// zeros.
-    function testParseIntegerLiteralDecimalUint256MaxLeadingZeros() external {
+    function testParseIntegerLiteralDecimalUint256MaxLeadingZeros() external view {
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(
             "_: 000115792089237316195423570985008687907853269984665640564039457584007913129639935e-18;"
         ).parse();
@@ -243,7 +243,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
     }
 
     /// Check that e notation works.
-    function testParseIntegerLiteralDecimalENotation() external {
+    function testParseIntegerLiteralDecimalENotation() external view {
         (bytes memory bytecode, uint256[] memory constants) =
             LibMetaFixture.newState("_ _ _ _ _: 1e2 10e2 1e30 1e18 1001e15;").parse();
         uint256 sourceIndex = 0;

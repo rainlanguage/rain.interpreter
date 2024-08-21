@@ -17,7 +17,7 @@ contract LibParseNamedRHSTest is Test {
     using LibParse for ParseState;
 
     /// The simplest RHS is a single word.
-    function testParseSingleWord() external {
+    function testParseSingleWord() external view {
         string memory s = "_:a();";
 
         ParseState memory state = LibParseState.newState(
@@ -43,7 +43,7 @@ contract LibParseNamedRHSTest is Test {
     }
 
     /// Two sequential words on the RHS.
-    function testParseTwoSequential() external {
+    function testParseTwoSequential() external view {
         string memory s = "_ _:a() b();";
 
         ParseState memory state = LibParseState.newState(
@@ -87,7 +87,7 @@ contract LibParseNamedRHSTest is Test {
     }
 
     /// Two sequential words on the RHS, each with a single input.
-    function testParseTwoSequentialWithInputs() external {
+    function testParseTwoSequentialWithInputs() external view {
         string memory s = "_ _:a(b()) b(c<0 0>());";
 
         ParseState memory state = LibParseState.newState(
@@ -135,7 +135,7 @@ contract LibParseNamedRHSTest is Test {
     }
 
     /// Two words on the RHS, one nested as an input to the other.
-    function testParseTwoNested() external {
+    function testParseTwoNested() external view {
         string memory s = "_:a(b());";
 
         ParseState memory state = LibParseState.newState(
@@ -179,7 +179,7 @@ contract LibParseNamedRHSTest is Test {
     }
 
     /// Three words on the RHS, two sequential nested as an input to the other.
-    function testParseTwoNestedAsThirdInput() external {
+    function testParseTwoNestedAsThirdInput() external view {
         string memory s = "_:a(b() c<0 0>());";
 
         ParseState memory state = LibParseState.newState(
@@ -226,7 +226,7 @@ contract LibParseNamedRHSTest is Test {
 
     /// Several words, mixing sequential and nested logic to some depth, with
     /// several LHS items.
-    function testParseSingleLHSNestingAndSequential00() external {
+    function testParseSingleLHSNestingAndSequential00() external view {
         string memory s = "_:a(b() c<0 0>(d() e<0>()));";
 
         ParseState memory state = LibParseState.newState(
@@ -278,7 +278,7 @@ contract LibParseNamedRHSTest is Test {
 
     /// Several words, mixing sequential and nested logic to some depth, with
     /// several LHS items.
-    function testParseSingleLHSNestingAndSequential01() external {
+    function testParseSingleLHSNestingAndSequential01() external view {
         string memory s = "_:a(b() c<0 0>(d() e<0>()) f() g(h() i()));";
 
         ParseState memory state = LibParseState.newState(
@@ -338,7 +338,7 @@ contract LibParseNamedRHSTest is Test {
 
     /// Several words, mixing sequential and nested logic to some depth, with
     /// several LHS items.
-    function testParseSingleLHSNestingAndSequential02() external {
+    function testParseSingleLHSNestingAndSequential02() external view {
         string memory s = "_ _ _:a(b() c<0 0>(d())) d() e<0>(b());";
 
         ParseState memory state = LibParseState.newState(
@@ -392,7 +392,7 @@ contract LibParseNamedRHSTest is Test {
 
     /// More than 14 words deep triggers a whole other internal loop due to there
     /// being 7 words max per active source.
-    function testParseSingleLHSNestingAndSequential03() external {
+    function testParseSingleLHSNestingAndSequential03() external view {
         string memory s =
             "_ _:a(b() c<0 0>(d() e<0>() f() g() h() i() j() k() l() m() n() o() p())) p(o() n(m() l() k() j() i() h() g() f() e<0>() d() c<0 0>() b() a()));";
 
@@ -500,7 +500,7 @@ contract LibParseNamedRHSTest is Test {
     }
 
     /// Two lines, each with LHS and RHS.
-    function testParseTwoFullLinesSingleRHSEach() external {
+    function testParseTwoFullLinesSingleRHSEach() external view {
         string memory s = "_:a(),_ _:b() c<0 0>(d());";
 
         ParseState memory state = LibParseState.newState(
@@ -549,7 +549,7 @@ contract LibParseNamedRHSTest is Test {
     }
 
     /// Two full sources, each with a single LHS and RHS.
-    function testParseTwoFullSourcesSingleRHSEach() external {
+    function testParseTwoFullSourcesSingleRHSEach() external view {
         string memory s = "_:a();_:b();";
 
         ParseState memory state = LibParseState.newState(

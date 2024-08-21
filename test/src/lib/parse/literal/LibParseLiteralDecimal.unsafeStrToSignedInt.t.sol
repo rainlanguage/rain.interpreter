@@ -14,7 +14,7 @@ contract TestLibParseLiteralDecimalUnsafeStrToSignedInt is Test {
     using LibParseLiteralDecimal for ParseState;
 
     /// Test round tripping strings through the unsafeStrToSignedInt function.
-    function testUnsafeStrToSignedIntRoundTrip(uint256 value, uint8 leadingZerosCount, bool isNeg) external {
+    function testUnsafeStrToSignedIntRoundTrip(uint256 value, uint8 leadingZerosCount, bool isNeg) external pure {
         value = bound(value, 0, uint256(type(int256).max) + (isNeg ? 1 : 0));
         string memory str = value.toString();
 

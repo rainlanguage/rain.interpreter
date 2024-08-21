@@ -1,4 +1,4 @@
-use alloy_primitives::{keccak256, Address, B256, U256};
+use alloy::primitives::{keccak256, Address, B256, U256};
 use rain_interpreter_bindings::IInterpreterV2::FullyQualifiedNamespace;
 
 pub struct CreateNamespace {}

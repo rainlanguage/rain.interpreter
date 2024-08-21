@@ -11,12 +11,12 @@ import {LibFixedPointDecimalScale, DECIMAL_MAX_SAFE_INT} from "rain.math.fixedpo
 contract LibParseOperandHandleOperandM1M1Test is Test {
     // Both values are optional so if nothing is provided everything falls back
     // to zero.
-    function testHandleOperandM1M1NoValues() external {
+    function testHandleOperandM1M1NoValues() external pure {
         assertEq(Operand.unwrap(LibParseOperand.handleOperandM1M1(new uint256[](0))), 0);
     }
 
     // If one value is provided it must be 1 bit.
-    function testHandleOperandM1M1OneValue(uint256 value) external {
+    function testHandleOperandM1M1OneValue(uint256 value) external pure {
         value = bound(value, 0, 1);
         uint256[] memory values = new uint256[](1);
         values[0] = value;
@@ -44,7 +44,7 @@ contract LibParseOperandHandleOperandM1M1Test is Test {
     }
 
     // If two values are provided, they must be 1 bit each.
-    function testHandleOperandM1M1TwoValues(uint256 a, uint256 b) external {
+    function testHandleOperandM1M1TwoValues(uint256 a, uint256 b) external pure {
         a = bound(a, 0, 1);
         b = bound(b, 0, 1);
         uint256[] memory values = new uint256[](2);

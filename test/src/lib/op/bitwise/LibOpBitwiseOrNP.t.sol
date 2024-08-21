@@ -12,7 +12,7 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 contract LibOpBitwiseOrNPTest is OpTest {
     /// Directly test the integrity logic of LibOpBitwiseOrNP. All possible
     /// operands result in the same number of inputs and outputs, (2, 1).
-    function testOpBitwiseORNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+    function testOpBitwiseORNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpBitwiseOrNP.integrity(state, operand);
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
@@ -20,7 +20,7 @@ contract LibOpBitwiseOrNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpBitwiseOrNP. This tests that the
     /// opcode correctly pushes the bitwise OR onto the stack.
-    function testOpBitwiseORNPRun(uint256 x, uint256 y) external {
+    function testOpBitwiseORNPRun(uint256 x, uint256 y) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = x;
@@ -32,7 +32,7 @@ contract LibOpBitwiseOrNPTest is OpTest {
     }
 
     /// Test the eval of bitwise OR parsed from a string.
-    function testOpBitwiseORNPEval() external {
+    function testOpBitwiseORNPEval() external view {
         checkHappy("_: bitwise-or(0 0);", 0, "0 0");
         checkHappy("_: bitwise-or(0 1e-18);", 1, "0 1");
         checkHappy("_: bitwise-or(1e-18 0);", 1, "1 0");

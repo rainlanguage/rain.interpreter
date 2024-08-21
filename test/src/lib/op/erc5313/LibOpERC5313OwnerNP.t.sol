@@ -12,7 +12,7 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 /// @title LibOpERC5313OwnerNPTest
 /// @notice Test the opcode for getting the owner of an erc5313 contract.
 contract LibOpERC5313OwnerNPTest is OpTest {
-    function testOpERC5313OwnerOfNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+    function testOpERC5313OwnerOfNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpERC5313OwnerNP.integrity(state, operand);
 
         assertEq(calcInputs, 1);

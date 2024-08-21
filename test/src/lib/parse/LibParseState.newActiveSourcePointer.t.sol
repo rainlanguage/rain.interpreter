@@ -5,7 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {EMPTY_ACTIVE_SOURCE, LibParseState} from "src/lib/parse/LibParseState.sol";
 
 contract LibParseStateNewActiveSourcePointerTest is Test {
-    function checkPointer(uint256 pointer, uint256 expectedSource) internal {
+    function checkPointer(uint256 pointer, uint256 expectedSource) internal pure {
         uint256 activeSource;
         assembly ("memory-safe") {
             activeSource := mload(pointer)
@@ -17,7 +17,7 @@ contract LibParseStateNewActiveSourcePointerTest is Test {
     /// If the old pointer is zero, the new pointer should point to
     /// EMPTY_ACTIVE_SOURCE.
     /// The fuzzed bytes just ensure the memory pointer is always different.
-    function testZeroOldPointer(bytes memory) external {
+    function testZeroOldPointer(bytes memory) external pure {
         uint256 oldPointer = 0;
         uint256 newPointer = LibParseState.newActiveSourcePointer(oldPointer);
         checkPointer(newPointer, EMPTY_ACTIVE_SOURCE);
@@ -25,7 +25,7 @@ contract LibParseStateNewActiveSourcePointerTest is Test {
 
     /// No matter the alignment of the free memory pointer, the new pointer
     /// should always be aligned.
-    function testAlignedOldPointer(uint256 offset0, uint256 offset1) external {
+    function testAlignedOldPointer(uint256 offset0, uint256 offset1) external pure {
         uint256 originalPointer0;
         offset0 = bound(offset0, 0, 0x100);
         assembly ("memory-safe") {
@@ -50,7 +50,7 @@ contract LibParseStateNewActiveSourcePointerTest is Test {
 
     /// If the free memory pointer is aligned, the new pointer should be
     /// the same as the free memory pointer.
-    function testPreUnalignedNewPointer() external {
+    function testPreUnalignedNewPointer() external pure {
         uint256 originalPointer0;
         assembly ("memory-safe") {
             originalPointer0 := mload(0x40)
@@ -76,7 +76,7 @@ contract LibParseStateNewActiveSourcePointerTest is Test {
     /// No matter the content of what the active source pointer points to,
     /// when a new one is created the old content should point to the new
     /// content.
-    function testPostUnalignedNewPointer(uint256 activeSource) external {
+    function testPostUnalignedNewPointer(uint256 activeSource) external pure {
         uint256 activeSourcePtr0 = LibParseState.newActiveSourcePointer(0);
         assembly ("memory-safe") {
             mstore(activeSourcePtr0, activeSource)

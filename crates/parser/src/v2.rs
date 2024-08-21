@@ -1,11 +1,12 @@
 use crate::error::ParserError;
+use alloy::primitives::*;
 use alloy_ethers_typecast::transaction::{ReadContractParametersBuilder, ReadableClient};
-use alloy_primitives::*;
 use ethers::providers::JsonRpcClient;
 use rain_interpreter_bindings::IParserPragmaV1::*;
 use rain_interpreter_bindings::IParserV2::*;
 use rain_interpreter_dispair::DISPair;
 
+#[cfg(not(target_family = "wasm"))]
 pub trait Parser2 {
     /// Call Parser contract to parse the provided rainlang text.
     fn parse_text<T: JsonRpcClient>(
@@ -35,6 +36,38 @@ pub trait Parser2 {
         client: ReadableClient<T>,
     ) -> impl std::future::Future<Output = Result<parsePragma1Return, ParserError>> + Send;
 }
+
+#[cfg(target_family = "wasm")]
+pub trait Parser2 {
+    /// Call Parser contract to parse the provided rainlang text.
+    fn parse_text<T: JsonRpcClient>(
+        &self,
+        text: &str,
+        client: ReadableClient<T>,
+    ) -> impl std::future::Future<Output = Result<parse2Return, ParserError>>
+    where
+        Self: Sync,
+    {
+        self.parse(text.as_bytes().to_vec(), client)
+    }
+
+    /// Call Parser contract to parse the provided data
+    /// The provided data must contain valid UTF-8 encoding of valid rainlang text.
+    fn parse<T: JsonRpcClient>(
+        &self,
+        data: Vec<u8>,
+        client: ReadableClient<T>,
+    ) -> impl std::future::Future<Output = Result<parse2Return, ParserError>>;
+
+    /// Call Parser contract to parse the provided rainlang text and provide the pragma.
+    /// The provided rainlang text must be valid UTF-8 encoding of valid rainlang text.
+    fn parse_pragma<T: JsonRpcClient>(
+        &self,
+        data: Vec<u8>,
+        client: ReadableClient<T>,
+    ) -> impl std::future::Future<Output = Result<parsePragma1Return, ParserError>>;
+}
+
 /// ParserV2
 /// Struct representing ParserV2 instances.
 #[derive(Clone, Default)]
@@ -74,7 +107,7 @@ impl Parser2 for ParserV2 {
             .read(
                 ReadContractParametersBuilder::default()
                     .address(self.deployer_address)
-                    .call(parse2Call { data })
+                    .call(parse2Call { data: data.into() })
                     .build()
                     .map_err(ParserError::ReadContractParametersBuilderError)?,
             )
@@ -91,7 +124,7 @@ impl Parser2 for ParserV2 {
             .read(
                 ReadContractParametersBuilder::default()
                     .address(self.deployer_address)
-                    .call(parsePragma1Call { data })
+                    .call(parsePragma1Call { data: data.into() })
                     .build()
                     .map_err(ParserError::ReadContractParametersBuilderError)?,
             )
@@ -118,7 +151,7 @@ impl ParserV2 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloy_primitives::Address;
+    use alloy::primitives::Address;
     use ethers::providers::{MockProvider, MockResponse, Provider};
 
     #[tokio::test]
@@ -157,7 +190,7 @@ mod tests {
 
         let result = parser.parse_text("my rainlang", client).await.unwrap();
 
-        assert_eq!(result.bytecode, hex!("1234"));
+        assert_eq!(**result.bytecode, hex!("1234"));
     }
 
     #[tokio::test]
@@ -181,7 +214,7 @@ mod tests {
 
         let result = parser.parse_text(rainlang, client).await.unwrap();
 
-        assert_eq!(result.bytecode, hex!("6d79207261696e6c616e67"));
+        assert_eq!(**result.bytecode, hex!("6d79207261696e6c616e67"));
     }
 
     #[tokio::test]

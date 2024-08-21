@@ -15,9 +15,8 @@ anyhow = { workspace = true }
 clap = { workspace = true }
 serde = { workspace = true }
 serde_bytes = { workspace = true }
-tokio = { workspace = true }
+tokio = { version = "1.28.0", features = ["full"] }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true, features = ['env-filter'] }
-alloy-primitives = { workspace = true }
-alloy-sol-types = { workspace = true }
+alloy = { workspace = true }
 rain-interpreter-env = { workspace = true }
