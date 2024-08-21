@@ -5,7 +5,7 @@ import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC16
 import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
-import {LibMemoryKV, MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
+import {LibMemoryKV, MemoryKV, MemoryKVKey, MemoryKVVal} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {LibCast} from "rain.lib.typecast/LibCast.sol";
 import {LibDataContract} from "rain.datacontract/lib/LibDataContract.sol";
 
@@ -32,6 +32,11 @@ contract RainterpreterNPE2 is IInterpreterV4, IOpcodeToolingV1, ERC165 {
         InterpreterStateNP memory state = eval.bytecode.unsafeDeserializeNP(
             SourceIndexV2.unwrap(eval.sourceIndex), eval.namespace, eval.store, eval.context, OPCODE_FUNCTION_POINTERS
         );
+        for (uint256 i = 0; i < eval.stateOverlay.length; i += 2) {
+            state.stateKV = LibMemoryKV.set(
+                state.stateKV, MemoryKVKey.wrap(eval.stateOverlay[i]), MemoryKVVal.wrap(eval.stateOverlay[i + 1])
+            );
+        }
         // We use the return by returning it. Slither false positive.
         //slither-disable-next-line unused-return
         return state.eval2(eval.inputs, type(uint256).max);
