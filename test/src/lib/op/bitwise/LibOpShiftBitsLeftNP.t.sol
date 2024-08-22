@@ -27,7 +27,7 @@ contract LibOpShiftBitsLeftNPTest is OpTest {
         uint8 inputs,
         uint8 outputs,
         uint8 shiftAmount
-    ) external {
+    ) external pure {
         vm.assume(shiftAmount != 0);
         inputs = uint8(bound(inputs, 1, 0x0F));
         outputs = uint8(bound(outputs, 1, 0x0F));
@@ -63,7 +63,7 @@ contract LibOpShiftBitsLeftNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpShiftBitsLeftNP. This tests that
     /// the opcode correctly shifts bits left.
-    function testOpShiftBitsLeftNPRun(uint256 x, uint8 shiftAmount) external {
+    function testOpShiftBitsLeftNPRun(uint256 x, uint8 shiftAmount) external view {
         vm.assume(shiftAmount != 0);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](1);
@@ -80,7 +80,7 @@ contract LibOpShiftBitsLeftNPTest is OpTest {
     }
 
     /// Test the eval of a shift bits left opcode parsed from a string.
-    function testOpShiftBitsLeftNPEval() external {
+    function testOpShiftBitsLeftNPEval() external view {
         checkHappy("_: bitwise-shift-left<1>(0);", 0, "1, 0");
         checkHappy("_: bitwise-shift-left<2>(0);", 0, "2, 0");
         checkHappy("_: bitwise-shift-left<3>(0);", 0, "3, 0");

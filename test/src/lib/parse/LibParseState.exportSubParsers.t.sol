@@ -11,7 +11,7 @@ contract LibParseStateExportSubParsersTest is Test {
     using LibBytes for bytes;
 
     /// Can round trip any array through the sub parser LL.
-    function testExportSubParsers(ParseState memory state, address[] memory values) external {
+    function testExportSubParsers(ParseState memory state, address[] memory values) external pure {
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         state.subParsers = 0;
         for (uint256 i = 0; i < values.length; i++) {

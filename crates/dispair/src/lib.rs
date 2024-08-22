@@ -1,8 +1,8 @@
+use alloy::primitives::*;
 use alloy_ethers_typecast::transaction::{
     ReadContractParametersBuilder, ReadContractParametersBuilderError, ReadableClient,
     ReadableClientError,
 };
-use alloy_primitives::*;
 use ethers::providers::JsonRpcClient;
 use rain_interpreter_bindings::DeployerISP;
 use thiserror::Error;
@@ -73,7 +73,7 @@ impl DISPair {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloy_primitives::Address;
+    use alloy::primitives::Address;
     use ethers::providers::{MockProvider, MockResponse, Provider};
     use serde_json::json;
     use tracing_subscriber::FmtSubscriber;

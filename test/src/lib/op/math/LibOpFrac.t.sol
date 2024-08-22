@@ -8,14 +8,14 @@
 // contract LibOpFracTest is OpTest {
 //     /// Directly test the integrity logic of LibOpFrac.
 //     /// Inputs are always 1, outputs are always 1.
-//     function testOpFracIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+//     function testOpFracIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
 //         (uint256 calcInputs, uint256 calcOutputs) = LibOpFrac.integrity(state, operand);
 //         assertEq(calcInputs, 1);
 //         assertEq(calcOutputs, 1);
 //     }
 
 //     /// Directly test the runtime logic of LibOpFrac.
-//     function testOpFracRun(uint256 a, uint16 operandData) public {
+//     function testOpFracRun(uint256 a, uint16 operandData) public view {
 //         a = bound(a, 0, type(uint64).max - 1e18);
 //         InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
@@ -26,15 +26,15 @@
 //         opReferenceCheck(state, operand, LibOpFrac.referenceFn, LibOpFrac.integrity, LibOpFrac.run, inputs);
 //     }
 
-//     /// Test the eval of `frac`.
-//     function testOpFracEval() external {
-//         checkHappy("_: frac(0);", 0, "0");
-//         checkHappy("_: frac(1);", 0, "1");
-//         checkHappy("_: frac(0.5);", 0.5e18, "0.5");
-//         checkHappy("_: frac(2);", 0, "2");
-//         checkHappy("_: frac(3);", 0, "3");
-//         checkHappy("_: frac(3.8);", 0.8e18, "3.8");
-//     }
+// /// Test the eval of `frac`.
+// function testOpFracEval() external view {
+//     checkHappy("_: frac(0);", 0, "0");
+//     checkHappy("_: frac(1);", 0, "1");
+//     checkHappy("_: frac(0.5);", 0.5e18, "0.5");
+//     checkHappy("_: frac(2);", 0, "2");
+//     checkHappy("_: frac(3);", 0, "3");
+//     checkHappy("_: frac(3.8);", 0.8e18, "3.8");
+// }
 
 //     /// Test the eval of `frac` for bad inputs.
 //     function testOpFracZeroInputs() external {

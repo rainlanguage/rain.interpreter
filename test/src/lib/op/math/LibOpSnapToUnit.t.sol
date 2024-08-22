@@ -8,14 +8,14 @@
 // contract LibOpSnapToUnitTest is OpTest {
 //     /// Directly test the integrity logic of LibOpSnapToUnit.
 //     /// Inputs are always 2, outputs are always 1.
-//     function testOpSnapToUnitIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+//     function testOpSnapToUnitIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
 //         (uint256 calcInputs, uint256 calcOutputs) = LibOpSnapToUnit.integrity(state, operand);
 //         assertEq(calcInputs, 2);
 //         assertEq(calcOutputs, 1);
 //     }
 
 //     /// Directly test the runtime logic of LibOpSnapToUnit.
-//     function testOpSnapToUnitRun(uint256 threshold, uint256 value) public {
+//     function testOpSnapToUnitRun(uint256 threshold, uint256 value) public view {
 //         InterpreterStateNP memory state = opTestDefaultInterpreterState();
 //         value = bound(value, 0, type(uint64).max - 1e18);
 
@@ -29,13 +29,13 @@
 //         );
 //     }
 
-//     /// Test the eval of `snap-to-unit`.
-//     function testOpSnapToUnitEval() external {
-//         // If the threshold is 1 then we always floor.
-//         checkHappy("_: snap-to-unit(1 1);", 1e18, "1 1");
-//         checkHappy("_: snap-to-unit(1 0.5);", 0, "1 0.5");
-//         checkHappy("_: snap-to-unit(1 2);", 2e18, "1 2");
-//         checkHappy("_: snap-to-unit(1 2.5);", 2e18, "1 2.5");
+// /// Test the eval of `snap-to-unit`.
+// function testOpSnapToUnitEval() external view {
+//     // If the threshold is 1 then we always floor.
+//     checkHappy("_: snap-to-unit(1 1);", 1e18, "1 1");
+//     checkHappy("_: snap-to-unit(1 0.5);", 0, "1 0.5");
+//     checkHappy("_: snap-to-unit(1 2);", 2e18, "1 2");
+//     checkHappy("_: snap-to-unit(1 2.5);", 2e18, "1 2.5");
 
 //         // If the threshold is 0.2 then we floor or ceil anything within the
 //         // threshold.

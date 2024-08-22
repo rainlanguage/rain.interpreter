@@ -8,14 +8,14 @@
 // contract LibOpLinearGrowthTest is OpTest {
 //     /// Directly test the integrity logic of LibOpLinearGrowth.
 //     /// Inputs are always 3, outputs are always 1.
-//     function testOpLinearGrowthIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+//     function testOpLinearGrowthIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
 //         (uint256 calcInputs, uint256 calcOutputs) = LibOpLinearGrowth.integrity(state, operand);
 //         assertEq(calcInputs, 3);
 //         assertEq(calcOutputs, 1);
 //     }
 
 //     /// Directly test the runtime logic of LibOpLinearGrowth.
-//     function testOpLinearGrowthRun(uint256 a, uint256 r, uint256 t, uint16 operandData) public {
+//     function testOpLinearGrowthRun(uint256 a, uint256 r, uint256 t, uint16 operandData) public view {
 //         // @TODO This is a hack to cover some range that we can definitely
 //         // handle but it doesn't cover the full range of the function.
 //         a = bound(a, 0, type(uint128).max);
@@ -36,21 +36,21 @@
 //         );
 //     }
 
-//     /// Test the eval of `linear-growth`.
-//     function testOpLinearGrowthEval() external {
-//         checkHappy("_: linear-growth(0 0 0);", 0, "0 0 0");
-//         checkHappy("_: linear-growth(0 0.1 0);", 0, "0 0.1 0");
-//         checkHappy("_: linear-growth(0 0.1 1);", 1e17, "0 0.1 1");
-//         checkHappy("_: linear-growth(1 0.1 0);", 1e18, "1 0.1 0");
-//         checkHappy("_: linear-growth(1 0.1 1);", 1.1e18, "1 0.1 1");
-//         checkHappy("_: linear-growth(1 0.1 2);", 1.2e18, "1 0.1 2");
-//         checkHappy("_: linear-growth(1 0.1 2.5);", 1.25e18, "1 0.1 2.5");
-//         checkHappy("_: linear-growth(1 0 2);", 1e18, "1 0 2");
-//         checkHappy("_: linear-growth(1 0.1 0.5);", 1.05e18, "1 0.1 0.5");
-//         checkHappy("_: linear-growth(2 0.1 0);", 2e18, "2 0.1 0");
-//         checkHappy("_: linear-growth(2 0.1 1);", 2.1e18, "2 0.1 1");
-//         checkHappy("_: linear-growth(2 0.1 2);", 2.2e18, "2 0.1 2");
-//     }
+// /// Test the eval of `linear-growth`.
+// function testOpLinearGrowthEval() external view {
+//     checkHappy("_: linear-growth(0 0 0);", 0, "0 0 0");
+//     checkHappy("_: linear-growth(0 0.1 0);", 0, "0 0.1 0");
+//     checkHappy("_: linear-growth(0 0.1 1);", 1e17, "0 0.1 1");
+//     checkHappy("_: linear-growth(1 0.1 0);", 1e18, "1 0.1 0");
+//     checkHappy("_: linear-growth(1 0.1 1);", 1.1e18, "1 0.1 1");
+//     checkHappy("_: linear-growth(1 0.1 2);", 1.2e18, "1 0.1 2");
+//     checkHappy("_: linear-growth(1 0.1 2.5);", 1.25e18, "1 0.1 2.5");
+//     checkHappy("_: linear-growth(1 0 2);", 1e18, "1 0 2");
+//     checkHappy("_: linear-growth(1 0.1 0.5);", 1.05e18, "1 0.1 0.5");
+//     checkHappy("_: linear-growth(2 0.1 0);", 2e18, "2 0.1 0");
+//     checkHappy("_: linear-growth(2 0.1 1);", 2.1e18, "2 0.1 1");
+//     checkHappy("_: linear-growth(2 0.1 2);", 2.2e18, "2 0.1 2");
+// }
 
 //     function testOpLinearGrowthEvalZeroInputs() external {
 //         checkBadInputs(": linear-growth();", 0, 3, 0);

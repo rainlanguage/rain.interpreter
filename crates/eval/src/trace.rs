@@ -1,5 +1,5 @@
 use crate::fork::ForkTypedReturn;
-use alloy_primitives::{Address, U256};
+use alloy::primitives::{Address, U256};
 use rain_interpreter_bindings::IInterpreterV3::{eval3Call, eval3Return};
 
 use thiserror::Error;
@@ -169,6 +169,7 @@ mod tests {
     use super::*;
     use crate::eval::ForkEvalArgs;
     use crate::fork::{Forker, NewForkedEvm};
+    use alloy::primitives::utils::parse_ether;
     use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
     use rain_interpreter_env::{
         CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
@@ -186,7 +187,7 @@ mod tests {
         let res = fork
             .fork_eval(ForkEvalArgs {
                 rainlang_string: r"
-                a: int-add(1 2),
+                a: add(1 2),
                 b: 2,
                 c: 4,
                 _: call<1>(1 2),
@@ -194,9 +195,9 @@ mod tests {
                 :set(3 4);
                 a b:,
                 c: call<2>(a b),
-                d: int-add(a b);
+                d: add(a b);
                 a b:,
-                c: int-mul(a b);
+                c: mul(a b);
                 "
                 .into(),
                 source_index: 0,
@@ -255,15 +256,15 @@ mod tests {
         let res = fork
             .fork_eval(ForkEvalArgs {
                 rainlang_string: r"
-                a: int-add(1 2),
+                a: add(1 2),
                 b: 2,
                 c: 4,
                 _: call<1>(1 2);
                 a b:,
                 c: call<2>(a b),
-                d: int-add(a b);
+                d: add(a b);
                 a b:,
-                c: int-mul(a b);
+                c: mul(a b);
                 "
                 .into(),
                 source_index: 0,
@@ -279,11 +280,11 @@ mod tests {
 
         // search_trace_by_path
         let trace_0 = rain_eval_result.search_trace_by_path("0.1").unwrap();
-        assert_eq!(trace_0, U256::from(2));
+        assert_eq!(trace_0, parse_ether("2").unwrap());
         let trace_1 = rain_eval_result.search_trace_by_path("0.1.3").unwrap();
-        assert_eq!(trace_1, U256::from(3));
+        assert_eq!(trace_1, parse_ether("3").unwrap());
         let trace_2 = rain_eval_result.search_trace_by_path("0.1.2").unwrap();
-        assert_eq!(trace_2, U256::from(2));
+        assert_eq!(trace_2, parse_ether("2").unwrap());
 
         // test the various errors
         // bad trace path
@@ -297,6 +298,8 @@ mod tests {
     }
 
     fn vec_i32_to_u256(vec: Vec<i32>) -> Vec<U256> {
-        vec.iter().map(|&x| U256::from(x)).collect()
+        vec.iter()
+            .map(|&x| parse_ether(&x.to_string()).unwrap())
+            .collect()
     }
 }

@@ -8,14 +8,14 @@
 // contract LibOpLnTest is OpTest {
 //     /// Directly test the integrity logic of LibOpLn.
 //     /// Inputs are always 1, outputs are always 1.
-//     function testOpLnIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+//     function testOpLnIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
 //         (uint256 calcInputs, uint256 calcOutputs) = LibOpLn.integrity(state, operand);
 //         assertEq(calcInputs, 1);
 //         assertEq(calcOutputs, 1);
 //     }
 
 //     /// Directly test the runtime logic of LibOpLn.
-//     function testOpLnRun(uint256 a, uint16 operandData) public {
+//     function testOpLnRun(uint256 a, uint16 operandData) public view {
 //         // e lifted from prb math.
 //         a = bound(a, 2_718281828459045235, type(uint64).max - 1e18);
 //         InterpreterStateNP memory state = opTestDefaultInterpreterState();
@@ -27,16 +27,16 @@
 //         opReferenceCheck(state, operand, LibOpLn.referenceFn, LibOpLn.integrity, LibOpLn.run, inputs);
 //     }
 
-//     /// Test the eval of `ln`.
-//     function testOpLnEval() external {
-//         // Any number less than e other than 1 is negative which doesn't exist
-//         // in unsigned integers.
-//         checkHappy("_: ln(1);", 0, "ln 1");
-//         checkHappy("_: ln(2.718281828459045235);", 999999999999999990, "ln e");
-//         checkHappy("_: ln(3);", 1098612288668109680, "ln 3");
-//         checkHappy("_: ln(4);", 1386294361119890619, "ln 4");
-//         checkHappy("_: ln(5);", 1609437912434100365, "ln 5");
-//     }
+// /// Test the eval of `ln`.
+// function testOpLnEval() external view {
+//     // Any number less than e other than 1 is negative which doesn't exist
+//     // in unsigned integers.
+//     checkHappy("_: ln(1);", 0, "ln 1");
+//     checkHappy("_: ln(2.718281828459045235);", 999999999999999990, "ln e");
+//     checkHappy("_: ln(3);", 1098612288668109680, "ln 3");
+//     checkHappy("_: ln(4);", 1386294361119890619, "ln 4");
+//     checkHappy("_: ln(5);", 1609437912434100365, "ln 5");
+// }
 
 //     /// Test the eval of `ln` for bad inputs.
 //     function testOpLnZeroInputs() external {

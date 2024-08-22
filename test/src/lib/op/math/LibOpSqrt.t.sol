@@ -8,14 +8,14 @@
 // contract LibOpSqrtTest is OpTest {
 //     /// Directly test the integrity logic of LibOpSqrt.
 //     /// Inputs are always 1, outputs are always 1.
-//     function testOpSqrtIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+//     function testOpSqrtIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
 //         (uint256 calcInputs, uint256 calcOutputs) = LibOpSqrt.integrity(state, operand);
 //         assertEq(calcInputs, 1);
 //         assertEq(calcOutputs, 1);
 //     }
 
 //     /// Directly test the runtime logic of LibOpSqrt.
-//     function testOpSqrtRun(uint256 a) public {
+//     function testOpSqrtRun(uint256 a) public view {
 //         a = bound(a, 0, type(uint64).max - 1e18);
 //         InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
@@ -26,14 +26,14 @@
 //         opReferenceCheck(state, operand, LibOpSqrt.referenceFn, LibOpSqrt.integrity, LibOpSqrt.run, inputs);
 //     }
 
-//     /// Test the eval of `sqrt`.
-//     function testOpSqrtEval() external {
-//         checkHappy("_: sqrt(0);", 0, "0");
-//         checkHappy("_: sqrt(1);", 1e18, "1");
-//         checkHappy("_: sqrt(0.5);", 707106781186547524, "0.5");
-//         checkHappy("_: sqrt(2);", 1414213562373095048, "2");
-//         checkHappy("_: sqrt(2.5);", 1581138830084189665, "2.5");
-//     }
+// /// Test the eval of `sqrt`.
+// function testOpSqrtEval() external view {
+//     checkHappy("_: sqrt(0);", 0, "0");
+//     checkHappy("_: sqrt(1);", 1e18, "1");
+//     checkHappy("_: sqrt(0.5);", 707106781186547524, "0.5");
+//     checkHappy("_: sqrt(2);", 1414213562373095048, "2");
+//     checkHappy("_: sqrt(2.5);", 1581138830084189665, "2.5");
+// }
 
 //     /// Test the eval of `sqrt` for bad inputs.
 //     function testOpSqrtEvalBad() external {

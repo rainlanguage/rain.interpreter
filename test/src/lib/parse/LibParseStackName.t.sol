@@ -10,7 +10,7 @@ import "src/lib/parse/LibParseStackName.sol";
 /// Tests for handling named stack items.
 contract LibParseStackNameTest is Test {
     /// Test that we can push and retrieve a stack name.
-    function testPushAndRetrieveStackNameSingle(ParseState memory state, bytes32 word) external {
+    function testPushAndRetrieveStackNameSingle(ParseState memory state, bytes32 word) external pure {
         state.lineTracker = 0;
         state.topLevel1 = 0;
         state.stackNames = 0;
@@ -28,7 +28,7 @@ contract LibParseStackNameTest is Test {
     }
 
     /// Test that we can push and retrieve two different stack names.
-    function testPushAndRetrieveStackNameDouble(ParseState memory state, bytes32 word1, bytes32 word2) external {
+    function testPushAndRetrieveStackNameDouble(ParseState memory state, bytes32 word1, bytes32 word2) external pure {
         vm.assume(word1 != word2);
         state.lineTracker = 0;
         state.topLevel1 = 0;
@@ -58,7 +58,7 @@ contract LibParseStackNameTest is Test {
     }
 
     /// Test that two identical stack names are not pushed.
-    function testPushAndRetrieveStackNameDoubleIdentical(ParseState memory state, bytes32 word) external {
+    function testPushAndRetrieveStackNameDoubleIdentical(ParseState memory state, bytes32 word) external pure {
         state.lineTracker = 0;
         state.topLevel1 = 0;
         state.stackNames = 0;
@@ -76,7 +76,7 @@ contract LibParseStackNameTest is Test {
     }
 
     /// Test that we can push and retrieve many stack names.
-    function testPushAndRetrieveStackNameMany(ParseState memory state, uint256 n) external {
+    function testPushAndRetrieveStackNameMany(ParseState memory state, uint256 n) external pure {
         n = bound(n, 1, 100);
         state.lineTracker = 0;
         state.topLevel1 = 0;

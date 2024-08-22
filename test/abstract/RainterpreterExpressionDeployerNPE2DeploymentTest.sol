@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {IERC1820_REGISTRY, IERC1820Registry} from "rain.erc1820/lib/LibIERC1820.sol";
 import {Test, console2, stdError} from "forge-std/Test.sol";
 
 import {INVALID_BYTECODE} from "../lib/etch/LibEtch.sol";
@@ -90,15 +89,6 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
             revert("unexpected parse meta");
         }
 
-        vm.etch(address(IERC1820_REGISTRY), INVALID_BYTECODE);
-        vm.mockCall(
-            address(IERC1820_REGISTRY),
-            abi.encodeWithSelector(IERC1820Registry.interfaceHash.selector),
-            abi.encode(bytes32(uint256(0)))
-        );
-        vm.mockCall(
-            address(IERC1820_REGISTRY), abi.encodeWithSelector(IERC1820Registry.setInterfaceImplementer.selector), ""
-        );
         iDeployer = new RainterpreterExpressionDeployerNPE2(
             RainterpreterExpressionDeployerNPE2ConstructionConfigV2(
                 address(iInterpreter), address(iStore), address(iParser)

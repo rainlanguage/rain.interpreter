@@ -8,14 +8,14 @@
 // contract LibOpAvgTest is OpTest {
 //     /// Directly test the integrity logic of LibOpAvg.
 //     /// Inputs are always 2, outputs are always 1.
-//     function testOpAvgIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+//     function testOpAvgIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
 //         (uint256 calcInputs, uint256 calcOutputs) = LibOpAvg.integrity(state, operand);
 //         assertEq(calcInputs, 2);
 //         assertEq(calcOutputs, 1);
 //     }
 
 //     /// Directly test the runtime logic of LibOpAvg.
-//     function testOpAvgRun(uint256 a, uint256 b, uint16 operandData) public {
+//     function testOpAvgRun(uint256 a, uint256 b, uint16 operandData) public view {
 //         // @TODO This is a hack to get around the fact that we are very likely
 //         // to overflow uint256 if we just fuzz it, and that it's clunky to
 //         // determine whether it will overflow or not. Basically the overflow
@@ -34,18 +34,18 @@
 //         opReferenceCheck(state, operand, LibOpAvg.referenceFn, LibOpAvg.integrity, LibOpAvg.run, inputs);
 //     }
 
-//     /// Test the eval of `avg`.
-//     function testOpAvgEval() external {
-//         checkHappy("_: avg(0 0);", 0, "0 0");
-//         checkHappy("_: avg(0 1);", 5e17, "0 1");
-//         checkHappy("_: avg(1 0);", 5e17, "1 0");
-//         checkHappy("_: avg(1 1);", 1e18, "1 1");
-//         checkHappy("_: avg(1 2);", 1.5e18, "1 2");
-//         checkHappy("_: avg(2 2);", 2e18, "2 2");
-//         checkHappy("_: avg(2 3);", 2.5e18, "2 3");
-//         checkHappy("_: avg(2 4);", 3e18, "2 4");
-//         checkHappy("_: avg(4 0.5);", 2.25e18, "4 5");
-//     }
+// /// Test the eval of `avg`.
+// function testOpAvgEval() external view {
+//     checkHappy("_: avg(0 0);", 0, "0 0");
+//     checkHappy("_: avg(0 1);", 5e17, "0 1");
+//     checkHappy("_: avg(1 0);", 5e17, "1 0");
+//     checkHappy("_: avg(1 1);", 1e18, "1 1");
+//     checkHappy("_: avg(1 2);", 1.5e18, "1 2");
+//     checkHappy("_: avg(2 2);", 2e18, "2 2");
+//     checkHappy("_: avg(2 3);", 2.5e18, "2 3");
+//     checkHappy("_: avg(2 4);", 3e18, "2 4");
+//     checkHappy("_: avg(4 0.5);", 2.25e18, "4 5");
+// }
 
 //     /// Test the eval of `avg` for bad inputs.
 //     function testOpAvgEvalOneInput() external {

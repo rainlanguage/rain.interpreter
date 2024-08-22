@@ -36,7 +36,7 @@ contract LibOpStackNPTest is OpTest {
         uint256 stackIndex,
         uint256[] memory constants,
         Operand operand
-    ) external {
+    ) external pure {
         stackIndex = bound(stackIndex, 1, type(uint256).max);
         operand = Operand.wrap(bound(Operand.unwrap(operand), 0, stackIndex - 1));
         IntegrityCheckStateNP memory state = LibIntegrityCheckNP.newState(bytecode, stackIndex, constants);
@@ -69,7 +69,7 @@ contract LibOpStackNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpStackNP. This tests that the
     /// operand always puts a single value on the stack.
-    function testOpStackNPRun(uint256[][] memory stacks, uint256 stackIndex) external {
+    function testOpStackNPRun(uint256[][] memory stacks, uint256 stackIndex) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256 stackValue;
         {
@@ -128,7 +128,7 @@ contract LibOpStackNPTest is OpTest {
     }
 
     /// Test the eval of a stack opcode parsed from a string.
-    function testOpStackEval() external {
+    function testOpStackEval() external view {
         bytes memory bytecode = iDeployer.parse2("foo: 1, bar: foo, _: -1;");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             EvalV4({
@@ -149,7 +149,7 @@ contract LibOpStackNPTest is OpTest {
     }
 
     /// Test the eval of several stack opcodes parsed from a string.
-    function testOpStackEvalSeveral() external {
+    function testOpStackEvalSeveral() external view {
         bytes memory bytecode = iDeployer.parse2("foo: 1, bar: foo, _ baz: bar bar, bing _:foo baz;");
 
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(

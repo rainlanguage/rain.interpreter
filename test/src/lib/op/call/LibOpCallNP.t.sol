@@ -82,7 +82,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         uint256 outputs,
         uint8 sourceCount,
         bytes32 seed
-    ) external {
+    ) external pure {
         inputs = bound(inputs, 0, 0x0F);
 
         conformBytecode(state.bytecode, sourceCount, seed);
@@ -204,7 +204,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
     // }
 
     /// Boilerplate for checking the stack and kvs of a call.
-    function checkCallNPRun(bytes memory rainlang, uint256[] memory stack, uint256[] memory kvs) internal {
+    function checkCallNPRun(bytes memory rainlang, uint256[] memory stack, uint256[] memory kvs) internal view {
         bytes memory bytecode = iDeployer.parse2(rainlang);
         (uint256[] memory actualStack, uint256[] memory actualKVs) = iInterpreter.eval4(
             EvalV4({
@@ -228,7 +228,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
     }
 
     // /// Test the eval of call to see various stacks.
-    // function testOpCallNPRunNoIO() external {
+    // function testOpCallNPRunNoIO() external view {
     //     // Check evals that result in no stack or kvs.
     //     uint256[] memory stack = new uint256[](0);
     //     uint256[] memory kvs = new uint256[](0);

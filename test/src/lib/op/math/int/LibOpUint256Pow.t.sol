@@ -17,36 +17,37 @@
 // contract LibOpUint256PowTest is OpTest {
 //     using LibUint256Array for uint256[];
 
-//     /// Directly test the integrity logic of LibOpUint256Exp. This tests the happy
-//     /// path where the inputs input and calc match.
-//     function testOpUint256ExpIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData)
-//         external
-//     {
-//         inputs = uint8(bound(inputs, 2, 0x0F));
-//         (uint256 calcInputs, uint256 calcOutputs) =
-//             LibOpUint256Pow.integrity(state, LibOperand.build(inputs, 1, operandData));
+// /// Directly test the integrity logic of LibOpUint256Exp. This tests the happy
+// /// path where the inputs input and calc match.
+// function testOpUint256ExpIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData)
+//     external
+//     pure
+// {
+//     inputs = uint8(bound(inputs, 2, 0x0F));
+//     (uint256 calcInputs, uint256 calcOutputs) =
+//         LibOpUint256Pow.integrity(state, LibOperand.build(inputs, 1, operandData));
 
 //         assertEq(calcInputs, inputs);
 //         assertEq(calcOutputs, 1);
 //     }
 
-//     /// Directly test the integrity logic of LibOpUint256Pow. This tests the unhappy
-//     /// path where the operand is invalid due to 0 inputs.
-//     function testOpUint256PowIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external {
-//         (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256Pow.integrity(state, Operand.wrap(0));
-//         // Calc inputs will be minimum 2.
-//         assertEq(calcInputs, 2);
-//         assertEq(calcOutputs, 1);
-//     }
+// /// Directly test the integrity logic of LibOpUint256Pow. This tests the unhappy
+// /// path where the operand is invalid due to 0 inputs.
+// function testOpUint256PowIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
+//     (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256Pow.integrity(state, Operand.wrap(0));
+//     // Calc inputs will be minimum 2.
+//     assertEq(calcInputs, 2);
+//     assertEq(calcOutputs, 1);
+// }
 
-//     /// Directly test the integrity logic of LibOpUint256Pow. This tests the unhappy
-//     /// path where the operand is invalid due to 1 inputs.
-//     function testOpUint256PowIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external {
-//         (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256Pow.integrity(state, Operand.wrap(0x010000));
-//         // Calc inputs will be minimum 2.
-//         assertEq(calcInputs, 2);
-//         assertEq(calcOutputs, 1);
-//     }
+// /// Directly test the integrity logic of LibOpUint256Pow. This tests the unhappy
+// /// path where the operand is invalid due to 1 inputs.
+// function testOpUint256PowIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external pure {
+//     (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256Pow.integrity(state, Operand.wrap(0x010000));
+//     // Calc inputs will be minimum 2.
+//     assertEq(calcInputs, 2);
+//     assertEq(calcOutputs, 1);
+// }
 
 //     /// Directly test the runtime logic of LibOpUint256Pow.
 //     function testOpUint256PowRun(uint256[] memory inputs) external {
@@ -109,13 +110,13 @@
 //         checkBadOutputs("_ _: uint256-power(0 0);", 2, 1, 2);
 //     }
 
-//     /// Test the eval of `uint256-power` opcode parsed from a string. Tests two inputs.
-//     /// Tests the happy path where we do not overflow.
-//     function testOpUint256PowEval2InputsHappy() external {
-//         // Anything exp 0 is 1.
-//         checkHappy("_: uint256-power(0 0);", 1, "0 ** 0");
-//         checkHappy("_: uint256-power(1e-18 0);", 1, "1 ** 0");
-//         checkHappy("_: uint256-power(max-value() 0);", 1, "max-value() ** 0");
+// /// Test the eval of `uint256-power` opcode parsed from a string. Tests two inputs.
+// /// Tests the happy path where we do not overflow.
+// function testOpUint256PowEval2InputsHappy() external view {
+//     // Anything exp 0 is 1.
+//     checkHappy("_: uint256-power(0 0);", 1, "0 ** 0");
+//     checkHappy("_: uint256-power(1e-18 0);", 1, "1 ** 0");
+//     checkHappy("_: uint256-power(max-value() 0);", 1, "max-value() ** 0");
 
 //         // 1 exp anything is 1.
 //         checkHappy("_: uint256-power(1e-18 0);", 1, "1 ** 0");
@@ -150,18 +151,18 @@
 //         checkUnhappyOverflow("_: uint256-power(max-value() max-value());");
 //     }
 
-//     /// Test the eval of `uint256-power` opcode parsed from a string. Tests three inputs.
-//     /// Tests the happy path where we do not divide by zero.
-//     function testOpUint256PowEval3InputsHappy() external {
-//         // Anything exp 0 is 1.
-//         checkHappy("_: uint256-power(0 0 0);", 1, "0 ** 0 ** 0");
-//         checkHappy("_: uint256-power(1e-18 0 0);", 1, "1 ** 0 ** 0");
-//         checkHappy("_: uint256-power(max-value() 0 0);", 1, "max-value() ** 0 ** 0");
-//         checkHappy("_: uint256-power(0 1e-18 0);", 1, "0 ** 1 ** 0");
-//         checkHappy("_: uint256-power(1e-18 1e-18 0);", 1, "1 ** 1 ** 0");
-//         checkHappy("_: uint256-power(0 0 1e-18);", 1, "0 ** 0 ** 1");
-//         checkHappy("_: uint256-power(1e-18 0 1e-18);", 1, "1 ** 0 ** 1");
-//         checkHappy("_: uint256-power(max-value() 0 1e-18);", 1, "max-value() ** 0 ** 1");
+// /// Test the eval of `uint256-power` opcode parsed from a string. Tests three inputs.
+// /// Tests the happy path where we do not divide by zero.
+// function testOpUint256PowEval3InputsHappy() external view {
+//     // Anything exp 0 is 1.
+//     checkHappy("_: uint256-power(0 0 0);", 1, "0 ** 0 ** 0");
+//     checkHappy("_: uint256-power(1e-18 0 0);", 1, "1 ** 0 ** 0");
+//     checkHappy("_: uint256-power(max-value() 0 0);", 1, "max-value() ** 0 ** 0");
+//     checkHappy("_: uint256-power(0 1e-18 0);", 1, "0 ** 1 ** 0");
+//     checkHappy("_: uint256-power(1e-18 1e-18 0);", 1, "1 ** 1 ** 0");
+//     checkHappy("_: uint256-power(0 0 1e-18);", 1, "0 ** 0 ** 1");
+//     checkHappy("_: uint256-power(1e-18 0 1e-18);", 1, "1 ** 0 ** 1");
+//     checkHappy("_: uint256-power(max-value() 0 1e-18);", 1, "max-value() ** 0 ** 1");
 
 //         // 1 exp anything is 1.
 //         checkHappy("_: uint256-power(1e-18 0 0);", 1, "1 ** 0 ** 0");

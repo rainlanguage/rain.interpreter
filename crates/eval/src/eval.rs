@@ -1,6 +1,6 @@
 use crate::error::ForkCallError;
 use crate::fork::{ForkTypedReturn, Forker};
-use alloy_primitives::{Address, U256};
+use alloy::primitives::{Address, U256};
 use rain_interpreter_bindings::DeployerISP::{iInterpreterCall, iStoreCall};
 use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
 use rain_interpreter_bindings::IInterpreterV3::eval3Call;
@@ -40,7 +40,7 @@ impl Forker {
     ///
     /// * `rainlang_string` - The Rainlang string to parse.
     /// * `deployer` - The address of the deployer. Must be deployed before the
-    /// fork's current block.
+    ///   fork's current block.
     ///
     /// # Returns
     ///
@@ -56,7 +56,7 @@ impl Forker {
         } = args;
 
         let parse_call = parse2Call {
-            data: rainlang_string.as_bytes().to_vec(),
+            data: rainlang_string.as_bytes().to_vec().into(),
         };
 
         let parse_result = self
@@ -134,6 +134,7 @@ impl Forker {
 
 #[cfg(test)]
 mod tests {
+    use alloy::primitives::utils::parse_ether;
     use rain_interpreter_env::{
         CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
     };
@@ -153,21 +154,14 @@ mod tests {
         let fork = Forker::new_with_fork(args, None, None).await.unwrap();
         let res = fork
             .fork_parse(ForkParseArgs {
-                rainlang_string: r"_: int-add(1 2);".to_owned(),
+                rainlang_string: r"_: add(1 2);".to_owned(),
                 deployer,
                 decode_errors: true,
             })
             .await
             .unwrap();
 
-        let expected_bytes: Vec<u8> = vec![
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 1, 0, 0, 3, 2, 0, 1, 1, 16, 0, 1, 1, 16, 0, 0, 61,
-            18, 0, 0,
-        ];
+        let expected_bytes: Vec<u8> = alloy::hex::decode("0x00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000de0b6b3a76400000000000000000000000000000000000000000000000000001bc16d674ec8000000000000000000000000000000000000000000000000000000000000000000130100000302000101100001011000002b120000").unwrap();
         assert_eq!(res.typed_return.bytecode, expected_bytes);
     }
 
@@ -181,7 +175,7 @@ mod tests {
         let fork = Forker::new_with_fork(args, None, None).await.unwrap();
         let res = fork
             .fork_eval(ForkEvalArgs {
-                rainlang_string: r"_: int-add(1 2);".into(),
+                rainlang_string: r"_: add(1 2);".into(),
                 source_index: 0,
                 deployer,
                 namespace: FullyQualifiedNamespace::default(),
@@ -192,7 +186,7 @@ mod tests {
             .unwrap();
 
         // stack
-        let expected_stack = vec![U256::from(3)];
+        let expected_stack = vec![parse_ether("3").unwrap()];
         assert_eq!(res.typed_return.stack, expected_stack);
 
         // storage writes
@@ -201,7 +195,7 @@ mod tests {
 
         // stack in the trace for source index 0
         let mut expected_stack_trace = vec![0u8, 0u8, 0u8, 0u8];
-        expected_stack_trace.append(&mut U256::from(3).to_be_bytes_vec());
+        expected_stack_trace.append(&mut parse_ether("3").unwrap().to_be_bytes_vec());
         let source_index_zero_trace = res.raw.traces.unwrap().into_nodes()[1].to_owned().trace;
         assert_eq!(source_index_zero_trace.data, expected_stack_trace);
 
@@ -229,7 +223,7 @@ mod tests {
             let handle = tokio::spawn(async move {
                 fork_clone
                     .fork_eval(ForkEvalArgs {
-                        rainlang_string: r"_: int-add(1 2);".into(),
+                        rainlang_string: r"_: add(1 2);".into(),
                         source_index: 0,
                         deployer,
                         namespace: FullyQualifiedNamespace::default(),
@@ -244,7 +238,7 @@ mod tests {
 
         for handle in handles {
             let res = handle.await.unwrap();
-            assert_eq!(res.typed_return.stack, vec![U256::from(3)]);
+            assert_eq!(res.typed_return.stack, vec![parse_ether("3").unwrap()]);
         }
     }
 }

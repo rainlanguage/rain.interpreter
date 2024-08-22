@@ -21,6 +21,7 @@ contract LibParseOperandParseOperandTest is Test {
 
     function checkParsingOperandFromData(string memory s, uint256[] memory expectedValues, uint256 expectedEnd)
         internal
+        pure
     {
         ParseState memory state = LibMetaFixture.newState(s);
         // Before parsing any operand values the state gets initialized at the
@@ -42,7 +43,7 @@ contract LibParseOperandParseOperandTest is Test {
 
     // Test that parsing a string that doesn't start with the operand opening
     // character always results in a zero length operand values array.
-    function testParseOperandNoOpeningCharacter(string memory s) external {
+    function testParseOperandNoOpeningCharacter(string memory s) external pure {
         vm.assume(bytes(s).length > 0);
         vm.assume(bytes(s)[0] != "<");
 
@@ -52,7 +53,7 @@ contract LibParseOperandParseOperandTest is Test {
     // Test that parsing an empty "<>" operand results in a zero length operand
     // values array. The cursor moves past both the opening and closing
     // characters.
-    function testParseOperandEmptyOperand(string memory s) external {
+    function testParseOperandEmptyOperand(string memory s) external pure {
         vm.assume(bytes(s).length > 2);
         bytes(s)[0] = "<";
         bytes(s)[1] = ">";
@@ -67,7 +68,7 @@ contract LibParseOperandParseOperandTest is Test {
         string memory maybeWhitespaceA,
         string memory maybeWhitespaceB,
         string memory suffix
-    ) external {
+    ) external pure {
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceA);
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceB);
 
@@ -97,7 +98,7 @@ contract LibParseOperandParseOperandTest is Test {
         string memory maybeWhitespaceB,
         string memory maybeWhitespaceC,
         string memory suffix
-    ) external {
+    ) external pure {
         vm.assume(bytes(maybeWhitespaceB).length > 0);
 
         valueA = bound(valueA, 0, SIGNED_NORMALIZED_MAX);
@@ -142,7 +143,7 @@ contract LibParseOperandParseOperandTest is Test {
         string memory maybeWhitespaceC,
         string memory maybeWhitespaceD,
         string memory suffix
-    ) external {
+    ) external pure {
         vm.assume(bytes(maybeWhitespaceB).length > 0);
         vm.assume(bytes(maybeWhitespaceC).length > 0);
 
@@ -162,14 +163,14 @@ contract LibParseOperandParseOperandTest is Test {
             string memory valueBString = asHexB ? uint256(valueB).toHexString() : valueB.toString();
             string memory valueCString = asHexC ? uint256(valueC).toHexString() : valueC.toString();
 
-            s = string.concat(
+            s = string.concat(string.concat(
                 "<",
                 maybeWhitespaceA,
                 valueAString,
                 maybeWhitespaceB,
                 valueBString,
                 maybeWhitespaceC,
-                valueCString,
+                valueCString),
                 maybeWhitespaceD,
                 ">",
                 suffix
@@ -199,7 +200,7 @@ contract LibParseOperandParseOperandTest is Test {
         int256[4] memory values,
         string[5] memory maybeWhitespace,
         string memory suffix
-    ) external {
+    ) external pure {
         {
             vm.assume(bytes(maybeWhitespace[1]).length > 0);
             vm.assume(bytes(maybeWhitespace[2]).length > 0);

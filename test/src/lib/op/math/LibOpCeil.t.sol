@@ -8,14 +8,14 @@
 // contract LibOpCeilTest is OpTest {
 //     /// Directly test the integrity logic of LibOpCeil.
 //     /// Inputs are always 1, outputs are always 1.
-//     function testOpCeilIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+//     function testOpCeilIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
 //         (uint256 calcInputs, uint256 calcOutputs) = LibOpCeil.integrity(state, operand);
 //         assertEq(calcInputs, 1);
 //         assertEq(calcOutputs, 1);
 //     }
 
 //     /// Directly test the runtime logic of LibOpCeil.
-//     function testOpCeilRun(uint256 a, uint16 operandData) public {
+//     function testOpCeilRun(uint256 a, uint16 operandData) public view {
 //         a = bound(a, 0, type(uint64).max - 1e18);
 //         InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
@@ -26,14 +26,14 @@
 //         opReferenceCheck(state, operand, LibOpCeil.referenceFn, LibOpCeil.integrity, LibOpCeil.run, inputs);
 //     }
 
-//     /// Test the eval of `ceil`.
-//     function testOpCeilEval() external {
-//         checkHappy("_: ceil(0);", 0, "0");
-//         checkHappy("_: ceil(1);", 1e18, "1");
-//         checkHappy("_: ceil(0.5);", 1e18, "0.5");
-//         checkHappy("_: ceil(2);", 2e18, "2");
-//         checkHappy("_: ceil(2.5);", 3e18, "2.5");
-//     }
+// /// Test the eval of `ceil`.
+// function testOpCeilEval() external view {
+//     checkHappy("_: ceil(0);", 0, "0");
+//     checkHappy("_: ceil(1);", 1e18, "1");
+//     checkHappy("_: ceil(0.5);", 1e18, "0.5");
+//     checkHappy("_: ceil(2);", 2e18, "2");
+//     checkHappy("_: ceil(2.5);", 3e18, "2.5");
+// }
 
 //     /// Test the eval of `ceil` for bad inputs.
 //     function testOpCeilZeroInputs() external {

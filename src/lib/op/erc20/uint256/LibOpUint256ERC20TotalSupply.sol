@@ -18,11 +18,11 @@ library LibOpUint256ERC20TotalSupply {
 
     function run(InterpreterStateNP memory, Operand, Pointer stackTop) internal view returns (Pointer) {
         uint256 account;
-        assembly {
+        assembly ("memory-safe") {
             account := mload(stackTop)
         }
         uint256 totalSupply = IERC20(address(uint160(account))).totalSupply();
-        assembly {
+        assembly ("memory-safe") {
             mstore(stackTop, totalSupply)
         }
         return stackTop;

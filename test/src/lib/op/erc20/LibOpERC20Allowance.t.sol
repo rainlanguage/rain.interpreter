@@ -14,7 +14,7 @@
 // /// @title LibOpERC20AllowanceTest
 // /// @notice Test the opcode for getting the allowance of an erc20 token.
 // contract LibOpERC20AllowanceTest is OpTest {
-//     function testOpERC20AllowanceNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external {
+//     function testOpERC20AllowanceNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
 //         (uint256 calcInputs, uint256 calcOutputs) = LibOpERC20Allowance.integrity(state, operand);
 
 //         assertEq(calcInputs, 3);
