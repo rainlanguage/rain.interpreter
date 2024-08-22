@@ -6,7 +6,6 @@ import {Operand} from "rain.interpreter.interface/interface/unstable/IInterprete
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
-import {FIXED_POINT_ONE} from "rain.math.fixedpoint/lib/FixedPointDecimalConstants.sol";
 
 /// @title LibOpCtPopNP
 /// @notice An opcode that counts the number of bits set in a word. This is

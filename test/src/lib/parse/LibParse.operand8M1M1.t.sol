@@ -4,7 +4,6 @@ pragma solidity =0.8.25;
 import {UnsupportedLiteralType} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {ParserOutOfBounds} from "src/lib/parse/LibParse.sol";
 import {ExpectedOperand, UnclosedOperand} from "src/error/ErrParse.sol";
-import {IntegerOverflow} from "rain.math.fixedpoint/error/ErrScale.sol";
 import {OperandTest} from "test/abstract/OperandTest.sol";
 
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";

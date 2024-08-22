@@ -5,8 +5,6 @@ import {Test} from "forge-std/Test.sol";
 import {LibParseOperand, Operand} from "src/lib/parse/LibParseOperand.sol";
 import {ExpectedOperand, UnexpectedOperandValue} from "src/error/ErrParse.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
-import {IntegerOverflow} from "rain.math.fixedpoint/error/ErrScale.sol";
-import {LibFixedPointDecimalScale, DECIMAL_MAX_SAFE_INT} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 
 contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
     // There must be exactly two values so zero values is an error.

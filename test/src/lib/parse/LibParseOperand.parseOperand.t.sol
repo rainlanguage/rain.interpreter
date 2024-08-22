@@ -163,14 +163,10 @@ contract LibParseOperandParseOperandTest is Test {
             string memory valueBString = asHexB ? uint256(valueB).toHexString() : valueB.toString();
             string memory valueCString = asHexC ? uint256(valueC).toHexString() : valueC.toString();
 
-            s = string.concat(string.concat(
-                "<",
-                maybeWhitespaceA,
-                valueAString,
-                maybeWhitespaceB,
-                valueBString,
-                maybeWhitespaceC,
-                valueCString),
+            s = string.concat(
+                string.concat(
+                    "<", maybeWhitespaceA, valueAString, maybeWhitespaceB, valueBString, maybeWhitespaceC, valueCString
+                ),
                 maybeWhitespaceD,
                 ">",
                 suffix

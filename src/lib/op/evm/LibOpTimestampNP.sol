@@ -5,7 +5,6 @@ import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterStateNP, LibInterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {FIXED_POINT_ONE} from "rain.math.fixedpoint/lib/FixedPointDecimalConstants.sol";
 
 /// @title LibOpTimestampNP
 /// Implementation of the EVM `TIMESTAMP` opcode as a standard Rainlang opcode.

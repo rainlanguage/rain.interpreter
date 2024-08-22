@@ -5,7 +5,6 @@ import {Operand} from "rain.interpreter.interface/interface/unstable/IInterprete
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {LibFixedPointDecimalScale, DECIMAL_MAX_SAFE_INT} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 import {MASK_2BIT} from "sol.lib.binmaskflag/Binary.sol";
 import {LibParseLiteral} from "../../parse/literal/LibParseLiteral.sol";
 

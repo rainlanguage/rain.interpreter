@@ -5,7 +5,6 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
-import {FIXED_POINT_ONE} from "rain.math.fixedpoint/lib/FixedPointDecimalConstants.sol";
 
 /// @title LibOpChainIdNP
 /// Implementation of the EVM `CHAINID` opcode as a standard Rainlang opcode.

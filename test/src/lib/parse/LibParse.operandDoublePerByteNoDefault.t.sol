@@ -6,7 +6,6 @@ import {ExpectedOperand, UnclosedOperand, UnexpectedOperandValue} from "src/erro
 import {LibParse} from "src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
-import {IntegerOverflow} from "rain.math.fixedpoint/error/ErrScale.sol";
 
 contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     using LibParse for ParseState;

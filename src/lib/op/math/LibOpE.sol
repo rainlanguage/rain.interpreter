@@ -5,7 +5,6 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
-import {FIXED_POINT_ONE, FIXED_POINT_E} from "rain.math.fixedpoint/lib/FixedPointDecimalConstants.sol";
 
 /// @title LibOpE
 /// Stacks the mathematical constant e.

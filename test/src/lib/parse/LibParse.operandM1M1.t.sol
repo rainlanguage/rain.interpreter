@@ -6,7 +6,6 @@ import {ParserOutOfBounds, LibParse, ExpectedLeftParen} from "src/lib/parse/LibP
 import {OperandTest} from "test/abstract/OperandTest.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
-import {IntegerOverflow} from "rain.math.fixedpoint/error/ErrScale.sol";
 
 contract LibParseOperandM1M1Test is OperandTest {
     using LibParse for ParseState;
