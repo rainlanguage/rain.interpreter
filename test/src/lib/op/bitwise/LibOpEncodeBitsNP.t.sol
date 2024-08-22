@@ -72,16 +72,18 @@ contract LibOpEncodeBitsNPTest is OpTest {
         checkHappy("_:bitwise-encode<0 1>(1e-18 1e-18);", 1, "1 1");
         checkHappy("_:bitwise-encode<0 1>(0 2e-18);", 2, "0 2");
         checkHappy("_:bitwise-encode<0 1>(1e-18 2e-18);", 3, "1 2");
-        checkHappy("_:bitwise-encode<0 1>(max-value() 0);", 1, "max-value 0");
-        checkHappy("_:bitwise-encode<0 1>(max-value() 1e-18);", 1, "max-value 1");
-        checkHappy("_:bitwise-encode<0 1>(max-value() 2e-18);", 3, "max-value 2");
-        checkHappy("_:bitwise-encode<0 1>(max-value() 3e-18);", 3, "max-value 3");
-        checkHappy("_:bitwise-encode<0 2>(max-value() 0);", 3, "max-value 0 0 2");
-        checkHappy("_:bitwise-encode<1 1>(max-value() 0);", 2, "max-value 1 1 1");
-        checkHappy("_:bitwise-encode<1 1>(max-value() 1e-18);", 3, "max-value 1 1 1");
-        checkHappy("_:bitwise-encode<1 1>(max-value() 2e-18);", 2, "max-value 2 1 1");
-        checkHappy("_:bitwise-encode<0xFF 1>(max-value() 0);", 1 << 255, "max-value 2 0xFF 1");
-        checkHappy("_:bitwise-encode<0 0xFF>(max-value() 0);", type(uint256).max >> 1, "max-value 2 0xFF 1");
+        checkHappy("_:bitwise-encode<0 1>(uint256-max-value() 0);", 1, "uint256-max-value 0");
+        checkHappy("_:bitwise-encode<0 1>(uint256-max-value() 1e-18);", 1, "uint256-max-value 1");
+        checkHappy("_:bitwise-encode<0 1>(uint256-max-value() 2e-18);", 3, "uint256-max-value 2");
+        checkHappy("_:bitwise-encode<0 1>(uint256-max-value() 3e-18);", 3, "uint256-max-value 3");
+        checkHappy("_:bitwise-encode<0 2>(uint256-max-value() 0);", 3, "uint256-max-value 0 0 2");
+        checkHappy("_:bitwise-encode<1 1>(uint256-max-value() 0);", 2, "uint256-max-value 1 1 1");
+        checkHappy("_:bitwise-encode<1 1>(uint256-max-value() 1e-18);", 3, "uint256-max-value 1 1 1");
+        checkHappy("_:bitwise-encode<1 1>(uint256-max-value() 2e-18);", 2, "uint256-max-value 2 1 1");
+        checkHappy("_:bitwise-encode<0xFF 1>(uint256-max-value() 0);", 1 << 255, "uint256-max-value 2 0xFF 1");
+        checkHappy(
+            "_:bitwise-encode<0 0xFF>(uint256-max-value() 0);", type(uint256).max >> 1, "uint256-max-value 2 0xFF 1"
+        );
     }
 
     /// Check bad inputs.

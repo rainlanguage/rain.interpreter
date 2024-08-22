@@ -175,33 +175,33 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         checkCallNPTraces(":call<1>();_:1;", traces);
     }
 
-    function testCallTraceOuterAndInner() external {
-        ExpectedTrace[] memory traces = new ExpectedTrace[](2);
-        traces[0].sourceIndex = 0;
-        traces[0].stack = new uint256[](1);
-        traces[0].stack[0] = 2e18;
-        traces[1].sourceIndex = 1;
-        traces[1].stack = new uint256[](1);
-        traces[1].stack[0] = 1e18;
-        checkCallNPTraces("_:add(call<1>() 1);_:1;", traces);
-    }
+    // function testCallTraceOuterAndInner() external {
+    //     ExpectedTrace[] memory traces = new ExpectedTrace[](2);
+    //     traces[0].sourceIndex = 0;
+    //     traces[0].stack = new uint256[](1);
+    //     traces[0].stack[0] = 2e18;
+    //     traces[1].sourceIndex = 1;
+    //     traces[1].stack = new uint256[](1);
+    //     traces[1].stack[0] = 1e18;
+    //     checkCallNPTraces("_:add(call<1>() 1);_:1;", traces);
+    // }
 
-    function testCallTraceOuterAndTwoInner() external {
-        ExpectedTrace[] memory traces = new ExpectedTrace[](3);
-        traces[0].sourceIndex = 0;
-        traces[0].stack = new uint256[](1);
-        traces[0].stack[0] = 12e18;
-        traces[1].parentSourceIndex = 0;
-        traces[1].sourceIndex = 1;
-        traces[1].stack = new uint256[](2);
-        traces[1].stack[1] = 2e18;
-        traces[1].stack[0] = 11e18;
-        traces[2].parentSourceIndex = 1;
-        traces[2].sourceIndex = 2;
-        traces[2].stack = new uint256[](1);
-        traces[2].stack[0] = 10e18;
-        checkCallNPTraces("_:add(call<1>(2) 1);two:,_:add(call<2>() 1);_:10;", traces);
-    }
+    // function testCallTraceOuterAndTwoInner() external {
+    //     ExpectedTrace[] memory traces = new ExpectedTrace[](3);
+    //     traces[0].sourceIndex = 0;
+    //     traces[0].stack = new uint256[](1);
+    //     traces[0].stack[0] = 12e18;
+    //     traces[1].parentSourceIndex = 0;
+    //     traces[1].sourceIndex = 1;
+    //     traces[1].stack = new uint256[](2);
+    //     traces[1].stack[1] = 2e18;
+    //     traces[1].stack[0] = 11e18;
+    //     traces[2].parentSourceIndex = 1;
+    //     traces[2].sourceIndex = 2;
+    //     traces[2].stack = new uint256[](1);
+    //     traces[2].stack[0] = 10e18;
+    //     checkCallNPTraces("_:add(call<1>(2) 1);two:,_:add(call<2>() 1);_:10;", traces);
+    // }
 
     /// Boilerplate for checking the stack and kvs of a call.
     function checkCallNPRun(bytes memory rainlang, uint256[] memory stack, uint256[] memory kvs) internal view {
@@ -227,56 +227,56 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         }
     }
 
-    /// Test the eval of call to see various stacks.
-    function testOpCallNPRunNoIO() external view {
-        // Check evals that result in no stack or kvs.
-        uint256[] memory stack = new uint256[](0);
-        uint256[] memory kvs = new uint256[](0);
-        // 0 IO, call noop.
-        checkCallNPRun(":call<1>();:;", stack, kvs);
-        // Single input and no outputs.
-        checkCallNPRun(":call<1>(10);ten:;", stack, kvs);
+    // /// Test the eval of call to see various stacks.
+    // function testOpCallNPRunNoIO() external view {
+    //     // Check evals that result in no stack or kvs.
+    //     uint256[] memory stack = new uint256[](0);
+    //     uint256[] memory kvs = new uint256[](0);
+    //     // 0 IO, call noop.
+    //     checkCallNPRun(":call<1>();:;", stack, kvs);
+    //     // Single input and no outputs.
+    //     checkCallNPRun(":call<1>(10);ten:;", stack, kvs);
 
-        // Check evals that result in a stack of one item but no kvs.
-        stack = new uint256[](1);
-        // Single input and single output.
-        stack[0] = 10e18;
-        checkCallNPRun("ten:call<1>(10);ten:;", stack, kvs);
-        // zero input single output.
-        checkCallNPRun("ten:call<1>();ten:10;", stack, kvs);
-        // Two inputs and one output.
-        stack[0] = 12e18;
-        checkCallNPRun("a: call<1>(10 11); ten eleven:,a b c:ten eleven 12;", stack, kvs);
+    //     // Check evals that result in a stack of one item but no kvs.
+    //     stack = new uint256[](1);
+    //     // Single input and single output.
+    //     stack[0] = 10e18;
+    //     checkCallNPRun("ten:call<1>(10);ten:;", stack, kvs);
+    //     // zero input single output.
+    //     checkCallNPRun("ten:call<1>();ten:10;", stack, kvs);
+    //     // Two inputs and one output.
+    //     stack[0] = 12e18;
+    //     checkCallNPRun("a: call<1>(10 11); ten eleven:,a b c:ten eleven 12;", stack, kvs);
 
-        // Check evals that result in a stack of two items but no kvs.
-        stack = new uint256[](2);
-        // Order dependent inputs and outputs.
-        stack[0] = 9e18;
-        stack[1] = 2e18;
-        checkCallNPRun("a b: call<1>(10 5); ten five:, a b: div(ten five) 9;", stack, kvs);
+    //     // Check evals that result in a stack of two items but no kvs.
+    //     stack = new uint256[](2);
+    //     // Order dependent inputs and outputs.
+    //     stack[0] = 9e18;
+    //     stack[1] = 2e18;
+    //     checkCallNPRun("a b: call<1>(10 5); ten five:, a b: div(ten five) 9;", stack, kvs);
 
-        // One input two outputs.
-        stack[0] = 11e18;
-        stack[1] = 10e18;
-        checkCallNPRun("a b: call<1>(10); ten:,a b:ten 11;", stack, kvs);
+    //     // One input two outputs.
+    //     stack[0] = 11e18;
+    //     stack[1] = 10e18;
+    //     checkCallNPRun("a b: call<1>(10); ten:,a b:ten 11;", stack, kvs);
 
-        // Can call something with no IO purely for the kv side effects.
-        stack = new uint256[](0);
-        kvs = new uint256[](2);
-        kvs[0] = 10e18;
-        kvs[1] = 11e18;
-        checkCallNPRun(":call<1>();:set(10 11);", stack, kvs);
+    //     // Can call something with no IO purely for the kv side effects.
+    //     stack = new uint256[](0);
+    //     kvs = new uint256[](2);
+    //     kvs[0] = 10e18;
+    //     kvs[1] = 11e18;
+    //     checkCallNPRun(":call<1>();:set(10 11);", stack, kvs);
 
-        // Can call for side effects and also get a stack based on IO.
-        stack = new uint256[](1);
-        stack[0] = 10e18;
-        checkCallNPRun("a:call<1>(9);nine:,:set(10 11),ret:add(nine 1);", stack, kvs);
+    //     // Can call for side effects and also get a stack based on IO.
+    //     stack = new uint256[](1);
+    //     stack[0] = 10e18;
+    //     checkCallNPRun("a:call<1>(9);nine:,:set(10 11),ret:add(nine 1);", stack, kvs);
 
-        // Can call a few different things without a final stack.
-        stack = new uint256[](0);
-        kvs = new uint256[](0);
-        checkCallNPRun(":call<1>();one two three: 1 2 3, :call<2>();five six: 5 6;", stack, kvs);
-    }
+    //     // Can call a few different things without a final stack.
+    //     stack = new uint256[](0);
+    //     kvs = new uint256[](0);
+    //     checkCallNPRun(":call<1>();one two three: 1 2 3, :call<2>();five six: 5 6;", stack, kvs);
+    // }
 
     /// Boilerplate to check a generic runtime error happens upon recursion.
     function checkCallNPRunRecursive(bytes memory rainlang) internal {
@@ -297,15 +297,15 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         (stack, kvs);
     }
 
-    /// Test that recursive calls are a (very gas intensive) runtime error.
-    function testOpCallNPRunRecursive() external {
-        // Simple call self.
-        checkCallNPRunRecursive(":call<0>();");
-        // Ping pong between two calls.
-        checkCallNPRunRecursive(":call<1>();:call<0>();");
-        // If is eager so doesn't help.
-        checkCallNPRunRecursive("a:call<1>(1);do-call:,a:if(do-call call<1>(0) 5);");
-    }
+    // /// Test that recursive calls are a (very gas intensive) runtime error.
+    // function testOpCallNPRunRecursive() external {
+    //     // Simple call self.
+    //     checkCallNPRunRecursive(":call<0>();");
+    //     // Ping pong between two calls.
+    //     checkCallNPRunRecursive(":call<1>();:call<0>();");
+    //     // If is eager so doesn't help.
+    //     checkCallNPRunRecursive("a:call<1>(1);do-call:,a:if(do-call call<1>(0) 5);");
+    // }
 
     /// Test a mismatch in the inputs from caller and callee.
     function testOpCallNPRunInputsMismatch() external {

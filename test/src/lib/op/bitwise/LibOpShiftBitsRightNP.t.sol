@@ -105,10 +105,10 @@ contract LibOpShiftBitsRightNPTest is OpTest {
         checkHappy("_: bitwise-shift-right<3>(4e-18);", 0, "3, 4");
         checkHappy("_: bitwise-shift-right<255>(4e-18);", 0, "255, 4");
 
-        checkHappy("_: bitwise-shift-right<1>(max-value());", type(uint256).max >> 1, "1, max");
-        checkHappy("_: bitwise-shift-right<2>(max-value());", type(uint256).max >> 2, "2, max");
-        checkHappy("_: bitwise-shift-right<3>(max-value());", type(uint256).max >> 3, "3, max");
-        checkHappy("_: bitwise-shift-right<255>(max-value());", 1, "255, max");
+        checkHappy("_: bitwise-shift-right<1>(uint256-max-value());", type(uint256).max >> 1, "1, max");
+        checkHappy("_: bitwise-shift-right<2>(uint256-max-value());", type(uint256).max >> 2, "2, max");
+        checkHappy("_: bitwise-shift-right<3>(uint256-max-value());", type(uint256).max >> 3, "3, max");
+        checkHappy("_: bitwise-shift-right<255>(uint256-max-value());", 1, "255, max");
     }
 
     /// Test that a bitwise shift with bad inputs fails integrity.

@@ -83,11 +83,11 @@ contract LibOpDecodeBitsNPTest is OpTest {
         checkHappy("_:bitwise-decode<0 2>(2e-18);", 2, "0 2 2");
         checkHappy("_:bitwise-decode<0 2>(3e-18);", 3, "0 2 3");
         checkHappy("_:bitwise-decode<0 2>(4e-18);", 0, "0 2 4");
-        checkHappy("_:bitwise-decode<0 2>(max-value());", 3, "0 2 max-value");
-        checkHappy("_:bitwise-decode<0 0xFF>(max-value());", type(uint256).max >> 1, "0 0xFF max-value");
-        checkHappy("_:bitwise-decode<0xFF 1>(max-value());", 1, "0xFF 1 max-value");
-        checkHappy("_:bitwise-decode<1 0xFF>(max-value());", type(uint256).max >> 1, "1 0xFF max-value");
-        checkHappy("_:bitwise-decode<20 2>(max-value());", 3, "20 2 max-value");
+        checkHappy("_:bitwise-decode<0 2>(uint256-max-value());", 3, "0 2 uint256-max-value");
+        checkHappy("_:bitwise-decode<0 0xFF>(uint256-max-value());", type(uint256).max >> 1, "0 0xFF uint256-max-value");
+        checkHappy("_:bitwise-decode<0xFF 1>(uint256-max-value());", 1, "0xFF 1 uint256-max-value");
+        checkHappy("_:bitwise-decode<1 0xFF>(uint256-max-value());", type(uint256).max >> 1, "1 0xFF uint256-max-value");
+        checkHappy("_:bitwise-decode<20 2>(uint256-max-value());", 3, "20 2 uint256-max-value");
     }
 
     /// Check bad inputs.

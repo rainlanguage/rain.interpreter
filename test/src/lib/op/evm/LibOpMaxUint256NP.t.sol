@@ -50,21 +50,21 @@ contract LibOpMaxUint256NPTest is OpTest {
 
     /// Test the eval of LibOpMaxUint256NP parsed from a string.
     function testOpMaxUint256NPEval() external {
-        checkHappy("_: max-value();", type(uint256).max, "");
+        checkHappy("_: uint256-max-value();", type(uint256).max, "");
     }
 
     /// Test that a max-value with inputs fails integrity check.
     function testOpMaxUint256NPEvalFail() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
-        bytes memory bytecode = iDeployer.parse2("_: max-value(0x00);");
+        bytes memory bytecode = iDeployer.parse2("_: uint256-max-value(0x00);");
         (bytecode);
     }
 
     function testOpMaxUint256NPZeroOutputs() external {
-        checkBadOutputs(": max-value();", 0, 1, 0);
+        checkBadOutputs(": uint256-max-value();", 0, 1, 0);
     }
 
     function testOpMaxUint256NPTwoOutputs() external {
-        checkBadOutputs("_ _: max-value();", 0, 1, 2);
+        checkBadOutputs("_ _: uint256-max-value();", 0, 1, 2);
     }
 }
