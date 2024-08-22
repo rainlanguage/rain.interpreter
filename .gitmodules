@@ -4,9 +4,6 @@
 [submodule "lib/rain.lib.memkv"]
 	path = lib/rain.lib.memkv
 	url = https://github.com/rainprotocol/rain.lib.memkv
-[submodule "lib/prb-math"]
-	path = lib/prb-math
-	url = https://github.com/PaulRBerg/prb-math
 [submodule "lib/sol.lib.binmaskflag"]
 	path = lib/sol.lib.binmaskflag
 	url = https://github.com/rainprotocol/sol.lib.binmaskflag

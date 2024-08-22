@@ -1,43 +1,43 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// // SPDX-License-Identifier: CAL
+// pragma solidity ^0.8.18;
 
-import {UD60x18, sqrt} from "prb-math/UD60x18.sol";
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
-import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
+// import {UD60x18, sqrt} from "prb-math/UD60x18.sol";
+// import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+// import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+// import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
+// import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 
-/// @title LibOpSqrt
-/// @notice Opcode for the square root of an decimal 18 fixed point number.
-library LibOpSqrt {
-    function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
-        // There must be one inputs and one output.
-        return (1, 1);
-    }
+// /// @title LibOpSqrt
+// /// @notice Opcode for the square root of an decimal 18 fixed point number.
+// library LibOpSqrt {
+//     function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
+//         // There must be one inputs and one output.
+//         return (1, 1);
+//     }
 
-    /// sqrt
-    /// 18 decimal fixed point square root of a number.
-    function run(InterpreterStateNP memory, Operand, Pointer stackTop) internal pure returns (Pointer) {
-        uint256 a;
-        assembly ("memory-safe") {
-            a := mload(stackTop)
-        }
-        a = UD60x18.unwrap(sqrt(UD60x18.wrap(a)));
+//     /// sqrt
+//     /// 18 decimal fixed point square root of a number.
+//     function run(InterpreterStateNP memory, Operand, Pointer stackTop) internal pure returns (Pointer) {
+//         uint256 a;
+//         assembly ("memory-safe") {
+//             a := mload(stackTop)
+//         }
+//         a = UD60x18.unwrap(sqrt(UD60x18.wrap(a)));
 
-        assembly ("memory-safe") {
-            mstore(stackTop, a)
-        }
-        return stackTop;
-    }
+//         assembly ("memory-safe") {
+//             mstore(stackTop, a)
+//         }
+//         return stackTop;
+//     }
 
-    /// Gas intensive reference implementation of sqrt for testing.
-    function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
-        internal
-        pure
-        returns (uint256[] memory)
-    {
-        uint256[] memory outputs = new uint256[](1);
-        outputs[0] = UD60x18.unwrap(sqrt(UD60x18.wrap(inputs[0])));
-        return outputs;
-    }
-}
+//     /// Gas intensive reference implementation of sqrt for testing.
+//     function referenceFn(InterpreterStateNP memory, Operand, uint256[] memory inputs)
+//         internal
+//         pure
+//         returns (uint256[] memory)
+//     {
+//         uint256[] memory outputs = new uint256[](1);
+//         outputs[0] = UD60x18.unwrap(sqrt(UD60x18.wrap(inputs[0])));
+//         return outputs;
+//     }
+// }
