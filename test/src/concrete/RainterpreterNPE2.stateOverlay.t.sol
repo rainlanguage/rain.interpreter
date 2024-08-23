@@ -6,13 +6,14 @@ import {RainterpreterExpressionDeployerNPE2DeploymentTest} from
 import {FullyQualifiedNamespace, StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {EvalV4, SourceIndexV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibNamespace} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
+import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
 
 contract RainterpreterNPE2StateOverlayTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     /// Show that state overlay can prewarm a get.
-    function testStateOverlayGet() external {
+    function testStateOverlayGet() external view {
         bytes memory bytecode = iDeployer.parse2("_: get(9);");
 
-        uint256 k = 9e18;
+        uint256 k = LibDecimalFloat.pack(9e37, -37);
         uint256 v = 42;
         uint256[] memory stateOverlay = new uint256[](2);
         stateOverlay[0] = k;
@@ -38,11 +39,11 @@ contract RainterpreterNPE2StateOverlayTest is RainterpreterExpressionDeployerNPE
     }
 
     /// Show that state overlay can be overridden by a set in the bytecode.
-    function testStateOverlaySet() external {
+    function testStateOverlaySet() external view {
         bytes memory bytecode = iDeployer.parse2("_:get(9),:set(9 42),_:get(9);");
 
-        uint256 k = 9e18;
-        uint256 v = 43e18;
+        uint256 k = LibDecimalFloat.pack(9e37, -37);
+        uint256 v = LibDecimalFloat.pack(43e37, -37);
         uint256[] memory stateOverlay = new uint256[](2);
         stateOverlay[0] = k;
         stateOverlay[1] = v;
@@ -60,10 +61,10 @@ contract RainterpreterNPE2StateOverlayTest is RainterpreterExpressionDeployerNPE
         );
 
         assertEq(stack.length, 2);
-        assertEq(stack[0], 42e18);
+        assertEq(stack[0], LibDecimalFloat.pack(42e37, -37));
         assertEq(stack[1], v);
         assertEq(kvs.length, 2);
         assertEq(kvs[0], k);
-        assertEq(kvs[1], 42e18);
+        assertEq(kvs[1], LibDecimalFloat.pack(42e37, -37));
     }
 }

@@ -36,6 +36,7 @@ import {
     OPCODE_FUNCTION_POINTERS
 } from "../../generated/RainterpreterReferenceExternNPE2.pointers.sol";
 import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
+import {console2} from "forge-std/Test.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
 /// 1:1 with the number of opcodes provided by the extern component of this
@@ -253,7 +254,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
                     state, cursor + SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH, end
                 );
                 // We can only repeat a single digit.
-                if (LibDecimalFloat.lt(signedCoefficient, exponent, 9, 0)) {
+                if (LibDecimalFloat.gt(signedCoefficient, exponent, 9, 0)) {
                     revert InvalidRepeatCount();
                 }
 

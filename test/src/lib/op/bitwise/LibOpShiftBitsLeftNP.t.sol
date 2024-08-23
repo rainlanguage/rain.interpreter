@@ -143,8 +143,6 @@ contract LibOpShiftBitsLeftNPTest is OpTest {
             "_: bitwise-shift-left<65535>(0);", abi.encodeWithSelector(UnsupportedBitwiseShiftAmount.selector, 65535)
         );
         // Lets go ahead and overflow the operand.
-        checkUnhappyParse(
-            "_: bitwise-shift-left<65536>(0);", abi.encodeWithSelector(OperandOverflow.selector)
-        );
+        checkUnhappyParse("_: bitwise-shift-left<65536>(0);", abi.encodeWithSelector(OperandOverflow.selector));
     }
 }

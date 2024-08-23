@@ -34,11 +34,7 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
 
         uint256[] memory values = new uint256[](1);
         values[0] = value;
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                OperandOverflow.selector
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         LibParseOperand.handleOperand8M1M1(values);
     }
 
@@ -68,11 +64,7 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
         uint256[] memory values = new uint256[](2);
         values[0] = a;
         values[1] = b;
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                OperandOverflow.selector
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         LibParseOperand.handleOperand8M1M1(values);
     }
 
@@ -106,11 +98,7 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
         values[0] = a;
         values[1] = b;
         values[2] = c;
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                OperandOverflow.selector
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         LibParseOperand.handleOperand8M1M1(values);
     }
 

@@ -45,11 +45,7 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
         values[0] = a;
         values[1] = b;
 
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                OperandOverflow.selector
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         LibParseOperand.handleOperandDoublePerByteNoDefault(values);
     }
 
@@ -67,11 +63,7 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
         uint256[] memory values = new uint256[](2);
         values[0] = a;
         values[1] = b;
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                OperandOverflow.selector
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         LibParseOperand.handleOperandDoublePerByteNoDefault(values);
     }
 

@@ -20,6 +20,7 @@ import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {COMPATIBILITY_V4} from "rain.interpreter.interface/interface/ISubParserV3.sol";
 import {OPCODE_EXTERN} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {ExternDispatchConstantsHeightOverflow} from "src/error/ErrSubParse.sol";
+import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
 
 contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
     using Strings for address;
@@ -38,15 +39,15 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
         );
 
         uint256[] memory expectedStack = new uint256[](3);
-        expectedStack[0] = 4;
-        expectedStack[1] = 3;
+        expectedStack[0] = LibDecimalFloat.pack(4e37, -37);
+        expectedStack[1] = LibDecimalFloat.pack(3e37, -37);
         expectedStack[2] = EncodedExternDispatch.unwrap(encodedExternDispatch);
 
         checkHappy(
             // Need the constant in the constant array to be indexable in the operand.
             "_: 0x000000000000000000000000c7183455a4c133ae270771860664b6b7ec320bb1,"
             // Operand is the constant index of the dispatch.
-            "three four: extern<0>(2e-18 3e-18);",
+            "three four: extern<0>(2 3);",
             expectedStack,
             "inc 2 3 = 3 4"
         );
@@ -56,14 +57,12 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
         RainterpreterReferenceExternNPE2 extern = new RainterpreterReferenceExternNPE2();
 
         uint256[] memory expectedStack = new uint256[](2);
-        expectedStack[0] = 4;
-        expectedStack[1] = 3;
+        expectedStack[0] = LibDecimalFloat.pack(4e37, -37);
+        expectedStack[1] = LibDecimalFloat.pack(3e37, -37);
 
         checkHappy(
             bytes(
-                string.concat(
-                    "using-words-from ", address(extern).toHexString(), " three four: ref-extern-inc(2e-18 3e-18);"
-                )
+                string.concat("using-words-from ", address(extern).toHexString(), " three four: ref-extern-inc(2 3);")
             ),
             expectedStack,
             "sugared inc 2 3 = 3 4"

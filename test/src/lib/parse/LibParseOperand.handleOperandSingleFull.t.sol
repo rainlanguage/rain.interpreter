@@ -28,11 +28,7 @@ contract LibParseOperandHandleOperandSingleFullTest is Test {
         value *= 1e18;
         uint256[] memory values = new uint256[](1);
         values[0] = value;
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                OperandOverflow.selector
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         LibParseOperand.handleOperandSingleFull(values);
     }
 
