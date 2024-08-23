@@ -5,6 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {LibParseOperand, Operand} from "src/lib/parse/LibParseOperand.sol";
 import {ExpectedOperand, UnexpectedOperandValue} from "src/error/ErrParse.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
+import {OperandOverflow} from "src/error/ErrParse.sol";
 
 contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
     // There must be exactly two values so zero values is an error.
@@ -31,7 +32,7 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
 
     // If the first value is greater than 1 byte, it is an error.
     function testHandleOperandDoublePerByteNoDefaultFirstValueTooLarge(uint256 a, uint256 b) external {
-        a = bound(a, uint256(type(uint8).max) + 1, DECIMAL_MAX_SAFE_INT);
+        a = bound(a, uint256(type(uint8).max) + 1, 1e38);
         b = bound(b, 0, type(uint8).max);
 
         // If a is a decimal, scale it above 256 as a decimal.
@@ -46,7 +47,7 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
 
         vm.expectRevert(
             abi.encodeWithSelector(
-                IntegerOverflow.selector, LibFixedPointDecimalScale.decimalOrIntToInt(a, DECIMAL_MAX_SAFE_INT), 255
+                OperandOverflow.selector
             )
         );
         LibParseOperand.handleOperandDoublePerByteNoDefault(values);
@@ -55,7 +56,7 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
     // If the second value is greater than 1 byte, it is an error.
     function testHandleOperandDoublePerByteNoDefaultSecondValueTooLarge(uint256 a, uint256 b) external {
         a = bound(a, 0, type(uint8).max);
-        b = bound(b, uint256(type(uint8).max) + 1, DECIMAL_MAX_SAFE_INT);
+        b = bound(b, uint256(type(uint8).max) + 1, 1e38);
 
         // If b is a decimal, scale it above 256 as a decimal.
         if (b >= 1e18) {
@@ -68,7 +69,7 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
         values[1] = b;
         vm.expectRevert(
             abi.encodeWithSelector(
-                IntegerOverflow.selector, LibFixedPointDecimalScale.decimalOrIntToInt(b, DECIMAL_MAX_SAFE_INT), 255
+                OperandOverflow.selector
             )
         );
         LibParseOperand.handleOperandDoublePerByteNoDefault(values);

@@ -66,7 +66,7 @@ bytes32 constant SUB_PARSER_LITERAL_REPEAT_KEYWORD_MASK =
 uint256 constant SUB_PARSER_LITERAL_REPEAT_INDEX = 0;
 
 /// @dev Thrown when the repeat literal parser is not a single digit.
-error InvalidRepeatCount(uint256 value);
+error InvalidRepeatCount();
 
 /// @dev Number of opcode function pointers available to run at eval time.
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;

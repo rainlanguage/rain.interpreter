@@ -148,3 +148,6 @@ error BadSubParserResult(bytes bytecode);
 
 /// Thrown when there are more than 16 inputs or outputs for a given opcode.
 error OpcodeIOOverflow(uint256 offset);
+
+/// Thrown when an operand value is larger than the maximum allowed.
+error OperandOverflow();

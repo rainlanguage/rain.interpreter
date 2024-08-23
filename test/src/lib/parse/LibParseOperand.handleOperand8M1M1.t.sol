@@ -5,6 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {LibParseOperand, Operand} from "src/lib/parse/LibParseOperand.sol";
 import {ExpectedOperand, UnexpectedOperandValue} from "src/error/ErrParse.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
+import {OperandOverflow} from "src/error/ErrParse.sol";
 
 contract LibParseOperandHandleOperand8M1M1Test is Test {
     // The first value must be 1 byte and is mandatory. Zero values is an error.
@@ -23,7 +24,7 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
 
     // If the first value is greater than 1 byte, it is an error.
     function testHandleOperand8M1M1FirstValueTooLarge(uint256 value) external {
-        value = bound(value, uint256(type(uint8).max) + 1, DECIMAL_MAX_SAFE_INT);
+        value = bound(value, uint256(type(uint8).max) + 1, 1e38);
 
         // If value is a decimal, scale it above 256 as a decimal.
         if (value >= 1e18) {
@@ -35,7 +36,7 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
         values[0] = value;
         vm.expectRevert(
             abi.encodeWithSelector(
-                IntegerOverflow.selector, LibFixedPointDecimalScale.decimalOrIntToInt(value, DECIMAL_MAX_SAFE_INT), 0xFF
+                OperandOverflow.selector
             )
         );
         LibParseOperand.handleOperand8M1M1(values);
@@ -56,7 +57,7 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
     // but the second is greater than 1 bit, it is an error.
     function testHandleOperand8M1M1FirstAndSecondValueSecondValueTooLarge(uint256 a, uint256 b) external {
         a = bound(a, 0, type(uint8).max);
-        b = bound(b, 2, DECIMAL_MAX_SAFE_INT);
+        b = bound(b, 2, 1e38);
 
         // If b is a decimal, scale it above 256 as a decimal.
         if (b >= 1e18) {
@@ -69,7 +70,7 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
         values[1] = b;
         vm.expectRevert(
             abi.encodeWithSelector(
-                IntegerOverflow.selector, LibFixedPointDecimalScale.decimalOrIntToInt(b, DECIMAL_MAX_SAFE_INT), 1
+                OperandOverflow.selector
             )
         );
         LibParseOperand.handleOperand8M1M1(values);
@@ -93,7 +94,7 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
     function testHandleOperand8M1M1AllValuesThirdValueTooLarge(uint256 a, uint256 b, uint256 c) external {
         a = bound(a, 0, type(uint8).max);
         b = bound(b, 0, 1);
-        c = bound(c, 2, DECIMAL_MAX_SAFE_INT);
+        c = bound(c, 2, 1e38);
 
         // If c is a decimal, scale it above 256 as a decimal.
         if (c >= 1e18) {
@@ -107,7 +108,7 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
         values[2] = c;
         vm.expectRevert(
             abi.encodeWithSelector(
-                IntegerOverflow.selector, LibFixedPointDecimalScale.decimalOrIntToInt(c, DECIMAL_MAX_SAFE_INT), 1
+                OperandOverflow.selector
             )
         );
         LibParseOperand.handleOperand8M1M1(values);

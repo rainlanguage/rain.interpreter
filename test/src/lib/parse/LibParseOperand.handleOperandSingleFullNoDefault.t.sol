@@ -5,6 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {LibParseOperand, Operand} from "src/lib/parse/LibParseOperand.sol";
 import {UnexpectedOperandValue, ExpectedOperand} from "src/error/ErrParse.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
+import {OperandOverflow} from "src/error/ErrParse.sol";
 
 contract LibParseOperandHandleOperandSingleFullTest is Test {
     // No values errors.
@@ -23,7 +24,7 @@ contract LibParseOperandHandleOperandSingleFullTest is Test {
 
     // Single values outside 2 bytes are disallowed.
     function testHandleOperandSingleFullSingleValueNoDefaultDisallowed(uint256 value) external {
-        value = bound(value, uint256(type(uint16).max) + 1, DECIMAL_MAX_SAFE_INT);
+        value = bound(value, uint256(type(uint16).max) + 1, 1e38);
         value = value * 1e18;
 
         // If value is a decimal, scale it above 256 as a decimal.
@@ -36,9 +37,7 @@ contract LibParseOperandHandleOperandSingleFullTest is Test {
         values[0] = value;
         vm.expectRevert(
             abi.encodeWithSelector(
-                IntegerOverflow.selector,
-                LibFixedPointDecimalScale.decimalOrIntToInt(value, DECIMAL_MAX_SAFE_INT),
-                0xFFFF
+                OperandOverflow.selector
             )
         );
         LibParseOperand.handleOperandSingleFullNoDefault(values);

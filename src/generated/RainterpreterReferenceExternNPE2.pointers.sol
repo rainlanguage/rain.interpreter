@@ -9,7 +9,7 @@
 pragma solidity =0.8.25;
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0x4247a5ea9bd8abcbe989b8ae09f2b9b29cafa521add389fc7b6f2b1ca3c49ecc);
+bytes32 constant BYTECODE_HASH = bytes32(0xa6f1f65cad3f9e2d59cbe0234b3d684442e6152a23f7966772d1bc21270e4ccf);
 
 /// @dev The hash of the meta that describes the contract.
 bytes32 constant DESCRIBED_BY_META_HASH = bytes32(0xadf71693c6ecf3fd560904bc46973d1b6e651440d15366673f9b3984749e7c16);
@@ -47,14 +47,14 @@ bytes constant SUB_PARSER_WORD_PARSERS = hex"0775079707a607b607c7";
 /// @dev Every two bytes is a function pointer for an operand handler.
 /// These positional indexes all map to the same indexes looked up in the parse
 /// meta.
-bytes constant OPERAND_HANDLER_FUNCTION_POINTERS = hex"0a270a6c0a270a270a27";
+bytes constant OPERAND_HANDLER_FUNCTION_POINTERS = hex"0a370a7c0a370a370a37";
 
 /// @dev Every two bytes is a function pointer for a literal parser.
 /// Literal dispatches are determined by the first byte(s) of the literal
 /// rather than a full word lookup, and are done with simple conditional
 /// jumps as the possibilities are limited compared to the number of words we
 /// have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"09f8";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0a06";
 
 /// @dev The function pointers for the integrity check fns.
 bytes constant INTEGRITY_FUNCTION_POINTERS = hex"08ad";

@@ -5,6 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {LibParseOperand, Operand} from "src/lib/parse/LibParseOperand.sol";
 import {ExpectedOperand, UnexpectedOperandValue} from "src/error/ErrParse.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
+import {OperandOverflow} from "src/error/ErrParse.sol";
 
 contract LibParseOperandHandleOperandM1M1Test is Test {
     // Both values are optional so if nothing is provided everything falls back
@@ -23,7 +24,7 @@ contract LibParseOperandHandleOperandM1M1Test is Test {
 
     // If one value is provided and it is greater than 1 bit, it is an error.
     function testHandleOperandM1M1OneValueTooLarge(uint256 value) external {
-        value = bound(value, 2, DECIMAL_MAX_SAFE_INT);
+        value = bound(value, 2, 1e38);
 
         // If value is a decimal, scale it above 256 as a decimal.
         if (value >= 1e18) {
@@ -35,7 +36,7 @@ contract LibParseOperandHandleOperandM1M1Test is Test {
         values[0] = value;
         vm.expectRevert(
             abi.encodeWithSelector(
-                IntegerOverflow.selector, LibFixedPointDecimalScale.decimalOrIntToInt(value, DECIMAL_MAX_SAFE_INT), 1
+                OperandOverflow.selector
             )
         );
         LibParseOperand.handleOperandM1M1(values);
@@ -55,7 +56,7 @@ contract LibParseOperandHandleOperandM1M1Test is Test {
     // an error.
     function testHandleOperandM1M1TwoValuesSecondValueTooLarge(uint256 a, uint256 b) external {
         a = bound(a, 0, 1);
-        b = bound(b, 2, DECIMAL_MAX_SAFE_INT);
+        b = bound(b, 2, 1e38);
 
         // If b is a decimal, scale it above 256 as a decimal.
         if (b >= 1e18) {
@@ -68,7 +69,7 @@ contract LibParseOperandHandleOperandM1M1Test is Test {
         values[1] = b;
         vm.expectRevert(
             abi.encodeWithSelector(
-                IntegerOverflow.selector, LibFixedPointDecimalScale.decimalOrIntToInt(b, DECIMAL_MAX_SAFE_INT), 1
+                OperandOverflow.selector
             )
         );
         LibParseOperand.handleOperandM1M1(values);

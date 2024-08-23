@@ -6,7 +6,8 @@ import {
     UnclosedOperand,
     OperandValuesOverflow,
     UnexpectedOperand,
-    UnexpectedOperandValue
+    UnexpectedOperandValue,
+    OperandOverflow
 } from "../../error/ErrParse.sol";
 import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibParse} from "./LibParse.sol";
@@ -157,8 +158,11 @@ library LibParseOperand {
             assembly ("memory-safe") {
                 operand := mload(add(values, 0x20))
             }
-            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(operand);
+            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(Operand.unwrap(operand));
             operand = Operand.wrap(LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0));
+            if (Operand.unwrap(operand) > type(uint16).max) {
+                revert OperandOverflow();
+            }
         } else if (values.length == 0) {
             operand = Operand.wrap(0);
         } else {
@@ -175,6 +179,9 @@ library LibParseOperand {
             }
             (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(Operand.unwrap(operand));
             operand = Operand.wrap(LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0));
+            if (Operand.unwrap(operand) > type(uint16).max) {
+                revert OperandOverflow();
+            }
         } else if (values.length == 0) {
             revert ExpectedOperand();
         } else {
@@ -197,6 +204,10 @@ library LibParseOperand {
             a = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
             (signedCoefficient, exponent) = LibDecimalFloat.unpack(b);
             b = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
+
+            if (a > type(uint8).max || b > type(uint8).max) {
+                revert OperandOverflow();
+            }
 
             operand = Operand.wrap(a | (b << 8));
         } else if (values.length < 2) {
@@ -242,6 +253,10 @@ library LibParseOperand {
             (signedCoefficient, exponent) = LibDecimalFloat.unpack(c);
             c = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
 
+            if (a > type(uint8).max || b > 1 || c > 1) {
+                revert OperandOverflow();
+            }
+
             operand = Operand.wrap(a | (b << 8) | (c << 9));
         } else if (length == 0) {
             revert ExpectedOperand();
@@ -278,6 +293,10 @@ library LibParseOperand {
             a = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
             (signedCoefficient, exponent) = LibDecimalFloat.unpack(b);
             b = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
+
+            if (a > 1 || b > 1) {
+                revert OperandOverflow();
+            }
 
             operand = Operand.wrap(a | (b << 1));
         } else {

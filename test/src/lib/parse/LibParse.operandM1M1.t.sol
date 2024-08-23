@@ -6,6 +6,7 @@ import {ParserOutOfBounds, LibParse, ExpectedLeftParen} from "src/lib/parse/LibP
 import {OperandTest} from "test/abstract/OperandTest.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
+import {OperandOverflow} from "src/error/ErrParse.sol";
 
 contract LibParseOperandM1M1Test is OperandTest {
     using LibParse for ParseState;
@@ -81,7 +82,7 @@ contract LibParseOperandM1M1Test is OperandTest {
 
     /// Default is zero for this operand parser. Tests first overflow.
     function testOperandM1M1FirstOverflow() external {
-        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector, 2, 1));
+        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:d<2>();").parse();
         (bytecode);
         (constants);
@@ -135,7 +136,7 @@ contract LibParseOperandM1M1Test is OperandTest {
 
     /// Default is zero for this operand parser. Tests 0 2.
     function testOperandM1M1SecondOverflow() external {
-        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector, 2, 1));
+        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:d<0 2>();").parse();
         (bytecode);
         (constants);

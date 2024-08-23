@@ -16,6 +16,7 @@ import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreter
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {UnsupportedBitwiseShiftAmount} from "src/error/ErrBitwise.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {OperandOverflow} from "src/error/ErrParse.sol";
 
 contract LibOpShiftBitsRightNPTest is OpTest {
     /// Directly test the integrity logic of LibOpShiftBitsRightNP. Tests the
@@ -142,7 +143,7 @@ contract LibOpShiftBitsRightNPTest is OpTest {
         );
         // Lets go ahead and overflow the operand.
         checkUnhappyParse(
-            "_: bitwise-shift-right<65536>(0);", abi.encodeWithSelector(IntegerOverflow.selector, 65536, 65535)
+            "_: bitwise-shift-right<65536>(0);", abi.encodeWithSelector(OperandOverflow.selector)
         );
     }
 }
