@@ -28,7 +28,7 @@ library LibOpCtPopNP {
             value := mload(stackTop)
         }
         unchecked {
-            value = LibCtPop.ctpop(value) * FIXED_POINT_ONE;
+            value = LibCtPop.ctpop(value);
         }
         assembly ("memory-safe") {
             mstore(stackTop, value)
@@ -42,7 +42,7 @@ library LibOpCtPopNP {
         pure
         returns (uint256[] memory)
     {
-        inputs[0] = LibCtPop.ctpopSlow(inputs[0]) * FIXED_POINT_ONE;
+        inputs[0] = LibCtPop.ctpopSlow(inputs[0]);
         return inputs;
     }
 }

@@ -14,10 +14,9 @@ library LibOpBlockNumberNP {
     }
 
     function run(InterpreterStateNP memory, Operand, Pointer stackTop) internal view returns (Pointer) {
-        uint256 decimalOne = FIXED_POINT_ONE;
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
-            mstore(stackTop, mul(number(), decimalOne))
+            mstore(stackTop, number())
         }
         return stackTop;
     }
@@ -28,7 +27,7 @@ library LibOpBlockNumberNP {
         returns (uint256[] memory)
     {
         uint256[] memory outputs = new uint256[](1);
-        outputs[0] = block.number * FIXED_POINT_ONE;
+        outputs[0] = block.number;
         return outputs;
     }
 }

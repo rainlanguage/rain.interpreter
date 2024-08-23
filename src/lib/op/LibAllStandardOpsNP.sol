@@ -32,9 +32,9 @@ import {LibOpUint256ERC20Allowance} from "./erc20/uint256/LibOpUint256ERC20Allow
 import {LibOpUint256ERC20BalanceOf} from "./erc20/uint256/LibOpUint256ERC20BalanceOf.sol";
 import {LibOpUint256ERC20TotalSupply} from "./erc20/uint256/LibOpUint256ERC20TotalSupply.sol";
 
-import {LibOpERC20Allowance} from "./erc20/LibOpERC20Allowance.sol";
-import {LibOpERC20BalanceOf} from "./erc20/LibOpERC20BalanceOf.sol";
-import {LibOpERC20TotalSupply} from "./erc20/LibOpERC20TotalSupply.sol";
+// import {LibOpERC20Allowance} from "./erc20/LibOpERC20Allowance.sol";
+// import {LibOpERC20BalanceOf} from "./erc20/LibOpERC20BalanceOf.sol";
+// import {LibOpERC20TotalSupply} from "./erc20/LibOpERC20TotalSupply.sol";
 
 import {LibOpUint256ERC721BalanceOf} from "./erc721/uint256/LibOpUint256ERC721BalanceOf.sol";
 import {LibOpERC721OwnerOf} from "./erc721/LibOpERC721OwnerOf.sol";
@@ -70,7 +70,7 @@ import {LibOpAdd} from "./math/LibOpAdd.sol";
 // import {LibOpCeil} from "./math/LibOpCeil.sol";
 // import {LibOpMul} from "./math/LibOpMul.sol";
 // import {LibOpDiv} from "./math/LibOpDiv.sol";
-import {LibOpE} from "./math/LibOpE.sol";
+// import {LibOpE} from "./math/LibOpE.sol";
 // import {LibOpExp} from "./math/LibOpExp.sol";
 // import {LibOpExp2} from "./math/LibOpExp2.sol";
 // import {LibOpFloor} from "./math/LibOpFloor.sol";
@@ -85,10 +85,10 @@ import {LibOpMin} from "./math/LibOpMin.sol";
 import {LibOpMod} from "./math/LibOpMod.sol";
 // import {LibOpLog2} from "./math/LibOpLog2.sol";
 // import {LibOpPow} from "./math/LibOpPow.sol";
-import {LibOpScale18Dynamic} from "./math/LibOpScale18Dynamic.sol";
-import {LibOpScale18} from "./math/LibOpScale18.sol";
-import {LibOpScaleNDynamic} from "./math/LibOpScaleNDynamic.sol";
-import {LibOpScaleN} from "./math/LibOpScaleN.sol";
+// import {LibOpScale18Dynamic} from "./math/LibOpScale18Dynamic.sol";
+// import {LibOpScale18} from "./math/LibOpScale18.sol";
+// import {LibOpScaleNDynamic} from "./math/LibOpScaleNDynamic.sol";
+// import {LibOpScaleN} from "./math/LibOpScaleN.sol";
 // import {LibOpSnapToUnit} from "./math/LibOpSnapToUnit.sol";
 // import {LibOpSqrt} from "./math/LibOpSqrt.sol";
 // import {LibOpSub} from "./math/LibOpSub.sol";

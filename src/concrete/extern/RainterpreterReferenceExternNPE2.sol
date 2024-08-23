@@ -35,6 +35,7 @@ import {
     INTEGRITY_FUNCTION_POINTERS,
     OPCODE_FUNCTION_POINTERS
 } from "../../generated/RainterpreterReferenceExternNPE2.pointers.sol";
+import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
 /// 1:1 with the number of opcodes provided by the extern component of this
@@ -246,17 +247,17 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
                 ParseState memory state = LibParseState.newState("", "", "", "");
                 // If we have a match on the keyword then the next chars MUST
                 // be a decimal, otherwise it's an error.
-                uint256 value;
-                (cursor, value) = LibParseLiteralDecimal.parseDecimal(
+                int256 signedCoefficient;
+                int256 exponent;
+                (cursor, signedCoefficient, exponent) = LibParseLiteralDecimal.parseDecimalFloat(
                     state, cursor + SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH, end
                 );
-                value = LibFixedPointDecimalScale.scaleToIntegerLossless(value);
                 // We can only repeat a single digit.
-                if (value > 9) {
-                    revert InvalidRepeatCount(value);
+                if (LibDecimalFloat.lt(signedCoefficient, exponent, 9, 0)) {
+                    revert InvalidRepeatCount();
                 }
 
-                return (true, SUB_PARSER_LITERAL_REPEAT_INDEX, value);
+                return (true, SUB_PARSER_LITERAL_REPEAT_INDEX, LibDecimalFloat.pack(signedCoefficient, exponent));
             } else {
                 return (false, 0, 0);
             }
