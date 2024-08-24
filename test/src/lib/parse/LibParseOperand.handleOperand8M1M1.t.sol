@@ -23,17 +23,11 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
     }
 
     // If the first value is greater than 1 byte, it is an error.
-    function testHandleOperand8M1M1FirstValueTooLarge(uint256 value) external {
-        value = bound(value, uint256(type(uint8).max) + 1, 1e38);
-
-        // If value is a decimal, scale it above 256 as a decimal.
-        if (value >= 1e18) {
-            value = bound(value, 256e18, type(uint256).max);
-            value = value - (value % 1e18);
-        }
+    function testHandleOperand8M1M1FirstValueTooLarge(int256 value) external {
+        value = bound(value, int256(uint256(type(uint8).max)) + 1, type(int128).max);
 
         uint256[] memory values = new uint256[](1);
-        values[0] = value;
+        values[0] = uint256(value);
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         LibParseOperand.handleOperand8M1M1(values);
     }
@@ -53,13 +47,7 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
     // but the second is greater than 1 bit, it is an error.
     function testHandleOperand8M1M1FirstAndSecondValueSecondValueTooLarge(uint256 a, uint256 b) external {
         a = bound(a, 0, type(uint8).max);
-        b = bound(b, 2, 1e38);
-
-        // If b is a decimal, scale it above 256 as a decimal.
-        if (b >= 1e18) {
-            b = bound(b, 256e18, type(uint256).max);
-            b = b - (b % 1e18);
-        }
+        b = bound(b, 2, uint256(int256(type(int128).max)));
 
         uint256[] memory values = new uint256[](2);
         values[0] = a;
@@ -86,13 +74,7 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
     function testHandleOperand8M1M1AllValuesThirdValueTooLarge(uint256 a, uint256 b, uint256 c) external {
         a = bound(a, 0, type(uint8).max);
         b = bound(b, 0, 1);
-        c = bound(c, 2, 1e38);
-
-        // If c is a decimal, scale it above 256 as a decimal.
-        if (c >= 1e18) {
-            c = bound(c, 256e18, type(uint256).max);
-            c = c - (c % 1e18);
-        }
+        c = bound(c, 2, uint256(int256(type(int128).max)));
 
         uint256[] memory values = new uint256[](3);
         values[0] = a;

@@ -24,13 +24,7 @@ contract LibParseOperandHandleOperandM1M1Test is Test {
 
     // If one value is provided and it is greater than 1 bit, it is an error.
     function testHandleOperandM1M1OneValueTooLarge(uint256 value) external {
-        value = bound(value, 2, 1e38);
-
-        // If value is a decimal, scale it above 256 as a decimal.
-        if (value >= 1e18) {
-            value = bound(value, 256e18, type(uint256).max);
-            value = value - (value % 1e18);
-        }
+        value = bound(value, 2, uint256(int256(type(int128).max)));
 
         uint256[] memory values = new uint256[](1);
         values[0] = value;
@@ -52,13 +46,7 @@ contract LibParseOperandHandleOperandM1M1Test is Test {
     // an error.
     function testHandleOperandM1M1TwoValuesSecondValueTooLarge(uint256 a, uint256 b) external {
         a = bound(a, 0, 1);
-        b = bound(b, 2, 1e38);
-
-        // If b is a decimal, scale it above 256 as a decimal.
-        if (b >= 1e18) {
-            b = bound(b, 256e18, type(uint256).max);
-            b = b - (b % 1e18);
-        }
+        b = bound(b, 2, uint256(int256(type(int128).max)));
 
         uint256[] memory values = new uint256[](2);
         values[0] = a;

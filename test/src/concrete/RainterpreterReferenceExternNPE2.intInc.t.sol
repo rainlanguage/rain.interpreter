@@ -132,8 +132,10 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
     function testRainterpreterReferenceExternNPE2IntIncRun(Operand operand, uint256[] memory inputs) external pure {
         uint256[] memory expectedOutputs = new uint256[](inputs.length);
         for (uint256 i = 0; i < inputs.length; i++) {
-            vm.assume(inputs[i] < type(uint256).max);
-            expectedOutputs[i] = inputs[i] + 1;
+            inputs[i] = bound(inputs[i], 0, uint256(int256(type(int128).max)));
+            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(inputs[i]);
+            (signedCoefficient, exponent) = LibDecimalFloat.add(signedCoefficient, exponent, 1e37, -37);
+            expectedOutputs[i] = LibDecimalFloat.pack(signedCoefficient, exponent);
         }
 
         uint256[] memory actualOutputs = LibExternOpIntIncNPE2.run(operand, inputs);
