@@ -41,8 +41,8 @@ contract LibOpCtPopNPTest is OpTest {
     /// Test the eval of a ct pop opcode parsed from a string.
     function testOpCtPopNPEval(uint256 x) external view {
         uint256[] memory stack = new uint256[](1);
-        stack[0] = LibCtPop.ctpop(x) * 1e18;
-        checkHappy(bytes(string.concat("_: bitwise-count-ones(", Strings.toString(x), "e-18);")), stack, "");
+        stack[0] = LibCtPop.ctpop(x);
+        checkHappy(bytes(string.concat("_: bitwise-count-ones(", Strings.toHexString(x), ");")), stack, "");
     }
 
     /// Test that a bitwise count with bad inputs fails integrity.

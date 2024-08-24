@@ -124,12 +124,22 @@ library LibParseLiteralDecimal {
         int256 signedCoefficient;
         int256 exponent;
         (cursor, signedCoefficient, exponent) = parseDecimalFloat(state, start, end);
-        (int256 normalizedSignedCoefficient, int256 normalizedExponent) =
-            LibDecimalFloatImplementation.normalize(signedCoefficient, exponent);
-        if (!LibDecimalFloat.eq(normalizedSignedCoefficient, normalizedExponent, signedCoefficient, exponent)) {
+
+        // Prenormalize signed coefficients that are smaller than their
+        // normalized form at parse time, as this can save runtime gas that would
+        // be needed to normalize the value at runtime.
+        // We only do normalization that will scale up, to avoid causing
+        // unneccessary precision loss.
+        if (-1e37 < signedCoefficient && signedCoefficient < 1e37) {
+            (signedCoefficient, exponent) = LibDecimalFloatImplementation.normalize(signedCoefficient, exponent);
+        }
+
+        packedFloat = LibDecimalFloat.pack(signedCoefficient, exponent);
+
+        (int256 unpackedSignedCoefficient, int256 unpackedExponent) = LibDecimalFloat.unpack(packedFloat);
+        if (unpackedSignedCoefficient != signedCoefficient || unpackedExponent != exponent) {
             revert DecimalLiteralPrecisionLoss(state.parseErrorOffset(start));
         }
-        packedFloat = LibDecimalFloat.pack(normalizedSignedCoefficient, normalizedExponent);
     }
 
     function parseDecimalFloat(ParseState memory state, uint256 start, uint256 end)

@@ -15,6 +15,7 @@ import {Operand, LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
+import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
 
 /// @title LibParseNamedLHSTest
 contract LibParseNamedLHSTest is Test {
@@ -159,9 +160,9 @@ contract LibParseNamedLHSTest is Test {
             hex"00100003"
         );
         assertEq(constants.length, 3);
-        assertEq(constants[0], 1e18);
-        assertEq(constants[1], 2e18);
-        assertEq(constants[2], 3e18);
+        assertEq(constants[0], LibDecimalFloat.pack(1e37, -37));
+        assertEq(constants[1], LibDecimalFloat.pack(2e37, -37));
+        assertEq(constants[2], LibDecimalFloat.pack(3e37, -37));
     }
 
     /// Duplicate names are disallowed in the same source.
@@ -213,9 +214,9 @@ contract LibParseNamedLHSTest is Test {
             hex"00100001"
         );
         assertEq(constants.length, 4);
-        assertEq(constants[0], 1e18);
-        assertEq(constants[1], 2e18);
-        assertEq(constants[2], 3e18);
-        assertEq(constants[3], 4e18);
+        assertEq(constants[0], LibDecimalFloat.pack(1e37, -37));
+        assertEq(constants[1], LibDecimalFloat.pack(2e37, -37));
+        assertEq(constants[2], LibDecimalFloat.pack(3e37, -37));
+        assertEq(constants[3], LibDecimalFloat.pack(4e37, -37));
     }
 }
