@@ -36,7 +36,6 @@ import {
     OPCODE_FUNCTION_POINTERS
 } from "../../generated/RainterpreterReferenceExternNPE2.pointers.sol";
 import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
-import {console2} from "forge-std/Test.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
 /// 1:1 with the number of opcodes provided by the extern component of this
