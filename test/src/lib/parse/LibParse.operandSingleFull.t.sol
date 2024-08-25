@@ -6,7 +6,7 @@ import {ExpectedOperand, UnclosedOperand, UnexpectedOperandValue} from "src/erro
 import {LibParse, ExpectedLeftParen} from "src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
-import {IntegerOverflow} from "rain.math.fixedpoint/error/ErrScale.sol";
+import {OperandOverflow} from "src/error/ErrParse.sol";
 
 contract LibParseOperandSingleFullTest is Test {
     using LibParse for ParseState;
@@ -205,7 +205,7 @@ contract LibParseOperandSingleFullTest is Test {
 
     /// Overflowing decimal uint16 max as single full operand reverts.
     function testOperandSingleFullUint16MaxOverflow() external {
-        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector, 65536, 65535));
+        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:b<65536>();").parse();
         (bytecode);
         (constants);
@@ -213,7 +213,7 @@ contract LibParseOperandSingleFullTest is Test {
 
     /// Overflowing hexadecimal uint16 max as a single full operand reverts.
     function testOperandSingleFullHexUint16MaxOverflow() external {
-        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector, 65536, 65535));
+        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:b<0x010000>();").parse();
         (bytecode);
         (constants);

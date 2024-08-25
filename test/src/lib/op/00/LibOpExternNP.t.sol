@@ -17,6 +17,7 @@ import {
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
+import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
 
 /// @title LibOpExternNPTest
 /// @notice Test the runtime and integrity time logic of LibOpExternNP.
@@ -211,10 +212,10 @@ contract LibOpExternNPTest is OpTest {
         );
 
         uint256[] memory externInputs = new uint256[](2);
-        externInputs[0] = 20;
-        externInputs[1] = 83;
+        externInputs[0] = LibDecimalFloat.pack(20e36, -36);
+        externInputs[1] = LibDecimalFloat.pack(83e36, -36);
         uint256[] memory externOutputs = new uint256[](1);
-        externOutputs[0] = 99;
+        externOutputs[0] = LibDecimalFloat.pack(99e36, -36);
         vm.mockCall(
             address(extern),
             abi.encodeWithSelector(IInterpreterExternV3.extern.selector, externDispatch, externInputs),
@@ -222,7 +223,7 @@ contract LibOpExternNPTest is OpTest {
         );
 
         uint256[] memory expectedStack = new uint256[](2);
-        expectedStack[0] = 99;
+        expectedStack[0] = LibDecimalFloat.pack(99e36, -36);
         expectedStack[1] = 0x00000000000000000005001000000000000000000000000000000000deadbeef;
 
         checkHappy(
@@ -230,7 +231,7 @@ contract LibOpExternNPTest is OpTest {
             "_: 0x00000000000000000005001000000000000000000000000000000000deadbeef,"
             // Operand is the constant index of the dispatch then the number of outputs.
             // 2 inputs and 1 output matches the mocked integrity check.
-            "_: extern<0>(20e-18 83e-18);",
+            "_: extern<0>(20 83);",
             expectedStack,
             "0xdeadbeef 20 83 99"
         );
@@ -264,19 +265,19 @@ contract LibOpExternNPTest is OpTest {
         );
 
         uint256[] memory externInputs = new uint256[](3);
-        externInputs[0] = 1;
-        externInputs[1] = 2;
-        externInputs[2] = 3;
+        externInputs[0] = LibDecimalFloat.pack(1e37, -37);
+        externInputs[1] = LibDecimalFloat.pack(2e37, -37);
+        externInputs[2] = LibDecimalFloat.pack(3e37, -37);
 
         uint256[] memory externOutputs = new uint256[](3);
-        externOutputs[0] = 4;
-        externOutputs[1] = 5;
-        externOutputs[2] = 6;
+        externOutputs[0] = LibDecimalFloat.pack(4e37, -37);
+        externOutputs[1] = LibDecimalFloat.pack(5e37, -37);
+        externOutputs[2] = LibDecimalFloat.pack(6e37, -37);
 
         uint256[] memory expectedStack = new uint256[](4);
-        expectedStack[0] = 6;
-        expectedStack[1] = 5;
-        expectedStack[2] = 4;
+        expectedStack[0] = LibDecimalFloat.pack(6e37, -37);
+        expectedStack[1] = LibDecimalFloat.pack(5e37, -37);
+        expectedStack[2] = LibDecimalFloat.pack(4e37, -37);
         expectedStack[3] = 0x00000000000000000005001000000000000000000000000000000000deadbeef;
 
         vm.mockCall(
@@ -295,7 +296,7 @@ contract LibOpExternNPTest is OpTest {
             "_: 0x00000000000000000005001000000000000000000000000000000000deadbeef,"
             // Operand is the constant index of the dispatch then the number of outputs.
             // 3 inputs and 3 outputs matches the mocked integrity check.
-            "four five six: extern<0>(1e-18 2e-18 3e-18);",
+            "four five six: extern<0>(1 2 3);",
             expectedStack,
             "0xdeadbeef 1 2 3 4 5 6"
         );

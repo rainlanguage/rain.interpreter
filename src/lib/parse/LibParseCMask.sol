@@ -471,8 +471,8 @@ uint128 constant CMASK_WHITESPACE = CMASK_LINE_FEED | CMASK_CARRIAGE_RETURN | CM
 /// @dev Rainlang stack item delimiter is whitespace
 uint128 constant CMASK_LHS_STACK_DELIMITER = CMASK_WHITESPACE;
 
-/// @dev Rainlang supports numeric literals as anything starting with 0-9
-uint128 constant CMASK_NUMERIC_LITERAL_HEAD = CMASK_NUMERIC_0_9;
+/// @dev Rainlang supports numeric literals as anything starting with 0-9 or -
+uint128 constant CMASK_NUMERIC_LITERAL_HEAD = CMASK_NUMERIC_0_9 | CMASK_NEGATIVE_SIGN;
 
 /// @dev Rainlang supports string literals as anything starting with "
 uint128 constant CMASK_STRING_LITERAL_HEAD = CMASK_QUOTATION_MARK;

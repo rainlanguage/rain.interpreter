@@ -49,7 +49,7 @@ contract LibOpMaxUint256NPTest is OpTest {
     }
 
     /// Test the eval of LibOpMaxUint256NP parsed from a string.
-    function testOpMaxUint256NPEval() external {
+    function testOpMaxUint256NPEval() external view {
         checkHappy("_: uint256-max-value();", type(uint256).max, "");
     }
 

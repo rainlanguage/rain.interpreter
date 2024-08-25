@@ -70,19 +70,19 @@ contract LibOpDecodeBitsNPTest is OpTest {
 
     /// Test the eval of decoding bits parsed from a string.
     function testOpDecodeBitsNPEvalHappy() external view {
-        checkHappy("_:bitwise-decode<0 1>(0);", 0, "0 1 0");
-        checkHappy("_:bitwise-decode<0 1>(1e-18);", 1, "0 1 1");
-        checkHappy("_:bitwise-decode<0 1>(2e-18);", 0, "0 1 2");
-        checkHappy("_:bitwise-decode<0 1>(3e-18);", 1, "0 1 3");
-        checkHappy("_:bitwise-decode<0 1>(4e-18);", 0, "0 1 4");
-        checkHappy("_:bitwise-decode<0 1>(5e-18);", 1, "0 1 5");
-        checkHappy("_:bitwise-decode<0 1>(6e-18);", 0, "0 1 6");
-        checkHappy("_:bitwise-decode<0 1>(7e-18);", 1, "0 1 7");
-        checkHappy("_:bitwise-decode<0 2>(0);", 0, "0 2 0");
-        checkHappy("_:bitwise-decode<0 2>(1e-18);", 1, "0 2 1");
-        checkHappy("_:bitwise-decode<0 2>(2e-18);", 2, "0 2 2");
-        checkHappy("_:bitwise-decode<0 2>(3e-18);", 3, "0 2 3");
-        checkHappy("_:bitwise-decode<0 2>(4e-18);", 0, "0 2 4");
+        checkHappy("_:bitwise-decode<0 1>(0x00);", 0, "0 1 0");
+        checkHappy("_:bitwise-decode<0 1>(0x01);", 1, "0 1 1");
+        checkHappy("_:bitwise-decode<0 1>(0x02);", 0, "0 1 2");
+        checkHappy("_:bitwise-decode<0 1>(0x03);", 1, "0 1 3");
+        checkHappy("_:bitwise-decode<0 1>(0x04);", 0, "0 1 4");
+        checkHappy("_:bitwise-decode<0 1>(0x05);", 1, "0 1 5");
+        checkHappy("_:bitwise-decode<0 1>(0x06);", 0, "0 1 6");
+        checkHappy("_:bitwise-decode<0 1>(0x07);", 1, "0 1 7");
+        checkHappy("_:bitwise-decode<0 2>(0x00);", 0, "0 2 0");
+        checkHappy("_:bitwise-decode<0 2>(0x01);", 1, "0 2 1");
+        checkHappy("_:bitwise-decode<0 2>(0x02);", 2, "0 2 2");
+        checkHappy("_:bitwise-decode<0 2>(0x03);", 3, "0 2 3");
+        checkHappy("_:bitwise-decode<0 2>(0x04);", 0, "0 2 4");
         checkHappy("_:bitwise-decode<0 2>(uint256-max-value());", 3, "0 2 uint256-max-value");
         checkHappy("_:bitwise-decode<0 0xFF>(uint256-max-value());", type(uint256).max >> 1, "0 0xFF uint256-max-value");
         checkHappy("_:bitwise-decode<0xFF 1>(uint256-max-value());", 1, "0xFF 1 uint256-max-value");

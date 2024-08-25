@@ -12,11 +12,10 @@ import {
 } from "../../abstract/BaseRainterpreterSubParserNPE2.sol";
 import {LibExtern, EncodedExternDispatch} from "../../lib/extern/LibExtern.sol";
 import {IInterpreterExternV3} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
-import {LibSubParse} from "../../lib/parse/LibSubParse.sol";
+import {LibSubParse, CURRENT_COMPATIBILITY} from "../../lib/parse/LibSubParse.sol";
 import {LibParseState, ParseState} from "../../lib/parse/LibParseState.sol";
 import {LibParseOperand} from "../../lib/parse/LibParseOperand.sol";
 import {LibParseLiteral} from "../../lib/parse/literal/LibParseLiteral.sol";
-import {COMPATIBILITY_V4} from "rain.interpreter.interface/interface/ISubParserV3.sol";
 import {LibExternOpIntIncNPE2, OP_INDEX_INCREMENT} from "../../lib/extern/reference/op/LibExternOpIntIncNPE2.sol";
 import {LibExternOpStackOperandNPE2} from "../../lib/extern/reference/op/LibExternOpStackOperandNPE2.sol";
 import {LibExternOpContextSenderNPE2} from "../../lib/extern/reference/op/LibExternOpContextSenderNPE2.sol";
@@ -25,7 +24,6 @@ import {LibExternOpContextCallingContractNPE2} from
 import {LibExternOpContextRainlenNPE2} from "../../lib/extern/reference/op/LibExternOpContextRainlenNPE2.sol";
 import {LibParseLiteralRepeat} from "../../lib/extern/reference/literal/LibParseLiteralRepeat.sol";
 import {LibParseLiteralDecimal} from "../../lib/parse/literal/LibParseLiteralDecimal.sol";
-import {LibFixedPointDecimalScale} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 import {
     DESCRIBED_BY_META_HASH,
     PARSE_META as SUB_PARSER_PARSE_META,
@@ -36,6 +34,7 @@ import {
     INTEGRITY_FUNCTION_POINTERS,
     OPCODE_FUNCTION_POINTERS
 } from "../../generated/RainterpreterReferenceExternNPE2.pointers.sol";
+import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
 /// 1:1 with the number of opcodes provided by the extern component of this
@@ -66,7 +65,7 @@ bytes32 constant SUB_PARSER_LITERAL_REPEAT_KEYWORD_MASK =
 uint256 constant SUB_PARSER_LITERAL_REPEAT_INDEX = 0;
 
 /// @dev Thrown when the repeat literal parser is not a single digit.
-error InvalidRepeatCount(uint256 value);
+error InvalidRepeatCount();
 
 /// @dev Number of opcode function pointers available to run at eval time.
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
@@ -186,7 +185,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// known constant value, which should allow the compiler to optimise the
     /// entire function call away.
     function subParserCompatibility() internal pure override returns (bytes32) {
-        return COMPATIBILITY_V4;
+        return CURRENT_COMPATIBILITY;
     }
 
     /// Overrides the base function pointers for opcodes. Simply returns the
@@ -247,17 +246,17 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
                 ParseState memory state = LibParseState.newState("", "", "", "");
                 // If we have a match on the keyword then the next chars MUST
                 // be a decimal, otherwise it's an error.
-                uint256 value;
-                (cursor, value) = LibParseLiteralDecimal.parseDecimal(
+                int256 signedCoefficient;
+                int256 exponent;
+                (cursor, signedCoefficient, exponent) = LibParseLiteralDecimal.parseDecimalFloat(
                     state, cursor + SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH, end
                 );
-                value = LibFixedPointDecimalScale.scaleToIntegerLossless(value);
                 // We can only repeat a single digit.
-                if (value > 9) {
-                    revert InvalidRepeatCount(value);
+                if (LibDecimalFloat.gt(signedCoefficient, exponent, 9, 0)) {
+                    revert InvalidRepeatCount();
                 }
 
-                return (true, SUB_PARSER_LITERAL_REPEAT_INDEX, value);
+                return (true, SUB_PARSER_LITERAL_REPEAT_INDEX, LibDecimalFloat.pack(signedCoefficient, exponent));
             } else {
                 return (false, 0, 0);
             }

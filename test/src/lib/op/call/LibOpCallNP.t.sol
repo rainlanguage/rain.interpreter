@@ -17,6 +17,7 @@ import {LibBytecode, SourceIndexOutOfBounds} from "rain.interpreter.interface/li
 import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {STACK_TRACER} from "src/lib/state/LibInterpreterStateNP.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
 
 /// @title LibOpCallNPTest
 /// @notice Test the LibOpCallNP library that includes the "call" word.
@@ -161,7 +162,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         ExpectedTrace[] memory traces = new ExpectedTrace[](1);
         traces[0].sourceIndex = 0;
         traces[0].stack = new uint256[](1);
-        traces[0].stack[0] = 1e18;
+        traces[0].stack[0] = LibDecimalFloat.pack(1e37, -37);
         checkCallNPTraces("_: 1;", traces);
     }
 
@@ -171,7 +172,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         traces[0].stack = new uint256[](0);
         traces[1].sourceIndex = 1;
         traces[1].stack = new uint256[](1);
-        traces[1].stack[0] = 1e18;
+        traces[1].stack[0] = LibDecimalFloat.pack(1e37, -37);
         checkCallNPTraces(":call<1>();_:1;", traces);
     }
 

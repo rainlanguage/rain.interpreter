@@ -23,6 +23,7 @@ import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreter
 import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP, LibInterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
 
 /// @title LibOpHashNPTest
 /// @notice Test the runtime and integrity time logic of LibOpHashNP.
@@ -57,12 +58,12 @@ contract LibOpHashNPTest is OpTest {
     }
 
     /// Test the eval of a hash opcode parsed from a string. Tests 0 inputs.
-    function testOpHashNPEval0Inputs() external {
+    function testOpHashNPEval0Inputs() external view {
         checkHappy("_: hash();", uint256(keccak256("")), "");
     }
 
     /// Test the eval of a hash opcode parsed from a string. Tests 1 input.
-    function testOpHashNPEval1Input() external {
+    function testOpHashNPEval1Input() external view {
         checkHappy(
             "_: hash(0x1234567890abcdef);", uint256(keccak256(abi.encodePacked(uint256(0x1234567890abcdef)))), ""
         );
@@ -70,7 +71,7 @@ contract LibOpHashNPTest is OpTest {
 
     /// Test the eval of a hash opcode parsed from a string. Tests 2 inputs that
     /// are identical to each other.
-    function testOpHashNPEval2Inputs() external {
+    function testOpHashNPEval2Inputs() external view {
         checkHappy(
             "_: hash(0x1234567890abcdef 0x1234567890abcdef);",
             uint256(keccak256(abi.encodePacked(uint256(0x1234567890abcdef), uint256(0x1234567890abcdef)))),
@@ -80,7 +81,7 @@ contract LibOpHashNPTest is OpTest {
 
     /// Test the eval of a hash opcode parsed from a string. Tests 2 inputs that
     /// are different from each other.
-    function testOpHashNPEval2InputsDifferent() external {
+    function testOpHashNPEval2InputsDifferent() external view {
         checkHappy(
             "_: hash(0x1234567890abcdef 0xfedcba0987654321);",
             uint256(keccak256(abi.encodePacked(uint256(0x1234567890abcdef), uint256(0xfedcba0987654321)))),
@@ -104,11 +105,11 @@ contract LibOpHashNPTest is OpTest {
             })
         );
         assertEq(stack.length, 3);
-        assertEq(stack[0], uint256(9e18));
+        assertEq(stack[0], LibDecimalFloat.pack(9e37, -37));
         assertEq(
             stack[1], uint256(keccak256(abi.encodePacked(uint256(0x1234567890abcdef), uint256(0xfedcba0987654321))))
         );
-        assertEq(stack[2], uint256(5e18));
+        assertEq(stack[2], LibDecimalFloat.pack(5e37, -37));
         assertEq(kvs.length, 0);
     }
 

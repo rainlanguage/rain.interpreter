@@ -21,6 +21,7 @@ import {OpTest, PRE, POST} from "test/abstract/OpTest.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {BadOpOutputsLength} from "src/error/ErrIntegrity.sol";
+import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
 
 /// @title LibOpStackNPTest
 /// @notice Test the runtime and integrity time logic of LibOpStackNP.
@@ -128,7 +129,7 @@ contract LibOpStackNPTest is OpTest {
 
     /// Test the eval of a stack opcode parsed from a string.
     function testOpStackEval() external view {
-        bytes memory bytecode = iDeployer.parse2("foo: 1, bar: foo;");
+        bytes memory bytecode = iDeployer.parse2("foo: 1, bar: foo, _: -1;");
         (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
             EvalV4({
                 store: iStore,
@@ -140,9 +141,10 @@ contract LibOpStackNPTest is OpTest {
                 stateOverlay: new uint256[](0)
             })
         );
-        assertEq(stack.length, 2);
-        assertEq(stack[0], 1e18);
-        assertEq(stack[1], 1e18);
+        assertEq(stack.length, 3);
+        assertEq(stack[0], LibDecimalFloat.pack(-1e37, -37));
+        assertEq(stack[1], stack[2]);
+        assertEq(stack[2], LibDecimalFloat.pack(1e37, -37));
         assertEq(kvs.length, 0);
     }
 
@@ -162,12 +164,12 @@ contract LibOpStackNPTest is OpTest {
             })
         );
         assertEq(stack.length, 6);
-        assertEq(stack[0], 1e18);
-        assertEq(stack[1], 1e18);
-        assertEq(stack[2], 1e18);
-        assertEq(stack[3], 1e18);
-        assertEq(stack[4], 1e18);
-        assertEq(stack[5], 1e18);
+        assertEq(stack[0], LibDecimalFloat.pack(1e37, -37));
+        assertEq(stack[1], LibDecimalFloat.pack(1e37, -37));
+        assertEq(stack[2], LibDecimalFloat.pack(1e37, -37));
+        assertEq(stack[3], LibDecimalFloat.pack(1e37, -37));
+        assertEq(stack[4], LibDecimalFloat.pack(1e37, -37));
+        assertEq(stack[5], LibDecimalFloat.pack(1e37, -37));
         assertEq(kvs.length, 0);
     }
 

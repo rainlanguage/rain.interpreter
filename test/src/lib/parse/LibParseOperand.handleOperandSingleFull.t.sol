@@ -5,8 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {LibParseOperand, Operand} from "src/lib/parse/LibParseOperand.sol";
 import {UnexpectedOperandValue} from "src/error/ErrParse.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
-import {IntegerOverflow} from "rain.math.fixedpoint/error/ErrScale.sol";
-import {LibFixedPointDecimalScale, DECIMAL_MAX_SAFE_INT} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
+import {OperandOverflow} from "src/error/ErrParse.sol";
 
 contract LibParseOperandHandleOperandSingleFullTest is Test {
     // No values falls back to zero.
@@ -17,25 +16,17 @@ contract LibParseOperandHandleOperandSingleFullTest is Test {
     // A single value of up to 2 bytes is allowed.
     function testHandleOperandSingleFullSingleValue(uint256 value) external pure {
         value = bound(value, 0, type(uint16).max);
-        uint256 valueScaled = value * 1e18;
         uint256[] memory values = new uint256[](1);
-        values[0] = valueScaled;
+        values[0] = value;
         assertEq(Operand.unwrap(LibParseOperand.handleOperandSingleFull(values)), value);
     }
 
     // Single values outside 2 bytes are disallowed.
     function testHandleOperandSingleFullSingleValueDisallowed(uint256 value) external {
-        value = bound(value, uint256(type(uint16).max) + 1, DECIMAL_MAX_SAFE_INT);
-        value *= 1e18;
+        value = bound(value, uint256(type(uint16).max) + 1, uint256(int256(type(int128).max)));
         uint256[] memory values = new uint256[](1);
         values[0] = value;
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                IntegerOverflow.selector,
-                LibFixedPointDecimalScale.decimalOrIntToInt(value, DECIMAL_MAX_SAFE_INT),
-                0xFFFF
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         LibParseOperand.handleOperandSingleFull(values);
     }
 

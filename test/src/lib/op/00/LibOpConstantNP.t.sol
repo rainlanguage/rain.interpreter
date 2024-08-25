@@ -18,6 +18,7 @@ import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpr
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {BadOpOutputsLength} from "src/error/ErrIntegrity.sol";
+import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
 
 /// @title LibOpConstantNPTest
 /// @notice Test the runtime and integrity time logic of LibOpConstantNP.
@@ -95,8 +96,8 @@ contract LibOpConstantNPTest is OpTest {
             })
         );
         assertEq(stack.length, 2);
-        assertEq(stack[0], 1001e15);
-        assertEq(stack[1], 2e18);
+        assertEq(stack[0], LibDecimalFloat.pack(1.001e37, -37));
+        assertEq(stack[1], LibDecimalFloat.pack(2e37, -37));
         assertEq(kvs.length, 0);
     }
 

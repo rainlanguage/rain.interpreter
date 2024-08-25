@@ -6,7 +6,7 @@ import {ExpectedOperand, UnclosedOperand, UnexpectedOperandValue} from "src/erro
 import {LibParse} from "src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
-import {IntegerOverflow} from "rain.math.fixedpoint/error/ErrScale.sol";
+import {OperandOverflow} from "src/error/ErrParse.sol";
 
 contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     using LibParse for ParseState;
@@ -153,7 +153,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
 
     /// 2 literals are expected for this operand parser. Tests 256 256.
     function testOperandDoublePerByteNoDefaultSecondOverflow() external {
-        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector, 256, 255));
+        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<256 256>();").parse();
         (bytecode);
         (constants);
@@ -161,7 +161,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
 
     /// 2 literals are expected for this operand parser. Tests 256 255.
     function testOperandDoublePerByteNoDefaultSecondOverflowFirst() external {
-        vm.expectRevert(abi.encodeWithSelector(IntegerOverflow.selector, 256, 255));
+        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<256 255>();").parse();
         (bytecode);
         (constants);
