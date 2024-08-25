@@ -4,9 +4,9 @@ pragma solidity =0.8.25;
 import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 
-import {ISubParserV3, COMPATIBILITY_V4, AuthoringMetaV2} from "rain.interpreter.interface/interface/ISubParserV3.sol";
+import {ISubParserV3, AuthoringMetaV2} from "rain.interpreter.interface/interface/ISubParserV3.sol";
 import {IncompatibleSubParser} from "../error/ErrSubParse.sol";
-import {LibSubParse, ParseState} from "../lib/parse/LibSubParse.sol";
+import {LibSubParse, ParseState, CURRENT_COMPATIBILITY} from "../lib/parse/LibSubParse.sol";
 import {CMASK_RHS_WORD_TAIL} from "../lib/parse/LibParseCMask.sol";
 import {LibParse, Operand} from "../lib/parse/LibParse.sol";
 import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
@@ -118,7 +118,7 @@ abstract contract BaseRainterpreterSubParserNPE2 is
     /// same commit the abstract sub parser is pulled from.
     //slither-disable-next-line dead-code
     function subParserCompatibility() internal pure virtual returns (bytes32) {
-        return COMPATIBILITY_V4;
+        return CURRENT_COMPATIBILITY;
     }
 
     /// Overrideable function to allow implementations to define their

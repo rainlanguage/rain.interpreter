@@ -12,11 +12,10 @@ import {
 } from "../../abstract/BaseRainterpreterSubParserNPE2.sol";
 import {LibExtern, EncodedExternDispatch} from "../../lib/extern/LibExtern.sol";
 import {IInterpreterExternV3} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
-import {LibSubParse} from "../../lib/parse/LibSubParse.sol";
+import {LibSubParse, CURRENT_COMPATIBILITY} from "../../lib/parse/LibSubParse.sol";
 import {LibParseState, ParseState} from "../../lib/parse/LibParseState.sol";
 import {LibParseOperand} from "../../lib/parse/LibParseOperand.sol";
 import {LibParseLiteral} from "../../lib/parse/literal/LibParseLiteral.sol";
-import {COMPATIBILITY_V4} from "rain.interpreter.interface/interface/ISubParserV3.sol";
 import {LibExternOpIntIncNPE2, OP_INDEX_INCREMENT} from "../../lib/extern/reference/op/LibExternOpIntIncNPE2.sol";
 import {LibExternOpStackOperandNPE2} from "../../lib/extern/reference/op/LibExternOpStackOperandNPE2.sol";
 import {LibExternOpContextSenderNPE2} from "../../lib/extern/reference/op/LibExternOpContextSenderNPE2.sol";
@@ -186,7 +185,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// known constant value, which should allow the compiler to optimise the
     /// entire function call away.
     function subParserCompatibility() internal pure override returns (bytes32) {
-        return COMPATIBILITY_V4;
+        return CURRENT_COMPATIBILITY;
     }
 
     /// Overrides the base function pointers for opcodes. Simply returns the
