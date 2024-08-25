@@ -15,5 +15,4 @@ bytes32 constant BYTECODE_HASH = bytes32(0xb2bb360cac3a5504625d94621550913d5024d
 /// By setting these as a constant they can be inlined into the interpreter
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
-bytes constant OPCODE_FUNCTION_POINTERS =
-    hex"06b407040746091209f90a0b0a1d0a360a780aca0adb0aec0b8e0bcb0c7a0cfe0d4d0e43";
+bytes constant OPCODE_FUNCTION_POINTERS = hex"06b407040746091209f90a0b0a1d0a360a780aca0adb0aec0b8e0bcb0c7a0cfe0d4d0e43";

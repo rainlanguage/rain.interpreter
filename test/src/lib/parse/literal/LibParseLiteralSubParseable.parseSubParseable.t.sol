@@ -35,7 +35,8 @@ contract LibParseLiteralSubParseableTest is Test {
             abi.encode(true, returnValue)
         );
         vm.expectCall(
-            subParser, abi.encodeWithSelector(ISubParserV3.subParseLiteral.selector, CURRENT_COMPATIBILITY, subParseData)
+            subParser,
+            abi.encodeWithSelector(ISubParserV3.subParseLiteral.selector, CURRENT_COMPATIBILITY, subParseData)
         );
         (uint256 cursorAfter, uint256 value) =
             state.parseSubParseable(cursor, Pointer.unwrap(state.data.endDataPointer()));
