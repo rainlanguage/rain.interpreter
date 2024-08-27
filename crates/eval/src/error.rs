@@ -23,6 +23,8 @@ pub enum ForkCallError {
     U64FromUint256(#[from] FromUintError<u64>),
     #[error(transparent)]
     Eyre(#[from] eyre::Report),
+    #[error("Replay transaction error: {0}")]
+    ReplayTransactionError(String),
 }
 
 #[cfg(not(target_family = "wasm"))]
