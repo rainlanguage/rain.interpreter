@@ -1,7 +1,9 @@
 use crate::fork::ForkTypedReturn;
 use alloy::primitives::{Address, U256};
+use foundry_evm::executors::RawCallResult;
 use rain_interpreter_bindings::IInterpreterV3::{eval3Call, eval3Return};
 
+use revm::primitives::bitvec::vec;
 use thiserror::Error;
 
 pub const RAIN_TRACER_ADDRESS: &str = "0xF06Cd48c98d7321649dB7D8b2C396A81A2046555";
@@ -56,13 +58,11 @@ pub struct RainEvalResult {
     pub traces: Vec<RainSourceTrace>,
 }
 
-impl From<ForkTypedReturn<eval3Call>> for RainEvalResult {
-    fn from(typed_return: ForkTypedReturn<eval3Call>) -> Self {
-        let eval3Return { stack, writes } = typed_return.typed_return;
-
+impl From<RawCallResult> for RainEvalResult {
+    fn from(raw_call_result: RawCallResult) -> Self {
         let tracer_address = RAIN_TRACER_ADDRESS.parse::<Address>().unwrap();
-        let mut traces: Vec<RainSourceTrace> = typed_return
-            .raw
+
+        let mut traces: Vec<RainSourceTrace> = raw_call_result
             .traces
             .unwrap()
             .to_owned()
@@ -79,10 +79,25 @@ impl From<ForkTypedReturn<eval3Call>> for RainEvalResult {
         traces.reverse();
 
         RainEvalResult {
-            reverted: typed_return.raw.reverted,
+            reverted: raw_call_result.reverted,
+            stack: vec![],
+            writes: vec![],
+            traces,
+        }
+    }
+}
+
+impl From<ForkTypedReturn<eval3Call>> for RainEvalResult {
+    fn from(typed_return: ForkTypedReturn<eval3Call>) -> Self {
+        let eval3Return { stack, writes } = typed_return.typed_return;
+
+        let res: RainEvalResult = typed_return.raw.into();
+
+        RainEvalResult {
+            reverted: res.reverted,
             stack,
             writes,
-            traces,
+            traces: res.traces,
         }
     }
 }
