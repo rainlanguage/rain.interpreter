@@ -1,4 +1,5 @@
 use alloy::primitives::ruint::FromUintError;
+use foundry_evm::backend::DatabaseError;
 #[cfg(not(target_family = "wasm"))]
 use foundry_evm::executors::RawCallResult;
 use rain_error_decoding::{AbiDecodeFailedErrors, AbiDecodedErrorType};
@@ -23,8 +24,22 @@ pub enum ForkCallError {
     U64FromUint256(#[from] FromUintError<u64>),
     #[error(transparent)]
     Eyre(#[from] eyre::Report),
-    #[error("Replay transaction error: {0}")]
-    ReplayTransactionError(String),
+    #[error("Replay transaction error: {:#?}", .0)]
+    ReplayTransactionError(ReplayTransactionError),
+}
+
+#[derive(Debug, Error)]
+pub enum ReplayTransactionError {
+    #[error("Transaction not found for hash {0} and fork url {1}")]
+    TransactionNotFound(String, String),
+    #[error("No active fork found")]
+    NoActiveFork,
+    #[error("Database error for hash {0} and fork url {1}: {2}")]
+    DatabaseError(String, String, DatabaseError),
+    #[error("No block number found in transaction for hash {0} and fork url {1}")]
+    NoBlockNumberFound(String, String),
+    #[error("No from address found in transaction for hash {0} and fork url {1}")]
+    NoFromAddressFound(String, String),
 }
 
 #[cfg(not(target_family = "wasm"))]

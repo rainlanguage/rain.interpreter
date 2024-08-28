@@ -1,4 +1,4 @@
-use crate::error::ForkCallError;
+use crate::error::{ForkCallError, ReplayTransactionError};
 use alloy::primitives::{Address, BlockNumber, U256};
 use alloy::sol_types::SolCall;
 use foundry_evm::{
@@ -397,6 +397,7 @@ impl Forker {
     /// A result containing the raw call result.
     pub fn replay_transaction(
         &mut self,
+        fork_url: String,
         tx_hash: B256,
     ) -> Result<RawCallResult, ForkCallError> {
         let active_fork_local_id = self
@@ -405,38 +406,40 @@ impl Forker {
             .active_fork_id()
             .ok_or(ForkCallError::ExecutorError("no active fork!".to_owned()))?;
 
-        let _ = self.executor
+        let fork_id = self.executor
             .backend_mut().create_select_fork_at_transaction(
                 CreateFork { 
                     enable_caching: true, 
-                    url: "https://eth-mainnet.alchemyapi.io/v2/WV407BEiBmjNJfKo9Uo_55u0z0ITyCOX".to_string(), 
+                    url: fork_url.clone(), 
                     env: Env::default(), 
                     evm_opts: EvmOpts::default()
                 },
                 &mut Env::default(),
                 &mut JournaledState::new(SpecId::LATEST, HashSet::new()),
                 tx_hash
-            );
+            )?;
 
+        println!("Fork created ");
 
         let mut env = self.executor.env().clone();
         
-        let full_tx = self.executor.backend().active_fork_db().unwrap().db.get_transaction(tx_hash).unwrap();
+        // get the transaction
+        let shared_backend = &self.executor.backend().active_fork_db().ok_or(ForkCallError::ReplayTransactionError(ReplayTransactionError::NoActiveFork))?.db;
+        let full_tx = shared_backend.get_transaction(tx_hash).map_err(|e| ForkCallError::ReplayTransactionError(ReplayTransactionError::DatabaseError(tx_hash.to_string(), fork_url.clone(), e)))?;
+        
+        println!("Transaction found");
 
-        let block_number = full_tx.block_number.unwrap();
+        // get the block number from the transaction
+        let block_number = full_tx.block_number.ok_or(ForkCallError::ReplayTransactionError(ReplayTransactionError::NoBlockNumberFound(tx_hash.to_string(), fork_url.clone())))?;
+        
+        println!("Block number found");
 
-        let block = self.executor.backend().active_fork_db().unwrap().db.get_full_block(block_number).unwrap();
-
-        let first_tx = block.transactions.into_transactions().enumerate().next().unwrap().1;
-        println!("{:?}", first_tx);
-        println!("{:?}", block_number);
-        // let (fork_block, block) =
-        //     self.executor.backend().db().get_block_number_and_block_for_transaction(id, transaction)?;
-
-        // roll the fork to the transaction's block or latest if it's pending
+        // get the block
+        let block = shared_backend.get_full_block(block_number).map_err(|e| ForkCallError::ReplayTransactionError(ReplayTransactionError::DatabaseError(block_number.to_string(), fork_url.clone(), e)))?;
 
         let mut journaled_state = JournaledState::new(SpecId::LATEST, HashSet::new());
         
+        // matching env to the env from the block the transaction is in
         env.block.timestamp = U256::from(block.header.timestamp);
         env.block.coinbase = block.header.miner;
         env.block.difficulty = block.header.difficulty;
@@ -445,28 +448,27 @@ impl Forker {
         env.block.gas_limit = U256::from(block.header.gas_limit);
         env.block.number = U256::from(block.header.number.unwrap_or(block_number));
 
+        println!("Starting to replay");
         // replay all transactions that came before
         let env = env.clone();
 
         let tx = self.executor
             .backend_mut()
             .replay_until(
-                active_fork_local_id,
+                fork_id,
                 env,
                 tx_hash,
                 &mut journaled_state,
             )?;
-          
-        println!("{:?}", tx);
-        
+                  
         let res = match tx {
             Some(tx) => {
                 match tx.to {
                     Some(to) => self.call(tx.from.as_slice(), to.as_slice(), &tx.input)?,
-                    None => return Err(ForkCallError::ReplayTransactionError("Transaction has no from address".to_owned()))
+                    None => return Err(ForkCallError::ReplayTransactionError(ReplayTransactionError::NoFromAddressFound(tx_hash.to_string(), fork_url)))
                 }
             }
-            None => return Err(ForkCallError::ReplayTransactionError("Transaction not found. Is the fork block number correct?".to_owned()))
+            None => return Err(ForkCallError::ReplayTransactionError(ReplayTransactionError::TransactionNotFound(tx_hash.to_string(), fork_url)))
         };
 
         Ok(res)
@@ -749,18 +751,16 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_replay() {
-        let args = NewForkedEvm {
-            fork_url: "https://eth-mainnet.alchemyapi.io/v2/WV407BEiBmjNJfKo9Uo_55u0z0ITyCOX".to_owned(),
-            fork_block_number: Some(20622339),
-        };
-        let mut forker = Forker::new_with_fork(args, None, None).await.unwrap();
+        let mut forker = Forker::new_with_fork(NewForkedEvm {
+            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
+            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
+        }, None, None).await.unwrap();
 
-        // let mut forker = Forker::new();
-        let tx_hash = "0x5ee1ff6d0c58904f89200829b12f84acda2bf662009a9b3a036132ce311b6c15"
+        let tx_hash = "0xcbfff7d9369afcc7a851dff42ca2769f32d77c3b9066023b887583ee9cd0809d"
             .parse::<B256>()
             .unwrap();
 
-        let replay_result = forker.replay_transaction(tx_hash).unwrap();
+        let replay_result = forker.replay_transaction(CI_DEPLOY_SEPOLIA_RPC_URL.into(), tx_hash).unwrap();
         println!("{:?}", replay_result);
         // assert_eq!(replay_result.exit_reason, InstructionResult::Ok);
     }
