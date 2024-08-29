@@ -1,6 +1,7 @@
 use alloy::primitives::ruint::FromUintError;
 #[cfg(not(target_family = "wasm"))]
 use foundry_evm::backend::DatabaseError;
+#[cfg(not(target_family = "wasm"))]
 use foundry_evm::executors::RawCallResult;
 use rain_error_decoding::{AbiDecodeFailedErrors, AbiDecodedErrorType};
 use thiserror::Error;
@@ -34,6 +35,7 @@ pub enum ReplayTransactionError {
     TransactionNotFound(String, String),
     #[error("No active fork found")]
     NoActiveFork,
+    #[cfg(not(target_family = "wasm"))]
     #[error("Database error for hash {0} and fork url {1}: {2}")]
     DatabaseError(String, String, DatabaseError),
     #[error("No block number found in transaction for hash {0} and fork url {1}")]
