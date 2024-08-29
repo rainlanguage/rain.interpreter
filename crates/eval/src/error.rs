@@ -1,6 +1,6 @@
 use alloy::primitives::ruint::FromUintError;
-use foundry_evm::backend::DatabaseError;
 #[cfg(not(target_family = "wasm"))]
+use foundry_evm::backend::DatabaseError;
 use foundry_evm::executors::RawCallResult;
 use rain_error_decoding::{AbiDecodeFailedErrors, AbiDecodedErrorType};
 use thiserror::Error;
