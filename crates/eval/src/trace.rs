@@ -2,8 +2,6 @@ use crate::fork::ForkTypedReturn;
 use alloy::primitives::{Address, U256};
 use foundry_evm::executors::RawCallResult;
 use rain_interpreter_bindings::IInterpreterV3::{eval3Call, eval3Return};
-
-use revm::primitives::bitvec::vec;
 use thiserror::Error;
 
 pub const RAIN_TRACER_ADDRESS: &str = "0xF06Cd48c98d7321649dB7D8b2C396A81A2046555";
