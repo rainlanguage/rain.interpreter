@@ -2,9 +2,18 @@ use crate::fork::ForkTypedReturn;
 use alloy::primitives::{Address, U256};
 use foundry_evm::executors::RawCallResult;
 use rain_interpreter_bindings::IInterpreterV3::{eval3Call, eval3Return};
+use std::ops::{Deref, DerefMut};
 use thiserror::Error;
 
 pub const RAIN_TRACER_ADDRESS: &str = "0xF06Cd48c98d7321649dB7D8b2C396A81A2046555";
+
+#[derive(Error, Debug)]
+pub enum RainEvalResultError {
+    #[error("Corrupt traces")]
+    CorruptTraces,
+}
+
+type RainStack = Vec<U256>;
 
 /// A struct representing a single trace from a Rain source. Intended to be decoded
 /// from the calldata sent as part of a noop call by the Interpreter to the
@@ -13,7 +22,34 @@ pub const RAIN_TRACER_ADDRESS: &str = "0xF06Cd48c98d7321649dB7D8b2C396A81A204655
 pub struct RainSourceTrace {
     pub parent_source_index: u16,
     pub source_index: u16,
-    pub stack: Vec<U256>,
+    pub stack: RainStack,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RainSourceTraces {
+    pub traces: Vec<RainSourceTrace>,
+}
+
+impl Deref for RainSourceTraces {
+    type Target = Vec<RainSourceTrace>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.traces
+    }
+}
+
+impl DerefMut for RainSourceTraces {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.traces
+    }
+}
+
+impl FromIterator<RainSourceTrace> for RainSourceTraces {
+    fn from_iter<I: IntoIterator<Item = RainSourceTrace>>(iter: I) -> Self {
+        RainSourceTraces {
+            traces: iter.into_iter().collect(),
+        }
+    }
 }
 
 impl RainSourceTrace {
@@ -46,6 +82,52 @@ impl RainSourceTrace {
     }
 }
 
+impl RainSourceTraces {
+    pub fn flatten(&self) -> RainStack {
+        let mut flattened_stack: RainStack = vec![];
+        for trace in self.traces.iter() {
+            let mut stack = trace.stack.clone();
+            stack.reverse();
+            for stack_item in stack.iter() {
+                flattened_stack.push(*stack_item);
+            }
+        }
+        flattened_stack
+    }
+    pub fn flattened_path_names(&self) -> Result<Vec<String>, RainEvalResultError> {
+        let mut path_names: Vec<String> = vec![];
+        let mut source_paths: Vec<String> = vec![];
+
+        for trace in self.iter() {
+            let current_path = if trace.parent_source_index == trace.source_index {
+                format!("{}", trace.source_index)
+            } else {
+                source_paths
+                    .iter()
+                    .rev()
+                    .find_map(|recent_path| {
+                        recent_path.split('.').last().and_then(|last_part| {
+                            if last_part == trace.parent_source_index.to_string() {
+                                Some(format!("{}.{}", recent_path, trace.source_index))
+                            } else {
+                                None
+                            }
+                        })
+                    })
+                    .ok_or_else(|| RainEvalResultError::CorruptTraces)?
+            };
+
+            for (index, _) in trace.stack.iter().enumerate() {
+                path_names.push(format!("{}.{}", current_path, index));
+            }
+
+            source_paths.push(current_path);
+        }
+
+        Ok(path_names)
+    }
+}
+
 /// A struct representing the result of a Rain eval call. Contains the stack,
 /// writes, and traces. Can be constructed from a `ForkTypedReturn<eval3Call>`.
 #[derive(Debug, Clone)]
@@ -53,14 +135,37 @@ pub struct RainEvalResult {
     pub reverted: bool,
     pub stack: Vec<U256>,
     pub writes: Vec<U256>,
-    pub traces: Vec<RainSourceTrace>,
+    pub traces: RainSourceTraces,
+}
+
+pub struct RainEvalResults {
+    pub results: Vec<RainEvalResult>,
+}
+
+pub struct RainEvalResultsTable {
+    pub column_names: Vec<String>,
+    pub rows: Vec<RainStack>,
+}
+
+impl RainEvalResults {
+    pub fn into_flattened_table(&self) -> Result<RainEvalResultsTable, RainEvalResultError> {
+        let column_names = &self.results[0].traces.flattened_path_names()?;
+        let mut rows = Vec::new();
+        for result in &self.results {
+            rows.push(result.traces.flatten());
+        }
+        Ok(RainEvalResultsTable {
+            column_names: column_names.to_vec(),
+            rows,
+        })
+    }
 }
 
 impl From<RawCallResult> for RainEvalResult {
     fn from(raw_call_result: RawCallResult) -> Self {
         let tracer_address = RAIN_TRACER_ADDRESS.parse::<Address>().unwrap();
 
-        let mut traces: Vec<RainSourceTrace> = raw_call_result
+        let mut traces: RainSourceTraces = raw_call_result
             .traces
             .unwrap()
             .to_owned()
