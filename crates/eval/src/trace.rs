@@ -117,7 +117,7 @@ impl RainSourceTraces {
                             }
                         })
                     })
-                    .ok_or_else(|| RainEvalResultError::CorruptTraces)?
+                    .ok_or(RainEvalResultError::CorruptTraces)?
             };
 
             for (index, _) in trace.stack.iter().enumerate() {
