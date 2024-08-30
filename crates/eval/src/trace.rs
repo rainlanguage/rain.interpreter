@@ -444,13 +444,13 @@ mod tests {
     #[test]
     fn test_rain_source_trace_from_data() {
         // stack items are 32 bytes each
-        let stack_items = vec![U256::from(1), U256::from(2), U256::from(3)];
+        let stack_items = [U256::from(1), U256::from(2), U256::from(3)];
         let stack_data: Vec<u8> = stack_items
             .iter()
             .flat_map(|x| x.to_be_bytes_vec())
             .collect();
 
-        let source_indices = vec![
+        let source_indices = [
             0x00, 0x01, 0x00, 0x02, // parent_source_index: 1, source_index: 2
         ];
 
