@@ -152,6 +152,20 @@ impl From<Vec<RainEvalResult>> for RainEvalResults {
     }
 }
 
+impl Deref for RainEvalResults {
+    type Target = Vec<RainEvalResult>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.results
+    }
+}
+
+impl DerefMut for RainEvalResults {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.results
+    }
+}
+
 #[typeshare]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RainEvalResultsTable {
