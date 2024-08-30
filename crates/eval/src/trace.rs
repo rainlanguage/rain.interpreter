@@ -2,8 +2,10 @@ use crate::fork::ForkTypedReturn;
 use alloy::primitives::{Address, U256};
 use foundry_evm::executors::RawCallResult;
 use rain_interpreter_bindings::IInterpreterV3::{eval3Call, eval3Return};
+use serde::{Deserialize, Serialize};
 use std::ops::{Deref, DerefMut};
 use thiserror::Error;
+use typeshare::typeshare;
 
 pub const RAIN_TRACER_ADDRESS: &str = "0xF06Cd48c98d7321649dB7D8b2C396A81A2046555";
 
@@ -13,6 +15,7 @@ pub enum RainEvalResultError {
     CorruptTraces,
 }
 
+#[typeshare(serialized_as = "Vec<String>")]
 type RainStack = Vec<U256>;
 
 /// A struct representing a single trace from a Rain source. Intended to be decoded
@@ -138,10 +141,19 @@ pub struct RainEvalResult {
     pub traces: RainSourceTraces,
 }
 
+#[derive(Debug, Clone)]
 pub struct RainEvalResults {
     pub results: Vec<RainEvalResult>,
 }
 
+impl From<Vec<RainEvalResult>> for RainEvalResults {
+    fn from(results: Vec<RainEvalResult>) -> Self {
+        RainEvalResults { results }
+    }
+}
+
+#[typeshare]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct RainEvalResultsTable {
     pub column_names: Vec<String>,
     pub rows: Vec<RainStack>,

@@ -15,6 +15,7 @@ reqwest = { workspace = true }
 once_cell = { workspace = true }
 eyre = { workspace = true }
 rain-error-decoding = { workspace = true }
+typeshare = { workspace = true }
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 foundry-evm = { workspace = true }
