@@ -441,6 +441,135 @@ mod tests {
         assert!(matches!(result, Err(TraceSearchError::TraceNotFound(_))));
     }
 
+    #[test]
+    fn test_rain_source_trace_from_data() {
+        // stack items are 32 bytes each
+        let stack_items = vec![U256::from(1), U256::from(2), U256::from(3)];
+        let stack_data: Vec<u8> = stack_items
+            .iter()
+            .flat_map(|x| x.to_be_bytes_vec())
+            .collect();
+
+        let source_indices = vec![
+            0x00, 0x01, 0x00, 0x02, // parent_source_index: 1, source_index: 2
+        ];
+
+        // concat source indices and stack data
+        let data: Vec<u8> = source_indices
+            .iter()
+            .chain(stack_data.iter())
+            .copied()
+            .collect();
+
+        let trace = RainSourceTrace::from_data(&data).unwrap();
+
+        assert_eq!(trace.parent_source_index, 1);
+        assert_eq!(trace.source_index, 2);
+        assert_eq!(trace.stack.len(), 3);
+        assert_eq!(trace.stack[0], U256::from(1));
+    }
+
+    #[test]
+    fn test_rain_source_traces_deref() {
+        let trace1 = RainSourceTrace {
+            parent_source_index: 1,
+            source_index: 1, // Adjusted to have the same parent and source index for consistency
+            stack: vec![U256::from(1)],
+        };
+        let trace2 = RainSourceTrace {
+            parent_source_index: 1, // Adjusted to match the parent_source_index
+            source_index: 2,
+            stack: vec![U256::from(2)],
+        };
+
+        let traces = RainSourceTraces {
+            traces: vec![trace1.clone(), trace2.clone()],
+        };
+
+        assert_eq!(traces[0], trace1);
+        assert_eq!(traces[1], trace2);
+    }
+
+    #[test]
+    fn test_rain_source_traces_flatten() {
+        let trace1 = RainSourceTrace {
+            parent_source_index: 1,
+            source_index: 1, // Adjusted to match the test case
+            stack: vec![U256::from(1), U256::from(2)],
+        };
+        let trace2 = RainSourceTrace {
+            parent_source_index: 1, // Adjusted to match the parent_source_index
+            source_index: 2,
+            stack: vec![U256::from(3)],
+        };
+
+        let traces = RainSourceTraces {
+            traces: vec![trace1, trace2],
+        };
+
+        let flattened_stack = traces.flatten();
+        assert_eq!(
+            flattened_stack,
+            vec![U256::from(2), U256::from(1), U256::from(3)]
+        );
+    }
+
+    #[test]
+    fn test_rain_source_traces_flattened_path_names() {
+        let trace1 = RainSourceTrace {
+            parent_source_index: 1,
+            source_index: 1, // Adjusted to match the test case
+            stack: vec![U256::from(1), U256::from(2)],
+        };
+        let trace2 = RainSourceTrace {
+            parent_source_index: 1, // Adjusted to match the parent_source_index
+            source_index: 2,
+            stack: vec![U256::from(3)],
+        };
+
+        let traces = RainSourceTraces {
+            traces: vec![trace1, trace2],
+        };
+
+        let path_names = traces.flattened_path_names().unwrap();
+        assert_eq!(path_names, vec!["1.0", "1.1", "1.2.0"]);
+    }
+
+    #[test]
+    fn test_rain_eval_result_into_flattened_table() {
+        let trace1 = RainSourceTrace {
+            parent_source_index: 1,
+            source_index: 1, // Adjusted to match the test case
+            stack: vec![U256::from(1), U256::from(2)],
+        };
+        let trace2 = RainSourceTrace {
+            parent_source_index: 1, // Adjusted to match the parent_source_index
+            source_index: 2,
+            stack: vec![U256::from(3)],
+        };
+
+        let rain_eval_result = RainEvalResult {
+            reverted: false,
+            stack: vec![],
+            writes: vec![],
+            traces: RainSourceTraces {
+                traces: vec![trace1, trace2],
+            },
+        };
+
+        let rain_eval_results = RainEvalResults {
+            results: vec![rain_eval_result],
+        };
+
+        let table = rain_eval_results.into_flattened_table().unwrap();
+        assert_eq!(table.column_names, vec!["1.0", "1.1", "1.2.0"]);
+        assert_eq!(table.rows.len(), 1);
+        assert_eq!(
+            table.rows[0],
+            vec![U256::from(2), U256::from(1), U256::from(3)]
+        );
+    }
+
     fn vec_i32_to_u256(vec: Vec<i32>) -> Vec<U256> {
         vec.iter()
             .map(|&x| parse_ether(&x.to_string()).unwrap())
