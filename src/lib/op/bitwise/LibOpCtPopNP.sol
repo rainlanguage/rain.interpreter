@@ -2,11 +2,10 @@
 pragma solidity ^0.8.18;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {Operand} from "rain.interpreter.interface/interface/IInterpreterV3.sol";
+import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
-import {FIXED_POINT_ONE} from "rain.math.fixedpoint/lib/FixedPointDecimalConstants.sol";
 
 /// @title LibOpCtPopNP
 /// @notice An opcode that counts the number of bits set in a word. This is
@@ -29,7 +28,7 @@ library LibOpCtPopNP {
             value := mload(stackTop)
         }
         unchecked {
-            value = LibCtPop.ctpop(value) * FIXED_POINT_ONE;
+            value = LibCtPop.ctpop(value);
         }
         assembly ("memory-safe") {
             mstore(stackTop, value)
@@ -43,7 +42,7 @@ library LibOpCtPopNP {
         pure
         returns (uint256[] memory)
     {
-        inputs[0] = LibCtPop.ctpopSlow(inputs[0]) * FIXED_POINT_ONE;
+        inputs[0] = LibCtPop.ctpopSlow(inputs[0]);
         return inputs;
     }
 }

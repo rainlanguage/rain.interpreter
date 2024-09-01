@@ -6,15 +6,15 @@ import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibInt
 import {LibOpERC721OwnerOf} from "src/lib/op/erc721/LibOpERC721OwnerOf.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import {
-    IInterpreterV2,
+    IInterpreterV4,
     FullyQualifiedNamespace,
     SourceIndexV2,
-    Operand
-} from "rain.interpreter.interface/interface/deprecated/IInterpreterV2.sol";
+    Operand,
+    EvalV4
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {LibEncodedDispatch} from "rain.interpreter.interface/lib/deprecated/caller/LibEncodedDispatch.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/deprecated/IInterpreterCallerV2.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
@@ -67,13 +67,16 @@ contract LibOpERC721OwnerOfTest is OpTest {
         vm.mockCall(token, abi.encodeWithSelector(IERC721.ownerOf.selector, tokenId), abi.encode(owner));
         vm.expectCall(token, abi.encodeWithSelector(IERC721.ownerOf.selector, tokenId), 1);
 
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval3(
-            iStore,
-            FullyQualifiedNamespace.wrap(0),
-            bytecode,
-            SourceIndexV2.wrap(0),
-            LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-            new uint256[](0)
+        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
+            EvalV4({
+                store: iStore,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
+                inputs: new uint256[](0),
+                stateOverlay: new uint256[](0)
+            })
         );
         assertEq(stack.length, 1);
         assertEq(stack[0], uint256(uint160(owner)));

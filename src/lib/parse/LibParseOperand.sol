@@ -6,16 +6,17 @@ import {
     UnclosedOperand,
     OperandValuesOverflow,
     UnexpectedOperand,
-    UnexpectedOperandValue
+    UnexpectedOperandValue,
+    OperandOverflow
 } from "../../error/ErrParse.sol";
-import {Operand} from "rain.interpreter.interface/interface/IInterpreterV3.sol";
+import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibParse} from "./LibParse.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 import {CMASK_OPERAND_END, CMASK_WHITESPACE, CMASK_OPERAND_START} from "./LibParseCMask.sol";
 import {ParseState, OPERAND_VALUES_LENGTH, FSM_YANG_MASK} from "./LibParseState.sol";
 import {LibParseError} from "./LibParseError.sol";
 import {LibParseInterstitial} from "./LibParseInterstitial.sol";
-import {LibFixedPointDecimalScale, DECIMAL_MAX_SAFE_INT} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
+import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
 
 library LibParseOperand {
     using LibParseError for ParseState;
@@ -157,9 +158,11 @@ library LibParseOperand {
             assembly ("memory-safe") {
                 operand := mload(add(values, 0x20))
             }
-            operand = Operand.wrap(
-                LibFixedPointDecimalScale.decimalOrIntToInt(Operand.unwrap(operand), uint256(type(uint16).max))
-            );
+            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(Operand.unwrap(operand));
+            operand = Operand.wrap(LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0));
+            if (Operand.unwrap(operand) > type(uint16).max) {
+                revert OperandOverflow();
+            }
         } else if (values.length == 0) {
             operand = Operand.wrap(0);
         } else {
@@ -174,9 +177,11 @@ library LibParseOperand {
             assembly ("memory-safe") {
                 operand := mload(add(values, 0x20))
             }
-            operand = Operand.wrap(
-                LibFixedPointDecimalScale.decimalOrIntToInt(Operand.unwrap(operand), uint256(type(uint16).max))
-            );
+            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(Operand.unwrap(operand));
+            operand = Operand.wrap(LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0));
+            if (Operand.unwrap(operand) > type(uint16).max) {
+                revert OperandOverflow();
+            }
         } else if (values.length == 0) {
             revert ExpectedOperand();
         } else {
@@ -195,8 +200,14 @@ library LibParseOperand {
                 a := mload(add(values, 0x20))
                 b := mload(add(values, 0x40))
             }
-            a = LibFixedPointDecimalScale.decimalOrIntToInt(a, type(uint8).max);
-            b = LibFixedPointDecimalScale.decimalOrIntToInt(b, type(uint8).max);
+            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(a);
+            a = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
+            (signedCoefficient, exponent) = LibDecimalFloat.unpack(b);
+            b = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
+
+            if (a > type(uint8).max || b > type(uint8).max) {
+                revert OperandOverflow();
+            }
 
             operand = Operand.wrap(a | (b << 8));
         } else if (values.length < 2) {
@@ -235,9 +246,16 @@ library LibParseOperand {
                 c = 0;
             }
 
-            a = LibFixedPointDecimalScale.decimalOrIntToInt(a, type(uint8).max);
-            b = LibFixedPointDecimalScale.decimalOrIntToInt(b, 1);
-            c = LibFixedPointDecimalScale.decimalOrIntToInt(c, 1);
+            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(a);
+            a = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
+            (signedCoefficient, exponent) = LibDecimalFloat.unpack(b);
+            b = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
+            (signedCoefficient, exponent) = LibDecimalFloat.unpack(c);
+            c = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
+
+            if (a > type(uint8).max || b > 1 || c > 1) {
+                revert OperandOverflow();
+            }
 
             operand = Operand.wrap(a | (b << 8) | (c << 9));
         } else if (length == 0) {
@@ -271,8 +289,14 @@ library LibParseOperand {
                 b = 0;
             }
 
-            a = LibFixedPointDecimalScale.decimalOrIntToInt(a, 1);
-            b = LibFixedPointDecimalScale.decimalOrIntToInt(b, 1);
+            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(a);
+            a = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
+            (signedCoefficient, exponent) = LibDecimalFloat.unpack(b);
+            b = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
+
+            if (a > 1 || b > 1) {
+                revert OperandOverflow();
+            }
 
             operand = Operand.wrap(a | (b << 1));
         } else {

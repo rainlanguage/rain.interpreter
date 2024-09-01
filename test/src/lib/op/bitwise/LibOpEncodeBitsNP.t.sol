@@ -4,7 +4,7 @@ pragma solidity =0.8.25;
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {Operand} from "rain.interpreter.interface/interface/IInterpreterV3.sol";
+import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {TruncatedBitwiseEncoding, ZeroLengthBitwiseEncoding} from "src/error/ErrBitwise.sol";
 import {LibOpEncodeBitsNP} from "src/lib/op/bitwise/LibOpEncodeBitsNP.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
@@ -66,22 +66,24 @@ contract LibOpEncodeBitsNPTest is OpTest {
 
     /// Test the eval of encoding bits parsed from a string.
     function testOpEncodeBitsNPEvalHappy() external view {
-        checkHappy("_:bitwise-encode<0 1>(0 0);", 0, "0 0");
-        checkHappy("_:bitwise-encode<0 1>(0 1e-18);", 0, "0 1");
-        checkHappy("_:bitwise-encode<0 1>(1e-18 0);", 1, "1 0");
-        checkHappy("_:bitwise-encode<0 1>(1e-18 1e-18);", 1, "1 1");
-        checkHappy("_:bitwise-encode<0 1>(0 2e-18);", 2, "0 2");
-        checkHappy("_:bitwise-encode<0 1>(1e-18 2e-18);", 3, "1 2");
-        checkHappy("_:bitwise-encode<0 1>(max-value() 0);", 1, "max-value 0");
-        checkHappy("_:bitwise-encode<0 1>(max-value() 1e-18);", 1, "max-value 1");
-        checkHappy("_:bitwise-encode<0 1>(max-value() 2e-18);", 3, "max-value 2");
-        checkHappy("_:bitwise-encode<0 1>(max-value() 3e-18);", 3, "max-value 3");
-        checkHappy("_:bitwise-encode<0 2>(max-value() 0);", 3, "max-value 0 0 2");
-        checkHappy("_:bitwise-encode<1 1>(max-value() 0);", 2, "max-value 1 1 1");
-        checkHappy("_:bitwise-encode<1 1>(max-value() 1e-18);", 3, "max-value 1 1 1");
-        checkHappy("_:bitwise-encode<1 1>(max-value() 2e-18);", 2, "max-value 2 1 1");
-        checkHappy("_:bitwise-encode<0xFF 1>(max-value() 0);", 1 << 255, "max-value 2 0xFF 1");
-        checkHappy("_:bitwise-encode<0 0xFF>(max-value() 0);", type(uint256).max >> 1, "max-value 2 0xFF 1");
+        checkHappy("_:bitwise-encode<0 1>(0x00 0x00);", 0, "0 0");
+        checkHappy("_:bitwise-encode<0 1>(0x00 0x01);", 0, "0 1");
+        checkHappy("_:bitwise-encode<0 1>(0x01 0x00);", 1, "1 0");
+        checkHappy("_:bitwise-encode<0 1>(0x01 0x01);", 1, "1 1");
+        checkHappy("_:bitwise-encode<0 1>(0x00 0x02);", 2, "0 2");
+        checkHappy("_:bitwise-encode<0 1>(0x01 0x02);", 3, "1 2");
+        checkHappy("_:bitwise-encode<0 1>(uint256-max-value() 0x00);", 1, "uint256-max-value 0");
+        checkHappy("_:bitwise-encode<0 1>(uint256-max-value() 0x01);", 1, "uint256-max-value 1");
+        checkHappy("_:bitwise-encode<0 1>(uint256-max-value() 0x02);", 3, "uint256-max-value 2");
+        checkHappy("_:bitwise-encode<0 1>(uint256-max-value() 0x03);", 3, "uint256-max-value 3");
+        checkHappy("_:bitwise-encode<0 2>(uint256-max-value() 0x00);", 3, "uint256-max-value 0 0 2");
+        checkHappy("_:bitwise-encode<1 1>(uint256-max-value() 0x00);", 2, "uint256-max-value 1 1 1");
+        checkHappy("_:bitwise-encode<1 1>(uint256-max-value() 0x01);", 3, "uint256-max-value 1 1 1");
+        checkHappy("_:bitwise-encode<1 1>(uint256-max-value() 0x02);", 2, "uint256-max-value 2 1 1");
+        checkHappy("_:bitwise-encode<0xFF 1>(uint256-max-value() 0x00);", 1 << 255, "uint256-max-value 2 0xFF 1");
+        checkHappy(
+            "_:bitwise-encode<0 0xFF>(uint256-max-value() 0);", type(uint256).max >> 1, "uint256-max-value 2 0xFF 1"
+        );
     }
 
     /// Check bad inputs.

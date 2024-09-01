@@ -16,10 +16,9 @@ import {
     UnexpectedParserBytecodeHash,
     UnexpectedPointers
 } from "../error/ErrDeploy.sol";
-import {IParserV1View} from "rain.interpreter.interface/interface/deprecated/IParserV1View.sol";
-import {IInterpreterV3} from "rain.interpreter.interface/interface/IInterpreterV3.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {IDescribedByMetaV1} from "rain.metadata/interface/IDescribedByMetaV1.sol";
+import {IInterpreterV4} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 import {LibIntegrityCheckNP} from "../lib/integrity/LibIntegrityCheckNP.sol";
 import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
@@ -33,6 +32,7 @@ import {
     DESCRIBED_BY_META_HASH
 } from "../generated/RainterpreterExpressionDeployerNPE2.pointers.sol";
 import {IIntegrityToolingV1} from "rain.sol.codegen/interface/IIntegrityToolingV1.sol";
+import {IParserV1View} from "rain.interpreter.interface/interface/deprecated/IParserV1View.sol";
 
 /// All config required to construct a `RainterpreterNPE2`.
 /// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match
@@ -59,14 +59,14 @@ contract RainterpreterExpressionDeployerNPE2 is
 
     /// The interpreter with known bytecode that this deployer is constructed
     /// for.
-    IInterpreterV3 public immutable iInterpreter;
+    IInterpreterV4 public immutable iInterpreter;
     /// The store with known bytecode that this deployer is constructed for.
     IInterpreterStoreV2 public immutable iStore;
     IParserV1View public immutable iParser;
 
     constructor(RainterpreterExpressionDeployerNPE2ConstructionConfigV2 memory config) {
         // Set the immutables.
-        IInterpreterV3 interpreter = IInterpreterV3(config.interpreter);
+        IInterpreterV4 interpreter = IInterpreterV4(config.interpreter);
         IInterpreterStoreV2 store = IInterpreterStoreV2(config.store);
         IParserV1View parser = IParserV1View(config.parser);
 

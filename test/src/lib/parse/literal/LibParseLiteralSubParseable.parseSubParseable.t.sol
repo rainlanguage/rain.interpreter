@@ -6,9 +6,10 @@ import {ParseState, Pointer, LibParseState} from "src/lib/parse/LibParseState.so
 import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseLiteralSubParseable} from "src/lib/parse/literal/LibParseLiteralSubParseable.sol";
 import {UnclosedSubParseableLiteral, SubParseableMissingDispatch} from "src/error/ErrParse.sol";
-import {ISubParserV3, COMPATIBILITY_V4} from "rain.interpreter.interface/interface/ISubParserV3.sol";
+import {ISubParserV3} from "rain.interpreter.interface/interface/ISubParserV3.sol";
 import {LibLiteralString} from "test/lib/literal/LibLiteralString.sol";
 import {CMASK_WHITESPACE, CMASK_SUB_PARSEABLE_LITERAL_END} from "src/lib/parse/LibParseCMask.sol";
+import {CURRENT_COMPATIBILITY} from "src/lib/parse/LibSubParse.sol";
 
 contract LibParseLiteralSubParseableTest is Test {
     using LibBytes for bytes;
@@ -30,11 +31,12 @@ contract LibParseLiteralSubParseableTest is Test {
         uint256 returnValue = 99;
         vm.mockCall(
             subParser,
-            abi.encodeWithSelector(ISubParserV3.subParseLiteral.selector, COMPATIBILITY_V4, subParseData),
+            abi.encodeWithSelector(ISubParserV3.subParseLiteral.selector, CURRENT_COMPATIBILITY, subParseData),
             abi.encode(true, returnValue)
         );
         vm.expectCall(
-            subParser, abi.encodeWithSelector(ISubParserV3.subParseLiteral.selector, COMPATIBILITY_V4, subParseData)
+            subParser,
+            abi.encodeWithSelector(ISubParserV3.subParseLiteral.selector, CURRENT_COMPATIBILITY, subParseData)
         );
         (uint256 cursorAfter, uint256 value) =
             state.parseSubParseable(cursor, Pointer.unwrap(state.data.endDataPointer()));

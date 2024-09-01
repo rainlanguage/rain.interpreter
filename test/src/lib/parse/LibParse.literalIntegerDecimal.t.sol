@@ -8,6 +8,7 @@ import {DecimalLiteralOverflow} from "src/lib/parse/literal/LibParseLiteral.sol"
 import {LibParse, UnexpectedRHSChar, UnexpectedRightParen} from "src/lib/parse/LibParse.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
+import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
 
 /// @title LibParseLiteralIntegerDecimalTest
 /// Tests parsing integer literal decimal values.
@@ -46,7 +47,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
         );
 
         assertEq(constants.length, 1);
-        assertEq(constants[0], 1e18);
+        assertEq(constants[0], LibDecimalFloat.pack(1e37, -37));
     }
 
     /// Check 2 decimal literals. Should not revert and return one source and
@@ -83,8 +84,8 @@ contract LibParseLiteralIntegerDecimalTest is Test {
         );
 
         assertEq(constants.length, 2);
-        assertEq(constants[0], 10e18);
-        assertEq(constants[1], 25e18);
+        assertEq(constants[0], LibDecimalFloat.pack(10e36, -36));
+        assertEq(constants[1], LibDecimalFloat.pack(25e36, -36));
     }
 
     /// Check 3 decimal literals with 2 dupes. Should dedupe and respect ordering.
@@ -123,15 +124,14 @@ contract LibParseLiteralIntegerDecimalTest is Test {
             hex"01100000"
         );
         assertEq(constants.length, 2);
-        assertEq(constants[0], 11e18);
-        assertEq(constants[1], 233e18);
+        assertEq(constants[0], LibDecimalFloat.pack(11e36, -36));
+        assertEq(constants[1], LibDecimalFloat.pack(233e35, -35));
     }
 
-    /// Check that we can parse uint256 max int in decimal form.
-    function testParseIntegerLiteralDecimalUint256Max() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(
-            "_: 115792089237316195423570985008687907853269984665640564039457584007913129639935e-18;"
-        ).parse();
+    /// Check that we can parse the max int128 value in decimal form.
+    function testParseIntegerLiteralDecimalInt128Max() external view {
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibMetaFixture.newState("_: 170141183460469231731687303715884105727;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -160,15 +160,14 @@ contract LibParseLiteralIntegerDecimalTest is Test {
         );
 
         assertEq(constants.length, 1);
-        assertEq(constants[0], type(uint256).max);
+        assertEq(constants[0], uint256(int256(type(int128).max)));
     }
 
     /// Check that we can parse uint256 max int in decimal form with leading
     /// zeros.
-    function testParseIntegerLiteralDecimalUint256MaxLeadingZeros() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(
-            "_: 000115792089237316195423570985008687907853269984665640564039457584007913129639935e-18;"
-        ).parse();
+    function testParseIntegerLiteralDecimalInt128MaxLeadingZeros() external view {
+        (bytes memory bytecode, uint256[] memory constants) =
+            LibMetaFixture.newState("_: 000170141183460469231731687303715884105727;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -196,7 +195,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
             hex"01100000"
         );
         assertEq(constants.length, 1);
-        assertEq(constants[0], type(uint256).max);
+        assertEq(constants[0], uint256(int256(type(int128).max)));
     }
 
     /// Check that decimal literals will revert if they overflow uint256.
@@ -282,11 +281,11 @@ contract LibParseLiteralIntegerDecimalTest is Test {
         );
 
         assertEq(constants.length, 5);
-        assertEq(constants[0], 1e20);
-        assertEq(constants[1], 10e20);
-        assertEq(constants[2], 1e48);
-        assertEq(constants[3], 1e36);
-        assertEq(constants[4], 1001e33);
+        assertEq(constants[0], LibDecimalFloat.pack(1e37, -35));
+        assertEq(constants[1], LibDecimalFloat.pack(1e37, -34));
+        assertEq(constants[2], LibDecimalFloat.pack(1e37, -7));
+        assertEq(constants[3], LibDecimalFloat.pack(1e37, -19));
+        assertEq(constants[4], LibDecimalFloat.pack(1001e34, -19));
     }
 
     /// Check that decimals cause yang.

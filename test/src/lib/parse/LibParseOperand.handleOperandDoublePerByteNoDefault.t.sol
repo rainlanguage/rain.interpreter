@@ -5,8 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {LibParseOperand, Operand} from "src/lib/parse/LibParseOperand.sol";
 import {ExpectedOperand, UnexpectedOperandValue} from "src/error/ErrParse.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
-import {IntegerOverflow} from "rain.math.fixedpoint/error/ErrScale.sol";
-import {LibFixedPointDecimalScale, DECIMAL_MAX_SAFE_INT} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
+import {OperandOverflow} from "src/error/ErrParse.sol";
 
 contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
     // There must be exactly two values so zero values is an error.
@@ -33,46 +32,26 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
 
     // If the first value is greater than 1 byte, it is an error.
     function testHandleOperandDoublePerByteNoDefaultFirstValueTooLarge(uint256 a, uint256 b) external {
-        a = bound(a, uint256(type(uint8).max) + 1, DECIMAL_MAX_SAFE_INT);
+        a = bound(a, uint256(type(uint8).max) + 1, uint256(int256(type(int128).max)));
         b = bound(b, 0, type(uint8).max);
-
-        // If a is a decimal, scale it above 256 as a decimal.
-        if (a >= 1e18) {
-            a = bound(a, 256e18, type(uint256).max);
-            a = a - (a % 1e18);
-        }
 
         uint256[] memory values = new uint256[](2);
         values[0] = a;
         values[1] = b;
 
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                IntegerOverflow.selector, LibFixedPointDecimalScale.decimalOrIntToInt(a, DECIMAL_MAX_SAFE_INT), 255
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         LibParseOperand.handleOperandDoublePerByteNoDefault(values);
     }
 
     // If the second value is greater than 1 byte, it is an error.
     function testHandleOperandDoublePerByteNoDefaultSecondValueTooLarge(uint256 a, uint256 b) external {
         a = bound(a, 0, type(uint8).max);
-        b = bound(b, uint256(type(uint8).max) + 1, DECIMAL_MAX_SAFE_INT);
-
-        // If b is a decimal, scale it above 256 as a decimal.
-        if (b >= 1e18) {
-            b = bound(b, 256e18, type(uint256).max);
-            b = b - (b % 1e18);
-        }
+        b = bound(b, uint256(type(uint8).max) + 1, uint256(int256(type(int128).max)));
 
         uint256[] memory values = new uint256[](2);
         values[0] = a;
         values[1] = b;
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                IntegerOverflow.selector, LibFixedPointDecimalScale.decimalOrIntToInt(b, DECIMAL_MAX_SAFE_INT), 255
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         LibParseOperand.handleOperandDoublePerByteNoDefault(values);
     }
 
