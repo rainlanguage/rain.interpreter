@@ -135,6 +135,7 @@ impl RainSourceTraces {
 /// writes, and traces. Can be constructed from a `ForkTypedReturn<eval3Call>`.
 #[derive(Debug, Clone)]
 pub struct RainEvalResult {
+    pub block_number: U256,
     pub reverted: bool,
     pub stack: Vec<U256>,
     pub writes: Vec<U256>,
@@ -169,6 +170,8 @@ impl DerefMut for RainEvalResults {
 #[typeshare]
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RainEvalResultsTable {
+    #[typeshare(typescript(type = "string"))]
+    pub block_number: U256,
     pub column_names: Vec<String>,
     pub rows: Vec<RainStack>,
 }
@@ -181,6 +184,7 @@ impl RainEvalResults {
             rows.push(result.traces.flatten());
         }
         Ok(RainEvalResultsTable {
+            block_number: self.results[0].block_number,
             column_names: column_names.to_vec(),
             rows,
         })
@@ -208,6 +212,7 @@ impl From<RawCallResult> for RainEvalResult {
         traces.reverse();
 
         RainEvalResult {
+            block_number: raw_call_result.env.block.number,
             reverted: raw_call_result.reverted,
             stack: vec![],
             writes: vec![],
@@ -223,6 +228,7 @@ impl From<ForkTypedReturn<eval3Call>> for RainEvalResult {
         let res: RainEvalResult = typed_return.raw.into();
 
         RainEvalResult {
+            block_number: res.block_number,
             reverted: res.reverted,
             stack,
             writes,
@@ -549,6 +555,7 @@ mod tests {
         };
 
         let rain_eval_result = RainEvalResult {
+            block_number: U256::from(1),
             reverted: false,
             stack: vec![],
             writes: vec![],
