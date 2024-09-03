@@ -36,6 +36,7 @@ alloy-ethers-typecast = { git = "https://github.com/rainlanguage/alloy-ethers-ty
 rain-interpreter-env = { path = "crates/env" }
 eyre = "0.6"
 rain-error-decoding = { git = "https://github.com/rainlanguage/rain.error", rev = "72d9577fdaf7135113847027ba951f9a43b41827" }
+typeshare = { git = "https://github.com/tomjw64/typeshare", rev = "556b44aafd5304eedf17206800f69834e3820b7c" }
 
 [workspace.dependencies.rain_interpreter_parser]
 path = "crates/parser"

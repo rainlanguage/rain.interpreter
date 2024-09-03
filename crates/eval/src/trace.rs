@@ -2,9 +2,21 @@ use crate::fork::ForkTypedReturn;
 use alloy::primitives::{Address, U256};
 use foundry_evm::executors::RawCallResult;
 use rain_interpreter_bindings::IInterpreterV3::{eval3Call, eval3Return};
+use serde::{Deserialize, Serialize};
+use std::ops::{Deref, DerefMut};
 use thiserror::Error;
+use typeshare::typeshare;
 
 pub const RAIN_TRACER_ADDRESS: &str = "0xF06Cd48c98d7321649dB7D8b2C396A81A2046555";
+
+#[derive(Error, Debug)]
+pub enum RainEvalResultError {
+    #[error("Corrupt traces")]
+    CorruptTraces,
+}
+
+#[typeshare(serialized_as = "Vec<String>")]
+type RainStack = Vec<U256>;
 
 /// A struct representing a single trace from a Rain source. Intended to be decoded
 /// from the calldata sent as part of a noop call by the Interpreter to the
@@ -13,7 +25,34 @@ pub const RAIN_TRACER_ADDRESS: &str = "0xF06Cd48c98d7321649dB7D8b2C396A81A204655
 pub struct RainSourceTrace {
     pub parent_source_index: u16,
     pub source_index: u16,
-    pub stack: Vec<U256>,
+    pub stack: RainStack,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RainSourceTraces {
+    pub traces: Vec<RainSourceTrace>,
+}
+
+impl Deref for RainSourceTraces {
+    type Target = Vec<RainSourceTrace>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.traces
+    }
+}
+
+impl DerefMut for RainSourceTraces {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.traces
+    }
+}
+
+impl FromIterator<RainSourceTrace> for RainSourceTraces {
+    fn from_iter<I: IntoIterator<Item = RainSourceTrace>>(iter: I) -> Self {
+        RainSourceTraces {
+            traces: iter.into_iter().collect(),
+        }
+    }
 }
 
 impl RainSourceTrace {
@@ -46,6 +85,52 @@ impl RainSourceTrace {
     }
 }
 
+impl RainSourceTraces {
+    pub fn flatten(&self) -> RainStack {
+        let mut flattened_stack: RainStack = vec![];
+        for trace in self.traces.iter() {
+            let mut stack = trace.stack.clone();
+            stack.reverse();
+            for stack_item in stack.iter() {
+                flattened_stack.push(*stack_item);
+            }
+        }
+        flattened_stack
+    }
+    pub fn flattened_path_names(&self) -> Result<Vec<String>, RainEvalResultError> {
+        let mut path_names: Vec<String> = vec![];
+        let mut source_paths: Vec<String> = vec![];
+
+        for trace in self.iter() {
+            let current_path = if trace.parent_source_index == trace.source_index {
+                format!("{}", trace.source_index)
+            } else {
+                source_paths
+                    .iter()
+                    .rev()
+                    .find_map(|recent_path| {
+                        recent_path.split('.').last().and_then(|last_part| {
+                            if last_part == trace.parent_source_index.to_string() {
+                                Some(format!("{}.{}", recent_path, trace.source_index))
+                            } else {
+                                None
+                            }
+                        })
+                    })
+                    .ok_or(RainEvalResultError::CorruptTraces)?
+            };
+
+            for (index, _) in trace.stack.iter().enumerate() {
+                path_names.push(format!("{}.{}", current_path, index));
+            }
+
+            source_paths.push(current_path);
+        }
+
+        Ok(path_names)
+    }
+}
+
 /// A struct representing the result of a Rain eval call. Contains the stack,
 /// writes, and traces. Can be constructed from a `ForkTypedReturn<eval3Call>`.
 #[derive(Debug, Clone)]
@@ -53,14 +138,60 @@ pub struct RainEvalResult {
     pub reverted: bool,
     pub stack: Vec<U256>,
     pub writes: Vec<U256>,
-    pub traces: Vec<RainSourceTrace>,
+    pub traces: RainSourceTraces,
+}
+
+#[derive(Debug, Clone)]
+pub struct RainEvalResults {
+    pub results: Vec<RainEvalResult>,
+}
+
+impl From<Vec<RainEvalResult>> for RainEvalResults {
+    fn from(results: Vec<RainEvalResult>) -> Self {
+        RainEvalResults { results }
+    }
+}
+
+impl Deref for RainEvalResults {
+    type Target = Vec<RainEvalResult>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.results
+    }
+}
+
+impl DerefMut for RainEvalResults {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.results
+    }
+}
+
+#[typeshare]
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RainEvalResultsTable {
+    pub column_names: Vec<String>,
+    pub rows: Vec<RainStack>,
+}
+
+impl RainEvalResults {
+    pub fn into_flattened_table(&self) -> Result<RainEvalResultsTable, RainEvalResultError> {
+        let column_names = &self.results[0].traces.flattened_path_names()?;
+        let mut rows = Vec::new();
+        for result in &self.results {
+            rows.push(result.traces.flatten());
+        }
+        Ok(RainEvalResultsTable {
+            column_names: column_names.to_vec(),
+            rows,
+        })
+    }
 }
 
 impl From<RawCallResult> for RainEvalResult {
     fn from(raw_call_result: RawCallResult) -> Self {
         let tracer_address = RAIN_TRACER_ADDRESS.parse::<Address>().unwrap();
 
-        let mut traces: Vec<RainSourceTrace> = raw_call_result
+        let mut traces: RainSourceTraces = raw_call_result
             .traces
             .unwrap()
             .to_owned()
@@ -308,6 +439,135 @@ mod tests {
 
         let result = rain_eval_result.search_trace_by_path("0.1.12");
         assert!(matches!(result, Err(TraceSearchError::TraceNotFound(_))));
+    }
+
+    #[test]
+    fn test_rain_source_trace_from_data() {
+        // stack items are 32 bytes each
+        let stack_items = [U256::from(1), U256::from(2), U256::from(3)];
+        let stack_data: Vec<u8> = stack_items
+            .iter()
+            .flat_map(|x| x.to_be_bytes_vec())
+            .collect();
+
+        let source_indices = [
+            0x00, 0x01, 0x00, 0x02, // parent_source_index: 1, source_index: 2
+        ];
+
+        // concat source indices and stack data
+        let data: Vec<u8> = source_indices
+            .iter()
+            .chain(stack_data.iter())
+            .copied()
+            .collect();
+
+        let trace = RainSourceTrace::from_data(&data).unwrap();
+
+        assert_eq!(trace.parent_source_index, 1);
+        assert_eq!(trace.source_index, 2);
+        assert_eq!(trace.stack.len(), 3);
+        assert_eq!(trace.stack[0], U256::from(1));
+    }
+
+    #[test]
+    fn test_rain_source_traces_deref() {
+        let trace1 = RainSourceTrace {
+            parent_source_index: 1,
+            source_index: 1, // Adjusted to have the same parent and source index for consistency
+            stack: vec![U256::from(1)],
+        };
+        let trace2 = RainSourceTrace {
+            parent_source_index: 1, // Adjusted to match the parent_source_index
+            source_index: 2,
+            stack: vec![U256::from(2)],
+        };
+
+        let traces = RainSourceTraces {
+            traces: vec![trace1.clone(), trace2.clone()],
+        };
+
+        assert_eq!(traces[0], trace1);
+        assert_eq!(traces[1], trace2);
+    }
+
+    #[test]
+    fn test_rain_source_traces_flatten() {
+        let trace1 = RainSourceTrace {
+            parent_source_index: 1,
+            source_index: 1, // Adjusted to match the test case
+            stack: vec![U256::from(1), U256::from(2)],
+        };
+        let trace2 = RainSourceTrace {
+            parent_source_index: 1, // Adjusted to match the parent_source_index
+            source_index: 2,
+            stack: vec![U256::from(3)],
+        };
+
+        let traces = RainSourceTraces {
+            traces: vec![trace1, trace2],
+        };
+
+        let flattened_stack = traces.flatten();
+        assert_eq!(
+            flattened_stack,
+            vec![U256::from(2), U256::from(1), U256::from(3)]
+        );
+    }
+
+    #[test]
+    fn test_rain_source_traces_flattened_path_names() {
+        let trace1 = RainSourceTrace {
+            parent_source_index: 1,
+            source_index: 1, // Adjusted to match the test case
+            stack: vec![U256::from(1), U256::from(2)],
+        };
+        let trace2 = RainSourceTrace {
+            parent_source_index: 1, // Adjusted to match the parent_source_index
+            source_index: 2,
+            stack: vec![U256::from(3)],
+        };
+
+        let traces = RainSourceTraces {
+            traces: vec![trace1, trace2],
+        };
+
+        let path_names = traces.flattened_path_names().unwrap();
+        assert_eq!(path_names, vec!["1.0", "1.1", "1.2.0"]);
+    }
+
+    #[test]
+    fn test_rain_eval_result_into_flattened_table() {
+        let trace1 = RainSourceTrace {
+            parent_source_index: 1,
+            source_index: 1, // Adjusted to match the test case
+            stack: vec![U256::from(1), U256::from(2)],
+        };
+        let trace2 = RainSourceTrace {
+            parent_source_index: 1, // Adjusted to match the parent_source_index
+            source_index: 2,
+            stack: vec![U256::from(3)],
+        };
+
+        let rain_eval_result = RainEvalResult {
+            reverted: false,
+            stack: vec![],
+            writes: vec![],
+            traces: RainSourceTraces {
+                traces: vec![trace1, trace2],
+            },
+        };
+
+        let rain_eval_results = RainEvalResults {
+            results: vec![rain_eval_result],
+        };
+
+        let table = rain_eval_results.into_flattened_table().unwrap();
+        assert_eq!(table.column_names, vec!["1.0", "1.1", "1.2.0"]);
+        assert_eq!(table.rows.len(), 1);
+        assert_eq!(
+            table.rows[0],
+            vec![U256::from(2), U256::from(1), U256::from(3)]
+        );
     }
 
     fn vec_i32_to_u256(vec: Vec<i32>) -> Vec<U256> {
