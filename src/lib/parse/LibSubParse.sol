@@ -8,15 +8,17 @@ import {
     OPCODE_CONSTANT,
     OPCODE_CONTEXT,
     Operand
-} from "rain.interpreter.interface/interface/IInterpreterV3.sol";
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibBytecode, Pointer} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
-import {ISubParserV3, COMPATIBILITY_V4} from "rain.interpreter.interface/interface/ISubParserV3.sol";
+import {ISubParserV3, COMPATIBILITY_V5} from "rain.interpreter.interface/interface/ISubParserV3.sol";
 import {BadSubParserResult, UnknownWord, UnsupportedLiteralType} from "../../error/ErrParse.sol";
 import {LibExtern, EncodedExternDispatch} from "../extern/LibExtern.sol";
 import {IInterpreterExternV3} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
 import {ExternDispatchConstantsHeightOverflow} from "../../error/ErrSubParse.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibParseError} from "./LibParseError.sol";
+
+bytes32 constant CURRENT_COMPATIBILITY = COMPATIBILITY_V5;
 
 library LibSubParse {
     using LibParseState for ParseState;
@@ -203,7 +205,7 @@ library LibSubParse {
                         }
 
                         (bool success, bytes memory subBytecode, uint256[] memory subConstants) =
-                            subParser.subParseWord(COMPATIBILITY_V4, data);
+                            subParser.subParseWord(CURRENT_COMPATIBILITY, data);
                         if (success) {
                             // The sub bytecode must be exactly 4 bytes to
                             // represent an op.
@@ -310,7 +312,7 @@ library LibSubParse {
                     deref := mload(shr(0xf0, deref))
                 }
 
-                (bool success, uint256 value) = subParser.subParseLiteral(COMPATIBILITY_V4, data);
+                (bool success, uint256 value) = subParser.subParseLiteral(CURRENT_COMPATIBILITY, data);
                 if (success) {
                     return value;
                 }

@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.25;
 
-import {Operand} from "rain.interpreter.interface/interface/IInterpreterV3.sol";
+import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibSubParse} from "../../../parse/LibSubParse.sol";
 import {IInterpreterExternV3} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
+import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
 
 /// @dev Opcode index of the extern increment opcode. Needs to be manually kept
 /// in sync with the extern opcode function pointers. Definitely write tests for
@@ -20,7 +21,9 @@ library LibExternOpIntIncNPE2 {
     //slither-disable-next-line dead-code
     function run(Operand, uint256[] memory inputs) internal pure returns (uint256[] memory) {
         for (uint256 i = 0; i < inputs.length; i++) {
-            ++inputs[i];
+            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(inputs[i]);
+            (signedCoefficient, exponent) = LibDecimalFloat.add(signedCoefficient, exponent, 1e37, -37);
+            inputs[i] = LibDecimalFloat.pack(signedCoefficient, exponent);
         }
         return inputs;
     }

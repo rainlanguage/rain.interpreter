@@ -2,10 +2,9 @@
 pragma solidity ^0.8.18;
 
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
-import {Operand} from "rain.interpreter.interface/interface/IInterpreterV3.sol";
+import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterStateNP, LibInterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {FIXED_POINT_ONE} from "rain.math.fixedpoint/lib/FixedPointDecimalConstants.sol";
 
 /// @title LibOpTimestampNP
 /// Implementation of the EVM `TIMESTAMP` opcode as a standard Rainlang opcode.
@@ -15,10 +14,9 @@ library LibOpTimestampNP {
     }
 
     function run(InterpreterStateNP memory, Operand, Pointer stackTop) internal view returns (Pointer) {
-        uint256 decimalOne = FIXED_POINT_ONE;
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
-            mstore(stackTop, mul(timestamp(), decimalOne))
+            mstore(stackTop, timestamp())
         }
         return stackTop;
     }
@@ -29,7 +27,7 @@ library LibOpTimestampNP {
         returns (uint256[] memory)
     {
         uint256[] memory outputs = new uint256[](1);
-        outputs[0] = block.timestamp * FIXED_POINT_ONE;
+        outputs[0] = block.timestamp;
         return outputs;
     }
 }

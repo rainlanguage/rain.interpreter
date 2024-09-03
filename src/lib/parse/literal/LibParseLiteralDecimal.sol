@@ -18,6 +18,7 @@ import {
 } from "../LibParseCMask.sol";
 import {LibParseError} from "../LibParseError.sol";
 import {LibParse} from "../LibParse.sol";
+import {LibDecimalFloatImplementation, LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
 
 /// @dev The default is 18 decimal places for a fractional number.
 uint256 constant DECIMAL_SCALE = 18;
@@ -115,6 +116,32 @@ library LibParseLiteralDecimal {
         }
     }
 
+    function parseDecimalFloatPacked(ParseState memory state, uint256 start, uint256 end)
+        internal
+        pure
+        returns (uint256 cursor, uint256 packedFloat)
+    {
+        int256 signedCoefficient;
+        int256 exponent;
+        (cursor, signedCoefficient, exponent) = parseDecimalFloat(state, start, end);
+
+        // Prenormalize signed coefficients that are smaller than their
+        // normalized form at parse time, as this can save runtime gas that would
+        // be needed to normalize the value at runtime.
+        // We only do normalization that will scale up, to avoid causing
+        // unneccessary precision loss.
+        if (-1e37 < signedCoefficient && signedCoefficient < 1e37) {
+            (signedCoefficient, exponent) = LibDecimalFloatImplementation.normalize(signedCoefficient, exponent);
+        }
+
+        packedFloat = LibDecimalFloat.pack(signedCoefficient, exponent);
+
+        (int256 unpackedSignedCoefficient, int256 unpackedExponent) = LibDecimalFloat.unpack(packedFloat);
+        if (unpackedSignedCoefficient != signedCoefficient || unpackedExponent != exponent) {
+            revert DecimalLiteralPrecisionLoss(state.parseErrorOffset(start));
+        }
+    }
+
     function parseDecimalFloat(ParseState memory state, uint256 start, uint256 end)
         internal
         pure
@@ -188,88 +215,5 @@ library LibParseLiteralDecimal {
                 exponent += eValue;
             }
         }
-    }
-
-    /// Returns cursor after, value
-    function parseDecimal(ParseState memory state, uint256 cursor, uint256 end)
-        internal
-        pure
-        returns (uint256, uint256)
-    {
-        uint256 fracOffset = 0;
-        uint256 fracValue = 0;
-        uint256 scale = 0;
-        uint256 intValue = 0;
-
-        unchecked {
-            {
-                uint256 start = cursor;
-                cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
-                if (cursor == start) {
-                    revert ZeroLengthDecimal(state.parseErrorOffset(cursor));
-                }
-                intValue = state.unsafeStrToInt(start, cursor);
-            }
-
-            uint256 isFrac = LibParse.isMask(cursor, end, CMASK_DECIMAL_POINT);
-            if (isFrac == 1) {
-                cursor++;
-                uint256 fracStart = cursor;
-                cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
-                if (cursor == fracStart) {
-                    revert MalformedDecimalPoint(state.parseErrorOffset(cursor));
-                }
-
-                // Trailing zeros are allowed in fractional literals but should
-                // not be counted in the precision.
-                uint256 nonZeroCursor = cursor;
-                while (LibParse.isMask(nonZeroCursor - 1, end, CMASK_ZERO) == 1) {
-                    nonZeroCursor--;
-                }
-
-                fracValue = state.unsafeStrToInt(fracStart, nonZeroCursor);
-                fracOffset = nonZeroCursor - fracStart;
-            }
-
-            uint256 eValue = 0;
-            uint256 eNeg = 0;
-            if (LibParse.isMask(cursor, end, CMASK_E_NOTATION) > 0) {
-                cursor++;
-                eNeg = LibParse.isMask(cursor, end, CMASK_NEGATIVE_SIGN);
-                cursor += eNeg;
-
-                uint256 eStart = cursor;
-                cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
-                if (cursor == eStart) {
-                    revert MalformedExponentDigits(state.parseErrorOffset(cursor));
-                }
-                eValue = state.unsafeStrToInt(eStart, cursor);
-            }
-
-            {
-                // If this is a fractional number, then we need to scale it up to
-                // 1e18 being "one". Otherwise we treat as an integer.
-                if (eNeg > 0) {
-                    if (DECIMAL_SCALE < eValue) {
-                        revert DecimalLiteralPrecisionLoss(state.parseErrorOffset(cursor));
-                    }
-                    scale = DECIMAL_SCALE - eValue;
-                } else {
-                    scale = DECIMAL_SCALE + eValue;
-                }
-            }
-
-            if (scale >= 77) {
-                revert DecimalLiteralOverflow(state.parseErrorOffset(cursor));
-            }
-
-            if (scale < fracOffset) {
-                revert DecimalLiteralPrecisionLoss(state.parseErrorOffset(cursor));
-            }
-        }
-
-        // Do this bit with checked math in case we missed an edge case above
-        // that causes overflow.
-        return (cursor, intValue * (10 ** scale) + fracValue * (10 ** (scale - fracOffset)));
     }
 }

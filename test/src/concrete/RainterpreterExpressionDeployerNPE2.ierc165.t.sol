@@ -10,7 +10,6 @@ import {
 } from "src/concrete/RainterpreterExpressionDeployerNPE2.sol";
 import {IParserPragmaV1} from "rain.interpreter.interface/interface/IParserPragmaV1.sol";
 import {IParserV2} from "rain.interpreter.interface/interface/IParserV2.sol";
-import {IExpressionDeployerV4} from "rain.interpreter.interface/interface/deprecated/IExpressionDeployerV4.sol";
 import {IDescribedByMetaV1} from "rain.metadata/interface/IDescribedByMetaV1.sol";
 import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
 import {RainterpreterParserNPE2} from "src/concrete/RainterpreterParserNPE2.sol";
@@ -21,7 +20,6 @@ contract RainterpreterExpressionDeployerNPE2IERC165Test is Test {
     function testRainterpreterExpressionDeployerNPE2IERC165(bytes4 badInterfaceId) external {
         vm.assume(badInterfaceId != type(IERC165).interfaceId);
         vm.assume(badInterfaceId != type(IDescribedByMetaV1).interfaceId);
-        vm.assume(badInterfaceId != type(IExpressionDeployerV4).interfaceId);
         vm.assume(badInterfaceId != type(IParserV2).interfaceId);
         vm.assume(badInterfaceId != type(IParserPragmaV1).interfaceId);
 
@@ -34,7 +32,6 @@ contract RainterpreterExpressionDeployerNPE2IERC165Test is Test {
         );
         assertTrue(deployer.supportsInterface(type(IERC165).interfaceId));
         vm.assume(badInterfaceId != type(IDescribedByMetaV1).interfaceId);
-        vm.assume(badInterfaceId != type(IExpressionDeployerV4).interfaceId);
         vm.assume(badInterfaceId != type(IParserV2).interfaceId);
         vm.assume(badInterfaceId != type(IParserPragmaV1).interfaceId);
 
