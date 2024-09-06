@@ -315,16 +315,15 @@ mod tests {
     use crate::fork::{Forker, NewForkedEvm};
     use alloy::primitives::utils::parse_ether;
     use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
-    use rain_interpreter_env::{
-        CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
-    };
+    use rain_interpreter_test_fixtures::LocalEvm;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_trace() {
-        let deployer_address: Address = *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS;
+        let local_evm = LocalEvm::new().await;
+        let deployer = *local_evm.deployer.address();
         let args = NewForkedEvm {
-            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
-            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
+            fork_url: local_evm.url(),
+            fork_block_number: None,
         };
         let fork = Forker::new_with_fork(args, None, None).await.unwrap();
 
@@ -345,7 +344,7 @@ mod tests {
                 "
                 .into(),
                 source_index: 0,
-                deployer: deployer_address,
+                deployer,
                 namespace: FullyQualifiedNamespace::default(),
                 context: vec![],
                 decode_errors: true,
@@ -391,9 +390,11 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_search_trace_by_path() {
+        let local_evm = LocalEvm::new().await;
+        let deployer = *local_evm.deployer.address();
         let args = NewForkedEvm {
-            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
-            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
+            fork_url: local_evm.url(),
+            fork_block_number: None,
         };
         let fork = Forker::new_with_fork(args, None, None).await.unwrap();
 
@@ -412,7 +413,7 @@ mod tests {
                 "
                 .into(),
                 source_index: 0,
-                deployer: *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
+                deployer,
                 namespace: FullyQualifiedNamespace::default(),
                 context: vec![],
                 decode_errors: true,

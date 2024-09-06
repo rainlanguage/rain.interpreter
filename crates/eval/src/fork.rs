@@ -8,7 +8,7 @@ use foundry_evm::{
     opts::EvmOpts,
 };
 use rain_error_decoding::AbiDecodedErrorType;
-use revm::primitives::B256;
+use revm::primitives::{TxKind, B256};
 use revm::{
     interpreter::InstructionResult,
     primitives::{Address as Addr, Bytes, Env, HashSet, SpecId},
@@ -477,13 +477,10 @@ impl Forker {
         )?;
 
         let res = match tx {
-            Some(tx) => match tx.to {
-                Some(to) => self.call(tx.from.as_slice(), to.as_slice(), &tx.input)?,
-                None => {
-                    return Err(ForkCallError::ReplayTransactionError(
-                        ReplayTransactionError::NoFromAddressFound(tx_hash.to_string(), fork_url),
-                    ))
-                }
+            // if to field is None, it means the tx was a contract deployment, see 'revm::primitives::TxKind'
+            Some(tx) => match TxKind::from(tx.to) {
+                TxKind::Call(to) => self.call(tx.from.as_slice(), to.as_slice(), &tx.input)?,
+                TxKind::Create => self.call(tx.from.as_slice(), &[0u8; 20], &tx.input)?,
             },
             None => {
                 return Err(ForkCallError::ReplayTransactionError(
@@ -499,18 +496,16 @@ impl Forker {
 #[cfg(test)]
 
 mod tests {
-    use crate::namespace::CreateNamespace;
-    use rain_interpreter_env::{
-        CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
-    };
-
     use super::*;
+    use crate::namespace::CreateNamespace;
+    use alloy::eips::BlockNumberOrTag;
     use alloy::primitives::U256;
-    use alloy::sol;
+    use alloy::{providers::Provider, sol};
     use rain_interpreter_bindings::{
-        DeployerISP::{iParserCall, iStoreCall},
+        DeployerISP::iParserCall,
         IInterpreterStoreV1::{getCall, setCall},
     };
+    use rain_interpreter_test_fixtures::LocalEvm;
 
     sol! {
         interface IERC20 {
@@ -521,57 +516,40 @@ mod tests {
             function transferFrom(address from, address to, uint256 amount) external returns (bool);
         }
     }
-    const USDT_POLYGON: &str = "0xc2132d05d31c914a87c6611c10748aeb04b58e8f";
-    const USDT_BSC: &str = "0x55d398326f99059fF775485246999027B3197955";
-    const POLYGON_FORK_NUMBER: u64 = 54697866;
-    const BSC_FORK_NUMBER: u64 = 40531873;
-    const POLYGON_FORK_URL: &str = "https://rpc.ankr.com/polygon";
-    const BSC_FORK_URL: &str = "https://rpc.ankr.com/bsc";
-    const BSC_ACC: &str = "0xee5B5B923fFcE93A870B3104b7CA09c3db80047A";
-    const POLYGON_ACC: &str = "0xF977814e90dA44bFA03b6295A0616a897441aceC";
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_forker_read() {
+        let local_evm = LocalEvm::new().await;
+        let deployer = *local_evm.deployer.address();
         let args = NewForkedEvm {
-            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
-            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
+            fork_url: local_evm.url(),
+            fork_block_number: None,
         };
         let forker = Forker::new_with_fork(args, None, None).await.unwrap();
 
         let from_address = Address::default();
-        let to_address: Address = *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS;
+        let to_address = deployer;
         let call = iParserCall {};
         let result = forker
             .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
         let parser_address = result.typed_return._0;
-        let expected_address = "0xf14e09601a47552de6abd3a0b165607fafd2b5ba"
-            .parse::<Address>()
-            .unwrap();
+        let expected_address = *local_evm.parser.address();
         assert_eq!(parser_address, expected_address);
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_forker_write() {
+        let local_evm = LocalEvm::new().await;
         let args = NewForkedEvm {
-            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
-            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
+            fork_url: local_evm.url(),
+            fork_block_number: None,
         };
         let mut forker = Forker::new_with_fork(args, None, None).await.unwrap();
 
         let from_address = Address::repeat_byte(0x02);
-        let store_call = iStoreCall {};
-        let store_result = forker
-            .alloy_call(
-                from_address,
-                *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
-                store_call,
-                false,
-            )
-            .await
-            .unwrap();
-        let store_address: Address = store_result.typed_return._0;
+        let store_address = *local_evm.store.address();
 
         let namespace = U256::from(1);
         let key = U256::from(3);
@@ -612,16 +590,19 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_multi_fork_read_write_switch_reset() -> Result<(), ForkCallError> {
+        let local_evm1 = LocalEvm::new_with_tokens(1).await;
+        let local_evm1_token = *local_evm1.tokens[0].address();
+        let local_evm1_token_holder = local_evm1.anvil.addresses()[0];
         let args = NewForkedEvm {
-            fork_url: POLYGON_FORK_URL.to_owned(),
-            fork_block_number: Some(POLYGON_FORK_NUMBER),
+            fork_url: local_evm1.url(),
+            fork_block_number: None,
         };
         let mut forker = Forker::new_with_fork(args, None, None).await.unwrap();
 
         let from_address = Address::default();
-        let to_address: Address = USDT_POLYGON.parse::<Address>().unwrap();
+        let to_address = local_evm1_token;
         let call = IERC20::balanceOfCall {
-            account: POLYGON_ACC.parse::<Address>().unwrap(),
+            account: local_evm1_token_holder,
         };
         let result = forker
             .alloy_call(from_address, to_address, call, false)
@@ -630,8 +611,8 @@ mod tests {
         let old_balance = result.typed_return._0;
         let polygon_old_balance = result.typed_return._0;
 
-        let from_address = POLYGON_ACC.parse::<Address>().unwrap();
-        let to_address: Address = USDT_POLYGON.parse::<Address>().unwrap();
+        let from_address = local_evm1_token_holder;
+        let to_address = local_evm1_token;
         let send_amount = U256::from(0xffu64);
         let transfer_call = IERC20::transferCall {
             to: Address::repeat_byte(0x2),
@@ -649,9 +630,9 @@ mod tests {
             .unwrap();
 
         let from_address = Address::default();
-        let to_address: Address = USDT_POLYGON.parse::<Address>().unwrap();
+        let to_address = local_evm1_token;
         let call = IERC20::balanceOfCall {
-            account: POLYGON_ACC.parse::<Address>().unwrap(),
+            account: local_evm1_token_holder,
         };
         let result = forker
             .alloy_call(from_address, to_address, call, false)
@@ -662,16 +643,19 @@ mod tests {
         let polygon_balance = new_balance;
 
         // switch fork
+        let local_evm2 = LocalEvm::new_with_tokens(1).await;
+        let local_evm2_token = *local_evm2.tokens[0].address();
+        let local_evm2_token_holder = local_evm2.anvil.addresses()[0];
         let args = NewForkedEvm {
-            fork_url: BSC_FORK_URL.to_owned(),
-            fork_block_number: Some(BSC_FORK_NUMBER),
+            fork_url: local_evm2.url(),
+            fork_block_number: None,
         };
         forker.add_or_select(args, None).await?;
 
         let from_address = Address::default();
-        let to_address: Address = USDT_BSC.parse::<Address>().unwrap();
+        let to_address = local_evm2_token;
         let call = IERC20::balanceOfCall {
-            account: BSC_ACC.parse::<Address>().unwrap(),
+            account: local_evm2_token_holder,
         };
         let result = forker
             .alloy_call(from_address, to_address, call, false)
@@ -679,9 +663,9 @@ mod tests {
             .unwrap();
         let old_balance = result.typed_return._0;
 
-        let from_address = BSC_ACC.parse::<Address>().unwrap();
-        let to_address: Address = USDT_BSC.parse::<Address>().unwrap();
-        let send_amount = U256::from(0xffffffffu64);
+        let from_address = local_evm2_token_holder;
+        let to_address = local_evm2_token;
+        let send_amount = U256::from(0xffu64);
         let transfer_call = IERC20::transferCall {
             to: Address::repeat_byte(0x2),
             amount: send_amount,
@@ -698,9 +682,9 @@ mod tests {
             .unwrap();
 
         let from_address = Address::default();
-        let to_address: Address = USDT_BSC.parse::<Address>().unwrap();
+        let to_address = local_evm2_token;
         let call = IERC20::balanceOfCall {
-            account: BSC_ACC.parse::<Address>().unwrap(),
+            account: local_evm2_token_holder,
         };
         let result = forker
             .alloy_call(from_address, to_address, call, false)
@@ -709,17 +693,17 @@ mod tests {
         let new_balance = result.typed_return._0;
         assert_eq!(new_balance, old_balance - send_amount);
 
-        // switch fork
+        // switch back to fork1
         let args = NewForkedEvm {
-            fork_url: POLYGON_FORK_URL.to_owned(),
-            fork_block_number: Some(POLYGON_FORK_NUMBER),
+            fork_url: local_evm1.url(),
+            fork_block_number: None,
         };
         forker.add_or_select(args, None).await?;
 
         let from_address = Address::default();
-        let to_address: Address = USDT_POLYGON.parse::<Address>().unwrap();
+        let to_address = local_evm1_token;
         let call = IERC20::balanceOfCall {
-            account: POLYGON_ACC.parse::<Address>().unwrap(),
+            account: local_evm1_token_holder,
         };
         let result = forker
             .alloy_call(from_address, to_address, call, false)
@@ -729,9 +713,9 @@ mod tests {
         assert_eq!(balance, polygon_balance);
 
         // reset fork
-        forker.roll_fork(Some(POLYGON_FORK_NUMBER), None)?;
+        forker.roll_fork(None, None)?;
         let call = IERC20::balanceOfCall {
-            account: POLYGON_ACC.parse::<Address>().unwrap(),
+            account: local_evm1_token_holder,
         };
         let result = forker
             .alloy_call(from_address, to_address, call, false)
@@ -746,35 +730,43 @@ mod tests {
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_rolls() {
         // we need to roll the fork forwards and check that the env block number is updated
+        let local_evm = LocalEvm::new().await;
+        let block_number = local_evm.provider.get_block_number().await.unwrap() - 2;
         let args = NewForkedEvm {
-            fork_url: POLYGON_FORK_URL.to_owned(),
-            fork_block_number: Some(POLYGON_FORK_NUMBER),
+            fork_url: local_evm.url(),
+            fork_block_number: Some(block_number),
         };
         let mut forker = Forker::new_with_fork(args, None, None).await.unwrap();
 
         // check the env block number is the same as the fork block number
-        assert_eq!(
-            forker.executor.env().block.number,
-            U256::from(POLYGON_FORK_NUMBER)
-        );
+        assert_eq!(forker.executor.env().block.number, U256::from(block_number));
 
         // roll the fork forwards by 1 block
-        forker
-            .roll_fork(Some(POLYGON_FORK_NUMBER + 1), None)
-            .unwrap();
+        forker.roll_fork(Some(block_number + 1), None).unwrap();
 
         // check the env block number is updated
         assert_eq!(
             forker.executor.env().block.number,
-            U256::from(POLYGON_FORK_NUMBER + 1)
+            U256::from(block_number + 1)
         );
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_replay() {
+        let local_evm = LocalEvm::new().await;
+        let block_number = local_evm.provider.get_block_number().await.unwrap();
+        let tx_hash = local_evm
+            .provider
+            .get_block_by_number(BlockNumberOrTag::Number(block_number - 2), false)
+            .await
+            .unwrap()
+            .unwrap()
+            .transactions
+            .as_hashes()
+            .unwrap()[0];
         let mut forker = Forker::new_with_fork(
             NewForkedEvm {
-                fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
+                fork_url: local_evm.url(),
                 fork_block_number: None,
             },
             None,
@@ -783,18 +775,9 @@ mod tests {
         .await
         .unwrap();
 
-        let tx_hash = "0xcbfff7d9369afcc7a851dff42ca2769f32d77c3b9066023b887583ee9cd0809d"
-            .parse::<B256>()
-            .unwrap();
-
         let replay_result = forker.replay_transaction(tx_hash).await.unwrap();
 
-        assert!(
-            replay_result.env.tx.caller
-                == "0x8924274F5304277FFDdd29fad5181D98D5F65eF6"
-                    .parse::<Address>()
-                    .unwrap()
-        );
+        assert!(replay_result.env.tx.caller == local_evm.anvil.addresses()[0]);
         assert!(replay_result.exit_reason.is_ok());
     }
 }
