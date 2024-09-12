@@ -8,7 +8,7 @@ import {DecimalLiteralOverflow} from "src/lib/parse/literal/LibParseLiteral.sol"
 import {LibParse, UnexpectedRHSChar, UnexpectedRightParen} from "src/lib/parse/LibParse.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
-import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibParseLiteralIntegerDecimalTest
 /// Tests parsing integer literal decimal values.

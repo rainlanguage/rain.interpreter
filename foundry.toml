@@ -37,6 +37,7 @@ remappings = [
     "rain.sol.codegen/=lib/rain.sol.codegen/src/",
     "rain.solmem/=lib/rain.interpreter.interface/lib/rain.solmem/src/",
     "openzeppelin-contracts/=lib/rain.interpreter.interface/lib/openzeppelin-contracts/",
+    "rain.math.float/=lib/rain.math.float/src/",
 ]
 
 [fuzz]

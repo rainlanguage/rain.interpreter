@@ -10,8 +10,8 @@ import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {LibLiteralString} from "test/lib/literal/LibLiteralString.sol";
 import {OperandValuesOverflow, UnclosedOperand} from "src/error/ErrParse.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
-import {LibDecimalFloat, LibDecimalFloatImplementation} from "rain.math.float/src/lib/LibDecimalFloat.sol";
-import {SIGNED_NORMALIZED_MAX} from "rain.math.float/src/lib/implementation/LibDecimalFloatImplementation.sol";
+import {LibDecimalFloat, LibDecimalFloatImplementation} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {SIGNED_NORMALIZED_MAX} from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
 
 contract LibParseOperandParseOperandTest is Test {
     using LibBytes for bytes;

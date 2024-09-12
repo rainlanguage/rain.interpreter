@@ -17,7 +17,7 @@ import {
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
-import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpExternNPTest
 /// @notice Test the runtime and integrity time logic of LibOpExternNP.
