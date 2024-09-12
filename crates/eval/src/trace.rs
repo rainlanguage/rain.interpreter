@@ -101,6 +101,8 @@ impl RainSourceTraces {
         let mut path_names: Vec<String> = vec![];
         let mut source_paths: Vec<String> = vec![];
 
+        println!("{:?}", self.traces);
+
         for trace in self.iter() {
             let current_path = if trace.parent_source_index == trace.source_index {
                 format!("{}", trace.source_index)
@@ -111,13 +113,15 @@ impl RainSourceTraces {
                     .find_map(|recent_path| {
                         recent_path.split('.').last().and_then(|last_part| {
                             if last_part == trace.parent_source_index.to_string() {
+                                println!("found match");
                                 Some(format!("{}.{}", recent_path, trace.source_index))
                             } else {
-                                None
+                                println!("no match");
+                                Some(format!("?.{}", trace.source_index))
                             }
                         })
                     })
-                    .ok_or(RainEvalResultError::CorruptTraces)?
+                    .unwrap_or(format!("?.{}", trace.source_index))
             };
 
             for (index, _) in trace.stack.iter().enumerate() {
