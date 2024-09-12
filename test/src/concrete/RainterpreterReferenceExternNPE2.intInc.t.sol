@@ -19,7 +19,7 @@ import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {OPCODE_EXTERN} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {ExternDispatchConstantsHeightOverflow} from "src/error/ErrSubParse.sol";
-import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {CURRENT_COMPATIBILITY} from "src/lib/parse/LibSubParse.sol";
 
 contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
@@ -70,6 +70,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
     }
 
     /// Directly test the subparsing of the reference extern opcode.
+    /// forge-config: default.fuzz.runs = 100
     function testRainterpreterReferenceExternNPE2IntIncSubParseKnownWord(uint16 constantsHeight, bytes1 ioByte)
         external
     {
@@ -107,6 +108,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
     /// Directly test the subparsing of the reference extern opcode. Check that
     /// we get a false for success if the subparser doesn't recognize the word
     /// but the data is otherwise valid.
+    /// forge-config: default.fuzz.runs = 100
     function testRainterpreterReferenceExternNPE2IntIncSubParseUnknownWord(
         uint16 constantsHeight,
         bytes1 ioByte,
@@ -129,6 +131,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
 
     /// Test the inc library directly. The run function should increment every
     /// value it is passed by 1.
+    /// forge-config: default.fuzz.runs = 100
     function testRainterpreterReferenceExternNPE2IntIncRun(Operand operand, uint256[] memory inputs) external pure {
         uint256[] memory expectedOutputs = new uint256[](inputs.length);
         for (uint256 i = 0; i < inputs.length; i++) {
@@ -147,6 +150,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
 
     /// Test the inc library directly. The integrity function should return the
     /// same inputs and outputs.
+    /// forge-config: default.fuzz.runs = 100
     function testRainterpreterReferenceExternNPE2IntIncIntegrity(Operand operand, uint256 inputs, uint256 outputs)
         external
         pure

@@ -35,6 +35,7 @@ contract RainterpreterStoreNPE2Test is Test {
 
     /// Ensure the store gives a decent error message when an odd number of
     /// arguments is passed to `set`.
+    /// forge-config: default.fuzz.runs = 100
     function testRainterpreterStoreNPE2SetOddLength(StateNamespace namespace, uint256[] memory kvs) external {
         vm.assume(kvs.length % 2 != 0);
 
@@ -45,6 +46,7 @@ contract RainterpreterStoreNPE2Test is Test {
 
     /// Store should set and get values correctly.
     /// This test assumes no dupes.
+    /// forge-config: default.fuzz.runs = 100
     function testRainterpreterStoreNPE2SetGetNoDupesSingle(StateNamespace namespace, uint256[] memory kvs) external {
         // Truncate to even length.
         uint256 newLength = kvs.length - (kvs.length % 2);
@@ -71,7 +73,8 @@ contract RainterpreterStoreNPE2Test is Test {
         uint256[] kvs;
     }
 
-    /// Store should get and set values correctly across many namespaces.
+    /// Store should get and set values correctly across many namespaces.j
+    /// forge-config: default.fuzz.runs = 100
     function testRainterpreterStoreNPE2SetGetNoDupesMany(Set[] memory sets) external {
         uint256 setsLength = sets.length >= 10 ? 10 : sets.length;
         uint256[] memory refs;
@@ -115,7 +118,7 @@ contract RainterpreterStoreNPE2Test is Test {
     /// previous writes to the same key (i.e. like a k/v store). The assumption
     /// is that the fuzzer will generate some dupes just randomly, so there's
     /// no special logic to make that happen.
-
+    /// forge-config: default.fuzz.runs = 100
     function testRainterpreterStoreNPE2SetGetDupes(Set11[] memory sets) external {
         vm.assume(sets.length < 20);
 

@@ -23,7 +23,7 @@ import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreter
 import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP, LibInterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
-import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpHashNPTest
 /// @notice Test the runtime and integrity time logic of LibOpHashNP.

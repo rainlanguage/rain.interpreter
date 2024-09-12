@@ -17,7 +17,7 @@ import {LibBytecode, SourceIndexOutOfBounds} from "rain.interpreter.interface/li
 import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {STACK_TRACER} from "src/lib/state/LibInterpreterStateNP.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
-import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpCallNPTest
 /// @notice Test the LibOpCallNP library that includes the "call" word.

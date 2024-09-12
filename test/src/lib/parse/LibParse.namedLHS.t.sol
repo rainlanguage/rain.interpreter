@@ -15,7 +15,7 @@ import {Operand, LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
-import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibParseNamedLHSTest
 contract LibParseNamedLHSTest is Test {

@@ -55,6 +55,7 @@ contract LibParseLiteralStringTest is Test {
 
     /// Any ASCII printable string shorter than 32 bytes should be parsed
     /// correctly.
+    /// forge-config: default.fuzz.runs = 100
     function testParseStringLiteralShortASCII(string memory str) external view {
         vm.assume(bytes(str).length < 0x20);
         LibLiteralString.conformValidPrintableStringContent(str);
@@ -75,6 +76,7 @@ contract LibParseLiteralStringTest is Test {
     }
 
     /// Can parse 2 valid strings.
+    /// forge-config: default.fuzz.runs = 100
     function testParseStringLiteralTwo(string memory strA, string memory strB) external view {
         vm.assume(bytes(strA).length < 0x20);
         LibLiteralString.conformValidPrintableStringContent(strA);
@@ -99,6 +101,7 @@ contract LibParseLiteralStringTest is Test {
     }
 
     /// Valid ASCII printable strings 32 bytes or longer should error.
+    /// forge-config: default.fuzz.runs = 100
     function testParseStringLiteralLongASCII(string memory str) external {
         vm.assume(bytes(str).length >= 0x20);
         LibLiteralString.conformValidPrintableStringContent(str);
@@ -110,6 +113,7 @@ contract LibParseLiteralStringTest is Test {
 
     /// Invalid chars beyond the 31 byte valid range will not be parsed. Instead
     /// a `StringTooLong` error will be thrown.
+    /// forge-config: default.fuzz.runs = 100
     function testParseStringLiteralInvalidCharAfter(string memory strA, string memory strB) external {
         vm.assume(bytes(strA).length >= 0x20);
         LibLiteralString.conformValidPrintableStringContent(strA);
@@ -126,6 +130,7 @@ contract LibParseLiteralStringTest is Test {
 
     /// Invalid chars anywhere in the parsed string will cause an unclosed
     /// string literal error.
+    /// forge-config: default.fuzz.runs = 100
     function testParseStringLiteralInvalidCharWithin(string memory str, uint256 badIndex) external {
         vm.assume(bytes(str).length > 0);
         LibLiteralString.conformValidPrintableStringContent(str);

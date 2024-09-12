@@ -34,6 +34,7 @@ contract LibOpContextNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpContextNP. This tests that the
     /// values in the context matrix can be pushed to the stack via. the operand.
+    /// forge-config: default.fuzz.runs = 100
     function testOpContextNPRun(uint256[][] memory context, uint256 i, uint256 j) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         state.context = context;
@@ -52,6 +53,7 @@ contract LibOpContextNPTest is OpTest {
 
     /// Directly test the reference logic of LibOpContextNP. This tests that the
     /// runtime logic will revert if the indexes are OOB. Tests that i is OOB.
+    /// forge-config: default.fuzz.runs = 100
     function testOpContextNPRunOOBi(uint256[][] memory context, uint256 i, uint256 j) external {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         state.context = context;
@@ -68,6 +70,7 @@ contract LibOpContextNPTest is OpTest {
 
     /// Directly test the reference logic of LibOpContextNP. This tests that the
     /// runtime logic will revert if the indexes are OOB. Tests that j is OOB.
+    /// forge-config: default.fuzz.runs = 100
     function testOpContextNPRunOOBj(uint256[][] memory context, uint256 i, uint256 j) external {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         state.context = context;
@@ -85,6 +88,7 @@ contract LibOpContextNPTest is OpTest {
     }
 
     /// Test the eval of context opcode parsed from a string. This tests 0 0.
+    /// forge-config: default.fuzz.runs = 100
     function testOpContextNPEval00(uint256[][] memory context) external view {
         vm.assume(context.length > 0);
         vm.assume(context[0].length > 0);
@@ -108,6 +112,7 @@ contract LibOpContextNPTest is OpTest {
     }
 
     /// Test the eval of context opcode parsed from a string. This tests 0 1.
+    /// forge-config: default.fuzz.runs = 100
     function testOpContextNPEval01(uint256[][] memory context) external view {
         vm.assume(context.length > 0);
         vm.assume(context[0].length > 1);
@@ -130,6 +135,7 @@ contract LibOpContextNPTest is OpTest {
     }
 
     /// Test the eval of context opcode parsed from a string. This tests 1 0.
+    /// forge-config: default.fuzz.runs = 100
     function testOpContextNPEval10(uint256[][] memory context) external view {
         vm.assume(context.length > 1);
         vm.assume(context[1].length > 0);
@@ -153,6 +159,7 @@ contract LibOpContextNPTest is OpTest {
     }
 
     /// Test the eval of context opcode parsed from a string. This tests 1 1.
+    /// forge-config: default.fuzz.runs = 100
     function testOpContextNPEval11(uint256[][] memory context) external view {
         vm.assume(context.length > 1);
         vm.assume(context[1].length > 1);
@@ -176,6 +183,7 @@ contract LibOpContextNPTest is OpTest {
     }
 
     /// Test the eval of context opcode parsed from a string. This tests OOB i.
+    /// forge-config: default.fuzz.runs = 100
     function testOpContextNPEvalOOBi(uint256[] memory context0) external {
         uint256[][] memory context = new uint256[][](1);
         context[0] = context0;

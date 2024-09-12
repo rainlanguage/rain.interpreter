@@ -18,7 +18,7 @@ import {
 } from "../LibParseCMask.sol";
 import {LibParseError} from "../LibParseError.sol";
 import {LibParse} from "../LibParse.sol";
-import {LibDecimalFloatImplementation, LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
+import {LibDecimalFloatImplementation, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @dev The default is 18 decimal places for a fractional number.
 uint256 constant DECIMAL_SCALE = 18;

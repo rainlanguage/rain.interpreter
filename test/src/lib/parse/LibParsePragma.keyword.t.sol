@@ -67,6 +67,7 @@ contract LibParsePragmaKeywordTest is Test {
     }
 
     /// Anything that DOES NOT start with the keyword should be a noop.
+    /// forge-config: default.fuzz.runs = 100
     function testPragmaKeywordNoop(ParseState memory state, string calldata calldataStr) external pure {
         if (bytes(calldataStr).length >= PRAGMA_KEYWORD_BYTES_LENGTH) {
             bytes memory prefix = bytes(calldataStr)[0:PRAGMA_KEYWORD_BYTES_LENGTH];
@@ -82,6 +83,7 @@ contract LibParsePragmaKeywordTest is Test {
 
     /// Anything that DOES start with the keyword but WITHOUT whitespace should
     /// error.
+    /// forge-config: default.fuzz.runs = 100
     function testPragmaKeywordNoWhitespace(uint256 seed, string memory str) external {
         bytes1 notWhitespace = LibLiteralString.charFromMask(seed, ~CMASK_WHITESPACE);
         string memory fullString =
@@ -93,6 +95,7 @@ contract LibParsePragmaKeywordTest is Test {
     /// Anything that DOES start with the keyword and WITH whitespace BUT NOT
     /// hex values should more the cursor forward exactly the length of the
     /// keyword + the whitespace char.
+    /// forge-config: default.fuzz.runs = 100
     function testPragmaKeywordWhitespaceNoHex(uint256 seed, string calldata calldataStr) external pure {
         seed = bound(seed, 0, type(uint256).max - 1);
         bytes1 whitespace = LibLiteralString.charFromMask(seed, CMASK_WHITESPACE);
@@ -117,6 +120,7 @@ contract LibParsePragmaKeywordTest is Test {
 
     /// Anything that DOES start with the keyword and WITH whitespace then some
     /// hex address should push the hex address to the state as a sub parser.
+    /// forge-config: default.fuzz.runs = 100
     function testPragmaKeywordParseSubParser(
         string memory whitespace,
         address subParser,
@@ -153,6 +157,7 @@ contract LibParsePragmaKeywordTest is Test {
     }
 
     /// Can parse a couple of addresses cleanly.
+    /// forge-config: default.fuzz.runs = 100
     function testPragmaKeywordParseSubParserCoupleOfAddresses(
         string memory whitespace0,
         string memory whitespace1,

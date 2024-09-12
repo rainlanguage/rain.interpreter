@@ -34,7 +34,7 @@ import {
     INTEGRITY_FUNCTION_POINTERS,
     OPCODE_FUNCTION_POINTERS
 } from "../../generated/RainterpreterReferenceExternNPE2.pointers.sol";
-import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
 /// 1:1 with the number of opcodes provided by the extern component of this
