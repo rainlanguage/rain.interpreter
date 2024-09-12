@@ -69,6 +69,7 @@ contract LibOpStackNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpStackNP. This tests that the
     /// operand always puts a single value on the stack.
+    /// forge-config: default.fuzz.runs = 100
     function testOpStackNPRun(uint256[][] memory stacks, uint256 stackIndex) external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256 stackValue;

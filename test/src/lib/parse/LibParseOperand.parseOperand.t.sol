@@ -43,6 +43,7 @@ contract LibParseOperandParseOperandTest is Test {
 
     // Test that parsing a string that doesn't start with the operand opening
     // character always results in a zero length operand values array.
+    /// forge-config: default.fuzz.runs = 100
     function testParseOperandNoOpeningCharacter(string memory s) external pure {
         vm.assume(bytes(s).length > 0);
         vm.assume(bytes(s)[0] != "<");
@@ -53,6 +54,7 @@ contract LibParseOperandParseOperandTest is Test {
     // Test that parsing an empty "<>" operand results in a zero length operand
     // values array. The cursor moves past both the opening and closing
     // characters.
+    /// forge-config: default.fuzz.runs = 100
     function testParseOperandEmptyOperand(string memory s) external pure {
         vm.assume(bytes(s).length > 2);
         bytes(s)[0] = "<";
@@ -62,6 +64,7 @@ contract LibParseOperandParseOperandTest is Test {
     }
 
     // Test that we can parse a single literal.
+    /// forge-config: default.fuzz.runs = 100
     function testParseOperandSingleDecimalLiteral(
         bool asHex,
         int256 value,
@@ -89,6 +92,7 @@ contract LibParseOperandParseOperandTest is Test {
     }
 
     // Test that we can parse two literals.
+    /// forge-config: default.fuzz.runs = 100
     function testParseOperandTwoDecimalLiterals(
         bool asHexA,
         bool asHexB,
@@ -131,6 +135,7 @@ contract LibParseOperandParseOperandTest is Test {
     }
 
     // Test that we can parse three literals.
+    /// forge-config: default.fuzz.runs = 100
     function testParseOperandThreeDecimalLiterals(
         bool asHexA,
         bool asHexB,
@@ -191,6 +196,7 @@ contract LibParseOperandParseOperandTest is Test {
     }
 
     // Test that we can parse four literals.
+    /// forge-config: default.fuzz.runs = 100
     function testParseOperandFourDecimalLiterals(
         bool[4] memory asHex,
         int256[4] memory values,

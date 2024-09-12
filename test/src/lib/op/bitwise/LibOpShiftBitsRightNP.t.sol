@@ -22,6 +22,7 @@ contract LibOpShiftBitsRightNPTest is OpTest {
     /// Directly test the integrity logic of LibOpShiftBitsRightNP. Tests the
     /// happy path where the integrity check does not error due to an unsupported
     /// shift amount.
+    /// forge-config: default.fuzz.runs = 100
     function testOpShiftBitsRightNPIntegrityHappy(
         IntegrityCheckStateNP memory state,
         uint8 inputs,
@@ -40,6 +41,7 @@ contract LibOpShiftBitsRightNPTest is OpTest {
     /// Directly test the execution logic of LibOpShiftBitsRightNP. Tests that
     /// any shift amount that always results in an output of 0 will error as
     /// an unsupported shift amount.
+    /// forge-config: default.fuzz.runs = 100
     function testOpShiftBitsRightNPIntegrityZero(IntegrityCheckStateNP memory state, uint8 inputs, uint16 shiftAmount16)
         external
     {
@@ -53,6 +55,7 @@ contract LibOpShiftBitsRightNPTest is OpTest {
     /// Directly test the execution logic of LibOpShiftBitsRightNP. Tests that
     /// any shift amount that is a noop (0) will error as an unsupported shift
     /// amount.
+    /// forge-config: default.fuzz.runs = 100
     function testOpShiftBitsRightNPIntegrityNoop(IntegrityCheckStateNP memory state, uint8 inputs) external {
         Operand operand = Operand.wrap(uint256(inputs) << 0x10);
         vm.expectRevert(abi.encodeWithSelector(UnsupportedBitwiseShiftAmount.selector, 0));
