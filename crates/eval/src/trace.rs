@@ -117,7 +117,10 @@ impl RainSourceTraces {
                             }
                         })
                     })
-                    .ok_or(RainEvalResultError::CorruptTraces)?
+                    .unwrap_or(format!(
+                        "{}?.{}",
+                        trace.parent_source_index, trace.source_index
+                    ))
             };
 
             for (index, _) in trace.stack.iter().enumerate() {
