@@ -1,4 +1,5 @@
-// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 thedavidmeister
 pragma solidity =0.8.25;
 
 import {Script} from "forge-std/Script.sol";
@@ -45,7 +46,9 @@ contract BuildPointers is Script {
             address(parser),
             "RainterpreterParserNPE2",
             string.concat(
-                LibGenParseMeta.parseMetaConstantString(vm, LibAllStandardOpsNP.authoringMetaV2(), PARSE_META_BUILD_DEPTH),
+                LibGenParseMeta.parseMetaConstantString(
+                    vm, LibAllStandardOpsNP.authoringMetaV2(), PARSE_META_BUILD_DEPTH
+                ),
                 LibCodeGen.operandHandlerFunctionPointersConstantString(vm, parser),
                 LibCodeGen.literalParserFunctionPointersConstantString(vm, parser)
             )
