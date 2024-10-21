@@ -13,7 +13,7 @@ import {
     FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/deprecated/IInterpreterV2.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {LibIntOrAString, IntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
+import {LibIntOrAString, IntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpEnsureNPTest is OpTest {
