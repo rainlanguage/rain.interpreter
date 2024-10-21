@@ -1,9 +1,6 @@
 [submodule "lib/rain.metadata"]
 	path = lib/rain.metadata
 	url = https://github.com/rainprotocol/rain.metadata
-[submodule "lib/rain.lib.memkv"]
-	path = lib/rain.lib.memkv
-	url = https://github.com/rainprotocol/rain.lib.memkv
 [submodule "lib/sol.lib.binmaskflag"]
 	path = lib/sol.lib.binmaskflag
 	url = https://github.com/rainprotocol/sol.lib.binmaskflag
@@ -25,3 +22,6 @@
 [submodule "lib/rain.datacontract"]
 	path = lib/rain.datacontract
 	url = https://github.com/rainlanguage/rain.datacontract
+[submodule "lib/rain.lib.memkv"]
+	path = lib/rain.lib.memkv
+	url = https://github.com/rainlanguage/rain.lib.memkv
