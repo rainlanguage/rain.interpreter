@@ -16,12 +16,12 @@
 [submodule "lib/rain.sol.codegen"]
 	path = lib/rain.sol.codegen
 	url = https://github.com/rainlanguage/rain.sol.codegen
-[submodule "lib/rain.math.float"]
-	path = lib/rain.math.float
-	url = https://github.com/rainlanguage/rain.math.float
 [submodule "lib/prb-math"]
 	path = lib/prb-math
 	url = https://github.com/PaulRBerg/prb-math
 [submodule "lib/rain.intorastring"]
 	path = lib/rain.intorastring
 	url = https://github.com/rainlanguage/rain.intorastring
+[submodule "lib/rain.datacontract"]
+	path = lib/rain.datacontract
+	url = https://github.com/rainlanguage/rain.datacontract
