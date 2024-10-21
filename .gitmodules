@@ -1,12 +1,6 @@
 [submodule "lib/sol.lib.binmaskflag"]
 	path = lib/sol.lib.binmaskflag
 	url = https://github.com/rainprotocol/sol.lib.binmaskflag
-[submodule "lib/rain.interpreter.interface"]
-	path = lib/rain.interpreter.interface
-	url = https://github.com/rainlanguage/rain.interpreter.interface
-[submodule "lib/rain.sol.codegen"]
-	path = lib/rain.sol.codegen
-	url = https://github.com/rainlanguage/rain.sol.codegen
 [submodule "lib/prb-math"]
 	path = lib/prb-math
 	url = https://github.com/PaulRBerg/prb-math
@@ -25,3 +19,9 @@
 [submodule "lib/rain.metadata"]
 	path = lib/rain.metadata
 	url = https://github.com/rainlanguage/rain.metadata
+[submodule "lib/rain.sol.codegen"]
+	path = lib/rain.sol.codegen
+	url = https://github.com/rainlanguage/rain.sol.codegen
+[submodule "lib/rain.interpreter.interface"]
+	path = lib/rain.interpreter.interface
+	url = https://github.com/rainlanguage/rain.interpreter.interface
