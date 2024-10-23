@@ -1,4 +1,5 @@
-// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 thedavidmeister
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
@@ -14,7 +15,7 @@ import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {Operand, LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
-import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
+import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";
 
 /// @title LibParseNamedLHSTest
 contract LibParseNamedLHSTest is Test {

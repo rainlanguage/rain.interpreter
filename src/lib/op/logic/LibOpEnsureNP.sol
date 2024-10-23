@@ -1,11 +1,12 @@
-// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 thedavidmeister
 pragma solidity ^0.8.18;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV3.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
-import {LibIntOrAString, IntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
+import {LibIntOrAString, IntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
 
 /// @title LibOpEnsureNP
 /// @notice Opcode to revert if the condition is zero.

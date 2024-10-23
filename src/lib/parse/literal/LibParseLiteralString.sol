@@ -1,8 +1,9 @@
-// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 thedavidmeister
 pragma solidity ^0.8.18;
 
 import {ParseState} from "../LibParseState.sol";
-import {IntOrAString, LibIntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
+import {IntOrAString, LibIntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
 import {UnclosedStringLiteral, StringTooLong} from "../../../error/ErrParse.sol";
 import {CMASK_STRING_LITERAL_END, CMASK_STRING_LITERAL_TAIL} from "../LibParseCMask.sol";
 import {LibParseError} from "../LibParseError.sol";

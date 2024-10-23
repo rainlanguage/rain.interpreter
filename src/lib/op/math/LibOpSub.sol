@@ -1,11 +1,12 @@
-// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 thedavidmeister
 pragma solidity ^0.8.18;
 
 import {Operand} from "rain.interpreter.interface/interface/IInterpreterV3.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
-import {SaturatingMath} from "rain.math.saturating/SaturatingMath.sol";
+import {LibSaturatingMath} from "rain.math.saturating/lib/LibSaturatingMath.sol";
 
 /// @title LibOpSub
 /// @notice Opcode to subtract N integers.
@@ -34,7 +35,7 @@ library LibOpSub {
             saturate := and(operand, 1)
         }
         function (uint256, uint256) internal pure returns (uint256) f =
-            saturate > 0 ? SaturatingMath.saturatingSub : sub;
+            saturate > 0 ? LibSaturatingMath.saturatingSub : sub;
         a = f(a, b);
 
         {

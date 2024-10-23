@@ -1,30 +1,27 @@
-[submodule "lib/rain.metadata"]
-	path = lib/rain.metadata
-	url = https://github.com/rainprotocol/rain.metadata
-[submodule "lib/rain.lib.memkv"]
-	path = lib/rain.lib.memkv
-	url = https://github.com/rainprotocol/rain.lib.memkv
 [submodule "lib/prb-math"]
 	path = lib/prb-math
 	url = https://github.com/PaulRBerg/prb-math
-[submodule "lib/sol.lib.binmaskflag"]
-	path = lib/sol.lib.binmaskflag
-	url = https://github.com/rainprotocol/sol.lib.binmaskflag
-[submodule "lib/rain.math.fixedpoint"]
-	path = lib/rain.math.fixedpoint
-	url = https://github.com/rainprotocol/rain.math.fixedpoint
-[submodule "lib/rain.chainlink"]
-	path = lib/rain.chainlink
-	url = https://github.com/rainprotocol/rain.chainlink
 [submodule "lib/rain.intorastring"]
 	path = lib/rain.intorastring
 	url = https://github.com/rainlanguage/rain.intorastring
-[submodule "lib/rain.interpreter.interface"]
-	path = lib/rain.interpreter.interface
-	url = https://github.com/rainlanguage/rain.interpreter.interface
+[submodule "lib/rain.datacontract"]
+	path = lib/rain.datacontract
+	url = https://github.com/rainlanguage/rain.datacontract
+[submodule "lib/rain.lib.memkv"]
+	path = lib/rain.lib.memkv
+	url = https://github.com/rainlanguage/rain.lib.memkv
+[submodule "lib/rain.math.fixedpoint"]
+	path = lib/rain.math.fixedpoint
+	url = https://github.com/rainlanguage/rain.math.fixedpoint
+[submodule "lib/rain.metadata"]
+	path = lib/rain.metadata
+	url = https://github.com/rainlanguage/rain.metadata
 [submodule "lib/rain.sol.codegen"]
 	path = lib/rain.sol.codegen
 	url = https://github.com/rainlanguage/rain.sol.codegen
-[submodule "lib/rain.math.float"]
-	path = lib/rain.math.float
-	url = https://github.com/rainlanguage/rain.math.float
+[submodule "lib/rain.sol.binmaskflag"]
+	path = lib/rain.sol.binmaskflag
+	url = https://github.com/rainlanguage/rain.sol.binmaskflag
+[submodule "lib/rain.interpreter.interface"]
+	path = lib/rain.interpreter.interface
+	url = https://github.com/rainlanguage/rain.interpreter.interface

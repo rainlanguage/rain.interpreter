@@ -1,4 +1,5 @@
-// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 thedavidmeister
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
@@ -11,7 +12,7 @@ import {
 } from "src/concrete/RainterpreterParserNPE2.sol";
 import {LibAllStandardOpsNP, AuthoringMetaV2} from "src/lib/op/LibAllStandardOpsNP.sol";
 import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
-import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
+import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";
 
 contract RainterpreterParserNPE2PointersTest is Test {
     function testOperandHandlerFunctionPointers() external {

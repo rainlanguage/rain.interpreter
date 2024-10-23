@@ -1,4 +1,5 @@
-// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 thedavidmeister
 pragma solidity =0.8.25;
 
 import {Test, console2, stdError} from "forge-std/Test.sol";
@@ -24,7 +25,7 @@ import {
 } from "../../src/concrete/RainterpreterExpressionDeployerNPE2.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 import {LibEncodedDispatch} from "rain.interpreter.interface/lib/deprecated/caller/LibEncodedDispatch.sol";
-import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
+import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";
 
 /// @title RainterpreterExpressionDeployerNPD2DeploymentTest
 /// Tests that the RainterpreterExpressionDeployerNPE2 meta is correct. Also

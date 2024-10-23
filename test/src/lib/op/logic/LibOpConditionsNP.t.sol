@@ -1,4 +1,5 @@
-// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 thedavidmeister
 pragma solidity =0.8.25;
 
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
@@ -17,7 +18,7 @@ import {
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/deprecated/IInterpreterCallerV2.sol";
 import {LibEncodedDispatch} from "rain.interpreter.interface/lib/deprecated/caller/LibEncodedDispatch.sol";
-import {LibIntOrAString, IntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
+import {LibIntOrAString, IntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpConditionsNPTest is OpTest {

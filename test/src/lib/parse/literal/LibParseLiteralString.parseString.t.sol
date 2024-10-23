@@ -1,10 +1,11 @@
-// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 thedavidmeister
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {LibParseLiteralString} from "src/lib/parse/literal/LibParseLiteralString.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
-import {IntOrAString, LibIntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
+import {IntOrAString, LibIntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 import {CMASK_STRING_LITERAL_TAIL} from "src/lib/parse/LibParseCMask.sol";

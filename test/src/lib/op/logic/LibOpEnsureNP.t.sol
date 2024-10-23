@@ -1,4 +1,5 @@
-// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 thedavidmeister
 pragma solidity =0.8.25;
 
 import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
@@ -13,7 +14,7 @@ import {
     FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/deprecated/IInterpreterV2.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {LibIntOrAString, IntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
+import {LibIntOrAString, IntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpEnsureNPTest is OpTest {
