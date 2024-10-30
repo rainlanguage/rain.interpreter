@@ -20,7 +20,7 @@ import {
     COMMENT_END_SEQUENCE,
     CMASK_IDENTIFIER_HEAD
 } from "rain.string/lib/parse/LibParseCMask.sol";
-import {LibParseChars} from "rain.string/lib/parse/LibParseChars.sol";
+import {LibParseChar} from "rain.string/lib/parse/LibParseChar.sol";
 import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
 import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
@@ -151,7 +151,7 @@ library LibParse {
                     }
                     // Anon stack item.
                     else {
-                        cursor = skipMask(cursor + 1, end, CMASK_LHS_STACK_TAIL);
+                        cursor = LibParseChar.skipMask(cursor + 1, end, CMASK_LHS_STACK_TAIL);
                     }
                     // Bump the index regardless of whether the stack
                     // item is named or not.
@@ -161,7 +161,7 @@ library LibParse {
                     // Set yang as we are now building a stack item.
                     state.fsm |= FSM_YANG_MASK | FSM_ACTIVE_SOURCE_MASK;
                 } else if (char & CMASK_WHITESPACE != 0) {
-                    cursor = skipMask(cursor + 1, end, CMASK_WHITESPACE);
+                    cursor = LibParseChar.skipMask(cursor + 1, end, CMASK_WHITESPACE);
                     // Set ying as we now open to possibilities.
                     state.fsm &= ~FSM_YANG_MASK;
                 } else if (char & CMASK_LHS_RHS_DELIMITER != 0) {
@@ -356,7 +356,7 @@ library LibParse {
                     state.highwater();
                     cursor++;
                 } else if (char & CMASK_WHITESPACE > 0) {
-                    cursor = skipMask(cursor + 1, end, CMASK_WHITESPACE);
+                    cursor = LibParseChar.skipMask(cursor + 1, end, CMASK_WHITESPACE);
                     // Set yin as we now open to possibilities.
                     state.fsm &= ~FSM_YANG_MASK;
                 }
