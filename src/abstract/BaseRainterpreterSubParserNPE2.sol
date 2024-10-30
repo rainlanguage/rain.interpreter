@@ -7,7 +7,7 @@ import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {ISubParserV3, AuthoringMetaV2} from "rain.interpreter.interface/interface/ISubParserV3.sol";
 import {IncompatibleSubParser} from "../error/ErrSubParse.sol";
 import {LibSubParse, ParseState, CURRENT_COMPATIBILITY} from "../lib/parse/LibSubParse.sol";
-import {CMASK_RHS_WORD_TAIL} from "../lib/parse/LibParseCMask.sol";
+import {CMASK_RHS_WORD_TAIL} from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibParse, Operand} from "../lib/parse/LibParse.sol";
 import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {LibParseOperand} from "../lib/parse/LibParseOperand.sol";

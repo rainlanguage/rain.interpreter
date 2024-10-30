@@ -7,7 +7,7 @@ import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {IntOrAString, LibIntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
-import {CMASK_STRING_LITERAL_TAIL} from "src/lib/parse/LibParseCMask.sol";
+import {CMASK_STRING_LITERAL_TAIL} from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibLiteralString} from "test/lib/literal/LibLiteralString.sol";
 import {UnclosedStringLiteral} from "src/error/ErrParse.sol";
 

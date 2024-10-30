@@ -15,7 +15,7 @@ import {
     CMASK_DECIMAL_POINT,
     CMASK_NEGATIVE_SIGN,
     CMASK_ZERO
-} from "../LibParseCMask.sol";
+} from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibParseError} from "../LibParseError.sol";
 import {LibParse} from "../LibParse.sol";
 import {LibDecimalFloatImplementation, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
