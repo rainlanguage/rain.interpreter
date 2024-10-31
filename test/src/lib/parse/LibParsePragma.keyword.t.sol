@@ -11,7 +11,7 @@ import {
     CMASK_LITERAL_HEX_DISPATCH_START,
     CMASK_INTERSTITIAL_HEAD,
     CMASK_HEX
-} from "src/lib/parse/LibParseCMask.sol";
+} from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibLiteralString} from "test/lib/literal/LibLiteralString.sol";
 import {NoWhitespaceAfterUsingWordsFrom} from "src/error/ErrParse.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";

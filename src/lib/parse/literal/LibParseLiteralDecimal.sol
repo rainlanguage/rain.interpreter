@@ -15,7 +15,8 @@ import {
     CMASK_DECIMAL_POINT,
     CMASK_NEGATIVE_SIGN,
     CMASK_ZERO
-} from "../LibParseCMask.sol";
+} from "rain.string/lib/parse/LibParseCMask.sol";
+import {LibParseChar} from "rain.string/lib/parse/LibParseChar.sol";
 import {LibParseError} from "../LibParseError.sol";
 import {LibParse} from "../LibParse.sol";
 import {LibDecimalFloatImplementation, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
@@ -97,7 +98,7 @@ library LibParseLiteralDecimal {
     function unsafeStrToSignedInt(ParseState memory state, uint256 start, uint256 end) internal pure returns (int256) {
         unchecked {
             uint256 cursor = start;
-            uint256 isNeg = LibParse.isMask(cursor, end, CMASK_NEGATIVE_SIGN);
+            uint256 isNeg = LibParseChar.isMask(cursor, end, CMASK_NEGATIVE_SIGN);
             cursor += isNeg;
 
             uint256 value = state.unsafeStrToInt(cursor, end);
@@ -149,28 +150,28 @@ library LibParseLiteralDecimal {
     {
         unchecked {
             cursor = start;
-            cursor = LibParse.skipMask(cursor, end, CMASK_NEGATIVE_SIGN);
+            cursor = LibParseChar.skipMask(cursor, end, CMASK_NEGATIVE_SIGN);
             {
                 uint256 intStart = cursor;
-                cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
+                cursor = LibParseChar.skipMask(cursor, end, CMASK_NUMERIC_0_9);
                 if (cursor == intStart) {
                     revert ZeroLengthDecimal(state.parseErrorOffset(start));
                 }
             }
             signedCoefficient = state.unsafeStrToSignedInt(start, cursor);
 
-            int256 fracValue = int256(LibParse.isMask(cursor, end, CMASK_DECIMAL_POINT));
+            int256 fracValue = int256(LibParseChar.isMask(cursor, end, CMASK_DECIMAL_POINT));
             if (fracValue != 0) {
                 cursor++;
                 uint256 fracStart = cursor;
-                cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
+                cursor = LibParseChar.skipMask(cursor, end, CMASK_NUMERIC_0_9);
                 if (cursor == fracStart) {
                     revert MalformedDecimalPoint(state.parseErrorOffset(fracStart));
                 }
                 // Trailing zeros are allowed in fractional literals but should
                 // not be counted in the precision.
                 uint256 nonZeroCursor = cursor;
-                while (LibParse.isMask(nonZeroCursor - 1, end, CMASK_ZERO) == 1) {
+                while (LibParseChar.isMask(nonZeroCursor - 1, end, CMASK_ZERO) == 1) {
                     nonZeroCursor--;
                 }
 
@@ -198,14 +199,14 @@ library LibParseLiteralDecimal {
                 signedCoefficient = rescaledIntValue + fracValue;
             }
 
-            int256 eValue = int256(LibParse.isMask(cursor, end, CMASK_E_NOTATION));
+            int256 eValue = int256(LibParseChar.isMask(cursor, end, CMASK_E_NOTATION));
             if (eValue != 0) {
                 cursor++;
                 uint256 eStart = cursor;
-                cursor = LibParse.skipMask(cursor, end, CMASK_NEGATIVE_SIGN);
+                cursor = LibParseChar.skipMask(cursor, end, CMASK_NEGATIVE_SIGN);
                 {
                     uint256 digitsStart = cursor;
-                    cursor = LibParse.skipMask(cursor, end, CMASK_NUMERIC_0_9);
+                    cursor = LibParseChar.skipMask(cursor, end, CMASK_NUMERIC_0_9);
                     if (cursor == digitsStart) {
                         revert MalformedExponentDigits(state.parseErrorOffset(digitsStart));
                     }

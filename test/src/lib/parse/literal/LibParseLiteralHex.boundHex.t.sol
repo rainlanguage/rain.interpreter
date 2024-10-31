@@ -5,7 +5,7 @@ import {ParseLiteralTest} from "test/abstract/ParseLiteralTest.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibLiteralString} from "test/lib/literal/LibLiteralString.sol";
-import {CMASK_HEX} from "src/lib/parse/LibParseCMask.sol";
+import {CMASK_HEX} from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibParseLiteralHex} from "src/lib/parse/literal/LibParseLiteralHex.sol";
 
 /// @title LibParseLiteralBoundLiteralHexTest

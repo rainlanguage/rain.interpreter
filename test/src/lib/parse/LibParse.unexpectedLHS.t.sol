@@ -8,7 +8,7 @@ import {
     CMASK_LHS_RHS_DELIMITER,
     CMASK_LHS_STACK_DELIMITER,
     CMASK_LHS_STACK_HEAD
-} from "src/lib/parse/LibParseCMask.sol";
+} from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibParse, UnexpectedLHSChar} from "src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";

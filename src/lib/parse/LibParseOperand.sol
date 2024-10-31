@@ -12,7 +12,7 @@ import {
 import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibParse} from "./LibParse.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
-import {CMASK_OPERAND_END, CMASK_WHITESPACE, CMASK_OPERAND_START} from "./LibParseCMask.sol";
+import {CMASK_OPERAND_END, CMASK_WHITESPACE, CMASK_OPERAND_START} from "rain.string/lib/parse/LibParseCMask.sol";
 import {ParseState, OPERAND_VALUES_LENGTH, FSM_YANG_MASK} from "./LibParseState.sol";
 import {LibParseError} from "./LibParseError.sol";
 import {LibParseInterstitial} from "./LibParseInterstitial.sol";

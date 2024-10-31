@@ -19,7 +19,8 @@ import {
     COMMENT_START_SEQUENCE,
     COMMENT_END_SEQUENCE,
     CMASK_IDENTIFIER_HEAD
-} from "./LibParseCMask.sol";
+} from "rain.string/lib/parse/LibParseCMask.sol";
+import {LibParseChar} from "rain.string/lib/parse/LibParseChar.sol";
 import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
 import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
@@ -121,25 +122,6 @@ library LibParse {
         }
     }
 
-    /// Skip an unlimited number of chars until we find one that is not in the
-    /// mask.
-    function skipMask(uint256 cursor, uint256 end, uint256 mask) internal pure returns (uint256) {
-        assembly ("memory-safe") {
-            //slither-disable-next-line incorrect-shift
-            for {} and(lt(cursor, end), gt(and(shl(byte(0, mload(cursor)), 1), mask), 0)) { cursor := add(cursor, 1) } {}
-        }
-        return cursor;
-    }
-
-    /// Checks if the cursor points at a char of the given mask, and is in range
-    /// of end.
-    function isMask(uint256 cursor, uint256 end, uint256 mask) internal pure returns (uint256 result) {
-        assembly ("memory-safe") {
-            //slither-disable-next-line incorrect-shift
-            result := and(lt(cursor, end), iszero(iszero(and(shl(byte(0, mload(cursor)), 1), mask))))
-        }
-    }
-
     function parseLHS(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
             while (cursor < end) {
@@ -169,7 +151,7 @@ library LibParse {
                     }
                     // Anon stack item.
                     else {
-                        cursor = skipMask(cursor + 1, end, CMASK_LHS_STACK_TAIL);
+                        cursor = LibParseChar.skipMask(cursor + 1, end, CMASK_LHS_STACK_TAIL);
                     }
                     // Bump the index regardless of whether the stack
                     // item is named or not.
@@ -179,7 +161,7 @@ library LibParse {
                     // Set yang as we are now building a stack item.
                     state.fsm |= FSM_YANG_MASK | FSM_ACTIVE_SOURCE_MASK;
                 } else if (char & CMASK_WHITESPACE != 0) {
-                    cursor = skipMask(cursor + 1, end, CMASK_WHITESPACE);
+                    cursor = LibParseChar.skipMask(cursor + 1, end, CMASK_WHITESPACE);
                     // Set ying as we now open to possibilities.
                     state.fsm &= ~FSM_YANG_MASK;
                 } else if (char & CMASK_LHS_RHS_DELIMITER != 0) {
@@ -374,7 +356,7 @@ library LibParse {
                     state.highwater();
                     cursor++;
                 } else if (char & CMASK_WHITESPACE > 0) {
-                    cursor = skipMask(cursor + 1, end, CMASK_WHITESPACE);
+                    cursor = LibParseChar.skipMask(cursor + 1, end, CMASK_WHITESPACE);
                     // Set yin as we now open to possibilities.
                     state.fsm &= ~FSM_YANG_MASK;
                 }
