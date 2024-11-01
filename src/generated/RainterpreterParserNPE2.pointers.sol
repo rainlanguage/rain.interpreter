@@ -9,7 +9,7 @@
 pragma solidity =0.8.25;
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0x6ceb7c73c69eaf63e3a95805892de0f17ff921c8cc8ae7694745fd7f832ecad5);
+bytes32 constant BYTECODE_HASH = bytes32(0xd8315c246d10aebf39bd05e34e371579c45ebd604dc8ef3ffc5e8a236aeefd5c);
 
 /// @dev The parse meta that is used to lookup word definitions.
 /// The structure of the parse meta is:

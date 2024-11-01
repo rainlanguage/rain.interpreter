@@ -17,6 +17,7 @@ import {
     CMASK_ZERO
 } from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibParseChar} from "rain.string/lib/parse/LibParseChar.sol";
+import {LibParseDecimal} from "rain.string/lib/parse/LibParseDecimal.sol";
 import {LibParseError} from "../LibParseError.sol";
 import {LibParse} from "../LibParse.sol";
 import {LibDecimalFloatImplementation, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
@@ -34,7 +35,10 @@ library LibParseLiteralDecimal {
             uint256 isNeg = LibParseChar.isMask(cursor, end, CMASK_NEGATIVE_SIGN);
             cursor += isNeg;
 
-            uint256 value = state.unsafeStrToInt(cursor, end);
+            (bool success, uint256 value) = LibParseDecimal.unsafeDecimalStringToInt(cursor, end);
+            if (!success) {
+                revert DecimalLiteralOverflow(state.parseErrorOffset(start));
+            }
 
             if (isNeg != 0) {
                 if (value > uint256(type(int256).max) + 1) {
