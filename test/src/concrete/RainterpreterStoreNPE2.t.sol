@@ -119,6 +119,7 @@ contract RainterpreterStoreNPE2Test is Test {
     /// is that the fuzzer will generate some dupes just randomly, so there's
     /// no special logic to make that happen.
     /// forge-config: default.fuzz.runs = 100
+
     function testRainterpreterStoreNPE2SetGetDupes(Set11[] memory sets) external {
         vm.assume(sets.length < 20);
 

@@ -8,10 +8,11 @@ import {
     COMMENT_END_SEQUENCE,
     COMMENT_START_SEQUENCE,
     CMASK_COMMENT_END_SEQUENCE_END
-} from "./LibParseCMask.sol";
+} from "rain.string/lib/parse/LibParseCMask.sol";
 import {ParserOutOfBounds, MalformedCommentStart, UnclosedComment} from "../../error/ErrParse.sol";
 import {LibParseError} from "./LibParseError.sol";
 import {LibParse} from "./LibParse.sol";
+import {LibParseChar} from "rain.string/lib/parse/LibParseChar.sol";
 
 library LibParseInterstitial {
     using LibParse for ParseState;
@@ -90,7 +91,7 @@ library LibParseInterstitial {
         unchecked {
             // Set ying as we now open to possibilities.
             state.fsm &= ~FSM_YANG_MASK;
-            return LibParse.skipMask(cursor, end, CMASK_WHITESPACE);
+            return LibParseChar.skipMask(cursor, end, CMASK_WHITESPACE);
         }
     }
 

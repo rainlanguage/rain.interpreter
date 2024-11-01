@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {LibParseState, ParseState} from "./LibParseState.sol";
-import {CMASK_WHITESPACE, CMASK_LITERAL_HEX_DISPATCH_START} from "./LibParseCMask.sol";
+import {CMASK_WHITESPACE, CMASK_LITERAL_HEX_DISPATCH_START} from "rain.string/lib/parse/LibParseCMask.sol";
 import {NoWhitespaceAfterUsingWordsFrom} from "../../error/ErrParse.sol";
 import {LibParseError} from "./LibParseError.sol";
 import {LibParseInterstitial} from "./LibParseInterstitial.sol";

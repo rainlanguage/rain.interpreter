@@ -19,3 +19,6 @@
 [submodule "lib/rain.math.float"]
 	path = lib/rain.math.float
 	url = https://github.com/rainlanguage/rain.math.float
+[submodule "lib/rain.string"]
+	path = lib/rain.string
+	url = https://github.com/rainlanguage/rain.string

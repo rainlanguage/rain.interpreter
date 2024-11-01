@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {CMASK_STRING_LITERAL_TAIL, CMASK_HEX, CMASK_WHITESPACE} from "src/lib/parse/LibParseCMask.sol";
+import {CMASK_STRING_LITERAL_TAIL, CMASK_HEX, CMASK_WHITESPACE} from "rain.string/lib/parse/LibParseCMask.sol";
 
 library LibLiteralString {
     function conformStringToMask(string memory str, uint256 mask, uint256 max) internal pure {

@@ -5,7 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {LibParse} from "src/lib/parse/LibParse.sol";
 import {Pointer, LibBytes} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseSlow} from "./LibParseSlow.sol";
-import {CMASK_NUMERIC_0_9} from "src/lib/parse/LibParseCMask.sol";
+import {CMASK_NUMERIC_0_9} from "rain.string/lib/parse/LibParseCMask.sol";
 import {WordSize} from "src/error/ErrParse.sol";
 
 /// @title LibParseParseWordTest
