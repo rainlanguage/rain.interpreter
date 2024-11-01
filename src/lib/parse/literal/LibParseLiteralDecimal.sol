@@ -35,8 +35,8 @@ library LibParseLiteralDecimal {
             uint256 isNeg = LibParseChar.isMask(cursor, end, CMASK_NEGATIVE_SIGN);
             cursor += isNeg;
 
-            (bool success, uint256 value) = LibParseDecimal.unsafeDecimalStringToInt(cursor, end);
-            if (!success) {
+            (uint256 success, uint256 value) = LibParseDecimal.unsafeDecimalStringToInt(cursor, end);
+            if (success == 0) {
                 revert DecimalLiteralOverflow(state.parseErrorOffset(start));
             }
 
