@@ -29,30 +29,7 @@ library LibParseLiteralDecimal {
     using LibParseError for ParseState;
     using LibParseLiteralDecimal for ParseState;
 
-    function unsafeStrToSignedInt(ParseState memory state, uint256 start, uint256 end) internal pure returns (int256) {
-        unchecked {
-            uint256 cursor = start;
-            uint256 isNeg = LibParseChar.isMask(cursor, end, CMASK_NEGATIVE_SIGN);
-            cursor += isNeg;
 
-            (uint256 success, uint256 value) = LibParseDecimal.unsafeDecimalStringToInt(cursor, end);
-            if (success == 0) {
-                revert DecimalLiteralOverflow(state.parseErrorOffset(start));
-            }
-
-            if (isNeg != 0) {
-                if (value > uint256(type(int256).max) + 1) {
-                    revert DecimalLiteralOverflow(state.parseErrorOffset(start));
-                }
-                return -int256(value);
-            } else {
-                if (value > uint256(type(int256).max)) {
-                    revert DecimalLiteralOverflow(state.parseErrorOffset(start));
-                }
-                return int256(value);
-            }
-        }
-    }
 
     function parseDecimalFloatPacked(ParseState memory state, uint256 start, uint256 end)
         internal
@@ -95,7 +72,10 @@ library LibParseLiteralDecimal {
                     revert ZeroLengthDecimal(state.parseErrorOffset(start));
                 }
             }
-            signedCoefficient = state.unsafeStrToSignedInt(start, cursor);
+            (uint256 success, int256 signedCoefficient) = unsafeStrToSignedInt(start, cursor);
+            if (success == 0) {
+                revert DecimalLiteralOverflow(state.parseErrorOffset(start));
+            }
 
             int256 fracValue = int256(LibParseChar.isMask(cursor, end, CMASK_DECIMAL_POINT));
             if (fracValue != 0) {
@@ -149,7 +129,11 @@ library LibParseLiteralDecimal {
                     }
                 }
 
-                eValue = state.unsafeStrToSignedInt(eStart, cursor);
+                (uint256 eSuccess, int256 eValue) = unsafeStrToSignedInt(eStart, cursor);
+                if (eSuccess == 0) {
+                    revert DecimalLiteralOverflow(state.parseErrorOffset(eStart));
+                }
+
                 exponent += eValue;
             }
         }
