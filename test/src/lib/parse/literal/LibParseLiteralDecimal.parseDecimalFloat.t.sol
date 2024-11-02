@@ -9,7 +9,11 @@ import {LibParseLiteralDecimal} from "src/lib/parse/literal/LibParseLiteralDecim
 import {LibParseLiteral, ZeroLengthDecimal} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {ParseEmptyDecimalString} from "rain.string/error/ErrParse.sol";
-import {ParseDecimalPrecisionLoss, MalformedExponentDigits, MalformedDecimalPoint} from "rain.math.float/error/ErrParse.sol";
+import {
+    ParseDecimalPrecisionLoss,
+    MalformedExponentDigits,
+    MalformedDecimalPoint
+} from "rain.math.float/error/ErrParse.sol";
 
 /// @title LibParseLiteralDecimalParseDecimalFloatTest
 contract LibParseLiteralDecimalParseDecimalFloatTest is Test {
