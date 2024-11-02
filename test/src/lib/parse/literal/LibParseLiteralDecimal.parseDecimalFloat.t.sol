@@ -8,12 +8,6 @@ import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseLiteralDecimal} from "src/lib/parse/literal/LibParseLiteralDecimal.sol";
 import {LibParseLiteral, ZeroLengthDecimal} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
-// import {
-//     MalformedExponentDigits,
-//     MalformedDecimalPoint,
-//     DecimalLiteralOverflow,
-//     DecimalLiteralPrecisionLoss
-// } from "src/error/ErrParse.sol";
 import {ParseEmptyDecimalString} from "rain.string/error/ErrParse.sol";
 import {ParseDecimalPrecisionLoss, MalformedExponentDigits, MalformedDecimalPoint} from "rain.math.float/error/ErrParse.sol";
 
