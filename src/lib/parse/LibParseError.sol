@@ -12,7 +12,7 @@ library LibParseError {
         }
     }
 
-    function handleErrorSelector(ParseState memory state, bytes4 errorSelector, uint256 cursor) internal pure {
+    function handleErrorSelector(ParseState memory state, uint256 cursor, bytes4 errorSelector) internal pure {
         if (errorSelector != 0) {
             uint256 errorOffset = parseErrorOffset(state, cursor);
             assembly ("memory-safe") {
