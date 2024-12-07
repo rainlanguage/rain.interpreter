@@ -4,6 +4,7 @@ description = "Rain Interpreter Rust Crate."
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+author.workspace = true
 homepage.workspace = true
 
 [dependencies]
