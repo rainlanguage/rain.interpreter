@@ -7,7 +7,7 @@ import {ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
-import {LibLiteralString} from "test/lib/literal/LibLiteralString.sol";
+import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {OperandValuesOverflow, UnclosedOperand} from "src/error/ErrParse.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibDecimalFloat, LibDecimalFloatImplementation} from "rain.math.float/lib/LibDecimalFloat.sol";
@@ -72,8 +72,8 @@ contract LibParseOperandParseOperandTest is Test {
         string memory maybeWhitespaceB,
         string memory suffix
     ) external pure {
-        LibLiteralString.conformStringToWhitespace(maybeWhitespaceA);
-        LibLiteralString.conformStringToWhitespace(maybeWhitespaceB);
+        LibConformString.conformStringToWhitespace(maybeWhitespaceA);
+        LibConformString.conformStringToWhitespace(maybeWhitespaceB);
 
         value = bound(value, 0, SIGNED_NORMALIZED_MAX);
 
@@ -108,9 +108,9 @@ contract LibParseOperandParseOperandTest is Test {
         valueA = bound(valueA, 0, SIGNED_NORMALIZED_MAX);
         valueB = bound(valueB, 0, SIGNED_NORMALIZED_MAX);
 
-        LibLiteralString.conformStringToWhitespace(maybeWhitespaceA);
-        LibLiteralString.conformStringToWhitespace(maybeWhitespaceB);
-        LibLiteralString.conformStringToWhitespace(maybeWhitespaceC);
+        LibConformString.conformStringToWhitespace(maybeWhitespaceA);
+        LibConformString.conformStringToWhitespace(maybeWhitespaceB);
+        LibConformString.conformStringToWhitespace(maybeWhitespaceC);
 
         string memory valueAString = asHexA ? uint256(valueA).toHexString() : valueA.toString();
         string memory valueBString = asHexB ? uint256(valueB).toHexString() : valueB.toString();
@@ -156,10 +156,10 @@ contract LibParseOperandParseOperandTest is Test {
         valueB = bound(valueB, 0, SIGNED_NORMALIZED_MAX);
         valueC = bound(valueC, 0, SIGNED_NORMALIZED_MAX);
 
-        LibLiteralString.conformStringToWhitespace(maybeWhitespaceA);
-        LibLiteralString.conformStringToWhitespace(maybeWhitespaceB);
-        LibLiteralString.conformStringToWhitespace(maybeWhitespaceC);
-        LibLiteralString.conformStringToWhitespace(maybeWhitespaceD);
+        LibConformString.conformStringToWhitespace(maybeWhitespaceA);
+        LibConformString.conformStringToWhitespace(maybeWhitespaceB);
+        LibConformString.conformStringToWhitespace(maybeWhitespaceC);
+        LibConformString.conformStringToWhitespace(maybeWhitespaceD);
 
         string memory s;
         uint256 expectedLength;
@@ -207,11 +207,11 @@ contract LibParseOperandParseOperandTest is Test {
             vm.assume(bytes(maybeWhitespace[1]).length > 0);
             vm.assume(bytes(maybeWhitespace[2]).length > 0);
             vm.assume(bytes(maybeWhitespace[3]).length > 0);
-            LibLiteralString.conformStringToWhitespace(maybeWhitespace[0]);
-            LibLiteralString.conformStringToWhitespace(maybeWhitespace[1]);
-            LibLiteralString.conformStringToWhitespace(maybeWhitespace[2]);
-            LibLiteralString.conformStringToWhitespace(maybeWhitespace[3]);
-            LibLiteralString.conformStringToWhitespace(maybeWhitespace[4]);
+            LibConformString.conformStringToWhitespace(maybeWhitespace[0]);
+            LibConformString.conformStringToWhitespace(maybeWhitespace[1]);
+            LibConformString.conformStringToWhitespace(maybeWhitespace[2]);
+            LibConformString.conformStringToWhitespace(maybeWhitespace[3]);
+            LibConformString.conformStringToWhitespace(maybeWhitespace[4]);
         }
 
         for (uint256 i = 0; i < 4; i++) {

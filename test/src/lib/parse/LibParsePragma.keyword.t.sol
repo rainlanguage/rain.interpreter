@@ -12,7 +12,7 @@ import {
     CMASK_INTERSTITIAL_HEAD,
     CMASK_HEX
 } from "rain.string/lib/parse/LibParseCMask.sol";
-import {LibLiteralString} from "test/lib/literal/LibLiteralString.sol";
+import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {NoWhitespaceAfterUsingWordsFrom} from "src/error/ErrParse.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
@@ -85,7 +85,7 @@ contract LibParsePragmaKeywordTest is Test {
     /// error.
     /// forge-config: default.fuzz.runs = 100
     function testPragmaKeywordNoWhitespace(uint256 seed, string memory str) external {
-        bytes1 notWhitespace = LibLiteralString.charFromMask(seed, ~CMASK_WHITESPACE);
+        bytes1 notWhitespace = LibConformString.charFromMask(seed, ~CMASK_WHITESPACE);
         string memory fullString =
             string.concat(string(PRAGMA_KEYWORD_BYTES), string(abi.encodePacked(notWhitespace)), str);
         vm.expectRevert(abi.encodeWithSelector(NoWhitespaceAfterUsingWordsFrom.selector, PRAGMA_KEYWORD_BYTES_LENGTH));
@@ -98,8 +98,8 @@ contract LibParsePragmaKeywordTest is Test {
     /// forge-config: default.fuzz.runs = 100
     function testPragmaKeywordWhitespaceNoHex(uint256 seed, string calldata calldataStr) external pure {
         seed = bound(seed, 0, type(uint256).max - 1);
-        bytes1 whitespace = LibLiteralString.charFromMask(seed, CMASK_WHITESPACE);
-        bytes1 notInterstitialHead = LibLiteralString.charFromMask(seed + 1, ~CMASK_INTERSTITIAL_HEAD);
+        bytes1 whitespace = LibConformString.charFromMask(seed, CMASK_WHITESPACE);
+        bytes1 notInterstitialHead = LibConformString.charFromMask(seed + 1, ~CMASK_INTERSTITIAL_HEAD);
         if (bytes(calldataStr).length > 2) {
             vm.assume(
                 keccak256(bytes(calldataStr[0:2]))
@@ -128,8 +128,8 @@ contract LibParsePragmaKeywordTest is Test {
         string calldata suffix
     ) external pure {
         vm.assume(bytes(whitespace).length > 0);
-        bytes1 notHexData = LibLiteralString.charFromMask(seed, ~CMASK_HEX);
-        LibLiteralString.conformStringToMask(whitespace, CMASK_WHITESPACE, 0x80);
+        bytes1 notHexData = LibConformString.charFromMask(seed, ~CMASK_HEX);
+        LibConformString.conformStringToMask(whitespace, CMASK_WHITESPACE, 0x80);
         string memory str = string.concat(
             string(PRAGMA_KEYWORD_BYTES),
             whitespace,
@@ -169,10 +169,10 @@ contract LibParsePragmaKeywordTest is Test {
         vm.assume(bytes(whitespace0).length > 0);
         vm.assume(bytes(whitespace1).length > 0);
 
-        bytes1 notHexData = LibLiteralString.charFromMask(seed, ~CMASK_HEX);
+        bytes1 notHexData = LibConformString.charFromMask(seed, ~CMASK_HEX);
 
-        LibLiteralString.conformStringToMask(whitespace0, CMASK_WHITESPACE, 0x80);
-        LibLiteralString.conformStringToMask(whitespace1, CMASK_WHITESPACE, 0x80);
+        LibConformString.conformStringToMask(whitespace0, CMASK_WHITESPACE, 0x80);
+        LibConformString.conformStringToMask(whitespace1, CMASK_WHITESPACE, 0x80);
 
         string memory str = string.concat(
             string.concat(
