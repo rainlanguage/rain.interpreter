@@ -8,7 +8,7 @@ import {IntOrAString, LibIntOrAString} from "rain.intorastring/src/lib/LibIntOrA
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 import {CMASK_STRING_LITERAL_TAIL} from "rain.string/lib/parse/LibParseCMask.sol";
-import {LibLiteralString} from "test/lib/literal/LibLiteralString.sol";
+import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {UnclosedStringLiteral} from "src/error/ErrParse.sol";
 
 /// @title LibParseLiteralStringTest
@@ -30,7 +30,7 @@ contract LibParseLiteralStringTest is Test {
 
     /// The parser will only accept strings that are valid according to the mask.
     function testParseStringLiteralAny(bytes memory data) external pure {
-        LibLiteralString.conformStringToMask(string(data), CMASK_STRING_LITERAL_TAIL, 0x80);
+        LibConformString.conformStringToMask(string(data), CMASK_STRING_LITERAL_TAIL, 0x80);
         vm.assume(data.length < 32);
         ParseState memory state = LibParseState.newState(bytes(string.concat("\"", string(data), "\"")), "", "", "");
 
@@ -45,10 +45,10 @@ contract LibParseLiteralStringTest is Test {
     /// If any character in the string is not in the mask, the parser will error.
     function testParseStringLiteralCorrupt(bytes memory data, uint256 corruptIndex) external {
         vm.assume(data.length > 0);
-        LibLiteralString.conformStringToMask(string(data), CMASK_STRING_LITERAL_TAIL, 0x80);
+        LibConformString.conformStringToMask(string(data), CMASK_STRING_LITERAL_TAIL, 0x80);
         vm.assume(data.length < 32);
         corruptIndex = bound(corruptIndex, 0, data.length - 1);
-        LibLiteralString.corruptSingleChar(string(data), corruptIndex);
+        LibConformString.corruptSingleChar(string(data), corruptIndex);
 
         ParseState memory state = LibParseState.newState(bytes(string.concat("\"", string(data), "\"")), "", "", "");
 

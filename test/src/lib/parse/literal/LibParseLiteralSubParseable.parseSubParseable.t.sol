@@ -7,7 +7,7 @@ import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseLiteralSubParseable} from "src/lib/parse/literal/LibParseLiteralSubParseable.sol";
 import {UnclosedSubParseableLiteral, SubParseableMissingDispatch} from "src/error/ErrParse.sol";
 import {ISubParserV3} from "rain.interpreter.interface/interface/ISubParserV3.sol";
-import {LibLiteralString} from "test/lib/literal/LibLiteralString.sol";
+import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {CMASK_WHITESPACE, CMASK_SUB_PARSEABLE_LITERAL_END} from "rain.string/lib/parse/LibParseCMask.sol";
 import {CURRENT_COMPATIBILITY} from "src/lib/parse/LibSubParse.sol";
 
@@ -123,12 +123,12 @@ contract LibParseLiteralSubParseableTest is Test {
         vm.assume(bytes(whitespace).length > 0);
 
         // Dispatch can be any ASCII other than whitespace or literal end char.
-        LibLiteralString.conformStringToMask(dispatch, ~(CMASK_WHITESPACE | CMASK_SUB_PARSEABLE_LITERAL_END));
+        LibConformString.conformStringToMask(dispatch, ~(CMASK_WHITESPACE | CMASK_SUB_PARSEABLE_LITERAL_END));
         // Whitespace can be any standard rainlang whitespace.
-        LibLiteralString.conformStringToWhitespace(whitespace);
+        LibConformString.conformStringToWhitespace(whitespace);
         // Body can be any ASCII other than the literal end, including
         // whitespace.
-        LibLiteralString.conformStringToMask(body, ~CMASK_SUB_PARSEABLE_LITERAL_END);
+        LibConformString.conformStringToMask(body, ~CMASK_SUB_PARSEABLE_LITERAL_END);
 
         checkParseSubParseable(
             string(abi.encodePacked("[", dispatch, whitespace, body, "]")),
