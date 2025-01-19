@@ -6,7 +6,7 @@ import {RainterpreterExpressionDeployerNPE2DeploymentTest} from
 import {FullyQualifiedNamespace, StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {EvalV4, SourceIndexV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibNamespace} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
-import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 contract RainterpreterNPE2StateOverlayTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     /// Show that state overlay can prewarm a get.
