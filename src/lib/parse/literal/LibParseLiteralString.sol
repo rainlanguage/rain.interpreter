@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {ParseState} from "../LibParseState.sol";
-import {IntOrAString, LibIntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
+import {IntOrAString, LibIntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
 import {UnclosedStringLiteral, StringTooLong} from "../../../error/ErrParse.sol";
 import {CMASK_STRING_LITERAL_END, CMASK_STRING_LITERAL_TAIL} from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibParseError} from "../LibParseError.sol";
