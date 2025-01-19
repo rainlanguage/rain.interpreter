@@ -28,7 +28,7 @@ contract RainterpreterNPE2 is IInterpreterV4, IOpcodeToolingV1, ERC165 {
     using LibInterpreterStateDataContractNP for bytes;
 
     /// @inheritdoc IInterpreterV4
-    function eval4(EvalV4 calldata eval) external view virtual override returns (uint256[] memory, uint256[] memory) {
+    function eval4(EvalV4 calldata eval) external view virtual override returns (bytes32[] memory, bytes32[] memory) {
         InterpreterStateNP memory state = eval.bytecode.unsafeDeserializeNP(
             SourceIndexV2.unwrap(eval.sourceIndex), eval.namespace, eval.store, eval.context, OPCODE_FUNCTION_POINTERS
         );

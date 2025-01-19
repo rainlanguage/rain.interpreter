@@ -18,7 +18,7 @@ import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpr
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {BadOpOutputsLength} from "src/error/ErrIntegrity.sol";
-import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpConstantNPTest
 /// @notice Test the runtime and integrity time logic of LibOpConstantNP.
@@ -84,20 +84,20 @@ contract LibOpConstantNPTest is OpTest {
     function testOpConstantEvalNPE2E() external view {
         bytes memory bytecode = iDeployer.parse2("_ _: 2 1.001;");
 
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
+        (bytes32[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
             EvalV4({
                 store: iStore,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
-                context: LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-                inputs: new uint256[](0),
-                stateOverlay: new uint256[](0)
+                context: LibContext.build(new bytes32[][](0), new SignedContextV1[](0)),
+                inputs: new bytes32[](0),
+                stateOverlay: new bytes32[](0)
             })
         );
         assertEq(stack.length, 2);
-        assertEq(stack[0], LibDecimalFloat.pack(1.001e37, -37));
-        assertEq(stack[1], LibDecimalFloat.pack(2e37, -37));
+        assertEq(stack[0], PackedFloat.unwrap(LibDecimalFloat.pack(1.001e37, -37)));
+        assertEq(stack[1], PackedFloat.unwrap(LibDecimalFloat.pack(2e37, -37)));
         assertEq(kvs.length, 0);
     }
 
