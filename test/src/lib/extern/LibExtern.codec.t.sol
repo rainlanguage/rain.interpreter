@@ -2,7 +2,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {
     IInterpreterExternV3, EncodedExternDispatch
 } from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
@@ -16,10 +16,10 @@ contract LibExternCodecTest is Test {
     function testLibExternCodecEncodeExternDispatch(uint256 opcode, uint256 operand) external pure {
         opcode = bound(opcode, 0, type(uint16).max);
         operand = bound(operand, 0, type(uint16).max);
-        ExternDispatch dispatch = LibExtern.encodeExternDispatch(opcode, Operand.wrap(operand));
-        (uint256 decodedOpcode, Operand decodedOperand) = LibExtern.decodeExternDispatch(dispatch);
+        ExternDispatch dispatch = LibExtern.encodeExternDispatch(opcode, OperandV2.wrap(operand));
+        (uint256 decodedOpcode, OperandV2 decodedOperand) = LibExtern.decodeExternDispatch(dispatch);
         assertEq(decodedOpcode, opcode);
-        assertEq(Operand.unwrap(decodedOperand), operand);
+        assertEq(OperandV2.unwrap(decodedOperand), operand);
     }
 
     /// Ensure `encodeExternCall` encodes the address and dispatch correctly.
@@ -27,13 +27,13 @@ contract LibExternCodecTest is Test {
         opcode = bound(opcode, 0, type(uint16).max);
         operand = bound(operand, 0, type(uint16).max);
         IInterpreterExternV3 extern = IInterpreterExternV3(address(0x1234567890123456789012345678901234567890));
-        ExternDispatch dispatch = LibExtern.encodeExternDispatch(opcode, Operand.wrap(uint16(operand)));
+        ExternDispatch dispatch = LibExtern.encodeExternDispatch(opcode, OperandV2.wrap(uint16(operand)));
         EncodedExternDispatch encoded = LibExtern.encodeExternCall(extern, dispatch);
         (IInterpreterExternV3 decodedExtern, ExternDispatch decodedDispatch) = LibExtern.decodeExternCall(encoded);
         assertEq(uint256(uint160(address(decodedExtern))), uint256(uint160(address(extern))));
         assertEq(ExternDispatch.unwrap(decodedDispatch), ExternDispatch.unwrap(dispatch));
-        (uint256 decodedOpcode, Operand decodedOperand) = LibExtern.decodeExternDispatch(decodedDispatch);
+        (uint256 decodedOpcode, OperandV2 decodedOperand) = LibExtern.decodeExternDispatch(decodedDispatch);
         assertEq(decodedOpcode, opcode);
-        assertEq(Operand.unwrap(decodedOperand), operand);
+        assertEq(OperandV2.unwrap(decodedOperand), operand);
     }
 }

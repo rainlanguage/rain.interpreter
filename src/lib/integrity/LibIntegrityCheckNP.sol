@@ -13,7 +13,7 @@ import {
 } from "../../error/ErrIntegrity.sol";
 import {IInterpreterV4, SourceIndexV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2, StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {BadOpInputsLength} from "../../lib/integrity/LibIntegrityCheckNP.sol";
 
@@ -99,10 +99,10 @@ library LibIntegrityCheckNP {
                 uint256 end = cursor + LibBytecode.sourceOpsCount(bytecode, i) * 4;
 
                 while (cursor < end) {
-                    Operand operand;
+                    OperandV2 operand;
                     uint256 bytecodeOpInputs;
                     uint256 bytecodeOpOutputs;
-                    function(IntegrityCheckStateNP memory, Operand)
+                    function(IntegrityCheckStateNP memory, OperandV2)
                     view
                     returns (uint256, uint256) f;
                     assembly ("memory-safe") {

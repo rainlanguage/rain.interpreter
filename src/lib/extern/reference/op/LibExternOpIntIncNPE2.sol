@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.25;
 
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibSubParse} from "../../../parse/LibSubParse.sol";
 import {IInterpreterExternV3} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
 import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
@@ -19,7 +19,7 @@ library LibExternOpIntIncNPE2 {
     /// we can test multi input/output logic is implemented correctly for
     /// externs.
     //slither-disable-next-line dead-code
-    function run(Operand, uint256[] memory inputs) internal pure returns (uint256[] memory) {
+    function run(OperandV2, uint256[] memory inputs) internal pure returns (uint256[] memory) {
         for (uint256 i = 0; i < inputs.length; i++) {
             (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(inputs[i]);
             (signedCoefficient, exponent) = LibDecimalFloat.add(signedCoefficient, exponent, 1e37, -37);
@@ -31,14 +31,14 @@ library LibExternOpIntIncNPE2 {
     /// The integrity check for the extern increment opcode. The inputs and
     /// outputs are the same always.
     //slither-disable-next-line dead-code
-    function integrity(Operand, uint256 inputs, uint256) internal pure returns (uint256, uint256) {
+    function integrity(OperandV2, uint256 inputs, uint256) internal pure returns (uint256, uint256) {
         return (inputs, inputs);
     }
 
     /// The sub parser for the extern increment opcode. It has no special logic
     /// so uses the default sub parser from `LibSubParse`.
     //slither-disable-next-line dead-code
-    function subParser(uint256 constantsHeight, uint256 ioByte, Operand operand)
+    function subParser(uint256 constantsHeight, uint256 ioByte, OperandV2 operand)
         internal
         view
         returns (bool, bytes memory, uint256[] memory)

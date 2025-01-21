@@ -9,7 +9,7 @@ import {OutOfBoundsConstantRead, LibOpConstantNP} from "src/lib/op/00/LibOpConst
 import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
-    Operand,
+    OperandV2,
     SourceIndexV2,
     FullyQualifiedNamespace,
     EvalV4
@@ -28,9 +28,9 @@ contract LibOpConstantNPTest is OpTest {
     /// Directly test the integrity logic of LibOpConstantNP. The operand always
     /// puts a single value on the stack. This tests the happy path where the
     /// operand points to a value in the constants array.
-    function testOpConstantNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
+    function testOpConstantNPIntegrity(IntegrityCheckStateNP memory state, OperandV2 operand) external pure {
         vm.assume(state.constants.length > 0);
-        operand = Operand.wrap(bound(Operand.unwrap(operand), 0, state.constants.length - 1));
+        operand = OperandV2.wrap(bound(OperandV2.unwrap(operand), 0, state.constants.length - 1));
 
         (uint256 calcInputs, uint256 calcOutputs) = LibOpConstantNP.integrity(state, operand);
 
@@ -41,12 +41,12 @@ contract LibOpConstantNPTest is OpTest {
     /// Directly test the integrity logic of LibOpConstantNP. This tests the case
     /// where the operand points past the end of the constants array, which MUST
     /// always error as an OOB read.
-    function testOpConstantNPIntegrityOOBConstants(IntegrityCheckStateNP memory state, Operand operand) external {
-        operand = Operand.wrap(bound(Operand.unwrap(operand), state.constants.length, type(uint16).max));
+    function testOpConstantNPIntegrityOOBConstants(IntegrityCheckStateNP memory state, OperandV2 operand) external {
+        operand = OperandV2.wrap(bound(OperandV2.unwrap(operand), state.constants.length, type(uint16).max));
 
         vm.expectRevert(
             abi.encodeWithSelector(
-                OutOfBoundsConstantRead.selector, state.opIndex, state.constants.length, Operand.unwrap(operand)
+                OutOfBoundsConstantRead.selector, state.opIndex, state.constants.length, OperandV2.unwrap(operand)
             )
         );
         LibOpConstantNP.integrity(state, operand);

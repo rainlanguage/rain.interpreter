@@ -6,7 +6,7 @@ import {LibOpMaxUint256NP} from "src/lib/op/evm/LibOpMaxUint256NP.sol";
 import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
     IInterpreterV4,
-    Operand,
+    OperandV2,
     SourceIndexV2,
     FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
@@ -42,7 +42,7 @@ contract LibOpMaxUint256NPTest is OpTest {
     function testOpMaxUint256NPRun() external view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](0);
-        Operand operand = LibOperand.build(0, 1, 0);
+        OperandV2 operand = LibOperand.build(0, 1, 0);
         opReferenceCheck(
             state, operand, LibOpMaxUint256NP.referenceFn, LibOpMaxUint256NP.integrity, LibOpMaxUint256NP.run, inputs
         );

@@ -4,7 +4,7 @@ pragma solidity =0.8.25;
 import {
     IInterpreterV4,
     FullyQualifiedNamespace,
-    Operand,
+    OperandV2,
     SourceIndexV2,
     EvalV4
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
@@ -44,7 +44,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         uint256 sourceIndex = randomSourceIndex(state.bytecode, seed);
         assertTrue(sourceIndex <= type(uint16).max);
 
-        Operand operand = LibOperand.build(uint8(inputs), uint8(outputs), uint16(sourceIndex));
+        OperandV2 operand = LibOperand.build(uint8(inputs), uint8(outputs), uint16(sourceIndex));
         vm.expectRevert(abi.encodeWithSelector(CallOutputsExceedSource.selector, sourceOutputs, outputs));
         LibOpCallNP.integrity(state, operand);
     }
@@ -68,7 +68,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
 
         sourceIndex = bound(sourceIndex, sourceCount, type(uint16).max);
 
-        Operand operand = LibOperand.build(uint8(inputs), uint8(outputs), uint16(sourceIndex));
+        OperandV2 operand = LibOperand.build(uint8(inputs), uint8(outputs), uint16(sourceIndex));
         vm.expectRevert(abi.encodeWithSelector(SourceIndexOutOfBounds.selector, sourceIndex, state.bytecode));
         LibOpCallNP.integrity(state, operand);
     }
@@ -95,7 +95,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         uint256 sourceIndex = randomSourceIndex(state.bytecode, seed);
         assertTrue(sourceIndex <= type(uint8).max);
 
-        Operand operand = LibOperand.build(uint8(inputs), uint8(outputs), uint16(sourceIndex));
+        OperandV2 operand = LibOperand.build(uint8(inputs), uint8(outputs), uint16(sourceIndex));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpCallNP.integrity(state, operand);
         uint256 sourceInputs = uint8(state.bytecode[sourcePosition + 2]);
         assertEq(calcInputs, sourceInputs, "inputs");

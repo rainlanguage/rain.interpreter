@@ -1,8 +1,8 @@
-// // SPDX-License-Identifier: CAL
-// pragma solidity ^0.8.18;
+// SPDX-License-Identifier: CAL
+pragma solidity ^0.8.18;
 
 // import {MASK_2BIT} from "sol.lib.binmaskflag/Binary.sol";
-// import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+// import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 // import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 // import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 // import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";

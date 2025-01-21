@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {Operand, OPCODE_CONSTANT} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, OPCODE_CONSTANT} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibParseStackTracker, ParseStackTracker} from "./LibParseStackTracker.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
@@ -518,7 +518,7 @@ library LibParseState {
             // 0 indexed from the bottom of the linked list to the top.
             {
                 uint256 constantsHeight = state.constantsBuilder & 0xFFFF;
-                state.pushOpToSource(OPCODE_CONSTANT, Operand.wrap(exists ? constantsHeight - t : constantsHeight));
+                state.pushOpToSource(OPCODE_CONSTANT, OperandV2.wrap(bytes32(exists ? constantsHeight - t : constantsHeight)));
             }
 
             // If the literal is not a duplicate, then we need to add it to the
@@ -533,7 +533,7 @@ library LibParseState {
         }
     }
 
-    function pushOpToSource(ParseState memory state, uint256 opcode, Operand operand) internal pure {
+    function pushOpToSource(ParseState memory state, uint256 opcode, OperandV2 operand) internal pure {
         unchecked {
             // This might be a top level item so try to snapshot its pointer to
             // the line tracker before writing the stack counter.
@@ -554,7 +554,7 @@ library LibParseState {
                 mstore8(counterPointer, add(byte(0, mload(counterPointer)), 1))
             }
 
-            uint256 activeSource;
+            bytes32 activeSource;
             uint256 offset;
             uint256 activeSourcePointer = state.activeSourcePtr;
             assembly ("memory-safe") {
@@ -601,13 +601,13 @@ library LibParseState {
             // increment offset. We have 16 bits allocated to the offset and stop
             // processing at 0x100 so this never overflows into the actual source
             // data.
-            activeSource + 0x20
+            bytes32(uint256(activeSource) + 0x20)
             // include the operand. The operand is assumed to be 16 bits, so we shift
             // it into the correct position.
-            | Operand.unwrap(operand) << offset
+            | OperandV2.unwrap(operand) << offset
             // include new op. The opcode is assumed to be 8 bits, so we shift it
             // into the correct position, beyond the operand.
-            | opcode << (offset + 0x18);
+            | bytes32(opcode << (offset + 0x18));
             assembly ("memory-safe") {
                 mstore(activeSourcePointer, activeSource)
             }

@@ -9,7 +9,7 @@ import {
     UnexpectedOperandValue,
     OperandOverflow
 } from "../../error/ErrParse.sol";
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibParse} from "./LibParse.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 import {CMASK_OPERAND_END, CMASK_WHITESPACE, CMASK_OPERAND_START} from "rain.string/lib/parse/LibParseCMask.sol";
@@ -122,8 +122,8 @@ library LibParseOperand {
     /// parser the literal extraction will be done first, then the word lookup
     /// will have to be done by the sub parser, alongside the values provided
     /// by the main parser.
-    function handleOperand(ParseState memory state, uint256 wordIndex) internal pure returns (Operand) {
-        function (uint256[] memory) internal pure returns (Operand) handler;
+    function handleOperand(ParseState memory state, uint256 wordIndex) internal pure returns (OperandV2) {
+        function (uint256[] memory) internal pure returns (OperandV2) handler;
         bytes memory handlers = state.operandHandlers;
         assembly ("memory-safe") {
             // There is no bounds check here because the indexes are calcualted
@@ -135,51 +135,51 @@ library LibParseOperand {
         return handler(state.operandValues);
     }
 
-    function handleOperandDisallowed(uint256[] memory values) internal pure returns (Operand) {
+    function handleOperandDisallowed(uint256[] memory values) internal pure returns (OperandV2) {
         if (values.length != 0) {
             revert UnexpectedOperand();
         }
-        return Operand.wrap(0);
+        return OperandV2.wrap(0);
     }
 
-    function handleOperandDisallowedAlwaysOne(uint256[] memory values) internal pure returns (Operand) {
+    function handleOperandDisallowedAlwaysOne(uint256[] memory values) internal pure returns (OperandV2) {
         if (values.length != 0) {
             revert UnexpectedOperand();
         }
-        return Operand.wrap(1);
+        return OperandV2.wrap(1);
     }
 
     /// There must be one or zero values. The fallback is 0 if nothing is
     /// provided, else the provided value MUST fit in two bytes and is used as
     /// is.
-    function handleOperandSingleFull(uint256[] memory values) internal pure returns (Operand operand) {
+    function handleOperandSingleFull(uint256[] memory values) internal pure returns (OperandV2 operand) {
         // Happy path at the top for efficiency.
         if (values.length == 1) {
             assembly ("memory-safe") {
                 operand := mload(add(values, 0x20))
             }
-            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(Operand.unwrap(operand));
-            operand = Operand.wrap(LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0));
-            if (Operand.unwrap(operand) > type(uint16).max) {
+            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(OperandV2.unwrap(operand));
+            operand = OperandV2.wrap(LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0));
+            if (OperandV2.unwrap(operand) > type(uint16).max) {
                 revert OperandOverflow();
             }
         } else if (values.length == 0) {
-            operand = Operand.wrap(0);
+            operand = OperandV2.wrap(0);
         } else {
             revert UnexpectedOperandValue();
         }
     }
 
     /// There must be exactly one value. There is no default fallback.
-    function handleOperandSingleFullNoDefault(uint256[] memory values) internal pure returns (Operand operand) {
+    function handleOperandSingleFullNoDefault(uint256[] memory values) internal pure returns (OperandV2 operand) {
         // Happy path at the top for efficiency.
         if (values.length == 1) {
             assembly ("memory-safe") {
                 operand := mload(add(values, 0x20))
             }
-            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(Operand.unwrap(operand));
-            operand = Operand.wrap(LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0));
-            if (Operand.unwrap(operand) > type(uint16).max) {
+            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(OperandV2.unwrap(operand));
+            operand = OperandV2.wrap(LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0));
+            if (OperandV2.unwrap(operand) > type(uint16).max) {
                 revert OperandOverflow();
             }
         } else if (values.length == 0) {
@@ -191,7 +191,7 @@ library LibParseOperand {
 
     /// There must be exactly two values. There is no default fallback. Each
     /// value MUST fit in one byte and is used as is.
-    function handleOperandDoublePerByteNoDefault(uint256[] memory values) internal pure returns (Operand operand) {
+    function handleOperandDoublePerByteNoDefault(uint256[] memory values) internal pure returns (OperandV2 operand) {
         // Happy path at the top for efficiency.
         if (values.length == 2) {
             uint256 a;
@@ -209,7 +209,7 @@ library LibParseOperand {
                 revert OperandOverflow();
             }
 
-            operand = Operand.wrap(a | (b << 8));
+            operand = OperandV2.wrap(a | (b << 8));
         } else if (values.length < 2) {
             revert ExpectedOperand();
         } else {
@@ -219,7 +219,7 @@ library LibParseOperand {
 
     /// 8 bit value then maybe 1 bit flag then maybe 1 bit flag. Fallback to 0
     /// for both flags if not provided.
-    function handleOperand8M1M1(uint256[] memory values) internal pure returns (Operand operand) {
+    function handleOperand8M1M1(uint256[] memory values) internal pure returns (OperandV2 operand) {
         // Happy path at the top for efficiency.
         uint256 length = values.length;
         if (length >= 1 && length <= 3) {
@@ -257,7 +257,7 @@ library LibParseOperand {
                 revert OperandOverflow();
             }
 
-            operand = Operand.wrap(a | (b << 8) | (c << 9));
+            operand = OperandV2.wrap(a | (b << 8) | (c << 9));
         } else if (length == 0) {
             revert ExpectedOperand();
         } else {
@@ -266,7 +266,7 @@ library LibParseOperand {
     }
 
     /// 2x maybe 1 bit flags. Fallback to 0 for both flags if not provided.
-    function handleOperandM1M1(uint256[] memory values) internal pure returns (Operand operand) {
+    function handleOperandM1M1(uint256[] memory values) internal pure returns (OperandV2 operand) {
         // Happy path at the top for efficiency.
         uint256 length = values.length;
         if (length < 3) {
@@ -298,7 +298,7 @@ library LibParseOperand {
                 revert OperandOverflow();
             }
 
-            operand = Operand.wrap(a | (b << 1));
+            operand = OperandV2.wrap(a | (b << 1));
         } else {
             revert UnexpectedOperandValue();
         }

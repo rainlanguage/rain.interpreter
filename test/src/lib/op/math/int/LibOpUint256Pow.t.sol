@@ -1,5 +1,5 @@
-// // SPDX-License-Identifier: CAL
-// pragma solidity =0.8.25;
+// SPDX-License-Identifier: CAL
+pragma solidity =0.8.25;
 
 // import {stdError} from "forge-std/Test.sol";
 
@@ -11,7 +11,7 @@
 // import {LibOpUint256Pow} from "src/lib/op/math/uint256/LibOpUint256Pow.sol";
 // import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 // import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-// import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+// import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 // import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 // contract LibOpUint256PowTest is OpTest {

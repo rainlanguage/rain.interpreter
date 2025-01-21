@@ -3,7 +3,7 @@ pragma solidity =0.8.25;
 
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {BadDynamicLength} from "../../error/ErrOpList.sol";
-import {BaseRainterpreterExternNPE2, Operand} from "../../abstract/BaseRainterpreterExternNPE2.sol";
+import {BaseRainterpreterExternNPE2, OperandV2} from "../../abstract/BaseRainterpreterExternNPE2.sol";
 import {
     BaseRainterpreterSubParserNPE2,
     IParserToolingV1,
@@ -268,12 +268,12 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// @inheritdoc IParserToolingV1
     function buildOperandHandlerFunctionPointers() external pure override returns (bytes memory) {
         unchecked {
-            function(uint256[] memory) internal pure returns (Operand) lengthPointer;
+            function(uint256[] memory) internal pure returns (OperandV2) lengthPointer;
             uint256 length = SUB_PARSER_WORD_PARSERS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(uint256[] memory) internal pure returns (Operand)[SUB_PARSER_WORD_PARSERS_LENGTH + 1] memory
+            function(uint256[] memory) internal pure returns (OperandV2)[SUB_PARSER_WORD_PARSERS_LENGTH + 1] memory
                 handlersFixed = [
                     lengthPointer,
                     // inc
@@ -311,13 +311,13 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// @inheritdoc ISubParserToolingV1
     function buildSubParserWordParsers() external pure returns (bytes memory) {
         unchecked {
-            function(uint256, uint256, Operand) internal view returns (bool, bytes memory, uint256[] memory)
+            function(uint256, uint256, OperandV2) internal view returns (bool, bytes memory, uint256[] memory)
                 lengthPointer;
             uint256 length = SUB_PARSER_WORD_PARSERS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(uint256, uint256, Operand) internal view returns (bool, bytes memory, uint256[] memory)[SUB_PARSER_WORD_PARSERS_LENGTH
+            function(uint256, uint256, OperandV2) internal view returns (bool, bytes memory, uint256[] memory)[SUB_PARSER_WORD_PARSERS_LENGTH
                 + 1] memory pointersFixed = [
                     lengthPointer,
                     LibExternOpIntIncNPE2.subParser,
@@ -349,12 +349,12 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// relative to the bytecode of the current contract, not the test contract.
     function buildOpcodeFunctionPointers() external pure returns (bytes memory) {
         unchecked {
-            function(Operand, uint256[] memory) internal view returns (uint256[] memory) lengthPointer;
+            function(OperandV2, uint256[] memory) internal view returns (uint256[] memory) lengthPointer;
             uint256 length = OPCODE_FUNCTION_POINTERS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(Operand, uint256[] memory) internal view returns (uint256[] memory)[OPCODE_FUNCTION_POINTERS_LENGTH
+            function(OperandV2, uint256[] memory) internal view returns (uint256[] memory)[OPCODE_FUNCTION_POINTERS_LENGTH
                 + 1] memory pointersFixed = [lengthPointer, LibExternOpIntIncNPE2.run];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
@@ -379,12 +379,12 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// the current contract, not the test contract.
     function buildIntegrityFunctionPointers() external pure returns (bytes memory) {
         unchecked {
-            function(Operand, uint256, uint256) internal pure returns (uint256, uint256) lengthPointer;
+            function(OperandV2, uint256, uint256) internal pure returns (uint256, uint256) lengthPointer;
             uint256 length = OPCODE_FUNCTION_POINTERS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(Operand, uint256, uint256) internal pure returns (uint256, uint256)[OPCODE_FUNCTION_POINTERS_LENGTH
+            function(OperandV2, uint256, uint256) internal pure returns (uint256, uint256)[OPCODE_FUNCTION_POINTERS_LENGTH
                 + 1] memory pointersFixed = [lengthPointer, LibExternOpIntIncNPE2.integrity];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {

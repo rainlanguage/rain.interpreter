@@ -16,7 +16,7 @@ import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "../../src/error/ErrParse.sol";
 import {BadOpInputsLength, BadOpOutputsLength} from "../../src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
-    Operand,
+    OperandV2,
     IInterpreterV4,
     SourceIndexV2,
     IInterpreterStoreV2,
@@ -82,16 +82,16 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     }
 
     function opReferenceCheckIntegrity(
-        function(IntegrityCheckStateNP memory, Operand) view returns (uint256, uint256) integrityFn,
-        Operand operand,
+        function(IntegrityCheckStateNP memory, OperandV2) view returns (uint256, uint256) integrityFn,
+        OperandV2 operand,
         uint256[] memory constants,
         uint256[] memory inputs
     ) internal view returns (uint256) {
         IntegrityCheckStateNP memory integrityState = LibIntegrityCheckNP.newState("", 0, constants);
         (uint256 calcInputs, uint256 calcOutputs) = integrityFn(integrityState, operand);
         assertEq(calcInputs, inputs.length, "inputs length");
-        assertEq(calcInputs, (Operand.unwrap(operand) >> 0x10) & 0x0F, "operand inputs");
-        assertEq(calcOutputs, Operand.unwrap(operand) >> 0x14, "operand outputs");
+        assertEq(calcInputs, (OperandV2.unwrap(operand) >> 0x10) & 0x0F, "operand inputs");
+        assertEq(calcOutputs, OperandV2.unwrap(operand) >> 0x14, "operand outputs");
         return calcOutputs;
     }
 
@@ -137,9 +137,9 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
 
     function opReferenceCheckActual(
         InterpreterStateNP memory state,
-        Operand operand,
+        OperandV2 operand,
         ReferenceCheckPointers memory pointers,
-        function(InterpreterStateNP memory, Operand, Pointer) view returns (Pointer) runFn
+        function(InterpreterStateNP memory, OperandV2, Pointer) view returns (Pointer) runFn
     ) internal view {
         bytes32 stateFingerprintBefore = state.fingerprint();
         pointers.actualStackTopAfter = runFn(state, operand, pointers.stackTop);
@@ -150,8 +150,8 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
 
     function opReferenceCheckExpectations(
         InterpreterStateNP memory state,
-        Operand operand,
-        function(InterpreterStateNP memory, Operand, uint256[] memory) view returns (uint256[] memory) referenceFn,
+        OperandV2 operand,
+        function(InterpreterStateNP memory, OperandV2, uint256[] memory) view returns (uint256[] memory) referenceFn,
         ReferenceCheckPointers memory pointers,
         uint256[] memory inputs,
         uint256 calcOutputs
@@ -174,10 +174,10 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
 
     function opReferenceCheck(
         InterpreterStateNP memory state,
-        Operand operand,
-        function(InterpreterStateNP memory, Operand, uint256[] memory) view returns (uint256[] memory) referenceFn,
-        function(IntegrityCheckStateNP memory, Operand) view returns (uint256, uint256) integrityFn,
-        function(InterpreterStateNP memory, Operand, Pointer) view returns (Pointer) runFn,
+        OperandV2 operand,
+        function(InterpreterStateNP memory, OperandV2, uint256[] memory) view returns (uint256[] memory) referenceFn,
+        function(IntegrityCheckStateNP memory, OperandV2) view returns (uint256, uint256) integrityFn,
+        function(InterpreterStateNP memory, OperandV2, Pointer) view returns (Pointer) runFn,
         uint256[] memory inputs
     ) internal view {
         uint256 calcOutputs = opReferenceCheckIntegrity(integrityFn, operand, state.constants, inputs);

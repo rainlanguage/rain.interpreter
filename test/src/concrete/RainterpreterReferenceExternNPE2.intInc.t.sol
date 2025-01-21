@@ -14,7 +14,7 @@ import {
     EncodedExternDispatch,
     IInterpreterExternV3
 } from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {OPCODE_EXTERN} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
@@ -30,7 +30,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
 
         uint256 intIncOpcode = 0;
 
-        ExternDispatch externDispatch = LibExtern.encodeExternDispatch(intIncOpcode, Operand.wrap(0));
+        ExternDispatch externDispatch = LibExtern.encodeExternDispatch(intIncOpcode, OperandV2.wrap(0));
         EncodedExternDispatch encodedExternDispatch = LibExtern.encodeExternCall(extern, externDispatch);
 
         assertEq(
@@ -100,9 +100,9 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
         // implementation includes both.
         assertEq(address(decodedExtern), address(subParser));
 
-        (uint256 opcode, Operand operand) = LibExtern.decodeExternDispatch(decodedExternDispatch);
+        (uint256 opcode, OperandV2 operand) = LibExtern.decodeExternDispatch(decodedExternDispatch);
         assertEq(opcode, OP_INDEX_INCREMENT);
-        assertEq(Operand.unwrap(operand), 0);
+        assertEq(OperandV2.unwrap(operand), 0);
     }
 
     /// Directly test the subparsing of the reference extern opcode. Check that
@@ -132,7 +132,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
     /// Test the inc library directly. The run function should increment every
     /// value it is passed by 1.
     /// forge-config: default.fuzz.runs = 100
-    function testRainterpreterReferenceExternNPE2IntIncRun(Operand operand, uint256[] memory inputs) external pure {
+    function testRainterpreterReferenceExternNPE2IntIncRun(OperandV2 operand, uint256[] memory inputs) external pure {
         uint256[] memory expectedOutputs = new uint256[](inputs.length);
         for (uint256 i = 0; i < inputs.length; i++) {
             inputs[i] = bound(inputs[i], 0, uint256(int256(type(int128).max)));
@@ -151,7 +151,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
     /// Test the inc library directly. The integrity function should return the
     /// same inputs and outputs.
     /// forge-config: default.fuzz.runs = 100
-    function testRainterpreterReferenceExternNPE2IntIncIntegrity(Operand operand, uint256 inputs, uint256 outputs)
+    function testRainterpreterReferenceExternNPE2IntIncIntegrity(OperandV2 operand, uint256 inputs, uint256 outputs)
         external
         pure
     {

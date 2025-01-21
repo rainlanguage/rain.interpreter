@@ -8,7 +8,7 @@ import {ISubParserV3, AuthoringMetaV2} from "rain.interpreter.interface/interfac
 import {IncompatibleSubParser} from "../error/ErrSubParse.sol";
 import {LibSubParse, ParseState, CURRENT_COMPATIBILITY} from "../lib/parse/LibSubParse.sol";
 import {CMASK_RHS_WORD_TAIL} from "rain.string/lib/parse/LibParseCMask.sol";
-import {LibParse, Operand} from "../lib/parse/LibParse.sol";
+import {LibParse, OperandV2} from "../lib/parse/LibParse.sol";
 import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {LibParseOperand} from "../lib/parse/LibParseOperand.sol";
 import {IDescribedByMetaV1} from "rain.metadata/interface/IDescribedByMetaV1.sol";
@@ -216,8 +216,8 @@ abstract contract BaseRainterpreterSubParserNPE2 is
         (cursor, word) = LibParse.parseWord(cursor, end, CMASK_RHS_WORD_TAIL);
         (bool exists, uint256 index) = LibParseMeta.lookupWord(state.meta, word);
         if (exists) {
-            Operand operand = state.handleOperand(index);
-            function (uint256, uint256, Operand) internal pure returns (bool, bytes memory, uint256[] memory) subParser;
+            OperandV2 operand = state.handleOperand(index);
+            function (uint256, uint256, OperandV2) internal pure returns (bool, bytes memory, uint256[] memory) subParser;
             bytes memory localSubParserWordParsers = subParserWordParsers();
             assembly ("memory-safe") {
                 subParser := and(mload(add(localSubParserWordParsers, mul(add(index, 1), 2))), 0xFFFF)

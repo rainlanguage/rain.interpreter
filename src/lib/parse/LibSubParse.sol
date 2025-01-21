@@ -7,7 +7,7 @@ import {
     OPCODE_EXTERN,
     OPCODE_CONSTANT,
     OPCODE_CONTEXT,
-    Operand
+    OperandV2
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibBytecode, Pointer} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {ISubParserV3, COMPATIBILITY_V5} from "rain.interpreter.interface/interface/ISubParserV3.sol";
@@ -115,7 +115,7 @@ library LibSubParse {
         IInterpreterExternV3 extern,
         uint256 constantsHeight,
         uint256 ioByte,
-        Operand operand,
+        OperandV2 operand,
         uint256 opcodeIndex
     ) internal pure returns (bool, bytes memory, uint256[] memory) {
         // The constants height is an error check because the main parser can

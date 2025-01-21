@@ -1,10 +1,10 @@
-// // SPDX-License-Identifier: CAL
-// pragma solidity =0.8.25;
+// SPDX-License-Identifier: CAL
+pragma solidity =0.8.25;
 
 // import {stdError} from "forge-std/Test.sol";
 // import {OpTest} from "test/abstract/OpTest.sol";
 // import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
-// import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+// import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 // import {LibOpERC20TotalSupply} from "src/lib/op/erc20/LibOpERC20TotalSupply.sol";
 // import {IERC20} from "openzeppelin-contracts/contracts/interfaces/IERC20.sol";
 // import {UnexpectedOperand} from "src/error/ErrParse.sol";

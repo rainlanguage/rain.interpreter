@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibOpEncodeBitsNP} from "./LibOpEncodeBitsNP.sol";
@@ -12,7 +12,7 @@ import {LibOpEncodeBitsNP} from "./LibOpEncodeBitsNP.sol";
 /// with LibOpEncodeBitsNP.
 library LibOpDecodeBitsNP {
     /// Decode takes a single value and returns the decoded value.
-    function integrity(IntegrityCheckStateNP memory state, Operand operand) internal pure returns (uint256, uint256) {
+    function integrity(IntegrityCheckStateNP memory state, OperandV2 operand) internal pure returns (uint256, uint256) {
         // Use exact same integrity check as encode other than the return values.
         // All we're interested in is the errors that might be thrown.
         //slither-disable-next-line unused-return
@@ -21,7 +21,7 @@ library LibOpDecodeBitsNP {
         return (1, 1);
     }
 
-    function run(InterpreterStateNP memory, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
+    function run(InterpreterStateNP memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         unchecked {
             uint256 value;
             assembly ("memory-safe") {
@@ -31,8 +31,8 @@ library LibOpDecodeBitsNP {
             // We decode as a start and length of bits. This avoids mistakes such as
             // inclusive/exclusive ranges, and makes it easier to reason about the
             // encoding.
-            uint256 startBit = Operand.unwrap(operand) & 0xFF;
-            uint256 length = (Operand.unwrap(operand) >> 8) & 0xFF;
+            uint256 startBit = OperandV2.unwrap(operand) & 0xFF;
+            uint256 length = (OperandV2.unwrap(operand) >> 8) & 0xFF;
 
             // Build a bitmask of desired length. Max length is uint8 max which
             // is 255. A 256 length doesn't really make sense as that isn't an
@@ -48,7 +48,7 @@ library LibOpDecodeBitsNP {
         }
     }
 
-    function referenceFn(InterpreterStateNP memory, Operand operand, uint256[] memory inputs)
+    function referenceFn(InterpreterStateNP memory, OperandV2 operand, uint256[] memory inputs)
         internal
         pure
         returns (uint256[] memory outputs)
@@ -56,8 +56,8 @@ library LibOpDecodeBitsNP {
         // We decode as a start and length of bits. This avoids mistakes such as
         // inclusive/exclusive ranges, and makes it easier to reason about the
         // encoding.
-        uint256 startBit = Operand.unwrap(operand) & 0xFF;
-        uint256 length = (Operand.unwrap(operand) >> 8) & 0xFF;
+        uint256 startBit = OperandV2.unwrap(operand) & 0xFF;
+        uint256 length = (OperandV2.unwrap(operand) >> 8) & 0xFF;
 
         // Build a bitmask of desired length. Max length is uint8 max which
         // is 255. A 256 length doesn't really make sense as that isn't an

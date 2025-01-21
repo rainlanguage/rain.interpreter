@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {
     IInterpreterExternV3,
     ExternDispatch,
@@ -18,13 +18,13 @@ library LibExtern {
     /// - bits [16,32): the opcode
     /// IMPORTANT: The encoding process does not check that either the opcode or
     /// operand fit within 16 bits. This is the responsibility of the caller.
-    function encodeExternDispatch(uint256 opcode, Operand operand) internal pure returns (ExternDispatch) {
-        return ExternDispatch.wrap(opcode << 0x10 | Operand.unwrap(operand));
+    function encodeExternDispatch(uint256 opcode, OperandV2 operand) internal pure returns (ExternDispatch) {
+        return ExternDispatch.wrap(bytes32(opcode) << 0x10 | OperandV2.unwrap(operand));
     }
 
     /// Inverse of `encodeExternDispatch`.
-    function decodeExternDispatch(ExternDispatch dispatch) internal pure returns (uint256, Operand) {
-        return (ExternDispatch.unwrap(dispatch) >> 0x10, Operand.wrap(uint16(ExternDispatch.unwrap(dispatch))));
+    function decodeExternDispatch(ExternDispatch dispatch) internal pure returns (uint256, OperandV2) {
+        return (ExternDispatch.unwrap(dispatch) >> 0x10, OperandV2.wrap(uint16(ExternDispatch.unwrap(dispatch))));
     }
 
     /// Encodes an extern address and dispatch pair into a single 32-byte word.

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
@@ -14,9 +14,9 @@ error OutOfBoundsConstantRead(uint256 opIndex, uint256 constantsLength, uint256 
 /// Integrated deeply into LibParse, which requires this opcode or a variant
 /// to be present at a known opcode index.
 library LibOpConstantNP {
-    function integrity(IntegrityCheckStateNP memory state, Operand operand) internal pure returns (uint256, uint256) {
+    function integrity(IntegrityCheckStateNP memory state, OperandV2 operand) internal pure returns (uint256, uint256) {
         // Operand is the index so ensure it doesn't exceed the constants length.
-        uint256 constantIndex = Operand.unwrap(operand) & 0xFFFF;
+        uint256 constantIndex = OperandV2.unwrap(operand) & 0xFFFF;
         if (constantIndex >= state.constants.length) {
             revert OutOfBoundsConstantRead(state.opIndex, state.constants.length, constantIndex);
         }
@@ -25,7 +25,7 @@ library LibOpConstantNP {
         return (0, 1);
     }
 
-    function run(InterpreterStateNP memory state, Operand operand, Pointer stackTop) internal pure returns (Pointer) {
+    function run(InterpreterStateNP memory state, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256[] memory constants = state.constants;
         // Skip index OOB check and rely on integrity check for that.
         assembly ("memory-safe") {
@@ -36,12 +36,12 @@ library LibOpConstantNP {
         return stackTop;
     }
 
-    function referenceFn(InterpreterStateNP memory state, Operand operand, uint256[] memory)
+    function referenceFn(InterpreterStateNP memory state, OperandV2 operand, uint256[] memory)
         internal
         pure
         returns (uint256[] memory outputs)
     {
-        uint256 index = Operand.unwrap(operand) & 0xFFFF;
+        uint256 index = OperandV2.unwrap(operand) & 0xFFFF;
         outputs = new uint256[](1);
         outputs[0] = state.constants[index];
     }

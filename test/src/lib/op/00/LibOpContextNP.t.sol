@@ -8,7 +8,7 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {
     IInterpreterV4,
-    Operand,
+    OperandV2,
     SourceIndexV2,
     FullyQualifiedNamespace,
     EvalV4
@@ -25,7 +25,7 @@ contract LibOpContextNPTest is OpTest {
     /// Directly test the integrity logic of LibOpContextNP. All operands are
     /// valid, so the integrity check should always pass. The inputs and
     /// outputs are always 0 and 1 respectively.
-    function testOpContextNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
+    function testOpContextNPIntegrity(IntegrityCheckStateNP memory state, OperandV2 operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpContextNP.integrity(state, operand);
 
         assertEq(calcInputs, 0, "inputs");
@@ -44,7 +44,7 @@ contract LibOpContextNPTest is OpTest {
         vm.assume(state.context[i].length > 0);
         vm.assume(state.context[i].length < type(uint8).max);
         j = bound(j, 0, state.context[i].length - 1);
-        Operand operand = LibOperand.build(0, 1, uint16(uint256(i) | uint256(j) << 8));
+        OperandV2 operand = LibOperand.build(0, 1, uint16(uint256(i) | uint256(j) << 8));
         uint256[] memory inputs = new uint256[](0);
         opReferenceCheck(
             state, operand, LibOpContextNP.referenceFn, LibOpContextNP.integrity, LibOpContextNP.run, inputs
@@ -60,7 +60,7 @@ contract LibOpContextNPTest is OpTest {
         vm.assume(state.context.length < type(uint8).max);
         i = bound(i, state.context.length, type(uint8).max);
         j = bound(j, 0, type(uint8).max);
-        Operand operand = LibOperand.build(0, 1, uint16(uint256(i) | uint256(j) << 8));
+        OperandV2 operand = LibOperand.build(0, 1, uint16(uint256(i) | uint256(j) << 8));
         uint256[] memory inputs = new uint256[](0);
         vm.expectRevert(stdError.indexOOBError);
         opReferenceCheck(
@@ -79,7 +79,7 @@ contract LibOpContextNPTest is OpTest {
         i = bound(i, 0, state.context.length - 1);
         vm.assume(state.context[i].length < type(uint8).max);
         j = bound(j, state.context[i].length, type(uint8).max);
-        Operand operand = LibOperand.build(0, 1, uint16(uint256(i) | uint256(j) << 8));
+        OperandV2 operand = LibOperand.build(0, 1, uint16(uint256(i) | uint256(j) << 8));
         uint256[] memory inputs = new uint256[](0);
         vm.expectRevert(stdError.indexOOBError);
         opReferenceCheck(

@@ -8,7 +8,7 @@ import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {
     IInterpreterV4,
     FullyQualifiedNamespace,
-    Operand,
+    OperandV2,
     SourceIndexV2
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
@@ -22,7 +22,7 @@ import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 contract LibOpCtPopNPTest is OpTest {
     /// Directly test the integrity logic of LibOpCtPopNP. All possible operands
     /// result in the same number of inputs and outputs, (1, 1).
-    function testOpCtPopNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
+    function testOpCtPopNPIntegrity(IntegrityCheckStateNP memory state, OperandV2 operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpCtPopNP.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
@@ -34,7 +34,7 @@ contract LibOpCtPopNPTest is OpTest {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = x;
-        Operand operand = LibOperand.build(1, 1, 0);
+        OperandV2 operand = LibOperand.build(1, 1, 0);
         opReferenceCheck(state, operand, LibOpCtPopNP.referenceFn, LibOpCtPopNP.integrity, LibOpCtPopNP.run, inputs);
     }
 

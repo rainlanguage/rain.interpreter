@@ -3,7 +3,7 @@ pragma solidity ^0.8.18;
 
 import {NotAnExternContract} from "../../../error/ErrExtern.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {
@@ -27,8 +27,8 @@ error BadOutputsLength(uint256 expectedLength, uint256 actualLength);
 library LibOpExternNP {
     using LibUint256Array for uint256[];
 
-    function integrity(IntegrityCheckStateNP memory state, Operand operand) internal view returns (uint256, uint256) {
-        uint256 encodedExternDispatchIndex = Operand.unwrap(operand) & 0xFFFF;
+    function integrity(IntegrityCheckStateNP memory state, OperandV2 operand) internal view returns (uint256, uint256) {
+        uint256 encodedExternDispatchIndex = OperandV2.unwrap(operand) & 0xFFFF;
 
         EncodedExternDispatch encodedExternDispatch =
             EncodedExternDispatch.wrap(state.constants[encodedExternDispatchIndex]);
@@ -36,16 +36,16 @@ library LibOpExternNP {
         if (!ERC165Checker.supportsInterface(address(extern), type(IInterpreterExternV3).interfaceId)) {
             revert NotAnExternContract(address(extern));
         }
-        uint256 expectedInputsLength = (Operand.unwrap(operand) >> 0x10) & 0x0F;
-        uint256 expectedOutputsLength = (Operand.unwrap(operand) >> 0x14) & 0x0F;
+        uint256 expectedInputsLength = (OperandV2.unwrap(operand) >> 0x10) & 0x0F;
+        uint256 expectedOutputsLength = (OperandV2.unwrap(operand) >> 0x14) & 0x0F;
         //slither-disable-next-line unused-return
         return extern.externIntegrity(dispatch, expectedInputsLength, expectedOutputsLength);
     }
 
-    function run(InterpreterStateNP memory state, Operand operand, Pointer stackTop) internal view returns (Pointer) {
-        uint256 encodedExternDispatchIndex = Operand.unwrap(operand) & 0xFFFF;
-        uint256 inputsLength = (Operand.unwrap(operand) >> 0x10) & 0x0F;
-        uint256 outputsLength = (Operand.unwrap(operand) >> 0x14) & 0x0F;
+    function run(InterpreterStateNP memory state, OperandV2 operand, Pointer stackTop) internal view returns (Pointer) {
+        uint256 encodedExternDispatchIndex = OperandV2.unwrap(operand) & 0xFFFF;
+        uint256 inputsLength = (OperandV2.unwrap(operand) >> 0x10) & 0x0F;
+        uint256 outputsLength = (OperandV2.unwrap(operand) >> 0x14) & 0x0F;
 
         uint256 encodedExternDispatch = state.constants[encodedExternDispatchIndex];
         (IInterpreterExternV3 extern, ExternDispatch dispatch) =
@@ -90,13 +90,13 @@ library LibOpExternNP {
         return stackTop;
     }
 
-    function referenceFn(InterpreterStateNP memory state, Operand operand, uint256[] memory inputs)
+    function referenceFn(InterpreterStateNP memory state, OperandV2 operand, uint256[] memory inputs)
         internal
         view
         returns (uint256[] memory outputs)
     {
-        uint256 encodedExternDispatchIndex = Operand.unwrap(operand) & 0xFFFF;
-        uint256 outputsLength = (Operand.unwrap(operand) >> 0x14) & 0x0F;
+        uint256 encodedExternDispatchIndex = OperandV2.unwrap(operand) & 0xFFFF;
+        uint256 outputsLength = (OperandV2.unwrap(operand) >> 0x14) & 0x0F;
 
         uint256 encodedExternDispatch = state.constants[encodedExternDispatchIndex];
         (IInterpreterExternV3 extern, ExternDispatch dispatch) =

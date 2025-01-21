@@ -12,7 +12,7 @@ import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
 import {
     IInterpreterV4,
-    Operand,
+    OperandV2,
     SourceIndexV2,
     EvalV4
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
@@ -42,7 +42,7 @@ contract LibOpHashNPTest is OpTest {
     ) external pure {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
-        Operand operand = LibOperand.build(inputs, outputs, operandData);
+        OperandV2 operand = LibOperand.build(inputs, outputs, operandData);
         (uint256 calcInputs, uint256 calcOutputs) = LibOpHashNP.integrity(state, operand);
 
         assertEq(inputs, calcInputs);
@@ -53,7 +53,7 @@ contract LibOpHashNPTest is OpTest {
     function testOpHashNPRun(uint256[] memory inputs) external view {
         vm.assume(inputs.length <= 0x0F);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
-        Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
+        OperandV2 operand = LibOperand.build(uint8(inputs.length), 1, 0);
         opReferenceCheck(state, operand, LibOpHashNP.referenceFn, LibOpHashNP.integrity, LibOpHashNP.run, inputs);
     }
 

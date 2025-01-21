@@ -25,7 +25,7 @@ import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
 import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 import {LibParseOperand} from "./LibParseOperand.sol";
-import {Operand, OPCODE_STACK, OPCODE_UNKNOWN} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, OPCODE_STACK, OPCODE_UNKNOWN} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibParseStackName} from "./LibParseStackName.sol";
 import {
     ExcessLHSItems,
@@ -207,7 +207,7 @@ library LibParse {
                     (bool exists, uint256 opcodeIndex) = LibParseMeta.lookupWord(state.meta, word);
                     if (exists) {
                         cursor = state.parseOperand(cursor, end);
-                        Operand operand = state.handleOperand(opcodeIndex);
+                        OperandV2 operand = state.handleOperand(opcodeIndex);
                         state.pushOpToSource(opcodeIndex, operand);
                         // This is a real word so we expect to see parens
                         // after it.
@@ -217,14 +217,14 @@ library LibParse {
                     else {
                         (exists, opcodeIndex) = state.stackNameIndex(word);
                         if (exists) {
-                            state.pushOpToSource(OPCODE_STACK, Operand.wrap(opcodeIndex));
+                            state.pushOpToSource(OPCODE_STACK, OperandV2.wrap(opcodeIndex));
                             // Need to process highwater here because we
                             // don't have any parens to open or close.
                             state.highwater();
                         }
                         // Fallback to sub parsing.
                         else {
-                            Operand operand;
+                            OperandV2 operand;
                             bytes memory subParserBytecode;
 
                             {

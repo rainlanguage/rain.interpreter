@@ -7,7 +7,7 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {LibOpSetNP} from "src/lib/op/store/LibOpSetNP.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpSetNPTest is OpTest {
@@ -32,7 +32,7 @@ contract LibOpSetNPTest is OpTest {
     /// Directly test the runtime logic of LibOpSetNP.
     function testLibOpSetNP(uint256 key, uint256 value) public view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
-        Operand operand = Operand.wrap(uint256(2) << 0x10);
+        OperandV2 operand = OperandV2.wrap(uint256(2) << 0x10);
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = key;
         inputs[1] = value;

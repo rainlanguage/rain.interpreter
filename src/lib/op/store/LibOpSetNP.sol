@@ -3,7 +3,7 @@ pragma solidity ^0.8.18;
 
 import {MemoryKV, MemoryKVKey, MemoryKVVal, LibMemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
@@ -12,13 +12,13 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 library LibOpSetNP {
     using LibMemoryKV for MemoryKV;
 
-    function integrity(IntegrityCheckStateNP memory, Operand) internal pure returns (uint256, uint256) {
+    function integrity(IntegrityCheckStateNP memory, OperandV2) internal pure returns (uint256, uint256) {
         // Always 2 inputs. The key and the value. `hash()` is recommended to
         // build compound keys.
         return (2, 0);
     }
 
-    function run(InterpreterStateNP memory state, Operand, Pointer stackTop) internal pure returns (Pointer) {
+    function run(InterpreterStateNP memory state, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
         unchecked {
             uint256 key;
             uint256 value;
@@ -33,7 +33,7 @@ library LibOpSetNP {
         }
     }
 
-    function referenceFn(InterpreterStateNP memory state, Operand, uint256[] memory inputs)
+    function referenceFn(InterpreterStateNP memory state, OperandV2, uint256[] memory inputs)
         internal
         pure
         returns (uint256[] memory)

@@ -4,7 +4,7 @@ pragma solidity ^0.8.19;
 import {BadDynamicLength} from "../../error/ErrOpList.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV2.sol";
 import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "../integrity/LibIntegrityCheckNP.sol";
 import {LibInterpreterStateNP, InterpreterStateNP} from "../state/LibInterpreterStateNP.sol";
@@ -348,12 +348,12 @@ library LibAllStandardOpsNP {
 
     function operandHandlerFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
-            function (uint256[] memory) internal pure returns (Operand) lengthPointer;
+            function (uint256[] memory) internal pure returns (OperandV2) lengthPointer;
             uint256 length = ALL_STANDARD_OPS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function (uint256[] memory) internal pure returns (Operand)[ALL_STANDARD_OPS_LENGTH + 1] memory
+            function (uint256[] memory) internal pure returns (OperandV2)[ALL_STANDARD_OPS_LENGTH + 1] memory
                 pointersFixed = [
                     lengthPointer,
                     // stack
@@ -522,14 +522,14 @@ library LibAllStandardOpsNP {
 
     function integrityFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
-            function(IntegrityCheckStateNP memory, Operand)
+            function(IntegrityCheckStateNP memory, OperandV2)
                 view
                 returns (uint256, uint256) lengthPointer;
             uint256 length = ALL_STANDARD_OPS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(IntegrityCheckStateNP memory, Operand)
+            function(IntegrityCheckStateNP memory, OperandV2)
                 view
                 returns (uint256, uint256)[ALL_STANDARD_OPS_LENGTH + 1] memory pointersFixed = [
                     lengthPointer,
@@ -634,14 +634,14 @@ library LibAllStandardOpsNP {
     /// method can just be a thin wrapper around this function.
     function opcodeFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
-            function(InterpreterStateNP memory, Operand, Pointer)
+            function(InterpreterStateNP memory, OperandV2, Pointer)
                 view
                 returns (Pointer) lengthPointer;
             uint256 length = ALL_STANDARD_OPS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(InterpreterStateNP memory, Operand, Pointer)
+            function(InterpreterStateNP memory, OperandV2, Pointer)
                 view
                 returns (Pointer)[ALL_STANDARD_OPS_LENGTH + 1] memory pointersFixed = [
                     lengthPointer,

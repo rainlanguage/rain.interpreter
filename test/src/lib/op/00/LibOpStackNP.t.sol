@@ -5,7 +5,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
 import {
     IInterpreterV4,
-    Operand,
+    OperandV2,
     SourceIndexV2,
     EvalV4
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
@@ -35,10 +35,10 @@ contract LibOpStackNPTest is OpTest {
         bytes memory bytecode,
         uint256 stackIndex,
         uint256[] memory constants,
-        Operand operand
+        OperandV2 operand
     ) external pure {
         stackIndex = bound(stackIndex, 1, type(uint256).max);
-        operand = Operand.wrap(bound(Operand.unwrap(operand), 0, stackIndex - 1));
+        operand = OperandV2.wrap(bound(OperandV2.unwrap(operand), 0, stackIndex - 1));
         IntegrityCheckStateNP memory state = LibIntegrityCheckNP.newState(bytecode, stackIndex, constants);
 
         (uint256 inputs, uint256 outputs) = LibOpStackNP.integrity(state, operand);
@@ -59,7 +59,7 @@ contract LibOpStackNPTest is OpTest {
     ) external {
         stackIndex = uint16(bound(stackIndex, 0, uint256(type(uint16).max)));
         readIndex = uint16(bound(readIndex, stackIndex, uint256(type(uint16).max)));
-        Operand operand = LibOperand.build(0, 1, readIndex);
+        OperandV2 operand = LibOperand.build(0, 1, readIndex);
         IntegrityCheckStateNP memory state = LibIntegrityCheckNP.newState(bytecode, stackIndex, constants);
         state.opIndex = opIndex;
 
@@ -106,7 +106,7 @@ contract LibOpStackNPTest is OpTest {
         bytes32 stateFingerprintBefore = state.fingerprint();
 
         // Run the opcode.
-        Pointer stackTopAfter = LibOpStackNP.run(state, Operand.wrap(stackIndex), stackTop);
+        Pointer stackTopAfter = LibOpStackNP.run(state, OperandV2.wrap(stackIndex), stackTop);
 
         assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(expectedStackTopAfter));
 

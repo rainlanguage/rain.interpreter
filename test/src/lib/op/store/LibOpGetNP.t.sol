@@ -9,7 +9,7 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {LibOpGetNP} from "src/lib/op/store/LibOpGetNP.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2, StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
@@ -42,7 +42,7 @@ contract LibOpGetNPTest is OpTest {
     /// Test that if the key is not in the store or state the value is 0.
     function testLibOpGetNPRunUnset(uint256 key, uint16 operandData) public view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
-        Operand operand = LibOperand.build(1, 1, operandData);
+        OperandV2 operand = LibOperand.build(1, 1, operandData);
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = key;
         state.stateKV = MemoryKV.wrap(0);
@@ -72,7 +72,7 @@ contract LibOpGetNPTest is OpTest {
     /// Test that if the key is in the store the value is fetched from the store.
     function testLibOpGetNPRunStore(uint256 key, uint256 value, uint16 operandData) public {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
-        Operand operand = LibOperand.build(1, 1, operandData);
+        OperandV2 operand = LibOperand.build(1, 1, operandData);
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = key;
         state.stateKV = MemoryKV.wrap(0);
@@ -105,7 +105,7 @@ contract LibOpGetNPTest is OpTest {
     /// Test that if the key is in the state the value is fetched from the state.
     function testLibOpGetNPRunState(uint256 key, uint256 value, uint16 operandData) public view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
-        Operand operand = LibOperand.build(1, 1, operandData);
+        OperandV2 operand = LibOperand.build(1, 1, operandData);
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = key;
         state.stateKV = MemoryKV.wrap(0);
@@ -141,7 +141,7 @@ contract LibOpGetNPTest is OpTest {
         public
     {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
-        Operand operand = LibOperand.build(1, 1, operandData);
+        OperandV2 operand = LibOperand.build(1, 1, operandData);
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = key;
         state.stateKV = MemoryKV.wrap(0);
@@ -176,7 +176,7 @@ contract LibOpGetNPTest is OpTest {
     /// to the state, then get cannot see it.
     function testLibOpGetNPRunStoreDifferentNamespace(uint256 key, uint256 value, uint16 operandData) public {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
-        Operand operand = LibOperand.build(1, 1, operandData);
+        OperandV2 operand = LibOperand.build(1, 1, operandData);
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = key;
         state.stateKV = MemoryKV.wrap(0);

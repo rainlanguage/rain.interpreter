@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibInterpreterStateNP, InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 import {Pointer, LibPointer} from "rain.solmem/lib/LibPointer.sol";
@@ -73,9 +73,9 @@ error CallOutputsExceedSource(uint256 sourceOutputs, uint256 outputs);
 library LibOpCallNP {
     using LibPointer for Pointer;
 
-    function integrity(IntegrityCheckStateNP memory state, Operand operand) internal pure returns (uint256, uint256) {
-        uint256 sourceIndex = Operand.unwrap(operand) & 0xFFFF;
-        uint256 outputs = Operand.unwrap(operand) >> 0x14;
+    function integrity(IntegrityCheckStateNP memory state, OperandV2 operand) internal pure returns (uint256, uint256) {
+        uint256 sourceIndex = OperandV2.unwrap(operand) & 0xFFFF;
+        uint256 outputs = OperandV2.unwrap(operand) >> 0x14;
 
         (uint256 sourceInputs, uint256 sourceOutputs) =
             LibBytecode.sourceInputsOutputsLength(state.bytecode, sourceIndex);
@@ -91,11 +91,11 @@ library LibOpCallNP {
     /// number of outputs, and a number of inputs. It then runs the standard
     /// eval loop for the source, with a starting stack pointer above the inputs,
     /// and then copies the outputs to the calling stack.
-    function run(InterpreterStateNP memory state, Operand operand, Pointer stackTop) internal view returns (Pointer) {
+    function run(InterpreterStateNP memory state, OperandV2 operand, Pointer stackTop) internal view returns (Pointer) {
         // Extract config from the operand.
-        uint256 sourceIndex = Operand.unwrap(operand) & 0xFFFF;
-        uint256 inputs = (Operand.unwrap(operand) >> 0x10) & 0x0F;
-        uint256 outputs = Operand.unwrap(operand) >> 0x14;
+        uint256 sourceIndex = OperandV2.unwrap(operand) & 0xFFFF;
+        uint256 inputs = (OperandV2.unwrap(operand) >> 0x10) & 0x0F;
+        uint256 outputs = OperandV2.unwrap(operand) >> 0x14;
 
         // Copy inputs in. The inputs have to be copied in reverse order so that
         // the top of the stack from the perspective of `call`, i.e. the first

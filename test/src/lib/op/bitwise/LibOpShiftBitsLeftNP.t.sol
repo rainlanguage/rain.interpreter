@@ -8,7 +8,7 @@ import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {
     IInterpreterV4,
     FullyQualifiedNamespace,
-    Operand,
+    OperandV2,
     SourceIndexV2
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
@@ -31,7 +31,7 @@ contract LibOpShiftBitsLeftNPTest is OpTest {
         vm.assume(shiftAmount != 0);
         inputs = uint8(bound(inputs, 1, 0x0F));
         outputs = uint8(bound(outputs, 1, 0x0F));
-        Operand operand = LibOperand.build(inputs, outputs, shiftAmount);
+        OperandV2 operand = LibOperand.build(inputs, outputs, shiftAmount);
         (uint256 calcInputs, uint256 calcOutputs) = LibOpShiftBitsLeftNP.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
@@ -45,7 +45,7 @@ contract LibOpShiftBitsLeftNPTest is OpTest {
     {
         inputs = uint8(bound(inputs, 0, 0x0F));
         uint256 shiftAmount = bound(uint256(shiftAmount16), uint256(type(uint8).max) + 1, type(uint16).max);
-        Operand operand = LibOperand.build(inputs, 1, uint16(shiftAmount));
+        OperandV2 operand = LibOperand.build(inputs, 1, uint16(shiftAmount));
         vm.expectRevert(abi.encodeWithSelector(UnsupportedBitwiseShiftAmount.selector, shiftAmount));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpShiftBitsLeftNP.integrity(state, operand);
         (calcInputs, calcOutputs);
@@ -55,7 +55,7 @@ contract LibOpShiftBitsLeftNPTest is OpTest {
     /// any shift amount that is a noop (0) will error as an unsupported shift
     /// amount.
     function testOpShiftBitsLeftNPIntegrityNoop(IntegrityCheckStateNP memory state, uint8 inputs) external {
-        Operand operand = Operand.wrap(uint256(inputs) << 0x10);
+        OperandV2 operand = OperandV2.wrap(uint256(inputs) << 0x10);
         vm.expectRevert(abi.encodeWithSelector(UnsupportedBitwiseShiftAmount.selector, 0));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpShiftBitsLeftNP.integrity(state, operand);
         (calcInputs, calcOutputs);
@@ -68,7 +68,7 @@ contract LibOpShiftBitsLeftNPTest is OpTest {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = x;
-        Operand operand = LibOperand.build(1, 1, shiftAmount);
+        OperandV2 operand = LibOperand.build(1, 1, shiftAmount);
         opReferenceCheck(
             state,
             operand,

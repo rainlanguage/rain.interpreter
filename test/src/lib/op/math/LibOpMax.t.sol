@@ -1,5 +1,5 @@
-// // SPDX-License-Identifier: CAL
-// pragma solidity =0.8.25;
+// SPDX-License-Identifier: CAL
+pragma solidity =0.8.25;
 
 // import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
@@ -9,7 +9,7 @@
 // import {LibOpMax} from "src/lib/op/math/LibOpMax.sol";
 // import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 // import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
-// import {Operand} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+// import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 // import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 // contract LibOpMaxTest is OpTest {
