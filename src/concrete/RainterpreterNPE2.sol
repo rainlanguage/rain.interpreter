@@ -13,7 +13,12 @@ import {LibEvalNP} from "../lib/eval/LibEvalNP.sol";
 import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
 import {InterpreterStateNP} from "../lib/state/LibInterpreterStateNP.sol";
 import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
-import {IInterpreterV4, SourceIndexV2, EvalV4} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {
+    IInterpreterV4,
+    SourceIndexV2,
+    EvalV4,
+    StackItem
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {
     BYTECODE_HASH as INTERPRETER_BYTECODE_HASH,
     OPCODE_FUNCTION_POINTERS
@@ -28,7 +33,13 @@ contract RainterpreterNPE2 is IInterpreterV4, IOpcodeToolingV1, ERC165 {
     using LibInterpreterStateDataContractNP for bytes;
 
     /// @inheritdoc IInterpreterV4
-    function eval4(EvalV4 calldata eval) external view virtual override returns (bytes32[] memory, bytes32[] memory) {
+    function eval4(EvalV4 calldata eval)
+        external
+        view
+        virtual
+        override
+        returns (StackItem[] memory, bytes32[] memory)
+    {
         InterpreterStateNP memory state = eval.bytecode.unsafeDeserializeNP(
             SourceIndexV2.unwrap(eval.sourceIndex), eval.namespace, eval.store, eval.context, OPCODE_FUNCTION_POINTERS
         );

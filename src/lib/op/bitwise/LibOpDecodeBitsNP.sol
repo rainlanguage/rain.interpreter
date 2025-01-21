@@ -12,7 +12,11 @@ import {LibOpEncodeBitsNP} from "./LibOpEncodeBitsNP.sol";
 /// with LibOpEncodeBitsNP.
 library LibOpDecodeBitsNP {
     /// Decode takes a single value and returns the decoded value.
-    function integrity(IntegrityCheckStateNP memory state, OperandV2 operand) internal pure returns (uint256, uint256) {
+    function integrity(IntegrityCheckStateNP memory state, OperandV2 operand)
+        internal
+        pure
+        returns (uint256, uint256)
+    {
         // Use exact same integrity check as encode other than the return values.
         // All we're interested in is the errors that might be thrown.
         //slither-disable-next-line unused-return

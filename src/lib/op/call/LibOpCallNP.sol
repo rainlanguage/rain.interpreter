@@ -73,7 +73,11 @@ error CallOutputsExceedSource(uint256 sourceOutputs, uint256 outputs);
 library LibOpCallNP {
     using LibPointer for Pointer;
 
-    function integrity(IntegrityCheckStateNP memory state, OperandV2 operand) internal pure returns (uint256, uint256) {
+    function integrity(IntegrityCheckStateNP memory state, OperandV2 operand)
+        internal
+        pure
+        returns (uint256, uint256)
+    {
         uint256 sourceIndex = OperandV2.unwrap(operand) & 0xFFFF;
         uint256 outputs = OperandV2.unwrap(operand) >> 0x14;
 
@@ -91,7 +95,11 @@ library LibOpCallNP {
     /// number of outputs, and a number of inputs. It then runs the standard
     /// eval loop for the source, with a starting stack pointer above the inputs,
     /// and then copies the outputs to the calling stack.
-    function run(InterpreterStateNP memory state, OperandV2 operand, Pointer stackTop) internal view returns (Pointer) {
+    function run(InterpreterStateNP memory state, OperandV2 operand, Pointer stackTop)
+        internal
+        view
+        returns (Pointer)
+    {
         // Extract config from the operand.
         uint256 sourceIndex = OperandV2.unwrap(operand) & 0xFFFF;
         uint256 inputs = (OperandV2.unwrap(operand) >> 0x10) & 0x0F;

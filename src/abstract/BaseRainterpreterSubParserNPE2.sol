@@ -217,7 +217,8 @@ abstract contract BaseRainterpreterSubParserNPE2 is
         (bool exists, uint256 index) = LibParseMeta.lookupWord(state.meta, word);
         if (exists) {
             OperandV2 operand = state.handleOperand(index);
-            function (uint256, uint256, OperandV2) internal pure returns (bool, bytes memory, uint256[] memory) subParser;
+            function (uint256, uint256, OperandV2) internal pure returns (bool, bytes memory, uint256[] memory)
+                subParser;
             bytes memory localSubParserWordParsers = subParserWordParsers();
             assembly ("memory-safe") {
                 subParser := and(mload(add(localSubParserWordParsers, mul(add(index, 1), 2))), 0xFFFF)

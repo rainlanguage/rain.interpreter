@@ -14,7 +14,11 @@ error OutOfBoundsConstantRead(uint256 opIndex, uint256 constantsLength, uint256 
 /// Integrated deeply into LibParse, which requires this opcode or a variant
 /// to be present at a known opcode index.
 library LibOpConstantNP {
-    function integrity(IntegrityCheckStateNP memory state, OperandV2 operand) internal pure returns (uint256, uint256) {
+    function integrity(IntegrityCheckStateNP memory state, OperandV2 operand)
+        internal
+        pure
+        returns (uint256, uint256)
+    {
         // Operand is the index so ensure it doesn't exceed the constants length.
         uint256 constantIndex = OperandV2.unwrap(operand) & 0xFFFF;
         if (constantIndex >= state.constants.length) {
@@ -25,7 +29,11 @@ library LibOpConstantNP {
         return (0, 1);
     }
 
-    function run(InterpreterStateNP memory state, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
+    function run(InterpreterStateNP memory state, OperandV2 operand, Pointer stackTop)
+        internal
+        pure
+        returns (Pointer)
+    {
         uint256[] memory constants = state.constants;
         // Skip index OOB check and rely on integrity check for that.
         assembly ("memory-safe") {

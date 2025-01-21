@@ -137,7 +137,7 @@ struct ParseState {
     uint256 constantsBloom;
     bytes literalParsers;
     bytes operandHandlers;
-    uint256[] operandValues;
+    bytes32[] operandValues;
     ParseStackTracker stackTracker;
     bytes data;
     bytes meta;
@@ -222,7 +222,7 @@ library LibParseState {
             // operandHandlers
             operandHandlers,
             // operandValues
-            new uint256[](OPERAND_VALUES_LENGTH),
+            new bytes32[](OPERAND_VALUES_LENGTH),
             // stackTracker
             ParseStackTracker.wrap(0),
             // data bytes
@@ -518,7 +518,9 @@ library LibParseState {
             // 0 indexed from the bottom of the linked list to the top.
             {
                 uint256 constantsHeight = state.constantsBuilder & 0xFFFF;
-                state.pushOpToSource(OPCODE_CONSTANT, OperandV2.wrap(bytes32(exists ? constantsHeight - t : constantsHeight)));
+                state.pushOpToSource(
+                    OPCODE_CONSTANT, OperandV2.wrap(bytes32(exists ? constantsHeight - t : constantsHeight))
+                );
             }
 
             // If the literal is not a duplicate, then we need to add it to the

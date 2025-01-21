@@ -27,7 +27,11 @@ error BadOutputsLength(uint256 expectedLength, uint256 actualLength);
 library LibOpExternNP {
     using LibUint256Array for uint256[];
 
-    function integrity(IntegrityCheckStateNP memory state, OperandV2 operand) internal view returns (uint256, uint256) {
+    function integrity(IntegrityCheckStateNP memory state, OperandV2 operand)
+        internal
+        view
+        returns (uint256, uint256)
+    {
         uint256 encodedExternDispatchIndex = OperandV2.unwrap(operand) & 0xFFFF;
 
         EncodedExternDispatch encodedExternDispatch =
@@ -42,7 +46,11 @@ library LibOpExternNP {
         return extern.externIntegrity(dispatch, expectedInputsLength, expectedOutputsLength);
     }
 
-    function run(InterpreterStateNP memory state, OperandV2 operand, Pointer stackTop) internal view returns (Pointer) {
+    function run(InterpreterStateNP memory state, OperandV2 operand, Pointer stackTop)
+        internal
+        view
+        returns (Pointer)
+    {
         uint256 encodedExternDispatchIndex = OperandV2.unwrap(operand) & 0xFFFF;
         uint256 inputsLength = (OperandV2.unwrap(operand) >> 0x10) & 0x0F;
         uint256 outputsLength = (OperandV2.unwrap(operand) >> 0x14) & 0x0F;

@@ -25,7 +25,9 @@ import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
 import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 import {LibParseOperand} from "./LibParseOperand.sol";
-import {OperandV2, OPCODE_STACK, OPCODE_UNKNOWN} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {
+    OperandV2, OPCODE_STACK, OPCODE_UNKNOWN
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibParseStackName} from "./LibParseStackName.sol";
 import {
     ExcessLHSItems,
@@ -217,7 +219,7 @@ library LibParse {
                     else {
                         (exists, opcodeIndex) = state.stackNameIndex(word);
                         if (exists) {
-                            state.pushOpToSource(OPCODE_STACK, OperandV2.wrap(opcodeIndex));
+                            state.pushOpToSource(OPCODE_STACK, OperandV2.wrap(bytes32(opcodeIndex)));
                             // Need to process highwater here because we
                             // don't have any parens to open or close.
                             state.highwater();

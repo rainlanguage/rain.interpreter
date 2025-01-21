@@ -12,8 +12,7 @@ import {
 import {LibBytecode, Pointer} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {ISubParserV3, COMPATIBILITY_V5} from "rain.interpreter.interface/interface/ISubParserV3.sol";
 import {BadSubParserResult, UnknownWord, UnsupportedLiteralType} from "../../error/ErrParse.sol";
-import {LibExtern, EncodedExternDispatch} from "../extern/LibExtern.sol";
-import {IInterpreterExternV3} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
+import {IInterpreterExternV4, LibExtern, EncodedExternDispatchV2} from "../extern/LibExtern.sol";
 import {ExternDispatchConstantsHeightOverflow} from "../../error/ErrSubParse.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibParseError} from "./LibParseError.sol";
@@ -112,7 +111,7 @@ library LibSubParse {
     /// implies the parse meta has been traversed and the parse index has been
     /// mapped to an extern opcode index somehow.
     function subParserExtern(
-        IInterpreterExternV3 extern,
+        IInterpreterExternV4 extern,
         uint256 constantsHeight,
         uint256 ioByte,
         OperandV2 operand,
@@ -142,7 +141,7 @@ library LibSubParse {
             mstore(bytecode, 4)
         }
 
-        uint256 externDispatch = EncodedExternDispatch.unwrap(
+        bytes32 externDispatch = EncodedExternDispatchV2.unwrap(
             LibExtern.encodeExternCall(extern, LibExtern.encodeExternDispatch(opcodeIndex, operand))
         );
 
@@ -327,7 +326,7 @@ library LibSubParse {
         pure
         returns (uint256 constantsHeight, uint256 ioByte, ParseState memory state)
     {
-        uint256[] memory operandValues;
+        bytes32[] memory operandValues;
         assembly ("memory-safe") {
             // Pull the header out into EVM stack items.
             constantsHeight := and(mload(add(data, 2)), 0xFFFF)

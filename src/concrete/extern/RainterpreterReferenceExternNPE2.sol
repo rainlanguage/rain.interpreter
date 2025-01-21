@@ -10,8 +10,7 @@ import {
     ISubParserToolingV1,
     AuthoringMetaV2
 } from "../../abstract/BaseRainterpreterSubParserNPE2.sol";
-import {LibExtern, EncodedExternDispatch} from "../../lib/extern/LibExtern.sol";
-import {IInterpreterExternV3} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
+import {LibExtern, EncodedExternDispatchV2, IInterpreterExternV4} from "../../lib/extern/LibExtern.sol";
 import {LibSubParse, CURRENT_COMPATIBILITY} from "../../lib/parse/LibSubParse.sol";
 import {LibParseState, ParseState} from "../../lib/parse/LibParseState.sol";
 import {LibParseOperand} from "../../lib/parse/LibParseOperand.sol";

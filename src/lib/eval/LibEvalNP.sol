@@ -69,7 +69,7 @@ library LibEvalNP {
                     internal
                     view
                     returns (Pointer) f;
-                    OperandV2 operand;
+        OperandV2 operand;
         uint256 word;
         while (cursor < end) {
             assembly ("memory-safe") {

@@ -14,7 +14,11 @@ library LibOpContextNP {
         return (0, 1);
     }
 
-    function run(InterpreterStateNP memory state, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
+    function run(InterpreterStateNP memory state, OperandV2 operand, Pointer stackTop)
+        internal
+        pure
+        returns (Pointer)
+    {
         uint256 i = OperandV2.unwrap(operand) & 0xFF;
         uint256 j = (OperandV2.unwrap(operand) >> 8) & 0xFF;
         // We want these indexes to be checked at runtime for OOB accesses
