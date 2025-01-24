@@ -3,8 +3,8 @@ pragma solidity ^0.8.25;
 
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibSubParse} from "../../../parse/LibSubParse.sol";
-import {IInterpreterExternV3} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
-import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {IInterpreterExternV4, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterExternV4.sol";
+import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @dev Opcode index of the extern increment opcode. Needs to be manually kept
 /// in sync with the extern opcode function pointers. Definitely write tests for
@@ -19,11 +19,12 @@ library LibExternOpIntIncNPE2 {
     /// we can test multi input/output logic is implemented correctly for
     /// externs.
     //slither-disable-next-line dead-code
-    function run(OperandV2, uint256[] memory inputs) internal pure returns (uint256[] memory) {
+    function run(OperandV2, StackItem[] memory inputs) internal pure returns (StackItem[] memory) {
         for (uint256 i = 0; i < inputs.length; i++) {
-            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(inputs[i]);
+            (int256 signedCoefficient, int256 exponent) =
+                LibDecimalFloat.unpack(PackedFloat.wrap(StackItem.unwrap(inputs[i])));
             (signedCoefficient, exponent) = LibDecimalFloat.add(signedCoefficient, exponent, 1e37, -37);
-            inputs[i] = LibDecimalFloat.pack(signedCoefficient, exponent);
+            inputs[i] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(signedCoefficient, exponent)));
         }
         return inputs;
     }
@@ -41,11 +42,11 @@ library LibExternOpIntIncNPE2 {
     function subParser(uint256 constantsHeight, uint256 ioByte, OperandV2 operand)
         internal
         view
-        returns (bool, bytes memory, uint256[] memory)
+        returns (bool, bytes memory, bytes32[] memory)
     {
         //slither-disable-next-line unused-return
         return LibSubParse.subParserExtern(
-            IInterpreterExternV3(address(this)), constantsHeight, ioByte, operand, OP_INDEX_INCREMENT
+            IInterpreterExternV4(address(this)), constantsHeight, ioByte, operand, OP_INDEX_INCREMENT
         );
     }
 }

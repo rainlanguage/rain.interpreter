@@ -16,7 +16,7 @@ library LibExternOpStackOperandNPE2 {
     function subParser(uint256 constantsHeight, uint256, OperandV2 operand)
         internal
         pure
-        returns (bool, bytes memory, uint256[] memory)
+        returns (bool, bytes memory, bytes32[] memory)
     {
         //slither-disable-next-line unused-return
         return LibSubParse.subParserConstant(constantsHeight, OperandV2.unwrap(operand));

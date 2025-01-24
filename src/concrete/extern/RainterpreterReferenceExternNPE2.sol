@@ -6,6 +6,7 @@ import {BadDynamicLength} from "../../error/ErrOpList.sol";
 import {BaseRainterpreterExternNPE2, OperandV2} from "../../abstract/BaseRainterpreterExternNPE2.sol";
 import {
     BaseRainterpreterSubParserNPE2,
+    AuthoringMetaV2,
     IParserToolingV1,
     ISubParserToolingV1
 } from "../../abstract/BaseRainterpreterSubParserNPE2.sol";
@@ -177,13 +178,6 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// entire function call away.
     function subParserLiteralParsers() internal pure override returns (bytes memory) {
         return LITERAL_PARSER_FUNCTION_POINTERS;
-    }
-
-    /// Overrides the compatibility version for sub parsing. Simply returns the
-    /// known constant value, which should allow the compiler to optimise the
-    /// entire function call away.
-    function subParserCompatibility() internal pure override returns (bytes32) {
-        return CURRENT_COMPATIBILITY;
     }
 
     /// Overrides the base function pointers for opcodes. Simply returns the

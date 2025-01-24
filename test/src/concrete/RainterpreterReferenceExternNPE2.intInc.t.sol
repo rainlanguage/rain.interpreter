@@ -78,8 +78,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
         RainterpreterReferenceExternNPE2 subParser = new RainterpreterReferenceExternNPE2();
 
         bytes memory wordToParse = bytes("ref-extern-inc");
-        (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParseWord(
-            CURRENT_COMPATIBILITY,
+        (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParseWord2(
             bytes.concat(bytes2(constantsHeight), ioByte, bytes2(uint16(wordToParse.length)), wordToParse, bytes32(0))
         );
         assertTrue(success);
@@ -119,8 +118,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
         constantsHeight = uint16(bound(constantsHeight, 0, 0xFF));
         RainterpreterReferenceExternNPE2 subParser = new RainterpreterReferenceExternNPE2();
 
-        (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParseWord(
-            CURRENT_COMPATIBILITY,
+        (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParseWord2(
             bytes.concat(bytes2(constantsHeight), ioByte, bytes2(uint16(unknownWord.length)), unknownWord, bytes32(0))
         );
         assertFalse(success);

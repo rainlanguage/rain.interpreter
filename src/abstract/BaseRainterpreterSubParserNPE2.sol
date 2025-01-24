@@ -145,13 +145,6 @@ abstract contract BaseRainterpreterSubParserNPE2 is
         value = 0;
     }
 
-    modifier onlyCompatible(bytes32 compatibility) {
-        if (compatibility != subParserCompatibility()) {
-            revert IncompatibleSubParser();
-        }
-        _;
-    }
-
     /// A basic implementation of sub parsing literals that uses encoded
     /// function pointers to dispatch everything necessary in O(1) and allows
     /// for the child contract to override all relevant functions with some
@@ -159,20 +152,14 @@ abstract contract BaseRainterpreterSubParserNPE2 is
     /// This is virtual but the expectation is that it generally DOES NOT need
     /// to be overridden, as the function pointers and metadata bytes are all
     /// that need to be changed to implement a new subparser.
-    /// @inheritdoc ISubParserV3
-    function subParseLiteral(bytes32 compatibility, bytes memory data)
-        external
-        view
-        virtual
-        onlyCompatible(compatibility)
-        returns (bool, uint256)
-    {
+    /// @inheritdoc ISubParserV4
+    function subParseLiteral2(bytes memory data) external view virtual returns (bool, bytes32) {
         (uint256 dispatchStart, uint256 bodyStart, uint256 bodyEnd) = LibSubParse.consumeSubParseLiteralInputData(data);
 
         (bool success, uint256 index, uint256 dispatchValue) = matchSubParseLiteralDispatch(dispatchStart, bodyStart);
 
         if (success) {
-            function (uint256, uint256, uint256) internal pure returns (uint256) subParser;
+            function (uint256, uint256, uint256) internal pure returns (bytes32) subParser;
             bytes memory localSubParserLiteralParsers = subParserLiteralParsers();
             assembly ("memory-safe") {
                 subParser := and(mload(add(localSubParserLiteralParsers, mul(add(index, 1), 2))), 0xFFFF)
@@ -190,14 +177,8 @@ abstract contract BaseRainterpreterSubParserNPE2 is
     /// This is virtual but the expectation is that it generally DOES NOT need
     /// to be overridden, as the function pointers and metadata bytes are all
     /// that need to be changed to implement a new subparser.
-    /// @inheritdoc ISubParserV3
-    function subParseWord(bytes32 compatibility, bytes memory data)
-        external
-        pure
-        virtual
-        onlyCompatible(compatibility)
-        returns (bool, bytes memory, uint256[] memory)
-    {
+    /// @inheritdoc ISubParserV4
+    function subParseWord2(bytes memory data) external pure virtual returns (bool, bytes memory, bytes32[] memory) {
         (uint256 constantsHeight, uint256 ioByte, ParseState memory state) =
             LibSubParse.consumeSubParseWordInputData(data, subParserParseMeta(), subParserOperandHandlers());
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
@@ -208,7 +189,7 @@ abstract contract BaseRainterpreterSubParserNPE2 is
         (bool exists, uint256 index) = LibParseMeta.lookupWord(state.meta, word);
         if (exists) {
             OperandV2 operand = state.handleOperand(index);
-            function (uint256, uint256, OperandV2) internal pure returns (bool, bytes memory, uint256[] memory)
+            function (uint256, uint256, OperandV2) internal pure returns (bool, bytes memory, bytes32[] memory)
                 subParser;
             bytes memory localSubParserWordParsers = subParserWordParsers();
             assembly ("memory-safe") {
@@ -216,13 +197,13 @@ abstract contract BaseRainterpreterSubParserNPE2 is
             }
             return subParser(constantsHeight, ioByte, operand);
         } else {
-            return (false, "", new uint256[](0));
+            return (false, "", new bytes32[](0));
         }
     }
 
     /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(ISubParserV3).interfaceId || interfaceId == type(IDescribedByMetaV1).interfaceId
+        return interfaceId == type(ISubParserV4).interfaceId || interfaceId == type(IDescribedByMetaV1).interfaceId
             || super.supportsInterface(interfaceId);
     }
 }

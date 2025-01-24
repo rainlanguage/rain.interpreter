@@ -79,7 +79,7 @@ library LibParseOperand {
                     if (i == OPERAND_VALUES_LENGTH) {
                         revert OperandValuesOverflow(state.parseErrorOffset(cursor));
                     }
-                    uint256 value;
+                    bytes32 value;
                     (cursor, value) = state.parseLiteral(cursor, end);
                     // We manipulate the operand values array directly in
                     // assembly because if we used the Solidity indexing syntax
@@ -158,7 +158,8 @@ library LibParseOperand {
             assembly ("memory-safe") {
                 operand := mload(add(values, 0x20))
             }
-            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(PackedFloat.wrap(OperandV2.unwrap(operand)));
+            (int256 signedCoefficient, int256 exponent) =
+                LibDecimalFloat.unpack(PackedFloat.wrap(OperandV2.unwrap(operand)));
             uint256 operandUint = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
             if (operandUint > type(uint16).max) {
                 revert OperandOverflow();
@@ -178,7 +179,8 @@ library LibParseOperand {
             assembly ("memory-safe") {
                 operand := mload(add(values, 0x20))
             }
-            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(PackedFloat.wrap(OperandV2.unwrap(operand)));
+            (int256 signedCoefficient, int256 exponent) =
+                LibDecimalFloat.unpack(PackedFloat.wrap(OperandV2.unwrap(operand)));
             uint256 operandUint = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
             if (operandUint > uint256(type(uint16).max)) {
                 revert OperandOverflow();

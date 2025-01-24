@@ -320,7 +320,7 @@ library LibAllStandardOpsNP {
 
     function literalParserFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
-            function (ParseState memory, uint256, uint256) view returns (uint256, uint256) lengthPointer;
+            function (ParseState memory, uint256, uint256) view returns (uint256, bytes32) lengthPointer;
             uint256 length = LITERAL_PARSERS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
@@ -348,12 +348,12 @@ library LibAllStandardOpsNP {
 
     function operandHandlerFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
-            function (uint256[] memory) internal pure returns (OperandV2) lengthPointer;
+            function (bytes32[] memory) internal pure returns (OperandV2) lengthPointer;
             uint256 length = ALL_STANDARD_OPS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function (uint256[] memory) internal pure returns (OperandV2)[ALL_STANDARD_OPS_LENGTH + 1] memory
+            function (bytes32[] memory) internal pure returns (OperandV2)[ALL_STANDARD_OPS_LENGTH + 1] memory
                 pointersFixed = [
                     lengthPointer,
                     // stack
