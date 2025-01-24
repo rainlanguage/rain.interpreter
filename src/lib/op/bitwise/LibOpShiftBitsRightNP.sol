@@ -13,7 +13,7 @@ import {UnsupportedBitwiseShiftAmount} from "../../../error/ErrBitwise.sol";
 library LibOpShiftBitsRightNP {
     /// Shift bits right by the amount specified in the operand.
     function integrity(IntegrityCheckStateNP memory, OperandV2 operand) internal pure returns (uint256, uint256) {
-        uint256 shiftAmount = OperandV2.unwrap(operand) & 0xFFFF;
+        uint256 shiftAmount = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
 
         if (
             // Shift amount must not result in the output always being 0.
@@ -42,7 +42,7 @@ library LibOpShiftBitsRightNP {
         pure
         returns (uint256[] memory)
     {
-        uint256 shiftAmount = OperandV2.unwrap(operand) & 0xFFFF;
+        uint256 shiftAmount = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
         inputs[0] = inputs[0] >> shiftAmount;
         return inputs;
     }

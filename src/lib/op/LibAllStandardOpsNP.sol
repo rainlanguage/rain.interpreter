@@ -325,7 +325,7 @@ library LibAllStandardOpsNP {
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function (ParseState memory, uint256, uint256) view returns (uint256, uint256)[LITERAL_PARSERS_LENGTH + 1]
+            function (ParseState memory, uint256, uint256) view returns (uint256, bytes32)[LITERAL_PARSERS_LENGTH + 1]
                 memory pointersFixed = [
                     lengthPointer,
                     LibParseLiteralHex.parseHex,

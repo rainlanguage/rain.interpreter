@@ -9,7 +9,6 @@ import {UnclosedSubParseableLiteral, SubParseableMissingDispatch} from "src/erro
 import {ISubParserV3} from "rain.interpreter.interface/interface/ISubParserV3.sol";
 import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {CMASK_WHITESPACE, CMASK_SUB_PARSEABLE_LITERAL_END} from "rain.string/lib/parse/LibParseCMask.sol";
-import {CURRENT_COMPATIBILITY} from "src/lib/parse/LibSubParse.sol";
 
 contract LibParseLiteralSubParseableTest is Test {
     using LibBytes for bytes;

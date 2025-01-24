@@ -33,7 +33,7 @@ library LibParseOperand {
 
         // Reset operand values to length 0 to avoid any previous values bleeding
         // into processing this operand.
-        uint256[] memory operandValues = state.operandValues;
+        bytes32[] memory operandValues = state.operandValues;
         assembly ("memory-safe") {
             mstore(operandValues, 0)
         }
@@ -146,7 +146,7 @@ library LibParseOperand {
         if (values.length != 0) {
             revert UnexpectedOperand();
         }
-        return OperandV2.wrap(1);
+        return OperandV2.wrap(bytes32(uint256(1)));
     }
 
     /// There must be one or zero values. The fallback is 0 if nothing is
@@ -158,11 +158,12 @@ library LibParseOperand {
             assembly ("memory-safe") {
                 operand := mload(add(values, 0x20))
             }
-            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(OperandV2.unwrap(operand));
-            operand = OperandV2.wrap(LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0));
-            if (OperandV2.unwrap(operand) > type(uint16).max) {
+            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(PackedFloat.wrap(OperandV2.unwrap(operand)));
+            uint256 operandUint = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
+            if (operandUint > type(uint16).max) {
                 revert OperandOverflow();
             }
+            operand = OperandV2.wrap(bytes32(operandUint));
         } else if (values.length == 0) {
             operand = OperandV2.wrap(0);
         } else {
@@ -177,11 +178,12 @@ library LibParseOperand {
             assembly ("memory-safe") {
                 operand := mload(add(values, 0x20))
             }
-            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(OperandV2.unwrap(operand));
-            operand = OperandV2.wrap(LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0));
-            if (uint256(OperandV2.unwrap(operand)) > uint256(type(uint16).max)) {
+            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(PackedFloat.wrap(OperandV2.unwrap(operand)));
+            uint256 operandUint = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
+            if (operandUint > uint256(type(uint16).max)) {
                 revert OperandOverflow();
             }
+            operand = OperandV2.wrap(bytes32(operandUint));
         } else if (values.length == 0) {
             revert ExpectedOperand();
         } else {
@@ -209,7 +211,7 @@ library LibParseOperand {
                 revert OperandOverflow();
             }
 
-            operand = OperandV2.wrap(aUint | (bUint << 8));
+            operand = OperandV2.wrap(bytes32(aUint | (bUint << 8)));
         } else if (values.length < 2) {
             revert ExpectedOperand();
         } else {

@@ -11,7 +11,7 @@ address constant STACK_TRACER = address(uint160(uint256(keccak256("rain.interpre
 
 struct InterpreterStateNP {
     Pointer[] stackBottoms;
-    uint256[] constants;
+    bytes32[] constants;
     uint256 sourceIndex;
     MemoryKV stateKV;
     FullyQualifiedNamespace namespace;

@@ -12,7 +12,7 @@ import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 library LibOpEveryNP {
     function integrity(IntegrityCheckStateNP memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least one input.
-        uint256 inputs = (OperandV2.unwrap(operand) >> 0x10) & 0x0F;
+        uint256 inputs = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
         inputs = inputs > 0 ? inputs : 1;
         return (inputs, 1);
     }

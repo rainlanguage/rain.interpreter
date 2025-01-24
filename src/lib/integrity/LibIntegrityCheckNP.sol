@@ -21,7 +21,7 @@ struct IntegrityCheckStateNP {
     uint256 stackIndex;
     uint256 stackMaxIndex;
     uint256 readHighwater;
-    uint256[] constants;
+    bytes32[] constants;
     uint256 opIndex;
     bytes bytecode;
 }
@@ -29,7 +29,7 @@ struct IntegrityCheckStateNP {
 library LibIntegrityCheckNP {
     using LibIntegrityCheckNP for IntegrityCheckStateNP;
 
-    function newState(bytes memory bytecode, uint256 stackIndex, uint256[] memory constants)
+    function newState(bytes memory bytecode, uint256 stackIndex, bytes32[] memory constants)
         internal
         pure
         returns (IntegrityCheckStateNP memory)
@@ -50,7 +50,7 @@ library LibIntegrityCheckNP {
         );
     }
 
-    function integrityCheck2(bytes memory fPointers, bytes memory bytecode, uint256[] memory constants)
+    function integrityCheck2(bytes memory fPointers, bytes memory bytecode, bytes32[] memory constants)
         internal
         view
         returns (bytes memory io)

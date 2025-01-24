@@ -19,8 +19,8 @@ library LibOpContextNP {
         pure
         returns (Pointer)
     {
-        uint256 i = OperandV2.unwrap(operand) & 0xFF;
-        uint256 j = (OperandV2.unwrap(operand) >> 8) & 0xFF;
+        uint256 i = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFF)));
+        uint256 j = uint256((OperandV2.unwrap(operand) >> 8) & bytes32(uint256(0xFF)));
         // We want these indexes to be checked at runtime for OOB accesses
         // because we don't know the shape of the context at compile time.
         // Solidity handles that for us as long as we don't invoke yul for the
@@ -41,8 +41,8 @@ library LibOpContextNP {
         pure
         returns (uint256[] memory outputs)
     {
-        uint256 i = OperandV2.unwrap(operand) & 0xFF;
-        uint256 j = (OperandV2.unwrap(operand) >> 8) & 0xFF;
+        uint256 i = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFF)));
+        uint256 j = uint256((OperandV2.unwrap(operand) >> 8) & bytes32(uint256(0xFF)));
         // We want these indexes to be checked at runtime for OOB accesses
         // because we don't know the shape of the context at compile time.
         // Solidity handles that for us as long as we don't invoke yul for the

@@ -78,8 +78,8 @@ library LibOpCallNP {
         pure
         returns (uint256, uint256)
     {
-        uint256 sourceIndex = OperandV2.unwrap(operand) & 0xFFFF;
-        uint256 outputs = OperandV2.unwrap(operand) >> 0x14;
+        uint256 sourceIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
+        uint256 outputs = uint256(OperandV2.unwrap(operand) >> 0x14);
 
         (uint256 sourceInputs, uint256 sourceOutputs) =
             LibBytecode.sourceInputsOutputsLength(state.bytecode, sourceIndex);
@@ -101,9 +101,9 @@ library LibOpCallNP {
         returns (Pointer)
     {
         // Extract config from the operand.
-        uint256 sourceIndex = OperandV2.unwrap(operand) & 0xFFFF;
-        uint256 inputs = (OperandV2.unwrap(operand) >> 0x10) & 0x0F;
-        uint256 outputs = OperandV2.unwrap(operand) >> 0x14;
+        uint256 sourceIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
+        uint256 inputs = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
+        uint256 outputs = uint256(OperandV2.unwrap(operand) >> 0x14);
 
         // Copy inputs in. The inputs have to be copied in reverse order so that
         // the top of the stack from the perspective of `call`, i.e. the first

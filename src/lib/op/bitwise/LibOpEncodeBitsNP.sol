@@ -13,8 +13,8 @@ library LibOpEncodeBitsNP {
     /// Encode takes two values and returns one value. The first value is the
     /// source, the second value is the target.
     function integrity(IntegrityCheckStateNP memory, OperandV2 operand) internal pure returns (uint256, uint256) {
-        uint256 startBit = OperandV2.unwrap(operand) & 0xFF;
-        uint256 length = (OperandV2.unwrap(operand) >> 8) & 0xFF;
+        uint256 startBit = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFF)));
+        uint256 length = uint256((OperandV2.unwrap(operand) >> 8) & bytes32(uint256(0xFF)));
 
         if (length == 0) {
             revert ZeroLengthBitwiseEncoding();
@@ -38,8 +38,8 @@ library LibOpEncodeBitsNP {
             // We encode as a start and length of bits. This avoids mistakes such as
             // inclusive/exclusive ranges, and makes it easier to reason about the
             // encoding.
-            uint256 startBit = OperandV2.unwrap(operand) & 0xFF;
-            uint256 length = (OperandV2.unwrap(operand) >> 8) & 0xFF;
+            uint256 startBit = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFF)));
+            uint256 length = uint256((OperandV2.unwrap(operand) >> 8) & bytes32(uint256(0xFF)));
 
             // Build a bitmask of desired length. Max length is uint8 max which
             // is 255. A 256 length doesn't really make sense as that isn't an
@@ -70,8 +70,8 @@ library LibOpEncodeBitsNP {
         // We encode as a start and length of bits. This avoids mistakes such as
         // inclusive/exclusive ranges, and makes it easier to reason about the
         // encoding.
-        uint256 startBit = OperandV2.unwrap(operand) & 0xFF;
-        uint256 length = (OperandV2.unwrap(operand) >> 8) & 0xFF;
+        uint256 startBit = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFF)));
+        uint256 length = uint256((OperandV2.unwrap(operand) >> 8) & bytes32(uint256(0xFF)));
 
         // Build a bitmask of desired length. Max length is uint8 max which
         // is 255. A 256 length doesn't really make sense as that isn't an

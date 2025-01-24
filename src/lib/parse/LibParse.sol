@@ -65,6 +65,7 @@ import {LibParseError} from "./LibParseError.sol";
 import {LibSubParse} from "./LibSubParse.sol";
 import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
+import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 
 uint256 constant NOT_LOW_16_BIT_MASK = ~uint256(0xFFFF);
 uint256 constant ACTIVE_SOURCE_MASK = NOT_LOW_16_BIT_MASK;
@@ -83,6 +84,7 @@ library LibParse {
     using LibSubParse for ParseState;
     using LibBytes for bytes;
     using LibUint256Array for uint256[];
+    using LibBytes32Array for bytes32[];
 
     /// Parses a word that matches a tail mask between cursor and end. The caller
     /// has several responsibilities while safely using this word.

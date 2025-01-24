@@ -10,14 +10,12 @@ import {
     OperandV2
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibBytecode, Pointer} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
-import {ISubParserV3, COMPATIBILITY_V5} from "rain.interpreter.interface/interface/ISubParserV3.sol";
+import {ISubParserV4} from "rain.interpreter.interface/interface/unstable/ISubParserV4.sol";
 import {BadSubParserResult, UnknownWord, UnsupportedLiteralType} from "../../error/ErrParse.sol";
 import {IInterpreterExternV4, LibExtern, EncodedExternDispatchV2} from "../extern/LibExtern.sol";
 import {ExternDispatchConstantsHeightOverflow} from "../../error/ErrSubParse.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibParseError} from "./LibParseError.sol";
-
-bytes32 constant CURRENT_COMPATIBILITY = COMPATIBILITY_V5;
 
 library LibSubParse {
     using LibParseState for ParseState;
@@ -166,7 +164,7 @@ library LibSubParse {
                 if (memoryAtCursor >> 0xf8 == OPCODE_UNKNOWN) {
                     uint256 deref = state.subParsers;
                     while (deref != 0) {
-                        ISubParserV3 subParser = ISubParserV3(address(uint160(deref)));
+                        ISubParserV4 subParser = ISubParserV4(address(uint160(deref)));
                         assembly ("memory-safe") {
                             deref := mload(shr(0xf0, deref))
                         }
@@ -204,7 +202,7 @@ library LibSubParse {
                         }
 
                         (bool success, bytes memory subBytecode, uint256[] memory subConstants) =
-                            subParser.subParseWord(CURRENT_COMPATIBILITY, data);
+                            subParser.subParseWord2(data);
                         if (success) {
                             // The sub bytecode must be exactly 4 bytes to
                             // represent an op.
@@ -280,7 +278,7 @@ library LibSubParse {
         uint256 dispatchEnd,
         uint256 bodyStart,
         uint256 bodyEnd
-    ) internal view returns (uint256) {
+    ) internal view returns (bytes32) {
         unchecked {
             // Build the data for the subparser.
             bytes memory data;
@@ -306,12 +304,12 @@ library LibSubParse {
 
             uint256 deref = state.subParsers;
             while (deref != 0) {
-                ISubParserV3 subParser = ISubParserV3(address(uint160(deref)));
+                ISubParserV4 subParser = ISubParserV4(address(uint160(deref)));
                 assembly ("memory-safe") {
                     deref := mload(shr(0xf0, deref))
                 }
 
-                (bool success, uint256 value) = subParser.subParseLiteral(CURRENT_COMPATIBILITY, data);
+                (bool success, bytes32 value) = subParser.subParseLiteral2(data);
                 if (success) {
                     return value;
                 }

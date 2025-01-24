@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
@@ -20,7 +20,7 @@ library LibOpConstantNP {
         returns (uint256, uint256)
     {
         // Operand is the index so ensure it doesn't exceed the constants length.
-        uint256 constantIndex = OperandV2.unwrap(operand) & 0xFFFF;
+        uint256 constantIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
         if (constantIndex >= state.constants.length) {
             revert OutOfBoundsConstantRead(state.opIndex, state.constants.length, constantIndex);
         }
@@ -34,7 +34,7 @@ library LibOpConstantNP {
         pure
         returns (Pointer)
     {
-        uint256[] memory constants = state.constants;
+        bytes32[] memory constants = state.constants;
         // Skip index OOB check and rely on integrity check for that.
         assembly ("memory-safe") {
             let value := mload(add(constants, mul(add(and(operand, 0xFFFF), 1), 0x20)))
@@ -44,13 +44,13 @@ library LibOpConstantNP {
         return stackTop;
     }
 
-    function referenceFn(InterpreterStateNP memory state, OperandV2 operand, uint256[] memory)
+    function referenceFn(InterpreterStateNP memory state, OperandV2 operand, StackItem[] memory)
         internal
         pure
-        returns (uint256[] memory outputs)
+        returns (StackItem[] memory outputs)
     {
-        uint256 index = OperandV2.unwrap(operand) & 0xFFFF;
-        outputs = new uint256[](1);
-        outputs[0] = state.constants[index];
+        uint256 index = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
+        outputs = new StackItem[](1);
+        outputs[0] = StackItem.wrap(state.constants[index]);
     }
 }
