@@ -13,14 +13,14 @@ import {InterpreterStateNP} from "./LibInterpreterStateNP.sol";
 library LibInterpreterStateDataContractNP {
     using LibBytes for bytes;
 
-    function serializeSizeNP(bytes memory bytecode, uint256[] memory constants) internal pure returns (uint256 size) {
+    function serializeSizeNP(bytes memory bytecode, bytes32[] memory constants) internal pure returns (uint256 size) {
         unchecked {
             // bytecode length + constants length * 0x20 + 0x40 for both the bytecode and constants length words.
             size = bytecode.length + constants.length * 0x20 + 0x40;
         }
     }
 
-    function unsafeSerializeNP(Pointer cursor, bytes memory bytecode, uint256[] memory constants) internal pure {
+    function unsafeSerializeNP(Pointer cursor, bytes memory bytecode, bytes32[] memory constants) internal pure {
         unchecked {
             // Copy constants into place with length.
             assembly ("memory-safe") {
@@ -42,7 +42,7 @@ library LibInterpreterStateDataContractNP {
         uint256 sourceIndex,
         FullyQualifiedNamespace namespace,
         IInterpreterStoreV2 store,
-        uint256[][] memory context,
+        bytes32[][] memory context,
         bytes memory fs
     ) internal pure returns (InterpreterStateNP memory) {
         unchecked {
@@ -52,7 +52,7 @@ library LibInterpreterStateDataContractNP {
             }
 
             // Reference the constants array as-is and move cursor past it.
-            uint256[] memory constants;
+            bytes32[] memory constants;
             assembly ("memory-safe") {
                 constants := cursor
                 cursor := add(cursor, mul(0x20, add(mload(cursor), 1)))

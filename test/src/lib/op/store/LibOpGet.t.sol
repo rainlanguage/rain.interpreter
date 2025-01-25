@@ -6,51 +6,49 @@ import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {LibOpGetNP} from "src/lib/op/store/LibOpGetNP.sol";
+import {LibOpGet} from "src/lib/op/store/LibOpGet.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2, StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-contract LibOpGetNPTest is OpTest {
+contract LibOpGetTest is OpTest {
     using LibMemoryKV for MemoryKV;
     using LibPointer for Pointer;
 
-    /// Directly test the integrity logic of LibOpGetNP. The inputs are always
+    /// Directly test the integrity logic of LibOpGet. The inputs are always
     /// 1 and the outputs are always 1.
-    function testLibOpGetNPIntegrity(
-        IntegrityCheckStateNP memory state,
-        uint8 inputs,
-        uint8 outputs,
-        uint16 operandData
-    ) public pure {
+    function testLibOpGetIntegrity(IntegrityCheckStateNP memory state, uint8 inputs, uint8 outputs, uint16 operandData)
+        public
+        pure
+    {
         inputs = uint8(bound(inputs, 1, 0x0F));
         outputs = uint8(bound(outputs, 1, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpGetNP.integrity(state, LibOperand.build(inputs, outputs, operandData));
+            LibOpGet.integrity(state, LibOperand.build(inputs, outputs, operandData));
         assertEq(calcInputs, 1, "inputs");
         assertEq(calcOutputs, 1, "outputs");
     }
 
     /// Test the eval of `get` opcode parsed from a string. Tests zero inputs.
-    function testLibOpGetNPEvalZeroInputs() external {
+    function testLibOpGetEvalZeroInputs() external {
         checkBadInputs("_:get();", 0, 1, 0);
     }
 
-    /// Directly test the runtime logic of LibOpGetNP.
+    /// Directly test the runtime logic of LibOpGet.
     /// Test that if the key is not in the store or state the value is 0.
-    function testLibOpGetNPRunUnset(uint256 key, uint16 operandData) public view {
+    function testLibOpGetRunUnset(uint256 key, uint16 operandData) public view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         OperandV2 operand = LibOperand.build(1, 1, operandData);
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = key;
         state.stateKV = MemoryKV.wrap(0);
 
-        uint256 calcOutputs = opReferenceCheckIntegrity(LibOpGetNP.integrity, operand, state.constants, inputs);
+        uint256 calcOutputs = opReferenceCheckIntegrity(LibOpGet.integrity, operand, state.constants, inputs);
         ReferenceCheckPointers memory pointers = opReferenceCheckPointers(inputs, calcOutputs);
         assertEq(MemoryKV.unwrap(state.stateKV), 0);
-        pointers.actualStackTopAfter = LibOpGetNP.run(state, operand, pointers.stackTop);
+        pointers.actualStackTopAfter = LibOpGet.run(state, operand, pointers.stackTop);
 
         uint256 getValue = pointers.actualStackTopAfter.unsafeReadWord();
         assertEq(getValue, 0, "getValue");
@@ -65,12 +63,12 @@ contract LibOpGetNPTest is OpTest {
         assertEq(kvs.length, 2, "kvs.length");
 
         state.stateKV = MemoryKV.wrap(0);
-        opReferenceCheckExpectations(state, operand, LibOpGetNP.referenceFn, pointers, inputs, calcOutputs);
+        opReferenceCheckExpectations(state, operand, LibOpGet.referenceFn, pointers, inputs, calcOutputs);
     }
 
-    /// Directly test the runtime logic of LibOpGetNP.
+    /// Directly test the runtime logic of LibOpGet.
     /// Test that if the key is in the store the value is fetched from the store.
-    function testLibOpGetNPRunStore(uint256 key, uint256 value, uint16 operandData) public {
+    function testLibOpGetRunStore(uint256 key, uint256 value, uint16 operandData) public {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         OperandV2 operand = LibOperand.build(1, 1, operandData);
         uint256[] memory inputs = new uint256[](1);
@@ -78,10 +76,10 @@ contract LibOpGetNPTest is OpTest {
         state.stateKV = MemoryKV.wrap(0);
         state.store.set(StateNamespace.wrap(0), LibUint256Array.arrayFrom(key, value));
 
-        uint256 calcOutputs = opReferenceCheckIntegrity(LibOpGetNP.integrity, operand, state.constants, inputs);
+        uint256 calcOutputs = opReferenceCheckIntegrity(LibOpGet.integrity, operand, state.constants, inputs);
         ReferenceCheckPointers memory pointers = opReferenceCheckPointers(inputs, calcOutputs);
         assertEq(MemoryKV.unwrap(state.stateKV), 0);
-        pointers.actualStackTopAfter = LibOpGetNP.run(state, operand, pointers.stackTop);
+        pointers.actualStackTopAfter = LibOpGet.run(state, operand, pointers.stackTop);
 
         uint256 getValue = pointers.actualStackTopAfter.unsafeReadWord();
         assertEq(getValue, value, "getValue");
@@ -98,12 +96,12 @@ contract LibOpGetNPTest is OpTest {
         assertEq(kvs[1], value, "kvs[1]");
 
         state.stateKV = MemoryKV.wrap(0);
-        opReferenceCheckExpectations(state, operand, LibOpGetNP.referenceFn, pointers, inputs, calcOutputs);
+        opReferenceCheckExpectations(state, operand, LibOpGet.referenceFn, pointers, inputs, calcOutputs);
     }
 
-    /// Directly test the runtime logic of LibOpGetNP.
+    /// Directly test the runtime logic of LibOpGet.
     /// Test that if the key is in the state the value is fetched from the state.
-    function testLibOpGetNPRunState(uint256 key, uint256 value, uint16 operandData) public view {
+    function testLibOpGetRunState(uint256 key, uint256 value, uint16 operandData) public view {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         OperandV2 operand = LibOperand.build(1, 1, operandData);
         uint256[] memory inputs = new uint256[](1);
@@ -111,9 +109,9 @@ contract LibOpGetNPTest is OpTest {
         state.stateKV = MemoryKV.wrap(0);
         state.stateKV = state.stateKV.set(MemoryKVKey.wrap(key), MemoryKVVal.wrap(value));
 
-        uint256 calcOutputs = opReferenceCheckIntegrity(LibOpGetNP.integrity, operand, state.constants, inputs);
+        uint256 calcOutputs = opReferenceCheckIntegrity(LibOpGet.integrity, operand, state.constants, inputs);
         ReferenceCheckPointers memory pointers = opReferenceCheckPointers(inputs, calcOutputs);
-        pointers.actualStackTopAfter = LibOpGetNP.run(state, operand, pointers.stackTop);
+        pointers.actualStackTopAfter = LibOpGet.run(state, operand, pointers.stackTop);
 
         uint256 getValue = pointers.actualStackTopAfter.unsafeReadWord();
         assertEq(getValue, value, "getValue");
@@ -131,13 +129,13 @@ contract LibOpGetNPTest is OpTest {
 
         state.stateKV = MemoryKV.wrap(0);
         state.stateKV = state.stateKV.set(MemoryKVKey.wrap(key), MemoryKVVal.wrap(value));
-        opReferenceCheckExpectations(state, operand, LibOpGetNP.referenceFn, pointers, inputs, calcOutputs);
+        opReferenceCheckExpectations(state, operand, LibOpGet.referenceFn, pointers, inputs, calcOutputs);
     }
 
-    /// Directly test the runtime logic of LibOpGetNP.
+    /// Directly test the runtime logic of LibOpGet.
     /// Test that if the key is in the state and the store the value is fetched
     /// from the state.
-    function testLibOpGetNPRunStateAndStore(uint256 key, uint256 valueStore, uint256 valueState, uint16 operandData)
+    function testLibOpGetRunStateAndStore(uint256 key, uint256 valueStore, uint256 valueState, uint16 operandData)
         public
     {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
@@ -148,9 +146,9 @@ contract LibOpGetNPTest is OpTest {
         state.stateKV = state.stateKV.set(MemoryKVKey.wrap(key), MemoryKVVal.wrap(valueState));
         state.store.set(StateNamespace.wrap(0), LibUint256Array.arrayFrom(key, valueStore));
 
-        uint256 calcOutputs = opReferenceCheckIntegrity(LibOpGetNP.integrity, operand, state.constants, inputs);
+        uint256 calcOutputs = opReferenceCheckIntegrity(LibOpGet.integrity, operand, state.constants, inputs);
         ReferenceCheckPointers memory pointers = opReferenceCheckPointers(inputs, calcOutputs);
-        pointers.actualStackTopAfter = LibOpGetNP.run(state, operand, pointers.stackTop);
+        pointers.actualStackTopAfter = LibOpGet.run(state, operand, pointers.stackTop);
 
         uint256 getValue = pointers.actualStackTopAfter.unsafeReadWord();
         assertEq(getValue, valueState, "getValue");
@@ -168,13 +166,13 @@ contract LibOpGetNPTest is OpTest {
 
         state.stateKV = MemoryKV.wrap(0);
         state.stateKV = state.stateKV.set(MemoryKVKey.wrap(key), MemoryKVVal.wrap(valueState));
-        opReferenceCheckExpectations(state, operand, LibOpGetNP.referenceFn, pointers, inputs, calcOutputs);
+        opReferenceCheckExpectations(state, operand, LibOpGet.referenceFn, pointers, inputs, calcOutputs);
     }
 
-    /// Directly test the runtime logic of LibOpGetNP.
+    /// Directly test the runtime logic of LibOpGet.
     /// Test that if a value is set in the store under a different namespace
     /// to the state, then get cannot see it.
-    function testLibOpGetNPRunStoreDifferentNamespace(uint256 key, uint256 value, uint16 operandData) public {
+    function testLibOpGetRunStoreDifferentNamespace(uint256 key, uint256 value, uint16 operandData) public {
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         OperandV2 operand = LibOperand.build(1, 1, operandData);
         uint256[] memory inputs = new uint256[](1);
@@ -182,9 +180,9 @@ contract LibOpGetNPTest is OpTest {
         state.stateKV = MemoryKV.wrap(0);
         state.store.set(StateNamespace.wrap(1), LibUint256Array.arrayFrom(key, value));
 
-        uint256 calcOutputs = opReferenceCheckIntegrity(LibOpGetNP.integrity, operand, state.constants, inputs);
+        uint256 calcOutputs = opReferenceCheckIntegrity(LibOpGet.integrity, operand, state.constants, inputs);
         ReferenceCheckPointers memory pointers = opReferenceCheckPointers(inputs, calcOutputs);
-        pointers.actualStackTopAfter = LibOpGetNP.run(state, operand, pointers.stackTop);
+        pointers.actualStackTopAfter = LibOpGet.run(state, operand, pointers.stackTop);
 
         uint256 getValue = pointers.actualStackTopAfter.unsafeReadWord();
         assertEq(getValue, 0, "getValue");
@@ -201,12 +199,12 @@ contract LibOpGetNPTest is OpTest {
         assertEq(kvs[1], 0, "kvs[1]");
 
         state.stateKV = MemoryKV.wrap(0);
-        opReferenceCheckExpectations(state, operand, LibOpGetNP.referenceFn, pointers, inputs, calcOutputs);
+        opReferenceCheckExpectations(state, operand, LibOpGet.referenceFn, pointers, inputs, calcOutputs);
     }
 
     /// Test the eval of `get` opcode parsed from a string. Tests that if
     /// the key is not set in the store, the value is 0.
-    function testLibOpGetNPEvalKeyNotSet() external view {
+    function testLibOpGetEvalKeyNotSet() external view {
         uint256[] memory stack;
         uint256[] memory kvs;
         (stack, kvs) = parseAndEval("_:get(0x1234);");
@@ -258,7 +256,7 @@ contract LibOpGetNPTest is OpTest {
 
     /// Test the eval of `get` opcode parsed from a string. Tests that if
     /// `set` is called prior then `get` can see it.
-    function testLibOpGetNPEvalSetThenGet() external view {
+    function testLibOpGetEvalSetThenGet() external view {
         uint256[] memory stack;
         uint256[] memory kvs;
 
@@ -333,7 +331,7 @@ contract LibOpGetNPTest is OpTest {
 
     /// Test the eval of `get` opcode parsed from a string. Tests that if
     /// the key is set in the store prior to eval then `get` can see it.
-    function testLibOpGetNPEvalStoreThenGet() external {
+    function testLibOpGetEvalStoreThenGet() external {
         uint256[] memory stack;
         uint256[] memory kvs;
 
@@ -439,7 +437,7 @@ contract LibOpGetNPTest is OpTest {
 
     /// Test the eval of `get` opcode parsed from a string. Tests a combination
     /// of setting in the store and setting in the state with `set`.
-    function testLibOpGetNPEvalStoreAndSetAndGet() external {
+    function testLibOpGetEvalStoreAndSetAndGet() external {
         uint256[] memory stack;
         uint256[] memory kvs;
 
@@ -476,26 +474,26 @@ contract LibOpGetNPTest is OpTest {
     }
 
     /// Test the eval of `get` opcode parsed from a string. Tests two inputs.
-    function testLibOpGetNPEvalTwoInputs() external {
+    function testLibOpGetEvalTwoInputs() external {
         checkBadInputs("_:get(0x1234 0x5678);", 2, 1, 2);
     }
 
     /// Test the eval of `get` opcode parsed from a string. Tests three inputs.
-    function testLibOpGetNPEvalThreeInputs() external {
+    function testLibOpGetEvalThreeInputs() external {
         checkBadInputs("_:get(0x1234 0x5678 0x9abc);", 3, 1, 3);
     }
 
-    function testLibOpGetNPEvalZeroOutputs() external {
+    function testLibOpGetEvalZeroOutputs() external {
         checkBadOutputs(":get(0x1234);", 1, 1, 0);
     }
 
-    function testLibOpGetNPEvalTwoOutputs() external {
+    function testLibOpGetEvalTwoOutputs() external {
         checkBadOutputs("_ _:get(0x1234);", 1, 1, 2);
     }
 
     /// Test the eval of `get` opcode parsed from a string.
     /// Tests that operands are disallowed.
-    function testLibOpGetNPEvalOperandDisallowed() external {
+    function testLibOpGetEvalOperandDisallowed() external {
         checkDisallowedOperand("_:get<0>(0x1234);");
         checkDisallowedOperand("_:get<1>(0x1234);");
         checkDisallowedOperand("_:get<2>(0x1234);");

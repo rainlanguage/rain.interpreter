@@ -9,7 +9,7 @@ import {LibMemoryKV, MemoryKV, MemoryKVKey, MemoryKVVal} from "rain.lib.memkv/li
 import {LibCast} from "rain.lib.typecast/LibCast.sol";
 import {LibDataContract} from "rain.datacontract/lib/LibDataContract.sol";
 
-import {LibEvalNP} from "../lib/eval/LibEvalNP.sol";
+import {LibEval} from "../lib/eval/LibEval.sol";
 import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
 import {InterpreterStateNP} from "../lib/state/LibInterpreterStateNP.sol";
 import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
@@ -29,7 +29,7 @@ import {IOpcodeToolingV1} from "rain.sol.codegen/interface/IOpcodeToolingV1.sol"
 /// @notice Implementation of a Rainlang interpreter that is compatible with
 /// native onchain Rainlang parsing.
 contract RainterpreterNPE2 is IInterpreterV4, IOpcodeToolingV1, ERC165 {
-    using LibEvalNP for InterpreterStateNP;
+    using LibEval for InterpreterStateNP;
     using LibInterpreterStateDataContractNP for bytes;
 
     /// @inheritdoc IInterpreterV4

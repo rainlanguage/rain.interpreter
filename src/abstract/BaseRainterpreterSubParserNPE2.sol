@@ -137,7 +137,7 @@ abstract contract BaseRainterpreterSubParserNPE2 is
         internal
         view
         virtual
-        returns (bool success, uint256 index, uint256 value)
+        returns (bool success, uint256 index, bytes32 value)
     {
         (cursor, end);
         success = false;
@@ -156,10 +156,10 @@ abstract contract BaseRainterpreterSubParserNPE2 is
     function subParseLiteral2(bytes memory data) external view virtual returns (bool, bytes32) {
         (uint256 dispatchStart, uint256 bodyStart, uint256 bodyEnd) = LibSubParse.consumeSubParseLiteralInputData(data);
 
-        (bool success, uint256 index, uint256 dispatchValue) = matchSubParseLiteralDispatch(dispatchStart, bodyStart);
+        (bool success, uint256 index, bytes32 dispatchValue) = matchSubParseLiteralDispatch(dispatchStart, bodyStart);
 
         if (success) {
-            function (uint256, uint256, uint256) internal pure returns (bytes32) subParser;
+            function (bytes32, uint256, uint256) internal pure returns (bytes32) subParser;
             bytes memory localSubParserLiteralParsers = subParserLiteralParsers();
             assembly ("memory-safe") {
                 subParser := and(mload(add(localSubParserLiteralParsers, mul(add(index, 1), 2))), 0xFFFF)

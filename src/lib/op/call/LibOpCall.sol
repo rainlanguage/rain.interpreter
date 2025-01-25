@@ -6,7 +6,7 @@ import {LibInterpreterStateNP, InterpreterStateNP} from "../../state/LibInterpre
 import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 import {Pointer, LibPointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
-import {LibEvalNP} from "../../eval/LibEvalNP.sol";
+import {LibEval} from "../../eval/LibEval.sol";
 
 /// Thrown when the outputs requested by the operand exceed the outputs
 /// available from the source.
@@ -14,7 +14,7 @@ import {LibEvalNP} from "../../eval/LibEvalNP.sol";
 /// @param outputs The number of outputs requested by the operand.
 error CallOutputsExceedSource(uint256 sourceOutputs, uint256 outputs);
 
-/// @title LibOpCallNP
+/// @title LibOpCall
 /// @notice Contains the call operation. This allows sources to be treated in a
 /// function-like manner. Primarily intended as a way for expression authors to
 /// create reusable logic inline with their expression, in a way that mimics how
@@ -70,7 +70,7 @@ error CallOutputsExceedSource(uint256 sourceOutputs, uint256 outputs);
 /// /* b = 9 */
 /// a b: call<1 2>(10 5); ten five:, a b: int-div(ten five) 9;
 /// ```
-library LibOpCallNP {
+library LibOpCall {
     using LibPointer for Pointer;
 
     function integrity(IntegrityCheckStateNP memory state, OperandV2 operand)
@@ -130,7 +130,7 @@ library LibOpCallNP {
         state.sourceIndex = sourceIndex;
 
         // Run the eval loop.
-        evalStackTop = LibEvalNP.evalLoopNP(state, currentSourceIndex, evalStackTop, evalStackBottom);
+        evalStackTop = LibEval.evalLoop(state, currentSourceIndex, evalStackTop, evalStackBottom);
 
         // Restore the source index in the state.
         state.sourceIndex = currentSourceIndex;

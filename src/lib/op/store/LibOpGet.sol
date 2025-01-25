@@ -2,14 +2,14 @@
 pragma solidity ^0.8.18;
 
 import {MemoryKVKey, MemoryKVVal, MemoryKV, LibMemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 
-/// @title LibOpGetNP
+/// @title LibOpGet
 /// @notice Opcode for reading from storage.
-library LibOpGetNP {
+library LibOpGet {
     using LibMemoryKV for MemoryKV;
 
     function integrity(IntegrityCheckStateNP memory, OperandV2) internal pure returns (uint256, uint256) {
@@ -25,7 +25,7 @@ library LibOpGetNP {
     /// @param state The interpreter state of the current eval.
     /// @param stackTop Pointer to the current stack top.
     function run(InterpreterStateNP memory state, OperandV2, Pointer stackTop) internal view returns (Pointer) {
-        uint256 key;
+        bytes32 key;
         assembly ("memory-safe") {
             key := mload(stackTop)
         }
@@ -33,7 +33,7 @@ library LibOpGetNP {
 
         // Cache MISS, get from external store.
         if (exists == 0) {
-            uint256 storeValue = state.store.get(state.namespace, key);
+            bytes32 storeValue = state.store.get(state.namespace, key);
 
             // Push fetched value to memory to make subsequent lookups on the
             // same key find a cache HIT.
@@ -53,27 +53,27 @@ library LibOpGetNP {
         return stackTop;
     }
 
-    function referenceFn(InterpreterStateNP memory state, OperandV2, uint256[] memory inputs)
+    function referenceFn(InterpreterStateNP memory state, OperandV2, StackItem[] memory inputs)
         internal
         view
-        returns (uint256[] memory)
+        returns (StackItem[] memory)
     {
-        uint256 key = inputs[0];
+        bytes32 key = StackItem.unwrap(inputs[0]);
         (uint256 exists, MemoryKVVal value) = state.stateKV.get(MemoryKVKey.wrap(key));
-        uint256[] memory outputs = new uint256[](1);
+        StackItem[] memory outputs = new StackItem[](1);
         // Cache MISS, get from external store.
         if (exists == 0) {
-            uint256 storeValue = state.store.get(state.namespace, key);
+            bytes32 storeValue = state.store.get(state.namespace, key);
 
             // Push fetched value to memory to make subsequent lookups on the
             // same key find a cache HIT.
             state.stateKV = state.stateKV.set(MemoryKVKey.wrap(key), MemoryKVVal.wrap(storeValue));
 
-            outputs[0] = storeValue;
+            outputs[0] = StackItem.wrap(storeValue);
         }
         // Cache HIT.
         else {
-            outputs[0] = MemoryKVVal.unwrap(value);
+            outputs[0] = StackItem.wrap(MemoryKVVal.unwrap(value));
         }
 
         return outputs;

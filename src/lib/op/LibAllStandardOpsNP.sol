@@ -24,7 +24,7 @@ import {LibOpEncodeBitsNP} from "./bitwise/LibOpEncodeBitsNP.sol";
 import {LibOpShiftBitsLeftNP} from "./bitwise/LibOpShiftBitsLeftNP.sol";
 import {LibOpShiftBitsRightNP} from "./bitwise/LibOpShiftBitsRightNP.sol";
 
-import {LibOpCallNP} from "./call/LibOpCallNP.sol";
+import {LibOpCall} from "./call/LibOpCall.sol";
 
 import {LibOpHashNP} from "./crypto/LibOpHashNP.sol";
 
@@ -93,7 +93,7 @@ import {LibOpMod} from "./math/LibOpMod.sol";
 // import {LibOpSqrt} from "./math/LibOpSqrt.sol";
 // import {LibOpSub} from "./math/LibOpSub.sol";
 
-import {LibOpGetNP} from "./store/LibOpGetNP.sol";
+import {LibOpGet} from "./store/LibOpGet.sol";
 import {LibOpSetNP} from "./store/LibOpSetNP.sol";
 
 import {LibParseLiteral, ParseState, LITERAL_PARSERS_LENGTH} from "../parse/literal/LibParseLiteral.sol";
@@ -547,7 +547,7 @@ library LibAllStandardOpsNP {
                     LibOpEncodeBitsNP.integrity,
                     LibOpShiftBitsLeftNP.integrity,
                     LibOpShiftBitsRightNP.integrity,
-                    LibOpCallNP.integrity,
+                    LibOpCall.integrity,
                     LibOpHashNP.integrity,
                     // LibOpUint256ERC20Allowance.integrity,
                     // LibOpUint256ERC20BalanceOf.integrity,
@@ -613,7 +613,7 @@ library LibAllStandardOpsNP {
                     // LibOpSub.integrity,
                     // // saturating-sub is a repeat of sub.
                     // LibOpSub.integrity,
-                    LibOpGetNP.integrity,
+                    LibOpGet.integrity,
                     LibOpSetNP.integrity
                 ];
             uint256[] memory pointersDynamic;
@@ -659,7 +659,7 @@ library LibAllStandardOpsNP {
                     LibOpEncodeBitsNP.run,
                     LibOpShiftBitsLeftNP.run,
                     LibOpShiftBitsRightNP.run,
-                    LibOpCallNP.run,
+                    LibOpCall.run,
                     LibOpHashNP.run,
                     // LibOpUint256ERC20Allowance.run,
                     // LibOpUint256ERC20BalanceOf.run,
@@ -725,7 +725,7 @@ library LibAllStandardOpsNP {
                     // LibOpSub.run,
                     // // saturating-sub is a repeat of sub.
                     // LibOpSub.run,
-                    LibOpGetNP.run,
+                    LibOpGet.run,
                     LibOpSetNP.run
                 ];
             uint256[] memory pointersDynamic;

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
 import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
 
@@ -28,7 +28,7 @@ library LibOpContextNP {
         if (Pointer.unwrap(stackTop) < 0x20) {
             revert("stack underflow");
         }
-        uint256 v = state.context[i][j];
+        bytes32 v = state.context[i][j];
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
             mstore(stackTop, v)
@@ -36,10 +36,10 @@ library LibOpContextNP {
         return stackTop;
     }
 
-    function referenceFn(InterpreterStateNP memory state, OperandV2 operand, uint256[] memory)
+    function referenceFn(InterpreterStateNP memory state, OperandV2 operand, StackItem[] memory)
         internal
         pure
-        returns (uint256[] memory outputs)
+        returns (StackItem[] memory outputs)
     {
         uint256 i = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFF)));
         uint256 j = uint256((OperandV2.unwrap(operand) >> 8) & bytes32(uint256(0xFF)));
@@ -47,9 +47,9 @@ library LibOpContextNP {
         // because we don't know the shape of the context at compile time.
         // Solidity handles that for us as long as we don't invoke yul for the
         // reads.
-        uint256 v = state.context[i][j];
-        outputs = new uint256[](1);
-        outputs[0] = v;
+        bytes32 v = state.context[i][j];
+        outputs = new StackItem[](1);
+        outputs[0] = StackItem.wrap(v);
         return outputs;
     }
 }

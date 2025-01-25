@@ -7,22 +7,21 @@ import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibMemoryKV, MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 /// Thrown when the inputs length does not match the expected inputs length.
 /// @param expected The expected number of inputs.
 /// @param actual The actual number of inputs.
 error InputsLengthMismatch(uint256 expected, uint256 actual);
 
-library LibEvalNP {
+library LibEval {
     using LibMemoryKV for MemoryKV;
 
-    function evalLoopNP(
-        InterpreterStateNP memory state,
-        uint256 parentSourceIndex,
-        Pointer stackTop,
-        Pointer stackBottom
-    ) internal view returns (Pointer) {
+    function evalLoop(InterpreterStateNP memory state, uint256 parentSourceIndex, Pointer stackTop, Pointer stackBottom)
+        internal
+        view
+        returns (Pointer)
+    {
         uint256 sourceIndex = state.sourceIndex;
         uint256 cursor;
         uint256 end;
@@ -159,10 +158,10 @@ library LibEvalNP {
         return stackTop;
     }
 
-    function eval2(InterpreterStateNP memory state, uint256[] memory inputs, uint256 maxOutputs)
+    function eval2(InterpreterStateNP memory state, StackItem[] memory inputs, uint256 maxOutputs)
         internal
         view
-        returns (uint256[] memory, uint256[] memory)
+        returns (StackItem[] memory, bytes32[] memory)
     {
         unchecked {
             // Use the bytecode's own definition of its IO. Clear example of
@@ -194,7 +193,7 @@ library LibEvalNP {
 
             // Run the loop.
             // Parent source index and child are the same at the root eval.
-            stackTop = evalLoopNP(state, state.sourceIndex, stackTop, stackBottom);
+            stackTop = evalLoop(state, state.sourceIndex, stackTop, stackBottom);
 
             // Convert the stack top pointer to an array with the correct length.
             // If the stack top is pointing to the base of Solidity's understanding
@@ -204,13 +203,13 @@ library LibEvalNP {
             // and the original stack MUST be immutable as they're both pointing to
             // the same memory region.
             uint256 outputs = maxOutputs < sourceOutputs ? maxOutputs : sourceOutputs;
-            uint256[] memory stack;
+            StackItem[] memory stack;
             assembly ("memory-safe") {
                 stack := sub(stackTop, 0x20)
                 mstore(stack, outputs)
             }
 
-            return (stack, state.stateKV.toUint256Array());
+            return (stack, state.stateKV.toBytes32Array());
         }
     }
 }

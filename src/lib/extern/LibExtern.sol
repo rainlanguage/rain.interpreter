@@ -5,7 +5,8 @@ import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpre
 import {
     IInterpreterExternV4,
     ExternDispatchV2,
-    EncodedExternDispatchV2
+    EncodedExternDispatchV2,
+    StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterExternV4.sol";
 
 /// @title LibExtern

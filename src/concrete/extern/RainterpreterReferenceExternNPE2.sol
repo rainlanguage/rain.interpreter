@@ -10,7 +10,7 @@ import {
     IParserToolingV1,
     ISubParserToolingV1
 } from "../../abstract/BaseRainterpreterSubParserNPE2.sol";
-import {LibExtern, EncodedExternDispatchV2, IInterpreterExternV4} from "../../lib/extern/LibExtern.sol";
+import {LibExtern, EncodedExternDispatchV2, IInterpreterExternV4, StackItem} from "../../lib/extern/LibExtern.sol";
 import {LibSubParse} from "../../lib/parse/LibSubParse.sol";
 import {LibParseState, ParseState} from "../../lib/parse/LibParseState.sol";
 import {LibParseOperand} from "../../lib/parse/LibParseOperand.sol";
@@ -33,7 +33,7 @@ import {
     INTEGRITY_FUNCTION_POINTERS,
     OPCODE_FUNCTION_POINTERS
 } from "../../generated/RainterpreterReferenceExternNPE2.pointers.sol";
-import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
 /// 1:1 with the number of opcodes provided by the extern component of this
@@ -223,7 +223,7 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
         pure
         virtual
         override
-        returns (bool, uint256, uint256)
+        returns (bool, uint256, bytes32)
     {
         unchecked {
             uint256 length = end - cursor;
@@ -248,7 +248,11 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
                     revert InvalidRepeatCount();
                 }
 
-                return (true, SUB_PARSER_LITERAL_REPEAT_INDEX, LibDecimalFloat.pack(signedCoefficient, exponent));
+                return (
+                    true,
+                    SUB_PARSER_LITERAL_REPEAT_INDEX,
+                    PackedFloat.unwrap(LibDecimalFloat.pack(signedCoefficient, exponent))
+                );
             } else {
                 return (false, 0, 0);
             }
@@ -260,12 +264,12 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// @inheritdoc IParserToolingV1
     function buildOperandHandlerFunctionPointers() external pure override returns (bytes memory) {
         unchecked {
-            function(uint256[] memory) internal pure returns (OperandV2) lengthPointer;
+            function(bytes32[] memory) internal pure returns (OperandV2) lengthPointer;
             uint256 length = SUB_PARSER_WORD_PARSERS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(uint256[] memory) internal pure returns (OperandV2)[SUB_PARSER_WORD_PARSERS_LENGTH + 1] memory
+            function(bytes32[] memory) internal pure returns (OperandV2)[SUB_PARSER_WORD_PARSERS_LENGTH + 1] memory
                 handlersFixed = [
                     lengthPointer,
                     // inc
@@ -303,13 +307,13 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// @inheritdoc ISubParserToolingV1
     function buildSubParserWordParsers() external pure returns (bytes memory) {
         unchecked {
-            function(uint256, uint256, OperandV2) internal view returns (bool, bytes memory, uint256[] memory)
+            function(uint256, uint256, OperandV2) internal view returns (bool, bytes memory, bytes32[] memory)
                 lengthPointer;
             uint256 length = SUB_PARSER_WORD_PARSERS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(uint256, uint256, OperandV2) internal view returns (bool, bytes memory, uint256[] memory)[SUB_PARSER_WORD_PARSERS_LENGTH
+            function(uint256, uint256, OperandV2) internal view returns (bool, bytes memory, bytes32[] memory)[SUB_PARSER_WORD_PARSERS_LENGTH
                 + 1] memory pointersFixed = [
                     lengthPointer,
                     LibExternOpIntIncNPE2.subParser,
@@ -341,12 +345,12 @@ contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, Bas
     /// relative to the bytecode of the current contract, not the test contract.
     function buildOpcodeFunctionPointers() external pure returns (bytes memory) {
         unchecked {
-            function(OperandV2, uint256[] memory) internal view returns (uint256[] memory) lengthPointer;
+            function(OperandV2, StackItem[] memory) internal view returns (StackItem[] memory) lengthPointer;
             uint256 length = OPCODE_FUNCTION_POINTERS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(OperandV2, uint256[] memory) internal view returns (uint256[] memory)[OPCODE_FUNCTION_POINTERS_LENGTH
+            function(OperandV2, StackItem[] memory) internal view returns (StackItem[] memory)[OPCODE_FUNCTION_POINTERS_LENGTH
                 + 1] memory pointersFixed = [lengthPointer, LibExternOpIntIncNPE2.run];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {

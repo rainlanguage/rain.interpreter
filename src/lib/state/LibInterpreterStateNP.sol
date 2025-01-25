@@ -16,7 +16,7 @@ struct InterpreterStateNP {
     MemoryKV stateKV;
     FullyQualifiedNamespace namespace;
     IInterpreterStoreV2 store;
-    uint256[][] context;
+    bytes32[][] context;
     bytes bytecode;
     bytes fs;
 }

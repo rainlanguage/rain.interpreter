@@ -12,17 +12,17 @@ import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpr
 import {OpTest} from "test/abstract/OpTest.sol";
 import {BytecodeTest} from "rain.interpreter.interface/../test/abstract/BytecodeTest.sol";
 import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
-import {LibOpCallNP, CallOutputsExceedSource} from "src/lib/op/call/LibOpCallNP.sol";
+import {LibOpCall, CallOutputsExceedSource} from "src/lib/op/call/LibOpCall.sol";
 import {LibBytecode, SourceIndexOutOfBounds} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {STACK_TRACER} from "src/lib/state/LibInterpreterStateNP.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
-/// @title LibOpCallNPTest
-/// @notice Test the LibOpCallNP library that includes the "call" word.
-contract LibOpCallNPTest is OpTest, BytecodeTest {
-    /// Directly test the integrity logic of LibOpCallNP. This tests that if the
+/// @title LibOpCallTest
+/// @notice Test the LibOpCall library that includes the "call" word.
+contract LibOpCallTest is OpTest, BytecodeTest {
+    /// Directly test the integrity logic of LibOpCall. This tests that if the
     /// outputs in the operand exceed the outputs available from the source, then
     /// the call will revert.
     function testOpCallNPIntegrityTooManyOutputs(
@@ -46,10 +46,10 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
 
         OperandV2 operand = LibOperand.build(uint8(inputs), uint8(outputs), uint16(sourceIndex));
         vm.expectRevert(abi.encodeWithSelector(CallOutputsExceedSource.selector, sourceOutputs, outputs));
-        LibOpCallNP.integrity(state, operand);
+        LibOpCall.integrity(state, operand);
     }
 
-    /// Directly test the integrity logic of LibOpCallNP. This tests that if the
+    /// Directly test the integrity logic of LibOpCall. This tests that if the
     /// source index in the operand is outside the source count of the bytecode,
     /// this will revert as `SourceIndexOutOfBounds`.
     function testOpCallNPIntegritySourceIndexOutOfBounds(
@@ -70,10 +70,10 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
 
         OperandV2 operand = LibOperand.build(uint8(inputs), uint8(outputs), uint16(sourceIndex));
         vm.expectRevert(abi.encodeWithSelector(SourceIndexOutOfBounds.selector, sourceIndex, state.bytecode));
-        LibOpCallNP.integrity(state, operand);
+        LibOpCall.integrity(state, operand);
     }
 
-    /// Directly test the integrity logic of LibOpCallNP. This tests that if the
+    /// Directly test the integrity logic of LibOpCall. This tests that if the
     /// outputs in the operand are within the bounds set by the source, then the
     /// inputs is always specified by the source (callee), and the outputs are
     /// always specified by the operand (caller).
@@ -96,7 +96,7 @@ contract LibOpCallNPTest is OpTest, BytecodeTest {
         assertTrue(sourceIndex <= type(uint8).max);
 
         OperandV2 operand = LibOperand.build(uint8(inputs), uint8(outputs), uint16(sourceIndex));
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpCallNP.integrity(state, operand);
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpCall.integrity(state, operand);
         uint256 sourceInputs = uint8(state.bytecode[sourcePosition + 2]);
         assertEq(calcInputs, sourceInputs, "inputs");
         assertEq(calcOutputs, outputs, "outputs");

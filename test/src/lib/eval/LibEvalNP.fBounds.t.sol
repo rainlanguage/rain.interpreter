@@ -5,13 +5,13 @@ import {Test} from "forge-std/Test.sol";
 
 import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
-import {LibEvalNP} from "src/lib/eval/LibEvalNP.sol";
+import {LibEval} from "src/lib/eval/LibEval.sol";
 import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {
     IInterpreterStoreV2, FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 
-contract LibEvalNPFBoundsTest is Test {
+contract LibEvalFBoundsTest is Test {
     /// Due to the mod of indexes to function pointers the indexes wrap at the
     /// length of the function pointers. Test that the length of the fn pointers
     /// + 1 is the constant op.
@@ -125,7 +125,7 @@ contract LibEvalNPFBoundsTest is Test {
             fs
         );
 
-        (uint256[] memory outputs, uint256[] memory kvs) = LibEvalNP.eval2(state, new uint256[](0), type(uint256).max);
+        (uint256[] memory outputs, uint256[] memory kvs) = LibEval.eval2(state, new uint256[](0), type(uint256).max);
         assertEq(outputs.length, expectedLength);
         for (uint256 i = 0; i < outputs.length; i++) {
             assertEq(outputs[i], c);
@@ -137,7 +137,7 @@ contract LibEvalNPFBoundsTest is Test {
             bytecode[i] = bytes1(uint8(uint8(fs.length / 2) + 1));
         }
 
-        (outputs, kvs) = LibEvalNP.eval2(state, new uint256[](0), type(uint256).max);
+        (outputs, kvs) = LibEval.eval2(state, new uint256[](0), type(uint256).max);
         assertEq(outputs.length, expectedLength);
         for (uint256 i = 0; i < outputs.length; i++) {
             assertEq(outputs[i], c);
