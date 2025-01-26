@@ -8,7 +8,7 @@ import {EvalV4, SourceIndexV2} from "rain.interpreter.interface/interface/unstab
 import {LibNamespace} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
 import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
-contract RainterpreterNPE2StateOverlayTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
+contract RainterpreterStateOverlayTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     /// Show that state overlay can prewarm a get.
     function testStateOverlayGet() external view {
         bytes memory bytecode = iDeployer.parse2("_: get(9);");

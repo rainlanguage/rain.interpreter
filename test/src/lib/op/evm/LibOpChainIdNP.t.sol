@@ -12,8 +12,8 @@ pragma solidity =0.8.25;
 // // import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 // // import {LibOpChainIdNP} from "src/lib/op/evm/LibOpChainIdNP.sol";
 
-// // import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
-// // import {RainterpreterStoreNPE2, FullyQualifiedNamespace} from "src/concrete/RainterpreterStoreNPE2.sol";
+// // import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
+// // import {RainterpreterStore, FullyQualifiedNamespace} from "src/concrete/RainterpreterStore.sol";
 // // import {RainterpreterExpressionDeployerNPE2} from "src/concrete/RainterpreterExpressionDeployerNPE2.sol";
 // // import {
 // //     Operand, IInterpreterV4, SourceIndexV2

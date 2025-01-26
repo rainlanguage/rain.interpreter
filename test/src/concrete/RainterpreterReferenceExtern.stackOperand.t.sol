@@ -2,16 +2,16 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {RainterpreterReferenceExternNPE2} from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
+import {RainterpreterReferenceExtern} from "src/concrete/extern/RainterpreterReferenceExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 
-contract RainterpreterReferenceExternNPE2StackOperandTest is OpTest {
+contract RainterpreterReferenceExternStackOperandTest is OpTest {
     using Strings for address;
     using Strings for uint256;
 
-    function testRainterpreterReferenceExternNPE2StackOperandSingle(uint256 value) external {
+    function testRainterpreterReferenceExternStackOperandSingle(uint256 value) external {
         value = bound(value, 0, type(uint16).max);
-        RainterpreterReferenceExternNPE2 extern = new RainterpreterReferenceExternNPE2();
+        RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();
 
         uint256[] memory expectedStack = new uint256[](1);
         expectedStack[0] = value;

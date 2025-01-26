@@ -2,11 +2,11 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {RainterpreterNPE2, OPCODE_FUNCTION_POINTERS} from "src/concrete/RainterpreterNPE2.sol";
+import {Rainterpreter, OPCODE_FUNCTION_POINTERS} from "src/concrete/Rainterpreter.sol";
 
-contract RainterpreterNPE2PointersTest is Test {
+contract RainterpreterPointersTest is Test {
     function testOpcodeFunctionPointers() external {
-        RainterpreterNPE2 interpreter = new RainterpreterNPE2();
+        Rainterpreter interpreter = new Rainterpreter();
         bytes memory expected = interpreter.buildOpcodeFunctionPointers();
         bytes memory actual = OPCODE_FUNCTION_POINTERS;
         assertEq(actual, expected);

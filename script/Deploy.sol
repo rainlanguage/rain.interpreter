@@ -2,8 +2,8 @@
 pragma solidity =0.8.25;
 
 import {Script} from "forge-std/Script.sol";
-import {RainterpreterStoreNPE2} from "../src/concrete/RainterpreterStoreNPE2.sol";
-import {RainterpreterNPE2} from "../src/concrete/RainterpreterNPE2.sol";
+import {RainterpreterStore} from "../src/concrete/RainterpreterStore.sol";
+import {Rainterpreter} from "../src/concrete/Rainterpreter.sol";
 import {RainterpreterParserNPE2} from "../src/concrete/RainterpreterParserNPE2.sol";
 import {
     RainterpreterExpressionDeployerNPE2,
@@ -26,11 +26,11 @@ contract Deploy is Script {
         RainterpreterParserNPE2 parser = new RainterpreterParserNPE2();
         vm.writeFile("deployments/latest/RainterpreterParserNPE2", vm.toString(address(parser)));
 
-        RainterpreterStoreNPE2 store = new RainterpreterStoreNPE2();
-        vm.writeFile("deployments/latest/RainterpreterStoreNPE2", vm.toString(address(store)));
+        RainterpreterStore store = new RainterpreterStore();
+        vm.writeFile("deployments/latest/RainterpreterStore", vm.toString(address(store)));
 
-        RainterpreterNPE2 interpreter = new RainterpreterNPE2();
-        vm.writeFile("deployments/latest/RainterpreterNPE2", vm.toString(address(interpreter)));
+        Rainterpreter interpreter = new Rainterpreter();
+        vm.writeFile("deployments/latest/Rainterpreter", vm.toString(address(interpreter)));
 
         RainterpreterExpressionDeployerNPE2 deployer = new RainterpreterExpressionDeployerNPE2(
             RainterpreterExpressionDeployerNPE2ConstructionConfigV2(

@@ -3,12 +3,12 @@ pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {
-    RainterpreterReferenceExternNPE2,
+    RainterpreterReferenceExtern,
     OPCODE_FUNCTION_POINTERS,
     INTEGRITY_FUNCTION_POINTERS,
     OP_INDEX_INCREMENT,
     LibExternOpIntIncNPE2
-} from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
+} from "src/concrete/extern/RainterpreterReferenceExtern.sol";
 import {
     ExternDispatch,
     EncodedExternDispatch,
@@ -21,11 +21,11 @@ import {OPCODE_EXTERN} from "rain.interpreter.interface/interface/unstable/IInte
 import {ExternDispatchConstantsHeightOverflow} from "src/error/ErrSubParse.sol";
 import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
-contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
+contract RainterpreterReferenceExternIntIncTest is OpTest {
     using Strings for address;
 
-    function testRainterpreterReferenceExternNPE2IntIncHappyUnsugared() external {
-        RainterpreterReferenceExternNPE2 extern = new RainterpreterReferenceExternNPE2();
+    function testRainterpreterReferenceExternIntIncHappyUnsugared() external {
+        RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();
 
         uint256 intIncOpcode = 0;
 
@@ -52,8 +52,8 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
         );
     }
 
-    function testRainterpreterReferenceExternNPE2IntIncHappySugared() external {
-        RainterpreterReferenceExternNPE2 extern = new RainterpreterReferenceExternNPE2();
+    function testRainterpreterReferenceExternIntIncHappySugared() external {
+        RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();
 
         uint256[] memory expectedStack = new uint256[](2);
         expectedStack[0] = LibDecimalFloat.pack(4e37, -37);
@@ -70,12 +70,12 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
 
     /// Directly test the subparsing of the reference extern opcode.
     /// forge-config: default.fuzz.runs = 100
-    function testRainterpreterReferenceExternNPE2IntIncSubParseKnownWord(uint16 constantsHeight, bytes1 ioByte)
+    function testRainterpreterReferenceExternIntIncSubParseKnownWord(uint16 constantsHeight, bytes1 ioByte)
         external
     {
         // Extern "only" supports up to constant height of 0xFF.
         constantsHeight = uint16(bound(constantsHeight, 0, 0xFF));
-        RainterpreterReferenceExternNPE2 subParser = new RainterpreterReferenceExternNPE2();
+        RainterpreterReferenceExtern subParser = new RainterpreterReferenceExtern();
 
         bytes memory wordToParse = bytes("ref-extern-inc");
         (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParseWord2(
@@ -107,7 +107,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
     /// we get a false for success if the subparser doesn't recognize the word
     /// but the data is otherwise valid.
     /// forge-config: default.fuzz.runs = 100
-    function testRainterpreterReferenceExternNPE2IntIncSubParseUnknownWord(
+    function testRainterpreterReferenceExternIntIncSubParseUnknownWord(
         uint16 constantsHeight,
         bytes1 ioByte,
         bytes memory unknownWord
@@ -116,7 +116,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
         vm.assume(unknownWord.length < 32);
         // Extern "only" supports up to constant height of 0xFF.
         constantsHeight = uint16(bound(constantsHeight, 0, 0xFF));
-        RainterpreterReferenceExternNPE2 subParser = new RainterpreterReferenceExternNPE2();
+        RainterpreterReferenceExtern subParser = new RainterpreterReferenceExtern();
 
         (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParseWord2(
             bytes.concat(bytes2(constantsHeight), ioByte, bytes2(uint16(unknownWord.length)), unknownWord, bytes32(0))
@@ -129,7 +129,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
     /// Test the inc library directly. The run function should increment every
     /// value it is passed by 1.
     /// forge-config: default.fuzz.runs = 100
-    function testRainterpreterReferenceExternNPE2IntIncRun(OperandV2 operand, uint256[] memory inputs) external pure {
+    function testRainterpreterReferenceExternIntIncRun(OperandV2 operand, uint256[] memory inputs) external pure {
         uint256[] memory expectedOutputs = new uint256[](inputs.length);
         for (uint256 i = 0; i < inputs.length; i++) {
             inputs[i] = bound(inputs[i], 0, uint256(int256(type(int128).max)));
@@ -148,7 +148,7 @@ contract RainterpreterReferenceExternNPE2IntIncTest is OpTest {
     /// Test the inc library directly. The integrity function should return the
     /// same inputs and outputs.
     /// forge-config: default.fuzz.runs = 100
-    function testRainterpreterReferenceExternNPE2IntIncIntegrity(OperandV2 operand, uint256 inputs, uint256 outputs)
+    function testRainterpreterReferenceExternIntIncIntegrity(OperandV2 operand, uint256 inputs, uint256 outputs)
         external
         pure
     {

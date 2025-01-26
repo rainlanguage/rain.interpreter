@@ -10,7 +10,7 @@ import {LibCast} from "rain.lib.typecast/LibCast.sol";
 import {LibDataContract} from "rain.datacontract/lib/LibDataContract.sol";
 
 import {LibEval} from "../lib/eval/LibEval.sol";
-import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
+import {LibInterpreterStateDataContract} from "../lib/state/LibInterpreterStateDataContract.sol";
 import {InterpreterState} from "../lib/state/LibInterpreterState.sol";
 import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
 import {
@@ -22,15 +22,15 @@ import {
 import {
     BYTECODE_HASH as INTERPRETER_BYTECODE_HASH,
     OPCODE_FUNCTION_POINTERS
-} from "../generated/RainterpreterNPE2.pointers.sol";
+} from "../generated/Rainterpreter.pointers.sol";
 import {IOpcodeToolingV1} from "rain.sol.codegen/interface/IOpcodeToolingV1.sol";
 
-/// @title RainterpreterNPE2
+/// @title Rainterpreter
 /// @notice Implementation of a Rainlang interpreter that is compatible with
 /// native onchain Rainlang parsing.
-contract RainterpreterNPE2 is IInterpreterV4, IOpcodeToolingV1, ERC165 {
+contract Rainterpreter is IInterpreterV4, IOpcodeToolingV1, ERC165 {
     using LibEval for InterpreterState;
-    using LibInterpreterStateDataContractNP for bytes;
+    using LibInterpreterStateDataContract for bytes;
 
     /// @inheritdoc IInterpreterV4
     function eval4(EvalV4 calldata eval)

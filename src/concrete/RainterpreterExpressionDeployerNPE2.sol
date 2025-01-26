@@ -21,12 +21,12 @@ import {IDescribedByMetaV1} from "rain.metadata/interface/IDescribedByMetaV1.sol
 import {IInterpreterV4} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 import {LibIntegrityCheckNP} from "../lib/integrity/LibIntegrityCheckNP.sol";
-import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
+import {LibInterpreterStateDataContract} from "../lib/state/LibInterpreterStateDataContract.sol";
 import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
 import {LibParse, LibParseMeta} from "../lib/parse/LibParse.sol";
-import {RainterpreterNPE2, INTERPRETER_BYTECODE_HASH} from "./RainterpreterNPE2.sol";
+import {Rainterpreter, INTERPRETER_BYTECODE_HASH} from "./Rainterpreter.sol";
 import {PARSER_BYTECODE_HASH} from "./RainterpreterParserNPE2.sol";
-import {STORE_BYTECODE_HASH} from "./RainterpreterStoreNPE2.sol";
+import {STORE_BYTECODE_HASH} from "./RainterpreterStore.sol";
 import {
     INTEGRITY_FUNCTION_POINTERS,
     DESCRIBED_BY_META_HASH
@@ -34,7 +34,7 @@ import {
 import {IIntegrityToolingV1} from "rain.sol.codegen/interface/IIntegrityToolingV1.sol";
 import {IParserV1View} from "rain.interpreter.interface/interface/deprecated/IParserV1View.sol";
 
-/// All config required to construct a `RainterpreterNPE2`.
+/// All config required to construct a `Rainterpreter`.
 /// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match
 /// known bytecode.
 /// @param store The `IInterpreterStoreV2`. MUST match known bytecode.
@@ -112,7 +112,7 @@ contract RainterpreterExpressionDeployerNPE2 is
     function parse2(bytes memory data) external view virtual override returns (bytes memory) {
         (bytes memory bytecode, uint256[] memory constants) = iParser.parse(data);
 
-        uint256 size = LibInterpreterStateDataContractNP.serializeSizeNP(bytecode, constants);
+        uint256 size = LibInterpreterStateDataContract.serializeSizeNP(bytecode, constants);
         bytes memory serialized;
         Pointer cursor;
         assembly ("memory-safe") {
@@ -121,7 +121,7 @@ contract RainterpreterExpressionDeployerNPE2 is
             mstore(serialized, size)
             cursor := add(serialized, 0x20)
         }
-        LibInterpreterStateDataContractNP.unsafeSerializeNP(cursor, bytecode, constants);
+        LibInterpreterStateDataContract.unsafeSerializeNP(cursor, bytecode, constants);
 
         bytes memory io = LibIntegrityCheckNP.integrityCheck2(INTEGRITY_FUNCTION_POINTERS, bytecode, constants);
         // Nothing is done with IO in IParserV2.

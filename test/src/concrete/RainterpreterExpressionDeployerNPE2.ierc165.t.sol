@@ -11,9 +11,9 @@ import {
 import {IParserPragmaV1} from "rain.interpreter.interface/interface/IParserPragmaV1.sol";
 import {IParserV2} from "rain.interpreter.interface/interface/IParserV2.sol";
 import {IDescribedByMetaV1} from "rain.metadata/interface/IDescribedByMetaV1.sol";
-import {RainterpreterNPE2} from "src/concrete/RainterpreterNPE2.sol";
+import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
 import {RainterpreterParserNPE2} from "src/concrete/RainterpreterParserNPE2.sol";
-import {RainterpreterStoreNPE2} from "src/concrete/RainterpreterStoreNPE2.sol";
+import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
 
 contract RainterpreterExpressionDeployerNPE2IERC165Test is Test {
     /// Test that ERC165 is implemented for all interfaces.
@@ -25,8 +25,8 @@ contract RainterpreterExpressionDeployerNPE2IERC165Test is Test {
 
         RainterpreterExpressionDeployerNPE2 deployer = new RainterpreterExpressionDeployerNPE2(
             RainterpreterExpressionDeployerNPE2ConstructionConfigV2(
-                address(new RainterpreterNPE2()),
-                address(new RainterpreterStoreNPE2()),
+                address(new Rainterpreter()),
+                address(new RainterpreterStore()),
                 address(new RainterpreterParserNPE2())
             )
         );

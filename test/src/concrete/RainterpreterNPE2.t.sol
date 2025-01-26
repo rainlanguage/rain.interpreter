@@ -3,13 +3,13 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 
-import {RainterpreterNPE2, OPCODE_FUNCTION_POINTERS} from "src/concrete/RainterpreterNPE2.sol";
+import {Rainterpreter, OPCODE_FUNCTION_POINTERS} from "src/concrete/Rainterpreter.sol";
 
-/// @title RainterpreterNPE2Test
+/// @title RainterpreterTest
 /// Test suite for RainterpreterNP.
-contract RainterpreterNPE2Test is Test {
+contract RainterpreterTest is Test {
     /// The function pointers of the interpreter must be even non-zero length.
-    function testRainterpreterNPE2OddFunctionPointersLength() external pure {
+    function testRainterpreterOddFunctionPointersLength() external pure {
         assertTrue(OPCODE_FUNCTION_POINTERS.length % 2 == 0);
         assertTrue(OPCODE_FUNCTION_POINTERS.length > 0);
     }

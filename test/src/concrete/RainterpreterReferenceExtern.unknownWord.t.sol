@@ -2,15 +2,15 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {RainterpreterReferenceExternNPE2} from "src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
+import {RainterpreterReferenceExtern} from "src/concrete/extern/RainterpreterReferenceExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {UnknownWord} from "src/error/ErrParse.sol";
 
-contract RainterpreterReferenceExternNPE2UnknownWordTest is OpTest {
+contract RainterpreterReferenceExternUnknownWordTest is OpTest {
     using Strings for address;
 
-    function testRainterpreterReferenceExternNPE2UnknownWord() external {
-        RainterpreterReferenceExternNPE2 extern = new RainterpreterReferenceExternNPE2();
+    function testRainterpreterReferenceExternUnknownWord() external {
+        RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();
 
         checkUnhappyParse(
             bytes(string.concat("using-words-from ", address(extern).toHexString(), " _: not-a-word();")),

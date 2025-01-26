@@ -32,7 +32,7 @@ import {
     LITERAL_PARSER_FUNCTION_POINTERS,
     INTEGRITY_FUNCTION_POINTERS,
     OPCODE_FUNCTION_POINTERS
-} from "../../generated/RainterpreterReferenceExternNPE2.pointers.sol";
+} from "../../generated/RainterpreterReferenceExtern.pointers.sol";
 import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
@@ -69,12 +69,12 @@ error InvalidRepeatCount();
 /// @dev Number of opcode function pointers available to run at eval time.
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
 
-/// @title LibRainterpreterReferenceExternNPE2
+/// @title LibRainterpreterReferenceExtern
 /// This library allows code SEPARATE FROM the implementation contract to do
 /// offchain processing of supporting data without needing to compile all this
 /// information into the implementation contract. Any tooling that supports
 /// solidity can read this data and expose it to end users.
-library LibRainterpreterReferenceExternNPE2 {
+library LibRainterpreterReferenceExtern {
     /// This mirrors the `authoringMeta` function in `LibAllStandardOps`. The
     /// goal is to produce a standard encoded `AuthoringMeta[]` that tooling can
     /// use to describe all the parseable words, that can be built directly into
@@ -118,7 +118,7 @@ library LibRainterpreterReferenceExternNPE2 {
     }
 }
 
-/// @title RainterpreterReferenceExternNPE2
+/// @title RainterpreterReferenceExtern
 /// This is a reference implementation of BOTH the sub parser and extern
 /// interfaces. It is NOT REQUIRED that these be one and the same. It is entirely
 /// possible to implement standalone parsers and extern contracts that each
@@ -147,7 +147,7 @@ library LibRainterpreterReferenceExternNPE2 {
 /// calculated. Any discprepancy there is definitely a critical issue that causes
 /// undefined behaviour in production, so ALWAYS test this, preferably in an
 /// automated way.
-contract RainterpreterReferenceExternNPE2 is BaseRainterpreterSubParserNPE2, BaseRainterpreterExternNPE2 {
+contract RainterpreterReferenceExtern is BaseRainterpreterSubParserNPE2, BaseRainterpreterExternNPE2 {
     function describedByMetaV1() external pure override returns (bytes32) {
         return DESCRIBED_BY_META_HASH;
     }

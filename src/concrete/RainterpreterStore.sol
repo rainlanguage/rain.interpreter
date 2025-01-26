@@ -3,12 +3,12 @@ pragma solidity =0.8.25;
 
 import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
-import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
+import {IInterpreterStoreV3} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV3.sol";
 import {
     LibNamespace, FullyQualifiedNamespace, StateNamespace
 } from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
 
-import {BYTECODE_HASH as STORE_BYTECODE_HASH} from "../generated/RainterpreterStoreNPE2.pointers.sol";
+import {BYTECODE_HASH as STORE_BYTECODE_HASH} from "../generated/RainterpreterStore.pointers.sol";
 
 /// Thrown when a `set` call is made with an odd number of arguments.
 error OddSetLength(uint256 length);
@@ -19,7 +19,7 @@ error OddSetLength(uint256 length);
 /// mapping. `StateNamespace` is fully qualified only by `msg.sender` on set and
 /// doesn't attempt to do any deduping etc. if the same key appears twice it will
 /// be set twice.
-contract RainterpreterStoreNPE2 is IInterpreterStoreV2, ERC165 {
+contract RainterpreterStore is IInterpreterStoreV3, ERC165 {
     using LibNamespace for StateNamespace;
 
     /// Store is several tiers of sandbox.
@@ -38,11 +38,11 @@ contract RainterpreterStoreNPE2 is IInterpreterStoreV2, ERC165 {
 
     /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IInterpreterStoreV2).interfaceId || super.supportsInterface(interfaceId);
+        return interfaceId == type(IInterpreterStoreV3).interfaceId || super.supportsInterface(interfaceId);
     }
 
-    /// @inheritdoc IInterpreterStoreV2
-    function set(StateNamespace namespace, uint256[] calldata kvs) external virtual {
+    /// @inheritdoc IInterpreterStoreV3
+    function set(StateNamespace namespace, bytes32[] calldata kvs) external virtual {
         /// This would be picked up by an out of bounds index below, but it's
         /// nice to have a more specific error message.
         if (kvs.length % 2 != 0) {
@@ -51,16 +51,16 @@ contract RainterpreterStoreNPE2 is IInterpreterStoreV2, ERC165 {
         unchecked {
             FullyQualifiedNamespace fullyQualifiedNamespace = namespace.qualifyNamespace(msg.sender);
             for (uint256 i = 0; i < kvs.length; i += 2) {
-                uint256 key = kvs[i];
-                uint256 value = kvs[i + 1];
+                bytes32 key = kvs[i];
+                bytes32 value = kvs[i + 1];
                 emit Set(fullyQualifiedNamespace, key, value);
                 sStore[fullyQualifiedNamespace][key] = value;
             }
         }
     }
 
-    /// @inheritdoc IInterpreterStoreV2
-    function get(FullyQualifiedNamespace namespace, uint256 key) external view virtual returns (uint256) {
+    /// @inheritdoc IInterpreterStoreV3
+    function get(FullyQualifiedNamespace namespace, bytes32 key) external view virtual returns (bytes32) {
         return sStore[namespace][key];
     }
 }

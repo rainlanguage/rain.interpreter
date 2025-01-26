@@ -9,25 +9,25 @@ import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibMemoryKV, MemoryKV, MemoryKVVal, MemoryKVKey} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {LibNamespace, StateNamespace} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
-import {RainterpreterStoreNPE2, OddSetLength} from "src/concrete/RainterpreterStoreNPE2.sol";
+import {RainterpreterStore, OddSetLength} from "src/concrete/RainterpreterStore.sol";
 
-/// @title RainterpreterStoreNPE2Test
-/// Test suite for RainterpreterStoreNPE2.
-contract RainterpreterStoreNPE2Test is Test {
+/// @title RainterpreterStoreTest
+/// Test suite for RainterpreterStore.
+contract RainterpreterStoreTest is Test {
     using LibNamespace for StateNamespace;
     using LibMemoryKV for MemoryKV;
     using Address for address;
 
     /// Store should introspect support for `IERC165` and `IInterpreterStoreV2`.
     /// It should not support any other interface.
-    function testRainterpreterStoreNPE2IERC165(uint32 badInterfaceIdUint) external {
+    function testRainterpreterStoreIERC165(uint32 badInterfaceIdUint) external {
         // https://github.com/foundry-rs/foundry/issues/6115
         bytes4 badInterfaceId = bytes4(badInterfaceIdUint);
 
         vm.assume(badInterfaceId != type(IERC165).interfaceId);
         vm.assume(badInterfaceId != type(IInterpreterStoreV2).interfaceId);
 
-        RainterpreterStoreNPE2 store = new RainterpreterStoreNPE2();
+        RainterpreterStore store = new RainterpreterStore();
         assertTrue(store.supportsInterface(type(IERC165).interfaceId));
         assertTrue(store.supportsInterface(type(IInterpreterStoreV2).interfaceId));
         assertFalse(store.supportsInterface(badInterfaceId));
@@ -36,10 +36,10 @@ contract RainterpreterStoreNPE2Test is Test {
     /// Ensure the store gives a decent error message when an odd number of
     /// arguments is passed to `set`.
     /// forge-config: default.fuzz.runs = 100
-    function testRainterpreterStoreNPE2SetOddLength(StateNamespace namespace, uint256[] memory kvs) external {
+    function testRainterpreterStoreSetOddLength(StateNamespace namespace, uint256[] memory kvs) external {
         vm.assume(kvs.length % 2 != 0);
 
-        RainterpreterStoreNPE2 store = new RainterpreterStoreNPE2();
+        RainterpreterStore store = new RainterpreterStore();
         vm.expectRevert(abi.encodeWithSelector(OddSetLength.selector, kvs.length));
         store.set(namespace, kvs);
     }
@@ -47,7 +47,7 @@ contract RainterpreterStoreNPE2Test is Test {
     /// Store should set and get values correctly.
     /// This test assumes no dupes.
     /// forge-config: default.fuzz.runs = 100
-    function testRainterpreterStoreNPE2SetGetNoDupesSingle(StateNamespace namespace, uint256[] memory kvs) external {
+    function testRainterpreterStoreSetGetNoDupesSingle(StateNamespace namespace, uint256[] memory kvs) external {
         // Truncate to even length.
         uint256 newLength = kvs.length - (kvs.length % 2);
         LibUint256Array.truncate(kvs, newLength);
@@ -55,7 +55,7 @@ contract RainterpreterStoreNPE2Test is Test {
         for (uint256 i = 0; i < kvs.length; i += 2) {
             kvs[i] = uint256(keccak256(abi.encodePacked(i, kvs[i])));
         }
-        RainterpreterStoreNPE2 store = new RainterpreterStoreNPE2();
+        RainterpreterStore store = new RainterpreterStore();
         store.set(namespace, kvs);
 
         for (uint256 i = 0; i < kvs.length; i += 2) {
@@ -75,7 +75,7 @@ contract RainterpreterStoreNPE2Test is Test {
 
     /// Store should get and set values correctly across many namespaces.j
     /// forge-config: default.fuzz.runs = 100
-    function testRainterpreterStoreNPE2SetGetNoDupesMany(Set[] memory sets) external {
+    function testRainterpreterStoreSetGetNoDupesMany(Set[] memory sets) external {
         uint256 setsLength = sets.length >= 10 ? 10 : sets.length;
         uint256[] memory refs;
         assembly ("memory-safe") {
@@ -94,7 +94,7 @@ contract RainterpreterStoreNPE2Test is Test {
             }
         }
 
-        RainterpreterStoreNPE2 store = new RainterpreterStoreNPE2();
+        RainterpreterStore store = new RainterpreterStore();
         for (uint256 i = 0; i < sets.length; i++) {
             store.set(sets[i].namespace, sets[i].kvs);
             for (uint256 j = 0; j < sets[i].kvs.length; j += 2) {
@@ -120,10 +120,10 @@ contract RainterpreterStoreNPE2Test is Test {
     /// no special logic to make that happen.
     /// forge-config: default.fuzz.runs = 100
 
-    function testRainterpreterStoreNPE2SetGetDupes(Set11[] memory sets) external {
+    function testRainterpreterStoreSetGetDupes(Set11[] memory sets) external {
         vm.assume(sets.length < 20);
 
-        RainterpreterStoreNPE2 store = new RainterpreterStoreNPE2();
+        RainterpreterStore store = new RainterpreterStore();
         for (uint256 i = 0; i < sets.length; i++) {
             uint256[11] memory kvsFixed = sets[i].kvs;
             uint256[] memory kvs;
@@ -141,10 +141,10 @@ contract RainterpreterStoreNPE2Test is Test {
                 kv = LibMemoryKV.set(kv, MemoryKVKey.wrap(key), MemoryKVVal.wrap(value));
             }
 
-            uint256[] memory finalKVs = kv.toUint256Array();
+            bytes32[] memory finalKVs = kv.toBytes32Array();
             for (uint256 j = 0; j < finalKVs.length; j += 2) {
-                uint256 key = finalKVs[j];
-                uint256 value = finalKVs[j + 1];
+                bytes32 key = finalKVs[j];
+                bytes32 value = finalKVs[j + 1];
                 assertEq(store.get(sets[i].namespace.qualifyNamespace(address(this)), key), value);
             }
         }

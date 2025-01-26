@@ -6,11 +6,11 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
 import {FullyQualifiedNamespace} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
+import {IInterpreterStoreV3} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV3.sol";
 
 import {InterpreterState} from "./LibInterpreterState.sol";
 
-library LibInterpreterStateDataContractNP {
+library LibInterpreterStateDataContract {
     using LibBytes for bytes;
 
     function serializeSizeNP(bytes memory bytecode, bytes32[] memory constants) internal pure returns (uint256 size) {
@@ -37,11 +37,11 @@ library LibInterpreterStateDataContractNP {
         }
     }
 
-    function unsafeDeserializeNP(
+    function unsafeDeserialize(
         bytes memory serialized,
         uint256 sourceIndex,
         FullyQualifiedNamespace namespace,
-        IInterpreterStoreV2 store,
+        IInterpreterStoreV3 store,
         bytes32[][] memory context,
         bytes memory fs
     ) internal pure returns (InterpreterState memory) {

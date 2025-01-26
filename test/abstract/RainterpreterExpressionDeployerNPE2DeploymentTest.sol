@@ -6,7 +6,7 @@ import {Test, console2, stdError} from "forge-std/Test.sol";
 import {INVALID_BYTECODE} from "../lib/etch/LibEtch.sol";
 import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV2.sol";
-import {RainterpreterStoreNPE2, STORE_BYTECODE_HASH} from "src/concrete/RainterpreterStoreNPE2.sol";
+import {RainterpreterStore, STORE_BYTECODE_HASH} from "src/concrete/RainterpreterStore.sol";
 import {
     RainterpreterParserNPE2,
     PARSE_META,
@@ -14,8 +14,8 @@ import {
     PARSER_BYTECODE_HASH
 } from "src/concrete/RainterpreterParserNPE2.sol";
 import {
-    RainterpreterNPE2, OPCODE_FUNCTION_POINTERS, INTERPRETER_BYTECODE_HASH
-} from "src/concrete/RainterpreterNPE2.sol";
+    Rainterpreter, OPCODE_FUNCTION_POINTERS, INTERPRETER_BYTECODE_HASH
+} from "src/concrete/Rainterpreter.sol";
 import {
     DESCRIBED_BY_META_HASH,
     INTEGRITY_FUNCTION_POINTERS,
@@ -32,9 +32,9 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
     //solhint-disable-next-line private-vars-leading-underscore
     RainterpreterExpressionDeployerNPE2 internal immutable iDeployer;
     //solhint-disable-next-line private-vars-leading-underscore
-    RainterpreterNPE2 internal immutable iInterpreter;
+    Rainterpreter internal immutable iInterpreter;
     //solhint-disable-next-line private-vars-leading-underscore
-    RainterpreterStoreNPE2 internal immutable iStore;
+    RainterpreterStore internal immutable iStore;
     //solhint-disable-next-line private-vars-leading-underscore
     RainterpreterParserNPE2 internal immutable iParser;
 
@@ -43,8 +43,8 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
     constructor() {
         beforeOpTestConstructor();
 
-        iInterpreter = new RainterpreterNPE2();
-        iStore = new RainterpreterStoreNPE2();
+        iInterpreter = new Rainterpreter();
+        iStore = new RainterpreterStore();
         iParser = new RainterpreterParserNPE2();
 
         // Sanity check the interpreter's bytecode hash.
