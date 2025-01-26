@@ -30,7 +30,7 @@ import {STORE_BYTECODE_HASH} from "./RainterpreterStore.sol";
 import {
     INTEGRITY_FUNCTION_POINTERS,
     DESCRIBED_BY_META_HASH
-} from "../generated/RainterpreterExpressionDeployerNPE2.pointers.sol";
+} from "../generated/RainterpreterExpressionDeployer.pointers.sol";
 import {IIntegrityToolingV1} from "rain.sol.codegen/interface/IIntegrityToolingV1.sol";
 import {IParserV1View} from "rain.interpreter.interface/interface/deprecated/IParserV1View.sol";
 
@@ -39,14 +39,14 @@ import {IParserV1View} from "rain.interpreter.interface/interface/deprecated/IPa
 /// known bytecode.
 /// @param store The `IInterpreterStoreV2`. MUST match known bytecode.
 /// @param parser The `IParserV1View`. MUST match known bytecode.
-struct RainterpreterExpressionDeployerNPE2ConstructionConfigV2 {
+struct RainterpreterExpressionDeployerConstructionConfigV2 {
     address interpreter;
     address store;
     address parser;
 }
 
-/// @title RainterpreterExpressionDeployerNPE2
-contract RainterpreterExpressionDeployerNPE2 is
+/// @title RainterpreterExpressionDeployer
+contract RainterpreterExpressionDeployer is
     IDescribedByMetaV1,
     IParserV2,
     IParserPragmaV1,
@@ -64,7 +64,7 @@ contract RainterpreterExpressionDeployerNPE2 is
     IInterpreterStoreV2 public immutable iStore;
     IParserV1View public immutable iParser;
 
-    constructor(RainterpreterExpressionDeployerNPE2ConstructionConfigV2 memory config) {
+    constructor(RainterpreterExpressionDeployerConstructionConfigV2 memory config) {
         // Set the immutables.
         IInterpreterV4 interpreter = IInterpreterV4(config.interpreter);
         IInterpreterStoreV2 store = IInterpreterStoreV2(config.store);
@@ -110,9 +110,9 @@ contract RainterpreterExpressionDeployerNPE2 is
 
     /// @inheritdoc IParserV2
     function parse2(bytes memory data) external view virtual override returns (bytes memory) {
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(data);
+        (bytes memory bytecode, bytes32[] memory constants) = iParser.parse(data);
 
-        uint256 size = LibInterpreterStateDataContract.serializeSizeNP(bytecode, constants);
+        uint256 size = LibInterpreterStateDataContract.serializeSize(bytecode, constants);
         bytes memory serialized;
         Pointer cursor;
         assembly ("memory-safe") {
@@ -121,7 +121,7 @@ contract RainterpreterExpressionDeployerNPE2 is
             mstore(serialized, size)
             cursor := add(serialized, 0x20)
         }
-        LibInterpreterStateDataContract.unsafeSerializeNP(cursor, bytecode, constants);
+        LibInterpreterStateDataContract.unsafeSerialize(cursor, bytecode, constants);
 
         bytes memory io = LibIntegrityCheckNP.integrityCheck2(INTEGRITY_FUNCTION_POINTERS, bytecode, constants);
         // Nothing is done with IO in IParserV2.

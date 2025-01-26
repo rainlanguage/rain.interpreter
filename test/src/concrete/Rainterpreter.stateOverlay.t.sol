@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {RainterpreterExpressionDeployerNPE2DeploymentTest} from
-    "test/abstract/RainterpreterExpressionDeployerNPE2DeploymentTest.sol";
+import {RainterpreterExpressionDeployerDeploymentTest} from
+    "test/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
 import {FullyQualifiedNamespace, StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {EvalV4, SourceIndexV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibNamespace} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
 import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
-contract RainterpreterStateOverlayTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
+contract RainterpreterStateOverlayTest is RainterpreterExpressionDeployerDeploymentTest {
     /// Show that state overlay can prewarm a get.
     function testStateOverlayGet() external view {
         bytes memory bytecode = iDeployer.parse2("_: get(9);");

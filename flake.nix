@@ -30,7 +30,7 @@
                 -t cbor \
                 -e deflate \
                 -l none \
-                -o meta/RainterpreterExpressionDeployerNPE2.rain.meta \
+                -o meta/RainterpreterExpressionDeployer.rain.meta \
               ;
 
               rain meta build \

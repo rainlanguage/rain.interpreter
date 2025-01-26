@@ -70,9 +70,7 @@ contract RainterpreterReferenceExternIntIncTest is OpTest {
 
     /// Directly test the subparsing of the reference extern opcode.
     /// forge-config: default.fuzz.runs = 100
-    function testRainterpreterReferenceExternIntIncSubParseKnownWord(uint16 constantsHeight, bytes1 ioByte)
-        external
-    {
+    function testRainterpreterReferenceExternIntIncSubParseKnownWord(uint16 constantsHeight, bytes1 ioByte) external {
         // Extern "only" supports up to constant height of 0xFF.
         constantsHeight = uint16(bound(constantsHeight, 0, 0xFF));
         RainterpreterReferenceExtern subParser = new RainterpreterReferenceExtern();

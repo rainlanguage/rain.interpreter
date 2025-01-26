@@ -11,7 +11,7 @@ contract ErrDeploy {}
 /// address upon construction.
 error UnexpectedPointers(bytes actualPointers);
 
-/// Thrown when the `RainterpreterExpressionDeployerNPE2` is constructed with
+/// Thrown when the `RainterpreterExpressionDeployer` is constructed with
 /// unknown interpreter bytecode.
 /// @param expectedBytecodeHash The bytecode hash that was expected at the
 /// interpreter address upon construction.

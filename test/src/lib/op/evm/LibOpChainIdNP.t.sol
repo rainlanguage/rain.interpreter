@@ -14,7 +14,7 @@ pragma solidity =0.8.25;
 
 // // import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
 // // import {RainterpreterStore, FullyQualifiedNamespace} from "src/concrete/RainterpreterStore.sol";
-// // import {RainterpreterExpressionDeployerNPE2} from "src/concrete/RainterpreterExpressionDeployerNPE2.sol";
+// // import {RainterpreterExpressionDeployer} from "src/concrete/RainterpreterExpressionDeployer.sol";
 // // import {
 // //     Operand, IInterpreterV4, SourceIndexV2
 // // } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";

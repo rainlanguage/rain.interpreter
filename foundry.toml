@@ -27,7 +27,7 @@ fs_permissions = [
     { access = "write", path = "./deployments/latest/RainterpreterParserNPE2" },
     { access = "write", path = "./deployments/latest/RainterpreterStore" },
     { access = "write", path = "./deployments/latest/Rainterpreter" },
-    { access = "write", path = "./deployments/latest/RainterpreterExpressionDeployerNPE2" }
+    { access = "write", path = "./deployments/latest/RainterpreterExpressionDeployer" }
 ]
 
 remappings = [

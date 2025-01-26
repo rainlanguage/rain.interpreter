@@ -6,9 +6,9 @@ import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
 import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
 import {RainterpreterParserNPE2, PARSE_META_BUILD_DEPTH} from "src/concrete/RainterpreterParserNPE2.sol";
 import {
-    RainterpreterExpressionDeployerNPE2,
-    RainterpreterExpressionDeployerNPE2ConstructionConfigV2
-} from "src/concrete/RainterpreterExpressionDeployerNPE2.sol";
+    RainterpreterExpressionDeployer,
+    RainterpreterExpressionDeployerConstructionConfigV2
+} from "src/concrete/RainterpreterExpressionDeployer.sol";
 import {
     RainterpreterReferenceExtern,
     LibRainterpreterReferenceExtern,
@@ -23,10 +23,7 @@ contract BuildPointers is Script {
         Rainterpreter interpreter = new Rainterpreter();
 
         LibFs.buildFileForContract(
-            vm,
-            address(interpreter),
-            "Rainterpreter",
-            LibCodeGen.opcodeFunctionPointersConstantString(vm, interpreter)
+            vm, address(interpreter), "Rainterpreter", LibCodeGen.opcodeFunctionPointersConstantString(vm, interpreter)
         );
     }
 
@@ -51,18 +48,16 @@ contract BuildPointers is Script {
         );
     }
 
-    function buildRainterpreterExpressionDeployerNPE2Pointers() internal {
+    function buildRainterpreterExpressionDeployerPointers() internal {
         Rainterpreter interpreter = new Rainterpreter();
         RainterpreterStore store = new RainterpreterStore();
         RainterpreterParserNPE2 parser = new RainterpreterParserNPE2();
 
-        RainterpreterExpressionDeployerNPE2 deployer = new RainterpreterExpressionDeployerNPE2(
-            RainterpreterExpressionDeployerNPE2ConstructionConfigV2(
-                address(interpreter), address(store), address(parser)
-            )
+        RainterpreterExpressionDeployer deployer = new RainterpreterExpressionDeployer(
+            RainterpreterExpressionDeployerConstructionConfigV2(address(interpreter), address(store), address(parser))
         );
 
-        string memory name = "RainterpreterExpressionDeployerNPE2";
+        string memory name = "RainterpreterExpressionDeployer";
 
         LibFs.buildFileForContract(
             vm,
@@ -104,7 +99,7 @@ contract BuildPointers is Script {
         buildRainterpreterPointers();
         buildRainterpreterStorePointers();
         buildRainterpreterParserNPE2Pointers();
-        buildRainterpreterExpressionDeployerNPE2Pointers();
+        buildRainterpreterExpressionDeployerPointers();
         buildRainterpreterReferenceExternPointers();
     }
 }

@@ -13,14 +13,14 @@ import {InterpreterState} from "./LibInterpreterState.sol";
 library LibInterpreterStateDataContract {
     using LibBytes for bytes;
 
-    function serializeSizeNP(bytes memory bytecode, bytes32[] memory constants) internal pure returns (uint256 size) {
+    function serializeSize(bytes memory bytecode, bytes32[] memory constants) internal pure returns (uint256 size) {
         unchecked {
             // bytecode length + constants length * 0x20 + 0x40 for both the bytecode and constants length words.
             size = bytecode.length + constants.length * 0x20 + 0x40;
         }
     }
 
-    function unsafeSerializeNP(Pointer cursor, bytes memory bytecode, bytes32[] memory constants) internal pure {
+    function unsafeSerialize(Pointer cursor, bytes memory bytecode, bytes32[] memory constants) internal pure {
         unchecked {
             // Copy constants into place with length.
             assembly ("memory-safe") {

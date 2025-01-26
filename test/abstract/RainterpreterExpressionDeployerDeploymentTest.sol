@@ -13,24 +13,22 @@ import {
     PARSE_META_BUILD_DEPTH,
     PARSER_BYTECODE_HASH
 } from "src/concrete/RainterpreterParserNPE2.sol";
-import {
-    Rainterpreter, OPCODE_FUNCTION_POINTERS, INTERPRETER_BYTECODE_HASH
-} from "src/concrete/Rainterpreter.sol";
+import {Rainterpreter, OPCODE_FUNCTION_POINTERS, INTERPRETER_BYTECODE_HASH} from "src/concrete/Rainterpreter.sol";
 import {
     DESCRIBED_BY_META_HASH,
     INTEGRITY_FUNCTION_POINTERS,
-    RainterpreterExpressionDeployerNPE2ConstructionConfigV2,
-    RainterpreterExpressionDeployerNPE2
-} from "../../src/concrete/RainterpreterExpressionDeployerNPE2.sol";
+    RainterpreterExpressionDeployerConstructionConfigV2,
+    RainterpreterExpressionDeployer
+} from "../../src/concrete/RainterpreterExpressionDeployer.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
 
 /// @title RainterpreterExpressionDeployerNPD2DeploymentTest
-/// Tests that the RainterpreterExpressionDeployerNPE2 meta is correct. Also
+/// Tests that the RainterpreterExpressionDeployer meta is correct. Also
 /// tests basic functionality of the `IParserV1View` interface implementation.
-abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
+abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
     //solhint-disable-next-line private-vars-leading-underscore
-    RainterpreterExpressionDeployerNPE2 internal immutable iDeployer;
+    RainterpreterExpressionDeployer internal immutable iDeployer;
     //solhint-disable-next-line private-vars-leading-underscore
     Rainterpreter internal immutable iInterpreter;
     //solhint-disable-next-line private-vars-leading-underscore
@@ -89,8 +87,8 @@ abstract contract RainterpreterExpressionDeployerNPE2DeploymentTest is Test {
             revert("unexpected parse meta");
         }
 
-        iDeployer = new RainterpreterExpressionDeployerNPE2(
-            RainterpreterExpressionDeployerNPE2ConstructionConfigV2(
+        iDeployer = new RainterpreterExpressionDeployer(
+            RainterpreterExpressionDeployerConstructionConfigV2(
                 address(iInterpreter), address(iStore), address(iParser)
             )
         );

@@ -28,13 +28,13 @@ contract RainterpreterStore is IInterpreterStoreV3, ERC165 {
     ///    callers cannot attack each other
     /// 1. StateNamespace is caller-provided namespace so that expressions cannot
     ///    attack each other
-    /// 2. `uint256` is expression-provided key
-    /// 3. `uint256` is expression-provided value
+    /// 2. `bytes32` is expression-provided key
+    /// 3. `bytes32` is expression-provided value
     ///
     /// tiers 0 and 1 are both embodied in the `FullyQualifiedNamespace`.
     // Slither doesn't like the leading underscore.
     //solhint-disable-next-line private-vars-leading-underscore
-    mapping(FullyQualifiedNamespace fullyQualifiedNamespace => mapping(uint256 key => uint256 value)) internal sStore;
+    mapping(FullyQualifiedNamespace fullyQualifiedNamespace => mapping(bytes32 key => bytes32 value)) internal sStore;
 
     /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
