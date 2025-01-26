@@ -2,8 +2,8 @@
 pragma solidity ^0.8.18;
 
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {LibInterpreterStateNP, InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
-import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
+import {LibInterpreterState, InterpreterState} from "../../state/LibInterpreterState.sol";
+import {LibIntegrityCheckNP, IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
 import {Pointer, LibPointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {LibEval} from "../../eval/LibEval.sol";
@@ -73,11 +73,7 @@ error CallOutputsExceedSource(uint256 sourceOutputs, uint256 outputs);
 library LibOpCall {
     using LibPointer for Pointer;
 
-    function integrity(IntegrityCheckStateNP memory state, OperandV2 operand)
-        internal
-        pure
-        returns (uint256, uint256)
-    {
+    function integrity(IntegrityCheckState memory state, OperandV2 operand) internal pure returns (uint256, uint256) {
         uint256 sourceIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
         uint256 outputs = uint256(OperandV2.unwrap(operand) >> 0x14);
 
@@ -95,11 +91,7 @@ library LibOpCall {
     /// number of outputs, and a number of inputs. It then runs the standard
     /// eval loop for the source, with a starting stack pointer above the inputs,
     /// and then copies the outputs to the calling stack.
-    function run(InterpreterStateNP memory state, OperandV2 operand, Pointer stackTop)
-        internal
-        view
-        returns (Pointer)
-    {
+    function run(InterpreterState memory state, OperandV2 operand, Pointer stackTop) internal view returns (Pointer) {
         // Extract config from the operand.
         uint256 sourceIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
         uint256 inputs = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));

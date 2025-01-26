@@ -4,15 +4,15 @@ pragma solidity ^0.8.18;
 import {MemoryKVKey, MemoryKVVal, MemoryKV, LibMemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
-import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
+import {InterpreterState} from "../../state/LibInterpreterState.sol";
+import {IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
 
 /// @title LibOpGet
 /// @notice Opcode for reading from storage.
 library LibOpGet {
     using LibMemoryKV for MemoryKV;
 
-    function integrity(IntegrityCheckStateNP memory, OperandV2) internal pure returns (uint256, uint256) {
+    function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // Always 1 input. The key. `hash()` is recommended to build compound
         // keys.
         return (1, 1);
@@ -24,7 +24,7 @@ library LibOpGet {
     /// the value will fallback to `0` as per default Solidity/EVM behaviour.
     /// @param state The interpreter state of the current eval.
     /// @param stackTop Pointer to the current stack top.
-    function run(InterpreterStateNP memory state, OperandV2, Pointer stackTop) internal view returns (Pointer) {
+    function run(InterpreterState memory state, OperandV2, Pointer stackTop) internal view returns (Pointer) {
         bytes32 key;
         assembly ("memory-safe") {
             key := mload(stackTop)
@@ -53,7 +53,7 @@ library LibOpGet {
         return stackTop;
     }
 
-    function referenceFn(InterpreterStateNP memory state, OperandV2, StackItem[] memory inputs)
+    function referenceFn(InterpreterState memory state, OperandV2, StackItem[] memory inputs)
         internal
         view
         returns (StackItem[] memory)

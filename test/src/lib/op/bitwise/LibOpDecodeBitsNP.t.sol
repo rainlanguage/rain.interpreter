@@ -2,8 +2,8 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
-import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {TruncatedBitwiseEncoding, ZeroLengthBitwiseEncoding} from "src/error/ErrBitwise.sol";
 import {LibOpDecodeBitsNP} from "src/lib/op/bitwise/LibOpDecodeBitsNP.sol";
@@ -15,7 +15,7 @@ contract LibOpDecodeBitsNPTest is OpTest {
     /// However, lengths can overflow and error so we bound the operand to avoid
     /// that here.
     function testOpDecodeBitsNPIntegrity(
-        IntegrityCheckStateNP memory state,
+        IntegrityCheckState memory state,
         uint8 inputs,
         uint8 outputs,
         uint8 start8Bit,
@@ -33,7 +33,7 @@ contract LibOpDecodeBitsNPTest is OpTest {
 
     /// Directly test the integrity logic of LibOpDecodeBitsNP. This tests the
     /// error when the length overflows.
-    function testOpDecodeBitsNPIntegrityFail(IntegrityCheckStateNP memory state, uint8 start8Bit, uint8 length8Bit)
+    function testOpDecodeBitsNPIntegrityFail(IntegrityCheckState memory state, uint8 start8Bit, uint8 length8Bit)
         external
     {
         // if start is [0,1] then length cannot overflow.
@@ -47,7 +47,7 @@ contract LibOpDecodeBitsNPTest is OpTest {
 
     /// Directly test the integrity logic of LibOpDecodeBitsNP. This tests the
     /// error when the length is zero.
-    function testOpDecodeBitsNPIntegrityFailZeroLength(IntegrityCheckStateNP memory state, uint8 start) external {
+    function testOpDecodeBitsNPIntegrityFailZeroLength(IntegrityCheckState memory state, uint8 start) external {
         OperandV2 operand = OperandV2.wrap(2 << 0x10 | 0 << 8 | uint256(start));
         vm.expectRevert(abi.encodeWithSelector(ZeroLengthBitwiseEncoding.selector));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpDecodeBitsNP.integrity(state, operand);
@@ -62,7 +62,7 @@ contract LibOpDecodeBitsNPTest is OpTest {
         OperandV2 operand = LibOperand.build(1, 1, uint16((uint256(length) << 8) | uint256(start)));
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = value;
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
+        InterpreterState memory state = opTestDefaultInterpreterState();
         opReferenceCheck(
             state, operand, LibOpDecodeBitsNP.referenceFn, LibOpDecodeBitsNP.integrity, LibOpDecodeBitsNP.run, inputs
         );

@@ -8,7 +8,7 @@ import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
 import {FullyQualifiedNamespace} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 
-import {InterpreterStateNP} from "./LibInterpreterStateNP.sol";
+import {InterpreterState} from "./LibInterpreterState.sol";
 
 library LibInterpreterStateDataContractNP {
     using LibBytes for bytes;
@@ -44,7 +44,7 @@ library LibInterpreterStateDataContractNP {
         IInterpreterStoreV2 store,
         bytes32[][] memory context,
         bytes memory fs
-    ) internal pure returns (InterpreterStateNP memory) {
+    ) internal pure returns (InterpreterState memory) {
         unchecked {
             Pointer cursor;
             assembly ("memory-safe") {
@@ -106,7 +106,7 @@ library LibInterpreterStateDataContractNP {
                 }
             }
 
-            return InterpreterStateNP(
+            return InterpreterState(
                 stackBottoms, constants, sourceIndex, MemoryKV.wrap(0), namespace, store, context, bytecode, fs
             );
         }

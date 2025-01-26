@@ -3,7 +3,7 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 
-import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
 import {LibEval} from "src/lib/eval/LibEval.sol";
 import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
@@ -113,8 +113,8 @@ contract LibEvalFBoundsTest is Test {
         uint256[] memory constants = new uint256[](1);
         constants[0] = c;
         uint256[][] memory context = new uint256[][](0);
-        InterpreterStateNP memory state = InterpreterStateNP(
-            LibInterpreterStateNP.stackBottoms(stacks),
+        InterpreterState memory state = InterpreterState(
+            LibInterpreterState.stackBottoms(stacks),
             constants,
             0,
             MemoryKV.wrap(0),

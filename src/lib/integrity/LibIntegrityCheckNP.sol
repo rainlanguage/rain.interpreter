@@ -17,7 +17,7 @@ import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpre
 import {IInterpreterStoreV2, StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {BadOpInputsLength} from "../../lib/integrity/LibIntegrityCheckNP.sol";
 
-struct IntegrityCheckStateNP {
+struct IntegrityCheckState {
     uint256 stackIndex;
     uint256 stackMaxIndex;
     uint256 readHighwater;
@@ -27,14 +27,14 @@ struct IntegrityCheckStateNP {
 }
 
 library LibIntegrityCheckNP {
-    using LibIntegrityCheckNP for IntegrityCheckStateNP;
+    using LibIntegrityCheckNP for IntegrityCheckState;
 
     function newState(bytes memory bytecode, uint256 stackIndex, bytes32[] memory constants)
         internal
         pure
-        returns (IntegrityCheckStateNP memory)
+        returns (IntegrityCheckState memory)
     {
-        return IntegrityCheckStateNP(
+        return IntegrityCheckState(
             // stackIndex
             stackIndex,
             // stackMaxIndex
@@ -91,7 +91,7 @@ library LibIntegrityCheckNP {
                     ioCursor := add(ioCursor, 2)
                 }
 
-                IntegrityCheckStateNP memory state = LibIntegrityCheckNP.newState(bytecode, inputsLength, constants);
+                IntegrityCheckState memory state = LibIntegrityCheckNP.newState(bytecode, inputsLength, constants);
 
                 // Have low 4 bytes of cursor overlap the first op, skipping the
                 // prefix.
@@ -102,7 +102,7 @@ library LibIntegrityCheckNP {
                     OperandV2 operand;
                     uint256 bytecodeOpInputs;
                     uint256 bytecodeOpOutputs;
-                    function(IntegrityCheckStateNP memory, OperandV2)
+                    function(IntegrityCheckState memory, OperandV2)
                     view
                     returns (uint256, uint256) f;
                     assembly ("memory-safe") {

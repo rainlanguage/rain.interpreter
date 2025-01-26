@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {LibInterpreterStateNP, InterpreterStateNP} from "../state/LibInterpreterStateNP.sol";
+import {LibInterpreterState, InterpreterState} from "../state/LibInterpreterState.sol";
 
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibMemoryKV, MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
@@ -17,7 +17,7 @@ error InputsLengthMismatch(uint256 expected, uint256 actual);
 library LibEval {
     using LibMemoryKV for MemoryKV;
 
-    function evalLoop(InterpreterStateNP memory state, uint256 parentSourceIndex, Pointer stackTop, Pointer stackBottom)
+    function evalLoop(InterpreterState memory state, uint256 parentSourceIndex, Pointer stackTop, Pointer stackBottom)
         internal
         view
         returns (Pointer)
@@ -64,7 +64,7 @@ library LibEval {
             }
         }
 
-        function(InterpreterStateNP memory, OperandV2, Pointer)
+        function(InterpreterState memory, OperandV2, Pointer)
                     internal
                     view
                     returns (Pointer) f;
@@ -153,12 +153,12 @@ library LibEval {
             cursor += 4;
         }
 
-        LibInterpreterStateNP.stackTrace(parentSourceIndex, sourceIndex, stackTop, stackBottom);
+        LibInterpreterState.stackTrace(parentSourceIndex, sourceIndex, stackTop, stackBottom);
 
         return stackTop;
     }
 
-    function eval2(InterpreterStateNP memory state, StackItem[] memory inputs, uint256 maxOutputs)
+    function eval2(InterpreterState memory state, StackItem[] memory inputs, uint256 maxOutputs)
         internal
         view
         returns (StackItem[] memory, bytes32[] memory)

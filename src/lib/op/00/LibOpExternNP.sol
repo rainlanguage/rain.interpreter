@@ -2,9 +2,9 @@
 pragma solidity ^0.8.18;
 
 import {NotAnExternContract} from "../../../error/ErrExtern.sol";
-import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
+import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {
     IInterpreterExternV4,
@@ -29,11 +29,7 @@ error BadOutputsLength(uint256 expectedLength, uint256 actualLength);
 library LibOpExternNP {
     using LibUint256Array for uint256[];
 
-    function integrity(IntegrityCheckStateNP memory state, OperandV2 operand)
-        internal
-        view
-        returns (uint256, uint256)
-    {
+    function integrity(IntegrityCheckState memory state, OperandV2 operand) internal view returns (uint256, uint256) {
         uint256 encodedExternDispatchIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
 
         EncodedExternDispatchV2 encodedExternDispatch =
@@ -48,11 +44,7 @@ library LibOpExternNP {
         return extern.externIntegrity(dispatch, expectedInputsLength, expectedOutputsLength);
     }
 
-    function run(InterpreterStateNP memory state, OperandV2 operand, Pointer stackTop)
-        internal
-        view
-        returns (Pointer)
-    {
+    function run(InterpreterState memory state, OperandV2 operand, Pointer stackTop) internal view returns (Pointer) {
         uint256 encodedExternDispatchIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
         uint256 inputsLength = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
         uint256 outputsLength = uint256((OperandV2.unwrap(operand) >> 0x14) & bytes32(uint256(0x0F)));
@@ -100,7 +92,7 @@ library LibOpExternNP {
         return stackTop;
     }
 
-    function referenceFn(InterpreterStateNP memory state, OperandV2 operand, StackItem[] memory inputs)
+    function referenceFn(InterpreterState memory state, OperandV2 operand, StackItem[] memory inputs)
         internal
         view
         returns (StackItem[] memory outputs)

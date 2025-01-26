@@ -7,8 +7,8 @@ pragma solidity =0.8.25;
 // import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 // import {UnexpectedOperand} from "src/error/ErrParse.sol";
 // import {LibOpMax} from "src/lib/op/math/LibOpMax.sol";
-// import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
-// import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+// import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
+// import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 // import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 // import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
@@ -17,7 +17,7 @@ pragma solidity =0.8.25;
 
 // /// Directly test the integrity logic of LibOpMax. This tests the happy
 // /// path where the inputs input and calc match.
-// function testOpMaxIntegrityHappy(IntegrityCheckStateNP memory state, uint8 inputs, uint16 operandData)
+// function testOpMaxIntegrityHappy(IntegrityCheckState memory state, uint8 inputs, uint16 operandData)
 //     external
 //     pure
 // {
@@ -30,7 +30,7 @@ pragma solidity =0.8.25;
 
 // /// Directly test the integrity logic of LibOpMax. This tests the unhappy
 // /// path where the operand is invalid due to 0 inputs.
-// function testOpMaxIntegrityUnhappyZeroInputs(IntegrityCheckStateNP memory state) external pure {
+// function testOpMaxIntegrityUnhappyZeroInputs(IntegrityCheckState memory state) external pure {
 //     (uint256 calcInputs, uint256 calcOutputs) = LibOpMax.integrity(state, Operand.wrap(0));
 //     // Calc inputs will be minimum 2.
 //     assertEq(calcInputs, 2);
@@ -39,7 +39,7 @@ pragma solidity =0.8.25;
 
 // /// Directly test the integrity logic of LibOpMax. This tests the unhappy
 // /// path where the operand is invalid due to 1 inputs.
-// function testOpMaxIntegrityUnhappyOneInput(IntegrityCheckStateNP memory state) external pure {
+// function testOpMaxIntegrityUnhappyOneInput(IntegrityCheckState memory state) external pure {
 //     (uint256 calcInputs, uint256 calcOutputs) = LibOpMax.integrity(state, Operand.wrap(0x010000));
 //     // Calc inputs will be minimum 2.
 //     assertEq(calcInputs, 2);
@@ -48,7 +48,7 @@ pragma solidity =0.8.25;
 
 // /// Directly test the runtime logic of LibOpMax.
 // function testOpMaxRun(uint256[] memory inputs) external view {
-//     InterpreterStateNP memory state = opTestDefaultInterpreterState();
+//     InterpreterState memory state = opTestDefaultInterpreterState();
 //     vm.assume(inputs.length >= 2);
 //     vm.assume(inputs.length <= 0x0F);
 //     Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);

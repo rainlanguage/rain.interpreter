@@ -2,26 +2,26 @@
 pragma solidity ^0.8.18;
 
 import {MemoryKV, MemoryKVKey, MemoryKVVal, LibMemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
-import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
+import {IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
-/// @title LibOpSetNP
+/// @title LibOpSet
 /// @notice Opcode for recording k/v state changes to be set in storage.
-library LibOpSetNP {
+library LibOpSet {
     using LibMemoryKV for MemoryKV;
 
-    function integrity(IntegrityCheckStateNP memory, OperandV2) internal pure returns (uint256, uint256) {
+    function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // Always 2 inputs. The key and the value. `hash()` is recommended to
         // build compound keys.
         return (2, 0);
     }
 
-    function run(InterpreterStateNP memory state, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
+    function run(InterpreterState memory state, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
         unchecked {
-            uint256 key;
-            uint256 value;
+            bytes32 key;
+            bytes32 value;
             assembly ("memory-safe") {
                 key := mload(stackTop)
                 value := mload(add(stackTop, 0x20))
@@ -33,14 +33,14 @@ library LibOpSetNP {
         }
     }
 
-    function referenceFn(InterpreterStateNP memory state, OperandV2, uint256[] memory inputs)
+    function referenceFn(InterpreterState memory state, OperandV2, StackItem[] memory inputs)
         internal
         pure
-        returns (uint256[] memory)
+        returns (StackItem[] memory)
     {
-        uint256 key = inputs[0];
-        uint256 value = inputs[1];
+        bytes32 key = StackItem.unwrap(inputs[0]);
+        bytes32 value = StackItem.unwrap(inputs[1]);
         state.stateKV = state.stateKV.set(MemoryKVKey.wrap(key), MemoryKVVal.wrap(value));
-        return new uint256[](0);
+        return new StackItem[](0);
     }
 }

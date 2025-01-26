@@ -3,7 +3,7 @@ pragma solidity =0.8.25;
 
 // import {stdError} from "forge-std/Test.sol";
 // import {OpTest} from "test/abstract/OpTest.sol";
-// import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+// import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 // import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 // import {LibOpERC20TotalSupply} from "src/lib/op/erc20/LibOpERC20TotalSupply.sol";
 // import {IERC20} from "openzeppelin-contracts/contracts/interfaces/IERC20.sol";
@@ -16,7 +16,7 @@ pragma solidity =0.8.25;
 // /// @title LibOpERC20TotalSupplyTest
 // /// @notice Test the opcode for getting the total supply of an erc20 contract.
 // contract LibOpERC20TotalSupplyTest is OpTest {
-//     function testOpERC20TotalSupplyNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
+//     function testOpERC20TotalSupplyNPIntegrity(IntegrityCheckState memory state, Operand operand) external pure {
 //         (uint256 calcInputs, uint256 calcOutputs) = LibOpERC20TotalSupply.integrity(state, operand);
 
 //         assertEq(calcInputs, 1);

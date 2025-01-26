@@ -3,14 +3,14 @@ pragma solidity ^0.8.18;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
-import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
+import {InterpreterState} from "../../state/LibInterpreterState.sol";
+import {IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
 
 /// @title LibOpEveryNP
 /// @notice Opcode to return the last item out of N items if they are all true,
 /// else 0.
 library LibOpEveryNP {
-    function integrity(IntegrityCheckStateNP memory, OperandV2 operand) internal pure returns (uint256, uint256) {
+    function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least one input.
         uint256 inputs = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
         inputs = inputs > 0 ? inputs : 1;
@@ -18,7 +18,7 @@ library LibOpEveryNP {
     }
 
     /// EVERY is the last nonzero item, else 0.
-    function run(InterpreterStateNP memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
+    function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         assembly ("memory-safe") {
             let length := mul(and(shr(0x10, operand), 0x0F), 0x20)
             let cursor := stackTop
@@ -35,7 +35,7 @@ library LibOpEveryNP {
     }
 
     /// Gas intensive reference implementation of EVERY for testing.
-    function referenceFn(InterpreterStateNP memory, OperandV2, uint256[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2, uint256[] memory inputs)
         internal
         pure
         returns (uint256[] memory outputs)

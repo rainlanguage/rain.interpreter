@@ -2,7 +2,7 @@
 pragma solidity =0.8.25;
 
 // import {OpTest} from "test/abstract/OpTest.sol";
-// import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+// import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 // import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 // import {LibOpERC20Allowance} from "src/lib/op/erc20/LibOpERC20Allowance.sol";
 // import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
@@ -14,7 +14,7 @@ pragma solidity =0.8.25;
 // /// @title LibOpERC20AllowanceTest
 // /// @notice Test the opcode for getting the allowance of an erc20 token.
 // contract LibOpERC20AllowanceTest is OpTest {
-//     function testOpERC20AllowanceNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
+//     function testOpERC20AllowanceNPIntegrity(IntegrityCheckState memory state, Operand operand) external pure {
 //         (uint256 calcInputs, uint256 calcOutputs) = LibOpERC20Allowance.integrity(state, operand);
 
 //         assertEq(calcInputs, 3);

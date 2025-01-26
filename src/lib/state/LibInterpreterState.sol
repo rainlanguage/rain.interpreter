@@ -4,25 +4,26 @@ pragma solidity ^0.8.18;
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {
-    FullyQualifiedNamespace, IInterpreterStoreV2
-} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
+    FullyQualifiedNamespace,
+    IInterpreterStoreV3
+} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV3.sol";
 
 address constant STACK_TRACER = address(uint160(uint256(keccak256("rain.interpreter.stack-tracer.0"))));
 
-struct InterpreterStateNP {
+struct InterpreterState {
     Pointer[] stackBottoms;
     bytes32[] constants;
     uint256 sourceIndex;
     MemoryKV stateKV;
     FullyQualifiedNamespace namespace;
-    IInterpreterStoreV2 store;
+    IInterpreterStoreV3 store;
     bytes32[][] context;
     bytes bytecode;
     bytes fs;
 }
 
-library LibInterpreterStateNP {
-    function fingerprint(InterpreterStateNP memory state) internal pure returns (bytes32) {
+library LibInterpreterState {
+    function fingerprint(InterpreterState memory state) internal pure returns (bytes32) {
         return keccak256(abi.encode(state));
     }
 

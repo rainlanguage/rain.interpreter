@@ -2,9 +2,9 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibOpShiftBitsLeftNP} from "src/lib/op/bitwise/LibOpShiftBitsLeftNP.sol";
-import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {
     IInterpreterV4,
     FullyQualifiedNamespace,
@@ -23,7 +23,7 @@ contract LibOpShiftBitsLeftNPTest is OpTest {
     /// happy path where the integrity check does not error due to an unsupported
     /// shift amount.
     function testOpShiftBitsLeftNPIntegrityHappy(
-        IntegrityCheckStateNP memory state,
+        IntegrityCheckState memory state,
         uint8 inputs,
         uint8 outputs,
         uint8 shiftAmount
@@ -40,7 +40,7 @@ contract LibOpShiftBitsLeftNPTest is OpTest {
     /// Directly test the execution logic of LibOpShiftBitsLeftNP. Tests that
     /// any shift amount that always results in an output of 0 will error as
     /// an unsupported shift amount.
-    function testOpShiftBitsLeftNPIntegrityZero(IntegrityCheckStateNP memory state, uint8 inputs, uint16 shiftAmount16)
+    function testOpShiftBitsLeftNPIntegrityZero(IntegrityCheckState memory state, uint8 inputs, uint16 shiftAmount16)
         external
     {
         inputs = uint8(bound(inputs, 0, 0x0F));
@@ -54,7 +54,7 @@ contract LibOpShiftBitsLeftNPTest is OpTest {
     /// Directly test the execution logic of LibOpShiftBitsLeftNP. Tests that
     /// any shift amount that is a noop (0) will error as an unsupported shift
     /// amount.
-    function testOpShiftBitsLeftNPIntegrityNoop(IntegrityCheckStateNP memory state, uint8 inputs) external {
+    function testOpShiftBitsLeftNPIntegrityNoop(IntegrityCheckState memory state, uint8 inputs) external {
         OperandV2 operand = OperandV2.wrap(uint256(inputs) << 0x10);
         vm.expectRevert(abi.encodeWithSelector(UnsupportedBitwiseShiftAmount.selector, 0));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpShiftBitsLeftNP.integrity(state, operand);
@@ -65,7 +65,7 @@ contract LibOpShiftBitsLeftNPTest is OpTest {
     /// the opcode correctly shifts bits left.
     function testOpShiftBitsLeftNPRun(uint256 x, uint8 shiftAmount) external view {
         vm.assume(shiftAmount != 0);
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
+        InterpreterState memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = x;
         OperandV2 operand = LibOperand.build(1, 1, shiftAmount);

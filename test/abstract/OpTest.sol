@@ -9,8 +9,8 @@ import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 
 import {RainterpreterExpressionDeployerNPE2DeploymentTest} from
     "./RainterpreterExpressionDeployerNPE2DeploymentTest.sol";
-import {LibInterpreterStateNP, InterpreterStateNP} from "../../src/lib/state/LibInterpreterStateNP.sol";
-import {IntegrityCheckStateNP, LibIntegrityCheckNP} from "../../src/lib/integrity/LibIntegrityCheckNP.sol";
+import {LibInterpreterState, InterpreterState} from "../../src/lib/state/LibInterpreterState.sol";
+import {IntegrityCheckState, LibIntegrityCheckNP} from "../../src/lib/integrity/LibIntegrityCheckNP.sol";
 
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "../../src/error/ErrParse.sol";
@@ -30,7 +30,7 @@ uint256 constant PRE = uint256(keccak256(abi.encodePacked("pre")));
 uint256 constant POST = uint256(keccak256(abi.encodePacked("post")));
 
 abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
-    using LibInterpreterStateNP for InterpreterStateNP;
+    using LibInterpreterState for InterpreterState;
     using LibUint256Array for uint256[];
     using LibPointer for Pointer;
 
@@ -61,12 +61,12 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         vm.assume(account != address(0x000000000000000000636F6e736F6c652e6c6f67));
     }
 
-    function opTestDefaultIngegrityCheckState() internal pure returns (IntegrityCheckStateNP memory) {
-        return IntegrityCheckStateNP(0, 0, 0, new uint256[](0), 0, "");
+    function opTestDefaultIngegrityCheckState() internal pure returns (IntegrityCheckState memory) {
+        return IntegrityCheckState(0, 0, 0, new uint256[](0), 0, "");
     }
 
-    function opTestDefaultInterpreterState() internal view returns (InterpreterStateNP memory) {
-        return InterpreterStateNP(
+    function opTestDefaultInterpreterState() internal view returns (InterpreterState memory) {
+        return InterpreterState(
             new Pointer[](0),
             new uint256[](0),
             0,
@@ -82,12 +82,12 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     }
 
     function opReferenceCheckIntegrity(
-        function(IntegrityCheckStateNP memory, OperandV2) view returns (uint256, uint256) integrityFn,
+        function(IntegrityCheckState memory, OperandV2) view returns (uint256, uint256) integrityFn,
         OperandV2 operand,
         uint256[] memory constants,
         uint256[] memory inputs
     ) internal view returns (uint256) {
-        IntegrityCheckStateNP memory integrityState = LibIntegrityCheckNP.newState("", 0, constants);
+        IntegrityCheckState memory integrityState = LibIntegrityCheckNP.newState("", 0, constants);
         (uint256 calcInputs, uint256 calcOutputs) = integrityFn(integrityState, operand);
         assertEq(calcInputs, inputs.length, "inputs length");
         assertEq(calcInputs, uint256((OperandV2.unwrap(operand) >> 0x10) & 0x0F), "operand inputs");
@@ -136,10 +136,10 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     }
 
     function opReferenceCheckActual(
-        InterpreterStateNP memory state,
+        InterpreterState memory state,
         OperandV2 operand,
         ReferenceCheckPointers memory pointers,
-        function(InterpreterStateNP memory, OperandV2, Pointer) view returns (Pointer) runFn
+        function(InterpreterState memory, OperandV2, Pointer) view returns (Pointer) runFn
     ) internal view {
         bytes32 stateFingerprintBefore = state.fingerprint();
         pointers.actualStackTopAfter = runFn(state, operand, pointers.stackTop);
@@ -149,9 +149,9 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     }
 
     function opReferenceCheckExpectations(
-        InterpreterStateNP memory state,
+        InterpreterState memory state,
         OperandV2 operand,
-        function(InterpreterStateNP memory, OperandV2, uint256[] memory) view returns (uint256[] memory) referenceFn,
+        function(InterpreterState memory, OperandV2, uint256[] memory) view returns (uint256[] memory) referenceFn,
         ReferenceCheckPointers memory pointers,
         uint256[] memory inputs,
         uint256 calcOutputs
@@ -173,11 +173,11 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     }
 
     function opReferenceCheck(
-        InterpreterStateNP memory state,
+        InterpreterState memory state,
         OperandV2 operand,
-        function(InterpreterStateNP memory, OperandV2, uint256[] memory) view returns (uint256[] memory) referenceFn,
-        function(IntegrityCheckStateNP memory, OperandV2) view returns (uint256, uint256) integrityFn,
-        function(InterpreterStateNP memory, OperandV2, Pointer) view returns (Pointer) runFn,
+        function(InterpreterState memory, OperandV2, uint256[] memory) view returns (uint256[] memory) referenceFn,
+        function(IntegrityCheckState memory, OperandV2) view returns (uint256, uint256) integrityFn,
+        function(InterpreterState memory, OperandV2, Pointer) view returns (Pointer) runFn,
         uint256[] memory inputs
     ) internal view {
         uint256 calcOutputs = opReferenceCheckIntegrity(integrityFn, operand, state.constants, inputs);

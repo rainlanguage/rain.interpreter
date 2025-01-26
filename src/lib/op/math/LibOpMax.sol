@@ -3,13 +3,13 @@ pragma solidity ^0.8.18;
 
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
-import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
+import {InterpreterState} from "../../state/LibInterpreterState.sol";
+import {IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
 
 /// @title LibOpMax
 /// @notice Opcode to find the max from N integers.
 library LibOpMax {
-    function integrity(IntegrityCheckStateNP memory, OperandV2 operand) internal pure returns (uint256, uint256) {
+    function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
         uint256 inputs = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
         inputs = inputs > 1 ? inputs : 2;
@@ -18,7 +18,7 @@ library LibOpMax {
 
     /// max
     /// Finds the maximum value from N integers.
-    function run(InterpreterStateNP memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
+    function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;
         uint256 b;
         assembly ("memory-safe") {
@@ -55,7 +55,7 @@ library LibOpMax {
     }
 
     /// Gas intensive reference implementation of maximum for testing.
-    function referenceFn(InterpreterStateNP memory, OperandV2, uint256[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2, uint256[] memory inputs)
         internal
         pure
         returns (uint256[] memory outputs)

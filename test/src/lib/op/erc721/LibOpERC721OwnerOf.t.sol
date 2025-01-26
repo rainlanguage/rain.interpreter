@@ -2,7 +2,7 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibOpERC721OwnerOf} from "src/lib/op/erc721/LibOpERC721OwnerOf.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import {
@@ -23,7 +23,7 @@ import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 /// @title LibOpERC721OwnerOfTest
 /// @notice Test the opcode for getting the owner of an erc721 token.
 contract LibOpERC721OwnerOfTest is OpTest {
-    function testOpERC721OwnerOfNPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs) external pure {
+    function testOpERC721OwnerOfNPIntegrity(IntegrityCheckState memory state, uint8 inputs) external pure {
         (uint256 calcInputs, uint256 calcOutputs) =
             LibOpERC721OwnerOf.integrity(state, OperandV2.wrap(uint256(inputs) << 0x10));
 

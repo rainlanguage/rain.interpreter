@@ -11,11 +11,11 @@ import {
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
 import {BytecodeTest} from "rain.interpreter.interface/../test/abstract/BytecodeTest.sol";
-import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibOpCall, CallOutputsExceedSource} from "src/lib/op/call/LibOpCall.sol";
 import {LibBytecode, SourceIndexOutOfBounds} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
-import {STACK_TRACER} from "src/lib/state/LibInterpreterStateNP.sol";
+import {STACK_TRACER} from "src/lib/state/LibInterpreterState.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
@@ -26,7 +26,7 @@ contract LibOpCallTest is OpTest, BytecodeTest {
     /// outputs in the operand exceed the outputs available from the source, then
     /// the call will revert.
     function testOpCallNPIntegrityTooManyOutputs(
-        IntegrityCheckStateNP memory state,
+        IntegrityCheckState memory state,
         uint256 inputs,
         uint256 outputs,
         uint8 sourceCount,
@@ -53,7 +53,7 @@ contract LibOpCallTest is OpTest, BytecodeTest {
     /// source index in the operand is outside the source count of the bytecode,
     /// this will revert as `SourceIndexOutOfBounds`.
     function testOpCallNPIntegritySourceIndexOutOfBounds(
-        IntegrityCheckStateNP memory state,
+        IntegrityCheckState memory state,
         uint256 inputs,
         uint256 outputs,
         uint256 sourceCount,
@@ -78,7 +78,7 @@ contract LibOpCallTest is OpTest, BytecodeTest {
     /// inputs is always specified by the source (callee), and the outputs are
     /// always specified by the operand (caller).
     function testOpCallNPIntegrityIO(
-        IntegrityCheckStateNP memory state,
+        IntegrityCheckState memory state,
         uint256 inputs,
         uint256 outputs,
         uint8 sourceCount,

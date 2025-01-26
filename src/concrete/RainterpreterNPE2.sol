@@ -11,7 +11,7 @@ import {LibDataContract} from "rain.datacontract/lib/LibDataContract.sol";
 
 import {LibEval} from "../lib/eval/LibEval.sol";
 import {LibInterpreterStateDataContractNP} from "../lib/state/LibInterpreterStateDataContractNP.sol";
-import {InterpreterStateNP} from "../lib/state/LibInterpreterStateNP.sol";
+import {InterpreterState} from "../lib/state/LibInterpreterState.sol";
 import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
 import {
     IInterpreterV4,
@@ -29,7 +29,7 @@ import {IOpcodeToolingV1} from "rain.sol.codegen/interface/IOpcodeToolingV1.sol"
 /// @notice Implementation of a Rainlang interpreter that is compatible with
 /// native onchain Rainlang parsing.
 contract RainterpreterNPE2 is IInterpreterV4, IOpcodeToolingV1, ERC165 {
-    using LibEval for InterpreterStateNP;
+    using LibEval for InterpreterState;
     using LibInterpreterStateDataContractNP for bytes;
 
     /// @inheritdoc IInterpreterV4
@@ -40,7 +40,7 @@ contract RainterpreterNPE2 is IInterpreterV4, IOpcodeToolingV1, ERC165 {
         override
         returns (StackItem[] memory, bytes32[] memory)
     {
-        InterpreterStateNP memory state = eval.bytecode.unsafeDeserializeNP(
+        InterpreterState memory state = eval.bytecode.unsafeDeserialize(
             SourceIndexV2.unwrap(eval.sourceIndex), eval.namespace, eval.store, eval.context, OPCODE_FUNCTION_POINTERS
         );
         for (uint256 i = 0; i < eval.stateOverlay.length; i += 2) {

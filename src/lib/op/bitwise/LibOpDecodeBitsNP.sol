@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {IntegrityCheckStateNP} from "../../integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {InterpreterStateNP} from "../../state/LibInterpreterStateNP.sol";
+import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibOpEncodeBitsNP} from "./LibOpEncodeBitsNP.sol";
 
@@ -12,11 +12,7 @@ import {LibOpEncodeBitsNP} from "./LibOpEncodeBitsNP.sol";
 /// with LibOpEncodeBitsNP.
 library LibOpDecodeBitsNP {
     /// Decode takes a single value and returns the decoded value.
-    function integrity(IntegrityCheckStateNP memory state, OperandV2 operand)
-        internal
-        pure
-        returns (uint256, uint256)
-    {
+    function integrity(IntegrityCheckState memory state, OperandV2 operand) internal pure returns (uint256, uint256) {
         // Use exact same integrity check as encode other than the return values.
         // All we're interested in is the errors that might be thrown.
         //slither-disable-next-line unused-return
@@ -25,7 +21,7 @@ library LibOpDecodeBitsNP {
         return (1, 1);
     }
 
-    function run(InterpreterStateNP memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
+    function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         unchecked {
             uint256 value;
             assembly ("memory-safe") {
@@ -52,7 +48,7 @@ library LibOpDecodeBitsNP {
         }
     }
 
-    function referenceFn(InterpreterStateNP memory, OperandV2 operand, uint256[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2 operand, uint256[] memory inputs)
         internal
         pure
         returns (uint256[] memory outputs)

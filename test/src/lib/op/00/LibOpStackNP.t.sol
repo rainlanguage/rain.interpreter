@@ -12,8 +12,8 @@ import {
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {OutOfBoundsStackRead, LibOpStackNP} from "src/lib/op/00/LibOpStackNP.sol";
-import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
-import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {LibIntegrityCheckNP, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {
     IInterpreterStoreV2, FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
@@ -26,7 +26,7 @@ import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 /// @title LibOpStackNPTest
 /// @notice Test the runtime and integrity time logic of LibOpStackNP.
 contract LibOpStackNPTest is OpTest {
-    using LibInterpreterStateNP for InterpreterStateNP;
+    using LibInterpreterState for InterpreterState;
 
     /// Directly test the integrity logic of LibOpStackNP. The operand always
     /// puts a single value on the stack. This tests the happy path where the
@@ -39,7 +39,7 @@ contract LibOpStackNPTest is OpTest {
     ) external pure {
         stackIndex = bound(stackIndex, 1, type(uint256).max);
         operand = OperandV2.wrap(bound(OperandV2.unwrap(operand), 0, stackIndex - 1));
-        IntegrityCheckStateNP memory state = LibIntegrityCheckNP.newState(bytecode, stackIndex, constants);
+        IntegrityCheckState memory state = LibIntegrityCheckNP.newState(bytecode, stackIndex, constants);
 
         (uint256 inputs, uint256 outputs) = LibOpStackNP.integrity(state, operand);
 
@@ -60,7 +60,7 @@ contract LibOpStackNPTest is OpTest {
         stackIndex = uint16(bound(stackIndex, 0, uint256(type(uint16).max)));
         readIndex = uint16(bound(readIndex, stackIndex, uint256(type(uint16).max)));
         OperandV2 operand = LibOperand.build(0, 1, readIndex);
-        IntegrityCheckStateNP memory state = LibIntegrityCheckNP.newState(bytecode, stackIndex, constants);
+        IntegrityCheckState memory state = LibIntegrityCheckNP.newState(bytecode, stackIndex, constants);
         state.opIndex = opIndex;
 
         vm.expectRevert(abi.encodeWithSelector(OutOfBoundsStackRead.selector, state.opIndex, stackIndex, readIndex));
@@ -71,11 +71,11 @@ contract LibOpStackNPTest is OpTest {
     /// operand always puts a single value on the stack.
     /// forge-config: default.fuzz.runs = 100
     function testOpStackNPRun(uint256[][] memory stacks, uint256 stackIndex) external view {
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
+        InterpreterState memory state = opTestDefaultInterpreterState();
         uint256 stackValue;
         {
             vm.assume(stacks.length > 0);
-            state.stackBottoms = LibInterpreterStateNP.stackBottoms(stacks);
+            state.stackBottoms = LibInterpreterState.stackBottoms(stacks);
             state.sourceIndex = bound(state.sourceIndex, 0, stacks.length - 1);
             uint256[] memory stack = stacks[state.sourceIndex];
             vm.assume(stack.length > 0);
