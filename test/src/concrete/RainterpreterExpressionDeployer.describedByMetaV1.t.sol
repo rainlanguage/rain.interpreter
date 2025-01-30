@@ -8,7 +8,7 @@ import {
 } from "src/concrete/RainterpreterExpressionDeployer.sol";
 import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
 import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
-import {RainterpreterParserNPE2} from "src/concrete/RainterpreterParserNPE2.sol";
+import {RainterpreterParser} from "src/concrete/RainterpreterParser.sol";
 import {EXPRESSION_DEPLOYER_NP_META_PATH} from "src/lib/constants/ExpressionDeployerNPConstants.sol";
 
 contract RainterpreterExpressionDeployerDescribedByMetaV1Test is Test {
@@ -16,7 +16,7 @@ contract RainterpreterExpressionDeployerDescribedByMetaV1Test is Test {
         bytes memory describedByMeta = vm.readFileBinary(EXPRESSION_DEPLOYER_NP_META_PATH);
         RainterpreterExpressionDeployer deployer = new RainterpreterExpressionDeployer(
             RainterpreterExpressionDeployerConstructionConfigV2(
-                address(new Rainterpreter()), address(new RainterpreterStore()), address(new RainterpreterParserNPE2())
+                address(new Rainterpreter()), address(new RainterpreterStore()), address(new RainterpreterParser())
             )
         );
 

@@ -258,7 +258,7 @@ library LibSubParse {
     function subParseWords(ParseState memory state, bytes memory bytecode)
         internal
         view
-        returns (bytes memory, uint256[] memory)
+        returns (bytes memory, bytes32[] memory)
     {
         unchecked {
             uint256 sourceCount = LibBytecode.sourceCount(bytecode);

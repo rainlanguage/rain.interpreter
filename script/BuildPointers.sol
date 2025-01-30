@@ -4,7 +4,7 @@ pragma solidity =0.8.25;
 import {Script} from "forge-std/Script.sol";
 import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
 import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
-import {RainterpreterParserNPE2, PARSE_META_BUILD_DEPTH} from "src/concrete/RainterpreterParserNPE2.sol";
+import {RainterpreterParser, PARSE_META_BUILD_DEPTH} from "src/concrete/RainterpreterParser.sol";
 import {
     RainterpreterExpressionDeployer,
     RainterpreterExpressionDeployerConstructionConfigV2
@@ -33,13 +33,13 @@ contract BuildPointers is Script {
         LibFs.buildFileForContract(vm, address(store), "RainterpreterStore", "");
     }
 
-    function buildRainterpreterParserNPE2Pointers() internal {
-        RainterpreterParserNPE2 parser = new RainterpreterParserNPE2();
+    function buildRainterpreterParserPointers() internal {
+        RainterpreterParser parser = new RainterpreterParser();
 
         LibFs.buildFileForContract(
             vm,
             address(parser),
-            "RainterpreterParserNPE2",
+            "RainterpreterParser",
             string.concat(
                 LibCodeGen.parseMetaConstantString(vm, LibAllStandardOpsNP.authoringMetaV2(), PARSE_META_BUILD_DEPTH),
                 LibCodeGen.operandHandlerFunctionPointersConstantString(vm, parser),
@@ -51,7 +51,7 @@ contract BuildPointers is Script {
     function buildRainterpreterExpressionDeployerPointers() internal {
         Rainterpreter interpreter = new Rainterpreter();
         RainterpreterStore store = new RainterpreterStore();
-        RainterpreterParserNPE2 parser = new RainterpreterParserNPE2();
+        RainterpreterParser parser = new RainterpreterParser();
 
         RainterpreterExpressionDeployer deployer = new RainterpreterExpressionDeployer(
             RainterpreterExpressionDeployerConstructionConfigV2(address(interpreter), address(store), address(parser))
@@ -98,7 +98,7 @@ contract BuildPointers is Script {
     function run() external {
         buildRainterpreterPointers();
         buildRainterpreterStorePointers();
-        buildRainterpreterParserNPE2Pointers();
+        buildRainterpreterParserPointers();
         buildRainterpreterExpressionDeployerPointers();
         buildRainterpreterReferenceExternPointers();
     }

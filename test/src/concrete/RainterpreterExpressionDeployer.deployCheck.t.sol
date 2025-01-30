@@ -8,7 +8,7 @@ import {
     RainterpreterExpressionDeployerConstructionConfigV2
 } from "src/concrete/RainterpreterExpressionDeployer.sol";
 import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
-import {RainterpreterParserNPE2} from "src/concrete/RainterpreterParserNPE2.sol";
+import {RainterpreterParser} from "src/concrete/RainterpreterParser.sol";
 import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
 
 /// @title RainterpreterExpressionDeployerDeployCheckTest
@@ -19,7 +19,7 @@ contract RainterpreterExpressionDeployerDeployCheckTest is Test {
     function testRainterpreterExpressionDeployerDeployNoEIP1820() external {
         new RainterpreterExpressionDeployer(
             RainterpreterExpressionDeployerConstructionConfigV2(
-                address(new Rainterpreter()), address(new RainterpreterStore()), address(new RainterpreterParserNPE2())
+                address(new Rainterpreter()), address(new RainterpreterStore()), address(new RainterpreterParser())
             )
         );
     }

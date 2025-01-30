@@ -187,7 +187,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
         opReferenceCheckExpectations(state, operand, referenceFn, pointers, inputs, calcOutputs);
     }
 
-    function parseAndEval(bytes memory rainString, uint256[][] memory context)
+    function parseAndEval(bytes memory rainString, bytes32[][] memory context)
         internal
         view
         returns (StackItem[] memory, bytes32[] memory)

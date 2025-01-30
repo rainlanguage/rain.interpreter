@@ -8,11 +8,11 @@ import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.so
 import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV2.sol";
 import {RainterpreterStore, STORE_BYTECODE_HASH} from "src/concrete/RainterpreterStore.sol";
 import {
-    RainterpreterParserNPE2,
+    RainterpreterParser,
     PARSE_META,
     PARSE_META_BUILD_DEPTH,
     PARSER_BYTECODE_HASH
-} from "src/concrete/RainterpreterParserNPE2.sol";
+} from "src/concrete/RainterpreterParser.sol";
 import {Rainterpreter, OPCODE_FUNCTION_POINTERS, INTERPRETER_BYTECODE_HASH} from "src/concrete/Rainterpreter.sol";
 import {
     DESCRIBED_BY_META_HASH,
@@ -34,7 +34,7 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
     //solhint-disable-next-line private-vars-leading-underscore
     RainterpreterStore internal immutable iStore;
     //solhint-disable-next-line private-vars-leading-underscore
-    RainterpreterParserNPE2 internal immutable iParser;
+    RainterpreterParser internal immutable iParser;
 
     function beforeOpTestConstructor() internal virtual {}
 
@@ -43,7 +43,7 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
 
         iInterpreter = new Rainterpreter();
         iStore = new RainterpreterStore();
-        iParser = new RainterpreterParserNPE2();
+        iParser = new RainterpreterParser();
 
         // Sanity check the interpreter's bytecode hash.
         bytes32 i9rHash;

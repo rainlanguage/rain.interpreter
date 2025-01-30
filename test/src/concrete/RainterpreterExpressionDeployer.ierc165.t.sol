@@ -12,7 +12,7 @@ import {IParserPragmaV1} from "rain.interpreter.interface/interface/IParserPragm
 import {IParserV2} from "rain.interpreter.interface/interface/IParserV2.sol";
 import {IDescribedByMetaV1} from "rain.metadata/interface/IDescribedByMetaV1.sol";
 import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
-import {RainterpreterParserNPE2} from "src/concrete/RainterpreterParserNPE2.sol";
+import {RainterpreterParser} from "src/concrete/RainterpreterParser.sol";
 import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
 
 contract RainterpreterExpressionDeployerIERC165Test is Test {
@@ -25,7 +25,7 @@ contract RainterpreterExpressionDeployerIERC165Test is Test {
 
         RainterpreterExpressionDeployer deployer = new RainterpreterExpressionDeployer(
             RainterpreterExpressionDeployerConstructionConfigV2(
-                address(new Rainterpreter()), address(new RainterpreterStore()), address(new RainterpreterParserNPE2())
+                address(new Rainterpreter()), address(new RainterpreterStore()), address(new RainterpreterParser())
             )
         );
         assertTrue(deployer.supportsInterface(type(IERC165).interfaceId));

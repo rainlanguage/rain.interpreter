@@ -397,7 +397,7 @@ library LibParse {
         }
     }
 
-    function parse(ParseState memory state) internal view returns (bytes memory bytecode, uint256[] memory) {
+    function parse(ParseState memory state) internal view returns (bytes memory bytecode, bytes32[] memory) {
         unchecked {
             if (state.data.length > 0) {
                 uint256 cursor = Pointer.unwrap(state.data.dataPointer());

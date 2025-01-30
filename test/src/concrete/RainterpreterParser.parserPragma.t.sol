@@ -2,12 +2,12 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {RainterpreterParserNPE2} from "src/concrete/RainterpreterParserNPE2.sol";
+import {RainterpreterParser} from "src/concrete/RainterpreterParser.sol";
 import {IParserPragmaV1, PragmaV1} from "rain.interpreter.interface/interface/IParserPragmaV1.sol";
 
-contract RainterpreterParserNPE2ParserPragma is Test {
+contract RainterpreterParserParserPragma is Test {
     function checkPragma(bytes memory source, address[] memory expectedAddresses) internal {
-        RainterpreterParserNPE2 parser = new RainterpreterParserNPE2();
+        RainterpreterParser parser = new RainterpreterParser();
         PragmaV1 memory pragmaV2 = parser.parsePragma1(source);
         assert(pragmaV2.usingWordsFrom.length == expectedAddresses.length);
         for (uint256 i = 0; i < expectedAddresses.length; i++) {

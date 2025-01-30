@@ -3,26 +3,26 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {
-    RainterpreterParserNPE2,
+    RainterpreterParser,
     OPERAND_HANDLER_FUNCTION_POINTERS,
     LITERAL_PARSER_FUNCTION_POINTERS,
     PARSE_META,
     PARSE_META_BUILD_DEPTH
-} from "src/concrete/RainterpreterParserNPE2.sol";
+} from "src/concrete/RainterpreterParser.sol";
 import {LibAllStandardOpsNP, AuthoringMetaV2} from "src/lib/op/LibAllStandardOpsNP.sol";
 import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
 
-contract RainterpreterParserNPE2PointersTest is Test {
+contract RainterpreterParserPointersTest is Test {
     function testOperandHandlerFunctionPointers() external {
-        RainterpreterParserNPE2 parser = new RainterpreterParserNPE2();
+        RainterpreterParser parser = new RainterpreterParser();
         bytes memory expected = parser.buildOperandHandlerFunctionPointers();
         bytes memory actual = OPERAND_HANDLER_FUNCTION_POINTERS;
         assertEq(actual, expected);
     }
 
     function testLiteralParserFunctionPointers() external {
-        RainterpreterParserNPE2 parser = new RainterpreterParserNPE2();
+        RainterpreterParser parser = new RainterpreterParser();
         bytes memory expected = parser.buildLiteralParserFunctionPointers();
         bytes memory actual = LITERAL_PARSER_FUNCTION_POINTERS;
         assertEq(actual, expected);

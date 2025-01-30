@@ -835,7 +835,7 @@ library LibParseState {
         }
     }
 
-    function buildConstants(ParseState memory state) internal pure returns (uint256[] memory constants) {
+    function buildConstants(ParseState memory state) internal pure returns (bytes32[] memory constants) {
         uint256 constantsHeight = state.constantsBuilder & 0xFFFF;
         uint256 tailPtr = state.constantsBuilder >> 0x10;
 

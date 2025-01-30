@@ -17,27 +17,23 @@ import {
     OPERAND_HANDLER_FUNCTION_POINTERS,
     PARSE_META,
     PARSE_META_BUILD_DEPTH
-} from "../generated/RainterpreterParserNPE2.pointers.sol";
-import {IParserToolingV1} from "rain.sol.codegen/interface/IParserToolingV1.sol";
+} from "../generated/RainterpreterParser.pointers.sol";
 import {IParserV1View} from "rain.interpreter.interface/interface/deprecated/IParserV1View.sol";
+import {IParserToolingV1} from "rain.sol.codegen/interface/IParserToolingV1.sol";
 
-/// @title RainterpreterParserNPE2
-/// @dev The parser implementation.
-contract RainterpreterParserNPE2 is IParserV1View, IParserPragmaV1, ERC165, IParserToolingV1 {
+/// @title RainterpreterParser
+/// @dev The parser implementation. NOT intended to be called directly so
+/// intentionally does NOT implement various interfaces. The expression deployer
+/// calls into this contract and exposes the relevant interfaces, with additional
+/// safety and integrity checks.
+contract RainterpreterParser is IParserToolingV1{
     using LibParse for ParseState;
     using LibParseState for ParseState;
     using LibParsePragma for ParseState;
     using LibParseInterstitial for ParseState;
     using LibBytes for bytes;
 
-    /// @inheritdoc ERC165
-    function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
-        return interfaceId == type(IParserV1View).interfaceId || interfaceId == type(IParserPragmaV1).interfaceId
-            || super.supportsInterface(interfaceId);
-    }
-
-    /// @inheritdoc IParserV1View
-    function parse(bytes memory data) external view virtual override returns (bytes memory, uint256[] memory) {
+    function unsafeParse(bytes memory data) external view returns (bytes memory, bytes32[] memory) {
         // The return is used by returning it, so this is a false positive.
         //slither-disable-next-line unused-return
         return LibParseState.newState(
@@ -45,8 +41,7 @@ contract RainterpreterParserNPE2 is IParserV1View, IParserPragmaV1, ERC165, IPar
         ).parse();
     }
 
-    /// @inheritdoc IParserPragmaV1
-    function parsePragma1(bytes memory data) external pure virtual override returns (PragmaV1 memory) {
+    function parsePragma1(bytes memory data) external pure virtual returns (PragmaV1 memory) {
         ParseState memory parseState =
             LibParseState.newState(data, parseMeta(), operandHandlerFunctionPointers(), literalParserFunctionPointers());
         uint256 cursor = Pointer.unwrap(data.dataPointer());
@@ -73,13 +68,11 @@ contract RainterpreterParserNPE2 is IParserV1View, IParserPragmaV1, ERC165, IPar
     }
 
     /// External function to build the operand handler function pointers.
-    /// @inheritdoc IParserToolingV1
     function buildOperandHandlerFunctionPointers() external pure returns (bytes memory) {
         return LibAllStandardOpsNP.operandHandlerFunctionPointers();
     }
 
     /// External function to build the literal parser function pointers.
-    /// @inheritdoc IParserToolingV1
     function buildLiteralParserFunctionPointers() external pure returns (bytes memory) {
         return LibAllStandardOpsNP.literalParserFunctionPointers();
     }

@@ -25,7 +25,7 @@ import {LibInterpreterStateDataContract} from "../lib/state/LibInterpreterStateD
 import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
 import {LibParse, LibParseMeta} from "../lib/parse/LibParse.sol";
 import {Rainterpreter, INTERPRETER_BYTECODE_HASH} from "./Rainterpreter.sol";
-import {PARSER_BYTECODE_HASH} from "./RainterpreterParserNPE2.sol";
+import {PARSER_BYTECODE_HASH} from "./RainterpreterParser.sol";
 import {STORE_BYTECODE_HASH} from "./RainterpreterStore.sol";
 import {
     INTEGRITY_FUNCTION_POINTERS,
@@ -33,6 +33,7 @@ import {
 } from "../generated/RainterpreterExpressionDeployer.pointers.sol";
 import {IIntegrityToolingV1} from "rain.sol.codegen/interface/IIntegrityToolingV1.sol";
 import {IParserV1View} from "rain.interpreter.interface/interface/deprecated/IParserV1View.sol";
+import {RainterpreterParser} from "./RainterpreterParser.sol";
 
 /// All config required to construct a `Rainterpreter`.
 /// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match
@@ -62,13 +63,13 @@ contract RainterpreterExpressionDeployer is
     IInterpreterV4 public immutable iInterpreter;
     /// The store with known bytecode that this deployer is constructed for.
     IInterpreterStoreV2 public immutable iStore;
-    IParserV1View public immutable iParser;
+    RainterpreterParser public immutable iParser;
 
     constructor(RainterpreterExpressionDeployerConstructionConfigV2 memory config) {
         // Set the immutables.
         IInterpreterV4 interpreter = IInterpreterV4(config.interpreter);
         IInterpreterStoreV2 store = IInterpreterStoreV2(config.store);
-        IParserV1View parser = IParserV1View(config.parser);
+        RainterpreterParser parser = RainterpreterParser(config.parser);
 
         iInterpreter = interpreter;
         iStore = store;
@@ -110,7 +111,7 @@ contract RainterpreterExpressionDeployer is
 
     /// @inheritdoc IParserV2
     function parse2(bytes memory data) external view virtual override returns (bytes memory) {
-        (bytes memory bytecode, bytes32[] memory constants) = iParser.parse(data);
+        (bytes memory bytecode, bytes32[] memory constants) = iParser.unsafeParse(data);
 
         uint256 size = LibInterpreterStateDataContract.serializeSize(bytecode, constants);
         bytes memory serialized;
@@ -136,7 +137,7 @@ contract RainterpreterExpressionDeployer is
     function parsePragma1(bytes calldata data) external view virtual override returns (PragmaV1 memory) {
         // We know the iParser is also an IParserPragmaV1 because we enforced
         // the bytecode hash in the constructor.
-        return IParserPragmaV1(address(iParser)).parsePragma1(data);
+        return iParser.parsePragma1(data);
     }
 
     /// Defines all the function pointers to integrity checks. This is the
