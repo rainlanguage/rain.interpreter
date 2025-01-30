@@ -30,7 +30,7 @@ contract LibOpConstantNPTest is OpTest {
     /// operand points to a value in the constants array.
     function testOpConstantNPIntegrity(IntegrityCheckState memory state, OperandV2 operand) external pure {
         vm.assume(state.constants.length > 0);
-        operand = OperandV2.wrap(bound(OperandV2.unwrap(operand), 0, state.constants.length - 1));
+        operand = OperandV2.wrap(bytes32(bound(uint256(OperandV2.unwrap(operand)), 0, state.constants.length - 1)));
 
         (uint256 calcInputs, uint256 calcOutputs) = LibOpConstantNP.integrity(state, operand);
 
@@ -42,7 +42,8 @@ contract LibOpConstantNPTest is OpTest {
     /// where the operand points past the end of the constants array, which MUST
     /// always error as an OOB read.
     function testOpConstantNPIntegrityOOBConstants(IntegrityCheckState memory state, OperandV2 operand) external {
-        operand = OperandV2.wrap(bound(OperandV2.unwrap(operand), state.constants.length, type(uint16).max));
+        operand =
+            OperandV2.wrap(bytes32(bound(uint256(OperandV2.unwrap(operand)), state.constants.length, type(uint16).max)));
 
         vm.expectRevert(
             abi.encodeWithSelector(
@@ -54,7 +55,7 @@ contract LibOpConstantNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpConstantNP. This tests that the
     /// operand always puts a single value on the stack.
-    function testOpConstantNPRun(uint256[] memory constants, uint16 constantIndex) external view {
+    function testOpConstantNPRun(bytes32[] memory constants, uint16 constantIndex) external view {
         InterpreterState memory state = opTestDefaultInterpreterState();
         state.constants = constants;
         vm.assume(state.constants.length > 0);

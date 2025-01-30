@@ -5,6 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {Address} from "openzeppelin-contracts/contracts/utils/Address.sol";
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 
+import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibMemoryKV, MemoryKV, MemoryKVVal, MemoryKVKey} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
@@ -36,7 +37,7 @@ contract RainterpreterStoreTest is Test {
     /// Ensure the store gives a decent error message when an odd number of
     /// arguments is passed to `set`.
     /// forge-config: default.fuzz.runs = 100
-    function testRainterpreterStoreSetOddLength(StateNamespace namespace, uint256[] memory kvs) external {
+    function testRainterpreterStoreSetOddLength(StateNamespace namespace, bytes32[] memory kvs) external {
         vm.assume(kvs.length % 2 != 0);
 
         RainterpreterStore store = new RainterpreterStore();
@@ -47,20 +48,20 @@ contract RainterpreterStoreTest is Test {
     /// Store should set and get values correctly.
     /// This test assumes no dupes.
     /// forge-config: default.fuzz.runs = 100
-    function testRainterpreterStoreSetGetNoDupesSingle(StateNamespace namespace, uint256[] memory kvs) external {
+    function testRainterpreterStoreSetGetNoDupesSingle(StateNamespace namespace, bytes32[] memory kvs) external {
         // Truncate to even length.
         uint256 newLength = kvs.length - (kvs.length % 2);
-        LibUint256Array.truncate(kvs, newLength);
+        LibBytes32Array.truncate(kvs, newLength);
         // Remove dupe keys by simply hashing the index with each key.
         for (uint256 i = 0; i < kvs.length; i += 2) {
-            kvs[i] = uint256(keccak256(abi.encodePacked(i, kvs[i])));
+            kvs[i] = keccak256(abi.encodePacked(i, kvs[i]));
         }
         RainterpreterStore store = new RainterpreterStore();
         store.set(namespace, kvs);
 
         for (uint256 i = 0; i < kvs.length; i += 2) {
-            uint256 key = kvs[i];
-            uint256 value = kvs[i + 1];
+            bytes32 key = kvs[i];
+            bytes32 value = kvs[i + 1];
             assertEq(store.get(namespace.qualifyNamespace(address(this)), key), value);
         }
     }
@@ -70,7 +71,7 @@ contract RainterpreterStoreTest is Test {
     /// @param kvs The key/value pairs to set.
     struct Set {
         StateNamespace namespace;
-        uint256[] kvs;
+        bytes32[] kvs;
     }
 
     /// Store should get and set values correctly across many namespaces.j
@@ -87,10 +88,10 @@ contract RainterpreterStoreTest is Test {
             // Truncate to even length.
             uint256 newLength = sets[i].kvs.length - (sets[i].kvs.length % 2);
             newLength = newLength >= 10 ? 10 : newLength;
-            LibUint256Array.truncate(sets[i].kvs, newLength);
+            LibBytes32Array.truncate(sets[i].kvs, newLength);
             // Remove dupe keys by simply hashing the index with each key.
             for (uint256 j = 0; j < sets[i].kvs.length; j += 2) {
-                sets[i].kvs[j] = uint256(keccak256(abi.encodePacked(j, sets[i].kvs[j])));
+                sets[i].kvs[j] = keccak256(abi.encodePacked(j, sets[i].kvs[j]));
             }
         }
 
@@ -98,8 +99,8 @@ contract RainterpreterStoreTest is Test {
         for (uint256 i = 0; i < sets.length; i++) {
             store.set(sets[i].namespace, sets[i].kvs);
             for (uint256 j = 0; j < sets[i].kvs.length; j += 2) {
-                uint256 key = sets[i].kvs[j];
-                uint256 value = sets[i].kvs[j + 1];
+                bytes32 key = sets[i].kvs[j];
+                bytes32 value = sets[i].kvs[j + 1];
                 assertEq(store.get(sets[i].namespace.qualifyNamespace(address(this)), key), value);
             }
         }
@@ -112,7 +113,7 @@ contract RainterpreterStoreTest is Test {
     /// @param kvs The key/value pairs to set.
     struct Set11 {
         StateNamespace namespace;
-        uint256[11] kvs;
+        bytes32[11] kvs;
     }
     /// Store should handle dupes correctly, where subsequent writes override
     /// previous writes to the same key (i.e. like a k/v store). The assumption
@@ -125,8 +126,8 @@ contract RainterpreterStoreTest is Test {
 
         RainterpreterStore store = new RainterpreterStore();
         for (uint256 i = 0; i < sets.length; i++) {
-            uint256[11] memory kvsFixed = sets[i].kvs;
-            uint256[] memory kvs;
+            bytes32[11] memory kvsFixed = sets[i].kvs;
+            bytes32[] memory kvs;
             assembly ("memory-safe") {
                 kvs := kvsFixed
                 mstore(kvs, 10)
@@ -136,8 +137,8 @@ contract RainterpreterStoreTest is Test {
             MemoryKV kv = MemoryKV.wrap(0);
 
             for (uint256 j = 0; j < kvs.length; j += 2) {
-                uint256 key = kvs[j];
-                uint256 value = kvs[j + 1];
+                bytes32 key = kvs[j];
+                bytes32 value = kvs[j + 1];
                 kv = LibMemoryKV.set(kv, MemoryKVKey.wrap(key), MemoryKVVal.wrap(value));
             }
 

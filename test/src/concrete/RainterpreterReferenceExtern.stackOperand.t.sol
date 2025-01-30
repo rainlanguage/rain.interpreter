@@ -2,7 +2,7 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {RainterpreterReferenceExtern} from "src/concrete/extern/RainterpreterReferenceExtern.sol";
+import {RainterpreterReferenceExtern, StackItem} from "src/concrete/extern/RainterpreterReferenceExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 
 contract RainterpreterReferenceExternStackOperandTest is OpTest {
@@ -13,8 +13,8 @@ contract RainterpreterReferenceExternStackOperandTest is OpTest {
         value = bound(value, 0, type(uint16).max);
         RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();
 
-        uint256[] memory expectedStack = new uint256[](1);
-        expectedStack[0] = value;
+        StackItem[] memory expectedStack = new StackItem[](1);
+        expectedStack[0] = StackItem.wrap(bytes32(value));
 
         checkHappy(
             bytes(

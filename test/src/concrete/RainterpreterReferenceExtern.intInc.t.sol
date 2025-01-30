@@ -10,16 +10,17 @@ import {
     LibExternOpIntIncNPE2
 } from "src/concrete/extern/RainterpreterReferenceExtern.sol";
 import {
-    ExternDispatch,
-    EncodedExternDispatch,
-    IInterpreterExternV3
-} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
+    ExternDispatchV2,
+    EncodedExternDispatchV2,
+    IInterpreterExternV4,
+    StackItem
+} from "rain.interpreter.interface/interface/unstable/IInterpreterExternV4.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {OPCODE_EXTERN} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {ExternDispatchConstantsHeightOverflow} from "src/error/ErrSubParse.sol";
-import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 contract RainterpreterReferenceExternIntIncTest is OpTest {
     using Strings for address;
@@ -29,18 +30,18 @@ contract RainterpreterReferenceExternIntIncTest is OpTest {
 
         uint256 intIncOpcode = 0;
 
-        ExternDispatch externDispatch = LibExtern.encodeExternDispatch(intIncOpcode, OperandV2.wrap(0));
-        EncodedExternDispatch encodedExternDispatch = LibExtern.encodeExternCall(extern, externDispatch);
+        ExternDispatchV2 externDispatch = LibExtern.encodeExternDispatch(intIncOpcode, OperandV2.wrap(0));
+        EncodedExternDispatchV2 encodedExternDispatch = LibExtern.encodeExternCall(extern, externDispatch);
 
         assertEq(
-            EncodedExternDispatch.unwrap(encodedExternDispatch),
+            EncodedExternDispatchV2.unwrap(encodedExternDispatch),
             0x000000000000000000000000c7183455a4c133ae270771860664b6b7ec320bb1
         );
 
-        uint256[] memory expectedStack = new uint256[](3);
-        expectedStack[0] = LibDecimalFloat.pack(4e37, -37);
-        expectedStack[1] = LibDecimalFloat.pack(3e37, -37);
-        expectedStack[2] = EncodedExternDispatch.unwrap(encodedExternDispatch);
+        StackItem[] memory expectedStack = new StackItem[](3);
+        expectedStack[0] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(4e37, -37)));
+        expectedStack[1] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(3e37, -37)));
+        expectedStack[2] = StackItem.wrap(EncodedExternDispatchV2.unwrap(encodedExternDispatch));
 
         checkHappy(
             // Need the constant in the constant array to be indexable in the operand.
@@ -55,9 +56,9 @@ contract RainterpreterReferenceExternIntIncTest is OpTest {
     function testRainterpreterReferenceExternIntIncHappySugared() external {
         RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();
 
-        uint256[] memory expectedStack = new uint256[](2);
-        expectedStack[0] = LibDecimalFloat.pack(4e37, -37);
-        expectedStack[1] = LibDecimalFloat.pack(3e37, -37);
+        StackItem[] memory expectedStack = new StackItem[](2);
+        expectedStack[0] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(4e37, -37)));
+        expectedStack[1] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(3e37, -37)));
 
         checkHappy(
             bytes(
@@ -76,7 +77,7 @@ contract RainterpreterReferenceExternIntIncTest is OpTest {
         RainterpreterReferenceExtern subParser = new RainterpreterReferenceExtern();
 
         bytes memory wordToParse = bytes("ref-extern-inc");
-        (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParseWord2(
+        (bool success, bytes memory bytecode, bytes32[] memory constants) = subParser.subParseWord2(
             bytes.concat(bytes2(constantsHeight), ioByte, bytes2(uint16(wordToParse.length)), wordToParse, bytes32(0))
         );
         assertTrue(success);
@@ -89,8 +90,8 @@ contract RainterpreterReferenceExternIntIncTest is OpTest {
         assertEq((uint16(uint8(bytecode[2])) << 8) | uint16(uint8(bytecode[3])), constantsHeight);
 
         assertEq(constants.length, 1);
-        (IInterpreterExternV3 decodedExtern, ExternDispatch decodedExternDispatch) =
-            LibExtern.decodeExternCall(EncodedExternDispatch.wrap(constants[0]));
+        (IInterpreterExternV4 decodedExtern, ExternDispatchV2 decodedExternDispatch) =
+            LibExtern.decodeExternCall(EncodedExternDispatchV2.wrap(constants[0]));
 
         // The sub parser is also the extern contract because the reference
         // implementation includes both.
@@ -116,7 +117,7 @@ contract RainterpreterReferenceExternIntIncTest is OpTest {
         constantsHeight = uint16(bound(constantsHeight, 0, 0xFF));
         RainterpreterReferenceExtern subParser = new RainterpreterReferenceExtern();
 
-        (bool success, bytes memory bytecode, uint256[] memory constants) = subParser.subParseWord2(
+        (bool success, bytes memory bytecode, bytes32[] memory constants) = subParser.subParseWord2(
             bytes.concat(bytes2(constantsHeight), ioByte, bytes2(uint16(unknownWord.length)), unknownWord, bytes32(0))
         );
         assertFalse(success);
@@ -127,19 +128,22 @@ contract RainterpreterReferenceExternIntIncTest is OpTest {
     /// Test the inc library directly. The run function should increment every
     /// value it is passed by 1.
     /// forge-config: default.fuzz.runs = 100
-    function testRainterpreterReferenceExternIntIncRun(OperandV2 operand, uint256[] memory inputs) external pure {
-        uint256[] memory expectedOutputs = new uint256[](inputs.length);
+    function testRainterpreterReferenceExternIntIncRun(OperandV2 operand, StackItem[] memory inputs) external pure {
+        StackItem[] memory expectedOutputs = new StackItem[](inputs.length);
         for (uint256 i = 0; i < inputs.length; i++) {
-            inputs[i] = bound(inputs[i], 0, uint256(int256(type(int128).max)));
-            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(inputs[i]);
+            inputs[i] = StackItem.wrap(
+                bytes32(bound(uint256(StackItem.unwrap(inputs[i])), 0, uint256(int256(type(int128).max))))
+            );
+            (int256 signedCoefficient, int256 exponent) =
+                LibDecimalFloat.unpack(PackedFloat.wrap(StackItem.unwrap(inputs[i])));
             (signedCoefficient, exponent) = LibDecimalFloat.add(signedCoefficient, exponent, 1e37, -37);
-            expectedOutputs[i] = LibDecimalFloat.pack(signedCoefficient, exponent);
+            expectedOutputs[i] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(signedCoefficient, exponent)));
         }
 
-        uint256[] memory actualOutputs = LibExternOpIntIncNPE2.run(operand, inputs);
+        StackItem[] memory actualOutputs = LibExternOpIntIncNPE2.run(operand, inputs);
         assertEq(actualOutputs.length, expectedOutputs.length);
         for (uint256 i = 0; i < actualOutputs.length; i++) {
-            assertEq(actualOutputs[i], expectedOutputs[i]);
+            assertEq(StackItem.unwrap(actualOutputs[i]), StackItem.unwrap(expectedOutputs[i]));
         }
     }
 

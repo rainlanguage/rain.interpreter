@@ -7,6 +7,7 @@ import {
     FullyQualifiedNamespace,
     IInterpreterStoreV3
 } from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV3.sol";
+import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 address constant STACK_TRACER = address(uint160(uint256(keccak256("rain.interpreter.stack-tracer.0"))));
 
@@ -27,7 +28,7 @@ library LibInterpreterState {
         return keccak256(abi.encode(state));
     }
 
-    function stackBottoms(uint256[][] memory stacks) internal pure returns (Pointer[] memory) {
+    function stackBottoms(StackItem[][] memory stacks) internal pure returns (Pointer[] memory) {
         Pointer[] memory bottoms = new Pointer[](stacks.length);
         assembly ("memory-safe") {
             for {

@@ -3,7 +3,7 @@ pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
-import {RainterpreterReferenceExtern} from "src/concrete/extern/RainterpreterReferenceExtern.sol";
+import {RainterpreterReferenceExtern, StackItem} from "src/concrete/extern/RainterpreterReferenceExtern.sol";
 
 contract RainterpreterReferenceExternContextSenderTest is OpTest {
     using Strings for address;
@@ -11,8 +11,8 @@ contract RainterpreterReferenceExternContextSenderTest is OpTest {
     function testRainterpreterReferenceExterNPE2ContextContractHappy() external {
         RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();
 
-        uint256[] memory expectedStack = new uint256[](1);
-        expectedStack[0] = uint256(uint160(address(this)));
+        StackItem[] memory expectedStack = new StackItem[](1);
+        expectedStack[0] = StackItem.wrap(bytes32(uint256(uint160(address(this)))));
 
         checkHappy(
             bytes(

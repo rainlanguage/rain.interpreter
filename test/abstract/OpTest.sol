@@ -210,43 +210,43 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
 
     /// 90%+ of the time we don't need to pass a context. This overloads a
     /// simplified interface to parse and eval.
-    function parseAndEval(bytes memory rainString) internal view returns (uint256[] memory, uint256[] memory) {
+    function parseAndEval(bytes memory rainString) internal view returns (StackItem[] memory, bytes32[] memory) {
         return parseAndEval(rainString, LibContext.build(new bytes32[][](0), new SignedContextV1[](0)));
     }
 
-    function checkHappy(bytes memory rainString, uint256 expectedValue, string memory errString) internal view {
-        uint256[] memory expectedStack = new uint256[](1);
-        expectedStack[0] = expectedValue;
+    function checkHappy(bytes memory rainString, bytes32 expectedValue, string memory errString) internal view {
+        StackItem[] memory expectedStack = new StackItem[](1);
+        expectedStack[0] = StackItem.wrap(expectedValue);
         checkHappy(rainString, expectedStack, errString);
     }
 
-    function checkHappy(bytes memory rainString, uint256[] memory expectedStack, string memory errString)
+    function checkHappy(bytes memory rainString, StackItem[] memory expectedStack, string memory errString)
         internal
         view
     {
-        checkHappy(rainString, LibContext.build(new uint256[][](0), new SignedContextV1[](0)), expectedStack, errString);
+        checkHappy(rainString, LibContext.build(new bytes32[][](0), new SignedContextV1[](0)), expectedStack, errString);
     }
 
     function checkHappy(
         bytes memory rainString,
-        uint256[][] memory context,
-        uint256[] memory expectedStack,
+        bytes32[][] memory context,
+        StackItem[] memory expectedStack,
         string memory errString
     ) internal view {
-        (uint256[] memory stack, uint256[] memory kvs) = parseAndEval(rainString, context);
+        (StackItem[] memory stack, bytes32[] memory kvs) = parseAndEval(rainString, context);
 
         assertEq(stack.length, expectedStack.length, errString);
         for (uint256 i = 0; i < expectedStack.length; i++) {
-            assertEq(stack[i], expectedStack[i], errString);
+            assertEq(StackItem.unwrap(stack[i]), StackItem.unwrap(expectedStack[i]), errString);
         }
         assertEq(kvs.length, 0);
     }
 
-    function checkHappyKVs(bytes memory rainString, uint256[] memory expectedKVs, string memory errString)
+    function checkHappyKVs(bytes memory rainString, bytes32[] memory expectedKVs, string memory errString)
         internal
         view
     {
-        (uint256[] memory stack, uint256[] memory kvs) = parseAndEval(rainString);
+        (StackItem[] memory stack, bytes32[] memory kvs) = parseAndEval(rainString);
 
         assertEq(stack.length, 0);
         assertEq(kvs.length, expectedKVs.length, errString);
@@ -262,15 +262,15 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
     function checkUnhappy(bytes memory rainString, bytes memory err) internal {
         bytes memory bytecode = iDeployer.parse2(rainString);
         vm.expectRevert(err);
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
+        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
             EvalV4({
                 store: iStore,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
-                context: LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-                inputs: new uint256[](0),
-                stateOverlay: new uint256[](0)
+                context: LibContext.build(new bytes32[][](0), new SignedContextV1[](0)),
+                inputs: new StackItem[](0),
+                stateOverlay: new bytes32[](0)
             })
         );
         (stack, kvs);
@@ -284,7 +284,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
 
     function checkUnhappyParse(bytes memory rainString, bytes memory err) internal {
         vm.expectRevert(err);
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
+        (bytes memory bytecode, bytes32[] memory constants) = iParser.unsafeParse(rainString);
         (bytecode);
         (constants);
     }
@@ -307,7 +307,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
 
     function checkDisallowedOperand(bytes memory rainString) internal {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
+        (bytes memory bytecode, bytes32[] memory constants) = iParser.unsafeParse(rainString);
         (bytecode);
         (constants);
     }

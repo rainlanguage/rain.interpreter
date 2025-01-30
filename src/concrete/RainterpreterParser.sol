@@ -26,7 +26,7 @@ import {IParserToolingV1} from "rain.sol.codegen/interface/IParserToolingV1.sol"
 /// intentionally does NOT implement various interfaces. The expression deployer
 /// calls into this contract and exposes the relevant interfaces, with additional
 /// safety and integrity checks.
-contract RainterpreterParser is IParserToolingV1{
+contract RainterpreterParser is ERC165, IParserToolingV1 {
     using LibParse for ParseState;
     using LibParseState for ParseState;
     using LibParsePragma for ParseState;
@@ -39,6 +39,11 @@ contract RainterpreterParser is IParserToolingV1{
         return LibParseState.newState(
             data, parseMeta(), operandHandlerFunctionPointers(), literalParserFunctionPointers()
         ).parse();
+    }
+
+    /// @inheritdoc ERC165
+    function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
+        return interfaceId == type(IParserToolingV1).interfaceId || super.supportsInterface(interfaceId);
     }
 
     function parsePragma1(bytes memory data) external pure virtual returns (PragmaV1 memory) {

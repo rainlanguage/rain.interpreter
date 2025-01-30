@@ -12,9 +12,9 @@ import {
 /// calling and internal dispatch.
 contract LibExternCodecTest is Test {
     /// Ensure `encodeExternDispatch` encodes the opcode and operand correctly.
-    function testLibExternCodecEncodeExternDispatch(uint256 opcode, uint256 operand) external pure {
+    function testLibExternCodecEncodeExternDispatch(uint256 opcode, bytes32 operand) external pure {
         opcode = bound(opcode, 0, type(uint16).max);
-        operand = bound(operand, 0, type(uint16).max);
+        operand = bytes32(bound(uint256(operand), 0, type(uint16).max));
         ExternDispatchV2 dispatch = LibExtern.encodeExternDispatch(opcode, OperandV2.wrap(bytes32(operand)));
         (uint256 decodedOpcode, OperandV2 decodedOperand) = LibExtern.decodeExternDispatch(dispatch);
         assertEq(decodedOpcode, opcode);
@@ -22,11 +22,11 @@ contract LibExternCodecTest is Test {
     }
 
     /// Ensure `encodeExternCall` encodes the address and dispatch correctly.
-    function testLibExternCodecEncodeExternCall(uint256 opcode, uint256 operand) external pure {
+    function testLibExternCodecEncodeExternCall(uint256 opcode, bytes32 operand) external pure {
         opcode = bound(opcode, 0, type(uint16).max);
-        operand = bound(operand, 0, type(uint16).max);
+        operand = bytes32(bound(uint256(operand), 0, type(uint16).max));
         IInterpreterExternV4 extern = IInterpreterExternV4(address(0x1234567890123456789012345678901234567890));
-        ExternDispatchV2 dispatch = LibExtern.encodeExternDispatch(opcode, OperandV2.wrap(uint16(operand)));
+        ExternDispatchV2 dispatch = LibExtern.encodeExternDispatch(opcode, OperandV2.wrap(operand));
         EncodedExternDispatchV2 encoded = LibExtern.encodeExternCall(extern, dispatch);
         (IInterpreterExternV4 decodedExtern, ExternDispatchV2 decodedDispatch) = LibExtern.decodeExternCall(encoded);
         assertEq(uint256(uint160(address(decodedExtern))), uint256(uint160(address(extern))));
