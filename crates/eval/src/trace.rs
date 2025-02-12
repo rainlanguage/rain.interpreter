@@ -16,7 +16,7 @@ pub enum RainEvalResultError {
     CorruptTraces,
 }
 
-#[cfg_attr(target_family = "wasm", tsify_next::declare(type = "string[]"))]
+#[cfg_attr(target_family = "wasm", tsify::declare(type = "string[]"))]
 type RainStack = Vec<U256>;
 
 /// A struct representing a single trace from a Rain source. Intended to be decoded
