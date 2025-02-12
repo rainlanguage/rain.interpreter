@@ -171,6 +171,7 @@ impl DerefMut for RainEvalResults {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 #[cfg_attr(target_family = "wasm", derive(Tsify))]
 pub struct RainEvalResultsTable {
     pub column_names: Vec<String>,
