@@ -16,6 +16,7 @@ type RainStack = Vec<U256>;
 #[cfg_attr(target_family = "wasm", derive(Tsify))]
 pub struct RainEvalResultsTable {
     pub column_names: Vec<String>,
+    #[cfg_attr(target_family = "wasm", tsify(type = "string[][]"))]
     pub rows: Vec<RainStack>,
 }
 #[cfg(target_family = "wasm")]
