@@ -7225,9 +7225,9 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-utils"
-version = "0.0.5"
+version = "0.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "237e6e4559e81c2fc316b9b598db1dd706fd035556b227949d055e19f60cc947"
+checksum = "04293ba23e84c21b0d42179abedf35e6eb082bd6f06bce7a42a8dd8e0b2b589f"
 dependencies = [
  "js-sys",
  "paste",
