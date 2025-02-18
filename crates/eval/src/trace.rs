@@ -8,7 +8,6 @@ mod impls;
 #[cfg(not(target_family = "wasm"))]
 pub use impls::*;
 
-#[cfg_attr(target_family = "wasm", tsify::declare(type = "string[]"))]
 type RainStack = Vec<U256>;
 
 #[derive(Debug, Serialize, Deserialize)]
