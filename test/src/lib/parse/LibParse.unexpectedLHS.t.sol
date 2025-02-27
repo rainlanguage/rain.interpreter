@@ -98,7 +98,7 @@ contract LibParseUnexpectedLHSTest is Test {
         vm.assume(hasInvalidChar);
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, i + 1));
-        (bytes memory bytecode, uint256[] memory constants) =
+        (bytes memory bytecode, bytes32[] memory constants) =
             LibMetaFixture.newState(string(bytes.concat(bytes1(a), b, ":;"))).parse();
         (bytecode, constants);
     }

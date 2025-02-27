@@ -7,10 +7,10 @@ import {UnexpectedOperand} from "src/error/ErrParse.sol";
 
 contract LibParseOperandHandleOperandDisallowedTest is Test {
     function testHandleOperandDisallowedNoValues() external pure {
-        assertEq(OperandV2.unwrap(LibParseOperand.handleOperandDisallowed(new uint256[](0))), 0);
+        assertEq(OperandV2.unwrap(LibParseOperand.handleOperandDisallowed(new bytes32[](0))), 0);
     }
 
-    function testHandleOperandDisallowedAnyValues(uint256[] memory values) external {
+    function testHandleOperandDisallowedAnyValues(bytes32[] memory values) external {
         vm.assume(values.length > 0);
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
         LibParseOperand.handleOperandDisallowed(values);

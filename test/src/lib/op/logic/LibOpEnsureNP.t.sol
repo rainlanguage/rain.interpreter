@@ -76,7 +76,7 @@ pragma solidity =0.8.25;
 // //     /// Tests ensuring with an addition on the same line.
 // //     function testOpEnsureNPEvalBadOutputs() external {
 // //         vm.expectRevert(abi.encodeWithSelector(ExcessRHSItems.selector, 34));
-// //         (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_:ensure(1 \"always true\") add(1 1);");
+// //         (bytes memory bytecode, bytes32[] memory constants) = iParser.parse("_:ensure(1 \"always true\") add(1 1);");
 // //         (bytecode);
 // //         (constants);
 // //     }
@@ -86,7 +86,7 @@ pragma solidity =0.8.25;
 // //     /// Tests ensuring with another ensure on the same line.
 // //     function testOpEnsureNPEvalBadOutputs2() external {
 // //         vm.expectRevert(abi.encodeWithSelector(ExcessRHSItems.selector, 48));
-// //         (bytes memory bytecode, uint256[] memory constants) =
+// //         (bytes memory bytecode, bytes32[] memory constants) =
 // //             iParser.parse(":ensure(1 \"always true\") ensure(1 \"always true\");");
 // //         (bytecode);
 // //         (constants);

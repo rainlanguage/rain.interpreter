@@ -7,7 +7,7 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {LibOpSet} from "src/lib/op/store/LibOpSet.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpSetTest is OpTest {
@@ -28,12 +28,12 @@ contract LibOpSetTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpSet.
-    function testLibOpSet(uint256 key, uint256 value) public view {
+    function testLibOpSet(bytes32 key, bytes32 value) public view {
         InterpreterState memory state = opTestDefaultInterpreterState();
-        OperandV2 operand = OperandV2.wrap(uint256(2) << 0x10);
-        uint256[] memory inputs = new uint256[](2);
-        inputs[0] = key;
-        inputs[1] = value;
+        OperandV2 operand = OperandV2.wrap(bytes32(uint256(2) << 0x10));
+        StackItem[] memory inputs = new StackItem[](2);
+        inputs[0] = StackItem.wrap(key);
+        inputs[1] = StackItem.wrap(value);
         state.stateKV = MemoryKV.wrap(0);
 
         uint256 calcOutputs = opReferenceCheckIntegrity(LibOpSet.integrity, operand, state.constants, inputs);
@@ -45,7 +45,7 @@ contract LibOpSetTest is OpTest {
         assertEq(exists, 1, "exists");
         assertEq(MemoryKVVal.unwrap(actualValue), value, "value");
 
-        uint256[] memory kvs = state.stateKV.toUint256Array();
+        bytes32[] memory kvs = state.stateKV.toBytes32Array();
         assertEq(kvs.length, 2, "kvs.length");
         assertEq(kvs[0], key, "kvs[0]");
         assertEq(kvs[1], value, "kvs[1]");
@@ -61,38 +61,38 @@ contract LibOpSetTest is OpTest {
 
     /// Test the eval of `set` opcode parsed from a string. Tests two inputs.
     function testLibOpSetEvalTwoInputs() external view {
-        uint256[] memory expectedKVs = new uint256[](2);
-        expectedKVs[0] = 0x1234;
-        expectedKVs[1] = 0x5678;
+        bytes32[] memory expectedKVs = new bytes32[](2);
+        expectedKVs[0] = bytes32(uint256(0x1234));
+        expectedKVs[1] = bytes32(uint256(0x5678));
         checkHappyKVs(":set(0x1234 0x5678);", expectedKVs, "0x1234 0x5678");
 
         expectedKVs[0] = 0;
         expectedKVs[1] = 0;
         checkHappyKVs(":set(0 0);", expectedKVs, "0 0");
 
-        expectedKVs[0] = 0x1234;
+        expectedKVs[0] = bytes32(uint256(0x1234));
         expectedKVs[1] = 0;
         checkHappyKVs(":set(0x1234 0);", expectedKVs, "0x1234 0");
 
         expectedKVs[0] = 0;
-        expectedKVs[1] = 0x5678;
+        expectedKVs[1] = bytes32(uint256(0x5678));
         checkHappyKVs(":set(0 0x5678);", expectedKVs, "0 0x5678");
 
         // Setting the same key twice should overwrite the value.
-        expectedKVs[0] = 0x1234;
-        expectedKVs[1] = 0x9abc;
+        expectedKVs[0] = bytes32(uint256(0x1234));
+        expectedKVs[1] = bytes32(uint256(0x9abc));
         checkHappyKVs(":set(0x1234 0x5678),:set(0x1234 0x9abc);", expectedKVs, "0x1234 0x5678 0x9abc");
     }
 
     /// Test the eval of `set` opcode parsed from a string. Tests setting twice.
     function testLibOpSetEvalSetTwice() external view {
-        uint256[] memory expectedKVs = new uint256[](4);
+        bytes32[] memory expectedKVs = new bytes32[](4);
         // The ordering of the expectedKVs is based on internal hashing not the
         // order of setting.
-        expectedKVs[2] = 0x1234;
-        expectedKVs[3] = 0x5678;
-        expectedKVs[0] = 0x5678;
-        expectedKVs[1] = 0x9abc;
+        expectedKVs[2] = bytes32(uint256(0x1234));
+        expectedKVs[3] = bytes32(uint256(0x5678));
+        expectedKVs[0] = bytes32(uint256(0x5678));
+        expectedKVs[1] = bytes32(uint256(0x9abc));
         checkHappyKVs(":set(0x1234 0x5678),:set(0x5678 0x9abc);", expectedKVs, "0x1234 0x5678 0x5678 0x9abc");
     }
 

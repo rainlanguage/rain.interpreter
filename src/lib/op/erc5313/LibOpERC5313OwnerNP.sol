@@ -4,7 +4,7 @@ pragma solidity ^0.8.25;
 import {IERC5313} from "openzeppelin-contracts/contracts/interfaces/IERC5313.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 
 /// @title LibOpERC5313OwnerNP
@@ -28,15 +28,15 @@ library LibOpERC5313OwnerNP {
         return stackTop;
     }
 
-    function referenceFn(InterpreterState memory, OperandV2, uint256[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         view
-        returns (uint256[] memory)
+        returns (StackItem[] memory)
     {
-        uint256 account = inputs[0];
-        address owner = IERC5313(address(uint160(account))).owner();
-        uint256[] memory outputs = new uint256[](1);
-        outputs[0] = uint256(uint160(owner));
+        bytes32 account = StackItem.unwrap(inputs[0]);
+        address owner = IERC5313(address(uint160(uint256(account)))).owner();
+        StackItem[] memory outputs = new StackItem[](1);
+        outputs[0] = StackItem.wrap(bytes32(uint256(uint160(owner))));
         return outputs;
     }
 }

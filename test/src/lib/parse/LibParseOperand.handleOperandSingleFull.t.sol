@@ -10,7 +10,7 @@ import {OperandOverflow} from "src/error/ErrParse.sol";
 contract LibParseOperandHandleOperandSingleFullTest is Test {
     // No values falls back to zero.
     function testHandleOperandSingleFullNoValues() external pure {
-        assertEq(OperandV2.unwrap(LibParseOperand.handleOperandSingleFull(new uint256[](0))), 0);
+        assertEq(OperandV2.unwrap(LibParseOperand.handleOperandSingleFull(new bytes32[](0))), 0);
     }
 
     // A single value of up to 2 bytes is allowed.

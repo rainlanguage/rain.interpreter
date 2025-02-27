@@ -3,7 +3,7 @@ pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibOpERC5313OwnerNP} from "src/lib/op/erc5313/LibOpERC5313OwnerNP.sol";
 import {IERC5313} from "openzeppelin-contracts/contracts/interfaces/IERC5313.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
@@ -23,8 +23,8 @@ contract LibOpERC5313OwnerNPTest is OpTest {
         assumeEtchable(account);
         vm.etch(account, hex"fe");
 
-        uint256[] memory inputs = new uint256[](1);
-        inputs[0] = uint256(uint160(account));
+        StackItem[] memory inputs = new StackItem[](1);
+        inputs[0] = StackItem.wrap(bytes32(uint256(uint160(account))));
         OperandV2 operand = LibOperand.build(1, 1, operandData);
 
         vm.mockCall(account, abi.encodeWithSelector(IERC5313.owner.selector), abi.encode(owner));
@@ -46,7 +46,7 @@ contract LibOpERC5313OwnerNPTest is OpTest {
         vm.mockCall(
             address(0xdeadbeef), abi.encodeWithSelector(IERC5313.owner.selector), abi.encode(address(0xdeadc0de))
         );
-        checkHappy("_: erc5313-owner(0xdeadbeef);", 0xdeadc0de, "0xdeadbeef 0xdeadc0de");
+        checkHappy("_: erc5313-owner(0xdeadbeef);", bytes32(uint256(0xdeadc0de)), "0xdeadbeef 0xdeadc0de");
     }
 
     /// Test that an owner with bad inputs fails integrity.

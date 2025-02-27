@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 
 /// @title LibOpERC721OwnerOf
@@ -31,16 +31,17 @@ library LibOpERC721OwnerOf {
         return stackTop;
     }
 
-    function referenceFn(InterpreterState memory, OperandV2, uint256[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         view
-        returns (uint256[] memory)
+        returns (StackItem[] memory)
     {
-        uint256 token = inputs[0];
-        uint256 tokenId = inputs[1];
-        address tokenOwner = IERC721(address(uint160(token))).ownerOf(tokenId);
-        uint256[] memory outputs = new uint256[](1);
-        outputs[0] = uint256(uint160(tokenOwner));
+        StackItem token = inputs[0];
+        StackItem tokenId = inputs[1];
+        address tokenOwner =
+            IERC721(address(uint160(uint256(StackItem.unwrap(token))))).ownerOf(uint256(StackItem.unwrap(tokenId)));
+        StackItem[] memory outputs = new StackItem[](1);
+        outputs[0] = StackItem.wrap(bytes32(uint256(uint160(tokenOwner))));
         return outputs;
     }
 }

@@ -11,20 +11,20 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
     // There must be exactly two values so zero values is an error.
     function testHandleOperandDoublePerByteNoDefaultNoValues() external {
         vm.expectRevert(abi.encodeWithSelector(ExpectedOperand.selector));
-        LibParseOperand.handleOperandDoublePerByteNoDefault(new uint256[](0));
+        LibParseOperand.handleOperandDoublePerByteNoDefault(new bytes32[](0));
     }
 
     // There must be exactly two values so one value is an error.
     function testHandleOperandDoublePerByteNoDefaultOneValue(uint256 value) external {
         value = bound(value, 0, type(uint16).max);
-        uint256[] memory values = new uint256[](1);
-        values[0] = value;
+        bytes32[] memory values = new bytes32[](1);
+        values[0] = bytes32(value);
         vm.expectRevert(abi.encodeWithSelector(ExpectedOperand.selector));
         LibParseOperand.handleOperandDoublePerByteNoDefault(values);
     }
 
     // There must be exactly two values so three or more values is an error.
-    function testHandleOperandDoublePerByteNoDefaultManyValues(uint256[] memory values) external {
+    function testHandleOperandDoublePerByteNoDefaultManyValues(bytes32[] memory values) external {
         vm.assume(values.length > 2);
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperandValue.selector));
         LibParseOperand.handleOperandDoublePerByteNoDefault(values);
@@ -35,9 +35,9 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
         a = bound(a, uint256(type(uint8).max) + 1, uint256(int256(type(int128).max)));
         b = bound(b, 0, type(uint8).max);
 
-        uint256[] memory values = new uint256[](2);
-        values[0] = a;
-        values[1] = b;
+        bytes32[] memory values = new bytes32[](2);
+        values[0] = bytes32(a);
+        values[1] = bytes32(b);
 
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         LibParseOperand.handleOperandDoublePerByteNoDefault(values);
@@ -48,9 +48,9 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
         a = bound(a, 0, type(uint8).max);
         b = bound(b, uint256(type(uint8).max) + 1, uint256(int256(type(int128).max)));
 
-        uint256[] memory values = new uint256[](2);
-        values[0] = a;
-        values[1] = b;
+        bytes32[] memory values = new bytes32[](2);
+        values[0] = bytes32(a);
+        values[1] = bytes32(b);
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         LibParseOperand.handleOperandDoublePerByteNoDefault(values);
     }
@@ -61,9 +61,9 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
     function testHandleOperandDoublePerByteNoDefaultBothValuesWithinOneByte(uint256 a, uint256 b) external pure {
         a = bound(a, 0, type(uint8).max);
         b = bound(b, 0, type(uint8).max);
-        uint256[] memory values = new uint256[](2);
-        values[0] = a;
-        values[1] = b;
-        assertEq(OperandV2.unwrap(LibParseOperand.handleOperandDoublePerByteNoDefault(values)), (b << 8) | a);
+        bytes32[] memory values = new bytes32[](2);
+        values[0] = bytes32(a);
+        values[1] = bytes32(b);
+        assertEq(OperandV2.unwrap(LibParseOperand.handleOperandDoublePerByteNoDefault(values)), bytes32((b << 8) | a));
     }
 }

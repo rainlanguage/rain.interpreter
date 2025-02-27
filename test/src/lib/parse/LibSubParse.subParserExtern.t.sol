@@ -25,7 +25,7 @@ contract LibSubParseSubParserExternTest is Test {
     ) external pure {
         inputs = uint8(bound(inputs, 0, 0xF));
         outputs = uint8(bound(outputs, 0, 0xF));
-        (bool success, bytes memory bytecode, uint256[] memory constants) = LibSubParse.subParserExtern(
+        (bool success, bytes memory bytecode, bytes32[] memory constants) = LibSubParse.subParserExtern(
             extern,
             uint256(constantsHeight),
             uint256(outputs) << 4 | uint256(inputs),
@@ -60,7 +60,7 @@ contract LibSubParseSubParserExternTest is Test {
     ) external {
         constantsHeight = bound(constantsHeight, uint256(type(uint16).max) + 1, type(uint256).max);
         vm.expectRevert(abi.encodeWithSelector(ExternDispatchConstantsHeightOverflow.selector, constantsHeight));
-        (bool success, bytes memory bytecode, uint256[] memory constants) = LibSubParse.subParserExtern(
+        (bool success, bytes memory bytecode, bytes32[] memory constants) = LibSubParse.subParserExtern(
             extern,
             constantsHeight,
             uint256(outputsByte) << 4 | uint256(inputsByte),

@@ -8,7 +8,8 @@ import {
     IInterpreterV4,
     OperandV2,
     SourceIndexV2,
-    FullyQualifiedNamespace
+    FullyQualifiedNamespace,
+    StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState, LibInterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
@@ -41,7 +42,7 @@ contract LibOpMaxUint256NPTest is OpTest {
     /// opcode correctly pushes the max uint256 onto the stack.
     function testOpMaxUint256NPRun() external view {
         InterpreterState memory state = opTestDefaultInterpreterState();
-        uint256[] memory inputs = new uint256[](0);
+        StackItem[] memory inputs = new StackItem[](0);
         OperandV2 operand = LibOperand.build(0, 1, 0);
         opReferenceCheck(
             state, operand, LibOpMaxUint256NP.referenceFn, LibOpMaxUint256NP.integrity, LibOpMaxUint256NP.run, inputs
@@ -50,7 +51,7 @@ contract LibOpMaxUint256NPTest is OpTest {
 
     /// Test the eval of LibOpMaxUint256NP parsed from a string.
     function testOpMaxUint256NPEval() external view {
-        checkHappy("_: uint256-max-value();", type(uint256).max, "");
+        checkHappy("_: uint256-max-value();", bytes32(type(uint256).max), "");
     }
 
     /// Test that a max-value with inputs fails integrity check.
