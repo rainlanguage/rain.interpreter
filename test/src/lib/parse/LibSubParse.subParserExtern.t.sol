@@ -5,8 +5,8 @@ import {Test} from "forge-std/Test.sol";
 import {OperandV2, OPCODE_EXTERN} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {
     IInterpreterExternV4,
-    ExternDispatch,
-    EncodedExternDispatch
+    ExternDispatchV2,
+    EncodedExternDispatchV2
 } from "rain.interpreter.interface/interface/unstable/IInterpreterExternV4.sol";
 import {LibSubParse} from "src/lib/parse/LibSubParse.sol";
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
@@ -41,8 +41,8 @@ contract LibSubParseSubParserExternTest is Test {
         assertEq(uint16(uint8(bytecode[2])) << 8 | uint16(uint8(bytecode[3])), constantsHeight);
 
         assertEq(constants.length, 1);
-        (IInterpreterExternV4 externDecoded, ExternDispatch externDispatchDecoded) =
-            LibExtern.decodeExternCall(EncodedExternDispatch.wrap(constants[0]));
+        (IInterpreterExternV4 externDecoded, ExternDispatchV2 externDispatchDecoded) =
+            LibExtern.decodeExternCall(EncodedExternDispatchV2.wrap(constants[0]));
         assertEq(address(extern), address(externDecoded));
         (uint256 opcodeIndexDecoded, OperandV2 operandDecoded) = LibExtern.decodeExternDispatch(externDispatchDecoded);
         assertEq(opcodeIndexDecoded, opcodeIndex);

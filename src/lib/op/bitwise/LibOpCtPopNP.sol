@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
 import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
@@ -37,12 +37,12 @@ library LibOpCtPopNP {
     }
 
     /// The reference implementation of ctpop.
-    function referenceFn(InterpreterState memory, OperandV2, uint256[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure
-        returns (uint256[] memory)
+        returns (StackItem[] memory)
     {
-        inputs[0] = LibCtPop.ctpopSlow(inputs[0]);
+        inputs[0] = StackItem.wrap(LibCtPop.ctpopSlow(StackItem.unwrap(inputs[0])));
         return inputs;
     }
 }

@@ -12,12 +12,13 @@ import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {
     EncodedExternDispatchV2,
     IInterpreterExternV4,
-    ExternDispatchV2
+    ExternDispatchV2,
+    StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterExternV4.sol";
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
-import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpExternNPTest
 /// @notice Test the runtime and integrity time logic of LibOpExternNP.
@@ -137,17 +138,29 @@ contract LibOpExternNPTest is OpTest {
     /// Test the eval of extern directly.
     function testOpExternNPRunHappy(
         IInterpreterExternV4 extern,
-        uint256[] memory constants,
+        bytes32[] memory constants,
         uint16 constantIndex,
-        uint256[] memory inputs,
-        uint256[] memory outputs
+        StackItem[] memory inputs,
+        StackItem[] memory outputs
     ) external {
         vm.assume(constants.length > 0);
         if (inputs.length > 0x0F) {
-            inputs.truncate(0x0F);
+            {
+                uint256[] memory inputsCopy;
+                assembly ("memory-safe") {
+                    inputsCopy := inputs
+                }
+                inputsCopy.truncate(0x0F);
+            }
         }
         if (outputs.length > 0x0F) {
-            outputs.truncate(0x0F);
+            {
+                uint256[] memory outputsCopy;
+                assembly ("memory-safe") {
+                    outputsCopy := outputs
+                }
+                outputsCopy.truncate(0x0F);
+            }
         }
 
         InterpreterState memory state = opTestDefaultInterpreterState();
@@ -190,7 +203,7 @@ contract LibOpExternNPTest is OpTest {
         IInterpreterExternV4 extern = IInterpreterExternV4(address(0xdeadbeef));
         vm.etch(address(extern), hex"fe");
         uint256 opcode = 5;
-        OperandV2 operand = OperandV2.wrap(0x10);
+        OperandV2 operand = OperandV2.wrap(bytes32(uint256(0x10)));
 
         ExternDispatchV2 externDispatch = LibExtern.encodeExternDispatch(opcode, operand);
         assertEq(
@@ -211,20 +224,20 @@ contract LibOpExternNPTest is OpTest {
             abi.encode(2, 1)
         );
 
-        uint256[] memory externInputs = new uint256[](2);
-        externInputs[0] = LibDecimalFloat.pack(20e36, -36);
-        externInputs[1] = LibDecimalFloat.pack(83e36, -36);
-        uint256[] memory externOutputs = new uint256[](1);
-        externOutputs[0] = LibDecimalFloat.pack(99e36, -36);
+        bytes32[] memory externInputs = new bytes32[](2);
+        externInputs[0] = PackedFloat.unwrap(LibDecimalFloat.pack(20e36, -36));
+        externInputs[1] = PackedFloat.unwrap(LibDecimalFloat.pack(83e36, -36));
+        bytes32[] memory externOutputs = new bytes32[](1);
+        externOutputs[0] = PackedFloat.unwrap(LibDecimalFloat.pack(99e36, -36));
         vm.mockCall(
             address(extern),
             abi.encodeWithSelector(IInterpreterExternV4.extern.selector, externDispatch, externInputs),
             abi.encode(externOutputs)
         );
 
-        uint256[] memory expectedStack = new uint256[](2);
-        expectedStack[0] = LibDecimalFloat.pack(99e36, -36);
-        expectedStack[1] = 0x00000000000000000005001000000000000000000000000000000000deadbeef;
+        StackItem[] memory expectedStack = new StackItem[](2);
+        expectedStack[0] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(99e36, -36)));
+        expectedStack[1] = StackItem.wrap(0x00000000000000000005001000000000000000000000000000000000deadbeef);
 
         checkHappy(
             // Need the constant in the constant array to be indexable in the operand.
@@ -243,7 +256,7 @@ contract LibOpExternNPTest is OpTest {
         IInterpreterExternV4 extern = IInterpreterExternV4(address(0xdeadbeef));
         vm.etch(address(extern), hex"fe");
         uint256 opcode = 5;
-        OperandV2 operand = OperandV2.wrap(0x10);
+        OperandV2 operand = OperandV2.wrap(bytes32(uint256(0x10)));
 
         ExternDispatchV2 externDispatch = LibExtern.encodeExternDispatch(opcode, operand);
         assertEq(
@@ -264,21 +277,21 @@ contract LibOpExternNPTest is OpTest {
             abi.encode(3, 3)
         );
 
-        uint256[] memory externInputs = new uint256[](3);
-        externInputs[0] = LibDecimalFloat.pack(1e37, -37);
-        externInputs[1] = LibDecimalFloat.pack(2e37, -37);
-        externInputs[2] = LibDecimalFloat.pack(3e37, -37);
+        StackItem[] memory externInputs = new StackItem[](3);
+        externInputs[0] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(1e37, -37)));
+        externInputs[1] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(2e37, -37)));
+        externInputs[2] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(3e37, -37)));
 
-        uint256[] memory externOutputs = new uint256[](3);
-        externOutputs[0] = LibDecimalFloat.pack(4e37, -37);
-        externOutputs[1] = LibDecimalFloat.pack(5e37, -37);
-        externOutputs[2] = LibDecimalFloat.pack(6e37, -37);
+        StackItem[] memory externOutputs = new StackItem[](3);
+        externOutputs[0] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(4e37, -37)));
+        externOutputs[1] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(5e37, -37)));
+        externOutputs[2] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(6e37, -37)));
 
-        uint256[] memory expectedStack = new uint256[](4);
-        expectedStack[0] = LibDecimalFloat.pack(6e37, -37);
-        expectedStack[1] = LibDecimalFloat.pack(5e37, -37);
-        expectedStack[2] = LibDecimalFloat.pack(4e37, -37);
-        expectedStack[3] = 0x00000000000000000005001000000000000000000000000000000000deadbeef;
+        StackItem[] memory expectedStack = new StackItem[](4);
+        expectedStack[0] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(6e37, -37)));
+        expectedStack[1] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(5e37, -37)));
+        expectedStack[2] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(4e37, -37)));
+        expectedStack[3] = StackItem.wrap(0x00000000000000000005001000000000000000000000000000000000deadbeef);
 
         vm.mockCall(
             address(extern),

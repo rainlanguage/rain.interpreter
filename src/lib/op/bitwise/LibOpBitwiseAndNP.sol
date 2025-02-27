@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
@@ -26,13 +26,13 @@ library LibOpBitwiseAndNP {
     }
 
     /// Reference implementation for bitwise AND.
-    function referenceFn(InterpreterState memory, OperandV2, uint256[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure
-        returns (uint256[] memory)
+        returns (StackItem[] memory)
     {
-        uint256[] memory outputs = new uint256[](1);
-        outputs[0] = inputs[0] & inputs[1];
+        StackItem[] memory outputs = new StackItem[](1);
+        outputs[0] = StackItem.wrap(StackItem.unwrap(inputs[0]) & StackItem.unwrap(inputs[1]));
         return outputs;
     }
 }
