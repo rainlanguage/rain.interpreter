@@ -12,7 +12,7 @@ import {LibParseOperand} from "../parse/LibParseOperand.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
 import {LibOpStackNP} from "./00/LibOpStackNP.sol";
-import {LibOpConstantNP} from "./00/LibOpConstantNP.sol";
+import {LibOpConstant} from "./00/LibOpConstant.sol";
 import {LibOpContextNP} from "./00/LibOpContextNP.sol";
 import {LibOpExternNP} from "./00/LibOpExternNP.sol";
 
@@ -536,7 +536,7 @@ library LibAllStandardOpsNP {
                     // The first ops are out of lexical ordering so that they
                     // can sit at stable well known indexes.
                     LibOpStackNP.integrity,
-                    LibOpConstantNP.integrity,
+                    LibOpConstant.integrity,
                     LibOpExternNP.integrity,
                     LibOpContextNP.integrity,
                     // Everything else is alphabetical, including folders.
@@ -648,7 +648,7 @@ library LibAllStandardOpsNP {
                     // The first ops are out of lexical ordering so that they
                     // can sit at stable well known indexes.
                     LibOpStackNP.run,
-                    LibOpConstantNP.run,
+                    LibOpConstant.run,
                     LibOpExternNP.run,
                     LibOpContextNP.run,
                     // Everything else is alphabetical, including folders.

@@ -26,8 +26,8 @@ import {FullyQualifiedNamespace, StateNamespace} from "rain.interpreter.interfac
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibNamespace} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
 
-uint256 constant PRE = uint256(keccak256(abi.encodePacked("pre")));
-uint256 constant POST = uint256(keccak256(abi.encodePacked("post")));
+bytes32 constant PRE = keccak256(abi.encodePacked("pre"));
+bytes32 constant POST = keccak256(abi.encodePacked("post"));
 
 abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
     using LibInterpreterState for InterpreterState;
@@ -85,7 +85,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
         function(IntegrityCheckState memory, OperandV2) view returns (uint256, uint256) integrityFn,
         OperandV2 operand,
         bytes32[] memory constants,
-        uint256[] memory inputs
+        StackItem[] memory inputs
     ) internal view returns (uint256) {
         IntegrityCheckState memory integrityState = LibIntegrityCheckNP.newState("", 0, constants);
         (uint256 calcInputs, uint256 calcOutputs) = integrityFn(integrityState, operand);
@@ -95,7 +95,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
         return calcOutputs;
     }
 
-    function opReferenceCheckPointers(uint256[] memory inputs, uint256 calcOutputs)
+    function opReferenceCheckPointers(StackItem[] memory inputs, uint256 calcOutputs)
         internal
         pure
         returns (ReferenceCheckPointers memory pointers)
@@ -131,7 +131,12 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
             pointers.post.unsafeWriteWord(POST);
             pointers.stackTop = stackTop;
             pointers.expectedStackTopAfter = expectedStackTopAfter;
-            LibMemCpy.unsafeCopyWordsTo(inputs.dataPointer(), pointers.stackTop, inputs.length);
+
+            uint256 inputsDataPointer;
+            assembly ("memory-safe") {
+                inputsDataPointer := add(inputs, 0x20)
+            }
+            LibMemCpy.unsafeCopyWordsTo(Pointer.wrap(inputsDataPointer), pointers.stackTop, inputs.length);
         }
     }
 
@@ -151,12 +156,12 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
     function opReferenceCheckExpectations(
         InterpreterState memory state,
         OperandV2 operand,
-        function(InterpreterState memory, OperandV2, uint256[] memory) view returns (uint256[] memory) referenceFn,
+        function(InterpreterState memory, OperandV2, StackItem[] memory) view returns (StackItem[] memory) referenceFn,
         ReferenceCheckPointers memory pointers,
-        uint256[] memory inputs,
+        StackItem[] memory inputs,
         uint256 calcOutputs
     ) internal view {
-        uint256[] memory expectedOutputs = referenceFn(state, operand, inputs);
+        StackItem[] memory expectedOutputs = referenceFn(state, operand, inputs);
         assertEq(expectedOutputs.length, calcOutputs, "expected outputs length");
 
         assertEq(
@@ -166,7 +171,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
         );
         assertEq(PRE, pointers.pre.unsafeReadWord(), "pre");
         for (uint256 i = 0; i < expectedOutputs.length; i++) {
-            assertEq(expectedOutputs[i], pointers.expectedStackTopAfter.unsafeReadWord(), "value");
+            assertEq(StackItem.unwrap(expectedOutputs[i]), pointers.expectedStackTopAfter.unsafeReadWord(), "value");
             pointers.expectedStackTopAfter = pointers.expectedStackTopAfter.unsafeAddWord();
         }
         assertEq(POST, pointers.post.unsafeReadWord(), "post");
@@ -175,10 +180,10 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
     function opReferenceCheck(
         InterpreterState memory state,
         OperandV2 operand,
-        function(InterpreterState memory, OperandV2, uint256[] memory) view returns (uint256[] memory) referenceFn,
+        function(InterpreterState memory, OperandV2, StackItem[] memory) view returns (StackItem[] memory) referenceFn,
         function(IntegrityCheckState memory, OperandV2) view returns (uint256, uint256) integrityFn,
         function(InterpreterState memory, OperandV2, Pointer) view returns (Pointer) runFn,
-        uint256[] memory inputs
+        StackItem[] memory inputs
     ) internal view {
         uint256 calcOutputs = opReferenceCheckIntegrity(integrityFn, operand, state.constants, inputs);
         ReferenceCheckPointers memory pointers = opReferenceCheckPointers(inputs, calcOutputs);

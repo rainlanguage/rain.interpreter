@@ -9,11 +9,11 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 /// Thrown when a constant read index is outside the constants array.
 error OutOfBoundsConstantRead(uint256 opIndex, uint256 constantsLength, uint256 constantRead);
 
-/// @title LibOpConstantNP
+/// @title LibOpConstant
 /// Implementation of copying a constant from the constants array to the stack.
 /// Integrated deeply into LibParse, which requires this opcode or a variant
 /// to be present at a known opcode index.
-library LibOpConstantNP {
+library LibOpConstant {
     function integrity(IntegrityCheckState memory state, OperandV2 operand) internal pure returns (uint256, uint256) {
         // Operand is the index so ensure it doesn't exceed the constants length.
         uint256 constantIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));

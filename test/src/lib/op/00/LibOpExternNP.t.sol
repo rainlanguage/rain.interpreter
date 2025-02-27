@@ -10,10 +10,10 @@ import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpre
 import {LibOpExternNP} from "src/lib/op/00/LibOpExternNP.sol";
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {
-    EncodedExternDispatch,
-    IInterpreterExternV3,
-    ExternDispatch
-} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
+    EncodedExternDispatchV2,
+    IInterpreterExternV4,
+    ExternDispatchV2
+} from "rain.interpreter.interface/interface/unstable/IInterpreterExternV4.sol";
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
@@ -24,11 +24,11 @@ import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 contract LibOpExternNPTest is OpTest {
     using LibUint256Array for uint256[];
 
-    function mockImplementsERC165IInterpreterExternV3(IInterpreterExternV3 extern) internal {
+    function mockImplementsERC165IInterpreterExternV4(IInterpreterExternV4 extern) internal {
         // Extern needs to implement ERC165 for the interface.
         vm.mockCall(
             address(extern),
-            abi.encodeWithSelector(IERC165.supportsInterface.selector, type(IInterpreterExternV3).interfaceId),
+            abi.encodeWithSelector(IERC165.supportsInterface.selector, type(IInterpreterExternV4).interfaceId),
             abi.encode(true)
         );
         vm.mockCall(
@@ -45,7 +45,7 @@ contract LibOpExternNPTest is OpTest {
 
     function testOpExternNPIntegrityHappy(
         IntegrityCheckState memory state,
-        IInterpreterExternV3 extern,
+        IInterpreterExternV4 extern,
         uint16 constantIndex,
         uint8 inputs,
         uint8 outputs
@@ -55,26 +55,26 @@ contract LibOpExternNPTest is OpTest {
 
         assumeEtchable(address(extern));
         vm.etch(address(extern), hex"fe");
-        mockImplementsERC165IInterpreterExternV3(extern);
+        mockImplementsERC165IInterpreterExternV4(extern);
 
         vm.assume(state.constants.length > 0);
         constantIndex = uint16(bound(constantIndex, 0, state.constants.length - 1));
 
         OperandV2 operand = LibOperand.build(inputs, outputs, constantIndex);
-        ExternDispatch externDispatch = LibExtern.encodeExternDispatch(0, operand);
-        EncodedExternDispatch encodedExternDispatch = LibExtern.encodeExternCall(extern, externDispatch);
-        state.constants[constantIndex] = EncodedExternDispatch.unwrap(encodedExternDispatch);
+        ExternDispatchV2 externDispatch = LibExtern.encodeExternDispatch(0, operand);
+        EncodedExternDispatchV2 encodedExternDispatch = LibExtern.encodeExternCall(extern, externDispatch);
+        state.constants[constantIndex] = EncodedExternDispatchV2.unwrap(encodedExternDispatch);
 
         // Extern integrity needs to match the inputs and outputs.
         vm.mockCall(
             address(extern),
-            abi.encodeWithSelector(IInterpreterExternV3.externIntegrity.selector, externDispatch),
+            abi.encodeWithSelector(IInterpreterExternV4.externIntegrity.selector, externDispatch),
             // Have the mock modify the inputs and outputs slightly so we know
             // the implementation is hitting the mock.
             abi.encode(inputs + 1, outputs + 1)
         );
         vm.expectCall(
-            address(extern), abi.encodeWithSelector(IInterpreterExternV3.externIntegrity.selector, externDispatch), 1
+            address(extern), abi.encodeWithSelector(IInterpreterExternV4.externIntegrity.selector, externDispatch), 1
         );
         (uint256 calcInputs, uint256 calcOutputs) = LibOpExternNP.integrity(state, operand);
 
@@ -84,7 +84,7 @@ contract LibOpExternNPTest is OpTest {
 
     function testOpExternNPIntegrityNotAnExternContract(
         IntegrityCheckState memory state,
-        IInterpreterExternV3 extern,
+        IInterpreterExternV4 extern,
         uint16 constantIndex,
         uint8 inputs,
         uint8 outputs
@@ -97,7 +97,7 @@ contract LibOpExternNPTest is OpTest {
         // Extern needs to implement ERC165 for the interface.
         vm.mockCall(
             address(extern),
-            abi.encodeWithSelector(IERC165.supportsInterface.selector, type(IInterpreterExternV3).interfaceId),
+            abi.encodeWithSelector(IERC165.supportsInterface.selector, type(IInterpreterExternV4).interfaceId),
             // If this is false then the contract is not an extern.
             abi.encode(false)
         );
@@ -116,9 +116,9 @@ contract LibOpExternNPTest is OpTest {
         constantIndex = uint16(bound(constantIndex, 0, state.constants.length - 1));
 
         OperandV2 operand = LibOperand.build(inputs, outputs, constantIndex);
-        ExternDispatch externDispatch = LibExtern.encodeExternDispatch(0, operand);
-        EncodedExternDispatch encodedExternDispatch = LibExtern.encodeExternCall(extern, externDispatch);
-        state.constants[constantIndex] = EncodedExternDispatch.unwrap(encodedExternDispatch);
+        ExternDispatchV2 externDispatch = LibExtern.encodeExternDispatch(0, operand);
+        EncodedExternDispatchV2 encodedExternDispatch = LibExtern.encodeExternCall(extern, externDispatch);
+        state.constants[constantIndex] = EncodedExternDispatchV2.unwrap(encodedExternDispatch);
 
         vm.expectRevert(abi.encodeWithSelector(NotAnExternContract.selector, address(extern)));
         this.externalIntegrity(state, operand);
@@ -136,7 +136,7 @@ contract LibOpExternNPTest is OpTest {
 
     /// Test the eval of extern directly.
     function testOpExternNPRunHappy(
-        IInterpreterExternV3 extern,
+        IInterpreterExternV4 extern,
         uint256[] memory constants,
         uint16 constantIndex,
         uint256[] memory inputs,
@@ -155,31 +155,31 @@ contract LibOpExternNPTest is OpTest {
 
         assumeEtchable(address(extern));
         vm.etch(address(extern), hex"fe");
-        mockImplementsERC165IInterpreterExternV3(extern);
+        mockImplementsERC165IInterpreterExternV4(extern);
 
         constantIndex = uint16(bound(constantIndex, 0, state.constants.length - 1));
 
         OperandV2 operand = LibOperand.build(uint8(inputs.length), uint8(outputs.length), constantIndex);
-        ExternDispatch externDispatch = LibExtern.encodeExternDispatch(0, operand);
-        EncodedExternDispatch encodedExternDispatch = LibExtern.encodeExternCall(extern, externDispatch);
-        state.constants[constantIndex] = EncodedExternDispatch.unwrap(encodedExternDispatch);
+        ExternDispatchV2 externDispatch = LibExtern.encodeExternDispatch(0, operand);
+        EncodedExternDispatchV2 encodedExternDispatch = LibExtern.encodeExternCall(extern, externDispatch);
+        state.constants[constantIndex] = EncodedExternDispatchV2.unwrap(encodedExternDispatch);
 
         // Extern integrity needs to match the inputs and outputs.
         vm.mockCall(
             address(extern),
-            abi.encodeWithSelector(IInterpreterExternV3.externIntegrity.selector, externDispatch),
+            abi.encodeWithSelector(IInterpreterExternV4.externIntegrity.selector, externDispatch),
             abi.encode(inputs.length, outputs.length)
         );
 
         // Extern run needs to match the inputs and outputs.
         vm.mockCall(
             address(extern),
-            abi.encodeWithSelector(IInterpreterExternV3.extern.selector, externDispatch, inputs),
+            abi.encodeWithSelector(IInterpreterExternV4.extern.selector, externDispatch, inputs),
             abi.encode(outputs)
         );
         // Expect this for both the reference fn and the run.
         vm.expectCall(
-            address(extern), abi.encodeWithSelector(IInterpreterExternV3.extern.selector, externDispatch, inputs), 2
+            address(extern), abi.encodeWithSelector(IInterpreterExternV4.extern.selector, externDispatch, inputs), 2
         );
 
         opReferenceCheck(state, operand, LibOpExternNP.referenceFn, LibOpExternNP.integrity, LibOpExternNP.run, inputs);
@@ -187,27 +187,27 @@ contract LibOpExternNPTest is OpTest {
 
     /// Test the eval of extern parsed from a string.
     function testOpExternNPEvalHappy() external {
-        IInterpreterExternV3 extern = IInterpreterExternV3(address(0xdeadbeef));
+        IInterpreterExternV4 extern = IInterpreterExternV4(address(0xdeadbeef));
         vm.etch(address(extern), hex"fe");
         uint256 opcode = 5;
         OperandV2 operand = OperandV2.wrap(0x10);
 
-        ExternDispatch externDispatch = LibExtern.encodeExternDispatch(opcode, operand);
+        ExternDispatchV2 externDispatch = LibExtern.encodeExternDispatch(opcode, operand);
         assertEq(
-            ExternDispatch.unwrap(externDispatch), 0x0000000000000000000000000000000000000000000000000000000000050010
+            ExternDispatchV2.unwrap(externDispatch), 0x0000000000000000000000000000000000000000000000000000000000050010
         );
 
-        EncodedExternDispatch encodedExternDispatch = LibExtern.encodeExternCall(extern, externDispatch);
+        EncodedExternDispatchV2 encodedExternDispatch = LibExtern.encodeExternCall(extern, externDispatch);
         assertEq(
-            EncodedExternDispatch.unwrap(encodedExternDispatch),
+            EncodedExternDispatchV2.unwrap(encodedExternDispatch),
             0x00000000000000000005001000000000000000000000000000000000deadbeef
         );
 
-        mockImplementsERC165IInterpreterExternV3(extern);
+        mockImplementsERC165IInterpreterExternV4(extern);
         // Extern integrity needs to match the inputs and outputs.
         vm.mockCall(
             address(extern),
-            abi.encodeWithSelector(IInterpreterExternV3.externIntegrity.selector, externDispatch),
+            abi.encodeWithSelector(IInterpreterExternV4.externIntegrity.selector, externDispatch),
             abi.encode(2, 1)
         );
 
@@ -218,7 +218,7 @@ contract LibOpExternNPTest is OpTest {
         externOutputs[0] = LibDecimalFloat.pack(99e36, -36);
         vm.mockCall(
             address(extern),
-            abi.encodeWithSelector(IInterpreterExternV3.extern.selector, externDispatch, externInputs),
+            abi.encodeWithSelector(IInterpreterExternV4.extern.selector, externDispatch, externInputs),
             abi.encode(externOutputs)
         );
 
@@ -240,27 +240,27 @@ contract LibOpExternNPTest is OpTest {
     /// Test the eval of extern parsed from a string with multiple inputs and
     /// outputs.
     function testOpExternNPEvalMultipleInputsOutputsHappy() external {
-        IInterpreterExternV3 extern = IInterpreterExternV3(address(0xdeadbeef));
+        IInterpreterExternV4 extern = IInterpreterExternV4(address(0xdeadbeef));
         vm.etch(address(extern), hex"fe");
         uint256 opcode = 5;
         OperandV2 operand = OperandV2.wrap(0x10);
 
-        ExternDispatch externDispatch = LibExtern.encodeExternDispatch(opcode, operand);
+        ExternDispatchV2 externDispatch = LibExtern.encodeExternDispatch(opcode, operand);
         assertEq(
-            ExternDispatch.unwrap(externDispatch), 0x0000000000000000000000000000000000000000000000000000000000050010
+            ExternDispatchV2.unwrap(externDispatch), 0x0000000000000000000000000000000000000000000000000000000000050010
         );
 
-        EncodedExternDispatch encodedExternDispatch = LibExtern.encodeExternCall(extern, externDispatch);
+        EncodedExternDispatchV2 encodedExternDispatch = LibExtern.encodeExternCall(extern, externDispatch);
         assertEq(
-            EncodedExternDispatch.unwrap(encodedExternDispatch),
+            EncodedExternDispatchV2.unwrap(encodedExternDispatch),
             0x00000000000000000005001000000000000000000000000000000000deadbeef
         );
 
-        mockImplementsERC165IInterpreterExternV3(extern);
+        mockImplementsERC165IInterpreterExternV4(extern);
         // Extern integrity needs to match the inputs and outputs.
         vm.mockCall(
             address(extern),
-            abi.encodeWithSelector(IInterpreterExternV3.externIntegrity.selector, externDispatch),
+            abi.encodeWithSelector(IInterpreterExternV4.externIntegrity.selector, externDispatch),
             abi.encode(3, 3)
         );
 
@@ -282,12 +282,12 @@ contract LibOpExternNPTest is OpTest {
 
         vm.mockCall(
             address(extern),
-            abi.encodeWithSelector(IInterpreterExternV3.extern.selector, externDispatch, externInputs),
+            abi.encodeWithSelector(IInterpreterExternV4.extern.selector, externDispatch, externInputs),
             abi.encode(externOutputs)
         );
         vm.expectCall(
             address(extern),
-            abi.encodeWithSelector(IInterpreterExternV3.extern.selector, externDispatch, externInputs),
+            abi.encodeWithSelector(IInterpreterExternV4.extern.selector, externDispatch, externInputs),
             1
         );
 

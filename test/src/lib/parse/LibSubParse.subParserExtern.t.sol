@@ -4,10 +4,10 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std/Test.sol";
 import {OperandV2, OPCODE_EXTERN} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {
-    IInterpreterExternV3,
+    IInterpreterExternV4,
     ExternDispatch,
     EncodedExternDispatch
-} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
+} from "rain.interpreter.interface/interface/unstable/IInterpreterExternV4.sol";
 import {LibSubParse} from "src/lib/parse/LibSubParse.sol";
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {ExternDispatchConstantsHeightOverflow} from "src/error/ErrSubParse.sol";
@@ -16,7 +16,7 @@ contract LibSubParseSubParserExternTest is Test {
     /// Every possible valid extern input will be sub parsed into extern
     /// bytecode.
     function testLibSubParseSubParserExtern(
-        IInterpreterExternV3 extern,
+        IInterpreterExternV4 extern,
         uint8 constantsHeight,
         uint8 inputs,
         uint8 outputs,
@@ -41,7 +41,7 @@ contract LibSubParseSubParserExternTest is Test {
         assertEq(uint16(uint8(bytecode[2])) << 8 | uint16(uint8(bytecode[3])), constantsHeight);
 
         assertEq(constants.length, 1);
-        (IInterpreterExternV3 externDecoded, ExternDispatch externDispatchDecoded) =
+        (IInterpreterExternV4 externDecoded, ExternDispatch externDispatchDecoded) =
             LibExtern.decodeExternCall(EncodedExternDispatch.wrap(constants[0]));
         assertEq(address(extern), address(externDecoded));
         (uint256 opcodeIndexDecoded, OperandV2 operandDecoded) = LibExtern.decodeExternDispatch(externDispatchDecoded);
@@ -51,7 +51,7 @@ contract LibSubParseSubParserExternTest is Test {
 
     /// Constants height must be less than 256 or the lib will error.
     function testLibSubParseSubParserExternConstantsHeightOverflow(
-        IInterpreterExternV3 extern,
+        IInterpreterExternV4 extern,
         uint256 constantsHeight,
         uint8 inputsByte,
         uint8 outputsByte,

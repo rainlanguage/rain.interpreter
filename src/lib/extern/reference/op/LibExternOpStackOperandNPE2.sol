@@ -3,7 +3,6 @@ pragma solidity ^0.8.25;
 
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibSubParse} from "../../../parse/LibSubParse.sol";
-import {IInterpreterExternV3} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
 
 /// @title LibExternOpStackOperandNPE2
 /// This op copies its operand value to the stack by copying it to the constants

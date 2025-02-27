@@ -26,7 +26,7 @@ bytes constant OPCODE_FUNCTION_POINTERS = hex"";
 /// theirs.
 bytes constant INTEGRITY_FUNCTION_POINTERS = hex"";
 
-/// Base implementation of `IInterpreterExternV3`. Inherit from this contract,
+/// Base implementation of `IInterpreterExternV4`. Inherit from this contract,
 /// and override `functionPointers` to provide a list of function pointers.
 abstract contract BaseRainterpreterExternNPE2 is IInterpreterExternV4, IIntegrityToolingV1, IOpcodeToolingV1, ERC165 {
     using LibStackPointer for uint256[];
