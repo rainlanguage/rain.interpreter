@@ -6,7 +6,8 @@ import {
     FullyQualifiedNamespace,
     OperandV2,
     SourceIndexV2,
-    EvalV4
+    EvalV4,
+    StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
@@ -17,7 +18,7 @@ import {LibBytecode, SourceIndexOutOfBounds} from "rain.interpreter.interface/li
 import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {STACK_TRACER} from "src/lib/state/LibInterpreterState.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
-import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpCallTest
 /// @notice Test the LibOpCall library that includes the "call" word.
@@ -130,7 +131,7 @@ contract LibOpCallTest is OpTest, BytecodeTest {
     struct ExpectedTrace {
         uint256 parentSourceIndex;
         uint256 sourceIndex;
-        uint256[] stack;
+        StackItem[] stack;
     }
 
     function checkCallNPTraces(bytes memory rainlang, ExpectedTrace[] memory traces) internal {
@@ -144,15 +145,15 @@ contract LibOpCallTest is OpTest, BytecodeTest {
             );
         }
         bytes memory bytecode = iDeployer.parse2(rainlang);
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
+        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
             EvalV4({
                 store: iStore,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
-                context: new uint256[][](0),
-                inputs: new uint256[](0),
-                stateOverlay: new uint256[](0)
+                context: new bytes32[][](0),
+                inputs: new StackItem[](0),
+                stateOverlay: new bytes32[](0)
             })
         );
         (stack, kvs);
@@ -161,18 +162,18 @@ contract LibOpCallTest is OpTest, BytecodeTest {
     function testCallTraceOuterOnly() external {
         ExpectedTrace[] memory traces = new ExpectedTrace[](1);
         traces[0].sourceIndex = 0;
-        traces[0].stack = new uint256[](1);
-        traces[0].stack[0] = LibDecimalFloat.pack(1e37, -37);
+        traces[0].stack = new StackItem[](1);
+        traces[0].stack[0] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(1e37, -37)));
         checkCallNPTraces("_: 1;", traces);
     }
 
     function testCallTraceInnerOnly() external {
         ExpectedTrace[] memory traces = new ExpectedTrace[](2);
         traces[0].sourceIndex = 0;
-        traces[0].stack = new uint256[](0);
+        traces[0].stack = new StackItem[](0);
         traces[1].sourceIndex = 1;
-        traces[1].stack = new uint256[](1);
-        traces[1].stack[0] = LibDecimalFloat.pack(1e37, -37);
+        traces[1].stack = new StackItem[](1);
+        traces[1].stack[0] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(1e37, -37)));
         checkCallNPTraces(":call<1>();_:1;", traces);
     }
 
@@ -205,22 +206,22 @@ contract LibOpCallTest is OpTest, BytecodeTest {
     // }
 
     /// Boilerplate for checking the stack and kvs of a call.
-    function checkCallNPRun(bytes memory rainlang, uint256[] memory stack, uint256[] memory kvs) internal view {
+    function checkCallNPRun(bytes memory rainlang, StackItem[] memory stack, bytes32[] memory kvs) internal view {
         bytes memory bytecode = iDeployer.parse2(rainlang);
-        (uint256[] memory actualStack, uint256[] memory actualKVs) = iInterpreter.eval4(
+        (StackItem[] memory actualStack, bytes32[] memory actualKVs) = iInterpreter.eval4(
             EvalV4({
                 store: iStore,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
-                context: new uint256[][](0),
-                inputs: new uint256[](0),
-                stateOverlay: new uint256[](0)
+                context: new bytes32[][](0),
+                inputs: new StackItem[](0),
+                stateOverlay: new bytes32[](0)
             })
         );
         assertEq(actualStack.length, stack.length, "stack length");
         for (uint256 i = 0; i < stack.length; i++) {
-            assertEq(actualStack[i], stack[i], "stack[i]");
+            assertEq(StackItem.unwrap(actualStack[i]), StackItem.unwrap(stack[i]), "stack[i]");
         }
         assertEq(actualKVs.length, kvs.length, "kvs length");
         for (uint256 i = 0; i < kvs.length; i++) {
@@ -284,15 +285,15 @@ contract LibOpCallTest is OpTest, BytecodeTest {
         bytes memory bytecode = iDeployer.parse2(rainlang);
         // But it will unconditionally happen at runtime.
         vm.expectRevert();
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
+        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
             EvalV4({
                 store: iStore,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
-                context: new uint256[][](0),
-                inputs: new uint256[](0),
-                stateOverlay: new uint256[](0)
+                context: new bytes32[][](0),
+                inputs: new StackItem[](0),
+                stateOverlay: new bytes32[](0)
             })
         );
         (stack, kvs);

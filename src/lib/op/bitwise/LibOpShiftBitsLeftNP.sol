@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {UnsupportedBitwiseShiftAmount} from "../../../error/ErrBitwise.sol";
@@ -37,13 +37,13 @@ library LibOpShiftBitsLeftNP {
     }
 
     /// Reference implementation for shifting bits left.
-    function referenceFn(InterpreterState memory, OperandV2 operand, uint256[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2 operand, StackItem[] memory inputs)
         internal
         pure
-        returns (uint256[] memory)
+        returns (StackItem[] memory)
     {
         uint256 shiftAmount = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
-        inputs[0] = inputs[0] << shiftAmount;
+        inputs[0] = StackItem.wrap(bytes32(uint256(StackItem.unwrap(inputs[0])) << shiftAmount));
         return inputs;
     }
 }

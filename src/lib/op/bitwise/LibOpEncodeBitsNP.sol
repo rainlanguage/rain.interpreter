@@ -3,7 +3,7 @@ pragma solidity ^0.8.18;
 
 import {ZeroLengthBitwiseEncoding, TruncatedBitwiseEncoding} from "../../../error/ErrBitwise.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
@@ -59,13 +59,13 @@ library LibOpEncodeBitsNP {
         }
     }
 
-    function referenceFn(InterpreterState memory, OperandV2 operand, uint256[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2 operand, StackItem[] memory inputs)
         internal
         pure
-        returns (uint256[] memory outputs)
+        returns (StackItem[] memory outputs)
     {
-        uint256 source = inputs[0];
-        uint256 target = inputs[1];
+        uint256 source = uint256(StackItem.unwrap(inputs[0]));
+        uint256 target = uint256(StackItem.unwrap(inputs[1]));
 
         // We encode as a start and length of bits. This avoids mistakes such as
         // inclusive/exclusive ranges, and makes it easier to reason about the
@@ -84,7 +84,7 @@ library LibOpEncodeBitsNP {
         // Fill the hole with masked bytes from source.
         target |= (source & mask) << startBit;
 
-        outputs = new uint256[](1);
-        outputs[0] = target;
+        outputs = new StackItem[](1);
+        outputs[0] = StackItem.wrap(bytes32(target));
     }
 }

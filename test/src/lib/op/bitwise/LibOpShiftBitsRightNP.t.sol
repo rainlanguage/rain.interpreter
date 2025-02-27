@@ -9,7 +9,8 @@ import {
     IInterpreterV4,
     FullyQualifiedNamespace,
     OperandV2,
-    SourceIndexV2
+    SourceIndexV2,
+    StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
@@ -46,7 +47,7 @@ contract LibOpShiftBitsRightNPTest is OpTest {
         external
     {
         uint256 shiftAmount = bound(uint256(shiftAmount16), uint256(type(uint8).max) + 1, type(uint16).max);
-        OperandV2 operand = OperandV2.wrap(uint256(inputs) << 0x10 | shiftAmount);
+        OperandV2 operand = OperandV2.wrap(bytes32(uint256(inputs) << 0x10 | shiftAmount));
         vm.expectRevert(abi.encodeWithSelector(UnsupportedBitwiseShiftAmount.selector, shiftAmount));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpShiftBitsRightNP.integrity(state, operand);
         (calcInputs, calcOutputs);
@@ -57,7 +58,7 @@ contract LibOpShiftBitsRightNPTest is OpTest {
     /// amount.
     /// forge-config: default.fuzz.runs = 100
     function testOpShiftBitsRightNPIntegrityNoop(IntegrityCheckState memory state, uint8 inputs) external {
-        OperandV2 operand = OperandV2.wrap(uint256(inputs) << 0x10);
+        OperandV2 operand = OperandV2.wrap(bytes32(uint256(inputs) << 0x10));
         vm.expectRevert(abi.encodeWithSelector(UnsupportedBitwiseShiftAmount.selector, 0));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpShiftBitsRightNP.integrity(state, operand);
         (calcInputs, calcOutputs);
@@ -65,10 +66,10 @@ contract LibOpShiftBitsRightNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpShiftBitsRightNP. This tests that
     /// the opcode correctly shifts bits right.
-    function testOpShiftBitsRightNPRun(uint256 x, uint8 shiftAmount) external view {
+    function testOpShiftBitsRightNPRun(StackItem x, uint8 shiftAmount) external view {
         vm.assume(shiftAmount != 0);
         InterpreterState memory state = opTestDefaultInterpreterState();
-        uint256[] memory inputs = new uint256[](1);
+        StackItem[] memory inputs = new StackItem[](1);
         inputs[0] = x;
         OperandV2 operand = LibOperand.build(uint8(inputs.length), 1, shiftAmount);
         opReferenceCheck(
@@ -93,25 +94,25 @@ contract LibOpShiftBitsRightNPTest is OpTest {
         checkHappy("_: bitwise-shift-right<3>(0x01);", 0, "3, 1");
         checkHappy("_: bitwise-shift-right<255>(0x01);", 0, "255, 1");
 
-        checkHappy("_: bitwise-shift-right<1>(0x02);", 1, "1, 2");
+        checkHappy("_: bitwise-shift-right<1>(0x02);", bytes32(uint256(1)), "1, 2");
         checkHappy("_: bitwise-shift-right<2>(0x02);", 0, "2, 2");
         checkHappy("_: bitwise-shift-right<3>(0x02);", 0, "3, 2");
         checkHappy("_: bitwise-shift-right<255>(0x02);", 0, "255, 2");
 
-        checkHappy("_: bitwise-shift-right<1>(0x03);", 1, "1, 3");
+        checkHappy("_: bitwise-shift-right<1>(0x03);", bytes32(uint256(1)), "1, 3");
         checkHappy("_: bitwise-shift-right<2>(0x03);", 0, "2, 3");
         checkHappy("_: bitwise-shift-right<3>(0x03);", 0, "3, 3");
         checkHappy("_: bitwise-shift-right<255>(0x03);", 0, "255, 3");
 
-        checkHappy("_: bitwise-shift-right<1>(0x04);", 2, "1, 4");
-        checkHappy("_: bitwise-shift-right<2>(0x04);", 1, "2, 4");
+        checkHappy("_: bitwise-shift-right<1>(0x04);", bytes32(uint256(2)), "1, 4");
+        checkHappy("_: bitwise-shift-right<2>(0x04);", bytes32(uint256(1)), "2, 4");
         checkHappy("_: bitwise-shift-right<3>(0x04);", 0, "3, 4");
         checkHappy("_: bitwise-shift-right<255>(0x04);", 0, "255, 4");
 
-        checkHappy("_: bitwise-shift-right<1>(uint256-max-value());", type(uint256).max >> 1, "1, max");
-        checkHappy("_: bitwise-shift-right<2>(uint256-max-value());", type(uint256).max >> 2, "2, max");
-        checkHappy("_: bitwise-shift-right<3>(uint256-max-value());", type(uint256).max >> 3, "3, max");
-        checkHappy("_: bitwise-shift-right<255>(uint256-max-value());", 1, "255, max");
+        checkHappy("_: bitwise-shift-right<1>(uint256-max-value());", bytes32(type(uint256).max >> 1), "1, max");
+        checkHappy("_: bitwise-shift-right<2>(uint256-max-value());", bytes32(type(uint256).max >> 2), "2, max");
+        checkHappy("_: bitwise-shift-right<3>(uint256-max-value());", bytes32(type(uint256).max >> 3), "3, max");
+        checkHappy("_: bitwise-shift-right<255>(uint256-max-value());", bytes32(uint256(1)), "255, max");
     }
 
     /// Test that a bitwise shift with bad inputs fails integrity.

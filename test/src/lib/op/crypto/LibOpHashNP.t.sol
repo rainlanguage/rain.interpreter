@@ -14,7 +14,8 @@ import {
     IInterpreterV4,
     OperandV2,
     SourceIndexV2,
-    EvalV4
+    EvalV4,
+    StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {
     IInterpreterStoreV2, FullyQualifiedNamespace
@@ -23,7 +24,7 @@ import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreter
 import {LibIntegrityCheckNP, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
 import {InterpreterState, LibInterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
-import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpHashNPTest
 /// @notice Test the runtime and integrity time logic of LibOpHashNP.
@@ -50,7 +51,7 @@ contract LibOpHashNPTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpHashNP.
-    function testOpHashNPRun(uint256[] memory inputs) external view {
+    function testOpHashNPRun(StackItem[] memory inputs) external view {
         vm.assume(inputs.length <= 0x0F);
         InterpreterState memory state = opTestDefaultInterpreterState();
         OperandV2 operand = LibOperand.build(uint8(inputs.length), 1, 0);
@@ -59,14 +60,12 @@ contract LibOpHashNPTest is OpTest {
 
     /// Test the eval of a hash opcode parsed from a string. Tests 0 inputs.
     function testOpHashNPEval0Inputs() external view {
-        checkHappy("_: hash();", uint256(keccak256("")), "");
+        checkHappy("_: hash();", keccak256(""), "");
     }
 
     /// Test the eval of a hash opcode parsed from a string. Tests 1 input.
     function testOpHashNPEval1Input() external view {
-        checkHappy(
-            "_: hash(0x1234567890abcdef);", uint256(keccak256(abi.encodePacked(uint256(0x1234567890abcdef)))), ""
-        );
+        checkHappy("_: hash(0x1234567890abcdef);", keccak256(abi.encodePacked(uint256(0x1234567890abcdef))), "");
     }
 
     /// Test the eval of a hash opcode parsed from a string. Tests 2 inputs that
@@ -74,7 +73,7 @@ contract LibOpHashNPTest is OpTest {
     function testOpHashNPEval2Inputs() external view {
         checkHappy(
             "_: hash(0x1234567890abcdef 0x1234567890abcdef);",
-            uint256(keccak256(abi.encodePacked(uint256(0x1234567890abcdef), uint256(0x1234567890abcdef)))),
+            keccak256(abi.encodePacked(uint256(0x1234567890abcdef), uint256(0x1234567890abcdef))),
             ""
         );
     }
@@ -84,7 +83,7 @@ contract LibOpHashNPTest is OpTest {
     function testOpHashNPEval2InputsDifferent() external view {
         checkHappy(
             "_: hash(0x1234567890abcdef 0xfedcba0987654321);",
-            uint256(keccak256(abi.encodePacked(uint256(0x1234567890abcdef), uint256(0xfedcba0987654321)))),
+            keccak256(abi.encodePacked(uint256(0x1234567890abcdef), uint256(0xfedcba0987654321))),
             ""
         );
     }
@@ -93,23 +92,24 @@ contract LibOpHashNPTest is OpTest {
     /// other stack items.
     function testOpHashNPEval2InputsOtherStack() external view {
         bytes memory bytecode = iDeployer.parse2("_ _ _: 5 hash(0x1234567890abcdef 0xfedcba0987654321) 9;");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
+        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
             EvalV4({
                 store: iStore,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
-                context: LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-                inputs: new uint256[](0),
-                stateOverlay: new uint256[](0)
+                context: LibContext.build(new bytes32[][](0), new SignedContextV1[](0)),
+                inputs: new StackItem[](0),
+                stateOverlay: new bytes32[](0)
             })
         );
         assertEq(stack.length, 3);
-        assertEq(stack[0], LibDecimalFloat.pack(9e37, -37));
+        assertEq(StackItem.unwrap(stack[0]), PackedFloat.unwrap(LibDecimalFloat.pack(9e37, -37)));
         assertEq(
-            stack[1], uint256(keccak256(abi.encodePacked(uint256(0x1234567890abcdef), uint256(0xfedcba0987654321))))
+            StackItem.unwrap(stack[1]),
+            keccak256(abi.encodePacked(uint256(0x1234567890abcdef), uint256(0xfedcba0987654321)))
         );
-        assertEq(stack[2], LibDecimalFloat.pack(5e37, -37));
+        assertEq(StackItem.unwrap(stack[2]), PackedFloat.unwrap(LibDecimalFloat.pack(5e37, -37)));
         assertEq(kvs.length, 0);
     }
 

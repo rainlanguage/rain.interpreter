@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibOpEncodeBitsNP} from "./LibOpEncodeBitsNP.sol";
@@ -48,10 +48,10 @@ library LibOpDecodeBitsNP {
         }
     }
 
-    function referenceFn(InterpreterState memory, OperandV2 operand, uint256[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2 operand, StackItem[] memory inputs)
         internal
         pure
-        returns (uint256[] memory outputs)
+        returns (StackItem[] memory outputs)
     {
         // We decode as a start and length of bits. This avoids mistakes such as
         // inclusive/exclusive ranges, and makes it easier to reason about the
@@ -63,7 +63,7 @@ library LibOpDecodeBitsNP {
         // is 255. A 256 length doesn't really make sense as that isn't an
         // encoding anyway, it's just the value verbatim.
         uint256 mask = (2 ** length) - 1;
-        outputs = new uint256[](1);
-        outputs[0] = (inputs[0] >> startBit) & mask;
+        outputs = new StackItem[](1);
+        outputs[0] = StackItem.wrap(bytes32((uint256(StackItem.unwrap(inputs[0])) >> startBit) & mask));
     }
 }

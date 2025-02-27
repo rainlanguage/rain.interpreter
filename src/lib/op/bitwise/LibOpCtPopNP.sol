@@ -42,7 +42,7 @@ library LibOpCtPopNP {
         pure
         returns (StackItem[] memory)
     {
-        inputs[0] = StackItem.wrap(LibCtPop.ctpopSlow(StackItem.unwrap(inputs[0])));
+        inputs[0] = StackItem.wrap(bytes32(LibCtPop.ctpopSlow(uint256(StackItem.unwrap(inputs[0])))));
         return inputs;
     }
 }

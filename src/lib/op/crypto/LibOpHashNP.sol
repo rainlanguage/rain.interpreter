@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
 
@@ -26,12 +26,12 @@ library LibOpHashNP {
         return stackTop;
     }
 
-    function referenceFn(InterpreterState memory, OperandV2, uint256[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure
-        returns (uint256[] memory outputs)
+        returns (StackItem[] memory outputs)
     {
-        outputs = new uint256[](1);
-        outputs[0] = uint256(keccak256(abi.encodePacked(inputs)));
+        outputs = new StackItem[](1);
+        outputs[0] = StackItem.wrap(keccak256(abi.encodePacked(inputs)));
     }
 }
