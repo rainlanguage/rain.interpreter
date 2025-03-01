@@ -42,7 +42,7 @@ contract LibParsePragmaKeywordTest is Test {
             bytes32 deref = state.subParsers;
             uint256 pointer = uint256(deref) >> 0xF0;
             while (deref != 0) {
-                assertEq(deref, bytes32(uint256(uint160(values[j]))));
+                assertEq(uint160(uint256(deref)), uint160(values[j]));
 
                 assembly ("memory-safe") {
                     deref := mload(pointer)
@@ -121,7 +121,7 @@ contract LibParsePragmaKeywordTest is Test {
     /// Anything that DOES start with the keyword and WITH whitespace then some
     /// hex address should push the hex address to the state as a sub parser.
     /// forge-config: default.fuzz.runs = 100
-    function testPragmaKeywordParseSubParser(
+    function testPragmaKeywordParseSubParserBasic(
         string memory whitespace,
         address subParser,
         uint256 seed,
@@ -148,7 +148,7 @@ contract LibParsePragmaKeywordTest is Test {
 
         // The sub parser should be pushed to the state.
         bytes32 deref = state.subParsers;
-        assertEq(deref, bytes32(uint256(uint160(subParser))));
+        assertEq(uint160(uint256(deref)), uint160(subParser));
         uint256 pointer = uint256(deref) >> 0xF0;
         assembly ("memory-safe") {
             deref := mload(pointer)
@@ -201,12 +201,12 @@ contract LibParsePragmaKeywordTest is Test {
 
         // The sub parsers should both be pushed to the state.
         bytes32 deref = state.subParsers;
-        assertEq(deref, bytes32(uint256(uint160(subParser1))));
+        assertEq(uint160(uint256(deref)), uint160(subParser1));
         uint256 pointer = uint256(deref) >> 0xF0;
         assembly ("memory-safe") {
             deref := mload(pointer)
         }
-        assertEq(deref, bytes32(uint256(uint160(subParser0))));
+        assertEq(uint160(uint256(deref)), uint160(subParser0));
         pointer = uint256(deref) >> 0xF0;
         assembly ("memory-safe") {
             deref := mload(pointer)

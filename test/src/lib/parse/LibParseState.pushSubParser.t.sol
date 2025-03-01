@@ -51,19 +51,19 @@ contract LibParseStatePushSubParserTest is Test {
             state.pushSubParser(cursor, bytes32(uint256(uint160(value2))));
         }
 
-        assertEq(state.subParsers, bytes32(uint256(uint160(value2))));
+        assertEq(uint160(uint256(state.subParsers)), uint256(uint160(value2)));
         uint256 pointer = uint256(state.subParsers) >> 0xF0;
         bytes32 deref;
         assembly ("memory-safe") {
             deref := mload(pointer)
         }
-        assertEq(deref, bytes32(uint256(uint160(value1))));
+        assertEq(uint160(uint256(deref)), uint256(uint160(value1)));
 
         pointer = uint256(deref) >> 0xF0;
         assembly ("memory-safe") {
             deref := mload(pointer)
         }
-        assertEq(deref, bytes32(uint256(uint160(value0))));
+        assertEq(uint160(uint256(deref)), uint256(uint160(value0)));
 
         pointer = uint256(deref) >> 0xF0;
         assembly ("memory-safe") {
@@ -85,7 +85,7 @@ contract LibParseStatePushSubParserTest is Test {
         bytes32 deref = state.subParsers;
         uint256 pointer = uint256(deref) >> 0xF0;
         while (deref != 0) {
-            assertEq(deref, bytes32(uint256(uint160(values[j]))));
+            assertEq(uint160(uint256(deref)), uint160(values[j]));
 
             assembly ("memory-safe") {
                 deref := mload(pointer)

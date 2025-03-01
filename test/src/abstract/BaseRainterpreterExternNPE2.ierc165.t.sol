@@ -5,6 +5,8 @@ import {Test} from "forge-std/Test.sol";
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 import {IInterpreterExternV4} from "rain.interpreter.interface/interface/unstable/IInterpreterExternV4.sol";
 import {BaseRainterpreterExternNPE2} from "src/abstract/BaseRainterpreterExternNPE2.sol";
+import {IIntegrityToolingV1} from "rain.sol.codegen/interface/IIntegrityToolingV1.sol";
+import {IOpcodeToolingV1} from "rain.sol.codegen/interface/IOpcodeToolingV1.sol";
 
 /// @dev We need a contract that is deployable in order to test the abstract
 /// base contract.
@@ -26,10 +28,14 @@ contract BaseRainterpreterExternNPE2IERC165Test is Test {
     function testRainterpreterExternNPE2IERC165(bytes4 badInterfaceId) external {
         vm.assume(badInterfaceId != type(IERC165).interfaceId);
         vm.assume(badInterfaceId != type(IInterpreterExternV4).interfaceId);
+        vm.assume(badInterfaceId != type(IIntegrityToolingV1).interfaceId);
+        vm.assume(badInterfaceId != type(IOpcodeToolingV1).interfaceId);
 
         ChildRainterpreterExternNPE2 extern = new ChildRainterpreterExternNPE2();
         assertTrue(extern.supportsInterface(type(IERC165).interfaceId));
         assertTrue(extern.supportsInterface(type(IInterpreterExternV4).interfaceId));
+        assertTrue(extern.supportsInterface(type(IIntegrityToolingV1).interfaceId));
+        assertTrue(extern.supportsInterface(type(IOpcodeToolingV1).interfaceId));
         assertFalse(extern.supportsInterface(badInterfaceId));
     }
 }
