@@ -164,7 +164,7 @@ library LibSubParse {
                 if (memoryAtCursor >> 0xf8 == OPCODE_UNKNOWN) {
                     bytes32 deref = state.subParsers;
                     while (deref != 0) {
-                        ISubParserV4 subParser = ISubParserV4(address(bytes20(deref)));
+                        ISubParserV4 subParser = ISubParserV4(address(uint160(uint256((deref)))));
                         assembly ("memory-safe") {
                             deref := mload(shr(0xf0, deref))
                         }
@@ -304,7 +304,7 @@ library LibSubParse {
 
             bytes32 deref = state.subParsers;
             while (deref != 0) {
-                ISubParserV4 subParser = ISubParserV4(address(bytes20(deref)));
+                ISubParserV4 subParser = ISubParserV4(address(uint160(uint256(deref))));
                 assembly ("memory-safe") {
                     deref := mload(shr(0xf0, deref))
                 }
