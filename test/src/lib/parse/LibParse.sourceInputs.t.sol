@@ -15,7 +15,7 @@ contract LibParseSourceInputsTest is Test {
 
     /// A single LHS item is parsed as a source input.
     function testParseSourceInputsSingle() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(":,_:;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(":,_:;").parse();
         assertEq(
             bytecode,
             // 1 source
@@ -37,7 +37,7 @@ contract LibParseSourceInputsTest is Test {
     /// Inputs can appear on the second line, even after an empty line, provided
     /// no RHS items have appeared yet.
     function testParseSourceInputsEmptyLinePrefix() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(":,_:;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(":,_:;").parse();
         assertEq(
             bytecode,
             // 1 source
@@ -59,7 +59,7 @@ contract LibParseSourceInputsTest is Test {
     /// Inputs can be spread across multiple lines, provided no RHS items have
     /// appeared yet. Tests one item per line, two times.
     function testParseSourceInputsMultipleLines() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(":,_:,\n_:;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(":,_:,\n_:;").parse();
         assertEq(
             bytecode,
             // 1 source

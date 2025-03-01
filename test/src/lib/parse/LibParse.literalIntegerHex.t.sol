@@ -16,7 +16,7 @@ contract LibParseLiteralIntegerHexTest is Test {
     /// sources and constants.
 
     function testParseIntegerLiteralHex00() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_: 0xa2;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_: 0xa2;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -45,13 +45,13 @@ contract LibParseLiteralIntegerHexTest is Test {
         );
 
         assertEq(constants.length, 1);
-        assertEq(constants[0], 0xa2);
+        assertEq(constants[0], bytes32(uint256(0xa2)));
     }
 
     /// Check 2 hex literals. Should not revert and return one source and
     /// length 2 constants.
     function testParseIntegerLiteralHex01() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_ _: 0xa2 0x03;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_ _: 0xa2 0x03;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -82,13 +82,13 @@ contract LibParseLiteralIntegerHexTest is Test {
         );
 
         assertEq(constants.length, 2);
-        assertEq(constants[0], 0xa2);
-        assertEq(constants[1], 0x03);
+        assertEq(constants[0], bytes32(uint256(0xa2)));
+        assertEq(constants[1], bytes32(uint256(0x03)));
     }
 
     /// Check 3 hex literals with 2 dupes. Should dedupe and respect ordering.
     function testParseIntegerLiteralHex02() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_ _ _: 0xa2 0x03 0xa2;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_ _ _: 0xa2 0x03 0xa2;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -122,13 +122,13 @@ contract LibParseLiteralIntegerHexTest is Test {
         );
 
         assertEq(constants.length, 2);
-        assertEq(constants[0], 0xa2);
-        assertEq(constants[1], 0x03);
+        assertEq(constants[0], bytes32(uint256(0xa2)));
+        assertEq(constants[1], bytes32(uint256(0x03)));
     }
 
     /// Check that we can parse uint256 max int in hex form.
     function testParseIntegerLiteralHexUint256Max() external view {
-        (bytes memory bytecode, uint256[] memory constants) =
+        (bytes memory bytecode, bytes32[] memory constants) =
             LibMetaFixture.newState("_: 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
@@ -156,6 +156,6 @@ contract LibParseLiteralIntegerHexTest is Test {
             hex"01100000"
         );
         assertEq(constants.length, 1);
-        assertEq(constants[0], type(uint256).max);
+        assertEq(constants[0], bytes32(type(uint256).max));
     }
 }

@@ -26,7 +26,7 @@ contract LibParseUnexpectedRightParenTest is Test {
         );
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRightParen.selector, 1));
-        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+        (bytes memory bytecode, bytes32[] memory constants) = state.parse();
         (bytecode, constants);
     }
 
@@ -41,7 +41,7 @@ contract LibParseUnexpectedRightParenTest is Test {
         );
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRightParen.selector, 7));
-        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+        (bytes memory bytecode, bytes32[] memory constants) = state.parse();
         (bytecode, constants);
     }
 }
