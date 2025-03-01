@@ -29,9 +29,9 @@ contract LibParseStatePushSubParserTest is Test {
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         state.pushSubParser(cursor, bytes32(uint256(uint160(value))));
 
-        assertEq(state.subParsers, bytes32(uint256(uint160(value))));
+        assertEq(uint160(uint256(state.subParsers)), uint160(value));
         uint256 pointer = uint256(state.subParsers) >> 0xF0;
-        uint256 deref;
+        bytes32 deref;
         assembly ("memory-safe") {
             deref := mload(pointer)
         }

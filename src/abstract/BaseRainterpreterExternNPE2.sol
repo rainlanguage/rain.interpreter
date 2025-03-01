@@ -88,7 +88,9 @@ abstract contract BaseRainterpreterExternNPE2 is IInterpreterExternV4, IIntegrit
 
     /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IInterpreterExternV4).interfaceId || super.supportsInterface(interfaceId);
+        return type(IInterpreterExternV4).interfaceId == interfaceId
+            || type(IIntegrityToolingV1).interfaceId == interfaceId || type(IOpcodeToolingV1).interfaceId == interfaceId
+            || super.supportsInterface(interfaceId);
     }
 
     /// Overrideable function to provide the list of function pointers for
