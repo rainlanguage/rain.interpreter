@@ -39,15 +39,15 @@ contract LibParsePragmaKeywordTest is Test {
 
         if (values.length > 0) {
             uint256 j = values.length - 1;
-            uint256 deref = state.subParsers;
-            uint256 pointer = deref >> 0xF0;
+            bytes32 deref = state.subParsers;
+            uint256 pointer = uint256(deref) >> 0xF0;
             while (deref != 0) {
-                assertEq(uint256(uint160(deref)), uint256(uint160(values[j])));
+                assertEq(deref, bytes32(uint256(uint160(values[j]))));
 
                 assembly ("memory-safe") {
                     deref := mload(pointer)
                 }
-                pointer = deref >> 0xF0;
+                pointer = uint256(deref) >> 0xF0;
                 // This underflows exactly when deref is zero and the loop
                 // terminates.
                 unchecked {
@@ -147,9 +147,9 @@ contract LibParsePragmaKeywordTest is Test {
         assertEq(cursorAfter, cursor + PRAGMA_KEYWORD_BYTES_LENGTH + bytes(whitespace).length + 42);
 
         // The sub parser should be pushed to the state.
-        uint256 deref = state.subParsers;
-        assertEq(address(uint160(deref)), subParser);
-        uint256 pointer = deref >> 0xF0;
+        bytes32 deref = state.subParsers;
+        assertEq(deref, bytes32(uint256(uint160(subParser))));
+        uint256 pointer = uint256(deref) >> 0xF0;
         assembly ("memory-safe") {
             deref := mload(pointer)
         }
@@ -200,14 +200,14 @@ contract LibParsePragmaKeywordTest is Test {
         );
 
         // The sub parsers should both be pushed to the state.
-        uint256 deref = state.subParsers;
-        assertEq(address(uint160(deref)), subParser1);
-        uint256 pointer = deref >> 0xF0;
+        bytes32 deref = state.subParsers;
+        assertEq(deref, bytes32(uint256(uint160(subParser1))));
+        uint256 pointer = uint256(deref) >> 0xF0;
         assembly ("memory-safe") {
             deref := mload(pointer)
         }
-        assertEq(address(uint160(deref)), subParser0);
-        pointer = deref >> 0xF0;
+        assertEq(deref, bytes32(uint256(uint160(subParser0))));
+        pointer = uint256(deref) >> 0xF0;
         assembly ("memory-safe") {
             deref := mload(pointer)
         }

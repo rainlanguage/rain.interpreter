@@ -24,17 +24,17 @@ contract LibParseLiteralSubParseableTest is Test {
         ParseState memory state = LibParseState.newState(bytes(data), "", "", "");
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         address subParser = address(0x1234567890123456789012345678901234567890);
-        state.pushSubParser(0, uint256(uint160(subParser)));
+        state.pushSubParser(0, bytes32(uint256(uint160(subParser))));
         bytes memory subParseData =
             bytes.concat(bytes2(uint16(bytes(expectedDispatch).length)), bytes(expectedDispatch), bytes(expectedBody));
-        uint256 returnValue = 99;
+        bytes32 returnValue = bytes32(uint256(99));
         vm.mockCall(
             subParser,
-            abi.encodeWithSelector(ISubParserV4.subParseLiteral.selector, subParseData),
+            abi.encodeWithSelector(ISubParserV4.subParseLiteral2.selector, subParseData),
             abi.encode(true, returnValue)
         );
-        vm.expectCall(subParser, abi.encodeWithSelector(ISubParserV4.subParseLiteral.selector, subParseData));
-        (uint256 cursorAfter, uint256 value) =
+        vm.expectCall(subParser, abi.encodeWithSelector(ISubParserV4.subParseLiteral2.selector, subParseData));
+        (uint256 cursorAfter, bytes32 value) =
             state.parseSubParseable(cursor, Pointer.unwrap(state.data.endDataPointer()));
         assertEq(cursorAfter - cursor, expectedCursorAfter);
         assertEq(value, returnValue);

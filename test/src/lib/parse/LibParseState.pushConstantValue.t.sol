@@ -24,7 +24,7 @@ contract LibParseStatePushConstantValueTest is Test {
 
     /// Pushing any value onto an empty constants LL should result in that value
     /// in the state with a pointer to 0.
-    function testPushConstantValueSingle(uint256 value) external pure {
+    function testPushConstantValueSingle(bytes32 value) external pure {
         // Start with a fresh state.
         ParseState memory state = LibParseState.newState("", "", "", "");
 
@@ -39,8 +39,8 @@ contract LibParseStatePushConstantValueTest is Test {
 
         // The constants builder should now point to the tail.
         uint256 pointer = state.constantsBuilder >> 0x10;
-        uint256 loadedValue;
-        uint256 loadedNext;
+        bytes32 loadedValue;
+        bytes32 loadedNext;
         assembly ("memory-safe") {
             loadedValue := mload(add(pointer, 0x20))
             loadedNext := mload(pointer)
@@ -53,7 +53,7 @@ contract LibParseStatePushConstantValueTest is Test {
     }
 
     /// Can push many values to the constants LL.
-    function testPushConstantValueMany(uint256[] memory values) external pure {
+    function testPushConstantValueMany(bytes32[] memory values) external pure {
         vm.assume(values.length > 0);
         // Start with a fresh state.
         ParseState memory state = LibParseState.newState("", "", "", "");
@@ -71,11 +71,11 @@ contract LibParseStatePushConstantValueTest is Test {
         assertEq(state.constantsBuilder & 0xFFFF, values.length);
 
         // Looping down the pointers should give us the values in reverse order.
-        uint256[] memory loadedFinalValues = new uint256[](values.length);
+        bytes32[] memory loadedFinalValues = new bytes32[](values.length);
         uint256 pointer = state.constantsBuilder >> 0x10;
         uint256 j = loadedFinalValues.length - 1;
         while (pointer != 0) {
-            uint256 loadedValue;
+            bytes32 loadedValue;
             assembly ("memory-safe") {
                 loadedValue := mload(add(pointer, 0x20))
                 pointer := mload(pointer)
