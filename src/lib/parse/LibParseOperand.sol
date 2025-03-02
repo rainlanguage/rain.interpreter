@@ -204,6 +204,7 @@ library LibParseOperand {
                 a := mload(add(values, 0x20))
                 b := mload(add(values, 0x40))
             }
+            // slither-disable-next-line write-after-write
             (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(a);
             uint256 aUint = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
             (signedCoefficient, exponent) = LibDecimalFloat.unpack(b);
@@ -250,6 +251,7 @@ library LibParseOperand {
                 c = PackedFloat.wrap(0);
             }
 
+            // slither-disable-next-line write-after-write
             (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(a);
             uint256 aUint = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
             (signedCoefficient, exponent) = LibDecimalFloat.unpack(b);
@@ -293,6 +295,7 @@ library LibParseOperand {
                 b = PackedFloat.wrap(0);
             }
 
+            // slither-disable-next-line write-after-write
             (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(a);
             uint256 aUint = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
             (signedCoefficient, exponent) = LibDecimalFloat.unpack(b);
