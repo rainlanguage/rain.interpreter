@@ -14,7 +14,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     /// Defaults are not allowed for this operand parser. Tests no operand.
     function testOperandDoublePerByteNoDefaultElided() external {
         vm.expectRevert(abi.encodeWithSelector(ExpectedOperand.selector));
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c();").parse();
         (bytecode);
         (constants);
     }
@@ -22,7 +22,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     /// Defaults are not allowed for this operand parser. Tests empty operand.
     function testOperandDoublePerByteNoDefaultEmpty() external {
         vm.expectRevert(abi.encodeWithSelector(ExpectedOperand.selector));
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c<>();").parse();
         (bytecode);
         (constants);
     }
@@ -31,14 +31,14 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     /// second operand.
     function testOperandDoublePerByteNoDefaultFirst() external {
         vm.expectRevert(abi.encodeWithSelector(ExpectedOperand.selector));
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<1>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c<1>();").parse();
         (bytecode);
         (constants);
     }
 
     /// 2 literals are expected for this operand parser. Tests 1 2.
     function testOperandDoublePerByteNoDefaultSecond() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<1 2>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c<1 2>();").parse();
         assertEq(
             bytecode,
             // 1 source
@@ -61,7 +61,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
 
     /// 2 literals are expected for this operand parser. Tests 0 0.
     function testOperandDoublePerByteNoDefaultSecondZero() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<0 0>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c<0 0>();").parse();
         assertEq(
             bytecode,
             // 1 source
@@ -84,7 +84,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
 
     /// 2 literals are expected for this operand parser. Tests 255 0.
     function testOperandDoublePerByteNoDefaultSecondMaxZero() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<255 0>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c<255 0>();").parse();
         assertEq(
             bytecode,
             // 1 source
@@ -107,7 +107,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
 
     /// 2 literals are expected for this operand parser. Tests 0 255.
     function testOperandDoublePerByteNoDefaultSecondZeroMax() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<0 255>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c<0 255>();").parse();
         assertEq(
             bytecode,
             // 1 source
@@ -130,7 +130,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
 
     /// 2 literals are expected for this operand parser. Tests 255 255.
     function testOperandDoublePerByteNoDefaultSecondMax() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<255 255>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c<255 255>();").parse();
         assertEq(
             bytecode,
             // 1 source
@@ -154,7 +154,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     /// 2 literals are expected for this operand parser. Tests 256 256.
     function testOperandDoublePerByteNoDefaultSecondOverflow() external {
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<256 256>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c<256 256>();").parse();
         (bytecode);
         (constants);
     }
@@ -162,7 +162,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     /// 2 literals are expected for this operand parser. Tests 256 255.
     function testOperandDoublePerByteNoDefaultSecondOverflowFirst() external {
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<256 255>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c<256 255>();").parse();
         (bytecode);
         (constants);
     }
@@ -170,7 +170,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     /// 3 literals is disallowed.
     function testOperandDoublePerByteNoDefaultThird() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperandValue.selector));
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<1 2 3>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c<1 2 3>();").parse();
         (bytecode);
         (constants);
     }
@@ -178,7 +178,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     /// Unclosed operand is disallowed.
     function testOperandDoublePerByteNoDefaultUnclosed() external {
         vm.expectRevert(abi.encodeWithSelector(UnclosedOperand.selector, 7));
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<1 2").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c<1 2").parse();
         (bytecode);
         (constants);
     }
@@ -186,14 +186,14 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     /// Unopened operand is disallowed.
     function testOperandDoublePerByteNoDefaultUnopened() external {
         vm.expectRevert(abi.encodeWithSelector(ExpectedOperand.selector));
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c>1 2>").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c>1 2>").parse();
         (bytecode);
         (constants);
     }
 
     /// Prefix whitespace is allowed.
     function testOperandDoublePerByteNoDefaultPrefixWhitespace() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c< 1 2>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c< 1 2>();").parse();
         assertEq(
             bytecode,
             // 1 source
@@ -216,7 +216,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
 
     /// Postfix whitespace is allowed.
     function testOperandDoublePerByteNoDefaultPostfixWhitespace() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<1 2 >();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c<1 2 >();").parse();
         assertEq(
             bytecode,
             // 1 source
@@ -239,7 +239,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
 
     /// Multiple sequential whitespace is allowed.
     function testOperandDoublePerByteNoDefaultMultipleWhitespace() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:c<  1   2   >();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c<  1   2   >();").parse();
         assertEq(
             bytecode,
             // 1 source

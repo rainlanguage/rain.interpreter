@@ -17,11 +17,11 @@ contract LibParseLiteralHexBoundHexTest is Test {
     using LibBytes for bytes;
 
     /// Fuzz and round trip.
-    function testParseLiteralHexRoundTrip(uint256 value) external pure {
-        string memory hexString = Strings.toHexString(value);
+    function testParseLiteralHexRoundTrip(bytes32 value) external pure {
+        string memory hexString = Strings.toHexString(uint256(value));
         ParseState memory state = LibParseState.newState(bytes(hexString), "", "", "");
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
-        (uint256 cursorAfter, uint256 parsedValue) = state.parseHex(
+        (uint256 cursorAfter, bytes32 parsedValue) = state.parseHex(
             // The hex parser wants only the hexadecimal digits without the
             // leading "0x".
             cursor,
