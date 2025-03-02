@@ -15,7 +15,7 @@ contract LibParseStateExportSubParsersTest is Test {
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         state.subParsers = 0;
         for (uint256 i = 0; i < values.length; i++) {
-            state.pushSubParser(cursor, uint256(uint160(values[i])));
+            state.pushSubParser(cursor, bytes32(uint256(uint160(values[i]))));
         }
 
         address[] memory exported = state.exportSubParsers();

@@ -18,7 +18,7 @@ contract LibParseCommentsTest is Test {
     /// A single comment with no expected bytecode.
     function testParseCommentNoWords() external view {
         string memory s = "/* empty output */:;";
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(s).parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(s).parse();
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(constants.length, 0);
 
@@ -49,7 +49,7 @@ contract LibParseCommentsTest is Test {
     /// A single comment with a single word in the bytecode.
     function testParseCommentSingleWord() external view {
         string memory s = "/* one word */\n_:a();";
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(s).parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(s).parse();
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(constants.length, 0);
 
@@ -83,7 +83,7 @@ contract LibParseCommentsTest is Test {
     /// Comments can be on the same line as source if there is some whitespace.
     function testParseCommentSingleWordSameLine() external view {
         string memory s = "/* same line comment */ _:a();";
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(s).parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(s).parse();
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(constants.length, 0);
 
@@ -117,7 +117,7 @@ contract LibParseCommentsTest is Test {
     /// Comments can appear between sources.
     function testParseCommentBetweenSources() external view {
         string memory s = "_:a(); /* interstitial comment */ _:b();";
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(s).parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(s).parse();
         assertEq(LibBytecode.sourceCount(bytecode), 2);
         assertEq(constants.length, 0);
 
@@ -173,7 +173,7 @@ contract LibParseCommentsTest is Test {
     /// Comments can appear after sources.
     function testParseCommentAfterSources() external view {
         string memory s = "_:a(); _:b(); /* trailing comment */";
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(s).parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(s).parse();
         assertEq(LibBytecode.sourceCount(bytecode), 2);
         assertEq(constants.length, 0);
 
@@ -229,7 +229,7 @@ contract LibParseCommentsTest is Test {
     /// Multiple comments can appear in a row.
     function testParseCommentMultiple() external view {
         string memory s = "/* comment 1 */ /* comment 2 */ _:a(); /* comment 3 */ _:b(); /* comment 4 */";
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(s).parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(s).parse();
         assertEq(LibBytecode.sourceCount(bytecode), 2);
         assertEq(constants.length, 0);
 
@@ -286,7 +286,7 @@ contract LibParseCommentsTest is Test {
     /// comment. Tests extra leading astericks.
     function testParseCommentManyAstericks() external view {
         string memory s = "/** _ */ _:a();";
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(s).parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(s).parse();
 
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         // a
@@ -322,7 +322,7 @@ contract LibParseCommentsTest is Test {
     /// comment. Tests extra trailing astericks.
     function testParseCommentManyAstericksTrailing() external view {
         string memory s = "/* _ **/ _:a();";
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(s).parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(s).parse();
 
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         // a
@@ -358,7 +358,7 @@ contract LibParseCommentsTest is Test {
     function testParseCommentLong() external view {
         string memory s =
             "/* this is a very \nlong comment that \nspans multiple lines **** and has many \nwords */ _:a();";
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(s).parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(s).parse();
 
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(constants.length, 0);

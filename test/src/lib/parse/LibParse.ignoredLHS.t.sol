@@ -17,7 +17,7 @@ contract LibParseIgnoredLHSTest is Test {
 
     /// A lone underscore should parse to an empty source and constant.
     function testParseIgnoredLHSLoneUnderscore() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -46,7 +46,7 @@ contract LibParseIgnoredLHSTest is Test {
 
     /// Two underscores should parse to an empty source and constant.
     function testParseIgnoredLHSTwoUnderscores() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_ _:;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_ _:;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -76,7 +76,7 @@ contract LibParseIgnoredLHSTest is Test {
 
     /// Inputs can be on multiple lines if there are no RHS items.
     function testParseIgnoredLHSMultipleLines() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:,_ _:;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:,_ _:;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -107,7 +107,7 @@ contract LibParseIgnoredLHSTest is Test {
     /// An underscore that is NOT an input should parse to a non-empty source
     /// with no constants.
     function testParseIgnoredLHSUnderscoreNotInput() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(":,_:a();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(":,_:a();").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -140,7 +140,7 @@ contract LibParseIgnoredLHSTest is Test {
     /// An underscore followed by some alpha chars should parse to an empty
     /// source and constant.
     function testParseIgnoredLHSUnderscoreAlpha() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_a:;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_a:;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -169,7 +169,7 @@ contract LibParseIgnoredLHSTest is Test {
 
     /// Two ignored alphas should parse to an empty source and constant.
     function testParseIgnoredLHSTwoAlphas() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_a _b:;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_a _b:;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -199,7 +199,7 @@ contract LibParseIgnoredLHSTest is Test {
 
     // Ignored alphas can be multiple chars long each.
     function testParseIgnoredLHSAlphaTooLong() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_foo _bar:;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_foo _bar:;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -229,7 +229,7 @@ contract LibParseIgnoredLHSTest is Test {
     /// Ignored words have no size limit. We can parse a 32 char ignored word.
     /// Normally words are limited to 31 chars.
     function testParseIgnoredWordTooLong() external view {
-        (bytes memory bytecode, uint256[] memory constants) =
+        (bytes memory bytecode, bytes32[] memory constants) =
             LibMetaFixture.newState("_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);

@@ -2,7 +2,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibParseOperand, Operand} from "src/lib/parse/LibParseOperand.sol";
+import {LibParseOperand, OperandV2} from "src/lib/parse/LibParseOperand.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
@@ -10,7 +10,7 @@ import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {OperandValuesOverflow, UnclosedOperand} from "src/error/ErrParse.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
-import {LibDecimalFloat, LibDecimalFloatImplementation} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat, LibDecimalFloatImplementation, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {SIGNED_NORMALIZED_MAX} from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
 
 contract LibParseOperandParseOperandTest is Test {
@@ -19,7 +19,7 @@ contract LibParseOperandParseOperandTest is Test {
     using Strings for uint256;
     using Strings for int256;
 
-    function checkParsingOperandFromData(string memory s, uint256[] memory expectedValues, uint256 expectedEnd)
+    function checkParsingOperandFromData(string memory s, bytes32[] memory expectedValues, uint256 expectedEnd)
         internal
         pure
     {
@@ -48,7 +48,7 @@ contract LibParseOperandParseOperandTest is Test {
         vm.assume(bytes(s).length > 0);
         vm.assume(bytes(s)[0] != "<");
 
-        checkParsingOperandFromData(s, new uint256[](0), 0);
+        checkParsingOperandFromData(s, new bytes32[](0), 0);
     }
 
     // Test that parsing an empty "<>" operand results in a zero length operand
@@ -60,7 +60,7 @@ contract LibParseOperandParseOperandTest is Test {
         bytes(s)[0] = "<";
         bytes(s)[1] = ">";
 
-        checkParsingOperandFromData(s, new uint256[](0), 2);
+        checkParsingOperandFromData(s, new bytes32[](0), 2);
     }
 
     // Test that we can parse a single literal.
@@ -80,9 +80,10 @@ contract LibParseOperandParseOperandTest is Test {
         string memory valueString = asHex ? uint256(value).toHexString() : value.toString();
         string memory s = string.concat("<", maybeWhitespaceA, valueString, maybeWhitespaceB, ">", suffix);
 
-        uint256[] memory expectedValues = new uint256[](1);
+        bytes32[] memory expectedValues = new bytes32[](1);
         (int256 signedCoefficient, int256 exponent) = LibDecimalFloatImplementation.normalize(value, 0);
-        expectedValues[0] = asHex ? uint256(value) : LibDecimalFloat.pack(signedCoefficient, exponent);
+        expectedValues[0] =
+            asHex ? bytes32(uint256(value)) : PackedFloat.unwrap(LibDecimalFloat.pack(signedCoefficient, exponent));
 
         checkParsingOperandFromData(
             s,
@@ -118,13 +119,15 @@ contract LibParseOperandParseOperandTest is Test {
         string memory s = string.concat(
             "<", maybeWhitespaceA, valueAString, maybeWhitespaceB, valueBString, maybeWhitespaceC, ">", suffix
         );
-        uint256[] memory expectedValues = new uint256[](2);
+        bytes32[] memory expectedValues = new bytes32[](2);
 
         (int256 signedCoefficient, int256 exponent) = LibDecimalFloatImplementation.normalize(valueA, 0);
-        expectedValues[0] = (asHexA ? uint256(valueA) : LibDecimalFloat.pack(signedCoefficient, exponent));
+        expectedValues[0] =
+            (asHexA ? bytes32(uint256(valueA)) : PackedFloat.unwrap(LibDecimalFloat.pack(signedCoefficient, exponent)));
 
         (signedCoefficient, exponent) = LibDecimalFloatImplementation.normalize(valueB, 0);
-        expectedValues[1] = (asHexB ? uint256(valueB) : LibDecimalFloat.pack(signedCoefficient, exponent));
+        expectedValues[1] =
+            (asHexB ? bytes32(uint256(valueB)) : PackedFloat.unwrap(LibDecimalFloat.pack(signedCoefficient, exponent)));
 
         checkParsingOperandFromData(
             s,
@@ -182,15 +185,18 @@ contract LibParseOperandParseOperandTest is Test {
                 + bytes(maybeWhitespaceD).length;
         }
 
-        uint256[] memory expectedValues = new uint256[](3);
+        bytes32[] memory expectedValues = new bytes32[](3);
         (int256 signedCoefficient, int256 exponent) = LibDecimalFloatImplementation.normalize(valueA, 0);
-        expectedValues[0] = (asHexA ? uint256(valueA) : LibDecimalFloat.pack(signedCoefficient, exponent));
+        expectedValues[0] =
+            (asHexA ? bytes32(uint256(valueA)) : PackedFloat.unwrap(LibDecimalFloat.pack(signedCoefficient, exponent)));
 
         (signedCoefficient, exponent) = LibDecimalFloatImplementation.normalize(valueB, 0);
-        expectedValues[1] = (asHexB ? uint256(valueB) : LibDecimalFloat.pack(signedCoefficient, exponent));
+        expectedValues[1] =
+            (asHexB ? bytes32(uint256(valueB)) : PackedFloat.unwrap(LibDecimalFloat.pack(signedCoefficient, exponent)));
 
         (signedCoefficient, exponent) = LibDecimalFloatImplementation.normalize(valueC, 0);
-        expectedValues[2] = (asHexC ? uint256(valueC) : LibDecimalFloat.pack(signedCoefficient, exponent));
+        expectedValues[2] =
+            (asHexC ? bytes32(uint256(valueC)) : PackedFloat.unwrap(LibDecimalFloat.pack(signedCoefficient, exponent)));
 
         checkParsingOperandFromData(s, expectedValues, expectedLength);
     }
@@ -249,10 +255,12 @@ contract LibParseOperandParseOperandTest is Test {
             s = string.concat(s, maybeWhitespace[4], ">", suffix);
         }
 
-        uint256[] memory expectedValues = new uint256[](4);
+        bytes32[] memory expectedValues = new bytes32[](4);
         for (uint256 i = 0; i < 4; i++) {
             (int256 signedCoefficient, int256 exponent) = LibDecimalFloatImplementation.normalize(values[i], 0);
-            expectedValues[i] = asHex[i] ? uint256(values[i]) : LibDecimalFloat.pack(signedCoefficient, exponent);
+            expectedValues[i] = asHex[i]
+                ? bytes32(uint256(values[i]))
+                : PackedFloat.unwrap(LibDecimalFloat.pack(signedCoefficient, exponent));
         }
         checkParsingOperandFromData(s, expectedValues, expectedLength);
     }
@@ -260,18 +268,18 @@ contract LibParseOperandParseOperandTest is Test {
     /// More than 4 values is an error.
     function testParseOperandTooManyValues() external {
         vm.expectRevert(abi.encodeWithSelector(OperandValuesOverflow.selector, 9));
-        checkParsingOperandFromData("<1 2 3 4 5>", new uint256[](0), 0);
+        checkParsingOperandFromData("<1 2 3 4 5>", new bytes32[](0), 0);
     }
 
     /// Unclosed operand is an error.
     function testParseOperandUnclosed() external {
         vm.expectRevert(abi.encodeWithSelector(UnclosedOperand.selector, 8));
-        checkParsingOperandFromData("<1 2 3 4", new uint256[](0), 0);
+        checkParsingOperandFromData("<1 2 3 4", new bytes32[](0), 0);
     }
 
     // Unexpected chars will be treated as unclosed operands.
     function testParseOperandUnexpectedChars() external {
         vm.expectRevert(abi.encodeWithSelector(UnclosedOperand.selector, 6));
-        checkParsingOperandFromData("<1 2 3;> 6", new uint256[](0), 0);
+        checkParsingOperandFromData("<1 2 3;> 6", new bytes32[](0), 0);
     }
 }
