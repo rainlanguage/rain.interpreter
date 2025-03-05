@@ -27,7 +27,7 @@ contract LibParseNamedRHSTest is Test {
             LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
-        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+        (bytes memory bytecode, bytes32[] memory constants) = state.parse();
 
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         uint256 sourceIndex = 0;
@@ -53,7 +53,7 @@ contract LibParseNamedRHSTest is Test {
             LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
-        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+        (bytes memory bytecode, bytes32[] memory constants) = state.parse();
 
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
@@ -97,7 +97,7 @@ contract LibParseNamedRHSTest is Test {
             LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
-        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+        (bytes memory bytecode, bytes32[] memory constants) = state.parse();
 
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
@@ -145,7 +145,7 @@ contract LibParseNamedRHSTest is Test {
             LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
-        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+        (bytes memory bytecode, bytes32[] memory constants) = state.parse();
 
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
@@ -189,7 +189,7 @@ contract LibParseNamedRHSTest is Test {
             LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
-        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+        (bytes memory bytecode, bytes32[] memory constants) = state.parse();
 
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
@@ -236,7 +236,7 @@ contract LibParseNamedRHSTest is Test {
             LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
-        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+        (bytes memory bytecode, bytes32[] memory constants) = state.parse();
 
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
@@ -288,7 +288,7 @@ contract LibParseNamedRHSTest is Test {
             LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
-        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+        (bytes memory bytecode, bytes32[] memory constants) = state.parse();
 
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
@@ -348,7 +348,7 @@ contract LibParseNamedRHSTest is Test {
             LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
-        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+        (bytes memory bytecode, bytes32[] memory constants) = state.parse();
 
         assertEq(
             bytecode,
@@ -403,7 +403,7 @@ contract LibParseNamedRHSTest is Test {
             LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
-        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+        (bytes memory bytecode, bytes32[] memory constants) = state.parse();
 
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
@@ -510,7 +510,7 @@ contract LibParseNamedRHSTest is Test {
             LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
-        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+        (bytes memory bytecode, bytes32[] memory constants) = state.parse();
         assertEq(LibBytecode.sourceCount(bytecode), 1);
 
         uint256 sourceIndex = 0;
@@ -559,7 +559,7 @@ contract LibParseNamedRHSTest is Test {
             LibAllStandardOpsNP.literalParserFunctionPointers()
         );
 
-        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+        (bytes memory bytecode, bytes32[] memory constants) = state.parse();
         assertEq(LibBytecode.sourceCount(bytecode), 2);
 
         uint256 sourceIndex = 0;

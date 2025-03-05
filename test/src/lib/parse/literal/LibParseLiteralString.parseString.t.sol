@@ -21,10 +21,10 @@ contract LibParseLiteralStringTest is Test {
     function testParseStringLiteralEmpty() external pure {
         ParseState memory state = LibParseState.newState("\"\"", "", "", "");
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
-        (uint256 cursorAfter, uint256 value) = state.parseString(cursor, Pointer.unwrap(state.data.endDataPointer()));
+        (uint256 cursorAfter, bytes32 value) = state.parseString(cursor, Pointer.unwrap(state.data.endDataPointer()));
         // Empty string is represented by 0 with the highest bit set to make it
         // a truthy value.
-        assertEq(value, 1 << 0xFF);
+        assertEq(value, bytes32(uint256(1 << 0xFF)));
         assertEq(cursorAfter, cursor + 2);
     }
 
@@ -36,9 +36,9 @@ contract LibParseLiteralStringTest is Test {
 
         uint256 expectedValue = IntOrAString.unwrap(LibIntOrAString.fromString2(string(data)));
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
-        (uint256 cursorAfter, uint256 value) =
+        (uint256 cursorAfter, bytes32 value) =
             state.parseString(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
-        assertEq(value, expectedValue);
+        assertEq(value, bytes32(expectedValue));
         assertEq(cursorAfter, cursor + data.length + 2);
     }
 
@@ -53,7 +53,7 @@ contract LibParseLiteralStringTest is Test {
         ParseState memory state = LibParseState.newState(bytes(string.concat("\"", string(data), "\"")), "", "", "");
 
         vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, 1 + corruptIndex));
-        (uint256 cursorAfter, uint256 value) =
+        (uint256 cursorAfter, bytes32 value) =
             state.parseString(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
         (cursorAfter, value);
     }

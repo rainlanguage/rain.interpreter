@@ -5,15 +5,16 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
 import {
     IInterpreterV4,
-    Operand,
+    OperandV2,
     SourceIndexV2,
-    EvalV4
+    EvalV4,
+    StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {OutOfBoundsStackRead, LibOpStackNP} from "src/lib/op/00/LibOpStackNP.sol";
-import {LibIntegrityCheckNP, IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
-import {LibInterpreterStateNP, InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {LibIntegrityCheckNP, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {
     IInterpreterStoreV2, FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
@@ -21,12 +22,12 @@ import {OpTest, PRE, POST} from "test/abstract/OpTest.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {BadOpOutputsLength} from "src/error/ErrIntegrity.sol";
-import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpStackNPTest
 /// @notice Test the runtime and integrity time logic of LibOpStackNP.
 contract LibOpStackNPTest is OpTest {
-    using LibInterpreterStateNP for InterpreterStateNP;
+    using LibInterpreterState for InterpreterState;
 
     /// Directly test the integrity logic of LibOpStackNP. The operand always
     /// puts a single value on the stack. This tests the happy path where the
@@ -34,12 +35,12 @@ contract LibOpStackNPTest is OpTest {
     function testOpStackNPIntegrity(
         bytes memory bytecode,
         uint256 stackIndex,
-        uint256[] memory constants,
-        Operand operand
+        bytes32[] memory constants,
+        OperandV2 operand
     ) external pure {
         stackIndex = bound(stackIndex, 1, type(uint256).max);
-        operand = Operand.wrap(bound(Operand.unwrap(operand), 0, stackIndex - 1));
-        IntegrityCheckStateNP memory state = LibIntegrityCheckNP.newState(bytecode, stackIndex, constants);
+        operand = OperandV2.wrap(bytes32(bound(uint256(OperandV2.unwrap(operand)), 0, stackIndex - 1)));
+        IntegrityCheckState memory state = LibIntegrityCheckNP.newState(bytecode, stackIndex, constants);
 
         (uint256 inputs, uint256 outputs) = LibOpStackNP.integrity(state, operand);
 
@@ -53,14 +54,14 @@ contract LibOpStackNPTest is OpTest {
     function testOpStackNPIntegrityOOBStack(
         bytes memory bytecode,
         uint16 stackIndex,
-        uint256[] memory constants,
+        bytes32[] memory constants,
         uint16 readIndex,
         uint256 opIndex
     ) external {
         stackIndex = uint16(bound(stackIndex, 0, uint256(type(uint16).max)));
         readIndex = uint16(bound(readIndex, stackIndex, uint256(type(uint16).max)));
-        Operand operand = LibOperand.build(0, 1, readIndex);
-        IntegrityCheckStateNP memory state = LibIntegrityCheckNP.newState(bytecode, stackIndex, constants);
+        OperandV2 operand = LibOperand.build(0, 1, readIndex);
+        IntegrityCheckState memory state = LibIntegrityCheckNP.newState(bytecode, stackIndex, constants);
         state.opIndex = opIndex;
 
         vm.expectRevert(abi.encodeWithSelector(OutOfBoundsStackRead.selector, state.opIndex, stackIndex, readIndex));
@@ -70,14 +71,14 @@ contract LibOpStackNPTest is OpTest {
     /// Directly test the runtime logic of LibOpStackNP. This tests that the
     /// operand always puts a single value on the stack.
     /// forge-config: default.fuzz.runs = 100
-    function testOpStackNPRun(uint256[][] memory stacks, uint256 stackIndex) external view {
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
-        uint256 stackValue;
+    function testOpStackNPRun(StackItem[][] memory stacks, uint256 stackIndex) external view {
+        InterpreterState memory state = opTestDefaultInterpreterState();
+        StackItem stackValue;
         {
             vm.assume(stacks.length > 0);
-            state.stackBottoms = LibInterpreterStateNP.stackBottoms(stacks);
+            state.stackBottoms = LibInterpreterState.stackBottoms(stacks);
             state.sourceIndex = bound(state.sourceIndex, 0, stacks.length - 1);
-            uint256[] memory stack = stacks[state.sourceIndex];
+            StackItem[] memory stack = stacks[state.sourceIndex];
             vm.assume(stack.length > 0);
             stackIndex = bound(stackIndex, 0, stack.length - 1);
             stackValue = stack[stack.length - (stackIndex + 1)];
@@ -88,8 +89,8 @@ contract LibOpStackNPTest is OpTest {
         Pointer expectedStackTopAfter;
         Pointer end;
         {
-            uint256 pre = PRE;
-            uint256 post = POST;
+            bytes32 pre = PRE;
+            bytes32 post = POST;
             assembly ("memory-safe") {
                 end := mload(0x40)
                 mstore(end, post)
@@ -106,7 +107,7 @@ contract LibOpStackNPTest is OpTest {
         bytes32 stateFingerprintBefore = state.fingerprint();
 
         // Run the opcode.
-        Pointer stackTopAfter = LibOpStackNP.run(state, Operand.wrap(stackIndex), stackTop);
+        Pointer stackTopAfter = LibOpStackNP.run(state, OperandV2.wrap(bytes32(stackIndex)), stackTop);
 
         assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(expectedStackTopAfter));
 
@@ -114,9 +115,9 @@ contract LibOpStackNPTest is OpTest {
         assertEq(state.fingerprint(), stateFingerprintBefore, "state");
 
         // The stack value should be on the stack without modifying any other data.
-        uint256 actualPost;
-        uint256 actualStackValue;
-        uint256 actualPre;
+        bytes32 actualPost;
+        bytes32 actualStackValue;
+        bytes32 actualPre;
         assembly ("memory-safe") {
             actualPost := mload(end)
             actualStackValue := mload(add(end, 0x20))
@@ -124,28 +125,28 @@ contract LibOpStackNPTest is OpTest {
         }
 
         assertEq(actualPost, POST, "post");
-        assertEq(actualStackValue, stackValue, "stackValue");
+        assertEq(actualStackValue, StackItem.unwrap(stackValue), "stackValue");
         assertEq(actualPre, PRE, "pre");
     }
 
     /// Test the eval of a stack opcode parsed from a string.
     function testOpStackEval() external view {
         bytes memory bytecode = iDeployer.parse2("foo: 1, bar: foo, _: -1;");
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
+        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
             EvalV4({
                 store: iStore,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
-                context: LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-                inputs: new uint256[](0),
-                stateOverlay: new uint256[](0)
+                context: LibContext.build(new bytes32[][](0), new SignedContextV1[](0)),
+                inputs: new StackItem[](0),
+                stateOverlay: new bytes32[](0)
             })
         );
         assertEq(stack.length, 3);
-        assertEq(stack[0], LibDecimalFloat.pack(-1e37, -37));
-        assertEq(stack[1], stack[2]);
-        assertEq(stack[2], LibDecimalFloat.pack(1e37, -37));
+        assertEq(StackItem.unwrap(stack[0]), PackedFloat.unwrap(LibDecimalFloat.pack(-1e37, -37)));
+        assertEq(StackItem.unwrap(stack[1]), StackItem.unwrap(stack[2]));
+        assertEq(StackItem.unwrap(stack[2]), PackedFloat.unwrap(LibDecimalFloat.pack(1e37, -37)));
         assertEq(kvs.length, 0);
     }
 
@@ -153,24 +154,24 @@ contract LibOpStackNPTest is OpTest {
     function testOpStackEvalSeveral() external view {
         bytes memory bytecode = iDeployer.parse2("foo: 1, bar: foo, _ baz: bar bar, bing _:foo baz;");
 
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
+        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
             EvalV4({
                 store: iStore,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
-                context: LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-                inputs: new uint256[](0),
-                stateOverlay: new uint256[](0)
+                context: LibContext.build(new bytes32[][](0), new SignedContextV1[](0)),
+                inputs: new StackItem[](0),
+                stateOverlay: new bytes32[](0)
             })
         );
         assertEq(stack.length, 6);
-        assertEq(stack[0], LibDecimalFloat.pack(1e37, -37));
-        assertEq(stack[1], LibDecimalFloat.pack(1e37, -37));
-        assertEq(stack[2], LibDecimalFloat.pack(1e37, -37));
-        assertEq(stack[3], LibDecimalFloat.pack(1e37, -37));
-        assertEq(stack[4], LibDecimalFloat.pack(1e37, -37));
-        assertEq(stack[5], LibDecimalFloat.pack(1e37, -37));
+        assertEq(StackItem.unwrap(stack[0]), PackedFloat.unwrap(LibDecimalFloat.pack(1e37, -37)));
+        assertEq(StackItem.unwrap(stack[1]), PackedFloat.unwrap(LibDecimalFloat.pack(1e37, -37)));
+        assertEq(StackItem.unwrap(stack[2]), PackedFloat.unwrap(LibDecimalFloat.pack(1e37, -37)));
+        assertEq(StackItem.unwrap(stack[3]), PackedFloat.unwrap(LibDecimalFloat.pack(1e37, -37)));
+        assertEq(StackItem.unwrap(stack[4]), PackedFloat.unwrap(LibDecimalFloat.pack(1e37, -37)));
+        assertEq(StackItem.unwrap(stack[5]), PackedFloat.unwrap(LibDecimalFloat.pack(1e37, -37)));
         assertEq(kvs.length, 0);
     }
 

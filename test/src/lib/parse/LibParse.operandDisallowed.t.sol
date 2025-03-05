@@ -14,7 +14,7 @@ contract LibParseOperandDisallowedTest is Test {
     /// Opening an operand is disallowed for words that don't support it.
     function testOperandDisallowed() external {
         vm.expectRevert(abi.encodeWithSelector(UnsupportedLiteralType.selector, 4));
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:a<;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:a<;").parse();
         (bytecode);
         (constants);
     }
@@ -22,7 +22,7 @@ contract LibParseOperandDisallowedTest is Test {
     /// Closing an operand is disallowed for words that don't support it.
     function testOperandDisallowed1() external {
         vm.expectRevert(abi.encodeWithSelector(ExpectedLeftParen.selector, 3));
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:a>;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:a>;").parse();
         (bytecode);
         (constants);
     }
@@ -31,7 +31,7 @@ contract LibParseOperandDisallowedTest is Test {
     /// that don't support it.
     function testOperandDisallowed3() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:a<1>;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:a<1>;").parse();
         (bytecode);
         (constants);
     }
@@ -40,7 +40,7 @@ contract LibParseOperandDisallowedTest is Test {
     /// disallowed for words that don't support it.
     function testOperandDisallowed4() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:a<1>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:a<1>();").parse();
         (bytecode);
         (constants);
     }

@@ -17,7 +17,7 @@ contract LibParseNOutputTest is Test {
 
     /// A single RHS item MAY have 0 outputs.
     function testParseNOutputExcessRHS0() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(":a();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(":a();").parse();
         assertEq(
             bytecode,
             // 1 source
@@ -55,7 +55,7 @@ contract LibParseNOutputTest is Test {
     /// A single RHS item can have multiple outputs. This RHS item has nesting.
     /// Nested words are always treated as a single output.
     function testParseNOutputNestedRHS() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(":,_ _:a(b());").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(":,_ _:a(b());").parse();
         assertEq(
             bytecode,
             // 1 source
@@ -88,7 +88,7 @@ contract LibParseNOutputTest is Test {
     /// Multiple output RHS items MAY be followed by single output RHS items,
     /// on a new line.
     function testParseBalanceStackOffsetsInputs() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_ _:a(), _:b();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_ _:a(), _:b();").parse();
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(constants.length, 0);
         // a and b should be parsed and inputs are just ignored in the output

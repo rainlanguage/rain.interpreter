@@ -15,14 +15,14 @@ contract LibParseLiteralStringTest is Test {
     using LibParse for ParseState;
 
     /// External parse function to allow us to assert reverts.
-    function externalParse(string memory str) external view returns (bytes memory, uint256[] memory) {
+    function externalParse(string memory str) external view returns (bytes memory, bytes32[] memory) {
         return LibMetaFixture.newState(str).parse();
     }
 
     /// Check an empty string literal. Should not revert and return length 1
     /// sources and constants.
     function testParseStringLiteralEmpty() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_: \"\";").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_: \"\";").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -33,13 +33,13 @@ contract LibParseLiteralStringTest is Test {
         assertEq(outputs, 1);
 
         assertEq(constants.length, 1);
-        assertEq(constants[0], IntOrAString.unwrap(LibIntOrAString.fromString2("")));
+        assertEq(constants[0], bytes32(IntOrAString.unwrap(LibIntOrAString.fromString2(""))));
     }
 
     /// Check a simple string `"a"` literal. Should not revert and return
     /// length 1 sources and constants.
     function testParseStringLiteralSimple() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_: \"a\";").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_: \"a\";").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -50,7 +50,7 @@ contract LibParseLiteralStringTest is Test {
         assertEq(outputs, 1);
 
         assertEq(constants.length, 1);
-        assertEq(constants[0], IntOrAString.unwrap(LibIntOrAString.fromString2("a")));
+        assertEq(constants[0], bytes32(IntOrAString.unwrap(LibIntOrAString.fromString2("a"))));
     }
 
     /// Any ASCII printable string shorter than 32 bytes should be parsed
@@ -60,7 +60,7 @@ contract LibParseLiteralStringTest is Test {
         vm.assume(bytes(str).length < 0x20);
         LibConformString.conformValidPrintableStringContent(str);
 
-        (bytes memory bytecode, uint256[] memory constants) =
+        (bytes memory bytecode, bytes32[] memory constants) =
             LibMetaFixture.newState(string.concat("_: \"", str, "\";")).parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
@@ -72,7 +72,7 @@ contract LibParseLiteralStringTest is Test {
         assertEq(outputs, 1);
 
         assertEq(constants.length, 1);
-        assertEq(constants[0], IntOrAString.unwrap(LibIntOrAString.fromString2(str)));
+        assertEq(constants[0], bytes32(IntOrAString.unwrap(LibIntOrAString.fromString2(str))));
     }
 
     /// Can parse 2 valid strings.
@@ -84,7 +84,7 @@ contract LibParseLiteralStringTest is Test {
         LibConformString.conformValidPrintableStringContent(strB);
         vm.assume(keccak256(bytes(strA)) != keccak256(bytes(strB)));
 
-        (bytes memory bytecode, uint256[] memory constants) =
+        (bytes memory bytecode, bytes32[] memory constants) =
             LibMetaFixture.newState(string.concat("_ _: \"", strA, "\"\"", strB, "\";")).parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
@@ -96,8 +96,8 @@ contract LibParseLiteralStringTest is Test {
         assertEq(outputs, 2);
 
         assertEq(constants.length, 2);
-        assertEq(constants[0], IntOrAString.unwrap(LibIntOrAString.fromString2(strA)));
-        assertEq(constants[1], IntOrAString.unwrap(LibIntOrAString.fromString2(strB)));
+        assertEq(constants[0], bytes32(IntOrAString.unwrap(LibIntOrAString.fromString2(strA))));
+        assertEq(constants[1], bytes32(IntOrAString.unwrap(LibIntOrAString.fromString2(strB))));
     }
 
     /// Valid ASCII printable strings 32 bytes or longer should error.
@@ -107,7 +107,7 @@ contract LibParseLiteralStringTest is Test {
         LibConformString.conformValidPrintableStringContent(str);
 
         vm.expectRevert(abi.encodeWithSelector(StringTooLong.selector, 3));
-        (bytes memory bytecode, uint256[] memory constants) = this.externalParse(string.concat("_: \"", str, "\";"));
+        (bytes memory bytecode, bytes32[] memory constants) = this.externalParse(string.concat("_: \"", str, "\";"));
         (bytecode, constants);
     }
 
@@ -123,7 +123,7 @@ contract LibParseLiteralStringTest is Test {
         }
 
         vm.expectRevert(abi.encodeWithSelector(StringTooLong.selector, 3));
-        (bytes memory bytecode, uint256[] memory constants) =
+        (bytes memory bytecode, bytes32[] memory constants) =
             this.externalParse(string.concat("_: \"", strA, strB, "\";"));
         (bytecode, constants);
     }
@@ -139,7 +139,7 @@ contract LibParseLiteralStringTest is Test {
         LibConformString.corruptSingleChar(str, badIndex);
 
         vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, 4 + badIndex));
-        (bytes memory bytecode, uint256[] memory constants) = this.externalParse(string.concat("_: \"", str, "\";"));
+        (bytes memory bytecode, bytes32[] memory constants) = this.externalParse(string.concat("_: \"", str, "\";"));
         (bytecode, constants);
     }
 }

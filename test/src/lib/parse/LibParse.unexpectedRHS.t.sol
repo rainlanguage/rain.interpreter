@@ -52,7 +52,7 @@ contract LibParseUnexpectedRHSTest is Test {
         string memory s = string(bytes.concat(":", bytes1(unexpected), ";"));
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 1));
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(s).parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(s).parse();
         (bytecode, constants);
     }
 
@@ -62,7 +62,7 @@ contract LibParseUnexpectedRHSTest is Test {
         string memory s = ":();";
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 1));
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState(s).parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(s).parse();
         (bytecode, constants);
     }
 }
