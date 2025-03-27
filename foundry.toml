@@ -42,3 +42,7 @@ remappings = [
 
 [fuzz]
 runs = 2048
+
+[etherscan]
+bera = { key = "${ETHERSCAN_API_KEY}", chain = 80094, url = "https://api.berascan.com/api" }
+sonic = { key = "${ETHERSCAN_API_KEY}", chain = 146, url = "https://api.sonicscan.org/api" }
