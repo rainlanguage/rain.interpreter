@@ -10,7 +10,7 @@
 pragma solidity =0.8.25;
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0x8a9ee0df9499ada1d36b135afa993b1f4becf64043fc0e460f30931e856148b3);
+bytes32 constant BYTECODE_HASH = bytes32(0x0913de8e0b36ea4fde9df417b198d01eba3e5cb78da1c5c6bbc50bea09444023);
 
 /// @dev The parse meta that is used to lookup word definitions.
 /// The structure of the parse meta is:
@@ -39,11 +39,11 @@ uint8 constant PARSE_META_BUILD_DEPTH = 2;
 /// These positional indexes all map to the same indexes looked up in the parse
 /// meta.
 bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
-    hex"18b918b918b9191b199319931993191b191b18b918b918b919931993199319931993199319931993199319931993199319931993199319931993199319931993199319931993199319931993199319931993199319931993199319931993199319931993199319931993199319931993199319931993199319931993199319d519931aa219d519931aa21993199318b91b0719931993";
+    hex"190019001900196519de19de19de1965196519001900190019de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de19de1a2319de1af51a2319de1af519de19de19001b5e19de19de";
 
 /// @dev Every two bytes is a function pointer for a literal parser.
 /// Literal dispatches are determined by the first byte(s) of the literal
 /// rather than a full word lookup, and are done with simple conditional
 /// jumps as the possibilities are limited compared to the number of words we
 /// have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0f3e1202160416db";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"0f76123e1645171f";
