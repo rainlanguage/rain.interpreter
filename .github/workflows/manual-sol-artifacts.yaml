@@ -20,6 +20,8 @@ on:
           - sepolia
           - songbird
           - linea
+          - bera
+          - sonic
 
 jobs:
   deploy:
