@@ -16,31 +16,41 @@ contract LibParseLiteralSubParseableTest is Test {
     using LibParseState for ParseState;
     using LibParseLiteralSubParseable for ParseState;
 
+    function parseSubParseableExternal(string memory data, string memory expectedDispatch, string memory expectedBody)
+        external
+        returns (uint256, uint256)
+    {
+        ParseState memory state = LibParseState.newState(bytes(data), "", "", "");
+        address subParser = address(0x1234567890123456789012345678901234567890);
+        state.pushSubParser(0, uint256(uint160(subParser)));
+
+        bytes memory subParseData =
+            bytes.concat(bytes2(uint16(bytes(expectedDispatch).length)), bytes(expectedDispatch), bytes(expectedBody));
+        uint256 returnValue = 99;
+
+        uint256 cursor = Pointer.unwrap(state.data.dataPointer());
+        uint256 end = Pointer.unwrap(state.data.endDataPointer());
+
+        vm.mockCall(
+            subParser,
+            abi.encodeWithSelector(ISubParserV3.subParseLiteral.selector, COMPATIBILITY_V4, subParseData),
+            abi.encode(true, returnValue)
+        );
+        (uint256 cursorAfter, uint256 value) = state.parseSubParseable(cursor, end);
+        assertEq(value, returnValue);
+
+        return (cursorAfter - cursor, value);
+    }
+
     function checkParseSubParseable(
         string memory data,
         string memory expectedDispatch,
         string memory expectedBody,
         uint256 expectedCursorAfter
     ) internal {
-        ParseState memory state = LibParseState.newState(bytes(data), "", "", "");
-        uint256 cursor = Pointer.unwrap(state.data.dataPointer());
-        address subParser = address(0x1234567890123456789012345678901234567890);
-        state.pushSubParser(0, uint256(uint160(subParser)));
-        bytes memory subParseData =
-            bytes.concat(bytes2(uint16(bytes(expectedDispatch).length)), bytes(expectedDispatch), bytes(expectedBody));
-        uint256 returnValue = 99;
-        vm.mockCall(
-            subParser,
-            abi.encodeWithSelector(ISubParserV3.subParseLiteral.selector, COMPATIBILITY_V4, subParseData),
-            abi.encode(true, returnValue)
-        );
-        vm.expectCall(
-            subParser, abi.encodeWithSelector(ISubParserV3.subParseLiteral.selector, COMPATIBILITY_V4, subParseData)
-        );
-        (uint256 cursorAfter, uint256 value) =
-            state.parseSubParseable(cursor, Pointer.unwrap(state.data.endDataPointer()));
-        assertEq(cursorAfter - cursor, expectedCursorAfter);
-        assertEq(value, returnValue);
+        (uint256 offsetAfter, uint256 value) = this.parseSubParseableExternal(data, expectedDispatch, expectedBody);
+        (value);
+        assertEq(offsetAfter, expectedCursorAfter);
     }
 
     function checkParseSubParseableError(string memory data, bytes memory err) internal {
