@@ -22,6 +22,13 @@ contract LibParseLiteralDecimalParseDecimalFloatTest is Test {
     using LibBytes for bytes;
     using Strings for uint256;
 
+    function parseDecimalFloatExternal(bytes memory data) external pure returns (uint256, int256, int256) {
+        ParseState memory state = LibParseState.newState(data, "", "", "");
+        return state.parseDecimalFloat(
+            Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer())
+        );
+    }
+
     function checkParseDecimalFloat(
         string memory data,
         int256 expectedSignedCoefficient,
@@ -38,9 +45,8 @@ contract LibParseLiteralDecimalParseDecimalFloatTest is Test {
     }
 
     function checkParseDecimalRevert(string memory data, bytes memory err) internal {
-        ParseState memory state = LibParseState.newState(bytes(data), "", "", "");
         vm.expectRevert(err);
-        state.parseDecimalFloat(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
+        this.parseDecimalFloatExternal(bytes(data));
     }
 
     /// An empty string should revert.
