@@ -14,6 +14,16 @@ import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {ExternDispatchConstantsHeightOverflow} from "src/error/ErrSubParse.sol";
 
 contract LibSubParseSubParserExternTest is Test {
+    function subParserExternExternal(
+        IInterpreterExternV3 extern,
+        uint256 constantsHeight,
+        uint256 inputsOutputs,
+        Operand operand,
+        uint256 opcodeIndex
+    ) external pure returns (bool, bytes memory, uint256[] memory) {
+        return LibSubParse.subParserExtern(extern, constantsHeight, inputsOutputs, operand, opcodeIndex);
+    }
+
     /// Every possible valid extern input will be sub parsed into extern
     /// bytecode.
     function testLibSubParseSubParserExtern(
@@ -61,7 +71,7 @@ contract LibSubParseSubParserExternTest is Test {
     ) external {
         constantsHeight = bound(constantsHeight, uint256(type(uint16).max) + 1, type(uint256).max);
         vm.expectRevert(abi.encodeWithSelector(ExternDispatchConstantsHeightOverflow.selector, constantsHeight));
-        (bool success, bytes memory bytecode, uint256[] memory constants) = LibSubParse.subParserExtern(
+        (bool success, bytes memory bytecode, uint256[] memory constants) = this.subParserExternExternal(
             extern,
             constantsHeight,
             uint256(outputsByte) << 4 | uint256(inputsByte),

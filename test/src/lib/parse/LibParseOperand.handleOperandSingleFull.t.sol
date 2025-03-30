@@ -10,6 +10,11 @@ import {IntegerOverflow} from "rain.math.fixedpoint/error/ErrScale.sol";
 import {LibFixedPointDecimalScale, DECIMAL_MAX_SAFE_INT} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 
 contract LibParseOperandHandleOperandSingleFullTest is Test {
+
+    function handleOperandSingleFullExternal(uint256[] memory values) external pure returns (uint256) {
+        return Operand.unwrap(LibParseOperand.handleOperandSingleFull(values));
+    }
+
     // No values falls back to zero.
     function testHandleOperandSingleFullNoValues() external pure {
         assertEq(Operand.unwrap(LibParseOperand.handleOperandSingleFull(new uint256[](0))), 0);
@@ -37,13 +42,13 @@ contract LibParseOperandHandleOperandSingleFullTest is Test {
                 0xFFFF
             )
         );
-        LibParseOperand.handleOperandSingleFull(values);
+        this.handleOperandSingleFullExternal(values);
     }
 
     // More than one value is disallowed.
     function testHandleOperandSingleFullManyValues(uint256[] memory values) external {
         vm.assume(values.length > 1);
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperandValue.selector));
-        LibParseOperand.handleOperandSingleFull(values);
+        this.handleOperandSingleFullExternal(values);
     }
 }
