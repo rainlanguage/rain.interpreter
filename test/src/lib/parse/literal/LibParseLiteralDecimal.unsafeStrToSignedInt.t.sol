@@ -14,6 +14,13 @@ contract TestLibParseLiteralDecimalUnsafeStrToSignedInt is Test {
     using LibBytes for bytes;
     using LibParseLiteralDecimal for ParseState;
 
+    function unsafeStrToSignedIntExternal(bytes memory data) external pure returns (int256) {
+        ParseState memory state = LibParseState.newState(data, "", "", "");
+        return state.unsafeStrToSignedInt(
+            Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer())
+        );
+    }
+
     /// Test round tripping strings through the unsafeStrToSignedInt function.
     function testUnsafeStrToSignedIntRoundTrip(uint256 value, uint8 leadingZerosCount, bool isNeg) external pure {
         value = bound(value, 0, uint256(type(int256).max) + (isNeg ? 1 : 0));
@@ -54,12 +61,8 @@ contract TestLibParseLiteralDecimalUnsafeStrToSignedInt is Test {
 
         string memory input = string(abi.encodePacked(leadingZeros, str));
 
-        ParseState memory state = LibParseState.newState(bytes(input), "", "", "");
-
         vm.expectRevert();
-        state.unsafeStrToSignedInt(
-            Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer())
-        );
+        this.unsafeStrToSignedIntExternal(bytes(input));
     }
 
     /// Test negative overflow.
@@ -74,11 +77,7 @@ contract TestLibParseLiteralDecimalUnsafeStrToSignedInt is Test {
 
         string memory input = string(abi.encodePacked("-", leadingZeros, str));
 
-        ParseState memory state = LibParseState.newState(bytes(input), "", "", "");
-
         vm.expectRevert();
-        state.unsafeStrToSignedInt(
-            Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer())
-        );
+        this.unsafeStrToSignedIntExternal(bytes(input));
     }
 }
