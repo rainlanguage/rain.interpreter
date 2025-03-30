@@ -18,7 +18,7 @@ contract LibParseOperandParseOperandTest is Test {
     using Strings for uint256;
 
     function checkParsingOperandFromData(string memory s, uint256[] memory expectedValues, uint256 expectedEnd)
-        internal
+        external
         pure
     {
         ParseState memory state = LibMetaFixture.newState(s);
@@ -41,22 +41,22 @@ contract LibParseOperandParseOperandTest is Test {
 
     // Test that parsing a string that doesn't start with the operand opening
     // character always results in a zero length operand values array.
-    function testParseOperandNoOpeningCharacter(string memory s) external pure {
+    function testParseOperandNoOpeningCharacter(string memory s) external view {
         vm.assume(bytes(s).length > 0);
         vm.assume(bytes(s)[0] != "<");
 
-        checkParsingOperandFromData(s, new uint256[](0), 0);
+        this.checkParsingOperandFromData(s, new uint256[](0), 0);
     }
 
     // Test that parsing an empty "<>" operand results in a zero length operand
     // values array. The cursor moves past both the opening and closing
     // characters.
-    function testParseOperandEmptyOperand(string memory s) external pure {
+    function testParseOperandEmptyOperand(string memory s) external view {
         vm.assume(bytes(s).length > 2);
         bytes(s)[0] = "<";
         bytes(s)[1] = ">";
 
-        checkParsingOperandFromData(s, new uint256[](0), 2);
+        this.checkParsingOperandFromData(s, new uint256[](0), 2);
     }
 
     // Test that we can parse a single literal.
@@ -66,7 +66,7 @@ contract LibParseOperandParseOperandTest is Test {
         string memory maybeWhitespaceA,
         string memory maybeWhitespaceB,
         string memory suffix
-    ) external pure {
+    ) external view {
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceA);
         LibLiteralString.conformStringToWhitespace(maybeWhitespaceB);
 
@@ -78,7 +78,7 @@ contract LibParseOperandParseOperandTest is Test {
         uint256[] memory expectedValues = new uint256[](1);
         expectedValues[0] = value * (asHex ? 1 : 1e18);
 
-        checkParsingOperandFromData(
+        this.checkParsingOperandFromData(
             s,
             expectedValues,
             bytes(valueString).length + 2 + bytes(maybeWhitespaceA).length + bytes(maybeWhitespaceB).length
@@ -95,8 +95,16 @@ contract LibParseOperandParseOperandTest is Test {
         string memory maybeWhitespaceB,
         string memory maybeWhitespaceC,
         string memory suffix
-    ) external pure {
+    ) external view {
         vm.assume(bytes(maybeWhitespaceB).length > 0);
+        uint256 expectedEnd = 0;
+
+        {
+            expectedEnd += 2;
+            expectedEnd += bytes(maybeWhitespaceA).length;
+            expectedEnd += bytes(maybeWhitespaceB).length;
+            expectedEnd += bytes(maybeWhitespaceC).length;
+        }
 
         valueA = bound(valueA, 0, type(uint256).max / 1e18);
         valueB = bound(valueB, 0, type(uint256).max / 1e18);
@@ -108,6 +116,11 @@ contract LibParseOperandParseOperandTest is Test {
         string memory valueAString = asHexA ? valueA.toHexString() : valueA.toString();
         string memory valueBString = asHexB ? valueB.toHexString() : valueB.toString();
 
+        {
+            expectedEnd += bytes(valueAString).length;
+            expectedEnd += bytes(valueBString).length;
+        }
+
         string memory s = string.concat(
             "<", maybeWhitespaceA, valueAString, maybeWhitespaceB, valueBString, maybeWhitespaceC, ">", suffix
         );
@@ -116,12 +129,7 @@ contract LibParseOperandParseOperandTest is Test {
         expectedValues[0] = valueA * (asHexA ? 1 : 1e18);
         expectedValues[1] = valueB * (asHexB ? 1 : 1e18);
 
-        checkParsingOperandFromData(
-            s,
-            expectedValues,
-            bytes(valueAString).length + bytes(valueBString).length + 2 + bytes(maybeWhitespaceA).length
-                + bytes(maybeWhitespaceB).length + bytes(maybeWhitespaceC).length
-        );
+        this.checkParsingOperandFromData(s, expectedValues, expectedEnd);
     }
 
     // Test that we can parse three literals.
@@ -137,7 +145,7 @@ contract LibParseOperandParseOperandTest is Test {
         string memory maybeWhitespaceC,
         string memory maybeWhitespaceD,
         string memory suffix
-    ) external pure {
+    ) external view {
         vm.assume(bytes(maybeWhitespaceB).length > 0);
         vm.assume(bytes(maybeWhitespaceC).length > 0);
 
@@ -164,17 +172,26 @@ contract LibParseOperandParseOperandTest is Test {
         );
 
         uint256[] memory expectedValues = new uint256[](3);
-        expectedValues[0] = valueA * (asHexA ? 1 : 1e18);
-        expectedValues[1] = valueB * (asHexB ? 1 : 1e18);
-        expectedValues[2] = valueC * (asHexC ? 1 : 1e18);
+        {
+            expectedValues[0] = valueA * (asHexA ? 1 : 1e18);
+            expectedValues[1] = valueB * (asHexB ? 1 : 1e18);
+            expectedValues[2] = valueC * (asHexC ? 1 : 1e18);
+        }
 
-        checkParsingOperandFromData(
-            s,
-            expectedValues,
-            bytes(valueAString).length + bytes(valueBString).length + bytes(valueCString).length + 2
-                + bytes(maybeWhitespaceA).length + bytes(maybeWhitespaceB).length + bytes(maybeWhitespaceC).length
-                + bytes(maybeWhitespaceD).length
-        );
+        uint256 expectedEnd = 0;
+        expectedEnd += 2;
+        expectedEnd += bytes(maybeWhitespaceA).length;
+        expectedEnd += bytes(maybeWhitespaceB).length;
+        expectedEnd += bytes(maybeWhitespaceC).length;
+        expectedEnd += bytes(maybeWhitespaceD).length;
+
+        {
+            expectedEnd += bytes(valueAString).length;
+            expectedEnd += bytes(valueBString).length;
+            expectedEnd += bytes(valueCString).length;
+        }
+
+        this.checkParsingOperandFromData(s, expectedValues, expectedEnd);
     }
 
     // Test that we can parse four literals.
@@ -183,7 +200,7 @@ contract LibParseOperandParseOperandTest is Test {
         uint256[4] memory values,
         string[5] memory maybeWhitespace,
         string memory suffix
-    ) external pure {
+    ) external view {
         {
             vm.assume(bytes(maybeWhitespace[1]).length > 0);
             vm.assume(bytes(maybeWhitespace[2]).length > 0);
@@ -234,24 +251,24 @@ contract LibParseOperandParseOperandTest is Test {
         for (uint256 i = 0; i < 4; i++) {
             expectedValues[i] = values[i] * (asHex[i] ? 1 : 1e18);
         }
-        checkParsingOperandFromData(s, expectedValues, expectedLength);
+        this.checkParsingOperandFromData(s, expectedValues, expectedLength);
     }
 
     /// More than 4 values is an error.
     function testParseOperandTooManyValues() external {
         vm.expectRevert(abi.encodeWithSelector(OperandValuesOverflow.selector, 9));
-        checkParsingOperandFromData("<1 2 3 4 5>", new uint256[](0), 0);
+        this.checkParsingOperandFromData("<1 2 3 4 5>", new uint256[](0), 0);
     }
 
     /// Unclosed operand is an error.
     function testParseOperandUnclosed() external {
         vm.expectRevert(abi.encodeWithSelector(UnclosedOperand.selector, 8));
-        checkParsingOperandFromData("<1 2 3 4", new uint256[](0), 0);
+        this.checkParsingOperandFromData("<1 2 3 4", new uint256[](0), 0);
     }
 
     // Unexpected chars will be treated as unclosed operands.
     function testParseOperandUnexpectedChars() external {
         vm.expectRevert(abi.encodeWithSelector(UnclosedOperand.selector, 6));
-        checkParsingOperandFromData("<1 2 3;> 6", new uint256[](0), 0);
+        this.checkParsingOperandFromData("<1 2 3;> 6", new uint256[](0), 0);
     }
 }
