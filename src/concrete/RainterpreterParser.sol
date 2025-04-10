@@ -8,7 +8,7 @@ import {IParserPragmaV1, PragmaV1} from "rain.interpreter.interface/interface/IP
 import {LibParseState, ParseState} from "../lib/parse/LibParseState.sol";
 import {LibParsePragma} from "../lib/parse/LibParsePragma.sol";
 import {LibParseLiteral} from "../lib/parse/literal/LibParseLiteral.sol";
-import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
+import {LibAllStandardOps} from "../lib/op/LibAllStandardOps.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseInterstitial} from "../lib/parse/LibParseInterstitial.sol";
 import {
@@ -74,11 +74,11 @@ contract RainterpreterParser is ERC165, IParserToolingV1 {
 
     /// External function to build the operand handler function pointers.
     function buildOperandHandlerFunctionPointers() external pure returns (bytes memory) {
-        return LibAllStandardOpsNP.operandHandlerFunctionPointers();
+        return LibAllStandardOps.operandHandlerFunctionPointers();
     }
 
     /// External function to build the literal parser function pointers.
     function buildLiteralParserFunctionPointers() external pure returns (bytes memory) {
-        return LibAllStandardOpsNP.literalParserFunctionPointers();
+        return LibAllStandardOps.literalParserFunctionPointers();
     }
 }

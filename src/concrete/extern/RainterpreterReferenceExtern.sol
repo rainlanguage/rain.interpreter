@@ -296,7 +296,7 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParserNPE2, BaseRai
         }
     }
 
-    /// This mimics how `LibAllStandardOpsNP` builds bytes out of function
+    /// This mimics how `LibAllStandardOps` builds bytes out of function
     /// pointers, but for sub parser functions. This is NOT intended to be
     /// called at runtime, instead tooling (e.g. the test suite) can call this
     /// function and compare it to `subParserFunctionPointers` to ensure they
@@ -335,7 +335,7 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParserNPE2, BaseRai
         }
     }
 
-    /// This mimics how LibAllStandardOpsNP builds function pointers for the
+    /// This mimics how LibAllStandardOps builds function pointers for the
     /// Rainterpreter. The same pattern applies to externs but for a different
     /// function signature for each opcode. Call this function somehow, e.g. from
     /// within a test, and then copy the output into the

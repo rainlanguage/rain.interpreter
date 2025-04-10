@@ -13,7 +13,7 @@ import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {OperandV2, LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
-import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
+import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
 import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
@@ -130,7 +130,7 @@ contract LibParseNamedLHSTest is Test {
             bytes("a _:1 2,b:a,:c(),d:3,e:d;"),
             parseMeta,
             operandHandlerPointers,
-            LibAllStandardOpsNP.literalParserFunctionPointers()
+            LibAllStandardOps.literalParserFunctionPointers()
         ).parse();
         assertEq(
             bytecode,
@@ -174,7 +174,7 @@ contract LibParseNamedLHSTest is Test {
     /// Duplicate names are allowed across different sources.
     function testParseNamedDuplicateDifferentSource() external view {
         (bytes memory bytecode, bytes32[] memory constants) = LibParseState.newState(
-            "a b:1 2, e:a;c d:3 4,e:d;", "", "", LibAllStandardOpsNP.literalParserFunctionPointers()
+            "a b:1 2, e:a;c d:3 4,e:d;", "", "", LibAllStandardOps.literalParserFunctionPointers()
         ).parse();
         assertEq(
             bytecode,

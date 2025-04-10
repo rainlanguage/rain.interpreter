@@ -16,7 +16,7 @@ import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {NoWhitespaceAfterUsingWordsFrom} from "src/error/ErrParse.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
-import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
+import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 
 /// @title LibParsePragmaKeywordTest
 contract LibParsePragmaKeywordTest is Test {
@@ -31,7 +31,7 @@ contract LibParsePragmaKeywordTest is Test {
         string memory err
     ) internal pure {
         ParseState memory state =
-            LibParseState.newState(bytes(str), "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+            LibParseState.newState(bytes(str), "", "", LibAllStandardOps.literalParserFunctionPointers());
         uint256 cursor = Pointer.unwrap(bytes(str).dataPointer());
         uint256 end = Pointer.unwrap(bytes(str).endDataPointer());
         uint256 cursorAfter = state.parsePragma(cursor, end);
@@ -59,7 +59,7 @@ contract LibParsePragmaKeywordTest is Test {
 
     function externalParsePragma(string memory str) external pure {
         ParseState memory state =
-            LibParseState.newState(bytes(str), "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+            LibParseState.newState(bytes(str), "", "", LibAllStandardOps.literalParserFunctionPointers());
         uint256 cursor = Pointer.unwrap(bytes(str).dataPointer());
         uint256 end = Pointer.unwrap(bytes(str).endDataPointer());
         uint256 cursorAfter = state.parsePragma(cursor, end);
@@ -110,7 +110,7 @@ contract LibParsePragmaKeywordTest is Test {
             string(PRAGMA_KEYWORD_BYTES), string(abi.encodePacked(whitespace, notInterstitialHead)), calldataStr
         );
         ParseState memory state =
-            LibParseState.newState(bytes(str), "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+            LibParseState.newState(bytes(str), "", "", LibAllStandardOps.literalParserFunctionPointers());
 
         uint256 cursor = Pointer.unwrap(bytes(str).dataPointer());
         uint256 end = Pointer.unwrap(bytes(str).endDataPointer());
@@ -138,7 +138,7 @@ contract LibParsePragmaKeywordTest is Test {
             suffix
         );
         ParseState memory state =
-            LibParseState.newState(bytes(str), "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+            LibParseState.newState(bytes(str), "", "", LibAllStandardOps.literalParserFunctionPointers());
         uint256 cursor = Pointer.unwrap(bytes(str).dataPointer());
         uint256 end = Pointer.unwrap(bytes(str).endDataPointer());
         uint256 cursorAfter = state.parsePragma(cursor, end);
@@ -187,7 +187,7 @@ contract LibParsePragmaKeywordTest is Test {
         );
 
         ParseState memory state =
-            LibParseState.newState(bytes(str), "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+            LibParseState.newState(bytes(str), "", "", LibAllStandardOps.literalParserFunctionPointers());
 
         uint256 cursor = Pointer.unwrap(bytes(str).dataPointer());
         uint256 end = Pointer.unwrap(bytes(str).endDataPointer());

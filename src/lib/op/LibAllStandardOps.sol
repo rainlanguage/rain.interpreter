@@ -44,7 +44,7 @@ import {LibOpERC5313OwnerNP} from "./erc5313/LibOpERC5313OwnerNP.sol";
 import {LibOpBlockNumberNP} from "./evm/LibOpBlockNumberNP.sol";
 import {LibOpChainIdNP} from "./evm/LibOpChainIdNP.sol";
 import {LibOpMaxUint256NP} from "./evm/LibOpMaxUint256NP.sol";
-import {LibOpTimestampNP} from "./evm/LibOpTimestampNP.sol";
+import {LibOpTimestamp} from "./evm/LibOpTimestamp.sol";
 
 import {LibOpAnyNP} from "./logic/LibOpAnyNP.sol";
 import {LibOpConditionsNP} from "./logic/LibOpConditionsNP.sol";
@@ -102,13 +102,13 @@ import {LibParseLiteralDecimal} from "../parse/literal/LibParseLiteralDecimal.so
 import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
-/// @dev Number of ops currently provided by `AllStandardOpsNP`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 18;
+/// @dev Number of ops currently provided by `AllStandardOps`.
+uint256 constant ALL_STANDARD_OPS_LENGTH = 20;
 
-/// @title LibAllStandardOpsNP
+/// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
 /// array to easily build function pointers for `IInterpreterV2`.
-library LibAllStandardOpsNP {
+library LibAllStandardOps {
     function authoringMetaV2() internal pure returns (bytes memory) {
         AuthoringMetaV2 memory lengthPlaceholder;
         AuthoringMetaV2[ALL_STANDARD_OPS_LENGTH + 1] memory wordsFixed = [
@@ -196,8 +196,8 @@ library LibAllStandardOpsNP {
             // AuthoringMetaV2("block-number", "The current block number."),
             // AuthoringMetaV2("chain-id", "The current chain id."),
             AuthoringMetaV2("uint256-max-value", "The maximum possible unsigned integer value (all binary bits are 1)."),
-            // AuthoringMetaV2("block-timestamp", "The current block timestamp."),
-            // AuthoringMetaV2("now", "The current block timestamp."),
+            AuthoringMetaV2("block-timestamp", "The current block timestamp."),
+            AuthoringMetaV2("now", "The current block timestamp."),
             // AuthoringMetaV2("any", "The first non-zero value out of all inputs, or 0 if every input is 0."),
             // AuthoringMetaV2(
             //     "conditions",
@@ -406,10 +406,10 @@ library LibAllStandardOpsNP {
                     // LibParseOperand.handleOperandDisallowed,
                     // max-value
                     LibParseOperand.handleOperandDisallowed,
-                    // // block-timestamp
-                    // LibParseOperand.handleOperandDisallowed,
-                    // // now
-                    // LibParseOperand.handleOperandDisallowed,
+                    // block-timestamp
+                    LibParseOperand.handleOperandDisallowed,
+                    // now
+                    LibParseOperand.handleOperandDisallowed,
                     // // any
                     // LibParseOperand.handleOperandDisallowed,
                     // // conditions
@@ -561,9 +561,9 @@ library LibAllStandardOpsNP {
                     // LibOpBlockNumberNP.integrity,
                     // LibOpChainIdNP.integrity,
                     LibOpMaxUint256NP.integrity,
-                    // LibOpTimestampNP.integrity,
-                    // // now
-                    // LibOpTimestampNP.integrity,
+                    LibOpTimestamp.integrity,
+                    // now
+                    LibOpTimestamp.integrity,
                     // LibOpAnyNP.integrity,
                     // LibOpConditionsNP.integrity,
                     // LibOpEnsureNP.integrity,
@@ -673,9 +673,9 @@ library LibAllStandardOpsNP {
                     // LibOpBlockNumberNP.run,
                     // LibOpChainIdNP.run,
                     LibOpMaxUint256NP.run,
-                    // LibOpTimestampNP.run,
-                    // // now
-                    // LibOpTimestampNP.run,
+                    LibOpTimestamp.run,
+                    // now
+                    LibOpTimestamp.run,
                     // LibOpAnyNP.run,
                     // LibOpConditionsNP.run,
                     // LibOpEnsureNP.run,

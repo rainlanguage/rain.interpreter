@@ -12,7 +12,7 @@ import {LibDataContract} from "rain.datacontract/lib/LibDataContract.sol";
 import {LibEval} from "../lib/eval/LibEval.sol";
 import {LibInterpreterStateDataContract} from "../lib/state/LibInterpreterStateDataContract.sol";
 import {InterpreterState} from "../lib/state/LibInterpreterState.sol";
-import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
+import {LibAllStandardOps} from "../lib/op/LibAllStandardOps.sol";
 import {
     IInterpreterV4,
     SourceIndexV2,
@@ -60,6 +60,6 @@ contract Rainterpreter is IInterpreterV4, IOpcodeToolingV1, ERC165 {
 
     /// @inheritdoc IOpcodeToolingV1
     function buildOpcodeFunctionPointers() public view virtual override returns (bytes memory) {
-        return LibAllStandardOpsNP.opcodeFunctionPointers();
+        return LibAllStandardOps.opcodeFunctionPointers();
     }
 }
