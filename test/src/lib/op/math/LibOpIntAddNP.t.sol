@@ -41,7 +41,6 @@ contract LibOpAddTest is OpTest {
 
     /// Directly test the runtime logic of LibOpAdd.
     function testOpAddRun(uint256[] memory inputs) external {
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
         vm.assume(inputs.length <= 0x0F);
         Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
@@ -59,7 +58,7 @@ contract LibOpAddTest is OpTest {
         if (overflows > 0) {
             vm.expectRevert(stdError.arithmeticError);
         }
-        opReferenceCheck(state, operand, LibOpAdd.referenceFn, LibOpAdd.integrity, LibOpAdd.run, inputs);
+        this.opReferenceCheck(operand, LibOpAdd.referenceFn, LibOpAdd.integrity, LibOpAdd.run, inputs);
     }
 
     /// Test the eval of `add` opcode parsed from a string. Tests zero inputs.

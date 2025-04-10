@@ -25,7 +25,6 @@ contract LibOpScaleNDynamicTest is OpTest {
         round = bound(round, 0, 1);
         saturate = bound(saturate, 0, 1);
         uint256 flags = round | (saturate << 1);
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
         if (scale >= 1e18) {
             scale = scale - (scale % 1e18);
@@ -44,8 +43,8 @@ contract LibOpScaleNDynamicTest is OpTest {
             vm.expectRevert(stdError.arithmeticError);
         }
 
-        opReferenceCheck(
-            state, operand, LibOpScaleNDynamic.referenceFn, LibOpScaleNDynamic.integrity, LibOpScaleNDynamic.run, inputs
+        this.opReferenceCheck(
+            operand, LibOpScaleNDynamic.referenceFn, LibOpScaleNDynamic.integrity, LibOpScaleNDynamic.run, inputs
         );
     }
 

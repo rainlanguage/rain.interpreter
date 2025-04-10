@@ -24,7 +24,6 @@ contract LibOpLinearGrowthTest is OpTest {
         // PRB math can't reliably handle t beyond 44e18 with a and r both up to
         // ~18e18 (uint64 max).
         t = bound(t, 0, type(uint64).max);
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
         Operand operand = LibOperand.build(3, 1, operandData);
         uint256[] memory inputs = new uint256[](3);
@@ -32,8 +31,8 @@ contract LibOpLinearGrowthTest is OpTest {
         inputs[1] = r;
         inputs[2] = t;
 
-        opReferenceCheck(
-            state, operand, LibOpLinearGrowth.referenceFn, LibOpLinearGrowth.integrity, LibOpLinearGrowth.run, inputs
+        this.opReferenceCheck(
+            operand, LibOpLinearGrowth.referenceFn, LibOpLinearGrowth.integrity, LibOpLinearGrowth.run, inputs
         );
     }
 

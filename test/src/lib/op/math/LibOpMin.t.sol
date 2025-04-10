@@ -46,11 +46,10 @@ contract LibOpMinTest is OpTest {
 
     /// Directly test the runtime logic of LibOpMin.
     function testOpMinRun(uint256[] memory inputs, uint16 operandData) external view {
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
         vm.assume(inputs.length <= 0x0F);
         Operand operand = LibOperand.build(uint8(inputs.length), 1, operandData);
-        opReferenceCheck(state, operand, LibOpMin.referenceFn, LibOpMin.integrity, LibOpMin.run, inputs);
+        this.opReferenceCheck(operand, LibOpMin.referenceFn, LibOpMin.integrity, LibOpMin.run, inputs);
     }
 
     /// Test the eval of `min` opcode parsed from a string. Tests zero inputs.

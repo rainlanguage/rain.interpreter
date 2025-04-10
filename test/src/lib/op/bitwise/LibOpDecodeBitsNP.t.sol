@@ -64,7 +64,7 @@ contract LibOpDecodeBitsNPTest is OpTest {
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = value;
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
-        opReferenceCheck(
+        this.opReferenceCheck(
             state, operand, LibOpDecodeBitsNP.referenceFn, LibOpDecodeBitsNP.integrity, LibOpDecodeBitsNP.run, inputs
         );
     }

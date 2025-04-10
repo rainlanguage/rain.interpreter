@@ -174,13 +174,38 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     }
 
     function opReferenceCheck(
-        InterpreterStateNP memory state,
         Operand operand,
         function(InterpreterStateNP memory, Operand, uint256[] memory) view returns (uint256[] memory) referenceFn,
         function(IntegrityCheckStateNP memory, Operand) view returns (uint256, uint256) integrityFn,
         function(InterpreterStateNP memory, Operand, Pointer) view returns (Pointer) runFn,
         uint256[] memory inputs
     ) internal view {
+        uint256 referenceFnPtr;
+        uint256 integrityFnPtr;
+        uint256 runFnPtr;
+        assembly ("memory-safe") {
+            referenceFnPtr := referenceFn
+            integrityFnPtr := integrityFn
+            runFnPtr := runFn
+        }
+        this.opReferenceCheckExternal(
+            operand,
+            referenceFnPtr,
+            integrityFnPtr,
+            runFnPtr,
+            inputs
+        );
+    }
+
+    function opReferenceCheckExternal(
+        Operand operand,
+        uint256 referenceFn,
+        uint256 integrityFn,
+        uint256 runFn,
+        uint256[] memory inputs
+    ) external view {
+        InterpreterStateNP memory state = opTestDefaultInterpreterState();
+
         uint256 calcOutputs = opReferenceCheckIntegrity(integrityFn, operand, state.constants, inputs);
         ReferenceCheckPointers memory pointers = opReferenceCheckPointers(inputs, calcOutputs);
 

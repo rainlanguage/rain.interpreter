@@ -44,8 +44,7 @@ contract LibOpERC721OwnerOfTest is OpTest {
         inputs[1] = tokenId;
         Operand operand = LibOperand.build(2, 1, operandData);
 
-        opReferenceCheck(
-            opTestDefaultInterpreterState(),
+        this.opReferenceCheck(
             operand,
             LibOpERC721OwnerOf.referenceFn,
             LibOpERC721OwnerOf.integrity,

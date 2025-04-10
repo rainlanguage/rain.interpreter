@@ -18,13 +18,12 @@ contract LibOpFloorTest is OpTest {
     /// Directly test the runtime logic of LibOpFloor.
     function testOpFloorRun(uint256 a, uint16 operandData) public view {
         a = bound(a, 0, type(uint64).max - 1e18);
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
         Operand operand = LibOperand.build(1, 1, operandData);
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = a;
 
-        opReferenceCheck(state, operand, LibOpFloor.referenceFn, LibOpFloor.integrity, LibOpFloor.run, inputs);
+        this.opReferenceCheck(operand, LibOpFloor.referenceFn, LibOpFloor.integrity, LibOpFloor.run, inputs);
     }
 
     /// Test the eval of `floor`.

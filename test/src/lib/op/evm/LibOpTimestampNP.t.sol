@@ -55,12 +55,11 @@ contract LibOpTimestampNPTest is OpTest {
     /// opcode correctly pushes the timestamp onto the stack.
     function testOpTimestampNPRun(uint256 blockTimestamp) external {
         blockTimestamp = bound(blockTimestamp, 0, type(uint256).max / 1e18);
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.warp(blockTimestamp);
         uint256[] memory inputs = new uint256[](0);
         Operand operand = LibOperand.build(0, 1, 0);
-        opReferenceCheck(
-            state, operand, LibOpTimestampNP.referenceFn, LibOpTimestampNP.integrity, LibOpTimestampNP.run, inputs
+        this.opReferenceCheck(
+            operand, LibOpTimestampNP.referenceFn, LibOpTimestampNP.integrity, LibOpTimestampNP.run, inputs
         );
     }
 

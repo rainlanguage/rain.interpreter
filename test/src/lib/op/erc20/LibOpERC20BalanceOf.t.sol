@@ -47,7 +47,7 @@ contract LibOpERC20BalanceOfTest is OpTest {
 
         vm.mockCall(token, abi.encodeWithSelector(IERC20Metadata.decimals.selector), abi.encode(decimals));
 
-        opReferenceCheck(
+        this.opReferenceCheck(
             opTestDefaultInterpreterState(),
             operand,
             LibOpERC20BalanceOf.referenceFn,

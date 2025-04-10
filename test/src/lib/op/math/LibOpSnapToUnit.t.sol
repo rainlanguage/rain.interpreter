@@ -17,7 +17,6 @@ contract LibOpSnapToUnitTest is OpTest {
 
     /// Directly test the runtime logic of LibOpSnapToUnit.
     function testOpSnapToUnitRun(uint256 threshold, uint256 value) public view {
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         value = bound(value, 0, type(uint64).max - 1e18);
 
         Operand operand = LibOperand.build(2, 1, 0);
@@ -25,8 +24,8 @@ contract LibOpSnapToUnitTest is OpTest {
         inputs[0] = threshold;
         inputs[1] = value;
 
-        opReferenceCheck(
-            state, operand, LibOpSnapToUnit.referenceFn, LibOpSnapToUnit.integrity, LibOpSnapToUnit.run, inputs
+        this.opReferenceCheck(
+            operand, LibOpSnapToUnit.referenceFn, LibOpSnapToUnit.integrity, LibOpSnapToUnit.run, inputs
         );
     }
 

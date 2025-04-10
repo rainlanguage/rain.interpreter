@@ -41,7 +41,6 @@ contract LibOpUint256MulTest is OpTest {
 
     /// Directly test the runtime logic of LibOpUint256Mul.
     function testOpUint256MulRun(uint256[] memory inputs) external {
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
         vm.assume(inputs.length <= 0x0F);
         Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
@@ -63,8 +62,8 @@ contract LibOpUint256MulTest is OpTest {
         if (overflows > 0) {
             vm.expectRevert(stdError.arithmeticError);
         }
-        opReferenceCheck(
-            state, operand, LibOpUint256Mul.referenceFn, LibOpUint256Mul.integrity, LibOpUint256Mul.run, inputs
+        this.opReferenceCheck(
+            operand, LibOpUint256Mul.referenceFn, LibOpUint256Mul.integrity, LibOpUint256Mul.run, inputs
         );
     }
 

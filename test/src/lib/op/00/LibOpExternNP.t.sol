@@ -182,7 +182,7 @@ contract LibOpExternNPTest is OpTest {
             address(extern), abi.encodeWithSelector(IInterpreterExternV3.extern.selector, externDispatch, inputs), 2
         );
 
-        opReferenceCheck(state, operand, LibOpExternNP.referenceFn, LibOpExternNP.integrity, LibOpExternNP.run, inputs);
+        this.opReferenceCheck(state, operand, LibOpExternNP.referenceFn, LibOpExternNP.integrity, LibOpExternNP.run, inputs);
     }
 
     /// Test the eval of extern parsed from a string.

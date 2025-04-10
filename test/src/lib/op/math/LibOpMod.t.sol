@@ -46,7 +46,6 @@ contract LibOpModTest is OpTest {
 
     /// Directly test the runtime logic of LibOpMod.
     function testOpModRun(uint256[] memory inputs) external {
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
         vm.assume(inputs.length <= 0x0F);
         Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
@@ -59,7 +58,7 @@ contract LibOpModTest is OpTest {
         if (modZeros > 0) {
             vm.expectRevert(stdError.divisionError);
         }
-        opReferenceCheck(state, operand, LibOpMod.referenceFn, LibOpMod.integrity, LibOpMod.run, inputs);
+        this.opReferenceCheck(operand, LibOpMod.referenceFn, LibOpMod.integrity, LibOpMod.run, inputs);
     }
 
     /// Test the eval of `mod` opcode parsed from a string. Tests zero inputs.

@@ -18,13 +18,12 @@ contract LibOpExp2Test is OpTest {
     /// Directly test the runtime logic of LibOpExp2.
     function testOpExp2Run(uint256 a, uint16 operandData) public view {
         a = bound(a, 0, type(uint64).max - 1e18);
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
         Operand operand = LibOperand.build(1, 1, operandData);
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = a;
 
-        opReferenceCheck(state, operand, LibOpExp2.referenceFn, LibOpExp2.integrity, LibOpExp2.run, inputs);
+        this.opReferenceCheck(operand, LibOpExp2.referenceFn, LibOpExp2.integrity, LibOpExp2.run, inputs);
     }
 
     /// Test the eval of `exp2`.

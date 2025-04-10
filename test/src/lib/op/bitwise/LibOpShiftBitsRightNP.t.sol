@@ -70,7 +70,7 @@ contract LibOpShiftBitsRightNPTest is OpTest {
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = x;
         Operand operand = LibOperand.build(uint8(inputs.length), 1, shiftAmount);
-        opReferenceCheck(
+        this.opReferenceCheck(
             state,
             operand,
             LibOpShiftBitsRightNP.referenceFn,

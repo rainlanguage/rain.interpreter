@@ -46,7 +46,7 @@ contract LibOpContextNPTest is OpTest {
         j = bound(j, 0, state.context[i].length - 1);
         Operand operand = LibOperand.build(0, 1, uint16(uint256(i) | uint256(j) << 8));
         uint256[] memory inputs = new uint256[](0);
-        opReferenceCheck(
+        this.opReferenceCheck(
             state, operand, LibOpContextNP.referenceFn, LibOpContextNP.integrity, LibOpContextNP.run, inputs
         );
     }
@@ -62,7 +62,7 @@ contract LibOpContextNPTest is OpTest {
         Operand operand = LibOperand.build(0, 1, uint16(uint256(i) | uint256(j) << 8));
         uint256[] memory inputs = new uint256[](0);
         vm.expectRevert(stdError.indexOOBError);
-        opReferenceCheck(
+        this.opReferenceCheck(
             state, operand, LibOpContextNP.referenceFn, LibOpContextNP.integrity, LibOpContextNP.run, inputs
         );
     }
@@ -80,7 +80,7 @@ contract LibOpContextNPTest is OpTest {
         Operand operand = LibOperand.build(0, 1, uint16(uint256(i) | uint256(j) << 8));
         uint256[] memory inputs = new uint256[](0);
         vm.expectRevert(stdError.indexOOBError);
-        opReferenceCheck(
+        this.opReferenceCheck(
             state, operand, LibOpContextNP.referenceFn, LibOpContextNP.integrity, LibOpContextNP.run, inputs
         );
     }

@@ -37,7 +37,7 @@ contract LibOpCtPopNPTest is OpTest {
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = x;
         Operand operand = LibOperand.build(1, 1, 0);
-        opReferenceCheck(state, operand, LibOpCtPopNP.referenceFn, LibOpCtPopNP.integrity, LibOpCtPopNP.run, inputs);
+        this.opReferenceCheck(state, operand, LibOpCtPopNP.referenceFn, LibOpCtPopNP.integrity, LibOpCtPopNP.run, inputs);
     }
 
     /// Test the eval of a ct pop opcode parsed from a string.

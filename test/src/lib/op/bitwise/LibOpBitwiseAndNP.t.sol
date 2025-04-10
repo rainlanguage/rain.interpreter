@@ -27,7 +27,7 @@ contract LibOpBitwiseAndNPTest is OpTest {
         inputs[0] = x;
         inputs[1] = y;
         Operand operand = LibOperand.build(2, 1, 0);
-        opReferenceCheck(
+        this.opReferenceCheck(
             state, operand, LibOpBitwiseAndNP.referenceFn, LibOpBitwiseAndNP.integrity, LibOpBitwiseAndNP.run, inputs
         );
     }

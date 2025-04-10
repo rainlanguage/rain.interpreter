@@ -40,7 +40,6 @@ contract LibOpSubTest is OpTest {
 
     /// Directly test the runtime logic of LibOpSub.
     function testOpSubRun(uint256[] memory inputs) external {
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
         vm.assume(inputs.length <= 0x0F);
         Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
@@ -59,7 +58,7 @@ contract LibOpSubTest is OpTest {
         if (underflows > 0) {
             vm.expectRevert(stdError.arithmeticError);
         }
-        opReferenceCheck(state, operand, LibOpSub.referenceFn, LibOpSub.integrity, LibOpSub.run, inputs);
+        this.opReferenceCheck(operand, LibOpSub.referenceFn, LibOpSub.integrity, LibOpSub.run, inputs);
     }
 
     /// Test the eval of `sub` opcode parsed from a string. Tests zero inputs.

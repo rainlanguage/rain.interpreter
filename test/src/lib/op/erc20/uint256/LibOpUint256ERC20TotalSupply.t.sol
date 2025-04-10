@@ -32,8 +32,7 @@ contract LibOpUint256ERC20TotalSupplyTest is OpTest {
         // called once for reference, once for run
         vm.expectCall(account, abi.encodeWithSelector(IERC20.totalSupply.selector), 2);
 
-        opReferenceCheck(
-            opTestDefaultInterpreterState(),
+        this.opReferenceCheck(
             operand,
             LibOpUint256ERC20TotalSupply.referenceFn,
             LibOpUint256ERC20TotalSupply.integrity,

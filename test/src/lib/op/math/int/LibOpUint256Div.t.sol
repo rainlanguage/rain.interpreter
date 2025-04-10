@@ -43,7 +43,6 @@ contract LibOpUint256DivTest is OpTest {
 
     /// Directly test the runtime logic of LibOpUint256Div.
     function testOpUint256DivRun(uint256[] memory inputs) external {
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
         vm.assume(inputs.length <= 0x0F);
         Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
@@ -57,8 +56,8 @@ contract LibOpUint256DivTest is OpTest {
         if (divZeros > 0) {
             vm.expectRevert(stdError.divisionError);
         }
-        opReferenceCheck(
-            state, operand, LibOpUint256Div.referenceFn, LibOpUint256Div.integrity, LibOpUint256Div.run, inputs
+        this.opReferenceCheck(
+            operand, LibOpUint256Div.referenceFn, LibOpUint256Div.integrity, LibOpUint256Div.run, inputs
         );
     }
 

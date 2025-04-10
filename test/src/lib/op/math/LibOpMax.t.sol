@@ -49,11 +49,10 @@ contract LibOpMaxTest is OpTest {
 
     /// Directly test the runtime logic of LibOpMax.
     function testOpMaxRun(uint256[] memory inputs) external view {
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
         vm.assume(inputs.length <= 0x0F);
         Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
-        opReferenceCheck(state, operand, LibOpMax.referenceFn, LibOpMax.integrity, LibOpMax.run, inputs);
+        this.opReferenceCheck(operand, LibOpMax.referenceFn, LibOpMax.integrity, LibOpMax.run, inputs);
     }
 
     /// Test the eval of `max` opcode parsed from a string. Tests zero inputs.
