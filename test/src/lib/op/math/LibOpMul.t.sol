@@ -44,7 +44,6 @@ contract LibOpMulTest is OpTest {
 
     /// Directly test the runtime logic of LibOpMul.
     function testOpMulRun(uint256[] memory inputs) public {
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
         vm.assume(inputs.length <= 0x0F);
         Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
@@ -60,7 +59,7 @@ contract LibOpMulTest is OpTest {
             }
             a = OZMath.mulDiv(a, b, 1e18);
         }
-        opReferenceCheck(state, operand, LibOpMul.referenceFn, LibOpMul.integrity, LibOpMul.run, inputs);
+        this.opReferenceCheck(operand, LibOpMul.referenceFn, LibOpMul.integrity, LibOpMul.run, inputs);
     }
 
     /// Test the eval of `mul` opcode parsed from a string.

@@ -60,7 +60,7 @@ contract LibOpEncodeBitsNPTest is OpTest {
         inputs[0] = source;
         inputs[1] = target;
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
-        opReferenceCheck(
+        this.opReferenceCheck(
             state, operand, LibOpEncodeBitsNP.referenceFn, LibOpEncodeBitsNP.integrity, LibOpEncodeBitsNP.run, inputs
         );
     }

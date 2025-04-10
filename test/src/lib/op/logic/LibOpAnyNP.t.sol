@@ -61,11 +61,10 @@ contract LibOpAnyNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpAnyNP.
     function testOpAnyNPRun(uint256[] memory inputs, uint16 operandData) external view {
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length != 0);
         vm.assume(inputs.length <= 0x0F);
         Operand operand = LibOperand.build(uint8(inputs.length), 1, operandData);
-        opReferenceCheck(state, operand, LibOpAnyNP.referenceFn, LibOpAnyNP.integrity, LibOpAnyNP.run, inputs);
+        this.opReferenceCheck(operand, LibOpAnyNP.referenceFn, LibOpAnyNP.integrity, LibOpAnyNP.run, inputs);
     }
 
     /// Sample the gas cost of the run function.

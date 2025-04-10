@@ -42,11 +42,10 @@ contract LibOpIsZeroNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpIsZeroNP.
     function testOpIsZeroNPRun(uint256 input) external view {
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = input;
         Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
-        opReferenceCheck(state, operand, LibOpIsZeroNP.referenceFn, LibOpIsZeroNP.integrity, LibOpIsZeroNP.run, inputs);
+        this.opReferenceCheck(operand, LibOpIsZeroNP.referenceFn, LibOpIsZeroNP.integrity, LibOpIsZeroNP.run, inputs);
     }
 
     /// Test the eval of isZero opcode parsed from a string. Tests 1 nonzero input.

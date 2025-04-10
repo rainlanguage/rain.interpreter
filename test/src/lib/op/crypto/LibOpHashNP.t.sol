@@ -52,7 +52,7 @@ contract LibOpHashNPTest is OpTest {
         vm.assume(inputs.length <= 0x0F);
         InterpreterStateNP memory state = opTestDefaultInterpreterState();
         Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
-        opReferenceCheck(state, operand, LibOpHashNP.referenceFn, LibOpHashNP.integrity, LibOpHashNP.run, inputs);
+        this.opReferenceCheck(state, operand, LibOpHashNP.referenceFn, LibOpHashNP.integrity, LibOpHashNP.run, inputs);
     }
 
     /// Test the eval of a hash opcode parsed from a string. Tests 0 inputs.

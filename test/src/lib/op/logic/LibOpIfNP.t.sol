@@ -40,13 +40,12 @@ contract LibOpIfNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpIfNP.
     function testOpIfNPRun(uint256 a, uint256 b, uint256 c) external view {
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](3);
         inputs[0] = a;
         inputs[1] = b;
         inputs[2] = c;
         Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
-        opReferenceCheck(state, operand, LibOpIfNP.referenceFn, LibOpIfNP.integrity, LibOpIfNP.run, inputs);
+        this.opReferenceCheck(operand, LibOpIfNP.referenceFn, LibOpIfNP.integrity, LibOpIfNP.run, inputs);
     }
 
     /// Test the eval of if parsed from a string. Tests 3 inputs. The first input

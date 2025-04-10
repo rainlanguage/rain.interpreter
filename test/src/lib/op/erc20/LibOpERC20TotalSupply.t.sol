@@ -42,7 +42,7 @@ contract LibOpERC20TotalSupplyTest is OpTest {
 
         vm.mockCall(account, abi.encodeWithSelector(IERC20Metadata.decimals.selector), abi.encode(decimals));
 
-        opReferenceCheck(
+        this.opReferenceCheck(
             opTestDefaultInterpreterState(),
             operand,
             LibOpERC20TotalSupply.referenceFn,

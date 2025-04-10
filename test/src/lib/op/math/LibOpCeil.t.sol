@@ -18,13 +18,12 @@ contract LibOpCeilTest is OpTest {
     /// Directly test the runtime logic of LibOpCeil.
     function testOpCeilRun(uint256 a, uint16 operandData) public view {
         a = bound(a, 0, type(uint64).max - 1e18);
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
         Operand operand = LibOperand.build(1, 1, operandData);
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = a;
 
-        opReferenceCheck(state, operand, LibOpCeil.referenceFn, LibOpCeil.integrity, LibOpCeil.run, inputs);
+        this.opReferenceCheck(operand, LibOpCeil.referenceFn, LibOpCeil.integrity, LibOpCeil.run, inputs);
     }
 
     /// Test the eval of `ceil`.

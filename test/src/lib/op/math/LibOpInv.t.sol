@@ -19,13 +19,12 @@ contract LibOpInvTest is OpTest {
     function testOpInvRun(uint256 a, uint16 operandData) public view {
         // 0 is division by 0.
         a = bound(a, 1, type(uint64).max - 1e18);
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
         Operand operand = LibOperand.build(1, 1, operandData);
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = a;
 
-        opReferenceCheck(state, operand, LibOpInv.referenceFn, LibOpInv.integrity, LibOpInv.run, inputs);
+        this.opReferenceCheck(operand, LibOpInv.referenceFn, LibOpInv.integrity, LibOpInv.run, inputs);
     }
 
     /// Test the eval of `inv`.

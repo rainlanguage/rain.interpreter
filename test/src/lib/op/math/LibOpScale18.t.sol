@@ -23,7 +23,6 @@ contract LibOpScale18Test is OpTest {
         round = bound(round, 0, 1);
         saturate = bound(saturate, 0, 1);
         uint256 flags = round | (saturate << 1);
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
         Operand operand = LibOperand.build(1, 1, uint16((flags << 8) | scale));
         uint256[] memory inputs = new uint256[](1);
@@ -33,7 +32,7 @@ contract LibOpScale18Test is OpTest {
             vm.expectRevert(stdError.arithmeticError);
         }
 
-        opReferenceCheck(state, operand, LibOpScale18.referenceFn, LibOpScale18.integrity, LibOpScale18.run, inputs);
+        this.opReferenceCheck(operand, LibOpScale18.referenceFn, LibOpScale18.integrity, LibOpScale18.run, inputs);
     }
 
     /// Test the eval of `scale-18`.

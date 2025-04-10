@@ -45,7 +45,6 @@ contract LibOpEnsureNPTest is OpTest {
     /// Directly test the run logic of LibOpEnsureNP.
     function testOpEnsureNPRun(uint256 condition, string memory reason) external {
         vm.assume(bytes(reason).length <= 31);
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = condition;
         inputs[1] = IntOrAString.unwrap(LibIntOrAString.fromString2(reason));
@@ -54,7 +53,7 @@ contract LibOpEnsureNPTest is OpTest {
         if (condition == 0) {
             vm.expectRevert(bytes(reason));
         }
-        opReferenceCheck(state, operand, LibOpEnsureNP.referenceFn, LibOpEnsureNP.integrity, LibOpEnsureNP.run, inputs);
+        this.opReferenceCheck(operand, LibOpEnsureNP.referenceFn, LibOpEnsureNP.integrity, LibOpEnsureNP.run, inputs);
     }
 
     /// Test the eval of `ensure` parsed from a string. Tests zero inputs.

@@ -19,13 +19,12 @@ contract LibOpLog10Test is OpTest {
     function testOpLog10Run(uint256 a, uint16 operandData) public view {
         // e lifted from prb math.
         a = bound(a, 2_718281828459045235, type(uint64).max - 1e18);
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
         Operand operand = LibOperand.build(1, 1, operandData);
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = a;
 
-        opReferenceCheck(state, operand, LibOpLog10.referenceFn, LibOpLog10.integrity, LibOpLog10.run, inputs);
+        this.opReferenceCheck(operand, LibOpLog10.referenceFn, LibOpLog10.integrity, LibOpLog10.run, inputs);
     }
 
     /// Test the eval of `log10`.

@@ -48,8 +48,6 @@ contract LibOpConditionsNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpConditionsNP.
     function testOpConditionsNPRun(uint256[] memory inputs, uint256 finalNonZero) external view {
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
-
         // Ensure that we have inputs that are a valid pairwise conditions.
         vm.assume(inputs.length > 1);
         vm.assume(inputs.length <= 0x0F);
@@ -62,15 +60,14 @@ contract LibOpConditionsNPTest is OpTest {
             inputs[inputs.length - 2] = finalNonZero;
         }
         Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
-        opReferenceCheck(
-            state, operand, LibOpConditionsNP.referenceFn, LibOpConditionsNP.integrity, LibOpConditionsNP.run, inputs
+        this.opReferenceCheck(
+            operand, LibOpConditionsNP.referenceFn, LibOpConditionsNP.integrity, LibOpConditionsNP.run, inputs
         );
     }
 
     /// Test the error case where no conditions are met.
     function testOpConditionsNPRunNoConditionsMet(uint256[] memory inputs, string memory reason) external {
         vm.assume(bytes(reason).length <= 31);
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         // Ensure that we have inputs that are a valid pairwise conditions.
         vm.assume(inputs.length > 1);
         if (inputs.length > 0x0F) {
@@ -91,8 +88,8 @@ contract LibOpConditionsNPTest is OpTest {
         }
 
         vm.expectRevert(bytes(reason));
-        opReferenceCheck(
-            state, operand, LibOpConditionsNP.referenceFn, LibOpConditionsNP.integrity, LibOpConditionsNP.run, inputs
+        this.opReferenceCheck(
+            operand, LibOpConditionsNP.referenceFn, LibOpConditionsNP.integrity, LibOpConditionsNP.run, inputs
         );
     }
 

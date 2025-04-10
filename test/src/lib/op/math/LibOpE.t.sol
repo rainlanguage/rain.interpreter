@@ -35,10 +35,9 @@ contract LibOpETest is OpTest {
     /// Directly test the runtime logic of LibOpE. This tests that the
     /// opcode correctly pushes the mathematical constant e onto the stack.
     function testOpERun(uint16 operandData) external view {
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         Operand operand = LibOperand.build(0, 1, operandData);
         uint256[] memory inputs = new uint256[](0);
-        opReferenceCheck(state, operand, LibOpE.referenceFn, LibOpE.integrity, LibOpE.run, inputs);
+        this.opReferenceCheck(operand, LibOpE.referenceFn, LibOpE.integrity, LibOpE.run, inputs);
     }
 
     /// Test the eval of a mathematical constant e opcode parsed from a string.

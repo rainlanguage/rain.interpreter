@@ -25,14 +25,13 @@ contract LibOpPowTest is OpTest {
         // do things that way.
         a = bound(a, 0, type(uint64).max);
         b = bound(b, 0, 10);
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
         Operand operand = LibOperand.build(2, 1, 0);
         uint256[] memory inputs = new uint256[](2);
         inputs[0] = a;
         inputs[1] = b;
 
-        opReferenceCheck(state, operand, LibOpPow.referenceFn, LibOpPow.integrity, LibOpPow.run, inputs);
+        this.opReferenceCheck(operand, LibOpPow.referenceFn, LibOpPow.integrity, LibOpPow.run, inputs);
     }
 
     /// Test the eval of `power`.

@@ -23,7 +23,6 @@ contract LibOpScaleNTest is OpTest {
         round = bound(round, 0, 1);
         saturate = bound(saturate, 0, 1);
         uint256 flags = round | (saturate << 1);
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
         Operand operand = LibOperand.build(1, 1, uint16((flags << 8) | scale));
 
@@ -34,7 +33,7 @@ contract LibOpScaleNTest is OpTest {
             vm.expectRevert(stdError.arithmeticError);
         }
 
-        opReferenceCheck(state, operand, LibOpScaleN.referenceFn, LibOpScaleN.integrity, LibOpScaleN.run, inputs);
+        this.opReferenceCheck(operand, LibOpScaleN.referenceFn, LibOpScaleN.integrity, LibOpScaleN.run, inputs);
     }
 
     /// Test the eval of `scale-n`.

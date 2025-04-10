@@ -53,8 +53,7 @@ contract LibOpUint256ERC721BalanceOfTest is OpTest {
         // called once for reference, once for run
         vm.expectCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), 2);
 
-        opReferenceCheck(
-            opTestDefaultInterpreterState(),
+        this.opReferenceCheck(
             operand,
             LibOpUint256ERC721BalanceOf.referenceFn,
             LibOpUint256ERC721BalanceOf.integrity,

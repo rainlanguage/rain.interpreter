@@ -18,13 +18,12 @@ contract LibOpFracTest is OpTest {
     /// Directly test the runtime logic of LibOpFrac.
     function testOpFracRun(uint256 a, uint16 operandData) public view {
         a = bound(a, 0, type(uint64).max - 1e18);
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
 
         Operand operand = LibOperand.build(1, 1, operandData);
         uint256[] memory inputs = new uint256[](1);
         inputs[0] = a;
 
-        opReferenceCheck(state, operand, LibOpFrac.referenceFn, LibOpFrac.integrity, LibOpFrac.run, inputs);
+        this.opReferenceCheck(operand, LibOpFrac.referenceFn, LibOpFrac.integrity, LibOpFrac.run, inputs);
     }
 
     /// Test the eval of `frac`.

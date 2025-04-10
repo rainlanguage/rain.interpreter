@@ -34,8 +34,7 @@ contract LibOpUint256ERC20AllowanceTest is OpTest {
         // called once for reference, once for run
         vm.expectCall(token, abi.encodeWithSelector(IERC20.allowance.selector, owner, spender), 2);
 
-        opReferenceCheck(
-            opTestDefaultInterpreterState(),
+        this.opReferenceCheck(
             operand,
             LibOpUint256ERC20Allowance.referenceFn,
             LibOpUint256ERC20Allowance.integrity,

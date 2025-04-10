@@ -32,8 +32,7 @@ contract LibOpERC5313OwnerNPTest is OpTest {
         // called once for reference, once for run
         vm.expectCall(account, abi.encodeWithSelector(IERC5313.owner.selector), 2);
 
-        opReferenceCheck(
-            opTestDefaultInterpreterState(),
+        this.opReferenceCheck(
             operand,
             LibOpERC5313OwnerNP.referenceFn,
             LibOpERC5313OwnerNP.integrity,

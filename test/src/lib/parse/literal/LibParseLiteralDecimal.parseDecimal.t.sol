@@ -24,6 +24,13 @@ contract LibParseLiteralDecimalTest is Test {
     using LibParseLiteral for ParseState;
     using LibParseLiteralDecimal for ParseState;
 
+    function parseDecimalExternal(bytes memory data) external pure {
+        ParseState memory state = LibParseState.newState(data, "", "", "");
+        (uint256 cursorAfter, uint256 value) =
+            state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
+        (cursorAfter, value);
+    }
+
     function checkParseDecimal(string memory data, uint256 expectedValue, uint256 expectedCursorAfter) internal pure {
         ParseState memory state = LibParseState.newState(bytes(data), "", "", "");
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
@@ -33,29 +40,20 @@ contract LibParseLiteralDecimalTest is Test {
     }
 
     function checkParseDecimalRevert(string memory data, bytes memory err) internal {
-        ParseState memory state = LibParseState.newState(bytes(data), "", "", "");
         vm.expectRevert(err);
-        (uint256 cursorAfter, uint256 value) =
-            state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
-        (cursorAfter, value);
+        this.parseDecimalExternal(bytes(data));
     }
 
     /// Check that an empty string literal is an error.
     function testParseLiteralDecimalEmpty() external {
-        ParseState memory state = LibParseState.newState("", "", "", "");
         vm.expectRevert(abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
-        (uint256 cursorAfter, uint256 value) =
-            state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
-        (cursorAfter, value);
+        this.parseDecimalExternal("");
     }
 
     /// A non decimal literal is an error.
     function testParseLiteralDecimalNonDecimal() external {
-        ParseState memory state = LibParseState.newState("hello", "", "", "");
         vm.expectRevert(abi.encodeWithSelector(ZeroLengthDecimal.selector, 0));
-        (uint256 cursorAfter, uint256 value) =
-            state.parseDecimal(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
-        (cursorAfter, value);
+        this.parseDecimalExternal("hello");
     }
 
     /// Fuzz and round trip.

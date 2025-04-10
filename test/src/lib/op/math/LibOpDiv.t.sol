@@ -45,7 +45,6 @@ contract LibOpDivTest is OpTest {
 
     /// Directly test the runtime logic of LibOpDiv.
     function testOpDivRun(uint256[] memory inputs) public {
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.assume(inputs.length >= 2);
         vm.assume(inputs.length <= 0x0F);
         Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
@@ -81,7 +80,7 @@ contract LibOpDivTest is OpTest {
             }
             a = OZMath.mulDiv(a, 1e18, b);
         }
-        opReferenceCheck(state, operand, LibOpDiv.referenceFn, LibOpDiv.integrity, LibOpDiv.run, inputs);
+        this.opReferenceCheck(operand, LibOpDiv.referenceFn, LibOpDiv.integrity, LibOpDiv.run, inputs);
     }
 
     function testDebugOpDivRun() external {

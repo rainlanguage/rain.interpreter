@@ -16,6 +16,12 @@ contract TestLibParseLiteralDecimalUnsafeStrToInt is Test {
     using LibParseLiteralDecimal for ParseState;
     using LibBytes for bytes;
 
+    function unsafeStrToIntExternal(bytes memory data) external pure returns (uint256) {
+        ParseState memory state = LibParseState.newState(data, "", "", "");
+        return
+            state.unsafeStrToInt(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
+    }
+
     /// Test round tripping strings through the unsafeStrToInt function.
     function testUnsafeStrToIntRoundTrip(uint256 value, uint8 leadingZerosCount) external pure {
         string memory str = value.toString();
@@ -48,9 +54,7 @@ contract TestLibParseLiteralDecimalUnsafeStrToInt is Test {
 
         string memory input = string(abi.encodePacked(strHigh, strLow));
 
-        ParseState memory state = LibParseState.newState(bytes(input), "", "", "");
-
         vm.expectRevert(bytes(abi.encodeWithSelector(DecimalLiteralOverflow.selector, 0)));
-        state.unsafeStrToInt(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
+        this.unsafeStrToIntExternal(bytes(input));
     }
 }

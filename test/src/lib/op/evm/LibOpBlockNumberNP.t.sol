@@ -49,12 +49,11 @@ contract LibOpBlockNumberNPTest is OpTest {
     /// opcode correctly pushes the block number onto the stack.
     function testOpBlockNumberNPRun(uint256 blockNumber, uint16 operandData) external {
         blockNumber = bound(blockNumber, 0, type(uint256).max / 1e18);
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
         vm.roll(blockNumber);
         uint256[] memory inputs = new uint256[](0);
         Operand operand = LibOperand.build(0, 1, operandData);
-        opReferenceCheck(
-            state, operand, LibOpBlockNumberNP.referenceFn, LibOpBlockNumberNP.integrity, LibOpBlockNumberNP.run, inputs
+        this.opReferenceCheck(
+            operand, LibOpBlockNumberNP.referenceFn, LibOpBlockNumberNP.integrity, LibOpBlockNumberNP.run, inputs
         );
     }
 
