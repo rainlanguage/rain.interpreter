@@ -9,7 +9,7 @@
 pragma solidity =0.8.25;
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0xb995ad74a81d34c4157b40d05fb8ee647510603d7f61842ffe795bc95880d977);
+bytes32 constant BYTECODE_HASH = bytes32(0xbf5f57a022f4944ac189aabdaa4b8ecfb5a3d6eadd5bece93b1e01339ff9cc64);
 
 /// @dev The parse meta that is used to lookup word definitions.
 /// The structure of the parse meta is:
@@ -28,7 +28,7 @@ bytes32 constant BYTECODE_HASH = bytes32(0xb995ad74a81d34c4157b40d05fb8ee6475106
 /// bit count of the previous bloom filter. If we reach the end of the bloom
 /// filters then we have a miss.
 bytes constant PARSE_META =
-    hex"010200000000800008000300082000000000900000402000a004000a00020a000000014832da0d028f7805527c9b0776a0de0988ed9c040b9b8a03903325117a837c00ba92eb0b7c28ea084e315a0c4f390206be54af0ffa93c7104b03a802a9c1290e858ded0aa744f9";
+    hex"010200800000800108000300082000000000900000402000a004000a00020a000000014832da0d028f7805527c9b0776a0de0988ed9c040b9b8a03903325137a837c00ba92eb0b7c28ea084e315a0c4f390206be54af0ffa93c7124b03a802a9c1290e858ded102a2ac00aa744f91114ee1b";
 
 /// @dev The build depth of the parser meta.
 
@@ -38,11 +38,11 @@ uint8 constant PARSE_META_BUILD_DEPTH = 2;
 /// These positional indexes all map to the same indexes looked up in the parse
 /// meta.
 bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
-    hex"1ce81ce81ce81db11eb01eb01eb01db11db11ce81ce81ce81eb01eb01eb01eb01eb01eb0";
+    hex"1cf81cf81cf81dc11ec01ec01ec01dc11dc11cf81cf81cf81ec01ec01ec01ec01ec01ec01ec01ec0";
 
 /// @dev Every two bytes is a function pointer for a literal parser.
 /// Literal dispatches are determined by the first byte(s) of the literal
 /// rather than a full word lookup, and are done with simple conditional
 /// jumps as the possibilities are limited compared to the number of words we
 /// have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"172419ec1a1d1af7";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"173419fc1a2d1b07";

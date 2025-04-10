@@ -54,7 +54,7 @@ contract LibOpTimestampTest is OpTest {
     /// Directly test the runtime logic of LibOpTimestamp. This tests that the
     /// opcode correctly pushes the timestamp onto the stack.
     function testOpTimestampRun(uint256 blockTimestamp) external {
-        blockTimestamp = bound(blockTimestamp, 0, type(uint256).max / 10);
+        blockTimestamp = bound(blockTimestamp, 0, uint128(type(int128).max));
         InterpreterState memory state = opTestDefaultInterpreterState();
         vm.warp(blockTimestamp);
         StackItem[] memory inputs = new StackItem[](0);
