@@ -5,7 +5,7 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState, LibInterpreterState} from "../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {Float, LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpTimestamp
 /// Implementation of the EVM `TIMESTAMP` opcode as a standard Rainlang opcode.
@@ -30,7 +30,8 @@ library LibOpTimestamp {
         returns (StackItem[] memory)
     {
         StackItem[] memory outputs = new StackItem[](1);
-        outputs[0] = Float(block.timestamp, 0);
+        outputs[0] =
+            StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.fromFixedDecimalLosslessMem(block.timestamp, 0).pack()));
         return outputs;
     }
 }

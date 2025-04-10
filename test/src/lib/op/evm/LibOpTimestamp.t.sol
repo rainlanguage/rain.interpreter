@@ -38,12 +38,10 @@ contract LibOpTimestampTest is OpTest {
     }
 
     /// Directly test the integrity logic of LibOpTimestamp.
-    function testOpTimestampIntegrity(
-        IntegrityCheckState memory state,
-        uint8 inputs,
-        uint8 outputs,
-        uint16 operandData
-    ) external pure {
+    function testOpTimestampIntegrity(IntegrityCheckState memory state, uint8 inputs, uint8 outputs, uint16 operandData)
+        external
+        pure
+    {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
@@ -74,19 +72,19 @@ contract LibOpTimestampTest is OpTest {
             blockTimestamp = bound(blockTimestamp, 0, type(uint256).max / 1e18);
             vm.warp(blockTimestamp);
             bytes memory bytecode = iDeployer.parse2(bytes(string.concat("_: ", words[i], "();")));
-            (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
+            (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
                 EvalV4({
                     store: iStore,
                     namespace: FullyQualifiedNamespace.wrap(0),
                     bytecode: bytecode,
                     sourceIndex: SourceIndexV2.wrap(0),
-                    context: LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-                    inputs: new uint256[](0),
-                    stateOverlay: new uint256[](0)
+                    context: LibContext.build(new bytes32[][](0), new SignedContextV1[](0)),
+                    inputs: new StackItem[](0),
+                    stateOverlay: new bytes32[](0)
                 })
             );
             assertEq(stack.length, 1);
-            assertEq(stack[0], blockTimestamp * 1e18);
+            assertEq(StackItem.unwrap(stack[0]), bytes32(blockTimestamp));
             assertEq(kvs.length, 0);
         }
     }
