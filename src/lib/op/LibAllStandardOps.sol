@@ -42,7 +42,7 @@ import {LibOpERC721OwnerOf} from "./erc721/LibOpERC721OwnerOf.sol";
 import {LibOpERC5313OwnerNP} from "./erc5313/LibOpERC5313OwnerNP.sol";
 
 import {LibOpBlockNumberNP} from "./evm/LibOpBlockNumberNP.sol";
-import {LibOpChainIdNP} from "./evm/LibOpChainIdNP.sol";
+import {LibOpChainId} from "./evm/LibOpChainId.sol";
 import {LibOpMaxUint256NP} from "./evm/LibOpMaxUint256NP.sol";
 import {LibOpTimestamp} from "./evm/LibOpTimestamp.sol";
 
@@ -103,7 +103,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 20;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 21;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -194,7 +194,7 @@ library LibAllStandardOps {
                 "Gets the owner of an erc5313 compatible contract. Note that erc5313 specifically DOES NOT do any onchain compatibility checks, so the expression author is responsible for ensuring the contract is compatible. The input is the contract address to get the owner of."
             ),
             // AuthoringMetaV2("block-number", "The current block number."),
-            // AuthoringMetaV2("chain-id", "The current chain id."),
+            AuthoringMetaV2("chain-id", "The current chain id."),
             AuthoringMetaV2("uint256-max-value", "The maximum possible unsigned integer value (all binary bits are 1)."),
             AuthoringMetaV2("block-timestamp", "The current block timestamp."),
             AuthoringMetaV2("now", "The current block timestamp."),
@@ -402,8 +402,8 @@ library LibAllStandardOps {
                     LibParseOperand.handleOperandDisallowed,
                     // // block-number
                     // LibParseOperand.handleOperandDisallowed,
-                    // // chain-id
-                    // LibParseOperand.handleOperandDisallowed,
+                    // chain-id
+                    LibParseOperand.handleOperandDisallowed,
                     // max-value
                     LibParseOperand.handleOperandDisallowed,
                     // block-timestamp
@@ -559,7 +559,7 @@ library LibAllStandardOps {
                     LibOpERC721OwnerOf.integrity,
                     LibOpERC5313OwnerNP.integrity,
                     // LibOpBlockNumberNP.integrity,
-                    // LibOpChainIdNP.integrity,
+                    LibOpChainId.integrity,
                     LibOpMaxUint256NP.integrity,
                     LibOpTimestamp.integrity,
                     // now
@@ -671,7 +671,7 @@ library LibAllStandardOps {
                     LibOpERC721OwnerOf.run,
                     LibOpERC5313OwnerNP.run,
                     // LibOpBlockNumberNP.run,
-                    // LibOpChainIdNP.run,
+                    LibOpChainId.run,
                     LibOpMaxUint256NP.run,
                     LibOpTimestamp.run,
                     // now
