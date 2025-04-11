@@ -103,7 +103,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 21;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 22;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -193,7 +193,7 @@ library LibAllStandardOps {
                 "erc5313-owner",
                 "Gets the owner of an erc5313 compatible contract. Note that erc5313 specifically DOES NOT do any onchain compatibility checks, so the expression author is responsible for ensuring the contract is compatible. The input is the contract address to get the owner of."
             ),
-            // AuthoringMetaV2("block-number", "The current block number."),
+            AuthoringMetaV2("block-number", "The current block number."),
             AuthoringMetaV2("chain-id", "The current chain id."),
             AuthoringMetaV2("uint256-max-value", "The maximum possible unsigned integer value (all binary bits are 1)."),
             AuthoringMetaV2("block-timestamp", "The current block timestamp."),
@@ -400,8 +400,8 @@ library LibAllStandardOps {
                     LibParseOperand.handleOperandDisallowed,
                     // erc5313-owner
                     LibParseOperand.handleOperandDisallowed,
-                    // // block-number
-                    // LibParseOperand.handleOperandDisallowed,
+                    // block-number
+                    LibParseOperand.handleOperandDisallowed,
                     // chain-id
                     LibParseOperand.handleOperandDisallowed,
                     // max-value
@@ -558,7 +558,7 @@ library LibAllStandardOps {
                     // LibOpUint256ERC721BalanceOf.integrity,
                     LibOpERC721OwnerOf.integrity,
                     LibOpERC5313OwnerNP.integrity,
-                    // LibOpBlockNumberNP.integrity,
+                    LibOpBlockNumber.integrity,
                     LibOpChainId.integrity,
                     LibOpMaxUint256NP.integrity,
                     LibOpTimestamp.integrity,
@@ -670,7 +670,7 @@ library LibAllStandardOps {
                     // LibOpUint256ERC721BalanceOf.run,
                     LibOpERC721OwnerOf.run,
                     LibOpERC5313OwnerNP.run,
-                    // LibOpBlockNumberNP.run,
+                    LibOpBlockNumber.run,
                     LibOpChainId.run,
                     LibOpMaxUint256NP.run,
                     LibOpTimestamp.run,
