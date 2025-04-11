@@ -41,7 +41,7 @@ import {LibOpERC721OwnerOf} from "./erc721/LibOpERC721OwnerOf.sol";
 
 import {LibOpERC5313OwnerNP} from "./erc5313/LibOpERC5313OwnerNP.sol";
 
-import {LibOpBlockNumberNP} from "./evm/LibOpBlockNumberNP.sol";
+import {LibOpBlockNumber} from "./evm/LibOpBlockNumber.sol";
 import {LibOpChainId} from "./evm/LibOpChainId.sol";
 import {LibOpMaxUint256NP} from "./evm/LibOpMaxUint256NP.sol";
 import {LibOpTimestamp} from "./evm/LibOpTimestamp.sol";
