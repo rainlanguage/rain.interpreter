@@ -9,7 +9,7 @@ import {
     PARSE_META,
     PARSE_META_BUILD_DEPTH
 } from "src/concrete/RainterpreterParser.sol";
-import {LibAllStandardOpsNP, AuthoringMetaV2} from "src/lib/op/LibAllStandardOpsNP.sol";
+import {LibAllStandardOps, AuthoringMetaV2} from "src/lib/op/LibAllStandardOps.sol";
 import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
 
@@ -29,7 +29,7 @@ contract RainterpreterParserPointersTest is Test {
     }
 
     function testParserParseMeta() external pure {
-        bytes memory authoringMetaBytes = LibAllStandardOpsNP.authoringMetaV2();
+        bytes memory authoringMetaBytes = LibAllStandardOps.authoringMetaV2();
         AuthoringMetaV2[] memory authoringMeta = abi.decode(authoringMetaBytes, (AuthoringMetaV2[]));
         bytes memory expected = LibGenParseMeta.buildParseMetaV2(authoringMeta, PARSE_META_BUILD_DEPTH);
         bytes memory actual = PARSE_META;

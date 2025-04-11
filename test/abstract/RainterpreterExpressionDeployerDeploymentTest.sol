@@ -20,7 +20,7 @@ import {
     RainterpreterExpressionDeployerConstructionConfigV2,
     RainterpreterExpressionDeployer
 } from "../../src/concrete/RainterpreterExpressionDeployer.sol";
-import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
+import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
 
 /// @title RainterpreterExpressionDeployerNPD2DeploymentTest
@@ -79,7 +79,7 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
             revert("unexpected parser bytecode hash");
         }
 
-        AuthoringMetaV2[] memory authoringMeta = abi.decode(LibAllStandardOpsNP.authoringMetaV2(), (AuthoringMetaV2[]));
+        AuthoringMetaV2[] memory authoringMeta = abi.decode(LibAllStandardOps.authoringMetaV2(), (AuthoringMetaV2[]));
         bytes memory parseMeta = LibGenParseMeta.buildParseMetaV2(authoringMeta, PARSE_META_BUILD_DEPTH);
         if (keccak256(parseMeta) != keccak256(PARSE_META)) {
             console2.log("current parse meta:");

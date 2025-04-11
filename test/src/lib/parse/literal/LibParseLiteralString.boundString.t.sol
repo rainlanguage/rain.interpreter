@@ -7,7 +7,7 @@ import {LibParseLiteralString} from "src/lib/parse/literal/LibParseLiteralString
 import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {StringTooLong, UnclosedStringLiteral, ParserOutOfBounds} from "src/error/ErrParse.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
-import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
+import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 
 /// @title LibParseLiteralStringBoundTest
 contract LibParseLiteralStringBoundTest is Test {
@@ -31,7 +31,7 @@ contract LibParseLiteralStringBoundTest is Test {
         returns (uint256, uint256, uint256, uint256)
     {
         ParseState memory state = LibParseState.newState(data, "", "", "");
-        state.literalParsers = LibAllStandardOpsNP.literalParserFunctionPointers();
+        state.literalParsers = LibAllStandardOps.literalParserFunctionPointers();
         assembly ("memory-safe") {
             mstore(data, length)
         }

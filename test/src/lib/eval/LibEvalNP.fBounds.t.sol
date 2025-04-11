@@ -4,7 +4,7 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std/Test.sol";
 
 import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
+import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 import {LibEval} from "src/lib/eval/LibEval.sol";
 import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {
@@ -18,7 +18,7 @@ contract LibEvalFBoundsTest is Test {
     /// length of the function pointers. Test that the length of the fn pointers
     /// + 1 is the constant op.
     function testEvalNPFBoundsModConstant(bytes32 c) public view {
-        bytes memory fs = LibAllStandardOpsNP.opcodeFunctionPointers();
+        bytes memory fs = LibAllStandardOps.opcodeFunctionPointers();
 
         bytes memory bytecode =
         // 1 source

@@ -22,7 +22,7 @@ import {IInterpreterV4} from "rain.interpreter.interface/interface/unstable/IInt
 
 import {LibIntegrityCheckNP} from "../lib/integrity/LibIntegrityCheckNP.sol";
 import {LibInterpreterStateDataContract} from "../lib/state/LibInterpreterStateDataContract.sol";
-import {LibAllStandardOpsNP} from "../lib/op/LibAllStandardOpsNP.sol";
+import {LibAllStandardOps} from "../lib/op/LibAllStandardOps.sol";
 import {LibParse, LibParseMeta} from "../lib/parse/LibParse.sol";
 import {Rainterpreter, INTERPRETER_BYTECODE_HASH} from "./Rainterpreter.sol";
 import {PARSER_BYTECODE_HASH} from "./RainterpreterParser.sol";
@@ -152,7 +152,7 @@ contract RainterpreterExpressionDeployer is
     /// @return The list of integrity function pointers.
     /// @inheritdoc IIntegrityToolingV1
     function buildIntegrityFunctionPointers() external view virtual returns (bytes memory) {
-        return LibAllStandardOpsNP.integrityFunctionPointers();
+        return LibAllStandardOps.integrityFunctionPointers();
     }
 
     ///@inheritdoc IDescribedByMetaV1

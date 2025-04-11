@@ -9,7 +9,7 @@ import {OperandV2, LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
-import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
+import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
 
 /// @title LibParseSingleRHSNamedGasTest
@@ -100,7 +100,7 @@ contract LibParseSingleRHSNamedGasTest is Test {
 
     function newState(string memory source) internal pure returns (ParseState memory) {
         return LibParseState.newState(
-            bytes(source), parseMeta(), operandHandlers(), LibAllStandardOpsNP.literalParserFunctionPointers()
+            bytes(source), parseMeta(), operandHandlers(), LibAllStandardOps.literalParserFunctionPointers()
         );
     }
 
