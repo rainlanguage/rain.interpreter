@@ -33,6 +33,7 @@ library LibOpBinaryEqualTo {
         returns (StackItem[] memory outputs)
     {
         outputs = new StackItem[](1);
-        outputs[0] = StackItem.wrap(bytes32(uint256(StackItem.unwrap(inputs[0]) == StackItem.unwrap(inputs[1]) ? 1 : 0)));
+        outputs[0] =
+            StackItem.wrap(bytes32(uint256(StackItem.unwrap(inputs[0]) == StackItem.unwrap(inputs[1]) ? 1 : 0)));
     }
 }
