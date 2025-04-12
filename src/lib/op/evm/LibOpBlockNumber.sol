@@ -2,13 +2,16 @@
 pragma solidity ^0.8.18;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
+import {Float, LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
-/// @title LibOpBlockNumberNP
+/// @title LibOpBlockNumber
 /// Implementation of the EVM `BLOCKNUMBER` opcode as a standard Rainlang opcode.
-library LibOpBlockNumberNP {
+library LibOpBlockNumber {
+    using LibDecimalFloat for Float;
+
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (0, 1);
     }
@@ -21,13 +24,14 @@ library LibOpBlockNumberNP {
         return stackTop;
     }
 
-    function referenceFn(InterpreterState memory, OperandV2, uint256[] memory)
+    function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory)
         internal
         view
-        returns (uint256[] memory)
+        returns (StackItem[] memory)
     {
-        uint256[] memory outputs = new uint256[](1);
-        outputs[0] = block.number;
+        StackItem[] memory outputs = new StackItem[](1);
+        outputs[0] =
+            StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.fromFixedDecimalLosslessMem(block.number, 0).pack()));
         return outputs;
     }
 }

@@ -9,7 +9,7 @@
 pragma solidity =0.8.25;
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0xcd53a237a45964c4dec598f020953afc10b49404572f854126ac38801091899e);
+bytes32 constant BYTECODE_HASH = bytes32(0x085974347eb2dbf40d35869d17ef03742781ba43c1b25f740b803db112b78372);
 
 /// @dev The parse meta that is used to lookup word definitions.
 /// The structure of the parse meta is:
@@ -28,7 +28,7 @@ bytes32 constant BYTECODE_HASH = bytes32(0xcd53a237a45964c4dec598f020953afc10b49
 /// bit count of the previous bloom filter. If we reach the end of the bloom
 /// filters then we have a miss.
 bytes constant PARSE_META =
-    hex"010400000084000020000100001480c000080022000000000a08000004004020248012247f9a0c1a71f803f3886500e75aa00b0a5e5a04c0e25d0f17e2ab0560a375134b1708083394ab0e908778020d55c6118cb51c01cc16a510c43a440dacafd5099918c50ab2278f14cae7b20698c5d007a441f5";
+    hex"010400000084000020000100001480c000088022000000000a08000004004020248013247f9a0c1a71f803f3886500e75aa00b0a5e5a04c0e25d1017e2ab0560a375144b1708083394ab0e9087780f97bf37020d55c6128cb51c01cc16a511c43a440dacafd5099918c50ab2278f15cae7b20698c5d007a441f5";
 
 /// @dev The build depth of the parser meta.
 
@@ -38,11 +38,11 @@ uint8 constant PARSE_META_BUILD_DEPTH = 2;
 /// These positional indexes all map to the same indexes looked up in the parse
 /// meta.
 bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
-    hex"1d001d001d001dc91ec81ec81ec81dc91dc91d001d001d001ec81ec81ec81ec81ec81ec81ec81ec81ec8";
+    hex"1d081d081d081dd11ed01ed01ed01dd11dd11d081d081d081ed01ed01ed01ed01ed01ed01ed01ed01ed01ed0";
 
 /// @dev Every two bytes is a function pointer for a literal parser.
 /// Literal dispatches are determined by the first byte(s) of the literal
 /// rather than a full word lookup, and are done with simple conditional
 /// jumps as the possibilities are limited compared to the number of words we
 /// have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"173c1a041a351b0f";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"17441a0c1a3d1b17";
