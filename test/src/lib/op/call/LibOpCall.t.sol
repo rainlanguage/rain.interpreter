@@ -12,10 +12,10 @@ import {
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
 import {BytecodeTest} from "rain.interpreter.interface/../test/abstract/BytecodeTest.sol";
-import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibOpCall, CallOutputsExceedSource} from "src/lib/op/call/LibOpCall.sol";
 import {LibBytecode, SourceIndexOutOfBounds} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
-import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {STACK_TRACER} from "src/lib/state/LibInterpreterState.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";

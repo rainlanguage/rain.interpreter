@@ -9,7 +9,7 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {INVALID_BYTECODE} from "test/lib/etch/LibEtch.sol";
 
 import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibOpChainId} from "src/lib/op/evm/LibOpChainId.sol";
 
 import {Rainterpreter} from "src/concrete/Rainterpreter.sol";

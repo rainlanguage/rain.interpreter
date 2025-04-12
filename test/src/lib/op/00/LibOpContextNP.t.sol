@@ -5,7 +5,7 @@ import {stdError} from "forge-std/Test.sol";
 
 import {LibOpContextNP} from "src/lib/op/00/LibOpContextNP.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
-import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {
     IInterpreterV4,
     OperandV2,

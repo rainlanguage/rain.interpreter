@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 import {OpTest} from "test/abstract/OpTest.sol";
 
 import {NotAnExternContract} from "src/error/ErrExtern.sol";
-import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibOpExternNP} from "src/lib/op/00/LibOpExternNP.sol";

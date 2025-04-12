@@ -8,7 +8,7 @@ pragma solidity =0.8.25;
 // import {UnexpectedOperand} from "src/error/ErrParse.sol";
 // import {LibOpMax} from "src/lib/op/math/LibOpMax.sol";
 // import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-// import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+// import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 // import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 // import {LibOperand} from "test/lib/operand/LibOperand.sol";
 

@@ -9,11 +9,11 @@
 pragma solidity =0.8.25;
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0xc1221aa74b1434c555353f5a49978e2927bbbd2aa573390f2e9c70dae150fc61);
+bytes32 constant BYTECODE_HASH = bytes32(0xde4cf4fdda5ab1db6c9dc4efd28e7bc6d2fab4b877d3fa33313972e8aef98b40);
 
 /// @dev The hash of the meta that describes the contract.
-bytes32 constant DESCRIBED_BY_META_HASH = bytes32(0x5dd330895b51ba508a0d66b8780e5237ade2317c62f8ed54012fe5ec70c13e55);
+bytes32 constant DESCRIBED_BY_META_HASH = bytes32(0x3f2b487a31a795f0019657747dbc12be841b12e69d4b563a13ff2834f2d71845);
 
 /// @dev The function pointers for the integrity check fns.
 bytes constant INTEGRITY_FUNCTION_POINTERS =
-    hex"0da40e220e861000100a100a1014101d103810de10de113a11b2100a101410001000100010001000101411bf";
+    hex"0dac0e2a0e8e100810121012101c1025104010e610e6114211ba1012101c100810081008100810081012101c11c7";

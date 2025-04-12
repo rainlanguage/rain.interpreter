@@ -3,7 +3,7 @@ pragma solidity ^0.8.18;
 
 // import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 // import {InterpreterState} from "../../state/LibInterpreterState.sol";
-// import {IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
+// import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 // import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
 // /// @title LibOpScale18

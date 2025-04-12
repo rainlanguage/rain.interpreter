@@ -15,7 +15,7 @@ import {IInterpreterV4, SourceIndexV2} from "rain.interpreter.interface/interfac
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2, StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {BadOpInputsLength} from "../../lib/integrity/LibIntegrityCheckNP.sol";
+import {BadOpInputsLength} from "../../lib/integrity/LibIntegrityCheck.sol";
 
 struct IntegrityCheckState {
     uint256 stackIndex;
@@ -26,8 +26,8 @@ struct IntegrityCheckState {
     bytes bytecode;
 }
 
-library LibIntegrityCheckNP {
-    using LibIntegrityCheckNP for IntegrityCheckState;
+library LibIntegrityCheck {
+    using LibIntegrityCheck for IntegrityCheckState;
 
     function newState(bytes memory bytecode, uint256 stackIndex, bytes32[] memory constants)
         internal
@@ -91,7 +91,7 @@ library LibIntegrityCheckNP {
                     ioCursor := add(ioCursor, 2)
                 }
 
-                IntegrityCheckState memory state = LibIntegrityCheckNP.newState(bytecode, inputsLength, constants);
+                IntegrityCheckState memory state = LibIntegrityCheck.newState(bytecode, inputsLength, constants);
 
                 // Have low 4 bytes of cursor overlap the first op, skipping the
                 // prefix.

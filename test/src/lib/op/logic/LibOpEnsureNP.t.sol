@@ -5,7 +5,7 @@ pragma solidity =0.8.25;
 // // import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 // // import {ExcessRHSItems} from "src/lib/parse/LibParse.sol";
 // // import {LibOpEnsureNP} from "src/lib/op/logic/LibOpEnsureNP.sol";
-// // import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+// // import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 // // import {
 // //     IInterpreterV4,
 // //     Operand,

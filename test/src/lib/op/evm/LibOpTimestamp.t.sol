@@ -13,7 +13,7 @@ import {
     StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {
     IInterpreterStoreV2, FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
