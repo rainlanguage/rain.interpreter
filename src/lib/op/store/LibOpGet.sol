@@ -5,7 +5,7 @@ import {MemoryKVKey, MemoryKVVal, MemoryKV, LibMemoryKV} from "rain.lib.memkv/li
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
-import {IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 
 /// @title LibOpGet
 /// @notice Opcode for reading from storage.

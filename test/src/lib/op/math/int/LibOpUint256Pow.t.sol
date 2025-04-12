@@ -9,7 +9,7 @@ pragma solidity =0.8.25;
 // import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 // import {UnexpectedOperand} from "src/error/ErrParse.sol";
 // import {LibOpUint256Pow} from "src/lib/op/math/uint256/LibOpUint256Pow.sol";
-// import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+// import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 // import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 // import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 // import {LibOperand} from "test/lib/operand/LibOperand.sol";

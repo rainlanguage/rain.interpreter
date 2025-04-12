@@ -13,7 +13,7 @@ import {
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {OutOfBoundsStackRead, LibOpStackNP} from "src/lib/op/00/LibOpStackNP.sol";
-import {LibIntegrityCheckNP, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {LibIntegrityCheck, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {
     IInterpreterStoreV2, FullyQualifiedNamespace
@@ -40,7 +40,7 @@ contract LibOpStackNPTest is OpTest {
     ) external pure {
         stackIndex = bound(stackIndex, 1, type(uint256).max);
         operand = OperandV2.wrap(bytes32(bound(uint256(OperandV2.unwrap(operand)), 0, stackIndex - 1)));
-        IntegrityCheckState memory state = LibIntegrityCheckNP.newState(bytecode, stackIndex, constants);
+        IntegrityCheckState memory state = LibIntegrityCheck.newState(bytecode, stackIndex, constants);
 
         (uint256 inputs, uint256 outputs) = LibOpStackNP.integrity(state, operand);
 
@@ -61,7 +61,7 @@ contract LibOpStackNPTest is OpTest {
         stackIndex = uint16(bound(stackIndex, 0, uint256(type(uint16).max)));
         readIndex = uint16(bound(readIndex, stackIndex, uint256(type(uint16).max)));
         OperandV2 operand = LibOperand.build(0, 1, readIndex);
-        IntegrityCheckState memory state = LibIntegrityCheckNP.newState(bytecode, stackIndex, constants);
+        IntegrityCheckState memory state = LibIntegrityCheck.newState(bytecode, stackIndex, constants);
         state.opIndex = opIndex;
 
         vm.expectRevert(abi.encodeWithSelector(OutOfBoundsStackRead.selector, state.opIndex, stackIndex, readIndex));

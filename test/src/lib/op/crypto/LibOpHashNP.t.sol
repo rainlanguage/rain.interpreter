@@ -21,7 +21,7 @@ import {
     IInterpreterStoreV2, FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
-import {LibIntegrityCheckNP, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {LibIntegrityCheck, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {InterpreterState, LibInterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";

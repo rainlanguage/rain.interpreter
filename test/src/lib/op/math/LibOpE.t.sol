@@ -5,7 +5,7 @@ pragma solidity =0.8.25;
 // import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 // import {LibOpE} from "src/lib/op/math/LibOpE.sol";
 // import {LibOperand, Operand} from "test/lib/operand/LibOperand.sol";
-// import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+// import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 // import {IInterpreterV4, EvalV4} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 // import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 // import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";

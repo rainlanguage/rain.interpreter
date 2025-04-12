@@ -3,7 +3,7 @@ pragma solidity =0.8.25;
 
 import "forge-std/Test.sol";
 
-import "src/lib/integrity/LibIntegrityCheckNP.sol";
+import "src/lib/integrity/LibIntegrityCheck.sol";
 import "src/lib/state/LibInterpreterState.sol";
 import "src/lib/op/LibAllStandardOps.sol";
 

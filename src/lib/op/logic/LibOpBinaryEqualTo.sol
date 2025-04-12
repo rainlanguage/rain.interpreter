@@ -1,21 +1,22 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
-import {IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 
-/// @title LibOpEqualToNP
+/// @title LibOpBinaryEqualTo
 /// @notice Opcode to return 1 if the first item on the stack is equal to
 /// the second item on the stack, else 0.
-library LibOpEqualToNP {
+library LibOpBinaryEqualTo {
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (2, 1);
     }
 
-    /// EQ
-    /// EQ is 1 if the first item is equal to the second item, else 0.
+    /// Binary Equality
+    /// Binary Equality is 1 if the first item is equal to the second item,
+    /// else 0.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
         assembly ("memory-safe") {
             let a := mload(stackTop)
@@ -25,13 +26,13 @@ library LibOpEqualToNP {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of EQ for testing.
-    function referenceFn(InterpreterState memory, OperandV2, uint256[] memory inputs)
+    /// Gas intensive reference implementation of binary equal for testing.
+    function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure
-        returns (uint256[] memory outputs)
+        returns (StackItem[] memory outputs)
     {
-        outputs = new uint256[](1);
-        outputs[0] = inputs[0] == inputs[1] ? 1 : 0;
+        outputs = new StackItem[](1);
+        outputs[0] = StackItem.wrap(bytes32(uint256(StackItem.unwrap(inputs[0]) == StackItem.unwrap(inputs[1]) ? 1 : 0)));
     }
 }

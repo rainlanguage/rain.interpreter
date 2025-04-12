@@ -6,7 +6,7 @@ pragma solidity =0.8.25;
 // // import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 // // import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 // // import {LibOpConditionsNP} from "src/lib/op/logic/LibOpConditionsNP.sol";
-// // import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+// // import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 // // import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 // // import {
 // //     IInterpreterV4,

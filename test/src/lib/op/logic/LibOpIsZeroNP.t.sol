@@ -3,7 +3,7 @@ pragma solidity =0.8.25;
 
 // // import {OpTest} from "test/abstract/OpTest.sol";
 // // import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
-// // import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+// // import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 // // import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 // // import {LibOpIsZeroNP} from "src/lib/op/logic/LibOpIsZeroNP.sol";
 // // import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";

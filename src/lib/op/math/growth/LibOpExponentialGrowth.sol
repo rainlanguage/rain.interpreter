@@ -5,7 +5,7 @@ pragma solidity ^0.8.18;
 // import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 // import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 // import {InterpreterState} from "../../../state/LibInterpreterState.sol";
-// import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheckNP.sol";
+// import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
 
 // /// @title LibOpExponentialGrowth
 // /// @notice Exponential growth is base(1 + rate)^t where base is the initial

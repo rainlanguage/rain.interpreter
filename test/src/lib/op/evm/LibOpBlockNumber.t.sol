@@ -15,7 +15,7 @@ import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {IMetaV1} from "rain.metadata/interface/deprecated/IMetaV1.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibOpBlockNumber} from "src/lib/op/evm/LibOpBlockNumber.sol";

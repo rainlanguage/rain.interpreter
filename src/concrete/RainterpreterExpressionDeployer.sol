@@ -20,7 +20,7 @@ import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpr
 import {IDescribedByMetaV1} from "rain.metadata/interface/IDescribedByMetaV1.sol";
 import {IInterpreterV4} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
-import {LibIntegrityCheckNP} from "../lib/integrity/LibIntegrityCheckNP.sol";
+import {LibIntegrityCheck} from "../lib/integrity/LibIntegrityCheck.sol";
 import {LibInterpreterStateDataContract} from "../lib/state/LibInterpreterStateDataContract.sol";
 import {LibAllStandardOps} from "../lib/op/LibAllStandardOps.sol";
 import {LibParse, LibParseMeta} from "../lib/parse/LibParse.sol";
@@ -124,7 +124,7 @@ contract RainterpreterExpressionDeployer is
         }
         LibInterpreterStateDataContract.unsafeSerialize(cursor, bytecode, constants);
 
-        bytes memory io = LibIntegrityCheckNP.integrityCheck2(INTEGRITY_FUNCTION_POINTERS, bytecode, constants);
+        bytes memory io = LibIntegrityCheck.integrityCheck2(INTEGRITY_FUNCTION_POINTERS, bytecode, constants);
         // Nothing is done with IO in IParserV2.
         (io);
 

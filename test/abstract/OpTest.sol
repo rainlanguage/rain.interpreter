@@ -9,11 +9,11 @@ import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 
 import {RainterpreterExpressionDeployerDeploymentTest} from "./RainterpreterExpressionDeployerDeploymentTest.sol";
 import {LibInterpreterState, InterpreterState} from "../../src/lib/state/LibInterpreterState.sol";
-import {IntegrityCheckState, LibIntegrityCheckNP} from "../../src/lib/integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckState, LibIntegrityCheck} from "../../src/lib/integrity/LibIntegrityCheck.sol";
 
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "../../src/error/ErrParse.sol";
-import {BadOpInputsLength, BadOpOutputsLength} from "../../src/lib/integrity/LibIntegrityCheckNP.sol";
+import {BadOpInputsLength, BadOpOutputsLength} from "../../src/lib/integrity/LibIntegrityCheck.sol";
 import {
     OperandV2,
     IInterpreterV4,
@@ -87,7 +87,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
         bytes32[] memory constants,
         StackItem[] memory inputs
     ) internal view returns (uint256) {
-        IntegrityCheckState memory integrityState = LibIntegrityCheckNP.newState("", 0, constants);
+        IntegrityCheckState memory integrityState = LibIntegrityCheck.newState("", 0, constants);
         (uint256 calcInputs, uint256 calcOutputs) = integrityFn(integrityState, operand);
         assertEq(calcInputs, inputs.length, "inputs length");
         assertEq(calcInputs, uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F))), "operand inputs");

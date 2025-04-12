@@ -7,7 +7,7 @@ import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {OutOfBoundsConstantRead, LibOpConstant} from "src/lib/op/00/LibOpConstant.sol";
 import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {
     OperandV2,
     SourceIndexV2,

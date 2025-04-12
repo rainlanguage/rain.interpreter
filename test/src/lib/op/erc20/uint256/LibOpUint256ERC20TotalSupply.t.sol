@@ -2,7 +2,7 @@
 pragma solidity =0.8.25;
 
 // // import {OpTest} from "test/abstract/OpTest.sol";
-// // import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+// // import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 // // import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 // // import {LibOpUint256ERC20TotalSupply} from "src/lib/op/erc20/uint256/LibOpUint256ERC20TotalSupply.sol";
 // // import {IERC20} from "openzeppelin-contracts/contracts/interfaces/IERC20.sol";

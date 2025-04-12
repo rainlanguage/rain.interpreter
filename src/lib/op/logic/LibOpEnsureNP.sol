@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
-import {IntegrityCheckState} from "../../integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {LibIntOrAString, IntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
 
 /// @title LibOpEnsureNP

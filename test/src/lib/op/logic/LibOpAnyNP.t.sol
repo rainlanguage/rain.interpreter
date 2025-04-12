@@ -15,9 +15,9 @@ pragma solidity =0.8.25;
 // //     IInterpreterStoreV2, FullyQualifiedNamespace
 // // } from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 // // import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
-// // import {LibIntegrityCheckNP, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+// // import {LibIntegrityCheck, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 // // import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-// // import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+// // import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 // // import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 // // contract LibOpAnyNPTest is OpTest {

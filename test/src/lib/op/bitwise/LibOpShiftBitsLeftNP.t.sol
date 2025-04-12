@@ -2,7 +2,7 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibOpShiftBitsLeftNP} from "src/lib/op/bitwise/LibOpShiftBitsLeftNP.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {
