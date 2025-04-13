@@ -56,6 +56,6 @@ library LibOpEqualTo {
         Float memory floatB = LibDecimalFloat.unpackMem(b);
 
         outputs = new StackItem[](1);
-        outputs[0] = StackItem.wrap(bytes32(uint256(floatA.eq(floatB) == true ? 1 : 0)));
+        outputs[0] = StackItem.wrap(bytes32(uint256(floatA.eq(floatB) ? 1 : 0)));
     }
 }
