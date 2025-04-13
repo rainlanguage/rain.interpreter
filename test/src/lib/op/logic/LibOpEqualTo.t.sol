@@ -69,6 +69,17 @@ contract LibOpEqualToNPTest is OpTest {
         checkHappy("_: equal-to(1 1);", bytes32(uint256(1)), "");
     }
 
+    /// A few examples of different exponents with the same numerical value.
+    function testOpEqualToEval2Inputs() external view {
+        checkHappy("_: equal-to(1 1e0);", bytes32(uint256(1)), "");
+        checkHappy("_: equal-to(10 10e0);", bytes32(uint256(1)), "");
+        checkHappy("_: equal-to(1e1 10);", bytes32(uint256(1)), "");
+        checkHappy("_: equal-to(0.2 2e-1);", bytes32(uint256(1)), "");
+        checkHappy("_: equal-to(100e5 10e6);", bytes32(uint256(1)), "");
+        checkHappy("_: equal-to(0x01 1);", bytes32(uint256(1)), "");
+        checkHappy("_: equal-to(0x01 10e-1);", bytes32(uint256(1)), "");
+    }
+
     /// Test that an equal to without inputs fails integrity check.
     function testOpEqualToEvalFail0Inputs() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));
