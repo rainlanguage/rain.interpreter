@@ -206,7 +206,7 @@ library LibAllStandardOps {
             // ),
             AuthoringMetaV2(
                 "ensure",
-                "Reverts if the first input is 0. The second input is a string that is used as the revert reason if the first input is 0. Has 0 outputs."
+                "Reverts if the first input is 0. This has to be exactly binary 0 (i.e. NOT the number 0). The second input is a string that is used as the revert reason if the first input is 0. Has 0 outputs."
             ),
             AuthoringMetaV2("equal-to", "1 if all inputs are equal, 0 otherwise. Equality is numerical."),
             AuthoringMetaV2("binary-equal-to", "1 if all inputs are equal, 0 otherwise. Equality is binary."),
