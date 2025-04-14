@@ -48,7 +48,7 @@ import {LibOpTimestamp} from "./evm/LibOpTimestamp.sol";
 
 import {LibOpAnyNP} from "./logic/LibOpAnyNP.sol";
 import {LibOpConditionsNP} from "./logic/LibOpConditionsNP.sol";
-import {LibOpEnsureNP} from "./logic/LibOpEnsureNP.sol";
+import {LibOpEnsure} from "./logic/LibOpEnsure.sol";
 import {LibOpEqualTo} from "./logic/LibOpEqualTo.sol";
 import {LibOpBinaryEqualTo} from "./logic/LibOpBinaryEqualTo.sol";
 import {LibOpEveryNP} from "./logic/LibOpEveryNP.sol";
@@ -104,7 +104,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 24;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 25;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -204,10 +204,10 @@ library LibAllStandardOps {
             //     "conditions",
             //     "Treats inputs as pairwise condition/value pairs. The first nonzero condition's value is used. If no conditions are nonzero, the expression reverts. Provide a constant nonzero value to define a fallback case. If the number of inputs is odd, the final value is used as an error string in the case that no conditions match."
             // ),
-            // AuthoringMetaV2(
-            //     "ensure",
-            //     "Reverts if the first input is 0. The second input is a string that is used as the revert reason if the first input is 0. Has 0 outputs."
-            // ),
+            AuthoringMetaV2(
+                "ensure",
+                "Reverts if the first input is 0. The second input is a string that is used as the revert reason if the first input is 0. Has 0 outputs."
+            ),
             AuthoringMetaV2("equal-to", "1 if all inputs are equal, 0 otherwise. Equality is numerical."),
             AuthoringMetaV2("binary-equal-to", "1 if all inputs are equal, 0 otherwise. Equality is binary."),
             // AuthoringMetaV2("every", "The last nonzero value out of all inputs, or 0 if any input is 0."),
@@ -416,8 +416,8 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // // conditions
                     // LibParseOperand.handleOperandDisallowed,
-                    // // ensure
-                    // LibParseOperand.handleOperandDisallowed,
+                    // ensure
+                    LibParseOperand.handleOperandDisallowed,
                     // equal-to
                     LibParseOperand.handleOperandDisallowed,
                     // binary-equal-to
@@ -570,7 +570,7 @@ library LibAllStandardOps {
                     LibOpTimestamp.integrity,
                     // LibOpAnyNP.integrity,
                     // LibOpConditionsNP.integrity,
-                    // LibOpEnsureNP.integrity,
+                    LibOpEnsure.integrity,
                     LibOpEqualTo.integrity,
                     LibOpBinaryEqualTo.integrity,
                     // LibOpEveryNP.integrity,
@@ -683,7 +683,7 @@ library LibAllStandardOps {
                     LibOpTimestamp.run,
                     // LibOpAnyNP.run,
                     // LibOpConditionsNP.run,
-                    // LibOpEnsureNP.run,
+                    LibOpEnsure.run,
                     LibOpEqualTo.run,
                     LibOpBinaryEqualTo.run,
                     // LibOpEveryNP.run,

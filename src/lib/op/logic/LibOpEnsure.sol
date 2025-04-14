@@ -2,14 +2,14 @@
 pragma solidity ^0.8.18;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {LibIntOrAString, IntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
 
-/// @title LibOpEnsureNP
+/// @title LibOpEnsure
 /// @notice Opcode to revert if the condition is zero.
-library LibOpEnsureNP {
+library LibOpEnsure {
     using LibIntOrAString for IntOrAString;
 
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
@@ -35,12 +35,12 @@ library LibOpEnsureNP {
     }
 
     /// Gas intensive reference implementation of `ensure` for testing.
-    function referenceFn(InterpreterState memory, OperandV2, uint256[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure
-        returns (uint256[] memory outputs)
+        returns (StackItem[] memory outputs)
     {
-        require(inputs[0] > 0, IntOrAString.wrap(inputs[1]).toString());
-        outputs = new uint256[](0);
+        require(StackItem.unwrap(inputs[0]) > 0, IntOrAString.wrap(uint256(StackItem.unwrap(inputs[1]))).toString());
+        outputs = new StackItem[](0);
     }
 }
