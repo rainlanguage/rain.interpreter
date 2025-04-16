@@ -60,11 +60,13 @@ contract RainterpreterStateOverlayTest is RainterpreterExpressionDeployerDeploym
             })
         );
 
+        bytes32 setTo = PackedFloat.unwrap(LibDecimalFloat.pack(42e36, -36));
+
         assertEq(stack.length, 2);
-        assertEq(StackItem.unwrap(stack[0]), PackedFloat.unwrap(LibDecimalFloat.pack(42e37, -37)));
+        assertEq(StackItem.unwrap(stack[0]), setTo);
         assertEq(StackItem.unwrap(stack[1]), v);
         assertEq(kvs.length, 2);
         assertEq(kvs[0], k);
-        assertEq(kvs[1], PackedFloat.unwrap(LibDecimalFloat.pack(42e37, -37)));
+        assertEq(kvs[1], setTo);
     }
 }
