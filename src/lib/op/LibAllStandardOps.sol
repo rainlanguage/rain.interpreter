@@ -43,7 +43,7 @@ import {LibOpERC5313OwnerNP} from "./erc5313/LibOpERC5313OwnerNP.sol";
 
 import {LibOpBlockNumber} from "./evm/LibOpBlockNumber.sol";
 import {LibOpChainId} from "./evm/LibOpChainId.sol";
-import {LibOpMaxUint256NP} from "./evm/LibOpMaxUint256NP.sol";
+import {LibOpMaxUint256} from "./math/uint256/LibOpMaxUint256.sol";
 import {LibOpTimestamp} from "./evm/LibOpTimestamp.sol";
 
 import {LibOpAnyNP} from "./logic/LibOpAnyNP.sol";
@@ -564,7 +564,7 @@ library LibAllStandardOps {
                     LibOpERC5313OwnerNP.integrity,
                     LibOpBlockNumber.integrity,
                     LibOpChainId.integrity,
-                    LibOpMaxUint256NP.integrity,
+                    LibOpMaxUint256.integrity,
                     LibOpTimestamp.integrity,
                     // now
                     LibOpTimestamp.integrity,
@@ -677,7 +677,7 @@ library LibAllStandardOps {
                     LibOpERC5313OwnerNP.run,
                     LibOpBlockNumber.run,
                     LibOpChainId.run,
-                    LibOpMaxUint256NP.run,
+                    LibOpMaxUint256.run,
                     LibOpTimestamp.run,
                     // now
                     LibOpTimestamp.run,

@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
+import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {InterpreterState} from "../../state/LibInterpreterState.sol";
+import {InterpreterState} from "../../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
-/// @title LibOpMaxUint256NP
+/// @title LibOpMaxUint256
 /// Exposes `type(uint256).max` as a Rainlang opcode.
-library LibOpMaxUint256NP {
+library LibOpMaxUint256 {
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (0, 1);
     }
