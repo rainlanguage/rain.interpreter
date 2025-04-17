@@ -9,7 +9,7 @@
 pragma solidity =0.8.25;
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0x6775c5f4371918d47f9ec1f3d8aec7022d890d33a7f248a2e1b059576f1af857);
+bytes32 constant BYTECODE_HASH = bytes32(0xbfd6bcec2b43035b3e0e2263afd1ef90a3d5a695ebbdfc46360375ca36d48010);
 
 /// @dev The parse meta that is used to lookup word definitions.
 /// The structure of the parse meta is:
@@ -28,7 +28,7 @@ bytes32 constant BYTECODE_HASH = bytes32(0x6775c5f4371918d47f9ec1f3d8aec7022d890
 /// bit count of the previous bloom filter. If we reach the end of the bloom
 /// filters then we have a miss.
 bytes constant PARSE_META =
-    hex"0105000000008080000080040004082020000080400e000200421800040a000280061865912a097c4c45175e75790b7ca67d1073777004806f0701b724cd16b651f2030f55d100133c2414347e350d53e76d0e8e6c74158a931112fdfb9211a8fcc50a2af447071c897208d3469002b3116f13cf63ef0582592f0c69a2ee0629ca940f0b5704";
+    hex"0105000000008080000080040004082020000080400e000200421800040a000280061865912a097c4c45175e75790b7ca67d1073777004806f0701b724cd15b651f2030f55d100133c2413347e350d53e76d0e8e6c74148a931111fdfb9216a8fcc50a2af447071c897208d3469002b3116f12cf63ef0582592f0c69a2ee0629ca940f0b5704";
 
 /// @dev The build depth of the parser meta.
 

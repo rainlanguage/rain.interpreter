@@ -43,7 +43,6 @@ import {LibOpERC5313OwnerNP} from "./erc5313/LibOpERC5313OwnerNP.sol";
 
 import {LibOpBlockNumber} from "./evm/LibOpBlockNumber.sol";
 import {LibOpChainId} from "./evm/LibOpChainId.sol";
-import {LibOpMaxUint256} from "./math/uint256/LibOpMaxUint256.sol";
 import {LibOpTimestamp} from "./evm/LibOpTimestamp.sol";
 
 import {LibOpAnyNP} from "./logic/LibOpAnyNP.sol";
@@ -62,6 +61,7 @@ import {LibOpLessThanOrEqualToNP} from "./logic/LibOpLessThanOrEqualToNP.sol";
 // import {LibOpExponentialGrowth} from "./math/growth/LibOpExponentialGrowth.sol";
 // import {LibOpLinearGrowth} from "./math/growth/LibOpLinearGrowth.sol";
 
+import {LibOpMaxUint256} from "./math/uint256/LibOpMaxUint256.sol";
 import {LibOpUint256Div} from "./math/uint256/LibOpUint256Div.sol";
 import {LibOpUint256Mul} from "./math/uint256/LibOpUint256Mul.sol";
 import {LibOpUint256Pow} from "./math/uint256/LibOpUint256Pow.sol";
@@ -82,6 +82,7 @@ import {LibOpAdd} from "./math/LibOpAdd.sol";
 // import {LibOpLn} from "./math/LibOpLn.sol";
 // import {LibOpLog10} from "./math/LibOpLog10.sol";
 import {LibOpMax} from "./math/LibOpMax.sol";
+import {LibOpMaxValue} from "./math/LibOpMaxValue.sol";
 import {LibOpMin} from "./math/LibOpMin.sol";
 import {LibOpMod} from "./math/LibOpMod.sol";
 // import {LibOpLog2} from "./math/LibOpLog2.sol";
@@ -196,7 +197,6 @@ library LibAllStandardOps {
             ),
             AuthoringMetaV2("block-number", "The current block number."),
             AuthoringMetaV2("chain-id", "The current chain id."),
-            AuthoringMetaV2("uint256-max-value", "The maximum possible unsigned integer value (all binary bits are 1)."),
             AuthoringMetaV2("block-timestamp", "The current block timestamp."),
             AuthoringMetaV2("now", "The current block timestamp."),
             // AuthoringMetaV2("any", "The first non-zero value out of all inputs, or 0 if every input is 0."),
@@ -233,6 +233,7 @@ library LibAllStandardOps {
             //     "linear-growth",
             //     "Calculates a linear growth curve as `base + (rate * t)` where `base` is the initial value, `rate` is the rate of growth and `t` is units of time. Inputs in order are `base`, `rate`, and `t` respectively."
             // ),
+            AuthoringMetaV2("uint256-max-value", "The maximum possible unsigned integer value (all binary bits are 1)."),
             // AuthoringMetaV2(
             //     "uint256-div",
             //     "Divides the first input by all other inputs as uint256 values. Errors if any divisor is zero. Rounds down."
@@ -406,8 +407,6 @@ library LibAllStandardOps {
                     LibParseOperand.handleOperandDisallowed,
                     // chain-id
                     LibParseOperand.handleOperandDisallowed,
-                    // max-value
-                    LibParseOperand.handleOperandDisallowed,
                     // block-timestamp
                     LibParseOperand.handleOperandDisallowed,
                     // now
@@ -440,6 +439,8 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // // linear-growth
                     // LibParseOperand.handleOperandDisallowed,
+                    // max-value
+                    LibParseOperand.handleOperandDisallowed,
                     // // uint256-div
                     // LibParseOperand.handleOperandDisallowed,
                     // // uint256-mul
@@ -564,7 +565,6 @@ library LibAllStandardOps {
                     LibOpERC5313OwnerNP.integrity,
                     LibOpBlockNumber.integrity,
                     LibOpChainId.integrity,
-                    LibOpMaxUint256.integrity,
                     LibOpTimestamp.integrity,
                     // now
                     LibOpTimestamp.integrity,
@@ -582,6 +582,7 @@ library LibAllStandardOps {
                     // LibOpLessThanOrEqualToNP.integrity,
                     // LibOpExponentialGrowth.integrity,
                     // LibOpLinearGrowth.integrity,
+                    LibOpMaxUint256.integrity,
                     // LibOpUint256Div.integrity,
                     // LibOpUint256Mul.integrity,
                     // LibOpUint256Pow.integrity,
@@ -677,7 +678,6 @@ library LibAllStandardOps {
                     LibOpERC5313OwnerNP.run,
                     LibOpBlockNumber.run,
                     LibOpChainId.run,
-                    LibOpMaxUint256.run,
                     LibOpTimestamp.run,
                     // now
                     LibOpTimestamp.run,
@@ -695,6 +695,7 @@ library LibAllStandardOps {
                     // LibOpLessThanOrEqualToNP.run,
                     // LibOpExponentialGrowth.run,
                     // LibOpLinearGrowth.run,
+                    LibOpMaxUint256.run,
                     // LibOpUint256Div.run,
                     // LibOpUint256Mul.run,
                     // LibOpUint256Pow.run,
