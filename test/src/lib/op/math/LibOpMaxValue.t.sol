@@ -2,7 +2,7 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {LibOpMaxUint256} from "src/lib/op/math/uint256/LibOpMaxUint256.sol";
+import {LibOpMaxValue} from "src/lib/op/math/LibOpMaxValue.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {
     IInterpreterV4,
@@ -32,7 +32,7 @@ contract LibOpMaxValueTest is OpTest {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpMaxUint256.integrity(state, LibOperand.build(inputs, outputs, operandData));
+            LibOpMaxValue.integrity(state, LibOperand.build(inputs, outputs, operandData));
 
         assertEq(calcInputs, 0);
         assertEq(calcOutputs, 1);
@@ -44,9 +44,7 @@ contract LibOpMaxValueTest is OpTest {
         InterpreterState memory state = opTestDefaultInterpreterState();
         StackItem[] memory inputs = new StackItem[](0);
         OperandV2 operand = LibOperand.build(0, 1, 0);
-        opReferenceCheck(
-            state, operand, LibOpMaxUint256.referenceFn, LibOpMaxUint256.integrity, LibOpMaxUint256.run, inputs
-        );
+        opReferenceCheck(state, operand, LibOpMaxValue.referenceFn, LibOpMaxValue.integrity, LibOpMaxValue.run, inputs);
     }
 
     /// Test the eval of LibOpMaxValue parsed from a string.
