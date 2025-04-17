@@ -39,7 +39,7 @@ contract LibOpMaxValueTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpMaxValue. This tests that the
-    /// opcode correctly pushes the max uint256 onto the stack.
+    /// opcode correctly pushes the max value onto the stack.
     function testOpMaxValueRun() external view {
         InterpreterState memory state = opTestDefaultInterpreterState();
         StackItem[] memory inputs = new StackItem[](0);
