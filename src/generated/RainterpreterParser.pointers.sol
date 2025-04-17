@@ -9,7 +9,7 @@
 pragma solidity =0.8.25;
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0xbfd6bcec2b43035b3e0e2263afd1ef90a3d5a695ebbdfc46360375ca36d48010);
+bytes32 constant BYTECODE_HASH = bytes32(0x62b57fa7fa8c68324595304304a0d3bc70a0a2691dee8e0a4e1962ea12c899cf);
 
 /// @dev The parse meta that is used to lookup word definitions.
 /// The structure of the parse meta is:
@@ -28,7 +28,7 @@ bytes32 constant BYTECODE_HASH = bytes32(0xbfd6bcec2b43035b3e0e2263afd1ef90a3d5a
 /// bit count of the previous bloom filter. If we reach the end of the bloom
 /// filters then we have a miss.
 bytes constant PARSE_META =
-    hex"0105000000008080000080040004082020000080400e000200421800040a000280061865912a097c4c45175e75790b7ca67d1073777004806f0701b724cd15b651f2030f55d100133c2413347e350d53e76d0e8e6c74148a931111fdfb9216a8fcc50a2af447071c897208d3469002b3116f12cf63ef0582592f0c69a2ee0629ca940f0b5704";
+    hex"0105000000008080000080040004082020000080400e000200423800040a000280061965912a097c4c45185e75790b7ca67d1073777004806f0701b724cd15b651f2030f55d1171a3d5c00133c2413347e350d53e76d0e8e6c74148a931111fdfb9216a8fcc50a2af447071c897208d3469002b3116f12cf63ef0582592f0c69a2ee0629ca940f0b5704";
 
 /// @dev The build depth of the parser meta.
 
@@ -38,11 +38,11 @@ uint8 constant PARSE_META_BUILD_DEPTH = 2;
 /// These positional indexes all map to the same indexes looked up in the parse
 /// meta.
 bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
-    hex"1d201d201d201df51f0c1f0c1f0c1df51df51d201d201d201f0c1f0c1f0c1f0c1f0c1f0c1f0c1f0c1f0c1f0c1f0c1f0c1f0c";
+    hex"1d281d281d281dfd1f141f141f141dfd1dfd1d281d281d281f141f141f141f141f141f141f141f141f141f141f141f141f141f14";
 
 /// @dev Every two bytes is a function pointer for a literal parser.
 /// Literal dispatches are determined by the first byte(s) of the literal
 /// rather than a full word lookup, and are done with simple conditional
 /// jumps as the possibilities are limited compared to the number of words we
 /// have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"175c1a241a551b2f";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"17641a2c1a5d1b37";

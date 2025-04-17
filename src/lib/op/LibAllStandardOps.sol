@@ -105,7 +105,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 25;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 26;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -265,6 +265,10 @@ library LibAllStandardOps {
             // AuthoringMetaV2("log2", "Base 2 logarithm log2(x). Errors if the number is zero."),
             // AuthoringMetaV2("log10", "Base 10 logarithm log10(x). Errors if the number is zero."),
             // AuthoringMetaV2("max", "Finds the maximum number from all inputs."),
+            AuthoringMetaV2(
+                "max-value",
+                "The maximum representable float value. This is so large that it is effectively infinity (it has ~2.1 billion zero digits). Almost all numbers that you could possibly subtract from it will be ignored as a rounding error."
+            ),
             // AuthoringMetaV2("min", "Finds the minimum number from all inputs."),
             // AuthoringMetaV2("mod", "Modulos the first number by all other numbers. Errors if any divisor is zero."),
             // AuthoringMetaV2("mul", "Multiplies all numbers together. Errors if the multiplication exceeds `max-value()`."),
@@ -439,7 +443,7 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // // linear-growth
                     // LibParseOperand.handleOperandDisallowed,
-                    // max-value
+                    // uint256-max-value
                     LibParseOperand.handleOperandDisallowed,
                     // // uint256-div
                     // LibParseOperand.handleOperandDisallowed,
@@ -479,6 +483,8 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // // max
                     // LibParseOperand.handleOperandDisallowed,
+                    // max-value
+                    LibParseOperand.handleOperandDisallowed,
                     // // min
                     // LibParseOperand.handleOperandDisallowed,
                     // // mod
@@ -602,6 +608,7 @@ library LibAllStandardOps {
                     // LibOpLog2.integrity,
                     // LibOpLog10.integrity,
                     // LibOpMax.integrity,
+                    LibOpMaxValue.integrity,
                     // LibOpMin.integrity,
                     // LibOpMod.integrity,
                     // LibOpMul.integrity,
@@ -715,6 +722,7 @@ library LibAllStandardOps {
                     // LibOpLog2.run,
                     // LibOpLog10.run,
                     // LibOpMax.run,
+                    LibOpMaxValue.run,
                     // LibOpMin.run,
                     // LibOpMod.run,
                     // LibOpMul.run,
