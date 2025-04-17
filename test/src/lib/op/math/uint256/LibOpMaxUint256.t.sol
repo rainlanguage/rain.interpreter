@@ -2,7 +2,7 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {LibOpMaxUint256NP} from "src/lib/op/evm/LibOpMaxUint256NP.sol";
+import {LibOpMaxUint256} from "src/lib/op/math/uint256/LibOpMaxUint256.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {
     IInterpreterV4,
@@ -17,13 +17,13 @@ import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpr
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-/// @title LibOpMaxUint256NPTest
-/// @notice Test the runtime and integrity time logic of LibOpMaxUint256NP.
-contract LibOpMaxUint256NPTest is OpTest {
+/// @title LibOpMaxUint256Test
+/// @notice Test the runtime and integrity time logic of LibOpMaxUint256.
+contract LibOpMaxUint256Test is OpTest {
     using LibInterpreterState for InterpreterState;
 
-    /// Directly test the integrity logic of LibOpMaxUint256NP.
-    function testOpMaxUint256NPIntegrity(
+    /// Directly test the integrity logic of LibOpMaxUint256.
+    function testOpMaxUint256Integrity(
         IntegrityCheckState memory state,
         uint8 inputs,
         uint8 outputs,
@@ -32,40 +32,40 @@ contract LibOpMaxUint256NPTest is OpTest {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpMaxUint256NP.integrity(state, LibOperand.build(inputs, outputs, operandData));
+            LibOpMaxUint256.integrity(state, LibOperand.build(inputs, outputs, operandData));
 
         assertEq(calcInputs, 0);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpMaxUint256NP. This tests that the
+    /// Directly test the runtime logic of LibOpMaxUint256. This tests that the
     /// opcode correctly pushes the max uint256 onto the stack.
-    function testOpMaxUint256NPRun() external view {
+    function testOpMaxUint256Run() external view {
         InterpreterState memory state = opTestDefaultInterpreterState();
         StackItem[] memory inputs = new StackItem[](0);
         OperandV2 operand = LibOperand.build(0, 1, 0);
         opReferenceCheck(
-            state, operand, LibOpMaxUint256NP.referenceFn, LibOpMaxUint256NP.integrity, LibOpMaxUint256NP.run, inputs
+            state, operand, LibOpMaxUint256.referenceFn, LibOpMaxUint256.integrity, LibOpMaxUint256.run, inputs
         );
     }
 
-    /// Test the eval of LibOpMaxUint256NP parsed from a string.
-    function testOpMaxUint256NPEval() external view {
+    /// Test the eval of LibOpMaxUint256 parsed from a string.
+    function testOpMaxUint256Eval() external view {
         checkHappy("_: uint256-max-value();", bytes32(type(uint256).max), "");
     }
 
     /// Test that a max-value with inputs fails integrity check.
-    function testOpMaxUint256NPEvalFail() public {
+    function testOpMaxUint256EvalFail() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
         bytes memory bytecode = iDeployer.parse2("_: uint256-max-value(0x00);");
         (bytecode);
     }
 
-    function testOpMaxUint256NPZeroOutputs() external {
+    function testOpMaxUint256ZeroOutputs() external {
         checkBadOutputs(": uint256-max-value();", 0, 1, 0);
     }
 
-    function testOpMaxUint256NPTwoOutputs() external {
+    function testOpMaxUint256TwoOutputs() external {
         checkBadOutputs("_ _: uint256-max-value();", 0, 1, 2);
     }
 }
