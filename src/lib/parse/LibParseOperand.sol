@@ -16,13 +16,14 @@ import {CMASK_OPERAND_END, CMASK_WHITESPACE, CMASK_OPERAND_START} from "rain.str
 import {ParseState, OPERAND_VALUES_LENGTH, FSM_YANG_MASK} from "./LibParseState.sol";
 import {LibParseError} from "./LibParseError.sol";
 import {LibParseInterstitial} from "./LibParseInterstitial.sol";
-import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 library LibParseOperand {
     using LibParseError for ParseState;
     using LibParseLiteral for ParseState;
     using LibParseOperand for ParseState;
     using LibParseInterstitial for ParseState;
+    using LibDecimalFloat for Float;
 
     function parseOperand(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         uint256 char;
@@ -159,7 +160,7 @@ library LibParseOperand {
                 operand := mload(add(values, 0x20))
             }
             (int256 signedCoefficient, int256 exponent) =
-                LibDecimalFloat.unpack(PackedFloat.wrap(OperandV2.unwrap(operand)));
+                Float.wrap(OperandV2.unwrap(operand)).unpack();
             uint256 operandUint = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
             if (operandUint > type(uint16).max) {
                 revert OperandOverflow();
@@ -180,7 +181,7 @@ library LibParseOperand {
                 operand := mload(add(values, 0x20))
             }
             (int256 signedCoefficient, int256 exponent) =
-                LibDecimalFloat.unpack(PackedFloat.wrap(OperandV2.unwrap(operand)));
+                Float.wrap(OperandV2.unwrap(operand)).unpack();
             uint256 operandUint = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
             if (operandUint > uint256(type(uint16).max)) {
                 revert OperandOverflow();
@@ -198,8 +199,8 @@ library LibParseOperand {
     function handleOperandDoublePerByteNoDefault(bytes32[] memory values) internal pure returns (OperandV2 operand) {
         // Happy path at the top for efficiency.
         if (values.length == 2) {
-            PackedFloat a;
-            PackedFloat b;
+            Float a;
+            Float b;
             assembly ("memory-safe") {
                 a := mload(add(values, 0x20))
                 b := mload(add(values, 0x40))
@@ -228,9 +229,9 @@ library LibParseOperand {
         // Happy path at the top for efficiency.
         uint256 length = values.length;
         if (length >= 1 && length <= 3) {
-            PackedFloat a;
-            PackedFloat b;
-            PackedFloat c;
+            Float a;
+            Float b;
+            Float c;
             assembly ("memory-safe") {
                 a := mload(add(values, 0x20))
             }
@@ -240,7 +241,7 @@ library LibParseOperand {
                     b := mload(add(values, 0x40))
                 }
             } else {
-                b = PackedFloat.wrap(0);
+                b = Float.wrap(0);
             }
 
             if (length == 3) {
@@ -248,7 +249,7 @@ library LibParseOperand {
                     c := mload(add(values, 0x60))
                 }
             } else {
-                c = PackedFloat.wrap(0);
+                c = Float.wrap(0);
             }
 
             // slither-disable-next-line write-after-write
@@ -276,15 +277,15 @@ library LibParseOperand {
         // Happy path at the top for efficiency.
         uint256 length = values.length;
         if (length < 3) {
-            PackedFloat a;
-            PackedFloat b;
+            Float a;
+            Float b;
 
             if (length >= 1) {
                 assembly ("memory-safe") {
                     a := mload(add(values, 0x20))
                 }
             } else {
-                a = PackedFloat.wrap(0);
+                a = Float.wrap(0);
             }
 
             if (length == 2) {
@@ -292,7 +293,7 @@ library LibParseOperand {
                     b := mload(add(values, 0x40))
                 }
             } else {
-                b = PackedFloat.wrap(0);
+                b = Float.wrap(0);
             }
 
             // slither-disable-next-line write-after-write

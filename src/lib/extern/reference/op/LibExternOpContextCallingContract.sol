@@ -9,10 +9,10 @@ import {
     CONTEXT_BASE_ROW_CALLING_CONTRACT
 } from "rain.interpreter.interface/lib/caller/LibContext.sol";
 
-/// @title LibExternOpContextCallingContractNPE2
+/// @title LibExternOpContextCallingContract
 /// This op is a simple reference to the contract that called the interpreter.
 /// It is used to demonstrate how to implement context references.
-library LibExternOpContextCallingContractNPE2 {
+library LibExternOpContextCallingContract {
     /// The sub parser for the extern increment opcode. It has no special logic
     /// so uses the default sub parser from `LibSubParse`.
     //slither-disable-next-line dead-code

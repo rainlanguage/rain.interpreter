@@ -15,11 +15,11 @@ import {LibSubParse} from "../../lib/parse/LibSubParse.sol";
 import {LibParseState, ParseState} from "../../lib/parse/LibParseState.sol";
 import {LibParseOperand} from "../../lib/parse/LibParseOperand.sol";
 import {LibParseLiteral} from "../../lib/parse/literal/LibParseLiteral.sol";
-import {LibExternOpIntIncNPE2, OP_INDEX_INCREMENT} from "../../lib/extern/reference/op/LibExternOpIntIncNPE2.sol";
+import {LibExternOpIntInc, OP_INDEX_INCREMENT} from "../../lib/extern/reference/op/LibExternOpIntInc.sol";
 import {LibExternOpStackOperandNPE2} from "../../lib/extern/reference/op/LibExternOpStackOperandNPE2.sol";
 import {LibExternOpContextSenderNPE2} from "../../lib/extern/reference/op/LibExternOpContextSenderNPE2.sol";
-import {LibExternOpContextCallingContractNPE2} from
-    "../../lib/extern/reference/op/LibExternOpContextCallingContractNPE2.sol";
+import {LibExternOpContextCallingContract} from
+    "../../lib/extern/reference/op/LibExternOpContextCallingContract.sol";
 import {LibExternOpContextRainlenNPE2} from "../../lib/extern/reference/op/LibExternOpContextRainlenNPE2.sol";
 import {LibParseLiteralRepeat} from "../../lib/extern/reference/literal/LibParseLiteralRepeat.sol";
 import {LibParseLiteralDecimal} from "../../lib/parse/literal/LibParseLiteralDecimal.sol";
@@ -33,7 +33,7 @@ import {
     INTEGRITY_FUNCTION_POINTERS,
     OPCODE_FUNCTION_POINTERS
 } from "../../generated/RainterpreterReferenceExtern.pointers.sol";
-import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
 /// 1:1 with the number of opcodes provided by the extern component of this
@@ -148,6 +148,8 @@ library LibRainterpreterReferenceExtern {
 /// undefined behaviour in production, so ALWAYS test this, preferably in an
 /// automated way.
 contract RainterpreterReferenceExtern is BaseRainterpreterSubParserNPE2, BaseRainterpreterExternNPE2 {
+    using LibDecimalFloat for Float;
+
     function describedByMetaV1() external pure override returns (bytes32) {
         return DESCRIBED_BY_META_HASH;
     }
@@ -238,20 +240,20 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParserNPE2, BaseRai
                 ParseState memory state = LibParseState.newState("", "", "", "");
                 // If we have a match on the keyword then the next chars MUST
                 // be a decimal, otherwise it's an error.
-                int256 signedCoefficient;
-                int256 exponent;
-                (cursor, signedCoefficient, exponent) = LibParseLiteralDecimal.parseDecimalFloat(
+                bytes32 floatBytes;
+                (cursor, floatBytes) = LibParseLiteralDecimal.parseDecimalFloatPacked(
                     state, cursor + SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH, end
                 );
+                Float float = Float.wrap(floatBytes);
                 // We can only repeat a single digit.
-                if (LibDecimalFloat.gt(signedCoefficient, exponent, 9, 0)) {
+                if (float.gt(LibDecimalFloat.packLossless(9, 0))) {
                     revert InvalidRepeatCount();
                 }
 
                 return (
                     true,
                     SUB_PARSER_LITERAL_REPEAT_INDEX,
-                    PackedFloat.unwrap(LibDecimalFloat.pack(signedCoefficient, exponent))
+                    floatBytes
                 );
             } else {
                 return (false, 0, 0);
@@ -316,10 +318,10 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParserNPE2, BaseRai
             function(uint256, uint256, OperandV2) internal view returns (bool, bytes memory, bytes32[] memory)[SUB_PARSER_WORD_PARSERS_LENGTH
                 + 1] memory pointersFixed = [
                     lengthPointer,
-                    LibExternOpIntIncNPE2.subParser,
+                    LibExternOpIntInc.subParser,
                     LibExternOpStackOperandNPE2.subParser,
                     LibExternOpContextSenderNPE2.subParser,
-                    LibExternOpContextCallingContractNPE2.subParser,
+                    LibExternOpContextCallingContract.subParser,
                     LibExternOpContextRainlenNPE2.subParser
                 ];
             uint256[] memory pointersDynamic;
@@ -351,7 +353,7 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParserNPE2, BaseRai
                 lengthPointer := length
             }
             function(OperandV2, StackItem[] memory) internal view returns (StackItem[] memory)[OPCODE_FUNCTION_POINTERS_LENGTH
-                + 1] memory pointersFixed = [lengthPointer, LibExternOpIntIncNPE2.run];
+                + 1] memory pointersFixed = [lengthPointer, LibExternOpIntInc.run];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
                 pointersDynamic := pointersFixed
@@ -381,7 +383,7 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParserNPE2, BaseRai
                 lengthPointer := length
             }
             function(OperandV2, uint256, uint256) internal pure returns (uint256, uint256)[OPCODE_FUNCTION_POINTERS_LENGTH
-                + 1] memory pointersFixed = [lengthPointer, LibExternOpIntIncNPE2.integrity];
+                + 1] memory pointersFixed = [lengthPointer, LibExternOpIntInc.integrity];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
                 pointersDynamic := pointersFixed

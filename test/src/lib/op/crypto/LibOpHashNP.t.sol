@@ -24,7 +24,7 @@ import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreter
 import {LibIntegrityCheck, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {InterpreterState, LibInterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
-import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpHashNPTest
 /// @notice Test the runtime and integrity time logic of LibOpHashNP.
@@ -104,12 +104,12 @@ contract LibOpHashNPTest is OpTest {
             })
         );
         assertEq(stack.length, 3);
-        assertEq(StackItem.unwrap(stack[0]), PackedFloat.unwrap(LibDecimalFloat.pack(9e37, -37)));
+        assertEq(StackItem.unwrap(stack[0]), Float.unwrap(LibDecimalFloat.packLossless(9e37, -37)));
         assertEq(
             StackItem.unwrap(stack[1]),
             keccak256(abi.encodePacked(uint256(0x1234567890abcdef), uint256(0xfedcba0987654321)))
         );
-        assertEq(StackItem.unwrap(stack[2]), PackedFloat.unwrap(LibDecimalFloat.pack(5e37, -37)));
+        assertEq(StackItem.unwrap(stack[2]), Float.unwrap(LibDecimalFloat.packLossless(5e37, -37)));
         assertEq(kvs.length, 0);
     }
 

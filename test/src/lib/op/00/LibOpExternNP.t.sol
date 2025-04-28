@@ -18,7 +18,7 @@ import {
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
-import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpExternNPTest
 /// @notice Test the runtime and integrity time logic of LibOpExternNP.
@@ -225,10 +225,10 @@ contract LibOpExternNPTest is OpTest {
         );
 
         bytes32[] memory externInputs = new bytes32[](2);
-        externInputs[0] = PackedFloat.unwrap(LibDecimalFloat.pack(20e36, -36));
-        externInputs[1] = PackedFloat.unwrap(LibDecimalFloat.pack(83e36, -36));
+        externInputs[0] = Float.unwrap(LibDecimalFloat.packLossless(20e36, -36));
+        externInputs[1] = Float.unwrap(LibDecimalFloat.packLossless(83e36, -36));
         bytes32[] memory externOutputs = new bytes32[](1);
-        externOutputs[0] = PackedFloat.unwrap(LibDecimalFloat.pack(99e36, -36));
+        externOutputs[0] = Float.unwrap(LibDecimalFloat.packLossless(99e36, -36));
         vm.mockCall(
             address(extern),
             abi.encodeWithSelector(IInterpreterExternV4.extern.selector, externDispatch, externInputs),
@@ -236,7 +236,7 @@ contract LibOpExternNPTest is OpTest {
         );
 
         StackItem[] memory expectedStack = new StackItem[](2);
-        expectedStack[0] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(99e36, -36)));
+        expectedStack[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(99e36, -36)));
         expectedStack[1] = StackItem.wrap(0x00000000000000000005001000000000000000000000000000000000deadbeef);
 
         checkHappy(
@@ -278,19 +278,19 @@ contract LibOpExternNPTest is OpTest {
         );
 
         StackItem[] memory externInputs = new StackItem[](3);
-        externInputs[0] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(1e37, -37)));
-        externInputs[1] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(2e37, -37)));
-        externInputs[2] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(3e37, -37)));
+        externInputs[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(1e37, -37)));
+        externInputs[1] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(2e37, -37)));
+        externInputs[2] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(3e37, -37)));
 
         StackItem[] memory externOutputs = new StackItem[](3);
-        externOutputs[0] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(4e37, -37)));
-        externOutputs[1] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(5e37, -37)));
-        externOutputs[2] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(6e37, -37)));
+        externOutputs[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(4e37, -37)));
+        externOutputs[1] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(5e37, -37)));
+        externOutputs[2] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(6e37, -37)));
 
         StackItem[] memory expectedStack = new StackItem[](4);
-        expectedStack[0] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(6e37, -37)));
-        expectedStack[1] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(5e37, -37)));
-        expectedStack[2] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(4e37, -37)));
+        expectedStack[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(6e37, -37)));
+        expectedStack[1] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(5e37, -37)));
+        expectedStack[2] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(4e37, -37)));
         expectedStack[3] = StackItem.wrap(0x00000000000000000005001000000000000000000000000000000000deadbeef);
 
         vm.mockCall(

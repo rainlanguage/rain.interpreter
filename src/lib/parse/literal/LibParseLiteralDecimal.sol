@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 
 import {ParseState} from "../LibParseState.sol";
 import {LibParseError} from "../LibParseError.sol";
-import {LibParseDecimalFloat, PackedFloat} from "rain.math.float/lib/parse/LibParseDecimalFloat.sol";
+import {LibParseDecimalFloat, Float} from "rain.math.float/lib/parse/LibParseDecimalFloat.sol";
 
 library LibParseLiteralDecimal {
     using LibParseError for ParseState;
@@ -14,20 +14,20 @@ library LibParseLiteralDecimal {
         pure
         returns (uint256, bytes32)
     {
-        (bytes4 errorSelector, uint256 cursor, PackedFloat packedFloat) =
+        (bytes4 errorSelector, uint256 cursor, Float float) =
             LibParseDecimalFloat.parseDecimalFloatPacked(start, end);
         state.handleErrorSelector(cursor, errorSelector);
-        return (cursor, PackedFloat.unwrap(packedFloat));
+        return (cursor, Float.unwrap(float));
     }
 
-    function parseDecimalFloat(ParseState memory state, uint256 start, uint256 end)
-        internal
-        pure
-        returns (uint256, int256, int256)
-    {
-        (bytes4 errorSelector, uint256 cursor, int256 signedCoefficient, int256 exponent) =
-            LibParseDecimalFloat.parseDecimalFloat(start, end);
-        state.handleErrorSelector(cursor, errorSelector);
-        return (cursor, signedCoefficient, exponent);
-    }
+    // function parseDecimalFloat(ParseState memory state, uint256 start, uint256 end)
+    //     internal
+    //     pure
+    //     returns (uint256, int256, int256)
+    // {
+    //     (bytes4 errorSelector, uint256 cursor, int256 signedCoefficient, int256 exponent) =
+    //         LibParseDecimalFloat.parseDecimalFloat(start, end);
+    //     state.handleErrorSelector(cursor, errorSelector);
+    //     return (cursor, signedCoefficient, exponent);
+    // }
 }

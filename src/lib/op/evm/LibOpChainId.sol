@@ -5,7 +5,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
-import {Float, LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpChainId
 /// Implementation of the EVM `CHAINID` opcode as a standard Rainlang opcode.
@@ -31,7 +31,7 @@ library LibOpChainId {
     {
         StackItem[] memory outputs = new StackItem[](1);
         outputs[0] =
-            StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.fromFixedDecimalLosslessMem(block.chainid, 0).pack()));
+            StackItem.wrap(Float.unwrap(LibDecimalFloat.fromFixedDecimalLosslessPacked(block.chainid, 0)));
         return outputs;
     }
 }

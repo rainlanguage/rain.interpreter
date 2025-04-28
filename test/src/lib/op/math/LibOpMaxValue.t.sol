@@ -16,7 +16,7 @@ import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
-import {PackedFloat, Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpMaxValueTest
 /// @notice Test the runtime and integrity time logic of LibOpMaxValue.
@@ -51,7 +51,7 @@ contract LibOpMaxValueTest is OpTest {
     function testOpMaxValueEval() external view {
         checkHappy(
             "_: max-value();",
-            PackedFloat.unwrap(Float({signedCoefficient: type(int224).max, exponent: type(int32).max}).pack()),
+            Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)),
             ""
         );
     }
