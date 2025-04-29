@@ -18,15 +18,4 @@ library LibParseLiteralDecimal {
         state.handleErrorSelector(cursor, errorSelector);
         return (cursor, Float.unwrap(float));
     }
-
-    // function parseDecimalFloat(ParseState memory state, uint256 start, uint256 end)
-    //     internal
-    //     pure
-    //     returns (uint256, int256, int256)
-    // {
-    //     (bytes4 errorSelector, uint256 cursor, int256 signedCoefficient, int256 exponent) =
-    //         LibParseDecimalFloat.parseDecimalFloat(start, end);
-    //     state.handleErrorSelector(cursor, errorSelector);
-    //     return (cursor, signedCoefficient, exponent);
-    // }
 }
