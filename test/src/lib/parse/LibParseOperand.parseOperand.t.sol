@@ -10,7 +10,7 @@ import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {OperandValuesOverflow, UnclosedOperand} from "src/error/ErrParse.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
-import {LibDecimalFloat, LibDecimalFloatImplementation, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat, LibDecimalFloatImplementation, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {SIGNED_NORMALIZED_MAX} from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
 
 contract LibParseOperandParseOperandTest is Test {
@@ -81,9 +81,7 @@ contract LibParseOperandParseOperandTest is Test {
         string memory s = string.concat("<", maybeWhitespaceA, valueString, maybeWhitespaceB, ">", suffix);
 
         bytes32[] memory expectedValues = new bytes32[](1);
-        (int256 signedCoefficient, int256 exponent) = LibDecimalFloatImplementation.normalize(value, 0);
-        expectedValues[0] =
-            asHex ? bytes32(uint256(value)) : PackedFloat.unwrap(LibDecimalFloat.pack(signedCoefficient, exponent));
+        expectedValues[0] = asHex ? bytes32(uint256(value)) : Float.unwrap(LibDecimalFloat.packLossless(value, 0));
 
         checkParsingOperandFromData(
             s,
@@ -121,13 +119,9 @@ contract LibParseOperandParseOperandTest is Test {
         );
         bytes32[] memory expectedValues = new bytes32[](2);
 
-        (int256 signedCoefficient, int256 exponent) = LibDecimalFloatImplementation.normalize(valueA, 0);
-        expectedValues[0] =
-            (asHexA ? bytes32(uint256(valueA)) : PackedFloat.unwrap(LibDecimalFloat.pack(signedCoefficient, exponent)));
+        expectedValues[0] = (asHexA ? bytes32(uint256(valueA)) : Float.unwrap(LibDecimalFloat.packLossless(valueA, 0)));
 
-        (signedCoefficient, exponent) = LibDecimalFloatImplementation.normalize(valueB, 0);
-        expectedValues[1] =
-            (asHexB ? bytes32(uint256(valueB)) : PackedFloat.unwrap(LibDecimalFloat.pack(signedCoefficient, exponent)));
+        expectedValues[1] = (asHexB ? bytes32(uint256(valueB)) : Float.unwrap(LibDecimalFloat.packLossless(valueB, 0)));
 
         checkParsingOperandFromData(
             s,
@@ -186,17 +180,11 @@ contract LibParseOperandParseOperandTest is Test {
         }
 
         bytes32[] memory expectedValues = new bytes32[](3);
-        (int256 signedCoefficient, int256 exponent) = LibDecimalFloatImplementation.normalize(valueA, 0);
-        expectedValues[0] =
-            (asHexA ? bytes32(uint256(valueA)) : PackedFloat.unwrap(LibDecimalFloat.pack(signedCoefficient, exponent)));
+        expectedValues[0] = (asHexA ? bytes32(uint256(valueA)) : Float.unwrap(LibDecimalFloat.packLossless(valueA, 0)));
 
-        (signedCoefficient, exponent) = LibDecimalFloatImplementation.normalize(valueB, 0);
-        expectedValues[1] =
-            (asHexB ? bytes32(uint256(valueB)) : PackedFloat.unwrap(LibDecimalFloat.pack(signedCoefficient, exponent)));
+        expectedValues[1] = (asHexB ? bytes32(uint256(valueB)) : Float.unwrap(LibDecimalFloat.packLossless(valueB, 0)));
 
-        (signedCoefficient, exponent) = LibDecimalFloatImplementation.normalize(valueC, 0);
-        expectedValues[2] =
-            (asHexC ? bytes32(uint256(valueC)) : PackedFloat.unwrap(LibDecimalFloat.pack(signedCoefficient, exponent)));
+        expectedValues[2] = (asHexC ? bytes32(uint256(valueC)) : Float.unwrap(LibDecimalFloat.packLossless(valueC, 0)));
 
         checkParsingOperandFromData(s, expectedValues, expectedLength);
     }
@@ -257,10 +245,8 @@ contract LibParseOperandParseOperandTest is Test {
 
         bytes32[] memory expectedValues = new bytes32[](4);
         for (uint256 i = 0; i < 4; i++) {
-            (int256 signedCoefficient, int256 exponent) = LibDecimalFloatImplementation.normalize(values[i], 0);
-            expectedValues[i] = asHex[i]
-                ? bytes32(uint256(values[i]))
-                : PackedFloat.unwrap(LibDecimalFloat.pack(signedCoefficient, exponent));
+            expectedValues[i] =
+                asHex[i] ? bytes32(uint256(values[i])) : Float.unwrap(LibDecimalFloat.packLossless(values[i], 0));
         }
         checkParsingOperandFromData(s, expectedValues, expectedLength);
     }

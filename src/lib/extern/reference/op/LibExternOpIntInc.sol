@@ -4,27 +4,28 @@ pragma solidity ^0.8.25;
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibSubParse} from "../../../parse/LibSubParse.sol";
 import {IInterpreterExternV4, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterExternV4.sol";
-import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @dev Opcode index of the extern increment opcode. Needs to be manually kept
 /// in sync with the extern opcode function pointers. Definitely write tests for
 /// this to ensure a mismatch doesn't happen silently.
 uint256 constant OP_INDEX_INCREMENT = 0;
 
-/// @title LibExternOpIntIncNPE2
+/// @title LibExternOpIntInc
 /// This op is a simple increment of every input by 1. It is used to demonstrate
 /// handling both multiple inputs and outputs in extern dispatching logic.
-library LibExternOpIntIncNPE2 {
+library LibExternOpIntInc {
+    using LibDecimalFloat for Float;
     /// Running the extern increments every input by 1. By allowing many inputs
     /// we can test multi input/output logic is implemented correctly for
     /// externs.
     //slither-disable-next-line dead-code
+
     function run(OperandV2, StackItem[] memory inputs) internal pure returns (StackItem[] memory) {
         for (uint256 i = 0; i < inputs.length; i++) {
-            (int256 signedCoefficient, int256 exponent) =
-                LibDecimalFloat.unpack(PackedFloat.wrap(StackItem.unwrap(inputs[i])));
-            (signedCoefficient, exponent) = LibDecimalFloat.add(signedCoefficient, exponent, 1e37, -37);
-            inputs[i] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(signedCoefficient, exponent)));
+            Float a = Float.wrap(StackItem.unwrap(inputs[i]));
+            a = a.add(LibDecimalFloat.packLossless(1e37, -37));
+            inputs[i] = StackItem.wrap(Float.unwrap(a));
         }
         return inputs;
     }

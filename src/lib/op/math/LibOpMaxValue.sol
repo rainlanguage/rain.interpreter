@@ -5,7 +5,7 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {Float, LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 uint256 constant MAX_VALUE = uint256(0x7fffffff7fffffffffffffffffffffffffffffffffffffffffffffffffffffff);
 
@@ -33,9 +33,7 @@ library LibOpMaxValue {
         returns (StackItem[] memory)
     {
         StackItem[] memory outputs = new StackItem[](1);
-        outputs[0] = StackItem.wrap(
-            PackedFloat.unwrap(Float({signedCoefficient: type(int224).max, exponent: type(int32).max}).pack())
-        );
+        outputs[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)));
         return outputs;
     }
 }

@@ -22,7 +22,7 @@ import {OpTest, PRE, POST} from "test/abstract/OpTest.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {BadOpOutputsLength} from "src/error/ErrIntegrity.sol";
-import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpStackNPTest
 /// @notice Test the runtime and integrity time logic of LibOpStackNP.
@@ -144,9 +144,9 @@ contract LibOpStackNPTest is OpTest {
             })
         );
         assertEq(stack.length, 3);
-        assertEq(StackItem.unwrap(stack[0]), PackedFloat.unwrap(LibDecimalFloat.pack(-1e37, -37)));
+        assertEq(StackItem.unwrap(stack[0]), Float.unwrap(LibDecimalFloat.packLossless(-1, 0)));
         assertEq(StackItem.unwrap(stack[1]), StackItem.unwrap(stack[2]));
-        assertEq(StackItem.unwrap(stack[2]), PackedFloat.unwrap(LibDecimalFloat.pack(1e37, -37)));
+        assertEq(StackItem.unwrap(stack[2]), Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
         assertEq(kvs.length, 0);
     }
 
@@ -166,12 +166,12 @@ contract LibOpStackNPTest is OpTest {
             })
         );
         assertEq(stack.length, 6);
-        assertEq(StackItem.unwrap(stack[0]), PackedFloat.unwrap(LibDecimalFloat.pack(1e37, -37)));
-        assertEq(StackItem.unwrap(stack[1]), PackedFloat.unwrap(LibDecimalFloat.pack(1e37, -37)));
-        assertEq(StackItem.unwrap(stack[2]), PackedFloat.unwrap(LibDecimalFloat.pack(1e37, -37)));
-        assertEq(StackItem.unwrap(stack[3]), PackedFloat.unwrap(LibDecimalFloat.pack(1e37, -37)));
-        assertEq(StackItem.unwrap(stack[4]), PackedFloat.unwrap(LibDecimalFloat.pack(1e37, -37)));
-        assertEq(StackItem.unwrap(stack[5]), PackedFloat.unwrap(LibDecimalFloat.pack(1e37, -37)));
+        assertEq(StackItem.unwrap(stack[0]), Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
+        assertEq(StackItem.unwrap(stack[1]), Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
+        assertEq(StackItem.unwrap(stack[2]), Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
+        assertEq(StackItem.unwrap(stack[3]), Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
+        assertEq(StackItem.unwrap(stack[4]), Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
+        assertEq(StackItem.unwrap(stack[5]), Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
         assertEq(kvs.length, 0);
     }
 

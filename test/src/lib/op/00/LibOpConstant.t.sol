@@ -19,7 +19,7 @@ import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpr
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {BadOpOutputsLength} from "src/error/ErrIntegrity.sol";
-import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpConstantTest
 /// @notice Test the runtime and integrity time logic of LibOpConstant.
@@ -98,8 +98,8 @@ contract LibOpConstantTest is OpTest {
             })
         );
         assertEq(stack.length, 2);
-        assertEq(StackItem.unwrap(stack[0]), PackedFloat.unwrap(LibDecimalFloat.pack(1.001e37, -37)));
-        assertEq(StackItem.unwrap(stack[1]), PackedFloat.unwrap(LibDecimalFloat.pack(2e37, -37)));
+        assertEq(StackItem.unwrap(stack[0]), Float.unwrap(LibDecimalFloat.packLossless(1.001e3, -3)));
+        assertEq(StackItem.unwrap(stack[1]), Float.unwrap(LibDecimalFloat.packLossless(2, 0)));
         assertEq(kvs.length, 0);
     }
 

@@ -15,7 +15,7 @@ import {OperandV2, LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
-import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibParseNamedLHSTest
 contract LibParseNamedLHSTest is Test {
@@ -160,9 +160,9 @@ contract LibParseNamedLHSTest is Test {
             hex"00100003"
         );
         assertEq(constants.length, 3);
-        assertEq(constants[0], PackedFloat.unwrap(LibDecimalFloat.pack(1e37, -37)));
-        assertEq(constants[1], PackedFloat.unwrap(LibDecimalFloat.pack(2e37, -37)));
-        assertEq(constants[2], PackedFloat.unwrap(LibDecimalFloat.pack(3e37, -37)));
+        assertEq(constants[0], Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
+        assertEq(constants[1], Float.unwrap(LibDecimalFloat.packLossless(2, 0)));
+        assertEq(constants[2], Float.unwrap(LibDecimalFloat.packLossless(3, 0)));
     }
 
     /// Duplicate names are disallowed in the same source.
@@ -214,9 +214,9 @@ contract LibParseNamedLHSTest is Test {
             hex"00100001"
         );
         assertEq(constants.length, 4);
-        assertEq(constants[0], PackedFloat.unwrap(LibDecimalFloat.pack(1e37, -37)));
-        assertEq(constants[1], PackedFloat.unwrap(LibDecimalFloat.pack(2e37, -37)));
-        assertEq(constants[2], PackedFloat.unwrap(LibDecimalFloat.pack(3e37, -37)));
-        assertEq(constants[3], PackedFloat.unwrap(LibDecimalFloat.pack(4e37, -37)));
+        assertEq(constants[0], Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
+        assertEq(constants[1], Float.unwrap(LibDecimalFloat.packLossless(2, 0)));
+        assertEq(constants[2], Float.unwrap(LibDecimalFloat.packLossless(3, 0)));
+        assertEq(constants[3], Float.unwrap(LibDecimalFloat.packLossless(4, 0)));
     }
 }

@@ -7,7 +7,7 @@ import {
     OPCODE_FUNCTION_POINTERS,
     INTEGRITY_FUNCTION_POINTERS,
     OP_INDEX_INCREMENT,
-    LibExternOpIntIncNPE2
+    LibExternOpIntInc
 } from "src/concrete/extern/RainterpreterReferenceExtern.sol";
 import {
     ExternDispatchV2,
@@ -20,10 +20,11 @@ import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {OPCODE_EXTERN} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {ExternDispatchConstantsHeightOverflow} from "src/error/ErrSubParse.sol";
-import {LibDecimalFloat, PackedFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 contract RainterpreterReferenceExternIntIncTest is OpTest {
     using Strings for address;
+    using LibDecimalFloat for Float;
 
     function testRainterpreterReferenceExternIntIncHappyUnsugared() external {
         RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();
@@ -39,8 +40,8 @@ contract RainterpreterReferenceExternIntIncTest is OpTest {
         );
 
         StackItem[] memory expectedStack = new StackItem[](3);
-        expectedStack[0] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(4e37, -37)));
-        expectedStack[1] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(3e37, -37)));
+        expectedStack[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(4e37, -37)));
+        expectedStack[1] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(3e37, -37)));
         expectedStack[2] = StackItem.wrap(EncodedExternDispatchV2.unwrap(encodedExternDispatch));
 
         checkHappy(
@@ -57,8 +58,8 @@ contract RainterpreterReferenceExternIntIncTest is OpTest {
         RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();
 
         StackItem[] memory expectedStack = new StackItem[](2);
-        expectedStack[0] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(4e37, -37)));
-        expectedStack[1] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(3e37, -37)));
+        expectedStack[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(4e37, -37)));
+        expectedStack[1] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(3e37, -37)));
 
         checkHappy(
             bytes(
@@ -134,13 +135,12 @@ contract RainterpreterReferenceExternIntIncTest is OpTest {
             inputs[i] = StackItem.wrap(
                 bytes32(bound(uint256(StackItem.unwrap(inputs[i])), 0, uint256(int256(type(int128).max))))
             );
-            (int256 signedCoefficient, int256 exponent) =
-                LibDecimalFloat.unpack(PackedFloat.wrap(StackItem.unwrap(inputs[i])));
-            (signedCoefficient, exponent) = LibDecimalFloat.add(signedCoefficient, exponent, 1e37, -37);
-            expectedOutputs[i] = StackItem.wrap(PackedFloat.unwrap(LibDecimalFloat.pack(signedCoefficient, exponent)));
+            Float a = Float.wrap(StackItem.unwrap(inputs[i]));
+            a = a.add(LibDecimalFloat.packLossless(1e37, -37));
+            expectedOutputs[i] = StackItem.wrap(Float.unwrap(a));
         }
 
-        StackItem[] memory actualOutputs = LibExternOpIntIncNPE2.run(operand, inputs);
+        StackItem[] memory actualOutputs = LibExternOpIntInc.run(operand, inputs);
         assertEq(actualOutputs.length, expectedOutputs.length);
         for (uint256 i = 0; i < actualOutputs.length; i++) {
             assertEq(StackItem.unwrap(actualOutputs[i]), StackItem.unwrap(expectedOutputs[i]));
@@ -154,7 +154,7 @@ contract RainterpreterReferenceExternIntIncTest is OpTest {
         external
         pure
     {
-        (uint256 calcInputs, uint256 calcOutputs) = LibExternOpIntIncNPE2.integrity(operand, inputs, outputs);
+        (uint256 calcInputs, uint256 calcOutputs) = LibExternOpIntInc.integrity(operand, inputs, outputs);
         assertEq(calcInputs, inputs);
         assertEq(calcOutputs, inputs);
     }
