@@ -48,7 +48,7 @@ contract LibParseLiteralIntegerDecimalTest is Test {
         );
 
         assertEq(constants.length, 1);
-        assertEq(constants[0], Float.unwrap(LibDecimalFloat.packLossless(1e37, -37)));
+        assertEq(constants[0], Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
     }
 
     /// Check 2 decimal literals. Should not revert and return one source and
@@ -85,8 +85,8 @@ contract LibParseLiteralIntegerDecimalTest is Test {
         );
 
         assertEq(constants.length, 2);
-        assertEq(constants[0], Float.unwrap(LibDecimalFloat.packLossless(10e36, -36)));
-        assertEq(constants[1], Float.unwrap(LibDecimalFloat.packLossless(25e36, -36)));
+        assertEq(constants[0], Float.unwrap(LibDecimalFloat.packLossless(10, 0)));
+        assertEq(constants[1], Float.unwrap(LibDecimalFloat.packLossless(25, 0)));
     }
 
     /// Check 3 decimal literals with 2 dupes. Should dedupe and respect ordering.
@@ -125,8 +125,8 @@ contract LibParseLiteralIntegerDecimalTest is Test {
             hex"01100000"
         );
         assertEq(constants.length, 2);
-        assertEq(constants[0], Float.unwrap(LibDecimalFloat.packLossless(11e36, -36)));
-        assertEq(constants[1], Float.unwrap(LibDecimalFloat.packLossless(233e35, -35)));
+        assertEq(constants[0], Float.unwrap(LibDecimalFloat.packLossless(11, 0)));
+        assertEq(constants[1], Float.unwrap(LibDecimalFloat.packLossless(233, 0)));
     }
 
     /// Check that we can parse the max int128 value in decimal form.
@@ -282,11 +282,11 @@ contract LibParseLiteralIntegerDecimalTest is Test {
         );
 
         assertEq(constants.length, 5);
-        assertEq(constants[0], Float.unwrap(LibDecimalFloat.packLossless(1e37, -35)));
-        assertEq(constants[1], Float.unwrap(LibDecimalFloat.packLossless(1e37, -34)));
-        assertEq(constants[2], Float.unwrap(LibDecimalFloat.packLossless(1e37, -7)));
-        assertEq(constants[3], Float.unwrap(LibDecimalFloat.packLossless(1e37, -19)));
-        assertEq(constants[4], Float.unwrap(LibDecimalFloat.packLossless(1001e34, -19)));
+        assertEq(constants[0], Float.unwrap(LibDecimalFloat.packLossless(1, 2)));
+        assertEq(constants[1], Float.unwrap(LibDecimalFloat.packLossless(10, 2)));
+        assertEq(constants[2], Float.unwrap(LibDecimalFloat.packLossless(1, 30)));
+        assertEq(constants[3], Float.unwrap(LibDecimalFloat.packLossless(1, 18)));
+        assertEq(constants[4], Float.unwrap(LibDecimalFloat.packLossless(1001, 15)));
     }
 
     /// Check that decimals cause yang.

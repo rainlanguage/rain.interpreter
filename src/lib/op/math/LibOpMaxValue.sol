@@ -33,9 +33,7 @@ library LibOpMaxValue {
         returns (StackItem[] memory)
     {
         StackItem[] memory outputs = new StackItem[](1);
-        outputs[0] = StackItem.wrap(
-            Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max))
-        );
+        outputs[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)));
         return outputs;
     }
 }

@@ -163,7 +163,7 @@ contract LibOpCallTest is OpTest, BytecodeTest {
         ExpectedTrace[] memory traces = new ExpectedTrace[](1);
         traces[0].sourceIndex = 0;
         traces[0].stack = new StackItem[](1);
-        traces[0].stack[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(1e37, -37)));
+        traces[0].stack[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
         checkCallNPTraces("_: 1;", traces);
     }
 
@@ -173,7 +173,7 @@ contract LibOpCallTest is OpTest, BytecodeTest {
         traces[0].stack = new StackItem[](0);
         traces[1].sourceIndex = 1;
         traces[1].stack = new StackItem[](1);
-        traces[1].stack[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(1e37, -37)));
+        traces[1].stack[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
         checkCallNPTraces(":call<1>();_:1;", traces);
     }
 

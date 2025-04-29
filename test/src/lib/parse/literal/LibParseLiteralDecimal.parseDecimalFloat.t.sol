@@ -24,7 +24,9 @@ contract LibParseLiteralDecimalParseDecimalFloatTest is Test {
     function checkParseDecimalRevert(string memory data, bytes memory err) internal {
         ParseState memory state = LibParseState.newState(bytes(data), "", "", "");
         vm.expectRevert(err);
-        state.parseDecimalFloatPacked(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
+        state.parseDecimalFloatPacked(
+            Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer())
+        );
     }
 
     /// An empty string should revert.

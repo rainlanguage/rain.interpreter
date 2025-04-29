@@ -20,6 +20,7 @@ library LibExternOpIntInc {
     /// we can test multi input/output logic is implemented correctly for
     /// externs.
     //slither-disable-next-line dead-code
+
     function run(OperandV2, StackItem[] memory inputs) internal pure returns (StackItem[] memory) {
         for (uint256 i = 0; i < inputs.length; i++) {
             Float a = Float.wrap(StackItem.unwrap(inputs[i]));

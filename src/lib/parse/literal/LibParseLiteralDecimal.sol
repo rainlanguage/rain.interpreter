@@ -14,8 +14,7 @@ library LibParseLiteralDecimal {
         pure
         returns (uint256, bytes32)
     {
-        (bytes4 errorSelector, uint256 cursor, Float float) =
-            LibParseDecimalFloat.parseDecimalFloatPacked(start, end);
+        (bytes4 errorSelector, uint256 cursor, Float float) = LibParseDecimalFloat.parseDecimalFloatPacked(start, end);
         state.handleErrorSelector(cursor, errorSelector);
         return (cursor, Float.unwrap(float));
     }

@@ -98,8 +98,8 @@ contract LibOpConstantTest is OpTest {
             })
         );
         assertEq(stack.length, 2);
-        assertEq(StackItem.unwrap(stack[0]), Float.unwrap(LibDecimalFloat.packLossless(1.001e37, -37)));
-        assertEq(StackItem.unwrap(stack[1]), Float.unwrap(LibDecimalFloat.packLossless(2e37, -37)));
+        assertEq(StackItem.unwrap(stack[0]), Float.unwrap(LibDecimalFloat.packLossless(1.001e3, -3)));
+        assertEq(StackItem.unwrap(stack[1]), Float.unwrap(LibDecimalFloat.packLossless(2, 0)));
         assertEq(kvs.length, 0);
     }
 

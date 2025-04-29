@@ -160,9 +160,9 @@ contract LibParseNamedLHSTest is Test {
             hex"00100003"
         );
         assertEq(constants.length, 3);
-        assertEq(constants[0], Float.unwrap(LibDecimalFloat.packLossless(1e37, -37)));
-        assertEq(constants[1], Float.unwrap(LibDecimalFloat.packLossless(2e37, -37)));
-        assertEq(constants[2], Float.unwrap(LibDecimalFloat.packLossless(3e37, -37)));
+        assertEq(constants[0], Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
+        assertEq(constants[1], Float.unwrap(LibDecimalFloat.packLossless(2, 0)));
+        assertEq(constants[2], Float.unwrap(LibDecimalFloat.packLossless(3, 0)));
     }
 
     /// Duplicate names are disallowed in the same source.
@@ -214,9 +214,9 @@ contract LibParseNamedLHSTest is Test {
             hex"00100001"
         );
         assertEq(constants.length, 4);
-        assertEq(constants[0], Float.unwrap(LibDecimalFloat.packLossless(1e37, -37)));
-        assertEq(constants[1], Float.unwrap(LibDecimalFloat.packLossless(2e37, -37)));
-        assertEq(constants[2], Float.unwrap(LibDecimalFloat.packLossless(3e37, -37)));
-        assertEq(constants[3], Float.unwrap(LibDecimalFloat.packLossless(4e37, -37)));
+        assertEq(constants[0], Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
+        assertEq(constants[1], Float.unwrap(LibDecimalFloat.packLossless(2, 0)));
+        assertEq(constants[2], Float.unwrap(LibDecimalFloat.packLossless(3, 0)));
+        assertEq(constants[3], Float.unwrap(LibDecimalFloat.packLossless(4, 0)));
     }
 }

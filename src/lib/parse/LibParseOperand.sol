@@ -159,8 +159,7 @@ library LibParseOperand {
             assembly ("memory-safe") {
                 operand := mload(add(values, 0x20))
             }
-            (int256 signedCoefficient, int256 exponent) =
-                Float.wrap(OperandV2.unwrap(operand)).unpack();
+            (int256 signedCoefficient, int256 exponent) = Float.wrap(OperandV2.unwrap(operand)).unpack();
             uint256 operandUint = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
             if (operandUint > type(uint16).max) {
                 revert OperandOverflow();
@@ -180,8 +179,7 @@ library LibParseOperand {
             assembly ("memory-safe") {
                 operand := mload(add(values, 0x20))
             }
-            (int256 signedCoefficient, int256 exponent) =
-                Float.wrap(OperandV2.unwrap(operand)).unpack();
+            (int256 signedCoefficient, int256 exponent) = Float.wrap(OperandV2.unwrap(operand)).unpack();
             uint256 operandUint = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
             if (operandUint > uint256(type(uint16).max)) {
                 revert OperandOverflow();

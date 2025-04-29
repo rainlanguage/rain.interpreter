@@ -104,12 +104,12 @@ contract LibOpHashNPTest is OpTest {
             })
         );
         assertEq(stack.length, 3);
-        assertEq(StackItem.unwrap(stack[0]), Float.unwrap(LibDecimalFloat.packLossless(9e37, -37)));
+        assertEq(StackItem.unwrap(stack[0]), Float.unwrap(LibDecimalFloat.packLossless(9, 0)));
         assertEq(
             StackItem.unwrap(stack[1]),
             keccak256(abi.encodePacked(uint256(0x1234567890abcdef), uint256(0xfedcba0987654321)))
         );
-        assertEq(StackItem.unwrap(stack[2]), Float.unwrap(LibDecimalFloat.packLossless(5e37, -37)));
+        assertEq(StackItem.unwrap(stack[2]), Float.unwrap(LibDecimalFloat.packLossless(5, 0)));
         assertEq(kvs.length, 0);
     }
 

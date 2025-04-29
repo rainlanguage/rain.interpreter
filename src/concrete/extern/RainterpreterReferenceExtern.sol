@@ -18,8 +18,7 @@ import {LibParseLiteral} from "../../lib/parse/literal/LibParseLiteral.sol";
 import {LibExternOpIntInc, OP_INDEX_INCREMENT} from "../../lib/extern/reference/op/LibExternOpIntInc.sol";
 import {LibExternOpStackOperandNPE2} from "../../lib/extern/reference/op/LibExternOpStackOperandNPE2.sol";
 import {LibExternOpContextSenderNPE2} from "../../lib/extern/reference/op/LibExternOpContextSenderNPE2.sol";
-import {LibExternOpContextCallingContract} from
-    "../../lib/extern/reference/op/LibExternOpContextCallingContract.sol";
+import {LibExternOpContextCallingContract} from "../../lib/extern/reference/op/LibExternOpContextCallingContract.sol";
 import {LibExternOpContextRainlenNPE2} from "../../lib/extern/reference/op/LibExternOpContextRainlenNPE2.sol";
 import {LibParseLiteralRepeat} from "../../lib/extern/reference/literal/LibParseLiteralRepeat.sol";
 import {LibParseLiteralDecimal} from "../../lib/parse/literal/LibParseLiteralDecimal.sol";
@@ -250,11 +249,7 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParserNPE2, BaseRai
                     revert InvalidRepeatCount();
                 }
 
-                return (
-                    true,
-                    SUB_PARSER_LITERAL_REPEAT_INDEX,
-                    floatBytes
-                );
+                return (true, SUB_PARSER_LITERAL_REPEAT_INDEX, floatBytes);
             } else {
                 return (false, 0, 0);
             }

@@ -13,7 +13,7 @@ contract RainterpreterStateOverlayTest is RainterpreterExpressionDeployerDeploym
     function testStateOverlayGet() external view {
         bytes memory bytecode = iDeployer.parse2("_: get(9);");
 
-        bytes32 k = Float.unwrap(LibDecimalFloat.packLossless(9e37, -37));
+        bytes32 k = Float.unwrap(LibDecimalFloat.packLossless(9, 0));
         bytes32 v = bytes32(uint256(42));
         bytes32[] memory stateOverlay = new bytes32[](2);
         stateOverlay[0] = k;
@@ -42,8 +42,8 @@ contract RainterpreterStateOverlayTest is RainterpreterExpressionDeployerDeploym
     function testStateOverlaySet() external view {
         bytes memory bytecode = iDeployer.parse2("_:get(9),:set(9 42),_:get(9);");
 
-        bytes32 k = Float.unwrap(LibDecimalFloat.packLossless(9e37, -37));
-        bytes32 v = Float.unwrap(LibDecimalFloat.packLossless(43e37, -37));
+        bytes32 k = Float.unwrap(LibDecimalFloat.packLossless(9, 0));
+        bytes32 v = Float.unwrap(LibDecimalFloat.packLossless(43, 0));
         bytes32[] memory stateOverlay = new bytes32[](2);
         stateOverlay[0] = k;
         stateOverlay[1] = v;
@@ -60,7 +60,7 @@ contract RainterpreterStateOverlayTest is RainterpreterExpressionDeployerDeploym
             })
         );
 
-        bytes32 setTo = Float.unwrap(LibDecimalFloat.packLossless(42e36, -36));
+        bytes32 setTo = Float.unwrap(LibDecimalFloat.packLossless(42, 0));
 
         assertEq(stack.length, 2);
         assertEq(StackItem.unwrap(stack[0]), setTo);

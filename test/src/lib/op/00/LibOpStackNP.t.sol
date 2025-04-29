@@ -144,9 +144,9 @@ contract LibOpStackNPTest is OpTest {
             })
         );
         assertEq(stack.length, 3);
-        assertEq(StackItem.unwrap(stack[0]), Float.unwrap(LibDecimalFloat.packLossless(-1e37, -37)));
+        assertEq(StackItem.unwrap(stack[0]), Float.unwrap(LibDecimalFloat.packLossless(-1, 0)));
         assertEq(StackItem.unwrap(stack[1]), StackItem.unwrap(stack[2]));
-        assertEq(StackItem.unwrap(stack[2]), Float.unwrap(LibDecimalFloat.packLossless(1e37, -37)));
+        assertEq(StackItem.unwrap(stack[2]), Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
         assertEq(kvs.length, 0);
     }
 
@@ -166,12 +166,12 @@ contract LibOpStackNPTest is OpTest {
             })
         );
         assertEq(stack.length, 6);
-        assertEq(StackItem.unwrap(stack[0]), Float.unwrap(LibDecimalFloat.packLossless(1e37, -37)));
-        assertEq(StackItem.unwrap(stack[1]), Float.unwrap(LibDecimalFloat.packLossless(1e37, -37)));
-        assertEq(StackItem.unwrap(stack[2]), Float.unwrap(LibDecimalFloat.packLossless(1e37, -37)));
-        assertEq(StackItem.unwrap(stack[3]), Float.unwrap(LibDecimalFloat.packLossless(1e37, -37)));
-        assertEq(StackItem.unwrap(stack[4]), Float.unwrap(LibDecimalFloat.packLossless(1e37, -37)));
-        assertEq(StackItem.unwrap(stack[5]), Float.unwrap(LibDecimalFloat.packLossless(1e37, -37)));
+        assertEq(StackItem.unwrap(stack[0]), Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
+        assertEq(StackItem.unwrap(stack[1]), Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
+        assertEq(StackItem.unwrap(stack[2]), Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
+        assertEq(StackItem.unwrap(stack[3]), Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
+        assertEq(StackItem.unwrap(stack[4]), Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
+        assertEq(StackItem.unwrap(stack[5]), Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
         assertEq(kvs.length, 0);
     }
 

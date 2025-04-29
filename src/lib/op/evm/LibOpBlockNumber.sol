@@ -30,8 +30,7 @@ library LibOpBlockNumber {
         returns (StackItem[] memory)
     {
         StackItem[] memory outputs = new StackItem[](1);
-        outputs[0] =
-            StackItem.wrap(Float.unwrap(LibDecimalFloat.fromFixedDecimalLosslessPacked(block.number, 0)));
+        outputs[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.fromFixedDecimalLosslessPacked(block.number, 0)));
         return outputs;
     }
 }

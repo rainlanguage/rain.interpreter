@@ -49,11 +49,7 @@ contract LibOpMaxValueTest is OpTest {
 
     /// Test the eval of LibOpMaxValue parsed from a string.
     function testOpMaxValueEval() external view {
-        checkHappy(
-            "_: max-value();",
-            Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)),
-            ""
-        );
+        checkHappy("_: max-value();", Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)), "");
     }
 
     /// Test that a max-value with inputs fails integrity check.
