@@ -21,7 +21,7 @@ import {
     RainterpreterExpressionDeployer
 } from "../../src/concrete/RainterpreterExpressionDeployer.sol";
 import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
-import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
+import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";
 
 /// @title RainterpreterExpressionDeployerNPD2DeploymentTest
 /// Tests that the RainterpreterExpressionDeployer meta is correct. Also
