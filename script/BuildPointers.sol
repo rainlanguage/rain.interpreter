@@ -16,6 +16,7 @@ import {
 } from "src/concrete/extern/RainterpreterReferenceExtern.sol";
 import {LibAllStandardOps, AuthoringMetaV2} from "src/lib/op/LibAllStandardOps.sol";
 import {LibCodeGen} from "rain.sol.codegen/lib/LibCodeGen.sol";
+import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";
 import {LibFs} from "rain.sol.codegen/lib/LibFs.sol";
 
 contract BuildPointers is Script {
@@ -41,7 +42,7 @@ contract BuildPointers is Script {
             address(parser),
             "RainterpreterParser",
             string.concat(
-                LibCodeGen.parseMetaConstantString(vm, LibAllStandardOps.authoringMetaV2(), PARSE_META_BUILD_DEPTH),
+                LibGenParseMeta.parseMetaConstantString(vm, LibAllStandardOps.authoringMetaV2(), PARSE_META_BUILD_DEPTH),
                 LibCodeGen.operandHandlerFunctionPointersConstantString(vm, parser),
                 LibCodeGen.literalParserFunctionPointersConstantString(vm, parser)
             )
@@ -82,7 +83,7 @@ contract BuildPointers is Script {
             string.concat(
                 string.concat(
                     LibCodeGen.describedByMetaHashConstantString(vm, name),
-                    LibCodeGen.parseMetaConstantString(
+                    LibGenParseMeta.parseMetaConstantString(
                         vm, LibRainterpreterReferenceExtern.authoringMetaV2(), EXTERN_PARSE_META_BUILD_DEPTH
                     ),
                     LibCodeGen.subParserWordParsersConstantString(vm, extern),
