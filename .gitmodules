@@ -13,9 +13,6 @@
 [submodule "lib/rain.interpreter.interface"]
 	path = lib/rain.interpreter.interface
 	url = https://github.com/rainlanguage/rain.interpreter.interface
-[submodule "lib/rain.sol.codegen"]
-	path = lib/rain.sol.codegen
-	url = https://github.com/rainlanguage/rain.sol.codegen
 [submodule "lib/rain.string"]
 	path = lib/rain.string
 	url = https://github.com/rainlanguage/rain.string
