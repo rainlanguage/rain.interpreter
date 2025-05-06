@@ -11,7 +11,7 @@ import {
 } from "src/concrete/RainterpreterParser.sol";
 import {LibAllStandardOps, AuthoringMetaV2} from "src/lib/op/LibAllStandardOps.sol";
 import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
-import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
+import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";
 
 contract RainterpreterParserPointersTest is Test {
     function testOperandHandlerFunctionPointers() external {
