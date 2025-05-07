@@ -27,25 +27,25 @@ sol!(
 sol!(
     #![sol(all_derives = true, rpc = true)]
     Interpreter,
-    "../../out/RainterpreterNPE2.sol/RainterpreterNPE2.json"
+    "../../out/Rainterpreter.sol/Rainterpreter.json"
 );
 
 sol!(
     #![sol(all_derives = true, rpc = true)]
     Store,
-    "../../out/RainterpreterStoreNPE2.sol/RainterpreterStoreNPE2.json"
+    "../../out/RainterpreterStore.sol/RainterpreterStore.json"
 );
 
 sol!(
     #![sol(all_derives = true, rpc = true)]
     Parser,
-    "../../out/RainterpreterParserNPE2.sol/RainterpreterParserNPE2.json"
+    "../../out/RainterpreterParser.sol/RainterpreterParser.json"
 );
 
 sol!(
     #![sol(all_derives = true, rpc = true)]
     Deployer,
-    "../../out/RainterpreterExpressionDeployerNPE2.sol/RainterpreterExpressionDeployerNPE2.json"
+    "../../out/RainterpreterExpressionDeployer.sol/RainterpreterExpressionDeployer.json"
 );
 
 // type aliases for LocalEvm provider type
