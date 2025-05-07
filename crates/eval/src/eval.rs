@@ -134,22 +134,19 @@ impl Forker {
 
 #[cfg(test)]
 mod tests {
-    use alloy::primitives::utils::parse_ether;
-    use rain_interpreter_env::{
-        CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
-    };
-
-    use std::sync::Arc;
-
     use super::*;
     use crate::fork::NewForkedEvm;
+    use alloy::primitives::utils::parse_ether;
+    use rain_interpreter_test_fixtures::LocalEvm;
+    use std::sync::Arc;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_parse() {
-        let deployer: Address = *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS;
+        let local_evm = LocalEvm::new().await;
+        let deployer = *local_evm.deployer.address();
         let args = NewForkedEvm {
-            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
-            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
+            fork_url: local_evm.url(),
+            fork_block_number: None,
         };
         let fork = Forker::new_with_fork(args, None, None).await.unwrap();
         let res = fork
@@ -167,10 +164,11 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_eval() {
-        let deployer: Address = *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS;
+        let local_evm = LocalEvm::new().await;
+        let deployer = *local_evm.deployer.address();
         let args = NewForkedEvm {
-            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_owned(),
-            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
+            fork_url: local_evm.url(),
+            fork_block_number: None,
         };
         let fork = Forker::new_with_fork(args, None, None).await.unwrap();
         let res = fork
@@ -209,10 +207,11 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 10)]
     async fn test_fork_eval_parallel() {
-        let deployer: Address = *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS;
+        let local_evm = LocalEvm::new().await;
+        let deployer = *local_evm.deployer.address();
         let args = NewForkedEvm {
-            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
-            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
+            fork_url: local_evm.url(),
+            fork_block_number: None,
         };
         let fork = Forker::new_with_fork(args, None, None).await.unwrap();
         let fork = Arc::new(fork); // Wrap in Arc for shared ownership

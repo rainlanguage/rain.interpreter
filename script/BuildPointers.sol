@@ -1,4 +1,5 @@
-// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
 import {Script} from "forge-std/Script.sol";
@@ -18,6 +19,7 @@ import {LibAllStandardOps, AuthoringMetaV2} from "src/lib/op/LibAllStandardOps.s
 import {LibCodeGen} from "rain.sol.codegen/lib/LibCodeGen.sol";
 import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";
 import {LibFs} from "rain.sol.codegen/lib/LibFs.sol";
+import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";
 
 contract BuildPointers is Script {
     function buildRainterpreterPointers() internal {
