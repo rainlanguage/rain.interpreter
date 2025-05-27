@@ -87,6 +87,7 @@ impl Parser for ParserV1 {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
     use super::*;
     use alloy::primitives::{Address, U256};
     use ethers::providers::{MockProvider, MockResponse, Provider};
@@ -124,7 +125,7 @@ mod tests {
             .concat(),
         )));
 
-        let client = ReadableClient::new(Provider::new(transport));
+        let client = ReadableClient::new(HashMap::from([("provider".to_string(), Provider::new(transport))]));
         let parser = ParserV1 {
             address: Address::repeat_byte(0x1),
         };
@@ -153,7 +154,7 @@ mod tests {
             .concat(),
         )));
 
-        let client = ReadableClient::new(Provider::new(transport));
+        let client = ReadableClient::new(HashMap::from([("provider".to_string(), Provider::new(transport))]));
         let parser = ParserV1 {
             address: Address::repeat_byte(0x1),
         };
