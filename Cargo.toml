@@ -36,7 +36,7 @@ reqwest = { version = "0.11.17", features = ["json"] }
 once_cell = "1.17.1"
 alloy-ethers-typecast = { git = "https://github.com/rainlanguage/alloy-ethers-typecast", rev = "f2e4fe4f8ba3773e4266c1911b531b0b22214cfb" }
 eyre = "0.6"
-rain-error-decoding = { git = "https://github.com/rainlanguage/rain.error", rev = "72d9577fdaf7135113847027ba951f9a43b41827" }
+rain-error-decoding = { git = "https://github.com/rainlanguage/rain.error", rev = "fa0cc05a8dbf0f167a2392255a8b509309e9da46" }
 
 [workspace.dependencies.rain_interpreter_parser]
 path = "crates/parser"
