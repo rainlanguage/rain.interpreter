@@ -72,6 +72,7 @@ impl DISPair {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
     use super::*;
     use alloy::primitives::Address;
     use ethers::providers::{MockProvider, MockResponse, Provider};
@@ -108,7 +109,10 @@ mod tests {
             interpreter_address
         ))));
 
-        let client = ReadableClient::new(Provider::new(transport));
+        let client = ReadableClient::new(HashMap::from([(
+            "provider".to_string(),
+            Provider::new(transport)
+        )]));
         let dispair = DISPair::from_deployer(deployer_address, client)
             .await
             .unwrap();
