@@ -11,6 +11,10 @@ import {OperandOverflow} from "src/error/ErrParse.sol";
 contract LibParseOperandSingleFullTest is Test {
     using LibParse for ParseState;
 
+    function parseExternal(string memory s) external view returns (bytes memory, bytes32[] memory) {
+        LibMetaFixture.newState(s).parse();
+    }
+
     /// Fallback is 0 for elided single full operand.
     function testOperandSingleFullElided() external view {
         (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:b();").parse();
@@ -60,7 +64,7 @@ contract LibParseOperandSingleFullTest is Test {
     /// Multiple operands are disallowed.
     function testOperandSingleFullMultiple() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperandValue.selector));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:b<0x00 0x01>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal("_:b<0x00 0x01>();");
         (bytecode);
         (constants);
     }
@@ -206,7 +210,7 @@ contract LibParseOperandSingleFullTest is Test {
     /// Overflowing decimal uint16 max as single full operand reverts.
     function testOperandSingleFullUint16MaxOverflow() external {
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:b<65536>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal("_:b<65536>();");
         (bytecode);
         (constants);
     }
@@ -214,7 +218,7 @@ contract LibParseOperandSingleFullTest is Test {
     /// Overflowing hexadecimal uint16 max as a single full operand reverts.
     function testOperandSingleFullHexUint16MaxOverflow() external {
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:b<0x010000>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal("_:b<0x010000>();");
         (bytecode);
         (constants);
     }
@@ -222,7 +226,7 @@ contract LibParseOperandSingleFullTest is Test {
     /// Opening angle bracket without closing angle bracket reverts.
     function testOperandSingleFullUnclosed() external {
         vm.expectRevert(abi.encodeWithSelector(UnclosedOperand.selector, 5));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:b<0;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal("_:b<0;");
         (bytecode);
         (constants);
     }
@@ -230,7 +234,7 @@ contract LibParseOperandSingleFullTest is Test {
     /// Closing angle bracket without opening angle bracket reverts.
     function testOperandSingleFullUnopened() external {
         vm.expectRevert(abi.encodeWithSelector(ExpectedLeftParen.selector, 3));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:b>0>;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal("_:b>0>;");
         (bytecode);
         (constants);
     }
