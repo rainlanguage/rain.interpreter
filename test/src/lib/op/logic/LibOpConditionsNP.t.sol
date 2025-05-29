@@ -16,7 +16,7 @@ pragma solidity =0.8.25;
 // // } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 // // import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 // // import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
-// // import {LibIntOrAString, IntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
+// // import {LibIntOrAString, IntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
 // // import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 // // contract LibOpConditionsNPTest is OpTest {
