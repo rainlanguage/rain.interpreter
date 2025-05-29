@@ -22,6 +22,10 @@ import {ParseState} from "src/lib/parse/LibParseState.sol";
 contract LibParseUnexpectedRHSTest is Test {
     using LibParse for ParseState;
 
+    function parseExternal(string memory s) external view returns (bytes memory bytecode, bytes32[] memory constants) {
+        LibMetaFixture.newState(s).parse();
+    }
+
     /// Check the parser reverts if it encounters an unexpected character as the
     /// first character on the RHS.
     function testParseUnexpectedRHS(uint8 unexpected) external {
@@ -52,7 +56,7 @@ contract LibParseUnexpectedRHSTest is Test {
         string memory s = string(bytes.concat(":", bytes1(unexpected), ";"));
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 1));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(s).parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal(s);
         (bytecode, constants);
     }
 
@@ -62,7 +66,7 @@ contract LibParseUnexpectedRHSTest is Test {
         string memory s = ":();";
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 1));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(s).parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal(s);
         (bytecode, constants);
     }
 }
