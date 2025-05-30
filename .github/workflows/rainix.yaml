@@ -61,4 +61,5 @@ jobs:
           CI_FORK_SEPOLIA_BLOCK_NUMBER: ${{ vars.CI_FORK_SEPOLIA_BLOCK_NUMBER }}
           CI_FORK_SEPOLIA_DEPLOYER_ADDRESS: ${{ vars.CI_FORK_SEPOLIA_DEPLOYER_ADDRESS }}
           CI_DEPLOY_SEPOLIA_RPC_URL: ${{ secrets.CI_DEPLOY_SEPOLIA_RPC_URL || vars.CI_DEPLOY_SEPOLIA_RPC_URL }}
+          CI_FORK_POLYGON_RPC_URL: ${{ secrets.CI_FORK_POLYGON_RPC_URL || vars.CI_FORK_POLYGON_RPC_URL }}
         run: nix develop -c ${{ matrix.task }}
