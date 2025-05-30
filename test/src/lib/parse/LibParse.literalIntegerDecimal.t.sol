@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Test} from "forge-std/Test.sol";
+import {ParseTest} from "test/abstract/ParseTest.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 
 import {DecimalLiteralOverflow} from "src/lib/parse/literal/LibParseLiteral.sol";
@@ -13,12 +13,8 @@ import {ParseDecimalOverflow} from "rain.string/error/ErrParse.sol";
 
 /// @title LibParseLiteralIntegerDecimalTest
 /// Tests parsing integer literal decimal values.
-contract LibParseLiteralIntegerDecimalTest is Test {
+contract LibParseLiteralIntegerDecimalTest is ParseTest {
     using LibParse for ParseState;
-
-    function parseExternal(string memory s) external view returns (bytes memory, bytes32[] memory) {
-        return LibMetaFixture.newState(s).parse();
-    }
 
     /// Check a single decimal literal. Should not revert and return length 1
     /// sources and constants.

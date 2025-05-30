@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Test} from "forge-std/Test.sol";
+import {ParseTest} from "test/abstract/ParseTest.sol";
 import {
     CMASK_COMMENT_HEAD,
     CMASK_IDENTIFIER_TAIL,
@@ -15,12 +15,8 @@ import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseUnexpectedLHSTest
 /// The parser should revert if it encounters an unexpected character on the LHS.
-contract LibParseUnexpectedLHSTest is Test {
+contract LibParseUnexpectedLHSTest is ParseTest {
     using LibParse for ParseState;
-
-    function parseExternal(string memory s) external view returns (bytes memory bytecode, bytes32[] memory constants) {
-        return LibMetaFixture.newState(s).parse();
-    }
 
     /// Check the parser reverts if it encounters an unexpected EOL on the LHS.
     function testParseUnexpectedLHSEOL() external {

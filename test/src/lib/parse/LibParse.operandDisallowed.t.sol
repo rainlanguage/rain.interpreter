@@ -1,19 +1,15 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Test} from "forge-std/Test.sol";
+import {ParseTest} from "test/abstract/ParseTest.sol";
 
 import {ExpectedOperand, UnclosedOperand, UnexpectedOperand, UnsupportedLiteralType} from "src/error/ErrParse.sol";
 import {LibParse, ExpectedLeftParen} from "src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
 
-contract LibParseOperandDisallowedTest is Test {
+contract LibParseOperandDisallowedTest is ParseTest {
     using LibParse for ParseState;
-
-    function parseExternal(string memory s) external view returns (bytes memory bytecode, bytes32[] memory constants) {
-        return LibMetaFixture.newState(s).parse();
-    }
 
     /// Opening an operand is disallowed for words that don't support it.
     function testOperandDisallowed() external {

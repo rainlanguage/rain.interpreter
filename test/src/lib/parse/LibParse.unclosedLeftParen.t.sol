@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Test} from "forge-std/Test.sol";
+import {ParseTest} from "test/abstract/ParseTest.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {LibParse} from "src/lib/parse/LibParse.sol";
 import {UnclosedLeftParen} from "src/error/ErrParse.sol";
@@ -9,12 +9,8 @@ import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseUnclosedLeftParenTest
 /// Test that the parser errors when it encounters an unclosed left paren.
-contract LibParseUnclosedLeftParenTest is Test {
+contract LibParseUnclosedLeftParenTest is ParseTest {
     using LibParse for ParseState;
-
-    function parseExternal(string memory s) external view {
-        LibMetaFixture.newState(s).parse();
-    }
 
     /// Check the parser reverts if it encounters an unclosed left paren.
     function testParseUnclosedLeftParen() external {

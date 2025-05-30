@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Test} from "forge-std/Test.sol";
+import {ParseTest} from "test/abstract/ParseTest.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 
 import {LibParse} from "src/lib/parse/LibParse.sol";
@@ -11,12 +11,8 @@ import {MissingFinalSemi} from "src/error/ErrParse.sol";
 /// @title LibParseMissingFinalSemiTest
 /// @notice Tests that missing final semicolons are rejected. Every expression
 /// MUST end with a semicolon as the EOF character.
-contract LibParseMissingFinalSemiTest is Test {
+contract LibParseMissingFinalSemiTest is ParseTest {
     using LibParse for ParseState;
-
-    function parseExternal(string memory s) external view returns (bytes memory bytecode, bytes32[] memory constants) {
-        return LibMetaFixture.newState(s).parse();
-    }
 
     /// A lone colon should revert as missing a semi.
     function testParseMissingFinalSemiRevertsLoneColon() external {

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Test} from "forge-std/Test.sol";
+import {ParseTest} from "test/abstract/ParseTest.sol";
 
 import {ExpectedOperand, UnclosedOperand} from "src/error/ErrParse.sol";
 import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV2.sol";
@@ -18,12 +18,8 @@ import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenPars
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibParseNamedLHSTest
-contract LibParseNamedLHSTest is Test {
+contract LibParseNamedLHSTest is ParseTest {
     using LibParse for ParseState;
-
-    function parseExternal(string memory s) external view returns (bytes memory bytecode, bytes32[] memory constants) {
-        return LibMetaFixture.newState(s).parse();
-    }
 
     /// A few simple examples that should create some empty sources.
     function testParseNamedLHSEmptySourceExamples() external view {

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Test} from "forge-std/Test.sol";
+import {ParseTest} from "test/abstract/ParseTest.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 
 import {LibParse} from "src/lib/parse/LibParse.sol";
@@ -12,12 +12,8 @@ import {ParseState} from "src/lib/parse/LibParseState.sol";
 /// @title LibParseNOutputTest
 /// Test that the parser can handle multi and zero outputs for RHS items when
 /// they are singular on a line, and mandates individual items otherwise.
-contract LibParseNOutputTest is Test {
+contract LibParseNOutputTest is ParseTest {
     using LibParse for ParseState;
-
-    function parseExternal(string memory s) external view returns (bytes memory bytecode, bytes32[] memory constants) {
-        return LibMetaFixture.newState(s).parse();
-    }
 
     /// A single RHS item MAY have 0 outputs.
     function testParseNOutputExcessRHS0() external view {
