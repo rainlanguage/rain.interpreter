@@ -23,3 +23,12 @@ pub static CI_FORK_SEPOLIA_BLOCK_NUMBER: Lazy<BlockNumber> = Lazy::new(|| {
     .parse()
     .unwrap()
 });
+
+pub static CI_FORK_POLYGON_RPC_URL: Lazy<String> = Lazy::new(|| {
+    env!(
+        "CI_FORK_POLYGON_RPC_URL",
+        "$CI_FORK_POLYGON_RPC_URL not set."
+    )
+    .to_string()
+});
+
