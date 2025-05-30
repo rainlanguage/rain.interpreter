@@ -230,7 +230,7 @@ impl Forker {
         }
 
         if !raw.exit_reason.is_ok() {
-            return Err(ForkCallError::Failed(raw));
+            return Err(raw.into());
         }
 
         let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
@@ -275,7 +275,7 @@ impl Forker {
         }
 
         if !raw.exit_reason.is_ok() {
-            return Err(ForkCallError::Failed(raw));
+            return Err(raw.into());
         }
 
         let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
@@ -372,9 +372,7 @@ impl Forker {
         if org_block_number.is_none() {
             return Err(ForkCallError::ExecutorError("no active fork!".to_owned()));
         }
-        let block_number = block_number
-            .map(BlockNumber::from)
-            .unwrap_or(org_block_number.unwrap());
+        let block_number = block_number.unwrap_or(org_block_number.unwrap());
 
         self.executor.env_mut().block.number = U256::from(block_number);
 
