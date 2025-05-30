@@ -32,3 +32,10 @@ pub static CI_FORK_POLYGON_RPC_URL: Lazy<String> = Lazy::new(|| {
     .to_string()
 });
 
+pub static CI_FORK_BSC_RPC_URL: Lazy<String> = Lazy::new(|| {
+    env!(
+        "CI_FORK_BSC_RPC_URL",
+        "$CI_FORK_BSC_RPC_URL not set."
+    )
+    .to_string()
+});
