@@ -90,6 +90,7 @@ mod tests {
     use super::*;
     use alloy::primitives::{Address, U256};
     use ethers::providers::{MockProvider, MockResponse, Provider};
+    use std::collections::HashMap;
 
     #[tokio::test]
     async fn test_from_dispair() {
@@ -124,7 +125,10 @@ mod tests {
             .concat(),
         )));
 
-        let client = ReadableClient::new(Provider::new(transport));
+        let client = ReadableClient::new(HashMap::from([(
+            "provider".to_string(),
+            Provider::new(transport),
+        )]));
         let parser = ParserV1 {
             address: Address::repeat_byte(0x1),
         };
@@ -153,7 +157,10 @@ mod tests {
             .concat(),
         )));
 
-        let client = ReadableClient::new(Provider::new(transport));
+        let client = ReadableClient::new(HashMap::from([(
+            "provider".to_string(),
+            Provider::new(transport),
+        )]));
         let parser = ParserV1 {
             address: Address::repeat_byte(0x1),
         };

@@ -14,4 +14,4 @@ serde_json = { workspace = true }
 alloy = { workspace = true, features = ["node-bindings", "sol-types", "rpc-types", "provider-http", "network", "contract", "signer-local"] }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-getrandom = { version = "0", features = ["js", "js-sys"] }
+getrandom = { version = "0.2.15", features = ["js", "js-sys"] }
