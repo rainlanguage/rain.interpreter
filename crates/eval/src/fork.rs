@@ -395,7 +395,8 @@ impl Forker {
 mod tests {
     use crate::namespace::CreateNamespace;
     use rain_interpreter_env::{
-        CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS, CI_FORK_POLYGON_RPC_URL, CI_FORK_BSC_RPC_URL
+        CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_BSC_RPC_URL, CI_FORK_POLYGON_RPC_URL,
+        CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
     };
 
     use super::*;

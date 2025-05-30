@@ -2,7 +2,11 @@ use alloy::primitives::{Address, BlockNumber};
 use once_cell::sync::Lazy;
 
 pub static CI_DEPLOY_SEPOLIA_RPC_URL: Lazy<String> = Lazy::new(|| {
-    env!("CI_DEPLOY_SEPOLIA_RPC_URL").to_string()
+    env!(
+        "CI_DEPLOY_SEPOLIA_RPC_URL",
+        "$CI_DEPLOY_SEPOLIA_RPC_URL not set."
+    )
+    .to_string()
 });
 
 pub static CI_FORK_SEPOLIA_DEPLOYER_ADDRESS: Lazy<Address> = Lazy::new(|| {
@@ -31,10 +35,5 @@ pub static CI_FORK_POLYGON_RPC_URL: Lazy<String> = Lazy::new(|| {
     .to_string()
 });
 
-pub static CI_FORK_BSC_RPC_URL: Lazy<String> = Lazy::new(|| {
-    env!(
-        "CI_FORK_BSC_RPC_URL",
-        "$CI_FORK_BSC_RPC_URL not set."
-    )
-    .to_string()
-});
+pub static CI_FORK_BSC_RPC_URL: Lazy<String> =
+    Lazy::new(|| env!("CI_FORK_BSC_RPC_URL", "$CI_FORK_BSC_RPC_URL not set.").to_string());
