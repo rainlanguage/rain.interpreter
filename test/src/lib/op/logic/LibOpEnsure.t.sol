@@ -45,15 +45,20 @@ contract LibOpEnsureTest is OpTest {
     /// Directly test the run logic of LibOpEnsure.
     function testOpEnsureRun(StackItem condition, string memory reason) external {
         vm.assume(bytes(reason).length <= 31);
+        if (StackItem.unwrap(condition) == 0) {
+            vm.expectRevert(bytes(reason));
+        }
+
+        this.internalTestOpEnsureRun(condition, reason);
+    }
+
+    function internalTestOpEnsureRun(StackItem condition, string memory reason) external view {
         InterpreterState memory state = opTestDefaultInterpreterState();
         StackItem[] memory inputs = new StackItem[](2);
         inputs[0] = condition;
         inputs[1] = StackItem.wrap(bytes32(IntOrAString.unwrap(LibIntOrAString.fromString2(reason))));
 
         OperandV2 operand = LibOperand.build(2, 0, 0);
-        if (StackItem.unwrap(condition) == 0) {
-            vm.expectRevert(bytes(reason));
-        }
         opReferenceCheck(state, operand, LibOpEnsure.referenceFn, LibOpEnsure.integrity, LibOpEnsure.run, inputs);
     }
 
