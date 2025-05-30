@@ -21,6 +21,10 @@ import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 contract LibParseNamedLHSTest is Test {
     using LibParse for ParseState;
 
+    function parseExternal(string memory s) external view returns (bytes memory bytecode, bytes32[] memory constants) {
+        return LibMetaFixture.newState(s).parse();
+    }
+
     /// A few simple examples that should create some empty sources.
     function testParseNamedLHSEmptySourceExamples() external view {
         string[3] memory examples0 = ["a _:;", "a b:;", "foo bar:;"];
@@ -94,7 +98,7 @@ contract LibParseNamedLHSTest is Test {
         // Only the first 32 chars are visible in the error.
         vm.expectRevert(abi.encodeWithSelector(WordSize.selector, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
         // 32 chars is too long.
-        LibMetaFixture.newState("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;").parse();
+        this.parseExternal("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;");
     }
 
     /// Exceeding the maximum length of a word should revert. Testing a 33 char
@@ -104,7 +108,7 @@ contract LibParseNamedLHSTest is Test {
         // Only the first 32 chars are visible in the error.
         vm.expectRevert(abi.encodeWithSelector(WordSize.selector, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
         // 33 chars is too long.
-        LibMetaFixture.newState("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;").parse();
+        this.parseExternal("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;");
     }
 
     /// Stack needs to index items by name correctly across lines.
@@ -168,7 +172,7 @@ contract LibParseNamedLHSTest is Test {
     /// Duplicate names are disallowed in the same source.
     function testParseNamedErrorDuplicateSameSource() external {
         vm.expectRevert(abi.encodeWithSelector(DuplicateLHSItem.selector, 4));
-        LibMetaFixture.newState("a:,a:;").parse();
+        this.parseExternal("a:,a:;");
     }
 
     /// Duplicate names are allowed across different sources.

@@ -11,10 +11,14 @@ import {ParseState} from "src/lib/parse/LibParseState.sol";
 contract LibParseOperandDisallowedTest is Test {
     using LibParse for ParseState;
 
+    function parseExternal(string memory s) external view returns (bytes memory bytecode, bytes32[] memory constants) {
+        return LibMetaFixture.newState(s).parse();
+    }
+
     /// Opening an operand is disallowed for words that don't support it.
     function testOperandDisallowed() external {
         vm.expectRevert(abi.encodeWithSelector(UnsupportedLiteralType.selector, 4));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:a<;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal("_:a<;");
         (bytecode);
         (constants);
     }
@@ -22,7 +26,7 @@ contract LibParseOperandDisallowedTest is Test {
     /// Closing an operand is disallowed for words that don't support it.
     function testOperandDisallowed1() external {
         vm.expectRevert(abi.encodeWithSelector(ExpectedLeftParen.selector, 3));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:a>;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal("_:a>;");
         (bytecode);
         (constants);
     }
@@ -31,7 +35,7 @@ contract LibParseOperandDisallowedTest is Test {
     /// that don't support it.
     function testOperandDisallowed3() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:a<1>;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal("_:a<1>;");
         (bytecode);
         (constants);
     }
@@ -40,7 +44,7 @@ contract LibParseOperandDisallowedTest is Test {
     /// disallowed for words that don't support it.
     function testOperandDisallowed4() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:a<1>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal("_:a<1>();");
         (bytecode);
         (constants);
     }

@@ -14,33 +14,37 @@ import {MissingFinalSemi} from "src/error/ErrParse.sol";
 contract LibParseMissingFinalSemiTest is Test {
     using LibParse for ParseState;
 
+    function parseExternal(string memory s) external view returns (bytes memory bytecode, bytes32[] memory constants) {
+        return LibMetaFixture.newState(s).parse();
+    }
+
     /// A lone colon should revert as missing a semi.
     function testParseMissingFinalSemiRevertsLoneColon() external {
         vm.expectRevert(abi.encodeWithSelector(MissingFinalSemi.selector, 1));
-        LibMetaFixture.newState(":").parse();
+        this.parseExternal(":");
     }
 
     /// A lone colon after an empty source should error as missing a semi.
     function testParseMissingFinalSemiRevertsEmptySource() external {
         vm.expectRevert(abi.encodeWithSelector(MissingFinalSemi.selector, 3));
-        LibMetaFixture.newState(":;:").parse();
+        this.parseExternal(":;:");
     }
 
     /// An empty source with a trailing comma should error as missing a semi.
     function testParseMissingFinalSemiRevertsTrailingComma() external {
         vm.expectRevert(abi.encodeWithSelector(MissingFinalSemi.selector, 2));
-        LibMetaFixture.newState(":,").parse();
+        this.parseExternal(":,");
     }
 
     /// A single word without a trailing semi should error as missing a semi.
     function testParseMissingFinalSemiRevertsSingleWord() external {
         vm.expectRevert(abi.encodeWithSelector(MissingFinalSemi.selector, 4));
-        LibMetaFixture.newState(":a()").parse();
+        this.parseExternal(":a()");
     }
 
     /// Some detached LHS items should error as missing a semi.
     function testParseMissingFinalSemiRevertsLHSItems() external {
         vm.expectRevert(abi.encodeWithSelector(MissingFinalSemi.selector, 3));
-        LibMetaFixture.newState("_ _").parse();
+        this.parseExternal("_ _");
     }
 }

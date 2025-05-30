@@ -16,6 +16,10 @@ import {MaxSources} from "src/error/ErrParse.sol";
 contract LibParseEmptyTest is Test {
     using LibParse for ParseState;
 
+    function parseExternal(string memory s) external view returns (bytes memory bytecode, bytes32[] memory constants) {
+        return LibMetaFixture.newState(s).parse();
+    }
+
     /// Check truly empty input bytes. Should not revert and return length 0
     /// sources and constants.
     function testParseEmpty00() external view {
@@ -504,6 +508,6 @@ contract LibParseEmptyTest is Test {
     /// state of the parser.
     function testParseEmptyError16() external {
         vm.expectRevert(abi.encodeWithSelector(MaxSources.selector));
-        LibMetaFixture.newState(":;:;:;:;:;:;:;:;:;:;:;:;:;:;:;:;").parse();
+        this.parseExternal(":;:;:;:;:;:;:;:;:;:;:;:;:;:;:;:;");
     }
 }

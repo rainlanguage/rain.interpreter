@@ -15,6 +15,10 @@ import {ParseState} from "src/lib/parse/LibParseState.sol";
 contract LibParseNOutputTest is Test {
     using LibParse for ParseState;
 
+    function parseExternal(string memory s) external view returns (bytes memory bytecode, bytes32[] memory constants) {
+        return LibMetaFixture.newState(s).parse();
+    }
+
     /// A single RHS item MAY have 0 outputs.
     function testParseNOutputExcessRHS0() external view {
         (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(":a();").parse();
@@ -42,14 +46,14 @@ contract LibParseNOutputTest is Test {
     /// LHS items.
     function testParseNOutputExcessRHS1() external {
         vm.expectRevert(abi.encodeWithSelector(ExcessRHSItems.selector, 8));
-        LibMetaFixture.newState(":a() b();").parse();
+        this.parseExternal(":a() b();");
     }
 
     /// Multiple RHS items MUST NOT have 0 outputs. Tests two RHS items and one
     /// LHS item.
     function testParseNOutputExcessRHS2() external {
         vm.expectRevert(abi.encodeWithSelector(ExcessRHSItems.selector, 9));
-        LibMetaFixture.newState("_:a() b();").parse();
+        this.parseExternal("_:a() b();");
     }
 
     /// A single RHS item can have multiple outputs. This RHS item has nesting.
@@ -82,7 +86,7 @@ contract LibParseNOutputTest is Test {
     /// and three LHS items.
     function testParseNOutputExcessRHS3() external {
         vm.expectRevert(abi.encodeWithSelector(ExcessLHSItems.selector, 13));
-        LibMetaFixture.newState("_ _ _:a() b();").parse();
+        this.parseExternal("_ _ _:a() b();");
     }
 
     /// Multiple output RHS items MAY be followed by single output RHS items,
