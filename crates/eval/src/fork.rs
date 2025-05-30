@@ -389,7 +389,6 @@ impl Forker {
 }
 
 #[cfg(test)]
-
 mod tests {
     use crate::namespace::CreateNamespace;
     use rain_interpreter_env::{
