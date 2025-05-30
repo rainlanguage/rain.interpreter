@@ -505,7 +505,7 @@ mod tests {
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_multi_fork_read_write_switch_reset() -> Result<(), ForkCallError> {
         let args = NewForkedEvm {
-            fork_url: CI_FORK_POLYGON_RPC_URL.to_owned(),
+            fork_url: CI_FORK_POLYGON_RPC_URL.clone(),
             fork_block_number: Some(POLYGON_FORK_NUMBER),
         };
         let mut forker = Forker::new_with_fork(args, None, None).await.unwrap();
@@ -603,7 +603,7 @@ mod tests {
 
         // switch fork
         let args = NewForkedEvm {
-            fork_url: CI_FORK_POLYGON_RPC_URL.to_owned(),
+            fork_url: CI_FORK_POLYGON_RPC_URL.clone(),
             fork_block_number: Some(POLYGON_FORK_NUMBER),
         };
         forker.add_or_select(args, None).await?;
@@ -639,7 +639,7 @@ mod tests {
     async fn test_fork_rolls() {
         // we need to roll the fork forwards and check that the env block number is updated
         let args = NewForkedEvm {
-            fork_url: CI_FORK_POLYGON_RPC_URL.to_owned(),
+            fork_url: CI_FORK_POLYGON_RPC_URL.clone(),
             fork_block_number: Some(POLYGON_FORK_NUMBER),
         };
         let mut forker = Forker::new_with_fork(args, None, None).await.unwrap();
