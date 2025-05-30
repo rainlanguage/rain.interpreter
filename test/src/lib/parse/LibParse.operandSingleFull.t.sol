@@ -12,7 +12,7 @@ contract LibParseOperandSingleFullTest is Test {
     using LibParse for ParseState;
 
     function parseExternal(string memory s) external view returns (bytes memory, bytes32[] memory) {
-        LibMetaFixture.newState(s).parse();
+        return LibMetaFixture.newState(s).parse();
     }
 
     /// Fallback is 0 for elided single full operand.
