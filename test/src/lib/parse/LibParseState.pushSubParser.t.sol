@@ -11,15 +11,18 @@ contract LibParseStatePushSubParserTest is Test {
     using LibParseState for ParseState;
     using LibBytes for bytes;
 
+    function pushSubParserExternal(ParseState memory state, bytes32 value) external pure {
+        state.pushSubParser(Pointer.unwrap(state.data.dataPointer()), value);
+    }
+
     /// Pushing any value onto the sub parser that exceeds the maximum value
     /// should revert.
     function testPushSubParserOverflow(ParseState memory state, uint256 value) external {
         value = bound(value, uint256(type(uint160).max) + 1, type(uint256).max);
 
         state.subParsers = 0;
-        uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         vm.expectRevert(abi.encodeWithSelector(InvalidSubParser.selector, 0));
-        state.pushSubParser(cursor, bytes32(value));
+        this.pushSubParserExternal(state, bytes32(value));
     }
 
     /// Pushing any value onto an empty sub parser LL should result in that value

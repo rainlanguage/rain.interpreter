@@ -20,7 +20,7 @@ contract LibParseOperandParseOperandTest is Test {
     using Strings for int256;
 
     function checkParsingOperandFromData(string memory s, bytes32[] memory expectedValues, uint256 expectedEnd)
-        internal
+        public
         pure
     {
         ParseState memory state = LibMetaFixture.newState(s);
@@ -254,18 +254,18 @@ contract LibParseOperandParseOperandTest is Test {
     /// More than 4 values is an error.
     function testParseOperandTooManyValues() external {
         vm.expectRevert(abi.encodeWithSelector(OperandValuesOverflow.selector, 9));
-        checkParsingOperandFromData("<1 2 3 4 5>", new bytes32[](0), 0);
+        this.checkParsingOperandFromData("<1 2 3 4 5>", new bytes32[](0), 0);
     }
 
     /// Unclosed operand is an error.
     function testParseOperandUnclosed() external {
         vm.expectRevert(abi.encodeWithSelector(UnclosedOperand.selector, 8));
-        checkParsingOperandFromData("<1 2 3 4", new bytes32[](0), 0);
+        this.checkParsingOperandFromData("<1 2 3 4", new bytes32[](0), 0);
     }
 
     // Unexpected chars will be treated as unclosed operands.
     function testParseOperandUnexpectedChars() external {
         vm.expectRevert(abi.encodeWithSelector(UnclosedOperand.selector, 6));
-        checkParsingOperandFromData("<1 2 3;> 6", new bytes32[](0), 0);
+        this.checkParsingOperandFromData("<1 2 3;> 6", new bytes32[](0), 0);
     }
 }

@@ -8,6 +8,10 @@ import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {OperandOverflow} from "src/error/ErrParse.sol";
 
 contract LibParseOperandHandleOperandM1M1Test is Test {
+    function handleOperandM1M1External(bytes32[] memory values) external pure returns (OperandV2) {
+        return LibParseOperand.handleOperandM1M1(values);
+    }
+
     // Both values are optional so if nothing is provided everything falls back
     // to zero.
     function testHandleOperandM1M1NoValues() external pure {
@@ -29,7 +33,7 @@ contract LibParseOperandHandleOperandM1M1Test is Test {
         bytes32[] memory values = new bytes32[](1);
         values[0] = bytes32(value);
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
-        LibParseOperand.handleOperandM1M1(values);
+        this.handleOperandM1M1External(values);
     }
 
     // If two values are provided, they must be 1 bit each.
@@ -52,13 +56,13 @@ contract LibParseOperandHandleOperandM1M1Test is Test {
         values[0] = bytes32(a);
         values[1] = bytes32(b);
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
-        LibParseOperand.handleOperandM1M1(values);
+        this.handleOperandM1M1External(values);
     }
 
     // If more than two values are provided, it is an error.
     function testHandleOperandM1M1ManyValues(bytes32[] memory values) external {
         vm.assume(values.length > 2);
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperandValue.selector));
-        LibParseOperand.handleOperandM1M1(values);
+        this.handleOperandM1M1External(values);
     }
 }

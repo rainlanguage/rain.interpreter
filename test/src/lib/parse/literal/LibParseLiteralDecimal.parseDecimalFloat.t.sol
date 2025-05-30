@@ -21,12 +21,20 @@ contract LibParseLiteralDecimalParseDecimalFloatTest is Test {
     using LibBytes for bytes;
     using Strings for uint256;
 
+    function parseDecimalFloatPackedExternal(ParseState memory state)
+        external
+        pure
+        returns (uint256 cursorAfter, bytes32 value)
+    {
+        return state.parseDecimalFloatPacked(
+            Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer())
+        );
+    }
+
     function checkParseDecimalRevert(string memory data, bytes memory err) internal {
         ParseState memory state = LibParseState.newState(bytes(data), "", "", "");
         vm.expectRevert(err);
-        state.parseDecimalFloatPacked(
-            Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer())
-        );
+        this.parseDecimalFloatPackedExternal(state);
     }
 
     /// An empty string should revert.

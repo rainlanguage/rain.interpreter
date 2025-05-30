@@ -8,10 +8,14 @@ import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {OperandOverflow} from "src/error/ErrParse.sol";
 
 contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
+    function handleOperandDoublePerByteNoDefaultExternal(bytes32[] memory values) external pure returns (OperandV2) {
+        return LibParseOperand.handleOperandDoublePerByteNoDefault(values);
+    }
+
     // There must be exactly two values so zero values is an error.
     function testHandleOperandDoublePerByteNoDefaultNoValues() external {
         vm.expectRevert(abi.encodeWithSelector(ExpectedOperand.selector));
-        LibParseOperand.handleOperandDoublePerByteNoDefault(new bytes32[](0));
+        this.handleOperandDoublePerByteNoDefaultExternal(new bytes32[](0));
     }
 
     // There must be exactly two values so one value is an error.
@@ -20,14 +24,14 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
         bytes32[] memory values = new bytes32[](1);
         values[0] = bytes32(value);
         vm.expectRevert(abi.encodeWithSelector(ExpectedOperand.selector));
-        LibParseOperand.handleOperandDoublePerByteNoDefault(values);
+        this.handleOperandDoublePerByteNoDefaultExternal(values);
     }
 
     // There must be exactly two values so three or more values is an error.
     function testHandleOperandDoublePerByteNoDefaultManyValues(bytes32[] memory values) external {
         vm.assume(values.length > 2);
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperandValue.selector));
-        LibParseOperand.handleOperandDoublePerByteNoDefault(values);
+        this.handleOperandDoublePerByteNoDefaultExternal(values);
     }
 
     // If the first value is greater than 1 byte, it is an error.
@@ -40,7 +44,7 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
         values[1] = bytes32(b);
 
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
-        LibParseOperand.handleOperandDoublePerByteNoDefault(values);
+        this.handleOperandDoublePerByteNoDefaultExternal(values);
     }
 
     // If the second value is greater than 1 byte, it is an error.
@@ -52,7 +56,7 @@ contract LibParseOperandHandleOperandDoublePerByteNoDefaultTest is Test {
         values[0] = bytes32(a);
         values[1] = bytes32(b);
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
-        LibParseOperand.handleOperandDoublePerByteNoDefault(values);
+        this.handleOperandDoublePerByteNoDefaultExternal(values);
     }
 
     // If both values are within 1 byte, it is not an error, the result is the

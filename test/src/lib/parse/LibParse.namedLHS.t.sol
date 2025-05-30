@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Test} from "forge-std/Test.sol";
+import {ParseTest} from "test/abstract/ParseTest.sol";
 
 import {ExpectedOperand, UnclosedOperand} from "src/error/ErrParse.sol";
 import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV2.sol";
@@ -18,7 +18,7 @@ import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenPars
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibParseNamedLHSTest
-contract LibParseNamedLHSTest is Test {
+contract LibParseNamedLHSTest is ParseTest {
     using LibParse for ParseState;
 
     /// A few simple examples that should create some empty sources.
@@ -94,7 +94,7 @@ contract LibParseNamedLHSTest is Test {
         // Only the first 32 chars are visible in the error.
         vm.expectRevert(abi.encodeWithSelector(WordSize.selector, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
         // 32 chars is too long.
-        LibMetaFixture.newState("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;").parse();
+        this.parseExternal("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;");
     }
 
     /// Exceeding the maximum length of a word should revert. Testing a 33 char
@@ -104,7 +104,7 @@ contract LibParseNamedLHSTest is Test {
         // Only the first 32 chars are visible in the error.
         vm.expectRevert(abi.encodeWithSelector(WordSize.selector, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
         // 33 chars is too long.
-        LibMetaFixture.newState("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;").parse();
+        this.parseExternal("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;");
     }
 
     /// Stack needs to index items by name correctly across lines.
@@ -168,7 +168,7 @@ contract LibParseNamedLHSTest is Test {
     /// Duplicate names are disallowed in the same source.
     function testParseNamedErrorDuplicateSameSource() external {
         vm.expectRevert(abi.encodeWithSelector(DuplicateLHSItem.selector, 4));
-        LibMetaFixture.newState("a:,a:;").parse();
+        this.parseExternal("a:,a:;");
     }
 
     /// Duplicate names are allowed across different sources.

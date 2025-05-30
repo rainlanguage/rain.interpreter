@@ -56,16 +56,19 @@ contract LibOpContextNPTest is OpTest {
     /// runtime logic will revert if the indexes are OOB. Tests that i is OOB.
     /// forge-config: default.fuzz.runs = 100
     function testOpContextNPRunOOBi(bytes32[][] memory context, uint256 i, uint256 j) external {
-        InterpreterState memory state = opTestDefaultInterpreterState();
-        state.context = context;
-        vm.assume(state.context.length < type(uint8).max);
-        i = bound(i, state.context.length, type(uint8).max);
+        vm.assume(context.length < type(uint8).max);
+        i = bound(i, context.length, type(uint8).max);
         j = bound(j, 0, type(uint8).max);
         OperandV2 operand = LibOperand.build(0, 1, uint16(uint256(i) | uint256(j) << 8));
-        StackItem[] memory inputs = new StackItem[](0);
         vm.expectRevert(stdError.indexOOBError);
+        this.internalTestOpContextNPRunOOBi(context, operand);
+    }
+
+    function internalTestOpContextNPRunOOBi(bytes32[][] memory context, OperandV2 operand) external view {
+        InterpreterState memory state = opTestDefaultInterpreterState();
+        state.context = context;
         opReferenceCheck(
-            state, operand, LibOpContextNP.referenceFn, LibOpContextNP.integrity, LibOpContextNP.run, inputs
+            state, operand, LibOpContextNP.referenceFn, LibOpContextNP.integrity, LibOpContextNP.run, new StackItem[](0)
         );
     }
 
@@ -73,18 +76,21 @@ contract LibOpContextNPTest is OpTest {
     /// runtime logic will revert if the indexes are OOB. Tests that j is OOB.
     /// forge-config: default.fuzz.runs = 100
     function testOpContextNPRunOOBj(bytes32[][] memory context, uint256 i, uint256 j) external {
+        vm.assume(context.length > 0);
+        vm.assume(context.length < type(uint8).max);
+        i = bound(i, 0, context.length - 1);
+        vm.assume(context[i].length < type(uint8).max);
+        j = bound(j, context[i].length, type(uint8).max);
+        vm.expectRevert(stdError.indexOOBError);
+        OperandV2 operand = LibOperand.build(0, 1, uint16(uint256(i) | uint256(j) << 8));
+        this.internalTestOpContextNPRunOOBj(context, operand);
+    }
+
+    function internalTestOpContextNPRunOOBj(bytes32[][] memory context, OperandV2 operand) external view {
         InterpreterState memory state = opTestDefaultInterpreterState();
         state.context = context;
-        vm.assume(state.context.length > 0);
-        vm.assume(state.context.length < type(uint8).max);
-        i = bound(i, 0, state.context.length - 1);
-        vm.assume(state.context[i].length < type(uint8).max);
-        j = bound(j, state.context[i].length, type(uint8).max);
-        OperandV2 operand = LibOperand.build(0, 1, uint16(uint256(i) | uint256(j) << 8));
-        StackItem[] memory inputs = new StackItem[](0);
-        vm.expectRevert(stdError.indexOOBError);
         opReferenceCheck(
-            state, operand, LibOpContextNP.referenceFn, LibOpContextNP.integrity, LibOpContextNP.run, inputs
+            state, operand, LibOpContextNP.referenceFn, LibOpContextNP.integrity, LibOpContextNP.run, new StackItem[](0)
         );
     }
 

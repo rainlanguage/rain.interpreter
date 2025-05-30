@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Test} from "forge-std/Test.sol";
-
+import {ParseTest} from "test/abstract/ParseTest.sol";
 import {LibParse} from "src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {UnexpectedRHSChar} from "src/error/ErrParse.sol";
@@ -19,7 +18,7 @@ import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseUnexpectedRHSTest
 /// The parser should revert if it encounters an unexpected character on the RHS.
-contract LibParseUnexpectedRHSTest is Test {
+contract LibParseUnexpectedRHSTest is ParseTest {
     using LibParse for ParseState;
 
     /// Check the parser reverts if it encounters an unexpected character as the
@@ -52,7 +51,7 @@ contract LibParseUnexpectedRHSTest is Test {
         string memory s = string(bytes.concat(":", bytes1(unexpected), ";"));
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 1));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(s).parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal(s);
         (bytecode, constants);
     }
 
@@ -62,7 +61,7 @@ contract LibParseUnexpectedRHSTest is Test {
         string memory s = ":();";
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 1));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(s).parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal(s);
         (bytecode, constants);
     }
 }

@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Test} from "forge-std/Test.sol";
+import {OperandTest} from "test/abstract/OperandTest.sol";
 import {ExpectedOperand, UnclosedOperand, UnexpectedOperandValue} from "src/error/ErrParse.sol";
 import {LibParse} from "src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
 import {OperandOverflow} from "src/error/ErrParse.sol";
 
-contract LibParseOperandDoublePerByteNoDefaultTest is Test {
+contract LibParseOperandDoublePerByteNoDefaultTest is OperandTest {
     using LibParse for ParseState;
 
     /// Defaults are not allowed for this operand parser. Tests no operand.
     function testOperandDoublePerByteNoDefaultElided() external {
         vm.expectRevert(abi.encodeWithSelector(ExpectedOperand.selector));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parse("_:c();");
         (bytecode);
         (constants);
     }
@@ -22,7 +22,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     /// Defaults are not allowed for this operand parser. Tests empty operand.
     function testOperandDoublePerByteNoDefaultEmpty() external {
         vm.expectRevert(abi.encodeWithSelector(ExpectedOperand.selector));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c<>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parse("_:c<>();");
         (bytecode);
         (constants);
     }
@@ -31,7 +31,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     /// second operand.
     function testOperandDoublePerByteNoDefaultFirst() external {
         vm.expectRevert(abi.encodeWithSelector(ExpectedOperand.selector));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c<1>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parse("_:c<1>();");
         (bytecode);
         (constants);
     }
@@ -154,7 +154,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     /// 2 literals are expected for this operand parser. Tests 256 256.
     function testOperandDoublePerByteNoDefaultSecondOverflow() external {
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c<256 256>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parse("_:c<256 256>();");
         (bytecode);
         (constants);
     }
@@ -162,7 +162,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     /// 2 literals are expected for this operand parser. Tests 256 255.
     function testOperandDoublePerByteNoDefaultSecondOverflowFirst() external {
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c<256 255>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parse("_:c<256 255>();");
         (bytecode);
         (constants);
     }
@@ -170,7 +170,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     /// 3 literals is disallowed.
     function testOperandDoublePerByteNoDefaultThird() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperandValue.selector));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c<1 2 3>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parse("_:c<1 2 3>();");
         (bytecode);
         (constants);
     }
@@ -178,7 +178,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     /// Unclosed operand is disallowed.
     function testOperandDoublePerByteNoDefaultUnclosed() external {
         vm.expectRevert(abi.encodeWithSelector(UnclosedOperand.selector, 7));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c<1 2").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parse("_:c<1 2");
         (bytecode);
         (constants);
     }
@@ -186,7 +186,7 @@ contract LibParseOperandDoublePerByteNoDefaultTest is Test {
     /// Unopened operand is disallowed.
     function testOperandDoublePerByteNoDefaultUnopened() external {
         vm.expectRevert(abi.encodeWithSelector(ExpectedOperand.selector));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:c>1 2>").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parse("_:c>1 2>");
         (bytecode);
         (constants);
     }

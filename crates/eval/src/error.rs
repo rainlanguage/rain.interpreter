@@ -10,7 +10,7 @@ pub enum ForkCallError {
     ExecutorError(String),
     #[cfg(not(target_family = "wasm"))]
     #[error("Call failed: {:#?}", .0)]
-    Failed(RawCallResult),
+    Failed(Box<RawCallResult>),
     #[error("Typed error: {0}")]
     TypedError(String),
     #[error(transparent)]
@@ -28,6 +28,6 @@ pub enum ForkCallError {
 #[cfg(not(target_family = "wasm"))]
 impl From<RawCallResult> for ForkCallError {
     fn from(value: RawCallResult) -> Self {
-        Self::Failed(value)
+        Self::Failed(Box::new(value))
     }
 }

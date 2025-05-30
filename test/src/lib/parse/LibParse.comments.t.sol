@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Test} from "forge-std/Test.sol";
+import {OperandTest} from "test/abstract/OperandTest.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 
 import {LibParse} from "src/lib/parse/LibParse.sol";
@@ -12,7 +12,7 @@ import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseCommentsTest
 /// Test that the parser correctly parses comments.
-contract LibParseCommentsTest is Test {
+contract LibParseCommentsTest is OperandTest {
     using LibParse for ParseState;
 
     /// A single comment with no expected bytecode.
@@ -395,56 +395,56 @@ contract LibParseCommentsTest is Test {
     function testParseCommentNoTrailingWhitespace() external {
         string memory s = "/* comment */_:a();";
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 13));
-        LibMetaFixture.newState(s).parse();
+        this.parse(bytes(s));
     }
 
     /// Comments cannot be in an ignored LHS item.
     function testParseCommentInIgnoredLHS() external {
         string memory s = "_/* comment */:a();";
         vm.expectRevert(abi.encodeWithSelector(UnexpectedComment.selector, 1));
-        LibMetaFixture.newState(s).parse();
+        this.parse(bytes(s));
     }
 
     /// Comments cannot be in a named LHS item.
     function testParseCommentInNamedLHS() external {
         string memory s = "_a/* comment */:a();";
         vm.expectRevert(abi.encodeWithSelector(UnexpectedComment.selector, 2));
-        LibMetaFixture.newState(s).parse();
+        this.parse(bytes(s));
     }
 
     /// Comments cannot be in the whitespace between LHS items.
     function testParseCommentInLHSWhitespace() external {
         string memory s = "_ /* comment */ _:a();";
         vm.expectRevert(abi.encodeWithSelector(UnexpectedComment.selector, 2));
-        LibMetaFixture.newState(s).parse();
+        this.parse(bytes(s));
     }
 
     /// Comments cannot be in the RHS. Tests the start of the RHS.
     function testParseCommentInRHS() external {
         string memory s = "_:/* comment */a();";
         vm.expectRevert(abi.encodeWithSelector(UnexpectedComment.selector, 2));
-        LibMetaFixture.newState(s).parse();
+        this.parse(bytes(s));
     }
 
     /// Comments cannot be in the RHS. Tests the middle of the RHS.
     function testParseCommentInRHS2() external {
         string memory s = "_:a()/* comment */ b();";
         vm.expectRevert(abi.encodeWithSelector(UnexpectedComment.selector, 5));
-        LibMetaFixture.newState(s).parse();
+        this.parse(bytes(s));
     }
 
     /// Comments cannot be in the RHS. Tests the end of the RHS.
     function testParseCommentInRHS3() external {
         string memory s = "_:a()/* comment */;";
         vm.expectRevert(abi.encodeWithSelector(UnexpectedComment.selector, 5));
-        LibMetaFixture.newState(s).parse();
+        this.parse(bytes(s));
     }
 
     /// Unclosed comments don't escape the data bounds.
     function testParseCommentUnclosed() external {
         string memory s = "/* unclosed comment";
         vm.expectRevert(abi.encodeWithSelector(UnclosedComment.selector, 19));
-        LibMetaFixture.newState(s).parse();
+        this.parse(bytes(s));
     }
 
     /// A comment that starts the end sequence but doesn't finish it is unclosed
@@ -452,6 +452,6 @@ contract LibParseCommentsTest is Test {
     function testParseCommentUnclosed2() external {
         string memory s = "/* unclosed comment *";
         vm.expectRevert(abi.encodeWithSelector(UnclosedComment.selector, 21));
-        LibMetaFixture.newState(s).parse();
+        this.parse(bytes(s));
     }
 }

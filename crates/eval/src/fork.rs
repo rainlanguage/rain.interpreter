@@ -230,7 +230,7 @@ impl Forker {
         }
 
         if !raw.exit_reason.is_ok() {
-            return Err(ForkCallError::Failed(raw));
+            return Err(raw.into());
         }
 
         let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
@@ -275,7 +275,7 @@ impl Forker {
         }
 
         if !raw.exit_reason.is_ok() {
-            return Err(ForkCallError::Failed(raw));
+            return Err(raw.into());
         }
 
         let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
@@ -372,9 +372,7 @@ impl Forker {
         if org_block_number.is_none() {
             return Err(ForkCallError::ExecutorError("no active fork!".to_owned()));
         }
-        let block_number = block_number
-            .map(BlockNumber::from)
-            .unwrap_or(org_block_number.unwrap());
+        let block_number = block_number.unwrap_or(org_block_number.unwrap());
 
         self.executor.env_mut().block.number = U256::from(block_number);
 
@@ -391,11 +389,11 @@ impl Forker {
 }
 
 #[cfg(test)]
-
 mod tests {
     use crate::namespace::CreateNamespace;
     use rain_interpreter_env::{
-        CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
+        CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_BSC_RPC_URL, CI_FORK_POLYGON_RPC_URL,
+        CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
     };
 
     use super::*;
@@ -419,8 +417,6 @@ mod tests {
     const USDT_BSC: &str = "0x55d398326f99059fF775485246999027B3197955";
     const POLYGON_FORK_NUMBER: u64 = 54697866;
     const BSC_FORK_NUMBER: u64 = 40531873;
-    const POLYGON_FORK_URL: &str = "https://rpc.ankr.com/polygon";
-    const BSC_FORK_URL: &str = "https://rpc.ankr.com/bsc";
     const BSC_ACC: &str = "0xee5B5B923fFcE93A870B3104b7CA09c3db80047A";
     const POLYGON_ACC: &str = "0xF977814e90dA44bFA03b6295A0616a897441aceC";
 
@@ -507,7 +503,7 @@ mod tests {
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_multi_fork_read_write_switch_reset() -> Result<(), ForkCallError> {
         let args = NewForkedEvm {
-            fork_url: POLYGON_FORK_URL.to_owned(),
+            fork_url: CI_FORK_POLYGON_RPC_URL.clone(),
             fork_block_number: Some(POLYGON_FORK_NUMBER),
         };
         let mut forker = Forker::new_with_fork(args, None, None).await.unwrap();
@@ -557,7 +553,7 @@ mod tests {
 
         // switch fork
         let args = NewForkedEvm {
-            fork_url: BSC_FORK_URL.to_owned(),
+            fork_url: CI_FORK_BSC_RPC_URL.to_owned(),
             fork_block_number: Some(BSC_FORK_NUMBER),
         };
         forker.add_or_select(args, None).await?;
@@ -605,7 +601,7 @@ mod tests {
 
         // switch fork
         let args = NewForkedEvm {
-            fork_url: POLYGON_FORK_URL.to_owned(),
+            fork_url: CI_FORK_POLYGON_RPC_URL.clone(),
             fork_block_number: Some(POLYGON_FORK_NUMBER),
         };
         forker.add_or_select(args, None).await?;
@@ -641,7 +637,7 @@ mod tests {
     async fn test_fork_rolls() {
         // we need to roll the fork forwards and check that the env block number is updated
         let args = NewForkedEvm {
-            fork_url: POLYGON_FORK_URL.to_owned(),
+            fork_url: CI_FORK_POLYGON_RPC_URL.clone(),
             fork_block_number: Some(POLYGON_FORK_NUMBER),
         };
         let mut forker = Forker::new_with_fork(args, None, None).await.unwrap();

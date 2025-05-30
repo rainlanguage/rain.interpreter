@@ -20,6 +20,14 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {OperandOverflow} from "src/error/ErrParse.sol";
 
 contract LibOpShiftBitsRightNPTest is OpTest {
+    function integrityExternal(IntegrityCheckState memory state, OperandV2 operand)
+        external
+        pure
+        returns (uint256, uint256)
+    {
+        return LibOpShiftBitsRightNP.integrity(state, operand);
+    }
+
     /// Directly test the integrity logic of LibOpShiftBitsRightNP. Tests the
     /// happy path where the integrity check does not error due to an unsupported
     /// shift amount.
@@ -49,7 +57,7 @@ contract LibOpShiftBitsRightNPTest is OpTest {
         uint256 shiftAmount = bound(uint256(shiftAmount16), uint256(type(uint8).max) + 1, type(uint16).max);
         OperandV2 operand = OperandV2.wrap(bytes32(uint256(inputs) << 0x10 | shiftAmount));
         vm.expectRevert(abi.encodeWithSelector(UnsupportedBitwiseShiftAmount.selector, shiftAmount));
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpShiftBitsRightNP.integrity(state, operand);
+        (uint256 calcInputs, uint256 calcOutputs) = this.integrityExternal(state, operand);
         (calcInputs, calcOutputs);
     }
 
@@ -60,7 +68,7 @@ contract LibOpShiftBitsRightNPTest is OpTest {
     function testOpShiftBitsRightNPIntegrityNoop(IntegrityCheckState memory state, uint8 inputs) external {
         OperandV2 operand = OperandV2.wrap(bytes32(uint256(inputs) << 0x10));
         vm.expectRevert(abi.encodeWithSelector(UnsupportedBitwiseShiftAmount.selector, 0));
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpShiftBitsRightNP.integrity(state, operand);
+        (uint256 calcInputs, uint256 calcOutputs) = this.integrityExternal(state, operand);
         (calcInputs, calcOutputs);
     }
 

@@ -15,6 +15,14 @@ import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 contract LibParseUnexpectedRightParenTest is Test {
     using LibParse for ParseState;
 
+    function parseExternal(ParseState memory state)
+        external
+        view
+        returns (bytes memory bytecode, bytes32[] memory constants)
+    {
+        return state.parse();
+    }
+
     /// Check the parser reverts if it encounters an unexpected right paren.
     function testParseUnexpectedRightParen() external {
         string memory str = ":)";
@@ -26,7 +34,7 @@ contract LibParseUnexpectedRightParenTest is Test {
         );
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRightParen.selector, 1));
-        (bytes memory bytecode, bytes32[] memory constants) = state.parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal(state);
         (bytecode, constants);
     }
 
@@ -41,7 +49,7 @@ contract LibParseUnexpectedRightParenTest is Test {
         );
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRightParen.selector, 7));
-        (bytes memory bytecode, bytes32[] memory constants) = state.parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal(state);
         (bytecode, constants);
     }
 }

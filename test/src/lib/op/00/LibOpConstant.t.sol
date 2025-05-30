@@ -26,6 +26,14 @@ import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 contract LibOpConstantTest is OpTest {
     using LibInterpreterState for InterpreterState;
 
+    function integrityExternal(IntegrityCheckState memory state, OperandV2 operand)
+        external
+        pure
+        returns (uint256, uint256)
+    {
+        return LibOpConstant.integrity(state, operand);
+    }
+
     /// Directly test the integrity logic of LibOpConstant. The operand always
     /// puts a single value on the stack. This tests the happy path where the
     /// operand points to a value in the constants array.
@@ -51,7 +59,7 @@ contract LibOpConstantTest is OpTest {
                 OutOfBoundsConstantRead.selector, state.opIndex, state.constants.length, OperandV2.unwrap(operand)
             )
         );
-        LibOpConstant.integrity(state, operand);
+        this.integrityExternal(state, operand);
     }
 
     /// Directly test the runtime logic of LibOpConstant. This tests that the

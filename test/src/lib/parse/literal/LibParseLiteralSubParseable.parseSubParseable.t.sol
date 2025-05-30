@@ -19,8 +19,9 @@ contract LibParseLiteralSubParseableTest is Test {
         string memory data,
         string memory expectedDispatch,
         string memory expectedBody,
-        uint256 expectedCursorAfter
-    ) internal {
+        uint256 expectedCursorAfter,
+        bytes memory err
+    ) public {
         ParseState memory state = LibParseState.newState(bytes(data), "", "", "");
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         address subParser = address(0x1234567890123456789012345678901234567890);
@@ -33,16 +34,27 @@ contract LibParseLiteralSubParseableTest is Test {
             abi.encodeWithSelector(ISubParserV4.subParseLiteral2.selector, subParseData),
             abi.encode(true, returnValue)
         );
-        vm.expectCall(subParser, abi.encodeWithSelector(ISubParserV4.subParseLiteral2.selector, subParseData));
+        if (bytes(err).length == 0) {
+            vm.expectCall(subParser, abi.encodeWithSelector(ISubParserV4.subParseLiteral2.selector, subParseData));
+        }
         (uint256 cursorAfter, bytes32 value) =
             state.parseSubParseable(cursor, Pointer.unwrap(state.data.endDataPointer()));
         assertEq(cursorAfter - cursor, expectedCursorAfter);
         assertEq(value, returnValue);
     }
 
+    function checkParseSubParseable(
+        string memory data,
+        string memory expectedDispatch,
+        string memory expectedBody,
+        uint256 expectedCursorAfter
+    ) internal {
+        checkParseSubParseable(data, expectedDispatch, expectedBody, expectedCursorAfter, "");
+    }
+
     function checkParseSubParseableError(string memory data, bytes memory err) internal {
         vm.expectRevert(err);
-        checkParseSubParseable(data, "", "", 0);
+        this.checkParseSubParseable(data, "", "", 0, err);
     }
 
     /// An unclosed sub parseable literal is an error.
