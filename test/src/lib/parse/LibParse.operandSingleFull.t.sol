@@ -1,19 +1,15 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Test} from "forge-std/Test.sol";
+import {ParseTest} from "test/abstract/ParseTest.sol";
 import {ExpectedOperand, UnclosedOperand, UnexpectedOperandValue} from "src/error/ErrParse.sol";
 import {LibParse, ExpectedLeftParen} from "src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
 import {OperandOverflow} from "src/error/ErrParse.sol";
 
-contract LibParseOperandSingleFullTest is Test {
+contract LibParseOperandSingleFullTest is ParseTest {
     using LibParse for ParseState;
-
-    function parseExternal(string memory s) external view returns (bytes memory, bytes32[] memory) {
-        return LibMetaFixture.newState(s).parse();
-    }
 
     /// Fallback is 0 for elided single full operand.
     function testOperandSingleFullElided() external view {
