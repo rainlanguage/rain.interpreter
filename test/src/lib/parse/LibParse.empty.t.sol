@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Test} from "forge-std/Test.sol";
+import {OperandTest} from "test/abstract/OperandTest.sol";
 
 import {LibParse} from "src/lib/parse/LibParse.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
@@ -13,12 +13,8 @@ import {MaxSources} from "src/error/ErrParse.sol";
 /// Tests parsing empty sources and constants. All we want to check is that the
 /// parser doesn't revert and the correct number of sources and constants are
 /// returned.
-contract LibParseEmptyTest is Test {
+contract LibParseEmptyTest is OperandTest {
     using LibParse for ParseState;
-
-    function parseExternal(string memory s) external view returns (bytes memory bytecode, bytes32[] memory constants) {
-        return LibMetaFixture.newState(s).parse();
-    }
 
     /// Check truly empty input bytes. Should not revert and return length 0
     /// sources and constants.
@@ -508,6 +504,6 @@ contract LibParseEmptyTest is Test {
     /// state of the parser.
     function testParseEmptyError16() external {
         vm.expectRevert(abi.encodeWithSelector(MaxSources.selector));
-        this.parseExternal(":;:;:;:;:;:;:;:;:;:;:;:;:;:;:;:;");
+        this.parse(bytes(":;:;:;:;:;:;:;:;:;:;:;:;:;:;:;:;"));
     }
 }
