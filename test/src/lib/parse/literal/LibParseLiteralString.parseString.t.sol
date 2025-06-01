@@ -17,6 +17,10 @@ contract LibParseLiteralStringTest is Test {
     using LibBytes for bytes;
     using LibParseLiteralString for ParseState;
 
+    function parseStringExternal(ParseState memory state) external pure returns (uint256 cursorAfter, bytes32 value) {
+        return state.parseString(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
+    }
+
     /// Check that an empty string literal is parsed correctly.
     function testParseStringLiteralEmpty() external pure {
         ParseState memory state = LibParseState.newState("\"\"", "", "", "");
@@ -53,8 +57,7 @@ contract LibParseLiteralStringTest is Test {
         ParseState memory state = LibParseState.newState(bytes(string.concat("\"", string(data), "\"")), "", "", "");
 
         vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, 1 + corruptIndex));
-        (uint256 cursorAfter, bytes32 value) =
-            state.parseString(Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer()));
+        (uint256 cursorAfter, bytes32 value) = this.parseStringExternal(state);
         (cursorAfter, value);
     }
 }

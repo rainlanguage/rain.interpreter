@@ -10,6 +10,14 @@ import {LibOpEncodeBitsNP} from "src/lib/op/bitwise/LibOpEncodeBitsNP.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpEncodeBitsNPTest is OpTest {
+    function integrityExternal(IntegrityCheckState memory state, OperandV2 operand)
+        external
+        pure
+        returns (uint256 inputs, uint256 outputs)
+    {
+        return LibOpEncodeBitsNP.integrity(state, operand);
+    }
+
     /// Directly test the integrity logic of LibOpEncodeBitsNP. All possible
     /// operands result in the same number of inputs and outputs, (2, 1).
     /// However, lengths can overflow and error so we bound the operand to avoid
@@ -36,7 +44,7 @@ contract LibOpEncodeBitsNPTest is OpTest {
         uint256 length = bound(uint256(length8Bit), uint256(type(uint8).max) - start + 2, uint256(type(uint8).max));
         OperandV2 operand = LibOperand.build(2, 1, uint16((uint256(length) << 8) | uint256(start)));
         vm.expectRevert(abi.encodeWithSelector(TruncatedBitwiseEncoding.selector, start, length));
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpEncodeBitsNP.integrity(state, operand);
+        (uint256 calcInputs, uint256 calcOutputs) = this.integrityExternal(state, operand);
         (calcInputs, calcOutputs);
     }
 
@@ -45,7 +53,7 @@ contract LibOpEncodeBitsNPTest is OpTest {
     function testOpEncodeBitsNPIntegrityFailZeroLength(IntegrityCheckState memory state, uint8 start) external {
         OperandV2 operand = LibOperand.build(2, 1, uint16(0 << 8 | uint256(start)));
         vm.expectRevert(abi.encodeWithSelector(ZeroLengthBitwiseEncoding.selector));
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpEncodeBitsNP.integrity(state, operand);
+        (uint256 calcInputs, uint256 calcOutputs) = this.integrityExternal(state, operand);
         (calcInputs, calcOutputs);
     }
 

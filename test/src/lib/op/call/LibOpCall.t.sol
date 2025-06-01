@@ -23,6 +23,10 @@ import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 /// @title LibOpCallTest
 /// @notice Test the LibOpCall library that includes the "call" word.
 contract LibOpCallTest is OpTest, BytecodeTest {
+    function integrityExternal(IntegrityCheckState memory state, OperandV2 operand) external pure {
+        LibOpCall.integrity(state, operand);
+    }
+
     /// Directly test the integrity logic of LibOpCall. This tests that if the
     /// outputs in the operand exceed the outputs available from the source, then
     /// the call will revert.
@@ -47,7 +51,7 @@ contract LibOpCallTest is OpTest, BytecodeTest {
 
         OperandV2 operand = LibOperand.build(uint8(inputs), uint8(outputs), uint16(sourceIndex));
         vm.expectRevert(abi.encodeWithSelector(CallOutputsExceedSource.selector, sourceOutputs, outputs));
-        LibOpCall.integrity(state, operand);
+        this.integrityExternal(state, operand);
     }
 
     /// Directly test the integrity logic of LibOpCall. This tests that if the
@@ -71,7 +75,7 @@ contract LibOpCallTest is OpTest, BytecodeTest {
 
         OperandV2 operand = LibOperand.build(uint8(inputs), uint8(outputs), uint16(sourceIndex));
         vm.expectRevert(abi.encodeWithSelector(SourceIndexOutOfBounds.selector, sourceIndex, state.bytecode));
-        LibOpCall.integrity(state, operand);
+        this.integrityExternal(state, operand);
     }
 
     /// Directly test the integrity logic of LibOpCall. This tests that if the

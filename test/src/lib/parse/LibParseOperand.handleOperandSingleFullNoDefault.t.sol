@@ -8,10 +8,14 @@ import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {OperandOverflow} from "src/error/ErrParse.sol";
 
 contract LibParseOperandHandleOperandSingleFullTest is Test {
+    function handleOperandSingleFullNoDefaultExternal(bytes32[] memory values) external pure returns (OperandV2) {
+        return LibParseOperand.handleOperandSingleFullNoDefault(values);
+    }
+
     // No values errors.
     function testHandleOperandSingleFullNoDefaultNoValues() external {
         vm.expectRevert(abi.encodeWithSelector(ExpectedOperand.selector));
-        OperandV2.unwrap(LibParseOperand.handleOperandSingleFullNoDefault(new bytes32[](0)));
+        this.handleOperandSingleFullNoDefaultExternal(new bytes32[](0));
     }
 
     // A single value of up to 2 bytes is allowed.
@@ -29,13 +33,13 @@ contract LibParseOperandHandleOperandSingleFullTest is Test {
         bytes32[] memory values = new bytes32[](1);
         values[0] = bytes32(value);
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
-        LibParseOperand.handleOperandSingleFullNoDefault(values);
+        this.handleOperandSingleFullNoDefaultExternal(values);
     }
 
     // More than one value is disallowed.
     function testHandleOperandSingleFullNoDefaultManyValues(bytes32[] memory values) external {
         vm.assume(values.length > 1);
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperandValue.selector));
-        LibParseOperand.handleOperandSingleFullNoDefault(values);
+        this.handleOperandSingleFullNoDefaultExternal(values);
     }
 }

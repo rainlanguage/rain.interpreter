@@ -83,7 +83,7 @@ contract LibParseOperandM1M1Test is OperandTest {
     /// Default is zero for this operand parser. Tests first overflow.
     function testOperandM1M1FirstOverflow() external {
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:d<2>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parse("_:d<2>();");
         (bytecode);
         (constants);
     }
@@ -137,7 +137,7 @@ contract LibParseOperandM1M1Test is OperandTest {
     /// Default is zero for this operand parser. Tests 0 2.
     function testOperandM1M1SecondOverflow() external {
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
-        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:d<0 2>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parse("_:d<0 2>();");
         (bytecode);
         (constants);
     }

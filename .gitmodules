@@ -7,9 +7,6 @@
 [submodule "lib/sol.lib.binmaskflag"]
 	path = lib/sol.lib.binmaskflag
 	url = https://github.com/rainprotocol/sol.lib.binmaskflag
-[submodule "lib/rain.intorastring"]
-	path = lib/rain.intorastring
-	url = https://github.com/rainlanguage/rain.intorastring
 [submodule "lib/rain.interpreter.interface"]
 	path = lib/rain.interpreter.interface
 	url = https://github.com/rainlanguage/rain.interpreter.interface

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Test} from "forge-std/Test.sol";
+import {ParseTest} from "test/abstract/ParseTest.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 
 import {LibParse} from "src/lib/parse/LibParse.sol";
@@ -12,7 +12,7 @@ import {ParseState} from "src/lib/parse/LibParseState.sol";
 /// @title LibParseNOutputTest
 /// Test that the parser can handle multi and zero outputs for RHS items when
 /// they are singular on a line, and mandates individual items otherwise.
-contract LibParseNOutputTest is Test {
+contract LibParseNOutputTest is ParseTest {
     using LibParse for ParseState;
 
     /// A single RHS item MAY have 0 outputs.
@@ -42,14 +42,14 @@ contract LibParseNOutputTest is Test {
     /// LHS items.
     function testParseNOutputExcessRHS1() external {
         vm.expectRevert(abi.encodeWithSelector(ExcessRHSItems.selector, 8));
-        LibMetaFixture.newState(":a() b();").parse();
+        this.parseExternal(":a() b();");
     }
 
     /// Multiple RHS items MUST NOT have 0 outputs. Tests two RHS items and one
     /// LHS item.
     function testParseNOutputExcessRHS2() external {
         vm.expectRevert(abi.encodeWithSelector(ExcessRHSItems.selector, 9));
-        LibMetaFixture.newState("_:a() b();").parse();
+        this.parseExternal("_:a() b();");
     }
 
     /// A single RHS item can have multiple outputs. This RHS item has nesting.
@@ -82,7 +82,7 @@ contract LibParseNOutputTest is Test {
     /// and three LHS items.
     function testParseNOutputExcessRHS3() external {
         vm.expectRevert(abi.encodeWithSelector(ExcessLHSItems.selector, 13));
-        LibMetaFixture.newState("_ _ _:a() b();").parse();
+        this.parseExternal("_ _ _:a() b();");
     }
 
     /// Multiple output RHS items MAY be followed by single output RHS items,

@@ -8,10 +8,14 @@ import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {OperandOverflow} from "src/error/ErrParse.sol";
 
 contract LibParseOperandHandleOperand8M1M1Test is Test {
+    function handleOperand8M1M1External(bytes32[] memory values) external pure returns (OperandV2) {
+        return LibParseOperand.handleOperand8M1M1(values);
+    }
+
     // The first value must be 1 byte and is mandatory. Zero values is an error.
     function testHandleOperand8M1M1NoValues() external {
         vm.expectRevert(abi.encodeWithSelector(ExpectedOperand.selector));
-        LibParseOperand.handleOperand8M1M1(new bytes32[](0));
+        this.handleOperand8M1M1External(new bytes32[](0));
     }
 
     // If only the first value is provided, the others default to zero.
@@ -29,7 +33,7 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
         bytes32[] memory values = new bytes32[](1);
         values[0] = bytes32(uint256(value));
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
-        LibParseOperand.handleOperand8M1M1(values);
+        this.handleOperand8M1M1External(values);
     }
 
     // If the first and second values are provided, the third defaults to zero.
@@ -53,7 +57,7 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
         values[0] = bytes32(a);
         values[1] = bytes32(b);
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
-        LibParseOperand.handleOperand8M1M1(values);
+        this.handleOperand8M1M1External(values);
     }
 
     // If all the values are provided they all appear in the operand.
@@ -81,13 +85,13 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
         values[1] = bytes32(b);
         values[2] = bytes32(c);
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
-        LibParseOperand.handleOperand8M1M1(values);
+        this.handleOperand8M1M1External(values);
     }
 
     // If more than three values are provided, it is an error.
     function testHandleOperand8M1M1ManyValues(bytes32[] memory values) external {
         vm.assume(values.length > 3);
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperandValue.selector));
-        LibParseOperand.handleOperand8M1M1(values);
+        this.handleOperand8M1M1External(values);
     }
 }

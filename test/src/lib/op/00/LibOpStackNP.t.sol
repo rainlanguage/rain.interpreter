@@ -29,6 +29,14 @@ import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 contract LibOpStackNPTest is OpTest {
     using LibInterpreterState for InterpreterState;
 
+    function integrityExternal(IntegrityCheckState memory state, OperandV2 operand)
+        external
+        pure
+        returns (uint256, uint256)
+    {
+        return LibOpStackNP.integrity(state, operand);
+    }
+
     /// Directly test the integrity logic of LibOpStackNP. The operand always
     /// puts a single value on the stack. This tests the happy path where the
     /// operand points to a value in the stack.
@@ -65,7 +73,7 @@ contract LibOpStackNPTest is OpTest {
         state.opIndex = opIndex;
 
         vm.expectRevert(abi.encodeWithSelector(OutOfBoundsStackRead.selector, state.opIndex, stackIndex, readIndex));
-        LibOpStackNP.integrity(state, operand);
+        this.integrityExternal(state, operand);
     }
 
     /// Directly test the runtime logic of LibOpStackNP. This tests that the
