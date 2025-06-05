@@ -7,19 +7,22 @@ description = "Rain Interpreter Parser Rust Crate."
 homepage = "https://github.com/rainlanguage/rain.interpreter"
 
 [dependencies]
-alloy-ethers-typecast =  { workspace = true }
+alloy-ethers-typecast = { workspace = true }
 rain_interpreter_dispair = { workspace = true }
 rain_interpreter_bindings = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 alloy = { workspace = true }
-ethers = { workspace = true, features = [
-  "legacy",
-] }
 thiserror = { workspace = true }
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 tokio = { version = "1.28.0", features = ["full"] }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-tokio = { version = "1.28.0", features = ["sync", "macros", "io-util", "rt", "time"] }
+tokio = { version = "1.28.0", features = [
+  "sync",
+  "macros",
+  "io-util",
+  "rt",
+  "time",
+] }

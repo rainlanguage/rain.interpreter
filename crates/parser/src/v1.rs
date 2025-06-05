@@ -88,7 +88,7 @@ impl Parser for ParserV1 {
 mod tests {
     use super::*;
     use alloy::primitives::{Address, U256};
-    use ethers::providers::{MockProvider, MockResponse, Provider};
+    use alloy::providers::mock::Asserter;
 
     #[tokio::test]
     async fn test_from_dispair() {
@@ -109,9 +109,9 @@ mod tests {
 
     #[tokio::test]
     async fn test_parse() {
-        let transport = MockProvider::default();
-        transport.push_response(MockResponse::Value(serde_json::Value::String(
-            [
+        let asserter = Asserter::new();
+        asserter.push_success(
+            &[
                 "0x0000000000000000000000000000000000000000000000000000000000000040", // offset to start of bytecode
                 "0000000000000000000000000000000000000000000000000000000000000080", // offset to start of constants
                 "0000000000000000000000000000000000000000000000000000000000000002", // length of bytecode
@@ -121,9 +121,9 @@ mod tests {
                 "0000000000000000000000000000000000000000000000000000000000000004",
             ]
             .concat(),
-        )));
+        );
 
-        let client = ReadableClient::new(Provider::new(transport));
+        let client = ReadableClient::new_mocked(asserter);
         let parser = ParserV1 {
             address: Address::repeat_byte(0x1),
         };
@@ -138,9 +138,9 @@ mod tests {
     async fn test_parse_text() {
         let rainlang = "my rainlang";
 
-        let transport = MockProvider::default();
-        transport.push_response(MockResponse::Value(serde_json::Value::String(
-            [
+        let asserter = Asserter::new();
+        asserter.push_success(
+            &[
                 "0x0000000000000000000000000000000000000000000000000000000000000040", // offset to start of bytecode
                 "0000000000000000000000000000000000000000000000000000000000000080", // offset to start of constants
                 "000000000000000000000000000000000000000000000000000000000000000b", // length of bytecode
@@ -150,9 +150,9 @@ mod tests {
                 "0000000000000000000000000000000000000000000000000000000000000004",
             ]
             .concat(),
-        )));
+        );
 
-        let client = ReadableClient::new(Provider::new(transport));
+        let client = ReadableClient::new_mocked(asserter);
         let parser = ParserV1 {
             address: Address::repeat_byte(0x1),
         };

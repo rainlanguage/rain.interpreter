@@ -70,16 +70,14 @@ impl DISPair {
 mod tests {
     use super::*;
     use alloy::primitives::Address;
-    use ethers::providers::{MockProvider, MockResponse, Provider};
-    use serde_json::json;
+    use alloy::providers::mock::Asserter;
     use tracing_subscriber::FmtSubscriber;
 
     #[tokio::test]
     async fn test_from_deployer() {
         setup_tracing();
 
-        // MockProvider for testing
-        let transport = MockProvider::default();
+        let asserter = Asserter::new();
         let deployer_address = "0x1234567890123456789012345678901234567890"
             .parse::<Address>()
             .unwrap();
@@ -89,22 +87,11 @@ mod tests {
 
         // Mock responses for the read calls - the responses will be popped off
         // the stack in the reverse order they are pushed on.
-        transport.push_response(MockResponse::Value(json!(format!(
-            "0x{:0>64}",
-            parser_address
-        ))));
+        asserter.push_success(&format!("0x{parser_address:0>64}"));
+        asserter.push_success(&format!("0x{store_address:0>64}"));
+        asserter.push_success(&format!("0x{interpreter_address:0>64}"));
 
-        transport.push_response(MockResponse::Value(json!(format!(
-            "0x{:0>64}",
-            store_address
-        ))));
-
-        transport.push_response(MockResponse::Value(json!(format!(
-            "0x{:0>64}",
-            interpreter_address
-        ))));
-
-        let client = ReadableClient::new(Provider::new(transport));
+        let client = ReadableClient::new_mocked(asserter);
         let dispair = DISPair::from_deployer(deployer_address, client)
             .await
             .unwrap();

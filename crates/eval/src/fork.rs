@@ -453,7 +453,7 @@ mod tests {
             .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
-        let parser_address = result.typed_return._0;
+        let parser_address = result.typed_return;
         let expected_address = "0xf14e09601a47552de6abd3a0b165607fafd2b5ba"
             .parse::<Address>()
             .unwrap();
@@ -479,7 +479,7 @@ mod tests {
             )
             .await
             .unwrap();
-        let store_address: Address = store_result.typed_return._0;
+        let store_address: Address = store_result.typed_return;
 
         let namespace = U256::from(1);
         let key = U256::from(3);
@@ -513,8 +513,7 @@ mod tests {
             )
             .await
             .unwrap()
-            .typed_return
-            ._0;
+            .typed_return;
         assert_eq!(value, get);
     }
 
@@ -535,8 +534,8 @@ mod tests {
             .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
-        let old_balance = result.typed_return._0;
-        let polygon_old_balance = result.typed_return._0;
+        let old_balance = result.typed_return;
+        let polygon_old_balance = result.typed_return;
 
         let from_address = POLYGON_ACC.parse::<Address>().unwrap();
         let to_address: Address = USDT_POLYGON.parse::<Address>().unwrap();
@@ -565,7 +564,7 @@ mod tests {
             .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
-        let new_balance = result.typed_return._0;
+        let new_balance = result.typed_return;
         assert_eq!(new_balance, old_balance - send_amount);
         let polygon_balance = new_balance;
 
@@ -585,7 +584,7 @@ mod tests {
             .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
-        let old_balance = result.typed_return._0;
+        let old_balance = result.typed_return;
 
         let from_address = BSC_ACC.parse::<Address>().unwrap();
         let to_address: Address = USDT_BSC.parse::<Address>().unwrap();
@@ -614,7 +613,7 @@ mod tests {
             .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
-        let new_balance = result.typed_return._0;
+        let new_balance = result.typed_return;
         assert_eq!(new_balance, old_balance - send_amount);
 
         // switch fork
@@ -633,7 +632,7 @@ mod tests {
             .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
-        let balance = result.typed_return._0;
+        let balance = result.typed_return;
         assert_eq!(balance, polygon_balance);
 
         // reset fork
@@ -645,7 +644,7 @@ mod tests {
             .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
-        let balance = result.typed_return._0;
+        let balance = result.typed_return;
         assert_eq!(balance, polygon_old_balance);
 
         Ok(())
@@ -662,8 +661,8 @@ mod tests {
 
         // check the env block number is the same as the fork block number
         assert_eq!(
-            forker.executor.env().block.number,
-            U256::from(POLYGON_FORK_NUMBER)
+            forker.executor.env().evm_env.block_env.number,
+            POLYGON_FORK_NUMBER
         );
 
         // roll the fork forwards by 1 block
@@ -673,8 +672,8 @@ mod tests {
 
         // check the env block number is updated
         assert_eq!(
-            forker.executor.env().block.number,
-            U256::from(POLYGON_FORK_NUMBER + 1)
+            forker.executor.env().evm_env.block_env.number,
+            POLYGON_FORK_NUMBER + 1
         );
     }
 }

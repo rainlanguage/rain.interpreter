@@ -154,8 +154,7 @@ impl ParserV2 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloy::primitives::Address;
-    use ethers::providers::{MockProvider, MockResponse, Provider};
+    use alloy::{primitives::Address, providers::mock::Asserter};
 
     #[tokio::test]
     async fn test_from_dispair() {
@@ -176,17 +175,17 @@ mod tests {
 
     #[tokio::test]
     async fn test_parse() {
-        let transport = MockProvider::default();
-        transport.push_response(MockResponse::Value(serde_json::Value::String(
-            [
+        let asserter = Asserter::new();
+        asserter.push_success(
+            &[
                 "0x0000000000000000000000000000000000000000000000000000000000000020", // offset to start of bytecode
                 "0000000000000000000000000000000000000000000000000000000000000002", // length of bytecode
                 "1234000000000000000000000000000000000000000000000000000000000000", // bytecode
             ]
             .concat(),
-        )));
+        );
 
-        let client = ReadableClient::new(Provider::new(transport));
+        let client = ReadableClient::new_mocked(asserter);
         let parser = ParserV2 {
             deployer_address: Address::repeat_byte(0x1),
         };
@@ -200,17 +199,17 @@ mod tests {
     async fn test_parse_text() {
         let rainlang = "my rainlang";
 
-        let transport = MockProvider::default();
-        transport.push_response(MockResponse::Value(serde_json::Value::String(
-            [
+        let asserter = Asserter::new();
+        asserter.push_success(
+            &[
                 "0x0000000000000000000000000000000000000000000000000000000000000020", // length of bytecode
                 "000000000000000000000000000000000000000000000000000000000000000b", // offset to start of bytecode
                 "6d79207261696e6c616e67000000000000000000000000000000000000000000", // bytecode
             ]
             .concat(),
-        )));
+        );
 
-        let client = ReadableClient::new(Provider::new(transport));
+        let client = ReadableClient::new_mocked(asserter);
         let parser = ParserV2 {
             deployer_address: Address::repeat_byte(0x1),
         };
@@ -227,9 +226,9 @@ mod tests {
         let pragma1 = Address::repeat_byte(0x11);
         let pragma2 = Address::repeat_byte(0x22);
 
-        let transport = MockProvider::default();
-        transport.push_response(MockResponse::Value(serde_json::Value::String(
-            [
+        let asserter = Asserter::new();
+        asserter.push_success(
+            &[
                 "0000000000000000000000000000000000000000000000000000000000000020", // offset
                 "0000000000000000000000000000000000000000000000000000000000000020", // offset
                 "0000000000000000000000000000000000000000000000000000000000000002", // array length
@@ -237,9 +236,9 @@ mod tests {
                 "0000000000000000000000002222222222222222222222222222222222222222", // array of addresses
             ]
             .concat(),
-        )));
+        );
 
-        let client = ReadableClient::new(Provider::new(transport));
+        let client = ReadableClient::new_mocked(asserter);
         let parser = ParserV2 {
             deployer_address: Address::repeat_byte(0x1),
         };

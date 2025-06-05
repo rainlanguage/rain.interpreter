@@ -133,6 +133,7 @@ impl Forker {
 #[cfg(test)]
 mod tests {
     use alloy::primitives::utils::parse_ether;
+    use foundry_evm::traces::CallTraceArena;
     use rain_interpreter_env::{
         CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
     };
@@ -160,7 +161,7 @@ mod tests {
             .unwrap();
 
         let expected_bytes: Vec<u8> = alloy::hex::decode("0x00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000de0b6b3a76400000000000000000000000000000000000000000000000000001bc16d674ec8000000000000000000000000000000000000000000000000000000000000000000130100000302000101100001011000002b120000").unwrap();
-        assert_eq!(res.typed_return.bytecode, expected_bytes);
+        assert_eq!(res.typed_return.0, expected_bytes);
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
@@ -194,7 +195,12 @@ mod tests {
         // stack in the trace for source index 0
         let mut expected_stack_trace = vec![0u8, 0u8, 0u8, 0u8];
         expected_stack_trace.append(&mut parse_ether("3").unwrap().to_be_bytes_vec());
-        let source_index_zero_trace = res.raw.traces.unwrap().into_nodes()[1].to_owned().trace;
+
+        let sparsed_trace_arena = res.raw.traces.unwrap();
+        let source_index_zero_trace = <CallTraceArena as Clone>::clone(&sparsed_trace_arena)
+            .into_nodes()[1]
+            .to_owned()
+            .trace;
         assert_eq!(source_index_zero_trace.data, expected_stack_trace);
 
         // asserting the known trace address
