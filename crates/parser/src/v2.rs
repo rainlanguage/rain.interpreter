@@ -1,7 +1,6 @@
 use crate::error::ParserError;
 use alloy::primitives::*;
 use alloy_ethers_typecast::transaction::{ReadContractParametersBuilder, ReadableClient};
-use ethers::providers::JsonRpcClient;
 use rain_interpreter_bindings::IParserPragmaV1::*;
 use rain_interpreter_bindings::IParserV2::*;
 use rain_interpreter_dispair::DISPair;
@@ -9,10 +8,10 @@ use rain_interpreter_dispair::DISPair;
 #[cfg(not(target_family = "wasm"))]
 pub trait Parser2 {
     /// Call Parser contract to parse the provided rainlang text.
-    fn parse_text<T: JsonRpcClient>(
+    fn parse_text(
         &self,
         text: &str,
-        client: ReadableClient<T>,
+        client: ReadableClient,
     ) -> impl std::future::Future<Output = Result<parse2Return, ParserError>> + Send
     where
         Self: Sync,
@@ -22,18 +21,18 @@ pub trait Parser2 {
 
     /// Call Parser contract to parse the provided data
     /// The provided data must contain valid UTF-8 encoding of valid rainlang text.
-    fn parse<T: JsonRpcClient>(
+    fn parse(
         &self,
         data: Vec<u8>,
-        client: ReadableClient<T>,
+        client: ReadableClient,
     ) -> impl std::future::Future<Output = Result<parse2Return, ParserError>> + Send;
 
     /// Call Parser contract to parse the provided rainlang text and provide the pragma.
     /// The provided rainlang text must be valid UTF-8 encoding of valid rainlang text.
-    fn parse_pragma<T: JsonRpcClient>(
+    fn parse_pragma(
         &self,
         data: Vec<u8>,
-        client: ReadableClient<T>,
+        client: ReadableClient,
     ) -> impl std::future::Future<Output = Result<parsePragma1Return, ParserError>> + Send;
 }
 
@@ -98,12 +97,12 @@ impl ParserV2 {
 }
 
 impl Parser2 for ParserV2 {
-    async fn parse<T: JsonRpcClient>(
+    async fn parse(
         &self,
         data: Vec<u8>,
-        client: ReadableClient<T>,
+        client: ReadableClient,
     ) -> Result<parse2Return, ParserError> {
-        client
+        let bytecode = client
             .read(
                 ReadContractParametersBuilder::default()
                     .address(self.deployer_address)
@@ -112,15 +111,17 @@ impl Parser2 for ParserV2 {
                     .map_err(ParserError::ReadContractParametersBuilderError)?,
             )
             .await
-            .map_err(ParserError::ReadableClientError)
+            .map_err(ParserError::ReadableClientError)?;
+
+        Ok(parse2Return { bytecode })
     }
 
-    async fn parse_pragma<T: JsonRpcClient>(
+    async fn parse_pragma(
         &self,
         data: Vec<u8>,
-        client: ReadableClient<T>,
+        client: ReadableClient,
     ) -> Result<parsePragma1Return, ParserError> {
-        client
+        let pragma = client
             .read(
                 ReadContractParametersBuilder::default()
                     .address(self.deployer_address)
@@ -129,16 +130,18 @@ impl Parser2 for ParserV2 {
                     .map_err(ParserError::ReadContractParametersBuilderError)?,
             )
             .await
-            .map_err(ParserError::ReadableClientError)
+            .map_err(ParserError::ReadableClientError)?;
+
+        Ok(parsePragma1Return { _0: pragma })
     }
 }
 
 impl ParserV2 {
     /// Call Parser contract to parse the provided rainlang text and provide the pragma.
-    pub async fn parse_pragma_text<T: JsonRpcClient>(
+    pub async fn parse_pragma_text(
         &self,
         text: &str,
-        client: ReadableClient<T>,
+        client: ReadableClient,
     ) -> Result<Vec<Address>, ParserError>
     where
         Self: Sync,

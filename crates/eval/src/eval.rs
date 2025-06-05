@@ -101,8 +101,7 @@ impl Forker {
         let store = self
             .alloy_call(Address::default(), deployer, iStoreCall {}, decode_errors)
             .await?
-            .typed_return
-            ._0;
+            .typed_return;
 
         let interpreter = self
             .alloy_call(
@@ -112,11 +111,10 @@ impl Forker {
                 decode_errors,
             )
             .await?
-            .typed_return
-            ._0;
+            .typed_return;
 
         let eval_args = eval3Call {
-            bytecode: parse_result.typed_return.bytecode,
+            bytecode: parse_result.typed_return,
             sourceIndex: U256::from(source_index),
             store,
             namespace: namespace.into(),

@@ -1,17 +1,19 @@
 use crate::error::ForkCallError;
 use alloy::primitives::{Address, BlockNumber, U256};
 use alloy::sol_types::SolCall;
+use foundry_evm::traces::TraceMode;
 use foundry_evm::{
-    backend::{Backend, DatabaseExt, LocalForkId},
+    Env, EnvMut,
+    backend::{Backend, DatabaseExt, JournaledState, LocalForkId},
     executors::{Executor, ExecutorBuilder, RawCallResult},
     fork::{CreateFork, ForkId, MultiFork},
     opts::EvmOpts,
 };
 use rain_error_decoding::AbiDecodedErrorType;
+use revm::primitives::hardfork::SpecId;
 use revm::{
     interpreter::InstructionResult,
-    primitives::{Address as Addr, Bytes, Env, HashSet, SpecId},
-    JournaledState,
+    primitives::{Address as Addr, Bytes},
 };
 use std::{any::type_name, collections::HashMap};
 
@@ -35,20 +37,32 @@ pub struct NewForkedEvm {
     pub fork_block_number: Option<BlockNumber>,
 }
 
-impl Default for Forker {
-    fn default() -> Self {
-        Self::new()
+fn mk_journaled_state(spec_id: SpecId) -> JournaledState {
+    let mut journaled_state = JournaledState::new();
+    journaled_state.set_spec_id(spec_id);
+    journaled_state
+}
+
+// NOTE: there is a trait for this in foundry-evm-core but it's not exposed
+// through the meta crate foundry-evm
+fn mk_env_mut(env: &mut Env) -> EnvMut<'_> {
+    EnvMut {
+        block: &mut env.evm_env.block_env,
+        cfg: &mut env.evm_env.cfg_env,
+        tx: &mut env.tx,
     }
 }
+
 impl Forker {
     /// Creates a new empty instance of `Forker`.
-    pub fn new() -> Forker {
-        let db = Backend::new(MultiFork::new().0, None);
-        let builder = ExecutorBuilder::default().inspectors(|stack| stack.trace(true).debug(false));
-        Self {
+    pub fn new() -> eyre::Result<Forker> {
+        let db = Backend::new(MultiFork::new().0, None)?;
+        let builder = ExecutorBuilder::default()
+            .inspectors(|stack| stack.trace_mode(TraceMode::Call.with_debug(false)));
+        Ok(Self {
             executor: builder.build(Env::default(), db),
             forks: HashMap::new(),
-        }
+        })
     }
 
     /// Creates a new instance of `Forker` with the specified fork URL and optional fork block number.
@@ -90,7 +104,7 @@ impl Forker {
             env: foundry_evm::opts::Env {
                 chain_id: None,
                 code_size_limit: None,
-                gas_limit: u64::MAX,
+                gas_limit: u64::MAX.into(),
                 ..Default::default()
             },
             memory_limit: u64::MAX,
@@ -98,29 +112,29 @@ impl Forker {
         };
 
         let create_fork = CreateFork {
-            url: fork_url.to_string(),
+            url: fork_url.clone(),
             enable_caching: true,
-            env: evm_opts.fork_evm_env(fork_url).await?.0,
+            env: evm_opts.fork_evm_env(&fork_url).await?.0,
             evm_opts,
         };
         let block_number = if let Some(v) = fork_block_number {
             BlockNumber::from(v)
         } else {
-            create_fork.env.block.number.try_into()?
+            create_fork.env.evm_env.block_env.number.into()
         };
 
-        let db = Backend::spawn(Some(create_fork.clone()));
+        let db = Backend::spawn(Some(create_fork.clone()))?;
 
         let builder = if let Some(gas) = gas_limit {
-            ExecutorBuilder::default()
-                .gas_limit(gas)
-                .inspectors(|stack| stack.trace(true).debug(false))
+            ExecutorBuilder::default().gas_limit(gas)
         } else {
-            ExecutorBuilder::default().inspectors(|stack| stack.trace(true).debug(false))
+            ExecutorBuilder::default()
         };
+        let builder =
+            builder.inspectors(|stack| stack.trace_mode(TraceMode::Call.with_debug(false)));
 
         let mut forks_map = HashMap::new();
-        forks_map.insert(fork_id, (U256::from(0), SpecId::LATEST, block_number));
+        forks_map.insert(fork_id, (U256::from(0), SpecId::default(), block_number));
         Ok(Self {
             executor: builder.build(env.unwrap_or(create_fork.env.clone()), db),
             forks: forks_map,
@@ -149,12 +163,12 @@ impl Forker {
             if self.executor.backend().is_active_fork(*local_fork_id) {
                 Ok(())
             } else {
-                let mut journaled_state = JournaledState::new(*spec_id, HashSet::new());
+                let mut journaled_state = mk_journaled_state(*spec_id);
                 self.executor
                     .backend_mut()
                     .select_fork(
                         *local_fork_id,
-                        &mut env.unwrap_or_default(),
+                        &mut mk_env_mut(&mut env.unwrap_or_default()),
                         &mut journaled_state,
                     )
                     .map(|_| ())
@@ -167,7 +181,7 @@ impl Forker {
                 env: foundry_evm::opts::Env {
                     chain_id: None,
                     code_size_limit: None,
-                    gas_limit: u64::MAX,
+                    gas_limit: u64::MAX.into(),
                     ..Default::default()
                 },
                 memory_limit: u64::MAX,
@@ -176,26 +190,30 @@ impl Forker {
             let create_fork = CreateFork {
                 url: fork_url.to_string(),
                 enable_caching: true,
-                env: evm_opts.fork_evm_env(fork_url).await.unwrap().0,
+                env: evm_opts.fork_evm_env(&fork_url).await.unwrap().0,
                 evm_opts,
             };
             let block_number = if let Some(v) = fork_block_number {
                 BlockNumber::from(v)
             } else {
-                create_fork.env.block.number.try_into()?
+                create_fork.env.evm_env.block_env.number.into()
             };
-            let mut journaled_state = JournaledState::new(SpecId::LATEST, HashSet::new());
+
             self.forks.insert(
                 fork_id,
-                (U256::from(self.forks.len()), SpecId::LATEST, block_number),
+                (
+                    U256::from(self.forks.len()),
+                    SpecId::default(),
+                    block_number,
+                ),
             );
-            let default_env = create_fork.env.clone();
+
             self.executor
                 .backend_mut()
                 .create_select_fork(
                     create_fork,
-                    &mut env.unwrap_or(default_env),
-                    &mut journaled_state,
+                    &mut mk_env_mut(&mut env.unwrap_or_default()),
+                    &mut mk_journaled_state(SpecId::default()),
                 )
                 .map(|_| ())
                 .map_err(|e| ForkCallError::ExecutorError(e.to_string()))
@@ -233,7 +251,7 @@ impl Forker {
             return Err(raw.into());
         }
 
-        let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
+        let typed_return = T::abi_decode_returns(&raw.result.0).map_err(|e| {
             ForkCallError::TypedError(format!(
                 "Call:{:?} Error:{:?} Raw:{:?}",
                 type_name::<T>(),
@@ -278,7 +296,7 @@ impl Forker {
             return Err(raw.into());
         }
 
-        let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
+        let typed_return = T::abi_decode_returns(&raw.result.0).map_err(|e| {
             ForkCallError::TypedError(format!("Call:{:?} Error:{:?}", type_name::<T>(), e))
         })?;
         Ok(ForkTypedReturn { raw, typed_return })
@@ -360,7 +378,7 @@ impl Forker {
             .active_fork_id()
             .ok_or(ForkCallError::ExecutorError("no active fork!".to_owned()))?;
         let mut org_block_number = None;
-        let mut spec_id = SpecId::LATEST;
+        let mut spec_id = SpecId::default();
         #[allow(clippy::for_kv_map)]
         for (_fork_id, (local_id, sid, bnumber)) in &self.forks {
             if *local_id == active_fork_local_id {
@@ -374,15 +392,15 @@ impl Forker {
         }
         let block_number = block_number.unwrap_or(org_block_number.unwrap());
 
-        self.executor.env_mut().block.number = U256::from(block_number);
+        self.executor.env_mut().evm_env.block_env.number = block_number;
 
         self.executor
             .backend_mut()
             .roll_fork(
                 Some(active_fork_local_id),
                 block_number,
-                &mut env.unwrap_or_default(),
-                &mut JournaledState::new(spec_id, HashSet::new()),
+                &mut mk_env_mut(&mut env.unwrap_or_default()),
+                &mut mk_journaled_state(spec_id),
             )
             .map_err(|v| ForkCallError::ExecutorError(v.to_string()))
     }

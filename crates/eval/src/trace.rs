@@ -1,5 +1,6 @@
 use crate::fork::ForkTypedReturn;
 use alloy::primitives::{Address, U256};
+use foundry_evm::traces::CallTraceArena;
 use rain_interpreter_bindings::IInterpreterV3::{eval3Call, eval3Return};
 
 use thiserror::Error;
@@ -61,11 +62,8 @@ impl From<ForkTypedReturn<eval3Call>> for RainEvalResult {
         let eval3Return { stack, writes } = typed_return.typed_return;
 
         let tracer_address = RAIN_TRACER_ADDRESS.parse::<Address>().unwrap();
-        let mut traces: Vec<RainSourceTrace> = typed_return
-            .raw
-            .traces
-            .unwrap()
-            .to_owned()
+        let call_trace_arena = typed_return.raw.traces.unwrap().to_owned();
+        let mut traces: Vec<RainSourceTrace> = <CallTraceArena as Clone>::clone(&call_trace_arena)
             .into_nodes()
             .iter()
             .filter_map(|trace_node| {

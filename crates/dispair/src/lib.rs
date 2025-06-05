@@ -3,7 +3,6 @@ use alloy_ethers_typecast::transaction::{
     ReadContractParametersBuilder, ReadContractParametersBuilderError, ReadableClient,
     ReadableClientError,
 };
-use ethers::providers::JsonRpcClient;
 use rain_interpreter_bindings::DeployerISP;
 use thiserror::Error;
 
@@ -27,9 +26,9 @@ pub struct DISPair {
 
 /// Implementation to build DISPair from Deployer address.
 impl DISPair {
-    pub async fn from_deployer<T: JsonRpcClient>(
+    pub async fn from_deployer(
         deployer: Address,
-        client: ReadableClient<T>,
+        client: ReadableClient,
     ) -> Result<Self, DISPairError> {
         Ok(DISPair {
             deployer,
@@ -42,8 +41,7 @@ impl DISPair {
                         .map_err(DISPairError::ReadContractParametersBuilderError)?,
                 )
                 .await
-                .map_err(DISPairError::ReadableClientError)?
-                ._0,
+                .map_err(DISPairError::ReadableClientError)?,
             store: client
                 .read(
                     ReadContractParametersBuilder::default()
@@ -53,8 +51,7 @@ impl DISPair {
                         .map_err(DISPairError::ReadContractParametersBuilderError)?,
                 )
                 .await
-                .map_err(DISPairError::ReadableClientError)?
-                ._0,
+                .map_err(DISPairError::ReadableClientError)?,
             parser: client
                 .read(
                     ReadContractParametersBuilder::default()
@@ -64,8 +61,7 @@ impl DISPair {
                         .map_err(DISPairError::ReadContractParametersBuilderError)?,
                 )
                 .await
-                .map_err(DISPairError::ReadableClientError)?
-                ._0,
+                .map_err(DISPairError::ReadableClientError)?,
         })
     }
 }

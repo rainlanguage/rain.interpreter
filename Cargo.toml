@@ -13,6 +13,7 @@ anyhow = "1.0.70"
 clap = { version = "4.2.5", features = ["cargo", "derive"] }
 ethers = { version = "2.0.14", default-features = false }
 foundry-evm = { git = "https://github.com/foundry-rs/foundry", rev = "dc43e2c1ab70ec111d3272572e1732008f973a06" }
+foundry-evm-core = { git = "https://github.com/foundry-rs/foundry", rev = "dc43e2c1ab70ec111d3272572e1732008f973a06" }
 foundry-fork-db = "0.15.0"
 foundry-block-explorers = "0.18.0"
 revm = { version = "24.0.1", default-features = false, features = [
