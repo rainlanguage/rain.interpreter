@@ -30,10 +30,10 @@ pub trait Parser {
 #[cfg(target_family = "wasm")]
 pub trait Parser {
     /// Call Parser contract to parse the provided rainlang text.
-    fn parse_text<T: JsonRpcClient>(
+    fn parse_text(
         &self,
         text: &str,
-        client: ReadableClient<T>,
+        client: ReadableClient,
     ) -> impl std::future::Future<Output = Result<parseReturn, ParserError>>
     where
         Self: Sync,
@@ -43,10 +43,10 @@ pub trait Parser {
 
     /// Call Parser contract to parse the provided data
     /// The provided data must contain valid UTF-8 encoding of valid rainlang text.
-    fn parse<T: JsonRpcClient>(
+    fn parse(
         &self,
         data: Vec<u8>,
-        client: ReadableClient<T>,
+        client: ReadableClient,
     ) -> impl std::future::Future<Output = Result<parseReturn, ParserError>>;
 }
 

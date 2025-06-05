@@ -39,10 +39,10 @@ pub trait Parser2 {
 #[cfg(target_family = "wasm")]
 pub trait Parser2 {
     /// Call Parser contract to parse the provided rainlang text.
-    fn parse_text<T: JsonRpcClient>(
+    fn parse_text(
         &self,
         text: &str,
-        client: ReadableClient<T>,
+        client: ReadableClient,
     ) -> impl std::future::Future<Output = Result<parse2Return, ParserError>>
     where
         Self: Sync,
@@ -52,18 +52,18 @@ pub trait Parser2 {
 
     /// Call Parser contract to parse the provided data
     /// The provided data must contain valid UTF-8 encoding of valid rainlang text.
-    fn parse<T: JsonRpcClient>(
+    fn parse(
         &self,
         data: Vec<u8>,
-        client: ReadableClient<T>,
+        client: ReadableClient,
     ) -> impl std::future::Future<Output = Result<parse2Return, ParserError>>;
 
     /// Call Parser contract to parse the provided rainlang text and provide the pragma.
     /// The provided rainlang text must be valid UTF-8 encoding of valid rainlang text.
-    fn parse_pragma<T: JsonRpcClient>(
+    fn parse_pragma(
         &self,
         data: Vec<u8>,
-        client: ReadableClient<T>,
+        client: ReadableClient,
     ) -> impl std::future::Future<Output = Result<parsePragma1Return, ParserError>>;
 }
 
