@@ -42,7 +42,7 @@ pub struct ForkEvalCliArgs {
     pub inputs: Vec<U256>,
 
     // Accept state overlay vector as array of uint256
-    #[arg( short, long, help = "The state overlay vector")]
+    #[arg(short, long, help = "The state overlay vector")]
     pub state_overlay: Vec<U256>,
 }
 

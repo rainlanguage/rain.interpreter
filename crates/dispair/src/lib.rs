@@ -81,8 +81,8 @@ mod tests {
         let dispair = DISPair::from_deployer(deployer, client).await.unwrap();
 
         assert_eq!(dispair.deployer, deployer);
-        assert_eq!(dispair.interpreter, *local_evm.interpreter.address(),);
+        assert_eq!(dispair.interpreter, *local_evm.interpreter.address());
         assert_eq!(dispair.store, *local_evm.store.address());
-        assert_eq!(dispair.parser, *local_evm.parser.address(),);
+        assert_eq!(dispair.parser, *local_evm.parser.address());
     }
 }
