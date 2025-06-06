@@ -117,10 +117,10 @@ impl Forker {
             env: evm_opts.fork_evm_env(&fork_url).await?.0,
             evm_opts,
         };
-        let block_number = if let Some(v) = fork_block_number {
-            BlockNumber::from(v)
+        let block_number = if let Some(block_number) = fork_block_number {
+            block_number
         } else {
-            create_fork.env.evm_env.block_env.number.into()
+            create_fork.env.evm_env.block_env.number
         };
 
         let db = Backend::spawn(Some(create_fork.clone()))?;
@@ -193,10 +193,10 @@ impl Forker {
                 env: evm_opts.fork_evm_env(&fork_url).await.unwrap().0,
                 evm_opts,
             };
-            let block_number = if let Some(v) = fork_block_number {
-                BlockNumber::from(v)
+            let block_number = if let Some(block_number) = fork_block_number {
+                block_number
             } else {
-                create_fork.env.evm_env.block_env.number.into()
+                create_fork.env.evm_env.block_env.number
             };
 
             self.forks.insert(
