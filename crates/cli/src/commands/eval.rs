@@ -104,7 +104,7 @@ impl Execute for Eval {
                     format!("{:#?}", rain_eval_result).as_bytes(),
                 )
             }
-            Err(e) => Err(anyhow!("Error: {e:#?}")),
+            Err(e) => Err(anyhow!("Error: {:?}", e)),
         }
     }
 }
