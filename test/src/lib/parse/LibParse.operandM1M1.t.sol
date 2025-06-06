@@ -13,7 +13,7 @@ contract LibParseOperandM1M1Test is OperandTest {
 
     /// Default is zero for this operand parser. Tests no operand.
     function testOperandM1M1Elided() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:d();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:d();").parse();
         assertEq(
             bytecode,
             // 1 source
@@ -36,7 +36,7 @@ contract LibParseOperandM1M1Test is OperandTest {
 
     /// Default is zero for this operand parser. Tests empty operand.
     function testOperandM1M1Empty() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:d<>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:d<>();").parse();
         assertEq(
             bytecode,
             // 1 source
@@ -59,7 +59,7 @@ contract LibParseOperandM1M1Test is OperandTest {
 
     /// Default is zero for this operand parser. Tests first but not second operand.
     function testOperandM1M1First() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:d<1>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:d<1>();").parse();
         assertEq(
             bytecode,
             // 1 source
@@ -83,14 +83,14 @@ contract LibParseOperandM1M1Test is OperandTest {
     /// Default is zero for this operand parser. Tests first overflow.
     function testOperandM1M1FirstOverflow() external {
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:d<2>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parse("_:d<2>();");
         (bytecode);
         (constants);
     }
 
     /// Default is zero for this operand parser. Tests 0 1.
     function testOperandM1M1Second() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:d<0 1>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:d<0 1>();").parse();
         assertEq(
             bytecode,
             // 1 source
@@ -113,7 +113,7 @@ contract LibParseOperandM1M1Test is OperandTest {
 
     /// Default is zero for this operand parser. Tests 0 0.
     function testOperandM1M1SecondZero() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:d<0 0>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:d<0 0>();").parse();
         assertEq(
             bytecode,
             // 1 source
@@ -137,14 +137,14 @@ contract LibParseOperandM1M1Test is OperandTest {
     /// Default is zero for this operand parser. Tests 0 2.
     function testOperandM1M1SecondOverflow() external {
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:d<0 2>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parse("_:d<0 2>();");
         (bytecode);
         (constants);
     }
 
     /// Default is zero for this operand parser. Tests 1 1.
     function testOperandM1M1Both() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:d<1 1>();").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:d<1 1>();").parse();
         assertEq(
             bytecode,
             // 1 source

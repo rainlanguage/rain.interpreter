@@ -19,12 +19,15 @@ import {
     COMMENT_START_SEQUENCE,
     COMMENT_END_SEQUENCE,
     CMASK_IDENTIFIER_HEAD
-} from "./LibParseCMask.sol";
+} from "rain.string/lib/parse/LibParseCMask.sol";
+import {LibParseChar} from "rain.string/lib/parse/LibParseChar.sol";
 import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
 import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 import {LibParseOperand} from "./LibParseOperand.sol";
-import {Operand, OPCODE_STACK, OPCODE_UNKNOWN} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {
+    OperandV2, OPCODE_STACK, OPCODE_UNKNOWN
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibParseStackName} from "./LibParseStackName.sol";
 import {
     ExcessLHSItems,
@@ -62,6 +65,7 @@ import {LibParseError} from "./LibParseError.sol";
 import {LibSubParse} from "./LibSubParse.sol";
 import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
+import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 
 uint256 constant NOT_LOW_16_BIT_MASK = ~uint256(0xFFFF);
 uint256 constant ACTIVE_SOURCE_MASK = NOT_LOW_16_BIT_MASK;
@@ -80,6 +84,7 @@ library LibParse {
     using LibSubParse for ParseState;
     using LibBytes for bytes;
     using LibUint256Array for uint256[];
+    using LibBytes32Array for bytes32[];
 
     /// Parses a word that matches a tail mask between cursor and end. The caller
     /// has several responsibilities while safely using this word.
@@ -121,25 +126,6 @@ library LibParse {
         }
     }
 
-    /// Skip an unlimited number of chars until we find one that is not in the
-    /// mask.
-    function skipMask(uint256 cursor, uint256 end, uint256 mask) internal pure returns (uint256) {
-        assembly ("memory-safe") {
-            //slither-disable-next-line incorrect-shift
-            for {} and(lt(cursor, end), gt(and(shl(byte(0, mload(cursor)), 1), mask), 0)) { cursor := add(cursor, 1) } {}
-        }
-        return cursor;
-    }
-
-    /// Checks if the cursor points at a char of the given mask, and is in range
-    /// of end.
-    function isMask(uint256 cursor, uint256 end, uint256 mask) internal pure returns (uint256 result) {
-        assembly ("memory-safe") {
-            //slither-disable-next-line incorrect-shift
-            result := and(lt(cursor, end), iszero(iszero(and(shl(byte(0, mload(cursor)), 1), mask))))
-        }
-    }
-
     function parseLHS(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
             while (cursor < end) {
@@ -169,7 +155,7 @@ library LibParse {
                     }
                     // Anon stack item.
                     else {
-                        cursor = skipMask(cursor + 1, end, CMASK_LHS_STACK_TAIL);
+                        cursor = LibParseChar.skipMask(cursor + 1, end, CMASK_LHS_STACK_TAIL);
                     }
                     // Bump the index regardless of whether the stack
                     // item is named or not.
@@ -179,7 +165,7 @@ library LibParse {
                     // Set yang as we are now building a stack item.
                     state.fsm |= FSM_YANG_MASK | FSM_ACTIVE_SOURCE_MASK;
                 } else if (char & CMASK_WHITESPACE != 0) {
-                    cursor = skipMask(cursor + 1, end, CMASK_WHITESPACE);
+                    cursor = LibParseChar.skipMask(cursor + 1, end, CMASK_WHITESPACE);
                     // Set ying as we now open to possibilities.
                     state.fsm &= ~FSM_YANG_MASK;
                 } else if (char & CMASK_LHS_RHS_DELIMITER != 0) {
@@ -225,7 +211,7 @@ library LibParse {
                     (bool exists, uint256 opcodeIndex) = LibParseMeta.lookupWord(state.meta, word);
                     if (exists) {
                         cursor = state.parseOperand(cursor, end);
-                        Operand operand = state.handleOperand(opcodeIndex);
+                        OperandV2 operand = state.handleOperand(opcodeIndex);
                         state.pushOpToSource(opcodeIndex, operand);
                         // This is a real word so we expect to see parens
                         // after it.
@@ -235,14 +221,14 @@ library LibParse {
                     else {
                         (exists, opcodeIndex) = state.stackNameIndex(word);
                         if (exists) {
-                            state.pushOpToSource(OPCODE_STACK, Operand.wrap(opcodeIndex));
+                            state.pushOpToSource(OPCODE_STACK, OperandV2.wrap(bytes32(opcodeIndex)));
                             // Need to process highwater here because we
                             // don't have any parens to open or close.
                             state.highwater();
                         }
                         // Fallback to sub parsing.
                         else {
-                            Operand operand;
+                            OperandV2 operand;
                             bytes memory subParserBytecode;
 
                             {
@@ -374,7 +360,7 @@ library LibParse {
                     state.highwater();
                     cursor++;
                 } else if (char & CMASK_WHITESPACE > 0) {
-                    cursor = skipMask(cursor + 1, end, CMASK_WHITESPACE);
+                    cursor = LibParseChar.skipMask(cursor + 1, end, CMASK_WHITESPACE);
                     // Set yin as we now open to possibilities.
                     state.fsm &= ~FSM_YANG_MASK;
                 }
@@ -411,7 +397,7 @@ library LibParse {
         }
     }
 
-    function parse(ParseState memory state) internal view returns (bytes memory bytecode, uint256[] memory) {
+    function parse(ParseState memory state) internal view returns (bytes memory bytecode, bytes32[] memory) {
         unchecked {
             if (state.data.length > 0) {
                 uint256 cursor = Pointer.unwrap(state.data.dataPointer());

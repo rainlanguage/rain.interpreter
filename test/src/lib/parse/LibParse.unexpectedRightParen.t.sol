@@ -8,12 +8,20 @@ import {LibParse} from "src/lib/parse/LibParse.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {UnexpectedRightParen} from "src/error/ErrParse.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
-import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
+import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 
 /// @title LibParseUnexpectedRightParenTest
 /// Test that the parser errors when it encounters an unexpected right paren.
 contract LibParseUnexpectedRightParenTest is Test {
     using LibParse for ParseState;
+
+    function parseExternal(ParseState memory state)
+        external
+        view
+        returns (bytes memory bytecode, bytes32[] memory constants)
+    {
+        return state.parse();
+    }
 
     /// Check the parser reverts if it encounters an unexpected right paren.
     function testParseUnexpectedRightParen() external {
@@ -22,11 +30,11 @@ contract LibParseUnexpectedRightParenTest is Test {
             bytes(str),
             LibMetaFixture.parseMetaV2(),
             LibMetaFixture.operandHandlerFunctionPointers(),
-            LibAllStandardOpsNP.literalParserFunctionPointers()
+            LibAllStandardOps.literalParserFunctionPointers()
         );
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRightParen.selector, 1));
-        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal(state);
         (bytecode, constants);
     }
 
@@ -37,11 +45,11 @@ contract LibParseUnexpectedRightParenTest is Test {
             bytes(str),
             LibMetaFixture.parseMetaV2(),
             LibMetaFixture.operandHandlerFunctionPointers(),
-            LibAllStandardOpsNP.literalParserFunctionPointers()
+            LibAllStandardOps.literalParserFunctionPointers()
         );
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedRightParen.selector, 7));
-        (bytes memory bytecode, uint256[] memory constants) = state.parse();
+        (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal(state);
         (bytecode, constants);
     }
 }

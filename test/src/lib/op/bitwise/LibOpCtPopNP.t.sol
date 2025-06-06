@@ -2,14 +2,15 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {IntegrityCheckStateNP} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibOpCtPopNP} from "src/lib/op/bitwise/LibOpCtPopNP.sol";
-import {InterpreterStateNP} from "src/lib/state/LibInterpreterStateNP.sol";
+import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {
     IInterpreterV4,
     FullyQualifiedNamespace,
-    Operand,
-    SourceIndexV2
+    OperandV2,
+    SourceIndexV2,
+    StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
@@ -22,7 +23,7 @@ import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 contract LibOpCtPopNPTest is OpTest {
     /// Directly test the integrity logic of LibOpCtPopNP. All possible operands
     /// result in the same number of inputs and outputs, (1, 1).
-    function testOpCtPopNPIntegrity(IntegrityCheckStateNP memory state, Operand operand) external pure {
+    function testOpCtPopNPIntegrity(IntegrityCheckState memory state, OperandV2 operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpCtPopNP.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
@@ -30,19 +31,23 @@ contract LibOpCtPopNPTest is OpTest {
 
     /// Directly test the runtime logic of LibOpCtPopNP. This tests that the
     /// opcode correctly pushes the ct pop onto the stack.
-    function testOpCtPopNPRun(uint256 x) external view {
-        InterpreterStateNP memory state = opTestDefaultInterpreterState();
-        uint256[] memory inputs = new uint256[](1);
+    function testOpCtPopNPRun(StackItem x) external view {
+        InterpreterState memory state = opTestDefaultInterpreterState();
+        StackItem[] memory inputs = new StackItem[](1);
         inputs[0] = x;
-        Operand operand = LibOperand.build(1, 1, 0);
+        OperandV2 operand = LibOperand.build(1, 1, 0);
         opReferenceCheck(state, operand, LibOpCtPopNP.referenceFn, LibOpCtPopNP.integrity, LibOpCtPopNP.run, inputs);
     }
 
     /// Test the eval of a ct pop opcode parsed from a string.
-    function testOpCtPopNPEval(uint256 x) external view {
-        uint256[] memory stack = new uint256[](1);
-        stack[0] = LibCtPop.ctpop(x);
-        checkHappy(bytes(string.concat("_: bitwise-count-ones(", Strings.toHexString(x), ");")), stack, "");
+    function testOpCtPopNPEval(StackItem x) external view {
+        StackItem[] memory stack = new StackItem[](1);
+        stack[0] = StackItem.wrap(bytes32(LibCtPop.ctpop(uint256(StackItem.unwrap(x)))));
+        checkHappy(
+            bytes(string.concat("_: bitwise-count-ones(", Strings.toHexString(uint256(StackItem.unwrap(x))), ");")),
+            stack,
+            ""
+        );
     }
 
     /// Test that a bitwise count with bad inputs fails integrity.

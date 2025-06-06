@@ -12,16 +12,4 @@ library LibParseSlow {
         }
         return data.length;
     }
-
-    function isMaskSlow(uint256 cursor, uint256 end, uint256 mask) internal pure returns (uint256) {
-        if (cursor < end) {
-            uint256 wordAtCursor;
-            assembly ("memory-safe") {
-                wordAtCursor := mload(cursor)
-            }
-            return (1 << uint256(wordAtCursor >> 0xF8)) & mask > 0 ? 1 : 0;
-        } else {
-            return 0;
-        }
-    }
 }

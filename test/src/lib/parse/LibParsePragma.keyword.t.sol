@@ -11,12 +11,12 @@ import {
     CMASK_LITERAL_HEX_DISPATCH_START,
     CMASK_INTERSTITIAL_HEAD,
     CMASK_HEX
-} from "src/lib/parse/LibParseCMask.sol";
-import {LibLiteralString} from "test/lib/literal/LibLiteralString.sol";
+} from "rain.string/lib/parse/LibParseCMask.sol";
+import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {NoWhitespaceAfterUsingWordsFrom} from "src/error/ErrParse.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
-import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
+import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 
 /// @title LibParsePragmaKeywordTest
 contract LibParsePragmaKeywordTest is Test {
@@ -31,7 +31,7 @@ contract LibParsePragmaKeywordTest is Test {
         string memory err
     ) internal pure {
         ParseState memory state =
-            LibParseState.newState(bytes(str), "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+            LibParseState.newState(bytes(str), "", "", LibAllStandardOps.literalParserFunctionPointers());
         uint256 cursor = Pointer.unwrap(bytes(str).dataPointer());
         uint256 end = Pointer.unwrap(bytes(str).endDataPointer());
         uint256 cursorAfter = state.parsePragma(cursor, end);
@@ -39,15 +39,15 @@ contract LibParsePragmaKeywordTest is Test {
 
         if (values.length > 0) {
             uint256 j = values.length - 1;
-            uint256 deref = state.subParsers;
-            uint256 pointer = deref >> 0xF0;
+            bytes32 deref = state.subParsers;
+            uint256 pointer = uint256(deref) >> 0xF0;
             while (deref != 0) {
-                assertEq(uint256(uint160(deref)), uint256(uint160(values[j])));
+                assertEq(uint160(uint256(deref)), uint160(values[j]));
 
                 assembly ("memory-safe") {
                     deref := mload(pointer)
                 }
-                pointer = deref >> 0xF0;
+                pointer = uint256(deref) >> 0xF0;
                 // This underflows exactly when deref is zero and the loop
                 // terminates.
                 unchecked {
@@ -59,7 +59,7 @@ contract LibParsePragmaKeywordTest is Test {
 
     function externalParsePragma(string memory str) external pure {
         ParseState memory state =
-            LibParseState.newState(bytes(str), "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+            LibParseState.newState(bytes(str), "", "", LibAllStandardOps.literalParserFunctionPointers());
         uint256 cursor = Pointer.unwrap(bytes(str).dataPointer());
         uint256 end = Pointer.unwrap(bytes(str).endDataPointer());
         uint256 cursorAfter = state.parsePragma(cursor, end);
@@ -67,6 +67,7 @@ contract LibParsePragmaKeywordTest is Test {
     }
 
     /// Anything that DOES NOT start with the keyword should be a noop.
+    /// forge-config: default.fuzz.runs = 100
     function testPragmaKeywordNoop(ParseState memory state, string calldata calldataStr) external pure {
         if (bytes(calldataStr).length >= PRAGMA_KEYWORD_BYTES_LENGTH) {
             bytes memory prefix = bytes(calldataStr)[0:PRAGMA_KEYWORD_BYTES_LENGTH];
@@ -82,8 +83,9 @@ contract LibParsePragmaKeywordTest is Test {
 
     /// Anything that DOES start with the keyword but WITHOUT whitespace should
     /// error.
+    /// forge-config: default.fuzz.runs = 100
     function testPragmaKeywordNoWhitespace(uint256 seed, string memory str) external {
-        bytes1 notWhitespace = LibLiteralString.charFromMask(seed, ~CMASK_WHITESPACE);
+        bytes1 notWhitespace = LibConformString.charFromMask(seed, ~CMASK_WHITESPACE);
         string memory fullString =
             string.concat(string(PRAGMA_KEYWORD_BYTES), string(abi.encodePacked(notWhitespace)), str);
         vm.expectRevert(abi.encodeWithSelector(NoWhitespaceAfterUsingWordsFrom.selector, PRAGMA_KEYWORD_BYTES_LENGTH));
@@ -93,10 +95,11 @@ contract LibParsePragmaKeywordTest is Test {
     /// Anything that DOES start with the keyword and WITH whitespace BUT NOT
     /// hex values should more the cursor forward exactly the length of the
     /// keyword + the whitespace char.
+    /// forge-config: default.fuzz.runs = 100
     function testPragmaKeywordWhitespaceNoHex(uint256 seed, string calldata calldataStr) external pure {
         seed = bound(seed, 0, type(uint256).max - 1);
-        bytes1 whitespace = LibLiteralString.charFromMask(seed, CMASK_WHITESPACE);
-        bytes1 notInterstitialHead = LibLiteralString.charFromMask(seed + 1, ~CMASK_INTERSTITIAL_HEAD);
+        bytes1 whitespace = LibConformString.charFromMask(seed, CMASK_WHITESPACE);
+        bytes1 notInterstitialHead = LibConformString.charFromMask(seed + 1, ~CMASK_INTERSTITIAL_HEAD);
         if (bytes(calldataStr).length > 2) {
             vm.assume(
                 keccak256(bytes(calldataStr[0:2]))
@@ -107,7 +110,7 @@ contract LibParsePragmaKeywordTest is Test {
             string(PRAGMA_KEYWORD_BYTES), string(abi.encodePacked(whitespace, notInterstitialHead)), calldataStr
         );
         ParseState memory state =
-            LibParseState.newState(bytes(str), "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+            LibParseState.newState(bytes(str), "", "", LibAllStandardOps.literalParserFunctionPointers());
 
         uint256 cursor = Pointer.unwrap(bytes(str).dataPointer());
         uint256 end = Pointer.unwrap(bytes(str).endDataPointer());
@@ -117,15 +120,16 @@ contract LibParsePragmaKeywordTest is Test {
 
     /// Anything that DOES start with the keyword and WITH whitespace then some
     /// hex address should push the hex address to the state as a sub parser.
-    function testPragmaKeywordParseSubParser(
+    /// forge-config: default.fuzz.runs = 100
+    function testPragmaKeywordParseSubParserBasic(
         string memory whitespace,
         address subParser,
         uint256 seed,
         string calldata suffix
     ) external pure {
         vm.assume(bytes(whitespace).length > 0);
-        bytes1 notHexData = LibLiteralString.charFromMask(seed, ~CMASK_HEX);
-        LibLiteralString.conformStringToMask(whitespace, CMASK_WHITESPACE, 0x80);
+        bytes1 notHexData = LibConformString.charFromMask(seed, ~CMASK_HEX);
+        LibConformString.conformStringToMask(whitespace, CMASK_WHITESPACE, 0x80);
         string memory str = string.concat(
             string(PRAGMA_KEYWORD_BYTES),
             whitespace,
@@ -134,7 +138,7 @@ contract LibParsePragmaKeywordTest is Test {
             suffix
         );
         ParseState memory state =
-            LibParseState.newState(bytes(str), "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+            LibParseState.newState(bytes(str), "", "", LibAllStandardOps.literalParserFunctionPointers());
         uint256 cursor = Pointer.unwrap(bytes(str).dataPointer());
         uint256 end = Pointer.unwrap(bytes(str).endDataPointer());
         uint256 cursorAfter = state.parsePragma(cursor, end);
@@ -143,9 +147,9 @@ contract LibParsePragmaKeywordTest is Test {
         assertEq(cursorAfter, cursor + PRAGMA_KEYWORD_BYTES_LENGTH + bytes(whitespace).length + 42);
 
         // The sub parser should be pushed to the state.
-        uint256 deref = state.subParsers;
-        assertEq(address(uint160(deref)), subParser);
-        uint256 pointer = deref >> 0xF0;
+        bytes32 deref = state.subParsers;
+        assertEq(uint160(uint256(deref)), uint160(subParser));
+        uint256 pointer = uint256(deref) >> 0xF0;
         assembly ("memory-safe") {
             deref := mload(pointer)
         }
@@ -153,6 +157,7 @@ contract LibParsePragmaKeywordTest is Test {
     }
 
     /// Can parse a couple of addresses cleanly.
+    /// forge-config: default.fuzz.runs = 100
     function testPragmaKeywordParseSubParserCoupleOfAddresses(
         string memory whitespace0,
         string memory whitespace1,
@@ -164,10 +169,10 @@ contract LibParsePragmaKeywordTest is Test {
         vm.assume(bytes(whitespace0).length > 0);
         vm.assume(bytes(whitespace1).length > 0);
 
-        bytes1 notHexData = LibLiteralString.charFromMask(seed, ~CMASK_HEX);
+        bytes1 notHexData = LibConformString.charFromMask(seed, ~CMASK_HEX);
 
-        LibLiteralString.conformStringToMask(whitespace0, CMASK_WHITESPACE, 0x80);
-        LibLiteralString.conformStringToMask(whitespace1, CMASK_WHITESPACE, 0x80);
+        LibConformString.conformStringToMask(whitespace0, CMASK_WHITESPACE, 0x80);
+        LibConformString.conformStringToMask(whitespace1, CMASK_WHITESPACE, 0x80);
 
         string memory str = string.concat(
             string.concat(
@@ -182,7 +187,7 @@ contract LibParsePragmaKeywordTest is Test {
         );
 
         ParseState memory state =
-            LibParseState.newState(bytes(str), "", "", LibAllStandardOpsNP.literalParserFunctionPointers());
+            LibParseState.newState(bytes(str), "", "", LibAllStandardOps.literalParserFunctionPointers());
 
         uint256 cursor = Pointer.unwrap(bytes(str).dataPointer());
         uint256 end = Pointer.unwrap(bytes(str).endDataPointer());
@@ -195,14 +200,14 @@ contract LibParsePragmaKeywordTest is Test {
         );
 
         // The sub parsers should both be pushed to the state.
-        uint256 deref = state.subParsers;
-        assertEq(address(uint160(deref)), subParser1);
-        uint256 pointer = deref >> 0xF0;
+        bytes32 deref = state.subParsers;
+        assertEq(uint160(uint256(deref)), uint160(subParser1));
+        uint256 pointer = uint256(deref) >> 0xF0;
         assembly ("memory-safe") {
             deref := mload(pointer)
         }
-        assertEq(address(uint160(deref)), subParser0);
-        pointer = deref >> 0xF0;
+        assertEq(uint160(uint256(deref)), uint160(subParser0));
+        pointer = uint256(deref) >> 0xF0;
         assembly ("memory-safe") {
             deref := mload(pointer)
         }

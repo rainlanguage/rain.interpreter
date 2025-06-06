@@ -2,16 +2,16 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibParseOperand, Operand} from "src/lib/parse/LibParseOperand.sol";
+import {LibParseOperand, OperandV2} from "src/lib/parse/LibParseOperand.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
-import {LibLiteralString} from "test/lib/literal/LibLiteralString.sol";
+import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {OperandValuesOverflow, UnclosedOperand} from "src/error/ErrParse.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
-import {LibDecimalFloat, LibDecimalFloatImplementation} from "rain.math.float/src/lib/LibDecimalFloat.sol";
-import {SIGNED_NORMALIZED_MAX} from "rain.math.float/src/lib/implementation/LibDecimalFloatImplementation.sol";
+import {LibDecimalFloat, LibDecimalFloatImplementation, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {SIGNED_NORMALIZED_MAX} from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
 
 contract LibParseOperandParseOperandTest is Test {
     using LibBytes for bytes;
@@ -19,8 +19,8 @@ contract LibParseOperandParseOperandTest is Test {
     using Strings for uint256;
     using Strings for int256;
 
-    function checkParsingOperandFromData(string memory s, uint256[] memory expectedValues, uint256 expectedEnd)
-        internal
+    function checkParsingOperandFromData(string memory s, bytes32[] memory expectedValues, uint256 expectedEnd)
+        public
         pure
     {
         ParseState memory state = LibMetaFixture.newState(s);
@@ -43,25 +43,28 @@ contract LibParseOperandParseOperandTest is Test {
 
     // Test that parsing a string that doesn't start with the operand opening
     // character always results in a zero length operand values array.
+    /// forge-config: default.fuzz.runs = 100
     function testParseOperandNoOpeningCharacter(string memory s) external pure {
         vm.assume(bytes(s).length > 0);
         vm.assume(bytes(s)[0] != "<");
 
-        checkParsingOperandFromData(s, new uint256[](0), 0);
+        checkParsingOperandFromData(s, new bytes32[](0), 0);
     }
 
     // Test that parsing an empty "<>" operand results in a zero length operand
     // values array. The cursor moves past both the opening and closing
     // characters.
+    /// forge-config: default.fuzz.runs = 100
     function testParseOperandEmptyOperand(string memory s) external pure {
         vm.assume(bytes(s).length > 2);
         bytes(s)[0] = "<";
         bytes(s)[1] = ">";
 
-        checkParsingOperandFromData(s, new uint256[](0), 2);
+        checkParsingOperandFromData(s, new bytes32[](0), 2);
     }
 
     // Test that we can parse a single literal.
+    /// forge-config: default.fuzz.runs = 100
     function testParseOperandSingleDecimalLiteral(
         bool asHex,
         int256 value,
@@ -69,17 +72,16 @@ contract LibParseOperandParseOperandTest is Test {
         string memory maybeWhitespaceB,
         string memory suffix
     ) external pure {
-        LibLiteralString.conformStringToWhitespace(maybeWhitespaceA);
-        LibLiteralString.conformStringToWhitespace(maybeWhitespaceB);
+        LibConformString.conformStringToWhitespace(maybeWhitespaceA);
+        LibConformString.conformStringToWhitespace(maybeWhitespaceB);
 
         value = bound(value, 0, SIGNED_NORMALIZED_MAX);
 
         string memory valueString = asHex ? uint256(value).toHexString() : value.toString();
         string memory s = string.concat("<", maybeWhitespaceA, valueString, maybeWhitespaceB, ">", suffix);
 
-        uint256[] memory expectedValues = new uint256[](1);
-        (int256 signedCoefficient, int256 exponent) = LibDecimalFloatImplementation.normalize(value, 0);
-        expectedValues[0] = asHex ? uint256(value) : LibDecimalFloat.pack(signedCoefficient, exponent);
+        bytes32[] memory expectedValues = new bytes32[](1);
+        expectedValues[0] = asHex ? bytes32(uint256(value)) : Float.unwrap(LibDecimalFloat.packLossless(value, 0));
 
         checkParsingOperandFromData(
             s,
@@ -89,6 +91,7 @@ contract LibParseOperandParseOperandTest is Test {
     }
 
     // Test that we can parse two literals.
+    /// forge-config: default.fuzz.runs = 100
     function testParseOperandTwoDecimalLiterals(
         bool asHexA,
         bool asHexB,
@@ -104,9 +107,9 @@ contract LibParseOperandParseOperandTest is Test {
         valueA = bound(valueA, 0, SIGNED_NORMALIZED_MAX);
         valueB = bound(valueB, 0, SIGNED_NORMALIZED_MAX);
 
-        LibLiteralString.conformStringToWhitespace(maybeWhitespaceA);
-        LibLiteralString.conformStringToWhitespace(maybeWhitespaceB);
-        LibLiteralString.conformStringToWhitespace(maybeWhitespaceC);
+        LibConformString.conformStringToWhitespace(maybeWhitespaceA);
+        LibConformString.conformStringToWhitespace(maybeWhitespaceB);
+        LibConformString.conformStringToWhitespace(maybeWhitespaceC);
 
         string memory valueAString = asHexA ? uint256(valueA).toHexString() : valueA.toString();
         string memory valueBString = asHexB ? uint256(valueB).toHexString() : valueB.toString();
@@ -114,13 +117,11 @@ contract LibParseOperandParseOperandTest is Test {
         string memory s = string.concat(
             "<", maybeWhitespaceA, valueAString, maybeWhitespaceB, valueBString, maybeWhitespaceC, ">", suffix
         );
-        uint256[] memory expectedValues = new uint256[](2);
+        bytes32[] memory expectedValues = new bytes32[](2);
 
-        (int256 signedCoefficient, int256 exponent) = LibDecimalFloatImplementation.normalize(valueA, 0);
-        expectedValues[0] = (asHexA ? uint256(valueA) : LibDecimalFloat.pack(signedCoefficient, exponent));
+        expectedValues[0] = (asHexA ? bytes32(uint256(valueA)) : Float.unwrap(LibDecimalFloat.packLossless(valueA, 0)));
 
-        (signedCoefficient, exponent) = LibDecimalFloatImplementation.normalize(valueB, 0);
-        expectedValues[1] = (asHexB ? uint256(valueB) : LibDecimalFloat.pack(signedCoefficient, exponent));
+        expectedValues[1] = (asHexB ? bytes32(uint256(valueB)) : Float.unwrap(LibDecimalFloat.packLossless(valueB, 0)));
 
         checkParsingOperandFromData(
             s,
@@ -131,6 +132,7 @@ contract LibParseOperandParseOperandTest is Test {
     }
 
     // Test that we can parse three literals.
+    /// forge-config: default.fuzz.runs = 100
     function testParseOperandThreeDecimalLiterals(
         bool asHexA,
         bool asHexB,
@@ -151,10 +153,10 @@ contract LibParseOperandParseOperandTest is Test {
         valueB = bound(valueB, 0, SIGNED_NORMALIZED_MAX);
         valueC = bound(valueC, 0, SIGNED_NORMALIZED_MAX);
 
-        LibLiteralString.conformStringToWhitespace(maybeWhitespaceA);
-        LibLiteralString.conformStringToWhitespace(maybeWhitespaceB);
-        LibLiteralString.conformStringToWhitespace(maybeWhitespaceC);
-        LibLiteralString.conformStringToWhitespace(maybeWhitespaceD);
+        LibConformString.conformStringToWhitespace(maybeWhitespaceA);
+        LibConformString.conformStringToWhitespace(maybeWhitespaceB);
+        LibConformString.conformStringToWhitespace(maybeWhitespaceC);
+        LibConformString.conformStringToWhitespace(maybeWhitespaceD);
 
         string memory s;
         uint256 expectedLength;
@@ -177,20 +179,18 @@ contract LibParseOperandParseOperandTest is Test {
                 + bytes(maybeWhitespaceD).length;
         }
 
-        uint256[] memory expectedValues = new uint256[](3);
-        (int256 signedCoefficient, int256 exponent) = LibDecimalFloatImplementation.normalize(valueA, 0);
-        expectedValues[0] = (asHexA ? uint256(valueA) : LibDecimalFloat.pack(signedCoefficient, exponent));
+        bytes32[] memory expectedValues = new bytes32[](3);
+        expectedValues[0] = (asHexA ? bytes32(uint256(valueA)) : Float.unwrap(LibDecimalFloat.packLossless(valueA, 0)));
 
-        (signedCoefficient, exponent) = LibDecimalFloatImplementation.normalize(valueB, 0);
-        expectedValues[1] = (asHexB ? uint256(valueB) : LibDecimalFloat.pack(signedCoefficient, exponent));
+        expectedValues[1] = (asHexB ? bytes32(uint256(valueB)) : Float.unwrap(LibDecimalFloat.packLossless(valueB, 0)));
 
-        (signedCoefficient, exponent) = LibDecimalFloatImplementation.normalize(valueC, 0);
-        expectedValues[2] = (asHexC ? uint256(valueC) : LibDecimalFloat.pack(signedCoefficient, exponent));
+        expectedValues[2] = (asHexC ? bytes32(uint256(valueC)) : Float.unwrap(LibDecimalFloat.packLossless(valueC, 0)));
 
         checkParsingOperandFromData(s, expectedValues, expectedLength);
     }
 
     // Test that we can parse four literals.
+    /// forge-config: default.fuzz.runs = 100
     function testParseOperandFourDecimalLiterals(
         bool[4] memory asHex,
         int256[4] memory values,
@@ -201,11 +201,11 @@ contract LibParseOperandParseOperandTest is Test {
             vm.assume(bytes(maybeWhitespace[1]).length > 0);
             vm.assume(bytes(maybeWhitespace[2]).length > 0);
             vm.assume(bytes(maybeWhitespace[3]).length > 0);
-            LibLiteralString.conformStringToWhitespace(maybeWhitespace[0]);
-            LibLiteralString.conformStringToWhitespace(maybeWhitespace[1]);
-            LibLiteralString.conformStringToWhitespace(maybeWhitespace[2]);
-            LibLiteralString.conformStringToWhitespace(maybeWhitespace[3]);
-            LibLiteralString.conformStringToWhitespace(maybeWhitespace[4]);
+            LibConformString.conformStringToWhitespace(maybeWhitespace[0]);
+            LibConformString.conformStringToWhitespace(maybeWhitespace[1]);
+            LibConformString.conformStringToWhitespace(maybeWhitespace[2]);
+            LibConformString.conformStringToWhitespace(maybeWhitespace[3]);
+            LibConformString.conformStringToWhitespace(maybeWhitespace[4]);
         }
 
         for (uint256 i = 0; i < 4; i++) {
@@ -243,10 +243,10 @@ contract LibParseOperandParseOperandTest is Test {
             s = string.concat(s, maybeWhitespace[4], ">", suffix);
         }
 
-        uint256[] memory expectedValues = new uint256[](4);
+        bytes32[] memory expectedValues = new bytes32[](4);
         for (uint256 i = 0; i < 4; i++) {
-            (int256 signedCoefficient, int256 exponent) = LibDecimalFloatImplementation.normalize(values[i], 0);
-            expectedValues[i] = asHex[i] ? uint256(values[i]) : LibDecimalFloat.pack(signedCoefficient, exponent);
+            expectedValues[i] =
+                asHex[i] ? bytes32(uint256(values[i])) : Float.unwrap(LibDecimalFloat.packLossless(values[i], 0));
         }
         checkParsingOperandFromData(s, expectedValues, expectedLength);
     }
@@ -254,18 +254,18 @@ contract LibParseOperandParseOperandTest is Test {
     /// More than 4 values is an error.
     function testParseOperandTooManyValues() external {
         vm.expectRevert(abi.encodeWithSelector(OperandValuesOverflow.selector, 9));
-        checkParsingOperandFromData("<1 2 3 4 5>", new uint256[](0), 0);
+        this.checkParsingOperandFromData("<1 2 3 4 5>", new bytes32[](0), 0);
     }
 
     /// Unclosed operand is an error.
     function testParseOperandUnclosed() external {
         vm.expectRevert(abi.encodeWithSelector(UnclosedOperand.selector, 8));
-        checkParsingOperandFromData("<1 2 3 4", new uint256[](0), 0);
+        this.checkParsingOperandFromData("<1 2 3 4", new bytes32[](0), 0);
     }
 
     // Unexpected chars will be treated as unclosed operands.
     function testParseOperandUnexpectedChars() external {
         vm.expectRevert(abi.encodeWithSelector(UnclosedOperand.selector, 6));
-        checkParsingOperandFromData("<1 2 3;> 6", new uint256[](0), 0);
+        this.checkParsingOperandFromData("<1 2 3;> 6", new bytes32[](0), 0);
     }
 }

@@ -2,9 +2,9 @@
 pragma solidity ^0.8.18;
 
 import {ParseState} from "../LibParseState.sol";
-import {IntOrAString, LibIntOrAString} from "rain.intorastring/src/lib/LibIntOrAString.sol";
+import {IntOrAString, LibIntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
 import {UnclosedStringLiteral, StringTooLong} from "../../../error/ErrParse.sol";
-import {CMASK_STRING_LITERAL_END, CMASK_STRING_LITERAL_TAIL} from "../LibParseCMask.sol";
+import {CMASK_STRING_LITERAL_END, CMASK_STRING_LITERAL_TAIL} from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibParseError} from "../LibParseError.sol";
 
 /// @title LibParseLiteralString
@@ -75,7 +75,7 @@ library LibParseLiteralString {
     function parseString(ParseState memory state, uint256 cursor, uint256 end)
         internal
         pure
-        returns (uint256, uint256)
+        returns (uint256, bytes32)
     {
         uint256 stringStart;
         uint256 stringEnd;
@@ -94,6 +94,6 @@ library LibParseLiteralString {
         assembly ("memory-safe") {
             mstore(str, memSnapshot)
         }
-        return (cursor, IntOrAString.unwrap(intOrAString));
+        return (cursor, bytes32(IntOrAString.unwrap(intOrAString)));
     }
 }

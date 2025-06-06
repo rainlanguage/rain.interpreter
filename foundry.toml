@@ -6,6 +6,7 @@ libs = ['lib']
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
 
 solc = "0.8.25"
+evm_version = "paris"
 
 # Try to make sure the optimizer doesn't touch the output in a way that can break
 # source maps for debugging.
@@ -24,19 +25,21 @@ cbor_metadata = false
 fs_permissions = [
     { access = "read-write", path = "./meta" },
     { access = "read-write", path = "src/generated" },
-    { access = "write", path = "./deployments/latest/RainterpreterParserNPE2" },
-    { access = "write", path = "./deployments/latest/RainterpreterStoreNPE2" },
-    { access = "write", path = "./deployments/latest/RainterpreterNPE2" },
-    { access = "write", path = "./deployments/latest/RainterpreterExpressionDeployerNPE2" }
+    { access = "write", path = "./deployments/latest/RainterpreterParser" },
+    { access = "write", path = "./deployments/latest/RainterpreterStore" },
+    { access = "write", path = "./deployments/latest/Rainterpreter" },
+    { access = "write", path = "./deployments/latest/RainterpreterExpressionDeployer" }
 ]
 
 remappings = [
     # The auto remapping wasn't appending /src/ for some reason.
     "forge-std/=lib/rain.interpreter.interface/lib/forge-std/src/",
     "rain.metadata/=lib/rain.metadata/src/",
-    "rain.sol.codegen/=lib/rain.sol.codegen/src/",
+    "rain.sol.codegen/=lib/rain.interpreter.interface/lib/rain.sol.codegen/src/",
     "rain.solmem/=lib/rain.interpreter.interface/lib/rain.solmem/src/",
     "openzeppelin-contracts/=lib/rain.interpreter.interface/lib/openzeppelin-contracts/",
+    "rain.math.float/=lib/rain.interpreter.interface/lib/rain.math.float/src/",
+    "rain.intorastring/=lib/rain.interpreter.interface/lib/rain.intorastring/src/",
 ]
 
 [fuzz]

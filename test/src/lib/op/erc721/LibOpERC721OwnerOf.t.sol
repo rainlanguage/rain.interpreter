@@ -2,15 +2,16 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {IntegrityCheckStateNP, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheckNP.sol";
+import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibOpERC721OwnerOf} from "src/lib/op/erc721/LibOpERC721OwnerOf.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import {
     IInterpreterV4,
     FullyQualifiedNamespace,
     SourceIndexV2,
-    Operand,
-    EvalV4
+    OperandV2,
+    EvalV4,
+    StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
@@ -23,25 +24,25 @@ import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 /// @title LibOpERC721OwnerOfTest
 /// @notice Test the opcode for getting the owner of an erc721 token.
 contract LibOpERC721OwnerOfTest is OpTest {
-    function testOpERC721OwnerOfNPIntegrity(IntegrityCheckStateNP memory state, uint8 inputs) external pure {
+    function testOpERC721OwnerOfNPIntegrity(IntegrityCheckState memory state, uint8 inputs) external pure {
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpERC721OwnerOf.integrity(state, Operand.wrap(uint256(inputs) << 0x10));
+            LibOpERC721OwnerOf.integrity(state, OperandV2.wrap(bytes32(uint256(inputs) << 0x10)));
 
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
     }
 
-    function testOpERC721OwnerOfNPRun(address token, uint256 tokenId, address owner, uint16 operandData) external {
+    function testOpERC721OwnerOfNPRun(address token, bytes32 tokenId, address owner, uint16 operandData) external {
         assumeEtchable(token);
         vm.etch(token, hex"fe");
         vm.mockCall(token, abi.encodeWithSelector(IERC721.ownerOf.selector, tokenId), abi.encode(owner));
         // called once for reference, once for run
         vm.expectCall(token, abi.encodeWithSelector(IERC721.ownerOf.selector, tokenId), 2);
 
-        uint256[] memory inputs = new uint256[](2);
-        inputs[0] = uint256(uint160(token));
-        inputs[1] = tokenId;
-        Operand operand = LibOperand.build(2, 1, operandData);
+        StackItem[] memory inputs = new StackItem[](2);
+        inputs[0] = StackItem.wrap(bytes32(uint256(uint160(token))));
+        inputs[1] = StackItem.wrap(tokenId);
+        OperandV2 operand = LibOperand.build(2, 1, operandData);
 
         opReferenceCheck(
             opTestDefaultInterpreterState(),
@@ -67,19 +68,19 @@ contract LibOpERC721OwnerOfTest is OpTest {
         vm.mockCall(token, abi.encodeWithSelector(IERC721.ownerOf.selector, tokenId), abi.encode(owner));
         vm.expectCall(token, abi.encodeWithSelector(IERC721.ownerOf.selector, tokenId), 1);
 
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
+        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
             EvalV4({
                 store: iStore,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
-                context: LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-                inputs: new uint256[](0),
-                stateOverlay: new uint256[](0)
+                context: LibContext.build(new bytes32[][](0), new SignedContextV1[](0)),
+                inputs: new StackItem[](0),
+                stateOverlay: new bytes32[](0)
             })
         );
         assertEq(stack.length, 1);
-        assertEq(stack[0], uint256(uint160(owner)));
+        assertEq(StackItem.unwrap(stack[0]), bytes32(uint256(uint160(owner))));
         assertEq(kvs.length, 0);
     }
 
@@ -107,7 +108,7 @@ contract LibOpERC721OwnerOfTest is OpTest {
     /// Test that operand fails integrity check.
     function testOpERC721OwnerOfNPEvalFailOperand() public {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse("_: erc721-owner-of<0>(0x00 0x01);");
+        (bytes memory bytecode, bytes32[] memory constants) = iParser.unsafeParse("_: erc721-owner-of<0>(0x00 0x01);");
         (bytecode, constants);
     }
 

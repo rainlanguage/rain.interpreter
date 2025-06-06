@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Test, console2} from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 import {ParseState, Pointer, LibParseState} from "src/lib/parse/LibParseState.sol";
 import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseLiteralSubParseable} from "src/lib/parse/literal/LibParseLiteralSubParseable.sol";
 import {UnclosedSubParseableLiteral, SubParseableMissingDispatch} from "src/error/ErrParse.sol";
-import {ISubParserV3} from "rain.interpreter.interface/interface/ISubParserV3.sol";
-import {LibLiteralString} from "test/lib/literal/LibLiteralString.sol";
-import {CMASK_WHITESPACE, CMASK_SUB_PARSEABLE_LITERAL_END} from "src/lib/parse/LibParseCMask.sol";
-import {CURRENT_COMPATIBILITY} from "src/lib/parse/LibSubParse.sol";
+import {ISubParserV4} from "rain.interpreter.interface/interface/unstable/ISubParserV4.sol";
+import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
+import {CMASK_WHITESPACE, CMASK_SUB_PARSEABLE_LITERAL_END} from "rain.string/lib/parse/LibParseCMask.sol";
 
 contract LibParseLiteralSubParseableTest is Test {
     using LibBytes for bytes;
@@ -20,33 +19,42 @@ contract LibParseLiteralSubParseableTest is Test {
         string memory data,
         string memory expectedDispatch,
         string memory expectedBody,
-        uint256 expectedCursorAfter
-    ) internal {
+        uint256 expectedCursorAfter,
+        bytes memory err
+    ) public {
         ParseState memory state = LibParseState.newState(bytes(data), "", "", "");
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         address subParser = address(0x1234567890123456789012345678901234567890);
-        state.pushSubParser(0, uint256(uint160(subParser)));
+        state.pushSubParser(0, bytes32(uint256(uint160(subParser))));
         bytes memory subParseData =
             bytes.concat(bytes2(uint16(bytes(expectedDispatch).length)), bytes(expectedDispatch), bytes(expectedBody));
-        uint256 returnValue = 99;
+        bytes32 returnValue = bytes32(uint256(99));
         vm.mockCall(
             subParser,
-            abi.encodeWithSelector(ISubParserV3.subParseLiteral.selector, CURRENT_COMPATIBILITY, subParseData),
+            abi.encodeWithSelector(ISubParserV4.subParseLiteral2.selector, subParseData),
             abi.encode(true, returnValue)
         );
-        vm.expectCall(
-            subParser,
-            abi.encodeWithSelector(ISubParserV3.subParseLiteral.selector, CURRENT_COMPATIBILITY, subParseData)
-        );
-        (uint256 cursorAfter, uint256 value) =
+        if (bytes(err).length == 0) {
+            vm.expectCall(subParser, abi.encodeWithSelector(ISubParserV4.subParseLiteral2.selector, subParseData));
+        }
+        (uint256 cursorAfter, bytes32 value) =
             state.parseSubParseable(cursor, Pointer.unwrap(state.data.endDataPointer()));
         assertEq(cursorAfter - cursor, expectedCursorAfter);
         assertEq(value, returnValue);
     }
 
+    function checkParseSubParseable(
+        string memory data,
+        string memory expectedDispatch,
+        string memory expectedBody,
+        uint256 expectedCursorAfter
+    ) internal {
+        checkParseSubParseable(data, expectedDispatch, expectedBody, expectedCursorAfter, "");
+    }
+
     function checkParseSubParseableError(string memory data, bytes memory err) internal {
         vm.expectRevert(err);
-        checkParseSubParseable(data, "", "", 0);
+        this.checkParseSubParseable(data, "", "", 0, err);
     }
 
     /// An unclosed sub parseable literal is an error.
@@ -123,12 +131,12 @@ contract LibParseLiteralSubParseableTest is Test {
         vm.assume(bytes(whitespace).length > 0);
 
         // Dispatch can be any ASCII other than whitespace or literal end char.
-        LibLiteralString.conformStringToMask(dispatch, ~(CMASK_WHITESPACE | CMASK_SUB_PARSEABLE_LITERAL_END));
+        LibConformString.conformStringToMask(dispatch, ~(CMASK_WHITESPACE | CMASK_SUB_PARSEABLE_LITERAL_END));
         // Whitespace can be any standard rainlang whitespace.
-        LibLiteralString.conformStringToWhitespace(whitespace);
+        LibConformString.conformStringToWhitespace(whitespace);
         // Body can be any ASCII other than the literal end, including
         // whitespace.
-        LibLiteralString.conformStringToMask(body, ~CMASK_SUB_PARSEABLE_LITERAL_END);
+        LibConformString.conformStringToMask(body, ~CMASK_SUB_PARSEABLE_LITERAL_END);
 
         checkParseSubParseable(
             string(abi.encodePacked("[", dispatch, whitespace, body, "]")),

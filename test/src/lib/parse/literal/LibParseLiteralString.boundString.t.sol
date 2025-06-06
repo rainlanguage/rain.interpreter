@@ -4,10 +4,10 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std/Test.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseLiteralString} from "src/lib/parse/literal/LibParseLiteralString.sol";
-import {LibLiteralString} from "test/lib/literal/LibLiteralString.sol";
+import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {StringTooLong, UnclosedStringLiteral, ParserOutOfBounds} from "src/error/ErrParse.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
-import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
+import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 
 /// @title LibParseLiteralStringBoundTest
 contract LibParseLiteralStringBoundTest is Test {
@@ -31,7 +31,7 @@ contract LibParseLiteralStringBoundTest is Test {
         returns (uint256, uint256, uint256, uint256)
     {
         ParseState memory state = LibParseState.newState(data, "", "", "");
-        state.literalParsers = LibAllStandardOpsNP.literalParserFunctionPointers();
+        state.literalParsers = LibAllStandardOps.literalParserFunctionPointers();
         assembly ("memory-safe") {
             mstore(data, length)
         }
@@ -59,7 +59,7 @@ contract LibParseLiteralStringBoundTest is Test {
     /// of their quotes and the inner start and end at their data bounds.
     function testParseStringLiteralBounds(string memory str) external view {
         vm.assume(bytes(str).length < 0x20);
-        LibLiteralString.conformValidPrintableStringContent(str);
+        LibConformString.conformValidPrintableStringContent(str);
 
         checkStringBounds(string.concat("\"", str, "\""), 1, bytes(str).length + 1, bytes(str).length + 2);
     }
@@ -67,7 +67,7 @@ contract LibParseLiteralStringBoundTest is Test {
     /// Valid but too long strings should error.
     function testParseStringLiteralBoundsTooLong(string memory str) external {
         vm.assume(bytes(str).length >= 0x20);
-        LibLiteralString.conformValidPrintableStringContent(str);
+        LibConformString.conformValidPrintableStringContent(str);
 
         vm.expectRevert(abi.encodeWithSelector(StringTooLong.selector, 0));
         checkStringBounds(string.concat("\"", str, "\""), 0, 0, 0);
@@ -76,9 +76,9 @@ contract LibParseLiteralStringBoundTest is Test {
     /// Invalid chars in the first 31 bytes should error.
     function testParseStringLiteralBoundsInvalidCharBefore(string memory str, uint256 badIndex) external {
         vm.assume(bytes(str).length > 0);
-        LibLiteralString.conformValidPrintableStringContent(str);
+        LibConformString.conformValidPrintableStringContent(str);
         badIndex = bound(badIndex, 0, (bytes(str).length > 0x1F ? 0x1F : bytes(str).length) - 1);
-        LibLiteralString.corruptSingleChar(str, badIndex);
+        LibConformString.corruptSingleChar(str, badIndex);
 
         vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, 1 + badIndex));
         checkStringBounds(string.concat("\"", str, "\""), 0, 0, 0);
@@ -88,7 +88,7 @@ contract LibParseLiteralStringBoundTest is Test {
     /// an unclosed string.
     function testParseStringLiteralBoundsParserOutOfBounds(string memory str, uint256 length) external {
         vm.assume(bytes(str).length < 0x20);
-        LibLiteralString.conformValidPrintableStringContent(str);
+        LibConformString.conformValidPrintableStringContent(str);
         str = string.concat("\"", str, "\"");
         length = bound(length, 1, bytes(str).length - 1);
 

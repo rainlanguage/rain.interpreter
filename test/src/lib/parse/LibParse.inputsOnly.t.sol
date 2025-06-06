@@ -19,7 +19,7 @@ contract LibParseInputsOnlyTest is Test {
     /// Some inputs-only examples. Should produce an empty source.
     /// Test a single input.
     function testParseInputsOnlySingle() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_:;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_:;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);
@@ -50,7 +50,7 @@ contract LibParseInputsOnlyTest is Test {
 
     /// Test multiple inputs.
     function testParseInputsOnlyMultiple() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("_ _:;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("_ _:;").parse();
         uint256 sourceIndex = 0;
         assertEq(LibBytecode.sourceCount(bytecode), 1);
         assertEq(LibBytecode.sourceRelativeOffset(bytecode, sourceIndex), 0);

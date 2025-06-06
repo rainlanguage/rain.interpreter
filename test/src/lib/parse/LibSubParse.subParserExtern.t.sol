@@ -2,21 +2,31 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {Operand, OPCODE_EXTERN} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, OPCODE_EXTERN} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {
-    IInterpreterExternV3,
-    ExternDispatch,
-    EncodedExternDispatch
-} from "rain.interpreter.interface/interface/IInterpreterExternV3.sol";
+    IInterpreterExternV4,
+    ExternDispatchV2,
+    EncodedExternDispatchV2
+} from "rain.interpreter.interface/interface/unstable/IInterpreterExternV4.sol";
 import {LibSubParse} from "src/lib/parse/LibSubParse.sol";
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {ExternDispatchConstantsHeightOverflow} from "src/error/ErrSubParse.sol";
 
 contract LibSubParseSubParserExternTest is Test {
+    function subParserExternExternal(
+        IInterpreterExternV4 extern,
+        uint256 constantsHeight,
+        uint256 inputsOutputs,
+        OperandV2 operand,
+        uint256 opcodeIndex
+    ) external pure returns (bool, bytes memory, bytes32[] memory) {
+        return LibSubParse.subParserExtern(extern, constantsHeight, inputsOutputs, operand, opcodeIndex);
+    }
+
     /// Every possible valid extern input will be sub parsed into extern
     /// bytecode.
     function testLibSubParseSubParserExtern(
-        IInterpreterExternV3 extern,
+        IInterpreterExternV4 extern,
         uint8 constantsHeight,
         uint8 inputs,
         uint8 outputs,
@@ -25,11 +35,11 @@ contract LibSubParseSubParserExternTest is Test {
     ) external pure {
         inputs = uint8(bound(inputs, 0, 0xF));
         outputs = uint8(bound(outputs, 0, 0xF));
-        (bool success, bytes memory bytecode, uint256[] memory constants) = LibSubParse.subParserExtern(
+        (bool success, bytes memory bytecode, bytes32[] memory constants) = LibSubParse.subParserExtern(
             extern,
             uint256(constantsHeight),
             uint256(outputs) << 4 | uint256(inputs),
-            Operand.wrap(uint256(operandValue)),
+            OperandV2.wrap(bytes32(uint256(operandValue))),
             uint256(opcodeIndex)
         );
         assertTrue(success);
@@ -41,17 +51,17 @@ contract LibSubParseSubParserExternTest is Test {
         assertEq(uint16(uint8(bytecode[2])) << 8 | uint16(uint8(bytecode[3])), constantsHeight);
 
         assertEq(constants.length, 1);
-        (IInterpreterExternV3 externDecoded, ExternDispatch externDispatchDecoded) =
-            LibExtern.decodeExternCall(EncodedExternDispatch.wrap(constants[0]));
+        (IInterpreterExternV4 externDecoded, ExternDispatchV2 externDispatchDecoded) =
+            LibExtern.decodeExternCall(EncodedExternDispatchV2.wrap(constants[0]));
         assertEq(address(extern), address(externDecoded));
-        (uint256 opcodeIndexDecoded, Operand operandDecoded) = LibExtern.decodeExternDispatch(externDispatchDecoded);
+        (uint256 opcodeIndexDecoded, OperandV2 operandDecoded) = LibExtern.decodeExternDispatch(externDispatchDecoded);
         assertEq(opcodeIndexDecoded, opcodeIndex);
-        assertEq(Operand.unwrap(operandDecoded), operandValue);
+        assertEq(OperandV2.unwrap(operandDecoded), bytes32(uint256(operandValue)));
     }
 
     /// Constants height must be less than 256 or the lib will error.
     function testLibSubParseSubParserExternConstantsHeightOverflow(
-        IInterpreterExternV3 extern,
+        IInterpreterExternV4 extern,
         uint256 constantsHeight,
         uint8 inputsByte,
         uint8 outputsByte,
@@ -60,11 +70,11 @@ contract LibSubParseSubParserExternTest is Test {
     ) external {
         constantsHeight = bound(constantsHeight, uint256(type(uint16).max) + 1, type(uint256).max);
         vm.expectRevert(abi.encodeWithSelector(ExternDispatchConstantsHeightOverflow.selector, constantsHeight));
-        (bool success, bytes memory bytecode, uint256[] memory constants) = LibSubParse.subParserExtern(
+        (bool success, bytes memory bytecode, bytes32[] memory constants) = this.subParserExternExternal(
             extern,
             constantsHeight,
             uint256(outputsByte) << 4 | uint256(inputsByte),
-            Operand.wrap(uint256(operandValue)),
+            OperandV2.wrap(bytes32(uint256(operandValue))),
             uint256(opcodeIndex)
         );
         (success, bytecode, constants);

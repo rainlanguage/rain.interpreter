@@ -7,30 +7,30 @@ import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 
-import {RainterpreterExpressionDeployerNPE2DeploymentTest} from
-    "./RainterpreterExpressionDeployerNPE2DeploymentTest.sol";
-import {LibInterpreterStateNP, InterpreterStateNP} from "../../src/lib/state/LibInterpreterStateNP.sol";
-import {IntegrityCheckStateNP, LibIntegrityCheckNP} from "../../src/lib/integrity/LibIntegrityCheckNP.sol";
+import {RainterpreterExpressionDeployerDeploymentTest} from "./RainterpreterExpressionDeployerDeploymentTest.sol";
+import {LibInterpreterState, InterpreterState} from "../../src/lib/state/LibInterpreterState.sol";
+import {IntegrityCheckState, LibIntegrityCheck} from "../../src/lib/integrity/LibIntegrityCheck.sol";
 
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "../../src/error/ErrParse.sol";
-import {BadOpInputsLength, BadOpOutputsLength} from "../../src/lib/integrity/LibIntegrityCheckNP.sol";
+import {BadOpInputsLength, BadOpOutputsLength} from "../../src/lib/integrity/LibIntegrityCheck.sol";
 import {
-    Operand,
+    OperandV2,
     IInterpreterV4,
     SourceIndexV2,
-    IInterpreterStoreV2,
-    EvalV4
+    IInterpreterStoreV3,
+    EvalV4,
+    StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {FullyQualifiedNamespace, StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibNamespace} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
 
-uint256 constant PRE = uint256(keccak256(abi.encodePacked("pre")));
-uint256 constant POST = uint256(keccak256(abi.encodePacked("post")));
+bytes32 constant PRE = keccak256(abi.encodePacked("pre"));
+bytes32 constant POST = keccak256(abi.encodePacked("post"));
 
-abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
-    using LibInterpreterStateNP for InterpreterStateNP;
+abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
+    using LibInterpreterState for InterpreterState;
     using LibUint256Array for uint256[];
     using LibPointer for Pointer;
 
@@ -61,41 +61,41 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         vm.assume(account != address(0x000000000000000000636F6e736F6c652e6c6f67));
     }
 
-    function opTestDefaultIngegrityCheckState() internal pure returns (IntegrityCheckStateNP memory) {
-        return IntegrityCheckStateNP(0, 0, 0, new uint256[](0), 0, "");
+    function opTestDefaultIngegrityCheckState() internal pure returns (IntegrityCheckState memory) {
+        return IntegrityCheckState(0, 0, 0, new bytes32[](0), 0, "");
     }
 
-    function opTestDefaultInterpreterState() internal view returns (InterpreterStateNP memory) {
-        return InterpreterStateNP(
+    function opTestDefaultInterpreterState() internal view returns (InterpreterState memory) {
+        return InterpreterState(
             new Pointer[](0),
-            new uint256[](0),
+            new bytes32[](0),
             0,
             MemoryKV.wrap(0),
             // Treat ourselves as the sender as we eval internally to directly
             // test the opcode logic.
             LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
-            IInterpreterStoreV2(address(iStore)),
-            new uint256[][](0),
+            IInterpreterStoreV3(address(iStore)),
+            new bytes32[][](0),
             "",
             ""
         );
     }
 
     function opReferenceCheckIntegrity(
-        function(IntegrityCheckStateNP memory, Operand) view returns (uint256, uint256) integrityFn,
-        Operand operand,
-        uint256[] memory constants,
-        uint256[] memory inputs
+        function(IntegrityCheckState memory, OperandV2) view returns (uint256, uint256) integrityFn,
+        OperandV2 operand,
+        bytes32[] memory constants,
+        StackItem[] memory inputs
     ) internal view returns (uint256) {
-        IntegrityCheckStateNP memory integrityState = LibIntegrityCheckNP.newState("", 0, constants);
+        IntegrityCheckState memory integrityState = LibIntegrityCheck.newState("", 0, constants);
         (uint256 calcInputs, uint256 calcOutputs) = integrityFn(integrityState, operand);
         assertEq(calcInputs, inputs.length, "inputs length");
-        assertEq(calcInputs, (Operand.unwrap(operand) >> 0x10) & 0x0F, "operand inputs");
-        assertEq(calcOutputs, Operand.unwrap(operand) >> 0x14, "operand outputs");
+        assertEq(calcInputs, uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F))), "operand inputs");
+        assertEq(calcOutputs, uint256(OperandV2.unwrap(operand) >> 0x14), "operand outputs");
         return calcOutputs;
     }
 
-    function opReferenceCheckPointers(uint256[] memory inputs, uint256 calcOutputs)
+    function opReferenceCheckPointers(StackItem[] memory inputs, uint256 calcOutputs)
         internal
         pure
         returns (ReferenceCheckPointers memory pointers)
@@ -131,15 +131,20 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
             pointers.post.unsafeWriteWord(POST);
             pointers.stackTop = stackTop;
             pointers.expectedStackTopAfter = expectedStackTopAfter;
-            LibMemCpy.unsafeCopyWordsTo(inputs.dataPointer(), pointers.stackTop, inputs.length);
+
+            uint256 inputsDataPointer;
+            assembly ("memory-safe") {
+                inputsDataPointer := add(inputs, 0x20)
+            }
+            LibMemCpy.unsafeCopyWordsTo(Pointer.wrap(inputsDataPointer), pointers.stackTop, inputs.length);
         }
     }
 
     function opReferenceCheckActual(
-        InterpreterStateNP memory state,
-        Operand operand,
+        InterpreterState memory state,
+        OperandV2 operand,
         ReferenceCheckPointers memory pointers,
-        function(InterpreterStateNP memory, Operand, Pointer) view returns (Pointer) runFn
+        function(InterpreterState memory, OperandV2, Pointer) view returns (Pointer) runFn
     ) internal view {
         bytes32 stateFingerprintBefore = state.fingerprint();
         pointers.actualStackTopAfter = runFn(state, operand, pointers.stackTop);
@@ -149,14 +154,14 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     }
 
     function opReferenceCheckExpectations(
-        InterpreterStateNP memory state,
-        Operand operand,
-        function(InterpreterStateNP memory, Operand, uint256[] memory) view returns (uint256[] memory) referenceFn,
+        InterpreterState memory state,
+        OperandV2 operand,
+        function(InterpreterState memory, OperandV2, StackItem[] memory) view returns (StackItem[] memory) referenceFn,
         ReferenceCheckPointers memory pointers,
-        uint256[] memory inputs,
+        StackItem[] memory inputs,
         uint256 calcOutputs
     ) internal view {
-        uint256[] memory expectedOutputs = referenceFn(state, operand, inputs);
+        StackItem[] memory expectedOutputs = referenceFn(state, operand, inputs);
         assertEq(expectedOutputs.length, calcOutputs, "expected outputs length");
 
         assertEq(
@@ -166,19 +171,19 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         );
         assertEq(PRE, pointers.pre.unsafeReadWord(), "pre");
         for (uint256 i = 0; i < expectedOutputs.length; i++) {
-            assertEq(expectedOutputs[i], pointers.expectedStackTopAfter.unsafeReadWord(), "value");
+            assertEq(StackItem.unwrap(expectedOutputs[i]), pointers.expectedStackTopAfter.unsafeReadWord(), "value");
             pointers.expectedStackTopAfter = pointers.expectedStackTopAfter.unsafeAddWord();
         }
         assertEq(POST, pointers.post.unsafeReadWord(), "post");
     }
 
     function opReferenceCheck(
-        InterpreterStateNP memory state,
-        Operand operand,
-        function(InterpreterStateNP memory, Operand, uint256[] memory) view returns (uint256[] memory) referenceFn,
-        function(IntegrityCheckStateNP memory, Operand) view returns (uint256, uint256) integrityFn,
-        function(InterpreterStateNP memory, Operand, Pointer) view returns (Pointer) runFn,
-        uint256[] memory inputs
+        InterpreterState memory state,
+        OperandV2 operand,
+        function(InterpreterState memory, OperandV2, StackItem[] memory) view returns (StackItem[] memory) referenceFn,
+        function(IntegrityCheckState memory, OperandV2) view returns (uint256, uint256) integrityFn,
+        function(InterpreterState memory, OperandV2, Pointer) view returns (Pointer) runFn,
+        StackItem[] memory inputs
     ) internal view {
         uint256 calcOutputs = opReferenceCheckIntegrity(integrityFn, operand, state.constants, inputs);
         ReferenceCheckPointers memory pointers = opReferenceCheckPointers(inputs, calcOutputs);
@@ -187,22 +192,22 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
         opReferenceCheckExpectations(state, operand, referenceFn, pointers, inputs, calcOutputs);
     }
 
-    function parseAndEval(bytes memory rainString, uint256[][] memory context)
+    function parseAndEval(bytes memory rainString, bytes32[][] memory context)
         internal
         view
-        returns (uint256[] memory, uint256[] memory)
+        returns (StackItem[] memory, bytes32[] memory)
     {
         bytes memory bytecode = iDeployer.parse2(rainString);
 
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
+        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
             EvalV4({
                 store: iStore,
                 namespace: LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
                 context: context,
-                inputs: new uint256[](0),
-                stateOverlay: new uint256[](0)
+                inputs: new StackItem[](0),
+                stateOverlay: new bytes32[](0)
             })
         );
         return (stack, kvs);
@@ -210,43 +215,43 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
 
     /// 90%+ of the time we don't need to pass a context. This overloads a
     /// simplified interface to parse and eval.
-    function parseAndEval(bytes memory rainString) internal view returns (uint256[] memory, uint256[] memory) {
-        return parseAndEval(rainString, LibContext.build(new uint256[][](0), new SignedContextV1[](0)));
+    function parseAndEval(bytes memory rainString) internal view returns (StackItem[] memory, bytes32[] memory) {
+        return parseAndEval(rainString, LibContext.build(new bytes32[][](0), new SignedContextV1[](0)));
     }
 
-    function checkHappy(bytes memory rainString, uint256 expectedValue, string memory errString) internal view {
-        uint256[] memory expectedStack = new uint256[](1);
-        expectedStack[0] = expectedValue;
+    function checkHappy(bytes memory rainString, bytes32 expectedValue, string memory errString) internal view {
+        StackItem[] memory expectedStack = new StackItem[](1);
+        expectedStack[0] = StackItem.wrap(expectedValue);
         checkHappy(rainString, expectedStack, errString);
     }
 
-    function checkHappy(bytes memory rainString, uint256[] memory expectedStack, string memory errString)
+    function checkHappy(bytes memory rainString, StackItem[] memory expectedStack, string memory errString)
         internal
         view
     {
-        checkHappy(rainString, LibContext.build(new uint256[][](0), new SignedContextV1[](0)), expectedStack, errString);
+        checkHappy(rainString, LibContext.build(new bytes32[][](0), new SignedContextV1[](0)), expectedStack, errString);
     }
 
     function checkHappy(
         bytes memory rainString,
-        uint256[][] memory context,
-        uint256[] memory expectedStack,
+        bytes32[][] memory context,
+        StackItem[] memory expectedStack,
         string memory errString
     ) internal view {
-        (uint256[] memory stack, uint256[] memory kvs) = parseAndEval(rainString, context);
+        (StackItem[] memory stack, bytes32[] memory kvs) = parseAndEval(rainString, context);
 
         assertEq(stack.length, expectedStack.length, errString);
         for (uint256 i = 0; i < expectedStack.length; i++) {
-            assertEq(stack[i], expectedStack[i], errString);
+            assertEq(StackItem.unwrap(stack[i]), StackItem.unwrap(expectedStack[i]), errString);
         }
         assertEq(kvs.length, 0);
     }
 
-    function checkHappyKVs(bytes memory rainString, uint256[] memory expectedKVs, string memory errString)
+    function checkHappyKVs(bytes memory rainString, bytes32[] memory expectedKVs, string memory errString)
         internal
         view
     {
-        (uint256[] memory stack, uint256[] memory kvs) = parseAndEval(rainString);
+        (StackItem[] memory stack, bytes32[] memory kvs) = parseAndEval(rainString);
 
         assertEq(stack.length, 0);
         assertEq(kvs.length, expectedKVs.length, errString);
@@ -262,15 +267,15 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
     function checkUnhappy(bytes memory rainString, bytes memory err) internal {
         bytes memory bytecode = iDeployer.parse2(rainString);
         vm.expectRevert(err);
-        (uint256[] memory stack, uint256[] memory kvs) = iInterpreter.eval4(
+        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
             EvalV4({
                 store: iStore,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
-                context: LibContext.build(new uint256[][](0), new SignedContextV1[](0)),
-                inputs: new uint256[](0),
-                stateOverlay: new uint256[](0)
+                context: LibContext.build(new bytes32[][](0), new SignedContextV1[](0)),
+                inputs: new StackItem[](0),
+                stateOverlay: new bytes32[](0)
             })
         );
         (stack, kvs);
@@ -284,7 +289,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
 
     function checkUnhappyParse(bytes memory rainString, bytes memory err) internal {
         vm.expectRevert(err);
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
+        (bytes memory bytecode, bytes32[] memory constants) = iParser.unsafeParse(rainString);
         (bytecode);
         (constants);
     }
@@ -307,7 +312,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerNPE2DeploymentTest {
 
     function checkDisallowedOperand(bytes memory rainString) internal {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
-        (bytes memory bytecode, uint256[] memory constants) = iParser.parse(rainString);
+        (bytes memory bytecode, bytes32[] memory constants) = iParser.unsafeParse(rainString);
         (bytecode);
         (constants);
     }

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Test} from "forge-std/Test.sol";
+import {ParseTest} from "test/abstract/ParseTest.sol";
 
 import {ExpectedOperand, UnclosedOperand} from "src/error/ErrParse.sol";
 import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV2.sol";
@@ -11,21 +11,21 @@ import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.s
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
-import {Operand, LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
+import {OperandV2, LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
-import {LibAllStandardOpsNP} from "src/lib/op/LibAllStandardOpsNP.sol";
-import {LibGenParseMeta} from "rain.sol.codegen/lib/LibGenParseMeta.sol";
-import {LibDecimalFloat} from "rain.math.float/src/lib/LibDecimalFloat.sol";
+import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
+import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";
+import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibParseNamedLHSTest
-contract LibParseNamedLHSTest is Test {
+contract LibParseNamedLHSTest is ParseTest {
     using LibParse for ParseState;
 
     /// A few simple examples that should create some empty sources.
     function testParseNamedLHSEmptySourceExamples() external view {
         string[3] memory examples0 = ["a _:;", "a b:;", "foo bar:;"];
         for (uint256 i = 0; i < examples0.length; i++) {
-            (bytes memory bytecode0, uint256[] memory constants0) = LibMetaFixture.newState(examples0[i]).parse();
+            (bytes memory bytecode0, bytes32[] memory constants0) = LibMetaFixture.newState(examples0[i]).parse();
             assertEq(LibBytecode.sourceCount(bytecode0), 1);
             uint256 sourceIndex0 = 0;
             assertEq(LibBytecode.sourceRelativeOffset(bytecode0, sourceIndex0), 0);
@@ -40,7 +40,7 @@ contract LibParseNamedLHSTest is Test {
 
     /// Two sources with one named input each.
     function testParseNamedLHSTwoInputs() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibMetaFixture.newState("a:;b:;").parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState("a:;b:;").parse();
         assertEq(
             bytecode,
             // 2 sources.
@@ -94,7 +94,7 @@ contract LibParseNamedLHSTest is Test {
         // Only the first 32 chars are visible in the error.
         vm.expectRevert(abi.encodeWithSelector(WordSize.selector, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
         // 32 chars is too long.
-        LibMetaFixture.newState("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;").parse();
+        this.parseExternal("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;");
     }
 
     /// Exceeding the maximum length of a word should revert. Testing a 33 char
@@ -104,7 +104,7 @@ contract LibParseNamedLHSTest is Test {
         // Only the first 32 chars are visible in the error.
         vm.expectRevert(abi.encodeWithSelector(WordSize.selector, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
         // 33 chars is too long.
-        LibMetaFixture.newState("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;").parse();
+        this.parseExternal("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:;");
     }
 
     /// Stack needs to index items by name correctly across lines.
@@ -115,8 +115,8 @@ contract LibParseNamedLHSTest is Test {
         meta[2] = AuthoringMetaV2("c", "c");
         bytes memory parseMeta = LibGenParseMeta.buildParseMetaV2(meta, 1);
 
-        function (uint256[] memory) internal pure returns (Operand)[] memory operandHandlers =
-            new function (uint256[] memory) internal pure returns (Operand)[](3);
+        function (bytes32[] memory) internal pure returns (OperandV2)[] memory operandHandlers =
+            new function (bytes32[] memory) internal pure returns (OperandV2)[](3);
         operandHandlers[0] = LibParseOperand.handleOperandDisallowed;
         operandHandlers[1] = LibParseOperand.handleOperandDisallowed;
         operandHandlers[2] = LibParseOperand.handleOperandSingleFull;
@@ -126,11 +126,11 @@ contract LibParseNamedLHSTest is Test {
         }
         bytes memory operandHandlerPointers = LibConvert.unsafeTo16BitBytes(pointers);
 
-        (bytes memory bytecode, uint256[] memory constants) = LibParseState.newState(
+        (bytes memory bytecode, bytes32[] memory constants) = LibParseState.newState(
             bytes("a _:1 2,b:a,:c(),d:3,e:d;"),
             parseMeta,
             operandHandlerPointers,
-            LibAllStandardOpsNP.literalParserFunctionPointers()
+            LibAllStandardOps.literalParserFunctionPointers()
         ).parse();
         assertEq(
             bytecode,
@@ -160,21 +160,21 @@ contract LibParseNamedLHSTest is Test {
             hex"00100003"
         );
         assertEq(constants.length, 3);
-        assertEq(constants[0], LibDecimalFloat.pack(1e37, -37));
-        assertEq(constants[1], LibDecimalFloat.pack(2e37, -37));
-        assertEq(constants[2], LibDecimalFloat.pack(3e37, -37));
+        assertEq(constants[0], Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
+        assertEq(constants[1], Float.unwrap(LibDecimalFloat.packLossless(2, 0)));
+        assertEq(constants[2], Float.unwrap(LibDecimalFloat.packLossless(3, 0)));
     }
 
     /// Duplicate names are disallowed in the same source.
     function testParseNamedErrorDuplicateSameSource() external {
         vm.expectRevert(abi.encodeWithSelector(DuplicateLHSItem.selector, 4));
-        LibMetaFixture.newState("a:,a:;").parse();
+        this.parseExternal("a:,a:;");
     }
 
     /// Duplicate names are allowed across different sources.
     function testParseNamedDuplicateDifferentSource() external view {
-        (bytes memory bytecode, uint256[] memory constants) = LibParseState.newState(
-            "a b:1 2, e:a;c d:3 4,e:d;", "", "", LibAllStandardOpsNP.literalParserFunctionPointers()
+        (bytes memory bytecode, bytes32[] memory constants) = LibParseState.newState(
+            "a b:1 2, e:a;c d:3 4,e:d;", "", "", LibAllStandardOps.literalParserFunctionPointers()
         ).parse();
         assertEq(
             bytecode,
@@ -214,9 +214,9 @@ contract LibParseNamedLHSTest is Test {
             hex"00100001"
         );
         assertEq(constants.length, 4);
-        assertEq(constants[0], LibDecimalFloat.pack(1e37, -37));
-        assertEq(constants[1], LibDecimalFloat.pack(2e37, -37));
-        assertEq(constants[2], LibDecimalFloat.pack(3e37, -37));
-        assertEq(constants[3], LibDecimalFloat.pack(4e37, -37));
+        assertEq(constants[0], Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
+        assertEq(constants[1], Float.unwrap(LibDecimalFloat.packLossless(2, 0)));
+        assertEq(constants[2], Float.unwrap(LibDecimalFloat.packLossless(3, 0)));
+        assertEq(constants[3], Float.unwrap(LibDecimalFloat.packLossless(4, 0)));
     }
 }

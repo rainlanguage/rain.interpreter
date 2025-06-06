@@ -2,20 +2,20 @@
 pragma solidity =0.8.25;
 
 import {Script} from "forge-std/Script.sol";
-import {LibAllStandardOpsNP} from "../src/lib/op/LibAllStandardOpsNP.sol";
-import {LibRainterpreterReferenceExternNPE2} from "../src/concrete/extern/RainterpreterReferenceExternNPE2.sol";
+import {LibAllStandardOps} from "../src/lib/op/LibAllStandardOps.sol";
+import {LibRainterpreterReferenceExtern} from "../src/concrete/extern/RainterpreterReferenceExtern.sol";
 
 /// @title Native Parser Authoring Meta
 /// @notice A script that returns the AuthoringMeta raw abi encoded bytes
-/// directly from the lib. This is intended to be packed with ExpressionDeployerNP
-/// ABI, deflated, cbor encoded and then passed to ExpressionDeployerNP constructor
+/// directly from the lib. This is intended to be packed with ExpressionDeployer
+/// ABI, deflated, cbor encoded and then passed to ExpressionDeployer constructor
 /// when deploying.
 contract BuildAuthoringMeta is Script {
     function run() external {
-        vm.writeFileBinary("meta/AuthoringMeta.rain.meta", LibAllStandardOpsNP.authoringMetaV2());
+        vm.writeFileBinary("meta/AuthoringMeta.rain.meta", LibAllStandardOps.authoringMetaV2());
         vm.writeFileBinary(
-            "meta/RainterpreterReferenceExternNPE2AuthoringMeta.rain.meta",
-            LibRainterpreterReferenceExternNPE2.authoringMetaV2()
+            "meta/RainterpreterReferenceExternAuthoringMeta.rain.meta",
+            LibRainterpreterReferenceExtern.authoringMetaV2()
         );
     }
 }

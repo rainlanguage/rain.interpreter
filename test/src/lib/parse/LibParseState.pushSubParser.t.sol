@@ -11,15 +11,18 @@ contract LibParseStatePushSubParserTest is Test {
     using LibParseState for ParseState;
     using LibBytes for bytes;
 
+    function pushSubParserExternal(ParseState memory state, bytes32 value) external pure {
+        state.pushSubParser(Pointer.unwrap(state.data.dataPointer()), value);
+    }
+
     /// Pushing any value onto the sub parser that exceeds the maximum value
     /// should revert.
     function testPushSubParserOverflow(ParseState memory state, uint256 value) external {
         value = bound(value, uint256(type(uint160).max) + 1, type(uint256).max);
 
         state.subParsers = 0;
-        uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         vm.expectRevert(abi.encodeWithSelector(InvalidSubParser.selector, 0));
-        state.pushSubParser(cursor, value);
+        this.pushSubParserExternal(state, bytes32(value));
     }
 
     /// Pushing any value onto an empty sub parser LL should result in that value
@@ -27,11 +30,11 @@ contract LibParseStatePushSubParserTest is Test {
     function testPushSubParserZero(ParseState memory state, address value) external pure {
         state.subParsers = 0;
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
-        state.pushSubParser(cursor, uint256(uint160(value)));
+        state.pushSubParser(cursor, bytes32(uint256(uint160(value))));
 
-        assertEq(uint256(uint160(state.subParsers)), uint256(uint160(value)));
-        uint256 pointer = state.subParsers >> 0xF0;
-        uint256 deref;
+        assertEq(uint160(uint256(state.subParsers)), uint160(value));
+        uint256 pointer = uint256(state.subParsers) >> 0xF0;
+        bytes32 deref;
         assembly ("memory-safe") {
             deref := mload(pointer)
         }
@@ -46,26 +49,26 @@ contract LibParseStatePushSubParserTest is Test {
         {
             uint256 cursor = Pointer.unwrap(state.data.dataPointer());
             state.subParsers = 0;
-            state.pushSubParser(cursor, uint256(uint160(value0)));
-            state.pushSubParser(cursor, uint256(uint160(value1)));
-            state.pushSubParser(cursor, uint256(uint160(value2)));
+            state.pushSubParser(cursor, bytes32(uint256(uint160(value0))));
+            state.pushSubParser(cursor, bytes32(uint256(uint160(value1))));
+            state.pushSubParser(cursor, bytes32(uint256(uint160(value2))));
         }
 
-        assertEq(uint256(uint160(state.subParsers)), uint256(uint160(value2)));
-        uint256 pointer = state.subParsers >> 0xF0;
-        uint256 deref;
+        assertEq(uint160(uint256(state.subParsers)), uint256(uint160(value2)));
+        uint256 pointer = uint256(state.subParsers) >> 0xF0;
+        bytes32 deref;
         assembly ("memory-safe") {
             deref := mload(pointer)
         }
-        assertEq(uint256(uint160(deref)), uint256(uint160(value1)));
+        assertEq(uint160(uint256(deref)), uint256(uint160(value1)));
 
-        pointer = deref >> 0xF0;
+        pointer = uint256(deref) >> 0xF0;
         assembly ("memory-safe") {
             deref := mload(pointer)
         }
-        assertEq(uint256(uint160(deref)), uint256(uint160(value0)));
+        assertEq(uint160(uint256(deref)), uint256(uint160(value0)));
 
-        pointer = deref >> 0xF0;
+        pointer = uint256(deref) >> 0xF0;
         assembly ("memory-safe") {
             deref := mload(pointer)
         }
@@ -78,19 +81,19 @@ contract LibParseStatePushSubParserTest is Test {
         state.subParsers = 0;
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         for (uint256 i = 0; i < values.length; i++) {
-            state.pushSubParser(cursor, uint256(uint160(values[i])));
+            state.pushSubParser(cursor, bytes32(uint256(uint160(values[i]))));
         }
 
         uint256 j = values.length - 1;
-        uint256 deref = state.subParsers;
-        uint256 pointer = deref >> 0xF0;
+        bytes32 deref = state.subParsers;
+        uint256 pointer = uint256(deref) >> 0xF0;
         while (deref != 0) {
-            assertEq(uint256(uint160(deref)), uint256(uint160(values[j])));
+            assertEq(uint160(uint256(deref)), uint160(values[j]));
 
             assembly ("memory-safe") {
                 deref := mload(pointer)
             }
-            pointer = deref >> 0xF0;
+            pointer = uint256(deref) >> 0xF0;
             // This underflows exactly when deref is zero and the loop
             // terminates.
             unchecked {

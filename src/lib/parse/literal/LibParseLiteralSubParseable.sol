@@ -5,11 +5,14 @@ import {ParseState} from "../LibParseState.sol";
 import {LibParse} from "../LibParse.sol";
 import {UnclosedSubParseableLiteral, SubParseableMissingDispatch} from "../../../error/ErrParse.sol";
 import {
-    CMASK_WHITESPACE, CMASK_SUB_PARSEABLE_LITERAL_HEAD, CMASK_SUB_PARSEABLE_LITERAL_END
-} from "../LibParseCMask.sol";
+    CMASK_WHITESPACE,
+    CMASK_SUB_PARSEABLE_LITERAL_HEAD,
+    CMASK_SUB_PARSEABLE_LITERAL_END
+} from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibParseInterstitial} from "../LibParseInterstitial.sol";
 import {LibParseError} from "../LibParseError.sol";
 import {LibSubParse} from "../LibSubParse.sol";
+import {LibParseChar} from "rain.string/lib/parse/LibParseChar.sol";
 
 library LibParseLiteralSubParseable {
     using LibParse for ParseState;
@@ -30,7 +33,7 @@ library LibParseLiteralSubParseable {
     function parseSubParseable(ParseState memory state, uint256 cursor, uint256 end)
         internal
         view
-        returns (uint256, uint256)
+        returns (uint256, bytes32)
     {
         unchecked {
             // Move cursor past opening bracket.
@@ -41,7 +44,7 @@ library LibParseLiteralSubParseable {
             uint256 dispatchStart = cursor;
 
             // Skip all non-whitespace and non-bracket characters.
-            cursor = LibParse.skipMask(cursor, end, ~(CMASK_WHITESPACE | CMASK_SUB_PARSEABLE_LITERAL_END));
+            cursor = LibParseChar.skipMask(cursor, end, ~(CMASK_WHITESPACE | CMASK_SUB_PARSEABLE_LITERAL_END));
             uint256 dispatchEnd = cursor;
 
             if (dispatchEnd == dispatchStart) {
@@ -57,7 +60,7 @@ library LibParseLiteralSubParseable {
             // Note that as multibyte is not supported, and the mask is 128 bits,
             // non-ascii chars MAY either fail to be skipped or will be treated
             // as a closing bracket.
-            cursor = LibParse.skipMask(cursor, end, ~CMASK_SUB_PARSEABLE_LITERAL_END);
+            cursor = LibParseChar.skipMask(cursor, end, ~CMASK_SUB_PARSEABLE_LITERAL_END);
             uint256 bodyEnd = cursor;
 
             {

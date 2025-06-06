@@ -1,0 +1,130 @@
+// SPDX-License-Identifier: CAL
+pragma solidity =0.8.25;
+
+import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
+import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
+import {ExcessRHSItems} from "src/lib/parse/LibParse.sol";
+import {LibOpEnsure} from "src/lib/op/logic/LibOpEnsure.sol";
+import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
+import {
+    IInterpreterV4,
+    OperandV2,
+    SourceIndexV2,
+    FullyQualifiedNamespace,
+    StackItem
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
+import {LibIntOrAString, IntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
+
+contract LibOpEnsureTest is OpTest {
+    /// Directly test the integrity logic of LibOpEnsure. This tests the
+    /// happy path where there is at least one input.
+    function testOpEnsureIntegrityHappy(
+        IntegrityCheckState memory state,
+        uint8 inputs,
+        uint8 outputs,
+        uint16 operandData
+    ) external pure {
+        inputs = uint8(bound(inputs, 0, 0x0F));
+        outputs = uint8(bound(outputs, 0, 0x0F));
+        (uint256 calcInputs, uint256 calcOutputs) =
+            LibOpEnsure.integrity(state, LibOperand.build(inputs, outputs, operandData));
+        assertEq(calcInputs, 2);
+        assertEq(calcOutputs, 0);
+    }
+
+    /// Directly test the integrity logic of LibOpEnsure. This tests the
+    /// unhappy path where there are no inputs.
+    function testOpEnsureIntegrityUnhappy(IntegrityCheckState memory state) external pure {
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpEnsure.integrity(state, OperandV2.wrap(0));
+        assertEq(calcInputs, 2);
+        assertEq(calcOutputs, 0);
+    }
+
+    /// Directly test the run logic of LibOpEnsure.
+    function testOpEnsureRun(StackItem condition, string memory reason) external {
+        vm.assume(bytes(reason).length <= 31);
+        if (StackItem.unwrap(condition) == 0) {
+            vm.expectRevert(bytes(reason));
+        }
+
+        this.internalTestOpEnsureRun(condition, reason);
+    }
+
+    function internalTestOpEnsureRun(StackItem condition, string memory reason) external view {
+        InterpreterState memory state = opTestDefaultInterpreterState();
+        StackItem[] memory inputs = new StackItem[](2);
+        inputs[0] = condition;
+        inputs[1] = StackItem.wrap(bytes32(IntOrAString.unwrap(LibIntOrAString.fromString2(reason))));
+
+        OperandV2 operand = LibOperand.build(2, 0, 0);
+        opReferenceCheck(state, operand, LibOpEnsure.referenceFn, LibOpEnsure.integrity, LibOpEnsure.run, inputs);
+    }
+
+    /// Test the eval of `ensure` parsed from a string. Tests zero inputs.
+    function testOpEnsureEvalZero() external {
+        checkBadInputs(":ensure();", 0, 2, 0);
+    }
+
+    /// Test the eval of `ensure` parsed from a string. Tests one input.
+    function testOpEnsureEvalOne() external {
+        checkBadInputs(":ensure(1);", 1, 2, 1);
+    }
+
+    /// Test the eval of `ensure` parsed from a string. Tests three inputs.
+    function testOpEnsureEvalThree() external {
+        checkBadInputs(":ensure(1 2 3);", 3, 2, 3);
+    }
+
+    /// Test the eval of `ensure` parsed from a string. Tests that ensure cannot
+    /// be used on the same line as another word as it has non-one outputs.
+    /// Tests ensuring with an addition on the same line.
+    function testOpEnsureEvalBadOutputs() external {
+        vm.expectRevert(abi.encodeWithSelector(ExcessRHSItems.selector, 34));
+        (bytes memory bytecode, bytes32[] memory constants) =
+            iParser.unsafeParse("_:ensure(1 \"always true\") add(1 1);");
+        (bytecode);
+        (constants);
+    }
+
+    /// Test the eval of `ensure` parsed from a string. Tests that ensure cannot
+    /// be used on the same line as another word as it has non-one outputs.
+    /// Tests ensuring with another ensure on the same line.
+    function testOpEnsureEvalBadOutputs2() external {
+        vm.expectRevert(abi.encodeWithSelector(ExcessRHSItems.selector, 48));
+        (bytes memory bytecode, bytes32[] memory constants) =
+            iParser.unsafeParse(":ensure(1 \"always true\") ensure(1 \"always true\");");
+        (bytecode);
+        (constants);
+    }
+
+    /// Test the eval of `ensure` parsed from a string. Tests the happy path
+    /// where all inputs are nonzero.
+    function testOpEnsureEvalHappy() external view {
+        checkHappy(":ensure(1 \"always 1\"), _:0x01;", bytes32(uint256(1)), "1");
+        checkHappy(":ensure(5 \"always 5\"), _:0x01;", bytes32(uint256(1)), "5");
+
+        // Empty reason should be fine.
+        checkHappy(":ensure(1 \"\"), _:0x01;", bytes32(uint256(1)), "");
+    }
+
+    /// Test the eval of `ensure` parsed from a string. Tests the unhappy path
+    /// where the input is 0.
+    function testOpEnsureEvalUnhappy() external {
+        checkUnhappy(":ensure(0 \"foo\"), _:1;", "foo");
+
+        // Empty reason should be fine.
+        checkUnhappy(":ensure(0 \"\"), _:1;", "");
+    }
+
+    /// Test the eval of `ensure` parsed from a string. Tests the unhappy path
+    /// where an operand is provided.
+    function testOpEnsureEvalUnhappyOperand() external {
+        checkUnhappyParse(":ensure<0>(1 \"foo\");", abi.encodeWithSelector(UnexpectedOperand.selector));
+    }
+
+    function testOpEnsureOneOutput() external {
+        checkBadOutputs("_:ensure(1 \"foo\");", 2, 0, 1);
+    }
+}
