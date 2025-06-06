@@ -36,6 +36,14 @@ pub struct ForkEvalCliArgs {
 
     #[arg(short, long, help = "Decode errors using the openchain.xyz database")]
     pub decode_errors: bool,
+
+    // Accept inputs vector as array of uint256
+    #[arg(short, long, help = "The inputs vectore")]
+    pub inputs: Vec<U256>,
+
+    // Accept state overlay vector as array of uint256
+    #[arg( short, long, help = "The state overlay vector")]
+    pub state_overlay: Vec<U256>,
 }
 
 impl TryFrom<ForkEvalCliArgs> for ForkEvalArgs {
@@ -62,8 +70,8 @@ impl TryFrom<ForkEvalCliArgs> for ForkEvalArgs {
             namespace: FullyQualifiedNamespace::from(namespace),
             context,
             decode_errors: args.decode_errors,
-            inputs: vec![],
-            state_overlay: vec![],
+            inputs: args.inputs,
+            state_overlay: args.state_overlay,
         })
     }
 }
@@ -142,6 +150,8 @@ mod tests {
                 namespace: "0x123".into(),
                 context: vec!["0x06,99".into()],
                 decode_errors: true,
+                inputs: vec![],
+                state_overlay: vec![],
             },
         };
 
