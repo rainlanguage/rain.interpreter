@@ -6,7 +6,7 @@ use anyhow::anyhow;
 use anyhow::Context;
 use anyhow::Result;
 use clap::Args;
-use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
+use rain_interpreter_bindings::IInterpreterStoreV3::FullyQualifiedNamespace;
 use rain_interpreter_eval::trace::RainEvalResult;
 use rain_interpreter_eval::{eval::ForkEvalArgs, fork::Forker};
 use std::path::PathBuf;
@@ -62,6 +62,8 @@ impl TryFrom<ForkEvalCliArgs> for ForkEvalArgs {
             namespace: FullyQualifiedNamespace::from(namespace),
             context,
             decode_errors: args.decode_errors,
+            inputs: vec![],
+            state_overlay: vec![],
         })
     }
 }
@@ -112,10 +114,7 @@ impl Execute for Eval {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    use rain_interpreter_env::{
-        CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
-    };
+    use rain_interpreter_test_fixtures::LocalEvm;
 
     #[test]
     fn test_parse_int_or_hex() {
@@ -127,16 +126,19 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_execute() {
+        let local_evm = LocalEvm::new().await;
+        let deployer = *local_evm.deployer.address();
+
         let eval = Eval {
             output_path: None,
             forked_evm: NewForkedEvmCliArgs {
-                fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
-                fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
+                fork_url: local_evm.url(),
+                fork_block_number: None,
             },
             fork_eval_args: ForkEvalCliArgs {
-                rainlang_string: r"_: add(10 2), _: context<0 0>(), _:context<0 1>();".into(),
+                rainlang_string: r"_: 12, _: context<0 0>(), _:context<0 1>();".into(),
                 source_index: 0,
-                deployer: *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
+                deployer,
                 namespace: "0x123".into(),
                 context: vec!["0x06,99".into()],
                 decode_errors: true,

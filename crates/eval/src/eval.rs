@@ -2,8 +2,8 @@ use crate::error::ForkCallError;
 use crate::fork::{ForkTypedReturn, Forker};
 use alloy::primitives::{Address, U256};
 use rain_interpreter_bindings::DeployerISP::{iInterpreterCall, iStoreCall};
-use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
-use rain_interpreter_bindings::IInterpreterV3::eval3Call;
+use rain_interpreter_bindings::IInterpreterStoreV3::FullyQualifiedNamespace;
+use rain_interpreter_bindings::IInterpreterV4::{EvalV4, eval4Call};
 use rain_interpreter_bindings::IParserV2::parse2Call;
 
 #[derive(Debug, Clone)]
@@ -14,6 +14,8 @@ pub struct ForkEvalArgs {
     pub namespace: FullyQualifiedNamespace,
     pub context: Vec<Vec<U256>>,
     pub decode_errors: bool,
+    pub inputs: Vec<U256>,
+    pub state_overlay: Vec<U256>,
 }
 
 #[derive(Debug, Clone)]
@@ -74,6 +76,9 @@ impl Forker {
     /// * `deployer` - The address of the deployer.
     /// * `namespace` - The fully qualified namespace.
     /// * `context` - The context vector.
+    /// * `inputs` - The inputs vector.
+    /// * `state_overlay` - The state_overlay vector.
+    /// * `decode_errors` - Whether to decode errors from registry or not
     ///
     /// # Returns
     ///
@@ -81,7 +86,7 @@ impl Forker {
     pub async fn fork_eval(
         &self,
         args: ForkEvalArgs,
-    ) -> Result<ForkTypedReturn<eval3Call>, ForkCallError> {
+    ) -> Result<ForkTypedReturn<eval4Call>, ForkCallError> {
         let ForkEvalArgs {
             rainlang_string,
             source_index,
@@ -89,6 +94,8 @@ impl Forker {
             namespace,
             context,
             decode_errors,
+            inputs,
+            state_overlay,
         } = args;
         let parse_result = self
             .fork_parse(ForkParseArgs {
@@ -113,13 +120,19 @@ impl Forker {
             .await?
             .typed_return;
 
-        let eval_args = eval3Call {
-            bytecode: parse_result.typed_return,
-            sourceIndex: U256::from(source_index),
-            store,
-            namespace: namespace.into(),
-            context,
-            inputs: vec![],
+        let eval_args = eval4Call {
+            eval: EvalV4 {
+                bytecode: parse_result.typed_return,
+                sourceIndex: U256::from(source_index),
+                store,
+                namespace: namespace.into(),
+                context: context
+                    .into_iter()
+                    .map(|v| v.into_iter().map(Into::into).collect())
+                    .collect(),
+                inputs: inputs.into_iter().map(Into::into).collect(),
+                stateOverlay: state_overlay.into_iter().map(Into::into).collect(),
+            },
         };
 
         let res = self
@@ -132,76 +145,78 @@ impl Forker {
 
 #[cfg(test)]
 mod tests {
-    use alloy::primitives::utils::parse_ether;
-    use foundry_evm::traces::CallTraceArena;
-    use rain_interpreter_env::{
-        CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
-    };
-
-    use std::sync::Arc;
-
     use super::*;
     use crate::fork::NewForkedEvm;
+    use alloy::primitives::FixedBytes;
+    use foundry_evm::traces::CallTraceArena;
+    use rain_interpreter_test_fixtures::LocalEvm;
+    use std::sync::Arc;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_parse() {
-        let deployer: Address = *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS;
+        let local_evm = LocalEvm::new().await;
+        let deployer = *local_evm.deployer.address();
         let args = NewForkedEvm {
-            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
-            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
+            fork_url: local_evm.url(),
+            fork_block_number: None,
         };
         let fork = Forker::new_with_fork(args, None, None).await.unwrap();
+        let x = local_evm.deployer.iInterpreter().call().await.unwrap();
+        println!("{}", x);
         let res = fork
             .fork_parse(ForkParseArgs {
-                rainlang_string: r"_: add(1 2);".to_owned(),
+                rainlang_string: r"_: 1;".to_owned(),
                 deployer,
                 decode_errors: true,
             })
             .await
             .unwrap();
 
-        let expected_bytes: Vec<u8> = alloy::hex::decode("0x00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000de0b6b3a76400000000000000000000000000000000000000000000000000001bc16d674ec8000000000000000000000000000000000000000000000000000000000000000000130100000302000101100001011000002b120000").unwrap();
+        let expected_bytes: Vec<u8> = alloy::hex::decode("0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000b0100000101000101100000").unwrap();
         assert_eq!(res.typed_return.0, expected_bytes);
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_eval() {
-        let deployer: Address = *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS;
+        let local_evm = LocalEvm::new().await;
+        let deployer = *local_evm.deployer.address();
         let args = NewForkedEvm {
-            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_owned(),
-            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
+            fork_url: local_evm.url(),
+            fork_block_number: None,
         };
         let fork = Forker::new_with_fork(args, None, None).await.unwrap();
         let res = fork
             .fork_eval(ForkEvalArgs {
-                rainlang_string: r"_: add(1 2);".into(),
+                rainlang_string: r"_: 3;".into(),
                 source_index: 0,
                 deployer,
                 namespace: FullyQualifiedNamespace::default(),
                 context: vec![],
                 decode_errors: true,
+                state_overlay: vec![],
+                inputs: vec![],
             })
             .await
             .unwrap();
 
         // stack
-        let expected_stack = vec![parse_ether("3").unwrap()];
+        let expected_stack: Vec<FixedBytes<32>> = vec![FixedBytes::left_padding_from(&[3u8])];
         assert_eq!(res.typed_return.stack, expected_stack);
 
         // storage writes
-        let expected_writes = vec![];
+        let expected_writes: Vec<FixedBytes<32>> = vec![];
         assert_eq!(res.typed_return.writes, expected_writes);
 
         // stack in the trace for source index 0
         let mut expected_stack_trace = vec![0u8, 0u8, 0u8, 0u8];
-        expected_stack_trace.append(&mut parse_ether("3").unwrap().to_be_bytes_vec());
+        expected_stack_trace.append(&mut <FixedBytes<32>>::left_padding_from(&[3u8]).to_vec());
 
         let sparsed_trace_arena = res.raw.traces.unwrap();
         let source_index_zero_trace = <CallTraceArena as Clone>::clone(&sparsed_trace_arena)
             .into_nodes()[1]
             .to_owned()
             .trace;
-        assert_eq!(source_index_zero_trace.data, expected_stack_trace);
+        assert_eq!(source_index_zero_trace.data.to_vec(), expected_stack_trace);
 
         // asserting the known trace address
         let expected_trace_address = "0xF06Cd48c98d7321649dB7D8b2C396A81A2046555"
@@ -213,10 +228,11 @@ mod tests {
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 10)]
     async fn test_fork_eval_parallel() {
-        let deployer: Address = *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS;
+        let local_evm = LocalEvm::new().await;
+        let deployer = *local_evm.deployer.address();
         let args = NewForkedEvm {
-            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
-            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
+            fork_url: local_evm.url(),
+            fork_block_number: None,
         };
         let fork = Forker::new_with_fork(args, None, None).await.unwrap();
         let fork = Arc::new(fork); // Wrap in Arc for shared ownership
@@ -227,12 +243,14 @@ mod tests {
             let handle = tokio::spawn(async move {
                 fork_clone
                     .fork_eval(ForkEvalArgs {
-                        rainlang_string: r"_: add(1 2);".into(),
+                        rainlang_string: r"_: 3;".into(),
                         source_index: 0,
                         deployer,
                         namespace: FullyQualifiedNamespace::default(),
                         context: vec![],
                         decode_errors: true,
+                        state_overlay: vec![],
+                        inputs: vec![],
                     })
                     .await
                     .unwrap()
@@ -242,7 +260,10 @@ mod tests {
 
         for handle in handles {
             let res = handle.await.unwrap();
-            assert_eq!(res.typed_return.stack, vec![parse_ether("3").unwrap()]);
+            assert_eq!(
+                res.typed_return.stack,
+                vec![FixedBytes::left_padding_from(&[3u8])]
+            );
         }
     }
 }

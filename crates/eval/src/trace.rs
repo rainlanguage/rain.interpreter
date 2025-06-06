@@ -1,7 +1,7 @@
 use crate::fork::ForkTypedReturn;
 use alloy::primitives::{Address, U256};
 use foundry_evm::traces::CallTraceArena;
-use rain_interpreter_bindings::IInterpreterV3::{eval3Call, eval3Return};
+use rain_interpreter_bindings::IInterpreterV4::{eval4Call, eval4Return};
 
 use thiserror::Error;
 
@@ -48,7 +48,7 @@ impl RainSourceTrace {
 }
 
 /// A struct representing the result of a Rain eval call. Contains the stack,
-/// writes, and traces. Can be constructed from a `ForkTypedReturn<eval3Call>`.
+/// writes, and traces. Can be constructed from a `ForkTypedReturn<eval4Call>`.
 #[derive(Debug, Clone)]
 pub struct RainEvalResult {
     pub reverted: bool,
@@ -57,9 +57,9 @@ pub struct RainEvalResult {
     pub traces: Vec<RainSourceTrace>,
 }
 
-impl From<ForkTypedReturn<eval3Call>> for RainEvalResult {
-    fn from(typed_return: ForkTypedReturn<eval3Call>) -> Self {
-        let eval3Return { stack, writes } = typed_return.typed_return;
+impl From<ForkTypedReturn<eval4Call>> for RainEvalResult {
+    fn from(typed_return: ForkTypedReturn<eval4Call>) -> Self {
+        let eval4Return { stack, writes } = typed_return.typed_return;
 
         let tracer_address = RAIN_TRACER_ADDRESS.parse::<Address>().unwrap();
         let call_trace_arena = typed_return.raw.traces.unwrap().to_owned();
@@ -78,8 +78,8 @@ impl From<ForkTypedReturn<eval3Call>> for RainEvalResult {
 
         RainEvalResult {
             reverted: typed_return.raw.reverted,
-            stack,
-            writes,
+            stack: stack.into_iter().map(Into::into).collect(),
+            writes: writes.into_iter().map(Into::into).collect(),
             traces,
         }
     }
@@ -167,25 +167,24 @@ mod tests {
     use super::*;
     use crate::eval::ForkEvalArgs;
     use crate::fork::{Forker, NewForkedEvm};
-    use alloy::primitives::utils::parse_ether;
-    use rain_interpreter_bindings::IInterpreterStoreV1::FullyQualifiedNamespace;
-    use rain_interpreter_env::{
-        CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
-    };
+    use rain_interpreter_bindings::IInterpreterStoreV3::FullyQualifiedNamespace;
+    use rain_interpreter_test_fixtures::LocalEvm;
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_trace() {
-        let deployer_address: Address = *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS;
+        let local_evm = LocalEvm::new().await;
+        let deployer_address = *local_evm.deployer.address();
         let args = NewForkedEvm {
-            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
-            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
+            fork_url: local_evm.url(),
+            fork_block_number: None,
         };
+
         let fork = Forker::new_with_fork(args, None, None).await.unwrap();
 
         let res = fork
             .fork_eval(ForkEvalArgs {
                 rainlang_string: r"
-                a: add(1 2),
+                a: 3,
                 b: 2,
                 c: 4,
                 _: call<1>(1 2),
@@ -193,9 +192,9 @@ mod tests {
                 :set(3 4);
                 a b:,
                 c: call<2>(a b),
-                d: add(a b);
+                d: 3;
                 a b:,
-                c: mul(a b);
+                c: 2;
                 "
                 .into(),
                 source_index: 0,
@@ -203,6 +202,8 @@ mod tests {
                 namespace: FullyQualifiedNamespace::default(),
                 context: vec![],
                 decode_errors: true,
+                state_overlay: vec![],
+                inputs: vec![],
             })
             .await
             .unwrap();
@@ -212,11 +213,11 @@ mod tests {
         // reverted
         assert!(!rain_eval_result.reverted);
         // stack
-        let expected_stack = vec_i32_to_u256(vec![3, 4, 2, 3]);
+        let expected_stack = vec![U256::from(3), U256::from(4), U256::from(2), U256::from(3)];
         assert_eq!(rain_eval_result.stack, expected_stack);
 
         // storage writes
-        let expected_writes = vec_i32_to_u256(vec![3, 4, 1, 2]);
+        let expected_writes = vec![U256::from(3), U256::from(4), U256::from(1), U256::from(2)];
         assert_eq!(rain_eval_result.writes, expected_writes);
 
         // stack traces
@@ -224,52 +225,56 @@ mod tests {
         let trace_0 = RainSourceTrace {
             parent_source_index: 0,
             source_index: 0,
-            stack: vec_i32_to_u256(vec![3, 4, 2, 3]),
+            stack: vec![U256::from(3), U256::from(4), U256::from(2), U256::from(3)],
         };
         assert_eq!(rain_eval_result.traces[0], trace_0);
         // 0 1
         let trace_1 = RainSourceTrace {
             parent_source_index: 0,
             source_index: 1,
-            stack: vec_i32_to_u256(vec![3, 2, 2, 1]),
+            stack: vec![U256::from(3), U256::from(2), U256::from(2), U256::from(1)],
         };
         assert_eq!(rain_eval_result.traces[1], trace_1);
         // 1 2
         let trace_2 = RainSourceTrace {
             parent_source_index: 1,
             source_index: 2,
-            stack: vec_i32_to_u256(vec![2, 2, 1]),
+            stack: vec![U256::from(2), U256::from(2), U256::from(1)],
         };
         assert_eq!(rain_eval_result.traces[2], trace_2);
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_search_trace_by_path() {
+        let local_evm = LocalEvm::new().await;
+        let deployer_address = *local_evm.deployer.address();
         let args = NewForkedEvm {
-            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
-            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
+            fork_url: local_evm.url(),
+            fork_block_number: None,
         };
         let fork = Forker::new_with_fork(args, None, None).await.unwrap();
 
         let res = fork
             .fork_eval(ForkEvalArgs {
                 rainlang_string: r"
-                a: add(1 2),
+                a: 3,
                 b: 2,
                 c: 4,
                 _: call<1>(1 2);
                 a b:,
                 c: call<2>(a b),
-                d: add(a b);
+                d: 3;
                 a b:,
-                c: mul(a b);
+                c: 2;
                 "
                 .into(),
                 source_index: 0,
-                deployer: *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
+                deployer: deployer_address,
                 namespace: FullyQualifiedNamespace::default(),
                 context: vec![],
                 decode_errors: true,
+                state_overlay: vec![],
+                inputs: vec![],
             })
             .await
             .unwrap();
@@ -278,11 +283,11 @@ mod tests {
 
         // search_trace_by_path
         let trace_0 = rain_eval_result.search_trace_by_path("0.1").unwrap();
-        assert_eq!(trace_0, parse_ether("2").unwrap());
+        assert_eq!(trace_0, U256::from(2));
         let trace_1 = rain_eval_result.search_trace_by_path("0.1.3").unwrap();
-        assert_eq!(trace_1, parse_ether("3").unwrap());
+        assert_eq!(trace_1, U256::from(3));
         let trace_2 = rain_eval_result.search_trace_by_path("0.1.2").unwrap();
-        assert_eq!(trace_2, parse_ether("2").unwrap());
+        assert_eq!(trace_2, U256::from(2));
 
         // test the various errors
         // bad trace path
@@ -293,11 +298,5 @@ mod tests {
 
         let result = rain_eval_result.search_trace_by_path("0.1.12");
         assert!(matches!(result, Err(TraceSearchError::TraceNotFound(_))));
-    }
-
-    fn vec_i32_to_u256(vec: Vec<i32>) -> Vec<U256> {
-        vec.iter()
-            .map(|&x| parse_ether(&x.to_string()).unwrap())
-            .collect()
     }
 }
