@@ -79,16 +79,10 @@ mod tests {
             .await
             .expect("Failed to create ReadableClient");
         let dispair = DISPair::from_deployer(deployer, client).await.unwrap();
-        let expected = DISPair {
-            deployer,
-            interpreter: *local_evm.interpreter.address(),
-            store: *local_evm.store.address(),
-            parser: *local_evm.parser.address(),
-        };
 
-        assert_eq!(dispair.deployer, expected.deployer);
-        assert_eq!(dispair.interpreter, expected.interpreter);
-        assert_eq!(dispair.store, expected.store);
-        assert_eq!(dispair.parser, expected.parser);
+        assert_eq!(dispair.deployer, deployer);
+        assert_eq!(dispair.interpreter, *local_evm.interpreter.address(),);
+        assert_eq!(dispair.store, *local_evm.store.address());
+        assert_eq!(dispair.parser, *local_evm.parser.address(),);
     }
 }
