@@ -3,14 +3,14 @@
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-    rainix.url = "github:rainlanguage/rainix";
+    rainix.url =
+      "github:rainlanguage/rainix?rev=8ef27fa997337ec2414d1e21999a298b75a0f01e";
     rain.url = "github:rainlanguage/rain.cli";
   };
 
   outputs = { self, flake-utils, rainix, rain }:
     flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = rainix.pkgs.${system};
+      let pkgs = rainix.pkgs.${system};
       in rec {
         packages = rec {
           i9r-prelude = rainix.mkTask.${system} {
@@ -41,7 +41,8 @@
                 -l none \
                 -o meta/RainterpreterReferenceExtern.rain.meta \
             '';
-            additionalBuildInputs = rainix.sol-build-inputs.${system} ++ [rain.defaultPackage.${system}];
+            additionalBuildInputs = rainix.sol-build-inputs.${system}
+              ++ [ rain.defaultPackage.${system} ];
           };
 
           test-wasm-build = rainix.mkTask.${system} {
@@ -56,12 +57,8 @@
 
         devShells.default = pkgs.mkShell {
           shellHook = rainix.devShells.${system}.default.shellHook;
-          packages = [
-            packages.i9r-prelude
-            packages.test-wasm-build
-          ];
+          packages = [ packages.i9r-prelude packages.test-wasm-build ];
           inputsFrom = [ rainix.devShells.${system}.default ];
         };
-      }
-    );
+      });
 }

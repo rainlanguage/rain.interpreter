@@ -3,7 +3,6 @@ use alloy_ethers_typecast::transaction::{
     ReadContractParametersBuilder, ReadContractParametersBuilderError, ReadableClient,
     ReadableClientError,
 };
-use ethers::providers::JsonRpcClient;
 use rain_interpreter_bindings::DeployerISP;
 use thiserror::Error;
 
@@ -27,9 +26,9 @@ pub struct DISPair {
 
 /// Implementation to build DISPair from Deployer address.
 impl DISPair {
-    pub async fn from_deployer<T: JsonRpcClient>(
+    pub async fn from_deployer(
         deployer: Address,
-        client: ReadableClient<T>,
+        client: ReadableClient,
     ) -> Result<Self, DISPairError> {
         Ok(DISPair {
             deployer,
@@ -42,8 +41,7 @@ impl DISPair {
                         .map_err(DISPairError::ReadContractParametersBuilderError)?,
                 )
                 .await
-                .map_err(DISPairError::ReadableClientError)?
-                ._0,
+                .map_err(DISPairError::ReadableClientError)?,
             store: client
                 .read(
                     ReadContractParametersBuilder::default()
@@ -53,8 +51,7 @@ impl DISPair {
                         .map_err(DISPairError::ReadContractParametersBuilderError)?,
                 )
                 .await
-                .map_err(DISPairError::ReadableClientError)?
-                ._0,
+                .map_err(DISPairError::ReadableClientError)?,
             parser: client
                 .read(
                     ReadContractParametersBuilder::default()
@@ -64,8 +61,7 @@ impl DISPair {
                         .map_err(DISPairError::ReadContractParametersBuilderError)?,
                 )
                 .await
-                .map_err(DISPairError::ReadableClientError)?
-                ._0,
+                .map_err(DISPairError::ReadableClientError)?,
         })
     }
 }
@@ -74,41 +70,26 @@ impl DISPair {
 mod tests {
     use super::*;
     use alloy::primitives::Address;
-    use ethers::providers::{MockProvider, MockResponse, Provider};
-    use serde_json::json;
+    use alloy::providers::mock::Asserter;
     use tracing_subscriber::FmtSubscriber;
 
     #[tokio::test]
     async fn test_from_deployer() {
         setup_tracing();
 
-        // MockProvider for testing
-        let transport = MockProvider::default();
-        let deployer_address = "0x1234567890123456789012345678901234567890"
+        let asserter = Asserter::new();
+        let deployer_address = "0x1111111111111111111111111111111111111111"
             .parse::<Address>()
             .unwrap();
-        let interpreter_address = "1234567890123456789012345678901234567891";
-        let store_address = "1234567890123456789012345678901234567892";
-        let parser_address = "1234567890123456789012345678901234567893";
+        let interpreter_address = "2222222222222222222222222222222222222222";
+        let store_address = "3333333333333333333333333333333333333333";
+        let parser_address = "4444444444444444444444444444444444444444";
 
-        // Mock responses for the read calls - the responses will be popped off
-        // the stack in the reverse order they are pushed on.
-        transport.push_response(MockResponse::Value(json!(format!(
-            "0x{:0>64}",
-            parser_address
-        ))));
+        asserter.push_success(&format!("0x{interpreter_address:0>64}"));
+        asserter.push_success(&format!("0x{store_address:0>64}"));
+        asserter.push_success(&format!("0x{parser_address:0>64}"));
 
-        transport.push_response(MockResponse::Value(json!(format!(
-            "0x{:0>64}",
-            store_address
-        ))));
-
-        transport.push_response(MockResponse::Value(json!(format!(
-            "0x{:0>64}",
-            interpreter_address
-        ))));
-
-        let client = ReadableClient::new(Provider::new(transport));
+        let client = ReadableClient::new_mocked(asserter);
         let dispair = DISPair::from_deployer(deployer_address, client)
             .await
             .unwrap();

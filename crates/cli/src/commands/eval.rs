@@ -144,7 +144,7 @@ mod tests {
         };
 
         let result = eval.execute().await;
-        println!("{:?}", result);
+        println!("{result:#?}");
         assert!(result.is_ok());
     }
 }
