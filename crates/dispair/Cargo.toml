@@ -28,5 +28,8 @@ tokio = { version = "1.28.0", features = [
   "time",
 ] }
 
+[dev-dependencies]
+rain_interpreter_test_fixtures = { workspace = true }
+
 [package.metadata.docs.rs]
 all-features = true

@@ -1,5 +1,5 @@
 use alloy::primitives::{Address, B256, U256, keccak256};
-use rain_interpreter_bindings::IInterpreterV2::FullyQualifiedNamespace;
+use rain_interpreter_bindings::IInterpreterV4::FullyQualifiedNamespace;
 
 pub struct CreateNamespace {}
 
