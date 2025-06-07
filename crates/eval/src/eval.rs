@@ -161,8 +161,7 @@ mod tests {
             fork_block_number: None,
         };
         let fork = Forker::new_with_fork(args, None, None).await.unwrap();
-        let x = local_evm.deployer.iInterpreter().call().await.unwrap();
-        println!("{}", x);
+
         let res = fork
             .fork_parse(ForkParseArgs {
                 rainlang_string: r"_: 1;".to_owned(),
