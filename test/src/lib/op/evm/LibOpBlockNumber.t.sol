@@ -47,7 +47,7 @@ contract LibOpBlockNumberTest is OpTest {
     /// Directly test the runtime logic of LibOpBlockNumber. This tests that the
     /// opcode correctly pushes the block number onto the stack.
     function testOpBlockNumberRun(uint256 blockNumber, uint16 operandData) external {
-        blockNumber = bound(blockNumber, 0, uint256(uint128(type(int128).max)));
+        blockNumber = bound(blockNumber, 0, uint256(type(uint64).max));
         InterpreterState memory state = opTestDefaultInterpreterState();
         vm.roll(blockNumber);
         StackItem[] memory inputs = new StackItem[](0);

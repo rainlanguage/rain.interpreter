@@ -69,7 +69,7 @@ contract LibOpTimestampTest is OpTest {
         string[] memory words = timestampWords();
 
         for (uint256 i; i < words.length; ++i) {
-            blockTimestamp = bound(blockTimestamp, 0, type(uint256).max / 1e18);
+            blockTimestamp = bound(blockTimestamp, 0, uint256(type(uint64).max));
             vm.warp(blockTimestamp);
             bytes memory bytecode = iDeployer.parse2(bytes(string.concat("_: ", words[i], "();")));
             (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
