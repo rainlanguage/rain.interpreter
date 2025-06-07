@@ -44,7 +44,7 @@ sol!(
     "../../out/RainterpreterExpressionDeployer.sol/RainterpreterExpressionDeployer.json"
 );
 
-// type aliases for LocalEvm fillers and provider type
+// type aliases for LocalEvm fillers and provider
 pub type LocalEvmFillers = JoinFill<
     JoinFill<
         alloy::providers::Identity,
@@ -63,7 +63,7 @@ pub type LocalEvmFillers = JoinFill<
 >;
 pub type LocalEvmProvider = FillProvider<LocalEvmFillers, RootProvider>;
 
-/// A local evm instance that wraps an Anvil instance and provider with
+/// LocalEvm is a thin wrapper around Anvil instance and alloy provider with
 /// signers as well as rain contracts already deployed on it.
 /// The first signer wallet is the main wallet that would sign any transactions
 /// that dont specify a sender (transaction's 'to' field)
@@ -89,7 +89,7 @@ pub struct LocalEvm {
     /// Array of alloy ERC20 contract instances deployed on this blockchain
     pub tokens: Vec<ERC20::ERC20Instance<LocalEvmProvider>>,
 
-    /// All wallets of this local blockchain that can be used to perform transactions
+    /// All wallets of this local blockchain that can be used to perform transactions.
     /// the first wallet is the blockchain's default wallet, ie transactions that dont
     /// explicitly specify a sender address will use this as the sender
     pub signer_wallets: Vec<EthereumWallet>,
