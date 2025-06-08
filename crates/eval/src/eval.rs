@@ -7,21 +7,34 @@ use rain_interpreter_bindings::IInterpreterV4::{EvalV4, eval4Call};
 use rain_interpreter_bindings::IParserV2::parse2Call;
 
 #[derive(Debug, Clone)]
+/// Arguments for evaluating a Rainlang string in a forked EVM context
 pub struct ForkEvalArgs {
+    /// The Rainalang string to evaluate
     pub rainlang_string: String,
+    /// The source index
     pub source_index: u16,
+    /// The address of the deployer
     pub deployer: Address,
+    /// The fully qualified namespace
     pub namespace: FullyQualifiedNamespace,
+    /// The context matrix
     pub context: Vec<Vec<U256>>,
+    /// Whether to decode errors from the registry
     pub decode_errors: bool,
+    /// Inputs vector which are prepopulated stack items
     pub inputs: Vec<U256>,
+    /// Applies to the state before evaluation to facilitate "what if" analysis
     pub state_overlay: Vec<U256>,
 }
 
 #[derive(Debug, Clone)]
+/// Arguments for parsing a Rainlang string in a forked EVM context
 pub struct ForkParseArgs {
+    /// The Rainlang string to parse
     pub rainlang_string: String,
+    /// The address of the deployer
     pub deployer: Address,
+    /// Whether to decode errors from the registry
     pub decode_errors: bool,
 }
 
@@ -69,17 +82,6 @@ impl Forker {
     }
 
     /// Evaluates the Rain language string and returns the evaluation result.
-    ///
-    /// # Arguments
-    /// * `rainlang_string` - The Rainalang string to evaluate.
-    /// * `source_index` - The source index.
-    /// * `deployer` - The address of the deployer.
-    /// * `namespace` - The fully qualified namespace.
-    /// * `context` - The context vector.
-    /// * `inputs` - The inputs vector.
-    /// * `state_overlay` - The state_overlay vector.
-    /// * `decode_errors` - Whether to decode errors from registry or not
-    ///
     /// # Returns
     ///
     /// The typed return of the eval, plus Foundry's RawCallResult struct, including the trace.

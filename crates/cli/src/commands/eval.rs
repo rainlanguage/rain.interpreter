@@ -38,12 +38,20 @@ pub struct ForkEvalCliArgs {
     pub decode_errors: bool,
 
     // Accept inputs vector as array of uint256
-    #[arg(short, long, help = "The inputs vectore")]
-    pub inputs: Vec<U256>,
+    #[arg(
+        short,
+        long,
+        help = "The inputs vector which are prepopulated stack items"
+    )]
+    pub inputs: Option<Vec<U256>>,
 
     // Accept state overlay vector as array of uint256
-    #[arg(short, long, help = "The state overlay vector")]
-    pub state_overlay: Vec<U256>,
+    #[arg(
+        short,
+        long,
+        help = "The state overlay vector which applies to the state before evaluation to facilitate 'what if' analysis"
+    )]
+    pub state_overlay: Option<Vec<U256>>,
 }
 
 impl TryFrom<ForkEvalCliArgs> for ForkEvalArgs {
@@ -70,8 +78,8 @@ impl TryFrom<ForkEvalCliArgs> for ForkEvalArgs {
             namespace: FullyQualifiedNamespace::from(namespace),
             context,
             decode_errors: args.decode_errors,
-            inputs: args.inputs,
-            state_overlay: args.state_overlay,
+            inputs: args.inputs.unwrap_or_default(),
+            state_overlay: args.state_overlay.unwrap_or_default(),
         })
     }
 }
@@ -150,8 +158,8 @@ mod tests {
                 namespace: "0x123".into(),
                 context: vec!["0x06,99".into()],
                 decode_errors: true,
-                inputs: vec![],
-                state_overlay: vec![],
+                inputs: None,
+                state_overlay: None,
             },
         };
 
