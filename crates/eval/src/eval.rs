@@ -17,7 +17,7 @@ pub struct ForkEvalArgs {
     pub deployer: Address,
     /// The fully qualified namespace
     pub namespace: FullyQualifiedNamespace,
-    /// The context matrix, that will be available in "context" word
+    /// The context matrix, that will be available in "context" word and its aliases
     pub context: Vec<Vec<U256>>,
     /// Whether to decode errors from the registry
     pub decode_errors: bool,
