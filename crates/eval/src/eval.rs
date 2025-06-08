@@ -205,7 +205,7 @@ mod tests {
             .unwrap();
 
         // stack
-        let expected_stack: Vec<FixedBytes<32>> = vec![FixedBytes::left_padding_from(&[3u8])];
+        let expected_stack = vec![<FixedBytes<32>>::left_padding_from(&[3u8])];
         assert_eq!(res.typed_return.stack, expected_stack);
 
         // storage writes
