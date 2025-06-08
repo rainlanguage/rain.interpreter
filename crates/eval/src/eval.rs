@@ -82,6 +82,10 @@ impl Forker {
     }
 
     /// Evaluates the Rain language string and returns the evaluation result.
+    ///
+    /// # Arguments
+    /// * `args` - The arguments for the evaluation
+    ///
     /// # Returns
     ///
     /// The typed return of the eval, plus Foundry's RawCallResult struct, including the trace.
