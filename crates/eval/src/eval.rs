@@ -84,7 +84,7 @@ impl Forker {
     /// Evaluates the Rain language string and returns the evaluation result.
     ///
     /// # Arguments
-    /// * `args` - The arguments for the evaluation
+    /// * `args` - The fork eval arguments for the evaluation
     ///
     /// # Returns
     ///
