@@ -1,6 +1,7 @@
+use std::ops::Deref;
+
 use crate::fork::ForkTypedReturn;
 use alloy::primitives::{Address, U256};
-use foundry_evm::traces::CallTraceArena;
 use rain_interpreter_bindings::IInterpreterV4::{eval4Call, eval4Return};
 
 use thiserror::Error;
@@ -63,7 +64,9 @@ impl From<ForkTypedReturn<eval4Call>> for RainEvalResult {
 
         let tracer_address = RAIN_TRACER_ADDRESS.parse::<Address>().unwrap();
         let call_trace_arena = typed_return.raw.traces.unwrap().to_owned();
-        let mut traces: Vec<RainSourceTrace> = <CallTraceArena as Clone>::clone(&call_trace_arena)
+        let mut traces: Vec<RainSourceTrace> = call_trace_arena
+            .deref()
+            .clone()
             .into_nodes()
             .iter()
             .filter_map(|trace_node| {
