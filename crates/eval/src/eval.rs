@@ -154,9 +154,8 @@ mod tests {
     use super::*;
     use crate::fork::NewForkedEvm;
     use alloy::primitives::FixedBytes;
-    use foundry_evm::traces::CallTraceArena;
     use rain_interpreter_test_fixtures::LocalEvm;
-    use std::sync::Arc;
+    use std::{ops::Deref, sync::Arc};
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_parse() {
@@ -217,8 +216,7 @@ mod tests {
         expected_stack_trace.append(&mut <FixedBytes<32>>::left_padding_from(&[3u8]).to_vec());
 
         let sparsed_trace_arena = res.raw.traces.unwrap();
-        let source_index_zero_trace = <CallTraceArena as Clone>::clone(&sparsed_trace_arena)
-            .into_nodes()[1]
+        let source_index_zero_trace = sparsed_trace_arena.deref().clone().into_nodes()[1]
             .to_owned()
             .trace;
         assert_eq!(source_index_zero_trace.data.to_vec(), expected_stack_trace);
