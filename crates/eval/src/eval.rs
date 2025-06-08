@@ -11,13 +11,13 @@ use rain_interpreter_bindings::IParserV2::parse2Call;
 pub struct ForkEvalArgs {
     /// The Rainalang string to evaluate
     pub rainlang_string: String,
-    /// The source index
+    /// The source index of the rainlang to evaluate
     pub source_index: u16,
     /// The address of the deployer
     pub deployer: Address,
     /// The fully qualified namespace
     pub namespace: FullyQualifiedNamespace,
-    /// The context matrix
+    /// The context matrix, that will be available in "context" word
     pub context: Vec<Vec<U256>>,
     /// Whether to decode errors from the registry
     pub decode_errors: bool,
