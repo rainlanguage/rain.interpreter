@@ -69,47 +69,20 @@ impl DISPair {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloy::primitives::Address;
-    use alloy::providers::mock::Asserter;
-    use tracing_subscriber::FmtSubscriber;
+    use rain_interpreter_test_fixtures::LocalEvm;
 
     #[tokio::test]
     async fn test_from_deployer() {
-        setup_tracing();
-
-        let asserter = Asserter::new();
-        let deployer_address = "0x1111111111111111111111111111111111111111"
-            .parse::<Address>()
-            .unwrap();
-        let interpreter_address = "2222222222222222222222222222222222222222";
-        let store_address = "3333333333333333333333333333333333333333";
-        let parser_address = "4444444444444444444444444444444444444444";
-
-        asserter.push_success(&format!("0x{interpreter_address:0>64}"));
-        asserter.push_success(&format!("0x{store_address:0>64}"));
-        asserter.push_success(&format!("0x{parser_address:0>64}"));
-
-        let client = ReadableClient::new_mocked(asserter);
-        let dispair = DISPair::from_deployer(deployer_address, client)
+        let local_evm = LocalEvm::new().await;
+        let deployer = *local_evm.deployer.address();
+        let client = ReadableClient::new_from_url(local_evm.url())
             .await
-            .unwrap();
+            .expect("Failed to create ReadableClient");
+        let dispair = DISPair::from_deployer(deployer, client).await.unwrap();
 
-        assert_eq!(dispair.deployer, deployer_address);
-        assert_eq!(
-            dispair.interpreter,
-            interpreter_address.parse::<Address>().unwrap()
-        );
-        assert_eq!(dispair.store, store_address.parse::<Address>().unwrap());
-        assert_eq!(dispair.parser, parser_address.parse::<Address>().unwrap());
-    }
-
-    #[allow(dead_code)]
-    fn setup_tracing() {
-        let subscriber = FmtSubscriber::builder()
-            .with_max_level(tracing::Level::DEBUG)
-            .finish();
-
-        tracing::subscriber::set_global_default(subscriber)
-            .expect("Failed to set tracing subscriber");
+        assert_eq!(dispair.deployer, deployer);
+        assert_eq!(dispair.interpreter, *local_evm.interpreter.address());
+        assert_eq!(dispair.store, *local_evm.store.address());
+        assert_eq!(dispair.parser, *local_evm.parser.address());
     }
 }
