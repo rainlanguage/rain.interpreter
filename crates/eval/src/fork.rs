@@ -1,17 +1,19 @@
 use crate::error::ForkCallError;
 use alloy::primitives::{Address, BlockNumber, U256};
 use alloy::sol_types::SolCall;
+use foundry_evm::traces::TraceMode;
 use foundry_evm::{
-    backend::{Backend, DatabaseExt, LocalForkId},
+    Env, EnvMut,
+    backend::{Backend, DatabaseExt, JournaledState, LocalForkId},
     executors::{Executor, ExecutorBuilder, RawCallResult},
     fork::{CreateFork, ForkId, MultiFork},
     opts::EvmOpts,
 };
 use rain_error_decoding::AbiDecodedErrorType;
+use revm::primitives::hardfork::SpecId;
 use revm::{
     interpreter::InstructionResult,
-    primitives::{Address as Addr, Bytes, Env, HashSet, SpecId},
-    JournaledState,
+    primitives::{Address as Addr, Bytes},
 };
 use std::{any::type_name, collections::HashMap};
 
@@ -35,20 +37,32 @@ pub struct NewForkedEvm {
     pub fork_block_number: Option<BlockNumber>,
 }
 
-impl Default for Forker {
-    fn default() -> Self {
-        Self::new()
+fn mk_journaled_state(spec_id: SpecId) -> JournaledState {
+    let mut journaled_state = JournaledState::new();
+    journaled_state.set_spec_id(spec_id);
+    journaled_state
+}
+
+// NOTE: there is a trait for this in foundry-evm-core but it's not exposed
+// through the meta crate foundry-evm
+fn mk_env_mut(env: &mut Env) -> EnvMut<'_> {
+    EnvMut {
+        block: &mut env.evm_env.block_env,
+        cfg: &mut env.evm_env.cfg_env,
+        tx: &mut env.tx,
     }
 }
+
 impl Forker {
     /// Creates a new empty instance of `Forker`.
-    pub fn new() -> Forker {
-        let db = Backend::new(MultiFork::new().0, None);
-        let builder = ExecutorBuilder::default().inspectors(|stack| stack.trace(true).debug(false));
-        Self {
+    pub fn new() -> eyre::Result<Forker> {
+        let db = Backend::new(MultiFork::new().0, None)?;
+        let builder = ExecutorBuilder::default()
+            .inspectors(|stack| stack.trace_mode(TraceMode::Call.with_debug(false)));
+        Ok(Self {
             executor: builder.build(Env::default(), db),
             forks: HashMap::new(),
-        }
+        })
     }
 
     /// Creates a new instance of `Forker` with the specified fork URL and optional fork block number.
@@ -90,7 +104,7 @@ impl Forker {
             env: foundry_evm::opts::Env {
                 chain_id: None,
                 code_size_limit: None,
-                gas_limit: u64::MAX,
+                gas_limit: u64::MAX.into(),
                 ..Default::default()
             },
             memory_limit: u64::MAX,
@@ -98,29 +112,29 @@ impl Forker {
         };
 
         let create_fork = CreateFork {
-            url: fork_url.to_string(),
+            url: fork_url.clone(),
             enable_caching: true,
-            env: evm_opts.fork_evm_env(fork_url).await?.0,
+            env: evm_opts.fork_evm_env(&fork_url).await?.0,
             evm_opts,
         };
-        let block_number = if let Some(v) = fork_block_number {
-            BlockNumber::from(v)
+        let block_number = if let Some(block_number) = fork_block_number {
+            block_number
         } else {
-            create_fork.env.block.number.try_into()?
+            create_fork.env.evm_env.block_env.number
         };
 
-        let db = Backend::spawn(Some(create_fork.clone()));
+        let db = Backend::spawn(Some(create_fork.clone()))?;
 
         let builder = if let Some(gas) = gas_limit {
-            ExecutorBuilder::default()
-                .gas_limit(gas)
-                .inspectors(|stack| stack.trace(true).debug(false))
+            ExecutorBuilder::default().gas_limit(gas)
         } else {
-            ExecutorBuilder::default().inspectors(|stack| stack.trace(true).debug(false))
+            ExecutorBuilder::default()
         };
+        let builder =
+            builder.inspectors(|stack| stack.trace_mode(TraceMode::Call.with_debug(false)));
 
         let mut forks_map = HashMap::new();
-        forks_map.insert(fork_id, (U256::from(0), SpecId::LATEST, block_number));
+        forks_map.insert(fork_id, (U256::from(0), SpecId::default(), block_number));
         Ok(Self {
             executor: builder.build(env.unwrap_or(create_fork.env.clone()), db),
             forks: forks_map,
@@ -149,12 +163,12 @@ impl Forker {
             if self.executor.backend().is_active_fork(*local_fork_id) {
                 Ok(())
             } else {
-                let mut journaled_state = JournaledState::new(*spec_id, HashSet::new());
+                let mut journaled_state = mk_journaled_state(*spec_id);
                 self.executor
                     .backend_mut()
                     .select_fork(
                         *local_fork_id,
-                        &mut env.unwrap_or_default(),
+                        &mut mk_env_mut(&mut env.unwrap_or_default()),
                         &mut journaled_state,
                     )
                     .map(|_| ())
@@ -167,7 +181,7 @@ impl Forker {
                 env: foundry_evm::opts::Env {
                     chain_id: None,
                     code_size_limit: None,
-                    gas_limit: u64::MAX,
+                    gas_limit: u64::MAX.into(),
                     ..Default::default()
                 },
                 memory_limit: u64::MAX,
@@ -176,26 +190,30 @@ impl Forker {
             let create_fork = CreateFork {
                 url: fork_url.to_string(),
                 enable_caching: true,
-                env: evm_opts.fork_evm_env(fork_url).await.unwrap().0,
+                env: evm_opts.fork_evm_env(&fork_url).await.unwrap().0,
                 evm_opts,
             };
-            let block_number = if let Some(v) = fork_block_number {
-                BlockNumber::from(v)
+            let block_number = if let Some(block_number) = fork_block_number {
+                block_number
             } else {
-                create_fork.env.block.number.try_into()?
+                create_fork.env.evm_env.block_env.number
             };
-            let mut journaled_state = JournaledState::new(SpecId::LATEST, HashSet::new());
+
             self.forks.insert(
                 fork_id,
-                (U256::from(self.forks.len()), SpecId::LATEST, block_number),
+                (
+                    U256::from(self.forks.len()),
+                    SpecId::default(),
+                    block_number,
+                ),
             );
-            let default_env = create_fork.env.clone();
+
             self.executor
                 .backend_mut()
                 .create_select_fork(
                     create_fork,
-                    &mut env.unwrap_or(default_env),
-                    &mut journaled_state,
+                    &mut mk_env_mut(&mut env.unwrap_or_default()),
+                    &mut mk_journaled_state(SpecId::default()),
                 )
                 .map(|_| ())
                 .map_err(|e| ForkCallError::ExecutorError(e.to_string()))
@@ -233,7 +251,7 @@ impl Forker {
             return Err(raw.into());
         }
 
-        let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
+        let typed_return = T::abi_decode_returns(&raw.result.0).map_err(|e| {
             ForkCallError::TypedError(format!(
                 "Call:{:?} Error:{:?} Raw:{:?}",
                 type_name::<T>(),
@@ -278,7 +296,7 @@ impl Forker {
             return Err(raw.into());
         }
 
-        let typed_return = T::abi_decode_returns(&raw.result.0, true).map_err(|e| {
+        let typed_return = T::abi_decode_returns(&raw.result.0).map_err(|e| {
             ForkCallError::TypedError(format!("Call:{:?} Error:{:?}", type_name::<T>(), e))
         })?;
         Ok(ForkTypedReturn { raw, typed_return })
@@ -360,7 +378,7 @@ impl Forker {
             .active_fork_id()
             .ok_or(ForkCallError::ExecutorError("no active fork!".to_owned()))?;
         let mut org_block_number = None;
-        let mut spec_id = SpecId::LATEST;
+        let mut spec_id = SpecId::default();
         #[allow(clippy::for_kv_map)]
         for (_fork_id, (local_id, sid, bnumber)) in &self.forks {
             if *local_id == active_fork_local_id {
@@ -374,15 +392,15 @@ impl Forker {
         }
         let block_number = block_number.unwrap_or(org_block_number.unwrap());
 
-        self.executor.env_mut().block.number = U256::from(block_number);
+        self.executor.env_mut().evm_env.block_env.number = block_number;
 
         self.executor
             .backend_mut()
             .roll_fork(
                 Some(active_fork_local_id),
                 block_number,
-                &mut env.unwrap_or_default(),
-                &mut JournaledState::new(spec_id, HashSet::new()),
+                &mut mk_env_mut(&mut env.unwrap_or_default()),
+                &mut mk_journaled_state(spec_id),
             )
             .map_err(|v| ForkCallError::ExecutorError(v.to_string()))
     }
@@ -390,19 +408,18 @@ impl Forker {
 
 #[cfg(test)]
 mod tests {
-    use crate::namespace::CreateNamespace;
-    use rain_interpreter_env::{
-        CI_DEPLOY_SEPOLIA_RPC_URL, CI_FORK_BSC_RPC_URL, CI_FORK_POLYGON_RPC_URL,
-        CI_FORK_SEPOLIA_BLOCK_NUMBER, CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
-    };
-
     use super::*;
-    use alloy::primitives::U256;
+    use crate::namespace::CreateNamespace;
     use alloy::sol;
-    use rain_interpreter_bindings::{
-        DeployerISP::{iParserCall, iStoreCall},
-        IInterpreterStoreV1::{getCall, setCall},
+    use alloy::{
+        primitives::{FixedBytes, U256},
+        providers::Provider,
     };
+    use rain_interpreter_bindings::{
+        DeployerISP::iParserCall,
+        IInterpreterStoreV3::{getCall, setCall},
+    };
+    use rain_interpreter_test_fixtures::LocalEvm;
 
     sol! {
         interface IERC20 {
@@ -413,59 +430,45 @@ mod tests {
             function transferFrom(address from, address to, uint256 amount) external returns (bool);
         }
     }
-    const USDT_POLYGON: &str = "0xc2132d05d31c914a87c6611c10748aeb04b58e8f";
-    const USDT_BSC: &str = "0x55d398326f99059fF775485246999027B3197955";
-    const POLYGON_FORK_NUMBER: u64 = 54697866;
-    const BSC_FORK_NUMBER: u64 = 40531873;
-    const BSC_ACC: &str = "0xee5B5B923fFcE93A870B3104b7CA09c3db80047A";
-    const POLYGON_ACC: &str = "0xF977814e90dA44bFA03b6295A0616a897441aceC";
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_forker_read() {
+        let local_evm = LocalEvm::new().await;
+        let deployer = *local_evm.deployer.address();
         let args = NewForkedEvm {
-            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
-            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
+            fork_url: local_evm.url(),
+            fork_block_number: None,
         };
+
         let forker = Forker::new_with_fork(args, None, None).await.unwrap();
 
         let from_address = Address::default();
-        let to_address: Address = *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS;
+        let to_address = deployer;
         let call = iParserCall {};
         let result = forker
             .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
-        let parser_address = result.typed_return._0;
-        let expected_address = "0xf14e09601a47552de6abd3a0b165607fafd2b5ba"
-            .parse::<Address>()
-            .unwrap();
+        let parser_address = result.typed_return;
+        let expected_address = *local_evm.parser.address();
         assert_eq!(parser_address, expected_address);
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_forker_write() {
+        let local_evm = LocalEvm::new().await;
         let args = NewForkedEvm {
-            fork_url: CI_DEPLOY_SEPOLIA_RPC_URL.to_string(),
-            fork_block_number: Some(*CI_FORK_SEPOLIA_BLOCK_NUMBER),
+            fork_url: local_evm.url(),
+            fork_block_number: None,
         };
         let mut forker = Forker::new_with_fork(args, None, None).await.unwrap();
 
         let from_address = Address::repeat_byte(0x02);
-        let store_call = iStoreCall {};
-        let store_result = forker
-            .alloy_call(
-                from_address,
-                *CI_FORK_SEPOLIA_DEPLOYER_ADDRESS,
-                store_call,
-                false,
-            )
-            .await
-            .unwrap();
-        let store_address: Address = store_result.typed_return._0;
+        let store_address = *local_evm.store.address();
 
         let namespace = U256::from(1);
-        let key = U256::from(3);
-        let value = U256::from(4);
+        let key = <FixedBytes<32>>::left_padding_from(&[3u8]);
+        let value = <FixedBytes<32>>::left_padding_from(&[4u8]);
         let _set = forker
             .alloy_call_committing(
                 from_address,
@@ -489,39 +492,41 @@ mod tests {
                 store_address,
                 getCall {
                     namespace: fully_quallified_namespace.into(),
-                    key: U256::from(3),
+                    key: <FixedBytes<32>>::left_padding_from(&[3u8]),
                 },
                 false,
             )
             .await
             .unwrap()
-            .typed_return
-            ._0;
+            .typed_return;
         assert_eq!(value, get);
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_multi_fork_read_write_switch_reset() -> Result<(), ForkCallError> {
+        let local_evm1 = LocalEvm::new_with_tokens(1).await;
+        let local_evm1_token = *local_evm1.tokens[0].address();
+        let local_evm1_token_holder = local_evm1.anvil.addresses()[0];
         let args = NewForkedEvm {
-            fork_url: CI_FORK_POLYGON_RPC_URL.clone(),
-            fork_block_number: Some(POLYGON_FORK_NUMBER),
+            fork_url: local_evm1.url(),
+            fork_block_number: None,
         };
         let mut forker = Forker::new_with_fork(args, None, None).await.unwrap();
 
         let from_address = Address::default();
-        let to_address: Address = USDT_POLYGON.parse::<Address>().unwrap();
+        let to_address = local_evm1_token;
         let call = IERC20::balanceOfCall {
-            account: POLYGON_ACC.parse::<Address>().unwrap(),
+            account: local_evm1_token_holder,
         };
         let result = forker
             .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
-        let old_balance = result.typed_return._0;
-        let polygon_old_balance = result.typed_return._0;
+        let old_balance = result.typed_return;
+        let polygon_old_balance = result.typed_return;
 
-        let from_address = POLYGON_ACC.parse::<Address>().unwrap();
-        let to_address: Address = USDT_POLYGON.parse::<Address>().unwrap();
+        let from_address = local_evm1_token_holder;
+        let to_address = local_evm1_token;
         let send_amount = U256::from(0xffu64);
         let transfer_call = IERC20::transferCall {
             to: Address::repeat_byte(0x2),
@@ -539,39 +544,42 @@ mod tests {
             .unwrap();
 
         let from_address = Address::default();
-        let to_address: Address = USDT_POLYGON.parse::<Address>().unwrap();
+        let to_address = local_evm1_token;
         let call = IERC20::balanceOfCall {
-            account: POLYGON_ACC.parse::<Address>().unwrap(),
+            account: local_evm1_token_holder,
         };
         let result = forker
             .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
-        let new_balance = result.typed_return._0;
+        let new_balance = result.typed_return;
         assert_eq!(new_balance, old_balance - send_amount);
         let polygon_balance = new_balance;
 
         // switch fork
+        let local_evm2 = LocalEvm::new_with_tokens(1).await;
+        let local_evm2_token = *local_evm2.tokens[0].address();
+        let local_evm2_token_holder = local_evm2.anvil.addresses()[0];
         let args = NewForkedEvm {
-            fork_url: CI_FORK_BSC_RPC_URL.to_owned(),
-            fork_block_number: Some(BSC_FORK_NUMBER),
+            fork_url: local_evm2.url(),
+            fork_block_number: None,
         };
         forker.add_or_select(args, None).await?;
 
         let from_address = Address::default();
-        let to_address: Address = USDT_BSC.parse::<Address>().unwrap();
+        let to_address = local_evm2_token;
         let call = IERC20::balanceOfCall {
-            account: BSC_ACC.parse::<Address>().unwrap(),
+            account: local_evm2_token_holder,
         };
         let result = forker
             .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
-        let old_balance = result.typed_return._0;
+        let old_balance = result.typed_return;
 
-        let from_address = BSC_ACC.parse::<Address>().unwrap();
-        let to_address: Address = USDT_BSC.parse::<Address>().unwrap();
-        let send_amount = U256::from(0xffffffffu64);
+        let from_address = local_evm2_token_holder;
+        let to_address = local_evm2_token;
+        let send_amount = U256::from(0xffu64);
         let transfer_call = IERC20::transferCall {
             to: Address::repeat_byte(0x2),
             amount: send_amount,
@@ -588,46 +596,46 @@ mod tests {
             .unwrap();
 
         let from_address = Address::default();
-        let to_address: Address = USDT_BSC.parse::<Address>().unwrap();
+        let to_address = local_evm2_token;
         let call = IERC20::balanceOfCall {
-            account: BSC_ACC.parse::<Address>().unwrap(),
+            account: local_evm2_token_holder,
         };
         let result = forker
             .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
-        let new_balance = result.typed_return._0;
+        let new_balance = result.typed_return;
         assert_eq!(new_balance, old_balance - send_amount);
 
-        // switch fork
+        // switch fork back to fork1
         let args = NewForkedEvm {
-            fork_url: CI_FORK_POLYGON_RPC_URL.clone(),
-            fork_block_number: Some(POLYGON_FORK_NUMBER),
+            fork_url: local_evm1.url(),
+            fork_block_number: None,
         };
         forker.add_or_select(args, None).await?;
 
         let from_address = Address::default();
-        let to_address: Address = USDT_POLYGON.parse::<Address>().unwrap();
+        let to_address = local_evm1_token;
         let call = IERC20::balanceOfCall {
-            account: POLYGON_ACC.parse::<Address>().unwrap(),
+            account: local_evm1_token_holder,
         };
         let result = forker
             .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
-        let balance = result.typed_return._0;
+        let balance = result.typed_return;
         assert_eq!(balance, polygon_balance);
 
         // reset fork
-        forker.roll_fork(Some(POLYGON_FORK_NUMBER), None)?;
+        forker.roll_fork(None, None)?;
         let call = IERC20::balanceOfCall {
-            account: POLYGON_ACC.parse::<Address>().unwrap(),
+            account: local_evm1_token_holder,
         };
         let result = forker
             .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
-        let balance = result.typed_return._0;
+        let balance = result.typed_return;
         assert_eq!(balance, polygon_old_balance);
 
         Ok(())
@@ -636,27 +644,24 @@ mod tests {
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_rolls() {
         // we need to roll the fork forwards and check that the env block number is updated
+        let local_evm = LocalEvm::new().await;
+        let block_number = local_evm.provider.get_block_number().await.unwrap() - 2;
         let args = NewForkedEvm {
-            fork_url: CI_FORK_POLYGON_RPC_URL.clone(),
-            fork_block_number: Some(POLYGON_FORK_NUMBER),
+            fork_url: local_evm.url(),
+            fork_block_number: Some(block_number),
         };
         let mut forker = Forker::new_with_fork(args, None, None).await.unwrap();
 
         // check the env block number is the same as the fork block number
-        assert_eq!(
-            forker.executor.env().block.number,
-            U256::from(POLYGON_FORK_NUMBER)
-        );
+        assert_eq!(forker.executor.env().evm_env.block_env.number, block_number);
 
         // roll the fork forwards by 1 block
-        forker
-            .roll_fork(Some(POLYGON_FORK_NUMBER + 1), None)
-            .unwrap();
+        forker.roll_fork(Some(block_number + 1), None).unwrap();
 
         // check the env block number is updated
         assert_eq!(
-            forker.executor.env().block.number,
-            U256::from(POLYGON_FORK_NUMBER + 1)
+            forker.executor.env().evm_env.block_env.number,
+            block_number + 1
         );
     }
 }

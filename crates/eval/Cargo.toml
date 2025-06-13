@@ -21,6 +21,17 @@ foundry-evm = { workspace = true }
 revm = { workspace = true }
 
 [dev-dependencies]
-tokio = { version = "1.28.0", features = ["full"] }
 tracing = { workspace = true }
-rain-interpreter-env = { workspace = true }
+rain_interpreter_test_fixtures = { workspace = true }
+
+[target.'cfg(not(target_family = "wasm"))'.dev-dependencies]
+tokio = { version = "1.28.0", features = ["full"] }
+
+[target.'cfg(target_family = "wasm")'.dev-dependencies]
+tokio = { version = "1.28.0", features = [
+    "sync",
+    "macros",
+    "io-util",
+    "rt",
+    "time",
+] }

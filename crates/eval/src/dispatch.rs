@@ -35,7 +35,8 @@ mod tests {
 
         let encoded_dispatch = CreateEncodedDispatch::encode(&address, source_index, max_outputs);
 
-        let mut encoded_dispatch_bytes = encoded_dispatch.into().as_le_slice().to_owned();
+        let mut encoded_dispatch_bytes =
+            encoded_dispatch.into_underlying().as_le_slice().to_owned();
         encoded_dispatch_bytes.reverse();
 
         assert_eq!(&encoded_dispatch_bytes[8..28], address.as_slice());

@@ -1,5 +1,5 @@
-use alloy::primitives::{keccak256, Address, B256, U256};
-use rain_interpreter_bindings::IInterpreterV2::FullyQualifiedNamespace;
+use alloy::primitives::{Address, B256, U256, keccak256};
+use rain_interpreter_bindings::IInterpreterV4::FullyQualifiedNamespace;
 
 pub struct CreateNamespace {}
 
@@ -35,7 +35,7 @@ mod tests {
                 .as_slice()
                 .to_owned();
 
-        let mut namespace_bytes = namespace.into().as_le_slice().to_owned();
+        let mut namespace_bytes = namespace.into_underlying().as_le_slice().to_owned();
         namespace_bytes.reverse();
         assert_eq!(namespace_bytes, expected);
     }

@@ -1,6 +1,10 @@
 name: Rainix CI
 on: [push]
 
+concurrency:
+  group: ${{ github.ref }}-rainix
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   rainix:
     strategy:
@@ -55,12 +59,7 @@ jobs:
         env:
           ETH_RPC_URL: ${{ secrets.CI_DEPLOY_SEPOLIA_RPC_URL || vars.CI_DEPLOY_SEPOLIA_RPC_URL }}
           ETHERSCAN_API_KEY: ${{ secrets.EXPLORER_VERIFICATION_KEY }}
-          DEPLOY_BROADCAST: ''
-          DEPLOY_VERIFIER: ''
+          DEPLOY_BROADCAST: ""
+          DEPLOY_VERIFIER: ""
           DEPLOY_METABOARD_ADDRESS: ${{ vars.CI_DEPLOY_SEPOLIA_METABOARD_ADDRESS }}
-          CI_FORK_SEPOLIA_BLOCK_NUMBER: ${{ vars.CI_FORK_SEPOLIA_BLOCK_NUMBER }}
-          CI_FORK_SEPOLIA_DEPLOYER_ADDRESS: ${{ vars.CI_FORK_SEPOLIA_DEPLOYER_ADDRESS }}
-          CI_DEPLOY_SEPOLIA_RPC_URL: ${{ secrets.CI_DEPLOY_SEPOLIA_RPC_URL || vars.CI_DEPLOY_SEPOLIA_RPC_URL }}
-          CI_FORK_POLYGON_RPC_URL: ${{ secrets.CI_FORK_POLYGON_RPC_URL || vars.CI_FORK_POLYGON_RPC_URL }}
-          CI_FORK_BSC_RPC_URL: ${{ secrets.CI_FORK_BSC_RPC_URL || vars.CI_FORK_BSC_RPC_URL }}
         run: nix develop -c ${{ matrix.task }}
