@@ -1,4 +1,5 @@
-use crate::error::ForkCallError;
+use crate::error::{ForkCallError, ReplayTransactionError};
+use alloy::consensus::Transaction;
 use alloy::primitives::{Address, BlockNumber, U256};
 use alloy::sol_types::SolCall;
 use foundry_evm::traces::TraceMode;
@@ -11,6 +12,7 @@ use foundry_evm::{
 };
 use rain_error_decoding::AbiDecodedErrorType;
 use revm::primitives::hardfork::SpecId;
+use revm::primitives::{B256, TxKind};
 use revm::{
     interpreter::InstructionResult,
     primitives::{Address as Addr, Bytes},
@@ -454,14 +456,15 @@ impl Forker {
         })?;
 
         // matching env to the env from the block the transaction is in
-        self.executor.env_mut().block.number = U256::from(block_number);
-        self.executor.env_mut().block.timestamp = U256::from(block.header.timestamp);
-        self.executor.env_mut().block.coinbase = block.header.miner;
-        self.executor.env_mut().block.difficulty = block.header.difficulty;
-        self.executor.env_mut().block.prevrandao = Some(block.header.mix_hash.unwrap_or_default());
-        self.executor.env_mut().block.basefee =
-            U256::from(block.header.base_fee_per_gas.unwrap_or_default());
-        self.executor.env_mut().block.gas_limit = U256::from(block.header.gas_limit);
+        self.executor.env_mut().evm_env.block_env.number = block_number;
+        self.executor.env_mut().evm_env.block_env.timestamp = block.header.timestamp;
+        self.executor.env_mut().evm_env.block_env.beneficiary = block.header.beneficiary;
+        self.executor.env_mut().evm_env.block_env.difficulty = block.header.difficulty;
+        self.executor.env_mut().evm_env.block_env.prevrandao =
+            Some(block.header.mix_hash.unwrap_or_default());
+        self.executor.env_mut().evm_env.block_env.basefee =
+            block.header.base_fee_per_gas.unwrap_or_default();
+        self.executor.env_mut().evm_env.block_env.gas_limit = block.header.gas_limit;
 
         let _ = &self
             .add_or_select(
@@ -479,7 +482,7 @@ impl Forker {
             .active_fork_id()
             .ok_or(ForkCallError::ExecutorError("no active fork!".to_owned()))?;
 
-        let mut journaled_state = JournaledState::new(SpecId::LATEST, HashSet::new());
+        let mut journaled_state = JournaledState::new();
 
         let env = self.executor.env().clone();
 
@@ -493,9 +496,15 @@ impl Forker {
 
         let res = match tx {
             // if to field is None, it means the tx was a contract deployment, see 'revm::primitives::TxKind'
-            Some(tx) => match TxKind::from(tx.to) {
-                TxKind::Call(to) => self.call(tx.from.as_slice(), to.as_slice(), &tx.input)?,
-                TxKind::Create => self.call(tx.from.as_slice(), &[0u8; 20], &tx.input)?,
+            Some(tx) => match tx.inner.kind() {
+                TxKind::Call(to) => self.call(
+                    tx.inner.signer().as_slice(),
+                    to.as_slice(),
+                    &tx.inner.input(),
+                )?,
+                TxKind::Create => {
+                    self.call(tx.inner.signer().as_slice(), &[0u8; 20], &tx.inner.input())?
+                }
             },
             None => {
                 return Err(ForkCallError::ReplayTransactionError(
@@ -512,6 +521,7 @@ impl Forker {
 mod tests {
     use super::*;
     use crate::namespace::CreateNamespace;
+    use alloy::eips::BlockNumberOrTag;
     use alloy::sol;
     use alloy::{
         primitives::{FixedBytes, U256},
@@ -773,7 +783,7 @@ mod tests {
         let block_number = local_evm.provider.get_block_number().await.unwrap();
         let tx_hash = local_evm
             .provider
-            .get_block_by_number(BlockNumberOrTag::Number(block_number - 2), false)
+            .get_block_by_number(BlockNumberOrTag::Number(block_number - 2))
             .await
             .unwrap()
             .unwrap()
