@@ -500,10 +500,10 @@ impl Forker {
                 TxKind::Call(to) => self.call(
                     tx.inner.signer().as_slice(),
                     to.as_slice(),
-                    &tx.inner.input(),
+                    tx.inner.input(),
                 )?,
                 TxKind::Create => {
-                    self.call(tx.inner.signer().as_slice(), &[0u8; 20], &tx.inner.input())?
+                    self.call(tx.inner.signer().as_slice(), &[0u8; 20], tx.inner.input())?
                 }
             },
             None => {
