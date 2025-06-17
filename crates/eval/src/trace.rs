@@ -340,4 +340,85 @@ mod tests {
         let result = rain_eval_result.search_trace_by_path("0.1.12");
         assert!(matches!(result, Err(TraceSearchError::TraceNotFound(_))));
     }
+
+    async fn get_raw_call_result() -> RawCallResult {
+        let local_evm = LocalEvm::new().await;
+        let deployer_address = *local_evm.deployer.address();
+        let args = NewForkedEvm {
+            fork_url: local_evm.url(),
+            fork_block_number: None,
+        };
+        let fork = Forker::new_with_fork(args, None, None).await.unwrap();
+
+        let res = fork
+            .fork_eval(ForkEvalArgs {
+                rainlang_string: r"
+                a: 3,
+                b: 2,
+                c: 4,
+                _: call<1>(1 2),
+                :set(1 2),
+                :set(3 4);
+                a b:,
+                c: call<2>(a b),
+                d: 3;
+                a b:,
+                c: 2;
+                "
+                .into(),
+                source_index: 0,
+                deployer: deployer_address,
+                namespace: FullyQualifiedNamespace::default(),
+                context: vec![],
+                decode_errors: true,
+                state_overlay: vec![],
+                inputs: vec![],
+            })
+            .await
+            .unwrap();
+
+        res.raw
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+    async fn test_try_from_raw_call_result() {
+        let raw = get_raw_call_result().await;
+        let rain_eval_result = RainEvalResult::try_from(raw).unwrap();
+
+        assert!(!rain_eval_result.reverted);
+        assert!(rain_eval_result.stack.is_empty());
+        assert!(rain_eval_result.writes.is_empty());
+
+        let trace_0 = RainSourceTrace {
+            parent_source_index: 0,
+            source_index: 0,
+            stack: vec![U256::from(3), U256::from(4), U256::from(2), U256::from(3)],
+        };
+        assert_eq!(rain_eval_result.traces[0], trace_0);
+
+        let trace_1 = RainSourceTrace {
+            parent_source_index: 0,
+            source_index: 1,
+            stack: vec![U256::from(3), U256::from(2), U256::from(2), U256::from(1)],
+        };
+        assert_eq!(rain_eval_result.traces[1], trace_1);
+
+        let trace_2 = RainSourceTrace {
+            parent_source_index: 1,
+            source_index: 2,
+            stack: vec![U256::from(2), U256::from(2), U256::from(1)],
+        };
+        assert_eq!(rain_eval_result.traces[2], trace_2);
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+    async fn test_try_from_raw_call_result_missing_traces() {
+        let mut raw = get_raw_call_result().await;
+        raw.traces = None;
+        let result = RainEvalResult::try_from(raw);
+        assert!(matches!(
+            result,
+            Err(RainEvalResultFromRawCallResultError::MissingTraces)
+        ));
+    }
 }
