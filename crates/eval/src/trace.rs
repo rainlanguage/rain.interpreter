@@ -2,11 +2,13 @@ use std::ops::Deref;
 
 use crate::fork::ForkTypedReturn;
 use alloy::primitives::{Address, U256};
+use foundry_evm::executors::RawCallResult;
 use rain_interpreter_bindings::IInterpreterV4::{eval4Call, eval4Return};
 
+use revm::primitives::address;
 use thiserror::Error;
 
-pub const RAIN_TRACER_ADDRESS: &str = "0xF06Cd48c98d7321649dB7D8b2C396A81A2046555";
+pub const RAIN_TRACER_ADDRESS: Address = address!("F06Cd48c98d7321649dB7D8b2C396A81A2046555");
 
 /// A struct representing a single trace from a Rain source. Intended to be decoded
 /// from the calldata sent as part of a noop call by the Interpreter to the
@@ -62,7 +64,6 @@ impl From<ForkTypedReturn<eval4Call>> for RainEvalResult {
     fn from(typed_return: ForkTypedReturn<eval4Call>) -> Self {
         let eval4Return { stack, writes } = typed_return.typed_return;
 
-        let tracer_address = RAIN_TRACER_ADDRESS.parse::<Address>().unwrap();
         let call_trace_arena = typed_return.raw.traces.unwrap().to_owned();
         let mut traces: Vec<RainSourceTrace> = call_trace_arena
             .deref()
@@ -70,7 +71,7 @@ impl From<ForkTypedReturn<eval4Call>> for RainEvalResult {
             .into_nodes()
             .iter()
             .filter_map(|trace_node| {
-                if Address::from(trace_node.trace.address.into_array()) == tracer_address {
+                if Address::from(trace_node.trace.address.into_array()) == RAIN_TRACER_ADDRESS {
                     RainSourceTrace::from_data(&trace_node.trace.data)
                 } else {
                     None
@@ -85,6 +86,43 @@ impl From<ForkTypedReturn<eval4Call>> for RainEvalResult {
             writes: writes.into_iter().map(Into::into).collect(),
             traces,
         }
+    }
+}
+
+#[derive(Error, Debug)]
+pub enum RainEvalResultFromRawCallResultError {
+    #[error("Traces are missing")]
+    MissingTraces,
+}
+
+impl TryFrom<RawCallResult> for RainEvalResult {
+    type Error = RainEvalResultFromRawCallResultError;
+
+    fn try_from(raw_call_result: RawCallResult) -> Result<Self, Self::Error> {
+        let trace_arena = raw_call_result
+            .traces
+            .ok_or(RainEvalResultFromRawCallResultError::MissingTraces)?;
+
+        let traces: Vec<RainSourceTrace> = trace_arena
+            .arena
+            .into_nodes()
+            .iter()
+            .filter_map(|trace_node| {
+                if Address::from(trace_node.trace.address.into_array()) == RAIN_TRACER_ADDRESS {
+                    RainSourceTrace::from_data(&trace_node.trace.data)
+                } else {
+                    None
+                }
+            })
+            .rev()
+            .collect();
+
+        Ok(RainEvalResult {
+            reverted: raw_call_result.reverted,
+            stack: vec![],
+            writes: vec![],
+            traces,
+        })
     }
 }
 
