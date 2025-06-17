@@ -105,7 +105,7 @@ impl TryFrom<RawCallResult> for RainEvalResult {
 
         let traces: Vec<RainSourceTrace> = trace_arena
             .arena
-            .into_nodes()
+            .nodes()
             .iter()
             .filter_map(|trace_node| {
                 if Address::from(trace_node.trace.address.into_array()) == RAIN_TRACER_ADDRESS {

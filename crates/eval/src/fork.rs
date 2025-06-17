@@ -427,33 +427,34 @@ impl Forker {
             .executor
             .backend()
             .active_fork_db()
-            .ok_or(ForkCallError::ReplayTransactionError(
-                ReplayTransactionError::NoActiveFork,
-            ))?
+            .ok_or(ReplayTransactionError::NoActiveFork)?
             .db;
         let full_tx = shared_backend.get_transaction(tx_hash).map_err(|e| {
-            ForkCallError::ReplayTransactionError(ReplayTransactionError::DatabaseError(
-                tx_hash.to_string(),
-                fork_url.clone(),
-                e,
-            ))
+            ReplayTransactionError::DatabaseError(tx_hash.to_string(), fork_url.clone(), e)
         })?;
 
         // get the block number from the transaction
-        let block_number = full_tx
-            .block_number
-            .ok_or(ForkCallError::ReplayTransactionError(
-                ReplayTransactionError::NoBlockNumberFound(tx_hash.to_string(), fork_url.clone()),
-            ))?;
+        let block_number =
+            full_tx
+                .block_number
+                .ok_or(ReplayTransactionError::NoBlockNumberFound(
+                    tx_hash.to_string(),
+                    fork_url.clone(),
+                ))?;
 
         // get the block
         let block = shared_backend.get_full_block(block_number).map_err(|e| {
-            ForkCallError::ReplayTransactionError(ReplayTransactionError::DatabaseError(
-                block_number.to_string(),
-                fork_url.clone(),
-                e,
-            ))
+            ReplayTransactionError::DatabaseError(block_number.to_string(), fork_url.clone(), e)
         })?;
+
+        self.add_or_select(
+            NewForkedEvm {
+                fork_url: fork_url.clone(),
+                fork_block_number: Some(block_number - 1),
+            },
+            None,
+        )
+        .await?;
 
         // matching env to the env from the block the transaction is in
         self.executor.env_mut().evm_env.block_env.number = block_number;
@@ -465,15 +466,6 @@ impl Forker {
         self.executor.env_mut().evm_env.block_env.basefee =
             block.header.base_fee_per_gas.unwrap_or_default();
         self.executor.env_mut().evm_env.block_env.gas_limit = block.header.gas_limit;
-
-        self.add_or_select(
-            NewForkedEvm {
-                fork_url: fork_url.clone(),
-                fork_block_number: Some(block_number - 1),
-            },
-            None,
-        )
-        .await?;
 
         let active_fork_local_id = self
             .executor
