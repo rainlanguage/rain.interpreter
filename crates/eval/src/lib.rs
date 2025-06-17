@@ -1,4 +1,3 @@
-pub mod dispatch;
 pub mod error;
 #[cfg(not(target_family = "wasm"))]
 pub mod eval;
