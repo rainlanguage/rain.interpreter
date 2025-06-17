@@ -1,4 +1,5 @@
-use crate::error::ForkCallError;
+use crate::error::{ForkCallError, ReplayTransactionError};
+use alloy::consensus::Transaction;
 use alloy::primitives::{Address, BlockNumber, U256};
 use alloy::sol_types::SolCall;
 use foundry_evm::traces::TraceMode;
@@ -11,6 +12,7 @@ use foundry_evm::{
 };
 use rain_error_decoding::AbiDecodedErrorType;
 use revm::primitives::hardfork::SpecId;
+use revm::primitives::{B256, TxKind};
 use revm::{
     interpreter::InstructionResult,
     primitives::{Address as Addr, Bytes},
@@ -404,12 +406,113 @@ impl Forker {
             )
             .map_err(|v| ForkCallError::ExecutorError(v.to_string()))
     }
+
+    /// Replays a transaction from the forked EVM.
+    /// # Arguments
+    /// * `tx_hash` - The transaction hash.
+    /// # Returns
+    /// A result containing the raw call result.
+    pub async fn replay_transaction(
+        &mut self,
+        tx_hash: B256,
+    ) -> Result<RawCallResult, ForkCallError> {
+        let fork_url = self
+            .executor
+            .backend()
+            .active_fork_url()
+            .ok_or(ReplayTransactionError::NoActiveFork)?;
+
+        // get the transaction
+        let shared_backend = &self
+            .executor
+            .backend()
+            .active_fork_db()
+            .ok_or(ReplayTransactionError::NoActiveFork)?
+            .db;
+        let full_tx = shared_backend.get_transaction(tx_hash).map_err(|e| {
+            ReplayTransactionError::DatabaseError(tx_hash.to_string(), fork_url.clone(), e)
+        })?;
+
+        // get the block number from the transaction
+        let block_number =
+            full_tx
+                .block_number
+                .ok_or(ReplayTransactionError::NoBlockNumberFound(
+                    tx_hash.to_string(),
+                    fork_url.clone(),
+                ))?;
+
+        // get the block
+        let block = shared_backend.get_full_block(block_number).map_err(|e| {
+            ReplayTransactionError::DatabaseError(block_number.to_string(), fork_url.clone(), e)
+        })?;
+
+        self.add_or_select(
+            NewForkedEvm {
+                fork_url: fork_url.clone(),
+                fork_block_number: Some(block_number - 1),
+            },
+            None,
+        )
+        .await?;
+
+        // matching env to the env from the block the transaction is in
+        self.executor.env_mut().evm_env.block_env.number = block_number;
+        self.executor.env_mut().evm_env.block_env.timestamp = block.header.timestamp;
+        self.executor.env_mut().evm_env.block_env.beneficiary = block.header.beneficiary;
+        self.executor.env_mut().evm_env.block_env.difficulty = block.header.difficulty;
+        self.executor.env_mut().evm_env.block_env.prevrandao =
+            Some(block.header.mix_hash.unwrap_or_default());
+        self.executor.env_mut().evm_env.block_env.basefee =
+            block.header.base_fee_per_gas.unwrap_or_default();
+        self.executor.env_mut().evm_env.block_env.gas_limit = block.header.gas_limit;
+
+        let active_fork_local_id = self
+            .executor
+            .backend()
+            .active_fork_id()
+            .ok_or(ForkCallError::ExecutorError("no active fork!".to_owned()))?;
+
+        let mut journaled_state = JournaledState::new();
+
+        let env = self.executor.env().clone();
+
+        // replay all transactions that came before
+        let tx = self.executor.backend_mut().replay_until(
+            active_fork_local_id,
+            env,
+            tx_hash,
+            &mut journaled_state,
+        )?;
+
+        let res = match tx {
+            // if to field is None, it means the tx was a contract deployment, see 'revm::primitives::TxKind'
+            Some(tx) => match tx.inner.kind() {
+                TxKind::Call(to) => self.call(
+                    tx.inner.signer().as_slice(),
+                    to.as_slice(),
+                    tx.inner.input(),
+                )?,
+                TxKind::Create => {
+                    self.call(tx.inner.signer().as_slice(), &[0u8; 20], tx.inner.input())?
+                }
+            },
+            None => {
+                return Err(ForkCallError::ReplayTransactionError(
+                    ReplayTransactionError::TransactionNotFound(tx_hash.to_string(), fork_url),
+                ));
+            }
+        };
+
+        Ok(res)
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::namespace::CreateNamespace;
+    use alloy::eips::BlockNumberOrTag;
     use alloy::sol;
     use alloy::{
         primitives::{FixedBytes, U256},
@@ -663,5 +766,35 @@ mod tests {
             forker.executor.env().evm_env.block_env.number,
             block_number + 1
         );
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+    async fn test_fork_replay() {
+        let local_evm = LocalEvm::new().await;
+        let block_number = local_evm.provider.get_block_number().await.unwrap();
+        let tx_hash = local_evm
+            .provider
+            .get_block_by_number(BlockNumberOrTag::Number(block_number - 2))
+            .await
+            .unwrap()
+            .unwrap()
+            .transactions
+            .as_hashes()
+            .unwrap()[0];
+        let mut forker = Forker::new_with_fork(
+            NewForkedEvm {
+                fork_url: local_evm.url(),
+                fork_block_number: None,
+            },
+            None,
+            None,
+        )
+        .await
+        .unwrap();
+
+        let replay_result = forker.replay_transaction(tx_hash).await.unwrap();
+
+        assert!(replay_result.env.tx.caller == local_evm.anvil.addresses()[0]);
+        assert!(replay_result.exit_reason.is_ok());
     }
 }
