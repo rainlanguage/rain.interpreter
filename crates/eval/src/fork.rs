@@ -416,10 +416,11 @@ impl Forker {
         &mut self,
         tx_hash: B256,
     ) -> Result<RawCallResult, ForkCallError> {
-        // ensure we have a valid active fork url before proceeding
-        let fork_url = self.executor.backend().active_fork_url().ok_or(
-            ForkCallError::ReplayTransactionError(ReplayTransactionError::NoActiveFork),
-        )?;
+        let fork_url = self
+            .executor
+            .backend()
+            .active_fork_url()
+            .ok_or(ReplayTransactionError::NoActiveFork)?;
 
         // get the transaction
         let shared_backend = &self
@@ -465,15 +466,14 @@ impl Forker {
             block.header.base_fee_per_gas.unwrap_or_default();
         self.executor.env_mut().evm_env.block_env.gas_limit = block.header.gas_limit;
 
-        let _ = &self
-            .add_or_select(
-                NewForkedEvm {
-                    fork_url: fork_url.clone(),
-                    fork_block_number: Some(block_number - 1),
-                },
-                None,
-            )
-            .await;
+        self.add_or_select(
+            NewForkedEvm {
+                fork_url: fork_url.clone(),
+                fork_block_number: Some(block_number - 1),
+            },
+            None,
+        )
+        .await?;
 
         let active_fork_local_id = self
             .executor
