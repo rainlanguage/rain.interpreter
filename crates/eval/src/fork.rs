@@ -416,11 +416,10 @@ impl Forker {
         &mut self,
         tx_hash: B256,
     ) -> Result<RawCallResult, ForkCallError> {
-        let fork_url = self
-            .executor
-            .backend()
-            .active_fork_url()
-            .unwrap_or("No fork url found".to_string());
+        // ensure we have a valid active fork url before proceeding
+        let fork_url = self.executor.backend().active_fork_url().ok_or(
+            ForkCallError::ReplayTransactionError(ReplayTransactionError::NoActiveFork),
+        )?;
 
         // get the transaction
         let shared_backend = &self

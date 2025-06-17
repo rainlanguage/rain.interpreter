@@ -24,7 +24,7 @@ pub enum ForkCallError {
     #[error(transparent)]
     Eyre(#[from] eyre::Report),
     #[error("Replay transaction error: {:#?}", .0)]
-    ReplayTransactionError(ReplayTransactionError),
+    ReplayTransactionError(#[from] ReplayTransactionError),
 }
 
 #[derive(Debug, Error)]
