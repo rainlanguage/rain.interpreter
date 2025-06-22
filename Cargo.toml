@@ -11,8 +11,8 @@ homepage = "https://github.com/rainprotocol/rain.interpreter"
 alloy = { version = "1.0.9", features = ["sol-types", "json", "json-abi"] }
 anyhow = "1.0.70"
 clap = { version = "4.2.5", features = ["cargo", "derive"] }
-foundry-evm = { git = "https://github.com/foundry-rs/foundry", rev = "dc43e2c1ab70ec111d3272572e1732008f973a06" }
-foundry-evm-core = { git = "https://github.com/foundry-rs/foundry", rev = "dc43e2c1ab70ec111d3272572e1732008f973a06" }
+foundry-evm = { git = "https://github.com/foundry-rs/foundry", rev = "b3fe111c5d0382651617675c73987c2e37d36f24" }
+foundry-evm-core = { git = "https://github.com/foundry-rs/foundry", rev = "b3fe111c5d0382651617675c73987c2e37d36f24" }
 foundry-fork-db = "0.15.0"
 foundry-block-explorers = "0.18.0"
 revm = { version = "24.0.1", default-features = false, features = [
