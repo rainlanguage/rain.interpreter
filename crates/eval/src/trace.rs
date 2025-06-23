@@ -226,6 +226,13 @@ impl From<Vec<RainEvalResult>> for RainEvalResults {
 
 impl RainEvalResults {
     pub fn into_flattened_table(&self) -> RainEvalResultsTable {
+        if self.results.is_empty() {
+            return RainEvalResultsTable {
+                column_names: Vec::new(),
+                rows: Vec::new(),
+            };
+        }
+
         let column_names = flattened_trace_path_names(&self.results[0].traces);
 
         let rows = self
