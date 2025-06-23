@@ -1,11 +1,10 @@
-use std::ops::Deref;
-
 use crate::fork::ForkTypedReturn;
 use alloy::primitives::{Address, U256};
 use foundry_evm::executors::RawCallResult;
 use rain_interpreter_bindings::IInterpreterV4::{eval4Call, eval4Return};
-
 use revm::primitives::address;
+use serde::{Deserialize, Serialize};
+use std::ops::Deref;
 use thiserror::Error;
 
 pub const RAIN_TRACER_ADDRESS: Address = address!("F06Cd48c98d7321649dB7D8b2C396A81A2046555");
@@ -201,6 +200,87 @@ impl RainEvalResult {
                 )
             })
     }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[cfg_attr(target_family = "wasm", derive(Tsify))]
+pub struct RainEvalResultsTable {
+    pub column_names: Vec<String>,
+    #[cfg_attr(target_family = "wasm", tsify(type = "string[][]"))]
+    pub rows: Vec<Vec<U256>>,
+}
+#[cfg(target_family = "wasm")]
+impl_wasm_traits!(RainEvalResultsTable);
+
+#[derive(Debug, Clone)]
+pub struct RainEvalResults {
+    pub results: Vec<RainEvalResult>,
+}
+
+impl From<Vec<RainEvalResult>> for RainEvalResults {
+    fn from(results: Vec<RainEvalResult>) -> Self {
+        RainEvalResults { results }
+    }
+}
+
+impl RainEvalResults {
+    pub fn into_flattened_table(&self) -> RainEvalResultsTable {
+        let column_names = flattened_trace_path_names(&self.results[0].traces);
+
+        let rows = self
+            .results
+            .iter()
+            .map(|result| {
+                result
+                    .traces
+                    .iter()
+                    .flat_map(|trace| trace.stack.iter().rev().copied())
+                    .collect()
+            })
+            .collect();
+
+        RainEvalResultsTable {
+            column_names: column_names.to_vec(),
+            rows,
+        }
+    }
+}
+
+pub fn flattened_trace_path_names(traces: &[RainSourceTrace]) -> Vec<String> {
+    let mut path_names: Vec<String> = vec![];
+    let mut source_paths: Vec<String> = vec![];
+
+    for trace in traces.iter() {
+        let current_path = if trace.parent_source_index == trace.source_index {
+            format!("{}", trace.source_index)
+        } else {
+            source_paths
+                .iter()
+                .rev()
+                .find_map(|recent_path| {
+                    recent_path.split('.').next_back().and_then(|last_part| {
+                        if last_part == trace.parent_source_index.to_string() {
+                            Some(format!("{}.{}", recent_path, trace.source_index))
+                        } else {
+                            None
+                        }
+                    })
+                })
+                .unwrap_or(format!(
+                    "{}?.{}",
+                    trace.parent_source_index, trace.source_index
+                ))
+        };
+
+        for (index, _) in trace.stack.iter().enumerate() {
+            path_names.push(format!("{}.{}", current_path, index));
+        }
+
+        source_paths.push(current_path);
+    }
+
+    path_names
 }
 
 #[cfg(test)]
@@ -420,5 +500,38 @@ mod tests {
             result,
             Err(RainEvalResultFromRawCallResultError::MissingTraces)
         ));
+    }
+
+    #[test]
+    fn test_rain_eval_result_into_flattened_table() {
+        let trace1 = RainSourceTrace {
+            parent_source_index: 1,
+            source_index: 1, // Adjusted to match the test case
+            stack: vec![U256::from(1), U256::from(2)],
+        };
+        let trace2 = RainSourceTrace {
+            parent_source_index: 1, // Adjusted to match the parent_source_index
+            source_index: 2,
+            stack: vec![U256::from(3)],
+        };
+
+        let rain_eval_result = RainEvalResult {
+            reverted: false,
+            stack: vec![],
+            writes: vec![],
+            traces: vec![trace1, trace2],
+        };
+
+        let rain_eval_results = RainEvalResults {
+            results: vec![rain_eval_result],
+        };
+
+        let table = rain_eval_results.into_flattened_table();
+        assert_eq!(table.column_names, vec!["1.0", "1.1", "1.2.0"]);
+        assert_eq!(table.rows.len(), 1);
+        assert_eq!(
+            table.rows[0],
+            vec![U256::from(2), U256::from(1), U256::from(3)]
+        );
     }
 }
