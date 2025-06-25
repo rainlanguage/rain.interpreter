@@ -20,6 +20,15 @@ rain-error-decoding = { workspace = true }
 foundry-evm = { workspace = true }
 revm = { workspace = true }
 
+[target.'cfg(target_family = "wasm")'.dependencies]
+wasm-bindgen-utils.workspace = true
+revm = { version = "25.0.0", default-features = false, features = [
+    "kzg-rs",
+    "portable",
+    "std",
+    "tracer",
+] }
+
 [dev-dependencies]
 tracing = { workspace = true }
 rain_interpreter_test_fixtures = { workspace = true }
