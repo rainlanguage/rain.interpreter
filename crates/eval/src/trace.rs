@@ -254,6 +254,9 @@ impl RainEvalResults {
     }
 }
 
+/// Generates flattened trace path names based on parent-child relationships.
+/// Format: "parent.child.stack_index" where parent/child are source indices.
+/// Falls back to "parent?.child" when parent path cannot be resolved.
 pub fn flattened_trace_path_names(traces: &[RainSourceTrace]) -> Vec<String> {
     let mut path_names: Vec<String> = vec![];
     let mut source_paths: Vec<String> = vec![];
