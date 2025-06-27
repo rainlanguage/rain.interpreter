@@ -5,6 +5,7 @@ pragma solidity ^0.8.18;
 import {ParseState} from "../LibParseState.sol";
 import {LibParseError} from "../LibParseError.sol";
 import {LibParseDecimalFloat, Float} from "rain.math.float/lib/parse/LibParseDecimalFloat.sol";
+import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 library LibParseLiteralDecimal {
     using LibParseError for ParseState;
@@ -14,8 +15,8 @@ library LibParseLiteralDecimal {
         pure
         returns (uint256, bytes32)
     {
-        (bytes4 errorSelector, uint256 cursor, Float float) = LibParseDecimalFloat.parseDecimalFloatPacked(start, end);
+        (bytes4 errorSelector, uint256 cursor, int256 signedCoefficient, int256 exponent) = LibParseDecimalFloat.parseDecimalFloatInline(start, end);
         state.handleErrorSelector(cursor, errorSelector);
-        return (cursor, Float.unwrap(float));
+        return (cursor, Float.unwrap(LibDecimalFloat.packLossless(signedCoefficient, exponent)));
     }
 }
