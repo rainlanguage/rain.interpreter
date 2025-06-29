@@ -11,8 +11,8 @@ homepage = "https://github.com/rainprotocol/rain.interpreter"
 alloy = { version = "1.0.9", features = ["sol-types", "json", "json-abi"] }
 anyhow = "1.0.70"
 clap = { version = "4.2.5", features = ["cargo", "derive"] }
-foundry-evm = { git = "https://github.com/foundry-rs/foundry", rev = "dc43e2c1ab70ec111d3272572e1732008f973a06" }
-foundry-evm-core = { git = "https://github.com/foundry-rs/foundry", rev = "dc43e2c1ab70ec111d3272572e1732008f973a06" }
+foundry-evm = { git = "https://github.com/foundry-rs/foundry", rev = "ed86c645f037f1cc4e5c1583f074a7b2142c4f66" }
+foundry-evm-core = { git = "https://github.com/foundry-rs/foundry", rev = "ed86c645f037f1cc4e5c1583f074a7b2142c4f66" }
 foundry-fork-db = "0.15.0"
 foundry-block-explorers = "0.18.0"
 revm = { version = "24.0.1", default-features = false, features = [
@@ -35,6 +35,7 @@ once_cell = "1.17.1"
 alloy-ethers-typecast = { git = "https://github.com/rainlanguage/alloy-ethers-typecast", rev = "f7b5bfd0687f16c77dbfdd4905b2434793fa7885" }
 eyre = "0.6"
 rain-error-decoding = { git = "https://github.com/rainlanguage/rain.error", rev = "bf08b5ab305287fc49408a441d6375f35dc280db" }
+wasm-bindgen-utils = "0.0.10"
 
 [workspace.dependencies.rain_interpreter_parser]
 path = "crates/parser"
