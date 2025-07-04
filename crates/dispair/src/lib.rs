@@ -1,5 +1,5 @@
 use alloy::primitives::*;
-use alloy_ethers_typecast::transaction::{
+use alloy_ethers_typecast::{
     ReadContractParametersBuilder, ReadContractParametersBuilderError, ReadableClient,
     ReadableClientError,
 };

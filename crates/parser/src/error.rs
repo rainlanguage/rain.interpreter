@@ -1,4 +1,4 @@
-use alloy_ethers_typecast::transaction::{ReadContractParametersBuilderError, ReadableClientError};
+use alloy_ethers_typecast::{ReadContractParametersBuilderError, ReadableClientError};
 use thiserror::Error;
 
 #[derive(Error, Debug)]

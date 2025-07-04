@@ -1,6 +1,6 @@
 use crate::error::ParserError;
 use alloy::primitives::*;
-use alloy_ethers_typecast::transaction::{ReadContractParametersBuilder, ReadableClient};
+use alloy_ethers_typecast::{ReadContractParametersBuilder, ReadableClient};
 use rain_interpreter_bindings::IParserPragmaV1::*;
 use rain_interpreter_bindings::IParserV2::*;
 use rain_interpreter_dispair::DISPair;
