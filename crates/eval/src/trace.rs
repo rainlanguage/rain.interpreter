@@ -1,11 +1,17 @@
+#[cfg(not(target_family = "wasm"))]
 use crate::fork::ForkTypedReturn;
 use alloy::primitives::{Address, U256};
+#[cfg(not(target_family = "wasm"))]
 use foundry_evm::executors::RawCallResult;
+#[cfg(not(target_family = "wasm"))]
 use rain_interpreter_bindings::IInterpreterV4::{eval4Call, eval4Return};
 use revm::primitives::address;
 use serde::{Deserialize, Serialize};
+#[cfg(not(target_family = "wasm"))]
 use std::ops::Deref;
 use thiserror::Error;
+#[cfg(target_family = "wasm")]
+use wasm_bindgen_utils::{impl_wasm_traits, prelude::*};
 
 pub const RAIN_TRACER_ADDRESS: Address = address!("F06Cd48c98d7321649dB7D8b2C396A81A2046555");
 
@@ -19,6 +25,7 @@ pub struct RainSourceTrace {
     pub stack: Vec<U256>,
 }
 
+#[cfg(not(target_family = "wasm"))]
 impl RainSourceTrace {
     fn from_data(data: &[u8]) -> Option<Self> {
         if data.len() < 4 {
@@ -59,6 +66,7 @@ pub struct RainEvalResult {
     pub traces: Vec<RainSourceTrace>,
 }
 
+#[cfg(not(target_family = "wasm"))]
 impl From<ForkTypedReturn<eval4Call>> for RainEvalResult {
     fn from(typed_return: ForkTypedReturn<eval4Call>) -> Self {
         let eval4Return { stack, writes } = typed_return.typed_return;
@@ -94,6 +102,7 @@ pub enum RainEvalResultFromRawCallResultError {
     MissingTraces,
 }
 
+#[cfg(not(target_family = "wasm"))]
 impl TryFrom<RawCallResult> for RainEvalResult {
     type Error = RainEvalResultFromRawCallResultError;
 
