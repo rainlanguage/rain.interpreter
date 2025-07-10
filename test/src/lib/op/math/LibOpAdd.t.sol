@@ -115,64 +115,81 @@ contract LibOpAddTest is OpTest {
         checkHappy("_: add(0 0);", 0, "0 + 0");
     }
 
-    // /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
-    // /// Tests that adding 0 to 1 is 1.
-    // function testOpAddEval2InputsHappyZeroOne() external view {
-    //     checkHappy("_: add(0 1e-18);", 1, "0 + 1");
-    //     checkHappy("_: add(1e-18 0);", 1, "1 + 0");
-    // }
+    /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
+    /// Tests that adding 0 to 1 is 1.
+    function testOpAddEval2InputsHappyZeroOne() external view {
+        checkHappy("_: add(0 1);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "0 + 1");
+        checkHappy("_: add(1 0);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "0 + 1");
+        checkHappy("_: add(0 1e-18);", Float.unwrap(LibDecimalFloat.packLossless(1, -18)), "0 + 1");
+        checkHappy("_: add(1e-18 0);", Float.unwrap(LibDecimalFloat.packLossless(1, -18)), "1 + 0");
+    }
 
-    // /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
-    // /// Tests that adding 0 to max-value() is max-value().
-    // function testOpAddEval2InputsHappyZeroMax() external view {
-    //     checkHappy("_: add(0 max-value());", type(uint256).max, "0 + max-value()");
-    //     checkHappy("_: add(max-value() 0);", type(uint256).max, "max-value() + 0");
-    // }
+    /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
+    /// Tests that adding 0 to max-value() is max-value().
+    function testOpAddEval2InputsHappyZeroMax() external view {
+        checkHappy(
+            "_: add(0 max-value());",
+            Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)),
+            "0 + max-value()"
+        );
+        checkHappy(
+            "_: add(max-value() 0);",
+            Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)),
+            "max-value() + 0"
+        );
+    }
 
-    //     /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
-    //     /// Tests the unhappy path where the addition does overflow.
-    //     function testOpAddEval2InputsUnhappy() external {
-    //         checkUnhappyOverflow("_: add(max-value() 1e-18);");
-    //         checkUnhappyOverflow("_: add(1e-18 max-value());");
-    //     }
+    /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
+    /// Tests the unhappy path where the addition does overflow.
+    function testOpAddEval2InputsUnhappy() external {
+        checkUnhappyOverflow("_: add(max-value() 1e-18);", 13479973333575319897333507543509815336, 2147483677);
+        checkUnhappyOverflow("_: add(1e-18 max-value());", 13479973333575319897333507543509815336, 2147483677);
+    }
 
-    // /// Test the eval of `add` opcode parsed from a string. Tests three inputs.
-    // /// Tests the happy path where the addition does not overflow.
-    // function testOpAddEval3InputsHappy() external view {
-    //     checkHappy("_: add(5e-18 6e-18 7e-18);", 18, "5 + 6 + 7");
-    //     checkHappy("_: add(6e-18 5e-18 7e-18);", 18, "6 + 5 + 7");
-    //     checkHappy("_: add(7e-18 6e-18 5e-18);", 18, "7 + 6 + 5");
-    //     checkHappy("_: add(5e-18 7e-18 6e-18);", 18, "5 + 7 + 6");
-    //     checkHappy("_: add(6e-18 7e-18 5e-18);", 18, "6 + 7 + 5");
-    //     checkHappy("_: add(7e-18 5e-18 6e-18);", 18, "7 + 5 + 6");
-    // }
+    /// Test the eval of `add` opcode parsed from a string. Tests three inputs.
+    /// Tests the happy path where the addition does not overflow.
+    function testOpAddEval3InputsHappy() external view {
+        checkHappy("_: add(5e-18 6e-18 7e-18);", Float.unwrap(LibDecimalFloat.packLossless(18e37, -55)), "5 + 6 + 7");
+        checkHappy("_: add(6e-18 5e-18 7e-18);", Float.unwrap(LibDecimalFloat.packLossless(18e37, -55)), "6 + 5 + 7");
+        checkHappy("_: add(7e-18 6e-18 5e-18);", Float.unwrap(LibDecimalFloat.packLossless(18e37, -55)), "7 + 6 + 5");
+        checkHappy("_: add(5e-18 7e-18 6e-18);", Float.unwrap(LibDecimalFloat.packLossless(18e37, -55)), "5 + 7 + 6");
+        checkHappy("_: add(7e-18 5e-18 6e-18);", Float.unwrap(LibDecimalFloat.packLossless(18e37, -55)), "7 + 5 + 6");
+    }
 
-    //     /// Test the eval of `add` opcode parsed from a string. Tests three inputs.
-    //     /// Tests the unhappy path where the addition does overflow.
-    //     function testOpAddEval3InputsUnhappy() external {
-    //         checkUnhappyOverflow("_: add(max-value() 1e-18 1e-18);");
-    //         checkUnhappyOverflow("_: add(1e-18 max-value() 1e-18);");
-    //         checkUnhappyOverflow("_: add(1e-18 1e-18 max-value());");
-    //         checkUnhappyOverflow("_: add(max-value() max-value() 1e-18);");
-    //         checkUnhappyOverflow("_: add(max-value() 1e-18 max-value());");
-    //         checkUnhappyOverflow("_: add(1e-18 max-value() max-value());");
-    //         checkUnhappyOverflow("_: add(max-value() max-value() max-value());");
-    //         checkUnhappyOverflow("_: add(max-value() 1e-18 0);");
-    //         checkUnhappyOverflow("_: add(1e-18 max-value() 0);");
-    //         checkUnhappyOverflow("_: add(1e-18 0 max-value());");
-    //         checkUnhappyOverflow("_: add(max-value() max-value() 0);");
-    //         checkUnhappyOverflow("_: add(max-value() 0 max-value());");
-    //         checkUnhappyOverflow("_: add(0 max-value() max-value());");
-    //     }
+    /// Test the eval of `add` opcode parsed from a string. Tests three inputs.
+    /// Tests the unhappy path where the addition does overflow.
+    function testOpAddEval3InputsUnhappy() external {
+        checkUnhappyOverflow("_: add(max-value() 1e-18 1e-18);", 13479973333575319897333507543509815336, 2147483677);
+        checkUnhappyOverflow("_: add(1e-18 max-value() 1e-18);", 13479973333575319897333507543509815336, 2147483677);
+        checkUnhappyOverflow("_: add(1e-18 1e-18 max-value());", 13479973333575319897333507543509815336, 2147483677);
+        checkUnhappyOverflow(
+            "_: add(max-value() max-value() 1e-18);", 26959946667150639794667015087019630672, 2147483677
+        );
+        checkUnhappyOverflow(
+            "_: add(max-value() 1e-18 max-value());", 13479973333575319897333507543509815336, 2147483677
+        );
+        checkUnhappyOverflow(
+            "_: add(1e-18 max-value() max-value());", 13479973333575319897333507543509815336, 2147483677
+        );
+        checkUnhappyOverflow(
+            "_: add(max-value() max-value() max-value());", 26959946667150639794667015087019630672, 2147483677
+        );
+        checkUnhappyOverflow("_: add(max-value() 1e-18 0);", 13479973333575319897333507543509815336, 2147483677);
+        checkUnhappyOverflow("_: add(1e-18 max-value() 0);", 13479973333575319897333507543509815336, 2147483677);
+        checkUnhappyOverflow("_: add(1e-18 0 max-value());", 13479973333575319897333507543509815336, 2147483677);
+        checkUnhappyOverflow("_: add(max-value() max-value() 0);", 26959946667150639794667015087019630672, 2147483677);
+        checkUnhappyOverflow("_: add(max-value() 0 max-value());", 26959946667150639794667015087019630672, 2147483677);
+        checkUnhappyOverflow("_: add(0 max-value() max-value());", 26959946667150639794667015087019630672, 2147483677);
+    }
 
-    //     /// Test the eval of `add` opcode parsed from a string.
-    //     /// Tests that operands are disallowed.
-    //     function testOpAddEvalOperandDisallowed() external {
-    //         checkDisallowedOperand("_: add<0>(0 0 0);");
-    //         checkDisallowedOperand("_: add<1>(0 0 0);");
-    //         checkDisallowedOperand("_: add<2>(0 0 0);");
-    //         checkDisallowedOperand("_: add<0 0>(0 0 0);");
-    //         checkDisallowedOperand("_: add<0 1>(0 0 0);");
-    //         checkDisallowedOperand("_: add<1 0>(0 0 0);");
-    //     }
+    /// Test the eval of `add` opcode parsed from a string.
+    /// Tests that operands are disallowed.
+    function testOpAddEvalOperandDisallowed() external {
+        checkDisallowedOperand("_: add<0>(0 0 0);");
+        checkDisallowedOperand("_: add<1>(0 0 0);");
+        checkDisallowedOperand("_: add<2>(0 0 0);");
+        checkDisallowedOperand("_: add<0 0>(0 0 0);");
+        checkDisallowedOperand("_: add<0 1>(0 0 0);");
+        checkDisallowedOperand("_: add<1 0>(0 0 0);");
+    }
 }
