@@ -5,6 +5,7 @@ import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpre
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
+import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
@@ -52,20 +53,20 @@ library LibOpAdd {
     }
 
     /// Gas intensive reference implementation of addition for testing.
-    function referenceFn(InterpreterState memory, OperandV2, bytes32[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure
-        returns (bytes32[] memory outputs)
+        returns (StackItem[] memory outputs)
     {
         // Unchecked so that when we assert that an overflow error is thrown, we
         // see the revert from the real function and not the reference function.
         unchecked {
-            Float acc = Float.wrap(inputs[0]);
+            Float acc = Float.wrap(StackItem.unwrap(inputs[0]));
             for (uint256 i = 1; i < inputs.length; i++) {
-                acc = LibDecimalFloat.add(acc, Float.wrap(inputs[i]));
+                acc = LibDecimalFloat.add(acc, Float.wrap(StackItem.unwrap(inputs[i])));
             }
-            outputs = new bytes32[](1);
-            outputs[0] = Float.unwrap(acc);
+            outputs = new StackItem[](1);
+            outputs[0] = StackItem.wrap(Float.unwrap(acc));
         }
     }
 }
