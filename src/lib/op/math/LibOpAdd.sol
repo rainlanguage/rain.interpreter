@@ -6,6 +6,8 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 
+import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+
 /// @title LibOpAdd
 /// @notice Opcode to add N numbers. Errors on overflow.
 library LibOpAdd {
@@ -16,17 +18,16 @@ library LibOpAdd {
         return (inputs, 1);
     }
 
-    /// add
-    /// Addition with implied overflow checks from the Solidity 0.8.x compiler.
+    /// float add
     function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
-        uint256 a;
-        uint256 b;
+        Float a;
+        Float b;
         assembly ("memory-safe") {
             a := mload(stackTop)
             b := mload(add(stackTop, 0x20))
             stackTop := add(stackTop, 0x40)
         }
-        a += b;
+        a = LibDecimalFloat.add(a, b);
 
         {
             uint256 inputs = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
@@ -36,7 +37,7 @@ library LibOpAdd {
                     b := mload(stackTop)
                     stackTop := add(stackTop, 0x20)
                 }
-                a += b;
+                a = LibDecimalFloat.add(a, b);
                 unchecked {
                     i++;
                 }
@@ -51,20 +52,20 @@ library LibOpAdd {
     }
 
     /// Gas intensive reference implementation of addition for testing.
-    function referenceFn(InterpreterState memory, OperandV2, uint256[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2, bytes32[] memory inputs)
         internal
         pure
-        returns (uint256[] memory outputs)
+        returns (bytes32[] memory outputs)
     {
         // Unchecked so that when we assert that an overflow error is thrown, we
         // see the revert from the real function and not the reference function.
         unchecked {
-            uint256 acc = inputs[0];
+            Float acc = Float.wrap(inputs[0]);
             for (uint256 i = 1; i < inputs.length; i++) {
-                acc += inputs[i];
+                acc = LibDecimalFloat.add(acc, Float.wrap(inputs[i]));
             }
-            outputs = new uint256[](1);
-            outputs[0] = acc;
+            outputs = new bytes32[](1);
+            outputs[0] = Float.unwrap(acc);
         }
     }
 }
