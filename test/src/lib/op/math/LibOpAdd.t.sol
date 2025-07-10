@@ -87,31 +87,33 @@ contract LibOpAddTest is OpTest {
         checkBadInputs("_: add();", 0, 2, 0);
     }
 
-    //     /// Test the eval of `add` opcode parsed from a string. Tests one input.
-    //     function testOpAddEvalOneInput() external {
-    //         checkBadInputs("_: add(5e-18);", 1, 2, 1);
-    //     }
+    /// Test the eval of `add` opcode parsed from a string. Tests one input.
+    function testOpAddEvalOneInput() external {
+        checkBadInputs("_: add(5e-18);", 1, 2, 1);
+    }
 
-    //     function testOpAddEvalZeroOutputs() external {
-    //         checkBadOutputs(": add(5e-18 6e-18);", 2, 1, 0);
-    //     }
+    function testOpAddEvalZeroOutputs() external {
+        checkBadOutputs(": add(5e-18 6e-18);", 2, 1, 0);
+    }
 
-    //     function testOpAddEvalTwoOutput() external {
-    //         checkBadOutputs("_ _: add(5e-18 6e-18);", 2, 1, 2);
-    //     }
+    function testOpAddEvalTwoOutput() external {
+        checkBadOutputs("_ _: add(5e-18 6e-18);", 2, 1, 2);
+    }
 
-    // /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
-    // /// Tests the happy path where the addition does not overflow.
-    // function testOpAddEval2InputsHappy() external view {
-    //     checkHappy("_: add(5e-18 6e-18);", 11, "5 + 6");
-    //     checkHappy("_: add(6e-18 5e-18);", 11, "6 + 5");
-    // }
+    /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
+    /// Tests the happy path where the addition does not overflow.
+    function testOpAddEval2InputsHappy() external view {
+        checkHappy("_: add(5 6);", Float.unwrap(LibDecimalFloat.packLossless(11e37, -37)), "5 + 6");
 
-    // /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
-    // /// Tests that adding 0 to 0 is 0.
-    // function testOpAddEval2InputsHappyZero() external view {
-    //     checkHappy("_: add(0 0);", 0, "0 + 0");
-    // }
+        checkHappy("_: add(5e-18 6e-18);", Float.unwrap(LibDecimalFloat.packLossless(11e37, -55)), "5e-18 + 6e-18");
+        checkHappy("_: add(6e-18 5e-18);", Float.unwrap(LibDecimalFloat.packLossless(11e37, -55)), "6 + 5");
+    }
+
+    /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
+    /// Tests that adding 0 to 0 is 0.
+    function testOpAddEval2InputsHappyZero() external view {
+        checkHappy("_: add(0 0);", 0, "0 + 0");
+    }
 
     // /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
     // /// Tests that adding 0 to 1 is 1.
