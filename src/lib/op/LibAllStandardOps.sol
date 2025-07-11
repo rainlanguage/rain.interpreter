@@ -93,7 +93,7 @@ import {LibOpMod} from "./math/LibOpMod.sol";
 // import {LibOpScaleN} from "./math/LibOpScaleN.sol";
 // import {LibOpSnapToUnit} from "./math/LibOpSnapToUnit.sol";
 // import {LibOpSqrt} from "./math/LibOpSqrt.sol";
-// import {LibOpSub} from "./math/LibOpSub.sol";
+import {LibOpSub} from "./math/LibOpSub.sol";
 
 import {LibOpGet} from "./store/LibOpGet.sol";
 import {LibOpSet} from "./store/LibOpSet.sol";
@@ -105,7 +105,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 28;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 29;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -305,10 +305,7 @@ library LibAllStandardOps {
             //     "Rounds a number to the nearest whole number if it is within the threshold distance from that whole number. The first input is the threshold and the second is the value to snap to the nearest unit."
             // ),
             // AuthoringMetaV2("sqrt", "Calculates the square root of the input. Errors if the input is negative."),
-            // AuthoringMetaV2(
-            //     "sub",
-            //     "Subtracts all numbers from the first number. The optional operand controls whether subtraction will saturate at 0. The default behaviour, and what will happen if the operand is 0, is that negative values are an error. If the operand is 1, the word will saturate at 0 (e.g. 1-2=0)."
-            // ),
+            AuthoringMetaV2("sub", "Subtracts all numbers from the first number."),
             // AuthoringMetaV2("saturating-sub", "Subtracts all numbers from the first number. Saturates at 0 (e.g. 1-2=0)."),
             AuthoringMetaV2("get", "Gets a value from storage. The first operand is the key to lookup."),
             AuthoringMetaV2(
@@ -509,8 +506,8 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // // sqrt
                     // LibParseOperand.handleOperandDisallowed,
-                    // // sub
-                    // LibParseOperand.handleOperandSingleFull,
+                    // sub
+                    LibParseOperand.handleOperandSingleFull,
                     // // saturating-sub
                     // LibParseOperand.handleOperandDisallowedAlwaysOne,
                     // get
@@ -623,7 +620,7 @@ library LibAllStandardOps {
                     // LibOpScaleNDynamic.integrity,
                     // LibOpSnapToUnit.integrity,
                     // LibOpSqrt.integrity,
-                    // LibOpSub.integrity,
+                    LibOpSub.integrity,
                     // // saturating-sub is a repeat of sub.
                     // LibOpSub.integrity,
                     LibOpGet.integrity,
@@ -737,7 +734,7 @@ library LibAllStandardOps {
                     // LibOpScaleNDynamic.run,
                     // LibOpSnapToUnit.run,
                     // LibOpSqrt.run,
-                    // LibOpSub.run,
+                    LibOpSub.run,
                     // // saturating-sub is a repeat of sub.
                     // LibOpSub.run,
                     LibOpGet.run,
