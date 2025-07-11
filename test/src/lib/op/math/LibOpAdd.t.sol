@@ -53,29 +53,27 @@ contract LibOpAddTest is OpTest {
         vm.assume(inputs.length <= 0x0F);
         OperandV2 operand = LibOperand.build(uint8(inputs.length), 1, 0);
         uint256 overflows = 0;
-        unchecked {
-            (int256 signedCoefficientA, int256 exponentA) =
-                LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(inputs[0])));
-            if (int32(exponentA) != exponentA) {
+        (int256 signedCoefficientA, int256 exponentA) = LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(inputs[0])));
+        if (int32(exponentA) != exponentA) {
+            overflows++;
+        }
+
+        for (uint256 i = 1; i < inputs.length; i++) {
+            (int256 signedCoefficientB, int256 exponentB) =
+                LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(inputs[i])));
+
+            if (int32(exponentB) != exponentB) {
                 overflows++;
             }
 
-            for (uint256 i = 1; i < inputs.length; i++) {
-                (int256 signedCoefficientB, int256 exponentB) =
-                    LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(inputs[i])));
+            (signedCoefficientA, exponentA) =
+                LibDecimalFloatImplementation.add(signedCoefficientA, exponentA, signedCoefficientB, exponentB);
 
-                if (int32(exponentB) != exponentB) {
-                    overflows++;
-                }
-
-                (signedCoefficientA, exponentA) =
-                    LibDecimalFloatImplementation.add(signedCoefficientA, exponentA, signedCoefficientB, exponentB);
-
-                if (int32(exponentA) != exponentA) {
-                    overflows++;
-                }
+            if (int32(exponentA) != exponentA) {
+                overflows++;
             }
         }
+
         if (overflows > 0) {
             vm.expectRevert();
         }

@@ -6,6 +6,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 /// @title LibOpDiv
 /// @notice Opcode to div N 18 decimal fixed point values. Errors on overflow.
@@ -54,17 +55,17 @@ library LibOpDiv {
     }
 
     /// Gas intensive reference implementation of division for testing.
-    function referenceFn(InterpreterState memory, OperandV2, bytes32[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure
-        returns (bytes32[] memory outputs)
+        returns (StackItem[] memory outputs)
     {
         // Unchecked so that when we assert that an overflow error is thrown, we
         // see the revert from the real function and not the reference function.
         unchecked {
-            Float a = Float.wrap(inputs[0]);
+            Float a = Float.wrap(StackItem.unwrap(inputs[0]));
             for (uint256 i = 1; i < inputs.length; i++) {
-                Float b = Float.wrap(inputs[i]);
+                Float b = Float.wrap(StackItem.unwrap(inputs[i]));
                 // Just bail out with a = some sentinel value if we're going to
                 // overflow or divide by zero. This gives the real implementation
                 // space to throw its own error that the test harness is expecting.
@@ -77,8 +78,8 @@ library LibOpDiv {
                 }
                 a = LibDecimalFloat.div(a, b);
             }
-            outputs = new bytes32[](1);
-            outputs[0] = Float.unwrap(a);
+            outputs = new StackItem[](1);
+            outputs[0] = StackItem.wrap(Float.unwrap(a));
         }
     }
 }
