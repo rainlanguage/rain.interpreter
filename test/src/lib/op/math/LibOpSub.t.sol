@@ -84,25 +84,12 @@ contract LibOpSubTest is OpTest {
         checkBadInputs("_: sub();", 0, 2, 0);
     }
 
-    /// Test the eval of `sub` opcode parsed from a string. Tests zero inputs.
-    function testOpSubEvalZeroInputsSaturating() external {
-        checkBadInputs("_: sub<1>();", 0, 2, 0);
-    }
-
     /// Test the eval of `sub` opcode parsed from a string. Tests one input.
     function testOpSubEvalOneInput() external {
         checkBadInputs("_: sub(5e-18);", 1, 2, 1);
         checkBadInputs("_: sub(0);", 1, 2, 1);
         checkBadInputs("_: sub(1e-18);", 1, 2, 1);
         checkBadInputs("_: sub(max-value());", 1, 2, 1);
-    }
-
-    /// Test the eval of `sub` opcode parsed from a string. Tests one input.
-    function testOpSubEvalOneInputSaturating() external {
-        checkBadInputs("_: sub<1>(5e-18);", 1, 2, 1);
-        checkBadInputs("_: sub<1>(0);", 1, 2, 1);
-        checkBadInputs("_: sub<1>(1e-18);", 1, 2, 1);
-        checkBadInputs("_: sub<1>(max-value());", 1, 2, 1);
     }
 
     /// Test the eval of `sub` opcode parsed from a string. Tests two inputs.
