@@ -7,6 +7,7 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {LibDecimalFloatImplementation} from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
+import {ExponentOverflow, CoefficientOverflow} from "rain.math.float/error/ErrDecimalFloat.sol";
 
 contract LibOpMulTest is OpTest {
     /// Directly test the integrity logic of LibOpMul. This tests the
@@ -47,42 +48,17 @@ contract LibOpMulTest is OpTest {
         );
     }
 
-    // /// Directly test the runtime logic of LibOpMul.
-    // function testOpMulRun(StackItem[] memory inputs) public {
-    //     vm.assume(inputs.length >= 2);
-    //     vm.assume(inputs.length <= 0x0F);
-    //     OperandV2 operand = LibOperand.build(uint8(inputs.length), 1, 0);
+    /// Directly test the runtime logic of LibOpMul.
+    function testOpMulRun(StackItem[] memory inputs) public view {
+        vm.assume(inputs.length >= 2);
+        vm.assume(inputs.length <= 0x0F);
+        OperandV2 operand = LibOperand.build(uint8(inputs.length), 1, 0);
 
-    //     (int256 signedCoefficientA, int256 exponentA) =
-    //         LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(inputs[0])));
-
-    //     uint256 overflows = 0;
-    //     // if (int32(exponentA) != exponentA || int224(signedCoefficientA) != signedCoefficientA) {
-    //     //     overflows++;
-    //     // }
-
-    //     for (uint256 i = 1; i < inputs.length; i++) {
-    //         (int256 signedCoefficientB, int256 exponentB) =
-    //             LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(inputs[i])));
-    //         // if (int32(exponentB) != exponentB || int224(signedCoefficientB) != signedCoefficientB) {
-    //         //     overflows++;
-    //         // }
-
-    //         (signedCoefficientA, exponentA) =
-    //             LibDecimalFloatImplementation.mul(signedCoefficientA, exponentA, signedCoefficientB, exponentB);
-
-    //         if (int32(exponentA) != exponentA || int224(signedCoefficientA) != signedCoefficientA) {
-    //             overflows++;
-    //         }
-
-    //     }
-
-    //     if (overflows > 0) {
-    //         vm.expectRevert();
-    //     }
-
-    //     this._testOpMulRun(operand, inputs);
-    // }
+        try this._testOpMulRun(operand, inputs) {}
+        catch (bytes memory err) {
+            assert(bytes4(err) == CoefficientOverflow.selector || bytes4(err) == ExponentOverflow.selector);
+        }
+    }
 
     /// Test the eval of `mul` opcode parsed from a string.
     /// Tests zero inputs.
@@ -129,16 +105,14 @@ contract LibOpMulTest is OpTest {
         );
     }
 
-    //     /// Test the eval of `mul` opcode parsed from a string.
-    //     /// Tests two inputs.
-    //     /// Tests the unhappy path where the final result overflows.
-    //     function testOpMulEvalTwoInputsUnhappyOverflow() external {
-    //         checkUnhappy(
-    //             "_: mul(max-value() 10);",
-    //             abi.encodeWithSelector(PRBMath_MulDiv18_Overflow.selector, type(uint256).max, 1e19)
-    //         );
-    //         checkUnhappy("_: mul(1e52 1e12);", abi.encodeWithSelector(PRBMath_MulDiv18_Overflow.selector, 1e70, 1e30));
-    //     }
+    /// Test the eval of `mul` opcode parsed from a string.
+    /// Tests two inputs.
+    /// Tests the unhappy path where the final result overflows.
+    function testOpMulEvalTwoInputsUnhappyOverflow() external {
+        checkUnhappyOverflow(
+            "_: mul(max-value() 10);", 13479973333575319897333507543509815336818572211270286240551805124607, 2147483648
+        );
+    }
 
     /// Test the eval of `mul` opcode parsed from a string.
     /// Tests three inputs.
@@ -165,17 +139,16 @@ contract LibOpMulTest is OpTest {
         );
     }
 
-    //     /// Test the eval of `mul` opcode parsed from a string.
-    //     /// Tests three inputs.
-    //     /// Tests the unhappy path where the final result overflows.
-    //     function testOpMulEvalThreeInputsUnhappyOverflow() external {
-    //         checkUnhappy(
-    //             "_: mul(max-value() 1 10);",
-    //             abi.encodeWithSelector(PRBMath_MulDiv18_Overflow.selector, type(uint256).max, 1e19)
-    //         );
-    //         checkUnhappy("_: mul(1e52 1 1e8);", abi.encodeWithSelector(PRBMath_MulDiv18_Overflow.selector, 1e70, 1e26));
-    //         checkUnhappy("_: mul(1e52 1e8 1);", abi.encodeWithSelector(PRBMath_MulDiv18_Overflow.selector, 1e70, 1e26));
-    //     }
+    /// Test the eval of `mul` opcode parsed from a string.
+    /// Tests three inputs.
+    /// Tests the unhappy path where the final result overflows.
+    function testOpMulEvalThreeInputsUnhappyOverflow() external {
+        checkUnhappyOverflow(
+            "_: mul(max-value() 1 10);",
+            13479973333575319897333507543509815336818572211270286240551805124607,
+            2147483648
+        );
+    }
 
     /// Test the eval of `mul` opcode parsed from a string.
     /// Tests that operands are disallowed.
