@@ -306,7 +306,6 @@ library LibAllStandardOps {
             // ),
             // AuthoringMetaV2("sqrt", "Calculates the square root of the input. Errors if the input is negative."),
             AuthoringMetaV2("sub", "Subtracts all numbers from the first number."),
-            // AuthoringMetaV2("saturating-sub", "Subtracts all numbers from the first number. Saturates at 0 (e.g. 1-2=0)."),
             AuthoringMetaV2("get", "Gets a value from storage. The first operand is the key to lookup."),
             AuthoringMetaV2(
                 "set",
@@ -508,8 +507,6 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // sub
                     LibParseOperand.handleOperandSingleFull,
-                    // // saturating-sub
-                    // LibParseOperand.handleOperandDisallowedAlwaysOne,
                     // get
                     LibParseOperand.handleOperandDisallowed,
                     // set
@@ -621,8 +618,6 @@ library LibAllStandardOps {
                     // LibOpSnapToUnit.integrity,
                     // LibOpSqrt.integrity,
                     LibOpSub.integrity,
-                    // // saturating-sub is a repeat of sub.
-                    // LibOpSub.integrity,
                     LibOpGet.integrity,
                     LibOpSet.integrity
                 ];
@@ -735,8 +730,6 @@ library LibAllStandardOps {
                     // LibOpSnapToUnit.run,
                     // LibOpSqrt.run,
                     LibOpSub.run,
-                    // // saturating-sub is a repeat of sub.
-                    // LibOpSub.run,
                     LibOpGet.run,
                     LibOpSet.run
                 ];
