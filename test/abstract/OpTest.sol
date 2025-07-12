@@ -25,6 +25,7 @@ import {
 import {FullyQualifiedNamespace, StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibNamespace} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
+import {ExponentOverflow} from "rain.math.float/error/ErrDecimalFloat.sol";
 
 bytes32 constant PRE = keccak256(abi.encodePacked("pre"));
 bytes32 constant POST = keccak256(abi.encodePacked("post"));
@@ -260,8 +261,8 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
         }
     }
 
-    function checkUnhappyOverflow(bytes memory rainString) internal {
-        checkUnhappy(rainString, stdError.arithmeticError);
+    function checkUnhappyOverflow(bytes memory rainString, int256 signedCoefficient, int256 exponent) internal {
+        checkUnhappy(rainString, abi.encodeWithSelector(ExponentOverflow.selector, signedCoefficient, exponent));
     }
 
     function checkUnhappy(bytes memory rainString, bytes memory err) internal {

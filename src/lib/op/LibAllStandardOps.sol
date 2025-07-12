@@ -70,7 +70,7 @@ import {LibOpAdd} from "./math/LibOpAdd.sol";
 // import {LibOpAvg} from "./math/LibOpAvg.sol";
 // import {LibOpCeil} from "./math/LibOpCeil.sol";
 // import {LibOpMul} from "./math/LibOpMul.sol";
-// import {LibOpDiv} from "./math/LibOpDiv.sol";
+import {LibOpDiv} from "./math/LibOpDiv.sol";
 // import {LibOpE} from "./math/LibOpE.sol";
 // import {LibOpExp} from "./math/LibOpExp.sol";
 // import {LibOpExp2} from "./math/LibOpExp2.sol";
@@ -93,7 +93,7 @@ import {LibOpMod} from "./math/LibOpMod.sol";
 // import {LibOpScaleN} from "./math/LibOpScaleN.sol";
 // import {LibOpSnapToUnit} from "./math/LibOpSnapToUnit.sol";
 // import {LibOpSqrt} from "./math/LibOpSqrt.sol";
-// import {LibOpSub} from "./math/LibOpSub.sol";
+import {LibOpSub} from "./math/LibOpSub.sol";
 
 import {LibOpGet} from "./store/LibOpGet.sol";
 import {LibOpSet} from "./store/LibOpSet.sol";
@@ -105,7 +105,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 26;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 29;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -246,10 +246,10 @@ library LibAllStandardOps {
             //     "uint256-power",
             //     "Raises the first input to the power of all other inputs as uint256 values. Errors if the exponentiation exceeds `max-value()`."
             // ),
-            // AuthoringMetaV2("add", "Adds all numbers together. Errors if the addition exceeds `max-value()`."),
+            AuthoringMetaV2("add", "Adds all numbers together."),
             // AuthoringMetaV2("avg", "Arithmetic average (mean) of two numbers."),
             // AuthoringMetaV2("ceil", "Ceiling of a number."),
-            // AuthoringMetaV2("div", "Divides the first number by all other numbers. Errors if any divisor is zero."),
+            AuthoringMetaV2("div", "Divides the first number by all other numbers. Errors if any divisor is zero."),
             // AuthoringMetaV2("e", "The mathematical constant e."),
             // AuthoringMetaV2("exp", "Natural exponential e^x. Errors if the exponentiation exceeds `max-value()`."),
             // AuthoringMetaV2("exp2", "Binary exponential 2^x where x. Errors if the exponentiation exceeds `max-value()`."),
@@ -305,11 +305,7 @@ library LibAllStandardOps {
             //     "Rounds a number to the nearest whole number if it is within the threshold distance from that whole number. The first input is the threshold and the second is the value to snap to the nearest unit."
             // ),
             // AuthoringMetaV2("sqrt", "Calculates the square root of the input. Errors if the input is negative."),
-            // AuthoringMetaV2(
-            //     "sub",
-            //     "Subtracts all numbers from the first number. The optional operand controls whether subtraction will saturate at 0. The default behaviour, and what will happen if the operand is 0, is that negative values are an error. If the operand is 1, the word will saturate at 0 (e.g. 1-2=0)."
-            // ),
-            // AuthoringMetaV2("saturating-sub", "Subtracts all numbers from the first number. Saturates at 0 (e.g. 1-2=0)."),
+            AuthoringMetaV2("sub", "Subtracts all numbers from the first number."),
             AuthoringMetaV2("get", "Gets a value from storage. The first operand is the key to lookup."),
             AuthoringMetaV2(
                 "set",
@@ -451,14 +447,14 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // // uint256-power
                     // LibParseOperand.handleOperandDisallowed,
-                    // // add
-                    // LibParseOperand.handleOperandDisallowed,
+                    // add
+                    LibParseOperand.handleOperandDisallowed,
                     // // avg
                     // LibParseOperand.handleOperandDisallowed,
                     // // ceil
                     // LibParseOperand.handleOperandDisallowed,
-                    // // div
-                    // LibParseOperand.handleOperandDisallowed,
+                    // div
+                    LibParseOperand.handleOperandDisallowed,
                     // // e
                     // LibParseOperand.handleOperandDisallowed,
                     // // exp
@@ -509,10 +505,8 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // // sqrt
                     // LibParseOperand.handleOperandDisallowed,
-                    // // sub
-                    // LibParseOperand.handleOperandSingleFull,
-                    // // saturating-sub
-                    // LibParseOperand.handleOperandDisallowedAlwaysOne,
+                    // sub
+                    LibParseOperand.handleOperandSingleFull,
                     // get
                     LibParseOperand.handleOperandDisallowed,
                     // set
@@ -592,10 +586,10 @@ library LibAllStandardOps {
                     // LibOpUint256Div.integrity,
                     // LibOpUint256Mul.integrity,
                     // LibOpUint256Pow.integrity,
-                    // LibOpAdd.integrity,
+                    LibOpAdd.integrity,
                     // LibOpAvg.integrity,
                     // LibOpCeil.integrity,
-                    // LibOpDiv.integrity,
+                    LibOpDiv.integrity,
                     // LibOpE.integrity,
                     // LibOpExp.integrity,
                     // LibOpExp2.integrity,
@@ -623,9 +617,7 @@ library LibAllStandardOps {
                     // LibOpScaleNDynamic.integrity,
                     // LibOpSnapToUnit.integrity,
                     // LibOpSqrt.integrity,
-                    // LibOpSub.integrity,
-                    // // saturating-sub is a repeat of sub.
-                    // LibOpSub.integrity,
+                    LibOpSub.integrity,
                     LibOpGet.integrity,
                     LibOpSet.integrity
                 ];
@@ -706,10 +698,10 @@ library LibAllStandardOps {
                     // LibOpUint256Div.run,
                     // LibOpUint256Mul.run,
                     // LibOpUint256Pow.run,
-                    // LibOpAdd.run,
+                    LibOpAdd.run,
                     // LibOpAvg.run,
                     // LibOpCeil.run,
-                    // LibOpDiv.run,
+                    LibOpDiv.run,
                     // LibOpE.run,
                     // LibOpExp.run,
                     // LibOpExp2.run,
@@ -737,9 +729,7 @@ library LibAllStandardOps {
                     // LibOpScaleNDynamic.run,
                     // LibOpSnapToUnit.run,
                     // LibOpSqrt.run,
-                    // LibOpSub.run,
-                    // // saturating-sub is a repeat of sub.
-                    // LibOpSub.run,
+                    LibOpSub.run,
                     LibOpGet.run,
                     LibOpSet.run
                 ];
