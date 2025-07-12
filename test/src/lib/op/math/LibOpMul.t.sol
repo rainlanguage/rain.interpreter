@@ -1,66 +1,70 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-// import {LibPointer} from "rain.solmem/lib/LibPointer.sol";
-// import {LibOpMul} from "src/lib/op/math/LibOpMul.sol";
-// import {Math as OZMath} from "openzeppelin-contracts/contracts/utils/math/Math.sol";
-// import {OpTest, IntegrityCheckState, Operand, InterpreterState} from "test/abstract/OpTest.sol";
-// import {PRBMath_MulDiv18_Overflow} from "prb-math/Common.sol";
-// import {LibWillOverflow} from "rain.math.fixedpoint/lib/LibWillOverflow.sol";
-// import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {LibOpMul} from "src/lib/op/math/LibOpMul.sol";
+import {OpTest, IntegrityCheckState, OperandV2, InterpreterState} from "test/abstract/OpTest.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
-// contract LibOpMulTest is OpTest {
-//     /// Directly test the integrity logic of LibOpMul. This tests the
-//     /// happy path where the inputs input and calc match.
-//     function testOpMulIntegrityHappy(IntegrityCheckState memory state, uint8 inputs, uint16 operandData)
-//         external
-//         pure
-//     {
-//         inputs = uint8(bound(inputs, 2, 0x0F));
-//         (uint256 calcInputs, uint256 calcOutputs) = LibOpMul.integrity(state, LibOperand.build(inputs, 1, operandData));
+contract LibOpMulTest is OpTest {
+    /// Directly test the integrity logic of LibOpMul. This tests the
+    /// happy path where the inputs input and calc match.
+    function testOpMulIntegrityHappy(IntegrityCheckState memory state, uint8 inputs, uint16 operandData)
+        external
+        pure
+    {
+        inputs = uint8(bound(inputs, 2, 0x0F));
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpMul.integrity(state, LibOperand.build(inputs, 1, operandData));
 
-//         assertEq(calcInputs, inputs);
-//         assertEq(calcOutputs, 1);
-//     }
+        assertEq(calcInputs, inputs);
+        assertEq(calcOutputs, 1);
+    }
 
-// /// Directly test the integrity logic of LibOpMul. This tests the
-// /// unhappy path where the operand is invalid due to 0 inputs.
-// function testOpMulIntegrityUnhappyZeroInputs(IntegrityCheckState memory state) external pure {
-//     (uint256 calcInputs, uint256 calcOutputs) = LibOpMul.integrity(state, Operand.wrap(0));
-//     // Calc inputs will be minimum 2.
-//     assertEq(calcInputs, 2);
-//     assertEq(calcOutputs, 1);
-// }
+/// Directly test the integrity logic of LibOpMul. This tests the
+/// unhappy path where the operand is invalid due to 0 inputs.
+function testOpMulIntegrityUnhappyZeroInputs(IntegrityCheckState memory state) external pure {
+    (uint256 calcInputs, uint256 calcOutputs) = LibOpMul.integrity(state, OperandV2.wrap(0));
+    // Calc inputs will be minimum 2.
+    assertEq(calcInputs, 2);
+    assertEq(calcOutputs, 1);
+}
 
-// /// Directly test the integrity logic of LibOpMul. This tests the
-// /// unhappy path where the operand is invalid due to 1 inputs.
-// function testOpDecimal18MulNPIntegrityUnhappyOneInput(IntegrityCheckState memory state) external pure {
-//     (uint256 calcInputs, uint256 calcOutputs) = LibOpMul.integrity(state, Operand.wrap(0x010000));
-//     // Calc inputs will be minimum 2.
-//     assertEq(calcInputs, 2);
-//     assertEq(calcOutputs, 1);
-// }
+/// Directly test the integrity logic of LibOpMul. This tests the
+/// unhappy path where the operand is invalid due to 1 inputs.
+function testOpDecimal18MulNPIntegrityUnhappyOneInput(IntegrityCheckState memory state) external pure {
+    (uint256 calcInputs, uint256 calcOutputs) = LibOpMul.integrity(state, OperandV2.wrap(bytes32(uint256(0x010000))));
+    // Calc inputs will be minimum 2.
+    assertEq(calcInputs, 2);
+    assertEq(calcOutputs, 1);
+}
 
-//     /// Directly test the runtime logic of LibOpMul.
-//     function testOpMulRun(uint256[] memory inputs) public {
-//         InterpreterState memory state = opTestDefaultInterpreterState();
-//         vm.assume(inputs.length >= 2);
-//         vm.assume(inputs.length <= 0x0F);
-//         Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
-//         // This is kinda shitty because it just duplicates what the reference
-//         // fn is doing, but because neither PRB nor Open Zeppelin expose a
-//         // try/catch for overflow, we have to do this.
-//         uint256 a = inputs[0];
-//         for (uint256 i = 1; i < inputs.length; i++) {
-//             uint256 b = inputs[i];
-//             if (LibWillOverflow.mulDivWillOverflow(a, b, 1e18)) {
-//                 vm.expectRevert(abi.encodeWithSelector(PRBMath_MulDiv18_Overflow.selector, a, b));
-//                 break;
-//             }
-//             a = OZMath.mulDiv(a, b, 1e18);
-//         }
-//         opReferenceCheck(state, operand, LibOpMul.referenceFn, LibOpMul.integrity, LibOpMul.run, inputs);
-//     }
+function _testOpMulRun(OperandV2 operand, StackItem[] memory inputs) external view {
+    opReferenceCheck(
+        opTestDefaultInterpreterState(),
+        operand,
+        LibOpMul.referenceFn,
+        LibOpMul.integrity,
+        LibOpMul.run,
+        inputs
+    );
+}
+
+    /// Directly test the runtime logic of LibOpMul.
+    function testOpMulRun(StackItem[] memory inputs) public view {
+        vm.assume(inputs.length >= 2);
+        vm.assume(inputs.length <= 0x0F);
+        OperandV2 operand = LibOperand.build(uint8(inputs.length), 1, 0);
+        // uint256 a = inputs[0];
+        // for (uint256 i = 1; i < inputs.length; i++) {
+        //     uint256 b = inputs[i];
+        //     if (LibWillOverflow.mulDivWillOverflow(a, b, 1e18)) {
+        //         vm.expectRevert(abi.encodeWithSelector(PRBMath_MulDiv18_Overflow.selector, a, b));
+        //         break;
+        //     }
+        //     a = OZMath.mulDiv(a, b, 1e18);
+        // }
+        this._testOpMulRun(operand, inputs);
+    }
 
 //     /// Test the eval of `mul` opcode parsed from a string.
 //     /// Tests zero inputs.
@@ -157,4 +161,4 @@ pragma solidity =0.8.25;
 //         checkDisallowedOperand("_: mul<0 1>(1 1 1);");
 //         checkDisallowedOperand("_: mul<1 0>(1 1 1);");
 //     }
-// }
+}

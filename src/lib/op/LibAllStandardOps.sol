@@ -69,7 +69,7 @@ import {LibOpUint256Pow} from "./math/uint256/LibOpUint256Pow.sol";
 import {LibOpAdd} from "./math/LibOpAdd.sol";
 // import {LibOpAvg} from "./math/LibOpAvg.sol";
 // import {LibOpCeil} from "./math/LibOpCeil.sol";
-// import {LibOpMul} from "./math/LibOpMul.sol";
+import {LibOpMul} from "./math/LibOpMul.sol";
 import {LibOpDiv} from "./math/LibOpDiv.sol";
 // import {LibOpE} from "./math/LibOpE.sol";
 // import {LibOpExp} from "./math/LibOpExp.sol";
@@ -105,7 +105,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 29;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 30;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -271,7 +271,7 @@ library LibAllStandardOps {
             ),
             // AuthoringMetaV2("min", "Finds the minimum number from all inputs."),
             // AuthoringMetaV2("mod", "Modulos the first number by all other numbers. Errors if any divisor is zero."),
-            // AuthoringMetaV2("mul", "Multiplies all numbers together. Errors if the multiplication exceeds `max-value()`."),
+            AuthoringMetaV2("mul", "Multiplies all numbers together."),
             // AuthoringMetaV2(
             //     "power",
             //     "Raises the first number to the power of the second number. Errors if the exponentiation exceeds `max-value()`."
@@ -485,8 +485,8 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // // mod
                     // LibParseOperand.handleOperandDisallowed,
-                    // // mul
-                    // LibParseOperand.handleOperandDisallowed,
+                    // mul
+                    LibParseOperand.handleOperandDisallowed,
                     // // power
                     // LibParseOperand.handleOperandDisallowed,
                     // // scale-18
@@ -605,7 +605,7 @@ library LibAllStandardOps {
                     LibOpMaxValue.integrity,
                     // LibOpMin.integrity,
                     // LibOpMod.integrity,
-                    // LibOpMul.integrity,
+                    LibOpMul.integrity,
                     // LibOpPow.integrity,
                     // LibOpScale18.integrity,
                     // // uint256-to-decimal18 is a repeat of scale18.
@@ -717,7 +717,7 @@ library LibAllStandardOps {
                     LibOpMaxValue.run,
                     // LibOpMin.run,
                     // LibOpMod.run,
-                    // LibOpMul.run,
+                    LibOpMul.run,
                     // LibOpPow.run,
                     // LibOpScale18.run,
                     // // uint256-to-decimal18 is a repeat of scale18.
