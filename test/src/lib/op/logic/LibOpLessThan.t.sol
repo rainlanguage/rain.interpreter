@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-// // import {OpTest} from "test/abstract/OpTest.sol";
+import {OpTest} from "test/abstract/OpTest.sol";
 // // import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
-// // import {LibOpLessThanNP} from "src/lib/op/logic/LibOpLessThanNP.sol";
+import {LibOpLessThan} from "src/lib/op/logic/LibOpLessThan.sol";
 // // import {
 // //     IInterpreterV4,
 // //     Operand,
@@ -14,28 +14,28 @@ pragma solidity =0.8.25;
 // // } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 // // import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 // // import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-// // import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
-// // import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-// contract LibOpLessThanNPTest is OpTest {
-//     /// Directly test the integrity logic of LibOpLessThanNP. No matter the
-//     /// operand inputs, the calc inputs must be 2, and the calc outputs must be
-//     /// 1.
-//     function testOpLessThanNPIntegrityHappy(
-//         IntegrityCheckState memory state,
-//         uint8 inputs,
-//         uint8 outputs,
-//         uint16 operandData
-//     ) external pure {
-//         inputs = uint8(bound(inputs, 0, 0x0F));
-//         outputs = uint8(bound(outputs, 0, 0x0F));
-//         (uint256 calcInputs, uint256 calcOutputs) =
-//             LibOpLessThanNP.integrity(state, LibOperand.build(inputs, outputs, operandData));
+contract LibOpLessThanTest is OpTest {
+    /// Directly test the integrity logic of LibOpLessThanNP. No matter the
+    /// operand inputs, the calc inputs must be 2, and the calc outputs must be
+    /// 1.
+    function testOpLessThanNPIntegrityHappy(
+        IntegrityCheckState memory state,
+        uint8 inputs,
+        uint8 outputs,
+        uint16 operandData
+    ) external pure {
+        inputs = uint8(bound(inputs, 0, 0x0F));
+        outputs = uint8(bound(outputs, 0, 0x0F));
+        (uint256 calcInputs, uint256 calcOutputs) =
+            LibOpLessThan.integrity(state, LibOperand.build(inputs, outputs, operandData));
 
-// //         // The inputs from the operand are ignored. The op is always 2 inputs.
-// //         assertEq(calcInputs, 2);
-// //         assertEq(calcOutputs, 1);
-// //     }
+        // The inputs from the operand are ignored. The op is always 2 inputs.
+        assertEq(calcInputs, 2);
+        assertEq(calcOutputs, 1);
+    }
 
 //     /// Directly test the runtime logic of LibOpLessThanNP.
 //     function testOpLessThanNPRun(uint256 input1, uint256 input2) external view {
@@ -161,4 +161,4 @@ pragma solidity =0.8.25;
 // //     function testOpLessThanNPTwoOutputs() external {
 // //         checkBadOutputs("_ _: less-than(30 0);", 2, 1, 2);
 // //     }
-// // }
+}
