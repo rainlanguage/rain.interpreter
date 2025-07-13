@@ -56,7 +56,7 @@ contract LibOpMulTest is OpTest {
 
         try this._testOpMulRun(operand, inputs) {}
         catch (bytes memory err) {
-            assert(bytes4(err) == CoefficientOverflow.selector || bytes4(err) == ExponentOverflow.selector);
+            assertTrue(bytes4(err) == CoefficientOverflow.selector || bytes4(err) == ExponentOverflow.selector);
         }
     }
 
