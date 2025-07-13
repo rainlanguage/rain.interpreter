@@ -55,7 +55,7 @@ import {LibOpGreaterThan} from "./logic/LibOpGreaterThan.sol";
 import {LibOpGreaterThanOrEqualToNP} from "./logic/LibOpGreaterThanOrEqualToNP.sol";
 import {LibOpIfNP} from "./logic/LibOpIfNP.sol";
 import {LibOpIsZeroNP} from "./logic/LibOpIsZeroNP.sol";
-import {LibOpLessThanNP} from "./logic/LibOpLessThanNP.sol";
+import {LibOpLessThan} from "./logic/LibOpLessThan.sol";
 import {LibOpLessThanOrEqualToNP} from "./logic/LibOpLessThanOrEqualToNP.sol";
 
 // import {LibOpExponentialGrowth} from "./math/growth/LibOpExponentialGrowth.sol";
@@ -105,7 +105,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 31;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 32;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -221,7 +221,7 @@ library LibAllStandardOps {
             //     "If the first input is nonzero, the second input is used. Otherwise, the third input is used. If is eagerly evaluated."
             // ),
             // AuthoringMetaV2("is-zero", "1 if the input is 0, 0 otherwise."),
-            // AuthoringMetaV2("less-than", "1 if the first input is less than the second input, 0 otherwise."),
+            AuthoringMetaV2("less-than", "true if the first input is less than the second input, false otherwise."),
             // AuthoringMetaV2(
             //     "less-than-or-equal-to", "1 if the first input is less than or equal to the second input, 0 otherwise."
             // ),
@@ -431,8 +431,8 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // // is-zero
                     // LibParseOperand.handleOperandDisallowed,
-                    // // less-than
-                    // LibParseOperand.handleOperandDisallowed,
+                    // less-than
+                    LibParseOperand.handleOperandDisallowed,
                     // // less-than-or-equal-to
                     // LibParseOperand.handleOperandDisallowed,
                     // // exponential-growth
@@ -578,7 +578,7 @@ library LibAllStandardOps {
                     // LibOpGreaterThanOrEqualToNP.integrity,
                     // LibOpIfNP.integrity,
                     // LibOpIsZeroNP.integrity,
-                    // LibOpLessThanNP.integrity,
+                    LibOpLessThan.integrity,
                     // LibOpLessThanOrEqualToNP.integrity,
                     // LibOpExponentialGrowth.integrity,
                     // LibOpLinearGrowth.integrity,
@@ -690,7 +690,7 @@ library LibAllStandardOps {
                     // LibOpGreaterThanOrEqualToNP.run,
                     // LibOpIfNP.run,
                     // LibOpIsZeroNP.run,
-                    // LibOpLessThanNP.run,
+                    LibOpLessThan.run,
                     // LibOpLessThanOrEqualToNP.run,
                     // LibOpExponentialGrowth.run,
                     // LibOpLinearGrowth.run,
