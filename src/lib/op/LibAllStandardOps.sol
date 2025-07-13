@@ -105,7 +105,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 32;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 33;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -269,7 +269,7 @@ library LibAllStandardOps {
                 "max-value",
                 "The maximum representable float value. This is so large that it is effectively infinity (it has ~2.1 billion zero digits). Almost all numbers that you could possibly subtract from it will be ignored as a rounding error."
             ),
-            // AuthoringMetaV2("min", "Finds the minimum number from all inputs."),
+            AuthoringMetaV2("min", "Finds the minimum number from all inputs."),
             // AuthoringMetaV2("mod", "Modulos the first number by all other numbers. Errors if any divisor is zero."),
             AuthoringMetaV2("mul", "Multiplies all numbers together."),
             // AuthoringMetaV2(
@@ -481,8 +481,8 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // max-value
                     LibParseOperand.handleOperandDisallowed,
-                    // // min
-                    // LibParseOperand.handleOperandDisallowed,
+                    // min
+                    LibParseOperand.handleOperandDisallowed,
                     // // mod
                     // LibParseOperand.handleOperandDisallowed,
                     // mul
@@ -603,7 +603,7 @@ library LibAllStandardOps {
                     // LibOpLog10.integrity,
                     // LibOpMax.integrity,
                     LibOpMaxValue.integrity,
-                    // LibOpMin.integrity,
+                    LibOpMin.integrity,
                     // LibOpMod.integrity,
                     LibOpMul.integrity,
                     // LibOpPow.integrity,
@@ -715,7 +715,7 @@ library LibAllStandardOps {
                     // LibOpLog10.run,
                     // LibOpMax.run,
                     LibOpMaxValue.run,
-                    // LibOpMin.run,
+                    LibOpMin.run,
                     // LibOpMod.run,
                     LibOpMul.run,
                     // LibOpPow.run,
