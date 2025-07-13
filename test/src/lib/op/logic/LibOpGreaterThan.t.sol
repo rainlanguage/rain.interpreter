@@ -70,6 +70,26 @@ contract LibOpGreaterThanTest is OpTest {
         checkHappy("_: greater-than(1 1);", 0, "");
     }
 
+    /// Test 1.1 gt 1.2, which should return 0.
+    function testOpGreaterThanEval1_1Gt1_2() external view {
+        checkHappy("_: greater-than(1.1 1.2);", 0, "");
+    }
+
+    /// Test 1.0 gt 1 which should return 0.
+    function testOpGreaterThanEval1_0Gt1() external view {
+        checkHappy("_: greater-than(1.0 1);", 0, "");
+    }
+
+    /// Test -1.1 gt -1.2, which should return 1.
+    function testOpGreaterThanEvalNeg1_1GtNeg1_2() external view {
+        checkHappy("_: greater-than(-1.1 -1.2);", bytes32(uint256(1)), "");
+    }
+
+    /// Test -1 gt 0, which should return 0.
+    function testOpGreaterThanEvalNeg1Gt0() external view {
+        checkHappy("_: greater-than(-1 0);", 0, "");
+    }
+
     /// Test that a greater than without inputs fails integrity check.
     function testOpGreaterThanEvalFail0Inputs() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));
