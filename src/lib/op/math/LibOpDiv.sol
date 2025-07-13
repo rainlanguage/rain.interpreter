@@ -21,8 +21,7 @@ library LibOpDiv {
     }
 
     /// div
-    /// 18 decimal fixed point division with implied overflow checks from PRB
-    /// Math.
+    /// 18 decimal floating point division.
     function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         Float a;
         Float b;
