@@ -88,6 +88,17 @@ contract LibOpMinTest is OpTest {
         checkHappy("_: min(0 2);", 0, "0 > 2 ? 0 : 2");
         checkHappy("_: min(1 2);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1 > 2 ? 1 : 2");
         checkHappy("_: min(2 2);", Float.unwrap(LibDecimalFloat.packLossless(2, 0)), "2 > 2 ? 2 : 2");
+        checkHappy("_: min(-1 1);", Float.unwrap(LibDecimalFloat.packLossless(-1, 0)), "-1 > 1 ? -1 : 1");
+        checkHappy("_: min(-1 0);", Float.unwrap(LibDecimalFloat.packLossless(-1, 0)), "-1 > 0 ? -1 : 0");
+        checkHappy("_: min(-1 -1);", Float.unwrap(LibDecimalFloat.packLossless(-1, 0)), "-1 > -1 ? -1 : -1");
+        checkHappy("_: min(-1 -2);", Float.unwrap(LibDecimalFloat.packLossless(-2, 0)), "-1 > -2 ? -1 : -2");
+        checkHappy("_: min(-2 -1);", Float.unwrap(LibDecimalFloat.packLossless(-2, 0)), "-2 > -1 ? -2 : -1");
+        checkHappy(
+            "_: min(-1.1 -1.0);", Float.unwrap(LibDecimalFloat.packLossless(-11, -1)), "-1.1 > -1.0 ? -1.1 : -1.0"
+        );
+        checkHappy("_: min(-1.0 -1);", Float.unwrap(LibDecimalFloat.packLossless(-1, 0)), "-1.0 > -1 ? -1.0 : -1");
+        checkHappy("_: min(-1.0 1.0);", Float.unwrap(LibDecimalFloat.packLossless(-1, 0)), "-1.0 > 1.0 ? -1.0 : 1.0");
+        checkHappy("_: min(-1.0 0);", Float.unwrap(LibDecimalFloat.packLossless(-1, 0)), "-1.0 > 0 ? -1.0 : 0");
     }
 
     /// Test the eval of `min` opcode parsed from a string. Tests three inputs.
@@ -184,6 +195,9 @@ contract LibOpMinTest is OpTest {
             Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)),
             "max-value() max-value() max-value()"
         );
+        checkHappy("_: min(0 0 -2);", Float.unwrap(LibDecimalFloat.packLossless(-2, 0)), "0 0 -2");
+        checkHappy("_: min(1 0 -2);", Float.unwrap(LibDecimalFloat.packLossless(-2, 0)), "1 0 -2");
+        checkHappy("_: min(-1.1 -1.0 0);", Float.unwrap(LibDecimalFloat.packLossless(-11, -1)), "-1.1 -1.0 0");
     }
 
     /// Test the eval of `min` opcode parsed from a string.

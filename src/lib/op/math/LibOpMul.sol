@@ -60,38 +60,13 @@ library LibOpMul {
         // Unchecked so that when we assert that an overflow error is thrown, we
         // see the revert from the real function and not the reference function.
         unchecked {
-            Float a;
-            uint256 overflows = 0;
-            (int256 signedCoefficientA, int256 exponentA) =
-                LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(inputs[0])));
-            if (int32(exponentA) != exponentA) {
-                overflows++;
-            }
+            Float acc = Float.wrap(StackItem.unwrap(inputs[0]));
             for (uint256 i = 1; i < inputs.length; i++) {
-                (int256 signedCoefficientB, int256 exponentB) =
-                    LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(inputs[i])));
-                if (int32(exponentB) != exponentB) {
-                    overflows++;
-                    break;
-                }
-
-                (signedCoefficientA, exponentA) =
-                    LibDecimalFloatImplementation.mul(signedCoefficientA, exponentA, signedCoefficientB, exponentB);
-
-                if (int32(exponentA) != exponentA) {
-                    overflows++;
-                    break;
-                }
+                acc = LibDecimalFloat.mul(acc, Float.wrap(StackItem.unwrap(inputs[i])));
             }
+
             outputs = new StackItem[](1);
-
-            if (overflows > 0) {
-                a = Float.wrap(keccak256(abi.encodePacked("overflow sentinel")));
-            } else {
-                a = LibDecimalFloat.packLossless(signedCoefficientA, exponentA);
-            }
-
-            outputs[0] = StackItem.wrap(Float.unwrap(a));
+            outputs[0] = StackItem.wrap(Float.unwrap(acc));
 
             return outputs;
         }

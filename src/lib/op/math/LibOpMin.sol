@@ -9,7 +9,7 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 /// @title LibOpMin
-/// @notice Opcode to find the min from N integers.
+/// @notice Opcode to find the min from N floats.
 library LibOpMin {
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
@@ -19,7 +19,7 @@ library LibOpMin {
     }
 
     /// min
-    /// Finds the minimum value from N integers.
+    /// Finds the minimum value from N floats.
     function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         Float a;
         Float b;
