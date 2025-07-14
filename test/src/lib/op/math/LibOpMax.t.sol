@@ -107,6 +107,13 @@ contract LibOpMaxTest is OpTest {
         checkHappy("_: max(0 2);", Float.unwrap(LibDecimalFloat.packLossless(2, 0)), "0 > 2 ? 0 : 2");
         checkHappy("_: max(1 2);", Float.unwrap(LibDecimalFloat.packLossless(2, 0)), "1 > 2 ? 1 : 2");
         checkHappy("_: max(2 2);", Float.unwrap(LibDecimalFloat.packLossless(2, 0)), "2 > 2 ? 2 : 2");
+        checkHappy("_: max(-1 1);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "-1 > 1 ? -1 : 1");
+        checkHappy("_: max(-1 0);", Float.unwrap(LibDecimalFloat.packLossless(0, 0)), "-1 > 0 ? -1 : 0");
+        checkHappy("_: max(-1 -1);", Float.unwrap(LibDecimalFloat.packLossless(-1, 0)), "-1 > -1 ? -1 : -1");
+        checkHappy("_: max(-1 -2);", Float.unwrap(LibDecimalFloat.packLossless(-1, 0)), "-1 > -2 ? -1 : -2");
+        checkHappy("_: max(-2 -1);", Float.unwrap(LibDecimalFloat.packLossless(-1, 0)), "-2 > -1 ? -2 : -1");
+        checkHappy("_: max(-1.1 -1.0);", Float.unwrap(LibDecimalFloat.packLossless(-1, 0)), "-1.1 > -1.2 ? -1.1 : -1.2");
+        checkHappy("_: max(-1.0 -1);", Float.unwrap(LibDecimalFloat.packLossless(-1, 0)), "-1.0 > -1.0 ? -1.0 : -1.0");
     }
 
     /// Test the eval of `max` opcode parsed from a string. Tests three inputs.
@@ -183,6 +190,9 @@ contract LibOpMaxTest is OpTest {
             Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)),
             "2 2 max-value()"
         );
+        checkHappy("_: max(-1.1 -1.0 0);", Float.unwrap(LibDecimalFloat.packLossless(0, 0)), "-1.1 -1.0 0");
+        checkHappy("_: max(-1.0 -1 0);", Float.unwrap(LibDecimalFloat.packLossless(0, 0)), "-1.0 -1 0");
+        checkHappy("_: max(-1.0 1.0 0);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "-1.0 -1.0 0");
     }
 
     /// Test the eval of `max` opcode parsed from a string.
