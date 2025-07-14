@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
+import {console2} from "forge-std/Test.sol";
 import {LibOpMul} from "src/lib/op/math/LibOpMul.sol";
 import {OpTest, IntegrityCheckState, OperandV2, InterpreterState} from "test/abstract/OpTest.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
@@ -56,6 +57,7 @@ contract LibOpMulTest is OpTest {
 
         try this._testOpMulRun(operand, inputs) {}
         catch (bytes memory err) {
+            console2.logBytes(err);
             assertTrue(bytes4(err) == CoefficientOverflow.selector || bytes4(err) == ExponentOverflow.selector);
         }
     }
