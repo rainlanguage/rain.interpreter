@@ -6,6 +6,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "../../../state/LibInterpreterState.sol";
+import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 /// @title LibOpUint256ERC20Allowance
 /// @notice Opcode for getting the current erc20 allowance of an account.
@@ -34,18 +35,17 @@ library LibOpUint256ERC20Allowance {
         return stackTop;
     }
 
-    function referenceFn(InterpreterState memory, OperandV2, uint256[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         view
-        returns (uint256[] memory)
+        returns (StackItem[] memory)
     {
-        uint256 token = inputs[0];
-        uint256 owner = inputs[1];
-        uint256 spender = inputs[2];
-        uint256 tokenAllowance =
-            IERC20(address(uint160(token))).allowance(address(uint160(owner)), address(uint160(spender)));
-        uint256[] memory outputs = new uint256[](1);
-        outputs[0] = tokenAllowance;
+        address token = address(uint160(uint256(StackItem.unwrap(inputs[0]))));
+        address owner = address(uint160(uint256(StackItem.unwrap(inputs[1]))));
+        address spender = address(uint160(uint256(StackItem.unwrap(inputs[2]))));
+        uint256 tokenAllowance = IERC20(token).allowance(owner, spender);
+        StackItem[] memory outputs = new StackItem[](1);
+        outputs[0] = StackItem.wrap(bytes32(tokenAllowance));
         return outputs;
     }
 }
