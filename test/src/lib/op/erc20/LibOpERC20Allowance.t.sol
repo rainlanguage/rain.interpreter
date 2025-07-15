@@ -7,10 +7,11 @@ import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpre
 import {LibOpERC20Allowance} from "src/lib/op/erc20/LibOpERC20Allowance.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
-// import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {IERC20Metadata} from "openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {FLAG_SATURATE} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 /// @title LibOpERC20AllowanceTest
 /// @notice Test the opcode for getting the allowance of an erc20 token.
@@ -22,33 +23,33 @@ contract LibOpERC20AllowanceTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    //     function testOpERC20AllowanceNPRun(address token, address owner, address spender, uint256 allowance, uint8 decimals)
-    //         external
-    //     {
-    //         assumeEtchable(token);
-    //         vm.etch(token, hex"fe");
+    function testOpERC20AllowanceRun(address token, address owner, address spender, uint256 allowance, uint8 decimals)
+        external
+    {
+        assumeEtchable(token);
+        vm.etch(token, hex"fe");
 
-    //         uint256[] memory inputs = new uint256[](3);
-    //         inputs[0] = uint256(uint160(token));
-    //         inputs[1] = uint256(uint160(owner));
-    //         inputs[2] = uint256(uint160(spender));
-    //         Operand operand = LibOperand.build(3, 1, 0);
+        StackItem[] memory inputs = new StackItem[](3);
+        inputs[0] = StackItem.wrap(bytes32(uint256(uint160(token))));
+        inputs[1] = StackItem.wrap(bytes32(uint256(uint160(owner))));
+        inputs[2] = StackItem.wrap(bytes32(uint256(uint160(spender))));
+        OperandV2 operand = LibOperand.build(3, 1, 0);
 
-    //         vm.mockCall(token, abi.encodeWithSelector(IERC20.allowance.selector, owner, spender), abi.encode(allowance));
-    //         // called once for reference, once for run
-    //         vm.expectCall(token, abi.encodeWithSelector(IERC20.allowance.selector, owner, spender), 2);
+        vm.mockCall(token, abi.encodeWithSelector(IERC20.allowance.selector, owner, spender), abi.encode(allowance));
+        // called once for reference, once for run
+        vm.expectCall(token, abi.encodeWithSelector(IERC20.allowance.selector, owner, spender), 2);
 
-    //         vm.mockCall(token, abi.encodeWithSelector(IERC20Metadata.decimals.selector), abi.encode(decimals));
+        vm.mockCall(token, abi.encodeWithSelector(IERC20Metadata.decimals.selector), abi.encode(decimals));
 
-    //         opReferenceCheck(
-    //             opTestDefaultInterpreterState(),
-    //             operand,
-    //             LibOpERC20Allowance.referenceFn,
-    //             LibOpERC20Allowance.integrity,
-    //             LibOpERC20Allowance.run,
-    //             inputs
-    //         );
-    //     }
+        opReferenceCheck(
+            opTestDefaultInterpreterState(),
+            operand,
+            LibOpERC20Allowance.referenceFn,
+            LibOpERC20Allowance.integrity,
+            LibOpERC20Allowance.run,
+            inputs
+        );
+    }
 
     /// Test the eval of allowance parsed from a string.
     function testOpERC20AllowanceEvalHappy(uint256 allowance, uint8 decimals) external {
@@ -58,8 +59,7 @@ contract LibOpERC20AllowanceTest is OpTest {
             abi.encode(allowance)
         );
         vm.mockCall(address(0xdeadbeef), abi.encodeWithSelector(IERC20Metadata.decimals.selector), abi.encode(decimals));
-        (Float tokenAllowanceFloat, bool lossless) = LibDecimalFloat.fromFixedDecimalLossyPacked(allowance, decimals);
-        (lossless);
+        (Float tokenAllowanceFloat,) = LibDecimalFloat.fromFixedDecimalLossyPacked(allowance, decimals);
         checkHappy(
             "_: erc20-allowance(0xdeadbeef 0xdeadc0de 0xdeaddead);",
             Float.unwrap(tokenAllowanceFloat),
