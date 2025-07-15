@@ -32,8 +32,7 @@ library LibOpERC20BalanceOf {
         // This can fail as `decimals` is an OPTIONAL part of the ERC20 standard.
         uint8 tokenDecimals = IERC20Metadata(address(uint160(token))).decimals();
 
-        Float tokenBalanceFloat =
-            LibDecimalFloat.fromFixedDecimalLosslessPacked(tokenBalance, tokenDecimals);
+        Float tokenBalanceFloat = LibDecimalFloat.fromFixedDecimalLosslessPacked(tokenBalance, tokenDecimals);
 
         assembly ("memory-safe") {
             mstore(stackTop, tokenBalanceFloat)
@@ -52,8 +51,7 @@ library LibOpERC20BalanceOf {
         uint256 tokenBalance = IERC20(token).balanceOf(account);
 
         uint8 tokenDecimals = IERC20Metadata(token).decimals();
-        Float tokenBalanceFloat =
-            LibDecimalFloat.fromFixedDecimalLosslessPacked(tokenBalance, tokenDecimals);
+        Float tokenBalanceFloat = LibDecimalFloat.fromFixedDecimalLosslessPacked(tokenBalance, tokenDecimals);
 
         StackItem[] memory outputs = new StackItem[](1);
         outputs[0] = StackItem.wrap(Float.unwrap(tokenBalanceFloat));
