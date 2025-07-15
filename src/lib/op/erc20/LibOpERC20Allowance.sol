@@ -35,10 +35,9 @@ library LibOpERC20Allowance {
         // This can fail as `decimals` is an OPTIONAL part of the ERC20 standard.
         uint8 tokenDecimals = IERC20Metadata(address(uint160(token))).decimals();
 
-        Float tokenAllowanceFloat = LibDecimalFloat.fromFixedDecimalLosslessPacked(
-            tokenAllowance,
-            tokenDecimals
-        );
+        (Float tokenAllowanceFloat, bool lossless) =
+            LibDecimalFloat.fromFixedDecimalLossyPacked(tokenAllowance, tokenDecimals);
+        (lossless);
 
         assembly ("memory-safe") {
             mstore(stackTop, tokenAllowanceFloat)
@@ -58,10 +57,9 @@ library LibOpERC20Allowance {
         uint8 tokenDecimals = IERC20Metadata(address(bytes20(token))).decimals();
         uint256 tokenAllowance =
             IERC20(address(bytes20(token))).allowance(address(bytes20(owner)), address(bytes20(spender)));
-        Float tokenAllowanceFloat = LibDecimalFloat.fromFixedDecimalLosslessPacked(
-            tokenAllowance,
-            tokenDecimals
-        );
+        (Float tokenAllowanceFloat, bool lossless) =
+            LibDecimalFloat.fromFixedDecimalLossyPacked(tokenAllowance, tokenDecimals);
+        (lossless);
 
         StackItem[] memory outputs = new StackItem[](1);
         outputs[0] = StackItem.wrap(Float.unwrap(tokenAllowanceFloat));

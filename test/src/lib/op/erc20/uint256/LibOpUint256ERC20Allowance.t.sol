@@ -1,23 +1,23 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-// import {OpTest} from "test/abstract/OpTest.sol";
-// import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
-// import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-// import {LibOpUint256ERC20Allowance} from "src/lib/op/erc20/uint256/LibOpUint256ERC20Allowance.sol";
+import {OpTest} from "test/abstract/OpTest.sol";
+import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {LibOpUint256ERC20Allowance} from "src/lib/op/erc20/uint256/LibOpUint256ERC20Allowance.sol";
 // import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 // import {UnexpectedOperand} from "src/error/ErrParse.sol";
 // import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-// /// @title LibOpUint256ERC20AllowanceTest
-// /// @notice Test the opcode for getting the allowance of an erc20 token.
-// contract LibOpUint256ERC20AllowanceTest is OpTest {
-//     function testOpERC20AllowanceNPIntegrity(IntegrityCheckState memory state, Operand operand) external pure {
-//         (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256ERC20Allowance.integrity(state, operand);
+/// @title LibOpUint256ERC20AllowanceTest
+/// @notice Test the opcode for getting the allowance of an erc20 token.
+contract LibOpUint256ERC20AllowanceTest is OpTest {
+    function testOpERC20AllowanceIntegrity(IntegrityCheckState memory state, OperandV2 operand) external pure {
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256ERC20Allowance.integrity(state, operand);
 
-//         assertEq(calcInputs, 3);
-//         assertEq(calcOutputs, 1);
-//     }
+        assertEq(calcInputs, 3);
+        assertEq(calcOutputs, 1);
+    }
 
 //     function testOpERC20AllowanceNPRun(address token, address owner, address spender, uint256 allowance) external {
 //         assumeEtchable(token);
@@ -89,4 +89,4 @@ pragma solidity =0.8.25;
 //             abi.encodeWithSelector(UnexpectedOperand.selector)
 //         );
 //     }
-// }
+}
