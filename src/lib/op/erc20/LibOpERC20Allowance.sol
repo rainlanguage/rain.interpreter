@@ -48,13 +48,12 @@ library LibOpERC20Allowance {
         view
         returns (StackItem[] memory)
     {
-        bytes32 token = StackItem.unwrap(inputs[0]);
-        bytes32 owner = StackItem.unwrap(inputs[1]);
-        bytes32 spender = StackItem.unwrap(inputs[2]);
+        address token = address(uint160(uint256(StackItem.unwrap(inputs[0]))));
+        address owner = address(uint160(uint256(StackItem.unwrap(inputs[1]))));
+        address spender = address(uint160(uint256(StackItem.unwrap(inputs[2]))));
 
-        uint8 tokenDecimals = IERC20Metadata(address(bytes20(token))).decimals();
-        uint256 tokenAllowance =
-            IERC20(address(bytes20(token))).allowance(address(bytes20(owner)), address(bytes20(spender)));
+        uint8 tokenDecimals = IERC20Metadata(token).decimals();
+        uint256 tokenAllowance = IERC20(token).allowance(owner, spender);
         (Float tokenAllowanceFloat,) = LibDecimalFloat.fromFixedDecimalLossyPacked(tokenAllowance, tokenDecimals);
 
         StackItem[] memory outputs = new StackItem[](1);
