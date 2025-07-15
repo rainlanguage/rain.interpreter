@@ -32,7 +32,7 @@ import {LibOpUint256ERC20Allowance} from "./erc20/uint256/LibOpUint256ERC20Allow
 import {LibOpUint256ERC20BalanceOf} from "./erc20/uint256/LibOpUint256ERC20BalanceOf.sol";
 import {LibOpUint256ERC20TotalSupply} from "./erc20/uint256/LibOpUint256ERC20TotalSupply.sol";
 
-// import {LibOpERC20Allowance} from "./erc20/LibOpERC20Allowance.sol";
+import {LibOpERC20Allowance} from "./erc20/LibOpERC20Allowance.sol";
 // import {LibOpERC20BalanceOf} from "./erc20/LibOpERC20BalanceOf.sol";
 // import {LibOpERC20TotalSupply} from "./erc20/LibOpERC20TotalSupply.sol";
 
@@ -105,7 +105,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 34;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 35;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -172,10 +172,10 @@ library LibAllStandardOps {
             //     "uint256-erc20-total-supply",
             //     "Gets the total supply of an erc20 token as a uint256 value. The input is the token address."
             // ),
-            // AuthoringMetaV2(
-            //     "erc20-allowance",
-            //     "Gets the allowance of an erc20 token for an account. The first input is the token address, the second is the owner address, and the third is the spender address. Saturates on overflow so that \"infinite approve\" doesn't error when upscaling."
-            // ),
+            AuthoringMetaV2(
+                "erc20-allowance",
+                "Gets the allowance of an erc20 token for an account. The first input is the token address, the second is the owner address, and the third is the spender address. Saturates on overflow so that \"infinite approve\" doesn't error when upscaling."
+            ),
             // AuthoringMetaV2(
             //     "erc20-balance-of",
             //     "Gets the balance of an erc20 token for an account. The first input is the token address and the second is the account address."
@@ -391,8 +391,8 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // // uint256-erc20-total-supply
                     // LibParseOperand.handleOperandDisallowed,
-                    // // erc20-allowance
-                    // LibParseOperand.handleOperandDisallowed,
+                    // erc20-allowance
+                    LibParseOperand.handleOperandDisallowed,
                     // // erc20-balance-of
                     // LibParseOperand.handleOperandDisallowed,
                     // // erc20-total-supply
@@ -557,7 +557,7 @@ library LibAllStandardOps {
                     // LibOpUint256ERC20Allowance.integrity,
                     // LibOpUint256ERC20BalanceOf.integrity,
                     // LibOpUint256ERC20TotalSupply.integrity,
-                    // LibOpERC20Allowance.integrity,
+                    LibOpERC20Allowance.integrity,
                     // LibOpERC20BalanceOf.integrity,
                     // LibOpERC20TotalSupply.integrity,
                     // LibOpUint256ERC721BalanceOf.integrity,
@@ -669,7 +669,7 @@ library LibAllStandardOps {
                     // LibOpUint256ERC20Allowance.run,
                     // LibOpUint256ERC20BalanceOf.run,
                     // LibOpUint256ERC20TotalSupply.run,
-                    // LibOpERC20Allowance.run,
+                    LibOpERC20Allowance.run,
                     // LibOpERC20BalanceOf.run,
                     // LibOpERC20TotalSupply.run,
                     // LibOpUint256ERC721BalanceOf.run,
