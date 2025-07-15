@@ -51,11 +51,11 @@ import {LibOpEnsure} from "./logic/LibOpEnsure.sol";
 import {LibOpEqualTo} from "./logic/LibOpEqualTo.sol";
 import {LibOpBinaryEqualTo} from "./logic/LibOpBinaryEqualTo.sol";
 import {LibOpEveryNP} from "./logic/LibOpEveryNP.sol";
-import {LibOpGreaterThanNP} from "./logic/LibOpGreaterThanNP.sol";
+import {LibOpGreaterThan} from "./logic/LibOpGreaterThan.sol";
 import {LibOpGreaterThanOrEqualToNP} from "./logic/LibOpGreaterThanOrEqualToNP.sol";
 import {LibOpIfNP} from "./logic/LibOpIfNP.sol";
 import {LibOpIsZeroNP} from "./logic/LibOpIsZeroNP.sol";
-import {LibOpLessThanNP} from "./logic/LibOpLessThanNP.sol";
+import {LibOpLessThan} from "./logic/LibOpLessThan.sol";
 import {LibOpLessThanOrEqualToNP} from "./logic/LibOpLessThanOrEqualToNP.sol";
 
 // import {LibOpExponentialGrowth} from "./math/growth/LibOpExponentialGrowth.sol";
@@ -69,8 +69,8 @@ import {LibOpUint256Pow} from "./math/uint256/LibOpUint256Pow.sol";
 import {LibOpAdd} from "./math/LibOpAdd.sol";
 // import {LibOpAvg} from "./math/LibOpAvg.sol";
 // import {LibOpCeil} from "./math/LibOpCeil.sol";
-// import {LibOpMul} from "./math/LibOpMul.sol";
-// import {LibOpDiv} from "./math/LibOpDiv.sol";
+import {LibOpMul} from "./math/LibOpMul.sol";
+import {LibOpDiv} from "./math/LibOpDiv.sol";
 // import {LibOpE} from "./math/LibOpE.sol";
 // import {LibOpExp} from "./math/LibOpExp.sol";
 // import {LibOpExp2} from "./math/LibOpExp2.sol";
@@ -93,7 +93,7 @@ import {LibOpMod} from "./math/LibOpMod.sol";
 // import {LibOpScaleN} from "./math/LibOpScaleN.sol";
 // import {LibOpSnapToUnit} from "./math/LibOpSnapToUnit.sol";
 // import {LibOpSqrt} from "./math/LibOpSqrt.sol";
-// import {LibOpSub} from "./math/LibOpSub.sol";
+import {LibOpSub} from "./math/LibOpSub.sol";
 
 import {LibOpGet} from "./store/LibOpGet.sol";
 import {LibOpSet} from "./store/LibOpSet.sol";
@@ -105,7 +105,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 26;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 34;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -211,7 +211,7 @@ library LibAllStandardOps {
             AuthoringMetaV2("equal-to", "1 if all inputs are equal, 0 otherwise. Equality is numerical."),
             AuthoringMetaV2("binary-equal-to", "1 if all inputs are equal, 0 otherwise. Equality is binary."),
             // AuthoringMetaV2("every", "The last nonzero value out of all inputs, or 0 if any input is 0."),
-            // AuthoringMetaV2("greater-than", "1 if the first input is greater than the second input, 0 otherwise."),
+            AuthoringMetaV2("greater-than", "true if the first input is greater than the second input, false otherwise."),
             // AuthoringMetaV2(
             //     "greater-than-or-equal-to",
             //     "1 if the first input is greater than or equal to the second input, 0 otherwise."
@@ -221,7 +221,7 @@ library LibAllStandardOps {
             //     "If the first input is nonzero, the second input is used. Otherwise, the third input is used. If is eagerly evaluated."
             // ),
             // AuthoringMetaV2("is-zero", "1 if the input is 0, 0 otherwise."),
-            // AuthoringMetaV2("less-than", "1 if the first input is less than the second input, 0 otherwise."),
+            AuthoringMetaV2("less-than", "true if the first input is less than the second input, false otherwise."),
             // AuthoringMetaV2(
             //     "less-than-or-equal-to", "1 if the first input is less than or equal to the second input, 0 otherwise."
             // ),
@@ -246,10 +246,10 @@ library LibAllStandardOps {
             //     "uint256-power",
             //     "Raises the first input to the power of all other inputs as uint256 values. Errors if the exponentiation exceeds `max-value()`."
             // ),
-            // AuthoringMetaV2("add", "Adds all numbers together. Errors if the addition exceeds `max-value()`."),
+            AuthoringMetaV2("add", "Adds all numbers together."),
             // AuthoringMetaV2("avg", "Arithmetic average (mean) of two numbers."),
             // AuthoringMetaV2("ceil", "Ceiling of a number."),
-            // AuthoringMetaV2("div", "Divides the first number by all other numbers. Errors if any divisor is zero."),
+            AuthoringMetaV2("div", "Divides the first number by all other numbers. Errors if any divisor is zero."),
             // AuthoringMetaV2("e", "The mathematical constant e."),
             // AuthoringMetaV2("exp", "Natural exponential e^x. Errors if the exponentiation exceeds `max-value()`."),
             // AuthoringMetaV2("exp2", "Binary exponential 2^x where x. Errors if the exponentiation exceeds `max-value()`."),
@@ -264,14 +264,14 @@ library LibAllStandardOps {
             // AuthoringMetaV2("ln", "Natural logarithm ln(x). Errors if the number is zero."),
             // AuthoringMetaV2("log2", "Base 2 logarithm log2(x). Errors if the number is zero."),
             // AuthoringMetaV2("log10", "Base 10 logarithm log10(x). Errors if the number is zero."),
-            // AuthoringMetaV2("max", "Finds the maximum number from all inputs."),
+            AuthoringMetaV2("max", "Finds the maximum number from all inputs."),
             AuthoringMetaV2(
                 "max-value",
                 "The maximum representable float value. This is so large that it is effectively infinity (it has ~2.1 billion zero digits). Almost all numbers that you could possibly subtract from it will be ignored as a rounding error."
             ),
-            // AuthoringMetaV2("min", "Finds the minimum number from all inputs."),
+            AuthoringMetaV2("min", "Finds the minimum number from all inputs."),
             // AuthoringMetaV2("mod", "Modulos the first number by all other numbers. Errors if any divisor is zero."),
-            // AuthoringMetaV2("mul", "Multiplies all numbers together. Errors if the multiplication exceeds `max-value()`."),
+            AuthoringMetaV2("mul", "Multiplies all numbers together."),
             // AuthoringMetaV2(
             //     "power",
             //     "Raises the first number to the power of the second number. Errors if the exponentiation exceeds `max-value()`."
@@ -305,11 +305,7 @@ library LibAllStandardOps {
             //     "Rounds a number to the nearest whole number if it is within the threshold distance from that whole number. The first input is the threshold and the second is the value to snap to the nearest unit."
             // ),
             // AuthoringMetaV2("sqrt", "Calculates the square root of the input. Errors if the input is negative."),
-            // AuthoringMetaV2(
-            //     "sub",
-            //     "Subtracts all numbers from the first number. The optional operand controls whether subtraction will saturate at 0. The default behaviour, and what will happen if the operand is 0, is that negative values are an error. If the operand is 1, the word will saturate at 0 (e.g. 1-2=0)."
-            // ),
-            // AuthoringMetaV2("saturating-sub", "Subtracts all numbers from the first number. Saturates at 0 (e.g. 1-2=0)."),
+            AuthoringMetaV2("sub", "Subtracts all numbers from the first number."),
             AuthoringMetaV2("get", "Gets a value from storage. The first operand is the key to lookup."),
             AuthoringMetaV2(
                 "set",
@@ -427,16 +423,16 @@ library LibAllStandardOps {
                     LibParseOperand.handleOperandDisallowed,
                     // // every
                     // LibParseOperand.handleOperandDisallowed,
-                    // // greater-than
-                    // LibParseOperand.handleOperandDisallowed,
+                    // greater-than
+                    LibParseOperand.handleOperandDisallowed,
                     // // greater-than-or-equal-to
                     // LibParseOperand.handleOperandDisallowed,
                     // // if
                     // LibParseOperand.handleOperandDisallowed,
                     // // is-zero
                     // LibParseOperand.handleOperandDisallowed,
-                    // // less-than
-                    // LibParseOperand.handleOperandDisallowed,
+                    // less-than
+                    LibParseOperand.handleOperandDisallowed,
                     // // less-than-or-equal-to
                     // LibParseOperand.handleOperandDisallowed,
                     // // exponential-growth
@@ -451,14 +447,14 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // // uint256-power
                     // LibParseOperand.handleOperandDisallowed,
-                    // // add
-                    // LibParseOperand.handleOperandDisallowed,
+                    // add
+                    LibParseOperand.handleOperandDisallowed,
                     // // avg
                     // LibParseOperand.handleOperandDisallowed,
                     // // ceil
                     // LibParseOperand.handleOperandDisallowed,
-                    // // div
-                    // LibParseOperand.handleOperandDisallowed,
+                    // div
+                    LibParseOperand.handleOperandDisallowed,
                     // // e
                     // LibParseOperand.handleOperandDisallowed,
                     // // exp
@@ -481,16 +477,16 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // // log10
                     // LibParseOperand.handleOperandDisallowed,
-                    // // max
-                    // LibParseOperand.handleOperandDisallowed,
+                    // max
+                    LibParseOperand.handleOperandDisallowed,
                     // max-value
                     LibParseOperand.handleOperandDisallowed,
-                    // // min
-                    // LibParseOperand.handleOperandDisallowed,
+                    // min
+                    LibParseOperand.handleOperandDisallowed,
                     // // mod
                     // LibParseOperand.handleOperandDisallowed,
-                    // // mul
-                    // LibParseOperand.handleOperandDisallowed,
+                    // mul
+                    LibParseOperand.handleOperandDisallowed,
                     // // power
                     // LibParseOperand.handleOperandDisallowed,
                     // // scale-18
@@ -509,10 +505,8 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // // sqrt
                     // LibParseOperand.handleOperandDisallowed,
-                    // // sub
-                    // LibParseOperand.handleOperandSingleFull,
-                    // // saturating-sub
-                    // LibParseOperand.handleOperandDisallowedAlwaysOne,
+                    // sub
+                    LibParseOperand.handleOperandSingleFull,
                     // get
                     LibParseOperand.handleOperandDisallowed,
                     // set
@@ -580,11 +574,11 @@ library LibAllStandardOps {
                     LibOpEqualTo.integrity,
                     LibOpBinaryEqualTo.integrity,
                     // LibOpEveryNP.integrity,
-                    // LibOpGreaterThanNP.integrity,
+                    LibOpGreaterThan.integrity,
                     // LibOpGreaterThanOrEqualToNP.integrity,
                     // LibOpIfNP.integrity,
                     // LibOpIsZeroNP.integrity,
-                    // LibOpLessThanNP.integrity,
+                    LibOpLessThan.integrity,
                     // LibOpLessThanOrEqualToNP.integrity,
                     // LibOpExponentialGrowth.integrity,
                     // LibOpLinearGrowth.integrity,
@@ -592,10 +586,10 @@ library LibAllStandardOps {
                     // LibOpUint256Div.integrity,
                     // LibOpUint256Mul.integrity,
                     // LibOpUint256Pow.integrity,
-                    // LibOpAdd.integrity,
+                    LibOpAdd.integrity,
                     // LibOpAvg.integrity,
                     // LibOpCeil.integrity,
-                    // LibOpDiv.integrity,
+                    LibOpDiv.integrity,
                     // LibOpE.integrity,
                     // LibOpExp.integrity,
                     // LibOpExp2.integrity,
@@ -607,11 +601,11 @@ library LibAllStandardOps {
                     // LibOpLn.integrity,
                     // LibOpLog2.integrity,
                     // LibOpLog10.integrity,
-                    // LibOpMax.integrity,
+                    LibOpMax.integrity,
                     LibOpMaxValue.integrity,
-                    // LibOpMin.integrity,
+                    LibOpMin.integrity,
                     // LibOpMod.integrity,
-                    // LibOpMul.integrity,
+                    LibOpMul.integrity,
                     // LibOpPow.integrity,
                     // LibOpScale18.integrity,
                     // // uint256-to-decimal18 is a repeat of scale18.
@@ -623,9 +617,7 @@ library LibAllStandardOps {
                     // LibOpScaleNDynamic.integrity,
                     // LibOpSnapToUnit.integrity,
                     // LibOpSqrt.integrity,
-                    // LibOpSub.integrity,
-                    // // saturating-sub is a repeat of sub.
-                    // LibOpSub.integrity,
+                    LibOpSub.integrity,
                     LibOpGet.integrity,
                     LibOpSet.integrity
                 ];
@@ -694,11 +686,11 @@ library LibAllStandardOps {
                     LibOpEqualTo.run,
                     LibOpBinaryEqualTo.run,
                     // LibOpEveryNP.run,
-                    // LibOpGreaterThanNP.run,
+                    LibOpGreaterThan.run,
                     // LibOpGreaterThanOrEqualToNP.run,
                     // LibOpIfNP.run,
                     // LibOpIsZeroNP.run,
-                    // LibOpLessThanNP.run,
+                    LibOpLessThan.run,
                     // LibOpLessThanOrEqualToNP.run,
                     // LibOpExponentialGrowth.run,
                     // LibOpLinearGrowth.run,
@@ -706,10 +698,10 @@ library LibAllStandardOps {
                     // LibOpUint256Div.run,
                     // LibOpUint256Mul.run,
                     // LibOpUint256Pow.run,
-                    // LibOpAdd.run,
+                    LibOpAdd.run,
                     // LibOpAvg.run,
                     // LibOpCeil.run,
-                    // LibOpDiv.run,
+                    LibOpDiv.run,
                     // LibOpE.run,
                     // LibOpExp.run,
                     // LibOpExp2.run,
@@ -721,11 +713,11 @@ library LibAllStandardOps {
                     // LibOpLn.run,
                     // LibOpLog2.run,
                     // LibOpLog10.run,
-                    // LibOpMax.run,
+                    LibOpMax.run,
                     LibOpMaxValue.run,
-                    // LibOpMin.run,
+                    LibOpMin.run,
                     // LibOpMod.run,
-                    // LibOpMul.run,
+                    LibOpMul.run,
                     // LibOpPow.run,
                     // LibOpScale18.run,
                     // // uint256-to-decimal18 is a repeat of scale18.
@@ -737,9 +729,7 @@ library LibAllStandardOps {
                     // LibOpScaleNDynamic.run,
                     // LibOpSnapToUnit.run,
                     // LibOpSqrt.run,
-                    // LibOpSub.run,
-                    // // saturating-sub is a repeat of sub.
-                    // LibOpSub.run,
+                    LibOpSub.run,
                     LibOpGet.run,
                     LibOpSet.run
                 ];
