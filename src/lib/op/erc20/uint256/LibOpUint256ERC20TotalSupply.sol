@@ -6,6 +6,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "../../../state/LibInterpreterState.sol";
+import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 /// @title LibOpUint256ERC20TotalSupply
 /// @notice Opcode for ERC20 `totalSupply`.
@@ -28,15 +29,15 @@ library LibOpUint256ERC20TotalSupply {
         return stackTop;
     }
 
-    function referenceFn(InterpreterState memory, OperandV2, uint256[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         view
-        returns (uint256[] memory)
+        returns (StackItem[] memory)
     {
-        uint256 account = inputs[0];
-        uint256 totalSupply = IERC20(address(uint160(account))).totalSupply();
-        uint256[] memory outputs = new uint256[](1);
-        outputs[0] = totalSupply;
+        address account = address(uint160(uint256(StackItem.unwrap(inputs[0]))));
+        uint256 totalSupply = IERC20(account).totalSupply();
+        StackItem[] memory outputs = new StackItem[](1);
+        outputs[0] = StackItem.wrap(bytes32(totalSupply));
         return outputs;
     }
 }
