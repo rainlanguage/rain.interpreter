@@ -35,6 +35,10 @@ library LibOpERC20Allowance {
         // This can fail as `decimals` is an OPTIONAL part of the ERC20 standard.
         uint8 tokenDecimals = IERC20Metadata(address(uint160(token))).decimals();
 
+        // Slither doesn't like that we're ignoring the lossless flag but it's
+        // currently irrelevant. Perhaps in the future we setup an operand to
+        // handle it, but not now.
+        //slither-disable-next-line unused-return
         (Float tokenAllowanceFloat,) = LibDecimalFloat.fromFixedDecimalLossyPacked(tokenAllowance, tokenDecimals);
 
         assembly ("memory-safe") {
@@ -54,6 +58,8 @@ library LibOpERC20Allowance {
 
         uint8 tokenDecimals = IERC20Metadata(token).decimals();
         uint256 tokenAllowance = IERC20(token).allowance(owner, spender);
+        // Same as in the run implementation.
+        //slither-disable-next-line unused-return
         (Float tokenAllowanceFloat,) = LibDecimalFloat.fromFixedDecimalLossyPacked(tokenAllowance, tokenDecimals);
 
         StackItem[] memory outputs = new StackItem[](1);
