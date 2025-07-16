@@ -7,9 +7,9 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 
-/// @title LibOpERC5313OwnerNP
+/// @title LibOpERC5313Owner
 /// @notice Opcode for ERC5313 `owner`.
-library LibOpERC5313OwnerNP {
+library LibOpERC5313Owner {
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // Always 1 input, the contract.
         // Always 1 output, the owner.
