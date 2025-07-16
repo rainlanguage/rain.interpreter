@@ -6,6 +6,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "../../../state/LibInterpreterState.sol";
+import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 /// @title OpUint256ERC721BalanceOf
 /// @notice Opcode for getting the current erc721 balance of an account.
@@ -31,16 +32,16 @@ library LibOpUint256ERC721BalanceOf {
         return stackTop;
     }
 
-    function referenceFn(InterpreterState memory, OperandV2, uint256[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         view
-        returns (uint256[] memory)
+        returns (StackItem[] memory)
     {
-        uint256 token = inputs[0];
-        uint256 account = inputs[1];
-        uint256 tokenBalance = IERC721(address(uint160(token))).balanceOf(address(uint160(account)));
-        uint256[] memory outputs = new uint256[](1);
-        outputs[0] = tokenBalance;
+        address token = address(uint160(uint256(StackItem.unwrap(inputs[0]))));
+        address account = address(uint160(uint256(StackItem.unwrap(inputs[1]))));
+        uint256 tokenBalance = IERC721(token).balanceOf(account);
+        StackItem[] memory outputs = new StackItem[](1);
+        outputs[0] = StackItem.wrap(bytes32(tokenBalance));
         return outputs;
     }
 }
