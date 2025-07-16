@@ -40,7 +40,7 @@ import {LibOpUint256ERC721BalanceOf} from "./erc721/uint256/LibOpUint256ERC721Ba
 import {LibOpERC721BalanceOf} from "./erc721/LibOpERC721BalanceOf.sol";
 import {LibOpERC721OwnerOf} from "./erc721/LibOpERC721OwnerOf.sol";
 
-import {LibOpERC5313OwnerNP} from "./erc5313/LibOpERC5313OwnerNP.sol";
+import {LibOpERC5313Owner} from "./erc5313/LibOpERC5313Owner.sol";
 
 import {LibOpBlockNumber} from "./evm/LibOpBlockNumber.sol";
 import {LibOpChainId} from "./evm/LibOpChainId.sol";
@@ -570,7 +570,7 @@ library LibAllStandardOps {
                     LibOpUint256ERC721BalanceOf.integrity,
                     LibOpERC721BalanceOf.integrity,
                     LibOpERC721OwnerOf.integrity,
-                    LibOpERC5313OwnerNP.integrity,
+                    LibOpERC5313Owner.integrity,
                     LibOpBlockNumber.integrity,
                     LibOpChainId.integrity,
                     LibOpTimestamp.integrity,
@@ -683,7 +683,7 @@ library LibAllStandardOps {
                     LibOpUint256ERC721BalanceOf.run,
                     LibOpERC721BalanceOf.run,
                     LibOpERC721OwnerOf.run,
-                    LibOpERC5313OwnerNP.run,
+                    LibOpERC5313Owner.run,
                     LibOpBlockNumber.run,
                     LibOpChainId.run,
                     LibOpTimestamp.run,
