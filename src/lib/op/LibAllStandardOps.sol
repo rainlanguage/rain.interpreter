@@ -225,7 +225,10 @@ library LibAllStandardOps {
             //     "if",
             //     "If the first input is nonzero, the second input is used. Otherwise, the third input is used. If is eagerly evaluated."
             // ),
-            AuthoringMetaV2("is-zero", "1 if the input is 0, 0 otherwise. The input is any numerical 0 value, not just binary 0 e.g. 0e20 is considered 0."),
+            AuthoringMetaV2(
+                "is-zero",
+                "1 if the input is 0, 0 otherwise. The input is any numerical 0 value, not just binary 0 e.g. 0e20 is considered 0."
+            ),
             AuthoringMetaV2("less-than", "true if the first input is less than the second input, false otherwise."),
             // AuthoringMetaV2(
             //     "less-than-or-equal-to", "1 if the first input is less than or equal to the second input, 0 otherwise."
