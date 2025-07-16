@@ -3,7 +3,7 @@ pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {LibOpUint256ERC721BalanceOf} from "src/lib/op/erc721/uint256/LibOpUint256ERC721BalanceOf.sol";
+import {LibOpERC721BalanceOf} from "src/lib/op/erc721/LibOpERC721BalanceOf.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import {
     IInterpreterV4,
@@ -18,10 +18,11 @@ import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
+import {LibDecimalFloat, Float, LossyConversionToFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
-/// @title LibOpUint256ERC721BalanceOfTest
+/// @title LibOpERC721BalanceOfTest
 /// @notice Test the opcode for getting the balance of an erc721 token.
-contract LibOpUint256ERC721BalanceOfTest is OpTest {
+contract LibOpERC721BalanceOfTest is OpTest {
     function testOpERC721BalanceOfIntegrity(
         IntegrityCheckState memory state,
         uint8 inputs,
@@ -31,7 +32,7 @@ contract LibOpUint256ERC721BalanceOfTest is OpTest {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpUint256ERC721BalanceOf.integrity(state, LibOperand.build(inputs, outputs, operandData));
+            LibOpERC721BalanceOf.integrity(state, LibOperand.build(inputs, outputs, operandData));
 
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
@@ -40,6 +41,9 @@ contract LibOpUint256ERC721BalanceOfTest is OpTest {
     function testOpERC721BalanceOfRun(address token, address account, uint256 balance, uint16 operandData) external {
         assumeEtchable(token);
         vm.etch(token, hex"fe");
+
+        (, bool lossless) = LibDecimalFloat.fromFixedDecimalLossyPacked(balance, 0);
+        vm.assume(lossless);
 
         StackItem[] memory inputs = new StackItem[](2);
         inputs[0] = StackItem.wrap(bytes32(uint256(uint160(token))));
@@ -54,9 +58,9 @@ contract LibOpUint256ERC721BalanceOfTest is OpTest {
         opReferenceCheck(
             opTestDefaultInterpreterState(),
             operand,
-            LibOpUint256ERC721BalanceOf.referenceFn,
-            LibOpUint256ERC721BalanceOf.integrity,
-            LibOpUint256ERC721BalanceOf.run,
+            LibOpERC721BalanceOf.referenceFn,
+            LibOpERC721BalanceOf.integrity,
+            LibOpERC721BalanceOf.run,
             inputs
         );
     }
@@ -65,10 +69,13 @@ contract LibOpUint256ERC721BalanceOfTest is OpTest {
         bytes memory bytecode = iDeployer.parse2(
             bytes(
                 string.concat(
-                    "_: uint256-erc721-balance-of(", Strings.toHexString(token), " ", Strings.toHexString(account), ");"
+                    "_: erc721-balance-of(", Strings.toHexString(token), " ", Strings.toHexString(account), ");"
                 )
             )
         );
+
+        (, bool lossless) = LibDecimalFloat.fromFixedDecimalLossyPacked(balance, 0);
+        vm.assume(lossless);
 
         assumeEtchable(token);
         vm.etch(token, hex"fe");
@@ -94,48 +101,48 @@ contract LibOpUint256ERC721BalanceOfTest is OpTest {
     /// Test that balance of without inputs fails integrity check.
     function testOpERC721BalanceOfIntegrityFail0() external {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));
-        bytes memory bytecode = iDeployer.parse2("_: uint256-erc721-balance-of();");
+        bytes memory bytecode = iDeployer.parse2("_: erc721-balance-of();");
         (bytecode);
     }
 
     /// Test that balance of with one input fails integrity check.
     function testOpERC721BalanceOfIntegrityFail1() external {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 2, 1));
-        bytes memory bytecode = iDeployer.parse2("_: uint256-erc721-balance-of(0x00);");
+        bytes memory bytecode = iDeployer.parse2("_: erc721-balance-of(0x00);");
         (bytecode);
     }
 
     /// Test that balance of with three inputs fails integrity check.
     function testOpERC721BalanceOfIntegrityFail3() external {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
-        bytes memory bytecode = iDeployer.parse2("_: uint256-erc721-balance-of(0x00 0x01 0x02);");
+        bytes memory bytecode = iDeployer.parse2("_: erc721-balance-of(0x00 0x01 0x02);");
         (bytecode);
     }
 
     /// Test that operand fails integrity check.
     function testOpERC721BalanceOfIntegrityFailOperand() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
-        bytes memory bytecode = iDeployer.parse2("_: uint256-erc721-balance-of<0>(0x00 0x01);");
+        bytes memory bytecode = iDeployer.parse2("_: erc721-balance-of<0>(0x00 0x01);");
         (bytecode);
     }
 
     function testOpERC721BalanceOfZeroInputs() external {
-        checkBadInputs("_: uint256-erc721-balance-of();", 0, 2, 0);
+        checkBadInputs("_: erc721-balance-of();", 0, 2, 0);
     }
 
     function testOpERC721BalanceOfOneInput() external {
-        checkBadInputs("_: uint256-erc721-balance-of(0x00);", 1, 2, 1);
+        checkBadInputs("_: erc721-balance-of(0x00);", 1, 2, 1);
     }
 
     function testOpERC721BalanceOfThreeInputs() external {
-        checkBadInputs("_: uint256-erc721-balance-of(0x00 0x01 0x02);", 3, 2, 3);
+        checkBadInputs("_: erc721-balance-of(0x00 0x01 0x02);", 3, 2, 3);
     }
 
     function testOpERC721BalanceOfZeroOutputs() external {
-        checkBadOutputs(": uint256-erc721-balance-of(0x00 0x01);", 2, 1, 0);
+        checkBadOutputs(": erc721-balance-of(0x00 0x01);", 2, 1, 0);
     }
 
     function testOpERC721BalanceOfTwoOutputs() external {
-        checkBadOutputs("_ _: uint256-erc721-balance-of(0x00 0x01);", 2, 1, 2);
+        checkBadOutputs("_ _: erc721-balance-of(0x00 0x01);", 2, 1, 2);
     }
 }
