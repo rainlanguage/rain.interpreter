@@ -10,7 +10,7 @@
 pragma solidity =0.8.25;
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0x0d1bd1e36b938abb7312784026140ed159a9a59520f9d315c8836bcf14931c55);
+bytes32 constant BYTECODE_HASH = bytes32(0x74d90562fe80acca7dc3ccd293ed98a0a51ec14dc39ea9c0a5d01ec43d4b3423);
 
 /// @dev The parse meta that is used to lookup word definitions.
 /// The structure of the parse meta is:
@@ -29,7 +29,7 @@ bytes32 constant BYTECODE_HASH = bytes32(0x0d1bd1e36b938abb7312784026140ed159a9a
 /// bit count of the previous bloom filter. If we reach the end of the bloom
 /// filters then we have a miss.
 bytes constant PARSE_META =
-    hex"0119204182060c080006c6c1800000012200200282040029000100680901208400200d1e98a71dd6ea18118eba9713065d302481e5d904ac72c00e7ff5a229ae0c8706fb9c2528c7bc2312fec72818d295ed23d9a6c50063d58d012ba0980c6cbb42216d6b2403ae6396082c4e962041d78a16172ab51a5b8f1d15f871180f48502f1fb9d38d0be7f2e71cf1ff4d19d140c2271a1e3510abcc6405b702d7020f038b07ee624a1e4143471482e75b1b60aa350a3d21ff174c80cb22cc4a6a26023c0409a046dc259b3887";
+    hex"0178a8806000299010000908a00a30484001280030060000180000000cc2200408a00c95d8382948145c2a34b3f325d587e204afc8f01d95a26007b9a51f0d5e6f2803ce312215fae0a1118cfd53051c784d1681ac9620ac6dfc26a4e5e91e5fc32a0e92b2401cbbd837100ef76b00cd8814229714ec133135921ff880501427634f0f23b4970ac0e53d0b895f991ac908be0983724f12c080bc279d7b7d235c0ab5086d2a7b19bcb24402af7d4506414b8117b04fb31bb2182f18ef532921c301e328fa5d8001336a5924ab2461";
 
 /// @dev The build depth of the parser meta.
 
@@ -39,11 +39,11 @@ uint8 constant PARSE_META_BUILD_DEPTH = 2;
 /// These positional indexes all map to the same indexes looked up in the parse
 /// meta.
 bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
-    hex"19eb19eb19eb1ac01bd71bd71bd71ac01ac019eb19eb19eb1bd71bd71bd71bd71bd71bd71bd71bd71bd71bd71bd71bd71bd71bd71bd71bd71bd71bd71bd71bd71bd71bd71bd71bd71bd71bd71bd719eb1bd71bd7";
+    hex"19f319f319f31ac81bdf1bdf1bdf1ac81ac819f319f319f31bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf1bdf19f31bdf1bdf";
 
 /// @dev Every two bytes is a function pointer for a literal parser.
 /// Literal dispatches are determined by the first byte(s) of the literal
 /// rather than a full word lookup, and are done with simple conditional
 /// jumps as the possibilities are limited compared to the number of words we
 /// have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"1533176517a81846";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"153b176d17b0184e";

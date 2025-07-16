@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-// // import {OpTest} from "test/abstract/OpTest.sol";
+import {OpTest} from "test/abstract/OpTest.sol";
 // // import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 // // import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 // // import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
@@ -17,7 +17,7 @@ pragma solidity =0.8.25;
 // // import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 // // import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-// // contract LibOpIsZeroNPTest is OpTest {
+contract LibOpIsZeroTest is OpTest {
 // //     using LibUint256Array for uint256[];
 
 //     /// Directly test the integrity logic of LibOpIsZeroNP. This tests the happy
@@ -75,7 +75,7 @@ pragma solidity =0.8.25;
 // //         checkBadOutputs(": is-zero(0);", 1, 1, 0);
 // //     }
 
-// //     function testOpIsZeroNPTwoOutputs() external {
-// //         checkBadOutputs("_ _: is-zero(30);", 1, 1, 2);
-// //     }
-// // }
+    function testOpIsZeroNPTwoOutputs() external {
+        checkBadOutputs("_ _: is-zero(30);", 1, 1, 2);
+    }
+}
