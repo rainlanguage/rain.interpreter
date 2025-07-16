@@ -37,6 +37,7 @@ import {LibOpERC20BalanceOf} from "./erc20/LibOpERC20BalanceOf.sol";
 import {LibOpERC20TotalSupply} from "./erc20/LibOpERC20TotalSupply.sol";
 
 import {LibOpUint256ERC721BalanceOf} from "./erc721/uint256/LibOpUint256ERC721BalanceOf.sol";
+import {LibOpERC721BalanceOf} from "./erc721/LibOpERC721BalanceOf.sol";
 import {LibOpERC721OwnerOf} from "./erc721/LibOpERC721OwnerOf.sol";
 
 import {LibOpERC5313OwnerNP} from "./erc5313/LibOpERC5313OwnerNP.sol";
@@ -105,7 +106,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 41;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 42;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -185,7 +186,11 @@ library LibAllStandardOps {
             ),
             AuthoringMetaV2(
                 "uint256-erc721-balance-of",
-                "Gets the balance of an erc721 token for an account as a uint256 value. The first input is the token address and the second is the account address."
+                "Gets the balance of an erc721 token for an account as a uint256 value. The first input is the token address and the second is the account address. Returns a uint256 rather than a float."
+            ),
+            AuthoringMetaV2(
+                "erc721-balance-of",
+                "Gets the balance of an erc721 token for an account. The first input is the token address and the second is the account address."
             ),
             AuthoringMetaV2(
                 "erc721-owner-of",
@@ -399,6 +404,8 @@ library LibAllStandardOps {
                     LibParseOperand.handleOperandDisallowed,
                     // uint256-erc721-balance-of
                     LibParseOperand.handleOperandDisallowed,
+                    // erc721-balance-of
+                    LibParseOperand.handleOperandDisallowed,
                     // erc721-owner-of
                     LibParseOperand.handleOperandDisallowed,
                     // erc5313-owner
@@ -561,6 +568,7 @@ library LibAllStandardOps {
                     LibOpERC20BalanceOf.integrity,
                     LibOpERC20TotalSupply.integrity,
                     LibOpUint256ERC721BalanceOf.integrity,
+                    LibOpERC721BalanceOf.integrity,
                     LibOpERC721OwnerOf.integrity,
                     LibOpERC5313OwnerNP.integrity,
                     LibOpBlockNumber.integrity,
@@ -673,6 +681,7 @@ library LibAllStandardOps {
                     LibOpERC20BalanceOf.run,
                     LibOpERC20TotalSupply.run,
                     LibOpUint256ERC721BalanceOf.run,
+                    LibOpERC721BalanceOf.run,
                     LibOpERC721OwnerOf.run,
                     LibOpERC5313OwnerNP.run,
                     LibOpBlockNumber.run,
