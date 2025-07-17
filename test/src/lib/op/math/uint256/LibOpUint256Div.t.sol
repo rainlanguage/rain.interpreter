@@ -2,8 +2,6 @@
 pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckState, OperandV2, InterpreterState, stdError} from "test/abstract/OpTest.sol";
-// import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
-// import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOpUint256Div} from "src/lib/op/math/uint256/LibOpUint256Div.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
@@ -100,20 +98,24 @@ contract LibOpUint256DivTest is OpTest {
         checkHappy("_: uint256-div(0x06 0x05);", bytes32(uint256(1)), "6 / 5");
         checkHappy("_: uint256-div(0x06 0x06);", bytes32(uint256(1)), "6 / 6");
         checkHappy("_: uint256-div(0x06 0x07);", bytes32(uint256(0)), "6 / 7");
-        // checkHappy("_: uint256-div(6e-18 max-value());", 0, "6 / max-value()");
+        checkHappy("_: uint256-div(0x06 uint256-max-value());", 0, "6 / uint256-max-value()");
 
         // Anything divided by 1 is itself.
         checkHappy("_: uint256-div(0 0x01);", bytes32(uint256(0)), "0 / 1");
         checkHappy("_: uint256-div(0x01 0x01);", bytes32(uint256(1)), "1 / 1");
         checkHappy("_: uint256-div(0x02 0x01);", bytes32(uint256(2)), "2 / 1");
         checkHappy("_: uint256-div(0x03 0x01);", bytes32(uint256(3)), "3 / 1");
-        // checkHappy("_: uint256-div(max-value() 1e-18);", type(uint256).max, "max-value() / 1");
+        checkHappy("_: uint256-div(uint256-max-value() 0x01);", bytes32(type(uint256).max), "uint256-max-value() / 1");
 
         // Anything divided by itself is 1 (except 0).
         checkHappy("_: uint256-div(0x01 0x01);", bytes32(uint256(1)), "1 / 1");
         checkHappy("_: uint256-div(0x02 0x02);", bytes32(uint256(1)), "2 / 2");
         checkHappy("_: uint256-div(0x03 0x03);", bytes32(uint256(1)), "3 / 3");
-        // checkHappy("_: uint256-div(max-value() max-value());", 1, "max-value() / max-value()");
+        checkHappy(
+            "_: uint256-div(uint256-max-value() uint256-max-value());",
+            bytes32(uint256(1)),
+            "uint256-max-value() / uint256-max-value()"
+        );
     }
 
     /// Test the eval of `uint256-div` opcode parsed from a string. Tests two inputs.
@@ -121,7 +123,7 @@ contract LibOpUint256DivTest is OpTest {
     function testOpUint256DivEval2InputsUnhappy() external {
         checkUnhappy("_: uint256-div(0 0);", stdError.divisionError);
         checkUnhappy("_: uint256-div(0x01 0);", stdError.divisionError);
-        // checkUnhappy("_: uint256-div(max-value() 0);", stdError.divisionError);
+        checkUnhappy("_: uint256-div(uint256-max-value() 0);", stdError.divisionError);
     }
 
     /// Test the eval of `uint256-div` opcode parsed from a string. Tests three inputs.
@@ -135,7 +137,7 @@ contract LibOpUint256DivTest is OpTest {
         checkHappy("_: uint256-div(0x06 0x05 0x01);", bytes32(uint256(1)), "6 / 5 / 1");
         checkHappy("_: uint256-div(0x06 0x06 0x01);", bytes32(uint256(1)), "6 / 6 / 1");
         checkHappy("_: uint256-div(0x06 0x07 0x01);", 0, "6 / 7 / 1");
-        // checkHappy("_: uint256-div(6e-18 max-value() 1e-18);", 0, "6 / max-value() / 1");
+        checkHappy("_: uint256-div(0x06 uint256-max-value() 0x01);", 0, "6 / uint256-max-value() / 1");
         checkHappy("_: uint256-div(0x06 0x01 0x02);", bytes32(uint256(3)), "6 / 1 / 2");
         checkHappy("_: uint256-div(0x06 0x02 0x02);", bytes32(uint256(1)), "6 / 2 / 2");
         checkHappy("_: uint256-div(0x06 0x03 0x02);", bytes32(uint256(1)), "6 / 3 / 2");
@@ -143,14 +145,16 @@ contract LibOpUint256DivTest is OpTest {
         checkHappy("_: uint256-div(0x06 0x05 0x02);", 0, "6 / 5 / 2");
         checkHappy("_: uint256-div(0x06 0x06 0x02);", 0, "6 / 6 / 2");
         checkHappy("_: uint256-div(0x06 0x07 0x02);", 0, "6 / 7 / 2");
-        // checkHappy("_: uint256-div(6e-18 max-value() 2e-18);", 0, "6 / max-value() / 2");
+        checkHappy("_: uint256-div(0x06 uint256-max-value() 0x02);", 0, "6 / uint256-max-value() / 2");
 
         // Anything divided by 1 is itself.
         checkHappy("_: uint256-div(0 0x01 0x01);", 0, "0 / 1 / 1");
         checkHappy("_: uint256-div(0x01 0x01 0x01);", bytes32(uint256(1)), "1 / 1 / 1");
         checkHappy("_: uint256-div(0x02 0x01 0x01);", bytes32(uint256(2)), "2 / 1 / 1");
         checkHappy("_: uint256-div(0x03 0x01 0x01);", bytes32(uint256(3)), "3 / 1 / 1");
-        //     checkHappy("_: uint256-div(max-value() 1e-18 1e-18);", type(uint256).max, "max-value() / 1 / 1");
+        checkHappy(
+            "_: uint256-div(uint256-max-value() 0x01 0x01);", bytes32(type(uint256).max), "uint256-max-value() / 1 / 1"
+        );
 
         // Anything divided by itself is 1 (except 0).
         checkHappy("_: uint256-div(0x01 0x01 0x01);", bytes32(uint256(1)), "1 / 1 / 1");
@@ -158,8 +162,16 @@ contract LibOpUint256DivTest is OpTest {
         checkHappy("_: uint256-div(0x02 0x01 0x02);", bytes32(uint256(1)), "2 / 1 / 2");
         checkHappy("_: uint256-div(0x03 0x03 0x01);", bytes32(uint256(1)), "3 / 3 / 1");
         checkHappy("_: uint256-div(0x03 0x01 0x03);", bytes32(uint256(1)), "3 / 1 / 3");
-        //     checkHappy("_: uint256-div(max-value() max-value() 1e-18);", 1, "max-value() / max-value() / 1");
-        //     checkHappy("_: uint256-div(max-value() 1e-18 max-value());", 1, "max-value() / 1 / max-value()");
+        checkHappy(
+            "_: uint256-div(uint256-max-value() uint256-max-value() 0x01);",
+            bytes32(uint256(1)),
+            "uint256-max-value() / uint256-max-value() / 1"
+        );
+        checkHappy(
+            "_: uint256-div(uint256-max-value() 0x01 uint256-max-value());",
+            bytes32(uint256(1)),
+            "uint256-max-value() / 1 / uint256-max-value()"
+        );
     }
 
     /// Test the eval of `uint256-div` opcode parsed from a string. Tests three inputs.
