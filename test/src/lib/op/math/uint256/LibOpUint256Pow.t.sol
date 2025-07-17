@@ -2,12 +2,7 @@
 pragma solidity =0.8.25;
 
 import {stdError} from "forge-std/Test.sol";
-
-// import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
-
 import {OpTest} from "test/abstract/OpTest.sol";
-// import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
-// import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOpUint256Pow} from "src/lib/op/math/uint256/LibOpUint256Pow.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
@@ -15,8 +10,6 @@ import {StackItem, OperandV2} from "rain.interpreter.interface/interface/unstabl
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpUint256PowTest is OpTest {
-    //     using LibUint256Array for uint256[];
-
     /// Directly test the integrity logic of LibOpUint256Exp. This tests the happy
     /// path where the inputs input and calc match.
     function testOpUint256ExpIntegrityHappy(IntegrityCheckState memory state, uint8 inputs, uint16 operandData)
