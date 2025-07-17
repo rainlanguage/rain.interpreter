@@ -196,10 +196,10 @@ contract LibOpUint256PowTest is OpTest {
         checkHappy("_: uint256-power(0x03 0x02 0x02);", bytes32(uint256(81)), "3 ** 2 ** 2");
 
         // Anything exp 3 1 is itself cubed.
-        checkHappy("_: uint256-power(0 0x03 0x01);", 0, "0 ** 3 ** 0");
-        checkHappy("_: uint256-power(0x01 0x03 0x01);", bytes32(uint256(1)), "1 ** 3 ** 0");
-        checkHappy("_: uint256-power(0x02 0x03 0x01);", bytes32(uint256(8)), "2 ** 3 ** 0");
-        checkHappy("_: uint256-power(0x03 0x03 0x01);", bytes32(uint256(27)), "3 ** 3 ** 0");
+        checkHappy("_: uint256-power(0 0x03 0x01);", 0, "0 ** 3 ** 1");
+        checkHappy("_: uint256-power(0x01 0x03 0x01);", bytes32(uint256(1)), "1 ** 3 ** 1");
+        checkHappy("_: uint256-power(0x02 0x03 0x01);", bytes32(uint256(8)), "2 ** 3 ** 1");
+        checkHappy("_: uint256-power(0x03 0x03 0x01);", bytes32(uint256(27)), "3 ** 3 ** 1");
 
         // Anything exp 3 2 is itself cubed squared.
         checkHappy("_: uint256-power(0 0x03 0x02);", 0, "0 ** 3 ** 2");
