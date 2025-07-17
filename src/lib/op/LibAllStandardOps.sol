@@ -106,7 +106,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 43;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 44;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -242,10 +242,10 @@ library LibAllStandardOps {
             //     "Calculates a linear growth curve as `base + (rate * t)` where `base` is the initial value, `rate` is the rate of growth and `t` is units of time. Inputs in order are `base`, `rate`, and `t` respectively."
             // ),
             AuthoringMetaV2("uint256-max-value", "The maximum possible unsigned integer value (all binary bits are 1)."),
-            // AuthoringMetaV2(
-            //     "uint256-div",
-            //     "Divides the first input by all other inputs as uint256 values. Errors if any divisor is zero. Rounds down."
-            // ),
+            AuthoringMetaV2(
+                "uint256-div",
+                "Divides the first input by all other inputs as uint256 values. Errors if any divisor is zero. Rounds down."
+            ),
             // AuthoringMetaV2(
             //     "uint256-mul",
             //     "Multiplies all inputs together as uint256 values. Errors if the multiplication exceeds `max-value()`."
@@ -451,8 +451,8 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // uint256-max-value
                     LibParseOperand.handleOperandDisallowed,
-                    // // uint256-div
-                    // LibParseOperand.handleOperandDisallowed,
+                    // uint256-div
+                    LibParseOperand.handleOperandDisallowed,
                     // // uint256-mul
                     // LibParseOperand.handleOperandDisallowed,
                     // // uint256-power
@@ -594,7 +594,7 @@ library LibAllStandardOps {
                     // LibOpExponentialGrowth.integrity,
                     // LibOpLinearGrowth.integrity,
                     LibOpMaxUint256.integrity,
-                    // LibOpUint256Div.integrity,
+                    LibOpUint256Div.integrity,
                     // LibOpUint256Mul.integrity,
                     // LibOpUint256Pow.integrity,
                     LibOpAdd.integrity,
@@ -707,7 +707,7 @@ library LibAllStandardOps {
                     // LibOpExponentialGrowth.run,
                     // LibOpLinearGrowth.run,
                     LibOpMaxUint256.run,
-                    // LibOpUint256Div.run,
+                    LibOpUint256Div.run,
                     // LibOpUint256Mul.run,
                     // LibOpUint256Pow.run,
                     LibOpAdd.run,
