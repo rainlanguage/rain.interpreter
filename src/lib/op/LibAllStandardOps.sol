@@ -107,7 +107,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 46;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 47;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -255,10 +255,10 @@ library LibAllStandardOps {
                 "uint256-mul",
                 "Multiplies all inputs together as uint256 values. Errors if the multiplication exceeds `uint256-max-value()`."
             ),
-            // AuthoringMetaV2(
-            //     "uint256-power",
-            //     "Raises the first input to the power of all other inputs as uint256 values. Errors if the exponentiation exceeds `max-value()`."
-            // ),
+            AuthoringMetaV2(
+                "uint256-power",
+                "Raises the first input to the power of all other inputs as uint256 values. Errors if the exponentiation exceeds `uint256-max-value()`."
+            ),
             AuthoringMetaV2("add", "Adds all numbers together."),
             // AuthoringMetaV2("avg", "Arithmetic average (mean) of two numbers."),
             // AuthoringMetaV2("ceil", "Ceiling of a number."),
@@ -462,8 +462,8 @@ library LibAllStandardOps {
                     LibParseOperand.handleOperandDisallowed,
                     // uint256-mul
                     LibParseOperand.handleOperandDisallowed,
-                    // // uint256-power
-                    // LibParseOperand.handleOperandDisallowed,
+                    // uint256-power
+                    LibParseOperand.handleOperandDisallowed,
                     // add
                     LibParseOperand.handleOperandDisallowed,
                     // // avg
@@ -604,7 +604,7 @@ library LibAllStandardOps {
                     LibOpUint256Add.integrity,
                     LibOpUint256Div.integrity,
                     LibOpUint256Mul.integrity,
-                    // LibOpUint256Pow.integrity,
+                    LibOpUint256Pow.integrity,
                     LibOpAdd.integrity,
                     // LibOpAvg.integrity,
                     // LibOpCeil.integrity,
@@ -718,7 +718,7 @@ library LibAllStandardOps {
                     LibOpUint256Add.run,
                     LibOpUint256Div.run,
                     LibOpUint256Mul.run,
-                    // LibOpUint256Pow.run,
+                    LibOpUint256Pow.run,
                     LibOpAdd.run,
                     // LibOpAvg.run,
                     // LibOpCeil.run,
