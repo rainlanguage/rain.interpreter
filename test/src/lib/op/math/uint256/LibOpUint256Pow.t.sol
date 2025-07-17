@@ -10,7 +10,7 @@ import {StackItem, OperandV2} from "rain.interpreter.interface/interface/unstabl
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpUint256PowTest is OpTest {
-    /// Directly test the integrity logic of LibOpUint256Exp. This tests the happy
+    /// Directly test the integrity logic of LibOpUint256Pow. This tests the happy
     /// path where the inputs input and calc match.
     function testOpUint256ExpIntegrityHappy(IntegrityCheckState memory state, uint8 inputs, uint16 operandData)
         external
