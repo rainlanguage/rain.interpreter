@@ -5,6 +5,7 @@ import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpre
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
 import {InterpreterState} from "../../../state/LibInterpreterState.sol";
+import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 /// @title LibOpUint256Mul
 /// @notice Opcode to mul N integers. Errors on overflow.
@@ -51,20 +52,20 @@ library LibOpUint256Mul {
     }
 
     /// Gas intensive reference implementation of multiplication for testing.
-    function referenceFn(InterpreterState memory, OperandV2, uint256[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure
-        returns (uint256[] memory outputs)
+        returns (StackItem[] memory outputs)
     {
         // Unchecked so that when we assert that an overflow error is thrown, we
         // see the revert from the real function and not the reference function.
         unchecked {
-            uint256 acc = inputs[0];
+            uint256 acc = uint256(StackItem.unwrap(inputs[0]));
             for (uint256 i = 1; i < inputs.length; i++) {
-                acc *= inputs[i];
+                acc *= uint256(StackItem.unwrap(inputs[i]));
             }
-            outputs = new uint256[](1);
-            outputs[0] = acc;
+            outputs = new StackItem[](1);
+            outputs[0] = StackItem.wrap(bytes32(acc));
         }
     }
 }
