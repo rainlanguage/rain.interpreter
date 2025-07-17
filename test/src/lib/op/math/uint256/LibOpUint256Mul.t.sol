@@ -80,10 +80,10 @@ contract LibOpUint256MulTest is OpTest {
 
     /// Test the eval of `uint256-mul` opcode parsed from a string. Tests one input.
     function testOpUint256MulEvalOneInput() external {
-        checkBadInputs("_: uint256-mul(5e-18);", 1, 2, 1);
+        checkBadInputs("_: uint256-mul(0x05);", 1, 2, 1);
         checkBadInputs("_: uint256-mul(0);", 1, 2, 1);
-        checkBadInputs("_: uint256-mul(1e-18);", 1, 2, 1);
-        checkBadInputs("_: uint256-mul(max-value());", 1, 2, 1);
+        checkBadInputs("_: uint256-mul(0x01);", 1, 2, 1);
+        checkBadInputs("_: uint256-mul(uint256-max-value());", 1, 2, 1);
     }
 
     function testOpUint256MulEvalZeroOutputs() external {
