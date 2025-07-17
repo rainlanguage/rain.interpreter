@@ -63,6 +63,7 @@ import {LibOpLessThanOrEqualToNP} from "./logic/LibOpLessThanOrEqualToNP.sol";
 // import {LibOpLinearGrowth} from "./math/growth/LibOpLinearGrowth.sol";
 
 import {LibOpMaxUint256} from "./math/uint256/LibOpMaxUint256.sol";
+import {LibOpUint256Add} from "./math/uint256/LibOpUint256Add.sol";
 import {LibOpUint256Div} from "./math/uint256/LibOpUint256Div.sol";
 import {LibOpUint256Mul} from "./math/uint256/LibOpUint256Mul.sol";
 import {LibOpUint256Pow} from "./math/uint256/LibOpUint256Pow.sol";
@@ -106,7 +107,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 45;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 46;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -243,12 +244,16 @@ library LibAllStandardOps {
             // ),
             AuthoringMetaV2("uint256-max-value", "The maximum possible unsigned integer value (all binary bits are 1)."),
             AuthoringMetaV2(
+                "uint256-add",
+                "Adds all inputs together as uint256 values. Errors if the addition exceeds `uint256-max-value()`."
+            ),
+            AuthoringMetaV2(
                 "uint256-div",
                 "Divides the first input by all other inputs as uint256 values. Errors if any divisor is zero. Rounds down."
             ),
             AuthoringMetaV2(
                 "uint256-mul",
-                "Multiplies all inputs together as uint256 values. Errors if the multiplication exceeds `max-value()`."
+                "Multiplies all inputs together as uint256 values. Errors if the multiplication exceeds `uint256-max-value()`."
             ),
             // AuthoringMetaV2(
             //     "uint256-power",
@@ -451,6 +456,8 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // uint256-max-value
                     LibParseOperand.handleOperandDisallowed,
+                    // uint256-add
+                    LibParseOperand.handleOperandDisallowed,
                     // uint256-div
                     LibParseOperand.handleOperandDisallowed,
                     // uint256-mul
@@ -594,6 +601,7 @@ library LibAllStandardOps {
                     // LibOpExponentialGrowth.integrity,
                     // LibOpLinearGrowth.integrity,
                     LibOpMaxUint256.integrity,
+                    LibOpUint256Add.integrity,
                     LibOpUint256Div.integrity,
                     LibOpUint256Mul.integrity,
                     // LibOpUint256Pow.integrity,
@@ -707,6 +715,7 @@ library LibAllStandardOps {
                     // LibOpExponentialGrowth.run,
                     // LibOpLinearGrowth.run,
                     LibOpMaxUint256.run,
+                    LibOpUint256Add.run,
                     LibOpUint256Div.run,
                     LibOpUint256Mul.run,
                     // LibOpUint256Pow.run,
