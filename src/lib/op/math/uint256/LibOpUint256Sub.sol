@@ -18,7 +18,7 @@ library LibOpUint256Sub {
     }
 
     /// uint256-sub
-    /// Addition with implied underflow checks from the Solidity 0.8.x
+    /// Subtraction with implied underflow checks from the Solidity 0.8.x
     /// compiler.
     function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;
