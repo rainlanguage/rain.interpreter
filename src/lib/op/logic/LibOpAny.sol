@@ -5,11 +5,12 @@ import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpre
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
+import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
-/// @title LibOpAnyNP
+/// @title LibOpAny
 /// @notice Opcode to return the first nonzero item on the stack up to the inputs
 /// limit.
-library LibOpAnyNP {
+library LibOpAny {
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least one input.
         uint256 inputs = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
@@ -36,21 +37,21 @@ library LibOpAnyNP {
     }
 
     /// Gas intensive reference implementation of ANY for testing.
-    function referenceFn(InterpreterState memory, OperandV2, uint256[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure
-        returns (uint256[] memory outputs)
+        returns (StackItem[] memory outputs)
     {
         // Zero length inputs is not supported so this 0 will always be written
         // over.
-        uint256 value = 0;
+        bytes32 value = 0;
         for (uint256 i = 0; i < inputs.length; i++) {
-            value = inputs[i];
-            if (value != 0) {
+            value = StackItem.unwrap(inputs[i]);
+            if (value != bytes32(0)) {
                 break;
             }
         }
-        outputs = new uint256[](1);
-        outputs[0] = value;
+        outputs = new StackItem[](1);
+        outputs[0] = StackItem.wrap(value);
     }
 }
