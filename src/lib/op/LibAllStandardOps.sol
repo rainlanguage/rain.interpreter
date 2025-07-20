@@ -46,7 +46,7 @@ import {LibOpBlockNumber} from "./evm/LibOpBlockNumber.sol";
 import {LibOpChainId} from "./evm/LibOpChainId.sol";
 import {LibOpTimestamp} from "./evm/LibOpTimestamp.sol";
 
-import {LibOpAnyNP} from "./logic/LibOpAnyNP.sol";
+import {LibOpAny} from "./logic/LibOpAny.sol";
 import {LibOpConditionsNP} from "./logic/LibOpConditionsNP.sol";
 import {LibOpEnsure} from "./logic/LibOpEnsure.sol";
 import {LibOpEqualTo} from "./logic/LibOpEqualTo.sol";
@@ -108,7 +108,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 48;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 49;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -206,7 +206,7 @@ library LibAllStandardOps {
             AuthoringMetaV2("chain-id", "The current chain id."),
             AuthoringMetaV2("block-timestamp", "The current block timestamp."),
             AuthoringMetaV2("now", "The current block timestamp."),
-            // AuthoringMetaV2("any", "The first non-zero value out of all inputs, or 0 if every input is 0."),
+            AuthoringMetaV2("any", "The first binary non-zero value out of all inputs, or 0 if every input is 0."),
             // AuthoringMetaV2(
             //     "conditions",
             //     "Treats inputs as pairwise condition/value pairs. The first nonzero condition's value is used. If no conditions are nonzero, the expression reverts. Provide a constant nonzero value to define a fallback case. If the number of inputs is odd, the final value is used as an error string in the case that no conditions match."
@@ -430,8 +430,8 @@ library LibAllStandardOps {
                     LibParseOperand.handleOperandDisallowed,
                     // now
                     LibParseOperand.handleOperandDisallowed,
-                    // // any
-                    // LibParseOperand.handleOperandDisallowed,
+                    // any
+                    LibParseOperand.handleOperandDisallowed,
                     // // conditions
                     // LibParseOperand.handleOperandDisallowed,
                     // ensure
@@ -592,7 +592,7 @@ library LibAllStandardOps {
                     LibOpTimestamp.integrity,
                     // now
                     LibOpTimestamp.integrity,
-                    // LibOpAnyNP.integrity,
+                    LibOpAny.integrity,
                     // LibOpConditionsNP.integrity,
                     LibOpEnsure.integrity,
                     LibOpEqualTo.integrity,
@@ -707,7 +707,7 @@ library LibAllStandardOps {
                     LibOpTimestamp.run,
                     // now
                     LibOpTimestamp.run,
-                    // LibOpAnyNP.run,
+                    LibOpAny.run,
                     // LibOpConditionsNP.run,
                     LibOpEnsure.run,
                     LibOpEqualTo.run,
