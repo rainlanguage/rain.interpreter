@@ -28,7 +28,7 @@ contract LibOpGreaterThanOrEqualToTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpGreaterThanOrEqualTo.
-    function testOpGreaterThanOrEqualToNPRun(StackItem input1, StackItem input2) external view {
+    function testOpGreaterThanOrEqualToRun(StackItem input1, StackItem input2) external view {
         InterpreterState memory state = opTestDefaultInterpreterState();
         StackItem[] memory inputs = new StackItem[](2);
         inputs[0] = input1;
