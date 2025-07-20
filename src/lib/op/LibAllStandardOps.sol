@@ -53,11 +53,11 @@ import {LibOpEqualTo} from "./logic/LibOpEqualTo.sol";
 import {LibOpBinaryEqualTo} from "./logic/LibOpBinaryEqualTo.sol";
 import {LibOpEveryNP} from "./logic/LibOpEveryNP.sol";
 import {LibOpGreaterThan} from "./logic/LibOpGreaterThan.sol";
-import {LibOpGreaterThanOrEqualToNP} from "./logic/LibOpGreaterThanOrEqualToNP.sol";
+import {LibOpGreaterThanOrEqualTo} from "./logic/LibOpGreaterThanOrEqualTo.sol";
 import {LibOpIfNP} from "./logic/LibOpIfNP.sol";
 import {LibOpIsZero} from "./logic/LibOpIsZero.sol";
 import {LibOpLessThan} from "./logic/LibOpLessThan.sol";
-import {LibOpLessThanOrEqualToNP} from "./logic/LibOpLessThanOrEqualToNP.sol";
+import {LibOpLessThanOrEqualTo} from "./logic/LibOpLessThanOrEqualTo.sol";
 
 // import {LibOpExponentialGrowth} from "./math/growth/LibOpExponentialGrowth.sol";
 // import {LibOpLinearGrowth} from "./math/growth/LibOpLinearGrowth.sol";
@@ -108,7 +108,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 49;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 51;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -219,10 +219,10 @@ library LibAllStandardOps {
             AuthoringMetaV2("binary-equal-to", "1 if all inputs are equal, 0 otherwise. Equality is binary."),
             // AuthoringMetaV2("every", "The last nonzero value out of all inputs, or 0 if any input is 0."),
             AuthoringMetaV2("greater-than", "true if the first input is greater than the second input, false otherwise."),
-            // AuthoringMetaV2(
-            //     "greater-than-or-equal-to",
-            //     "1 if the first input is greater than or equal to the second input, 0 otherwise."
-            // ),
+            AuthoringMetaV2(
+                "greater-than-or-equal-to",
+                "1 if the first input is greater than or equal to the second input, 0 otherwise."
+            ),
             // AuthoringMetaV2(
             //     "if",
             //     "If the first input is nonzero, the second input is used. Otherwise, the third input is used. If is eagerly evaluated."
@@ -232,9 +232,9 @@ library LibAllStandardOps {
                 "1 if the input is 0, 0 otherwise. The input is any numerical 0 value, not just binary 0 e.g. 0e20 is considered 0."
             ),
             AuthoringMetaV2("less-than", "true if the first input is less than the second input, false otherwise."),
-            // AuthoringMetaV2(
-            //     "less-than-or-equal-to", "1 if the first input is less than or equal to the second input, 0 otherwise."
-            // ),
+            AuthoringMetaV2(
+                "less-than-or-equal-to", "1 if the first input is less than or equal to the second input, 0 otherwise."
+            ),
             // AuthoringMetaV2(
             //     "exponential-growth",
             //     "Calculates an exponential growth curve as `base(1 + rate)^t` where `base` is the initial value, `rate` is the rate of growth and `t` is units of time. Inputs in order are `base`, `rate`, and `t` respectively."
@@ -444,16 +444,16 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // greater-than
                     LibParseOperand.handleOperandDisallowed,
-                    // // greater-than-or-equal-to
-                    // LibParseOperand.handleOperandDisallowed,
+                    // greater-than-or-equal-to
+                    LibParseOperand.handleOperandDisallowed,
                     // // if
                     // LibParseOperand.handleOperandDisallowed,
                     // is-zero
                     LibParseOperand.handleOperandDisallowed,
                     // less-than
                     LibParseOperand.handleOperandDisallowed,
-                    // // less-than-or-equal-to
-                    // LibParseOperand.handleOperandDisallowed,
+                    // less-than-or-equal-to
+                    LibParseOperand.handleOperandDisallowed,
                     // // exponential-growth
                     // LibParseOperand.handleOperandDisallowed,
                     // // linear-growth
@@ -599,11 +599,11 @@ library LibAllStandardOps {
                     LibOpBinaryEqualTo.integrity,
                     // LibOpEveryNP.integrity,
                     LibOpGreaterThan.integrity,
-                    // LibOpGreaterThanOrEqualToNP.integrity,
+                    LibOpGreaterThanOrEqualTo.integrity,
                     // LibOpIfNP.integrity,
                     LibOpIsZero.integrity,
                     LibOpLessThan.integrity,
-                    // LibOpLessThanOrEqualToNP.integrity,
+                    LibOpLessThanOrEqualTo.integrity,
                     // LibOpExponentialGrowth.integrity,
                     // LibOpLinearGrowth.integrity,
                     LibOpMaxUint256.integrity,
@@ -714,11 +714,11 @@ library LibAllStandardOps {
                     LibOpBinaryEqualTo.run,
                     // LibOpEveryNP.run,
                     LibOpGreaterThan.run,
-                    // LibOpGreaterThanOrEqualToNP.run,
+                    LibOpGreaterThanOrEqualTo.run,
                     // LibOpIfNP.run,
                     LibOpIsZero.run,
                     LibOpLessThan.run,
-                    // LibOpLessThanOrEqualToNP.run,
+                    LibOpLessThanOrEqualTo.run,
                     // LibOpExponentialGrowth.run,
                     // LibOpLinearGrowth.run,
                     LibOpMaxUint256.run,
