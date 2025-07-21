@@ -81,7 +81,7 @@ import {LibOpDiv} from "./math/LibOpDiv.sol";
 // import {LibOpFrac} from "./math/LibOpFrac.sol";
 // import {LibOpGm} from "./math/LibOpGm.sol";
 // import {LibOpHeadroom} from "./math/LibOpHeadroom.sol";
-// import {LibOpInv} from "./math/LibOpInv.sol";
+import {LibOpInv} from "./math/LibOpInv.sol";
 // import {LibOpLn} from "./math/LibOpLn.sol";
 // import {LibOpLog10} from "./math/LibOpLog10.sol";
 import {LibOpMax} from "./math/LibOpMax.sol";
@@ -108,7 +108,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 51;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 52;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -277,7 +277,7 @@ library LibAllStandardOps {
             //     "headroom",
             //     "Headroom of a number. I.e. the distance to the next whole number (1 - frac(x)). The headroom at any whole number is 1 (not 0)."
             // ),
-            // AuthoringMetaV2("inv", "The inverse (1 / x) of a number. Errors if the number is zero."),
+            AuthoringMetaV2("inv", "The inverse (1 / x) of a number. Errors if the number is zero."),
             // AuthoringMetaV2("ln", "Natural logarithm ln(x). Errors if the number is zero."),
             // AuthoringMetaV2("log2", "Base 2 logarithm log2(x). Errors if the number is zero."),
             // AuthoringMetaV2("log10", "Base 10 logarithm log10(x). Errors if the number is zero."),
@@ -492,8 +492,8 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // // headroom
                     // LibParseOperand.handleOperandDisallowed,
-                    // // inv
-                    // LibParseOperand.handleOperandDisallowed,
+                    // inv
+                    LibParseOperand.handleOperandDisallowed,
                     // // ln
                     // LibParseOperand.handleOperandDisallowed,
                     // // log2
@@ -623,7 +623,7 @@ library LibAllStandardOps {
                     // LibOpFrac.integrity,
                     // LibOpGm.integrity,
                     // LibOpHeadroom.integrity,
-                    // LibOpInv.integrity,
+                    LibOpInv.integrity,
                     // LibOpLn.integrity,
                     // LibOpLog2.integrity,
                     // LibOpLog10.integrity,
@@ -738,7 +738,7 @@ library LibAllStandardOps {
                     // LibOpFrac.run,
                     // LibOpGm.run,
                     // LibOpHeadroom.run,
-                    // LibOpInv.run,
+                    LibOpInv.run,
                     // LibOpLn.run,
                     // LibOpLog2.run,
                     // LibOpLog10.run,
