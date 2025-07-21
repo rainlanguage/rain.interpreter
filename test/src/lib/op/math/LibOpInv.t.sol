@@ -17,7 +17,9 @@ contract LibOpInvTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpInv.
-    function testOpInvRun(Float a, uint16 operandData) public view {
+    function testOpInvRun(int224 signedCoefficient, int32 exponent, uint16 operandData) public view {
+        exponent = int32(bound(exponent, type(int16).min, type(int16).max));
+        Float a = LibDecimalFloat.packLossless(signedCoefficient, exponent);
         // 0 is division by 0.
         vm.assume(!LibDecimalFloat.isZero(a));
         InterpreterState memory state = opTestDefaultInterpreterState();
