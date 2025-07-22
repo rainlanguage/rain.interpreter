@@ -7,8 +7,6 @@ import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
-uint256 constant MAX_VALUE = uint256(0x7fffffff7fffffffffffffffffffffffffffffffffffffffffffffffffffffff);
-
 /// @title LibOpMaxValue
 /// Exposes the maximum representable float value as a Rainlang opcode.
 library LibOpMaxValue {
@@ -19,7 +17,7 @@ library LibOpMaxValue {
     }
 
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
-        uint256 value = MAX_VALUE;
+        Float value = LibDecimalFloat.FLOAT_MAX_VALUE;
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
             mstore(stackTop, value)

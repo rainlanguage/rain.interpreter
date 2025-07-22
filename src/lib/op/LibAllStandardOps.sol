@@ -74,7 +74,7 @@ import {LibOpAdd} from "./math/LibOpAdd.sol";
 // import {LibOpCeil} from "./math/LibOpCeil.sol";
 import {LibOpMul} from "./math/LibOpMul.sol";
 import {LibOpDiv} from "./math/LibOpDiv.sol";
-// import {LibOpE} from "./math/LibOpE.sol";
+import {LibOpE} from "./math/LibOpE.sol";
 // import {LibOpExp} from "./math/LibOpExp.sol";
 // import {LibOpExp2} from "./math/LibOpExp2.sol";
 // import {LibOpFloor} from "./math/LibOpFloor.sol";
@@ -87,6 +87,7 @@ import {LibOpInv} from "./math/LibOpInv.sol";
 import {LibOpMax} from "./math/LibOpMax.sol";
 import {LibOpMaxValue} from "./math/LibOpMaxValue.sol";
 import {LibOpMin} from "./math/LibOpMin.sol";
+import {LibOpMinValue} from "./math/LibOpMinValue.sol";
 import {LibOpMod} from "./math/LibOpMod.sol";
 // import {LibOpLog2} from "./math/LibOpLog2.sol";
 // import {LibOpPow} from "./math/LibOpPow.sol";
@@ -108,7 +109,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 52;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 54;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -267,7 +268,7 @@ library LibAllStandardOps {
             // AuthoringMetaV2("avg", "Arithmetic average (mean) of two numbers."),
             // AuthoringMetaV2("ceil", "Ceiling of a number."),
             AuthoringMetaV2("div", "Divides the first number by all other numbers. Errors if any divisor is zero."),
-            // AuthoringMetaV2("e", "The mathematical constant e."),
+            AuthoringMetaV2("e", "The mathematical constant e."),
             // AuthoringMetaV2("exp", "Natural exponential e^x. Errors if the exponentiation exceeds `max-value()`."),
             // AuthoringMetaV2("exp2", "Binary exponential 2^x where x. Errors if the exponentiation exceeds `max-value()`."),
             // AuthoringMetaV2("floor", "Floor of a number."),
@@ -284,9 +285,13 @@ library LibAllStandardOps {
             AuthoringMetaV2("max", "Finds the maximum number from all inputs."),
             AuthoringMetaV2(
                 "max-value",
-                "The maximum representable float value. This is so large that it is effectively infinity (it has ~2.1 billion zero digits). Almost all numbers that you could possibly subtract from it will be ignored as a rounding error."
+                "The maximum representable float value. This is so large that it is effectively infinity. Almost all numbers that you could possibly subtract from it will be ignored as a rounding error."
             ),
             AuthoringMetaV2("min", "Finds the minimum number from all inputs."),
+            AuthoringMetaV2(
+                "min-value",
+                "The minimum representable float value. This is so small that it is effectively negative infinity. Almost all numbers that you could possibly add to it will be ignored as a rounding error."
+            ),
             // AuthoringMetaV2("mod", "Modulos the first number by all other numbers. Errors if any divisor is zero."),
             AuthoringMetaV2("mul", "Multiplies all numbers together."),
             // AuthoringMetaV2(
@@ -478,8 +483,8 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // div
                     LibParseOperand.handleOperandDisallowed,
-                    // // e
-                    // LibParseOperand.handleOperandDisallowed,
+                    // e
+                    LibParseOperand.handleOperandDisallowed,
                     // // exp
                     // LibParseOperand.handleOperandDisallowed,
                     // // exp2
@@ -505,6 +510,8 @@ library LibAllStandardOps {
                     // max-value
                     LibParseOperand.handleOperandDisallowed,
                     // min
+                    LibParseOperand.handleOperandDisallowed,
+                    // min-value
                     LibParseOperand.handleOperandDisallowed,
                     // // mod
                     // LibParseOperand.handleOperandDisallowed,
@@ -616,7 +623,7 @@ library LibAllStandardOps {
                     // LibOpAvg.integrity,
                     // LibOpCeil.integrity,
                     LibOpDiv.integrity,
-                    // LibOpE.integrity,
+                    LibOpE.integrity,
                     // LibOpExp.integrity,
                     // LibOpExp2.integrity,
                     // LibOpFloor.integrity,
@@ -630,6 +637,7 @@ library LibAllStandardOps {
                     LibOpMax.integrity,
                     LibOpMaxValue.integrity,
                     LibOpMin.integrity,
+                    LibOpMinValue.integrity,
                     // LibOpMod.integrity,
                     LibOpMul.integrity,
                     // LibOpPow.integrity,
@@ -731,7 +739,7 @@ library LibAllStandardOps {
                     // LibOpAvg.run,
                     // LibOpCeil.run,
                     LibOpDiv.run,
-                    // LibOpE.run,
+                    LibOpE.run,
                     // LibOpExp.run,
                     // LibOpExp2.run,
                     // LibOpFloor.run,
@@ -745,6 +753,7 @@ library LibAllStandardOps {
                     LibOpMax.run,
                     LibOpMaxValue.run,
                     LibOpMin.run,
+                    LibOpMinValue.run,
                     // LibOpMod.run,
                     LibOpMul.run,
                     // LibOpPow.run,
