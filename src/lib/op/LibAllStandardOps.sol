@@ -60,7 +60,7 @@ import {LibOpLessThan} from "./logic/LibOpLessThan.sol";
 import {LibOpLessThanOrEqualTo} from "./logic/LibOpLessThanOrEqualTo.sol";
 
 // import {LibOpExponentialGrowth} from "./math/growth/LibOpExponentialGrowth.sol";
-// import {LibOpLinearGrowth} from "./math/growth/LibOpLinearGrowth.sol";
+import {LibOpLinearGrowth} from "./math/growth/LibOpLinearGrowth.sol";
 
 import {LibOpMaxUint256} from "./math/uint256/LibOpMaxUint256.sol";
 import {LibOpUint256Add} from "./math/uint256/LibOpUint256Add.sol";
@@ -109,7 +109,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 54;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 55;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -240,10 +240,10 @@ library LibAllStandardOps {
             //     "exponential-growth",
             //     "Calculates an exponential growth curve as `base(1 + rate)^t` where `base` is the initial value, `rate` is the rate of growth and `t` is units of time. Inputs in order are `base`, `rate`, and `t` respectively."
             // ),
-            // AuthoringMetaV2(
-            //     "linear-growth",
-            //     "Calculates a linear growth curve as `base + (rate * t)` where `base` is the initial value, `rate` is the rate of growth and `t` is units of time. Inputs in order are `base`, `rate`, and `t` respectively."
-            // ),
+            AuthoringMetaV2(
+                "linear-growth",
+                "Calculates a linear growth curve as `base + (rate * t)` where `base` is the initial value, `rate` is the rate of growth and `t` is units of time. Inputs in order are `base`, `rate`, and `t` respectively."
+            ),
             AuthoringMetaV2("uint256-max-value", "The maximum possible unsigned integer value (all binary bits are 1)."),
             AuthoringMetaV2(
                 "uint256-add",
@@ -437,8 +437,8 @@ library LibAllStandardOps {
                     LibParseOperand.handleOperandDisallowed,
                     // // exponential-growth
                     // LibParseOperand.handleOperandDisallowed,
-                    // // linear-growth
-                    // LibParseOperand.handleOperandDisallowed,
+                    // linear-growth
+                    LibParseOperand.handleOperandDisallowed,
                     // uint256-max-value
                     LibParseOperand.handleOperandDisallowed,
                     // uint256-add
@@ -576,7 +576,7 @@ library LibAllStandardOps {
                     LibOpLessThan.integrity,
                     LibOpLessThanOrEqualTo.integrity,
                     // LibOpExponentialGrowth.integrity,
-                    // LibOpLinearGrowth.integrity,
+                    LibOpLinearGrowth.integrity,
                     LibOpMaxUint256.integrity,
                     LibOpUint256Add.integrity,
                     LibOpUint256Div.integrity,
@@ -684,7 +684,7 @@ library LibAllStandardOps {
                     LibOpLessThan.run,
                     LibOpLessThanOrEqualTo.run,
                     // LibOpExponentialGrowth.run,
-                    // LibOpLinearGrowth.run,
+                    LibOpLinearGrowth.run,
                     LibOpMaxUint256.run,
                     LibOpUint256Add.run,
                     LibOpUint256Div.run,
