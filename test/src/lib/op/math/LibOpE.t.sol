@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-// import {OpTest} from "test/abstract/OpTest.sol";
+import {OpTest} from "test/abstract/OpTest.sol";
 // import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-// import {LibOpE} from "src/lib/op/math/LibOpE.sol";
-// import {LibOperand, Operand} from "test/lib/operand/LibOperand.sol";
-// import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
+import {LibOpE} from "src/lib/op/math/LibOpE.sol";
+import {LibOperand, OperandV2} from "test/lib/operand/LibOperand.sol";
+import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 // import {IInterpreterV4, EvalV4} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 // import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 // import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
@@ -14,21 +14,21 @@ pragma solidity =0.8.25;
 // import {SourceIndexV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 // import {FIXED_POINT_E} from "rain.math.fixedpoint/lib/FixedPointDecimalConstants.sol";
 
-// /// @title LibOpETest
-// contract LibOpETest is OpTest {
-//     /// Directly test the integrity logic of LibOpE.
-//     function testOpEIntegrity(IntegrityCheckState memory state, uint8 inputs, uint8 outputs, uint16 operandData)
-//         external
-//         pure
-//     {
-//         inputs = uint8(bound(inputs, 0, 0x0F));
-//         outputs = uint8(bound(outputs, 0, 0x0F));
-//         (uint256 calcInputs, uint256 calcOutputs) =
-//             LibOpE.integrity(state, LibOperand.build(inputs, outputs, operandData));
+/// @title LibOpETest
+contract LibOpETest is OpTest {
+    /// Directly test the integrity logic of LibOpE.
+    function testOpEIntegrity(IntegrityCheckState memory state, uint8 inputs, uint8 outputs, uint16 operandData)
+        external
+        pure
+    {
+        inputs = uint8(bound(inputs, 0, 0x0F));
+        outputs = uint8(bound(outputs, 0, 0x0F));
+        (uint256 calcInputs, uint256 calcOutputs) =
+            LibOpE.integrity(state, LibOperand.build(inputs, outputs, operandData));
 
-//         assertEq(calcInputs, 0);
-//         assertEq(calcOutputs, 1);
-//     }
+        assertEq(calcInputs, 0);
+        assertEq(calcOutputs, 1);
+    }
 
 // /// Directly test the runtime logic of LibOpE. This tests that the
 // /// opcode correctly pushes the mathematical constant e onto the stack.
@@ -70,4 +70,4 @@ pragma solidity =0.8.25;
 //     function testOpEEvalTwoOutputs() external {
 //         checkBadOutputs("_ _: e();", 0, 1, 2);
 //     }
-// }
+}
