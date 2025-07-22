@@ -68,7 +68,7 @@ contract LibOpLinearGrowthTest is OpTest {
         checkHappy("_: linear-growth(2 0.1 2);", Float.unwrap(LibDecimalFloat.packLossless(2.2e38, -38)), "2 0.1 2");
 
         checkHappy("_: linear-growth(1 -0.1 1);", Float.unwrap(LibDecimalFloat.packLossless(0.9e38, -38)), "1 -0.1 1");
-        checkHappy("_: linear-growth(-1 -0.1 2);", Float.unwrap(LibDecimalFloat.packLossless(-1.2e38, -38)), "1 -0.1 2");
+        checkHappy("_: linear-growth(-1 -0.1 2);", Float.unwrap(LibDecimalFloat.packLossless(-1.2e38, -38)), "-1 -0.1 2");
     }
 
     function testOpLinearGrowthEvalZeroInputs() external {
