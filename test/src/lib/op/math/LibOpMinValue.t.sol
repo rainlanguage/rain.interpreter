@@ -59,11 +59,11 @@ contract LibOpMinValueTest is OpTest {
         (bytecode);
     }
 
-    function testOpMaxValueZeroOutputs() external {
-        checkBadOutputs(": max-value();", 0, 1, 0);
+    function testOpMinValueZeroOutputs() external {
+        checkBadOutputs(": min-value();", 0, 1, 0);
     }
 
-    function testOpMaxValueTwoOutputs() external {
-        checkBadOutputs("_ _: max-value();", 0, 1, 2);
+    function testOpMinValueTwoOutputs() external {
+        checkBadOutputs("_ _: min-value();", 0, 1, 2);
     }
 }
