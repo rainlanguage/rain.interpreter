@@ -16,8 +16,11 @@ import {
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {LibIntOrAString, IntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 contract LibOpEnsureTest is OpTest {
+    using LibDecimalFloat for Float;
+
     /// Directly test the integrity logic of LibOpEnsure. This tests the
     /// happy path where there is at least one input.
     function testOpEnsureIntegrityHappy(
@@ -45,7 +48,7 @@ contract LibOpEnsureTest is OpTest {
     /// Directly test the run logic of LibOpEnsure.
     function testOpEnsureRun(StackItem condition, string memory reason) external {
         vm.assume(bytes(reason).length <= 31);
-        if (StackItem.unwrap(condition) == 0) {
+        if (Float.wrap(StackItem.unwrap(condition)).isZero()) {
             vm.expectRevert(bytes(reason));
         }
 
@@ -116,6 +119,9 @@ contract LibOpEnsureTest is OpTest {
 
         // Empty reason should be fine.
         checkUnhappy(":ensure(0 \"\"), _:1;", "");
+
+        // Exponents for zero should be fine (cause a revert).
+        checkUnhappy(":ensure(0e18 \"foo\"), _:1;", "foo");
     }
 
     /// Test the eval of `ensure` parsed from a string. Tests the unhappy path
