@@ -299,30 +299,6 @@ library LibAllStandardOps {
             //     "Raises the first number to the power of the second number. Errors if the exponentiation exceeds `max-value()`."
             // ),
             // AuthoringMetaV2(
-            //     "scale-18",
-            //     "Scales a number from some fixed point decimal scale to 18 decimal fixed point. The first operand is the scale to scale from. The second (optional) operand controls rounding where 0 (default) rounds down and 1 rounds up. The third (optional) operand controls saturation where 0 (default) errors on overflow and 1 saturates at `max-value()`."
-            // ),
-            // AuthoringMetaV2(
-            //     "uint256-to-decimal18",
-            //     "Scales an unsigned integer value to 18 decimal fixed point, E.g. uint256 1 becomes 1e18 and 10 becomes 1e19. Identical to scale-18 with an input scale of 0, but perhaps more legible. Does NOT support saturation."
-            // ),
-            // AuthoringMetaV2(
-            //     "scale-18-dynamic",
-            //     "Scales a number from some fixed point decimal scale to 18 decimal fixed point. The first number is the scale to scale from and the second is the number to scale. The two optional operands control rounding and saturation respectively as per `scale-18`."
-            // ),
-            // AuthoringMetaV2(
-            //     "scale-n",
-            //     "Scales an input value from 18 decimal fixed point to some other fixed point scale N. The first operand is the scale to scale to. The second (optional) operand controls rounding where 0 (default) rounds down and 1 rounds up. The third (optional) operand controls saturation where 0 (default) errors on overflow and 1 saturates at max-value."
-            // ),
-            // AuthoringMetaV2(
-            //     "decimal18-to-uint256",
-            //     "Scales a number to a uint256 value. Always floors/rounds down any fractional part to the nearest whole integer. Identical to `scale-n` with an input scale of 0, but perhaps more legible."
-            // ),
-            // AuthoringMetaV2(
-            //     "scale-n-dynamic",
-            //     "Scales an input number from 18 decimal fixed point to some other fixed point scale N. The first input is the scale to scale to and the second is the value to scale. The two optional operand controls rounding and saturation respectively as per `scale-n`."
-            // ),
-            // AuthoringMetaV2(
             //     "snap-to-unit",
             //     "Rounds a number to the nearest whole number if it is within the threshold distance from that whole number. The first input is the threshold and the second is the value to snap to the nearest unit."
             // ),
@@ -519,18 +495,6 @@ library LibAllStandardOps {
                     LibParseOperand.handleOperandDisallowed,
                     // // power
                     // LibParseOperand.handleOperandDisallowed,
-                    // // scale-18
-                    // LibParseOperand.handleOperand8M1M1,
-                    // // uint256-to-decimal18
-                    // LibParseOperand.handleOperandDisallowed,
-                    // // scale-18-dynamic
-                    // LibParseOperand.handleOperandM1M1,
-                    // // scale-n
-                    // LibParseOperand.handleOperand8M1M1,
-                    // // decimal18-to-uint256
-                    // LibParseOperand.handleOperandDisallowed,
-                    // // scale-n-dynamic
-                    // LibParseOperand.handleOperandM1M1,
                     // // snap-to-unit
                     // LibParseOperand.handleOperandDisallowed,
                     // // sqrt
@@ -641,14 +605,6 @@ library LibAllStandardOps {
                     // LibOpMod.integrity,
                     LibOpMul.integrity,
                     // LibOpPow.integrity,
-                    // LibOpScale18.integrity,
-                    // // uint256-to-decimal18 is a repeat of scale18.
-                    // LibOpScale18.integrity,
-                    // LibOpScale18Dynamic.integrity,
-                    // LibOpScaleN.integrity,
-                    // // decimal18-to-uint256 is a repeat of scaleN.
-                    // LibOpScaleN.integrity,
-                    // LibOpScaleNDynamic.integrity,
                     // LibOpSnapToUnit.integrity,
                     // LibOpSqrt.integrity,
                     LibOpSub.integrity,
@@ -757,14 +713,6 @@ library LibAllStandardOps {
                     // LibOpMod.run,
                     LibOpMul.run,
                     // LibOpPow.run,
-                    // LibOpScale18.run,
-                    // // uint256-to-decimal18 is a repeat of scale18.
-                    // LibOpScale18.run,
-                    // LibOpScale18Dynamic.run,
-                    // LibOpScaleN.run,
-                    // // decimal18-to-uint256 is a repeat of scaleN.
-                    // LibOpScaleN.run,
-                    // LibOpScaleNDynamic.run,
                     // LibOpSnapToUnit.run,
                     // LibOpSqrt.run,
                     LibOpSub.run,
