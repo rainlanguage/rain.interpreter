@@ -1,48 +1,53 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-// import {UD60x18, mul, add} from "prb-math/UD60x18.sol";
-// import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-// import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-// import {InterpreterState} from "../../../state/LibInterpreterState.sol";
-// import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {InterpreterState} from "../../../state/LibInterpreterState.sol";
+import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
+import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
-// /// @title LibOpLinearGrowth
-// /// @notice Linear growth is base + rate * t where a is the initial value, r is
-// /// the growth rate, and t is time.
-// library LibOpLinearGrowth {
-//     function integrity(IntegrityCheckState memory, Operand) internal pure returns (uint256, uint256) {
-//         // There must be three inputs and one output.
-//         return (3, 1);
-//     }
+/// @title LibOpLinearGrowth
+/// @notice Linear growth is base + rate * t where a is the initial value, r is
+/// the growth rate, and t is time.
+library LibOpLinearGrowth {
+    function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
+        // There must be three inputs and one output.
+        return (3, 1);
+    }
 
-//     /// linear-growth
-//     function run(InterpreterState memory, Operand, Pointer stackTop) internal pure returns (Pointer) {
-//         uint256 base;
-//         uint256 rate;
-//         uint256 t;
-//         assembly ("memory-safe") {
-//             base := mload(stackTop)
-//             rate := mload(add(stackTop, 0x20))
-//             stackTop := add(stackTop, 0x40)
-//             t := mload(stackTop)
-//         }
-//         base = UD60x18.unwrap(add(UD60x18.wrap(base), mul(UD60x18.wrap(rate), UD60x18.wrap(t))));
+    /// linear-growth
+    function run(InterpreterState memory, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
+        Float base;
+        Float rate;
+        Float t;
+        assembly ("memory-safe") {
+            base := mload(stackTop)
+            rate := mload(add(stackTop, 0x20))
+            stackTop := add(stackTop, 0x40)
+            t := mload(stackTop)
+        }
 
-//         assembly ("memory-safe") {
-//             mstore(stackTop, base)
-//         }
-//         return stackTop;
-//     }
+        base = LibDecimalFloat.add(base, LibDecimalFloat.mul(rate, t));
 
-//     /// Gas intensive reference implementation for testing.
-//     function referenceFn(InterpreterState memory, Operand, uint256[] memory inputs)
-//         internal
-//         pure
-//         returns (uint256[] memory)
-//     {
-//         uint256[] memory outputs = new uint256[](1);
-//         outputs[0] = UD60x18.unwrap(add(UD60x18.wrap(inputs[0]), mul(UD60x18.wrap(inputs[1]), UD60x18.wrap(inputs[2]))));
-//         return outputs;
-//     }
-// }
+        assembly ("memory-safe") {
+            mstore(stackTop, base)
+        }
+        return stackTop;
+    }
+
+    /// Gas intensive reference implementation for testing.
+    function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
+        internal
+        pure
+        returns (StackItem[] memory)
+    {
+        Float base = Float.wrap(StackItem.unwrap(inputs[0]));
+        Float rate = Float.wrap(StackItem.unwrap(inputs[1]));
+        Float t = Float.wrap(StackItem.unwrap(inputs[2]));
+        StackItem[] memory outputs = new StackItem[](1);
+        outputs[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.add(base, LibDecimalFloat.mul(rate, t))));
+        return outputs;
+    }
+}
