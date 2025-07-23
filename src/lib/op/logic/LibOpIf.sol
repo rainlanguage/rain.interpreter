@@ -5,11 +5,15 @@ import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpre
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
+import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
-/// @title LibOpIfNP
+/// @title LibOpIf
 /// @notice Opcode to choose between two values based on a condition. If is
 /// eager, meaning both values are evaluated before the condition is checked.
-library LibOpIfNP {
+library LibOpIf {
+    using LibDecimalFloat for Float;
+
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (3, 1);
     }
@@ -18,21 +22,27 @@ library LibOpIfNP {
     /// IF is a conditional. If the first item on the stack is nonero, the second
     /// item is returned, else the third item is returned.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
+        Float condition;
         assembly ("memory-safe") {
-            let condition := mload(stackTop)
+            condition := mload(stackTop)
             stackTop := add(stackTop, 0x40)
-            mstore(stackTop, mload(sub(stackTop, mul(0x20, iszero(iszero(condition))))))
+        }
+
+        bool isZero = condition.isZero();
+
+        assembly ("memory-safe") {
+            mstore(stackTop, mload(sub(stackTop, mul(0x20, iszero(isZero)))))
         }
         return stackTop;
     }
 
     /// Gas intensive reference implementation of IF for testing.
-    function referenceFn(InterpreterState memory, OperandV2, uint256[] memory inputs)
+    function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure
-        returns (uint256[] memory outputs)
+        returns (StackItem[] memory outputs)
     {
-        outputs = new uint256[](1);
-        outputs[0] = inputs[0] > 0 ? inputs[1] : inputs[2];
+        outputs = new StackItem[](1);
+        outputs[0] = Float.wrap(StackItem.unwrap(inputs[0])).isZero() ? inputs[2] : inputs[1];
     }
 }
