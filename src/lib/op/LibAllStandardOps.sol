@@ -207,7 +207,7 @@ library LibAllStandardOps {
             AuthoringMetaV2("chain-id", "The current chain id."),
             AuthoringMetaV2("block-timestamp", "The current block timestamp."),
             AuthoringMetaV2("now", "The current block timestamp."),
-            AuthoringMetaV2("any", "The first binary non-zero value out of all inputs, or 0 if every input is 0."),
+            AuthoringMetaV2("any", "The first non-zero value out of all inputs, or 0 if every input is 0."),
             // AuthoringMetaV2(
             //     "conditions",
             //     "Treats inputs as pairwise condition/value pairs. The first nonzero condition's value is used. If no conditions are nonzero, the expression reverts. Provide a constant nonzero value to define a fallback case. If the number of inputs is odd, the final value is used as an error string in the case that no conditions match."
