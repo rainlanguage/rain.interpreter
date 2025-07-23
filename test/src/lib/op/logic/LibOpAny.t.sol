@@ -130,6 +130,12 @@ contract LibOpAnyTest is OpTest {
         checkHappy("_: any(0 5);", bytes32(uint256(5)), "");
     }
 
+    /// Test 0, 5 but where the 0 has an exponent like 0e5. Shows that truthy
+    /// check is float aware.
+    function testOpAnyEval2MixedInputsZeroExponent() external view {
+        checkHappy("_: any(0e5 5);", bytes32(uint256(5)), "");
+    }
+
     /// Test that any without inputs fails integrity check.
     function testOpAnyEvalFail() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 1, 0));
