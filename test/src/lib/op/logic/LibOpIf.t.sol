@@ -17,7 +17,7 @@ import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpre
 
 contract LibOpIfTest is OpTest {
     /// Directly test the integrity logic of LibOpIf. No matter the
-    /// operand inputs, the calc inputs must be 2, and the calc outputs must be
+    /// operand inputs, the calc inputs must be 3, and the calc outputs must be
     /// 1.
     function testOpIfIntegrityHappy(IntegrityCheckState memory state, uint8 inputs, uint8 outputs, uint16 operandData)
         external
