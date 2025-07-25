@@ -2,20 +2,18 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-// // import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibOpIf} from "src/lib/op/logic/LibOpIf.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
-// // import {
-// //     IInterpreterV4,
-// //     Operand,
-// //     SourceIndexV2,
-// //     FullyQualifiedNamespace
-// // } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-// // import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-// // import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-// // import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
+import {
+    IInterpreterV4,
+    OperandV2,
+    SourceIndexV2,
+    FullyQualifiedNamespace
+} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 contract LibOpIfTest is OpTest {
     /// Directly test the integrity logic of LibOpIf. No matter the
@@ -35,103 +33,118 @@ contract LibOpIfTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    //     /// Directly test the runtime logic of LibOpIfNP.
-    //     function testOpIfNPRun(uint256 a, uint256 b, uint256 c) external view {
-    //         InterpreterState memory state = opTestDefaultInterpreterState();
-    //         uint256[] memory inputs = new uint256[](3);
-    //         inputs[0] = a;
-    //         inputs[1] = b;
-    //         inputs[2] = c;
-    //         Operand operand = LibOperand.build(uint8(inputs.length), 1, 0);
-    //         opReferenceCheck(state, operand, LibOpIfNP.referenceFn, LibOpIfNP.integrity, LibOpIfNP.run, inputs);
-    //     }
+    /// Directly test the runtime logic of LibOpIf.
+    function testOpIfRun(StackItem a, StackItem b, StackItem c) external view {
+        InterpreterState memory state = opTestDefaultInterpreterState();
+        StackItem[] memory inputs = new StackItem[](3);
+        inputs[0] = a;
+        inputs[1] = b;
+        inputs[2] = c;
+        OperandV2 operand = LibOperand.build(uint8(inputs.length), 1, 0);
+        opReferenceCheck(state, operand, LibOpIf.referenceFn, LibOpIf.integrity, LibOpIf.run, inputs);
+    }
 
-    // //     /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
-    // //     /// is 0, the second input is 1, the third input is 2.
-    // //     function testOpIfNPEval3InputsFirstZeroSecondOneThirdTwo() external {
-    // //         checkHappy("_: if(0 1 2);", 2e18, "");
-    // //     }
+    /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
+    /// is 0, the second input is 1, the third input is 2.
+    function testOpIfEval3InputsFirstZeroSecondOneThirdTwo() external view {
+        checkHappy("_: if(0 1 2);", Float.unwrap(LibDecimalFloat.packLossless(2, 0)), "");
+    }
 
-    // //     /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
-    // //     /// is 1, the second input is 2, the third input is 3.
-    // //     function testOpIfNPEval3InputsFirstOneSecondTwoThirdThree() external {
-    // //         checkHappy("_: if(1 2 3);", 2e18, "");
-    // //     }
+    /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
+    /// is 1, the second input is 2, the third input is 3.
+    function testOpIfEval3InputsFirstOneSecondTwoThirdThree() external view {
+        checkHappy("_: if(1 2 3);", Float.unwrap(LibDecimalFloat.packLossless(2, 0)), "");
+    }
 
-    // //     /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
-    // //     /// is 0, the second input is 0, the third input is 3.
-    // //     function testOpIfNPEval3InputsFirstZeroSecondZeroThirdThree() external {
-    // //         checkHappy("_: if(0 0 3);", 3e18, "");
-    // //     }
+    /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
+    /// is 0, the second input is 0, the third input is 3.
+    function testOpIfEval3InputsFirstZeroSecondZeroThirdThree() external view {
+        checkHappy("_: if(0 0 3);", Float.unwrap(LibDecimalFloat.packLossless(3, 0)), "");
+    }
 
-    // //     /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
-    // //     /// is 1, the second input is 0, the third input is 3.
-    // //     function testOpIfNPEval3InputsFirstOneSecondZeroThirdThree() external {
-    // //         checkHappy("_: if(1 0 3);", 0, "");
-    // //     }
+    /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
+    /// is 1, the second input is 0, the third input is 3.
+    function testOpIfEval3InputsFirstOneSecondZeroThirdThree() external view {
+        checkHappy("_: if(1 0 3);", 0, "");
+    }
 
-    // //     /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
-    // //     /// is 0, the second input is 1, the third input is 0.
-    // //     function testOpIfNPEval3InputsFirstZeroSecondOneThirdZero() external {
-    // //         checkHappy("_: if(0 1 0);", 0, "");
-    // //     }
+    /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
+    /// is 0, the second input is 1, the third input is 0.
+    function testOpIfEval3InputsFirstZeroSecondOneThirdZero() external view {
+        checkHappy("_: if(0 1 0);", 0, "");
+    }
 
-    // //     /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
-    // //     /// is 0, the second input is 0, the third input is 1.
-    // //     function testOpIfNPEval3InputsFirstZeroSecondZeroThirdOne() external {
-    // //         checkHappy("_: if(0 0 1);", 1e18, "");
-    // //     }
+    /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
+    /// is 0, the second input is 0, the third input is 1.
+    function testOpIfEval3InputsFirstZeroSecondZeroThirdOne() external view {
+        checkHappy("_: if(0 0 1);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "");
+    }
 
-    // //     /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
-    // //     /// is 2, the second input is 3, the third input is 4.
-    // //     function testOpIfNPEval3InputsFirstTwoSecondThreeThirdFour() external {
-    // //         checkHappy("_: if(2 3 4);", 3e18, "");
-    // //     }
+    /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
+    /// is 2, the second input is 3, the third input is 4.
+    function testOpIfEval3InputsFirstTwoSecondThreeThirdFour() external view {
+        checkHappy("_: if(2 3 4);", Float.unwrap(LibDecimalFloat.packLossless(3, 0)), "");
+    }
 
-    // //     /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
-    // //     /// is 2, the second input is 0, the third input is 4.
-    // //     function testOpIfNPEval3InputsFirstTwoSecondZeroThirdFour() external {
-    // //         checkHappy("_: if(2 0 4);", 0, "");
-    // //     }
+    /// Test the eval of if parsed from a string. Tests 3 inputs. The first input
+    /// is 2, the second input is 0, the third input is 4.
+    function testOpIfEval3InputsFirstTwoSecondZeroThirdFour() external view {
+        checkHappy("_: if(2 0 4);", 0, "");
+    }
 
-        /// Test that empty strings are truthy values.
-        function testOpIfEvalEmptyStringTruthy() external {
-            checkHappy("_: if(\"\" 5 50);", Float.unwrap(LibDecimalFloat.packLossless(5, 0)), "");
-        }
+    /// Test that 0e5 is false, because exponents on zero are still false.
+    function testOpIfEvalZeroExponent() external view {
+        checkHappy("_: if(0e5 5 50);", Float.unwrap(LibDecimalFloat.packLossless(50, 0)), "");
+    }
 
-        /// Test that an if without inputs fails integrity check.
-        function testOpIfEvalFail0Inputs() public {
-            vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 3, 0));
-            bytes memory bytecode = iDeployer.parse2("_: if();");
-            (bytecode);
-        }
+    /// Strings behave pretty weirdly, and aren't really supported because
+    /// conditionals assume numeric inputs. We can demonstrate some of the
+    /// weirdness in testing.
+    function testOpIfEvalEmptyStringTruthy() external view {
+        /// Empty string is false, because even though there's a binary high
+        /// bit set, it looks like an exponent on zero as a float.
+        checkHappy("_: if(\"\" 5 50);", Float.unwrap(LibDecimalFloat.packLossless(50, 0)), "");
+        /// "foo" is also false, because even with a length of 3 it still
+        /// looks like an exponent on zero as a float.
+        checkHappy("_: if(\"foo\" 5 50);", Float.unwrap(LibDecimalFloat.packLossless(50, 0)), "");
+        /// "foos" is true because it has enough chars to look like a non
+        /// zero float.
+        checkHappy("_: if(\"foos\" 5 50);", Float.unwrap(LibDecimalFloat.packLossless(5, 0)), "");
+    }
 
-        /// Test that an if with 1 input fails integrity check.
-        function testOpIfEvalFail1Input() public {
-            vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 3, 1));
-            bytes memory bytecode = iDeployer.parse2("_: if(0x00);");
-            (bytecode);
-        }
+    /// Test that an if without inputs fails integrity check.
+    function testOpIfEvalFail0Inputs() public {
+        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 3, 0));
+        bytes memory bytecode = iDeployer.parse2("_: if();");
+        (bytecode);
+    }
 
-        /// Test that an if with 2 inputs fails integrity check.
-        function testOpIfEvalFail2Inputs() public {
-            vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 2, 3, 2));
-            bytes memory bytecode = iDeployer.parse2("_: if(0x00 0x00);");
-            (bytecode);
-        }
+    /// Test that an if with 1 input fails integrity check.
+    function testOpIfEvalFail1Input() public {
+        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 3, 1));
+        bytes memory bytecode = iDeployer.parse2("_: if(0x00);");
+        (bytecode);
+    }
 
-        /// Test that an if with 4 inputs fails integrity check.
-        function testOpIfEvalFail4Inputs() public {
-            vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 4, 3, 4));
-            bytes memory bytecode = iDeployer.parse2("_: if(0x00 0x00 0x00 0x00);");
-            (bytecode);
-        }
+    /// Test that an if with 2 inputs fails integrity check.
+    function testOpIfEvalFail2Inputs() public {
+        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 2, 3, 2));
+        bytes memory bytecode = iDeployer.parse2("_: if(0x00 0x00);");
+        (bytecode);
+    }
 
-        function testOpIfEvalZeroOutputs() external {
-            checkBadOutputs(": if(5 0 0);", 3, 1, 0);
-        }
+    /// Test that an if with 4 inputs fails integrity check.
+    function testOpIfEvalFail4Inputs() public {
+        vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 4, 3, 4));
+        bytes memory bytecode = iDeployer.parse2("_: if(0x00 0x00 0x00 0x00);");
+        (bytecode);
+    }
 
-        function testOpIfEvalTwoOutputs() external {
-            checkBadOutputs("_ _: if(5 0 0);", 3, 1, 2);
-        }
+    function testOpIfEvalZeroOutputs() external {
+        checkBadOutputs(": if(5 0 0);", 3, 1, 0);
+    }
+
+    function testOpIfEvalTwoOutputs() external {
+        checkBadOutputs("_ _: if(5 0 0);", 3, 1, 2);
+    }
 }
