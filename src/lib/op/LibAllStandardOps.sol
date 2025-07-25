@@ -54,7 +54,7 @@ import {LibOpBinaryEqualTo} from "./logic/LibOpBinaryEqualTo.sol";
 import {LibOpEveryNP} from "./logic/LibOpEveryNP.sol";
 import {LibOpGreaterThan} from "./logic/LibOpGreaterThan.sol";
 import {LibOpGreaterThanOrEqualTo} from "./logic/LibOpGreaterThanOrEqualTo.sol";
-import {LibOpIfNP} from "./logic/LibOpIfNP.sol";
+import {LibOpIf} from "./logic/LibOpIf.sol";
 import {LibOpIsZero} from "./logic/LibOpIsZero.sol";
 import {LibOpLessThan} from "./logic/LibOpLessThan.sol";
 import {LibOpLessThanOrEqualTo} from "./logic/LibOpLessThanOrEqualTo.sol";
@@ -109,7 +109,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 55;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 56;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -224,10 +224,10 @@ library LibAllStandardOps {
                 "greater-than-or-equal-to",
                 "1 if the first input is greater than or equal to the second input, 0 otherwise."
             ),
-            // AuthoringMetaV2(
-            //     "if",
-            //     "If the first input is nonzero, the second input is used. Otherwise, the third input is used. If is eagerly evaluated."
-            // ),
+            AuthoringMetaV2(
+                "if",
+                "If the first input is nonzero, the second input is used. Otherwise, the third input is used. If is eagerly evaluated."
+            ),
             AuthoringMetaV2(
                 "is-zero",
                 "1 if the input is 0, 0 otherwise. The input is any numerical 0 value, not just binary 0 e.g. 0e20 is considered 0."
@@ -427,8 +427,8 @@ library LibAllStandardOps {
                     LibParseOperand.handleOperandDisallowed,
                     // greater-than-or-equal-to
                     LibParseOperand.handleOperandDisallowed,
-                    // // if
-                    // LibParseOperand.handleOperandDisallowed,
+                    // if
+                    LibParseOperand.handleOperandDisallowed,
                     // is-zero
                     LibParseOperand.handleOperandDisallowed,
                     // less-than
@@ -571,7 +571,7 @@ library LibAllStandardOps {
                     // LibOpEveryNP.integrity,
                     LibOpGreaterThan.integrity,
                     LibOpGreaterThanOrEqualTo.integrity,
-                    // LibOpIfNP.integrity,
+                    LibOpIf.integrity,
                     LibOpIsZero.integrity,
                     LibOpLessThan.integrity,
                     LibOpLessThanOrEqualTo.integrity,
@@ -679,7 +679,7 @@ library LibAllStandardOps {
                     // LibOpEveryNP.run,
                     LibOpGreaterThan.run,
                     LibOpGreaterThanOrEqualTo.run,
-                    // LibOpIfNP.run,
+                    LibOpIf.run,
                     LibOpIsZero.run,
                     LibOpLessThan.run,
                     LibOpLessThanOrEqualTo.run,
