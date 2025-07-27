@@ -51,7 +51,7 @@ import {LibOpConditionsNP} from "./logic/LibOpConditionsNP.sol";
 import {LibOpEnsure} from "./logic/LibOpEnsure.sol";
 import {LibOpEqualTo} from "./logic/LibOpEqualTo.sol";
 import {LibOpBinaryEqualTo} from "./logic/LibOpBinaryEqualTo.sol";
-import {LibOpEveryNP} from "./logic/LibOpEveryNP.sol";
+import {LibOpEvery} from "./logic/LibOpEvery.sol";
 import {LibOpGreaterThan} from "./logic/LibOpGreaterThan.sol";
 import {LibOpGreaterThanOrEqualTo} from "./logic/LibOpGreaterThanOrEqualTo.sol";
 import {LibOpIf} from "./logic/LibOpIf.sol";
@@ -109,7 +109,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 56;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 57;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -218,7 +218,7 @@ library LibAllStandardOps {
             ),
             AuthoringMetaV2("equal-to", "1 if all inputs are equal, 0 otherwise. Equality is numerical."),
             AuthoringMetaV2("binary-equal-to", "1 if all inputs are equal, 0 otherwise. Equality is binary."),
-            // AuthoringMetaV2("every", "The last nonzero value out of all inputs, or 0 if any input is 0."),
+            AuthoringMetaV2("every", "The last nonzero value out of all inputs, or 0 if any input is 0."),
             AuthoringMetaV2("greater-than", "true if the first input is greater than the second input, false otherwise."),
             AuthoringMetaV2(
                 "greater-than-or-equal-to",
@@ -421,8 +421,8 @@ library LibAllStandardOps {
                     LibParseOperand.handleOperandDisallowed,
                     // binary-equal-to
                     LibParseOperand.handleOperandDisallowed,
-                    // // every
-                    // LibParseOperand.handleOperandDisallowed,
+                    // every
+                    LibParseOperand.handleOperandDisallowed,
                     // greater-than
                     LibParseOperand.handleOperandDisallowed,
                     // greater-than-or-equal-to
@@ -568,7 +568,7 @@ library LibAllStandardOps {
                     LibOpEnsure.integrity,
                     LibOpEqualTo.integrity,
                     LibOpBinaryEqualTo.integrity,
-                    // LibOpEveryNP.integrity,
+                    LibOpEvery.integrity,
                     LibOpGreaterThan.integrity,
                     LibOpGreaterThanOrEqualTo.integrity,
                     LibOpIf.integrity,
@@ -676,7 +676,7 @@ library LibAllStandardOps {
                     LibOpEnsure.run,
                     LibOpEqualTo.run,
                     LibOpBinaryEqualTo.run,
-                    // LibOpEveryNP.run,
+                    LibOpEvery.run,
                     LibOpGreaterThan.run,
                     LibOpGreaterThanOrEqualTo.run,
                     LibOpIf.run,
