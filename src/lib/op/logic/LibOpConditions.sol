@@ -46,12 +46,13 @@ library LibOpConditions {
                 stackTop := sub(end, mul(iszero(oddInputs), 0x20))
                 if oddInputs { reason := mload(end) }
             }
-
+            bool conditionIsZero;
             while (Pointer.unwrap(cursor) < Pointer.unwrap(end)) {
                 assembly ("memory-safe") {
                     condition := mload(cursor)
                 }
-                if (!condition.isZero()) {
+                conditionIsZero = condition.isZero();
+                if (!conditionIsZero) {
                     assembly ("memory-safe") {
                         mstore(stackTop, mload(add(cursor, 0x20)))
                     }
@@ -61,7 +62,7 @@ library LibOpConditions {
                 cursor = Pointer.wrap(Pointer.unwrap(cursor) + 0x40);
             }
 
-            if (condition.isZero()) {
+            if (conditionIsZero) {
                 revert(reason.toString());
             }
             // require(condition > 0, reason.toString());
