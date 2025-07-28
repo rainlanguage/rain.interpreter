@@ -45,7 +45,7 @@ contract LibOpConditionsTest is OpTest {
     }
 
     /// Directly test the runtime logic of LibOpConditions.
-    function testOpConditionsRun(StackItem[] memory inputs, bytes32 finalNonZero) external view {
+    function testOpConditionsRun(StackItem[] memory inputs, Float finalNonZero) external view {
         InterpreterState memory state = opTestDefaultInterpreterState();
 
         // Ensure that we have inputs that are a valid pairwise conditions.
@@ -60,8 +60,8 @@ contract LibOpConditionsTest is OpTest {
         }
         // Ensure the final condition is nonzero so that we don't error.
         if (Float.wrap(StackItem.unwrap(inputs[inputs.length - 2])).isZero()) {
-            vm.assume(finalNonZero != 0);
-            inputs[inputs.length - 2] = StackItem.wrap(finalNonZero);
+            vm.assume(!finalNonZero.isZero());
+            inputs[inputs.length - 2] = StackItem.wrap(Float.unwrap(finalNonZero));
         }
         OperandV2 operand = LibOperand.build(uint8(inputs.length), 1, 0);
         opReferenceCheck(
