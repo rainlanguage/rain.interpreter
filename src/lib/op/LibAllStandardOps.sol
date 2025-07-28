@@ -78,7 +78,7 @@ import {LibOpE} from "./math/LibOpE.sol";
 // import {LibOpExp} from "./math/LibOpExp.sol";
 // import {LibOpExp2} from "./math/LibOpExp2.sol";
 // import {LibOpFloor} from "./math/LibOpFloor.sol";
-// import {LibOpFrac} from "./math/LibOpFrac.sol";
+import {LibOpFrac} from "./math/LibOpFrac.sol";
 // import {LibOpGm} from "./math/LibOpGm.sol";
 // import {LibOpHeadroom} from "./math/LibOpHeadroom.sol";
 import {LibOpInv} from "./math/LibOpInv.sol";
@@ -109,7 +109,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 58;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 59;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -272,7 +272,7 @@ library LibAllStandardOps {
             // AuthoringMetaV2("exp", "Natural exponential e^x. Errors if the exponentiation exceeds `max-value()`."),
             // AuthoringMetaV2("exp2", "Binary exponential 2^x where x. Errors if the exponentiation exceeds `max-value()`."),
             // AuthoringMetaV2("floor", "Floor of a number."),
-            // AuthoringMetaV2("frac", "Fractional part of a number."),
+            AuthoringMetaV2("frac", "Fractional part of a number."),
             // AuthoringMetaV2("gm", "Geometric mean of all numbers. Errors if any number is zero."),
             // AuthoringMetaV2(
             //     "headroom",
@@ -467,8 +467,8 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // // floor
                     // LibParseOperand.handleOperandDisallowed,
-                    // // frac
-                    // LibParseOperand.handleOperandDisallowed,
+                    // frac
+                    LibParseOperand.handleOperandDisallowed,
                     // // gm
                     // LibParseOperand.handleOperandDisallowed,
                     // // headroom
@@ -591,7 +591,7 @@ library LibAllStandardOps {
                     // LibOpExp.integrity,
                     // LibOpExp2.integrity,
                     // LibOpFloor.integrity,
-                    // LibOpFrac.integrity,
+                    LibOpFrac.integrity,
                     // LibOpGm.integrity,
                     // LibOpHeadroom.integrity,
                     LibOpInv.integrity,
@@ -699,7 +699,7 @@ library LibAllStandardOps {
                     // LibOpExp.run,
                     // LibOpExp2.run,
                     // LibOpFloor.run,
-                    // LibOpFrac.run,
+                    LibOpFrac.run,
                     // LibOpGm.run,
                     // LibOpHeadroom.run,
                     LibOpInv.run,
