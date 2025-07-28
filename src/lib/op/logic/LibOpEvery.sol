@@ -35,7 +35,7 @@ library LibOpEvery {
                 }
                 if (item.isZero()) {
                     assembly ("memory-safe") {
-                        mstore(stackTop, item)
+                        mstore(stackTop, 0)
                     }
                     break;
                 }
@@ -57,6 +57,7 @@ library LibOpEvery {
         for (uint256 i = 0; i < inputs.length; i++) {
             value = Float.wrap(StackItem.unwrap(inputs[i]));
             if (value.isZero()) {
+                value = Float.wrap(0);
                 break;
             }
         }

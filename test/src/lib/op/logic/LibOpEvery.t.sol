@@ -85,8 +85,13 @@ contract LibOpEveryTest is OpTest {
         checkHappy("_: every(0 5);", 0, "");
     }
 
+    /// zero with a non zero exponent is false.
+    function testOpEveryEvalZeroWithExponent() external view {
+        checkHappy("_: every(0e5 5);", 0, "");
+    }
+
     /// Test that every without inputs fails integrity check.
-    function testOpAnyEvalFail() public {
+    function testOpEveryEvalFail() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 1, 0));
         bytes memory bytecode = iDeployer.parse2("_: every();");
         (bytecode);
