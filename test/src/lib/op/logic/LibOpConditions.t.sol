@@ -148,7 +148,7 @@ contract LibOpConditionsTest is OpTest {
     }
 
     /// Test that conditions without inputs fails integrity check.
-    function testOpConditionsNPEvalFail0Inputs() public {
+    function testOpConditionsEvalFail0Inputs() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));
         bytes memory bytecode = iDeployer.parse2("_: conditions();");
         (bytecode);
