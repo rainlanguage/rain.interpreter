@@ -4,7 +4,6 @@ pragma solidity =0.8.25;
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
 import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
-// // import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibOpConditions} from "src/lib/op/logic/LibOpConditions.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
@@ -14,8 +13,6 @@ import {
     SourceIndexV2,
     FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-// // import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-// // import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibIntOrAString, IntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
