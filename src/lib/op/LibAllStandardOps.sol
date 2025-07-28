@@ -47,7 +47,7 @@ import {LibOpChainId} from "./evm/LibOpChainId.sol";
 import {LibOpTimestamp} from "./evm/LibOpTimestamp.sol";
 
 import {LibOpAny} from "./logic/LibOpAny.sol";
-import {LibOpConditionsNP} from "./logic/LibOpConditionsNP.sol";
+import {LibOpConditions} from "./logic/LibOpConditions.sol";
 import {LibOpEnsure} from "./logic/LibOpEnsure.sol";
 import {LibOpEqualTo} from "./logic/LibOpEqualTo.sol";
 import {LibOpBinaryEqualTo} from "./logic/LibOpBinaryEqualTo.sol";
@@ -109,7 +109,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 57;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 58;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -208,10 +208,10 @@ library LibAllStandardOps {
             AuthoringMetaV2("block-timestamp", "The current block timestamp."),
             AuthoringMetaV2("now", "The current block timestamp."),
             AuthoringMetaV2("any", "The first non-zero value out of all inputs, or 0 if every input is 0."),
-            // AuthoringMetaV2(
-            //     "conditions",
-            //     "Treats inputs as pairwise condition/value pairs. The first nonzero condition's value is used. If no conditions are nonzero, the expression reverts. Provide a constant nonzero value to define a fallback case. If the number of inputs is odd, the final value is used as an error string in the case that no conditions match."
-            // ),
+            AuthoringMetaV2(
+                "conditions",
+                "Treats inputs as pairwise condition/value pairs. The first nonzero condition's value is used. If no conditions are nonzero, the expression reverts. Provide a constant nonzero value to define a fallback case. If the number of inputs is odd, the final value is used as an error string in the case that no conditions match."
+            ),
             AuthoringMetaV2(
                 "ensure",
                 "Reverts if the first input is 0. This has to be exactly binary 0 (i.e. NOT the number 0). The second input is a string that is used as the revert reason if the first input is 0. Has 0 outputs."
@@ -413,8 +413,8 @@ library LibAllStandardOps {
                     LibParseOperand.handleOperandDisallowed,
                     // any
                     LibParseOperand.handleOperandDisallowed,
-                    // // conditions
-                    // LibParseOperand.handleOperandDisallowed,
+                    // conditions
+                    LibParseOperand.handleOperandDisallowed,
                     // ensure
                     LibParseOperand.handleOperandDisallowed,
                     // equal-to
@@ -564,7 +564,7 @@ library LibAllStandardOps {
                     // now
                     LibOpTimestamp.integrity,
                     LibOpAny.integrity,
-                    // LibOpConditionsNP.integrity,
+                    LibOpConditions.integrity,
                     LibOpEnsure.integrity,
                     LibOpEqualTo.integrity,
                     LibOpBinaryEqualTo.integrity,
@@ -672,7 +672,7 @@ library LibAllStandardOps {
                     // now
                     LibOpTimestamp.run,
                     LibOpAny.run,
-                    // LibOpConditionsNP.run,
+                    LibOpConditions.run,
                     LibOpEnsure.run,
                     LibOpEqualTo.run,
                     LibOpBinaryEqualTo.run,
