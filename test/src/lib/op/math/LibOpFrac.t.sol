@@ -35,6 +35,8 @@ contract LibOpFracTest is OpTest {
         checkHappy("_: frac(2);", 0, "2");
         checkHappy("_: frac(3);", 0, "3");
         checkHappy("_: frac(3.8);", Float.unwrap(LibDecimalFloat.packLossless(0.8e1, -1)), "3.8");
+        checkHappy("_: frac(-0.5);", Float.unwrap(LibDecimalFloat.packLossless(-0.5e1, -1)), "-0.5");
+        checkHappy("_: frac(1.5e10);", Float.unwrap(LibDecimalFloat.packLossless(0, 9)), "1.5e10");
     }
 
     /// Test the eval of `frac` for bad inputs.
