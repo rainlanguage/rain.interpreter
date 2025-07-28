@@ -44,7 +44,7 @@ contract LibOpConditionsTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpConditionsNP.
+    /// Directly test the runtime logic of LibOpConditions.
     function testOpConditionsRun(StackItem[] memory inputs, bytes32 finalNonZero) external view {
         InterpreterState memory state = opTestDefaultInterpreterState();
 
