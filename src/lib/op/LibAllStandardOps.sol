@@ -296,10 +296,7 @@ library LibAllStandardOps {
             ),
             // AuthoringMetaV2("mod", "Modulos the first number by all other numbers. Errors if any divisor is zero."),
             AuthoringMetaV2("mul", "Multiplies all numbers together."),
-            AuthoringMetaV2(
-                "power",
-                "Raises the first number to the power of the second number."
-            ),
+            AuthoringMetaV2("power", "Raises the first number to the power of the second number."),
             // AuthoringMetaV2(
             //     "snap-to-unit",
             //     "Rounds a number to the nearest whole number if it is within the threshold distance from that whole number. The first input is the threshold and the second is the value to snap to the nearest unit."
