@@ -63,7 +63,7 @@ contract LibOpPowTest is OpTest {
         // 2 ^ 4
         checkHappy("_: power(2 4);", Float.unwrap(LibDecimalFloat.packLossless(1600, -2)), "2 4");
         // sqrt 4 = 2
-        checkHappy("_: power(4 0.5);", Float.unwrap(LibDecimalFloat.packLossless(2e3, -3)), "4 5");
+        checkHappy("_: power(4 0.5);", Float.unwrap(LibDecimalFloat.packLossless(2e3, -3)), "4 0.5");
         // -1 ^ 0 = 1
         checkHappy("_: power(-1 0);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "-1 0");
     }
