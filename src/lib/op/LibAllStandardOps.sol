@@ -91,7 +91,7 @@ import {LibOpMin} from "./math/LibOpMin.sol";
 import {LibOpMinValue} from "./math/LibOpMinValue.sol";
 import {LibOpMod} from "./math/LibOpMod.sol";
 // import {LibOpLog2} from "./math/LibOpLog2.sol";
-// import {LibOpPow} from "./math/LibOpPow.sol";
+import {LibOpPow} from "./math/LibOpPow.sol";
 // import {LibOpScale18Dynamic} from "./math/LibOpScale18Dynamic.sol";
 // import {LibOpScale18} from "./math/LibOpScale18.sol";
 // import {LibOpScaleNDynamic} from "./math/LibOpScaleNDynamic.sol";
@@ -110,7 +110,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 61;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 62;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -296,10 +296,7 @@ library LibAllStandardOps {
             ),
             // AuthoringMetaV2("mod", "Modulos the first number by all other numbers. Errors if any divisor is zero."),
             AuthoringMetaV2("mul", "Multiplies all numbers together."),
-            // AuthoringMetaV2(
-            //     "power",
-            //     "Raises the first number to the power of the second number. Errors if the exponentiation exceeds `max-value()`."
-            // ),
+            AuthoringMetaV2("power", "Raises the first number to the power of the second number."),
             // AuthoringMetaV2(
             //     "snap-to-unit",
             //     "Rounds a number to the nearest whole number if it is within the threshold distance from that whole number. The first input is the threshold and the second is the value to snap to the nearest unit."
@@ -497,8 +494,8 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // mul
                     LibParseOperand.handleOperandDisallowed,
-                    // // power
-                    // LibParseOperand.handleOperandDisallowed,
+                    // power
+                    LibParseOperand.handleOperandDisallowed,
                     // // snap-to-unit
                     // LibParseOperand.handleOperandDisallowed,
                     // // sqrt
@@ -609,7 +606,7 @@ library LibAllStandardOps {
                     LibOpMinValue.integrity,
                     // LibOpMod.integrity,
                     LibOpMul.integrity,
-                    // LibOpPow.integrity,
+                    LibOpPow.integrity,
                     // LibOpSnapToUnit.integrity,
                     // LibOpSqrt.integrity,
                     LibOpSub.integrity,
@@ -718,7 +715,7 @@ library LibAllStandardOps {
                     LibOpMinValue.run,
                     // LibOpMod.run,
                     LibOpMul.run,
-                    // LibOpPow.run,
+                    LibOpPow.run,
                     // LibOpSnapToUnit.run,
                     // LibOpSqrt.run,
                     LibOpSub.run,

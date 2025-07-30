@@ -1,80 +1,99 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-// import {OpTest, IntegrityCheckState, Operand, InterpreterState, UnexpectedOperand} from "test/abstract/OpTest.sol";
-// import {LibOpPow} from "src/lib/op/math/LibOpPow.sol";
-// import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {OpTest, IntegrityCheckState, OperandV2, InterpreterState, UnexpectedOperand} from "test/abstract/OpTest.sol";
+import {LibOpPow} from "src/lib/op/math/LibOpPow.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {Log10Negative} from "rain.math.float/error/ErrDecimalFloat.sol";
 
-// contract LibOpPowTest is OpTest {
-//     /// Directly test the integrity logic of LibOpPow.
-//     /// Inputs are always 2, outputs are always 1.
-//     function testOpPowIntegrity(IntegrityCheckState memory state, Operand operand) external pure {
-//         (uint256 calcInputs, uint256 calcOutputs) = LibOpPow.integrity(state, operand);
-//         assertEq(calcInputs, 2);
-//         assertEq(calcOutputs, 1);
-//     }
+contract LibOpPowTest is OpTest {
+    function beforeOpTestConstructor() internal virtual override {
+        vm.createSelectFork("https://1rpc.io/arb");
+    }
 
-//     /// Directly test the runtime logic of LibOpPow.
-//     function testOpPowRun(uint256 a, uint256 b) public view {
-//         // @TODO This is a hack to get around the fact that we are very likely
-//         // to overflow uint256 if we just fuzz it, and that it's clunky to
-//         // determine whether it will overflow or not. Basically the overflow
-//         // check is exactly the same as the implementation, including all the
-//         // intermediate squaring, so it seems like a bit of circular logic to
-//         // do things that way.
-//         a = bound(a, 0, type(uint64).max);
-//         b = bound(b, 0, 10);
-//         InterpreterState memory state = opTestDefaultInterpreterState();
+    /// Directly test the integrity logic of LibOpPow.
+    /// Inputs are always 2, outputs are always 1.
+    function testOpPowIntegrity(IntegrityCheckState memory state, OperandV2 operand) external pure {
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpPow.integrity(state, operand);
+        assertEq(calcInputs, 2);
+        assertEq(calcOutputs, 1);
+    }
 
-//         Operand operand = LibOperand.build(2, 1, 0);
-//         uint256[] memory inputs = new uint256[](2);
-//         inputs[0] = a;
-//         inputs[1] = b;
+    /// Directly test the runtime logic of LibOpPow.
+    function testOpPowRun(int224 signedCoefficientA, int32 exponentA, int224 signedCoefficientB, int32 exponentB)
+        public
+        view
+    {
+        signedCoefficientA = int224(bound(signedCoefficientA, 0, 10000));
+        exponentA = int32(bound(exponentA, -100, 10));
+        Float a = LibDecimalFloat.packLossless(signedCoefficientA, exponentA);
+        signedCoefficientB = int224(bound(signedCoefficientB, 0, 10000));
+        exponentB = int32(bound(exponentB, -100, 1));
+        Float b = LibDecimalFloat.packLossless(signedCoefficientB, exponentB);
+        InterpreterState memory state = opTestDefaultInterpreterState();
 
-//         opReferenceCheck(state, operand, LibOpPow.referenceFn, LibOpPow.integrity, LibOpPow.run, inputs);
-//     }
+        OperandV2 operand = LibOperand.build(2, 1, 0);
+        StackItem[] memory inputs = new StackItem[](2);
+        inputs[0] = StackItem.wrap(Float.unwrap(a));
+        inputs[1] = StackItem.wrap(Float.unwrap(b));
 
-// /// Test the eval of `power`.
-// function testOpPowEval() external view {
-//     // 0 ^ 0
-//     checkHappy("_: power(0 0);", 1e18, "0 0");
-//     // 0 ^ 1
-//     checkHappy("_: power(0 1);", 0, "0 1");
-//     // 1e18 ^ 0
-//     checkHappy("_: power(1 0);", 1e18, "1e18 0");
-//     // 1 ^ 1
-//     checkHappy("_: power(1 1);", 1e18, "1e18 1");
-//     // 1 ^ 2
-//     checkHappy("_: power(1 2);", 1e18, "1e18 2");
-//     // 2 ^ 2
-//     checkHappy("_: power(2 2);", 4e18, "2e18 2");
-//     // 2 ^ 3
-//     checkHappy("_: power(2 3);", 8e18, "2e18 3");
-//     // 2 ^ 4
-//     checkHappy("_: power(2 4);", 16e18, "2e18 4");
-//     // sqrt 4 = 2
-//     checkHappy("_: power(4 0.5);", 2e18, "4e18 5");
-// }
+        opReferenceCheck(state, operand, LibOpPow.referenceFn, LibOpPow.integrity, LibOpPow.run, inputs);
+    }
 
-//     /// Test the eval of `power` for bad inputs.
-//     function testOpPowEvalOneInput() external {
-//         checkBadInputs("_: power(1);", 1, 2, 1);
-//     }
+    /// Test the eval of `power`.
+    function testOpPowEval() external view {
+        // 0 ^ 0
+        checkHappy("_: power(0 0);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "0 0");
+        // 0 ^ 1
+        checkHappy("_: power(0 1);", 0, "0 1");
+        // 0 ^ 2
+        checkHappy("_: power(0 2);", 0, "0 2");
+        // 1 ^ 0
+        checkHappy("_: power(1 0);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1 0");
+        // 1 ^ 1
+        checkHappy("_: power(1 1);", Float.unwrap(LibDecimalFloat.packLossless(1e3, -3)), "1 1");
+        // 1 ^ 2
+        checkHappy("_: power(1 2);", Float.unwrap(LibDecimalFloat.packLossless(1e3, -3)), "1 2");
+        // 2 ^ 2
+        checkHappy("_: power(2 2);", Float.unwrap(LibDecimalFloat.packLossless(3999, -3)), "2 2");
+        // 2 ^ 3
+        checkHappy("_: power(2 3);", Float.unwrap(LibDecimalFloat.packLossless(7998, -3)), "2 3");
+        // 2 ^ 4
+        checkHappy("_: power(2 4);", Float.unwrap(LibDecimalFloat.packLossless(1600, -2)), "2 4");
+        // sqrt 4 = 2
+        checkHappy("_: power(4 0.5);", Float.unwrap(LibDecimalFloat.packLossless(2e3, -3)), "4 0.5");
+        // -1 ^ 0 = 1
+        checkHappy("_: power(-1 0);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "-1 0");
+    }
 
-//     function testOpPowThreeInputs() external {
-//         checkBadInputs("_: power(1 1 1);", 3, 2, 3);
-//     }
+    function testOpPowNegativeBaseError() external {
+        // Negative base with positive exponent.
+        checkUnhappy("_: power(-1 2);", abi.encodeWithSelector(Log10Negative.selector, -1e37, -37));
+        // Negative base with negative exponent.
+        checkUnhappy("_: power(-1 -2);", abi.encodeWithSelector(Log10Negative.selector, -1e37, -37));
+    }
 
-//     function testOpPowZeroOutputs() external {
-//         checkBadOutputs(": power(1 1);", 2, 1, 0);
-//     }
+    /// Test the eval of `power` for bad inputs.
+    function testOpPowEvalOneInput() external {
+        checkBadInputs("_: power(1);", 1, 2, 1);
+    }
 
-//     function testOpPowTwoOutputs() external {
-//         checkBadOutputs("_ _: power(1 1);", 2, 1, 2);
-//     }
+    function testOpPowThreeInputs() external {
+        checkBadInputs("_: power(1 1 1);", 3, 2, 3);
+    }
 
-//     /// Test that operand is disallowed.
-//     function testOpPowEvalOperandDisallowed() external {
-//         checkUnhappyParse("_: power<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector));
-//     }
-// }
+    function testOpPowZeroOutputs() external {
+        checkBadOutputs(": power(1 1);", 2, 1, 0);
+    }
+
+    function testOpPowTwoOutputs() external {
+        checkBadOutputs("_ _: power(1 1);", 2, 1, 2);
+    }
+
+    /// Test that operand is disallowed.
+    function testOpPowEvalOperandDisallowed() external {
+        checkUnhappyParse("_: power<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector));
+    }
+}
