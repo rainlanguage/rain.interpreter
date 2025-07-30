@@ -6,6 +6,7 @@ import {LibOpPow} from "src/lib/op/math/LibOpPow.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {Log10Negative} from "rain.math.float/error/ErrDecimalFloat.sol";
 
 contract LibOpPowTest is OpTest {
     function beforeOpTestConstructor() internal virtual override {
@@ -63,6 +64,15 @@ contract LibOpPowTest is OpTest {
         checkHappy("_: power(2 4);", Float.unwrap(LibDecimalFloat.packLossless(1600, -2)), "2 4");
         // sqrt 4 = 2
         checkHappy("_: power(4 0.5);", Float.unwrap(LibDecimalFloat.packLossless(2e3, -3)), "4 5");
+        // -1 ^ 0 = 1
+        checkHappy("_: power(-1 0);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "-1 0");
+    }
+
+    function testOpPowNegativeBaseError() external {
+        // Negative base with positive exponent.
+        checkUnhappy("_: power(-1 2);", abi.encodeWithSelector(Log10Negative.selector, -1e37, -37));
+        // Negative base with negative exponent.
+        checkUnhappy("_: power(-1 -2);", abi.encodeWithSelector(Log10Negative.selector, -1e37, -37));
     }
 
     /// Test the eval of `power` for bad inputs.
