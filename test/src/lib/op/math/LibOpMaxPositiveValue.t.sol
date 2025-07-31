@@ -2,7 +2,7 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {LibOpMaxValue} from "src/lib/op/math/LibOpMaxValue.sol";
+import {LibOpMaxPositiveValue} from "src/lib/op/math/LibOpMaxPositiveValue.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {
     IInterpreterV4,
@@ -18,13 +18,13 @@ import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreter
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
-/// @title LibOpMaxValueTest
-/// @notice Test the runtime and integrity time logic of LibOpMaxValue.
-contract LibOpMaxValueTest is OpTest {
+/// @title LibOpMaxPositiveValueTest
+/// @notice Test the runtime and integrity time logic of LibOpMaxPositiveValue.
+contract LibOpMaxPositiveValueTest is OpTest {
     using LibInterpreterState for InterpreterState;
     using LibDecimalFloat for Float;
 
-    /// Directly test the integrity logic of LibOpMaxValue.
+    /// Directly test the integrity logic of LibOpMaxPositiveValue.
     function testOpMaxValueIntegrity(IntegrityCheckState memory state, uint8 inputs, uint8 outputs, uint16 operandData)
         external
         pure
@@ -32,38 +32,45 @@ contract LibOpMaxValueTest is OpTest {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpMaxValue.integrity(state, LibOperand.build(inputs, outputs, operandData));
+            LibOpMaxPositiveValue.integrity(state, LibOperand.build(inputs, outputs, operandData));
 
         assertEq(calcInputs, 0);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpMaxValue. This tests that the
-    /// opcode correctly pushes the max value onto the stack.
-    function testOpMaxValueRun() external view {
+    /// Directly test the runtime logic of LibOpMaxPositiveValue. This tests that
+    /// the opcode correctly pushes the max value onto the stack.
+    function testOpMaxPositiveValueRun() external view {
         InterpreterState memory state = opTestDefaultInterpreterState();
         StackItem[] memory inputs = new StackItem[](0);
         OperandV2 operand = LibOperand.build(0, 1, 0);
-        opReferenceCheck(state, operand, LibOpMaxValue.referenceFn, LibOpMaxValue.integrity, LibOpMaxValue.run, inputs);
+        opReferenceCheck(
+            state,
+            operand,
+            LibOpMaxPositiveValue.referenceFn,
+            LibOpMaxPositiveValue.integrity,
+            LibOpMaxPositiveValue.run,
+            inputs
+        );
     }
 
-    /// Test the eval of LibOpMaxValue parsed from a string.
-    function testOpMaxValueEval() external view {
-        checkHappy("_: max-value();", Float.unwrap(LibDecimalFloat.FLOAT_MAX_VALUE), "");
+    /// Test the eval of LibOpMaxPositiveValue parsed from a string.
+    function testOpMaxPositivepValueEval() external view {
+        checkHappy("_: max-positive-value();", Float.unwrap(LibDecimalFloat.FLOAT_MAX_POSITIVE_VALUE), "");
     }
 
-    /// Test that a max-value with inputs fails integrity check.
-    function testOpMaxValueEvalFail() public {
+    /// Test that a max-positive-value with inputs fails integrity check.
+    function testOpMaxPositiveValueEvalFail() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
-        bytes memory bytecode = iDeployer.parse2("_: max-value(0x00);");
+        bytes memory bytecode = iDeployer.parse2("_: max-positive-value(0x00);");
         (bytecode);
     }
 
-    function testOpMaxValueZeroOutputs() external {
-        checkBadOutputs(": max-value();", 0, 1, 0);
+    function testOpMaxPositiveValueZeroOutputs() external {
+        checkBadOutputs(": max-positive-value();", 0, 1, 0);
     }
 
-    function testOpMaxValueTwoOutputs() external {
-        checkBadOutputs("_ _: max-value();", 0, 1, 2);
+    function testOpMaxPositiveValueTwoOutputs() external {
+        checkBadOutputs("_ _: max-positive-value();", 0, 1, 2);
     }
 }

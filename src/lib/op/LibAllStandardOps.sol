@@ -86,7 +86,7 @@ import {LibOpInv} from "./math/LibOpInv.sol";
 // import {LibOpLn} from "./math/LibOpLn.sol";
 // import {LibOpLog10} from "./math/LibOpLog10.sol";
 import {LibOpMax} from "./math/LibOpMax.sol";
-import {LibOpMaxValue} from "./math/LibOpMaxValue.sol";
+import {LibOpMaxPositiveValue} from "./math/LibOpMaxPositiveValue.sol";
 import {LibOpMin} from "./math/LibOpMin.sol";
 import {LibOpMinValue} from "./math/LibOpMinValue.sol";
 import {LibOpMod} from "./math/LibOpMod.sol";
@@ -286,7 +286,7 @@ library LibAllStandardOps {
             // AuthoringMetaV2("log10", "Base 10 logarithm log10(x). Errors if the number is zero."),
             AuthoringMetaV2("max", "Finds the maximum number from all inputs."),
             AuthoringMetaV2(
-                "max-value",
+                "max-positive-value",
                 "The maximum representable float value. This is so large that it is effectively infinity. Almost all numbers that you could possibly subtract from it will be ignored as a rounding error."
             ),
             AuthoringMetaV2("min", "Finds the minimum number from all inputs."),
@@ -601,7 +601,7 @@ library LibAllStandardOps {
                     // LibOpLog2.integrity,
                     // LibOpLog10.integrity,
                     LibOpMax.integrity,
-                    LibOpMaxValue.integrity,
+                    LibOpMaxPositiveValue.integrity,
                     LibOpMin.integrity,
                     LibOpMinValue.integrity,
                     // LibOpMod.integrity,
@@ -710,7 +710,7 @@ library LibAllStandardOps {
                     // LibOpLog2.run,
                     // LibOpLog10.run,
                     LibOpMax.run,
-                    LibOpMaxValue.run,
+                    LibOpMaxPositiveValue.run,
                     LibOpMin.run,
                     LibOpMinValue.run,
                     // LibOpMod.run,
