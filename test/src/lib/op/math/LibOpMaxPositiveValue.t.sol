@@ -25,7 +25,7 @@ contract LibOpMaxPositiveValueTest is OpTest {
     using LibDecimalFloat for Float;
 
     /// Directly test the integrity logic of LibOpMaxPositiveValue.
-    function testOpMaxValueIntegrity(IntegrityCheckState memory state, uint8 inputs, uint8 outputs, uint16 operandData)
+    function testOpMaxPositiveValueIntegrity(IntegrityCheckState memory state, uint8 inputs, uint8 outputs, uint16 operandData)
         external
         pure
     {
