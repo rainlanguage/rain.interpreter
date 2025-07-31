@@ -7,9 +7,9 @@ import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
-/// @title LibOpMinValue
+/// @title LibOpMinNegativeValue
 /// Exposes the minimum representable float value as a Rainlang opcode.
-library LibOpMinValue {
+library LibOpMinNegativeValue {
     using LibDecimalFloat for Float;
 
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {

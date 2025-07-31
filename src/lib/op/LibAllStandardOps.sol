@@ -88,7 +88,7 @@ import {LibOpInv} from "./math/LibOpInv.sol";
 import {LibOpMax} from "./math/LibOpMax.sol";
 import {LibOpMaxPositiveValue} from "./math/LibOpMaxPositiveValue.sol";
 import {LibOpMin} from "./math/LibOpMin.sol";
-import {LibOpMinValue} from "./math/LibOpMinValue.sol";
+import {LibOpMinNegativeValue} from "./math/LibOpMinNegativeValue.sol";
 import {LibOpMod} from "./math/LibOpMod.sol";
 // import {LibOpLog2} from "./math/LibOpLog2.sol";
 import {LibOpPow} from "./math/LibOpPow.sol";
@@ -291,7 +291,7 @@ library LibAllStandardOps {
             ),
             AuthoringMetaV2("min", "Finds the minimum number from all inputs."),
             AuthoringMetaV2(
-                "min-value",
+                "min-negative-value",
                 "The minimum representable float value. This is so small that it is effectively negative infinity. Almost all numbers that you could possibly add to it will be ignored as a rounding error."
             ),
             // AuthoringMetaV2("mod", "Modulos the first number by all other numbers. Errors if any divisor is zero."),
@@ -603,7 +603,7 @@ library LibAllStandardOps {
                     LibOpMax.integrity,
                     LibOpMaxPositiveValue.integrity,
                     LibOpMin.integrity,
-                    LibOpMinValue.integrity,
+                    LibOpMinNegativeValue.integrity,
                     // LibOpMod.integrity,
                     LibOpMul.integrity,
                     LibOpPow.integrity,
@@ -712,7 +712,7 @@ library LibAllStandardOps {
                     LibOpMax.run,
                     LibOpMaxPositiveValue.run,
                     LibOpMin.run,
-                    LibOpMinValue.run,
+                    LibOpMinNegativeValue.run,
                     // LibOpMod.run,
                     LibOpMul.run,
                     LibOpPow.run,
