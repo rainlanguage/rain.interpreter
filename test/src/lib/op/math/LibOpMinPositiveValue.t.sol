@@ -57,7 +57,7 @@ contract LibOpMinPositiveValueTest is OpTest {
     }
 
     /// Test the eval of LibOpMinPositiveValue parsed from a string.
-    function testOpMinPositivepValueEval() external view {
+    function testOpMinPositiveValueEval() external view {
         checkHappy("_: min-positive-value();", Float.unwrap(LibDecimalFloat.FLOAT_MIN_POSITIVE_VALUE), "");
     }
 
