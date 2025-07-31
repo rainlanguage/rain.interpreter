@@ -101,7 +101,7 @@ contract LibOpSubTest is OpTest {
         checkHappy(
             "_: sub(max-positive-value() 0);",
             Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)),
-            "max-value() 0"
+            "max-positive-value() 0"
         );
         checkHappy("_: sub(1 2);", Float.unwrap(LibDecimalFloat.packLossless(-1e37, -37)), "1 2");
         checkHappy("_: sub(1 0.1);", Float.unwrap(LibDecimalFloat.packLossless(9e37, -38)), "1 0.1");
