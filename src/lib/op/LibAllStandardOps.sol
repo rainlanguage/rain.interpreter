@@ -89,6 +89,7 @@ import {LibOpMax} from "./math/LibOpMax.sol";
 import {LibOpMaxPositiveValue} from "./math/LibOpMaxPositiveValue.sol";
 import {LibOpMin} from "./math/LibOpMin.sol";
 import {LibOpMinNegativeValue} from "./math/LibOpMinNegativeValue.sol";
+import {LibOpMinPositiveValue} from "./math/LibOpMinPositiveValue.sol";
 import {LibOpMod} from "./math/LibOpMod.sol";
 // import {LibOpLog2} from "./math/LibOpLog2.sol";
 import {LibOpPow} from "./math/LibOpPow.sol";
@@ -110,7 +111,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 62;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 63;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -293,6 +294,10 @@ library LibAllStandardOps {
             AuthoringMetaV2(
                 "min-negative-value",
                 "The minimum representable float value. This is so small that it is effectively negative infinity. Almost all numbers that you could possibly add to it will be ignored as a rounding error."
+            ),
+            AuthoringMetaV2(
+                "min-positive-value",
+                "The minimum positive representable float value. This is the smallest number that can be represented that is still greater than zero."
             ),
             // AuthoringMetaV2("mod", "Modulos the first number by all other numbers. Errors if any divisor is zero."),
             AuthoringMetaV2("mul", "Multiplies all numbers together."),
@@ -484,11 +489,13 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // max
                     LibParseOperand.handleOperandDisallowed,
-                    // max-value
+                    // max-positive-value
                     LibParseOperand.handleOperandDisallowed,
                     // min
                     LibParseOperand.handleOperandDisallowed,
-                    // min-value
+                    // min-negative-value
+                    LibParseOperand.handleOperandDisallowed,
+                    // min-positive-value
                     LibParseOperand.handleOperandDisallowed,
                     // // mod
                     // LibParseOperand.handleOperandDisallowed,
@@ -604,6 +611,7 @@ library LibAllStandardOps {
                     LibOpMaxPositiveValue.integrity,
                     LibOpMin.integrity,
                     LibOpMinNegativeValue.integrity,
+                    LibOpMinPositiveValue.integrity,
                     // LibOpMod.integrity,
                     LibOpMul.integrity,
                     LibOpPow.integrity,
@@ -713,6 +721,7 @@ library LibAllStandardOps {
                     LibOpMaxPositiveValue.run,
                     LibOpMin.run,
                     LibOpMinNegativeValue.run,
+                    LibOpMinPositiveValue.run,
                     // LibOpMod.run,
                     LibOpMul.run,
                     LibOpPow.run,
