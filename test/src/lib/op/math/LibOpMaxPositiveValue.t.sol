@@ -55,7 +55,7 @@ contract LibOpMaxPositiveValueTest is OpTest {
     }
 
     /// Test the eval of LibOpMaxPositiveValue parsed from a string.
-    function testOpMaxPositivepValueEval() external view {
+    function testOpMaxPositiveValueEval() external view {
         checkHappy("_: max-positive-value();", Float.unwrap(LibDecimalFloat.FLOAT_MAX_POSITIVE_VALUE), "");
     }
 
