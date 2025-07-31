@@ -59,31 +59,31 @@ contract LibOpMinTest is OpTest {
         checkBadInputs("_: min(5);", 1, 2, 1);
         checkBadInputs("_: min(0);", 1, 2, 1);
         checkBadInputs("_: min(1);", 1, 2, 1);
-        checkBadInputs("_: min(max-value());", 1, 2, 1);
+        checkBadInputs("_: min(max-positive-value());", 1, 2, 1);
     }
 
     /// Test the eval of `min` opcode parsed from a string. Tests two inputs.
     function testOpMinEval2InputsHappy() external view {
         checkHappy("_: min(0 0);", 0, "0 > 0 ? 0 : 1");
         checkHappy("_: min(1 0);", 0, "1 > 0 ? 1 : 0");
-        checkHappy("_: min(max-value() 0);", 0, "max-value() > 0 ? max-value() : 0");
+        checkHappy("_: min(max-positive-value() 0);", 0, "max-positive-value() > 0 ? max-positive-value() : 0");
         checkHappy("_: min(0 1);", 0, "0 > 1 ? 0 : 1");
         checkHappy("_: min(1 1);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1 > 1 ? 1 : 1");
-        checkHappy("_: min(0 max-value());", 0, "0 > max-value() ? 0 : max-value()");
+        checkHappy("_: min(0 max-positive-value());", 0, "0 > max-positive-value() ? 0 : max-positive-value()");
         checkHappy(
-            "_: min(1 max-value());",
+            "_: min(1 max-positive-value());",
             Float.unwrap(LibDecimalFloat.packLossless(1, 0)),
-            "1 > max-value() ? 1 : max-value()"
+            "1 > max-positive-value() ? 1 : max-positive-value()"
         );
         checkHappy(
-            "_: min(max-value() 1);",
+            "_: min(max-positive-value() 1);",
             Float.unwrap(LibDecimalFloat.packLossless(1, 0)),
-            "1 > max-value() ? 1 : max-value()"
+            "1 > max-positive-value() ? 1 : max-positive-value()"
         );
         checkHappy(
-            "_: min(max-value() max-value());",
+            "_: min(max-positive-value() max-positive-value());",
             Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)),
-            "max-value() > max-value() ? max-value() : max-value()"
+            "max-positive-value() > max-positive-value() ? max-positive-value() : max-positive-value()"
         );
         checkHappy("_: min(0 2);", 0, "0 > 2 ? 0 : 2");
         checkHappy("_: min(1 2);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1 > 2 ? 1 : 2");
@@ -130,70 +130,124 @@ contract LibOpMinTest is OpTest {
         checkHappy("_: min(0 2 2);", 0, "0 2 2");
         checkHappy("_: min(1 2 2);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1 2 2");
         checkHappy("_: min(2 2 2);", Float.unwrap(LibDecimalFloat.packLossless(2, 0)), "2 2 2");
-        checkHappy("_: min(0 0 max-value());", 0, "0 0 max-value()");
-        checkHappy("_: min(1 0 max-value());", 0, "1 0 max-value()");
-        checkHappy("_: min(2 0 max-value());", 0, "2 0 max-value()");
-        checkHappy("_: min(0 1 max-value());", 0, "0 1 max-value()");
-        checkHappy("_: min(1 1 max-value());", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1 1 max-value()");
-        checkHappy("_: min(2 1 max-value());", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "2 1 max-value()");
-        checkHappy("_: min(0 2 max-value());", 0, "0 2 max-value()");
-        checkHappy("_: min(1 2 max-value());", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1 2 max-value()");
-        checkHappy("_: min(2 2 max-value());", Float.unwrap(LibDecimalFloat.packLossless(2, 0)), "2 2 max-value()");
-        checkHappy("_: min(0 max-value() 0);", 0, "0 max-value() 0");
-        checkHappy("_: min(1 max-value() 0);", 0, "1 max-value() 0");
-        checkHappy("_: min(2 max-value() 0);", 0, "2 max-value() 0");
-        checkHappy("_: min(0 max-value() 1);", 0, "0 max-value() 1");
-        checkHappy("_: min(1 max-value() 1);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1 max-value() 1");
-        checkHappy("_: min(2 max-value() 1);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "2 max-value() 1");
-        checkHappy("_: min(0 max-value() 2);", 0, "0 max-value() 2");
-        checkHappy("_: min(1 max-value() 2);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1 max-value() 2");
-        checkHappy("_: min(2 max-value() 2);", Float.unwrap(LibDecimalFloat.packLossless(2, 0)), "2 max-value() 2");
-        checkHappy("_: min(0 max-value() max-value());", 0, "0 max-value() max-value()");
+        checkHappy("_: min(0 0 max-positive-value());", 0, "0 0 max-positive-value()");
+        checkHappy("_: min(1 0 max-positive-value());", 0, "1 0 max-positive-value()");
+        checkHappy("_: min(2 0 max-positive-value());", 0, "2 0 max-positive-value()");
+        checkHappy("_: min(0 1 max-positive-value());", 0, "0 1 max-positive-value()");
         checkHappy(
-            "_: min(1 max-value() max-value());",
+            "_: min(1 1 max-positive-value());",
             Float.unwrap(LibDecimalFloat.packLossless(1, 0)),
-            "1 max-value() max-value()"
+            "1 1 max-positive-value()"
         );
         checkHappy(
-            "_: min(2 max-value() max-value());",
-            Float.unwrap(LibDecimalFloat.packLossless(2, 0)),
-            "2 max-value() max-value()"
-        );
-        checkHappy("_: min(max-value() 0 0);", 0, "max-value() 0 0");
-        checkHappy("_: min(max-value() 1 0);", 0, "max-value() 1 0");
-        checkHappy("_: min(max-value() 2 0);", 0, "max-value() 2 0");
-        checkHappy("_: min(max-value() 0 1);", 0, "max-value() 0 1");
-        checkHappy("_: min(max-value() 1 1);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "max-value() 1 1");
-        checkHappy("_: min(max-value() 2 1);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "max-value() 2 1");
-        checkHappy("_: min(max-value() 0 2);", 0, "max-value() 0 2");
-        checkHappy("_: min(max-value() 1 2);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "max-value() 1 2");
-        checkHappy("_: min(max-value() 2 2);", Float.unwrap(LibDecimalFloat.packLossless(2, 0)), "max-value() 2 2");
-        checkHappy("_: min(max-value() 0 max-value());", 0, "max-value() 0 max-value()");
-        checkHappy(
-            "_: min(max-value() 1 max-value());",
+            "_: min(2 1 max-positive-value());",
             Float.unwrap(LibDecimalFloat.packLossless(1, 0)),
-            "max-value() 1 max-value()"
+            "2 1 max-positive-value()"
         );
+        checkHappy("_: min(0 2 max-positive-value());", 0, "0 2 max-positive-value()");
         checkHappy(
-            "_: min(max-value() 2 max-value());",
-            Float.unwrap(LibDecimalFloat.packLossless(2, 0)),
-            "max-value() 2 max-value()"
-        );
-        checkHappy("_: min(max-value() max-value() 0);", 0, "max-value() max-value() 0");
-        checkHappy(
-            "_: min(max-value() max-value() 1);",
+            "_: min(1 2 max-positive-value());",
             Float.unwrap(LibDecimalFloat.packLossless(1, 0)),
-            "max-value() max-value() 1"
+            "1 2 max-positive-value()"
         );
         checkHappy(
-            "_: min(max-value() max-value() 2);",
+            "_: min(2 2 max-positive-value());",
             Float.unwrap(LibDecimalFloat.packLossless(2, 0)),
-            "max-value() max-value() 2"
+            "2 2 max-positive-value()"
+        );
+        checkHappy("_: min(0 max-positive-value() 0);", 0, "0 max-positive-value() 0");
+        checkHappy("_: min(1 max-positive-value() 0);", 0, "1 max-positive-value() 0");
+        checkHappy("_: min(2 max-positive-value() 0);", 0, "2 max-positive-value() 0");
+        checkHappy("_: min(0 max-positive-value() 1);", 0, "0 max-positive-value() 1");
+        checkHappy(
+            "_: min(1 max-positive-value() 1);",
+            Float.unwrap(LibDecimalFloat.packLossless(1, 0)),
+            "1 max-positive-value() 1"
         );
         checkHappy(
-            "_: min(max-value() max-value() max-value());",
+            "_: min(2 max-positive-value() 1);",
+            Float.unwrap(LibDecimalFloat.packLossless(1, 0)),
+            "2 max-positive-value() 1"
+        );
+        checkHappy("_: min(0 max-positive-value() 2);", 0, "0 max-positive-value() 2");
+        checkHappy(
+            "_: min(1 max-positive-value() 2);",
+            Float.unwrap(LibDecimalFloat.packLossless(1, 0)),
+            "1 max-positive-value() 2"
+        );
+        checkHappy(
+            "_: min(2 max-positive-value() 2);",
+            Float.unwrap(LibDecimalFloat.packLossless(2, 0)),
+            "2 max-positive-value() 2"
+        );
+        checkHappy(
+            "_: min(0 max-positive-value() max-positive-value());", 0, "0 max-positive-value() max-positive-value()"
+        );
+        checkHappy(
+            "_: min(1 max-positive-value() max-positive-value());",
+            Float.unwrap(LibDecimalFloat.packLossless(1, 0)),
+            "1 max-positive-value() max-positive-value()"
+        );
+        checkHappy(
+            "_: min(2 max-positive-value() max-positive-value());",
+            Float.unwrap(LibDecimalFloat.packLossless(2, 0)),
+            "2 max-positive-value() max-positive-value()"
+        );
+        checkHappy("_: min(max-positive-value() 0 0);", 0, "max-positive-value() 0 0");
+        checkHappy("_: min(max-positive-value() 1 0);", 0, "max-positive-value() 1 0");
+        checkHappy("_: min(max-positive-value() 2 0);", 0, "max-positive-value() 2 0");
+        checkHappy("_: min(max-positive-value() 0 1);", 0, "max-positive-value() 0 1");
+        checkHappy(
+            "_: min(max-positive-value() 1 1);",
+            Float.unwrap(LibDecimalFloat.packLossless(1, 0)),
+            "max-positive-value() 1 1"
+        );
+        checkHappy(
+            "_: min(max-positive-value() 2 1);",
+            Float.unwrap(LibDecimalFloat.packLossless(1, 0)),
+            "max-positive-value() 2 1"
+        );
+        checkHappy("_: min(max-positive-value() 0 2);", 0, "max-positive-value() 0 2");
+        checkHappy(
+            "_: min(max-positive-value() 1 2);",
+            Float.unwrap(LibDecimalFloat.packLossless(1, 0)),
+            "max-positive-value() 1 2"
+        );
+        checkHappy(
+            "_: min(max-positive-value() 2 2);",
+            Float.unwrap(LibDecimalFloat.packLossless(2, 0)),
+            "max-positive-value() 2 2"
+        );
+        checkHappy(
+            "_: min(max-positive-value() 0 max-positive-value());", 0, "max-positive-value() 0 max-positive-value()"
+        );
+        checkHappy(
+            "_: min(max-positive-value() 1 max-positive-value());",
+            Float.unwrap(LibDecimalFloat.packLossless(1, 0)),
+            "max-positive-value() 1 max-positive-value()"
+        );
+        checkHappy(
+            "_: min(max-positive-value() 2 max-positive-value());",
+            Float.unwrap(LibDecimalFloat.packLossless(2, 0)),
+            "max-positive-value() 2 max-positive-value()"
+        );
+        checkHappy(
+            "_: min(max-positive-value() max-positive-value() 0);", 0, "max-positive-value() max-positive-value() 0"
+        );
+        checkHappy(
+            "_: min(max-positive-value() max-positive-value() 1);",
+            Float.unwrap(LibDecimalFloat.packLossless(1, 0)),
+            "max-positive-value() max-positive-value() 1"
+        );
+        checkHappy(
+            "_: min(max-positive-value() max-positive-value() 2);",
+            Float.unwrap(LibDecimalFloat.packLossless(2, 0)),
+            "max-positive-value() max-positive-value() 2"
+        );
+        checkHappy(
+            "_: min(max-positive-value() max-positive-value() max-positive-value());",
             Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)),
-            "max-value() max-value() max-value()"
+            "max-positive-value() max-positive-value() max-positive-value()"
         );
         checkHappy("_: min(0 0 -2);", Float.unwrap(LibDecimalFloat.packLossless(-2, 0)), "0 0 -2");
         checkHappy("_: min(1 0 -2);", Float.unwrap(LibDecimalFloat.packLossless(-2, 0)), "1 0 -2");

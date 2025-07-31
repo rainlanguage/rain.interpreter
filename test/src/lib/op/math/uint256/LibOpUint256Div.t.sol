@@ -75,7 +75,7 @@ contract LibOpUint256DivTest is OpTest {
         checkBadInputs("_: uint256-div(5e-18);", 1, 2, 1);
         checkBadInputs("_: uint256-div(0e-18);", 1, 2, 1);
         checkBadInputs("_: uint256-div(1e-18);", 1, 2, 1);
-        checkBadInputs("_: uint256-div(max-value());", 1, 2, 1);
+        checkBadInputs("_: uint256-div(max-positive-value());", 1, 2, 1);
     }
 
     function testOpUint256DivEvalZeroOutputs() external {
@@ -179,13 +179,13 @@ contract LibOpUint256DivTest is OpTest {
     function testOpUint256DivEval3InputsUnhappy() external {
         checkUnhappy("_: uint256-div(0 0 0);", stdError.divisionError);
         checkUnhappy("_: uint256-div(1e-18 0 0);", stdError.divisionError);
-        checkUnhappy("_: uint256-div(max-value() 0 0);", stdError.divisionError);
+        checkUnhappy("_: uint256-div(max-positive-value() 0 0);", stdError.divisionError);
         checkUnhappy("_: uint256-div(0 1e-18 0);", stdError.divisionError);
         checkUnhappy("_: uint256-div(1e-18 1e-18 0);", stdError.divisionError);
-        checkUnhappy("_: uint256-div(max-value() max-value() 0);", stdError.divisionError);
+        checkUnhappy("_: uint256-div(max-positive-value() max-positive-value() 0);", stdError.divisionError);
         checkUnhappy("_: uint256-div(0 0 1e-18);", stdError.divisionError);
         checkUnhappy("_: uint256-div(1e-18 0 1e-18);", stdError.divisionError);
-        checkUnhappy("_: uint256-div(max-value() 0 1e-18);", stdError.divisionError);
+        checkUnhappy("_: uint256-div(max-positive-value() 0 1e-18);", stdError.divisionError);
     }
 
     /// Test the eval of `uint256-div` opcode parsed from a string.

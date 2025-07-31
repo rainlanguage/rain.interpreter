@@ -74,7 +74,7 @@ contract LibOpMulTest is OpTest {
         checkBadInputs("_: mul(5);", 1, 2, 1);
         checkBadInputs("_: mul(0);", 1, 2, 1);
         checkBadInputs("_: mul(1);", 1, 2, 1);
-        checkBadInputs("_: mul(max-value());", 1, 2, 1);
+        checkBadInputs("_: mul(max-positive-value());", 1, 2, 1);
     }
 
     function testOpMulZeroOutputs() external {
@@ -101,9 +101,9 @@ contract LibOpMulTest is OpTest {
         checkHappy("_: mul(10 10);", Float.unwrap(LibDecimalFloat.packLossless(100, 0)), "10 10");
         // Test an intermediate overflow.
         checkHappy(
-            "_: mul(1 max-value());",
+            "_: mul(1 max-positive-value());",
             Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)),
-            "1 max-value()"
+            "1 max-positive-value()"
         );
     }
 
@@ -112,7 +112,9 @@ contract LibOpMulTest is OpTest {
     /// Tests the unhappy path where the final result overflows.
     function testOpMulEvalTwoInputsUnhappyOverflow() external {
         checkUnhappyOverflow(
-            "_: mul(max-value() 10);", 13479973333575319897333507543509815336818572211270286240551805124607, 2147483648
+            "_: mul(max-positive-value() 10);",
+            13479973333575319897333507543509815336818572211270286240551805124607,
+            2147483648
         );
     }
 
@@ -135,9 +137,9 @@ contract LibOpMulTest is OpTest {
         checkHappy("_: mul(10 10 10);", Float.unwrap(LibDecimalFloat.packLossless(1000, 0)), "10 10 10");
         // Test an intermediate overflow.
         checkHappy(
-            "_: mul(1 max-value() 1);",
+            "_: mul(1 max-positive-value() 1);",
             Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)),
-            "1 max-value() 1"
+            "1 max-positive-value() 1"
         );
     }
 
@@ -146,7 +148,7 @@ contract LibOpMulTest is OpTest {
     /// Tests the unhappy path where the final result overflows.
     function testOpMulEvalThreeInputsUnhappyOverflow() external {
         checkUnhappyOverflow(
-            "_: mul(max-value() 1 10);",
+            "_: mul(max-positive-value() 1 10);",
             13479973333575319897333507543509815336818572211270286240551805124607,
             2147483648
         );
