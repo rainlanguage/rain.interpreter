@@ -89,7 +89,7 @@ contract LibOpSubTest is OpTest {
         checkBadInputs("_: sub(5e-18);", 1, 2, 1);
         checkBadInputs("_: sub(0);", 1, 2, 1);
         checkBadInputs("_: sub(1e-18);", 1, 2, 1);
-        checkBadInputs("_: sub(max-value());", 1, 2, 1);
+        checkBadInputs("_: sub(max-positive-value());", 1, 2, 1);
     }
 
     /// Test the eval of `sub` opcode parsed from a string. Tests two inputs.
@@ -99,9 +99,9 @@ contract LibOpSubTest is OpTest {
         checkHappy("_: sub(2 1);", Float.unwrap(LibDecimalFloat.packLossless(1e37, -37)), "2 1");
         checkHappy("_: sub(2 2);", Float.unwrap(LibDecimalFloat.packLossless(0e37, -37)), "2 2");
         checkHappy(
-            "_: sub(max-value() 0);",
+            "_: sub(max-positive-value() 0);",
             Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)),
-            "max-value() 0"
+            "max-positive-value() 0"
         );
         checkHappy("_: sub(1 2);", Float.unwrap(LibDecimalFloat.packLossless(-1e37, -37)), "1 2");
         checkHappy("_: sub(1 0.1);", Float.unwrap(LibDecimalFloat.packLossless(9e37, -38)), "1 0.1");

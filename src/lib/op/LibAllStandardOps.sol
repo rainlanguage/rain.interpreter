@@ -86,9 +86,11 @@ import {LibOpInv} from "./math/LibOpInv.sol";
 // import {LibOpLn} from "./math/LibOpLn.sol";
 // import {LibOpLog10} from "./math/LibOpLog10.sol";
 import {LibOpMax} from "./math/LibOpMax.sol";
-import {LibOpMaxValue} from "./math/LibOpMaxValue.sol";
+import {LibOpMaxNegativeValue} from "./math/LibOpMaxNegativeValue.sol";
+import {LibOpMaxPositiveValue} from "./math/LibOpMaxPositiveValue.sol";
 import {LibOpMin} from "./math/LibOpMin.sol";
-import {LibOpMinValue} from "./math/LibOpMinValue.sol";
+import {LibOpMinNegativeValue} from "./math/LibOpMinNegativeValue.sol";
+import {LibOpMinPositiveValue} from "./math/LibOpMinPositiveValue.sol";
 import {LibOpMod} from "./math/LibOpMod.sol";
 // import {LibOpLog2} from "./math/LibOpLog2.sol";
 import {LibOpPow} from "./math/LibOpPow.sol";
@@ -110,7 +112,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 62;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 64;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -286,13 +288,21 @@ library LibAllStandardOps {
             // AuthoringMetaV2("log10", "Base 10 logarithm log10(x). Errors if the number is zero."),
             AuthoringMetaV2("max", "Finds the maximum number from all inputs."),
             AuthoringMetaV2(
-                "max-value",
+                "max-negative-value",
+                "The maximum representable float value that is negative. This is the largest number that can be represented that is still less than zero."
+            ),
+            AuthoringMetaV2(
+                "max-positive-value",
                 "The maximum representable float value. This is so large that it is effectively infinity. Almost all numbers that you could possibly subtract from it will be ignored as a rounding error."
             ),
             AuthoringMetaV2("min", "Finds the minimum number from all inputs."),
             AuthoringMetaV2(
-                "min-value",
+                "min-negative-value",
                 "The minimum representable float value. This is so small that it is effectively negative infinity. Almost all numbers that you could possibly add to it will be ignored as a rounding error."
+            ),
+            AuthoringMetaV2(
+                "min-positive-value",
+                "The minimum positive representable float value. This is the smallest number that can be represented that is still greater than zero."
             ),
             // AuthoringMetaV2("mod", "Modulos the first number by all other numbers. Errors if any divisor is zero."),
             AuthoringMetaV2("mul", "Multiplies all numbers together."),
@@ -484,11 +494,15 @@ library LibAllStandardOps {
                     // LibParseOperand.handleOperandDisallowed,
                     // max
                     LibParseOperand.handleOperandDisallowed,
-                    // max-value
+                    // max-negative-value
+                    LibParseOperand.handleOperandDisallowed,
+                    // max-positive-value
                     LibParseOperand.handleOperandDisallowed,
                     // min
                     LibParseOperand.handleOperandDisallowed,
-                    // min-value
+                    // min-negative-value
+                    LibParseOperand.handleOperandDisallowed,
+                    // min-positive-value
                     LibParseOperand.handleOperandDisallowed,
                     // // mod
                     // LibParseOperand.handleOperandDisallowed,
@@ -601,9 +615,11 @@ library LibAllStandardOps {
                     // LibOpLog2.integrity,
                     // LibOpLog10.integrity,
                     LibOpMax.integrity,
-                    LibOpMaxValue.integrity,
+                    LibOpMaxNegativeValue.integrity,
+                    LibOpMaxPositiveValue.integrity,
                     LibOpMin.integrity,
-                    LibOpMinValue.integrity,
+                    LibOpMinNegativeValue.integrity,
+                    LibOpMinPositiveValue.integrity,
                     // LibOpMod.integrity,
                     LibOpMul.integrity,
                     LibOpPow.integrity,
@@ -710,9 +726,11 @@ library LibAllStandardOps {
                     // LibOpLog2.run,
                     // LibOpLog10.run,
                     LibOpMax.run,
-                    LibOpMaxValue.run,
+                    LibOpMaxNegativeValue.run,
+                    LibOpMaxPositiveValue.run,
                     LibOpMin.run,
-                    LibOpMinValue.run,
+                    LibOpMinNegativeValue.run,
+                    LibOpMinPositiveValue.run,
                     // LibOpMod.run,
                     LibOpMul.run,
                     LibOpPow.run,

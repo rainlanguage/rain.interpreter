@@ -122,25 +122,25 @@ contract LibOpAddTest is OpTest {
     }
 
     /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
-    /// Tests that adding 0 to max-value() is max-value().
+    /// Tests that adding 0 to max-positive-value() is max-positive-value().
     function testOpAddEval2InputsHappyZeroMax() external view {
         checkHappy(
-            "_: add(0 max-value());",
+            "_: add(0 max-positive-value());",
             Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)),
-            "0 + max-value()"
+            "0 + max-positive-value()"
         );
         checkHappy(
-            "_: add(max-value() 0);",
+            "_: add(max-positive-value() 0);",
             Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)),
-            "max-value() + 0"
+            "max-positive-value() + 0"
         );
     }
 
     /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
     /// Tests the unhappy path where the addition does overflow.
     function testOpAddEval2InputsUnhappy() external {
-        checkUnhappyOverflow("_: add(max-value() 1e-18);", 13479973333575319897333507543509815336, 2147483677);
-        checkUnhappyOverflow("_: add(1e-18 max-value());", 13479973333575319897333507543509815336, 2147483677);
+        checkUnhappyOverflow("_: add(max-positive-value() 1e-18);", 13479973333575319897333507543509815336, 2147483677);
+        checkUnhappyOverflow("_: add(1e-18 max-positive-value());", 13479973333575319897333507543509815336, 2147483677);
     }
 
     /// Test the eval of `add` opcode parsed from a string. Tests three inputs.
@@ -156,27 +156,53 @@ contract LibOpAddTest is OpTest {
     /// Test the eval of `add` opcode parsed from a string. Tests three inputs.
     /// Tests the unhappy path where the addition does overflow.
     function testOpAddEval3InputsUnhappy() external {
-        checkUnhappyOverflow("_: add(max-value() 1e-18 1e-18);", 13479973333575319897333507543509815336, 2147483677);
-        checkUnhappyOverflow("_: add(1e-18 max-value() 1e-18);", 13479973333575319897333507543509815336, 2147483677);
-        checkUnhappyOverflow("_: add(1e-18 1e-18 max-value());", 13479973333575319897333507543509815336, 2147483677);
         checkUnhappyOverflow(
-            "_: add(max-value() max-value() 1e-18);", 26959946667150639794667015087019630672, 2147483677
+            "_: add(max-positive-value() 1e-18 1e-18);", 13479973333575319897333507543509815336, 2147483677
         );
         checkUnhappyOverflow(
-            "_: add(max-value() 1e-18 max-value());", 13479973333575319897333507543509815336, 2147483677
+            "_: add(1e-18 max-positive-value() 1e-18);", 13479973333575319897333507543509815336, 2147483677
         );
         checkUnhappyOverflow(
-            "_: add(1e-18 max-value() max-value());", 13479973333575319897333507543509815336, 2147483677
+            "_: add(1e-18 1e-18 max-positive-value());", 13479973333575319897333507543509815336, 2147483677
         );
         checkUnhappyOverflow(
-            "_: add(max-value() max-value() max-value());", 26959946667150639794667015087019630672, 2147483677
+            "_: add(max-positive-value() max-positive-value() 1e-18);",
+            26959946667150639794667015087019630672,
+            2147483677
         );
-        checkUnhappyOverflow("_: add(max-value() 1e-18 0);", 13479973333575319897333507543509815336, 2147483677);
-        checkUnhappyOverflow("_: add(1e-18 max-value() 0);", 13479973333575319897333507543509815336, 2147483677);
-        checkUnhappyOverflow("_: add(1e-18 0 max-value());", 13479973333575319897333507543509815336, 2147483677);
-        checkUnhappyOverflow("_: add(max-value() max-value() 0);", 26959946667150639794667015087019630672, 2147483677);
-        checkUnhappyOverflow("_: add(max-value() 0 max-value());", 26959946667150639794667015087019630672, 2147483677);
-        checkUnhappyOverflow("_: add(0 max-value() max-value());", 26959946667150639794667015087019630672, 2147483677);
+        checkUnhappyOverflow(
+            "_: add(max-positive-value() 1e-18 max-positive-value());",
+            13479973333575319897333507543509815336,
+            2147483677
+        );
+        checkUnhappyOverflow(
+            "_: add(1e-18 max-positive-value() max-positive-value());",
+            13479973333575319897333507543509815336,
+            2147483677
+        );
+        checkUnhappyOverflow(
+            "_: add(max-positive-value() max-positive-value() max-positive-value());",
+            26959946667150639794667015087019630672,
+            2147483677
+        );
+        checkUnhappyOverflow(
+            "_: add(max-positive-value() 1e-18 0);", 13479973333575319897333507543509815336, 2147483677
+        );
+        checkUnhappyOverflow(
+            "_: add(1e-18 max-positive-value() 0);", 13479973333575319897333507543509815336, 2147483677
+        );
+        checkUnhappyOverflow(
+            "_: add(1e-18 0 max-positive-value());", 13479973333575319897333507543509815336, 2147483677
+        );
+        checkUnhappyOverflow(
+            "_: add(max-positive-value() max-positive-value() 0);", 26959946667150639794667015087019630672, 2147483677
+        );
+        checkUnhappyOverflow(
+            "_: add(max-positive-value() 0 max-positive-value());", 26959946667150639794667015087019630672, 2147483677
+        );
+        checkUnhappyOverflow(
+            "_: add(0 max-positive-value() max-positive-value());", 26959946667150639794667015087019630672, 2147483677
+        );
     }
 
     /// Test the eval of `add` opcode parsed from a string.

@@ -151,7 +151,7 @@ contract LibOpUint256MulTest is OpTest {
         checkUnhappy("_: uint256-mul(0x02 0x02 uint256-max-value());", stdError.arithmeticError);
         checkUnhappy("_: uint256-mul(uint256-max-value() uint256-max-value() 0x02);", stdError.arithmeticError);
         checkUnhappy("_: uint256-mul(uint256-max-value() 0x02 uint256-max-value());", stdError.arithmeticError);
-        checkUnhappy("_: uint256-mul(2e-18 max-value() max-value());", stdError.arithmeticError);
+        checkUnhappy("_: uint256-mul(2e-18 max-positive-value() max-positive-value());", stdError.arithmeticError);
         checkUnhappy(
             "_: uint256-mul(uint256-max-value() uint256-max-value() uint256-max-value());", stdError.arithmeticError
         );

@@ -97,7 +97,7 @@ contract LibOpUint256PowTest is OpTest {
         checkBadInputs("_: uint256-power(5e-18);", 1, 2, 1);
         checkBadInputs("_: uint256-power(0);", 1, 2, 1);
         checkBadInputs("_: uint256-power(1e-18);", 1, 2, 1);
-        checkBadInputs("_: uint256-power(max-value());", 1, 2, 1);
+        checkBadInputs("_: uint256-power(max-positive-value());", 1, 2, 1);
     }
 
     function testOpUint256PowEvalZeroOutputs() external {

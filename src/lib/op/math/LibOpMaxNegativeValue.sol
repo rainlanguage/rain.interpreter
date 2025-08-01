@@ -7,9 +7,9 @@ import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
-/// @title LibOpMinValue
-/// Exposes the minimum representable float value as a Rainlang opcode.
-library LibOpMinValue {
+/// @title LibOpMaxNegativeValue
+/// Exposes the maximum negative representable float value as a Rainlang opcode.
+library LibOpMaxNegativeValue {
     using LibDecimalFloat for Float;
 
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
@@ -17,7 +17,7 @@ library LibOpMinValue {
     }
 
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
-        Float value = LibDecimalFloat.FLOAT_MIN_NEGATIVE_VALUE;
+        Float value = LibDecimalFloat.FLOAT_MAX_NEGATIVE_VALUE;
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
             mstore(stackTop, value)
@@ -31,7 +31,7 @@ library LibOpMinValue {
         returns (StackItem[] memory)
     {
         StackItem[] memory outputs = new StackItem[](1);
-        outputs[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(type(int224).min, type(int32).max)));
+        outputs[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(-1, type(int32).min)));
         return outputs;
     }
 }
