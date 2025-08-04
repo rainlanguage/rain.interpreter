@@ -2,11 +2,6 @@
     "editor.rulers": [
         80
     ],
-    "editor.quickSuggestions": { "other": false, "comments": false, "strings": false },
-    "editor.hover.enabled": false,
-    "editor.parameterHints.enabled": false,
-    "files.autoSave": "onFocusChange",
-    "files.trimTrailingWhitespace": true,
     "solidity.compileUsingRemoteVersion": "v0.8.25+commit.b61c2a91",
     "solidity.formatter": "forge"
 }
