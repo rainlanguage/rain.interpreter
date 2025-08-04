@@ -1,49 +1,54 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-// import {UD60x18, mul, pow} from "prb-math/UD60x18.sol";
-// import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-// import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-// import {InterpreterState} from "../../../state/LibInterpreterState.sol";
-// import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {InterpreterState} from "../../../state/LibInterpreterState.sol";
+import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
+import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
-// /// @title LibOpExponentialGrowth
-// /// @notice Exponential growth is base(1 + rate)^t where base is the initial
-// /// value, rate is the growth rate, and t is time.
-// library LibOpExponentialGrowth {
-//     function integrity(IntegrityCheckState memory, Operand) internal pure returns (uint256, uint256) {
-//         // There must be three inputs and one output.
-//         return (3, 1);
-//     }
+/// @title LibOpExponentialGrowth
+/// @notice Exponential growth is base(1 + rate)^t where base is the initial
+/// value, rate is the growth rate, and t is time.
+library LibOpExponentialGrowth {
+    using LibDecimalFloat for Float;
 
-//     /// exponential-growth
-//     function run(InterpreterState memory, Operand, Pointer stackTop) internal pure returns (Pointer) {
-//         uint256 base;
-//         uint256 rate;
-//         uint256 t;
-//         assembly ("memory-safe") {
-//             base := mload(stackTop)
-//             rate := mload(add(stackTop, 0x20))
-//             stackTop := add(stackTop, 0x40)
-//             t := mload(stackTop)
-//         }
-//         base = UD60x18.unwrap(mul(UD60x18.wrap(base), pow(UD60x18.wrap(1e18 + rate), UD60x18.wrap(t))));
+    function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
+        // There must be three inputs and one output.
+        return (3, 1);
+    }
 
-//         assembly ("memory-safe") {
-//             mstore(stackTop, base)
-//         }
-//         return stackTop;
-//     }
+    /// exponential-growth
+    function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
+        Float base;
+        Float rate;
+        Float t;
+        assembly ("memory-safe") {
+            base := mload(stackTop)
+            rate := mload(add(stackTop, 0x20))
+            stackTop := add(stackTop, 0x40)
+            t := mload(stackTop)
+        }
+        base = base.mul(rate.add(LibDecimalFloat.FLOAT_ONE).pow(t, LibDecimalFloat.LOG_TABLES_ADDRESS));
 
-//     /// Gas intensive reference implementation for testing.
-//     function referenceFn(InterpreterState memory, Operand, uint256[] memory inputs)
-//         internal
-//         pure
-//         returns (uint256[] memory)
-//     {
-//         uint256[] memory outputs = new uint256[](1);
-//         outputs[0] =
-//             UD60x18.unwrap(mul(UD60x18.wrap(inputs[0]), pow(UD60x18.wrap(1e18 + inputs[1]), UD60x18.wrap(inputs[2]))));
-//         return outputs;
-//     }
-// }
+        assembly ("memory-safe") {
+            mstore(stackTop, base)
+        }
+        return stackTop;
+    }
+
+    /// Gas intensive reference implementation for testing.
+    function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
+        internal
+        view
+        returns (StackItem[] memory)
+    {
+        Float base = Float.wrap(StackItem.unwrap(inputs[0]));
+        Float rate = Float.wrap(StackItem.unwrap(inputs[1]));
+        Float t = Float.wrap(StackItem.unwrap(inputs[2]));
+        base = base.mul(rate.add(LibDecimalFloat.FLOAT_ONE).pow(t, LibDecimalFloat.LOG_TABLES_ADDRESS));
+        StackItem[] memory outputs = new StackItem[](1);
+        outputs[0] = StackItem.wrap(Float.unwrap(base));
+        return outputs;
+    }
+}

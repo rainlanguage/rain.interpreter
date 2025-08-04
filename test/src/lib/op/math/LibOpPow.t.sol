@@ -10,7 +10,7 @@ import {Log10Negative} from "rain.math.float/error/ErrDecimalFloat.sol";
 
 contract LibOpPowTest is OpTest {
     function beforeOpTestConstructor() internal virtual override {
-        vm.createSelectFork("https://1rpc.io/arb");
+        vm.createSelectFork(vm.envString("ETH_RPC_URL"));
     }
 
     /// Directly test the integrity logic of LibOpPow.
