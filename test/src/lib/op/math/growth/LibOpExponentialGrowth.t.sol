@@ -1,91 +1,121 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-// import {OpTest, IntegrityCheckState, Operand, InterpreterState, UnexpectedOperand} from "test/abstract/OpTest.sol";
-// import {LibOpExponentialGrowth} from "src/lib/op/math/growth/LibOpExponentialGrowth.sol";
-// import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {OpTest, IntegrityCheckState, OperandV2, InterpreterState, UnexpectedOperand} from "test/abstract/OpTest.sol";
+import {LibOpExponentialGrowth} from "src/lib/op/math/growth/LibOpExponentialGrowth.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
-// contract LibOpExponentialGrowthTest is OpTest {
-//     /// Directly test the integrity logic of LibOpExponentialGrowth.
-//     /// Inputs are always 3, outputs are always 1.
-//     function testOpExponentialGrowthIntegrity(IntegrityCheckState memory state, Operand operand) external pure {
-//         (uint256 calcInputs, uint256 calcOutputs) = LibOpExponentialGrowth.integrity(state, operand);
-//         assertEq(calcInputs, 3);
-//         assertEq(calcOutputs, 1);
-//     }
+contract LibOpExponentialGrowthTest is OpTest {
+    function beforeOpTestConstructor() internal virtual override {
+        vm.createSelectFork(vm.envString("ETH_RPC_URL"));
+    }
 
-//     /// Directly test the runtime logic of LibOpExponentialGrowth.
-//     function testOpExponentialGrowthRun(uint256 a, uint256 r, uint256 t, uint16 operandData) public view {
-//         // @TODO This is a hack to cover some range that we can definitely
-//         // handle but it doesn't cover the full range of the function.
-//         a = bound(a, 0, type(uint64).max);
-//         r = bound(r, 0, type(uint64).max);
-//         // PRB math can't reliably handle t beyond 44e18 with a and r both up to
-//         // ~18e18 (uint64 max).
-//         t = bound(t, 0, 44e18);
-//         InterpreterState memory state = opTestDefaultInterpreterState();
+    /// Directly test the integrity logic of LibOpExponentialGrowth.
+    /// Inputs are always 3, outputs are always 1.
+    function testOpExponentialGrowthIntegrity(IntegrityCheckState memory state, OperandV2 operand) external pure {
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpExponentialGrowth.integrity(state, operand);
+        assertEq(calcInputs, 3);
+        assertEq(calcOutputs, 1);
+    }
 
-//         Operand operand = LibOperand.build(3, 1, operandData);
-//         uint256[] memory inputs = new uint256[](3);
-//         inputs[0] = a;
-//         inputs[1] = r;
-//         inputs[2] = t;
+    /// Directly test the runtime logic of LibOpExponentialGrowth.
+    function testOpExponentialGrowthRun(
+        int224 signedCoefficientA,
+        int32 exponentA,
+        int224 signedCoefficientR,
+        int32 exponentR,
+        int224 signedCoefficientT,
+        int32 exponentT,
+        uint16 operandData
+    ) public view {
+        signedCoefficientA = int224(bound(signedCoefficientA, 0, type(int8).max));
+        exponentA = int32(bound(exponentA, -10, 10));
+        Float a = LibDecimalFloat.packLossless(signedCoefficientA, exponentA);
 
-//         opReferenceCheck(
-//             state,
-//             operand,
-//             LibOpExponentialGrowth.referenceFn,
-//             LibOpExponentialGrowth.integrity,
-//             LibOpExponentialGrowth.run,
-//             inputs
-//         );
-//     }
+        signedCoefficientR = int224(bound(signedCoefficientR, 0, type(int8).max));
+        exponentR = int32(bound(exponentR, -10, 10));
+        Float r = LibDecimalFloat.packLossless(signedCoefficientR, exponentR);
 
-// /// Test the eval of `exponential-growth`.
-// function testOpExponentialGrowthEval() external view {
-//     checkHappy("_: exponential-growth(0 0 0);", 0, "0 0 0");
-//     checkHappy("_: exponential-growth(0 0.1 0);", 0, "0 0.1 0");
-//     checkHappy("_: exponential-growth(0 0.1 1);", 0, "0 0.1 1");
-//     checkHappy("_: exponential-growth(1 0.1 0);", 1e18, "1 0.1 0");
-//     checkHappy("_: exponential-growth(1 0.1 1);", 1.1e18, "1 0.1 1");
-//     // Not exactly 1.21
-//     checkHappy("_: exponential-growth(1 0.1 2);", 1209999999999999974, "1 0.1 2");
-//     // Not exactly 1.26905870629
-//     checkHappy("_: exponential-growth(1 0.1 2.5);", 1269058706285883337, "1 0.1 2.5");
-//     checkHappy("_: exponential-growth(1 0 2);", 1e18, "1 0 2");
-//     checkHappy("_: exponential-growth(1 0.1 0.5);", 1048808848170151541, "1 0.1 0.5");
-//     checkHappy("_: exponential-growth(2 0.1 0);", 2e18, "2 0.1 0");
-//     checkHappy("_: exponential-growth(2 0.1 1);", 2.2e18, "2 0.1 1");
-//     // Not exactly 2.42
-//     checkHappy("_: exponential-growth(2 0.1 2);", 2419999999999999948, "2 0.1 2");
-// }
+        signedCoefficientT = int224(bound(signedCoefficientT, 0, type(int8).max));
+        exponentT = int32(bound(exponentT, -10, 5));
+        Float t = LibDecimalFloat.packLossless(signedCoefficientT, exponentT);
 
-//     function testOpExponentialGrowthEvalZeroInputs() external {
-//         checkBadInputs(": exponential-growth();", 0, 3, 0);
-//     }
+        InterpreterState memory state = opTestDefaultInterpreterState();
 
-//     function testOpExponentialGrowthEvalOneInput() external {
-//         checkBadInputs("_: exponential-growth(1);", 1, 3, 1);
-//     }
+        OperandV2 operand = LibOperand.build(3, 1, operandData);
+        StackItem[] memory inputs = new StackItem[](3);
+        inputs[0] = StackItem.wrap(Float.unwrap(a));
+        inputs[1] = StackItem.wrap(Float.unwrap(r));
+        inputs[2] = StackItem.wrap(Float.unwrap(t));
 
-//     function testOpExponentialGrowthEvalTwoInputs() external {
-//         checkBadInputs("_: exponential-growth(1 0);", 2, 3, 2);
-//     }
+        opReferenceCheck(
+            state,
+            operand,
+            LibOpExponentialGrowth.referenceFn,
+            LibOpExponentialGrowth.integrity,
+            LibOpExponentialGrowth.run,
+            inputs
+        );
+    }
 
-//     function testOpExponentialGrowthEvalFourInputs() external {
-//         checkBadInputs("_: exponential-growth(1 0 0 1);", 4, 3, 4);
-//     }
+    /// Test the eval of `exponential-growth`.
+    function testOpExponentialGrowthEval() external view {
+        checkHappy("_: exponential-growth(0 0 0);", 0, "0 0 0");
+        checkHappy("_: exponential-growth(0 0.1 0);", 0, "0 0.1 0");
+        checkHappy("_: exponential-growth(0 0.1 1);", 0, "0 0.1 1");
+        checkHappy("_: exponential-growth(1 0.1 0);", Float.unwrap(LibDecimalFloat.FLOAT_ONE), "1 0.1 0");
+        checkHappy("_: exponential-growth(1 0.1 1);", Float.unwrap(LibDecimalFloat.packLossless(11e2, -3)), "1 0.1 1");
+        // Exactly 1.21
+        checkHappy("_: exponential-growth(1 0.1 2);", Float.unwrap(LibDecimalFloat.packLossless(121e1, -3)), "1 0.1 2");
+        // Not exactly 1.26905870629
+        checkHappy(
+            "_: exponential-growth(1 0.1 2.5);", Float.unwrap(LibDecimalFloat.packLossless(1269, -3)), "1 0.1 2.5"
+        );
+        checkHappy("_: exponential-growth(1 0 2);", Float.unwrap(LibDecimalFloat.packLossless(1e3, -3)), "1 0 2");
+        // Not exactly 1.0488088482
+        checkHappy(
+            "_: exponential-growth(1 0.1 0.5);", Float.unwrap(LibDecimalFloat.packLossless(1049, -3)), "1 0.1 0.5"
+        );
+        checkHappy("_: exponential-growth(2 0.1 0);", Float.unwrap(LibDecimalFloat.packLossless(2, 0)), "2 0.1 0");
+        checkHappy("_: exponential-growth(2 0.1 1);", Float.unwrap(LibDecimalFloat.packLossless(22e2, -3)), "2 0.1 1");
+        checkHappy("_: exponential-growth(2 0.1 2);", Float.unwrap(LibDecimalFloat.packLossless(242e1, -3)), "2 0.1 2");
 
-//     function testOpExponentialGrowthEvalZeroOutputs() external {
-//         checkBadOutputs(": exponential-growth(1 0 0);", 3, 1, 0);
-//     }
+        /// 1.8181..
+        checkHappy(
+            "_: exponential-growth(2 0.1 -1);",
+            Float.unwrap(LibDecimalFloat.packLossless(1.8181818181818181818181818181818181818e38, -38)),
+            "2 0.1 -1"
+        );
+    }
 
-//     function testOpExponentialGrowthEvalTwoOutputs() external {
-//         checkBadOutputs("_ _: exponential-growth(1 0 0);", 3, 1, 2);
-//     }
+    function testOpExponentialGrowthEvalZeroInputs() external {
+        checkBadInputs(": exponential-growth();", 0, 3, 0);
+    }
 
-//     /// Test that operand is disallowed.
-//     function testOpExponentialGrowthEvalOperandDisallowed() external {
-//         checkUnhappyParse("_: exponential-growth<0>(1 0 0);", abi.encodeWithSelector(UnexpectedOperand.selector));
-//     }
-// }
+    function testOpExponentialGrowthEvalOneInput() external {
+        checkBadInputs("_: exponential-growth(1);", 1, 3, 1);
+    }
+
+    function testOpExponentialGrowthEvalTwoInputs() external {
+        checkBadInputs("_: exponential-growth(1 0);", 2, 3, 2);
+    }
+
+    function testOpExponentialGrowthEvalFourInputs() external {
+        checkBadInputs("_: exponential-growth(1 0 0 1);", 4, 3, 4);
+    }
+
+    function testOpExponentialGrowthEvalZeroOutputs() external {
+        checkBadOutputs(": exponential-growth(1 0 0);", 3, 1, 0);
+    }
+
+    function testOpExponentialGrowthEvalTwoOutputs() external {
+        checkBadOutputs("_ _: exponential-growth(1 0 0);", 3, 1, 2);
+    }
+
+    /// Test that operand is disallowed.
+    function testOpExponentialGrowthEvalOperandDisallowed() external {
+        checkUnhappyParse("_: exponential-growth<0>(1 0 0);", abi.encodeWithSelector(UnexpectedOperand.selector));
+    }
+}

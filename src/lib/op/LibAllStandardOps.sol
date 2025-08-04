@@ -59,7 +59,7 @@ import {LibOpIsZero} from "./logic/LibOpIsZero.sol";
 import {LibOpLessThan} from "./logic/LibOpLessThan.sol";
 import {LibOpLessThanOrEqualTo} from "./logic/LibOpLessThanOrEqualTo.sol";
 
-// import {LibOpExponentialGrowth} from "./math/growth/LibOpExponentialGrowth.sol";
+import {LibOpExponentialGrowth} from "./math/growth/LibOpExponentialGrowth.sol";
 import {LibOpLinearGrowth} from "./math/growth/LibOpLinearGrowth.sol";
 
 import {LibOpMaxUint256} from "./math/uint256/LibOpMaxUint256.sol";
@@ -112,7 +112,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 64;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 65;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -239,10 +239,10 @@ library LibAllStandardOps {
             AuthoringMetaV2(
                 "less-than-or-equal-to", "1 if the first input is less than or equal to the second input, 0 otherwise."
             ),
-            // AuthoringMetaV2(
-            //     "exponential-growth",
-            //     "Calculates an exponential growth curve as `base(1 + rate)^t` where `base` is the initial value, `rate` is the rate of growth and `t` is units of time. Inputs in order are `base`, `rate`, and `t` respectively."
-            // ),
+            AuthoringMetaV2(
+                "exponential-growth",
+                "Calculates an exponential growth curve as `base(1 + rate)^t` where `base` is the initial value, `rate` is the rate of growth and `t` is units of time. Inputs in order are `base`, `rate`, and `t` respectively."
+            ),
             AuthoringMetaV2(
                 "linear-growth",
                 "Calculates a linear growth curve as `base + (rate * t)` where `base` is the initial value, `rate` is the rate of growth and `t` is units of time. Inputs in order are `base`, `rate`, and `t` respectively."
@@ -444,8 +444,8 @@ library LibAllStandardOps {
                     LibParseOperand.handleOperandDisallowed,
                     // less-than-or-equal-to
                     LibParseOperand.handleOperandDisallowed,
-                    // // exponential-growth
-                    // LibParseOperand.handleOperandDisallowed,
+                    // exponential-growth
+                    LibParseOperand.handleOperandDisallowed,
                     // linear-growth
                     LibParseOperand.handleOperandDisallowed,
                     // uint256-max-value
@@ -590,7 +590,7 @@ library LibAllStandardOps {
                     LibOpIsZero.integrity,
                     LibOpLessThan.integrity,
                     LibOpLessThanOrEqualTo.integrity,
-                    // LibOpExponentialGrowth.integrity,
+                    LibOpExponentialGrowth.integrity,
                     LibOpLinearGrowth.integrity,
                     LibOpMaxUint256.integrity,
                     LibOpUint256Add.integrity,
@@ -701,7 +701,7 @@ library LibAllStandardOps {
                     LibOpIsZero.run,
                     LibOpLessThan.run,
                     LibOpLessThanOrEqualTo.run,
-                    // LibOpExponentialGrowth.run,
+                    LibOpExponentialGrowth.run,
                     LibOpLinearGrowth.run,
                     LibOpMaxUint256.run,
                     LibOpUint256Add.run,
