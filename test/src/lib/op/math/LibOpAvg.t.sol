@@ -1,71 +1,78 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-// import {OpTest, IntegrityCheckState, Operand, InterpreterState, UnexpectedOperand} from "test/abstract/OpTest.sol";
-// import {LibOpAvg} from "src/lib/op/math/LibOpAvg.sol";
-// import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {OpTest, IntegrityCheckState, OperandV2, InterpreterState, UnexpectedOperand} from "test/abstract/OpTest.sol";
+import {LibOpAvg} from "src/lib/op/math/LibOpAvg.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
-// contract LibOpAvgTest is OpTest {
-//     /// Directly test the integrity logic of LibOpAvg.
-//     /// Inputs are always 2, outputs are always 1.
-//     function testOpAvgIntegrity(IntegrityCheckState memory state, Operand operand) external pure {
-//         (uint256 calcInputs, uint256 calcOutputs) = LibOpAvg.integrity(state, operand);
-//         assertEq(calcInputs, 2);
-//         assertEq(calcOutputs, 1);
-//     }
+contract LibOpAvgTest is OpTest {
+    /// Directly test the integrity logic of LibOpAvg.
+    /// Inputs are always 2, outputs are always 1.
+    function testOpAvgIntegrity(IntegrityCheckState memory state, OperandV2 operand) external pure {
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpAvg.integrity(state, operand);
+        assertEq(calcInputs, 2);
+        assertEq(calcOutputs, 1);
+    }
 
-//     /// Directly test the runtime logic of LibOpAvg.
-//     function testOpAvgRun(uint256 a, uint256 b, uint16 operandData) public view {
-//         // @TODO This is a hack to get around the fact that we are very likely
-//         // to overflow uint256 if we just fuzz it, and that it's clunky to
-//         // determine whether it will overflow or not. Basically the overflow
-//         // check is exactly the same as the implementation, including all the
-//         // intermediate squaring, so it seems like a bit of circular logic to
-//         // do things that way.
-//         a = bound(a, 0, type(uint64).max);
-//         b = bound(b, 0, 10);
-//         InterpreterState memory state = opTestDefaultInterpreterState();
+    /// Directly test the runtime logic of LibOpAvg.
+    function testOpAvgRun(
+        int256 signedCoefficientA,
+        int256 exponentA,
+        int256 signedCoefficientB,
+        int256 exponentB,
+        uint16 operandData
+    ) public view {
+        signedCoefficientA = bound(signedCoefficientA, type(int224).min, type(int224).max);
+        signedCoefficientB = bound(signedCoefficientB, type(int224).min, type(int224).max);
+        exponentA = bound(exponentA, type(int24).min, type(int24).max);
+        exponentB = bound(exponentB, type(int24).min, type(int24).max);
 
-//         Operand operand = LibOperand.build(2, 1, operandData);
-//         uint256[] memory inputs = new uint256[](2);
-//         inputs[0] = a;
-//         inputs[1] = b;
+        Float a = LibDecimalFloat.packLossless(signedCoefficientA, exponentA);
+        Float b = LibDecimalFloat.packLossless(signedCoefficientB, exponentB);
+        InterpreterState memory state = opTestDefaultInterpreterState();
 
-//         opReferenceCheck(state, operand, LibOpAvg.referenceFn, LibOpAvg.integrity, LibOpAvg.run, inputs);
-//     }
+        OperandV2 operand = LibOperand.build(2, 1, operandData);
+        StackItem[] memory inputs = new StackItem[](2);
+        inputs[0] = StackItem.wrap(Float.unwrap(a));
+        inputs[1] = StackItem.wrap(Float.unwrap(b));
 
-// /// Test the eval of `avg`.
-// function testOpAvgEval() external view {
-//     checkHappy("_: avg(0 0);", 0, "0 0");
-//     checkHappy("_: avg(0 1);", 5e17, "0 1");
-//     checkHappy("_: avg(1 0);", 5e17, "1 0");
-//     checkHappy("_: avg(1 1);", 1e18, "1 1");
-//     checkHappy("_: avg(1 2);", 1.5e18, "1 2");
-//     checkHappy("_: avg(2 2);", 2e18, "2 2");
-//     checkHappy("_: avg(2 3);", 2.5e18, "2 3");
-//     checkHappy("_: avg(2 4);", 3e18, "2 4");
-//     checkHappy("_: avg(4 0.5);", 2.25e18, "4 5");
-// }
+        opReferenceCheck(state, operand, LibOpAvg.referenceFn, LibOpAvg.integrity, LibOpAvg.run, inputs);
+    }
 
-//     /// Test the eval of `avg` for bad inputs.
-//     function testOpAvgEvalOneInput() external {
-//         checkBadInputs("_: avg(1);", 1, 2, 1);
-//     }
+    /// Test the eval of `avg`.
+    function testOpAvgEval() external view {
+        checkHappy("_: avg(0 0);", Float.unwrap(LibDecimalFloat.packLossless(0, -1)), "0 0");
+        checkHappy("_: avg(0 1);", Float.unwrap(LibDecimalFloat.packLossless(5e37, -38)), "0 1");
+        checkHappy("_: avg(1 0);", Float.unwrap(LibDecimalFloat.packLossless(5e37, -38)), "1 0");
+        checkHappy("_: avg(1 1);", Float.unwrap(LibDecimalFloat.packLossless(1e38, -38)), "1 1");
+        checkHappy("_: avg(1 2);", Float.unwrap(LibDecimalFloat.packLossless(15e37, -38)), "1 2");
+        checkHappy("_: avg(2 2);", Float.unwrap(LibDecimalFloat.packLossless(2e38, -38)), "2 2");
+        checkHappy("_: avg(2 3);", Float.unwrap(LibDecimalFloat.packLossless(25e37, -38)), "2 3");
+        checkHappy("_: avg(2 4);", Float.unwrap(LibDecimalFloat.packLossless(3e38, -38)), "2 4");
+        checkHappy("_: avg(4 0.5);", Float.unwrap(LibDecimalFloat.packLossless(225e36, -38)), "4 5");
+    }
 
-//     function testOpAvgEvalThreeInputs() external {
-//         checkBadInputs("_: avg(1 1 1);", 3, 2, 3);
-//     }
+    /// Test the eval of `avg` for bad inputs.
+    function testOpAvgEvalOneInput() external {
+        checkBadInputs("_: avg(1);", 1, 2, 1);
+    }
 
-//     function testOpAvgEvalZeroOutputs() external {
-//         checkBadOutputs(": avg(0 0);", 2, 1, 0);
-//     }
+    function testOpAvgEvalThreeInputs() external {
+        checkBadInputs("_: avg(1 1 1);", 3, 2, 3);
+    }
 
-//     function testOpAvgEvalTwoOutputs() external {
-//         checkBadOutputs("_ _: avg(0 0);", 2, 1, 2);
-//     }
+    function testOpAvgEvalZeroOutputs() external {
+        checkBadOutputs(": avg(0 0);", 2, 1, 0);
+    }
 
-//     /// Test that operand is disallowed.
-//     function testOpAvgEvalOperandDisallowed() external {
-//         checkUnhappyParse("_: avg<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector));
-//     }
-// }
+    function testOpAvgEvalTwoOutputs() external {
+        checkBadOutputs("_ _: avg(0 0);", 2, 1, 2);
+    }
+
+    /// Test that operand is disallowed.
+    function testOpAvgEvalOperandDisallowed() external {
+        checkUnhappyParse("_: avg<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector));
+    }
+}
