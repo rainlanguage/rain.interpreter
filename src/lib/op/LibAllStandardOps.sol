@@ -71,7 +71,7 @@ import {LibOpUint256Sub} from "./math/uint256/LibOpUint256Sub.sol";
 
 import {LibOpAbs} from "./math/LibOpAbs.sol";
 import {LibOpAdd} from "./math/LibOpAdd.sol";
-// import {LibOpAvg} from "./math/LibOpAvg.sol";
+import {LibOpAvg} from "./math/LibOpAvg.sol";
 // import {LibOpCeil} from "./math/LibOpCeil.sol";
 import {LibOpMul} from "./math/LibOpMul.sol";
 import {LibOpDiv} from "./math/LibOpDiv.sol";
@@ -112,7 +112,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 66;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 67;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -269,7 +269,7 @@ library LibAllStandardOps {
             ),
             AuthoringMetaV2("abs", "The absolute value of a number."),
             AuthoringMetaV2("add", "Adds all numbers together."),
-            // AuthoringMetaV2("avg", "Arithmetic average (mean) of two numbers."),
+            AuthoringMetaV2("avg", "Arithmetic average (mean) of two numbers."),
             // AuthoringMetaV2("ceil", "Ceiling of a number."),
             AuthoringMetaV2("div", "Divides the first number by all other numbers. Errors if any divisor is zero."),
             AuthoringMetaV2("e", "The mathematical constant e."),
@@ -464,8 +464,8 @@ library LibAllStandardOps {
                     LibParseOperand.handleOperandDisallowed,
                     // add
                     LibParseOperand.handleOperandDisallowed,
-                    // // avg
-                    // LibParseOperand.handleOperandDisallowed,
+                    // avg
+                    LibParseOperand.handleOperandDisallowed,
                     // // ceil
                     // LibParseOperand.handleOperandDisallowed,
                     // div
@@ -600,7 +600,7 @@ library LibAllStandardOps {
                     LibOpUint256Sub.integrity,
                     LibOpAbs.integrity,
                     LibOpAdd.integrity,
-                    // LibOpAvg.integrity,
+                    LibOpAvg.integrity,
                     // LibOpCeil.integrity,
                     LibOpDiv.integrity,
                     LibOpE.integrity,
@@ -711,7 +711,7 @@ library LibAllStandardOps {
                     LibOpUint256Sub.run,
                     LibOpAbs.run,
                     LibOpAdd.run,
-                    // LibOpAvg.run,
+                    LibOpAvg.run,
                     // LibOpCeil.run,
                     LibOpDiv.run,
                     LibOpE.run,
