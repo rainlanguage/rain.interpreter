@@ -99,7 +99,7 @@ import {LibOpPow} from "./math/LibOpPow.sol";
 // import {LibOpScaleNDynamic} from "./math/LibOpScaleNDynamic.sol";
 // import {LibOpScaleN} from "./math/LibOpScaleN.sol";
 // import {LibOpSnapToUnit} from "./math/LibOpSnapToUnit.sol";
-// import {LibOpSqrt} from "./math/LibOpSqrt.sol";
+import {LibOpSqrt} from "./math/LibOpSqrt.sol";
 import {LibOpSub} from "./math/LibOpSub.sol";
 
 import {LibOpGet} from "./store/LibOpGet.sol";
@@ -112,7 +112,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 65;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 66;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -311,7 +311,7 @@ library LibAllStandardOps {
             //     "snap-to-unit",
             //     "Rounds a number to the nearest whole number if it is within the threshold distance from that whole number. The first input is the threshold and the second is the value to snap to the nearest unit."
             // ),
-            // AuthoringMetaV2("sqrt", "Calculates the square root of the input. Errors if the input is negative."),
+            AuthoringMetaV2("sqrt", "Calculates the square root of the input. Errors if the input is negative."),
             AuthoringMetaV2("sub", "Subtracts all numbers from the first number."),
             AuthoringMetaV2("get", "Gets a value from storage. The first operand is the key to lookup."),
             AuthoringMetaV2(
@@ -512,8 +512,8 @@ library LibAllStandardOps {
                     LibParseOperand.handleOperandDisallowed,
                     // // snap-to-unit
                     // LibParseOperand.handleOperandDisallowed,
-                    // // sqrt
-                    // LibParseOperand.handleOperandDisallowed,
+                    // sqrt
+                    LibParseOperand.handleOperandDisallowed,
                     // sub
                     LibParseOperand.handleOperandSingleFull,
                     // get
@@ -624,7 +624,7 @@ library LibAllStandardOps {
                     LibOpMul.integrity,
                     LibOpPow.integrity,
                     // LibOpSnapToUnit.integrity,
-                    // LibOpSqrt.integrity,
+                    LibOpSqrt.integrity,
                     LibOpSub.integrity,
                     LibOpGet.integrity,
                     LibOpSet.integrity
@@ -735,7 +735,7 @@ library LibAllStandardOps {
                     LibOpMul.run,
                     LibOpPow.run,
                     // LibOpSnapToUnit.run,
-                    // LibOpSqrt.run,
+                    LibOpSqrt.run,
                     LibOpSub.run,
                     LibOpGet.run,
                     LibOpSet.run
