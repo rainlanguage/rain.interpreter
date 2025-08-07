@@ -80,7 +80,7 @@ import {LibOpExp} from "./math/LibOpExp.sol";
 import {LibOpExp2} from "./math/LibOpExp2.sol";
 import {LibOpFloor} from "./math/LibOpFloor.sol";
 import {LibOpFrac} from "./math/LibOpFrac.sol";
-// import {LibOpGm} from "./math/LibOpGm.sol";
+import {LibOpGm} from "./math/LibOpGm.sol";
 import {LibOpHeadroom} from "./math/LibOpHeadroom.sol";
 import {LibOpInv} from "./math/LibOpInv.sol";
 // import {LibOpLn} from "./math/LibOpLn.sol";
@@ -112,7 +112,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 70;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 71;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -277,7 +277,7 @@ library LibAllStandardOps {
             AuthoringMetaV2("exp2", "Binary exponential 2^x."),
             AuthoringMetaV2("floor", "Floor of a number."),
             AuthoringMetaV2("frac", "Fractional part of a number."),
-            // AuthoringMetaV2("gm", "Geometric mean of all numbers. Errors if any number is zero."),
+            AuthoringMetaV2("gm", "Geometric mean of two numbers."),
             AuthoringMetaV2(
                 "headroom",
                 "Headroom of a number. I.e. the distance to the next whole number (1 - frac(x)). The headroom at any whole number is 1 (not 0)."
@@ -480,8 +480,8 @@ library LibAllStandardOps {
                     LibParseOperand.handleOperandDisallowed,
                     // frac
                     LibParseOperand.handleOperandDisallowed,
-                    // // gm
-                    // LibParseOperand.handleOperandDisallowed,
+                    // gm
+                    LibParseOperand.handleOperandDisallowed,
                     // headroom
                     LibParseOperand.handleOperandDisallowed,
                     // inv
@@ -608,7 +608,7 @@ library LibAllStandardOps {
                     LibOpExp2.integrity,
                     LibOpFloor.integrity,
                     LibOpFrac.integrity,
-                    // LibOpGm.integrity,
+                    LibOpGm.integrity,
                     LibOpHeadroom.integrity,
                     LibOpInv.integrity,
                     // LibOpLn.integrity,
@@ -719,7 +719,7 @@ library LibAllStandardOps {
                     LibOpExp2.run,
                     LibOpFloor.run,
                     LibOpFrac.run,
-                    // LibOpGm.run,
+                    LibOpGm.run,
                     LibOpHeadroom.run,
                     LibOpInv.run,
                     // LibOpLn.run,
