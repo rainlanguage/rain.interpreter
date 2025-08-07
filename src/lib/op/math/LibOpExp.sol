@@ -1,43 +1,49 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-// import {UD60x18, exp} from "prb-math/UD60x18.sol";
-// import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-// import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-// import {InterpreterState} from "../../state/LibInterpreterState.sol";
-// import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {InterpreterState} from "../../state/LibInterpreterState.sol";
+import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
+import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
-// /// @title LibOpExp
-// /// @notice Opcode for the natural exponential e^x as decimal 18 fixed point.
-// library LibOpExp {
-//     function integrity(IntegrityCheckState memory, Operand) internal pure returns (uint256, uint256) {
-//         // There must be one inputs and one output.
-//         return (1, 1);
-//     }
+/// @title LibOpExp
+/// @notice Opcode for the natural exponential e^x as decimal floating point.
+library LibOpExp {
+    using LibDecimalFloat for Float;
 
-//     /// exp
-//     /// 18 decimal fixed point natural exponent of a number.
-//     function run(InterpreterState memory, Operand, Pointer stackTop) internal pure returns (Pointer) {
-//         uint256 a;
-//         assembly ("memory-safe") {
-//             a := mload(stackTop)
-//         }
-//         a = UD60x18.unwrap(exp(UD60x18.wrap(a)));
+    function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
+        // There must be one inputs and one output.
+        return (1, 1);
+    }
 
-//         assembly ("memory-safe") {
-//             mstore(stackTop, a)
-//         }
-//         return stackTop;
-//     }
+    /// exp
+    /// decimal floating point natural exponent of a number.
+    function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
+        Float a;
+        assembly ("memory-safe") {
+            a := mload(stackTop)
+        }
+        a = LibDecimalFloat.FLOAT_E.pow(a, LibDecimalFloat.LOG_TABLES_ADDRESS);
 
-//     /// Gas intensive reference implementation of exp for testing.
-//     function referenceFn(InterpreterState memory, Operand, uint256[] memory inputs)
-//         internal
-//         pure
-//         returns (uint256[] memory)
-//     {
-//         uint256[] memory outputs = new uint256[](1);
-//         outputs[0] = UD60x18.unwrap(exp(UD60x18.wrap(inputs[0])));
-//         return outputs;
-//     }
-// }
+        assembly ("memory-safe") {
+            mstore(stackTop, a)
+        }
+        return stackTop;
+    }
+
+    /// Gas intensive reference implementation of exp for testing.
+    function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
+        internal
+        view
+        returns (StackItem[] memory)
+    {
+        Float a = Float.wrap(StackItem.unwrap(inputs[0]));
+        a = LibDecimalFloat.FLOAT_E.pow(a, LibDecimalFloat.LOG_TABLES_ADDRESS);
+
+        StackItem[] memory outputs = new StackItem[](1);
+        outputs[0] = StackItem.wrap(Float.unwrap(a));
+        return outputs;
+    }
+}

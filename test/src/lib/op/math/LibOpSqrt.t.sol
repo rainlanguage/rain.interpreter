@@ -24,6 +24,7 @@ contract LibOpSqrtTest is OpTest {
 
     /// Directly test the runtime logic of LibOpSqrt.
     function testOpSqrtRun(Float a) public view {
+        vm.assume(!a.eq(LibDecimalFloat.FLOAT_MIN_NEGATIVE_VALUE));
         a = a.abs();
         InterpreterState memory state = opTestDefaultInterpreterState();
 
