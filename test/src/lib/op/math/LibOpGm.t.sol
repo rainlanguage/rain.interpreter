@@ -1,71 +1,87 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-// import {OpTest, IntegrityCheckState, Operand, InterpreterState, UnexpectedOperand} from "test/abstract/OpTest.sol";
-// import {LibOpGm} from "src/lib/op/math/LibOpGm.sol";
-// import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {OpTest, IntegrityCheckState, OperandV2, InterpreterState, UnexpectedOperand} from "test/abstract/OpTest.sol";
+import {LibOpGm} from "src/lib/op/math/LibOpGm.sol";
+import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
-// contract LibOpGmTest is OpTest {
-//     /// Directly test the integrity logic of LibOpGm.
-//     /// Inputs are always 2, outputs are always 1.
-//     function testOpGmIntegrity(IntegrityCheckState memory state, Operand operand) external pure {
-//         (uint256 calcInputs, uint256 calcOutputs) = LibOpGm.integrity(state, operand);
-//         assertEq(calcInputs, 2);
-//         assertEq(calcOutputs, 1);
-//     }
+contract LibOpGmTest is OpTest {
+    function beforeOpTestConstructor() internal virtual override {
+        vm.createSelectFork(vm.envString("ETH_RPC_URL"));
+    }
 
-//     /// Directly test the runtime logic of LibOpGm.
-//     function testOpGmRun(uint256 a, uint256 b, uint16 operandData) public view {
-//         // @TODO This is a hack to get around the fact that we are very likely
-//         // to overflow uint256 if we just fuzz it, and that it's clunky to
-//         // determine whether it will overflow or not. Basically the overflow
-//         // check is exactly the same as the implementation, including all the
-//         // intermediate squaring, so it seems like a bit of circular logic to
-//         // do things that way.
-//         a = bound(a, 0, type(uint64).max);
-//         b = bound(b, 0, 10);
-//         InterpreterState memory state = opTestDefaultInterpreterState();
+    /// Directly test the integrity logic of LibOpGm.
+    /// Inputs are always 2, outputs are always 1.
+    function testOpGmIntegrity(IntegrityCheckState memory state, OperandV2 operand) external pure {
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpGm.integrity(state, operand);
+        assertEq(calcInputs, 2);
+        assertEq(calcOutputs, 1);
+    }
 
-//         Operand operand = LibOperand.build(2, 1, operandData);
-//         uint256[] memory inputs = new uint256[](2);
-//         inputs[0] = a;
-//         inputs[1] = b;
+    /// Directly test the runtime logic of LibOpGm.
+    function testOpGmRun(
+        int224 signedCoefficientA,
+        int32 exponentA,
+        int224 signedCoefficientB,
+        int32 exponentB,
+        uint16 operandData
+    ) public view {
+        signedCoefficientA = int224(bound(signedCoefficientA, 0, 10000));
+        exponentA = int32(bound(exponentA, -10, 5));
+        signedCoefficientB = int224(bound(signedCoefficientB, 0, 10000));
+        exponentB = int32(bound(exponentB, -10, 5));
 
-//         opReferenceCheck(state, operand, LibOpGm.referenceFn, LibOpGm.integrity, LibOpGm.run, inputs);
-//     }
+        InterpreterState memory state = opTestDefaultInterpreterState();
 
-// /// Test the eval of `gm`.
-// function testOpGmEval() external view {
-//     checkHappy("_: gm(0 0);", 0, "0 0");
-//     checkHappy("_: gm(0 1);", 0, "0 1");
-//     checkHappy("_: gm(1 0);", 0, "1 0");
-//     checkHappy("_: gm(1 1);", 1e18, "1 1");
-//     checkHappy("_: gm(1 2);", 1414213562373095048, "1 2");
-//     checkHappy("_: gm(2 2);", 2e18, "2 2");
-//     checkHappy("_: gm(2 3);", 2449489742783178098, "2 3");
-//     checkHappy("_: gm(2 4);", 2828427124746190097, "2 4");
-//     checkHappy("_: gm(4 0.5);", 1414213562373095048, "4 0.5");
-// }
+        Float a = LibDecimalFloat.packLossless(signedCoefficientA, exponentA);
+        Float b = LibDecimalFloat.packLossless(signedCoefficientB, exponentB);
 
-//     /// Test the eval of `gm` for bad inputs.
-//     function testOpGmOneInput() external {
-//         checkBadInputs("_: gm(1e18);", 1, 2, 1);
-//     }
+        OperandV2 operand = LibOperand.build(2, 1, operandData);
+        StackItem[] memory inputs = new StackItem[](2);
+        inputs[0] = StackItem.wrap(Float.unwrap(a));
+        inputs[1] = StackItem.wrap(Float.unwrap(b));
 
-//     function testOpGmThreeInputs() external {
-//         checkBadInputs("_: gm(1 1 1);", 3, 2, 3);
-//     }
+        opReferenceCheck(state, operand, LibOpGm.referenceFn, LibOpGm.integrity, LibOpGm.run, inputs);
+    }
 
-//     function testOpGmZeroOutputs() external {
-//         checkBadOutputs(": gm(1 1);", 2, 1, 0);
-//     }
+    /// Test the eval of `gm`.
+    function testOpGmEval() external view {
+        checkHappy("_: gm(0 0);", 0, "0 0");
+        checkHappy("_: gm(0 1);", 0, "0 1");
+        checkHappy("_: gm(1 0);", 0, "1 0");
+        checkHappy("_: gm(1 1);", Float.unwrap(LibDecimalFloat.packLossless(1e3, -3)), "1 1");
+        checkHappy("_: gm(1 2);", Float.unwrap(LibDecimalFloat.packLossless(1415, -3)), "1 2");
+        checkHappy("_: gm(2 2);", Float.unwrap(LibDecimalFloat.packLossless(2e3, -3)), "2 2");
+        checkHappy("_: gm(2 3);", Float.unwrap(LibDecimalFloat.packLossless(2450, -3)), "2 3");
+        checkHappy(
+            "_: gm(2 4);",
+            Float.unwrap(LibDecimalFloat.packLossless(282850000000000000000000000000000000000000, -41)),
+            "2 4"
+        );
+        checkHappy("_: gm(4 0.5);", Float.unwrap(LibDecimalFloat.packLossless(1415, -3)), "4 0.5");
+    }
 
-//     function testOpGmTwoOutputs() external {
-//         checkBadOutputs("_ _: gm(1 1);", 2, 1, 2);
-//     }
+    /// Test the eval of `gm` for bad inputs.
+    function testOpGmOneInput() external {
+        checkBadInputs("_: gm(1);", 1, 2, 1);
+    }
 
-//     /// Test that operand is disallowed.
-//     function testOpGmEvalOperandDisallowed() external {
-//         checkUnhappyParse("_: gm<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector));
-//     }
-// }
+    function testOpGmThreeInputs() external {
+        checkBadInputs("_: gm(1 1 1);", 3, 2, 3);
+    }
+
+    function testOpGmZeroOutputs() external {
+        checkBadOutputs(": gm(1 1);", 2, 1, 0);
+    }
+
+    function testOpGmTwoOutputs() external {
+        checkBadOutputs("_ _: gm(1 1);", 2, 1, 2);
+    }
+
+    /// Test that operand is disallowed.
+    function testOpGmEvalOperandDisallowed() external {
+        checkUnhappyParse("_: gm<0>(1 1);", abi.encodeWithSelector(UnexpectedOperand.selector));
+    }
+}
