@@ -1,47 +1,54 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-// import {UD60x18, gm} from "prb-math/UD60x18.sol";
-// import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-// import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-// import {InterpreterState} from "../../state/LibInterpreterState.sol";
-// import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
+import {InterpreterState} from "../../state/LibInterpreterState.sol";
+import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
+import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
-// /// @title LibOpGm
-// /// @notice Opcode for the geometric average of two decimal 18 fixed point
-// /// numbers.
-// library LibOpGm {
-//     function integrity(IntegrityCheckState memory, Operand) internal pure returns (uint256, uint256) {
-//         // There must be two inputs and one output.
-//         return (2, 1);
-//     }
+/// @title LibOpGm
+/// @notice Opcode for the geometric average of two decimal floating point
+/// numbers.
+library LibOpGm {
+    using LibDecimalFloat for Float;
 
-//     /// gm
-//     /// 18 decimal fixed point geometric average of two numbers.
-//     function run(InterpreterState memory, Operand, Pointer stackTop) internal pure returns (Pointer) {
-//         uint256 a;
-//         uint256 b;
-//         assembly ("memory-safe") {
-//             a := mload(stackTop)
-//             stackTop := add(stackTop, 0x20)
-//             b := mload(stackTop)
-//         }
-//         a = UD60x18.unwrap(gm(UD60x18.wrap(a), UD60x18.wrap(b)));
+    function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
+        // There must be two inputs and one output.
+        return (2, 1);
+    }
 
-//         assembly ("memory-safe") {
-//             mstore(stackTop, a)
-//         }
-//         return stackTop;
-//     }
+    /// gm
+    /// decimal floating point geometric average of two numbers.
+    function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
+        Float a;
+        Float b;
+        assembly ("memory-safe") {
+            a := mload(stackTop)
+            stackTop := add(stackTop, 0x20)
+            b := mload(stackTop)
+        }
+        a = a.mul(b).pow(LibDecimalFloat.FLOAT_HALF, LibDecimalFloat.LOG_TABLES_ADDRESS);
 
-//     /// Gas intensive reference implementation of gm for testing.
-//     function referenceFn(InterpreterState memory, Operand, uint256[] memory inputs)
-//         internal
-//         pure
-//         returns (uint256[] memory)
-//     {
-//         uint256[] memory outputs = new uint256[](1);
-//         outputs[0] = UD60x18.unwrap(gm(UD60x18.wrap(inputs[0]), UD60x18.wrap(inputs[1])));
-//         return outputs;
-//     }
-// }
+        assembly ("memory-safe") {
+            mstore(stackTop, a)
+        }
+        return stackTop;
+    }
+
+    /// Gas intensive reference implementation of gm for testing.
+    function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
+        internal
+        view
+        returns (StackItem[] memory)
+    {
+        // The geometric mean is sqrt(a * b).
+        Float a = Float.wrap(StackItem.unwrap(inputs[0]));
+        Float b = Float.wrap(StackItem.unwrap(inputs[1]));
+        a = a.mul(b).pow(LibDecimalFloat.FLOAT_HALF, LibDecimalFloat.LOG_TABLES_ADDRESS);
+        StackItem[] memory outputs = new StackItem[](1);
+        outputs[0] = StackItem.wrap(Float.unwrap(a));
+        return outputs;
+    }
+}
