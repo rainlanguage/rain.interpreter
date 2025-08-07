@@ -77,7 +77,7 @@ import {LibOpMul} from "./math/LibOpMul.sol";
 import {LibOpDiv} from "./math/LibOpDiv.sol";
 import {LibOpE} from "./math/LibOpE.sol";
 import {LibOpExp} from "./math/LibOpExp.sol";
-// import {LibOpExp2} from "./math/LibOpExp2.sol";
+import {LibOpExp2} from "./math/LibOpExp2.sol";
 import {LibOpFloor} from "./math/LibOpFloor.sol";
 import {LibOpFrac} from "./math/LibOpFrac.sol";
 // import {LibOpGm} from "./math/LibOpGm.sol";
@@ -112,7 +112,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 68;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 69;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -274,7 +274,7 @@ library LibAllStandardOps {
             AuthoringMetaV2("div", "Divides the first number by all other numbers. Errors if any divisor is zero."),
             AuthoringMetaV2("e", "The mathematical constant e."),
             AuthoringMetaV2("exp", "Natural exponential e^x."),
-            // AuthoringMetaV2("exp2", "Binary exponential 2^x where x. Errors if the exponentiation exceeds `max-value()`."),
+            AuthoringMetaV2("exp2", "Binary exponential 2^x."),
             AuthoringMetaV2("floor", "Floor of a number."),
             AuthoringMetaV2("frac", "Fractional part of a number."),
             // AuthoringMetaV2("gm", "Geometric mean of all numbers. Errors if any number is zero."),
@@ -474,8 +474,8 @@ library LibAllStandardOps {
                     LibParseOperand.handleOperandDisallowed,
                     // exp
                     LibParseOperand.handleOperandDisallowed,
-                    // // exp2
-                    // LibParseOperand.handleOperandDisallowed,
+                    // exp2
+                    LibParseOperand.handleOperandDisallowed,
                     // floor
                     LibParseOperand.handleOperandDisallowed,
                     // frac
@@ -605,7 +605,7 @@ library LibAllStandardOps {
                     LibOpDiv.integrity,
                     LibOpE.integrity,
                     LibOpExp.integrity,
-                    // LibOpExp2.integrity,
+                    LibOpExp2.integrity,
                     LibOpFloor.integrity,
                     LibOpFrac.integrity,
                     // LibOpGm.integrity,
@@ -716,7 +716,7 @@ library LibAllStandardOps {
                     LibOpDiv.run,
                     LibOpE.run,
                     LibOpExp.run,
-                    // LibOpExp2.run,
+                    LibOpExp2.run,
                     LibOpFloor.run,
                     LibOpFrac.run,
                     // LibOpGm.run,
