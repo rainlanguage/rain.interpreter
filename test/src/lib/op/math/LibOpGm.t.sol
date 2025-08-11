@@ -55,11 +55,7 @@ contract LibOpGmTest is OpTest {
         checkHappy("_: gm(1 2);", Float.unwrap(LibDecimalFloat.packLossless(1415, -3)), "1 2");
         checkHappy("_: gm(2 2);", Float.unwrap(LibDecimalFloat.packLossless(2e3, -3)), "2 2");
         checkHappy("_: gm(2 3);", Float.unwrap(LibDecimalFloat.packLossless(2450, -3)), "2 3");
-        checkHappy(
-            "_: gm(2 4);",
-            Float.unwrap(LibDecimalFloat.packLossless(282850000000000000000000000000000000000000, -41)),
-            "2 4"
-        );
+        checkHappy("_: gm(2 4);", Float.unwrap(LibDecimalFloat.packLossless(2.8285e66, -66)), "2 4");
         checkHappy("_: gm(4 0.5);", Float.unwrap(LibDecimalFloat.packLossless(1415, -3)), "4 0.5");
     }
 

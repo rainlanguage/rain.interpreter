@@ -54,22 +54,22 @@ contract LibOpLinearGrowthTest is OpTest {
         checkHappy("_: linear-growth(0 0.1 0);", 0, "0 0.1 0");
         checkHappy("_: linear-growth(0 0.1 1);", Float.unwrap(LibDecimalFloat.packLossless(1, -1)), "0 0.1 1");
         checkHappy("_: linear-growth(1 0.1 0);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1 0.1 0");
-        checkHappy("_: linear-growth(1 0.1 1);", Float.unwrap(LibDecimalFloat.packLossless(1.1e38, -38)), "1 0.1 1");
-        checkHappy("_: linear-growth(1 0.1 2);", Float.unwrap(LibDecimalFloat.packLossless(1.2e38, -38)), "1 0.1 2");
+        checkHappy("_: linear-growth(1 0.1 1);", Float.unwrap(LibDecimalFloat.packLossless(1.1e67, -67)), "1 0.1 1");
+        checkHappy("_: linear-growth(1 0.1 2);", Float.unwrap(LibDecimalFloat.packLossless(1.2e67, -67)), "1 0.1 2");
         checkHappy(
-            "_: linear-growth(1 0.1 2.5);", Float.unwrap(LibDecimalFloat.packLossless(1.25e38, -38)), "1 0.1 2.5"
+            "_: linear-growth(1 0.1 2.5);", Float.unwrap(LibDecimalFloat.packLossless(1.25e67, -67)), "1 0.1 2.5"
         );
         checkHappy("_: linear-growth(1 0 2);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1 0 2");
         checkHappy(
-            "_: linear-growth(1 0.1 0.5);", Float.unwrap(LibDecimalFloat.packLossless(1.05e39, -39)), "1 0.1 0.5"
+            "_: linear-growth(1 0.1 0.5);", Float.unwrap(LibDecimalFloat.packLossless(1.05e67, -67)), "1 0.1 0.5"
         );
         checkHappy("_: linear-growth(2 0.1 0);", Float.unwrap(LibDecimalFloat.packLossless(2, 0)), "2 0.1 0");
-        checkHappy("_: linear-growth(2 0.1 1);", Float.unwrap(LibDecimalFloat.packLossless(2.1e38, -38)), "2 0.1 1");
-        checkHappy("_: linear-growth(2 0.1 2);", Float.unwrap(LibDecimalFloat.packLossless(2.2e38, -38)), "2 0.1 2");
+        checkHappy("_: linear-growth(2 0.1 1);", Float.unwrap(LibDecimalFloat.packLossless(2.1e66, -66)), "2 0.1 1");
+        checkHappy("_: linear-growth(2 0.1 2);", Float.unwrap(LibDecimalFloat.packLossless(2.2e66, -66)), "2 0.1 2");
 
-        checkHappy("_: linear-growth(1 -0.1 1);", Float.unwrap(LibDecimalFloat.packLossless(0.9e38, -38)), "1 -0.1 1");
+        checkHappy("_: linear-growth(1 -0.1 1);", Float.unwrap(LibDecimalFloat.packLossless(0.9e67, -67)), "1 -0.1 1");
         checkHappy(
-            "_: linear-growth(-1 -0.1 2);", Float.unwrap(LibDecimalFloat.packLossless(-1.2e38, -38)), "-1 -0.1 2"
+            "_: linear-growth(-1 -0.1 2);", Float.unwrap(LibDecimalFloat.packLossless(-1.2e67, -67)), "-1 -0.1 2"
         );
     }
 

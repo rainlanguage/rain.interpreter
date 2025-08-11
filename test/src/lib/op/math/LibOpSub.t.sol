@@ -95,29 +95,31 @@ contract LibOpSubTest is OpTest {
     /// Test the eval of `sub` opcode parsed from a string. Tests two inputs.
     function testOpSubEvalTwoInputs() external view {
         checkHappy("_: sub(1 0);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1 0");
-        checkHappy("_: sub(1 1);", Float.unwrap(LibDecimalFloat.packLossless(0e37, -37)), "1 1");
-        checkHappy("_: sub(2 1);", Float.unwrap(LibDecimalFloat.packLossless(1e37, -37)), "2 1");
-        checkHappy("_: sub(2 2);", Float.unwrap(LibDecimalFloat.packLossless(0e37, -37)), "2 2");
+        checkHappy("_: sub(1 1);", Float.unwrap(LibDecimalFloat.packLossless(0, -75)), "1 1");
+        checkHappy("_: sub(2 1);", Float.unwrap(LibDecimalFloat.packLossless(1e67, -67)), "2 1");
+        checkHappy("_: sub(2 2);", Float.unwrap(LibDecimalFloat.packLossless(0, -75)), "2 2");
         checkHappy(
             "_: sub(max-positive-value() 0);",
             Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)),
             "max-positive-value() 0"
         );
-        checkHappy("_: sub(1 2);", Float.unwrap(LibDecimalFloat.packLossless(-1e37, -37)), "1 2");
-        checkHappy("_: sub(1 0.1);", Float.unwrap(LibDecimalFloat.packLossless(9e37, -38)), "1 0.1");
+        checkHappy("_: sub(1 2);", Float.unwrap(LibDecimalFloat.packLossless(-1e67, -67)), "1 2");
+        checkHappy("_: sub(1 0.1);", Float.unwrap(LibDecimalFloat.packLossless(9e66, -67)), "1 0.1");
 
         // Subtracting 1 from max value is still max value because floats.
-        // https://github.com/rainlanguage/rain.math.float/issues/74
-        // checkHappy("_: sub(max-value() 1);", Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)), "max-value() 1");
-        // https://github.com/rainlanguage/rain.math.float/issues/75
-        // checkHappy("_: sub(max-value() max-value());", 0, "max-value() max-value()");
+        checkHappy(
+            "_: sub(max-positive-value() 1);",
+            Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)),
+            "max-positive-value() 1"
+        );
+        checkHappy("_: sub(max-value() max-value());", 0, "max-value() max-value()");
     }
 
     /// Test the eval of `sub` opcode parsed from a string. Tests three inputs.
     function testOpSubEvalThreeInputs() external view {
         checkHappy("_: sub(1 0 0);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1 0 0");
         checkHappy("_: sub(1 1 0);", Float.unwrap(LibDecimalFloat.packLossless(0, 0)), "1 1 0");
-        checkHappy("_: sub(2 1 1);", Float.unwrap(LibDecimalFloat.packLossless(0, -37)), "2 1 1");
+        checkHappy("_: sub(2 1 1);", Float.unwrap(LibDecimalFloat.packLossless(0, -75)), "2 1 1");
         checkHappy("_: sub(2 2 0);", Float.unwrap(LibDecimalFloat.packLossless(0, 0)), "2 2 0");
     }
 }
