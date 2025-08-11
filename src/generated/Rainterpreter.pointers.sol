@@ -10,11 +10,11 @@
 pragma solidity =0.8.25;
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0x058f6e179954062975f1f516e5581e0e4250dc80b12ec528f963b42562314db8);
+bytes32 constant BYTECODE_HASH = bytes32(0xfa01bb4bd0d0f44efbc86bd55e3a232db4c5ba4bf8e8a685d2a2854cdad0e2cb);
 
 /// @dev The function pointers known to the interpreter for dynamic dispatch.
 /// By setting these as a constant they can be inlined into the interpreter
 /// and loaded at eval time for very low gas (~100) due to the compiler
 /// optimising it to a single `codecopy` to build the in memory bytes array.
 bytes constant OPCODE_FUNCTION_POINTERS =
-    hex"087508a708cb0a570b200b320b440b5d0b810bb50bc60bd70c790c980d560e060e8a0fcc10ff0d5611f812aa134c13c413d513e613e613f71462156d15ec160516191678169116aa16e3170e17271740178917b017c31825187318c1190f195d196b19b919dc1a2a1a5b1a9f1ac41ad21ae01b311b4a1b581ba61bd71c081c561c871cb81d061d331d561da41e9a";
+    hex"087e08b008d40a600b290b3b0b4d0b660b8a0bbe0bcf0be00c820ca10d5f0e0f0e930fd511080d5f120112b3135513cd13de13ef13ef1400146b157615f5160e16221681169a16b316ec171717301749179217b917cc182e187c18ca19181966197419c219e519f31a411a721ab61adb1ae91af71b481b611b6f1bbd1bee1c1f1c6d1c9e1ccf1d1d1d4a1d6d1dbb1eb1";
