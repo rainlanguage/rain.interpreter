@@ -31,18 +31,10 @@ contract LibOpHeadroomTest is OpTest {
     function testOpHeadroomEval() external view {
         checkHappy("_: headroom(0);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "0");
         checkHappy("_: headroom(1);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1");
-        checkHappy(
-            "_: headroom(0.5);",
-            Float.unwrap(LibDecimalFloat.packLossless(50000000000000000000000000000000000000, -38)),
-            "0.5"
-        );
+        checkHappy("_: headroom(0.5);", Float.unwrap(LibDecimalFloat.packLossless(5e66, -67)), "0.5");
         checkHappy("_: headroom(2);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "2");
         checkHappy("_: headroom(3);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "3");
-        checkHappy(
-            "_: headroom(3.8);",
-            Float.unwrap(LibDecimalFloat.packLossless(20000000000000000000000000000000000000, -38)),
-            "3.8"
-        );
+        checkHappy("_: headroom(3.8);", Float.unwrap(LibDecimalFloat.packLossless(2e66, -67)), "3.8");
     }
 
     /// Test the eval of `headroom` for bad inputs.
