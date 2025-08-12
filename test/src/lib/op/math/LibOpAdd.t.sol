@@ -147,6 +147,7 @@ contract LibOpAddTest is OpTest {
         checkHappy("_: add(7 6 5);", Float.unwrap(LibDecimalFloat.packLossless(18e65, -65)), "7 + 6 + 5");
         checkHappy("_: add(5 7 6);", Float.unwrap(LibDecimalFloat.packLossless(18e65, -65)), "5 + 7 + 6");
         checkHappy("_: add(7 5 6);", Float.unwrap(LibDecimalFloat.packLossless(18e65, -65)), "7 + 5 + 6");
+        checkHappy("_: add(5 -6 1);", Float.unwrap(LibDecimalFloat.packLossless(0, -75)), "5 + -6 + 1");
     }
 
     /// Test the eval of `add` opcode parsed from a string. Tests three inputs.
