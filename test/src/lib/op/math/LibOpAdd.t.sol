@@ -41,42 +41,22 @@ contract LibOpAddTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    function _testOpAddRun(OperandV2 operand, StackItem[] memory inputs) external view {
-        InterpreterState memory state = opTestDefaultInterpreterState();
-        opReferenceCheck(state, operand, LibOpAdd.referenceFn, LibOpAdd.integrity, LibOpAdd.run, inputs);
-    }
-
     /// Directly test the runtime logic of LibOpAdd.
-    function testOpAddRun(StackItem[] memory inputs) external {
+    function testOpAddRun(StackItem[] memory inputs) external view {
         vm.assume(inputs.length >= 2);
         vm.assume(inputs.length <= 0x0F);
         OperandV2 operand = LibOperand.build(uint8(inputs.length), 1, 0);
-        uint256 overflows = 0;
-        (int256 signedCoefficientA, int256 exponentA) = LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(inputs[0])));
-        if (int32(exponentA) != exponentA) {
-            overflows++;
-        }
 
-        for (uint256 i = 1; i < inputs.length; i++) {
-            (int256 signedCoefficientB, int256 exponentB) =
+        for (uint256 i = 0; i < inputs.length; i++) {
+            (int256 signedCoefficient, int256 exponent) =
                 LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(inputs[i])));
-
-            if (int32(exponentB) != exponentB) {
-                overflows++;
-            }
-
-            (signedCoefficientA, exponentA) =
-                LibDecimalFloatImplementation.add(signedCoefficientA, exponentA, signedCoefficientB, exponentB);
-
-            if (int32(exponentA) != exponentA) {
-                overflows++;
-            }
+            exponent = int256(bound(exponent, type(int32).min, type(int32).max / 2));
+            inputs[i] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(signedCoefficient, int32(exponent))));
         }
 
-        if (overflows > 0) {
-            vm.expectRevert();
-        }
-        this._testOpAddRun(operand, inputs);
+        opReferenceCheck(
+            opTestDefaultInterpreterState(), operand, LibOpAdd.referenceFn, LibOpAdd.integrity, LibOpAdd.run, inputs
+        );
     }
 
     /// Test the eval of `add` opcode parsed from a string. Tests zero inputs.
