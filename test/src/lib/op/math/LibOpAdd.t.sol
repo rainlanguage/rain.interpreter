@@ -107,6 +107,10 @@ contract LibOpAddTest is OpTest {
 
         checkHappy("_: add(-5 6);", Float.unwrap(LibDecimalFloat.packLossless(1e67, -67)), "-5 + 6");
         checkHappy("_: add(6 -5);", Float.unwrap(LibDecimalFloat.packLossless(1e67, -67)), "6 + -5");
+
+        // Mixed-sign cancellation to zero should canonicalize to the zero encoding.
+        checkHappy("_: add(5 -5);", Float.unwrap(LibDecimalFloat.packLossless(0, -75)), "5 + -5");
+        checkHappy("_: add(-5 5);", Float.unwrap(LibDecimalFloat.packLossless(0, -75)), "-5 + 5");
     }
 
     /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
