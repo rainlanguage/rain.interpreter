@@ -26,7 +26,10 @@ library LibOpHeadroom {
         assembly ("memory-safe") {
             a := mload(stackTop)
         }
-        a = LibDecimalFloat.FLOAT_ONE.sub(a.frac());
+        a = a.ceil().sub(a);
+        if (a.isZero()) {
+            a = LibDecimalFloat.FLOAT_ONE;
+        }
 
         assembly ("memory-safe") {
             mstore(stackTop, a)
@@ -42,10 +45,13 @@ library LibOpHeadroom {
     {
         // The headroom is 1 - frac(x).
         Float a = Float.wrap(StackItem.unwrap(inputs[0]));
-        Float headroom = LibDecimalFloat.FLOAT_ONE.sub(a.frac());
+        a = a.ceil().sub(a);
+        if (a.isZero()) {
+            a = LibDecimalFloat.FLOAT_ONE;
+        }
 
         StackItem[] memory outputs = new StackItem[](1);
-        outputs[0] = StackItem.wrap(Float.unwrap(headroom));
+        outputs[0] = StackItem.wrap(Float.unwrap(a));
         return outputs;
     }
 }
