@@ -34,6 +34,12 @@ contract LibOpCeilTest is OpTest {
         checkHappy("_: ceil(0.5);", Float.unwrap(LibDecimalFloat.packLossless(1e67, -67)), "0.5");
         checkHappy("_: ceil(2);", Float.unwrap(LibDecimalFloat.packLossless(2, 0)), "2");
         checkHappy("_: ceil(2.5);", Float.unwrap(LibDecimalFloat.packLossless(3e66, -66)), "2.5");
+
+        checkHappy("_: ceil(-1);", Float.unwrap(LibDecimalFloat.packLossless(-1, 0)), "-1");
+        checkHappy("_: ceil(-0.5);", Float.unwrap(LibDecimalFloat.packLossless(0, -1)), "-0.5");
+        checkHappy("_: ceil(-1.5);", Float.unwrap(LibDecimalFloat.packLossless(-10, -1)), "-1.5");
+        checkHappy("_: ceil(-2);", Float.unwrap(LibDecimalFloat.packLossless(-2, 0)), "-2");
+        checkHappy("_: ceil(-2.5);", Float.unwrap(LibDecimalFloat.packLossless(-20, -1)), "-2.5");
     }
 
     /// Test the eval of `ceil` for bad inputs.
