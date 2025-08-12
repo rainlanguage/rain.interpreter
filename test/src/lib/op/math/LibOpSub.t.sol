@@ -41,42 +41,22 @@ contract LibOpSubTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    function _testOpSubRun(OperandV2 operand, StackItem[] memory inputs) external view {
-        InterpreterState memory state = opTestDefaultInterpreterState();
-        opReferenceCheck(state, operand, LibOpSub.referenceFn, LibOpSub.integrity, LibOpSub.run, inputs);
-    }
-
     /// Directly test the runtime logic of LibOpSub.
-    function testOpSubRun(StackItem[] memory inputs) external {
+    function testOpSubRun(StackItem[] memory inputs) external view {
         vm.assume(inputs.length >= 2);
         vm.assume(inputs.length <= 0x0F);
         OperandV2 operand = LibOperand.build(uint8(inputs.length), 1, 0);
 
-        uint256 overflows = 0;
-        (int256 signedCoefficientA, int256 exponentA) = LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(inputs[0])));
-        if (int32(exponentA) != exponentA) {
-            overflows++;
-        }
-
-        for (uint256 i = 1; i < inputs.length; i++) {
-            (int256 signedCoefficientB, int256 exponentB) =
+        for (uint256 i = 0; i < inputs.length; i++) {
+            (int256 signedCoefficient, int256 exponent) =
                 LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(inputs[i])));
-            if (int32(exponentB) != exponentB) {
-                overflows++;
-            }
-
-            (signedCoefficientA, exponentA) =
-                LibDecimalFloatImplementation.sub(signedCoefficientA, exponentA, signedCoefficientB, exponentB);
-            if (int32(exponentA) != exponentA) {
-                overflows++;
-            }
+            exponent = int256(bound(exponent, type(int32).min, type(int32).max / 2));
+            inputs[i] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(signedCoefficient, int32(exponent))));
         }
 
-        if (overflows > 0) {
-            vm.expectRevert();
-        }
-
-        this._testOpSubRun(operand, inputs);
+        opReferenceCheck(
+            opTestDefaultInterpreterState(), operand, LibOpSub.referenceFn, LibOpSub.integrity, LibOpSub.run, inputs
+        );
     }
 
     /// Test the eval of `sub` opcode parsed from a string. Tests zero inputs.
@@ -95,29 +75,35 @@ contract LibOpSubTest is OpTest {
     /// Test the eval of `sub` opcode parsed from a string. Tests two inputs.
     function testOpSubEvalTwoInputs() external view {
         checkHappy("_: sub(1 0);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1 0");
-        checkHappy("_: sub(1 1);", Float.unwrap(LibDecimalFloat.packLossless(0e37, -37)), "1 1");
-        checkHappy("_: sub(2 1);", Float.unwrap(LibDecimalFloat.packLossless(1e37, -37)), "2 1");
-        checkHappy("_: sub(2 2);", Float.unwrap(LibDecimalFloat.packLossless(0e37, -37)), "2 2");
+        checkHappy("_: sub(1 1);", Float.unwrap(LibDecimalFloat.packLossless(0, -75)), "1 1");
+        checkHappy("_: sub(2 1);", Float.unwrap(LibDecimalFloat.packLossless(1e67, -67)), "2 1");
+        checkHappy("_: sub(2 2);", Float.unwrap(LibDecimalFloat.packLossless(0, -75)), "2 2");
         checkHappy(
             "_: sub(max-positive-value() 0);",
             Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)),
             "max-positive-value() 0"
         );
-        checkHappy("_: sub(1 2);", Float.unwrap(LibDecimalFloat.packLossless(-1e37, -37)), "1 2");
-        checkHappy("_: sub(1 0.1);", Float.unwrap(LibDecimalFloat.packLossless(9e37, -38)), "1 0.1");
+        checkHappy("_: sub(1 2);", Float.unwrap(LibDecimalFloat.packLossless(-1e67, -67)), "1 2");
+        checkHappy("_: sub(1 0.1);", Float.unwrap(LibDecimalFloat.packLossless(9e66, -67)), "1 0.1");
 
         // Subtracting 1 from max value is still max value because floats.
-        // https://github.com/rainlanguage/rain.math.float/issues/74
-        // checkHappy("_: sub(max-value() 1);", Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)), "max-value() 1");
-        // https://github.com/rainlanguage/rain.math.float/issues/75
-        // checkHappy("_: sub(max-value() max-value());", 0, "max-value() max-value()");
+        checkHappy(
+            "_: sub(max-positive-value() 1);",
+            Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)),
+            "max-positive-value() 1"
+        );
+        checkHappy(
+            "_: sub(max-positive-value() max-positive-value());",
+            Float.unwrap(LibDecimalFloat.packLossless(0, type(int32).max - 8)),
+            "max-positive-value() max-positive-value()"
+        );
     }
 
     /// Test the eval of `sub` opcode parsed from a string. Tests three inputs.
     function testOpSubEvalThreeInputs() external view {
         checkHappy("_: sub(1 0 0);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1 0 0");
         checkHappy("_: sub(1 1 0);", Float.unwrap(LibDecimalFloat.packLossless(0, 0)), "1 1 0");
-        checkHappy("_: sub(2 1 1);", Float.unwrap(LibDecimalFloat.packLossless(0, -37)), "2 1 1");
+        checkHappy("_: sub(2 1 1);", Float.unwrap(LibDecimalFloat.packLossless(0, -75)), "2 1 1");
         checkHappy("_: sub(2 2 0);", Float.unwrap(LibDecimalFloat.packLossless(0, 0)), "2 2 0");
     }
 }

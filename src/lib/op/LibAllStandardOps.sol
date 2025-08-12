@@ -72,7 +72,7 @@ import {LibOpUint256Sub} from "./math/uint256/LibOpUint256Sub.sol";
 import {LibOpAbs} from "./math/LibOpAbs.sol";
 import {LibOpAdd} from "./math/LibOpAdd.sol";
 import {LibOpAvg} from "./math/LibOpAvg.sol";
-// import {LibOpCeil} from "./math/LibOpCeil.sol";
+import {LibOpCeil} from "./math/LibOpCeil.sol";
 import {LibOpMul} from "./math/LibOpMul.sol";
 import {LibOpDiv} from "./math/LibOpDiv.sol";
 import {LibOpE} from "./math/LibOpE.sol";
@@ -112,7 +112,7 @@ import {LibParseLiteralHex} from "../parse/literal/LibParseLiteralHex.sol";
 import {LibParseLiteralSubParseable} from "../parse/literal/LibParseLiteralSubParseable.sol";
 
 /// @dev Number of ops currently provided by `AllStandardOps`.
-uint256 constant ALL_STANDARD_OPS_LENGTH = 71;
+uint256 constant ALL_STANDARD_OPS_LENGTH = 72;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
@@ -270,7 +270,7 @@ library LibAllStandardOps {
             AuthoringMetaV2("abs", "The absolute value of a number."),
             AuthoringMetaV2("add", "Adds all numbers together."),
             AuthoringMetaV2("avg", "Arithmetic average (mean) of two numbers."),
-            // AuthoringMetaV2("ceil", "Ceiling of a number."),
+            AuthoringMetaV2("ceil", "Ceiling of a number. Lowest integer greater than or equal to the number."),
             AuthoringMetaV2("div", "Divides the first number by all other numbers. Errors if any divisor is zero."),
             AuthoringMetaV2("e", "The mathematical constant e."),
             AuthoringMetaV2("exp", "Natural exponential e^x."),
@@ -466,8 +466,8 @@ library LibAllStandardOps {
                     LibParseOperand.handleOperandDisallowed,
                     // avg
                     LibParseOperand.handleOperandDisallowed,
-                    // // ceil
-                    // LibParseOperand.handleOperandDisallowed,
+                    // ceil
+                    LibParseOperand.handleOperandDisallowed,
                     // div
                     LibParseOperand.handleOperandDisallowed,
                     // e
@@ -601,7 +601,7 @@ library LibAllStandardOps {
                     LibOpAbs.integrity,
                     LibOpAdd.integrity,
                     LibOpAvg.integrity,
-                    // LibOpCeil.integrity,
+                    LibOpCeil.integrity,
                     LibOpDiv.integrity,
                     LibOpE.integrity,
                     LibOpExp.integrity,
@@ -712,7 +712,7 @@ library LibAllStandardOps {
                     LibOpAbs.run,
                     LibOpAdd.run,
                     LibOpAvg.run,
-                    // LibOpCeil.run,
+                    LibOpCeil.run,
                     LibOpDiv.run,
                     LibOpE.run,
                     LibOpExp.run,

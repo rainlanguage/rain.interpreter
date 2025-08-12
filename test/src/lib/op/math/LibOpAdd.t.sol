@@ -98,12 +98,19 @@ contract LibOpAddTest is OpTest {
     }
 
     /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
-    /// Tests the happy path where the addition does not overflow.
     function testOpAddEval2InputsHappy() external view {
-        checkHappy("_: add(5 6);", Float.unwrap(LibDecimalFloat.packLossless(11e37, -37)), "5 + 6");
+        checkHappy("_: add(5 6);", Float.unwrap(LibDecimalFloat.packLossless(11e66, -66)), "5 + 6");
+        checkHappy("_: add(6 5);", Float.unwrap(LibDecimalFloat.packLossless(11e66, -66)), "6 + 5");
 
-        checkHappy("_: add(5e-18 6e-18);", Float.unwrap(LibDecimalFloat.packLossless(11e37, -55)), "5e-18 + 6e-18");
-        checkHappy("_: add(6e-18 5e-18);", Float.unwrap(LibDecimalFloat.packLossless(11e37, -55)), "6 + 5");
+        checkHappy("_: add(-5 -6);", Float.unwrap(LibDecimalFloat.packLossless(-11e66, -66)), "-5 + -6");
+        checkHappy("_: add(-6 -5);", Float.unwrap(LibDecimalFloat.packLossless(-11e66, -66)), "-6 + -5");
+
+        checkHappy("_: add(-5 6);", Float.unwrap(LibDecimalFloat.packLossless(1e67, -67)), "-5 + 6");
+        checkHappy("_: add(6 -5);", Float.unwrap(LibDecimalFloat.packLossless(1e67, -67)), "6 + -5");
+
+        // Mixed-sign cancellation to zero should canonicalize to the zero encoding.
+        checkHappy("_: add(5 -5);", Float.unwrap(LibDecimalFloat.packLossless(0, -75)), "5 + -5");
+        checkHappy("_: add(-5 5);", Float.unwrap(LibDecimalFloat.packLossless(0, -75)), "-5 + 5");
     }
 
     /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
@@ -136,72 +143,54 @@ contract LibOpAddTest is OpTest {
         );
     }
 
-    /// Test the eval of `add` opcode parsed from a string. Tests two inputs.
-    /// Tests the unhappy path where the addition does overflow.
-    function testOpAddEval2InputsUnhappy() external {
-        checkUnhappyOverflow("_: add(max-positive-value() 1e-18);", 13479973333575319897333507543509815336, 2147483677);
-        checkUnhappyOverflow("_: add(1e-18 max-positive-value());", 13479973333575319897333507543509815336, 2147483677);
-    }
-
     /// Test the eval of `add` opcode parsed from a string. Tests three inputs.
     /// Tests the happy path where the addition does not overflow.
     function testOpAddEval3InputsHappy() external view {
-        checkHappy("_: add(5e-18 6e-18 7e-18);", Float.unwrap(LibDecimalFloat.packLossless(18e37, -55)), "5 + 6 + 7");
-        checkHappy("_: add(6e-18 5e-18 7e-18);", Float.unwrap(LibDecimalFloat.packLossless(18e37, -55)), "6 + 5 + 7");
-        checkHappy("_: add(7e-18 6e-18 5e-18);", Float.unwrap(LibDecimalFloat.packLossless(18e37, -55)), "7 + 6 + 5");
-        checkHappy("_: add(5e-18 7e-18 6e-18);", Float.unwrap(LibDecimalFloat.packLossless(18e37, -55)), "5 + 7 + 6");
-        checkHappy("_: add(7e-18 5e-18 6e-18);", Float.unwrap(LibDecimalFloat.packLossless(18e37, -55)), "7 + 5 + 6");
+        checkHappy("_: add(5 6 7);", Float.unwrap(LibDecimalFloat.packLossless(18e65, -65)), "5 + 6 + 7");
+        checkHappy("_: add(6 5 7);", Float.unwrap(LibDecimalFloat.packLossless(18e65, -65)), "6 + 5 + 7");
+        checkHappy("_: add(7 6 5);", Float.unwrap(LibDecimalFloat.packLossless(18e65, -65)), "7 + 6 + 5");
+        checkHappy("_: add(5 7 6);", Float.unwrap(LibDecimalFloat.packLossless(18e65, -65)), "5 + 7 + 6");
+        checkHappy("_: add(7 5 6);", Float.unwrap(LibDecimalFloat.packLossless(18e65, -65)), "7 + 5 + 6");
+        checkHappy("_: add(5 -6 1);", Float.unwrap(LibDecimalFloat.packLossless(0, -75)), "5 + -6 + 1");
     }
 
     /// Test the eval of `add` opcode parsed from a string. Tests three inputs.
     /// Tests the unhappy path where the addition does overflow.
     function testOpAddEval3InputsUnhappy() external {
         checkUnhappyOverflow(
-            "_: add(max-positive-value() 1e-18 1e-18);", 13479973333575319897333507543509815336, 2147483677
-        );
-        checkUnhappyOverflow(
-            "_: add(1e-18 max-positive-value() 1e-18);", 13479973333575319897333507543509815336, 2147483677
-        );
-        checkUnhappyOverflow(
-            "_: add(1e-18 1e-18 max-positive-value());", 13479973333575319897333507543509815336, 2147483677
-        );
-        checkUnhappyOverflow(
             "_: add(max-positive-value() max-positive-value() 1e-18);",
-            26959946667150639794667015087019630672,
-            2147483677
+            2695994666715063979466701508701963067363714442254057248110361024921,
+            2147483648
         );
         checkUnhappyOverflow(
             "_: add(max-positive-value() 1e-18 max-positive-value());",
-            13479973333575319897333507543509815336,
-            2147483677
+            2695994666715063979466701508701963067363714442254057248110361024921,
+            2147483648
         );
         checkUnhappyOverflow(
             "_: add(1e-18 max-positive-value() max-positive-value());",
-            13479973333575319897333507543509815336,
-            2147483677
+            2695994666715063979466701508701963067363714442254057248110361024921,
+            2147483648
         );
         checkUnhappyOverflow(
             "_: add(max-positive-value() max-positive-value() max-positive-value());",
-            26959946667150639794667015087019630672,
-            2147483677
+            2695994666715063979466701508701963067363714442254057248110361024921,
+            2147483648
         );
         checkUnhappyOverflow(
-            "_: add(max-positive-value() 1e-18 0);", 13479973333575319897333507543509815336, 2147483677
+            "_: add(max-positive-value() max-positive-value() 0);",
+            2695994666715063979466701508701963067363714442254057248110361024921,
+            2147483648
         );
         checkUnhappyOverflow(
-            "_: add(1e-18 max-positive-value() 0);", 13479973333575319897333507543509815336, 2147483677
+            "_: add(max-positive-value() 0 max-positive-value());",
+            2695994666715063979466701508701963067363714442254057248110361024921,
+            2147483648
         );
         checkUnhappyOverflow(
-            "_: add(1e-18 0 max-positive-value());", 13479973333575319897333507543509815336, 2147483677
-        );
-        checkUnhappyOverflow(
-            "_: add(max-positive-value() max-positive-value() 0);", 26959946667150639794667015087019630672, 2147483677
-        );
-        checkUnhappyOverflow(
-            "_: add(max-positive-value() 0 max-positive-value());", 26959946667150639794667015087019630672, 2147483677
-        );
-        checkUnhappyOverflow(
-            "_: add(0 max-positive-value() max-positive-value());", 26959946667150639794667015087019630672, 2147483677
+            "_: add(0 max-positive-value() max-positive-value());",
+            2695994666715063979466701508701963067363714442254057248110361024921,
+            2147483648
         );
     }
 

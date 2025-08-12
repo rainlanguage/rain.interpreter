@@ -41,22 +41,22 @@ contract LibOpExpTest is OpTest {
         checkHappy("_: exp(0);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "e^0");
         checkHappy(
             "_: exp(1);",
-            Float.unwrap(LibDecimalFloat.packLossless(271828182845904523536028747135266249770000, -41)),
+            Float.unwrap(LibDecimalFloat.packLossless(2.7182818284590452353602874713526624977e66, -66)),
             "e^1"
         );
         checkHappy(
             "_: exp(0.5);",
-            Float.unwrap(LibDecimalFloat.packLossless(164864091422952261768014373567633124880000, -41)),
+            Float.unwrap(LibDecimalFloat.packLossless(1.64864091422952261768014373567633124885e66, -66)),
             "e^0.5"
         );
         checkHappy(
             "_: exp(2);",
-            Float.unwrap(LibDecimalFloat.packLossless(73901273138361809414411498854106499908000, -40)),
+            Float.unwrap(LibDecimalFloat.packLossless(7.3901273138361809414411498854106499908e66, -66)),
             "e^2"
         );
         checkHappy(
             "_: exp(3);",
-            Float.unwrap(LibDecimalFloat.packLossless(200884548537713570608086241405798749310000, -40)),
+            Float.unwrap(LibDecimalFloat.packLossless(20.088454853771357060808624140579874931e65, -65)),
             "e^3"
         );
     }

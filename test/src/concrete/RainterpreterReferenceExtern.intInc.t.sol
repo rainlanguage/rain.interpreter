@@ -40,8 +40,8 @@ contract RainterpreterReferenceExternIntIncTest is OpTest {
         );
 
         StackItem[] memory expectedStack = new StackItem[](3);
-        expectedStack[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(4e37, -37)));
-        expectedStack[1] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(3e37, -37)));
+        expectedStack[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(4e66, -66)));
+        expectedStack[1] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(3e66, -66)));
         expectedStack[2] = StackItem.wrap(EncodedExternDispatchV2.unwrap(encodedExternDispatch));
 
         checkHappy(
@@ -58,8 +58,8 @@ contract RainterpreterReferenceExternIntIncTest is OpTest {
         RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();
 
         StackItem[] memory expectedStack = new StackItem[](2);
-        expectedStack[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(4e37, -37)));
-        expectedStack[1] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(3e37, -37)));
+        expectedStack[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(4e66, -66)));
+        expectedStack[1] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(3e66, -66)));
 
         checkHappy(
             bytes(
