@@ -7,7 +7,10 @@ import {LibOpDiv} from "src/lib/op/math/LibOpDiv.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
-import {LibDecimalFloatImplementation} from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
+import {
+    LibDecimalFloatImplementation,
+    MulDivOverflow
+} from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
 
 contract LibOpDivTest is OpTest {
     using LibDecimalFloat for Float;
@@ -128,10 +131,18 @@ contract LibOpDivTest is OpTest {
     /// Test the eval of `div` opcode parsed from a string.
     /// Tests two inputs.
     /// Tests the unhappy path where we divide by zero.
-    function testOpDivEvalTwoInputsUnhappy() external {
+    function testOpDivEvalTwoInputsUnhappyDivZero() external {
         checkUnhappy("_: div(0 0);", stdError.divisionError);
-        checkUnhappy("_: div(1 0);", stdError.divisionError);
-        checkUnhappy("_: div(max-positive-value() 0);", stdError.divisionError);
+        checkUnhappy("_: div(1 0);", abi.encodeWithSelector(MulDivOverflow.selector, 1e76, 1e75, 0));
+        checkUnhappy(
+            "_: div(max-positive-value() 0);",
+            abi.encodeWithSelector(
+                MulDivOverflow.selector,
+                13479973333575319897333507543509815336818572211270286240551805124607000000000,
+                1e75,
+                0
+            )
+        );
     }
 
     /// Test the eval of `div` opcode parsed from a string.
@@ -168,9 +179,17 @@ contract LibOpDivTest is OpTest {
     /// Tests the unhappy path where we divide by zero.
     function testOpDivEvalThreeInputsUnhappyExamples() external {
         checkUnhappy("_: div(0 0 0);", stdError.divisionError);
-        // checkUnhappy("_: div(1 0 0);", stdError.divisionError);
-        // checkUnhappy("_: div(1 1 0);", stdError.divisionError);
-        // checkUnhappy("_: div(max-positive-value() 0 0);", stdError.divisionError);
+        checkUnhappy("_: div(1 0 0);", abi.encodeWithSelector(MulDivOverflow.selector, 1e76, 1e75, 0));
+        checkUnhappy("_: div(1 1 0);", abi.encodeWithSelector(MulDivOverflow.selector, 1e76, 1e75, 0));
+        checkUnhappy(
+            "_: div(max-positive-value() 0 0);",
+            abi.encodeWithSelector(
+                MulDivOverflow.selector,
+                13479973333575319897333507543509815336818572211270286240551805124607000000000,
+                1e75,
+                0
+            )
+        );
     }
 
     /// Test the eval of `div` opcode parsed from a string.
@@ -178,7 +197,9 @@ contract LibOpDivTest is OpTest {
     /// Tests the unhappy path where the final result overflows.
     function testOpDivEvalThreeInputsUnhappyOverflow() external {
         checkUnhappyOverflow(
-            "_: div(max-positive-value() 1e-18 1e-18);", 134799733335753198973335075435098153360, 2147483694
+            "_: div(max-positive-value() 1e-18 1e-18);",
+            13479973333575319897333507543509815336818572211270286240551805124607,
+            2147483665
         );
         // checkUnhappyOverflow("_: div(1e900000000 1 1e-900000000);", 1, -8000000000000000000000000000);
         //         checkUnhappy("_: div(1e52 1e-8 1);", abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, 1e70, 1e18, 1e10));
