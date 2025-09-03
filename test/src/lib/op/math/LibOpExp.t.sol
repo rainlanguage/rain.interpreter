@@ -37,26 +37,42 @@ contract LibOpExpTest is OpTest {
     }
 
     /// Test the eval of `exp`.
-    function testOpExpEval() external view {
+    function testOpExpEvalExample() external view {
         checkHappy("_: exp(0);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "e^0");
         checkHappy(
             "_: exp(1);",
-            Float.unwrap(LibDecimalFloat.packLossless(2.7182818284590452353602874713526624977e66, -66)),
+            Float.unwrap(
+                LibDecimalFloat.packLossless(
+                    2.718281828459045235360287471352662497757247093699959574966967627724e66, -66
+                )
+            ),
             "e^1"
         );
         checkHappy(
             "_: exp(0.5);",
-            Float.unwrap(LibDecimalFloat.packLossless(1.64864091422952261768014373567633124885e66, -66)),
+            Float.unwrap(
+                LibDecimalFloat.packLossless(
+                    1.648640914229522617680143735676331248878623546849979787483483813862e66, -66
+                )
+            ),
             "e^0.5"
         );
         checkHappy(
             "_: exp(2);",
-            Float.unwrap(LibDecimalFloat.packLossless(7.3901273138361809414411498854106499908e66, -66)),
+            Float.unwrap(
+                LibDecimalFloat.packLossless(
+                    7.390127313836180941441149885410649991028988374799838299867870510896e66, -66
+                )
+            ),
             "e^2"
         );
         checkHappy(
             "_: exp(3);",
-            Float.unwrap(LibDecimalFloat.packLossless(20.088454853771357060808624140579874931e65, -65)),
+            Float.unwrap(
+                LibDecimalFloat.packLossless(
+                    20.08845485377135706080862414057987493271741281099878724900902883172e65, -65
+                )
+            ),
             "e^3"
         );
     }

@@ -7,7 +7,10 @@ import {LibOpDiv} from "src/lib/op/math/LibOpDiv.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
-import {LibDecimalFloatImplementation} from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
+import {
+    LibDecimalFloatImplementation,
+    MulDivOverflow
+} from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
 
 contract LibOpDivTest is OpTest {
     using LibDecimalFloat for Float;
@@ -112,30 +115,45 @@ contract LibOpDivTest is OpTest {
     /// Tests two inputs.
     /// Tests the happy path where we do not divide by zero or overflow.
     function testOpDivEvalTwoInputsHappy() external view {
-        checkHappy("_: div(0 1);", Float.unwrap(LibDecimalFloat.packLossless(0, -1)), "0 1");
-        checkHappy("_: div(1 1);", Float.unwrap(LibDecimalFloat.packLossless(1e38, -38)), "1 1");
-        checkHappy("_: div(1 2);", Float.unwrap(LibDecimalFloat.packLossless(5e37, -38)), "1 2");
-        checkHappy("_: div(2 1);", Float.unwrap(LibDecimalFloat.packLossless(2e38, -38)), "2 1");
-        checkHappy("_: div(2 2);", Float.unwrap(LibDecimalFloat.packLossless(1e38, -38)), "2 2");
-        checkHappy("_: div(2 0.1);", Float.unwrap(LibDecimalFloat.packLossless(2e38, -37)), "2 0.1");
-        // https://github.com/rainlanguage/rain.math.float/issues/71
-        // checkHappy("_: div(max-positive-value() 1);", Float.unwrap(LibDecimalFloat.packLossless(1, 1)), "max-positive-value() 1");
+        checkHappy("_: div(0 1);", Float.unwrap(LibDecimalFloat.packLossless(0, 0)), "0 1");
+        checkHappy("_: div(1 1);", Float.unwrap(LibDecimalFloat.packLossless(1e67, -67)), "1 1");
+        checkHappy("_: div(1 2);", Float.unwrap(LibDecimalFloat.packLossless(0.5e67, -67)), "1 2");
+        checkHappy("_: div(2 1);", Float.unwrap(LibDecimalFloat.packLossless(2e66, -66)), "2 1");
+        checkHappy("_: div(2 2);", Float.unwrap(LibDecimalFloat.packLossless(1e67, -67)), "2 2");
+        checkHappy("_: div(2 0.1);", Float.unwrap(LibDecimalFloat.packLossless(20e65, -65)), "2 0.1");
+        checkHappy(
+            "_: div(max-positive-value() 1);",
+            Float.unwrap(LibDecimalFloat.FLOAT_MAX_POSITIVE_VALUE),
+            "max-positive-value() 1"
+        );
     }
 
     /// Test the eval of `div` opcode parsed from a string.
     /// Tests two inputs.
     /// Tests the unhappy path where we divide by zero.
-    function testOpDivEvalTwoInputsUnhappy() external {
+    function testOpDivEvalTwoInputsUnhappyDivZero() external {
         checkUnhappy("_: div(0 0);", stdError.divisionError);
-        checkUnhappy("_: div(1 0);", stdError.divisionError);
-        checkUnhappy("_: div(max-positive-value() 0);", stdError.divisionError);
+        checkUnhappy("_: div(1 0);", abi.encodeWithSelector(MulDivOverflow.selector, 1e76, 1e75, 0));
+        checkUnhappy(
+            "_: div(max-positive-value() 0);",
+            abi.encodeWithSelector(
+                MulDivOverflow.selector,
+                13479973333575319897333507543509815336818572211270286240551805124607000000000,
+                1e75,
+                0
+            )
+        );
     }
 
     /// Test the eval of `div` opcode parsed from a string.
     /// Tests two inputs.
     /// Tests the unhappy path where the final result overflows.
     function testOpDivEvalTwoInputsUnhappyOverflow() external {
-        checkUnhappyOverflow("_: div(max-positive-value() 1e-18);", 134799733335753198973335075435098153360, 2147483694);
+        checkUnhappyOverflow(
+            "_: div(max-positive-value() 1e-18);",
+            13479973333575319897333507543509815336818572211270286240551805124607,
+            2147483665
+        );
         // checkUnhappy("_: div(1e52 1e-8);", abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, 1e70, 1e18, 1e10));
     }
 
@@ -143,24 +161,35 @@ contract LibOpDivTest is OpTest {
     /// Tests three inputs.
     /// Tests the happy path where we do not divide by zero or overflow.
     function testOpDivEvalThreeInputsHappy() external view {
-        checkHappy("_: div(0 1 1);", Float.unwrap(LibDecimalFloat.packLossless(0, -1)), "0 1 1");
-        checkHappy("_: div(1 1 1);", Float.unwrap(LibDecimalFloat.packLossless(1e38, -38)), "1 1 1");
-        checkHappy("_: div(1 1 2);", Float.unwrap(LibDecimalFloat.packLossless(5e37, -38)), "1 1 2");
-        checkHappy("_: div(1 2 1);", Float.unwrap(LibDecimalFloat.packLossless(5e38, -39)), "1 2 1");
-        checkHappy("_: div(1 2 2);", Float.unwrap(LibDecimalFloat.packLossless(25e37, -39)), "1 2 2");
-        checkHappy("_: div(1 2 0.1);", Float.unwrap(LibDecimalFloat.packLossless(5e38, -38)), "1 2 0.1");
-        // https://github.com/rainlanguage/rain.math.float/issues/71
-        // checkHappy("_: div(max-positive-value() 1 1);", type(uint256).max, "max-positive-value() 1 1");
+        checkHappy("_: div(0 1 1);", Float.unwrap(LibDecimalFloat.packLossless(0, 0)), "0 1 1");
+        checkHappy("_: div(1 1 1);", Float.unwrap(LibDecimalFloat.packLossless(1e67, -67)), "1 1 1");
+        checkHappy("_: div(1 1 2);", Float.unwrap(LibDecimalFloat.packLossless(5e66, -67)), "1 1 2");
+        checkHappy("_: div(1 2 1);", Float.unwrap(LibDecimalFloat.packLossless(5e66, -67)), "1 2 1");
+        checkHappy("_: div(1 2 2);", Float.unwrap(LibDecimalFloat.packLossless(0.25e67, -67)), "1 2 2");
+        checkHappy("_: div(1 2 0.1);", Float.unwrap(LibDecimalFloat.packLossless(5e66, -66)), "1 2 0.1");
+        checkHappy(
+            "_: div(max-positive-value() 1 1);",
+            Float.unwrap(LibDecimalFloat.FLOAT_MAX_POSITIVE_VALUE),
+            "max-positive-value() 1 1"
+        );
     }
 
     /// Test the eval of `div` opcode parsed from a string.
     /// Tests three inputs.
     /// Tests the unhappy path where we divide by zero.
-    function testOpDivEvalThreeInputsUnhappy() external {
+    function testOpDivEvalThreeInputsUnhappyExamples() external {
         checkUnhappy("_: div(0 0 0);", stdError.divisionError);
-        checkUnhappy("_: div(1 0 0);", stdError.divisionError);
-        checkUnhappy("_: div(1 1 0);", stdError.divisionError);
-        checkUnhappy("_: div(max-positive-value() 0 0);", stdError.divisionError);
+        checkUnhappy("_: div(1 0 0);", abi.encodeWithSelector(MulDivOverflow.selector, 1e76, 1e75, 0));
+        checkUnhappy("_: div(1 1 0);", abi.encodeWithSelector(MulDivOverflow.selector, 1e76, 1e75, 0));
+        checkUnhappy(
+            "_: div(max-positive-value() 0 0);",
+            abi.encodeWithSelector(
+                MulDivOverflow.selector,
+                13479973333575319897333507543509815336818572211270286240551805124607000000000,
+                1e75,
+                0
+            )
+        );
     }
 
     /// Test the eval of `div` opcode parsed from a string.
@@ -168,7 +197,9 @@ contract LibOpDivTest is OpTest {
     /// Tests the unhappy path where the final result overflows.
     function testOpDivEvalThreeInputsUnhappyOverflow() external {
         checkUnhappyOverflow(
-            "_: div(max-positive-value() 1e-18 1e-18);", 134799733335753198973335075435098153360, 2147483694
+            "_: div(max-positive-value() 1e-18 1e-18);",
+            13479973333575319897333507543509815336818572211270286240551805124607,
+            2147483665
         );
         // checkUnhappyOverflow("_: div(1e900000000 1 1e-900000000);", 1, -8000000000000000000000000000);
         //         checkUnhappy("_: div(1e52 1e-8 1);", abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, 1e70, 1e18, 1e10));

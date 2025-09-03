@@ -42,16 +42,16 @@ contract LibOpAvgTest is OpTest {
     }
 
     /// Test the eval of `avg`.
-    function testOpAvgEval() external view {
-        checkHappy("_: avg(0 0);", Float.unwrap(LibDecimalFloat.packLossless(0, -1)), "0 0");
-        checkHappy("_: avg(0 1);", Float.unwrap(LibDecimalFloat.packLossless(5e37, -38)), "0 1");
-        checkHappy("_: avg(1 0);", Float.unwrap(LibDecimalFloat.packLossless(5e37, -38)), "1 0");
-        checkHappy("_: avg(1 1);", Float.unwrap(LibDecimalFloat.packLossless(1e38, -38)), "1 1");
-        checkHappy("_: avg(1 2);", Float.unwrap(LibDecimalFloat.packLossless(15e37, -38)), "1 2");
-        checkHappy("_: avg(2 2);", Float.unwrap(LibDecimalFloat.packLossless(2e38, -38)), "2 2");
-        checkHappy("_: avg(2 3);", Float.unwrap(LibDecimalFloat.packLossless(25e37, -38)), "2 3");
-        checkHappy("_: avg(2 4);", Float.unwrap(LibDecimalFloat.packLossless(3e38, -38)), "2 4");
-        checkHappy("_: avg(4 0.5);", Float.unwrap(LibDecimalFloat.packLossless(225e36, -38)), "4 5");
+    function testOpAvgEvalExamples() external view {
+        checkHappy("_: avg(0 0);", Float.unwrap(LibDecimalFloat.packLossless(0, 0)), "0 0");
+        checkHappy("_: avg(0 1);", Float.unwrap(LibDecimalFloat.packLossless(5e66, -67)), "0 1");
+        checkHappy("_: avg(1 0);", Float.unwrap(LibDecimalFloat.packLossless(5e66, -67)), "1 0");
+        checkHappy("_: avg(1 1);", Float.unwrap(LibDecimalFloat.packLossless(1e67, -67)), "1 1");
+        checkHappy("_: avg(1 2);", Float.unwrap(LibDecimalFloat.packLossless(1.5e66, -66)), "1 2");
+        checkHappy("_: avg(2 2);", Float.unwrap(LibDecimalFloat.packLossless(2e66, -66)), "2 2");
+        checkHappy("_: avg(2 3);", Float.unwrap(LibDecimalFloat.packLossless(2.5e66, -66)), "2 3");
+        checkHappy("_: avg(2 4);", Float.unwrap(LibDecimalFloat.packLossless(3e66, -66)), "2 4");
+        checkHappy("_: avg(4 0.5);", Float.unwrap(LibDecimalFloat.packLossless(2.25e66, -66)), "4 5");
     }
 
     /// Test the eval of `avg` for bad inputs.

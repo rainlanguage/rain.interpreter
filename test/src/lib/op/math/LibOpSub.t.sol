@@ -75,9 +75,9 @@ contract LibOpSubTest is OpTest {
     /// Test the eval of `sub` opcode parsed from a string. Tests two inputs.
     function testOpSubEvalTwoInputs() external view {
         checkHappy("_: sub(1 0);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1 0");
-        checkHappy("_: sub(1 1);", Float.unwrap(LibDecimalFloat.packLossless(0, -75)), "1 1");
+        checkHappy("_: sub(1 1);", Float.unwrap(LibDecimalFloat.packLossless(0, -76)), "1 1");
         checkHappy("_: sub(2 1);", Float.unwrap(LibDecimalFloat.packLossless(1e67, -67)), "2 1");
-        checkHappy("_: sub(2 2);", Float.unwrap(LibDecimalFloat.packLossless(0, -75)), "2 2");
+        checkHappy("_: sub(2 2);", Float.unwrap(LibDecimalFloat.packLossless(0, -76)), "2 2");
         checkHappy(
             "_: sub(max-positive-value() 0);",
             Float.unwrap(LibDecimalFloat.packLossless(type(int224).max, type(int32).max)),
@@ -94,7 +94,7 @@ contract LibOpSubTest is OpTest {
         );
         checkHappy(
             "_: sub(max-positive-value() max-positive-value());",
-            Float.unwrap(LibDecimalFloat.packLossless(0, type(int32).max - 8)),
+            Float.unwrap(LibDecimalFloat.packLossless(0, type(int32).max - 9)),
             "max-positive-value() max-positive-value()"
         );
     }
@@ -103,7 +103,7 @@ contract LibOpSubTest is OpTest {
     function testOpSubEvalThreeInputs() external view {
         checkHappy("_: sub(1 0 0);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1 0 0");
         checkHappy("_: sub(1 1 0);", Float.unwrap(LibDecimalFloat.packLossless(0, 0)), "1 1 0");
-        checkHappy("_: sub(2 1 1);", Float.unwrap(LibDecimalFloat.packLossless(0, -75)), "2 1 1");
+        checkHappy("_: sub(2 1 1);", Float.unwrap(LibDecimalFloat.packLossless(0, -76)), "2 1 1");
         checkHappy("_: sub(2 2 0);", Float.unwrap(LibDecimalFloat.packLossless(0, 0)), "2 2 0");
     }
 }

@@ -53,7 +53,7 @@ contract LibOpPowTest is OpTest {
         // 1 ^ 0
         checkHappy("_: power(1 0);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1 0");
         // 1 ^ 1
-        checkHappy("_: power(1 1);", Float.unwrap(LibDecimalFloat.packLossless(1e3, -3)), "1 1");
+        checkHappy("_: power(1 1);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1 1");
         // 1 ^ 2
         checkHappy("_: power(1 2);", Float.unwrap(LibDecimalFloat.packLossless(1e3, -3)), "1 2");
         // 2 ^ 2
@@ -70,9 +70,9 @@ contract LibOpPowTest is OpTest {
 
     function testOpPowNegativeBaseError() external {
         // Negative base with positive exponent.
-        checkUnhappy("_: power(-1 2);", abi.encodeWithSelector(Log10Negative.selector, -1e37, -37));
+        checkUnhappy("_: power(-1 2);", abi.encodeWithSelector(Log10Negative.selector, -1, 0));
         // Negative base with negative exponent.
-        checkUnhappy("_: power(-1 -2);", abi.encodeWithSelector(Log10Negative.selector, -1e37, -37));
+        checkUnhappy("_: power(-1 -2);", abi.encodeWithSelector(Log10Negative.selector, -1, 0));
     }
 
     /// Test the eval of `power` for bad inputs.

@@ -35,9 +35,9 @@ contract LibOpExp2Test is OpTest {
     }
 
     /// Test the eval of `exp2`.
-    function testOpExp2Eval() external view {
+    function testOpExp2EvalExample() external view {
         checkHappy("_: exp2(0);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "2^0");
-        checkHappy("_: exp2(1);", Float.unwrap(LibDecimalFloat.packLossless(2000, -3)), "2^1");
+        checkHappy("_: exp2(1);", Float.unwrap(LibDecimalFloat.packLossless(2, 0)), "2^1");
         checkHappy("_: exp2(0.5);", Float.unwrap(LibDecimalFloat.packLossless(1415, -3)), "2^0.5");
         checkHappy("_: exp2(2);", Float.unwrap(LibDecimalFloat.packLossless(3999, -3)), "2^2");
         checkHappy("_: exp2(3);", Float.unwrap(LibDecimalFloat.packLossless(7998, -3)), "2^3");
