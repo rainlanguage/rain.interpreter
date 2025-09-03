@@ -36,12 +36,14 @@ contract LibOpSqrtTest is OpTest {
     }
 
     /// Test the eval of `sqrt`.
-    function testOpSqrtEval() external view {
+    function testOpSqrtEvalExamples() external view {
         checkHappy("_: sqrt(0);", 0, "0");
         checkHappy("_: sqrt(1);", Float.unwrap(LibDecimalFloat.packLossless(1e3, -3)), "1");
         checkHappy(
             "_: sqrt(0.5);",
-            Float.unwrap(LibDecimalFloat.packLossless(70671378091872791519434628975265017667, -38)),
+            Float.unwrap(
+                LibDecimalFloat.packLossless(7067137809187279151943462897526501766784452296819787985865724381625, -67)
+            ),
             "0.5"
         );
         checkHappy("_: sqrt(2);", Float.unwrap(LibDecimalFloat.packLossless(1415, -3)), "2");

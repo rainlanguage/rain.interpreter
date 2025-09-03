@@ -10,7 +10,7 @@
 pragma solidity =0.8.25;
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0x12101f163b9f03997261cb8dbba0d24350308e2583d2456ffecf3761813ca62a);
+bytes32 constant BYTECODE_HASH = bytes32(0x8ce3d92b248b9234c85d9c152ad8d13b6ce7bb5c394e66b703fc858a4778666e);
 
 /// @dev The function pointers known to the interpreter for dynamic dispatch.
 /// By setting these as a constant they can be inlined into the interpreter

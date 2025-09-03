@@ -33,12 +33,16 @@ contract LibOpInvTest is OpTest {
 
     /// Test the eval of `inv`.
     function testOpInvEval() external view {
-        checkHappy("_: inv(1);", Float.unwrap(LibDecimalFloat.packLossless(1e38, -38)), "1");
-        checkHappy("_: inv(0.5);", Float.unwrap(LibDecimalFloat.packLossless(2e37, -37)), "0.5");
-        checkHappy("_: inv(2);", Float.unwrap(LibDecimalFloat.packLossless(0.5e38, -38)), "2");
+        checkHappy("_: inv(1);", Float.unwrap(LibDecimalFloat.packLossless(1e67, -67)), "1");
+        checkHappy("_: inv(0.5);", Float.unwrap(LibDecimalFloat.packLossless(2e66, -66)), "0.5");
+        checkHappy("_: inv(2);", Float.unwrap(LibDecimalFloat.packLossless(0.5e67, -67)), "2");
         checkHappy(
             "_: inv(3);",
-            Float.unwrap(LibDecimalFloat.packLossless(0.33333333333333333333333333333333333333e38, -38)),
+            Float.unwrap(
+                LibDecimalFloat.packLossless(
+                    0.3333333333333333333333333333333333333333333333333333333333333333333e67, -67
+                )
+            ),
             "3"
         );
     }

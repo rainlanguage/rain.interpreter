@@ -11,7 +11,6 @@ import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {OperandValuesOverflow, UnclosedOperand} from "src/error/ErrParse.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibDecimalFloat, LibDecimalFloatImplementation, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
-import {SIGNED_NORMALIZED_MAX} from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
 
 contract LibParseOperandParseOperandTest is Test {
     using LibBytes for bytes;
@@ -75,7 +74,7 @@ contract LibParseOperandParseOperandTest is Test {
         LibConformString.conformStringToWhitespace(maybeWhitespaceA);
         LibConformString.conformStringToWhitespace(maybeWhitespaceB);
 
-        value = bound(value, 0, SIGNED_NORMALIZED_MAX);
+        value = bound(value, 0, type(int224).max);
 
         string memory valueString = asHex ? uint256(value).toHexString() : value.toString();
         string memory s = string.concat("<", maybeWhitespaceA, valueString, maybeWhitespaceB, ">", suffix);
@@ -104,8 +103,8 @@ contract LibParseOperandParseOperandTest is Test {
     ) external pure {
         vm.assume(bytes(maybeWhitespaceB).length > 0);
 
-        valueA = bound(valueA, 0, SIGNED_NORMALIZED_MAX);
-        valueB = bound(valueB, 0, SIGNED_NORMALIZED_MAX);
+        valueA = bound(valueA, 0, type(int224).max);
+        valueB = bound(valueB, 0, type(int224).max);
 
         LibConformString.conformStringToWhitespace(maybeWhitespaceA);
         LibConformString.conformStringToWhitespace(maybeWhitespaceB);
@@ -149,9 +148,9 @@ contract LibParseOperandParseOperandTest is Test {
         vm.assume(bytes(maybeWhitespaceB).length > 0);
         vm.assume(bytes(maybeWhitespaceC).length > 0);
 
-        valueA = bound(valueA, 0, SIGNED_NORMALIZED_MAX);
-        valueB = bound(valueB, 0, SIGNED_NORMALIZED_MAX);
-        valueC = bound(valueC, 0, SIGNED_NORMALIZED_MAX);
+        valueA = bound(valueA, 0, type(int224).max);
+        valueB = bound(valueB, 0, type(int224).max);
+        valueC = bound(valueC, 0, type(int224).max);
 
         LibConformString.conformStringToWhitespace(maybeWhitespaceA);
         LibConformString.conformStringToWhitespace(maybeWhitespaceB);
@@ -209,7 +208,7 @@ contract LibParseOperandParseOperandTest is Test {
         }
 
         for (uint256 i = 0; i < 4; i++) {
-            values[i] = bound(values[i], 0, SIGNED_NORMALIZED_MAX);
+            values[i] = bound(values[i], 0, type(int224).max);
         }
 
         uint256 expectedLength;
