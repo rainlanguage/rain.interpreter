@@ -9,7 +9,8 @@ import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpre
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {
     LibDecimalFloatImplementation,
-    MulDivOverflow
+    MulDivOverflow,
+    DivisionByZero
 } from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
 
 contract LibOpDivTest is OpTest {
@@ -132,16 +133,11 @@ contract LibOpDivTest is OpTest {
     /// Tests two inputs.
     /// Tests the unhappy path where we divide by zero.
     function testOpDivEvalTwoInputsUnhappyDivZero() external {
-        checkUnhappy("_: div(0 0);", stdError.divisionError);
-        checkUnhappy("_: div(1 0);", abi.encodeWithSelector(MulDivOverflow.selector, 1e76, 1e75, 0));
+        checkUnhappy("_: div(0 0);", abi.encodeWithSelector(DivisionByZero.selector, 0, 0));
+        checkUnhappy("_: div(1 0);", abi.encodeWithSelector(DivisionByZero.selector, 1, 0));
         checkUnhappy(
             "_: div(max-positive-value() 0);",
-            abi.encodeWithSelector(
-                MulDivOverflow.selector,
-                13479973333575319897333507543509815336818572211270286240551805124607000000000,
-                1e75,
-                0
-            )
+            abi.encodeWithSelector(DivisionByZero.selector, type(int224).max, type(int32).max)
         );
     }
 
@@ -178,17 +174,12 @@ contract LibOpDivTest is OpTest {
     /// Tests three inputs.
     /// Tests the unhappy path where we divide by zero.
     function testOpDivEvalThreeInputsUnhappyExamples() external {
-        checkUnhappy("_: div(0 0 0);", stdError.divisionError);
-        checkUnhappy("_: div(1 0 0);", abi.encodeWithSelector(MulDivOverflow.selector, 1e76, 1e75, 0));
-        checkUnhappy("_: div(1 1 0);", abi.encodeWithSelector(MulDivOverflow.selector, 1e76, 1e75, 0));
+        checkUnhappy("_: div(0 0 0);", abi.encodeWithSelector(DivisionByZero.selector, 0, 0));
+        checkUnhappy("_: div(1 0 0);", abi.encodeWithSelector(DivisionByZero.selector, 1, 0));
+        checkUnhappy("_: div(1 1 0);", abi.encodeWithSelector(DivisionByZero.selector, 1e67, -67));
         checkUnhappy(
             "_: div(max-positive-value() 0 0);",
-            abi.encodeWithSelector(
-                MulDivOverflow.selector,
-                13479973333575319897333507543509815336818572211270286240551805124607000000000,
-                1e75,
-                0
-            )
+            abi.encodeWithSelector(DivisionByZero.selector, type(int224).max, type(int32).max)
         );
     }
 
