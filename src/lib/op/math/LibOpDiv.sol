@@ -52,6 +52,7 @@ library LibOpDiv {
                 }
             }
         }
+        //slither-disable-next-line unused-return
         (a,) = LibDecimalFloat.packLossy(signedCoefficient, exponent);
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
@@ -87,7 +88,9 @@ library LibOpDiv {
                 (signedCoefficient, exponent) =
                     LibDecimalFloatImplementation.div(signedCoefficient, exponent, signedCoefficientB, exponentB);
             }
-            (a,) = LibDecimalFloat.packLossy(signedCoefficient, exponent);
+            bool lossless;
+            (a, lossless) = LibDecimalFloat.packLossy(signedCoefficient, exponent);
+            (lossless);
             outputs = new StackItem[](1);
             outputs[0] = StackItem.wrap(Float.unwrap(a));
         }
