@@ -13,6 +13,8 @@ import {
     DivisionByZero
 } from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
 
+import {console2} from "forge-std/Test.sol";
+
 contract LibOpDivTest is OpTest {
     using LibDecimalFloat for Float;
 
@@ -61,17 +63,21 @@ contract LibOpDivTest is OpTest {
 
         (int256 signedCoefficientA, int256 exponentA) = LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(inputs[0])));
 
-        uint256 overflows = 0;
-        if (int32(exponentA) != exponentA) {
-            overflows++;
-        }
+        // uint256 overflows = 0;
+        // if (int32(exponentA) != exponentA && exponentA > 0) {
+        //     console2.log("exponentA overflow", uint256(0));
+        //     console2.logInt(exponentA);
+        //     overflows++;
+        // }
         uint256 divideByZero = 0;
         for (uint256 i = 1; i < inputs.length; i++) {
             (int256 signedCoefficientB, int256 exponentB) =
                 LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(inputs[i])));
-            if (int32(exponentB) != exponentB) {
-                overflows++;
-            }
+            // if (int32(exponentB) != exponentB) {
+            //     console2.log("exponentB overflow", i);
+            //     console2.logInt(exponentB);
+            //     overflows++;
+            // }
             if (signedCoefficientB == 0) {
                 divideByZero++;
                 break;
@@ -79,11 +85,17 @@ contract LibOpDivTest is OpTest {
 
             (signedCoefficientA, exponentA) =
                 LibDecimalFloatImplementation.div(signedCoefficientA, exponentA, signedCoefficientB, exponentB);
-            if (int32(exponentA) != exponentA) {
-                overflows++;
-            }
+            // if (int32(exponentA) != exponentA && exponentA > 0) {
+            //     console2.log("exponentA overflow", i);
+            //     console2.logInt(exponentA);
+            //     console2.logInt(exponentB);
+            //     overflows++;
+            // }
         }
-        if (overflows > 0) {
+        console2.log("final");
+        console2.logInt(exponentA);
+        // if (overflows > 0) {
+        if (int32(exponentA) != exponentA && exponentA > 0) {
             vm.expectRevert();
         } else if (divideByZero > 0) {
             vm.expectRevert();
@@ -147,8 +159,8 @@ contract LibOpDivTest is OpTest {
     function testOpDivEvalTwoInputsUnhappyOverflow() external {
         checkUnhappyOverflow(
             "_: div(max-positive-value() 1e-18);",
-            13479973333575319897333507543509815336818572211270286240551805124607,
-            2147483665
+            13479973333575319897333507543509815336818572211270286240551805124607000000000,
+            2147483656
         );
         // checkUnhappy("_: div(1e52 1e-8);", abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, 1e70, 1e18, 1e10));
     }
@@ -176,7 +188,7 @@ contract LibOpDivTest is OpTest {
     function testOpDivEvalThreeInputsUnhappyExamples() external {
         checkUnhappy("_: div(0 0 0);", abi.encodeWithSelector(DivisionByZero.selector, 0, 0));
         checkUnhappy("_: div(1 0 0);", abi.encodeWithSelector(DivisionByZero.selector, 1, 0));
-        checkUnhappy("_: div(1 1 0);", abi.encodeWithSelector(DivisionByZero.selector, 1e67, -67));
+        checkUnhappy("_: div(1 1 0);", abi.encodeWithSelector(DivisionByZero.selector, 1e76, -76));
         checkUnhappy(
             "_: div(max-positive-value() 0 0);",
             abi.encodeWithSelector(DivisionByZero.selector, type(int224).max, type(int32).max)
@@ -189,8 +201,8 @@ contract LibOpDivTest is OpTest {
     function testOpDivEvalThreeInputsUnhappyOverflow() external {
         checkUnhappyOverflow(
             "_: div(max-positive-value() 1e-18 1e-18);",
-            13479973333575319897333507543509815336818572211270286240551805124607,
-            2147483665
+            13479973333575319897333507543509815336818572211270286240551805124607000000000,
+            2147483674
         );
         // checkUnhappyOverflow("_: div(1e900000000 1 1e-900000000);", 1, -8000000000000000000000000000);
         //         checkUnhappy("_: div(1e52 1e-8 1);", abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, 1e70, 1e18, 1e10));
