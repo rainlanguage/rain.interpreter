@@ -6,10 +6,11 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloatImplementation} from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
 import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 /// @title LibOpDiv
-/// @notice Opcode to div N 18 decimal fixed point values. Errors on overflow.
+/// @notice Opcode to div N decimal float values. Errors on overflow.
 library LibOpDiv {
     using LibDecimalFloat for Float;
 
@@ -21,7 +22,7 @@ library LibOpDiv {
     }
 
     /// div
-    /// 18 decimal floating point division.
+    /// decimal floating point division.
     function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         Float a;
         Float b;
@@ -30,7 +31,10 @@ library LibOpDiv {
             b := mload(add(stackTop, 0x20))
             stackTop := add(stackTop, 0x40)
         }
-        a = LibDecimalFloat.div(a, b);
+        (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(a);
+        (int256 signedCoefficientB, int256 exponentB) = LibDecimalFloat.unpack(b);
+        (signedCoefficient, exponent) =
+            LibDecimalFloatImplementation.div(signedCoefficient, exponent, signedCoefficientB, exponentB);
 
         {
             uint256 inputs = uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F;
@@ -40,12 +44,16 @@ library LibOpDiv {
                     b := mload(stackTop)
                     stackTop := add(stackTop, 0x20)
                 }
-                a = LibDecimalFloat.div(a, b);
+                (signedCoefficientB, exponentB) = LibDecimalFloat.unpack(b);
+                (signedCoefficient, exponent) =
+                    LibDecimalFloatImplementation.div(signedCoefficient, exponent, signedCoefficientB, exponentB);
                 unchecked {
                     i++;
                 }
             }
         }
+        //slither-disable-next-line unused-return
+        (a,) = LibDecimalFloat.packLossy(signedCoefficient, exponent);
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
             mstore(stackTop, a)
@@ -63,6 +71,7 @@ library LibOpDiv {
         // see the revert from the real function and not the reference function.
         unchecked {
             Float a = Float.wrap(StackItem.unwrap(inputs[0]));
+            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(a);
             for (uint256 i = 1; i < inputs.length; i++) {
                 Float b = Float.wrap(StackItem.unwrap(inputs[i]));
                 // Just bail out with a = some sentinel value if we're going to
@@ -75,8 +84,13 @@ library LibOpDiv {
                     a = Float.wrap(bytes32(keccak256(abi.encodePacked("overflow sentinel"))));
                     break;
                 }
-                a = LibDecimalFloat.div(a, b);
+                (int256 signedCoefficientB, int256 exponentB) = LibDecimalFloat.unpack(b);
+                (signedCoefficient, exponent) =
+                    LibDecimalFloatImplementation.div(signedCoefficient, exponent, signedCoefficientB, exponentB);
             }
+            bool lossless;
+            (a, lossless) = LibDecimalFloat.packLossy(signedCoefficient, exponent);
+            (lossless);
             outputs = new StackItem[](1);
             outputs[0] = StackItem.wrap(Float.unwrap(a));
         }

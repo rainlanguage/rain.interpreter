@@ -113,8 +113,8 @@ contract LibOpMulTest is OpTest {
     function testOpMulEvalTwoInputsUnhappyOverflow() external {
         checkUnhappyOverflow(
             "_: mul(max-positive-value() 10);",
-            13479973333575319897333507543509815336818572211270286240551805124607,
-            2147483648
+            134799733335753198973335075435098153368185722112702862405518051246070,
+            2147483647
         );
     }
 
@@ -149,8 +149,8 @@ contract LibOpMulTest is OpTest {
     function testOpMulEvalThreeInputsUnhappyOverflow() external {
         checkUnhappyOverflow(
             "_: mul(max-positive-value() 1 10);",
-            13479973333575319897333507543509815336818572211270286240551805124607,
-            2147483648
+            134799733335753198973335075435098153368185722112702862405518051246070,
+            2147483647
         );
     }
 
