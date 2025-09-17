@@ -33,7 +33,6 @@ library LibOpDiv {
         }
         (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(a);
         (int256 signedCoefficientB, int256 exponentB) = LibDecimalFloat.unpack(b);
-        // a = LibDecimalFloat.div(a, b);
         (signedCoefficient, exponent) =
             LibDecimalFloatImplementation.div(signedCoefficient, exponent, signedCoefficientB, exponentB);
 
@@ -48,7 +47,6 @@ library LibOpDiv {
                 (signedCoefficientB, exponentB) = LibDecimalFloat.unpack(b);
                 (signedCoefficient, exponent) =
                     LibDecimalFloatImplementation.div(signedCoefficient, exponent, signedCoefficientB, exponentB);
-                // a = LibDecimalFloat.div(a, b);
                 unchecked {
                     i++;
                 }
