@@ -13,8 +13,6 @@ import {
     DivisionByZero
 } from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
 
-import {console2} from "forge-std/Test.sol";
-
 contract LibOpDivTest is OpTest {
     using LibDecimalFloat for Float;
 
