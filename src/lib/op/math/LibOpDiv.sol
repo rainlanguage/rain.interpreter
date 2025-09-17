@@ -9,8 +9,6 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {LibDecimalFloatImplementation} from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
 import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
-import {console2} from "forge-std/console2.sol";
-
 /// @title LibOpDiv
 /// @notice Opcode to div N decimal float values. Errors on overflow.
 library LibOpDiv {
@@ -61,7 +59,6 @@ library LibOpDiv {
             stackTop := sub(stackTop, 0x20)
             mstore(stackTop, a)
         }
-        console2.log("div");
         return stackTop;
     }
 
@@ -71,7 +68,6 @@ library LibOpDiv {
         pure
         returns (StackItem[] memory outputs)
     {
-        console2.log("reference");
         // Unchecked so that when we assert that an overflow error is thrown, we
         // see the revert from the real function and not the reference function.
         unchecked {
