@@ -63,21 +63,10 @@ contract LibOpDivTest is OpTest {
 
         (int256 signedCoefficientA, int256 exponentA) = LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(inputs[0])));
 
-        // uint256 overflows = 0;
-        // if (int32(exponentA) != exponentA && exponentA > 0) {
-        //     console2.log("exponentA overflow", uint256(0));
-        //     console2.logInt(exponentA);
-        //     overflows++;
-        // }
         uint256 divideByZero = 0;
         for (uint256 i = 1; i < inputs.length; i++) {
             (int256 signedCoefficientB, int256 exponentB) =
                 LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(inputs[i])));
-            // if (int32(exponentB) != exponentB) {
-            //     console2.log("exponentB overflow", i);
-            //     console2.logInt(exponentB);
-            //     overflows++;
-            // }
             if (signedCoefficientB == 0) {
                 divideByZero++;
                 break;
@@ -85,16 +74,7 @@ contract LibOpDivTest is OpTest {
 
             (signedCoefficientA, exponentA) =
                 LibDecimalFloatImplementation.div(signedCoefficientA, exponentA, signedCoefficientB, exponentB);
-            // if (int32(exponentA) != exponentA && exponentA > 0) {
-            //     console2.log("exponentA overflow", i);
-            //     console2.logInt(exponentA);
-            //     console2.logInt(exponentB);
-            //     overflows++;
-            // }
         }
-        console2.log("final");
-        console2.logInt(exponentA);
-        // if (overflows > 0) {
         if (int32(exponentA) != exponentA && exponentA > 0) {
             vm.expectRevert();
         } else if (divideByZero > 0) {
