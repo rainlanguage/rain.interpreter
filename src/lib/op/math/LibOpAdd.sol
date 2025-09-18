@@ -8,6 +8,7 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloatImplementation} from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
 
 /// @title LibOpAdd
 /// @notice Opcode to add N numbers. Errors on overflow.
@@ -28,7 +29,10 @@ library LibOpAdd {
             b := mload(add(stackTop, 0x20))
             stackTop := add(stackTop, 0x40)
         }
-        a = LibDecimalFloat.add(a, b);
+        (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(a);
+        (int256 signedCoefficientB, int256 exponentB) = LibDecimalFloat.unpack(b);
+        (signedCoefficient, exponent) =
+            LibDecimalFloatImplementation.add(signedCoefficient, exponent, signedCoefficientB, exponentB);
 
         {
             uint256 inputs = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
@@ -38,12 +42,16 @@ library LibOpAdd {
                     b := mload(stackTop)
                     stackTop := add(stackTop, 0x20)
                 }
-                a = LibDecimalFloat.add(a, b);
+                (signedCoefficientB, exponentB) = LibDecimalFloat.unpack(b);
+                (signedCoefficient, exponent) =
+                    LibDecimalFloatImplementation.add(signedCoefficient, exponent, signedCoefficientB, exponentB);
                 unchecked {
                     i++;
                 }
             }
         }
+
+        (a,) = LibDecimalFloat.packLossy(signedCoefficient, exponent);
 
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
@@ -62,9 +70,16 @@ library LibOpAdd {
         // see the revert from the real function and not the reference function.
         unchecked {
             Float acc = Float.wrap(StackItem.unwrap(inputs[0]));
+            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(acc);
             for (uint256 i = 1; i < inputs.length; i++) {
-                acc = LibDecimalFloat.add(acc, Float.wrap(StackItem.unwrap(inputs[i])));
+                (int256 signedCoefficientB, int256 exponentB) =
+                    LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(inputs[i])));
+                (signedCoefficient, exponent) =
+                    LibDecimalFloatImplementation.add(signedCoefficient, exponent, signedCoefficientB, exponentB);
             }
+            bool lossless;
+            (acc, lossless) = LibDecimalFloat.packLossy(signedCoefficient, exponent);
+            (lossless);
             outputs = new StackItem[](1);
             outputs[0] = StackItem.wrap(Float.unwrap(acc));
         }

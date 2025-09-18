@@ -154,7 +154,7 @@ contract LibOpAddTest is OpTest {
         );
         checkUnhappyOverflow(
             "_: add(max-positive-value() max-positive-value() max-positive-value());",
-            26959946667150639794667015087019630673637144422540572481103610249214000000000,
+            40439920000725959692000522630529446010455716633810858721655415373821000000000,
             2147483638
         );
         checkUnhappyOverflow(
