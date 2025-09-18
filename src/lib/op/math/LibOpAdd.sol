@@ -51,6 +51,7 @@ library LibOpAdd {
             }
         }
 
+        //slither-disable-next-line unused-return
         (a,) = LibDecimalFloat.packLossy(signedCoefficient, exponent);
 
         assembly ("memory-safe") {
