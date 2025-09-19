@@ -52,6 +52,7 @@ library LibOpMul {
             }
         }
 
+        //slither-disable-next-line unused-return
         (a,) = LibDecimalFloat.packLossy(signedCoefficient, exponent);
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
