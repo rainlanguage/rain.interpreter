@@ -12,6 +12,8 @@ import {LibDecimalFloatImplementation} from "rain.math.float/lib/implementation/
 /// @title LibOpMul
 /// @notice Opcode to mul N 18 floating point values.
 library LibOpMul {
+    using LibDecimalFloat for Float;
+
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
         uint256 inputs = uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F;
@@ -28,7 +30,10 @@ library LibOpMul {
             b := mload(add(stackTop, 0x20))
             stackTop := add(stackTop, 0x40)
         }
-        a = LibDecimalFloat.mul(a, b);
+        (int256 signedCoefficient, int256 exponent) = a.unpack();
+        (int256 signedCoefficientB, int256 exponentB) = b.unpack();
+        (signedCoefficient, exponent) =
+            LibDecimalFloatImplementation.mul(signedCoefficient, exponent, signedCoefficientB, exponentB);
 
         {
             uint256 inputs = uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F;
@@ -38,12 +43,17 @@ library LibOpMul {
                     b := mload(stackTop)
                     stackTop := add(stackTop, 0x20)
                 }
-                a = LibDecimalFloat.mul(a, b);
+                (signedCoefficientB, exponentB) = b.unpack();
+                (signedCoefficient, exponent) =
+                    LibDecimalFloatImplementation.mul(signedCoefficient, exponent, signedCoefficientB, exponentB);
                 unchecked {
                     i++;
                 }
             }
         }
+
+        //slither-disable-next-line unused-return
+        (a,) = LibDecimalFloat.packLossy(signedCoefficient, exponent);
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
             mstore(stackTop, a)
@@ -61,9 +71,17 @@ library LibOpMul {
         // see the revert from the real function and not the reference function.
         unchecked {
             Float acc = Float.wrap(StackItem.unwrap(inputs[0]));
+            (int256 signedCoefficient, int256 exponent) = acc.unpack();
             for (uint256 i = 1; i < inputs.length; i++) {
-                acc = LibDecimalFloat.mul(acc, Float.wrap(StackItem.unwrap(inputs[i])));
+                Float b = Float.wrap(StackItem.unwrap(inputs[i]));
+                (int256 signedCoefficientB, int256 exponentB) = b.unpack();
+                (signedCoefficient, exponent) =
+                    LibDecimalFloatImplementation.mul(signedCoefficient, exponent, signedCoefficientB, exponentB);
             }
+
+            bool lossless;
+            (acc, lossless) = LibDecimalFloat.packLossy(signedCoefficient, exponent);
+            (lossless);
 
             outputs = new StackItem[](1);
             outputs[0] = StackItem.wrap(Float.unwrap(acc));
