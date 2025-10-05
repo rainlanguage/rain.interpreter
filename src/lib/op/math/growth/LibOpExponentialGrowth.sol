@@ -7,6 +7,8 @@ import {InterpreterState} from "../../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
+import {console2} from "forge-std/console2.sol";
+
 /// @title LibOpExponentialGrowth
 /// @notice Exponential growth is base(1 + rate)^t where base is the initial
 /// value, rate is the growth rate, and t is time.
@@ -29,6 +31,8 @@ library LibOpExponentialGrowth {
             stackTop := add(stackTop, 0x40)
             t := mload(stackTop)
         }
+        console2.log("Exponential Growth:");
+        console2.log(LibDecimalFloat.LOG_TABLES_ADDRESS);
         base = base.mul(rate.add(LibDecimalFloat.FLOAT_ONE).pow(t, LibDecimalFloat.LOG_TABLES_ADDRESS));
 
         assembly ("memory-safe") {
