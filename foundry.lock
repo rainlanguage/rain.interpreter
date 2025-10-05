@@ -1,6 +1,6 @@
 {
   "lib/rain.interpreter.interface": {
-    "rev": "7fe4cdeb4a7817e02e249b87c42f70b7aa990a44"
+    "rev": "e338f790c10ccb5df15636adc4c8ef24348d19e4"
   },
   "lib/rain.lib.memkv": {
     "rev": "e818c8ec3b94dccb460e50d863241abbd7e4df33"

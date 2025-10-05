@@ -27,6 +27,9 @@ import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreter
 import {LibNamespace} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
 import {ExponentOverflow, CoefficientOverflow} from "rain.math.float/error/ErrDecimalFloat.sol";
 
+import {console2} from "forge-std/console2.sol";
+import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+
 bytes32 constant PRE = keccak256(abi.encodePacked("pre"));
 bytes32 constant POST = keccak256(abi.encodePacked("post"));
 
@@ -243,6 +246,13 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
 
         assertEq(stack.length, expectedStack.length, errString);
         for (uint256 i = 0; i < expectedStack.length; i++) {
+            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(stack[i])));
+            console2.logInt(signedCoefficient);
+            console2.logInt(exponent);
+            (signedCoefficient, exponent) =
+                LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(expectedStack[i])));
+            console2.logInt(signedCoefficient);
+            console2.logInt(exponent);
             assertEq(StackItem.unwrap(stack[i]), StackItem.unwrap(expectedStack[i]), errString);
         }
         assertEq(kvs.length, 0);
