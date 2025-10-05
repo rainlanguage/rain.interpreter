@@ -249,8 +249,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
             (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(stack[i])));
             console2.logInt(signedCoefficient);
             console2.logInt(exponent);
-            (signedCoefficient, exponent) =
-                LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(expectedStack[i])));
+            (signedCoefficient, exponent) = LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(expectedStack[i])));
             console2.logInt(signedCoefficient);
             console2.logInt(exponent);
             assertEq(StackItem.unwrap(stack[i]), StackItem.unwrap(expectedStack[i]), errString);
