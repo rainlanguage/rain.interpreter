@@ -31,7 +31,7 @@ library LibParseLiteralRepeat {
     //slither-disable-next-line dead-code
     function parseRepeat(uint256 dispatchValue, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
-            uint256 value;
+            uint256 value = 0;
             uint256 length = end - cursor;
             for (uint256 i = 0; i < length; ++i) {
                 value += dispatchValue * 10 ** i;
