@@ -7,8 +7,6 @@ import {InterpreterState} from "../../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
-import {console2} from "forge-std/console2.sol";
-
 /// @title LibOpExponentialGrowth
 /// @notice Exponential growth is base(1 + rate)^t where base is the initial
 /// value, rate is the growth rate, and t is time.
@@ -31,34 +29,7 @@ library LibOpExponentialGrowth {
             stackTop := add(stackTop, 0x40)
             t := mload(stackTop)
         }
-        console2.log("Exponential Growth:");
-        console2.log(LibDecimalFloat.LOG_TABLES_ADDRESS);
-        (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(base);
-        console2.log("  Base:");
-        console2.logInt(signedCoefficient);
-        console2.logInt(exponent);
-        (signedCoefficient, exponent) = LibDecimalFloat.unpack(rate);
-        console2.log("  Rate:");
-        console2.logInt(signedCoefficient);
-        console2.logInt(exponent);
-        (signedCoefficient, exponent) = LibDecimalFloat.unpack(t);
-        console2.log("  Time:");
-        console2.logInt(signedCoefficient);
-        console2.logInt(exponent);
-        console2.log("Calculating...");
-        console2.log("add");
-        Float add = rate.add(LibDecimalFloat.FLOAT_ONE);
-        console2.log("pow");
-        (signedCoefficient, exponent) = LibDecimalFloat.unpack(add);
-        console2.log("  (1 + r):");
-        console2.logInt(signedCoefficient);
-        console2.logInt(exponent);
-        Float pow = add.pow(t, LibDecimalFloat.LOG_TABLES_ADDRESS);
-        console2.log("mul");
-        base = base.mul(pow);
-        // base = base.mul(rate.add(LibDecimalFloat.FLOAT_ONE).pow(t, LibDecimalFloat.LOG_TABLES_ADDRESS));
-
-        console2.log("done");
+        base = base.mul(rate.add(LibDecimalFloat.FLOAT_ONE).pow(t, LibDecimalFloat.LOG_TABLES_ADDRESS));
 
         assembly ("memory-safe") {
             mstore(stackTop, base)
