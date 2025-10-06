@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.19;
 
-import "rain.lib.typecast/LibConvert.sol";
+import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 
 library LibIntegrityFnPointers {
     /// Generates fake IO function pointers as the index of each word, as a
