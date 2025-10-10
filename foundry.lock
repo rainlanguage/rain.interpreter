@@ -1,0 +1,17 @@
+{
+  "lib/rain.interpreter.interface": {
+    "rev": "f777a1c769433fb63dafe51db783bc64e001a0be"
+  },
+  "lib/rain.lib.memkv": {
+    "rev": "e818c8ec3b94dccb460e50d863241abbd7e4df33"
+  },
+  "lib/rain.metadata": {
+    "rev": "fa109319a3f73b3157fd1c32012cf824a40bfd98"
+  },
+  "lib/rain.string": {
+    "rev": "0f8e23969f41e093ee6baef0fc37b07eb1b6c803"
+  },
+  "lib/sol.lib.binmaskflag": {
+    "rev": "2a317d07df1ff447d3f0fda38c2c88968a859d75"
+  }
+}

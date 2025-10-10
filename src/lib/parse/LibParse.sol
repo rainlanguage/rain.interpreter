@@ -48,8 +48,7 @@ import {
     MissingFinalSemi,
     UnexpectedComment,
     ParenOverflow,
-    UnknownWord,
-    MalformedCommentStart
+    UnknownWord
 } from "../../error/ErrParse.sol";
 import {
     LibParseState,
