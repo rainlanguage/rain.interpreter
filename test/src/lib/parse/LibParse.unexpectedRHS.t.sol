@@ -3,7 +3,6 @@ pragma solidity =0.8.25;
 
 import {ParseTest} from "test/abstract/ParseTest.sol";
 import {LibParse} from "src/lib/parse/LibParse.sol";
-import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {UnexpectedRHSChar} from "src/error/ErrParse.sol";
 import {
     CMASK_RHS_WORD_HEAD,

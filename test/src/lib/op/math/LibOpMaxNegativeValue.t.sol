@@ -8,13 +8,9 @@ import {
     IInterpreterV4,
     OperandV2,
     SourceIndexV2,
-    FullyQualifiedNamespace,
     StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState, LibInterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
-import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 

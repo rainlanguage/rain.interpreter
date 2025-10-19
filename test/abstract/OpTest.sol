@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
+// Exported for convenience in op tests.
+//forge-lint: disable-next-line(unused-import)
 import {Test, stdError} from "forge-std/Test.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
@@ -16,7 +18,6 @@ import {UnexpectedOperand} from "../../src/error/ErrParse.sol";
 import {BadOpInputsLength, BadOpOutputsLength} from "../../src/lib/integrity/LibIntegrityCheck.sol";
 import {
     OperandV2,
-    IInterpreterV4,
     SourceIndexV2,
     IInterpreterStoreV3,
     EvalV4,

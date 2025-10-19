@@ -5,7 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseLiteralString} from "src/lib/parse/literal/LibParseLiteralString.sol";
 import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
-import {StringTooLong, UnclosedStringLiteral, ParserOutOfBounds} from "src/error/ErrParse.sol";
+import {StringTooLong, UnclosedStringLiteral} from "src/error/ErrParse.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 

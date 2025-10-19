@@ -9,8 +9,7 @@ import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {OperandValuesOverflow, UnclosedOperand} from "src/error/ErrParse.sol";
-import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
-import {LibDecimalFloat, LibDecimalFloatImplementation, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 contract LibParseOperandParseOperandTest is Test {
     using LibBytes for bytes;
@@ -76,10 +75,15 @@ contract LibParseOperandParseOperandTest is Test {
 
         value = bound(value, 0, type(int224).max);
 
+        // Casting an int256 to uint256 does not truncate, and is required to
+        // build a hex string.
+        //forge-lint: disable-next-line(unsafe-typecast)
         string memory valueString = asHex ? uint256(value).toHexString() : value.toString();
         string memory s = string.concat("<", maybeWhitespaceA, valueString, maybeWhitespaceB, ">", suffix);
 
         bytes32[] memory expectedValues = new bytes32[](1);
+        // Casting an int256 to uint256 does not truncate.
+        //forge-lint: disable-next-line(unsafe-typecast)
         expectedValues[0] = asHex ? bytes32(uint256(value)) : Float.unwrap(LibDecimalFloat.packLossless(value, 0));
 
         checkParsingOperandFromData(
@@ -110,16 +114,23 @@ contract LibParseOperandParseOperandTest is Test {
         LibConformString.conformStringToWhitespace(maybeWhitespaceB);
         LibConformString.conformStringToWhitespace(maybeWhitespaceC);
 
+        // Casting an int256 to uint256 does not truncate, and is required to
+        // build a hex string.
+        //forge-lint: disable-next-line(unsafe-typecast)
         string memory valueAString = asHexA ? uint256(valueA).toHexString() : valueA.toString();
+        //forge-lint: disable-next-line(unsafe-typecast)
         string memory valueBString = asHexB ? uint256(valueB).toHexString() : valueB.toString();
 
         string memory s = string.concat(
             "<", maybeWhitespaceA, valueAString, maybeWhitespaceB, valueBString, maybeWhitespaceC, ">", suffix
         );
+
         bytes32[] memory expectedValues = new bytes32[](2);
-
+        // Casting int256 to uint256 does not truncate, and is required to get
+        // to the bytes32 cast.
+        //forge-lint: disable-next-line(unsafe-typecast)
         expectedValues[0] = (asHexA ? bytes32(uint256(valueA)) : Float.unwrap(LibDecimalFloat.packLossless(valueA, 0)));
-
+        //forge-lint: disable-next-line(unsafe-typecast)
         expectedValues[1] = (asHexB ? bytes32(uint256(valueB)) : Float.unwrap(LibDecimalFloat.packLossless(valueB, 0)));
 
         checkParsingOperandFromData(
@@ -160,8 +171,13 @@ contract LibParseOperandParseOperandTest is Test {
         string memory s;
         uint256 expectedLength;
         {
+            // Casting an int256 to uint256 does not truncate, and is required to
+            // build a hex string.
+            //forge-lint: disable-next-line(unsafe-typecast)
             string memory valueAString = asHexA ? uint256(valueA).toHexString() : valueA.toString();
+            //forge-lint: disable-next-line(unsafe-typecast)
             string memory valueBString = asHexB ? uint256(valueB).toHexString() : valueB.toString();
+            //forge-lint: disable-next-line(unsafe-typecast)
             string memory valueCString = asHexC ? uint256(valueC).toHexString() : valueC.toString();
 
             s = string.concat(
@@ -179,10 +195,13 @@ contract LibParseOperandParseOperandTest is Test {
         }
 
         bytes32[] memory expectedValues = new bytes32[](3);
+        // Casting int256 to uint256 does not truncate, and is required to get
+        // to the bytes32 cast.
+        //forge-lint: disable-next-line(unsafe-typecast)
         expectedValues[0] = (asHexA ? bytes32(uint256(valueA)) : Float.unwrap(LibDecimalFloat.packLossless(valueA, 0)));
-
+        //forge-lint: disable-next-line(unsafe-typecast)
         expectedValues[1] = (asHexB ? bytes32(uint256(valueB)) : Float.unwrap(LibDecimalFloat.packLossless(valueB, 0)));
-
+        //forge-lint: disable-next-line(unsafe-typecast)
         expectedValues[2] = (asHexC ? bytes32(uint256(valueC)) : Float.unwrap(LibDecimalFloat.packLossless(valueC, 0)));
 
         checkParsingOperandFromData(s, expectedValues, expectedLength);

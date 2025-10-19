@@ -5,7 +5,6 @@ import {ParseTest} from "test/abstract/ParseTest.sol";
 
 import {ExpectedOperand, UnclosedOperand, UnexpectedOperand, UnsupportedLiteralType} from "src/error/ErrParse.sol";
 import {LibParse, ExpectedLeftParen} from "src/lib/parse/LibParse.sol";
-import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 contract LibParseOperandDisallowedTest is ParseTest {

@@ -17,7 +17,7 @@ import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
-import {LibDecimalFloat, Float, LossyConversionToFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpERC721BalanceOfTest
 /// @notice Test the opcode for getting the balance of an erc721 token.

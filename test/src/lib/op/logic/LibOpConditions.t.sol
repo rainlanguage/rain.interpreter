@@ -8,10 +8,7 @@ import {LibOpConditions} from "src/lib/op/logic/LibOpConditions.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {
-    IInterpreterV4,
-    OperandV2,
-    SourceIndexV2,
-    FullyQualifiedNamespace
+    OperandV2
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibIntOrAString, IntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";

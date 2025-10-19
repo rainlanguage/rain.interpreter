@@ -4,7 +4,6 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std/Test.sol";
 import {LibParseOperand, OperandV2} from "src/lib/parse/LibParseOperand.sol";
 import {ExpectedOperand, UnexpectedOperandValue} from "src/error/ErrParse.sol";
-import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {OperandOverflow} from "src/error/ErrParse.sol";
 
 contract LibParseOperandHandleOperand8M1M1Test is Test {
@@ -31,6 +30,8 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
         value = bound(value, int256(uint256(type(uint8).max)) + 1, type(int128).max);
 
         bytes32[] memory values = new bytes32[](1);
+        // Casting int256 to uint256 does not truncate.
+        //forge-lint: disable-next-line(unsafe-typecast)
         values[0] = bytes32(uint256(value));
         vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
         this.handleOperand8M1M1External(values);

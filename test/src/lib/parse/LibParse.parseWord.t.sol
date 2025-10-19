@@ -48,21 +48,43 @@ contract LibParseParseWordTest is Test {
 
     /// Test some examples of parsing words from a byte array.
     function testLibParseParseWordExamples() external {
+        // Casting a small literal is safe to typecast.
+        //forge-lint: disable-next-line(unsafe-typecast)
         checkParseWord("a", type(uint256).max, 1, bytes32(bytes("a")));
+        // Casting a small literal is safe to typecast.
+        //forge-lint: disable-next-line(unsafe-typecast)
         checkParseWord("ab", type(uint256).max, 2, bytes32(bytes("ab")));
+        // Casting a small literal is safe to typecast.
+        //forge-lint: disable-next-line(unsafe-typecast)
         checkParseWord("abc", type(uint256).max, 3, bytes32(bytes("abc")));
+        // Casting a small literal is safe to typecast.
+        //forge-lint: disable-next-line(unsafe-typecast)
         checkParseWord("a", CMASK_NUMERIC_0_9, 1, bytes32(bytes("a")));
+        // Casting a small literal is safe to typecast.
+        //forge-lint: disable-next-line(unsafe-typecast)
         checkParseWord("ab", CMASK_NUMERIC_0_9, 1, bytes32(bytes("a")));
+        // Casting a small literal is safe to typecast.
+        //forge-lint: disable-next-line(unsafe-typecast)
         checkParseWord("a1", CMASK_NUMERIC_0_9, 2, bytes32(bytes("a1")));
+        // Casting a small literal is safe to typecast.
+        //forge-lint: disable-next-line(unsafe-typecast)
         checkParseWord("a1b", CMASK_NUMERIC_0_9, 2, bytes32(bytes("a1")));
+        // Casting a small literal is safe to typecast.
+        //forge-lint: disable-next-line(unsafe-typecast)
         checkParseWord("a1b2", CMASK_NUMERIC_0_9, 2, bytes32(bytes("a1")));
+        // Casting a small literal is safe to typecast.
+        //forge-lint: disable-next-line(unsafe-typecast)
         checkParseWord("a12c", CMASK_NUMERIC_0_9, 3, bytes32(bytes("a12")));
         checkParseWord(
+            // Casting a small literal is safe to typecast.
+            //forge-lint: disable-next-line(unsafe-typecast)
             "0123456789012345678901234567890", CMASK_NUMERIC_0_9, 31, bytes32(bytes("0123456789012345678901234567890"))
         );
 
         vm.expectRevert(abi.encodeWithSelector(WordSize.selector, "01234567890123456789012345678901"));
         this.checkParseWord(
+            // Casting a small literal is safe to typecast.
+            //forge-lint: disable-next-line(unsafe-typecast)
             "01234567890123456789012345678901", CMASK_NUMERIC_0_9, 31, bytes32(bytes("0123456789012345678901234567890"))
         );
     }
@@ -76,6 +98,8 @@ contract LibParseParseWordTest is Test {
             wordInError := mload(add(data, 0x20))
         }
         vm.expectRevert(abi.encodeWithSelector(WordSize.selector, abi.encode(wordInError)));
+        // No truncation for an empty string.
+        //forge-lint: disable-next-line(unused-typecast)
         this.checkParseWord(data, type(uint256).max, 0, bytes32(bytes("")));
     }
 
@@ -92,6 +116,8 @@ contract LibParseParseWordTest is Test {
 
         (uint256 cursorAfter, bytes32 word) = LibParse.parseWord(cursor, end, CMASK_NUMERIC_0_9);
         assertEq(cursorAfter - cursor, length);
+        // Data has fixed length so we can typecast.
+        //forge-lint: disable-next-line(unsafe-typecast)
         assertEq(word, bytes32(data));
     }
 }

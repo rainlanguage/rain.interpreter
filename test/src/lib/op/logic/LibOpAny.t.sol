@@ -8,13 +8,13 @@ import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
 import {LibOpAny} from "src/lib/op/logic/LibOpAny.sol";
 import {
-    IInterpreterV4, OperandV2, SourceIndexV2
+    OperandV2
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {
     IInterpreterStoreV3,
     FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV3.sol";
-import {LibIntegrityCheck, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
+import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";

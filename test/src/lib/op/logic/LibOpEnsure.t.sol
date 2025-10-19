@@ -3,7 +3,7 @@ pragma solidity =0.8.25;
 
 import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
-import {ExcessRHSItems} from "src/lib/parse/LibParse.sol";
+import {ExcessRHSItems} from "src/error/ErrParse.sol";
 import {LibOpEnsure} from "src/lib/op/logic/LibOpEnsure.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {

@@ -270,6 +270,7 @@ library LibParseOperand {
     }
 
     /// 2x maybe 1 bit flags. Fallback to 0 for both flags if not provided.
+    //forge-lint: disable-next-line(mixed-case-function)
     function handleOperandM1M1(bytes32[] memory values) internal pure returns (OperandV2 operand) {
         // Happy path at the top for efficiency.
         uint256 length = values.length;

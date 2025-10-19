@@ -6,7 +6,6 @@ import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibInteg
 import {LibOpUint256ERC721BalanceOf} from "src/lib/op/erc721/uint256/LibOpUint256ERC721BalanceOf.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import {
-    IInterpreterV4,
     FullyQualifiedNamespace,
     OperandV2,
     SourceIndexV2,

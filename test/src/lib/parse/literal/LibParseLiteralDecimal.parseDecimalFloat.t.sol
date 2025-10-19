@@ -6,7 +6,6 @@ import {Test} from "forge-std/Test.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseLiteralDecimal} from "src/lib/parse/literal/LibParseLiteralDecimal.sol";
-import {LibParseLiteral, ZeroLengthDecimal} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {ParseEmptyDecimalString} from "rain.string/error/ErrParse.sol";
 import {

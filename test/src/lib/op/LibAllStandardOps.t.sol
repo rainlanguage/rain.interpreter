@@ -3,9 +3,7 @@ pragma solidity =0.8.25;
 
 import "forge-std/Test.sol";
 
-import "src/lib/integrity/LibIntegrityCheck.sol";
-import "src/lib/state/LibInterpreterState.sol";
-import "src/lib/op/LibAllStandardOps.sol";
+import {LibAllStandardOps, ALL_STANDARD_OPS_LENGTH} from "src/lib/op/LibAllStandardOps.sol";
 
 /// @title LibAllStandardOpsTest
 /// Some basic guard rails around the `LibAllStandardOps` library. Most of the

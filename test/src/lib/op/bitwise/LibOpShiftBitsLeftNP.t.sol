@@ -7,14 +7,9 @@ import {LibOpShiftBitsLeftNP} from "src/lib/op/bitwise/LibOpShiftBitsLeftNP.sol"
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {
     IInterpreterV4,
-    FullyQualifiedNamespace,
     OperandV2,
-    SourceIndexV2,
     StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
-import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {UnsupportedBitwiseShiftAmount} from "src/error/ErrBitwise.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {OperandOverflow} from "src/error/ErrParse.sol";
@@ -54,6 +49,8 @@ contract LibOpShiftBitsLeftNPTest is OpTest {
     {
         inputs = uint8(bound(inputs, 0, 0x0F));
         uint256 shiftAmount = bound(uint256(shiftAmount16), uint256(type(uint8).max) + 1, type(uint16).max);
+        // Bounds ensure the typecast is safe.
+        //forge-lint: disable-next-line(unsafe-typecast)
         OperandV2 operand = LibOperand.build(inputs, 1, uint16(shiftAmount));
         vm.expectRevert(abi.encodeWithSelector(UnsupportedBitwiseShiftAmount.selector, shiftAmount));
         (uint256 calcInputs, uint256 calcOutputs) = this.integrityExternal(state, operand);

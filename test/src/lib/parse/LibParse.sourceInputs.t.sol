@@ -5,7 +5,6 @@ import {Test} from "forge-std/Test.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 
 import {LibParse} from "src/lib/parse/LibParse.sol";
-import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseSourceInputsTest

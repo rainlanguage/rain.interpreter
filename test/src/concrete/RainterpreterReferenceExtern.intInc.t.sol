@@ -19,7 +19,6 @@ import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpre
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {OPCODE_EXTERN} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {ExternDispatchConstantsHeightOverflow} from "src/error/ErrSubParse.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 contract RainterpreterReferenceExternIntIncTest is OpTest {

@@ -9,12 +9,8 @@ import {
     IInterpreterV4,
     FullyQualifiedNamespace,
     OperandV2,
-    SourceIndexV2,
     StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
-import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {UnsupportedBitwiseShiftAmount} from "src/error/ErrBitwise.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {OperandOverflow} from "src/error/ErrParse.sol";

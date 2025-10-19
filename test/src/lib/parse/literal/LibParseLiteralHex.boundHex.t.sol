@@ -2,8 +2,6 @@
 pragma solidity =0.8.25;
 
 import {ParseLiteralTest} from "test/abstract/ParseLiteralTest.sol";
-import {ParseState} from "src/lib/parse/LibParseState.sol";
-import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {CMASK_HEX} from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibParseLiteralHex} from "src/lib/parse/literal/LibParseLiteralHex.sol";

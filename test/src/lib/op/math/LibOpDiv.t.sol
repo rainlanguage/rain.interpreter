@@ -140,7 +140,6 @@ contract LibOpDivTest is OpTest {
             13479973333575319897333507543509815336818572211270286240551805124607000000000,
             2147483656
         );
-        // checkUnhappy("_: div(1e52 1e-8);", abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, 1e70, 1e18, 1e10));
     }
 
     /// Test the eval of `div` opcode parsed from a string.

@@ -1,10 +1,8 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Test, console2, stdError} from "forge-std/Test.sol";
+import {Test, console2} from "forge-std/Test.sol";
 
-import {INVALID_BYTECODE} from "../lib/etch/LibEtch.sol";
-import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV2.sol";
 import {RainterpreterStore, STORE_BYTECODE_HASH} from "../../src/concrete/RainterpreterStore.sol";
 import {
@@ -14,10 +12,9 @@ import {
     PARSER_BYTECODE_HASH
 } from "../../src/concrete/RainterpreterParser.sol";
 import {
-    Rainterpreter, OPCODE_FUNCTION_POINTERS, INTERPRETER_BYTECODE_HASH
+    Rainterpreter, INTERPRETER_BYTECODE_HASH
 } from "../../src/concrete/Rainterpreter.sol";
 import {
-    DESCRIBED_BY_META_HASH,
     INTEGRITY_FUNCTION_POINTERS,
     RainterpreterExpressionDeployerConstructionConfigV2,
     RainterpreterExpressionDeployer

@@ -6,7 +6,6 @@ import {LibParseLiteralString} from "src/lib/parse/literal/LibParseLiteralString
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {IntOrAString, LibIntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
-import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 import {CMASK_STRING_LITERAL_TAIL} from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {UnclosedStringLiteral} from "src/error/ErrParse.sol";

@@ -10,7 +10,6 @@ import {
     CMASK_LHS_STACK_HEAD
 } from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibParse, UnexpectedLHSChar} from "src/lib/parse/LibParse.sol";
-import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseUnexpectedLHSTest
@@ -59,6 +58,7 @@ contract LibParseUnexpectedLHSTest is ParseTest {
     /// head of something on the LHS.
     function testParseUnexpectedLHSSingleChar(uint8 a) external {
         vm.assume(
+            //forge-lint: disable-next-line(incorrect-shift)
             1 << uint256(a)
                 & (CMASK_LHS_RHS_DELIMITER | CMASK_LHS_STACK_HEAD | CMASK_LHS_STACK_DELIMITER | CMASK_COMMENT_HEAD) == 0
         );
@@ -71,6 +71,7 @@ contract LibParseUnexpectedLHSTest is ParseTest {
     /// first character of an anonymous identifier on the LHS.
     function testParseUnexpectedLHSBadIgnoredTail(uint8 a) external {
         vm.assume(
+            //forge-lint: disable-next-line(incorrect-shift)
             1 << uint256(a)
                 & (CMASK_LHS_RHS_DELIMITER | CMASK_IDENTIFIER_TAIL | CMASK_LHS_STACK_DELIMITER | CMASK_COMMENT_HEAD) == 0
         );
@@ -90,8 +91,10 @@ contract LibParseUnexpectedLHSTest is ParseTest {
         for (; i < b.length; i++) {
             bytes1 c = b[i];
             vm.assume(
+                //forge-lint: disable-next-line(incorrect-shift)
                 1 << uint256(uint8(c)) & (CMASK_LHS_STACK_DELIMITER | CMASK_LHS_RHS_DELIMITER | CMASK_COMMENT_HEAD) == 0
             );
+            //forge-lint: disable-next-line(incorrect-shift)
             hasInvalidChar = 1 << uint256(uint8(c)) & CMASK_IDENTIFIER_TAIL == 0;
             if (hasInvalidChar) break;
         }
