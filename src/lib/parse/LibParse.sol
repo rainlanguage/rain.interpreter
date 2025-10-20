@@ -172,7 +172,7 @@ library LibParse {
         }
     }
 
-    //slither-disable-next-line cyclomatic-complexity
+    //slither-disable-start cyclomatic-complexity
     //forge-lint: disable-next-line(mixed-case-function)
     function parseRHS(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
@@ -384,6 +384,7 @@ library LibParse {
             return cursor;
         }
     }
+    //slither-disable-end
 
     function parse(ParseState memory state) internal view returns (bytes memory bytecode, bytes32[] memory) {
         unchecked {

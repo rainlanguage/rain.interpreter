@@ -13,9 +13,9 @@ contract LibInterpreterStateStackTraceTest is Test {
         sourceIndex = bound(sourceIndex, 0, 0xFFFF);
         uint256 lengthBefore = inputs.length;
         vm.expectCall(
+            STACK_TRACER,
             // Safe typecast due to bounds above.
             //forge-lint: disable-next-line(unsafe-typecast)
-            STACK_TRACER,
             abi.encodePacked(bytes2(uint16(parentSourceIndex)), bytes2(uint16(sourceIndex)), inputs),
             1
         );

@@ -10,12 +10,11 @@ import {LibParsePragma} from "../lib/parse/LibParsePragma.sol";
 import {LibAllStandardOps} from "../lib/op/LibAllStandardOps.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseInterstitial} from "../lib/parse/LibParseInterstitial.sol";
-import
-// Exported for convenience.
-//forge-lint: disable-next-line(unused-import)
-{
-    BYTECODE_HASH as PARSER_BYTECODE_HASH,
+import {
     LITERAL_PARSER_FUNCTION_POINTERS,
+    // Exported for convenience.
+    //forge-lint: disable-next-line(unused-import)
+    BYTECODE_HASH as PARSER_BYTECODE_HASH,
     OPERAND_HANDLER_FUNCTION_POINTERS,
     PARSE_META,
     // Exported for convenience.

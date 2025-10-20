@@ -55,9 +55,12 @@ contract RainterpreterExpressionDeployer is
 
     /// The interpreter with known bytecode that this deployer is constructed
     /// for.
+    //slither-disable-next-line naming-convention
     IInterpreterV4 public immutable I_INTERPRETER;
     /// The store with known bytecode that this deployer is constructed for.
+    //slither-disable-next-line naming-convention
     IInterpreterStoreV2 public immutable I_STORE;
+    //slither-disable-next-line naming-convention
     RainterpreterParser public immutable I_PARSER;
 
     constructor(RainterpreterExpressionDeployerConstructionConfigV2 memory config) {
