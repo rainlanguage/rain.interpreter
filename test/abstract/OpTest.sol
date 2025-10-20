@@ -55,10 +55,10 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
 
     function assumeEtchable(address account, address expression) internal view {
         assumeNotPrecompile(account);
-        vm.assume(account != address(iDeployer));
-        vm.assume(account != address(iInterpreter));
-        vm.assume(account != address(iStore));
-        vm.assume(account != address(iParser));
+        vm.assume(account != address(I_DEPLOYER));
+        vm.assume(account != address(I_INTERPRETER));
+        vm.assume(account != address(I_STORE));
+        vm.assume(account != address(I_PARSER));
         vm.assume(account != address(this));
         vm.assume(account != address(vm));
         vm.assume(account != address(expression));
@@ -79,7 +79,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
             // Treat ourselves as the sender as we eval internally to directly
             // test the opcode logic.
             LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
-            IInterpreterStoreV3(address(iStore)),
+            IInterpreterStoreV3(address(I_STORE)),
             new bytes32[][](0),
             "",
             ""
@@ -202,11 +202,11 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
         view
         returns (StackItem[] memory, bytes32[] memory)
     {
-        bytes memory bytecode = iDeployer.parse2(rainString);
+        bytes memory bytecode = I_DEPLOYER.parse2(rainString);
 
-        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
+        (StackItem[] memory stack, bytes32[] memory kvs) = I_INTERPRETER.eval4(
             EvalV4({
-                store: iStore,
+                store: I_STORE,
                 namespace: LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
@@ -282,11 +282,11 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
     }
 
     function checkUnhappy(bytes memory rainString, bytes memory err) internal {
-        bytes memory bytecode = iDeployer.parse2(rainString);
+        bytes memory bytecode = I_DEPLOYER.parse2(rainString);
         vm.expectRevert(err);
-        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
+        (StackItem[] memory stack, bytes32[] memory kvs) = I_INTERPRETER.eval4(
             EvalV4({
-                store: iStore,
+                store: I_STORE,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
@@ -300,13 +300,13 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
 
     function checkUnhappyParse2(bytes memory rainString, bytes memory err) internal {
         vm.expectRevert(err);
-        bytes memory bytecode = iDeployer.parse2(rainString);
+        bytes memory bytecode = I_DEPLOYER.parse2(rainString);
         (bytecode);
     }
 
     function checkUnhappyParse(bytes memory rainString, bytes memory err) internal {
         vm.expectRevert(err);
-        (bytes memory bytecode, bytes32[] memory constants) = iParser.unsafeParse(rainString);
+        (bytes memory bytecode, bytes32[] memory constants) = I_PARSER.unsafeParse(rainString);
         (bytecode);
         (constants);
     }
@@ -329,7 +329,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
 
     function checkDisallowedOperand(bytes memory rainString) internal {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
-        (bytes memory bytecode, bytes32[] memory constants) = iParser.unsafeParse(rainString);
+        (bytes memory bytecode, bytes32[] memory constants) = I_PARSER.unsafeParse(rainString);
         (bytecode);
         (constants);
     }

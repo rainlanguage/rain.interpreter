@@ -5,10 +5,7 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {LibOpGreaterThan} from "src/lib/op/logic/LibOpGreaterThan.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {
-    IInterpreterV4,
-    OperandV2,
-    SourceIndexV2,
-    FullyQualifiedNamespace
+    OperandV2
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
@@ -93,21 +90,21 @@ contract LibOpGreaterThanTest is OpTest {
     /// Test that a greater than without inputs fails integrity check.
     function testOpGreaterThanEvalFail0Inputs() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));
-        bytes memory bytecode = iDeployer.parse2("_: greater-than();");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: greater-than();");
         (bytecode);
     }
 
     /// Test that a greater than with 1 input fails integrity check.
     function testOpGreaterThanEvalFail1Input() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 2, 1));
-        bytes memory bytecode = iDeployer.parse2("_: greater-than(0x00);");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: greater-than(0x00);");
         (bytecode);
     }
 
     /// Test that a greater than with 3 inputs fails integrity check.
     function testOpGreaterThanEvalFail3Inputs() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
-        bytes memory bytecode = iDeployer.parse2("_: greater-than(0x00 0x00 0x00);");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: greater-than(0x00 0x00 0x00);");
         (bytecode);
     }
 

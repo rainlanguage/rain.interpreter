@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {stdError} from "forge-std/Test.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";

@@ -4,7 +4,6 @@ pragma solidity =0.8.25;
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
 import {
-    IInterpreterV4,
     OperandV2,
     SourceIndexV2,
     EvalV4,
@@ -138,10 +137,10 @@ contract LibOpStackNPTest is OpTest {
 
     /// Test the eval of a stack opcode parsed from a string.
     function testOpStackEval() external view {
-        bytes memory bytecode = iDeployer.parse2("foo: 1, bar: foo, _: -1;");
-        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
+        bytes memory bytecode = I_DEPLOYER.parse2("foo: 1, bar: foo, _: -1;");
+        (StackItem[] memory stack, bytes32[] memory kvs) = I_INTERPRETER.eval4(
             EvalV4({
-                store: iStore,
+                store: I_STORE,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
@@ -159,11 +158,11 @@ contract LibOpStackNPTest is OpTest {
 
     /// Test the eval of several stack opcodes parsed from a string.
     function testOpStackEvalSeveral() external view {
-        bytes memory bytecode = iDeployer.parse2("foo: 1, bar: foo, _ baz: bar bar, bing _:foo baz;");
+        bytes memory bytecode = I_DEPLOYER.parse2("foo: 1, bar: foo, _ baz: bar bar, bing _:foo baz;");
 
-        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
+        (StackItem[] memory stack, bytes32[] memory kvs) = I_INTERPRETER.eval4(
             EvalV4({
-                store: iStore,
+                store: I_STORE,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),

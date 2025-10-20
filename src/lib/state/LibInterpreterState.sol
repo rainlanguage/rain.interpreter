@@ -15,6 +15,7 @@ struct InterpreterState {
     Pointer[] stackBottoms;
     bytes32[] constants;
     uint256 sourceIndex;
+    //forge-lint: disable-next-line(mixed-case-variable)
     MemoryKV stateKV;
     FullyQualifiedNamespace namespace;
     IInterpreterStoreV3 store;

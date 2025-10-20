@@ -27,26 +27,26 @@ import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenPars
 /// tests basic functionality of the `IParserV1View` interface implementation.
 abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
     //solhint-disable-next-line private-vars-leading-underscore
-    RainterpreterExpressionDeployer internal immutable iDeployer;
+    RainterpreterExpressionDeployer internal immutable I_DEPLOYER;
     //solhint-disable-next-line private-vars-leading-underscore
-    Rainterpreter internal immutable iInterpreter;
+    Rainterpreter internal immutable I_INTERPRETER;
     //solhint-disable-next-line private-vars-leading-underscore
-    RainterpreterStore internal immutable iStore;
+    RainterpreterStore internal immutable I_STORE;
     //solhint-disable-next-line private-vars-leading-underscore
-    RainterpreterParser internal immutable iParser;
+    RainterpreterParser internal immutable I_PARSER;
 
     function beforeOpTestConstructor() internal virtual {}
 
     constructor() {
         beforeOpTestConstructor();
 
-        iInterpreter = new Rainterpreter();
-        iStore = new RainterpreterStore();
-        iParser = new RainterpreterParser();
+        I_INTERPRETER = new Rainterpreter();
+        I_STORE = new RainterpreterStore();
+        I_PARSER = new RainterpreterParser();
 
         // Sanity check the interpreter's bytecode hash.
         bytes32 i9rHash;
-        address interpreter = address(iInterpreter);
+        address interpreter = address(I_INTERPRETER);
         assembly ("memory-safe") {
             i9rHash := extcodehash(interpreter)
         }
@@ -57,7 +57,7 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
         }
 
         bytes32 storeHash;
-        address store = address(iStore);
+        address store = address(I_STORE);
         assembly ("memory-safe") {
             storeHash := extcodehash(store)
         }
@@ -68,7 +68,7 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
         }
 
         bytes32 parserHash;
-        address parser = address(iParser);
+        address parser = address(I_PARSER);
         assembly ("memory-safe") {
             parserHash := extcodehash(parser)
         }
@@ -86,14 +86,14 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
             revert("unexpected parse meta");
         }
 
-        iDeployer = new RainterpreterExpressionDeployer(
+        I_DEPLOYER = new RainterpreterExpressionDeployer(
             RainterpreterExpressionDeployerConstructionConfigV2(
-                address(iInterpreter), address(iStore), address(iParser)
+                address(I_INTERPRETER), address(I_STORE), address(I_PARSER)
             )
         );
 
         // Sanity check the deployer's integrity function pointers.
-        bytes memory integrityFunctionPointers = iDeployer.buildIntegrityFunctionPointers();
+        bytes memory integrityFunctionPointers = I_DEPLOYER.buildIntegrityFunctionPointers();
         if (keccak256(integrityFunctionPointers) != keccak256(INTEGRITY_FUNCTION_POINTERS)) {
             console2.log("current deployer integrity function pointers:");
             console2.logBytes(integrityFunctionPointers);

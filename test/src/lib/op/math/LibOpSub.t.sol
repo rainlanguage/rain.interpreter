@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {OpTest, IntegrityCheckState, InterpreterState, OperandV2, stdError} from "test/abstract/OpTest.sol";
+import {OpTest, IntegrityCheckState, OperandV2} from "test/abstract/OpTest.sol";
 import {LibOpSub} from "src/lib/op/math/LibOpSub.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";

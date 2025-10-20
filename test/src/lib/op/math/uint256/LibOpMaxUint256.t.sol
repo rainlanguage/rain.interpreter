@@ -5,7 +5,6 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {LibOpMaxUint256} from "src/lib/op/math/uint256/LibOpMaxUint256.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {
-    IInterpreterV4,
     OperandV2,
     StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
@@ -52,7 +51,7 @@ contract LibOpMaxUint256Test is OpTest {
     /// Test that a max-value with inputs fails integrity check.
     function testOpMaxUint256EvalFail() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
-        bytes memory bytecode = iDeployer.parse2("_: uint256-max-value(0x00);");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: uint256-max-value(0x00);");
         (bytecode);
     }
 

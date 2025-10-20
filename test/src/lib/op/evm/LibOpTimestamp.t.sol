@@ -6,7 +6,6 @@ import {Pointer, LibPointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {LibInterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {
-    IInterpreterV4,
     OperandV2,
     SourceIndexV2,
     EvalV4,
@@ -15,7 +14,7 @@ import {
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {
-    IInterpreterStoreV2, FullyQualifiedNamespace
+    FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
@@ -71,10 +70,10 @@ contract LibOpTimestampTest is OpTest {
         for (uint256 i; i < words.length; ++i) {
             blockTimestamp = bound(blockTimestamp, 0, uint256(type(uint64).max));
             vm.warp(blockTimestamp);
-            bytes memory bytecode = iDeployer.parse2(bytes(string.concat("_: ", words[i], "();")));
-            (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
+            bytes memory bytecode = I_DEPLOYER.parse2(bytes(string.concat("_: ", words[i], "();")));
+            (StackItem[] memory stack, bytes32[] memory kvs) = I_INTERPRETER.eval4(
                 EvalV4({
-                    store: iStore,
+                    store: I_STORE,
                     namespace: FullyQualifiedNamespace.wrap(0),
                     bytecode: bytecode,
                     sourceIndex: SourceIndexV2.wrap(0),
@@ -95,7 +94,7 @@ contract LibOpTimestampTest is OpTest {
 
         for (uint256 i; i < words.length; ++i) {
             vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
-            bytes memory bytecode = iDeployer.parse2(bytes(string.concat("_: ", words[i], "(0x00);")));
+            bytes memory bytecode = I_DEPLOYER.parse2(bytes(string.concat("_: ", words[i], "(0x00);")));
             (bytecode);
         }
     }

@@ -5,9 +5,7 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {LibOpMaxNegativeValue} from "src/lib/op/math/LibOpMaxNegativeValue.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {
-    IInterpreterV4,
     OperandV2,
-    SourceIndexV2,
     StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState, LibInterpreterState} from "src/lib/state/LibInterpreterState.sol";
@@ -58,7 +56,7 @@ contract LibOpMaxNegativeValueTest is OpTest {
     /// Test that a max-negative-value with inputs fails integrity check.
     function testOpMaxNegativeValueEvalFail() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
-        bytes memory bytecode = iDeployer.parse2("_: max-negative-value(0x00);");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: max-negative-value(0x00);");
         (bytecode);
     }
 

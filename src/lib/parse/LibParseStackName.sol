@@ -23,6 +23,7 @@ library LibParseStackName {
                     mstore(0x40, add(ptr, 0x20))
                 }
                 // Add the start of line height to the LHS line parse count.
+                // forge-lint: disable-next-line(mixed-case-variable)
                 uint256 stackLHSIndex = state.topLevel1 & 0xFF;
                 state.stackNames = fingerprint | (stackLHSIndex << 0x10) | ptr;
                 index = stackLHSIndex + 1;

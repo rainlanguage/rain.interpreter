@@ -139,7 +139,7 @@ contract LibOpAnyTest is OpTest {
     /// Test that any without inputs fails integrity check.
     function testOpAnyEvalFail() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 1, 0));
-        bytes memory bytecode = iDeployer.parse2("_: any();");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: any();");
         (bytecode);
     }
 

@@ -24,6 +24,9 @@ library LibOpERC721OwnerOf {
             stackTop := add(stackTop, 0x20)
             tokenId := mload(stackTop)
         }
+        // It is the rainlang author's responsibility to ensure that token is
+        // a valid address.
+        //forge-lint: disable-next-line(unsafe-typecast)
         address tokenOwner = IERC721(address(uint160(token))).ownerOf(tokenId);
         assembly ("memory-safe") {
             mstore(stackTop, tokenOwner)

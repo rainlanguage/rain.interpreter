@@ -6,7 +6,6 @@ import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibInteg
 import {LibOpERC721OwnerOf} from "src/lib/op/erc721/LibOpERC721OwnerOf.sol";
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import {
-    IInterpreterV4,
     FullyQualifiedNamespace,
     SourceIndexV2,
     OperandV2,
@@ -54,7 +53,7 @@ contract LibOpERC721OwnerOfTest is OpTest {
     }
 
     function testOpERC721OwnerOfNPEvalHappy(address token, uint256 tokenId, address owner) public {
-        bytes memory bytecode = iDeployer.parse2(
+        bytes memory bytecode = I_DEPLOYER.parse2(
             bytes(
                 string.concat(
                     "_: erc721-owner-of(", Strings.toHexString(token), " ", Strings.toHexString(tokenId), ");"
@@ -67,9 +66,9 @@ contract LibOpERC721OwnerOfTest is OpTest {
         vm.mockCall(token, abi.encodeWithSelector(IERC721.ownerOf.selector, tokenId), abi.encode(owner));
         vm.expectCall(token, abi.encodeWithSelector(IERC721.ownerOf.selector, tokenId), 1);
 
-        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
+        (StackItem[] memory stack, bytes32[] memory kvs) = I_INTERPRETER.eval4(
             EvalV4({
-                store: iStore,
+                store: I_STORE,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
@@ -86,28 +85,28 @@ contract LibOpERC721OwnerOfTest is OpTest {
     /// Test that owner of without inputs fails integrity check.
     function testOpERC721OwnerOfNPEvalFail0() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));
-        bytes memory bytecode = iDeployer.parse2("_: erc721-owner-of();");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: erc721-owner-of();");
         (bytecode);
     }
 
     /// Test that owner of with one input fails integrity check.
     function testOpERC721OwnerOfNPEvalFail1() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 2, 1));
-        bytes memory bytecode = iDeployer.parse2("_: erc721-owner-of(0x00);");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: erc721-owner-of(0x00);");
         (bytecode);
     }
 
     /// Test that owner of with too many inputs fails integrity check.
     function testOpERC721OwnerOfNPEvalFail3() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
-        bytes memory bytecode = iDeployer.parse2("_: erc721-owner-of(0x00 0x01 0x02);");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: erc721-owner-of(0x00 0x01 0x02);");
         (bytecode);
     }
 
     /// Test that operand fails integrity check.
     function testOpERC721OwnerOfNPEvalFailOperand() public {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
-        (bytes memory bytecode, bytes32[] memory constants) = iParser.unsafeParse("_: erc721-owner-of<0>(0x00 0x01);");
+        (bytes memory bytecode, bytes32[] memory constants) = I_PARSER.unsafeParse("_: erc721-owner-of<0>(0x00 0x01);");
         (bytecode, constants);
     }
 

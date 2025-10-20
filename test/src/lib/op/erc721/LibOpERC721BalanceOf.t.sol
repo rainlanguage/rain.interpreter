@@ -65,7 +65,7 @@ contract LibOpERC721BalanceOfTest is OpTest {
     }
 
     function testOpERC721BalanceOfEvalHappy(address token, address account, uint256 balance) public {
-        bytes memory bytecode = iDeployer.parse2(
+        bytes memory bytecode = I_DEPLOYER.parse2(
             bytes(
                 string.concat(
                     "_: erc721-balance-of(", Strings.toHexString(token), " ", Strings.toHexString(account), ");"
@@ -81,9 +81,9 @@ contract LibOpERC721BalanceOfTest is OpTest {
         vm.mockCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), abi.encode(balance));
         vm.expectCall(token, abi.encodeWithSelector(IERC721.balanceOf.selector, account), 1);
 
-        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
+        (StackItem[] memory stack, bytes32[] memory kvs) = I_INTERPRETER.eval4(
             EvalV4({
-                store: iStore,
+                store: I_STORE,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
@@ -100,28 +100,28 @@ contract LibOpERC721BalanceOfTest is OpTest {
     /// Test that balance of without inputs fails integrity check.
     function testOpERC721BalanceOfIntegrityFail0() external {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));
-        bytes memory bytecode = iDeployer.parse2("_: erc721-balance-of();");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: erc721-balance-of();");
         (bytecode);
     }
 
     /// Test that balance of with one input fails integrity check.
     function testOpERC721BalanceOfIntegrityFail1() external {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 2, 1));
-        bytes memory bytecode = iDeployer.parse2("_: erc721-balance-of(0x00);");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: erc721-balance-of(0x00);");
         (bytecode);
     }
 
     /// Test that balance of with three inputs fails integrity check.
     function testOpERC721BalanceOfIntegrityFail3() external {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
-        bytes memory bytecode = iDeployer.parse2("_: erc721-balance-of(0x00 0x01 0x02);");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: erc721-balance-of(0x00 0x01 0x02);");
         (bytecode);
     }
 
     /// Test that operand fails integrity check.
     function testOpERC721BalanceOfIntegrityFailOperand() external {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
-        bytes memory bytecode = iDeployer.parse2("_: erc721-balance-of<0>(0x00 0x01);");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: erc721-balance-of<0>(0x00 0x01);");
         (bytecode);
     }
 

@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.25;
 
-import {LibParseLiteralDecimal} from "../../../parse/literal/LibParseLiteralDecimal.sol";
-
 /// @title LibParseLiteralRepeat
 /// This is a library that mimics the literal libraries elsewhere in this repo,
 /// but structured to fit sub parsing rather than internal logic. It is NOT

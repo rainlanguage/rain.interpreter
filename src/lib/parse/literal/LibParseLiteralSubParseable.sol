@@ -6,7 +6,6 @@ import {LibParse} from "../LibParse.sol";
 import {UnclosedSubParseableLiteral, SubParseableMissingDispatch} from "../../../error/ErrParse.sol";
 import {
     CMASK_WHITESPACE,
-    CMASK_SUB_PARSEABLE_LITERAL_HEAD,
     CMASK_SUB_PARSEABLE_LITERAL_END
 } from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibParseInterstitial} from "../LibParseInterstitial.sol";

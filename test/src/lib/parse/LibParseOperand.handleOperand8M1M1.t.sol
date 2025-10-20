@@ -7,6 +7,7 @@ import {ExpectedOperand, UnexpectedOperandValue} from "src/error/ErrParse.sol";
 import {OperandOverflow} from "src/error/ErrParse.sol";
 
 contract LibParseOperandHandleOperand8M1M1Test is Test {
+    //forge-lint: disable-next-line(mixed-case-function)
     function handleOperand8M1M1External(bytes32[] memory values) external pure returns (OperandV2) {
         return LibParseOperand.handleOperand8M1M1(values);
     }

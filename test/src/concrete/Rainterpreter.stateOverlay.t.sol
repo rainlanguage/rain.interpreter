@@ -11,7 +11,7 @@ import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 contract RainterpreterStateOverlayTest is RainterpreterExpressionDeployerDeploymentTest {
     /// Show that state overlay can prewarm a get.
     function testStateOverlayGet() external view {
-        bytes memory bytecode = iDeployer.parse2("_: get(9);");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: get(9);");
 
         bytes32 k = Float.unwrap(LibDecimalFloat.packLossless(9, 0));
         bytes32 v = bytes32(uint256(42));
@@ -19,9 +19,9 @@ contract RainterpreterStateOverlayTest is RainterpreterExpressionDeployerDeploym
         stateOverlay[0] = k;
         stateOverlay[1] = v;
 
-        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
+        (StackItem[] memory stack, bytes32[] memory kvs) = I_INTERPRETER.eval4(
             EvalV4({
-                store: iStore,
+                store: I_STORE,
                 namespace: LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
@@ -40,7 +40,7 @@ contract RainterpreterStateOverlayTest is RainterpreterExpressionDeployerDeploym
 
     /// Show that state overlay can be overridden by a set in the bytecode.
     function testStateOverlaySet() external view {
-        bytes memory bytecode = iDeployer.parse2("_:get(9),:set(9 42),_:get(9);");
+        bytes memory bytecode = I_DEPLOYER.parse2("_:get(9),:set(9 42),_:get(9);");
 
         bytes32 k = Float.unwrap(LibDecimalFloat.packLossless(9, 0));
         bytes32 v = Float.unwrap(LibDecimalFloat.packLossless(43, 0));
@@ -48,9 +48,9 @@ contract RainterpreterStateOverlayTest is RainterpreterExpressionDeployerDeploym
         stateOverlay[0] = k;
         stateOverlay[1] = v;
 
-        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
+        (StackItem[] memory stack, bytes32[] memory kvs) = I_INTERPRETER.eval4(
             EvalV4({
-                store: iStore,
+                store: I_STORE,
                 namespace: LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),

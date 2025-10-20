@@ -4,8 +4,6 @@ pragma solidity =0.8.25;
 import {OpTest} from "test/abstract/OpTest.sol";
 import {
     RainterpreterReferenceExtern,
-    OPCODE_FUNCTION_POINTERS,
-    INTEGRITY_FUNCTION_POINTERS,
     OP_INDEX_INCREMENT,
     LibExternOpIntInc
 } from "src/concrete/extern/RainterpreterReferenceExtern.sol";

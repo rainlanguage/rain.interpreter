@@ -9,7 +9,6 @@ import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {IERC20Metadata} from "openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import {FLAG_SATURATE} from "rain.math.fixedpoint/lib/LibFixedPointDecimalScale.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 

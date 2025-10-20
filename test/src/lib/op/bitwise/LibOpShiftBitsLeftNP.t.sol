@@ -6,7 +6,6 @@ import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibOpShiftBitsLeftNP} from "src/lib/op/bitwise/LibOpShiftBitsLeftNP.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {
-    IInterpreterV4,
     OperandV2,
     StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";

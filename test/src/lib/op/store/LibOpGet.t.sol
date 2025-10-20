@@ -338,7 +338,7 @@ contract LibOpGetTest is OpTest {
         // Some key and value.
         bytes32 key = bytes32(uint256(0x1234));
         bytes32 value = bytes32(uint256(0x5678));
-        iStore.set(StateNamespace.wrap(0), LibBytes32Array.arrayFrom(key, value));
+        I_STORE.set(StateNamespace.wrap(0), LibBytes32Array.arrayFrom(key, value));
 
         (stack, kvs) = parseAndEval("_:get(0x1234);");
         assertEq(stack.length, 1, "stack.length");
@@ -350,7 +350,7 @@ contract LibOpGetTest is OpTest {
         // Key 0 and value 0.
         key = 0;
         value = 0;
-        iStore.set(StateNamespace.wrap(0), LibBytes32Array.arrayFrom(key, value));
+        I_STORE.set(StateNamespace.wrap(0), LibBytes32Array.arrayFrom(key, value));
 
         (stack, kvs) = parseAndEval("_:get(0);");
         assertEq(stack.length, 1, "stack.length");
@@ -362,7 +362,7 @@ contract LibOpGetTest is OpTest {
         // Key max and value max.
         key = bytes32(type(uint256).max);
         value = bytes32(type(uint256).max);
-        iStore.set(StateNamespace.wrap(0), LibBytes32Array.arrayFrom(key, value));
+        I_STORE.set(StateNamespace.wrap(0), LibBytes32Array.arrayFrom(key, value));
 
         (stack, kvs) = parseAndEval("_:get(uint256-max-value());");
         assertEq(stack.length, 1, "stack.length");
@@ -374,10 +374,10 @@ contract LibOpGetTest is OpTest {
         // Some key and value, then some other key and value.
         key = bytes32(uint256(0x1234));
         value = bytes32(uint256(0x5678));
-        iStore.set(StateNamespace.wrap(0), LibBytes32Array.arrayFrom(key, value));
+        I_STORE.set(StateNamespace.wrap(0), LibBytes32Array.arrayFrom(key, value));
         key = bytes32(uint256(0x9abc));
         value = bytes32(uint256(0xdef0));
-        iStore.set(StateNamespace.wrap(0), LibBytes32Array.arrayFrom(key, value));
+        I_STORE.set(StateNamespace.wrap(0), LibBytes32Array.arrayFrom(key, value));
 
         (stack, kvs) = parseAndEval("_:get(0x1234);");
         assertEq(stack.length, 1, "stack.length");
@@ -389,7 +389,7 @@ contract LibOpGetTest is OpTest {
         // key 0 value non-zero.
         key = 0;
         value = bytes32(uint256(0x5678));
-        iStore.set(StateNamespace.wrap(0), LibBytes32Array.arrayFrom(key, value));
+        I_STORE.set(StateNamespace.wrap(0), LibBytes32Array.arrayFrom(key, value));
 
         (stack, kvs) = parseAndEval("_:get(0);");
         assertEq(stack.length, 1, "stack.length");
@@ -401,7 +401,7 @@ contract LibOpGetTest is OpTest {
         // key non-zero value 0.
         key = bytes32(uint256(0x1234));
         value = 0;
-        iStore.set(StateNamespace.wrap(0), LibBytes32Array.arrayFrom(key, value));
+        I_STORE.set(StateNamespace.wrap(0), LibBytes32Array.arrayFrom(key, value));
 
         (stack, kvs) = parseAndEval("_:get(0x1234);");
         assertEq(stack.length, 1, "stack.length");
@@ -413,7 +413,7 @@ contract LibOpGetTest is OpTest {
         // key max value non-zero.
         key = bytes32(type(uint256).max);
         value = bytes32(uint256(0x5678));
-        iStore.set(StateNamespace.wrap(0), LibBytes32Array.arrayFrom(key, value));
+        I_STORE.set(StateNamespace.wrap(0), LibBytes32Array.arrayFrom(key, value));
 
         (stack, kvs) = parseAndEval("_:get(uint256-max-value());");
         assertEq(stack.length, 1, "stack.length");
@@ -425,7 +425,7 @@ contract LibOpGetTest is OpTest {
         // key non-zero value max.
         key = bytes32(uint256(0x1234));
         value = bytes32(type(uint256).max);
-        iStore.set(StateNamespace.wrap(0), LibBytes32Array.arrayFrom(key, value));
+        I_STORE.set(StateNamespace.wrap(0), LibBytes32Array.arrayFrom(key, value));
 
         (stack, kvs) = parseAndEval("_:get(0x1234);");
         assertEq(stack.length, 1, "stack.length");
@@ -442,7 +442,7 @@ contract LibOpGetTest is OpTest {
         bytes32[] memory kvs;
 
         // Set a value in store then override it with set before getting.
-        iStore.set(
+        I_STORE.set(
             StateNamespace.wrap(0), LibBytes32Array.arrayFrom(bytes32(uint256(0x1234)), bytes32(uint256(0x5678)))
         );
         (stack, kvs) = parseAndEval(":set(0x1234 0x9abc),_:get(0x1234);");
@@ -453,7 +453,7 @@ contract LibOpGetTest is OpTest {
         assertEq(kvs[1], bytes32(uint256(0x9abc)), "kvs[1]");
 
         // Set a value in store then override it with set after getting.
-        iStore.set(
+        I_STORE.set(
             StateNamespace.wrap(0), LibBytes32Array.arrayFrom(bytes32(uint256(0x1234)), bytes32(uint256(0x5678)))
         );
         (stack, kvs) = parseAndEval("_:get(0x1234),:set(0x1234 0x9abc),_:get(0x1234);");
@@ -465,7 +465,7 @@ contract LibOpGetTest is OpTest {
         assertEq(kvs[1], bytes32(uint256(0x9abc)), "kvs[1]");
 
         // Set a value in store then set some other value before getting each.
-        iStore.set(
+        I_STORE.set(
             StateNamespace.wrap(0), LibBytes32Array.arrayFrom(bytes32(uint256(0x1234)), bytes32(uint256(0x5678)))
         );
         (stack, kvs) = parseAndEval(":set(0x9abc 0xdef0),_:get(0x1234),_:get(0x9abc);");

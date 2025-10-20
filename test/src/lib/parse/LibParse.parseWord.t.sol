@@ -99,7 +99,7 @@ contract LibParseParseWordTest is Test {
         }
         vm.expectRevert(abi.encodeWithSelector(WordSize.selector, abi.encode(wordInError)));
         // No truncation for an empty string.
-        //forge-lint: disable-next-line(unused-typecast)
+        //forge-lint: disable-next-line(unsafe-typecast)
         this.checkParseWord(data, type(uint256).max, 0, bytes32(bytes("")));
     }
 

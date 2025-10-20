@@ -2,15 +2,11 @@
 pragma solidity =0.8.25;
 
 import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {ExcessRHSItems} from "src/error/ErrParse.sol";
 import {LibOpEnsure} from "src/lib/op/logic/LibOpEnsure.sol";
-import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
+import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {
-    IInterpreterV4,
     OperandV2,
-    SourceIndexV2,
-    FullyQualifiedNamespace,
     StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
@@ -86,7 +82,7 @@ contract LibOpEnsureTest is OpTest {
     function testOpEnsureEvalBadOutputs() external {
         vm.expectRevert(abi.encodeWithSelector(ExcessRHSItems.selector, 34));
         (bytes memory bytecode, bytes32[] memory constants) =
-            iParser.unsafeParse("_:ensure(1 \"always true\") add(1 1);");
+            I_PARSER.unsafeParse("_:ensure(1 \"always true\") add(1 1);");
         (bytecode);
         (constants);
     }
@@ -97,7 +93,7 @@ contract LibOpEnsureTest is OpTest {
     function testOpEnsureEvalBadOutputs2() external {
         vm.expectRevert(abi.encodeWithSelector(ExcessRHSItems.selector, 48));
         (bytes memory bytecode, bytes32[] memory constants) =
-            iParser.unsafeParse(":ensure(1 \"always true\") ensure(1 \"always true\");");
+            I_PARSER.unsafeParse(":ensure(1 \"always true\") ensure(1 \"always true\");");
         (bytecode);
         (constants);
     }

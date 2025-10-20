@@ -25,6 +25,9 @@ library LibOpUint256ERC721BalanceOf {
             stackTop := add(stackTop, 0x20)
             account := mload(stackTop)
         }
+        // It is the rainlang author's responsibility to ensure the correctness
+        // of token and amount as addresses.
+        //forge-lint: disable-next-line(unsafe-typecast)
         uint256 tokenBalance = IERC721(address(uint160(token))).balanceOf(address(uint160(account)));
         assembly ("memory-safe") {
             mstore(stackTop, tokenBalance)

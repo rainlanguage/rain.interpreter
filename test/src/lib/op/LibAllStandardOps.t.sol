@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
 import {LibAllStandardOps, ALL_STANDARD_OPS_LENGTH} from "src/lib/op/LibAllStandardOps.sol";
 

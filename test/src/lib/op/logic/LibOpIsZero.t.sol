@@ -6,10 +6,7 @@ import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibInteg
 import {LibOpIsZero} from "src/lib/op/logic/LibOpIsZero.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {
-    IInterpreterV4,
-    OperandV2,
-    SourceIndexV2,
-    FullyQualifiedNamespace
+    OperandV2
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
@@ -60,14 +57,14 @@ contract LibOpIsZeroTest is OpTest {
     /// Test that an iszero without inputs fails integrity check.
     function testOpIsZeroEvalFail0Inputs() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 1, 0));
-        bytes memory bytecode = iDeployer.parse2("_: is-zero();");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: is-zero();");
         (bytecode);
     }
 
     /// Test that an iszero with 2 inputs fails integrity check.
     function testOpIsZeroEvalFail2Inputs() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 2, 1, 2));
-        bytes memory bytecode = iDeployer.parse2("_: is-zero(0x00 0x00);");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: is-zero(0x00 0x00);");
         (bytecode);
     }
 

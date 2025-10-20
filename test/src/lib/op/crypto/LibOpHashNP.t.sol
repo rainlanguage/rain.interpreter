@@ -7,21 +7,19 @@ import {LibOpHashNP} from "src/lib/op/crypto/LibOpHashNP.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 
 import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
 import {
-    IInterpreterV4,
     OperandV2,
     SourceIndexV2,
     EvalV4,
     StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {
-    IInterpreterStoreV2, FullyQualifiedNamespace
+    FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
-import {LibIntegrityCheck, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
+import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {InterpreterState, LibInterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
@@ -91,10 +89,10 @@ contract LibOpHashNPTest is OpTest {
     /// Test the eval of a hash opcode parsed from a string. Tests 2 inputs and
     /// other stack items.
     function testOpHashNPEval2InputsOtherStack() external view {
-        bytes memory bytecode = iDeployer.parse2("_ _ _: 5 hash(0x1234567890abcdef 0xfedcba0987654321) 9;");
-        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
+        bytes memory bytecode = I_DEPLOYER.parse2("_ _ _: 5 hash(0x1234567890abcdef 0xfedcba0987654321) 9;");
+        (StackItem[] memory stack, bytes32[] memory kvs) = I_INTERPRETER.eval4(
             EvalV4({
-                store: iStore,
+                store: I_STORE,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
