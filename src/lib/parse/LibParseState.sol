@@ -741,8 +741,8 @@ library LibParseState {
 
             //slither-disable-next-line incorrect-shift
             state.sourcesBuilder =
-                //forge-lint: disable-next-line(incorrect-shift)
-                ((offset + 0x10) << 0xf0) | (source << offset) | (sourcesBuilder & ((1 << offset) - 1));
+            //forge-lint: disable-next-line(incorrect-shift)
+             ((offset + 0x10) << 0xf0) | (source << offset) | (sourcesBuilder & ((1 << offset) - 1));
 
             // Reset source as we're done with this one.
             state.fsm &= ~FSM_ACTIVE_SOURCE_MASK;

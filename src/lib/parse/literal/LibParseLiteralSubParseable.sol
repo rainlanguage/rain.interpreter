@@ -4,10 +4,7 @@ pragma solidity ^0.8.18;
 import {ParseState} from "../LibParseState.sol";
 import {LibParse} from "../LibParse.sol";
 import {UnclosedSubParseableLiteral, SubParseableMissingDispatch} from "../../../error/ErrParse.sol";
-import {
-    CMASK_WHITESPACE,
-    CMASK_SUB_PARSEABLE_LITERAL_END
-} from "rain.string/lib/parse/LibParseCMask.sol";
+import {CMASK_WHITESPACE, CMASK_SUB_PARSEABLE_LITERAL_END} from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibParseInterstitial} from "../LibParseInterstitial.sol";
 import {LibParseError} from "../LibParseError.sol";
 import {LibSubParse} from "../LibSubParse.sol";

@@ -5,7 +5,6 @@ import {Test} from "forge-std/Test.sol";
 
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 import {RainterpreterParser} from "src/concrete/RainterpreterParser.sol";
-import {IParserPragmaV1} from "rain.interpreter.interface/interface/IParserPragmaV1.sol";
 import {IParserToolingV1} from "rain.sol.codegen/interface/IParserToolingV1.sol";
 
 contract RainterpreterParserIERC165Test is Test {

@@ -78,14 +78,20 @@ contract LibParseParseWordTest is Test {
         checkParseWord(
             // Casting a small literal is safe to typecast.
             //forge-lint: disable-next-line(unsafe-typecast)
-            "0123456789012345678901234567890", CMASK_NUMERIC_0_9, 31, bytes32(bytes("0123456789012345678901234567890"))
+            "0123456789012345678901234567890",
+            CMASK_NUMERIC_0_9,
+            31,
+            bytes32(bytes("0123456789012345678901234567890"))
         );
 
         vm.expectRevert(abi.encodeWithSelector(WordSize.selector, "01234567890123456789012345678901"));
         this.checkParseWord(
             // Casting a small literal is safe to typecast.
             //forge-lint: disable-next-line(unsafe-typecast)
-            "01234567890123456789012345678901", CMASK_NUMERIC_0_9, 31, bytes32(bytes("0123456789012345678901234567890"))
+            "01234567890123456789012345678901",
+            CMASK_NUMERIC_0_9,
+            31,
+            bytes32(bytes("0123456789012345678901234567890"))
         );
     }
 

@@ -32,8 +32,8 @@ library LibOpERC20Allowance {
         // It is the rainlang author's responsibility to ensure that the token,
         // owner and spender are valid addresses.
         uint256 tokenAllowance =
-            //forge-lint: disable-next-line(unsafe-typecast)
-            IERC20(address(uint160(token))).allowance(address(uint160(owner)), address(uint160(spender)));
+        //forge-lint: disable-next-line(unsafe-typecast)
+         IERC20(address(uint160(token))).allowance(address(uint160(owner)), address(uint160(spender)));
 
         // This can fail as `decimals` is an OPTIONAL part of the ERC20 standard.
         //forge-lint: disable-next-line(unsafe-typecast)

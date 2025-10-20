@@ -13,7 +13,6 @@ import {
     StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterExternV4.sol";
 import {LibExtern} from "../../extern/LibExtern.sol";
-import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 import {ERC165Checker} from "openzeppelin-contracts/contracts/utils/introspection/ERC165Checker.sol";

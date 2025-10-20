@@ -5,9 +5,7 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibOpIsZero} from "src/lib/op/logic/LibOpIsZero.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {
-    OperandV2
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 

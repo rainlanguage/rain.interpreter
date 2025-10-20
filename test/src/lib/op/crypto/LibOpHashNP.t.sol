@@ -15,9 +15,7 @@ import {
     EvalV4,
     StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {
-    FullyQualifiedNamespace
-} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
+import {FullyQualifiedNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {InterpreterState, LibInterpreterState} from "src/lib/state/LibInterpreterState.sol";

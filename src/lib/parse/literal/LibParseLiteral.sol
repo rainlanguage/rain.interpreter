@@ -8,9 +8,7 @@ import {
     CMASK_SUB_PARSEABLE_LITERAL_HEAD
 } from "rain.string/lib/parse/LibParseCMask.sol";
 
-import {
-    UnsupportedLiteralType
-} from "../../../error/ErrParse.sol";
+import {UnsupportedLiteralType} from "../../../error/ErrParse.sol";
 import {ParseState} from "../LibParseState.sol";
 import {LibParseError} from "../LibParseError.sol";
 import {LibParseInterstitial} from "../LibParseInterstitial.sol";

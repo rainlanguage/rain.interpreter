@@ -3,7 +3,7 @@ pragma solidity =0.8.25;
 
 import {RainterpreterExpressionDeployerDeploymentTest} from
     "test/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
-import {FullyQualifiedNamespace, StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
+import {StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {EvalV4, SourceIndexV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibNamespace} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";

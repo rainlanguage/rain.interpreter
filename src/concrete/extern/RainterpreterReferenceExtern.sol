@@ -60,8 +60,8 @@ uint256 constant SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH = 18;
 /// @dev The mask to apply to the dispatch bytes when parsing to determin whether
 /// the dispatch is for the repeat literal parser.
 bytes32 constant SUB_PARSER_LITERAL_REPEAT_KEYWORD_MASK =
-    //forge-lint: disable-next-line(incorrect-shift)
-    bytes32(~((1 << (32 - SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH) * 8) - 1));
+//forge-lint: disable-next-line(incorrect-shift)
+ bytes32(~((1 << (32 - SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH) * 8) - 1));
 
 /// @dev The index of the repeat literal parser in the literal parser function
 /// pointers.

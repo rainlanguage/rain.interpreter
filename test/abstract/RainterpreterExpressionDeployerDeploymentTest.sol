@@ -11,9 +11,7 @@ import {
     PARSE_META_BUILD_DEPTH,
     PARSER_BYTECODE_HASH
 } from "../../src/concrete/RainterpreterParser.sol";
-import {
-    Rainterpreter, INTERPRETER_BYTECODE_HASH
-} from "../../src/concrete/Rainterpreter.sol";
+import {Rainterpreter, INTERPRETER_BYTECODE_HASH} from "../../src/concrete/Rainterpreter.sol";
 import {
     INTEGRITY_FUNCTION_POINTERS,
     RainterpreterExpressionDeployerConstructionConfigV2,

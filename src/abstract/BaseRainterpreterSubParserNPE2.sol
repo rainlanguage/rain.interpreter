@@ -4,8 +4,9 @@ pragma solidity =0.8.25;
 import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 
+// AuthoringMetaV2 exported for convenience.
+//forge-lint: disable-next-line(unused-import)
 import {ISubParserV4, AuthoringMetaV2} from "rain.interpreter.interface/interface/unstable/ISubParserV4.sol";
-import {IncompatibleSubParser} from "../error/ErrSubParse.sol";
 import {LibSubParse, ParseState} from "../lib/parse/LibSubParse.sol";
 import {CMASK_RHS_WORD_TAIL} from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibParse, OperandV2} from "../lib/parse/LibParse.sol";

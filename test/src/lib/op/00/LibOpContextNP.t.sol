@@ -7,16 +7,12 @@ import {LibOpContextNP} from "src/lib/op/00/LibOpContextNP.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {
-    IInterpreterV4,
     OperandV2,
     SourceIndexV2,
     FullyQualifiedNamespace,
     EvalV4,
     StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
@@ -68,6 +64,7 @@ contract LibOpContextNPTest is OpTest {
         this.internalTestOpContextNPRunOOBi(context, operand);
     }
 
+    //forge-lint: disable-next-line(mixed-case-function)
     function internalTestOpContextNPRunOOBi(bytes32[][] memory context, OperandV2 operand) external view {
         InterpreterState memory state = opTestDefaultInterpreterState();
         state.context = context;
@@ -79,6 +76,7 @@ contract LibOpContextNPTest is OpTest {
     /// Directly test the reference logic of LibOpContextNP. This tests that the
     /// runtime logic will revert if the indexes are OOB. Tests that j is OOB.
     /// forge-config: default.fuzz.runs = 100
+    //forge-lint: disable-next-line(mixed-case-function)
     function testOpContextNPRunOOBj(bytes32[][] memory context, uint256 i, uint256 j) external {
         vm.assume(context.length > 0);
         vm.assume(context.length < type(uint8).max);
@@ -91,6 +89,7 @@ contract LibOpContextNPTest is OpTest {
         this.internalTestOpContextNPRunOOBj(context, operand);
     }
 
+    //forge-lint: disable-next-line(mixed-case-function)
     function internalTestOpContextNPRunOOBj(bytes32[][] memory context, OperandV2 operand) external view {
         InterpreterState memory state = opTestDefaultInterpreterState();
         state.context = context;

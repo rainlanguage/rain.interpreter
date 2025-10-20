@@ -132,7 +132,7 @@ contract RainterpreterExpressionDeployer is
     function parsePragma1(bytes calldata data) external view virtual override returns (PragmaV1 memory) {
         // We know the I_PARSER is also an IParserPragmaV1 because we enforced
         // the bytecode hash in the constructor.
-        return I_PARSER .parsePragma1(data);
+        return I_PARSER.parsePragma1(data);
     }
 
     /// Defines all the function pointers to integrity checks. This is the

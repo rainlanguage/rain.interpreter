@@ -32,8 +32,9 @@ contract LibOpDecodeBitsNPTest is OpTest {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         uint256 start = bound(uint256(start8Bit), 0, type(uint8).max);
-        uint256 length = bound(uint256(length8Bit), 1, type(uint8).max - start);
-        length == 0 ? length = 1 : length;
+        uint256 lengthMax = type(uint8).max - start;
+        lengthMax = lengthMax == 0 ? 1 : lengthMax;
+        uint256 length = bound(uint256(length8Bit), 1, lengthMax);
         // Bounds ensure the typecast is safe.
         //forge-lint: disable-next-line(unsafe-typecast)
         OperandV2 operand = LibOperand.build(inputs, outputs, uint16((uint256(length) << 8) | uint256(start)));

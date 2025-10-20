@@ -14,12 +14,10 @@ import {
     EvalV4,
     StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {
-    // Exported for convenience.
-    //forge-lint: disable-next-line(unused-import)
-    BYTECODE_HASH as INTERPRETER_BYTECODE_HASH,
-    OPCODE_FUNCTION_POINTERS
-} from "../generated/Rainterpreter.pointers.sol";
+import
+// Exported for convenience.
+//forge-lint: disable-next-line(unused-import)
+{BYTECODE_HASH as INTERPRETER_BYTECODE_HASH, OPCODE_FUNCTION_POINTERS} from "../generated/Rainterpreter.pointers.sol";
 import {IOpcodeToolingV1} from "rain.sol.codegen/interface/IOpcodeToolingV1.sol";
 
 /// @title Rainterpreter

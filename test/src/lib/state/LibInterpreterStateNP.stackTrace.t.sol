@@ -15,7 +15,9 @@ contract LibInterpreterStateStackTraceTest is Test {
         vm.expectCall(
             // Safe typecast due to bounds above.
             //forge-lint: disable-next-line(unsafe-typecast)
-            STACK_TRACER, abi.encodePacked(bytes2(uint16(parentSourceIndex)), bytes2(uint16(sourceIndex)), inputs), 1
+            STACK_TRACER,
+            abi.encodePacked(bytes2(uint16(parentSourceIndex)), bytes2(uint16(sourceIndex)), inputs),
+            1
         );
         LibInterpreterState.stackTrace(parentSourceIndex, sourceIndex, inputs.dataPointer(), inputs.endPointer());
         // Check we didn't corrupt the inputs length while mutating memory.
