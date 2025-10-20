@@ -21,6 +21,9 @@ library LibOpERC5313Owner {
         assembly ("memory-safe") {
             account := mload(stackTop)
         }
+        // The rainlang author is responsible for ensuring the input is a valid
+        // ERC5313 contract address.
+        //forge-lint: disable-next-line(unsafe-typecast)
         address owner = IERC5313(address(uint160(account))).owner();
         assembly ("memory-safe") {
             mstore(stackTop, owner)

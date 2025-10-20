@@ -19,8 +19,6 @@ import {
     OpcodeIOOverflow
 } from "../../error/ErrParse.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
-import {LibParse} from "./LibParse.sol";
-import {LibParseOperand} from "./LibParseOperand.sol";
 import {LibParseError} from "./LibParseError.sol";
 
 /// @dev Initial state of an active source is just the starting offset which is
@@ -326,11 +324,14 @@ library LibParseState {
             state.fsm = (FSM_DEFAULT & ~FSM_ACCEPTING_INPUTS_MASK) | (state.fsm & FSM_ACCEPTING_INPUTS_MASK)
                 | FSM_ACTIVE_SOURCE_MASK;
 
+            //forge-lint: disable-next-line(mixed-case-variable)
             uint256 lineLHSItems = state.lineTracker & 0xFF;
             // Total number of RHS at top level is the top byte of topLevel0.
+            //forge-lint: disable-next-line(mixed-case-variable)
             uint256 totalRHSTopLevel = state.topLevel0 >> 0xf8;
             // Snapshot for RHS from start of line is second low byte of
             // lineTracker.
+            //forge-lint: disable-next-line(mixed-case-variable)
             uint256 lineRHSTopLevel = totalRHSTopLevel - ((state.lineTracker >> 8) & 0xFF);
 
             // If:
@@ -429,6 +430,7 @@ library LibParseState {
             parenOffset := byte(0, mload(add(state, 0x60)))
         }
         if (parenOffset == 0) {
+            //forge-lint: disable-next-line(mixed-case-variable)
             uint256 newStackRHSOffset;
             assembly ("memory-safe") {
                 let stackRHSOffsetPtr := add(state, 0x20)
@@ -739,7 +741,8 @@ library LibParseState {
 
             //slither-disable-next-line incorrect-shift
             state.sourcesBuilder =
-                ((offset + 0x10) << 0xf0) | (source << offset) | (sourcesBuilder & ((1 << offset) - 1));
+            //forge-lint: disable-next-line(incorrect-shift)
+             ((offset + 0x10) << 0xf0) | (source << offset) | (sourcesBuilder & ((1 << offset) - 1));
 
             // Reset source as we're done with this one.
             state.fsm &= ~FSM_ACTIVE_SOURCE_MASK;

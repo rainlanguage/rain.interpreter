@@ -36,7 +36,7 @@ impl DISPair {
                 .read(
                     ReadContractParametersBuilder::default()
                         .address(deployer)
-                        .call(DeployerISP::iInterpreterCall {})
+                        .call(DeployerISP::I_INTERPRETERCall {})
                         .build()
                         .map_err(DISPairError::ReadContractParametersBuilderError)?,
                 )
@@ -46,7 +46,7 @@ impl DISPair {
                 .read(
                     ReadContractParametersBuilder::default()
                         .address(deployer)
-                        .call(DeployerISP::iStoreCall {})
+                        .call(DeployerISP::I_STORECall {})
                         .build()
                         .map_err(DISPairError::ReadContractParametersBuilderError)?,
                 )
@@ -56,7 +56,7 @@ impl DISPair {
                 .read(
                     ReadContractParametersBuilder::default()
                         .address(deployer)
-                        .call(DeployerISP::iParserCall {})
+                        .call(DeployerISP::I_PARSERCall {})
                         .build()
                         .map_err(DISPairError::ReadContractParametersBuilderError)?,
                 )

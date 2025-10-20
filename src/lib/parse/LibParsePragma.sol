@@ -2,15 +2,18 @@
 pragma solidity ^0.8.18;
 
 import {LibParseState, ParseState} from "./LibParseState.sol";
-import {CMASK_WHITESPACE, CMASK_LITERAL_HEX_DISPATCH_START} from "rain.string/lib/parse/LibParseCMask.sol";
+import {CMASK_WHITESPACE} from "rain.string/lib/parse/LibParseCMask.sol";
 import {NoWhitespaceAfterUsingWordsFrom} from "../../error/ErrParse.sol";
 import {LibParseError} from "./LibParseError.sol";
 import {LibParseInterstitial} from "./LibParseInterstitial.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 
 bytes constant PRAGMA_KEYWORD_BYTES = bytes("using-words-from");
+// Constant is safe to typecast.
+//forge-lint: disable-next-line(unsafe-typecast)
 bytes32 constant PRAGMA_KEYWORD_BYTES32 = bytes32(PRAGMA_KEYWORD_BYTES);
 uint256 constant PRAGMA_KEYWORD_BYTES_LENGTH = 16;
+//forge-lint: disable-next-line(incorrect-shift)
 bytes32 constant PRAGMA_KEYWORD_MASK = bytes32(~((1 << (32 - PRAGMA_KEYWORD_BYTES_LENGTH) * 8) - 1));
 
 library LibParsePragma {

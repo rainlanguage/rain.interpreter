@@ -1,15 +1,13 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-// import {LibPointer} from "rain.solmem/lib/LibPointer.sol";
-import {OpTest, IntegrityCheckState, InterpreterState, OperandV2, stdError} from "test/abstract/OpTest.sol";
+import {OpTest, IntegrityCheckState, InterpreterState, OperandV2} from "test/abstract/OpTest.sol";
 import {LibOpDiv} from "src/lib/op/math/LibOpDiv.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {
     LibDecimalFloatImplementation,
-    MulDivOverflow,
     DivisionByZero
 } from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
 
@@ -73,6 +71,8 @@ contract LibOpDivTest is OpTest {
             (signedCoefficientA, exponentA) =
                 LibDecimalFloatImplementation.div(signedCoefficientA, exponentA, signedCoefficientB, exponentB);
         }
+        // Truncation is intentional here to check overflows.
+        //forge-lint: disable-next-line(unsafe-typecast)
         if (int32(exponentA) != exponentA && exponentA > 0) {
             vm.expectRevert();
         } else if (divideByZero > 0) {
@@ -140,7 +140,6 @@ contract LibOpDivTest is OpTest {
             13479973333575319897333507543509815336818572211270286240551805124607000000000,
             2147483656
         );
-        // checkUnhappy("_: div(1e52 1e-8);", abi.encodeWithSelector(PRBMath_MulDiv_Overflow.selector, 1e70, 1e18, 1e10));
     }
 
     /// Test the eval of `div` opcode parsed from a string.

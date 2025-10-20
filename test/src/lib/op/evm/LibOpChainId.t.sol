@@ -1,29 +1,13 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
-import {IMetaV1} from "rain.metadata/interface/deprecated/IMetaV1.sol";
-
 import {OpTest} from "test/abstract/OpTest.sol";
-import {INVALID_BYTECODE} from "test/lib/etch/LibEtch.sol";
 
 import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibOpChainId} from "src/lib/op/evm/LibOpChainId.sol";
 
-import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
-import {RainterpreterStore, FullyQualifiedNamespace} from "src/concrete/RainterpreterStore.sol";
-import {RainterpreterExpressionDeployer} from "src/concrete/RainterpreterExpressionDeployer.sol";
-import {
-    OperandV2,
-    IInterpreterV4,
-    SourceIndexV2,
-    StackItem
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
-import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 /// @title LibOpChainIdTest
@@ -64,7 +48,7 @@ contract LibOpChainIdTest is OpTest {
     /// Test that a chain ID with inputs fails integrity check.
     function testOpChainIdEvalFail() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 0, 1));
-        bytes memory bytecode = iDeployer.parse2("_: chain-id(0x00);");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: chain-id(0x00);");
         (bytecode);
     }
 

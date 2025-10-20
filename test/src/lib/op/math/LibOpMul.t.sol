@@ -3,11 +3,10 @@ pragma solidity =0.8.25;
 
 import {console2} from "forge-std/Test.sol";
 import {LibOpMul} from "src/lib/op/math/LibOpMul.sol";
-import {OpTest, IntegrityCheckState, OperandV2, InterpreterState} from "test/abstract/OpTest.sol";
+import {OpTest, IntegrityCheckState, OperandV2} from "test/abstract/OpTest.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
-import {LibDecimalFloatImplementation} from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
 import {ExponentOverflow, CoefficientOverflow} from "rain.math.float/error/ErrDecimalFloat.sol";
 
 contract LibOpMulTest is OpTest {
@@ -58,6 +57,9 @@ contract LibOpMulTest is OpTest {
         try this._testOpMulRun(operand, inputs) {}
         catch (bytes memory err) {
             console2.logBytes(err);
+            // Truncation is intentional so that we can read out the selector
+            // separate from the overall error.
+            //forge-lint: disable-next-line(unsafe-typecast)
             assertTrue(bytes4(err) == CoefficientOverflow.selector || bytes4(err) == ExponentOverflow.selector);
         }
     }

@@ -2,14 +2,12 @@
 pragma solidity =0.8.25;
 
 import {
-    IInterpreterV4,
     FullyQualifiedNamespace,
     OperandV2,
     SourceIndexV2,
     EvalV4,
     StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
 import {BytecodeTest} from "rain.interpreter.interface/../test/abstract/BytecodeTest.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
@@ -49,6 +47,8 @@ contract LibOpCallTest is OpTest, BytecodeTest {
         uint256 sourceIndex = randomSourceIndex(state.bytecode, seed);
         assertTrue(sourceIndex <= type(uint16).max);
 
+        // Bounds above ensure safe typecast.
+        //forge-lint: disable-next-line(unsafe-typecast)
         OperandV2 operand = LibOperand.build(uint8(inputs), uint8(outputs), uint16(sourceIndex));
         vm.expectRevert(abi.encodeWithSelector(CallOutputsExceedSource.selector, sourceOutputs, outputs));
         this.integrityExternal(state, operand);
@@ -73,6 +73,8 @@ contract LibOpCallTest is OpTest, BytecodeTest {
 
         sourceIndex = bound(sourceIndex, sourceCount, type(uint16).max);
 
+        // Bounds ensure typecast is safe.
+        // forge-lint: disable-next-line(unsafe-typecast)
         OperandV2 operand = LibOperand.build(uint8(inputs), uint8(outputs), uint16(sourceIndex));
         vm.expectRevert(abi.encodeWithSelector(SourceIndexOutOfBounds.selector, sourceIndex, state.bytecode));
         this.integrityExternal(state, operand);
@@ -100,6 +102,8 @@ contract LibOpCallTest is OpTest, BytecodeTest {
         uint256 sourceIndex = randomSourceIndex(state.bytecode, seed);
         assertTrue(sourceIndex <= type(uint8).max);
 
+        // Bounds ensure typecast is safe.
+        // forge-lint: disable-next-line(unsafe-typecast)
         OperandV2 operand = LibOperand.build(uint8(inputs), uint8(outputs), uint16(sourceIndex));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpCall.integrity(state, operand);
         uint256 sourceInputs = uint8(state.bytecode[sourcePosition + 2]);
@@ -138,7 +142,7 @@ contract LibOpCallTest is OpTest, BytecodeTest {
         StackItem[] stack;
     }
 
-    function checkCallNPTraces(bytes memory rainlang, ExpectedTrace[] memory traces) internal {
+    function checkCallTraces(bytes memory rainlang, ExpectedTrace[] memory traces) internal {
         for (uint256 i = 0; i < traces.length; ++i) {
             vm.expectCall(
                 STACK_TRACER,
@@ -148,10 +152,10 @@ contract LibOpCallTest is OpTest, BytecodeTest {
                 1
             );
         }
-        bytes memory bytecode = iDeployer.parse2(rainlang);
-        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
+        bytes memory bytecode = I_DEPLOYER.parse2(rainlang);
+        (StackItem[] memory stack, bytes32[] memory kvs) = I_INTERPRETER.eval4(
             EvalV4({
-                store: iStore,
+                store: I_STORE,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
@@ -168,7 +172,7 @@ contract LibOpCallTest is OpTest, BytecodeTest {
         traces[0].sourceIndex = 0;
         traces[0].stack = new StackItem[](1);
         traces[0].stack[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
-        checkCallNPTraces("_: 1;", traces);
+        checkCallTraces("_: 1;", traces);
     }
 
     function testCallTraceInnerOnly() external {
@@ -178,7 +182,7 @@ contract LibOpCallTest is OpTest, BytecodeTest {
         traces[1].sourceIndex = 1;
         traces[1].stack = new StackItem[](1);
         traces[1].stack[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
-        checkCallNPTraces(":call<1>();_:1;", traces);
+        checkCallTraces(":call<1>();_:1;", traces);
     }
 
     // function testCallTraceOuterAndInner() external {
@@ -210,11 +214,11 @@ contract LibOpCallTest is OpTest, BytecodeTest {
     // }
 
     /// Boilerplate for checking the stack and kvs of a call.
-    function checkCallNPRun(bytes memory rainlang, StackItem[] memory stack, bytes32[] memory kvs) internal view {
-        bytes memory bytecode = iDeployer.parse2(rainlang);
-        (StackItem[] memory actualStack, bytes32[] memory actualKVs) = iInterpreter.eval4(
+    function checkCallRun(bytes memory rainlang, StackItem[] memory stack, bytes32[] memory kvs) internal view {
+        bytes memory bytecode = I_DEPLOYER.parse2(rainlang);
+        (StackItem[] memory actualStack, bytes32[] memory actualKVs) = I_INTERPRETER.eval4(
             EvalV4({
-                store: iStore,
+                store: I_STORE,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
@@ -285,13 +289,13 @@ contract LibOpCallTest is OpTest, BytecodeTest {
     // }
 
     /// Boilerplate to check a generic runtime error happens upon recursion.
-    function checkCallNPRunRecursive(bytes memory rainlang) internal {
-        bytes memory bytecode = iDeployer.parse2(rainlang);
+    function checkCallRunRecursive(bytes memory rainlang) internal {
+        bytes memory bytecode = I_DEPLOYER.parse2(rainlang);
         // But it will unconditionally happen at runtime.
         vm.expectRevert();
-        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
+        (StackItem[] memory stack, bytes32[] memory kvs) = I_INTERPRETER.eval4(
             EvalV4({
-                store: iStore,
+                store: I_STORE,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
@@ -316,14 +320,14 @@ contract LibOpCallTest is OpTest, BytecodeTest {
     /// Test a mismatch in the inputs from caller and callee.
     function testOpCallNPRunInputsMismatch() external {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 2, 1, 2));
-        bytes memory bytecode = iDeployer.parse2("a: call<1>(10 11); ten:,a b c:ten 11 12;");
+        bytes memory bytecode = I_DEPLOYER.parse2("a: call<1>(10 11); ten:,a b c:ten 11 12;");
         (bytecode);
     }
 
     /// Test a mismatch in the outputs from caller and callee.
     function testOpCallNPRunOutputsMismatch() external {
         vm.expectRevert(abi.encodeWithSelector(CallOutputsExceedSource.selector, 3, 4));
-        bytes memory bytecode = iDeployer.parse2("ten eleven a b: call<1>(10 11); ten eleven:,a:9;");
+        bytes memory bytecode = I_DEPLOYER.parse2("ten eleven a b: call<1>(10 11); ten eleven:,a:9;");
         (bytecode);
     }
 }

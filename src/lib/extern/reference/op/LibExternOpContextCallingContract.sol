@@ -3,7 +3,6 @@ pragma solidity ^0.8.25;
 
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibSubParse} from "../../../parse/LibSubParse.sol";
-import {IInterpreterExternV4} from "rain.interpreter.interface/interface/unstable/IInterpreterExternV4.sol";
 import {
     CONTEXT_BASE_COLUMN,
     CONTEXT_BASE_ROW_CALLING_CONTRACT

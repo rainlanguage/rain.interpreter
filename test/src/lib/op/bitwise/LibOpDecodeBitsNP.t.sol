@@ -32,7 +32,11 @@ contract LibOpDecodeBitsNPTest is OpTest {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         uint256 start = bound(uint256(start8Bit), 0, type(uint8).max);
-        uint256 length = bound(uint256(length8Bit), 1, type(uint8).max - start + 1);
+        uint256 lengthMax = type(uint8).max - start;
+        lengthMax = lengthMax == 0 ? 1 : lengthMax;
+        uint256 length = bound(uint256(length8Bit), 1, lengthMax);
+        // Bounds ensure the typecast is safe.
+        //forge-lint: disable-next-line(unsafe-typecast)
         OperandV2 operand = LibOperand.build(inputs, outputs, uint16((uint256(length) << 8) | uint256(start)));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpDecodeBitsNP.integrity(state, operand);
         assertEq(calcInputs, 1);
@@ -66,7 +70,10 @@ contract LibOpDecodeBitsNPTest is OpTest {
     /// opcode correctly pushes the decoded bits onto the stack.
     function testOpDecodeBitsNPRun(StackItem value, uint8 start8Bit, uint8 length8Bit) external view {
         uint256 start = uint256(start8Bit);
-        uint256 length = bound(uint256(length8Bit), 1, type(uint8).max - start + 1);
+        uint256 length = bound(uint256(length8Bit), 0, type(uint8).max - start);
+        length = length == 0 ? 1 : length;
+        // Bounds ensure the typecast is safe.
+        //forge-lint: disable-next-line(unsafe-typecast)
         OperandV2 operand = LibOperand.build(1, 1, uint16((uint256(length) << 8) | uint256(start)));
         StackItem[] memory inputs = new StackItem[](1);
         inputs[0] = value;

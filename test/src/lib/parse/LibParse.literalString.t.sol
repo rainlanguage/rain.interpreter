@@ -8,7 +8,7 @@ import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {IntOrAString, LibIntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
 import {StringTooLong, UnclosedStringLiteral} from "src/error/ErrParse.sol";
 import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
-import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
+import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseLiteralStringTest
 contract LibParseLiteralStringTest is Test {

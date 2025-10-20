@@ -28,7 +28,10 @@ library LibOpUint256ERC20Allowance {
             spender := mload(stackTop)
         }
         uint256 tokenAllowance =
-            IERC20(address(uint160(token))).allowance(address(uint160(owner)), address(uint160(spender)));
+        // It is the rainlang author's responsibility to ensure that token,
+        // owner and spender are valid addresses.
+        //forge-lint: disable-next-line(unsafe-typecast)
+         IERC20(address(uint160(token))).allowance(address(uint160(owner)), address(uint160(spender)));
         assembly ("memory-safe") {
             mstore(stackTop, tokenAllowance)
         }

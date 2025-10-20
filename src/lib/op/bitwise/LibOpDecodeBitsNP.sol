@@ -38,6 +38,7 @@ library LibOpDecodeBitsNP {
             // is 255. A 256 length doesn't really make sense as that isn't an
             // encoding anyway, it's just the value verbatim.
             //slither-disable-next-line incorrect-shift
+            //forge-lint: disable-next-line(incorrect-shift)
             uint256 mask = (1 << length) - 1;
             value = (value >> startBit) & mask;
 

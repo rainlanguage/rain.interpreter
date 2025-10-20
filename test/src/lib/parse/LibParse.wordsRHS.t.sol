@@ -8,7 +8,6 @@ import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
-import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 
 /// @title LibParseNamedRHSTest

@@ -1,7 +1,7 @@
 use crate::error::ForkCallError;
 use crate::fork::{ForkTypedReturn, Forker};
 use alloy::primitives::{Address, U256};
-use rain_interpreter_bindings::DeployerISP::{iInterpreterCall, iStoreCall};
+use rain_interpreter_bindings::DeployerISP::{I_INTERPRETERCall, I_STORECall};
 use rain_interpreter_bindings::IInterpreterStoreV3::FullyQualifiedNamespace;
 use rain_interpreter_bindings::IInterpreterV4::{EvalV4, eval4Call};
 use rain_interpreter_bindings::IParserV2::parse2Call;
@@ -112,7 +112,7 @@ impl Forker {
             .await?;
 
         let store = self
-            .alloy_call(Address::default(), deployer, iStoreCall {}, decode_errors)
+            .alloy_call(Address::default(), deployer, I_STORECall {}, decode_errors)
             .await?
             .typed_return;
 
@@ -120,7 +120,7 @@ impl Forker {
             .alloy_call(
                 Address::default(),
                 deployer,
-                iInterpreterCall {},
+                I_INTERPRETERCall {},
                 decode_errors,
             )
             .await?

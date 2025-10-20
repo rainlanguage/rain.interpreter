@@ -5,16 +5,7 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibOpCtPopNP} from "src/lib/op/bitwise/LibOpCtPopNP.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {
-    IInterpreterV4,
-    FullyQualifiedNamespace,
-    OperandV2,
-    SourceIndexV2,
-    StackItem
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
-import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 

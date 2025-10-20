@@ -29,10 +29,14 @@ library LibOpERC20Allowance {
             stackTop := add(stackTop, 0x40)
             spender := mload(stackTop)
         }
+        // It is the rainlang author's responsibility to ensure that the token,
+        // owner and spender are valid addresses.
         uint256 tokenAllowance =
-            IERC20(address(uint160(token))).allowance(address(uint160(owner)), address(uint160(spender)));
+        //forge-lint: disable-next-line(unsafe-typecast)
+         IERC20(address(uint160(token))).allowance(address(uint160(owner)), address(uint160(spender)));
 
         // This can fail as `decimals` is an OPTIONAL part of the ERC20 standard.
+        //forge-lint: disable-next-line(unsafe-typecast)
         uint8 tokenDecimals = IERC20Metadata(address(uint160(token))).decimals();
 
         // Slither doesn't like that we're ignoring the lossless flag but it's

@@ -55,6 +55,7 @@ library LibParseLiteralString {
                 // End can't equal inner end, because then we would move past the
                 // end of the data considering the final " character.
                 //slither-disable-next-line incorrect-shift
+                //forge-lint: disable-next-line(incorrect-shift)
                 if (1 << finalChar & CMASK_STRING_LITERAL_END == 0 || end == innerEnd) {
                     revert UnclosedStringLiteral(state.parseErrorOffset(innerEnd));
                 }

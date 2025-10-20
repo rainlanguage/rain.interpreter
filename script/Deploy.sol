@@ -24,12 +24,15 @@ contract Deploy is Script {
         vm.startBroadcast(deployerPrivateKey);
 
         RainterpreterParser parser = new RainterpreterParser();
+        //forge-lint: disable-next-line(unsafe-cheatcode)
         vm.writeFile("deployments/latest/RainterpreterParser", vm.toString(address(parser)));
 
         RainterpreterStore store = new RainterpreterStore();
+        //forge-lint: disable-next-line(unsafe-cheatcode)
         vm.writeFile("deployments/latest/RainterpreterStore", vm.toString(address(store)));
 
         Rainterpreter interpreter = new Rainterpreter();
+        //forge-lint: disable-next-line(unsafe-cheatcode)
         vm.writeFile("deployments/latest/Rainterpreter", vm.toString(address(interpreter)));
 
         RainterpreterExpressionDeployer deployer = new RainterpreterExpressionDeployer(
@@ -37,6 +40,7 @@ contract Deploy is Script {
         );
         LibDescribedByMeta.emitForDescribedAddress(metaboard, deployer, constructionMeta);
 
+        //forge-lint: disable-next-line(unsafe-cheatcode)
         vm.writeFile("deployments/latest/RainterpreterExpressionDeployer", vm.toString(address(deployer)));
 
         vm.stopBroadcast();
