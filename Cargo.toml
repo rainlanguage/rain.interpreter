@@ -34,7 +34,7 @@ reqwest = { version = "0.11.17", features = ["json"] }
 once_cell = "1.17.1"
 alloy-ethers-typecast = { git = "https://github.com/rainlanguage/alloy-ethers-typecast", rev = "bcc3a04394aefe191fef4ae8e6e94381a419c99a" }
 eyre = "0.6"
-rain-error-decoding = { git = "https://github.com/rainlanguage/rain.error", rev = "bf08b5ab305287fc49408a441d6375f35dc280db" }
+rain-error-decoding = { git = "https://github.com/rainlanguage/rain.error", rev = "c97742d820aa94e825c373f226b004a8d258c30d" }
 wasm-bindgen-utils = "0.0.10"
 
 [workspace.dependencies.rain_interpreter_parser]
