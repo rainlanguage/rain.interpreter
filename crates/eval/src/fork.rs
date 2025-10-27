@@ -245,7 +245,7 @@ impl Forker {
         if decode_error && raw.exit_reason == InstructionResult::Revert {
             // decode result bytes to error selectors if it was a revert
             return Err(ForkCallError::AbiDecodedError(
-                AbiDecodedErrorType::selector_registry_abi_decode(&raw.result).await?,
+                AbiDecodedErrorType::selector_registry_abi_decode(&raw.result, None).await?,
             ));
         }
 
@@ -290,7 +290,7 @@ impl Forker {
         if decode_error && raw.exit_reason == InstructionResult::Revert {
             // decode result bytes to error selectors if it was a revert
             return Err(ForkCallError::AbiDecodedError(
-                AbiDecodedErrorType::selector_registry_abi_decode(&raw.result).await?,
+                AbiDecodedErrorType::selector_registry_abi_decode(&raw.result, None).await?,
             ));
         }
 
