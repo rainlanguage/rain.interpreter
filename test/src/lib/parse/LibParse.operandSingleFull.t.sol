@@ -2,7 +2,7 @@
 pragma solidity =0.8.25;
 
 import {ParseTest} from "test/abstract/ParseTest.sol";
-import {ExpectedOperand, UnclosedOperand, UnexpectedOperandValue} from "src/error/ErrParse.sol";
+import {UnclosedOperand, UnexpectedOperandValue} from "src/error/ErrParse.sol";
 import {LibParse, ExpectedLeftParen} from "src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";

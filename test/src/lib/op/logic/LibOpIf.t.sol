@@ -4,12 +4,7 @@ pragma solidity =0.8.25;
 import {OpTest} from "test/abstract/OpTest.sol";
 import {LibOpIf} from "src/lib/op/logic/LibOpIf.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {
-    IInterpreterV4,
-    OperandV2,
-    SourceIndexV2,
-    FullyQualifiedNamespace
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
@@ -115,28 +110,28 @@ contract LibOpIfTest is OpTest {
     /// Test that an if without inputs fails integrity check.
     function testOpIfEvalFail0Inputs() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 3, 0));
-        bytes memory bytecode = iDeployer.parse2("_: if();");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: if();");
         (bytecode);
     }
 
     /// Test that an if with 1 input fails integrity check.
     function testOpIfEvalFail1Input() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 3, 1));
-        bytes memory bytecode = iDeployer.parse2("_: if(0x00);");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: if(0x00);");
         (bytecode);
     }
 
     /// Test that an if with 2 inputs fails integrity check.
     function testOpIfEvalFail2Inputs() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 2, 3, 2));
-        bytes memory bytecode = iDeployer.parse2("_: if(0x00 0x00);");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: if(0x00 0x00);");
         (bytecode);
     }
 
     /// Test that an if with 4 inputs fails integrity check.
     function testOpIfEvalFail4Inputs() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 4, 3, 4));
-        bytes memory bytecode = iDeployer.parse2("_: if(0x00 0x00 0x00 0x00);");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: if(0x00 0x00 0x00 0x00);");
         (bytecode);
     }
 

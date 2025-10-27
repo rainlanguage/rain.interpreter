@@ -14,7 +14,7 @@ import {
     LibRainterpreterReferenceExtern,
     EXTERN_PARSE_META_BUILD_DEPTH
 } from "src/concrete/extern/RainterpreterReferenceExtern.sol";
-import {LibAllStandardOps, AuthoringMetaV2} from "src/lib/op/LibAllStandardOps.sol";
+import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 import {LibCodeGen} from "rain.sol.codegen/lib/LibCodeGen.sol";
 import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";
 import {LibFs} from "rain.sol.codegen/lib/LibFs.sol";

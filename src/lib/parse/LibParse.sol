@@ -16,25 +16,16 @@ import {
     CMASK_LHS_RHS_DELIMITER,
     CMASK_LHS_STACK_TAIL,
     CMASK_LHS_STACK_HEAD,
-    COMMENT_START_SEQUENCE,
-    COMMENT_END_SEQUENCE,
     CMASK_IDENTIFIER_HEAD
 } from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibParseChar} from "rain.string/lib/parse/LibParseChar.sol";
-import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
 import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
-import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 import {LibParseOperand} from "./LibParseOperand.sol";
 import {
     OperandV2, OPCODE_STACK, OPCODE_UNKNOWN
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibParseStackName} from "./LibParseStackName.sol";
 import {
-    ExcessLHSItems,
-    ExcessRHSItems,
-    NotAcceptingInputs,
-    ParseStackUnderflow,
-    ParseStackOverflow,
     UnexpectedRHSChar,
     UnexpectedRightParen,
     WordSize,
@@ -42,14 +33,9 @@ import {
     ParserOutOfBounds,
     ExpectedLeftParen,
     UnexpectedLHSChar,
-    DanglingSource,
-    MaxSources,
-    UnclosedLeftParen,
     MissingFinalSemi,
     UnexpectedComment,
-    ParenOverflow,
-    UnknownWord,
-    MalformedCommentStart
+    ParenOverflow
 } from "../../error/ErrParse.sol";
 import {
     LibParseState,
@@ -126,6 +112,7 @@ library LibParse {
         }
     }
 
+    //forge-lint: disable-next-line(mixed-case-function)
     function parseLHS(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
             while (cursor < end) {
@@ -185,7 +172,8 @@ library LibParse {
         }
     }
 
-    //slither-disable-next-line cyclomatic-complexity
+    //slither-disable-start cyclomatic-complexity
+    //forge-lint: disable-next-line(mixed-case-function)
     function parseRHS(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
             while (cursor < end) {
@@ -396,6 +384,7 @@ library LibParse {
             return cursor;
         }
     }
+    //slither-disable-end
 
     function parse(ParseState memory state) internal view returns (bytes memory bytecode, bytes32[] memory) {
         unchecked {

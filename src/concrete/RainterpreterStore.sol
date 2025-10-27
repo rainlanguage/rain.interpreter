@@ -8,6 +8,8 @@ import {
     LibNamespace, FullyQualifiedNamespace, StateNamespace
 } from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
 
+// Exported for convenience.
+//forge-lint: disable-next-line(unused-import)
 import {BYTECODE_HASH as STORE_BYTECODE_HASH} from "../generated/RainterpreterStore.pointers.sol";
 
 /// Thrown when a `set` call is made with an odd number of arguments.

@@ -10,7 +10,6 @@ import {
     OperandOverflow
 } from "../../error/ErrParse.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {LibParse} from "./LibParse.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 import {CMASK_OPERAND_END, CMASK_WHITESPACE, CMASK_OPERAND_START} from "rain.string/lib/parse/LibParseCMask.sol";
 import {ParseState, OPERAND_VALUES_LENGTH, FSM_YANG_MASK} from "./LibParseState.sol";
@@ -223,6 +222,7 @@ library LibParseOperand {
 
     /// 8 bit value then maybe 1 bit flag then maybe 1 bit flag. Fallback to 0
     /// for both flags if not provided.
+    //forge-lint: disable-next-line(mixed-case-function)
     function handleOperand8M1M1(bytes32[] memory values) internal pure returns (OperandV2 operand) {
         // Happy path at the top for efficiency.
         uint256 length = values.length;
@@ -271,6 +271,7 @@ library LibParseOperand {
     }
 
     /// 2x maybe 1 bit flags. Fallback to 0 for both flags if not provided.
+    //forge-lint: disable-next-line(mixed-case-function)
     function handleOperandM1M1(bytes32[] memory values) internal pure returns (OperandV2 operand) {
         // Happy path at the top for efficiency.
         uint256 length = values.length;

@@ -2,31 +2,13 @@
 pragma solidity ^0.8.18;
 
 import {
-    CMASK_E_NOTATION,
-    CMASK_HEX,
-    CMASK_LOWER_ALPHA_A_F,
-    CMASK_NUMERIC_0_9,
     CMASK_STRING_LITERAL_HEAD,
-    CMASK_UPPER_ALPHA_A_F,
     CMASK_LITERAL_HEX_DISPATCH,
     CMASK_NUMERIC_LITERAL_HEAD,
-    CMASK_SUB_PARSEABLE_LITERAL_HEAD,
-    CMASK_SUB_PARSEABLE_LITERAL_END,
-    CMASK_WHITESPACE
+    CMASK_SUB_PARSEABLE_LITERAL_HEAD
 } from "rain.string/lib/parse/LibParseCMask.sol";
-import {LibParse} from "../LibParse.sol";
 
-import {
-    DecimalLiteralOverflow,
-    HexLiteralOverflow,
-    MalformedExponentDigits,
-    MalformedHexLiteral,
-    OddLengthHexLiteral,
-    ZeroLengthDecimal,
-    ZeroLengthHexLiteral,
-    UnsupportedLiteralType,
-    UnclosedSubParseableLiteral
-} from "../../../error/ErrParse.sol";
+import {UnsupportedLiteralType} from "../../../error/ErrParse.sol";
 import {ParseState} from "../LibParseState.sol";
 import {LibParseError} from "../LibParseError.sol";
 import {LibParseInterstitial} from "../LibParseInterstitial.sol";

@@ -32,8 +32,8 @@ sol!(
 sol! {
     #![sol(all_derives = true)]
     interface  DeployerISP {
-        function iInterpreter() public view returns(address);
-        function iStore() public view returns(address);
-        function iParser() public view returns(address);
+        function I_INTERPRETER() public view returns(address);
+        function I_STORE() public view returns(address);
+        function I_PARSER() public view returns(address);
     }
 }

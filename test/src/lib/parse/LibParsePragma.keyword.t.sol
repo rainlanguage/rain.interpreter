@@ -15,7 +15,6 @@ import {
 import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {NoWhitespaceAfterUsingWordsFrom} from "src/error/ErrParse.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
-import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 
 /// @title LibParsePragmaKeywordTest
@@ -103,7 +102,10 @@ contract LibParsePragmaKeywordTest is Test {
         if (bytes(calldataStr).length > 2) {
             vm.assume(
                 keccak256(bytes(calldataStr[0:2]))
-                    != keccak256(abi.encodePacked(uint16(CMASK_LITERAL_HEX_DISPATCH_START)))
+                // CMASK_LITERAL_HEX_DISPATCH_START is a constant that is
+                // definitely a uint16 so this is safe.
+                //forge-lint: disable-next-line(unsafe-typecast)
+                != keccak256(abi.encodePacked(uint16(CMASK_LITERAL_HEX_DISPATCH_START)))
             );
         }
         string memory str = string.concat(

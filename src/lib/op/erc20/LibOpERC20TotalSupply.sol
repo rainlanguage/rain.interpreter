@@ -24,9 +24,13 @@ library LibOpERC20TotalSupply {
         assembly ("memory-safe") {
             token := mload(stackTop)
         }
+        // It is the rainlang author's responsibility to ensure that the token
+        // is a valid address.
+        //forge-lint: disable-next-line(unsafe-typecast)
         uint256 totalSupply = IERC20(address(uint160(token))).totalSupply();
 
         // This can fail as `decimals` is an OPTIONAL part of the ERC20 standard.
+        //forge-lint: disable-next-line(unsafe-typecast)
         uint8 tokenDecimals = IERC20Metadata(address(uint160(token))).decimals();
 
         Float totalSupplyFloat = LibDecimalFloat.fromFixedDecimalLosslessPacked(totalSupply, tokenDecimals);

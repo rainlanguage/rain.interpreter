@@ -13,7 +13,7 @@ contract RainterpreterExpressionDeployerMetaTest is RainterpreterExpressionDeplo
     /// Test that the expected construction meta hash can be read from the
     /// deployer.
     function testRainterpreterExpressionDeployerExpectedConstructionMetaHash() external view {
-        bytes32 actualConstructionMetaHash = iDeployer.describedByMetaV1();
+        bytes32 actualConstructionMetaHash = I_DEPLOYER.describedByMetaV1();
         assertEq(actualConstructionMetaHash, DESCRIBED_BY_META_HASH);
     }
 }

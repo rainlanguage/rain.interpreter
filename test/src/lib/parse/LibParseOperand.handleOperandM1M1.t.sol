@@ -3,11 +3,11 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {LibParseOperand, OperandV2} from "src/lib/parse/LibParseOperand.sol";
-import {ExpectedOperand, UnexpectedOperandValue} from "src/error/ErrParse.sol";
-import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
+import {UnexpectedOperandValue} from "src/error/ErrParse.sol";
 import {OperandOverflow} from "src/error/ErrParse.sol";
 
 contract LibParseOperandHandleOperandM1M1Test is Test {
+    //forge-lint: disable-next-line(mixed-case-function)
     function handleOperandM1M1External(bytes32[] memory values) external pure returns (OperandV2) {
         return LibParseOperand.handleOperandM1M1(values);
     }

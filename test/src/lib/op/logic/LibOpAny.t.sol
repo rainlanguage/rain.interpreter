@@ -7,14 +7,12 @@ import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {LibOpAny} from "src/lib/op/logic/LibOpAny.sol";
-import {
-    IInterpreterV4, OperandV2, SourceIndexV2
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {
     IInterpreterStoreV3,
     FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV3.sol";
-import {LibIntegrityCheck, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
+import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
@@ -139,7 +137,7 @@ contract LibOpAnyTest is OpTest {
     /// Test that any without inputs fails integrity check.
     function testOpAnyEvalFail() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 1, 0));
-        bytes memory bytecode = iDeployer.parse2("_: any();");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: any();");
         (bytecode);
     }
 

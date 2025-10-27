@@ -2,19 +2,10 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibOpBinaryEqualTo} from "src/lib/op/logic/LibOpBinaryEqualTo.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {
-    IInterpreterV4,
-    OperandV2,
-    SourceIndexV2,
-    FullyQualifiedNamespace,
-    StackItem
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpBinaryEqualToTest is OpTest {
@@ -84,21 +75,21 @@ contract LibOpBinaryEqualToTest is OpTest {
     /// Test that an equal to without inputs fails integrity check.
     function testOpBinaryEqualToEvalFail0Inputs() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));
-        bytes memory bytecode = iDeployer.parse2("_: binary-equal-to();");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: binary-equal-to();");
         (bytecode);
     }
 
     /// Test that an equal to with 1 input fails integrity check.
     function testOpBinaryEqualToEvalFail1Input() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 2, 1));
-        bytes memory bytecode = iDeployer.parse2("_: binary-equal-to(0x00);");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: binary-equal-to(0x00);");
         (bytecode);
     }
 
     /// Test that an equal to with 3 inputs fails integrity check.
     function testOpBinaryEqualToEvalFail3Inputs() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
-        bytes memory bytecode = iDeployer.parse2("_: binary-equal-to(0x00 0x00 0x00);");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: binary-equal-to(0x00 0x00 0x00);");
         (bytecode);
     }
 

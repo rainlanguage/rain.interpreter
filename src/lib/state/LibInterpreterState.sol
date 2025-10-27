@@ -15,6 +15,7 @@ struct InterpreterState {
     Pointer[] stackBottoms;
     bytes32[] constants;
     uint256 sourceIndex;
+    //forge-lint: disable-next-line(mixed-case-variable)
     MemoryKV stateKV;
     FullyQualifiedNamespace namespace;
     IInterpreterStoreV3 store;
@@ -25,6 +26,9 @@ struct InterpreterState {
 
 library LibInterpreterState {
     function fingerprint(InterpreterState memory state) internal pure returns (bytes32) {
+        // TODO Fix this inefficiency.
+        // https://github.com/rainlanguage/rain.interpreter/issues/413
+        // forge-lint: disable-next-line(asm-keccak256)
         return keccak256(abi.encode(state));
     }
 

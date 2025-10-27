@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {OpTest, IntegrityCheckState, InterpreterState, OperandV2, stdError} from "test/abstract/OpTest.sol";
+import {OpTest, IntegrityCheckState, OperandV2} from "test/abstract/OpTest.sol";
 import {LibOpSub} from "src/lib/op/math/LibOpSub.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
-import {LibDecimalFloatImplementation} from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
 
 contract LibOpSubTest is OpTest {
     /// Directly test the integrity logic of LibOpSub. This tests the happy
@@ -51,6 +50,8 @@ contract LibOpSubTest is OpTest {
             (int256 signedCoefficient, int256 exponent) =
                 LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(inputs[i])));
             exponent = int256(bound(exponent, type(int32).min, type(int32).max / 2));
+            // Bound makes typecast safe.
+            //forge-lint: disable-next-line(unsafe-typecast)
             inputs[i] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(signedCoefficient, int32(exponent))));
         }
 

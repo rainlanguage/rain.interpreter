@@ -4,7 +4,6 @@ pragma solidity =0.8.25;
 import {OpTest} from "test/abstract/OpTest.sol";
 
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
-import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {OutOfBoundsConstantRead, LibOpConstant} from "src/lib/op/00/LibOpConstant.sol";
 import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
@@ -15,7 +14,6 @@ import {
     EvalV4,
     StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {BadOpOutputsLength} from "src/error/ErrIntegrity.sol";
@@ -86,17 +84,17 @@ contract LibOpConstantTest is OpTest {
     /// expect the deployer to revert, as the integrity check MUST fail.
     function testOpConstantEvalZeroConstants() external {
         vm.expectRevert(abi.encodeWithSelector(OutOfBoundsConstantRead.selector, 0, 0, 0));
-        bytes memory bytecode = iDeployer.parse2("_ _ _: constant() constant() constant();");
+        bytes memory bytecode = I_DEPLOYER.parse2("_ _ _: constant() constant() constant();");
         (bytecode);
     }
 
     /// Test the eval of a constant opcode parsed from a string.
     function testOpConstantEvalNPE2E() external view {
-        bytes memory bytecode = iDeployer.parse2("_ _: 2 1.001;");
+        bytes memory bytecode = I_DEPLOYER.parse2("_ _: 2 1.001;");
 
-        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
+        (StackItem[] memory stack, bytes32[] memory kvs) = I_INTERPRETER.eval4(
             EvalV4({
-                store: iStore,
+                store: I_STORE,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),

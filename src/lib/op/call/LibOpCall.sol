@@ -2,8 +2,8 @@
 pragma solidity ^0.8.18;
 
 import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {LibInterpreterState, InterpreterState} from "../../state/LibInterpreterState.sol";
-import {LibIntegrityCheck, IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
+import {InterpreterState} from "../../state/LibInterpreterState.sol";
+import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {Pointer, LibPointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {LibEval} from "../../eval/LibEval.sol";

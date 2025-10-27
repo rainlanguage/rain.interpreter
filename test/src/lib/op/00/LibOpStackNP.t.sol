@@ -4,20 +4,16 @@ pragma solidity =0.8.25;
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
 import {
-    IInterpreterV4,
     OperandV2,
     SourceIndexV2,
     EvalV4,
     StackItem
 } from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
-import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {OutOfBoundsStackRead, LibOpStackNP} from "src/lib/op/00/LibOpStackNP.sol";
 import {LibIntegrityCheck, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {
-    IInterpreterStoreV2, FullyQualifiedNamespace
-} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
+import {FullyQualifiedNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {OpTest, PRE, POST} from "test/abstract/OpTest.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
@@ -139,10 +135,10 @@ contract LibOpStackNPTest is OpTest {
 
     /// Test the eval of a stack opcode parsed from a string.
     function testOpStackEval() external view {
-        bytes memory bytecode = iDeployer.parse2("foo: 1, bar: foo, _: -1;");
-        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
+        bytes memory bytecode = I_DEPLOYER.parse2("foo: 1, bar: foo, _: -1;");
+        (StackItem[] memory stack, bytes32[] memory kvs) = I_INTERPRETER.eval4(
             EvalV4({
-                store: iStore,
+                store: I_STORE,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),
@@ -160,11 +156,11 @@ contract LibOpStackNPTest is OpTest {
 
     /// Test the eval of several stack opcodes parsed from a string.
     function testOpStackEvalSeveral() external view {
-        bytes memory bytecode = iDeployer.parse2("foo: 1, bar: foo, _ baz: bar bar, bing _:foo baz;");
+        bytes memory bytecode = I_DEPLOYER.parse2("foo: 1, bar: foo, _ baz: bar bar, bing _:foo baz;");
 
-        (StackItem[] memory stack, bytes32[] memory kvs) = iInterpreter.eval4(
+        (StackItem[] memory stack, bytes32[] memory kvs) = I_INTERPRETER.eval4(
             EvalV4({
-                store: iStore,
+                store: I_STORE,
                 namespace: FullyQualifiedNamespace.wrap(0),
                 bytecode: bytecode,
                 sourceIndex: SourceIndexV2.wrap(0),

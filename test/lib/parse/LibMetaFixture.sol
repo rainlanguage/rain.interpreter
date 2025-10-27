@@ -2,10 +2,8 @@
 pragma solidity ^0.8.18;
 
 import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV2.sol";
-import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {OperandV2, LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
-import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";

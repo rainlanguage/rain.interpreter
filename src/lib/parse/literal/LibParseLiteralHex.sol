@@ -72,19 +72,26 @@ library LibParseLiteralHex {
                         hexCharByte := byte(0, mload(cursor))
                     }
                     //slither-disable-next-line incorrect-shift
+                    //forge-lint: disable-next-line(incorrect-shift)
                     uint256 hexChar = 1 << hexCharByte;
 
                     bytes32 nybble;
                     // 0-9
                     if (hexChar & CMASK_NUMERIC_0_9 != 0) {
+                        // Literal is safe to cast.
+                        // forge-lint: disable-next-line(unsafe-typecast)
                         nybble = bytes32(hexCharByte - uint256(uint8(bytes1("0"))));
                     }
                     // a-f
                     else if (hexChar & CMASK_LOWER_ALPHA_A_F != 0) {
+                        // Literal is safe to cast.
+                        // forge-lint: disable-next-line(unsafe-typecast)
                         nybble = bytes32(hexCharByte - uint256(uint8(bytes1("a"))) + 10);
                     }
                     // A-F
                     else if (hexChar & CMASK_UPPER_ALPHA_A_F != 0) {
+                        // Literal is safe to cast.
+                        // forge-lint: disable-next-line(unsafe-typecast)
                         nybble = bytes32(hexCharByte - uint256(uint8(bytes1("A"))) + 10);
                     } else {
                         revert MalformedHexLiteral(state.parseErrorOffset(cursor));

@@ -10,11 +10,11 @@ import {
     IParserToolingV1,
     ISubParserToolingV1
 } from "../../abstract/BaseRainterpreterSubParserNPE2.sol";
-import {LibExtern, EncodedExternDispatchV2, IInterpreterExternV4, StackItem} from "../../lib/extern/LibExtern.sol";
-import {LibSubParse} from "../../lib/parse/LibSubParse.sol";
+import {StackItem} from "../../lib/extern/LibExtern.sol";
 import {LibParseState, ParseState} from "../../lib/parse/LibParseState.sol";
 import {LibParseOperand} from "../../lib/parse/LibParseOperand.sol";
-import {LibParseLiteral} from "../../lib/parse/literal/LibParseLiteral.sol";
+// OP_INDEX_INCREMENT exported for convenience
+//forge-lint: disable-next-line(unused-import)
 import {LibExternOpIntInc, OP_INDEX_INCREMENT} from "../../lib/extern/reference/op/LibExternOpIntInc.sol";
 import {LibExternOpStackOperandNPE2} from "../../lib/extern/reference/op/LibExternOpStackOperandNPE2.sol";
 import {LibExternOpContextSenderNPE2} from "../../lib/extern/reference/op/LibExternOpContextSenderNPE2.sol";
@@ -25,6 +25,8 @@ import {LibParseLiteralDecimal} from "../../lib/parse/literal/LibParseLiteralDec
 import {
     DESCRIBED_BY_META_HASH,
     PARSE_META as SUB_PARSER_PARSE_META,
+    // Exported for convenience
+    //forge-lint: disable-next-line(unused-import)
     PARSE_META_BUILD_DEPTH as EXTERN_PARSE_META_BUILD_DEPTH,
     SUB_PARSER_WORD_PARSERS,
     OPERAND_HANDLER_FUNCTION_POINTERS,
@@ -48,6 +50,8 @@ uint256 constant SUB_PARSER_LITERAL_PARSERS_LENGTH = 1;
 bytes constant SUB_PARSER_LITERAL_REPEAT_KEYWORD = bytes("ref-extern-repeat-");
 
 /// @dev The keyword for the repeat literal parser, as a bytes32.
+// Constant is a safe cast because the length is less than 32 bytes.
+//forge-lint: disable-next-line(unsafe-typecast)
 bytes32 constant SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES32 = bytes32(SUB_PARSER_LITERAL_REPEAT_KEYWORD);
 
 /// @dev The number of bytes in the repeat literal keyword.
@@ -56,7 +60,8 @@ uint256 constant SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH = 18;
 /// @dev The mask to apply to the dispatch bytes when parsing to determin whether
 /// the dispatch is for the repeat literal parser.
 bytes32 constant SUB_PARSER_LITERAL_REPEAT_KEYWORD_MASK =
-    bytes32(~((1 << (32 - SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH) * 8) - 1));
+//forge-lint: disable-next-line(incorrect-shift)
+ bytes32(~((1 << (32 - SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH) * 8) - 1));
 
 /// @dev The index of the repeat literal parser in the literal parser function
 /// pointers.

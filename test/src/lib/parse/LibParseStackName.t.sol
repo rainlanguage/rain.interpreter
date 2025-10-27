@@ -1,10 +1,9 @@
 //// SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "src/lib/parse/LibParse.sol";
-import "src/lib/parse/LibParseStackName.sol";
+import {ParseState, LibParseStackName} from "src/lib/parse/LibParse.sol";
 
 /// @title LibParseStackNameTest
 /// Tests for handling named stack items.

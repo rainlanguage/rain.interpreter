@@ -13,7 +13,6 @@ import {
     LITERAL_PARSER_FUNCTION_POINTERS,
     OPERAND_HANDLER_FUNCTION_POINTERS
 } from "src/concrete/extern/RainterpreterReferenceExtern.sol";
-import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";
 
 contract RainterpreterReferenceExternPointersTest is Test {

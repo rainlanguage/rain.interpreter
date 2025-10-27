@@ -22,6 +22,9 @@ library LibOpUint256ERC20TotalSupply {
         assembly ("memory-safe") {
             account := mload(stackTop)
         }
+        // It is the rainlang author's responsibility to ensure that account is
+        // a valid address.
+        // forge-lint: disable-next-line(unsafe-typecast)
         uint256 totalSupply = IERC20(address(uint160(account))).totalSupply();
         assembly ("memory-safe") {
             mstore(stackTop, totalSupply)

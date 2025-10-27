@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {OpTest, IntegrityCheckState, OperandV2, InterpreterState} from "test/abstract/OpTest.sol";
+import {OpTest, IntegrityCheckState, OperandV2} from "test/abstract/OpTest.sol";
 import {LibOpAdd} from "src/lib/op/math/LibOpAdd.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
-import {LibDecimalFloatImplementation} from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
 import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 contract LibOpAddTest is OpTest {
@@ -51,6 +50,8 @@ contract LibOpAddTest is OpTest {
             (int256 signedCoefficient, int256 exponent) =
                 LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(inputs[i])));
             exponent = int256(bound(exponent, type(int32).min, type(int32).max / 2));
+            // Exponent bounds mean typecast is safe.
+            //forge-lint: disable-next-line(unsafe-typecast)
             inputs[i] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(signedCoefficient, int32(exponent))));
         }
 
@@ -154,7 +155,7 @@ contract LibOpAddTest is OpTest {
         );
         checkUnhappyOverflow(
             "_: add(max-positive-value() max-positive-value() max-positive-value());",
-            26959946667150639794667015087019630673637144422540572481103610249214000000000,
+            40439920000725959692000522630529446010455716633810858721655415373821000000000,
             2147483638
         );
         checkUnhappyOverflow(

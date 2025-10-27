@@ -4,17 +4,14 @@ pragma solidity =0.8.25;
 import {ERC165, IERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 import {Pointer, LibPointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
-import {LibDataContract, DataContractMemoryContainer} from "rain.datacontract/lib/LibDataContract.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {IParserV2} from "rain.interpreter.interface/interface/IParserV2.sol";
 import {IParserPragmaV1, PragmaV1} from "rain.interpreter.interface/interface/IParserPragmaV1.sol";
 
 import {
-    UnexpectedConstructionMetaHash,
     UnexpectedInterpreterBytecodeHash,
     UnexpectedStoreBytecodeHash,
-    UnexpectedParserBytecodeHash,
-    UnexpectedPointers
+    UnexpectedParserBytecodeHash
 } from "../error/ErrDeploy.sol";
 import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
 import {IDescribedByMetaV1} from "rain.metadata/interface/IDescribedByMetaV1.sol";
@@ -23,8 +20,7 @@ import {IInterpreterV4} from "rain.interpreter.interface/interface/unstable/IInt
 import {LibIntegrityCheck} from "../lib/integrity/LibIntegrityCheck.sol";
 import {LibInterpreterStateDataContract} from "../lib/state/LibInterpreterStateDataContract.sol";
 import {LibAllStandardOps} from "../lib/op/LibAllStandardOps.sol";
-import {LibParse, LibParseMeta} from "../lib/parse/LibParse.sol";
-import {Rainterpreter, INTERPRETER_BYTECODE_HASH} from "./Rainterpreter.sol";
+import {INTERPRETER_BYTECODE_HASH} from "./Rainterpreter.sol";
 import {PARSER_BYTECODE_HASH} from "./RainterpreterParser.sol";
 import {STORE_BYTECODE_HASH} from "./RainterpreterStore.sol";
 import {
@@ -32,7 +28,6 @@ import {
     DESCRIBED_BY_META_HASH
 } from "../generated/RainterpreterExpressionDeployer.pointers.sol";
 import {IIntegrityToolingV1} from "rain.sol.codegen/interface/IIntegrityToolingV1.sol";
-import {IParserV1View} from "rain.interpreter.interface/interface/deprecated/IParserV1View.sol";
 import {RainterpreterParser} from "./RainterpreterParser.sol";
 
 /// All config required to construct a `Rainterpreter`.
@@ -60,10 +55,13 @@ contract RainterpreterExpressionDeployer is
 
     /// The interpreter with known bytecode that this deployer is constructed
     /// for.
-    IInterpreterV4 public immutable iInterpreter;
+    //slither-disable-next-line naming-convention
+    IInterpreterV4 public immutable I_INTERPRETER;
     /// The store with known bytecode that this deployer is constructed for.
-    IInterpreterStoreV2 public immutable iStore;
-    RainterpreterParser public immutable iParser;
+    //slither-disable-next-line naming-convention
+    IInterpreterStoreV2 public immutable I_STORE;
+    //slither-disable-next-line naming-convention
+    RainterpreterParser public immutable I_PARSER;
 
     constructor(RainterpreterExpressionDeployerConstructionConfigV2 memory config) {
         // Set the immutables.
@@ -71,9 +69,9 @@ contract RainterpreterExpressionDeployer is
         IInterpreterStoreV2 store = IInterpreterStoreV2(config.store);
         RainterpreterParser parser = RainterpreterParser(config.parser);
 
-        iInterpreter = interpreter;
-        iStore = store;
-        iParser = parser;
+        I_INTERPRETER = interpreter;
+        I_STORE = store;
+        I_PARSER = parser;
 
         // Guard against an interpreter with unknown bytecode.
         bytes32 interpreterHash;
@@ -111,7 +109,7 @@ contract RainterpreterExpressionDeployer is
 
     /// @inheritdoc IParserV2
     function parse2(bytes memory data) external view virtual override returns (bytes memory) {
-        (bytes memory bytecode, bytes32[] memory constants) = iParser.unsafeParse(data);
+        (bytes memory bytecode, bytes32[] memory constants) = I_PARSER.unsafeParse(data);
 
         uint256 size = LibInterpreterStateDataContract.serializeSize(bytecode, constants);
         bytes memory serialized;
@@ -135,9 +133,9 @@ contract RainterpreterExpressionDeployer is
     /// more gas efficient to call the parser directly.
     /// @inheritdoc IParserPragmaV1
     function parsePragma1(bytes calldata data) external view virtual override returns (PragmaV1 memory) {
-        // We know the iParser is also an IParserPragmaV1 because we enforced
+        // We know the I_PARSER is also an IParserPragmaV1 because we enforced
         // the bytecode hash in the constructor.
-        return iParser.parsePragma1(data);
+        return I_PARSER.parsePragma1(data);
     }
 
     /// Defines all the function pointers to integrity checks. This is the

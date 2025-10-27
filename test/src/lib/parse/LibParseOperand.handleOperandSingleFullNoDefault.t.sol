@@ -4,7 +4,6 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std/Test.sol";
 import {LibParseOperand, OperandV2} from "src/lib/parse/LibParseOperand.sol";
 import {UnexpectedOperandValue, ExpectedOperand} from "src/error/ErrParse.sol";
-import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {OperandOverflow} from "src/error/ErrParse.sol";
 
 contract LibParseOperandHandleOperandSingleFullTest is Test {

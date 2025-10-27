@@ -6,7 +6,7 @@ import {LibOpPow} from "src/lib/op/math/LibOpPow.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {Log10Negative} from "rain.math.float/error/ErrDecimalFloat.sol";
+import {PowNegativeBase} from "rain.math.float/error/ErrDecimalFloat.sol";
 
 contract LibOpPowTest is OpTest {
     function beforeOpTestConstructor() internal virtual override {
@@ -57,11 +57,11 @@ contract LibOpPowTest is OpTest {
         // 1 ^ 2
         checkHappy("_: power(1 2);", Float.unwrap(LibDecimalFloat.packLossless(1e3, -3)), "1 2");
         // 2 ^ 2
-        checkHappy("_: power(2 2);", Float.unwrap(LibDecimalFloat.packLossless(3999, -3)), "2 2");
+        checkHappy("_: power(2 2);", Float.unwrap(LibDecimalFloat.packLossless(4000, -3)), "2 2");
         // 2 ^ 3
-        checkHappy("_: power(2 3);", Float.unwrap(LibDecimalFloat.packLossless(7998, -3)), "2 3");
+        checkHappy("_: power(2 3);", Float.unwrap(LibDecimalFloat.packLossless(8000, -3)), "2 3");
         // 2 ^ 4
-        checkHappy("_: power(2 4);", Float.unwrap(LibDecimalFloat.packLossless(1600, -2)), "2 4");
+        checkHappy("_: power(2 4);", Float.unwrap(LibDecimalFloat.packLossless(16000, -3)), "2 4");
         // sqrt 4 = 2
         checkHappy("_: power(4 0.5);", Float.unwrap(LibDecimalFloat.packLossless(2e3, -3)), "4 0.5");
         // -1 ^ 0 = 1
@@ -70,9 +70,9 @@ contract LibOpPowTest is OpTest {
 
     function testOpPowNegativeBaseError() external {
         // Negative base with positive exponent.
-        checkUnhappy("_: power(-1 2);", abi.encodeWithSelector(Log10Negative.selector, -1, 0));
+        checkUnhappy("_: power(-1 2);", abi.encodeWithSelector(PowNegativeBase.selector, -1, 0));
         // Negative base with negative exponent.
-        checkUnhappy("_: power(-1 -2);", abi.encodeWithSelector(Log10Negative.selector, -1, 0));
+        checkUnhappy("_: power(-1 -2);", abi.encodeWithSelector(PowNegativeBase.selector, -1, 0));
     }
 
     /// Test the eval of `power` for bad inputs.

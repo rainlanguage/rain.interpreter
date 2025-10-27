@@ -27,9 +27,13 @@ library LibOpERC20BalanceOf {
             stackTop := add(stackTop, 0x20)
             account := mload(stackTop)
         }
+        // It is the rainlang author's responsibility to ensure that the token
+        // and account are valid addresses.
+        //forge-lint: disable-next-line(unsafe-typecast)
         uint256 tokenBalance = IERC20(address(uint160(token))).balanceOf(address(uint160(account)));
 
         // This can fail as `decimals` is an OPTIONAL part of the ERC20 standard.
+        //forge-lint: disable-next-line(unsafe-typecast)
         uint8 tokenDecimals = IERC20Metadata(address(uint160(token))).decimals();
 
         Float tokenBalanceFloat = LibDecimalFloat.fromFixedDecimalLosslessPacked(tokenBalance, tokenDecimals);

@@ -3,7 +3,6 @@ pragma solidity =0.8.25;
 
 import {ParseTest} from "test/abstract/ParseTest.sol";
 import {LibParse} from "src/lib/parse/LibParse.sol";
-import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {UnexpectedRHSChar} from "src/error/ErrParse.sol";
 import {
     CMASK_RHS_WORD_HEAD,
@@ -24,6 +23,7 @@ contract LibParseUnexpectedRHSTest is ParseTest {
     /// Check the parser reverts if it encounters an unexpected character as the
     /// first character on the RHS.
     function testParseUnexpectedRHS(uint8 unexpected) external {
+        //forge-lint: disable-next-line(incorrect-shift)
         uint256 shifted = 1 << unexpected;
         vm.assume(
             0

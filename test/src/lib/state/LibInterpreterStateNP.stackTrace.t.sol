@@ -13,7 +13,11 @@ contract LibInterpreterStateStackTraceTest is Test {
         sourceIndex = bound(sourceIndex, 0, 0xFFFF);
         uint256 lengthBefore = inputs.length;
         vm.expectCall(
-            STACK_TRACER, abi.encodePacked(bytes2(uint16(parentSourceIndex)), bytes2(uint16(sourceIndex)), inputs), 1
+            STACK_TRACER,
+            // Safe typecast due to bounds above.
+            //forge-lint: disable-next-line(unsafe-typecast)
+            abi.encodePacked(bytes2(uint16(parentSourceIndex)), bytes2(uint16(sourceIndex)), inputs),
+            1
         );
         LibInterpreterState.stackTrace(parentSourceIndex, sourceIndex, inputs.dataPointer(), inputs.endPointer());
         // Check we didn't corrupt the inputs length while mutating memory.

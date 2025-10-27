@@ -7,12 +7,7 @@ import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpConditions} from "src/lib/op/logic/LibOpConditions.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {
-    IInterpreterV4,
-    OperandV2,
-    SourceIndexV2,
-    FullyQualifiedNamespace
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibIntOrAString, IntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
@@ -150,14 +145,14 @@ contract LibOpConditionsTest is OpTest {
     /// Test that conditions without inputs fails integrity check.
     function testOpConditionsEvalFail0Inputs() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));
-        bytes memory bytecode = iDeployer.parse2("_: conditions();");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: conditions();");
         (bytecode);
     }
 
     /// Test that conditions with 1 inputs fails integrity check.
     function testOpConditionsEvalFail1Inputs() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 2, 1));
-        bytes memory bytecode = iDeployer.parse2("_: conditions(0x00);");
+        bytes memory bytecode = I_DEPLOYER.parse2("_: conditions(0x00);");
         (bytecode);
     }
 

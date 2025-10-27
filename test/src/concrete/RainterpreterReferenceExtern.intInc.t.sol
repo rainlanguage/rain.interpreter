@@ -4,8 +4,6 @@ pragma solidity =0.8.25;
 import {OpTest} from "test/abstract/OpTest.sol";
 import {
     RainterpreterReferenceExtern,
-    OPCODE_FUNCTION_POINTERS,
-    INTEGRITY_FUNCTION_POINTERS,
     OP_INDEX_INCREMENT,
     LibExternOpIntInc
 } from "src/concrete/extern/RainterpreterReferenceExtern.sol";
@@ -19,7 +17,6 @@ import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpre
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {OPCODE_EXTERN} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {ExternDispatchConstantsHeightOverflow} from "src/error/ErrSubParse.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 contract RainterpreterReferenceExternIntIncTest is OpTest {

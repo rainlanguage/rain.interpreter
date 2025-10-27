@@ -70,10 +70,14 @@ contract LibOpExponentialGrowthTest is OpTest {
             "_: exponential-growth(1 0.1 1);", Float.unwrap(LibDecimalFloat.packLossless(1.1e67, -67)), "1 0.1 1"
         );
         // Exactly 1.21
-        checkHappy("_: exponential-growth(1 0.1 2);", Float.unwrap(LibDecimalFloat.packLossless(121e1, -3)), "1 0.1 2");
+        checkHappy(
+            "_: exponential-growth(1 0.1 2);", Float.unwrap(LibDecimalFloat.packLossless(1.21e67, -67)), "1 0.1 2"
+        );
         // Not exactly 1.26905870629
         checkHappy(
-            "_: exponential-growth(1 0.1 2.5);", Float.unwrap(LibDecimalFloat.packLossless(1269, -3)), "1 0.1 2.5"
+            "_: exponential-growth(1 0.1 2.5);",
+            Float.unwrap(LibDecimalFloat.packLossless(1.26929e67, -67)),
+            "1 0.1 2.5"
         );
         checkHappy("_: exponential-growth(1 0 2);", Float.unwrap(LibDecimalFloat.packLossless(1e3, -3)), "1 0 2");
         // Not exactly 1.0488088482
@@ -84,7 +88,9 @@ contract LibOpExponentialGrowthTest is OpTest {
         checkHappy(
             "_: exponential-growth(2 0.1 1);", Float.unwrap(LibDecimalFloat.packLossless(2.2e66, -66)), "2 0.1 1"
         );
-        checkHappy("_: exponential-growth(2 0.1 2);", Float.unwrap(LibDecimalFloat.packLossless(242e1, -3)), "2 0.1 2");
+        checkHappy(
+            "_: exponential-growth(2 0.1 2);", Float.unwrap(LibDecimalFloat.packLossless(2.42e66, -66)), "2 0.1 2"
+        );
 
         /// 1.8181..
         checkHappy(
