@@ -78,7 +78,7 @@ contract LibParseOperandParseOperandTest is Test {
         // Casting an int256 to uint256 does not truncate, and is required to
         // build a hex string.
         //forge-lint: disable-next-line(unsafe-typecast)
-        string memory valueString = asHex ? uint256(value).toHexString() : value.toString();
+        string memory valueString = asHex ? uint256(value).toHexString() : value.toStringSigned();
         string memory s = string.concat("<", maybeWhitespaceA, valueString, maybeWhitespaceB, ">", suffix);
 
         bytes32[] memory expectedValues = new bytes32[](1);
@@ -117,9 +117,9 @@ contract LibParseOperandParseOperandTest is Test {
         // Casting an int256 to uint256 does not truncate, and is required to
         // build a hex string.
         //forge-lint: disable-next-line(unsafe-typecast)
-        string memory valueAString = asHexA ? uint256(valueA).toHexString() : valueA.toString();
+        string memory valueAString = asHexA ? uint256(valueA).toHexString() : valueA.toStringSigned();
         //forge-lint: disable-next-line(unsafe-typecast)
-        string memory valueBString = asHexB ? uint256(valueB).toHexString() : valueB.toString();
+        string memory valueBString = asHexB ? uint256(valueB).toHexString() : valueB.toStringSigned();
 
         string memory s = string.concat(
             "<", maybeWhitespaceA, valueAString, maybeWhitespaceB, valueBString, maybeWhitespaceC, ">", suffix
@@ -174,11 +174,11 @@ contract LibParseOperandParseOperandTest is Test {
             // Casting an int256 to uint256 does not truncate, and is required to
             // build a hex string.
             //forge-lint: disable-next-line(unsafe-typecast)
-            string memory valueAString = asHexA ? uint256(valueA).toHexString() : valueA.toString();
+            string memory valueAString = asHexA ? uint256(valueA).toHexString() : valueA.toStringSigned();
             //forge-lint: disable-next-line(unsafe-typecast)
-            string memory valueBString = asHexB ? uint256(valueB).toHexString() : valueB.toString();
+            string memory valueBString = asHexB ? uint256(valueB).toHexString() : valueB.toStringSigned();
             //forge-lint: disable-next-line(unsafe-typecast)
-            string memory valueCString = asHexC ? uint256(valueC).toHexString() : valueC.toString();
+            string memory valueCString = asHexC ? uint256(valueC).toHexString() : valueC.toStringSigned();
 
             s = string.concat(
                 string.concat(
@@ -236,10 +236,10 @@ contract LibParseOperandParseOperandTest is Test {
                 + bytes(maybeWhitespace[2]).length + bytes(maybeWhitespace[3]).length + bytes(maybeWhitespace[4]).length;
         }
 
-        string memory valueAString = asHex[0] ? uint256(values[0]).toHexString() : values[0].toString();
-        string memory valueBString = asHex[1] ? uint256(values[1]).toHexString() : values[1].toString();
-        string memory valueCString = asHex[2] ? uint256(values[2]).toHexString() : values[2].toString();
-        string memory valueDString = asHex[3] ? uint256(values[3]).toHexString() : values[3].toString();
+        string memory valueAString = asHex[0] ? uint256(values[0]).toHexString() : values[0].toStringSigned();
+        string memory valueBString = asHex[1] ? uint256(values[1]).toHexString() : values[1].toStringSigned();
+        string memory valueCString = asHex[2] ? uint256(values[2]).toHexString() : values[2].toStringSigned();
+        string memory valueDString = asHex[3] ? uint256(values[3]).toHexString() : values[3].toStringSigned();
 
         {
             expectedLength += bytes(valueAString).length + bytes(valueBString).length + bytes(valueCString).length
