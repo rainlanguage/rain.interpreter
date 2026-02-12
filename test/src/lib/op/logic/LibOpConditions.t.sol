@@ -93,7 +93,7 @@ contract LibOpConditionsTest is OpTest {
 
         if (inputs.length % 2 != 0) {
             inputs[inputs.length - 1] =
-                StackItem.wrap(bytes32(IntOrAString.unwrap(LibIntOrAString.fromString2(reason))));
+                StackItem.wrap(bytes32(IntOrAString.unwrap(LibIntOrAString.fromStringV3(reason))));
         } else {
             reason = "";
         }

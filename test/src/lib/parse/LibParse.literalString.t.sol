@@ -33,7 +33,7 @@ contract LibParseLiteralStringTest is Test {
         assertEq(outputs, 1);
 
         assertEq(constants.length, 1);
-        assertEq(constants[0], bytes32(IntOrAString.unwrap(LibIntOrAString.fromString2(""))));
+        assertEq(constants[0], bytes32(IntOrAString.unwrap(LibIntOrAString.fromStringV3(""))));
     }
 
     /// Check a simple string `"a"` literal. Should not revert and return
@@ -50,7 +50,7 @@ contract LibParseLiteralStringTest is Test {
         assertEq(outputs, 1);
 
         assertEq(constants.length, 1);
-        assertEq(constants[0], bytes32(IntOrAString.unwrap(LibIntOrAString.fromString2("a"))));
+        assertEq(constants[0], bytes32(IntOrAString.unwrap(LibIntOrAString.fromStringV3("a"))));
     }
 
     /// Any ASCII printable string shorter than 32 bytes should be parsed
@@ -72,7 +72,7 @@ contract LibParseLiteralStringTest is Test {
         assertEq(outputs, 1);
 
         assertEq(constants.length, 1);
-        assertEq(constants[0], bytes32(IntOrAString.unwrap(LibIntOrAString.fromString2(str))));
+        assertEq(constants[0], bytes32(IntOrAString.unwrap(LibIntOrAString.fromStringV3(str))));
     }
 
     /// Can parse 2 valid strings.
@@ -96,8 +96,8 @@ contract LibParseLiteralStringTest is Test {
         assertEq(outputs, 2);
 
         assertEq(constants.length, 2);
-        assertEq(constants[0], bytes32(IntOrAString.unwrap(LibIntOrAString.fromString2(strA))));
-        assertEq(constants[1], bytes32(IntOrAString.unwrap(LibIntOrAString.fromString2(strB))));
+        assertEq(constants[0], bytes32(IntOrAString.unwrap(LibIntOrAString.fromStringV3(strA))));
+        assertEq(constants[1], bytes32(IntOrAString.unwrap(LibIntOrAString.fromStringV3(strB))));
     }
 
     /// Valid ASCII printable strings 32 bytes or longer should error.

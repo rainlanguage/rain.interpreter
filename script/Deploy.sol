@@ -5,6 +5,8 @@ import {Script} from "forge-std/Script.sol";
 import {RainterpreterStore} from "../src/concrete/RainterpreterStore.sol";
 import {Rainterpreter} from "../src/concrete/Rainterpreter.sol";
 import {RainterpreterParser} from "../src/concrete/RainterpreterParser.sol";
+import {LibRainDeploy} from "rain.deploy/lib/LibRainDeploy.sol";
+import {LibInterpreterDeploy} from "../src/lib/deploy/LibInterpreterDeploy.sol";
 
 // import {
 //     RainterpreterExpressionDeployer,

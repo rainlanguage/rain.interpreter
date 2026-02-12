@@ -52,7 +52,7 @@ contract LibOpEnsureTest is OpTest {
         InterpreterState memory state = opTestDefaultInterpreterState();
         StackItem[] memory inputs = new StackItem[](2);
         inputs[0] = condition;
-        inputs[1] = StackItem.wrap(bytes32(IntOrAString.unwrap(LibIntOrAString.fromString2(reason))));
+        inputs[1] = StackItem.wrap(bytes32(IntOrAString.unwrap(LibIntOrAString.fromStringV3(reason))));
 
         OperandV2 operand = LibOperand.build(2, 0, 0);
         opReferenceCheck(state, operand, LibOpEnsure.referenceFn, LibOpEnsure.integrity, LibOpEnsure.run, inputs);

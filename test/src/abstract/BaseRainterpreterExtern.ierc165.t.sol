@@ -31,7 +31,7 @@ contract BaseRainterpreterExternIERC165Test is Test {
         vm.assume(badInterfaceId != type(IIntegrityToolingV1).interfaceId);
         vm.assume(badInterfaceId != type(IOpcodeToolingV1).interfaceId);
 
-        ChildRainterpreterExternNPE2 extern = new ChildRainterpreterExtern();
+        ChildRainterpreterExtern extern = new ChildRainterpreterExtern();
         assertTrue(extern.supportsInterface(type(IERC165).interfaceId));
         assertTrue(extern.supportsInterface(type(IInterpreterExternV4).interfaceId));
         assertTrue(extern.supportsInterface(type(IIntegrityToolingV1).interfaceId));

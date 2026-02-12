@@ -33,7 +33,7 @@ library LibOpEnsure {
         }
 
         if (condition.isZero()) {
-            revert(reason.toString());
+            revert(reason.toStringV3());
         }
         return stackTop;
     }
@@ -46,7 +46,7 @@ library LibOpEnsure {
     {
         require(
             !Float.wrap(StackItem.unwrap(inputs[0])).isZero(),
-            IntOrAString.wrap(uint256(StackItem.unwrap(inputs[1]))).toString()
+            IntOrAString.wrap(uint256(StackItem.unwrap(inputs[1]))).toStringV3()
         );
         outputs = new StackItem[](0);
     }
