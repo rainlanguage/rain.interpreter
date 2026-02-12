@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Test} from "forge-std/Test.sol";
+import {Test, console2} from "forge-std/Test.sol";
 import {ParseState, Pointer, LibParseState} from "src/lib/parse/LibParseState.sol";
 import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseLiteralSubParseable} from "src/lib/parse/literal/LibParseLiteralSubParseable.sol";
@@ -121,6 +121,8 @@ contract LibParseLiteralSubParseableTest is Test {
         checkParseSubParseable("[hi\na]", "hi", "a", 6);
         checkParseSubParseable("[hi\na ]", "hi", "a ", 7);
         checkParseSubParseable("[hi\na\n]", "hi", "a\n", 7);
+        // Examples from fuzzing.
+        checkParseSubParseable("[[pi\n\n\n\na]", "[pi", "a", 10);
     }
 
     /// Fuzz the happy path.
@@ -138,11 +140,14 @@ contract LibParseLiteralSubParseableTest is Test {
         // whitespace.
         LibConformString.conformStringToMask(body, ~CMASK_SUB_PARSEABLE_LITERAL_END);
 
+        string memory data = string(abi.encodePacked("[", dispatch, whitespace, body, "]"));
+        // string memory name = vm.toString(keccak256(abi.encodePacked(dispatch, whitespace, body)));
+
+        // string memory path = string.concat("./out/test/testOutput-", name, ".txt");
+        // vm.writeFile(path, data);
+
         checkParseSubParseable(
-            string(abi.encodePacked("[", dispatch, whitespace, body, "]")),
-            dispatch,
-            body,
-            bytes(dispatch).length + bytes(whitespace).length + bytes(body).length + 2
+            data, dispatch, body, bytes(dispatch).length + bytes(whitespace).length + bytes(body).length + 2
         );
     }
 }

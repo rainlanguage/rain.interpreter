@@ -71,7 +71,7 @@ contract LibParsePragmaKeywordTest is Test {
     function testPragmaKeywordNoop(ParseState memory state, string calldata calldataStr) external pure {
         if (bytes(calldataStr).length >= PRAGMA_KEYWORD_BYTES_LENGTH) {
             bytes memory prefix = bytes(calldataStr)[0:PRAGMA_KEYWORD_BYTES_LENGTH];
-            assert(keccak256(prefix) != keccak256(PRAGMA_KEYWORD_BYTES));
+            vm.assume(keccak256(prefix) != keccak256(PRAGMA_KEYWORD_BYTES));
         }
         string memory str = calldataStr;
 

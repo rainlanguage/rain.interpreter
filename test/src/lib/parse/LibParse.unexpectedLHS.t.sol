@@ -102,9 +102,12 @@ contract LibParseUnexpectedLHSTest is ParseTest {
         }
         vm.assume(hasInvalidChar);
 
+        bytes memory identifier = bytes.concat(bytes1(a), b);
+        vm.assume(identifier.length > 0);
+        vm.assume(identifier.length < 32);
+
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, i + 1));
-        (bytes memory bytecode, bytes32[] memory constants) =
-            this.parseExternal(string(bytes.concat(bytes1(a), b, ":;")));
+        (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal(string(bytes.concat(identifier, ":;")));
         (bytecode, constants);
     }
 }

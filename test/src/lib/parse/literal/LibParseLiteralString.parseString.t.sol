@@ -25,9 +25,9 @@ contract LibParseLiteralStringTest is Test {
         ParseState memory state = LibParseState.newState("\"\"", "", "", "");
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());
         (uint256 cursorAfter, bytes32 value) = state.parseString(cursor, Pointer.unwrap(state.data.endDataPointer()));
-        // Empty string is represented by 0 with the highest bit set to make it
-        // a truthy value.
-        assertEq(value, bytes32(uint256(1 << 0xFF)));
+        // Empty string is length 0 with the 3 truth bits set, which is
+        // 0b11100000 or 0xe0 in hexadecimal.
+        assertEq(value, bytes32(uint256(0xe0)));
         assertEq(cursorAfter, cursor + 2);
     }
 

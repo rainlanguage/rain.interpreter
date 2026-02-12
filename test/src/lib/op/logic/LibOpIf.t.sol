@@ -95,14 +95,11 @@ contract LibOpIfTest is OpTest {
     /// conditionals assume numeric inputs. We can demonstrate some of the
     /// weirdness in testing.
     function testOpIfEvalEmptyStringTruthy() external view {
-        /// Empty string is false, because even though there's a binary high
-        /// bit set, it looks like an exponent on zero as a float.
-        checkHappy("_: if(\"\" 5 50);", Float.unwrap(LibDecimalFloat.packLossless(50, 0)), "");
-        /// "foo" is also false, because even with a length of 3 it still
-        /// looks like an exponent on zero as a float.
-        checkHappy("_: if(\"foo\" 5 50);", Float.unwrap(LibDecimalFloat.packLossless(50, 0)), "");
-        /// "foos" is true because it has enough chars to look like a non
-        /// zero float.
+        /// Empty string is true, because all strings are true.
+        checkHappy("_: if(\"\" 5 50);", Float.unwrap(LibDecimalFloat.packLossless(5, 0)), "");
+        /// "foo" is also true, because all strings are true.
+        checkHappy("_: if(\"foo\" 5 50);", Float.unwrap(LibDecimalFloat.packLossless(5, 0)), "");
+        /// "foos" is true, because all strings are true.
         checkHappy("_: if(\"foos\" 5 50);", Float.unwrap(LibDecimalFloat.packLossless(5, 0)), "");
     }
 

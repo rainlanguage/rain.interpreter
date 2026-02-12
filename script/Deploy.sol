@@ -7,6 +7,7 @@ import {Rainterpreter} from "../src/concrete/Rainterpreter.sol";
 import {RainterpreterParser} from "../src/concrete/RainterpreterParser.sol";
 import {LibRainDeploy} from "rain.deploy/lib/LibRainDeploy.sol";
 import {LibInterpreterDeploy} from "../src/lib/deploy/LibInterpreterDeploy.sol";
+import {LibDecimalFloatDeploy} from "rain.math.float/lib/deploy/LibDecimalFloatDeploy.sol";
 
 // import {
 //     RainterpreterExpressionDeployer,
@@ -20,6 +21,8 @@ contract Deploy is Script {
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("DEPLOYMENT_KEY");
 
+        address[] memory deps = new address[](1);
+        deps[0] = LibDecimalFloatDeploy.ZOLTU_DEPLOYED_LOG_TABLES_ADDRESS;
         LibRainDeploy.deployAndBroadcastToSupportedNetworks(
             vm,
             LibRainDeploy.supportedNetworks(),
@@ -28,7 +31,7 @@ contract Deploy is Script {
             "",
             LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS,
             LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH,
-            new address[](0)
+            deps
         );
 
         // bytes memory constructionMeta = vm.readFileBinary("meta/RainterpreterExpressionDeployer.rain.meta");
