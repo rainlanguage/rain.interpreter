@@ -13,9 +13,9 @@ import {
     UnexpectedStoreBytecodeHash,
     UnexpectedParserBytecodeHash
 } from "../error/ErrDeploy.sol";
-import {IInterpreterStoreV2} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
+import {IInterpreterStoreV3} from "rain.interpreter.interface/interface/IInterpreterStoreV3.sol";
 import {IDescribedByMetaV1} from "rain.metadata/interface/IDescribedByMetaV1.sol";
-import {IInterpreterV4} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {IInterpreterV4} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
 import {LibIntegrityCheck} from "../lib/integrity/LibIntegrityCheck.sol";
 import {LibInterpreterStateDataContract} from "../lib/state/LibInterpreterStateDataContract.sol";
@@ -33,7 +33,7 @@ import {RainterpreterParser} from "./RainterpreterParser.sol";
 /// All config required to construct a `Rainterpreter`.
 /// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match
 /// known bytecode.
-/// @param store The `IInterpreterStoreV2`. MUST match known bytecode.
+/// @param store The `IInterpreterStoreV3`. MUST match known bytecode.
 /// @param parser The `IParserV1View`. MUST match known bytecode.
 struct RainterpreterExpressionDeployerConstructionConfigV2 {
     address interpreter;
@@ -59,14 +59,14 @@ contract RainterpreterExpressionDeployer is
     IInterpreterV4 public immutable I_INTERPRETER;
     /// The store with known bytecode that this deployer is constructed for.
     //slither-disable-next-line naming-convention
-    IInterpreterStoreV2 public immutable I_STORE;
+    IInterpreterStoreV3 public immutable I_STORE;
     //slither-disable-next-line naming-convention
     RainterpreterParser public immutable I_PARSER;
 
     constructor(RainterpreterExpressionDeployerConstructionConfigV2 memory config) {
         // Set the immutables.
         IInterpreterV4 interpreter = IInterpreterV4(config.interpreter);
-        IInterpreterStoreV2 store = IInterpreterStoreV2(config.store);
+        IInterpreterStoreV3 store = IInterpreterStoreV3(config.store);
         RainterpreterParser parser = RainterpreterParser(config.parser);
 
         I_INTERPRETER = interpreter;

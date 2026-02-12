@@ -7,7 +7,7 @@ import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibMemoryKV, MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
 /// Thrown when the inputs length does not match the expected inputs length.
 /// @param expected The expected number of inputs.
@@ -64,10 +64,7 @@ library LibEval {
             }
         }
 
-        function(InterpreterState memory, OperandV2, Pointer)
-                    internal
-                    view
-                    returns (Pointer) f;
+        function(InterpreterState memory, OperandV2, Pointer) internal view returns (Pointer) f;
         OperandV2 operand;
         uint256 word;
         while (cursor < end) {

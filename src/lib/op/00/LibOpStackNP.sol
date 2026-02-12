@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 /// Thrown when a stack read index is outside the current stack top.
 
 error OutOfBoundsStackRead(uint256 opIndex, uint256 stackTopIndex, uint256 stackRead);

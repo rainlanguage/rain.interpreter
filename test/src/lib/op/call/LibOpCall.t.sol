@@ -7,7 +7,7 @@ import {
     SourceIndexV2,
     EvalV4,
     StackItem
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
 import {BytecodeTest} from "rain.interpreter.interface/../test/abstract/BytecodeTest.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";

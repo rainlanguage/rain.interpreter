@@ -12,7 +12,7 @@ import {
     FullyQualifiedNamespace,
     EvalV4,
     StackItem
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 

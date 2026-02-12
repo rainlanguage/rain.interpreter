@@ -6,7 +6,7 @@ import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 
 // AuthoringMetaV2 exported for convenience.
 //forge-lint: disable-next-line(unused-import)
-import {ISubParserV4, AuthoringMetaV2} from "rain.interpreter.interface/interface/unstable/ISubParserV4.sol";
+import {ISubParserV4, AuthoringMetaV2} from "rain.interpreter.interface/interface/ISubParserV4.sol";
 import {LibSubParse, ParseState} from "../lib/parse/LibSubParse.sol";
 import {CMASK_RHS_WORD_TAIL} from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibParse, OperandV2} from "../lib/parse/LibParse.sol";
@@ -73,7 +73,7 @@ bytes constant SUB_PARSER_LITERAL_PARSERS = hex"";
 ///   of the main parser. The expectation on failure is that there may be some
 ///   other subparser that can parse the data, so the main parser will handle
 ///   fallback logic.
-abstract contract BaseRainterpreterSubParserNPE2 is
+abstract contract BaseRainterpreterSubParser is
     ERC165,
     ISubParserV4,
     IDescribedByMetaV1,
@@ -160,7 +160,7 @@ abstract contract BaseRainterpreterSubParserNPE2 is
         (bool success, uint256 index, bytes32 dispatchValue) = matchSubParseLiteralDispatch(dispatchStart, bodyStart);
 
         if (success) {
-            function (bytes32, uint256, uint256) internal pure returns (bytes32) subParser;
+            function(bytes32, uint256, uint256) internal pure returns (bytes32) subParser;
             bytes memory localSubParserLiteralParsers = subParserLiteralParsers();
             assembly ("memory-safe") {
                 subParser := and(mload(add(localSubParserLiteralParsers, mul(add(index, 1), 2))), 0xFFFF)
@@ -190,8 +190,7 @@ abstract contract BaseRainterpreterSubParserNPE2 is
         (bool exists, uint256 index) = LibParseMeta.lookupWord(state.meta, word);
         if (exists) {
             OperandV2 operand = state.handleOperand(index);
-            function (uint256, uint256, OperandV2) internal pure returns (bool, bytes memory, bytes32[] memory)
-                subParser;
+            function(uint256, uint256, OperandV2) internal pure returns (bool, bytes memory, bytes32[] memory) subParser;
             bytes memory localSubParserWordParsers = subParserWordParsers();
             assembly ("memory-safe") {
                 subParser := and(mload(add(localSubParserWordParsers, mul(add(index, 1), 2))), 0xFFFF)

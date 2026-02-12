@@ -5,18 +5,14 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {LibOpMax} from "src/lib/op/math/LibOpMax.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
-import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 contract LibOpMaxTest is OpTest {
     /// Directly test the integrity logic of LibOpMax. This tests the happy
     /// path where the inputs input and calc match.
-    function testOpMaxIntegrityHappy(IntegrityCheckState memory state, uint8 inputs, uint16 operandData)
-        external
-        pure
-    {
+    function testOpMaxIntegrityHappy(IntegrityCheckState memory state, uint8 inputs, uint16 operandData) external pure {
         inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) = LibOpMax.integrity(state, LibOperand.build(inputs, 1, operandData));
 

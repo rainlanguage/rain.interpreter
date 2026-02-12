@@ -9,14 +9,9 @@ import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
-import {
-    OperandV2,
-    SourceIndexV2,
-    EvalV4,
-    StackItem
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {FullyQualifiedNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
+import {OperandV2, SourceIndexV2, EvalV4, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
+import {FullyQualifiedNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV3.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV4.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {InterpreterState, LibInterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";

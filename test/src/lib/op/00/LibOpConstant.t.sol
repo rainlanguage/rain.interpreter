@@ -13,8 +13,8 @@ import {
     FullyQualifiedNamespace,
     EvalV4,
     StackItem
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
+} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV4.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {BadOpOutputsLength} from "src/error/ErrIntegrity.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
@@ -49,8 +49,9 @@ contract LibOpConstantTest is OpTest {
     /// where the operand points past the end of the constants array, which MUST
     /// always error as an OOB read.
     function testOpConstantNPIntegrityOOBConstants(IntegrityCheckState memory state, OperandV2 operand) external {
-        operand =
-            OperandV2.wrap(bytes32(bound(uint256(OperandV2.unwrap(operand)), state.constants.length, type(uint16).max)));
+        operand = OperandV2.wrap(
+            bytes32(bound(uint256(OperandV2.unwrap(operand)), state.constants.length, type(uint16).max))
+        );
 
         vm.expectRevert(
             abi.encodeWithSelector(

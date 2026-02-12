@@ -3,9 +3,11 @@ pragma solidity =0.8.25;
 
 import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
-import {IInterpreterStoreV3} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV3.sol";
+import {IInterpreterStoreV3} from "rain.interpreter.interface/interface/IInterpreterStoreV3.sol";
 import {
-    LibNamespace, FullyQualifiedNamespace, StateNamespace
+    LibNamespace,
+    FullyQualifiedNamespace,
+    StateNamespace
 } from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
 
 // Exported for convenience.
@@ -16,7 +18,7 @@ import {BYTECODE_HASH as STORE_BYTECODE_HASH} from "../generated/RainterpreterSt
 error OddSetLength(uint256 length);
 
 /// @title RainterpreterStore
-/// @notice Simplest possible `IInterpreterStoreV2` that could work.
+/// @notice Simplest possible `IInterpreterStoreV3` that could work.
 /// Takes key/value pairings from the input array and stores each in an internal
 /// mapping. `StateNamespace` is fully qualified only by `msg.sender` on set and
 /// doesn't attempt to do any deduping etc. if the same key appears twice it will

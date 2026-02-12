@@ -4,7 +4,7 @@ pragma solidity ^0.8.25;
 import {IERC5313} from "openzeppelin-contracts/contracts/interfaces/IERC5313.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
-import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 
 /// @title LibOpERC5313Owner

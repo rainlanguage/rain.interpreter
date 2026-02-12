@@ -29,8 +29,9 @@ contract LibParsePragmaKeywordTest is Test {
         address[] memory values,
         string memory err
     ) internal pure {
-        ParseState memory state =
-            LibParseState.newState(bytes(str), "", "", LibAllStandardOps.literalParserFunctionPointers());
+        ParseState memory state = LibParseState.newState(
+            bytes(str), "", "", LibAllStandardOps.literalParserFunctionPointers()
+        );
         uint256 cursor = Pointer.unwrap(bytes(str).dataPointer());
         uint256 end = Pointer.unwrap(bytes(str).endDataPointer());
         uint256 cursorAfter = state.parsePragma(cursor, end);
@@ -102,10 +103,10 @@ contract LibParsePragmaKeywordTest is Test {
         if (bytes(calldataStr).length > 2) {
             vm.assume(
                 keccak256(bytes(calldataStr[0:2]))
-                // CMASK_LITERAL_HEX_DISPATCH_START is a constant that is
-                // definitely a uint16 so this is safe.
-                //forge-lint: disable-next-line(unsafe-typecast)
-                != keccak256(abi.encodePacked(uint16(CMASK_LITERAL_HEX_DISPATCH_START)))
+                    // CMASK_LITERAL_HEX_DISPATCH_START is a constant that is
+                    // definitely a uint16 so this is safe.
+                    //forge-lint: disable-next-line(unsafe-typecast)
+                    != keccak256(abi.encodePacked(uint16(CMASK_LITERAL_HEX_DISPATCH_START)))
             );
         }
         string memory str = string.concat(

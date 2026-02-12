@@ -4,9 +4,8 @@ pragma solidity ^0.8.18;
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../../state/LibInterpreterState.sol";
-import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 /// @title LibOpUint256ERC20Allowance
 /// @notice Opcode for getting the current erc20 allowance of an account.
@@ -31,7 +30,7 @@ library LibOpUint256ERC20Allowance {
         // It is the rainlang author's responsibility to ensure that token,
         // owner and spender are valid addresses.
         //forge-lint: disable-next-line(unsafe-typecast)
-         IERC20(address(uint160(token))).allowance(address(uint160(owner)), address(uint160(spender)));
+        IERC20(address(uint160(token))).allowance(address(uint160(owner)), address(uint160(spender)));
         assembly ("memory-safe") {
             mstore(stackTop, tokenAllowance)
         }

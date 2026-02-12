@@ -3,19 +3,14 @@ pragma solidity =0.8.25;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
-import {
-    OperandV2,
-    SourceIndexV2,
-    EvalV4,
-    StackItem
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, SourceIndexV2, EvalV4, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {OutOfBoundsStackRead, LibOpStackNP} from "src/lib/op/00/LibOpStackNP.sol";
 import {LibIntegrityCheck, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {FullyQualifiedNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
+import {FullyQualifiedNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV3.sol";
 import {OpTest, PRE, POST} from "test/abstract/OpTest.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV4.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {BadOpOutputsLength} from "src/error/ErrIntegrity.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";

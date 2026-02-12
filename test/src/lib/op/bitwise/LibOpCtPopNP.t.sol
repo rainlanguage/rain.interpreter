@@ -5,7 +5,7 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibOpCtPopNP} from "src/lib/op/bitwise/LibOpCtPopNP.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 

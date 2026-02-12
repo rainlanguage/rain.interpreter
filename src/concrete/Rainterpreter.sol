@@ -13,11 +13,14 @@ import {
     SourceIndexV2,
     EvalV4,
     StackItem
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import
-// Exported for convenience.
-//forge-lint: disable-next-line(unused-import)
-{BYTECODE_HASH as INTERPRETER_BYTECODE_HASH, OPCODE_FUNCTION_POINTERS} from "../generated/Rainterpreter.pointers.sol";
+} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
+import {
+
+    // Exported for convenience.
+    //forge-lint: disable-next-line(unused-import)
+    BYTECODE_HASH as INTERPRETER_BYTECODE_HASH,
+    OPCODE_FUNCTION_POINTERS
+} from "../generated/Rainterpreter.pointers.sol";
 import {IOpcodeToolingV1} from "rain.sol.codegen/interface/IOpcodeToolingV1.sol";
 
 /// @title Rainterpreter
@@ -28,16 +31,15 @@ contract Rainterpreter is IInterpreterV4, IOpcodeToolingV1, ERC165 {
     using LibInterpreterStateDataContract for bytes;
 
     /// @inheritdoc IInterpreterV4
-    function eval4(EvalV4 calldata eval)
-        external
-        view
-        virtual
-        override
-        returns (StackItem[] memory, bytes32[] memory)
-    {
-        InterpreterState memory state = eval.bytecode.unsafeDeserialize(
-            SourceIndexV2.unwrap(eval.sourceIndex), eval.namespace, eval.store, eval.context, OPCODE_FUNCTION_POINTERS
-        );
+    function eval4(EvalV4 calldata eval) external view virtual override returns (StackItem[] memory, bytes32[] memory) {
+        InterpreterState memory state = eval.bytecode
+            .unsafeDeserialize(
+                SourceIndexV2.unwrap(eval.sourceIndex),
+                eval.namespace,
+                eval.store,
+                eval.context,
+                OPCODE_FUNCTION_POINTERS
+            );
         for (uint256 i = 0; i < eval.stateOverlay.length; i += 2) {
             state.stateKV = LibMemoryKV.set(
                 state.stateKV, MemoryKVKey.wrap(eval.stateOverlay[i]), MemoryKVVal.wrap(eval.stateOverlay[i + 1])

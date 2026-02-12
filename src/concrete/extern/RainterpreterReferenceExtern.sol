@@ -3,13 +3,13 @@ pragma solidity =0.8.25;
 
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {BadDynamicLength} from "../../error/ErrOpList.sol";
-import {BaseRainterpreterExternNPE2, OperandV2} from "../../abstract/BaseRainterpreterExternNPE2.sol";
+import {BaseRainterpreterExtern, OperandV2} from "../../abstract/BaseRainterpreterExtern.sol";
 import {
-    BaseRainterpreterSubParserNPE2,
+    BaseRainterpreterSubParser,
     AuthoringMetaV2,
     IParserToolingV1,
     ISubParserToolingV1
-} from "../../abstract/BaseRainterpreterSubParserNPE2.sol";
+} from "../../abstract/BaseRainterpreterSubParser.sol";
 import {StackItem} from "../../lib/extern/LibExtern.sol";
 import {LibParseState, ParseState} from "../../lib/parse/LibParseState.sol";
 import {LibParseOperand} from "../../lib/parse/LibParseOperand.sol";
@@ -25,6 +25,7 @@ import {LibParseLiteralDecimal} from "../../lib/parse/literal/LibParseLiteralDec
 import {
     DESCRIBED_BY_META_HASH,
     PARSE_META as SUB_PARSER_PARSE_META,
+
     // Exported for convenience
     //forge-lint: disable-next-line(unused-import)
     PARSE_META_BUILD_DEPTH as EXTERN_PARSE_META_BUILD_DEPTH,
@@ -61,7 +62,7 @@ uint256 constant SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH = 18;
 /// the dispatch is for the repeat literal parser.
 bytes32 constant SUB_PARSER_LITERAL_REPEAT_KEYWORD_MASK =
 //forge-lint: disable-next-line(incorrect-shift)
- bytes32(~((1 << (32 - SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH) * 8) - 1));
+bytes32(~((1 << (32 - SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH) * 8) - 1));
 
 /// @dev The index of the repeat literal parser in the literal parser function
 /// pointers.
@@ -151,7 +152,7 @@ library LibRainterpreterReferenceExtern {
 /// calculated. Any discprepancy there is definitely a critical issue that causes
 /// undefined behaviour in production, so ALWAYS test this, preferably in an
 /// automated way.
-contract RainterpreterReferenceExtern is BaseRainterpreterSubParserNPE2, BaseRainterpreterExternNPE2 {
+contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainterpreterExtern {
     using LibDecimalFloat for Float;
 
     function describedByMetaV1() external pure override returns (bytes32) {
@@ -204,12 +205,12 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParserNPE2, BaseRai
     /// @inheritdoc IParserToolingV1
     function buildLiteralParserFunctionPointers() external pure returns (bytes memory) {
         unchecked {
-            function (uint256, uint256, uint256) internal pure returns (uint256) lengthPointer;
+            function(uint256, uint256, uint256) internal pure returns (uint256) lengthPointer;
             uint256 length = SUB_PARSER_LITERAL_PARSERS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function (uint256, uint256, uint256) internal pure returns (uint256)[SUB_PARSER_LITERAL_PARSERS_LENGTH + 1]
+            function(uint256, uint256, uint256) internal pure returns (uint256)[SUB_PARSER_LITERAL_PARSERS_LENGTH + 1]
                 memory parsersFixed = [lengthPointer, LibParseLiteralRepeat.parseRepeat];
             uint256[] memory parsersDynamic;
             assembly ("memory-safe") {
@@ -315,8 +316,10 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParserNPE2, BaseRai
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(uint256, uint256, OperandV2) internal view returns (bool, bytes memory, bytes32[] memory)[SUB_PARSER_WORD_PARSERS_LENGTH
-                + 1] memory pointersFixed = [
+            function(uint256, uint256, OperandV2)
+                internal
+                view returns (bool, bytes memory, bytes32[] memory)[SUB_PARSER_WORD_PARSERS_LENGTH + 1] memory
+                pointersFixed = [
                     lengthPointer,
                     LibExternOpIntInc.subParser,
                     LibExternOpStackOperandNPE2.subParser,
@@ -352,8 +355,10 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParserNPE2, BaseRai
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(OperandV2, StackItem[] memory) internal view returns (StackItem[] memory)[OPCODE_FUNCTION_POINTERS_LENGTH
-                + 1] memory pointersFixed = [lengthPointer, LibExternOpIntInc.run];
+            function(OperandV2, StackItem[] memory)
+                internal
+                view returns (StackItem[] memory)[OPCODE_FUNCTION_POINTERS_LENGTH + 1] memory
+                pointersFixed = [lengthPointer, LibExternOpIntInc.run];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
                 pointersDynamic := pointersFixed
@@ -382,8 +387,10 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParserNPE2, BaseRai
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(OperandV2, uint256, uint256) internal pure returns (uint256, uint256)[OPCODE_FUNCTION_POINTERS_LENGTH
-                + 1] memory pointersFixed = [lengthPointer, LibExternOpIntInc.integrity];
+            function(OperandV2, uint256, uint256)
+                internal
+                pure returns (uint256, uint256)[OPCODE_FUNCTION_POINTERS_LENGTH + 1] memory
+                pointersFixed = [lengthPointer, LibExternOpIntInc.integrity];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
                 pointersDynamic := pointersFixed
@@ -400,12 +407,12 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParserNPE2, BaseRai
     /// This is only needed because the parser and extern base contracts both
     /// implement IERC165, and the compiler needs to be told how to resolve the
     /// ambiguity.
-    /// @inheritdoc BaseRainterpreterSubParserNPE2
+    /// @inheritdoc BaseRainterpreterSubParser
     function supportsInterface(bytes4 interfaceId)
         public
         view
         virtual
-        override(BaseRainterpreterSubParserNPE2, BaseRainterpreterExternNPE2)
+        override(BaseRainterpreterSubParser, BaseRainterpreterExtern)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);

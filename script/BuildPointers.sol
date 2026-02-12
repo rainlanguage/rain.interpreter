@@ -42,7 +42,9 @@ contract BuildPointers is Script {
             address(parser),
             "RainterpreterParser",
             string.concat(
-                LibGenParseMeta.parseMetaConstantString(vm, LibAllStandardOps.authoringMetaV2(), PARSE_META_BUILD_DEPTH),
+                LibGenParseMeta.parseMetaConstantString(
+                    vm, LibAllStandardOps.authoringMetaV2(), PARSE_META_BUILD_DEPTH
+                ),
                 LibCodeGen.operandHandlerFunctionPointersConstantString(vm, parser),
                 LibCodeGen.literalParserFunctionPointersConstantString(vm, parser)
             )

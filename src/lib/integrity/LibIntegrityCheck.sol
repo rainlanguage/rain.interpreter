@@ -12,7 +12,7 @@ import {
     BadOpOutputsLength
 } from "../../error/ErrIntegrity.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {BadOpInputsLength} from "../../lib/integrity/LibIntegrityCheck.sol";
 
 struct IntegrityCheckState {
@@ -100,9 +100,7 @@ library LibIntegrityCheck {
                     OperandV2 operand;
                     uint256 bytecodeOpInputs;
                     uint256 bytecodeOpOutputs;
-                    function(IntegrityCheckState memory, OperandV2)
-                    view
-                    returns (uint256, uint256) f;
+                    function(IntegrityCheckState memory, OperandV2) view returns (uint256, uint256) f;
                     assembly ("memory-safe") {
                         let word := mload(cursor)
                         f := shr(0xf0, mload(add(fPointersStart, mul(byte(28, word), 2))))

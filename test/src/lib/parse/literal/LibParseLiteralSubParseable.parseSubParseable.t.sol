@@ -6,7 +6,7 @@ import {ParseState, Pointer, LibParseState} from "src/lib/parse/LibParseState.so
 import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseLiteralSubParseable} from "src/lib/parse/literal/LibParseLiteralSubParseable.sol";
 import {UnclosedSubParseableLiteral, SubParseableMissingDispatch} from "src/error/ErrParse.sol";
-import {ISubParserV4} from "rain.interpreter.interface/interface/unstable/ISubParserV4.sol";
+import {ISubParserV4} from "rain.interpreter.interface/interface/ISubParserV4.sol";
 import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {CMASK_WHITESPACE, CMASK_SUB_PARSEABLE_LITERAL_END} from "rain.string/lib/parse/LibParseCMask.sol";
 

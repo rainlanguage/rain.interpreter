@@ -5,7 +5,7 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibOpShiftBitsLeftNP} from "src/lib/op/bitwise/LibOpShiftBitsLeftNP.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {UnsupportedBitwiseShiftAmount} from "src/error/ErrBitwise.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {OperandOverflow} from "src/error/ErrParse.sol";

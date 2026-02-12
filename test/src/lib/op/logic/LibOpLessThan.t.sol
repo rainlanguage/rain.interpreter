@@ -3,11 +3,10 @@ pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {LibOpLessThan} from "src/lib/op/logic/LibOpLessThan.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
-import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 contract LibOpLessThanTest is OpTest {
     /// Directly test the integrity logic of LibOpLessThan. No matter the

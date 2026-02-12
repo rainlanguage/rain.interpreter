@@ -21,9 +21,7 @@ import {
 import {LibParseChar} from "rain.string/lib/parse/LibParseChar.sol";
 import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {LibParseOperand} from "./LibParseOperand.sol";
-import {
-    OperandV2, OPCODE_STACK, OPCODE_UNKNOWN
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, OPCODE_STACK, OPCODE_UNKNOWN} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibParseStackName} from "./LibParseStackName.sol";
 import {
     UnexpectedRHSChar,

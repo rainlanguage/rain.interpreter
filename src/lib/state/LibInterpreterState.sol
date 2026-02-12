@@ -6,8 +6,8 @@ import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {
     FullyQualifiedNamespace,
     IInterpreterStoreV3
-} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV3.sol";
-import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+} from "rain.interpreter.interface/interface/IInterpreterStoreV3.sol";
+import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
 address constant STACK_TRACER = address(uint160(uint256(keccak256("rain.interpreter.stack-tracer.0"))));
 

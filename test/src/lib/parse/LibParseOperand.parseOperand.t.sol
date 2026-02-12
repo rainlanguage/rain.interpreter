@@ -243,7 +243,7 @@ contract LibParseOperandParseOperandTest is Test {
 
         {
             expectedLength += bytes(valueAString).length + bytes(valueBString).length + bytes(valueCString).length
-                + bytes(valueDString).length;
+            + bytes(valueDString).length;
         }
 
         string memory s;

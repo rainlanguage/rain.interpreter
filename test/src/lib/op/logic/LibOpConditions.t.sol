@@ -7,11 +7,10 @@ import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpConditions} from "src/lib/op/logic/LibOpConditions.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibIntOrAString, IntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
-import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 contract LibOpConditionsTest is OpTest {
     using LibUint256Array for uint256[];

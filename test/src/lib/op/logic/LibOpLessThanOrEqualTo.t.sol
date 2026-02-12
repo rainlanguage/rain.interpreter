@@ -8,13 +8,13 @@ import {
     OperandV2,
     SourceIndexV2,
     FullyQualifiedNamespace,
-    EvalV4
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+    EvalV4,
+    StackItem
+} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV4.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
-import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 contract LibOpLessThanOrEqualToTest is OpTest {
     /// Directly test the integrity logic of LibOpLessThanOrEqualTo. No matter the

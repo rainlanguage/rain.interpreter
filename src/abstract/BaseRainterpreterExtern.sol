@@ -7,12 +7,12 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {
     IInterpreterExternV4,
     ExternDispatchV2,
     StackItem
-} from "rain.interpreter.interface/interface/unstable/IInterpreterExternV4.sol";
+} from "rain.interpreter.interface/interface/IInterpreterExternV4.sol";
 import {IIntegrityToolingV1} from "rain.sol.codegen/interface/IIntegrityToolingV1.sol";
 import {IOpcodeToolingV1} from "rain.sol.codegen/interface/IOpcodeToolingV1.sol";
 
@@ -27,7 +27,7 @@ bytes constant INTEGRITY_FUNCTION_POINTERS = hex"";
 
 /// Base implementation of `IInterpreterExternV4`. Inherit from this contract,
 /// and override `functionPointers` to provide a list of function pointers.
-abstract contract BaseRainterpreterExternNPE2 is IInterpreterExternV4, IIntegrityToolingV1, IOpcodeToolingV1, ERC165 {
+abstract contract BaseRainterpreterExtern is IInterpreterExternV4, IIntegrityToolingV1, IOpcodeToolingV1, ERC165 {
     using LibStackPointer for uint256[];
     using LibStackPointer for Pointer;
     using LibUint256Array for uint256;
