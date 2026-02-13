@@ -8,6 +8,9 @@ on:
         type: choice
         options:
           - parser
+          - store
+          - interpreter
+          - expression-deployer
 
 jobs:
   deploy:

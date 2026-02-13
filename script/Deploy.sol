@@ -11,6 +11,9 @@ import {LibDecimalFloatDeploy} from "rain.math.float/lib/deploy/LibDecimalFloatD
 import {ProdRainterpreterExpressionDeployer} from "../src/concrete/ProdRainterpreterExpressionDeployer.sol";
 
 bytes32 constant DEPLOYMENT_SUITE_PARSER = keccak256("parser");
+bytes32 constant DEPLOYMENT_SUITE_STORE = keccak256("store");
+bytes32 constant DEPLOYMENT_SUITE_INTERPRETER = keccak256("interpreter");
+bytes32 constant DEPLOYMENT_SUITE_EXPRESSION_DEPLOYER = keccak256("expression-deployer");
 
 /// @title Deploy
 contract Deploy is Script {
@@ -34,7 +37,7 @@ contract Deploy is Script {
                 LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH,
                 deps
             );
-        } else if (LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS.codehash != LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH)
+        } else if (suite == DEPLOYMENT_SUITE_STORE)
         {
             console2.log("Deploying RainterpreterStore...");
             LibRainDeploy.deployAndBroadcastToSupportedNetworks(
@@ -47,10 +50,7 @@ contract Deploy is Script {
                 LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH,
                 deps
             );
-        } else if (
-            LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS.codehash
-                != LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH
-        ) {
+        } else if (suite == DEPLOYMENT_SUITE_INTERPRETER) {
             console2.log("Deploying Rainterpreter...");
             LibRainDeploy.deployAndBroadcastToSupportedNetworks(
                 vm,
@@ -62,10 +62,7 @@ contract Deploy is Script {
                 LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH,
                 deps
             );
-        } else if (
-            LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS.codehash
-                != LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH
-        ) {
+        } else if (suite == DEPLOYMENT_SUITE_EXPRESSION_DEPLOYER) {
             console2.log("Deploying ProdRainterpreterExpressionDeployer...");
             LibRainDeploy.deployAndBroadcastToSupportedNetworks(
                 vm,
@@ -78,38 +75,5 @@ contract Deploy is Script {
                 deps
             );
         }
-
-        // LibRainDeploy.deployAndBroadcastToSupportedNetworks(
-        //     vm,
-        //     LibRainDeploy.supportedNetworks(),
-        //     deployerPrivateKey,
-        //     type(RainterpreterStore).creationCode,
-        //     "src/concrete/RainterpreterStore.sol:RainterpreterStore",
-        //     LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS,
-        //     LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH,
-        //     new address[](0)
-        // );
-
-        // LibRainDeploy.deployAndBroadcastToSupportedNetworks(
-        //     vm,
-        //     LibRainDeploy.supportedNetworks(),
-        //     deployerPrivateKey,
-        //     type(Rainterpreter).creationCode,
-        //     "src/concrete/Rainterpreter.sol:Rainterpreter",
-        //     LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS,
-        //     LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH,
-        //     deps
-        // );
-
-        // LibRainDeploy.deployAndBroadcastToSupportedNetworks(
-        //     vm,
-        //     LibRainDeploy.supportedNetworks(),
-        //     deployerPrivateKey,
-        //     type(ProdRainterpreterExpressionDeployer).creationCode,
-        //     "src/concrete/ProdRainterpreterExpressionDeployer.sol:ProdRainterpreterExpressionDeployer",
-        //     LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS,
-        //     LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH,
-        //     deps
-        // );
     }
 }
