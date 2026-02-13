@@ -2,6 +2,12 @@ name: Manual sol artifacts
 on:
   workflow_dispatch:
     inputs:
+      suite:
+        description: "The suite to deploy"
+        required: true
+        type: choice
+        options:
+          - parser
 
 jobs:
   deploy:

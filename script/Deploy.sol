@@ -10,6 +10,8 @@ import {LibInterpreterDeploy} from "../src/lib/deploy/LibInterpreterDeploy.sol";
 import {LibDecimalFloatDeploy} from "rain.math.float/lib/deploy/LibDecimalFloatDeploy.sol";
 import {ProdRainterpreterExpressionDeployer} from "../src/concrete/ProdRainterpreterExpressionDeployer.sol";
 
+bytes32 constant DEPLOYMENT_SUITE_PARSER = keccak256("parser");
+
 /// @title Deploy
 contract Deploy is Script {
     function run() external {
@@ -18,7 +20,9 @@ contract Deploy is Script {
         address[] memory deps = new address[](1);
         deps[0] = LibDecimalFloatDeploy.ZOLTU_DEPLOYED_LOG_TABLES_ADDRESS;
 
-        if (LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS.codehash != LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH) {
+        bytes32 suite = keccak256(bytes(vm.envOr("DEPLOYMENT_SUITE", string("parser"))));
+
+        if (suite == DEPLOYMENT_SUITE_PARSER) {
             console2.log("Deploying RainterpreterParser...");
             LibRainDeploy.deployAndBroadcastToSupportedNetworks(
                 vm,
