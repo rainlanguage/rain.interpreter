@@ -8,13 +8,7 @@ import {RainterpreterParser} from "../src/concrete/RainterpreterParser.sol";
 import {LibRainDeploy} from "rain.deploy/lib/LibRainDeploy.sol";
 import {LibInterpreterDeploy} from "../src/lib/deploy/LibInterpreterDeploy.sol";
 import {LibDecimalFloatDeploy} from "rain.math.float/lib/deploy/LibDecimalFloatDeploy.sol";
-
-// import {
-//     RainterpreterExpressionDeployer,
-//     RainterpreterExpressionDeployerConstructionConfigV2
-// } from "../src/concrete/RainterpreterExpressionDeployer.sol";
-// import {IMetaBoardV1_2} from "rain.metadata/interface/unstable/IMetaBoardV1_2.sol";
-// import {LibDescribedByMeta} from "rain.metadata/lib/LibDescribedByMeta.sol";
+import {ProdRainterpreterExpressionDeployer} from "../src/concrete/ProdRainterpreterExpressionDeployer.sol";
 
 /// @title Deploy
 contract Deploy is Script {
@@ -28,37 +22,43 @@ contract Deploy is Script {
             LibRainDeploy.supportedNetworks(),
             deployerPrivateKey,
             type(RainterpreterParser).creationCode,
-            "",
+            "src/concrete/RainterpreterParser.sol:RainterpreterParser",
             LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS,
             LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH,
             deps
         );
 
-        // bytes memory constructionMeta = vm.readFileBinary("meta/RainterpreterExpressionDeployer.rain.meta");
-        // IMetaBoardV1_2 metaboard = IMetaBoardV1_2(vm.envAddress("DEPLOY_METABOARD_ADDRESS"));
+        LibRainDeploy.deployAndBroadcastToSupportedNetworks(
+            vm,
+            LibRainDeploy.supportedNetworks(),
+            deployerPrivateKey,
+            type(RainterpreterStore).creationCode,
+            "src/concrete/RainterpreterStore.sol:RainterpreterStore",
+            LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS,
+            LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH,
+            new address[](0)
+        );
 
-        // vm.startBroadcast(deployerPrivateKey);
+        LibRainDeploy.deployAndBroadcastToSupportedNetworks(
+            vm,
+            LibRainDeploy.supportedNetworks(),
+            deployerPrivateKey,
+            type(Rainterpreter).creationCode,
+            "src/concrete/Rainterpreter.sol:Rainterpreter",
+            LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS,
+            LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH,
+            deps
+        );
 
-        // RainterpreterParser parser = new RainterpreterParser();
-        // //forge-lint: disable-next-line(unsafe-cheatcode)
-        // vm.writeFile("deployments/latest/RainterpreterParser", vm.toString(address(parser)));
-
-        // RainterpreterStore store = new RainterpreterStore();
-        // //forge-lint: disable-next-line(unsafe-cheatcode)
-        // vm.writeFile("deployments/latest/RainterpreterStore", vm.toString(address(store)));
-
-        // Rainterpreter interpreter = new Rainterpreter();
-        // //forge-lint: disable-next-line(unsafe-cheatcode)
-        // vm.writeFile("deployments/latest/Rainterpreter", vm.toString(address(interpreter)));
-
-        // RainterpreterExpressionDeployer deployer = new RainterpreterExpressionDeployer(
-        //     RainterpreterExpressionDeployerConstructionConfigV2(address(interpreter), address(store), address(parser))
-        // );
-        // LibDescribedByMeta.emitForDescribedAddress(metaboard, deployer, constructionMeta);
-
-        // //forge-lint: disable-next-line(unsafe-cheatcode)
-        // vm.writeFile("deployments/latest/RainterpreterExpressionDeployer", vm.toString(address(deployer)));
-
-        // vm.stopBroadcast();
+        LibRainDeploy.deployAndBroadcastToSupportedNetworks(
+            vm,
+            LibRainDeploy.supportedNetworks(),
+            deployerPrivateKey,
+            type(ProdRainterpreterExpressionDeployer).creationCode,
+            "src/concrete/ProdRainterpreterExpressionDeployer.sol:ProdRainterpreterExpressionDeployer",
+            LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS,
+            LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH,
+            deps
+        );
     }
 }

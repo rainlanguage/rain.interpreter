@@ -72,33 +72,6 @@ contract RainterpreterExpressionDeployer is
         I_INTERPRETER = interpreter;
         I_STORE = store;
         I_PARSER = parser;
-
-        // Guard against an interpreter with unknown bytecode.
-        bytes32 interpreterHash;
-        assembly ("memory-safe") {
-            interpreterHash := extcodehash(interpreter)
-        }
-        if (interpreterHash != expectedInterpreterBytecodeHash()) {
-            revert UnexpectedInterpreterBytecodeHash(expectedInterpreterBytecodeHash(), interpreterHash);
-        }
-
-        // Guard against an store with unknown bytecode.
-        bytes32 storeHash;
-        assembly ("memory-safe") {
-            storeHash := extcodehash(store)
-        }
-        if (storeHash != expectedStoreBytecodeHash()) {
-            revert UnexpectedStoreBytecodeHash(expectedStoreBytecodeHash(), storeHash);
-        }
-
-        // Guard against a parser with unknown bytecode.
-        bytes32 parserHash;
-        assembly ("memory-safe") {
-            parserHash := extcodehash(parser)
-        }
-        if (parserHash != expectedParserBytecodeHash()) {
-            revert UnexpectedParserBytecodeHash(expectedParserBytecodeHash(), parserHash);
-        }
     }
 
     /// @inheritdoc IERC165

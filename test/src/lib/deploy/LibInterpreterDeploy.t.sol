@@ -2,13 +2,16 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {Test} from "forge-std/Test.sol";
+import {Test, console2} from "forge-std/Test.sol";
 import {LibRainDeploy} from "rain.deploy/lib/LibRainDeploy.sol";
 import {LibInterpreterDeploy} from "src/lib/deploy/LibInterpreterDeploy.sol";
 import {RainterpreterParser} from "src/concrete/RainterpreterParser.sol";
+import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
+import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
+import {ProdRainterpreterExpressionDeployer} from "src/concrete/ProdRainterpreterExpressionDeployer.sol";
 
 contract LibInterpreterDeployTest is Test {
-    function testDeployAddress() external {
+    function testDeployAddressParser() external {
         vm.createSelectFork(vm.envString("CI_FORK_ETH_RPC_URL"));
 
         address deployedAddress = LibRainDeploy.deployZoltu(type(RainterpreterParser).creationCode);
@@ -19,9 +22,62 @@ contract LibInterpreterDeployTest is Test {
         assertEq(address(deployedAddress).codehash, LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH);
     }
 
-    function testExpectedCodeHash() external {
+    function testExpectedCodeHashParser() external {
         RainterpreterParser parser = new RainterpreterParser();
 
         assertEq(address(parser).codehash, LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH);
+    }
+
+    function testDeployAddressStore() external {
+        vm.createSelectFork(vm.envString("CI_FORK_ETH_RPC_URL"));
+
+        address deployedAddress = LibRainDeploy.deployZoltu(type(RainterpreterStore).creationCode);
+
+        assertEq(deployedAddress, LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS);
+        assertTrue(address(deployedAddress).code.length > 0, "Deployed address has no code");
+
+        assertEq(address(deployedAddress).codehash, LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH);
+    }
+
+    function testExpectedCodeHashStore() external {
+        RainterpreterStore store = new RainterpreterStore();
+
+        assertEq(address(store).codehash, LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH);
+    }
+
+    function testDeployAddressInterpreter() external {
+        vm.createSelectFork(vm.envString("CI_FORK_ETH_RPC_URL"));
+
+        address deployedAddress = LibRainDeploy.deployZoltu(type(Rainterpreter).creationCode);
+
+        assertEq(deployedAddress, LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS);
+        assertTrue(address(deployedAddress).code.length > 0, "Deployed address has no code");
+
+        assertEq(address(deployedAddress).codehash, LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH);
+    }
+
+    function testExpectedCodeHashInterpreter() external {
+        Rainterpreter interpreter = new Rainterpreter();
+
+        assertEq(address(interpreter).codehash, LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH);
+    }
+
+    function testDeployAddressExpressionDeployer() external {
+        vm.createSelectFork(vm.envString("CI_FORK_ETH_RPC_URL"));
+
+        address deployedAddress = LibRainDeploy.deployZoltu(type(ProdRainterpreterExpressionDeployer).creationCode);
+
+        console2.log("Deployed address:", deployedAddress);
+
+        assertEq(deployedAddress, LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS);
+        assertTrue(address(deployedAddress).code.length > 0, "Deployed address has no code");
+
+        assertEq(address(deployedAddress).codehash, LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH);
+    }
+
+    function testExpectedCodeHashExpressionDeployer() external {
+        ProdRainterpreterExpressionDeployer expressionDeployer = new ProdRainterpreterExpressionDeployer();
+
+        assertEq(address(expressionDeployer).codehash, LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH);
     }
 }
