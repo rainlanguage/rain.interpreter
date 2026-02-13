@@ -17,48 +17,88 @@ contract Deploy is Script {
 
         address[] memory deps = new address[](1);
         deps[0] = LibDecimalFloatDeploy.ZOLTU_DEPLOYED_LOG_TABLES_ADDRESS;
-        LibRainDeploy.deployAndBroadcastToSupportedNetworks(
-            vm,
-            LibRainDeploy.supportedNetworks(),
-            deployerPrivateKey,
-            type(RainterpreterParser).creationCode,
-            "src/concrete/RainterpreterParser.sol:RainterpreterParser",
-            LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS,
-            LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH,
-            deps
-        );
 
-        LibRainDeploy.deployAndBroadcastToSupportedNetworks(
-            vm,
-            LibRainDeploy.supportedNetworks(),
-            deployerPrivateKey,
-            type(RainterpreterStore).creationCode,
-            "src/concrete/RainterpreterStore.sol:RainterpreterStore",
-            LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS,
-            LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH,
-            new address[](0)
-        );
+        if (LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS.codehash != LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH) {
+            console2.log("Deploying RainterpreterParser...");
+            LibRainDeploy.deployAndBroadcastToSupportedNetworks(
+                vm,
+                LibRainDeploy.supportedNetworks(),
+                deployerPrivateKey,
+                type(RainterpreterParser).creationCode,
+                "src/concrete/RainterpreterParser.sol:RainterpreterParser",
+                LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS,
+                LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH,
+                deps
+            );
+        } else if (LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS.codehash != LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH) {
+            console2.log("Deploying RainterpreterStore...");
+            LibRainDeploy.deployAndBroadcastToSupportedNetworks(
+                vm,
+                LibRainDeploy.supportedNetworks(),
+                deployerPrivateKey,
+                type(RainterpreterStore).creationCode,
+                "src/concrete/RainterpreterStore.sol:RainterpreterStore",
+                LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS,
+                LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH,
+                deps
+            );
+        } else if (LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS.codehash != LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH) {
+            console2.log("Deploying Rainterpreter...");
+            LibRainDeploy.deployAndBroadcastToSupportedNetworks(
+                vm,
+                LibRainDeploy.supportedNetworks(),
+                deployerPrivateKey,
+                type(Rainterpreter).creationCode,
+                "src/concrete/Rainterpreter.sol:Rainterpreter",
+                LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS,
+                LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH,
+                deps
+            );
+         } else if (LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS.codehash != LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH) {
+            console2.log("Deploying ProdRainterpreterExpressionDeployer...");
+            LibRainDeploy.deployAndBroadcastToSupportedNetworks(
+                vm,
+                LibRainDeploy.supportedNetworks(),
+                deployerPrivateKey,
+                type(ProdRainterpreterExpressionDeployer).creationCode,
+                "src/concrete/ProdRainterpreterExpressionDeployer.sol:ProdRainterpreterExpressionDeployer",
+                LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS,
+                LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH,
+                deps
+            );
+        }
 
-        LibRainDeploy.deployAndBroadcastToSupportedNetworks(
-            vm,
-            LibRainDeploy.supportedNetworks(),
-            deployerPrivateKey,
-            type(Rainterpreter).creationCode,
-            "src/concrete/Rainterpreter.sol:Rainterpreter",
-            LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS,
-            LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH,
-            deps
-        );
+        // LibRainDeploy.deployAndBroadcastToSupportedNetworks(
+        //     vm,
+        //     LibRainDeploy.supportedNetworks(),
+        //     deployerPrivateKey,
+        //     type(RainterpreterStore).creationCode,
+        //     "src/concrete/RainterpreterStore.sol:RainterpreterStore",
+        //     LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS,
+        //     LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH,
+        //     new address[](0)
+        // );
 
-        LibRainDeploy.deployAndBroadcastToSupportedNetworks(
-            vm,
-            LibRainDeploy.supportedNetworks(),
-            deployerPrivateKey,
-            type(ProdRainterpreterExpressionDeployer).creationCode,
-            "src/concrete/ProdRainterpreterExpressionDeployer.sol:ProdRainterpreterExpressionDeployer",
-            LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS,
-            LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH,
-            deps
-        );
+        // LibRainDeploy.deployAndBroadcastToSupportedNetworks(
+        //     vm,
+        //     LibRainDeploy.supportedNetworks(),
+        //     deployerPrivateKey,
+        //     type(Rainterpreter).creationCode,
+        //     "src/concrete/Rainterpreter.sol:Rainterpreter",
+        //     LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS,
+        //     LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH,
+        //     deps
+        // );
+
+        // LibRainDeploy.deployAndBroadcastToSupportedNetworks(
+        //     vm,
+        //     LibRainDeploy.supportedNetworks(),
+        //     deployerPrivateKey,
+        //     type(ProdRainterpreterExpressionDeployer).creationCode,
+        //     "src/concrete/ProdRainterpreterExpressionDeployer.sol:ProdRainterpreterExpressionDeployer",
+        //     LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS,
+        //     LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH,
+        //     deps
+        // );
     }
 }
