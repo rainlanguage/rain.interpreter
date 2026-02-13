@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Script} from "forge-std/Script.sol";
+import {Script, console2} from "forge-std/Script.sol";
 import {RainterpreterStore} from "../src/concrete/RainterpreterStore.sol";
 import {Rainterpreter} from "../src/concrete/Rainterpreter.sol";
 import {RainterpreterParser} from "../src/concrete/RainterpreterParser.sol";
@@ -30,7 +30,8 @@ contract Deploy is Script {
                 LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH,
                 deps
             );
-        } else if (LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS.codehash != LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH) {
+        } else if (LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS.codehash != LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH)
+        {
             console2.log("Deploying RainterpreterStore...");
             LibRainDeploy.deployAndBroadcastToSupportedNetworks(
                 vm,
@@ -42,7 +43,10 @@ contract Deploy is Script {
                 LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH,
                 deps
             );
-        } else if (LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS.codehash != LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH) {
+        } else if (
+            LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS.codehash
+                != LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH
+        ) {
             console2.log("Deploying Rainterpreter...");
             LibRainDeploy.deployAndBroadcastToSupportedNetworks(
                 vm,
@@ -54,7 +58,10 @@ contract Deploy is Script {
                 LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH,
                 deps
             );
-         } else if (LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS.codehash != LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH) {
+        } else if (
+            LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS.codehash
+                != LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH
+        ) {
             console2.log("Deploying ProdRainterpreterExpressionDeployer...");
             LibRainDeploy.deployAndBroadcastToSupportedNetworks(
                 vm,
