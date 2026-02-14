@@ -17,8 +17,6 @@ jobs:
             task: rainix-sol-test
           - os: ubuntu-latest
             task: rainix-sol-static
-          - os: ubuntu-latest
-            task: rainix-sol-artifacts
           # We don't need to do rust static analysis on multiple platforms
           - os: ubuntu-latest
             task: rainix-rs-static

@@ -15,6 +15,7 @@ import {
 } from "rain.interpreter.interface/interface/IInterpreterExternV4.sol";
 import {IIntegrityToolingV1} from "rain.sol.codegen/interface/IIntegrityToolingV1.sol";
 import {IOpcodeToolingV1} from "rain.sol.codegen/interface/IOpcodeToolingV1.sol";
+import {ExternOpcodeOutOfRange, ExternPointersMismatch} from "../error/ErrExtern.sol";
 
 /// @dev Empty opcode function pointers constant. Inheriting contracts should
 /// create their own constant and override `opcodeFunctionPointers` to use
@@ -26,12 +27,23 @@ bytes constant OPCODE_FUNCTION_POINTERS = hex"";
 bytes constant INTEGRITY_FUNCTION_POINTERS = hex"";
 
 /// Base implementation of `IInterpreterExternV4`. Inherit from this contract,
-/// and override `functionPointers` to provide a list of function pointers.
+/// and override `opcodeFunctionPointers` and `integrityFunctionPointers` to
+/// provide lists of function pointers.
 abstract contract BaseRainterpreterExtern is IInterpreterExternV4, IIntegrityToolingV1, IOpcodeToolingV1, ERC165 {
     using LibStackPointer for uint256[];
     using LibStackPointer for Pointer;
     using LibUint256Array for uint256;
     using LibUint256Array for uint256[];
+
+    /// Validates that opcode and integrity function pointer tables have the
+    /// same length. This ensures the integrity check covers every opcode.
+    constructor() {
+        uint256 opcodeCount = opcodeFunctionPointers().length;
+        uint256 integrityCount = integrityFunctionPointers().length;
+        if (opcodeCount != integrityCount) {
+            revert ExternPointersMismatch(opcodeCount, integrityCount);
+        }
+    }
 
     /// @inheritdoc IInterpreterExternV4
     function extern(ExternDispatchV2 dispatch, StackItem[] memory inputs)
@@ -43,7 +55,6 @@ abstract contract BaseRainterpreterExtern is IInterpreterExternV4, IIntegrityToo
     {
         unchecked {
             bytes memory fPointers = opcodeFunctionPointers();
-            uint256 fsCount = fPointers.length / 2;
             uint256 fPointersStart;
             assembly ("memory-safe") {
                 fPointersStart := add(fPointers, 0x20)
@@ -53,7 +64,7 @@ abstract contract BaseRainterpreterExtern is IInterpreterExternV4, IIntegrityToo
 
             function(OperandV2, StackItem[] memory) internal view returns (StackItem[] memory) f;
             assembly ("memory-safe") {
-                f := shr(0xf0, mload(add(fPointersStart, mul(mod(opcode, fsCount), 2))))
+                f := shr(0xf0, mload(add(fPointersStart, mul(opcode, 2))))
             }
             outputs = f(operand, inputs);
         }
@@ -75,11 +86,14 @@ abstract contract BaseRainterpreterExtern is IInterpreterExternV4, IIntegrityToo
                 fPointersStart := add(fPointers, 0x20)
             }
             uint256 opcode = uint256((ExternDispatchV2.unwrap(dispatch) >> 0x10) & bytes32(uint256(type(uint16).max)));
+            if (opcode >= fsCount) {
+                revert ExternOpcodeOutOfRange(opcode, fsCount);
+            }
             OperandV2 operand = OperandV2.wrap(ExternDispatchV2.unwrap(dispatch) & bytes32(uint256(type(uint16).max)));
 
             function(OperandV2, uint256, uint256) internal pure returns (uint256, uint256) f;
             assembly ("memory-safe") {
-                f := shr(0xf0, mload(add(fPointersStart, mul(mod(opcode, fsCount), 2))))
+                f := shr(0xf0, mload(add(fPointersStart, mul(opcode, 2))))
             }
             (actualInputs, actualOutputs) = f(operand, expectedInputs, expectedOutputs);
         }

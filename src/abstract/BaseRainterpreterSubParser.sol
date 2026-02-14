@@ -37,7 +37,7 @@ bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"";
 /// parsers.
 bytes constant SUB_PARSER_LITERAL_PARSERS = hex"";
 
-/// Base implementation of `ISubParserV3`. Inherit from this contract and
+/// Base implementation of `ISubParserV4`. Inherit from this contract and
 /// override the virtual functions to align all the relevant pointers and
 /// metadata bytes so that it can actually run.
 /// The basic workflow for subparsing via this contract is:

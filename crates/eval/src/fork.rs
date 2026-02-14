@@ -519,7 +519,7 @@ mod tests {
         providers::Provider,
     };
     use rain_interpreter_bindings::{
-        DeployerISP::I_PARSERCall,
+        DeployerISP::parserCall,
         IInterpreterStoreV3::{getCall, setCall},
     };
     use rain_interpreter_test_fixtures::LocalEvm;
@@ -547,13 +547,13 @@ mod tests {
 
         let from_address = Address::default();
         let to_address = deployer;
-        let call = I_PARSERCall {};
+        let call = parserCall {};
         let result = forker
             .alloy_call(from_address, to_address, call, false)
             .await
             .unwrap();
         let parser_address = result.typed_return;
-        let expected_address = *local_evm.parser.address();
+        let expected_address: Address = "0x34ACfD304C67a78b8b3b64a1A3ae19b6854Fb5C1".parse().unwrap();
         assert_eq!(parser_address, expected_address);
     }
 

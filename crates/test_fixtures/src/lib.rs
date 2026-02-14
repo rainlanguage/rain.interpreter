@@ -5,6 +5,7 @@ use alloy::{
     primitives::{Address, Bytes, U256, utils::parse_units},
     providers::{
         PendingTransactionError, Provider, ProviderBuilder, RootProvider,
+        ext::AnvilApi,
         fillers::{FillProvider, JoinFill, WalletFiller},
         utils::JoinedRecommendedFillers,
     },
@@ -107,10 +108,27 @@ impl LocalEvm {
             .wallet(signer_wallets[0].clone())
             .connect_http(anvil.endpoint_url());
 
-        // deploy rain contracts
+        // Deploy rain contracts, then copy their runtime code to the
+        // deterministic Zoltu addresses that the deployer hardcodes.
         let interpreter = Interpreter::deploy(provider.clone()).await.unwrap();
         let store = Store::deploy(provider.clone()).await.unwrap();
         let parser = Parser::deploy(provider.clone()).await.unwrap();
+
+        // The expression deployer references the parser, store, and
+        // interpreter at their deterministic Zoltu addresses. Copy runtime
+        // code to those addresses so calls resolve correctly.
+        let parser_code = provider.get_code_at(*parser.address()).await.unwrap();
+        let store_code = provider.get_code_at(*store.address()).await.unwrap();
+        let interpreter_code = provider.get_code_at(*interpreter.address()).await.unwrap();
+
+        let parser_addr: Address = "0x34ACfD304C67a78b8b3b64a1A3ae19b6854Fb5C1".parse().unwrap();
+        let store_addr: Address = "0x08d847643144D0bC1964b024b2CcCFFB94836f79".parse().unwrap();
+        let interpreter_addr: Address = "0x288F6ef6f56617963B80c6136eB93b3b9839Dfc2".parse().unwrap();
+
+        provider.anvil_set_code(parser_addr, parser_code).await.unwrap();
+        provider.anvil_set_code(store_addr, store_code).await.unwrap();
+        provider.anvil_set_code(interpreter_addr, interpreter_code).await.unwrap();
+
         let deployer = Deployer::deploy(provider.clone()).await.unwrap();
 
         Self {

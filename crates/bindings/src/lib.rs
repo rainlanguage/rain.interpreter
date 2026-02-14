@@ -28,12 +28,12 @@ sol!(
     "../../out/IExpressionDeployerV3.sol/IExpressionDeployerV3.json"
 );
 
-// dispair binding
+// Bindings for the deployer's interpreter/store/parser address getters.
 sol! {
     #![sol(all_derives = true)]
-    interface  DeployerISP {
-        function I_INTERPRETER() public view returns(address);
-        function I_STORE() public view returns(address);
-        function I_PARSER() public view returns(address);
+    interface DeployerISP {
+        function interpreter() public pure returns(address);
+        function store() public pure returns(address);
+        function parser() public pure returns(address);
     }
 }

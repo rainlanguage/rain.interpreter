@@ -100,4 +100,19 @@ contract RainterpreterExpressionDeployer is
     function describedByMetaV1() external pure returns (bytes32) {
         return DESCRIBED_BY_META_HASH;
     }
+
+    /// Returns the deterministic address of the interpreter.
+    function interpreter() external pure returns (address) {
+        return LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS;
+    }
+
+    /// Returns the deterministic address of the store.
+    function store() external pure returns (address) {
+        return LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS;
+    }
+
+    /// Returns the deterministic address of the parser.
+    function parser() external pure returns (address) {
+        return LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS;
+    }
 }
