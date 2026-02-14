@@ -126,3 +126,4 @@ When reviewing code for audit:
 - Verify that the eval loop cannot be made to jump to arbitrary code via crafted bytecode
 - Check that context array access is bounds-checked
 - Review extern dispatch for correct encoding/decoding of `ExternDispatchV2`
+- Ensure all reverts use custom errors, not string messages (`revert("...")` is not allowed)
