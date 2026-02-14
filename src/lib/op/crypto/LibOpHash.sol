@@ -6,9 +6,9 @@ import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterp
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 
-/// @title LibOpHashNP
+/// @title LibOpHash
 /// Implementation of keccak256 hashing as a standard Rainlang opcode.
-library LibOpHashNP {
+library LibOpHash {
     /// `hash` integrity check. Inputs count is operand-defined, produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // Any number of inputs are valid.

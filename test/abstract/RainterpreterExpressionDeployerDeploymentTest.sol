@@ -21,7 +21,7 @@ import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenPars
 import {LibRainDeploy} from "rain.deploy/lib/LibRainDeploy.sol";
 import {LibInterpreterDeploy} from "../../src/lib/deploy/LibInterpreterDeploy.sol";
 
-/// @title RainterpreterExpressionDeployerNPD2DeploymentTest
+/// @title RainterpreterExpressionDeployerDeploymentTest
 /// Tests that the RainterpreterExpressionDeployer meta is correct. Also
 /// tests basic functionality of the `IParserV1View` interface implementation.
 abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {

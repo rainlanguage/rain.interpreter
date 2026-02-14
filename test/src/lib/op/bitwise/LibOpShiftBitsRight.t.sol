@@ -3,27 +3,27 @@ pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {LibOpShiftBitsRightNP} from "src/lib/op/bitwise/LibOpShiftBitsRightNP.sol";
+import {LibOpShiftBitsRight} from "src/lib/op/bitwise/LibOpShiftBitsRight.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {UnsupportedBitwiseShiftAmount} from "src/error/ErrBitwise.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {OperandOverflow} from "src/error/ErrParse.sol";
 
-contract LibOpShiftBitsRightNPTest is OpTest {
+contract LibOpShiftBitsRightTest is OpTest {
     function integrityExternal(IntegrityCheckState memory state, OperandV2 operand)
         external
         pure
         returns (uint256, uint256)
     {
-        return LibOpShiftBitsRightNP.integrity(state, operand);
+        return LibOpShiftBitsRight.integrity(state, operand);
     }
 
-    /// Directly test the integrity logic of LibOpShiftBitsRightNP. Tests the
+    /// Directly test the integrity logic of LibOpShiftBitsRight. Tests the
     /// happy path where the integrity check does not error due to an unsupported
     /// shift amount.
     /// forge-config: default.fuzz.runs = 100
-    function testOpShiftBitsRightNPIntegrityHappy(
+    function testOpShiftBitsRightIntegrityHappy(
         IntegrityCheckState memory state,
         uint8 inputs,
         uint8 outputs,
@@ -33,16 +33,16 @@ contract LibOpShiftBitsRightNPTest is OpTest {
         inputs = uint8(bound(inputs, 1, 0x0F));
         outputs = uint8(bound(outputs, 1, 0x0F));
         OperandV2 operand = LibOperand.build(inputs, outputs, shiftAmount);
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpShiftBitsRightNP.integrity(state, operand);
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpShiftBitsRight.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the execution logic of LibOpShiftBitsRightNP. Tests that
+    /// Directly test the execution logic of LibOpShiftBitsRight. Tests that
     /// any shift amount that always results in an output of 0 will error as
     /// an unsupported shift amount.
     /// forge-config: default.fuzz.runs = 100
-    function testOpShiftBitsRightNPIntegrityZero(IntegrityCheckState memory state, uint8 inputs, uint16 shiftAmount16)
+    function testOpShiftBitsRightIntegrityZero(IntegrityCheckState memory state, uint8 inputs, uint16 shiftAmount16)
         external
     {
         uint256 shiftAmount = bound(uint256(shiftAmount16), uint256(type(uint8).max) + 1, type(uint16).max);
@@ -52,20 +52,20 @@ contract LibOpShiftBitsRightNPTest is OpTest {
         (calcInputs, calcOutputs);
     }
 
-    /// Directly test the execution logic of LibOpShiftBitsRightNP. Tests that
+    /// Directly test the execution logic of LibOpShiftBitsRight. Tests that
     /// any shift amount that is a noop (0) will error as an unsupported shift
     /// amount.
     /// forge-config: default.fuzz.runs = 100
-    function testOpShiftBitsRightNPIntegrityNoop(IntegrityCheckState memory state, uint8 inputs) external {
+    function testOpShiftBitsRightIntegrityNoop(IntegrityCheckState memory state, uint8 inputs) external {
         OperandV2 operand = OperandV2.wrap(bytes32(uint256(inputs) << 0x10));
         vm.expectRevert(abi.encodeWithSelector(UnsupportedBitwiseShiftAmount.selector, 0));
         (uint256 calcInputs, uint256 calcOutputs) = this.integrityExternal(state, operand);
         (calcInputs, calcOutputs);
     }
 
-    /// Directly test the runtime logic of LibOpShiftBitsRightNP. This tests that
+    /// Directly test the runtime logic of LibOpShiftBitsRight. This tests that
     /// the opcode correctly shifts bits right.
-    function testOpShiftBitsRightNPRun(StackItem x, uint8 shiftAmount) external view {
+    function testOpShiftBitsRightRun(StackItem x, uint8 shiftAmount) external view {
         vm.assume(shiftAmount != 0);
         InterpreterState memory state = opTestDefaultInterpreterState();
         StackItem[] memory inputs = new StackItem[](1);
@@ -74,15 +74,15 @@ contract LibOpShiftBitsRightNPTest is OpTest {
         opReferenceCheck(
             state,
             operand,
-            LibOpShiftBitsRightNP.referenceFn,
-            LibOpShiftBitsRightNP.integrity,
-            LibOpShiftBitsRightNP.run,
+            LibOpShiftBitsRight.referenceFn,
+            LibOpShiftBitsRight.integrity,
+            LibOpShiftBitsRight.run,
             inputs
         );
     }
 
     /// Test the eval of a shift bits right opcode parsed from a string.
-    function testOpShiftBitsRightNPEval() external view {
+    function testOpShiftBitsRightEval() external view {
         checkHappy("_: bitwise-shift-right<1>(0x00);", 0, "1, 0");
         checkHappy("_: bitwise-shift-right<2>(0x00);", 0, "2, 0");
         checkHappy("_: bitwise-shift-right<3>(0x00);", 0, "3, 0");
@@ -115,24 +115,24 @@ contract LibOpShiftBitsRightNPTest is OpTest {
     }
 
     /// Test that a bitwise shift with bad inputs fails integrity.
-    function testOpShiftBitsRightNPZeroInputs() external {
+    function testOpShiftBitsRightZeroInputs() external {
         checkBadInputs("_: bitwise-shift-right<1>();", 0, 1, 0);
     }
 
-    function testOpShiftBitsRightNPTwoInputs() external {
+    function testOpShiftBitsRightTwoInputs() external {
         checkBadInputs("_: bitwise-shift-right<1>(0 0);", 2, 1, 2);
     }
 
-    function testOpShiftBitsRightNPZeroOutputs() external {
+    function testOpShiftBitsRightZeroOutputs() external {
         checkBadOutputs(": bitwise-shift-right<1>(0);", 1, 1, 0);
     }
 
-    function testOpShiftBitsRightNPTwoOutputs() external {
+    function testOpShiftBitsRightTwoOutputs() external {
         checkBadOutputs("_ _: bitwise-shift-right<1>(0);", 1, 1, 2);
     }
 
     /// Test that a bitwise shift with bad shift amount fails integrity.
-    function testOpShiftBitsRightNPIntegrityFailBadShiftAmount() external {
+    function testOpShiftBitsRightIntegrityFailBadShiftAmount() external {
         checkUnhappyParse2(
             "_: bitwise-shift-right<0>(0);", abi.encodeWithSelector(UnsupportedBitwiseShiftAmount.selector, 0)
         );

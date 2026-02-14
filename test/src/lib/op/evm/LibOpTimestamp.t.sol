@@ -82,7 +82,7 @@ contract LibOpTimestampTest is OpTest {
     }
 
     /// Test that a block timestamp with inputs fails integrity check.
-    function testOpBlockTimestampNPEvalFail() external {
+    function testOpBlockTimestampEvalFail() external {
         string[] memory words = timestampWords();
 
         for (uint256 i; i < words.length; ++i) {
@@ -92,7 +92,7 @@ contract LibOpTimestampTest is OpTest {
         }
     }
 
-    function testOpBlockTimestampNPZeroOutputs() external {
+    function testOpBlockTimestampZeroOutputs() external {
         string[] memory words = timestampWords();
 
         for (uint256 i; i < words.length; ++i) {
@@ -100,7 +100,7 @@ contract LibOpTimestampTest is OpTest {
         }
     }
 
-    function testOpBlockTimestampNPTwoOutputs() external {
+    function testOpBlockTimestampTwoOutputs() external {
         string[] memory words = timestampWords();
 
         for (uint256 i; i < words.length; ++i) {

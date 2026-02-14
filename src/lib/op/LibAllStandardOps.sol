@@ -10,22 +10,22 @@ import {IntegrityCheckState} from "../integrity/LibIntegrityCheck.sol";
 import {InterpreterState} from "../state/LibInterpreterState.sol";
 import {LibParseOperand} from "../parse/LibParseOperand.sol";
 
-import {LibOpStackNP} from "./00/LibOpStackNP.sol";
+import {LibOpStack} from "./00/LibOpStack.sol";
 import {LibOpConstant} from "./00/LibOpConstant.sol";
-import {LibOpContextNP} from "./00/LibOpContextNP.sol";
-import {LibOpExternNP} from "./00/LibOpExternNP.sol";
+import {LibOpContext} from "./00/LibOpContext.sol";
+import {LibOpExtern} from "./00/LibOpExtern.sol";
 
-import {LibOpBitwiseAndNP} from "./bitwise/LibOpBitwiseAndNP.sol";
-import {LibOpBitwiseOrNP} from "./bitwise/LibOpBitwiseOrNP.sol";
-import {LibOpCtPopNP} from "./bitwise/LibOpCtPopNP.sol";
-import {LibOpDecodeBitsNP} from "./bitwise/LibOpDecodeBitsNP.sol";
-import {LibOpEncodeBitsNP} from "./bitwise/LibOpEncodeBitsNP.sol";
-import {LibOpShiftBitsLeftNP} from "./bitwise/LibOpShiftBitsLeftNP.sol";
-import {LibOpShiftBitsRightNP} from "./bitwise/LibOpShiftBitsRightNP.sol";
+import {LibOpBitwiseAnd} from "./bitwise/LibOpBitwiseAnd.sol";
+import {LibOpBitwiseOr} from "./bitwise/LibOpBitwiseOr.sol";
+import {LibOpCtPop} from "./bitwise/LibOpCtPop.sol";
+import {LibOpDecodeBits} from "./bitwise/LibOpDecodeBits.sol";
+import {LibOpEncodeBits} from "./bitwise/LibOpEncodeBits.sol";
+import {LibOpShiftBitsLeft} from "./bitwise/LibOpShiftBitsLeft.sol";
+import {LibOpShiftBitsRight} from "./bitwise/LibOpShiftBitsRight.sol";
 
 import {LibOpCall} from "./call/LibOpCall.sol";
 
-import {LibOpHashNP} from "./crypto/LibOpHashNP.sol";
+import {LibOpHash} from "./crypto/LibOpHash.sol";
 
 import {LibOpUint256ERC20Allowance} from "./erc20/uint256/LibOpUint256ERC20Allowance.sol";
 import {LibOpUint256ERC20BalanceOf} from "./erc20/uint256/LibOpUint256ERC20BalanceOf.sol";
@@ -542,20 +542,20 @@ library LibAllStandardOps {
                     lengthPointer,
                     // The first ops are out of lexical ordering so that they
                     // can sit at stable well known indexes.
-                    LibOpStackNP.integrity,
+                    LibOpStack.integrity,
                     LibOpConstant.integrity,
-                    LibOpExternNP.integrity,
-                    LibOpContextNP.integrity,
+                    LibOpExtern.integrity,
+                    LibOpContext.integrity,
                     // Everything else is alphabetical, including folders.
-                    LibOpBitwiseAndNP.integrity,
-                    LibOpBitwiseOrNP.integrity,
-                    LibOpCtPopNP.integrity,
-                    LibOpDecodeBitsNP.integrity,
-                    LibOpEncodeBitsNP.integrity,
-                    LibOpShiftBitsLeftNP.integrity,
-                    LibOpShiftBitsRightNP.integrity,
+                    LibOpBitwiseAnd.integrity,
+                    LibOpBitwiseOr.integrity,
+                    LibOpCtPop.integrity,
+                    LibOpDecodeBits.integrity,
+                    LibOpEncodeBits.integrity,
+                    LibOpShiftBitsLeft.integrity,
+                    LibOpShiftBitsRight.integrity,
                     LibOpCall.integrity,
-                    LibOpHashNP.integrity,
+                    LibOpHash.integrity,
                     LibOpUint256ERC20Allowance.integrity,
                     LibOpUint256ERC20BalanceOf.integrity,
                     LibOpUint256ERC20TotalSupply.integrity,
@@ -651,20 +651,20 @@ library LibAllStandardOps {
                     lengthPointer,
                     // The first ops are out of lexical ordering so that they
                     // can sit at stable well known indexes.
-                    LibOpStackNP.run,
+                    LibOpStack.run,
                     LibOpConstant.run,
-                    LibOpExternNP.run,
-                    LibOpContextNP.run,
+                    LibOpExtern.run,
+                    LibOpContext.run,
                     // Everything else is alphabetical, including folders.
-                    LibOpBitwiseAndNP.run,
-                    LibOpBitwiseOrNP.run,
-                    LibOpCtPopNP.run,
-                    LibOpDecodeBitsNP.run,
-                    LibOpEncodeBitsNP.run,
-                    LibOpShiftBitsLeftNP.run,
-                    LibOpShiftBitsRightNP.run,
+                    LibOpBitwiseAnd.run,
+                    LibOpBitwiseOr.run,
+                    LibOpCtPop.run,
+                    LibOpDecodeBits.run,
+                    LibOpEncodeBits.run,
+                    LibOpShiftBitsLeft.run,
+                    LibOpShiftBitsRight.run,
                     LibOpCall.run,
-                    LibOpHashNP.run,
+                    LibOpHash.run,
                     LibOpUint256ERC20Allowance.run,
                     LibOpUint256ERC20BalanceOf.run,
                     LibOpUint256ERC20TotalSupply.run,

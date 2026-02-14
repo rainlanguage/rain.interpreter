@@ -7,9 +7,9 @@ import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterp
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
-/// @title LibOpEncodeBitsNP
+/// @title LibOpEncodeBits
 /// @notice Opcode for encoding binary data into a 256 bit value.
-library LibOpEncodeBitsNP {
+library LibOpEncodeBits {
     /// Encode takes two values and returns one value. The first value is the
     /// source, the second value is the target.
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {

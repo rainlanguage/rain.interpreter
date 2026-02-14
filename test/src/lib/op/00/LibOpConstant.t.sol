@@ -35,7 +35,7 @@ contract LibOpConstantTest is OpTest {
     /// Directly test the integrity logic of LibOpConstant. The operand always
     /// puts a single value on the stack. This tests the happy path where the
     /// operand points to a value in the constants array.
-    function testOpConstantNPIntegrity(IntegrityCheckState memory state, OperandV2 operand) external pure {
+    function testOpConstantIntegrity(IntegrityCheckState memory state, OperandV2 operand) external pure {
         vm.assume(state.constants.length > 0);
         operand = OperandV2.wrap(bytes32(bound(uint256(OperandV2.unwrap(operand)), 0, state.constants.length - 1)));
 
@@ -48,7 +48,7 @@ contract LibOpConstantTest is OpTest {
     /// Directly test the integrity logic of LibOpConstant. This tests the case
     /// where the operand points past the end of the constants array, which MUST
     /// always error as an OOB read.
-    function testOpConstantNPIntegrityOOBConstants(IntegrityCheckState memory state, OperandV2 operand) external {
+    function testOpConstantIntegrityOOBConstants(IntegrityCheckState memory state, OperandV2 operand) external {
         operand = OperandV2.wrap(
             bytes32(bound(uint256(OperandV2.unwrap(operand)), state.constants.length, type(uint16).max))
         );
@@ -63,7 +63,7 @@ contract LibOpConstantTest is OpTest {
 
     /// Directly test the runtime logic of LibOpConstant. This tests that the
     /// operand always puts a single value on the stack.
-    function testOpConstantNPRun(bytes32[] memory constants, uint16 constantIndex) external view {
+    function testOpConstantRun(bytes32[] memory constants, uint16 constantIndex) external view {
         InterpreterState memory state = opTestDefaultInterpreterState();
         state.constants = constants;
         vm.assume(state.constants.length > 0);
@@ -111,22 +111,22 @@ contract LibOpConstantTest is OpTest {
     }
 
     /// It is an error to have multiple outputs for a constant.
-    function testOpConstantNPMultipleOutputErrorSugared() external {
+    function testOpConstantMultipleOutputErrorSugared() external {
         checkUnhappyParse2("_ _: 1;", abi.encodeWithSelector(BadOpOutputsLength.selector, 0, 1, 2));
     }
 
     /// It is an error to have multiple outputs for a constant.
-    function testOpConstantNPMultipleOutputErrorUnsugared() external {
+    function testOpConstantMultipleOutputErrorUnsugared() external {
         checkUnhappyParse2("_:1,_ _: constant<0>();", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 2));
     }
 
     /// It is an error to have zero outputs for a constant.
-    function testOpConstantNPZeroOutputErrorSugared() external {
+    function testOpConstantZeroOutputErrorSugared() external {
         checkUnhappyParse2(":1;", abi.encodeWithSelector(BadOpOutputsLength.selector, 0, 1, 0));
     }
 
     /// It is an error to have zero outputs for a constant.
-    function testOpConstantNPZeroOutputErrorUnsugared() external {
+    function testOpConstantZeroOutputErrorUnsugared() external {
         checkUnhappyParse2("_:1,:constant<0>();", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 0));
     }
 }

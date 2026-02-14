@@ -7,7 +7,7 @@ import {NotAnExternContract} from "src/error/ErrExtern.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
-import {LibOpExternNP} from "src/lib/op/00/LibOpExternNP.sol";
+import {LibOpExtern} from "src/lib/op/00/LibOpExtern.sol";
 import {LibExtern} from "src/lib/extern/LibExtern.sol";
 import {
     EncodedExternDispatchV2,
@@ -20,9 +20,9 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
-/// @title LibOpExternNPTest
-/// @notice Test the runtime and integrity time logic of LibOpExternNP.
-contract LibOpExternNPTest is OpTest {
+/// @title LibOpExternTest
+/// @notice Test the runtime and integrity time logic of LibOpExtern.
+contract LibOpExternTest is OpTest {
     using LibUint256Array for uint256[];
 
     function mockImplementsERC165IInterpreterExternV4(IInterpreterExternV4 extern) internal {
@@ -44,7 +44,7 @@ contract LibOpExternNPTest is OpTest {
         );
     }
 
-    function testOpExternNPIntegrityHappy(
+    function testOpExternIntegrityHappy(
         IntegrityCheckState memory state,
         IInterpreterExternV4 extern,
         uint16 constantIndex,
@@ -77,13 +77,13 @@ contract LibOpExternNPTest is OpTest {
         vm.expectCall(
             address(extern), abi.encodeWithSelector(IInterpreterExternV4.externIntegrity.selector, externDispatch), 1
         );
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpExternNP.integrity(state, operand);
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpExtern.integrity(state, operand);
 
         assertEq(calcInputs, inputs + 1, "inputs");
         assertEq(calcOutputs, outputs + 1, "outputs");
     }
 
-    function testOpExternNPIntegrityNotAnExternContract(
+    function testOpExternIntegrityNotAnExternContract(
         IntegrityCheckState memory state,
         IInterpreterExternV4 extern,
         uint16 constantIndex,
@@ -132,11 +132,11 @@ contract LibOpExternNPTest is OpTest {
         view
         returns (uint256, uint256)
     {
-        return LibOpExternNP.integrity(state, operand);
+        return LibOpExtern.integrity(state, operand);
     }
 
     /// Test the eval of extern directly.
-    function testOpExternNPRunHappy(
+    function testOpExternRunHappy(
         IInterpreterExternV4 extern,
         bytes32[] memory constants,
         uint16 constantIndex,
@@ -195,11 +195,11 @@ contract LibOpExternNPTest is OpTest {
             address(extern), abi.encodeWithSelector(IInterpreterExternV4.extern.selector, externDispatch, inputs), 2
         );
 
-        opReferenceCheck(state, operand, LibOpExternNP.referenceFn, LibOpExternNP.integrity, LibOpExternNP.run, inputs);
+        opReferenceCheck(state, operand, LibOpExtern.referenceFn, LibOpExtern.integrity, LibOpExtern.run, inputs);
     }
 
     /// Test the eval of extern parsed from a string.
-    function testOpExternNPEvalHappy() external {
+    function testOpExternEvalHappy() external {
         IInterpreterExternV4 extern = IInterpreterExternV4(address(0xdeadbeef));
         vm.etch(address(extern), hex"fe");
         uint256 opcode = 5;
@@ -252,7 +252,7 @@ contract LibOpExternNPTest is OpTest {
 
     /// Test the eval of extern parsed from a string with multiple inputs and
     /// outputs.
-    function testOpExternNPEvalMultipleInputsOutputsHappy() external {
+    function testOpExternEvalMultipleInputsOutputsHappy() external {
         IInterpreterExternV4 extern = IInterpreterExternV4(address(0xdeadbeef));
         vm.etch(address(extern), hex"fe");
         uint256 opcode = 5;

@@ -8,7 +8,7 @@ import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterp
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-contract LibOpEqualToNPTest is OpTest {
+contract LibOpEqualToTest is OpTest {
     /// Directly test the integrity logic of LibOpEqualTo. No matter the
     /// operand inputs, the calc inputs must be 2, and the calc outputs must be
     /// 1.

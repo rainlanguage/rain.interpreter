@@ -6,9 +6,9 @@ import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterp
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
-/// @title LibOpBitwiseOrNP
+/// @title LibOpBitwiseOr
 /// @notice Opcode for computing bitwise OR from the top two items on the stack.
-library LibOpBitwiseOrNP {
+library LibOpBitwiseOr {
     /// The operand does nothing. Always 2 inputs and 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // Always 2 inputs and 1 output.

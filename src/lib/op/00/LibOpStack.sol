@@ -9,11 +9,11 @@ import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol
 
 error OutOfBoundsStackRead(uint256 opIndex, uint256 stackTopIndex, uint256 stackRead);
 
-/// @title LibOpStackNP
+/// @title LibOpStack
 /// Implementation of copying a stack item from the stack to the stack.
 /// Integrated deeply into LibParse, which requires this opcode or a variant
 /// to be present at a known opcode index.
-library LibOpStackNP {
+library LibOpStack {
     /// `stack` integrity check. Validates the read index is within bounds.
     function integrity(IntegrityCheckState memory state, OperandV2 operand) internal pure returns (uint256, uint256) {
         uint256 readIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));

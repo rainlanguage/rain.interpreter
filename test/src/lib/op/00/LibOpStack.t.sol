@@ -5,7 +5,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
 import {OperandV2, SourceIndexV2, EvalV4, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
-import {OutOfBoundsStackRead, LibOpStackNP} from "src/lib/op/00/LibOpStackNP.sol";
+import {OutOfBoundsStackRead, LibOpStack} from "src/lib/op/00/LibOpStack.sol";
 import {LibIntegrityCheck, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {FullyQualifiedNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV3.sol";
@@ -15,9 +15,9 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {BadOpOutputsLength} from "src/error/ErrIntegrity.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
-/// @title LibOpStackNPTest
-/// @notice Test the runtime and integrity time logic of LibOpStackNP.
-contract LibOpStackNPTest is OpTest {
+/// @title LibOpStackTest
+/// @notice Test the runtime and integrity time logic of LibOpStack.
+contract LibOpStackTest is OpTest {
     using LibInterpreterState for InterpreterState;
 
     function integrityExternal(IntegrityCheckState memory state, OperandV2 operand)
@@ -25,13 +25,13 @@ contract LibOpStackNPTest is OpTest {
         pure
         returns (uint256, uint256)
     {
-        return LibOpStackNP.integrity(state, operand);
+        return LibOpStack.integrity(state, operand);
     }
 
-    /// Directly test the integrity logic of LibOpStackNP. The operand always
+    /// Directly test the integrity logic of LibOpStack. The operand always
     /// puts a single value on the stack. This tests the happy path where the
     /// operand points to a value in the stack.
-    function testOpStackNPIntegrity(
+    function testOpStackIntegrity(
         bytes memory bytecode,
         uint256 stackIndex,
         bytes32[] memory constants,
@@ -41,16 +41,16 @@ contract LibOpStackNPTest is OpTest {
         operand = OperandV2.wrap(bytes32(bound(uint256(OperandV2.unwrap(operand)), 0, stackIndex - 1)));
         IntegrityCheckState memory state = LibIntegrityCheck.newState(bytecode, stackIndex, constants);
 
-        (uint256 inputs, uint256 outputs) = LibOpStackNP.integrity(state, operand);
+        (uint256 inputs, uint256 outputs) = LibOpStack.integrity(state, operand);
 
         assertEq(inputs, 0);
         assertEq(outputs, 1);
     }
 
-    /// Directly test the integrity logic of LibOpStackNP. This tests the case
+    /// Directly test the integrity logic of LibOpStack. This tests the case
     /// where the operand points past the end of the stack, which MUST always
     /// error as an OOB read.
-    function testOpStackNPIntegrityOOBStack(
+    function testOpStackIntegrityOOBStack(
         bytes memory bytecode,
         uint16 stackIndex,
         bytes32[] memory constants,
@@ -67,10 +67,10 @@ contract LibOpStackNPTest is OpTest {
         this.integrityExternal(state, operand);
     }
 
-    /// Directly test the runtime logic of LibOpStackNP. This tests that the
+    /// Directly test the runtime logic of LibOpStack. This tests that the
     /// operand always puts a single value on the stack.
     /// forge-config: default.fuzz.runs = 100
-    function testOpStackNPRun(StackItem[][] memory stacks, uint256 stackIndex) external view {
+    function testOpStackRun(StackItem[][] memory stacks, uint256 stackIndex) external view {
         InterpreterState memory state = opTestDefaultInterpreterState();
         StackItem stackValue;
         {
@@ -106,7 +106,7 @@ contract LibOpStackNPTest is OpTest {
         bytes32 stateFingerprintBefore = state.fingerprint();
 
         // Run the opcode.
-        Pointer stackTopAfter = LibOpStackNP.run(state, OperandV2.wrap(bytes32(stackIndex)), stackTop);
+        Pointer stackTopAfter = LibOpStack.run(state, OperandV2.wrap(bytes32(stackIndex)), stackTop);
 
         assertEq(Pointer.unwrap(stackTopAfter), Pointer.unwrap(expectedStackTopAfter));
 
@@ -175,22 +175,22 @@ contract LibOpStackNPTest is OpTest {
     }
 
     /// It is an error to have multiple outputs for a stack item.
-    function testOpStackNPMultipleOutputErrorSugared() external {
+    function testOpStackMultipleOutputErrorSugared() external {
         checkUnhappyParse2("foo: 1, _ _: foo;", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 2));
     }
 
     /// It is an error to have multiple outputs for a stack item.
-    function testOpStackNPMultipleOutputErrorUnsugared() external {
+    function testOpStackMultipleOutputErrorUnsugared() external {
         checkUnhappyParse2("foo: 1, _ _: stack<0>();", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 2));
     }
 
     /// It is an error to have zero outputs for a stack item.
-    function testOpStackNPZeroOutputErrorSugared() external {
+    function testOpStackZeroOutputErrorSugared() external {
         checkUnhappyParse2("foo: 1,: foo;", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 0));
     }
 
     /// It is an error to have zero outputs for a stack item.
-    function testOpStackNPZeroOutputErrorUnsugared() external {
+    function testOpStackZeroOutputErrorUnsugared() external {
         checkUnhappyParse2("foo: 1,: stack<0>();", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 0));
     }
 }

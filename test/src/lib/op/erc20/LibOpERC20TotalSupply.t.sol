@@ -21,7 +21,7 @@ contract LibOpERC20TotalSupplyTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    function testOpERC20TotalSupplyNPRun(address account, uint256 totalSupply, uint16 operandData, uint8 decimals)
+    function testOpERC20TotalSupplyRun(address account, uint256 totalSupply, uint16 operandData, uint8 decimals)
         external
     {
         assumeEtchable(account);

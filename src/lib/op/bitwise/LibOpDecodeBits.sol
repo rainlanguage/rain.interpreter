@@ -5,18 +5,18 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {LibOpEncodeBitsNP} from "./LibOpEncodeBitsNP.sol";
+import {LibOpEncodeBits} from "./LibOpEncodeBits.sol";
 
-/// @title LibOpDecodeBitsNP
+/// @title LibOpDecodeBits
 /// @notice Opcode for decoding binary data from a 256 bit value that was encoded
-/// with LibOpEncodeBitsNP.
-library LibOpDecodeBitsNP {
+/// with LibOpEncodeBits.
+library LibOpDecodeBits {
     /// Decode takes a single value and returns the decoded value.
     function integrity(IntegrityCheckState memory state, OperandV2 operand) internal pure returns (uint256, uint256) {
         // Use exact same integrity check as encode other than the return values.
         // All we're interested in is the errors that might be thrown.
         //slither-disable-next-line unused-return
-        LibOpEncodeBitsNP.integrity(state, operand);
+        LibOpEncodeBits.integrity(state, operand);
 
         return (1, 1);
     }

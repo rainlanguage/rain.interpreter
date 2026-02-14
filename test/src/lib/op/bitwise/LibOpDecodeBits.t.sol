@@ -6,23 +6,23 @@ import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {TruncatedBitwiseEncoding, ZeroLengthBitwiseEncoding} from "src/error/ErrBitwise.sol";
-import {LibOpDecodeBitsNP} from "src/lib/op/bitwise/LibOpDecodeBitsNP.sol";
+import {LibOpDecodeBits} from "src/lib/op/bitwise/LibOpDecodeBits.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-contract LibOpDecodeBitsNPTest is OpTest {
+contract LibOpDecodeBitsTest is OpTest {
     function integrityExternal(IntegrityCheckState memory state, OperandV2 operand)
         external
         pure
         returns (uint256, uint256)
     {
-        return LibOpDecodeBitsNP.integrity(state, operand);
+        return LibOpDecodeBits.integrity(state, operand);
     }
 
-    /// Directly test the integrity logic of LibOpDecodeBitsNP. All possible
+    /// Directly test the integrity logic of LibOpDecodeBits. All possible
     /// operands result in the same number of inputs and outputs, (2, 1).
     /// However, lengths can overflow and error so we bound the operand to avoid
     /// that here.
-    function testOpDecodeBitsNPIntegrity(
+    function testOpDecodeBitsIntegrity(
         IntegrityCheckState memory state,
         uint8 inputs,
         uint8 outputs,
@@ -38,14 +38,14 @@ contract LibOpDecodeBitsNPTest is OpTest {
         // Bounds ensure the typecast is safe.
         //forge-lint: disable-next-line(unsafe-typecast)
         OperandV2 operand = LibOperand.build(inputs, outputs, uint16((uint256(length) << 8) | uint256(start)));
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpDecodeBitsNP.integrity(state, operand);
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpDecodeBits.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the integrity logic of LibOpDecodeBitsNP. This tests the
+    /// Directly test the integrity logic of LibOpDecodeBits. This tests the
     /// error when the length overflows.
-    function testOpDecodeBitsNPIntegrityFail(IntegrityCheckState memory state, uint8 start8Bit, uint8 length8Bit)
+    function testOpDecodeBitsIntegrityFail(IntegrityCheckState memory state, uint8 start8Bit, uint8 length8Bit)
         external
     {
         // if start is [0,1] then length cannot overflow.
@@ -57,18 +57,18 @@ contract LibOpDecodeBitsNPTest is OpTest {
         (calcInputs, calcOutputs);
     }
 
-    /// Directly test the integrity logic of LibOpDecodeBitsNP. This tests the
+    /// Directly test the integrity logic of LibOpDecodeBits. This tests the
     /// error when the length is zero.
-    function testOpDecodeBitsNPIntegrityFailZeroLength(IntegrityCheckState memory state, uint8 start) external {
+    function testOpDecodeBitsIntegrityFailZeroLength(IntegrityCheckState memory state, uint8 start) external {
         OperandV2 operand = OperandV2.wrap(bytes32(2 << 0x10 | 0 << 8 | uint256(start)));
         vm.expectRevert(abi.encodeWithSelector(ZeroLengthBitwiseEncoding.selector));
         (uint256 calcInputs, uint256 calcOutputs) = this.integrityExternal(state, operand);
         (calcInputs, calcOutputs);
     }
 
-    /// Directly test the runtime logic of LibOpDecodeBitsNP. This tests that the
+    /// Directly test the runtime logic of LibOpDecodeBits. This tests that the
     /// opcode correctly pushes the decoded bits onto the stack.
-    function testOpDecodeBitsNPRun(StackItem value, uint8 start8Bit, uint8 length8Bit) external view {
+    function testOpDecodeBitsRun(StackItem value, uint8 start8Bit, uint8 length8Bit) external view {
         uint256 start = uint256(start8Bit);
         uint256 length = bound(uint256(length8Bit), 0, type(uint8).max - start);
         length = length == 0 ? 1 : length;
@@ -79,12 +79,12 @@ contract LibOpDecodeBitsNPTest is OpTest {
         inputs[0] = value;
         InterpreterState memory state = opTestDefaultInterpreterState();
         opReferenceCheck(
-            state, operand, LibOpDecodeBitsNP.referenceFn, LibOpDecodeBitsNP.integrity, LibOpDecodeBitsNP.run, inputs
+            state, operand, LibOpDecodeBits.referenceFn, LibOpDecodeBits.integrity, LibOpDecodeBits.run, inputs
         );
     }
 
     /// Test the eval of decoding bits parsed from a string.
-    function testOpDecodeBitsNPEvalHappy() external view {
+    function testOpDecodeBitsEvalHappy() external view {
         checkHappy("_:bitwise-decode<0 1>(0x00);", 0, "0 1 0");
         checkHappy("_:bitwise-decode<0 1>(0x01);", bytes32(uint256(1)), "0 1 1");
         checkHappy("_:bitwise-decode<0 1>(0x02);", 0, "0 1 2");
@@ -114,19 +114,19 @@ contract LibOpDecodeBitsNPTest is OpTest {
     }
 
     /// Check bad inputs.
-    function testOpDecodeBitsNPEvalZeroInputs() external {
+    function testOpDecodeBitsEvalZeroInputs() external {
         checkBadInputs("_:bitwise-decode<0 1>();", 0, 1, 0);
     }
 
-    function testOpDecodeBitsNPEvalTwoInputs() external {
+    function testOpDecodeBitsEvalTwoInputs() external {
         checkBadInputs("_:bitwise-decode<0 1>(0 0);", 2, 1, 2);
     }
 
-    function testOpDecodeBitsNPEvalZeroOutputs() external {
+    function testOpDecodeBitsEvalZeroOutputs() external {
         checkBadOutputs(":bitwise-decode<0 1>(0);", 1, 1, 0);
     }
 
-    function testOpDecodeBitsNPEvalTwoOutputs() external {
+    function testOpDecodeBitsEvalTwoOutputs() external {
         checkBadOutputs("_ _:bitwise-decode<0 1>(0);", 1, 1, 2);
     }
 }

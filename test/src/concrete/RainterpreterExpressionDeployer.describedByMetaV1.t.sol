@@ -6,11 +6,11 @@ import {RainterpreterExpressionDeployer} from "src/concrete/RainterpreterExpress
 import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
 import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
 import {RainterpreterParser} from "src/concrete/RainterpreterParser.sol";
-import {EXPRESSION_DEPLOYER_NP_META_PATH} from "src/lib/constants/ExpressionDeployerNPConstants.sol";
+import {EXPRESSION_DEPLOYER_META_PATH} from "src/lib/constants/ExpressionDeployerConstants.sol";
 
 contract RainterpreterExpressionDeployerDescribedByMetaV1Test is Test {
     function testRainterpreterExpressionDeployerDescribedByMetaV1Happy() external {
-        bytes memory describedByMeta = vm.readFileBinary(EXPRESSION_DEPLOYER_NP_META_PATH);
+        bytes memory describedByMeta = vm.readFileBinary(EXPRESSION_DEPLOYER_META_PATH);
         RainterpreterExpressionDeployer deployer = new RainterpreterExpressionDeployer();
 
         assertEq(keccak256(describedByMeta), deployer.describedByMetaV1());

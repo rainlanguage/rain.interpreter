@@ -23,9 +23,9 @@ error OutOfBoundsConstantRead(uint256 opIndex, uint256 constantsLength, uint256 
 /// Thrown when the outputs length is not equal to the expected length.
 error BadOutputsLength(uint256 expectedLength, uint256 actualLength);
 
-/// @title LibOpExternNP
+/// @title LibOpExtern
 /// @notice Implementation of calling an external contract.
-library LibOpExternNP {
+library LibOpExtern {
     using LibUint256Array for uint256[];
 
     /// `extern` integrity check. Validates the extern contract supports the expected interface and delegates to the extern's own integrity check.

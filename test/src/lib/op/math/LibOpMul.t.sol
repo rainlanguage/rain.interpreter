@@ -31,7 +31,7 @@ contract LibOpMulTest is OpTest {
 
     /// Directly test the integrity logic of LibOpMul. This tests the
     /// unhappy path where the operand is invalid due to 1 inputs.
-    function testOpDecimal18MulNPIntegrityUnhappyOneInput(IntegrityCheckState memory state) external pure {
+    function testOpDecimal18MulIntegrityUnhappyOneInput(IntegrityCheckState memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) =
             LibOpMul.integrity(state, OperandV2.wrap(bytes32(uint256(0x010000))));
         // Calc inputs will be minimum 2.

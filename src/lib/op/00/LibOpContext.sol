@@ -6,7 +6,7 @@ import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterp
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 
-library LibOpContextNP {
+library LibOpContext {
     /// `context` integrity check. Requires 0 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // Context doesn't have any inputs. The operand defines the reads.
