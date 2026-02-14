@@ -9,6 +9,7 @@ import {UnclosedSubParseableLiteral, SubParseableMissingDispatch} from "src/erro
 import {ISubParserV4} from "rain.interpreter.interface/interface/ISubParserV4.sol";
 import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {CMASK_WHITESPACE, CMASK_SUB_PARSEABLE_LITERAL_END} from "rain.string/lib/parse/LibParseCMask.sol";
+import {LibParseChar} from "rain.string/lib/parse/LibParseChar.sol";
 
 contract LibParseLiteralSubParseableTest is Test {
     using LibBytes for bytes;
@@ -127,7 +128,7 @@ contract LibParseLiteralSubParseableTest is Test {
 
     /// Fuzz the happy path.
     function testParseLiteralSubParseableHappyFuzz(string memory dispatch, string memory whitespace, string memory body)
-        external
+        public
     {
         vm.assume(bytes(dispatch).length > 0);
         vm.assume(bytes(whitespace).length > 0);
@@ -141,13 +142,28 @@ contract LibParseLiteralSubParseableTest is Test {
         LibConformString.conformStringToMask(body, ~CMASK_SUB_PARSEABLE_LITERAL_END);
 
         string memory data = string(abi.encodePacked("[", dispatch, whitespace, body, "]"));
-        // string memory name = vm.toString(keccak256(abi.encodePacked(dispatch, whitespace, body)));
 
-        // string memory path = string.concat("./out/test/testOutput-", name, ".txt");
-        // vm.writeFile(path, data);
+        // Expected body excludes any leading whitespace in the body.
+        string memory expectedBody = string.concat(body);
+        uint256 cursor;
+        uint256 end;
+        assembly ("memory-safe") {
+            cursor := add(expectedBody, 0x20)
+            end := add(cursor, mload(expectedBody))
+        }
+        cursor = LibParseChar.skipMask(cursor, end, CMASK_WHITESPACE);
+        assembly ("memory-safe") {
+            let whitespaceLength := sub(cursor, add(expectedBody, 0x20))
+            mstore(expectedBody, sub(mload(expectedBody), whitespaceLength))
+            mcopy(add(expectedBody, 0x20), cursor, mload(expectedBody))
+        }
 
         checkParseSubParseable(
-            data, dispatch, body, bytes(dispatch).length + bytes(whitespace).length + bytes(body).length + 2
+            data, dispatch, expectedBody, bytes(dispatch).length + bytes(whitespace).length + bytes(body).length + 2
         );
+    }
+
+    function testParseLiteralSubParseableHappyKnown() external {
+        testParseLiteralSubParseableHappyFuzz("2 max-positive-value() 2", unicode"3¹&\\u{a3c}È", " ,");
     }
 }

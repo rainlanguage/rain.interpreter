@@ -8,11 +8,13 @@ import {LibInterpreterDeploy} from "src/lib/deploy/LibInterpreterDeploy.sol";
 import {RainterpreterParser} from "src/concrete/RainterpreterParser.sol";
 import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
 import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
-import {ProdRainterpreterExpressionDeployer} from "src/concrete/ProdRainterpreterExpressionDeployer.sol";
+import {RainterpreterExpressionDeployer} from "src/concrete/RainterpreterExpressionDeployer.sol";
 
 contract LibInterpreterDeployTest is Test {
     function testDeployAddressParser() external {
         vm.createSelectFork(vm.envString("CI_FORK_ETH_RPC_URL"));
+
+        console2.logBytes(LibRainDeploy.ZOLTU_FACTORY.code);
 
         address deployedAddress = LibRainDeploy.deployZoltu(type(RainterpreterParser).creationCode);
 
@@ -65,7 +67,7 @@ contract LibInterpreterDeployTest is Test {
     function testDeployAddressExpressionDeployer() external {
         vm.createSelectFork(vm.envString("CI_FORK_ETH_RPC_URL"));
 
-        address deployedAddress = LibRainDeploy.deployZoltu(type(ProdRainterpreterExpressionDeployer).creationCode);
+        address deployedAddress = LibRainDeploy.deployZoltu(type(RainterpreterExpressionDeployer).creationCode);
 
         console2.log("Deployed address:", deployedAddress);
 
@@ -76,7 +78,7 @@ contract LibInterpreterDeployTest is Test {
     }
 
     function testExpectedCodeHashExpressionDeployer() external {
-        ProdRainterpreterExpressionDeployer expressionDeployer = new ProdRainterpreterExpressionDeployer();
+        RainterpreterExpressionDeployer expressionDeployer = new RainterpreterExpressionDeployer();
 
         assertEq(address(expressionDeployer).codehash, LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH);
     }

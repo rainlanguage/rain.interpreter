@@ -32,7 +32,7 @@ contract RainterpreterReferenceExternIntIncTest is OpTest {
 
         assertEq(
             EncodedExternDispatchV2.unwrap(encodedExternDispatch),
-            0x000000000000000000000000c7183455a4c133ae270771860664b6b7ec320bb1
+            0x0000000000000000000000005615deb798bb3e4dfa0139dfa1b3d433cc23b72f
         );
 
         StackItem[] memory expectedStack = new StackItem[](3);
@@ -42,7 +42,7 @@ contract RainterpreterReferenceExternIntIncTest is OpTest {
 
         checkHappy(
             // Need the constant in the constant array to be indexable in the operand.
-            "_: 0x000000000000000000000000c7183455a4c133ae270771860664b6b7ec320bb1,"
+            "_: 0x0000000000000000000000005615deb798bb3e4dfa0139dfa1b3d433cc23b72f,"
             // Operand is the constant index of the dispatch.
             "three four: extern<0>(2 3);",
             expectedStack,

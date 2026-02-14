@@ -36,6 +36,7 @@ import {
     OPCODE_FUNCTION_POINTERS
 } from "../../generated/RainterpreterReferenceExtern.pointers.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {IDescribedByMetaV1} from "rain.metadata/interface/IDescribedByMetaV1.sol";
 
 /// @dev The number of subparser functions available to the parser. This is NOT
 /// 1:1 with the number of opcodes provided by the extern component of this
@@ -155,6 +156,7 @@ library LibRainterpreterReferenceExtern {
 contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainterpreterExtern {
     using LibDecimalFloat for Float;
 
+    /// @inheritdoc IDescribedByMetaV1
     function describedByMetaV1() external pure override returns (bytes32) {
         return DESCRIBED_BY_META_HASH;
     }

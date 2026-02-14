@@ -5,10 +5,7 @@ import {Script} from "forge-std/Script.sol";
 import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
 import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
 import {RainterpreterParser, PARSE_META_BUILD_DEPTH} from "src/concrete/RainterpreterParser.sol";
-import {
-    RainterpreterExpressionDeployer,
-    RainterpreterExpressionDeployerConstructionConfigV2
-} from "src/concrete/RainterpreterExpressionDeployer.sol";
+import {RainterpreterExpressionDeployer} from "src/concrete/RainterpreterExpressionDeployer.sol";
 import {
     RainterpreterReferenceExtern,
     LibRainterpreterReferenceExtern,
@@ -52,13 +49,7 @@ contract BuildPointers is Script {
     }
 
     function buildRainterpreterExpressionDeployerPointers() internal {
-        Rainterpreter interpreter = new Rainterpreter();
-        RainterpreterStore store = new RainterpreterStore();
-        RainterpreterParser parser = new RainterpreterParser();
-
-        RainterpreterExpressionDeployer deployer = new RainterpreterExpressionDeployer(
-            RainterpreterExpressionDeployerConstructionConfigV2(address(interpreter), address(store), address(parser))
-        );
+        RainterpreterExpressionDeployer deployer = new RainterpreterExpressionDeployer();
 
         string memory name = "RainterpreterExpressionDeployer";
 

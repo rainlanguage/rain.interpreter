@@ -29,17 +29,7 @@ import {
 } from "../generated/RainterpreterExpressionDeployer.pointers.sol";
 import {IIntegrityToolingV1} from "rain.sol.codegen/interface/IIntegrityToolingV1.sol";
 import {RainterpreterParser} from "./RainterpreterParser.sol";
-
-/// All config required to construct a `Rainterpreter`.
-/// @param interpreter The `IInterpreterV2` to use for evaluation. MUST match
-/// known bytecode.
-/// @param store The `IInterpreterStoreV3`. MUST match known bytecode.
-/// @param parser The `IParserV1View`. MUST match known bytecode.
-struct RainterpreterExpressionDeployerConstructionConfigV2 {
-    address interpreter;
-    address store;
-    address parser;
-}
+import {LibInterpreterDeploy} from "../lib/deploy/LibInterpreterDeploy.sol";
 
 /// @title RainterpreterExpressionDeployer
 contract RainterpreterExpressionDeployer is
@@ -53,27 +43,6 @@ contract RainterpreterExpressionDeployer is
     using LibStackPointer for Pointer;
     using LibUint256Array for uint256[];
 
-    /// The interpreter with known bytecode that this deployer is constructed
-    /// for.
-    //slither-disable-next-line naming-convention
-    IInterpreterV4 public immutable I_INTERPRETER;
-    /// The store with known bytecode that this deployer is constructed for.
-    //slither-disable-next-line naming-convention
-    IInterpreterStoreV3 public immutable I_STORE;
-    //slither-disable-next-line naming-convention
-    RainterpreterParser public immutable I_PARSER;
-
-    constructor(RainterpreterExpressionDeployerConstructionConfigV2 memory config) {
-        // Set the immutables.
-        IInterpreterV4 interpreter = IInterpreterV4(config.interpreter);
-        IInterpreterStoreV3 store = IInterpreterStoreV3(config.store);
-        RainterpreterParser parser = RainterpreterParser(config.parser);
-
-        I_INTERPRETER = interpreter;
-        I_STORE = store;
-        I_PARSER = parser;
-    }
-
     /// @inheritdoc IERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(IDescribedByMetaV1).interfaceId || interfaceId == type(IParserV2).interfaceId
@@ -82,7 +51,8 @@ contract RainterpreterExpressionDeployer is
 
     /// @inheritdoc IParserV2
     function parse2(bytes memory data) external view virtual override returns (bytes memory) {
-        (bytes memory bytecode, bytes32[] memory constants) = I_PARSER.unsafeParse(data);
+        (bytes memory bytecode, bytes32[] memory constants) =
+            RainterpreterParser(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS).unsafeParse(data);
 
         uint256 size = LibInterpreterStateDataContract.serializeSize(bytecode, constants);
         bytes memory serialized;
@@ -108,7 +78,7 @@ contract RainterpreterExpressionDeployer is
     function parsePragma1(bytes calldata data) external view virtual override returns (PragmaV1 memory) {
         // We know the I_PARSER is also an IParserPragmaV1 because we enforced
         // the bytecode hash in the constructor.
-        return I_PARSER.parsePragma1(data);
+        return RainterpreterParser(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS).parsePragma1(data);
     }
 
     /// Defines all the function pointers to integrity checks. This is the

@@ -8,7 +8,7 @@ import {RainterpreterParser} from "../src/concrete/RainterpreterParser.sol";
 import {LibRainDeploy} from "rain.deploy/lib/LibRainDeploy.sol";
 import {LibInterpreterDeploy} from "../src/lib/deploy/LibInterpreterDeploy.sol";
 import {LibDecimalFloatDeploy} from "rain.math.float/lib/deploy/LibDecimalFloatDeploy.sol";
-import {ProdRainterpreterExpressionDeployer} from "../src/concrete/ProdRainterpreterExpressionDeployer.sol";
+import {RainterpreterExpressionDeployer} from "../src/concrete/RainterpreterExpressionDeployer.sol";
 
 bytes32 constant DEPLOYMENT_SUITE_PARSER = keccak256("parser");
 bytes32 constant DEPLOYMENT_SUITE_STORE = keccak256("store");
@@ -37,8 +37,7 @@ contract Deploy is Script {
                 LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH,
                 deps
             );
-        } else if (suite == DEPLOYMENT_SUITE_STORE)
-        {
+        } else if (suite == DEPLOYMENT_SUITE_STORE) {
             console2.log("Deploying RainterpreterStore...");
             LibRainDeploy.deployAndBroadcastToSupportedNetworks(
                 vm,
@@ -63,13 +62,13 @@ contract Deploy is Script {
                 deps
             );
         } else if (suite == DEPLOYMENT_SUITE_EXPRESSION_DEPLOYER) {
-            console2.log("Deploying ProdRainterpreterExpressionDeployer...");
+            console2.log("Deploying RainterpreterExpressionDeployer...");
             LibRainDeploy.deployAndBroadcastToSupportedNetworks(
                 vm,
                 LibRainDeploy.supportedNetworks(),
                 deployerPrivateKey,
-                type(ProdRainterpreterExpressionDeployer).creationCode,
-                "src/concrete/ProdRainterpreterExpressionDeployer.sol:ProdRainterpreterExpressionDeployer",
+                type(RainterpreterExpressionDeployer).creationCode,
+                "src/concrete/RainterpreterExpressionDeployer.sol:RainterpreterExpressionDeployer",
                 LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS,
                 LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH,
                 deps

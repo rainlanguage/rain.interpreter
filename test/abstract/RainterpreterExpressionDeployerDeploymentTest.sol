@@ -14,11 +14,12 @@ import {
 import {Rainterpreter, INTERPRETER_BYTECODE_HASH} from "../../src/concrete/Rainterpreter.sol";
 import {
     INTEGRITY_FUNCTION_POINTERS,
-    RainterpreterExpressionDeployerConstructionConfigV2,
     RainterpreterExpressionDeployer
 } from "../../src/concrete/RainterpreterExpressionDeployer.sol";
 import {LibAllStandardOps} from "../../src/lib/op/LibAllStandardOps.sol";
 import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";
+import {LibRainDeploy} from "rain.deploy/lib/LibRainDeploy.sol";
+import {LibInterpreterDeploy} from "../../src/lib/deploy/LibInterpreterDeploy.sol";
 
 /// @title RainterpreterExpressionDeployerNPD2DeploymentTest
 /// Tests that the RainterpreterExpressionDeployer meta is correct. Also
@@ -38,21 +39,35 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
     constructor() {
         beforeOpTestConstructor();
 
-        I_INTERPRETER = new Rainterpreter();
-        I_STORE = new RainterpreterStore();
-        I_PARSER = new RainterpreterParser();
+        vm.etch(LibRainDeploy.ZOLTU_FACTORY, hex"60003681823780368234f58015156014578182fd5b80825250506014600cf3");
 
-        // Sanity check the interpreter's bytecode hash.
-        bytes32 i9rHash;
-        address interpreter = address(I_INTERPRETER);
-        assembly ("memory-safe") {
-            i9rHash := extcodehash(interpreter)
+        if (LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH != LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS.codehash) {
+            console2.log("Deploying Parser");
+            LibRainDeploy.deployZoltu(type(RainterpreterParser).creationCode);
         }
-        if (i9rHash != INTERPRETER_BYTECODE_HASH) {
-            console2.log("current i9r bytecode hash:");
-            console2.logBytes32(i9rHash);
-            revert("unexpected interpreter bytecode hash");
+        if (
+            LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH
+                != LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS.codehash
+        ) {
+            console2.log("Deploying Interpreter");
+            LibRainDeploy.deployZoltu(type(Rainterpreter).creationCode);
         }
+        if (LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH != LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS.codehash) {
+            console2.log("Deploying Store");
+            LibRainDeploy.deployZoltu(type(RainterpreterStore).creationCode);
+        }
+
+        I_PARSER = RainterpreterParser(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS);
+        I_INTERPRETER = Rainterpreter(LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS);
+        I_STORE = RainterpreterStore(LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS);
+
+        assertEq(
+            address(I_INTERPRETER),
+            LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS,
+            "unexpected interpreter deployed address"
+        );
+        assertEq(address(I_STORE), LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS, "unexpected store deployed address");
+        assertEq(address(I_PARSER), LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS, "unexpected parser deployed address");
 
         bytes32 storeHash;
         address store = address(I_STORE);
@@ -84,11 +99,16 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
             revert("unexpected parse meta");
         }
 
-        I_DEPLOYER = new RainterpreterExpressionDeployer(
-            RainterpreterExpressionDeployerConstructionConfigV2(
-                address(I_INTERPRETER), address(I_STORE), address(I_PARSER)
-            )
-        );
+        // I_DEPLOYER = new RainterpreterExpressionDeployer();
+        if (
+            LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH
+                != LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS.codehash
+        ) {
+            console2.log("Deploying Expression Deployer");
+            I_DEPLOYER = RainterpreterExpressionDeployer(
+                LibRainDeploy.deployZoltu(type(RainterpreterExpressionDeployer).creationCode)
+            );
+        }
 
         // Sanity check the deployer's integrity function pointers.
         bytes memory integrityFunctionPointers = I_DEPLOYER.buildIntegrityFunctionPointers();
