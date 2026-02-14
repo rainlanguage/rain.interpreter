@@ -11,6 +11,10 @@ import {LibRainterpreterReferenceExtern} from "../src/concrete/extern/Rainterpre
 /// ABI, deflated, cbor encoded and then passed to ExpressionDeployer constructor
 /// when deploying.
 contract BuildAuthoringMeta is Script {
+    /// Writes raw ABI-encoded authoring meta bytes to disk for both the
+    /// standard ops and the reference extern. The output files are consumed
+    /// by the meta build pipeline to produce the final deflated/cbor-encoded
+    /// meta that is passed to contract constructors at deploy time.
     function run() external {
         vm.writeFileBinary("meta/AuthoringMeta.rain.meta", LibAllStandardOps.authoringMetaV2());
         vm.writeFileBinary(
