@@ -16,10 +16,10 @@ import {LibParseOperand} from "../../lib/parse/LibParseOperand.sol";
 // OP_INDEX_INCREMENT exported for convenience
 //forge-lint: disable-next-line(unused-import)
 import {LibExternOpIntInc, OP_INDEX_INCREMENT} from "../../lib/extern/reference/op/LibExternOpIntInc.sol";
-import {LibExternOpStackOperandNPE2} from "../../lib/extern/reference/op/LibExternOpStackOperandNPE2.sol";
-import {LibExternOpContextSenderNPE2} from "../../lib/extern/reference/op/LibExternOpContextSenderNPE2.sol";
+import {LibExternOpStackOperand} from "../../lib/extern/reference/op/LibExternOpStackOperand.sol";
+import {LibExternOpContextSender} from "../../lib/extern/reference/op/LibExternOpContextSender.sol";
 import {LibExternOpContextCallingContract} from "../../lib/extern/reference/op/LibExternOpContextCallingContract.sol";
-import {LibExternOpContextRainlenNPE2} from "../../lib/extern/reference/op/LibExternOpContextRainlenNPE2.sol";
+import {LibExternOpContextRainlen} from "../../lib/extern/reference/op/LibExternOpContextRainlen.sol";
 import {LibParseLiteralRepeat} from "../../lib/extern/reference/literal/LibParseLiteralRepeat.sol";
 import {LibParseLiteralDecimal} from "../../lib/parse/literal/LibParseLiteralDecimal.sol";
 import {
@@ -324,10 +324,10 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
                 pointersFixed = [
                     lengthPointer,
                     LibExternOpIntInc.subParser,
-                    LibExternOpStackOperandNPE2.subParser,
-                    LibExternOpContextSenderNPE2.subParser,
+                    LibExternOpStackOperand.subParser,
+                    LibExternOpContextSender.subParser,
                     LibExternOpContextCallingContract.subParser,
-                    LibExternOpContextRainlenNPE2.subParser
+                    LibExternOpContextRainlen.subParser
                 ];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {

@@ -90,7 +90,7 @@ contract LibOpConstantTest is OpTest {
     }
 
     /// Test the eval of a constant opcode parsed from a string.
-    function testOpConstantEvalNPE2E() external view {
+    function testOpConstantEval() external view {
         bytes memory bytecode = I_DEPLOYER.parse2("_ _: 2 1.001;");
 
         (StackItem[] memory stack, bytes32[] memory kvs) = I_INTERPRETER.eval4(

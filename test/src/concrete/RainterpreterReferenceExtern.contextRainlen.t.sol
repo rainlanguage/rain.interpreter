@@ -10,7 +10,7 @@ import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 contract RainterpreterReferenceExternContextRainlenTest is OpTest {
     using Strings for address;
 
-    function testRainterpreterReferenceExterNPE2ContextRainlenHappy() external {
+    function testRainterpreterReferenceExternContextRainlenHappy() external {
         RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();
 
         bytes memory rainlang = bytes(

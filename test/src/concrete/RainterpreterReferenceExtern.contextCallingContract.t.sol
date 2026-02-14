@@ -8,7 +8,7 @@ import {RainterpreterReferenceExtern, StackItem} from "src/concrete/extern/Raint
 contract RainterpreterReferenceExternContextSenderTest is OpTest {
     using Strings for address;
 
-    function testRainterpreterReferenceExterNPE2ContextContractHappy() external {
+    function testRainterpreterReferenceExternContextContractHappy() external {
         RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();
 
         StackItem[] memory expectedStack = new StackItem[](1);
