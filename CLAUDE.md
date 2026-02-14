@@ -108,5 +108,21 @@ External contracts can extend the interpreter with additional opcodes. `src/conc
 ## Audit Review
 
 When reviewing code for audit:
+
+### Documentation
 - Ensure all code is documented at all levels: contract, function, logic
 - After ensuring documentation, review the documentation against implementation
+
+### Security
+- Check assembly blocks for memory safety: out-of-bounds reads/writes, incorrect pointer arithmetic, missing bounds checks
+- Verify stack underflow/overflow protection in opcode `run` functions
+- Check that integrity functions correctly declare inputs/outputs matching what `run` actually consumes/produces
+- Look for reentrancy risks in opcodes that make external calls (ERC20, ERC721, extern)
+- Verify namespace isolation in the store — `msg.sender` + `StateNamespace` must always scope storage access
+- Check that bytecode hash verification in the expression deployer cannot be bypassed
+- Verify function pointer tables cannot index out of bounds or be manipulated
+- Look for unchecked arithmetic that could silently wrap
+- Check that operand parsing rejects invalid operand values rather than silently misinterpreting them
+- Verify that the eval loop cannot be made to jump to arbitrary code via crafted bytecode
+- Check that context array access is bounds-checked
+- Review extern dispatch for correct encoding/decoding of `ExternDispatchV2`
