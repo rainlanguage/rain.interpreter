@@ -89,7 +89,7 @@ contract BuildPointers is Script {
         LibFs.buildFileForContract(
             vm,
             address(extern),
-            "RainterpreterReferenceExtern",
+            name,
             string.concat(
                 string.concat(
                     LibCodeGen.describedByMetaHashConstantString(vm, name),

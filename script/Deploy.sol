@@ -10,13 +10,23 @@ import {LibInterpreterDeploy} from "../src/lib/deploy/LibInterpreterDeploy.sol";
 import {LibDecimalFloatDeploy} from "rain.math.float/lib/deploy/LibDecimalFloatDeploy.sol";
 import {RainterpreterExpressionDeployer} from "../src/concrete/RainterpreterExpressionDeployer.sol";
 
+/// @dev Deployment suite selector for the parser.
 bytes32 constant DEPLOYMENT_SUITE_PARSER = keccak256("parser");
+/// @dev Deployment suite selector for the store.
 bytes32 constant DEPLOYMENT_SUITE_STORE = keccak256("store");
+/// @dev Deployment suite selector for the interpreter.
 bytes32 constant DEPLOYMENT_SUITE_INTERPRETER = keccak256("interpreter");
+/// @dev Deployment suite selector for the expression deployer.
 bytes32 constant DEPLOYMENT_SUITE_EXPRESSION_DEPLOYER = keccak256("expression-deployer");
 
 /// @title Deploy
+/// @notice Forge script that deploys a single interpreter component to all
+/// supported networks. The `DEPLOYMENT_SUITE` env var selects which component
+/// to deploy: "parser", "store", "interpreter", or "expression-deployer".
+/// Defaults to "parser" if not set.
 contract Deploy is Script {
+    /// Deploys the component selected by the `DEPLOYMENT_SUITE` env var.
+    /// Reverts if the suite is not recognised.
     function run() external {
         uint256 deployerPrivateKey = vm.envUint("DEPLOYMENT_KEY");
 
@@ -73,6 +83,8 @@ contract Deploy is Script {
                 LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH,
                 deps
             );
+        } else {
+            revert("Unknown DEPLOYMENT_SUITE");
         }
     }
 }
