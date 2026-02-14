@@ -40,3 +40,8 @@ error UnexpectedParserBytecodeHash(bytes32 expectedBytecodeHash, bytes32 actualB
 /// @param actualConstructionMetaHash The meta hash that was found upon
 /// construction.
 error UnexpectedConstructionMetaHash(bytes32 expectedConstructionMetaHash, bytes32 actualConstructionMetaHash);
+
+/// Thrown when the `DEPLOYMENT_SUITE` env var does not match any known suite
+/// selector.
+/// @param suite The unrecognised suite selector hash.
+error UnknownDeploymentSuite(bytes32 suite);

@@ -9,6 +9,7 @@ import {LibRainDeploy} from "rain.deploy/lib/LibRainDeploy.sol";
 import {LibInterpreterDeploy} from "../src/lib/deploy/LibInterpreterDeploy.sol";
 import {LibDecimalFloatDeploy} from "rain.math.float/lib/deploy/LibDecimalFloatDeploy.sol";
 import {RainterpreterExpressionDeployer} from "../src/concrete/RainterpreterExpressionDeployer.sol";
+import {UnknownDeploymentSuite} from "../src/error/ErrDeploy.sol";
 
 /// @dev Deployment suite selector for the parser.
 bytes32 constant DEPLOYMENT_SUITE_PARSER = keccak256("parser");
@@ -84,7 +85,7 @@ contract Deploy is Script {
                 deps
             );
         } else {
-            revert("Unknown DEPLOYMENT_SUITE");
+            revert UnknownDeploymentSuite(suite);
         }
     }
 }

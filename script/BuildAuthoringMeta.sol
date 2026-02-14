@@ -7,14 +7,13 @@ import {LibRainterpreterReferenceExtern} from "../src/concrete/extern/Rainterpre
 
 /// @title BuildAuthoringMeta
 /// @notice Forge script that writes raw ABI-encoded AuthoringMeta bytes to
-/// disk for each parser. The output files are packed with the
-/// ExpressionDeployer ABI, deflated, cbor encoded and then passed to the
-/// ExpressionDeployer constructor when deploying.
+/// disk for each parser. The output files are consumed by the `i9r-prelude`
+/// meta build pipeline which deflates and cbor-encodes them.
 contract BuildAuthoringMeta is Script {
     /// Writes raw ABI-encoded authoring meta bytes to disk for both the
     /// standard ops and the reference extern. The output files are consumed
-    /// by the meta build pipeline to produce the final deflated/cbor-encoded
-    /// meta that is passed to contract constructors at deploy time.
+    /// by the `i9r-prelude` meta build pipeline to produce the final
+    /// deflated/cbor-encoded meta.
     function run() external {
         vm.writeFileBinary("meta/AuthoringMeta.rain.meta", LibAllStandardOps.authoringMetaV2());
         vm.writeFileBinary(
