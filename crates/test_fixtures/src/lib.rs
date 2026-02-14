@@ -111,12 +111,7 @@ impl LocalEvm {
         let interpreter = Interpreter::deploy(provider.clone()).await.unwrap();
         let store = Store::deploy(provider.clone()).await.unwrap();
         let parser = Parser::deploy(provider.clone()).await.unwrap();
-        let config = Deployer::RainterpreterExpressionDeployerConstructionConfigV2 {
-            interpreter: *interpreter.address(),
-            parser: *parser.address(),
-            store: *store.address(),
-        };
-        let deployer = Deployer::deploy(provider.clone(), config).await.unwrap();
+        let deployer = Deployer::deploy(provider.clone()).await.unwrap();
 
         Self {
             anvil,
