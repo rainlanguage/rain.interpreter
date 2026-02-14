@@ -10,12 +10,14 @@ import {InterpreterState} from "../../../state/LibInterpreterState.sol";
 /// @title OpUint256ERC721BalanceOf
 /// @notice Opcode for getting the current erc721 balance of an account.
 library LibOpUint256ERC721BalanceOf {
+    /// `uint256-erc721-balance-of` integrity check. Requires 2 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // Always 2 inputs, the token and the account.
         // Always 1 output, the balance.
         return (2, 1);
     }
 
+    /// `uint256-erc721-balance-of` opcode. Calls `balanceOf` on the token and returns the raw uint256 balance.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
         uint256 token;
         uint256 account;
@@ -34,6 +36,7 @@ library LibOpUint256ERC721BalanceOf {
         return stackTop;
     }
 
+    /// Reference implementation of `uint256-erc721-balance-of` for testing.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         view

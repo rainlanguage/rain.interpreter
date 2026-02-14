@@ -12,6 +12,7 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibOpAvg {
     using LibDecimalFloat for Float;
 
+    /// `avg` integrity check. Requires exactly 2 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // There must be two inputs and one output.
         return (2, 1);

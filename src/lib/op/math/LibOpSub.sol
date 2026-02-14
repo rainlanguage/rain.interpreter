@@ -13,6 +13,7 @@ import {LibDecimalFloatImplementation} from "rain.math.float/lib/implementation/
 library LibOpSub {
     using LibDecimalFloat for Float;
 
+    /// `sub` integrity check. Requires at least 2 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
         uint256 inputs = uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F;

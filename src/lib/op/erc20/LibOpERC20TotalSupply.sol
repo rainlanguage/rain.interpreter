@@ -13,12 +13,14 @@ import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol
 /// @title LibOpERC20TotalSupply
 /// @notice Opcode for ERC20 `totalSupply`.
 library LibOpERC20TotalSupply {
+    /// `erc20-total-supply` integrity check. Requires 1 input and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // Always 1 input, the contract.
         // Always 1 output, the total supply.
         return (1, 1);
     }
 
+    /// `erc20-total-supply` opcode. Calls `totalSupply` on the token and converts the result to a decimal float using the token's `decimals`.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
         uint256 token;
         assembly ("memory-safe") {
@@ -41,6 +43,7 @@ library LibOpERC20TotalSupply {
         return stackTop;
     }
 
+    /// Reference implementation of `erc20-total-supply` for testing.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         view

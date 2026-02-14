@@ -25,6 +25,7 @@ library LibOpEncodeBitsNP {
         return (2, 1);
     }
 
+    /// `encode-bits` opcode. Encodes a source value into a target at the bit position and length specified by the operand.
     function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         unchecked {
             uint256 source;
@@ -59,6 +60,7 @@ library LibOpEncodeBitsNP {
         }
     }
 
+    /// Reference implementation of `encode-bits` for testing.
     function referenceFn(InterpreterState memory, OperandV2 operand, StackItem[] memory inputs)
         internal
         pure

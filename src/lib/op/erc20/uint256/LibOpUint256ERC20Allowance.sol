@@ -10,12 +10,14 @@ import {InterpreterState} from "../../../state/LibInterpreterState.sol";
 /// @title LibOpUint256ERC20Allowance
 /// @notice Opcode for getting the current erc20 allowance of an account.
 library LibOpUint256ERC20Allowance {
+    /// `uint256-erc20-allowance` integrity check. Requires 3 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // Always 3 inputs, the token, the owner and the spender.
         // Always 1 output, the allowance.
         return (3, 1);
     }
 
+    /// `uint256-erc20-allowance` opcode. Calls `allowance` on the token and returns the raw uint256 allowance.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
         uint256 token;
         uint256 owner;
@@ -37,6 +39,7 @@ library LibOpUint256ERC20Allowance {
         return stackTop;
     }
 
+    /// Reference implementation of `uint256-erc20-allowance` for testing.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         view

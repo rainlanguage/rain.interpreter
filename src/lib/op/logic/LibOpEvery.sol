@@ -13,6 +13,7 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibOpEvery {
     using LibDecimalFloat for Float;
 
+    /// `every` integrity check. Requires at least 1 input and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least one input.
         uint256 inputs = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));

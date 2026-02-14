@@ -12,6 +12,7 @@ import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibOpExp {
     using LibDecimalFloat for Float;
 
+    /// `exp` integrity check. Requires exactly 1 input and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // There must be one inputs and one output.
         return (1, 1);

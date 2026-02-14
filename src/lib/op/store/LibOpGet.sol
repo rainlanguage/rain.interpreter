@@ -12,6 +12,7 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 library LibOpGet {
     using LibMemoryKV for MemoryKV;
 
+    /// `get` integrity check. Requires 1 input (key) and produces 1 output (value).
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // Always 1 input. The key. `hash()` is recommended to build compound
         // keys.
@@ -53,6 +54,7 @@ library LibOpGet {
         return stackTop;
     }
 
+    /// Reference implementation of `get` for testing.
     function referenceFn(InterpreterState memory state, OperandV2, StackItem[] memory inputs)
         internal
         view

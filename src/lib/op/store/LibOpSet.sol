@@ -12,12 +12,14 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 library LibOpSet {
     using LibMemoryKV for MemoryKV;
 
+    /// `set` integrity check. Requires 2 inputs (key, value) and produces 0 outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // Always 2 inputs. The key and the value. `hash()` is recommended to
         // build compound keys.
         return (2, 0);
     }
 
+    /// `set` opcode. Records a key/value pair in the in-memory state KV store to be persisted to storage after eval.
     function run(InterpreterState memory state, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
         unchecked {
             bytes32 key;
@@ -33,6 +35,7 @@ library LibOpSet {
         }
     }
 
+    /// Reference implementation of `set` for testing.
     function referenceFn(InterpreterState memory state, OperandV2, StackItem[] memory inputs)
         internal
         pure

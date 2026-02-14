@@ -21,6 +21,7 @@ library LibOpDecodeBitsNP {
         return (1, 1);
     }
 
+    /// `decode-bits` opcode. Decodes a value from the bit position and length specified by the operand.
     function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         unchecked {
             uint256 value;
@@ -49,6 +50,7 @@ library LibOpDecodeBitsNP {
         }
     }
 
+    /// Reference implementation of `decode-bits` for testing.
     function referenceFn(InterpreterState memory, OperandV2 operand, StackItem[] memory inputs)
         internal
         pure

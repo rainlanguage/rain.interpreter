@@ -11,6 +11,7 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 /// @notice Linear growth is base + rate * t where a is the initial value, r is
 /// the growth rate, and t is time.
 library LibOpLinearGrowth {
+    /// `linear-growth` integrity check. Requires exactly 3 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // There must be three inputs and one output.
         return (3, 1);

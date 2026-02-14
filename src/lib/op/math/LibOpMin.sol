@@ -10,6 +10,7 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 /// @title LibOpMin
 /// @notice Opcode to find the min from N floats.
 library LibOpMin {
+    /// `min` integrity check. Requires at least 2 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
         uint256 inputs = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));

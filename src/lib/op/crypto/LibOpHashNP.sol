@@ -9,6 +9,7 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 /// @title LibOpHashNP
 /// Implementation of keccak256 hashing as a standard Rainlang opcode.
 library LibOpHashNP {
+    /// `hash` integrity check. Inputs count is operand-defined, produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // Any number of inputs are valid.
         // 0 inputs will be the hash of empty (0 length) bytes.
@@ -16,6 +17,7 @@ library LibOpHashNP {
         return (inputs, 1);
     }
 
+    /// `hash` opcode. Computes keccak256 over the operand-specified number of stack items.
     function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         assembly ("memory-safe") {
             let length := mul(and(shr(0x10, operand), 0x0F), 0x20)
@@ -26,6 +28,7 @@ library LibOpHashNP {
         return stackTop;
     }
 
+    /// Reference implementation of `hash` for testing.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure

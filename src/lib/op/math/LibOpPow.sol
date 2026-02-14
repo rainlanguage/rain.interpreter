@@ -12,6 +12,7 @@ import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibOpPow {
     using LibDecimalFloat for Float;
 
+    /// `pow` integrity check. Requires exactly 2 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // There must be two inputs and one output.
         return (2, 1);

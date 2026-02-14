@@ -9,6 +9,7 @@ import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
 /// @title LibOpUint256Pow
 /// @notice Opcode to raise x successively to N integers. Errors on overflow.
 library LibOpUint256Pow {
+    /// `uint256-pow` integrity check. Requires at least 2 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
         uint256 inputs = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));

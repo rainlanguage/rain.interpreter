@@ -14,6 +14,7 @@ error OutOfBoundsStackRead(uint256 opIndex, uint256 stackTopIndex, uint256 stack
 /// Integrated deeply into LibParse, which requires this opcode or a variant
 /// to be present at a known opcode index.
 library LibOpStackNP {
+    /// `stack` integrity check. Validates the read index is within bounds.
     function integrity(IntegrityCheckState memory state, OperandV2 operand) internal pure returns (uint256, uint256) {
         uint256 readIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
         // Operand is the index so ensure it doesn't exceed the stack index.
@@ -29,6 +30,7 @@ library LibOpStackNP {
         return (0, 1);
     }
 
+    /// `stack` opcode. Copies a value from a previous stack position to the top.
     function run(InterpreterState memory state, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 sourceIndex = state.sourceIndex;
         assembly ("memory-safe") {

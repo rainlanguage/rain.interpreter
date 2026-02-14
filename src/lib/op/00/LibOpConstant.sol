@@ -14,6 +14,7 @@ error OutOfBoundsConstantRead(uint256 opIndex, uint256 constantsLength, uint256 
 /// Integrated deeply into LibParse, which requires this opcode or a variant
 /// to be present at a known opcode index.
 library LibOpConstant {
+    /// `constant` integrity check. Validates the constant index is within bounds.
     function integrity(IntegrityCheckState memory state, OperandV2 operand) internal pure returns (uint256, uint256) {
         // Operand is the index so ensure it doesn't exceed the constants length.
         uint256 constantIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
@@ -25,6 +26,7 @@ library LibOpConstant {
         return (0, 1);
     }
 
+    /// `constant` opcode. Copies a constant from the constants array to the stack.
     function run(InterpreterState memory state, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         bytes32[] memory constants = state.constants;
         // Skip index OOB check and rely on integrity check for that.
@@ -36,6 +38,7 @@ library LibOpConstant {
         return stackTop;
     }
 
+    /// Reference implementation of `constant` for testing.
     function referenceFn(InterpreterState memory state, OperandV2 operand, StackItem[] memory)
         internal
         pure

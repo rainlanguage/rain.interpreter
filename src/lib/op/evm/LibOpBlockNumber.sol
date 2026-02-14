@@ -12,10 +12,12 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibOpBlockNumber {
     using LibDecimalFloat for Float;
 
+    /// `block-number` integrity check. Requires 0 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (0, 1);
     }
 
+    /// `block-number` opcode. Reads the current block number.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
@@ -24,6 +26,7 @@ library LibOpBlockNumber {
         return stackTop;
     }
 
+    /// Reference implementation of `block-number` for testing.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory)
         internal
         view

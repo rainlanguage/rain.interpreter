@@ -10,6 +10,7 @@ import {InterpreterState} from "../../../state/LibInterpreterState.sol";
 /// @notice Opcode to divide N integers. Errors on divide by zero. Truncates
 /// towards zero.
 library LibOpUint256Div {
+    /// `uint256-div` integrity check. Requires at least 2 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
         uint256 inputs = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));

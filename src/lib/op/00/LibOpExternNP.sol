@@ -28,6 +28,7 @@ error BadOutputsLength(uint256 expectedLength, uint256 actualLength);
 library LibOpExternNP {
     using LibUint256Array for uint256[];
 
+    /// `extern` integrity check. Validates the extern contract supports the expected interface and delegates to the extern's own integrity check.
     function integrity(IntegrityCheckState memory state, OperandV2 operand) internal view returns (uint256, uint256) {
         uint256 encodedExternDispatchIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
 
@@ -43,6 +44,7 @@ library LibOpExternNP {
         return extern.externIntegrity(dispatch, expectedInputsLength, expectedOutputsLength);
     }
 
+    /// `extern` opcode. Calls an external contract's `extern` function with stack inputs and pushes its outputs.
     function run(InterpreterState memory state, OperandV2 operand, Pointer stackTop) internal view returns (Pointer) {
         uint256 encodedExternDispatchIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
         uint256 inputsLength = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
@@ -91,6 +93,7 @@ library LibOpExternNP {
         return stackTop;
     }
 
+    /// Reference implementation of `extern` for testing.
     function referenceFn(InterpreterState memory state, OperandV2 operand, StackItem[] memory inputs)
         internal
         view

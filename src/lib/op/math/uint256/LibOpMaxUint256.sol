@@ -9,10 +9,12 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 /// @title LibOpMaxUint256
 /// Exposes `type(uint256).max` as a Rainlang opcode.
 library LibOpMaxUint256 {
+    /// `max-uint256` integrity check. Requires 0 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (0, 1);
     }
 
+    /// `max-uint256` opcode. Pushes type(uint256).max onto the stack.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
         uint256 value = type(uint256).max;
         assembly ("memory-safe") {
@@ -22,6 +24,7 @@ library LibOpMaxUint256 {
         return stackTop;
     }
 
+    /// Reference implementation of `max-uint256` for testing.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory)
         internal
         pure

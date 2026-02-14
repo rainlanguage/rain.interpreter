@@ -10,12 +10,14 @@ import {InterpreterState} from "../../../state/LibInterpreterState.sol";
 /// @title LibOpUint256ERC20TotalSupply
 /// @notice Opcode for ERC20 `totalSupply`.
 library LibOpUint256ERC20TotalSupply {
+    /// `uint256-erc20-total-supply` integrity check. Requires 1 input and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // Always 1 input, the contract.
         // Always 1 output, the total supply.
         return (1, 1);
     }
 
+    /// `uint256-erc20-total-supply` opcode. Calls `totalSupply` on the token and returns the raw uint256 value.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
         uint256 account;
         assembly ("memory-safe") {
@@ -31,6 +33,7 @@ library LibOpUint256ERC20TotalSupply {
         return stackTop;
     }
 
+    /// Reference implementation of `uint256-erc20-total-supply` for testing.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         view

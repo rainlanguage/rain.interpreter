@@ -13,6 +13,7 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibOpExponentialGrowth {
     using LibDecimalFloat for Float;
 
+    /// `exponential-growth` integrity check. Requires exactly 3 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // There must be three inputs and one output.
         return (3, 1);

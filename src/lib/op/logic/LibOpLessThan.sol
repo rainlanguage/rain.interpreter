@@ -11,6 +11,7 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 /// @notice Opcode to return 1 if the first item on the stack is less than
 /// the second item on the stack, else 0.
 library LibOpLessThan {
+    /// `less-than` integrity check. Requires exactly 2 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (2, 1);
     }

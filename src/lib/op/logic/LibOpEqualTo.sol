@@ -14,6 +14,7 @@ import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibOpEqualTo {
     using LibDecimalFloat for Float;
 
+    /// `equal-to` integrity check. Requires exactly 2 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (2, 1);
     }
