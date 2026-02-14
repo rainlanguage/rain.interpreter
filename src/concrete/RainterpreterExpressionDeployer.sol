@@ -100,19 +100,4 @@ contract RainterpreterExpressionDeployer is
     function describedByMetaV1() external pure returns (bytes32) {
         return DESCRIBED_BY_META_HASH;
     }
-
-    /// Virtual function to return the expected interpreter bytecode hash.
-    function expectedInterpreterBytecodeHash() internal pure virtual returns (bytes32) {
-        return INTERPRETER_BYTECODE_HASH;
-    }
-
-    /// Virtual function to return the expected store bytecode hash.
-    function expectedStoreBytecodeHash() internal pure virtual returns (bytes32) {
-        return STORE_BYTECODE_HASH;
-    }
-
-    /// Virtual function to return the expected parser bytecode hash.
-    function expectedParserBytecodeHash() internal pure virtual returns (bytes32) {
-        return PARSER_BYTECODE_HASH;
-    }
 }

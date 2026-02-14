@@ -26,12 +26,10 @@ contract LibOpHashTest is OpTest {
 
     /// Directly test the integrity logic of LibOpHash. This tests the happy
     /// path where the operand is valid.
-    function testOpHashIntegrityHappy(
-        IntegrityCheckState memory state,
-        uint8 inputs,
-        uint8 outputs,
-        uint16 operandData
-    ) external pure {
+    function testOpHashIntegrityHappy(IntegrityCheckState memory state, uint8 inputs, uint8 outputs, uint16 operandData)
+        external
+        pure
+    {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         OperandV2 operand = LibOperand.build(inputs, outputs, operandData);

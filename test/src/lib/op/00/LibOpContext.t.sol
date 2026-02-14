@@ -45,9 +45,7 @@ contract LibOpContextTest is OpTest {
         //forge-lint: disable-next-line(unsafe-typecast)
         OperandV2 operand = LibOperand.build(0, 1, uint16(uint256(i) | uint256(j) << 8));
         StackItem[] memory inputs = new StackItem[](0);
-        opReferenceCheck(
-            state, operand, LibOpContext.referenceFn, LibOpContext.integrity, LibOpContext.run, inputs
-        );
+        opReferenceCheck(state, operand, LibOpContext.referenceFn, LibOpContext.integrity, LibOpContext.run, inputs);
     }
 
     /// Directly test the reference logic of LibOpContext. This tests that the

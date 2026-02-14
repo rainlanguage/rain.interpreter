@@ -72,12 +72,7 @@ contract LibOpShiftBitsLeftTest is OpTest {
         inputs[0] = x;
         OperandV2 operand = LibOperand.build(1, 1, shiftAmount);
         opReferenceCheck(
-            state,
-            operand,
-            LibOpShiftBitsLeft.referenceFn,
-            LibOpShiftBitsLeft.integrity,
-            LibOpShiftBitsLeft.run,
-            inputs
+            state, operand, LibOpShiftBitsLeft.referenceFn, LibOpShiftBitsLeft.integrity, LibOpShiftBitsLeft.run, inputs
         );
     }
 

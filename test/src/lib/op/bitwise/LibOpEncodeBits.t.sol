@@ -65,10 +65,7 @@ contract LibOpEncodeBitsTest is OpTest {
 
     /// Directly test the runtime logic of LibOpEncodeBits. This tests that the
     /// opcode correctly pushes the encoded bits onto the stack.
-    function testOpEncodeBitsRun(StackItem source, StackItem target, uint8 start8Bit, uint8 length8Bit)
-        external
-        view
-    {
+    function testOpEncodeBitsRun(StackItem source, StackItem target, uint8 start8Bit, uint8 length8Bit) external view {
         uint256 start = uint256(start8Bit);
         uint256 lengthMax = type(uint8).max - start;
         lengthMax = lengthMax == 0 ? 1 : lengthMax;
