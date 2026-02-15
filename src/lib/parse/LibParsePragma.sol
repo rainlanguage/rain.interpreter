@@ -22,6 +22,9 @@ library LibParsePragma {
     using LibParseLiteral for ParseState;
     using LibParseState for ParseState;
 
+    /// Parses an optional `using-words-from` pragma at the cursor. If the
+    /// pragma keyword is present, reads one or more literal sub parser
+    /// addresses and pushes them onto the state's sub parser list.
     function parsePragma(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
             // Not-pragma guard.

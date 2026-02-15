@@ -14,6 +14,12 @@ import {InputsLengthMismatch} from "../../error/ErrEval.sol";
 library LibEval {
     using LibMemoryKV for MemoryKV;
 
+    /// Evaluates opcodes from a single source in the bytecode. Reads 32-byte
+    /// words from the source, each containing up to 8 packed 4-byte opcodes
+    /// (1 byte opcode index + 3 bytes operand). Each opcode index is looked up
+    /// in the function pointer table (bounded by modulo) and dispatched.
+    /// A remainder loop handles sources whose opcode count is not a multiple
+    /// of 8. Emits a stack trace via `STACK_TRACER` after execution.
     function evalLoop(InterpreterState memory state, uint256 parentSourceIndex, Pointer stackTop, Pointer stackBottom)
         internal
         view
@@ -152,6 +158,11 @@ library LibEval {
         return stackTop;
     }
 
+    /// Top-level evaluation entry point. Validates that `inputs` length matches
+    /// the source's declared input count, copies inputs onto the stack, runs
+    /// `evalLoop`, then constructs the output array from the final stack
+    /// position. Returns the output stack items and any state KV writes as
+    /// parallel arrays.
     function eval2(InterpreterState memory state, StackItem[] memory inputs, uint256 maxOutputs)
         internal
         view

@@ -26,6 +26,10 @@ struct IntegrityCheckState {
 library LibIntegrityCheck {
     using LibIntegrityCheck for IntegrityCheckState;
 
+    /// Builds a fresh `IntegrityCheckState` for a single source. The initial
+    /// stack index, max index, and read highwater are all set to `stackIndex`
+    /// (the number of source inputs), so that source inputs are treated as
+    /// immutable during the integrity walk.
     function newState(bytes memory bytecode, uint256 stackIndex, bytes32[] memory constants)
         internal
         pure
@@ -47,6 +51,13 @@ library LibIntegrityCheck {
         );
     }
 
+    /// Walks every opcode in every source of `bytecode`, calling each opcode's
+    /// integrity function via `fPointers` to compute expected inputs/outputs.
+    /// Validates that the computed IO matches the bytecode-declared IO, that
+    /// the stack never underflows or drops below the read highwater, and that
+    /// the final stack depth matches the declared allocation and outputs.
+    /// Reverts on any mismatch. Returns a packed `io` byte array with two
+    /// bytes per source (inputs, outputs).
     function integrityCheck2(bytes memory fPointers, bytes memory bytecode, bytes32[] memory constants)
         internal
         view

@@ -13,6 +13,9 @@ import {InterpreterState} from "./LibInterpreterState.sol";
 library LibInterpreterStateDataContract {
     using LibBytes for bytes;
 
+    /// Returns the total byte size needed to serialize `bytecode` and
+    /// `constants` into a single contiguous memory region. The layout is:
+    /// `[constants length][constants data...][bytecode length][bytecode data...]`.
     function serializeSize(bytes memory bytecode, bytes32[] memory constants) internal pure returns (uint256 size) {
         unchecked {
             // bytecode length + constants length * 0x20 + 0x40 for both the bytecode and constants length words.
@@ -20,6 +23,9 @@ library LibInterpreterStateDataContract {
         }
     }
 
+    /// Writes `constants` (with length prefix) then `bytecode` (with length
+    /// prefix) into the memory region starting at `cursor`. The caller must
+    /// ensure `cursor` points to a region of at least `serializeSize` bytes.
     function unsafeSerialize(Pointer cursor, bytes memory bytecode, bytes32[] memory constants) internal pure {
         unchecked {
             // Copy constants into place with length.
@@ -37,6 +43,11 @@ library LibInterpreterStateDataContract {
         }
     }
 
+    /// Reconstructs an `InterpreterState` from a previously serialized byte
+    /// array. References the constants and bytecode arrays in-place (no copy).
+    /// Allocates a fresh stack for each source according to the bytecode's
+    /// declared stack allocation, and returns a fully populated state ready
+    /// for evaluation.
     function unsafeDeserialize(
         bytes memory serialized,
         uint256 sourceIndex,

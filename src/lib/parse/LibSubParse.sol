@@ -154,6 +154,8 @@ library LibSubParse {
         return (true, bytecode, constants);
     }
 
+    /// Iterates over a slice of bytecode ops and attempts to resolve any
+    /// unknown opcodes by delegating to the registered sub parsers.
     function subParseWordSlice(ParseState memory state, uint256 cursor, uint256 end) internal view {
         unchecked {
             for (; cursor < end; cursor += 4) {
@@ -255,6 +257,9 @@ library LibSubParse {
         }
     }
 
+    /// Resolves all unknown words across every source in the given bytecode
+    /// by calling `subParseWordSlice` for each source, then returns the
+    /// mutated bytecode and the final constants array.
     function subParseWords(ParseState memory state, bytes memory bytecode)
         internal
         view
@@ -272,6 +277,9 @@ library LibSubParse {
         }
     }
 
+    /// Delegates literal parsing to registered sub parsers. Packs the dispatch
+    /// and body regions into a single `bytes` payload and tries each sub parser
+    /// until one succeeds, reverting if none can handle the literal type.
     function subParseLiteral(
         ParseState memory state,
         uint256 dispatchStart,
@@ -319,6 +327,9 @@ library LibSubParse {
         }
     }
 
+    /// Unpacks the sub-parse word input data by extracting the constants
+    /// height, IO byte, and operand values from the header, then constructs
+    /// a fresh `ParseState` from the remaining word string and provided meta.
     function consumeSubParseWordInputData(bytes memory data, bytes memory meta, bytes memory operandHandlers)
         internal
         pure
@@ -343,6 +354,8 @@ library LibSubParse {
         state.operandValues = operandValues;
     }
 
+    /// Unpacks the sub-parse literal input data by extracting memory pointers
+    /// for the dispatch and body regions from the encoded `bytes` payload.
     function consumeSubParseLiteralInputData(bytes memory data)
         internal
         pure

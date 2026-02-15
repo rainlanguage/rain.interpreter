@@ -110,6 +110,9 @@ library LibParse {
         }
     }
 
+    /// Parses the left-hand side (LHS) of a source line. Handles named and
+    /// anonymous stack items, whitespace, and the LHS/RHS delimiter. Reverts
+    /// on unexpected characters, comments, or duplicate named stack items.
     //forge-lint: disable-next-line(mixed-case-function)
     function parseLHS(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
@@ -170,6 +173,9 @@ library LibParse {
         }
     }
 
+    /// Parses the right-hand side (RHS) of a source line. Resolves words
+    /// against known opcodes, LHS stack names, and sub parsers. Handles
+    /// parenthesised operand groups, literals, and line/source terminators.
     //forge-lint: disable-next-line(mixed-case-function)
     //slither-disable-next-line cyclomatic-complexity
     function parseRHS(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
@@ -383,6 +389,9 @@ library LibParse {
         }
     }
 
+    /// Top-level entry point for parsing. Processes pragmas, then iterates
+    /// over interstitial, LHS, and RHS sections to build the final bytecode
+    /// and constants array. Sub-parses any unknown words after initial parsing.
     function parse(ParseState memory state) internal view returns (bytes memory bytecode, bytes32[] memory) {
         unchecked {
             if (state.data.length > 0) {

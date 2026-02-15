@@ -19,6 +19,8 @@ library LibParseStackTracker {
         }
     }
 
+    /// Pushes n items onto the tracked stack, updating the current height
+    /// and the high watermark if the new height exceeds it.
     function push(ParseStackTracker tracker, uint256 n) internal pure returns (ParseStackTracker) {
         unchecked {
             uint256 current = ParseStackTracker.unwrap(tracker) & 0xFF;
@@ -32,6 +34,8 @@ library LibParseStackTracker {
         }
     }
 
+    /// Pops n items from the tracked stack. Reverts with
+    /// `ParseStackUnderflow` if the current stack height is less than n.
     function pop(ParseStackTracker tracker, uint256 n) internal pure returns (ParseStackTracker) {
         unchecked {
             uint256 current = ParseStackTracker.unwrap(tracker) & 0xFF;

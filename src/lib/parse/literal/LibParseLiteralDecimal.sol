@@ -10,6 +10,8 @@ import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibParseLiteralDecimal {
     using LibParseError for ParseState;
 
+    /// Parses a decimal float literal from the source and returns it as a
+    /// losslessly packed float in bytes32 form.
     function parseDecimalFloatPacked(ParseState memory state, uint256 start, uint256 end)
         internal
         pure

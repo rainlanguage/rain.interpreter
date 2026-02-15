@@ -85,6 +85,8 @@ library LibParseInterstitial {
         }
     }
 
+    /// Advances the cursor past any contiguous whitespace characters and
+    /// resets the FSM to yin state.
     function skipWhitespace(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
             // Set ying as we now open to possibilities.
@@ -93,6 +95,9 @@ library LibParseInterstitial {
         }
     }
 
+    /// Skips over all interstitial content (whitespace and comments) between
+    /// meaningful parse tokens, returning the cursor at the next non-interstitial
+    /// character.
     function parseInterstitial(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         while (cursor < end) {
             uint256 char;

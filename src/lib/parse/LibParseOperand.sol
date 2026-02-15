@@ -24,6 +24,9 @@ library LibParseOperand {
     using LibParseInterstitial for ParseState;
     using LibDecimalFloat for Float;
 
+    /// Parses an operand from the source string at the cursor position,
+    /// extracting literal values between the operand delimiters into the
+    /// state's operandValues array.
     function parseOperand(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         uint256 char;
         assembly ("memory-safe") {
@@ -135,6 +138,8 @@ library LibParseOperand {
         return handler(state.operandValues);
     }
 
+    /// Operand handler that disallows any operand values. Reverts if any
+    /// values are provided, otherwise returns a zero operand.
     function handleOperandDisallowed(bytes32[] memory values) internal pure returns (OperandV2) {
         if (values.length != 0) {
             revert UnexpectedOperand();
@@ -142,6 +147,8 @@ library LibParseOperand {
         return OperandV2.wrap(0);
     }
 
+    /// Operand handler that disallows any operand values but always returns
+    /// an operand of 1 instead of 0.
     function handleOperandDisallowedAlwaysOne(bytes32[] memory values) internal pure returns (OperandV2) {
         if (values.length != 0) {
             revert UnexpectedOperand();

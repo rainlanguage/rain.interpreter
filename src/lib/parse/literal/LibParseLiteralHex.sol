@@ -20,6 +20,8 @@ library LibParseLiteralHex {
     using LibParseLiteralHex for ParseState;
     using LibParseError for ParseState;
 
+    /// Finds the bounds of a hex literal by scanning forward from past the
+    /// "0x" prefix until a non-hex character is encountered.
     function boundHex(ParseState memory, uint256 cursor, uint256 end)
         internal
         pure

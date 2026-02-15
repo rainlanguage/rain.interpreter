@@ -28,6 +28,9 @@ library LibParseLiteral {
     using LibParseInterstitial for ParseState;
     using LibSubParse for ParseState;
 
+    /// Selects a literal parser function pointer from the state's literal
+    /// parsers array by index. Not bounds checked as indexes are expected to
+    /// be provided by the parser itself.
     function selectLiteralParserByIndex(ParseState memory state, uint256 index)
         internal
         pure
@@ -43,6 +46,8 @@ library LibParseLiteral {
         return parser;
     }
 
+    /// Parses a literal value at the cursor position. Reverts with
+    /// `UnsupportedLiteralType` if the literal type cannot be determined.
     function parseLiteral(ParseState memory state, uint256 cursor, uint256 end)
         internal
         pure
@@ -56,6 +61,9 @@ library LibParseLiteral {
         }
     }
 
+    /// Attempts to parse a literal value at the cursor position. Dispatches
+    /// to hex, decimal, string, or sub-parseable parsers based on the head
+    /// character. Returns false if the literal type is not recognized.
     function tryParseLiteral(ParseState memory state, uint256 cursor, uint256 end)
         internal
         pure
