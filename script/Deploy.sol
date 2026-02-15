@@ -9,6 +9,7 @@ import {LibRainDeploy} from "rain.deploy/lib/LibRainDeploy.sol";
 import {LibInterpreterDeploy} from "../src/lib/deploy/LibInterpreterDeploy.sol";
 import {LibDecimalFloatDeploy} from "rain.math.float/lib/deploy/LibDecimalFloatDeploy.sol";
 import {RainterpreterExpressionDeployer} from "../src/concrete/RainterpreterExpressionDeployer.sol";
+import {RainterpreterDISPaiRegistry} from "../src/concrete/RainterpreterDISPaiRegistry.sol";
 import {UnknownDeploymentSuite} from "../src/error/ErrDeploy.sol";
 
 /// @dev Deployment suite selector for the parser.
@@ -19,6 +20,8 @@ bytes32 constant DEPLOYMENT_SUITE_STORE = keccak256("store");
 bytes32 constant DEPLOYMENT_SUITE_INTERPRETER = keccak256("interpreter");
 /// @dev Deployment suite selector for the expression deployer.
 bytes32 constant DEPLOYMENT_SUITE_EXPRESSION_DEPLOYER = keccak256("expression-deployer");
+/// @dev Deployment suite selector for the DISPaiR registry.
+bytes32 constant DEPLOYMENT_SUITE_DISPAIR_REGISTRY = keccak256("dispair-registry");
 
 /// @title Deploy
 /// @notice Forge script that deploys a single interpreter component to all
@@ -82,6 +85,18 @@ contract Deploy is Script {
                 "src/concrete/RainterpreterExpressionDeployer.sol:RainterpreterExpressionDeployer",
                 LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS,
                 LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH,
+                deps
+            );
+        } else if (suite == DEPLOYMENT_SUITE_DISPAIR_REGISTRY) {
+            console2.log("Deploying RainterpreterDISPaiRegistry...");
+            LibRainDeploy.deployAndBroadcastToSupportedNetworks(
+                vm,
+                LibRainDeploy.supportedNetworks(),
+                deployerPrivateKey,
+                type(RainterpreterDISPaiRegistry).creationCode,
+                "src/concrete/RainterpreterDISPaiRegistry.sol:RainterpreterDISPaiRegistry",
+                LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_ADDRESS,
+                LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_CODEHASH,
                 deps
             );
         } else {

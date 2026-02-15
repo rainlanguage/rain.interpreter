@@ -30,6 +30,6 @@ sol!(
 
 sol!(
     #![sol(all_derives = true)]
-    LibInterpreterDeployConstants,
-    "../../out/LibInterpreterDeployConstants.sol/LibInterpreterDeployConstants.json"
+    RainterpreterDISPaiRegistry,
+    "../../out/RainterpreterDISPaiRegistry.sol/RainterpreterDISPaiRegistry.json"
 );

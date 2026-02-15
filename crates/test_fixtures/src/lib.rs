@@ -49,8 +49,8 @@ sol!(
 
 sol!(
     #![sol(all_derives = true, rpc = true)]
-    DeployConstants,
-    "../../out/LibInterpreterDeployConstants.sol/LibInterpreterDeployConstants.json"
+    DISPaiRegistry,
+    "../../out/RainterpreterDISPaiRegistry.sol/RainterpreterDISPaiRegistry.json"
 );
 
 // type aliases for LocalEvm fillers and provider
@@ -121,7 +121,7 @@ impl LocalEvm {
 
         // Deploy the constants helper to read the deterministic Zoltu
         // addresses that the deployer hardcodes.
-        let constants = DeployConstants::deploy(provider.clone()).await.unwrap();
+        let constants = DISPaiRegistry::deploy(provider.clone()).await.unwrap();
         let parser_addr = constants.parserAddress().call().await.unwrap();
         let store_addr = constants.storeAddress().call().await.unwrap();
         let interpreter_addr = constants.interpreterAddress().call().await.unwrap();

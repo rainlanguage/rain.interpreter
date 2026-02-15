@@ -9,6 +9,7 @@ import {RainterpreterParser} from "src/concrete/RainterpreterParser.sol";
 import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
 import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
 import {RainterpreterExpressionDeployer} from "src/concrete/RainterpreterExpressionDeployer.sol";
+import {RainterpreterDISPaiRegistry} from "src/concrete/RainterpreterDISPaiRegistry.sol";
 
 contract LibInterpreterDeployTest is Test {
     function testDeployAddressParser() external {
@@ -81,5 +82,22 @@ contract LibInterpreterDeployTest is Test {
         RainterpreterExpressionDeployer expressionDeployer = new RainterpreterExpressionDeployer();
 
         assertEq(address(expressionDeployer).codehash, LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH);
+    }
+
+    function testDeployAddressDISPaiRegistry() external {
+        vm.createSelectFork(vm.envString("CI_FORK_ETH_RPC_URL"));
+
+        address deployedAddress = LibRainDeploy.deployZoltu(type(RainterpreterDISPaiRegistry).creationCode);
+
+        assertEq(deployedAddress, LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_ADDRESS);
+        assertTrue(address(deployedAddress).code.length > 0, "Deployed address has no code");
+
+        assertEq(address(deployedAddress).codehash, LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_CODEHASH);
+    }
+
+    function testExpectedCodeHashDISPaiRegistry() external {
+        RainterpreterDISPaiRegistry registry = new RainterpreterDISPaiRegistry();
+
+        assertEq(address(registry).codehash, LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_CODEHASH);
     }
 }

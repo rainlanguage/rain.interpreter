@@ -11,6 +11,7 @@ on:
           - store
           - interpreter
           - expression-deployer
+          - dispair-registry
 
 jobs:
   deploy:
