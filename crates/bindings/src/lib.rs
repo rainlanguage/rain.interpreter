@@ -28,12 +28,8 @@ sol!(
     "../../out/IExpressionDeployerV3.sol/IExpressionDeployerV3.json"
 );
 
-// Bindings for the deployer's interpreter/store/parser address getters.
-sol! {
+sol!(
     #![sol(all_derives = true)]
-    interface DeployerISP {
-        function interpreter() public pure returns(address);
-        function store() public pure returns(address);
-        function parser() public pure returns(address);
-    }
-}
+    LibInterpreterDeployConstants,
+    "../../out/LibInterpreterDeployConstants.sol/LibInterpreterDeployConstants.json"
+);

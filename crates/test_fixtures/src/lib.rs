@@ -47,6 +47,12 @@ sol!(
     "../../out/RainterpreterExpressionDeployer.sol/RainterpreterExpressionDeployer.json"
 );
 
+sol!(
+    #![sol(all_derives = true, rpc = true)]
+    DeployConstants,
+    "../../out/LibInterpreterDeployConstants.sol/LibInterpreterDeployConstants.json"
+);
+
 // type aliases for LocalEvm fillers and provider
 pub type LocalEvmFillers = JoinFill<JoinedRecommendedFillers, WalletFiller<EthereumWallet>>;
 pub type LocalEvmProvider = FillProvider<LocalEvmFillers, RootProvider<AnyNetwork>, AnyNetwork>;
@@ -76,6 +82,11 @@ pub struct LocalEvm {
 
     /// Array of alloy ERC20 contract instances deployed on this blockchain
     pub tokens: Vec<ERC20::ERC20Instance<LocalEvmProvider, AnyNetwork>>,
+
+    /// Deterministic Zoltu addresses for interpreter, store, and parser.
+    pub zoltu_interpreter: Address,
+    pub zoltu_store: Address,
+    pub zoltu_parser: Address,
 
     /// All wallets of this local blockchain that can be used to perform transactions.
     /// the first wallet is the blockchain's default wallet, ie transactions that dont
@@ -108,6 +119,13 @@ impl LocalEvm {
             .wallet(signer_wallets[0].clone())
             .connect_http(anvil.endpoint_url());
 
+        // Deploy the constants helper to read the deterministic Zoltu
+        // addresses that the deployer hardcodes.
+        let constants = DeployConstants::deploy(provider.clone()).await.unwrap();
+        let parser_addr = constants.parserAddress().call().await.unwrap();
+        let store_addr = constants.storeAddress().call().await.unwrap();
+        let interpreter_addr = constants.interpreterAddress().call().await.unwrap();
+
         // Deploy rain contracts, then copy their runtime code to the
         // deterministic Zoltu addresses that the deployer hardcodes.
         let interpreter = Interpreter::deploy(provider.clone()).await.unwrap();
@@ -120,16 +138,6 @@ impl LocalEvm {
         let parser_code = provider.get_code_at(*parser.address()).await.unwrap();
         let store_code = provider.get_code_at(*store.address()).await.unwrap();
         let interpreter_code = provider.get_code_at(*interpreter.address()).await.unwrap();
-
-        let parser_addr: Address = "0x34ACfD304C67a78b8b3b64a1A3ae19b6854Fb5C1"
-            .parse()
-            .unwrap();
-        let store_addr: Address = "0x08d847643144D0bC1964b024b2CcCFFB94836f79"
-            .parse()
-            .unwrap();
-        let interpreter_addr: Address = "0x288F6ef6f56617963B80c6136eB93b3b9839Dfc2"
-            .parse()
-            .unwrap();
 
         provider
             .anvil_set_code(parser_addr, parser_code)
@@ -155,6 +163,9 @@ impl LocalEvm {
             deployer,
             tokens: vec![],
             signer_wallets,
+            zoltu_interpreter: interpreter_addr,
+            zoltu_store: store_addr,
+            zoltu_parser: parser_addr,
         }
     }
 

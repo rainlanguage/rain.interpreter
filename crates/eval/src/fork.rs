@@ -518,10 +518,7 @@ mod tests {
         primitives::{FixedBytes, U256},
         providers::Provider,
     };
-    use rain_interpreter_bindings::{
-        DeployerISP::parserCall,
-        IInterpreterStoreV3::{getCall, setCall},
-    };
+    use rain_interpreter_bindings::IInterpreterStoreV3::{getCall, setCall};
     use rain_interpreter_test_fixtures::LocalEvm;
 
     sol! {
@@ -531,6 +528,12 @@ mod tests {
             function allowance(address owner, address spender) external view returns (uint256);
             function approve(address spender, uint256 amount) external returns (bool);
             function transferFrom(address from, address to, uint256 amount) external returns (bool);
+        }
+    }
+
+    sol! {
+        interface IERC165 {
+            function supportsInterface(bytes4 interfaceId) external view returns (bool);
         }
     }
 
@@ -545,18 +548,15 @@ mod tests {
 
         let forker = Forker::new_with_fork(args, None, None).await.unwrap();
 
-        let from_address = Address::default();
-        let to_address = deployer;
-        let call = parserCall {};
+        // Call supportsInterface(IERC165) on the deployer to verify alloy_call works.
+        let call = IERC165::supportsInterfaceCall {
+            interfaceId: alloy::primitives::FixedBytes([0x01, 0xff, 0xc9, 0xa7]),
+        };
         let result = forker
-            .alloy_call(from_address, to_address, call, false)
+            .alloy_call(Address::default(), deployer, call, false)
             .await
             .unwrap();
-        let parser_address = result.typed_return;
-        let expected_address: Address = "0x34ACfD304C67a78b8b3b64a1A3ae19b6854Fb5C1"
-            .parse()
-            .unwrap();
-        assert_eq!(parser_address, expected_address);
+        assert!(result.typed_return);
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]

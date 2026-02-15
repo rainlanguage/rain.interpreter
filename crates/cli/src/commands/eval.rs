@@ -23,6 +23,12 @@ pub struct ForkEvalCliArgs {
     #[arg(short, long, help = "The address of the deployer")]
     pub deployer: Address,
 
+    #[arg(long, help = "The address of the interpreter")]
+    pub interpreter: Address,
+
+    #[arg(long, help = "The address of the store")]
+    pub store: Address,
+
     #[arg(short, long, help = "The namespace")]
     pub namespace: String,
 
@@ -75,6 +81,8 @@ impl TryFrom<ForkEvalCliArgs> for ForkEvalArgs {
             rainlang_string: args.rainlang_string,
             source_index: args.source_index,
             deployer: args.deployer,
+            interpreter: args.interpreter,
+            store: args.store,
             namespace: FullyQualifiedNamespace::from(namespace),
             context,
             decode_errors: args.decode_errors,
@@ -155,6 +163,8 @@ mod tests {
                 rainlang_string: r"_: 12, _: context<0 0>(), _:context<0 1>();".into(),
                 source_index: 0,
                 deployer,
+                interpreter: local_evm.zoltu_interpreter,
+                store: local_evm.zoltu_store,
                 namespace: "0x123".into(),
                 context: vec!["0x06,99".into()],
                 decode_errors: true,
