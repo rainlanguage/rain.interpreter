@@ -2,9 +2,7 @@
 pragma solidity =0.8.25;
 
 import {ERC165, IERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
-import {Pointer, LibPointer} from "rain.solmem/lib/LibPointer.sol";
-import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
-import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IParserV2} from "rain.interpreter.interface/interface/IParserV2.sol";
 import {IParserPragmaV1, PragmaV1} from "rain.interpreter.interface/interface/IParserPragmaV1.sol";
 
@@ -29,10 +27,6 @@ contract RainterpreterExpressionDeployer is
     IIntegrityToolingV1,
     ERC165
 {
-    using LibPointer for Pointer;
-    using LibStackPointer for Pointer;
-    using LibUint256Array for uint256[];
-
     /// @inheritdoc IERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(IDescribedByMetaV1).interfaceId || interfaceId == type(IParserV2).interfaceId
