@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.25;
 
 import {LibParseState, ParseState} from "./LibParseState.sol";
 import {CMASK_WHITESPACE} from "rain.string/lib/parse/LibParseCMask.sol";

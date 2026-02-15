@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.25;
 
 import {BadDynamicLength} from "../../error/ErrOpList.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";

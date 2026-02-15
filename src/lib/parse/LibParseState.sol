@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.25;
 
 import {OperandV2, OPCODE_CONSTANT} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibParseStackTracker, ParseStackTracker} from "./LibParseStackTracker.sol";

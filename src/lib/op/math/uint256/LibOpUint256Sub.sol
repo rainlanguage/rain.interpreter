@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.25;
 
 import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
 import {InterpreterState} from "../../../state/LibInterpreterState.sol";

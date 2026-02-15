@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.25;
 
 import {NotAnExternContract} from "../../../error/ErrExtern.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
