@@ -1,13 +1,11 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
+import {OutOfBoundsConstantRead} from "../../../error/ErrIntegrity.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-
-/// Thrown when a constant read index is outside the constants array.
-error OutOfBoundsConstantRead(uint256 opIndex, uint256 constantsLength, uint256 constantRead);
 
 /// @title LibOpConstant
 /// Implementation of copying a constant from the constants array to the stack.

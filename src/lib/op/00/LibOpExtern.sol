@@ -17,9 +17,6 @@ import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 import {ERC165Checker} from "openzeppelin-contracts/contracts/utils/introspection/ERC165Checker.sol";
 
-/// Thrown when a constant read index is outside the constants array.
-error OutOfBoundsConstantRead(uint256 opIndex, uint256 constantsLength, uint256 constantRead);
-
 /// Thrown when the outputs length is not equal to the expected length.
 error BadOutputsLength(uint256 expectedLength, uint256 actualLength);
 

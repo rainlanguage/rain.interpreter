@@ -22,3 +22,6 @@ error StackAllocationMismatch(uint256 stackMaxIndex, uint256 bytecodeAllocation)
 
 /// The final stack index does not match the bytecode outputs.
 error StackOutputsMismatch(uint256 stackIndex, uint256 bytecodeOutputs);
+
+/// Thrown when a constant read index is outside the constants array.
+error OutOfBoundsConstantRead(uint256 opIndex, uint256 constantsLength, uint256 constantRead);
