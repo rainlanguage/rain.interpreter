@@ -139,7 +139,7 @@ library LibRainterpreterReferenceExtern {
 /// implementation also builds function pointers to sub parsers, literals and
 /// operands as external functions so that tooling can check that the constants
 /// compiled internally into the contract match what they would be if dynamically
-/// calculated. Any discprepancy there is definitely a critical issue that causes
+/// calculated. Any discrepancy there is definitely a critical issue that causes
 /// undefined behaviour in production, so ALWAYS test this, preferably in an
 /// automated way.
 ///
@@ -150,7 +150,7 @@ library LibRainterpreterReferenceExtern {
 /// implementation also builds function pointers to opcodes and integrity checks
 /// as external functions so that tooling can check that the constants compiled
 /// internally into the contract match what they would be if dynamically
-/// calculated. Any discprepancy there is definitely a critical issue that causes
+/// calculated. Any discrepancy there is definitely a critical issue that causes
 /// undefined behaviour in production, so ALWAYS test this, preferably in an
 /// automated way.
 contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainterpreterExtern {
