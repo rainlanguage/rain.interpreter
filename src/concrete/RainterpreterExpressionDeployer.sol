@@ -76,8 +76,8 @@ contract RainterpreterExpressionDeployer is
     /// more gas efficient to call the parser directly.
     /// @inheritdoc IParserPragmaV1
     function parsePragma1(bytes calldata data) external view virtual override returns (PragmaV1 memory) {
-        // We know the I_PARSER is also an IParserPragmaV1 because we enforced
-        // the bytecode hash in the constructor.
+        // The parser at the deterministic Zoltu address is also an
+        // IParserPragmaV1.
         return RainterpreterParser(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS).parsePragma1(data);
     }
 
@@ -89,7 +89,8 @@ contract RainterpreterExpressionDeployer is
     /// proxy for enforcing that all opcode pointers exist at runtime, so the
     /// length of the integrity pointers MUST match the length of opcode function
     /// pointers. This function is `virtual` so that it can be overridden
-    /// pairwise with overrides to `functionPointers` on `Rainterpreter`.
+    /// pairwise with overrides to `buildOpcodeFunctionPointers` on
+    /// `Rainterpreter`.
     /// @return The list of integrity function pointers.
     /// @inheritdoc IIntegrityToolingV1
     function buildIntegrityFunctionPointers() external view virtual returns (bytes memory) {
