@@ -41,6 +41,12 @@ library LibOpERC20Allowance {
         //forge-lint: disable-next-line(unsafe-typecast)
         uint8 tokenDecimals = IERC20Metadata(address(uint160(token))).decimals();
 
+        // Unlike `balanceOf` and `totalSupply`, allowance uses the lossy
+        // conversion. Infinite approvals (`type(uint256).max`) are extremely
+        // common in ERC20 tokens, and that value cannot be represented
+        // losslessly in a decimal float. Using the lossless variant here would
+        // revert on any infinite approval, bricking most evaluations that read
+        // allowances.
         // Slither doesn't like that we're ignoring the lossless flag but it's
         // currently irrelevant. Perhaps in the future we setup an operand to
         // handle it, but not now.
