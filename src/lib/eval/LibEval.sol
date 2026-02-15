@@ -172,6 +172,13 @@ library LibEval {
             {
                 stackBottom = state.stackBottoms[state.sourceIndex];
                 stackTop = stackBottom;
+                // Inputs length must always match what the bytecode
+                // expects. Without this check a caller could pass more
+                // inputs than the stack allocation, moving stackTop
+                // below allocated memory.
+                if (inputs.length != sourceInputs) {
+                    revert InputsLengthMismatch(sourceInputs, inputs.length);
+                }
                 // Copy inputs into place if needed.
                 if (inputs.length > 0) {
                     // Inline some logic to avoid jumping due to function calls
@@ -183,8 +190,6 @@ library LibEval {
                         inputsDataPointer := add(inputs, 0x20)
                     }
                     LibMemCpy.unsafeCopyWordsTo(inputsDataPointer, stackTop, inputs.length);
-                } else if (inputs.length != sourceInputs) {
-                    revert InputsLengthMismatch(sourceInputs, inputs.length);
                 }
             }
 
