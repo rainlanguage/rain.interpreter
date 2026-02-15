@@ -6,6 +6,8 @@ import {
     ExternDispatchV2,
     EncodedExternDispatchV2
 } from "rain.interpreter.interface/interface/IInterpreterExternV4.sol";
+// StackItem exported for convenience.
+//forge-lint: disable-next-line(unused-import)
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
 /// @title LibExtern
