@@ -5,6 +5,8 @@ import {ParseState} from "./LibParseState.sol";
 
 library LibParseStackName {
     /// Push a word onto the stack name stack.
+    /// @param state The parser state containing the stack names.
+    /// @param word The word to push onto the stack name stack.
     /// @return exists Whether the word already existed.
     /// @return index The new index after the word was pushed. Will be unchanged
     /// if the word already existed.
@@ -32,6 +34,10 @@ library LibParseStackName {
     }
 
     /// Retrieve the index of a previously pushed stack name.
+    /// @param state The parser state containing the stack names.
+    /// @param word The word to look up.
+    /// @return exists Whether the word was found.
+    /// @return index The index of the word in the stack.
     function stackNameIndex(ParseState memory state, bytes32 word) internal pure returns (bool exists, uint256 index) {
         uint256 fingerprint;
         uint256 stackNames = state.stackNames;

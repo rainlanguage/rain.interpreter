@@ -20,6 +20,13 @@ library LibEval {
     /// in the function pointer table (bounded by modulo) and dispatched.
     /// A remainder loop handles sources whose opcode count is not a multiple
     /// of 8. Emits a stack trace via `STACK_TRACER` after execution.
+    /// @param state The interpreter state containing bytecode, constants,
+    /// stacks, and function pointers.
+    /// @param parentSourceIndex The source index of the caller (used for stack
+    /// tracing).
+    /// @param stackTop Pointer to the current top of the stack.
+    /// @param stackBottom Pointer to the bottom of the stack (highest address).
+    /// @return The updated stack top pointer after evaluation.
     function evalLoop(InterpreterState memory state, uint256 parentSourceIndex, Pointer stackTop, Pointer stackBottom)
         internal
         view
@@ -163,6 +170,13 @@ library LibEval {
     /// `evalLoop`, then constructs the output array from the final stack
     /// position. Returns the output stack items and any state KV writes as
     /// parallel arrays.
+    /// @param state The interpreter state containing bytecode, constants,
+    /// stacks, store, and function pointers.
+    /// @param inputs The stack items to pass as inputs to the source.
+    /// @param maxOutputs The maximum number of outputs to return from the
+    /// final stack.
+    /// @return The output stack items and any state KV writes as parallel
+    /// arrays of keys and values.
     function eval2(InterpreterState memory state, StackItem[] memory inputs, uint256 maxOutputs)
         internal
         view

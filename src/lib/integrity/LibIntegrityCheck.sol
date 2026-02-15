@@ -30,6 +30,11 @@ library LibIntegrityCheck {
     /// stack index, max index, and read highwater are all set to `stackIndex`
     /// (the number of source inputs), so that source inputs are treated as
     /// immutable during the integrity walk.
+    /// @param bytecode The full bytecode containing all sources.
+    /// @param stackIndex The number of source inputs, used as the initial
+    /// stack depth and read highwater.
+    /// @param constants The constants array for the expression.
+    /// @return The initialized integrity check state.
     function newState(bytes memory bytecode, uint256 stackIndex, bytes32[] memory constants)
         internal
         pure
@@ -58,6 +63,12 @@ library LibIntegrityCheck {
     /// the final stack depth matches the declared allocation and outputs.
     /// Reverts on any mismatch. Returns a packed `io` byte array with two
     /// bytes per source (inputs, outputs).
+    /// @param fPointers Packed 2-byte function pointers for each opcode's
+    /// integrity function.
+    /// @param bytecode The full bytecode containing all sources to check.
+    /// @param constants The constants array for the expression.
+    /// @return io Packed byte array with two bytes per source encoding
+    /// (inputs, outputs).
     function integrityCheck2(bytes memory fPointers, bytes memory bytecode, bytes32[] memory constants)
         internal
         view

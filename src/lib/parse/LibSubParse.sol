@@ -22,6 +22,11 @@ library LibSubParse {
     using LibParseError for ParseState;
 
     /// Sub parse a word into a context grid position.
+    /// @param column The column index in the context grid.
+    /// @param row The row index in the context grid.
+    /// @return Whether the sub parse succeeded.
+    /// @return The bytecode for the context opcode.
+    /// @return The constants array (empty for context ops).
     function subParserContext(uint256 column, uint256 row)
         internal
         pure
@@ -61,6 +66,11 @@ library LibSubParse {
 
     /// Sub parse a value into the bytecode that will run on the interpreter to
     /// push the given value onto the stack, using the constant opcode at eval.
+    /// @param constantsHeight The current height of the constants array.
+    /// @param value The constant value to push onto the stack.
+    /// @return Whether the sub parse succeeded.
+    /// @return The bytecode for the constant opcode.
+    /// @return The constants array containing the value.
     function subParserConstant(uint256 constantsHeight, bytes32 value)
         internal
         pure
@@ -108,6 +118,14 @@ library LibSubParse {
     /// parsing has already matched a word to the extern opcode index, so it
     /// implies the parse meta has been traversed and the parse index has been
     /// mapped to an extern opcode index somehow.
+    /// @param extern The extern contract to call at eval time.
+    /// @param constantsHeight The current height of the constants array.
+    /// @param ioByte The IO byte encoding inputs and outputs for the opcode.
+    /// @param operand The operand for the extern dispatch.
+    /// @param opcodeIndex The opcode index on the extern contract.
+    /// @return Whether the sub parse succeeded.
+    /// @return The bytecode for the extern opcode.
+    /// @return The constants array containing the encoded extern dispatch.
     function subParserExtern(
         IInterpreterExternV4 extern,
         uint256 constantsHeight,
@@ -156,6 +174,9 @@ library LibSubParse {
 
     /// Iterates over a slice of bytecode ops and attempts to resolve any
     /// unknown opcodes by delegating to the registered sub parsers.
+    /// @param state The current parse state containing sub parser references.
+    /// @param cursor The memory pointer to the start of the bytecode slice.
+    /// @param end The memory pointer to the end of the bytecode slice.
     function subParseWordSlice(ParseState memory state, uint256 cursor, uint256 end) internal view {
         unchecked {
             for (; cursor < end; cursor += 4) {
@@ -260,6 +281,10 @@ library LibSubParse {
     /// Resolves all unknown words across every source in the given bytecode
     /// by calling `subParseWordSlice` for each source, then returns the
     /// mutated bytecode and the final constants array.
+    /// @param state The current parse state containing sub parser references.
+    /// @param bytecode The full bytecode containing all sources to resolve.
+    /// @return The mutated bytecode with unknown ops resolved.
+    /// @return The final constants array after all sub parses.
     function subParseWords(ParseState memory state, bytes memory bytecode)
         internal
         view
@@ -280,6 +305,12 @@ library LibSubParse {
     /// Delegates literal parsing to registered sub parsers. Packs the dispatch
     /// and body regions into a single `bytes` payload and tries each sub parser
     /// until one succeeds, reverting if none can handle the literal type.
+    /// @param state The current parse state containing sub parser references.
+    /// @param dispatchStart Memory pointer to the start of the dispatch region.
+    /// @param dispatchEnd Memory pointer to the end of the dispatch region.
+    /// @param bodyStart Memory pointer to the start of the body region.
+    /// @param bodyEnd Memory pointer to the end of the body region.
+    /// @return The parsed literal value as a bytes32.
     function subParseLiteral(
         ParseState memory state,
         uint256 dispatchStart,
@@ -330,6 +361,14 @@ library LibSubParse {
     /// Unpacks the sub-parse word input data by extracting the constants
     /// height, IO byte, and operand values from the header, then constructs
     /// a fresh `ParseState` from the remaining word string and provided meta.
+    /// @param data The raw sub-parse input data containing the header and
+    /// word string.
+    /// @param meta The parser meta bytes for the new parse state.
+    /// @param operandHandlers The operand handler bytes for the new parse
+    /// state.
+    /// @return constantsHeight The constants height from the header.
+    /// @return ioByte The IO byte from the header.
+    /// @return state The newly constructed parse state.
     function consumeSubParseWordInputData(bytes memory data, bytes memory meta, bytes memory operandHandlers)
         internal
         pure
@@ -356,6 +395,11 @@ library LibSubParse {
 
     /// Unpacks the sub-parse literal input data by extracting memory pointers
     /// for the dispatch and body regions from the encoded `bytes` payload.
+    /// @param data The raw sub-parse literal input data.
+    /// @return dispatchStart Memory pointer to the start of the dispatch
+    /// region.
+    /// @return bodyStart Memory pointer to the start of the body region.
+    /// @return bodyEnd Memory pointer to the end of the body region.
     function consumeSubParseLiteralInputData(bytes memory data)
         internal
         pure

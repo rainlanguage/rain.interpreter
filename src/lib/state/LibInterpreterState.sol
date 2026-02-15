@@ -28,6 +28,8 @@ library LibInterpreterState {
     /// Computes a keccak256 fingerprint of the entire interpreter state,
     /// including bytecode, constants, stack bottoms, and context. Used to
     /// detect state mutations between evaluation calls.
+    /// @param state The interpreter state to fingerprint.
+    /// @return The keccak256 hash of the ABI-encoded state.
     function fingerprint(InterpreterState memory state) internal pure returns (bytes32) {
         return keccak256(abi.encode(state));
     }
@@ -36,6 +38,8 @@ library LibInterpreterState {
     /// Each stack's bottom pointer is the address just past its last element,
     /// i.e. `array + 0x20 * (length + 1)`. The eval loop uses these pointers
     /// as the starting stack top, growing downward as values are pushed.
+    /// @param stacks The pre-allocated stack arrays, one per source.
+    /// @return The array of bottom pointers, one per stack.
     function stackBottoms(StackItem[][] memory stacks) internal pure returns (Pointer[] memory) {
         Pointer[] memory bottoms = new Pointer[](stacks.length);
         assembly ("memory-safe") {
@@ -94,6 +98,10 @@ library LibInterpreterState {
     ///   would be both complex and onerous for caller implementations, and make
     ///   it much harder for tooling/consumers to reliably find all the data, as
     ///   it would be spread across callers in potentially inconsistent events.
+    /// @param parentSourceIndex The source index of the calling source.
+    /// @param sourceIndex The source index of the source that was evaluated.
+    /// @param stackTop Pointer to the top of the stack after evaluation.
+    /// @param stackBottom Pointer to the bottom of the stack.
     function stackTrace(uint256 parentSourceIndex, uint256 sourceIndex, Pointer stackTop, Pointer stackBottom)
         internal
         view
