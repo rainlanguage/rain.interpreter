@@ -10,7 +10,7 @@ import {CONTEXT_BASE_COLUMN, CONTEXT_BASE_ROW_SENDER} from "rain.interpreter.int
 /// the interpreter. It is used to demonstrate how to implement context
 /// references.
 library LibExternOpContextSender {
-    /// The sub parser for the extern increment opcode. It has no special logic
+    /// The sub parser for the sender context opcode. It has no special logic
     /// so uses the default sub parser from `LibSubParse`.
     //slither-disable-next-line dead-code
     function subParser(uint256, uint256, OperandV2) internal pure returns (bool, bytes memory, bytes32[] memory) {
