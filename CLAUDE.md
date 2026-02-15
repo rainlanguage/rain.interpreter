@@ -107,11 +107,12 @@ External contracts can extend the interpreter with additional opcodes. `src/conc
 
 ## Audit Review
 
-When reviewing code for audit:
+When reviewing code for audit, read every file in full. Do not rely on grepping for patterns — systematic line-by-line review catches issues that keyword searches miss.
 
 ### Documentation
 - Systematically enumerate every function in every contract and library, and verify each has NatSpec documentation
 - Do not rely on scanning — explicitly list undocumented functions as findings
+- All NatSpec must include `@param` and `@return` tags as relevant for functions, structs, errors, etc.
 - After ensuring documentation exists, review it against the implementation for accuracy
 
 ### Security
@@ -128,6 +129,12 @@ When reviewing code for audit:
 - Check that context array access is bounds-checked
 - Review extern dispatch for correct encoding/decoding of `ExternDispatchV2`
 - Ensure all reverts use custom errors, not string messages (`revert("...")` is not allowed). Custom errors should be defined in `src/error/`
+
+### Code Hygiene
+- Review all commented-out code — each instance should be either reinstated or deleted, not left commented
+- Ensure no build warnings from `forge build` or `cargo check`
+- Identify leaky abstractions: internal details exposed through public interfaces, implementation concerns bleeding across module boundaries, or tight coupling between components that should be independent
+- Check that all submodules sharing the same dependency are pinned to the same git commit
 
 ### Test Coverage
 - Every function in every contract and library must have associated test cases
