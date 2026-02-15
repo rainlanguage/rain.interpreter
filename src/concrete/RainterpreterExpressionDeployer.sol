@@ -36,7 +36,8 @@ contract RainterpreterExpressionDeployer is
     /// @inheritdoc IERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(IDescribedByMetaV1).interfaceId || interfaceId == type(IParserV2).interfaceId
-            || interfaceId == type(IParserPragmaV1).interfaceId || super.supportsInterface(interfaceId);
+            || interfaceId == type(IParserPragmaV1).interfaceId
+            || interfaceId == type(IIntegrityToolingV1).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /// @inheritdoc IParserV2
