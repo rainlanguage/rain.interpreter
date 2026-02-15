@@ -24,7 +24,6 @@ uint256 constant LITERAL_PARSER_INDEX_SUB_PARSE = 3;
 library LibParseLiteral {
     using LibParseLiteral for ParseState;
     using LibParseError for ParseState;
-    using LibParseLiteral for ParseState;
     using LibParseInterstitial for ParseState;
     using LibSubParse for ParseState;
 
