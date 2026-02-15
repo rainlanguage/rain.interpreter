@@ -22,6 +22,7 @@ import {
     OPCODE_FUNCTION_POINTERS
 } from "../generated/Rainterpreter.pointers.sol";
 import {IOpcodeToolingV1} from "rain.sol.codegen/interface/IOpcodeToolingV1.sol";
+import {OddSetLength} from "../error/ErrStore.sol";
 
 /// @title Rainterpreter
 /// @notice Implementation of a Rainlang interpreter that is compatible with
@@ -40,6 +41,9 @@ contract Rainterpreter is IInterpreterV4, IOpcodeToolingV1, ERC165 {
                 eval.context,
                 OPCODE_FUNCTION_POINTERS
             );
+        if (eval.stateOverlay.length % 2 != 0) {
+            revert OddSetLength(eval.stateOverlay.length);
+        }
         for (uint256 i = 0; i < eval.stateOverlay.length; i += 2) {
             state.stateKV = LibMemoryKV.set(
                 state.stateKV, MemoryKVKey.wrap(eval.stateOverlay[i]), MemoryKVVal.wrap(eval.stateOverlay[i + 1])
