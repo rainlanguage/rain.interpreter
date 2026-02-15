@@ -126,7 +126,7 @@ library LibParseOperand {
         function(bytes32[] memory) internal pure returns (OperandV2) handler;
         bytes memory handlers = state.operandHandlers;
         assembly ("memory-safe") {
-            // There is no bounds check here because the indexes are calcualted
+            // There is no bounds check here because the indexes are calculated
             // by the parser itself, NOT provided by the user. Therefore the
             // scope of corrupt data is limited to a bug in the parser itself,
             // which can and should have direct test coverage.

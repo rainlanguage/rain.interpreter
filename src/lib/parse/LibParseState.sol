@@ -95,7 +95,7 @@ uint256 constant OPERAND_VALUES_LENGTH = 4;
 /// of top level items as at the beginning of the line. This is reset to the high
 /// byte of `topLevel0` on each new line.
 /// - bytes 2+: A sequence of 2 byte pointers to before the start of each top
-/// level item, which is implictly after the end of the previous top level item.
+/// level item, which is implicitly after the end of the previous top level item.
 /// Allows us to quickly find the start of the RHS source for each top level
 /// item.
 /// @param stackNames A linked list of stack names. As the parser encounters
@@ -594,7 +594,7 @@ library LibParseState {
 
                 // Write the operand low byte pointer into the paren tracker.
                 // Move 3 bytes after the input counter pos, then shift down 32
-                // bytes to accomodate the full mload.
+                // bytes to accommodate the full mload.
                 let parenTrackerPointer := sub(inputCounterPos, 29)
                 mstore(parenTrackerPointer, or(and(mload(parenTrackerPointer), not(0xFFFF)), inputsBytePointer))
             }

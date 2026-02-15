@@ -338,7 +338,7 @@ library LibSubParse {
         }
         // Literal parsers are empty for the sub parser as the main parser should
         // be handling all literals in operands. The sub parser handles literal
-        // parsing as a dedicated interface seperately.
+        // parsing as a dedicated interface separately.
         state = LibParseState.newState(data, meta, operandHandlers, "");
         state.operandValues = operandValues;
     }

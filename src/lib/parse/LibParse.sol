@@ -334,7 +334,7 @@ library LibParse {
                         mstore8(
                             // Add 2 for the reserved bytes to the offset
                             // then read top 16 bits from the pointer.
-                            // Add 1 to sandwitch the inputs byte between
+                            // Add 1 to sandwich the inputs byte between
                             // the opcode index byte and the operand low
                             // bytes.
                             add(1, shr(0xf0, mload(add(add(stateOffset, 2), parenOffset)))),
