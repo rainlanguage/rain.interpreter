@@ -55,6 +55,18 @@ abstract contract BaseRainterpreterExtern is IInterpreterExternV4, IIntegrityToo
     {
         unchecked {
             bytes memory fPointers = opcodeFunctionPointers();
+            // We mod the opcode with the function pointer count to ensure
+            // that the index is always in bounds. A mod is cheaper than a
+            // bounds check, and mirrors how the main eval loop handles
+            // opcode dispatch. This protects against malicious callers
+            // passing an out-of-range opcode, since `extern` is `external`
+            // and can be called directly by anyone. Without the mod, an
+            // out-of-range opcode reads arbitrary memory and interprets it
+            // as a function pointer, allowing a jump to arbitrary code.
+            // The integrity check (`externIntegrity`) separately protects
+            // against accidental out-of-bounds opcodes by reverting at
+            // parse time.
+            uint256 fsCount = fPointers.length / 2;
             uint256 fPointersStart;
             assembly ("memory-safe") {
                 fPointersStart := add(fPointers, 0x20)
@@ -64,7 +76,7 @@ abstract contract BaseRainterpreterExtern is IInterpreterExternV4, IIntegrityToo
 
             function(OperandV2, StackItem[] memory) internal view returns (StackItem[] memory) f;
             assembly ("memory-safe") {
-                f := shr(0xf0, mload(add(fPointersStart, mul(opcode, 2))))
+                f := shr(0xf0, mload(add(fPointersStart, mul(mod(opcode, fsCount), 2))))
             }
             outputs = f(operand, inputs);
         }
