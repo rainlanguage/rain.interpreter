@@ -44,12 +44,12 @@ library LibInterpreterDeploy {
 
     /// The address of the `RainterpreterExpressionDeployer` contract when
     /// deployed with the rain standard zoltu deployer.
-    address constant EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS = address(0x66Adf6F31dbe7ac68394299D4A8Ca18495867E80);
+    address constant EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS = address(0xF8276773c35DD7D4c593d6701F148B4fCFA99B28);
 
     /// The code hash of the `RainterpreterExpressionDeployer` contract when
     /// deployed with the rain standard zoltu deployer. This can be used to
     /// verify that the deployed contract has the expected bytecode, which
     /// provides stronger guarantees than just checking the address.
     bytes32 constant EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH =
-        bytes32(0xda64d79d5d834bf00bfa7b8b4929c52d4054e8ec545b04dbc6704867a79d722f);
+        bytes32(0x8204c2fae739ba7757c486e0c82fc6725bcc1d14d45e411bf610538609f35f6b);
 }
