@@ -106,7 +106,7 @@ uint256 constant ALL_STANDARD_OPS_LENGTH = 72;
 
 /// @title LibAllStandardOps
 /// @notice Every opcode available from the core repository laid out as a single
-/// array to easily build function pointers for `IInterpreterV2`.
+/// array to easily build function pointers for `IInterpreterV4`.
 library LibAllStandardOps {
     /// Builds the authoring meta for all standard opcodes. Each entry is an
     /// `AuthoringMetaV2` struct with a word (the Rainlang keyword) and a
@@ -656,7 +656,7 @@ library LibAllStandardOps {
     }
 
     /// All function pointers for the standard opcodes. Intended to be used to
-    /// build a `IInterpreterV2` instance, specifically the `functionPointers`
+    /// build a `IInterpreterV4` instance, specifically the `functionPointers`
     /// method can just be a thin wrapper around this function.
     function opcodeFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
