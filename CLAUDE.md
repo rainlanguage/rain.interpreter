@@ -110,8 +110,9 @@ External contracts can extend the interpreter with additional opcodes. `src/conc
 When reviewing code for audit:
 
 ### Documentation
-- Ensure all code is documented at all levels: contract, function, logic
-- After ensuring documentation, review the documentation against implementation
+- Systematically enumerate every function in every contract and library, and verify each has NatSpec documentation
+- Do not rely on scanning — explicitly list undocumented functions as findings
+- After ensuring documentation exists, review it against the implementation for accuracy
 
 ### Security
 - Check assembly blocks for memory safety: out-of-bounds reads/writes, incorrect pointer arithmetic, missing bounds checks
@@ -127,3 +128,9 @@ When reviewing code for audit:
 - Check that context array access is bounds-checked
 - Review extern dispatch for correct encoding/decoding of `ExternDispatchV2`
 - Ensure all reverts use custom errors, not string messages (`revert("...")` is not allowed). Custom errors should be defined in `src/error/`
+
+### Test Coverage
+- Every function in every contract and library must have associated test cases
+- Check that all error paths have corresponding test cases, preferably fuzzed
+- Verify edge cases are covered: zero-length inputs, max-length inputs, off-by-one boundaries, odd/even length arrays where parity matters
+- Ensure new error definitions added during audit have tests that trigger the revert
