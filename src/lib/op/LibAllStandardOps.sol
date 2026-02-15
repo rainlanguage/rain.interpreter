@@ -286,9 +286,6 @@ library LibAllStandardOps {
                 "Headroom of a number. I.e. the distance to the next whole number (1 - frac(x)). The headroom at any whole number is 1 (not 0)."
             ),
             AuthoringMetaV2("inv", "The inverse (1 / x) of a number. Errors if the number is zero."),
-            // AuthoringMetaV2("ln", "Natural logarithm ln(x). Errors if the number is zero."),
-            // AuthoringMetaV2("log2", "Base 2 logarithm log2(x). Errors if the number is zero."),
-            // AuthoringMetaV2("log10", "Base 10 logarithm log10(x). Errors if the number is zero."),
             AuthoringMetaV2("max", "Finds the maximum number from all inputs."),
             AuthoringMetaV2(
                 "max-negative-value",
@@ -307,13 +304,8 @@ library LibAllStandardOps {
                 "min-positive-value",
                 "The minimum positive representable float value. This is the smallest number that can be represented that is still greater than zero."
             ),
-            // AuthoringMetaV2("mod", "Modulos the first number by all other numbers. Errors if any divisor is zero."),
             AuthoringMetaV2("mul", "Multiplies all numbers together."),
             AuthoringMetaV2("power", "Raises the first number to the power of the second number."),
-            // AuthoringMetaV2(
-            //     "snap-to-unit",
-            //     "Rounds a number to the nearest whole number if it is within the threshold distance from that whole number. The first input is the threshold and the second is the value to snap to the nearest unit."
-            // ),
             AuthoringMetaV2("sqrt", "Calculates the square root of the input. Errors if the input is negative."),
             AuthoringMetaV2("sub", "Subtracts all numbers from the first number."),
             AuthoringMetaV2("get", "Gets a value from storage. The first operand is the key to lookup."),
@@ -497,12 +489,6 @@ library LibAllStandardOps {
                     LibParseOperand.handleOperandDisallowed,
                     // inv
                     LibParseOperand.handleOperandDisallowed,
-                    // // ln
-                    // LibParseOperand.handleOperandDisallowed,
-                    // // log2
-                    // LibParseOperand.handleOperandDisallowed,
-                    // // log10
-                    // LibParseOperand.handleOperandDisallowed,
                     // max
                     LibParseOperand.handleOperandDisallowed,
                     // max-negative-value
@@ -515,14 +501,10 @@ library LibAllStandardOps {
                     LibParseOperand.handleOperandDisallowed,
                     // min-positive-value
                     LibParseOperand.handleOperandDisallowed,
-                    // // mod
-                    // LibParseOperand.handleOperandDisallowed,
                     // mul
                     LibParseOperand.handleOperandDisallowed,
                     // power
                     LibParseOperand.handleOperandDisallowed,
-                    // // snap-to-unit
-                    // LibParseOperand.handleOperandDisallowed,
                     // sqrt
                     LibParseOperand.handleOperandDisallowed,
                     // sub
@@ -624,19 +606,14 @@ library LibAllStandardOps {
                     LibOpGm.integrity,
                     LibOpHeadroom.integrity,
                     LibOpInv.integrity,
-                    // LibOpLn.integrity,
-                    // LibOpLog2.integrity,
-                    // LibOpLog10.integrity,
                     LibOpMax.integrity,
                     LibOpMaxNegativeValue.integrity,
                     LibOpMaxPositiveValue.integrity,
                     LibOpMin.integrity,
                     LibOpMinNegativeValue.integrity,
                     LibOpMinPositiveValue.integrity,
-                    // LibOpMod.integrity,
                     LibOpMul.integrity,
                     LibOpPow.integrity,
-                    // LibOpSnapToUnit.integrity,
                     LibOpSqrt.integrity,
                     LibOpSub.integrity,
                     LibOpGet.integrity,
@@ -733,19 +710,14 @@ library LibAllStandardOps {
                     LibOpGm.run,
                     LibOpHeadroom.run,
                     LibOpInv.run,
-                    // LibOpLn.run,
-                    // LibOpLog2.run,
-                    // LibOpLog10.run,
                     LibOpMax.run,
                     LibOpMaxNegativeValue.run,
                     LibOpMaxPositiveValue.run,
                     LibOpMin.run,
                     LibOpMinNegativeValue.run,
                     LibOpMinPositiveValue.run,
-                    // LibOpMod.run,
                     LibOpMul.run,
                     LibOpPow.run,
-                    // LibOpSnapToUnit.run,
                     LibOpSqrt.run,
                     LibOpSub.run,
                     LibOpGet.run,
