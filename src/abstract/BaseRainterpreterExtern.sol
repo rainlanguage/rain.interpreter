@@ -15,7 +15,7 @@ import {
 } from "rain.interpreter.interface/interface/IInterpreterExternV4.sol";
 import {IIntegrityToolingV1} from "rain.sol.codegen/interface/IIntegrityToolingV1.sol";
 import {IOpcodeToolingV1} from "rain.sol.codegen/interface/IOpcodeToolingV1.sol";
-import {ExternOpcodeOutOfRange, ExternPointersMismatch} from "../error/ErrExtern.sol";
+import {ExternOpcodeOutOfRange, ExternPointersMismatch, ExternOpcodePointersEmpty} from "../error/ErrExtern.sol";
 
 /// @dev Empty opcode function pointers constant. Inheriting contracts should
 /// create their own constant and override `opcodeFunctionPointers` to use
@@ -35,13 +35,18 @@ abstract contract BaseRainterpreterExtern is IInterpreterExternV4, IIntegrityToo
     using LibUint256Array for uint256;
     using LibUint256Array for uint256[];
 
-    /// Validates that opcode and integrity function pointer tables have the
-    /// same length. This ensures the integrity check covers every opcode.
+    /// Validates that opcode function pointers are non-empty and that opcode
+    /// and integrity function pointer tables have the same length. This ensures
+    /// every opcode has a corresponding integrity check, and that the mod in
+    /// `extern()` cannot divide by zero.
     constructor() {
-        uint256 opcodeCount = opcodeFunctionPointers().length;
-        uint256 integrityCount = integrityFunctionPointers().length;
-        if (opcodeCount != integrityCount) {
-            revert ExternPointersMismatch(opcodeCount, integrityCount);
+        uint256 opcodeFunctionPointersLength = opcodeFunctionPointers().length;
+        if (opcodeFunctionPointersLength == 0) {
+            revert ExternOpcodePointersEmpty();
+        }
+        uint256 integrityFunctionPointersLength = integrityFunctionPointers().length;
+        if (opcodeFunctionPointersLength != integrityFunctionPointersLength) {
+            revert ExternPointersMismatch(opcodeFunctionPointersLength, integrityFunctionPointersLength);
         }
     }
 
