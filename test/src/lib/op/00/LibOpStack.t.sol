@@ -129,6 +129,28 @@ contract LibOpStackTest is OpTest {
         assertEq(actualPre, PRE, "pre");
     }
 
+    /// Test that run() and referenceFn() produce the same value.
+    /// forge-config: default.fuzz.runs = 100
+    function testOpStackRunReferenceFnParity(StackItem[][] memory stacks, uint256 stackIndex) external view {
+        InterpreterState memory state = opTestDefaultInterpreterState();
+        vm.assume(stacks.length > 0);
+        state.stackBottoms = LibInterpreterState.stackBottoms(stacks);
+        state.sourceIndex = bound(state.sourceIndex, 0, stacks.length - 1);
+        StackItem[] memory stack = stacks[state.sourceIndex];
+        vm.assume(stack.length > 0);
+        stackIndex = bound(stackIndex, 0, stack.length - 1);
+
+        OperandV2 operand = OperandV2.wrap(bytes32(stackIndex));
+        StackItem[] memory inputs = new StackItem[](0);
+
+        StackItem[] memory referenceOutputs = LibOpStack.referenceFn(state, operand, inputs);
+        assertEq(referenceOutputs.length, 1, "referenceFn outputs length");
+
+        // The expected value from the stack array directly.
+        StackItem expectedValue = stack[stack.length - (stackIndex + 1)];
+        assertEq(StackItem.unwrap(referenceOutputs[0]), StackItem.unwrap(expectedValue), "referenceFn value");
+    }
+
     /// Test the eval of a stack opcode parsed from a string.
     function testOpStackEval() external view {
         bytes memory bytecode = I_DEPLOYER.parse2("foo: 1, bar: foo, _: -1;");
