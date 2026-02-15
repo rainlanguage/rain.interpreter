@@ -47,21 +47,12 @@ error OddLengthHexLiteral(uint256 offset);
 /// Encountered a hex literal with an invalid character.
 error MalformedHexLiteral(uint256 offset);
 
-/// Encountered a decimal literal that is larger than supported.
-error DecimalLiteralOverflow(uint256 offset);
-
-/// Encountered a decimal literal with precision loss.
-error DecimalLiteralPrecisionLoss(uint256 offset);
-
 /// Encountered a decimal literal with an exponent that has too many or no
 /// digits.
 error MalformedExponentDigits(uint256 offset);
 
 /// Encountered a decimal literal with a malformed decimal point.
 error MalformedDecimalPoint(uint256 offset);
-
-/// Encountered a zero length decimal literal.
-error ZeroLengthDecimal(uint256 offset);
 
 /// The expression does not finish with a semicolon (EOF).
 error MissingFinalSemi(uint256 offset);
