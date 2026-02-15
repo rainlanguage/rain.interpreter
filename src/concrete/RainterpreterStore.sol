@@ -13,9 +13,7 @@ import {
 // Exported for convenience.
 //forge-lint: disable-next-line(unused-import)
 import {BYTECODE_HASH as STORE_BYTECODE_HASH} from "../generated/RainterpreterStore.pointers.sol";
-
-/// Thrown when a `set` call is made with an odd number of arguments.
-error OddSetLength(uint256 length);
+import {OddSetLength} from "../error/ErrStore.sol";
 
 /// @title RainterpreterStore
 /// @notice Simplest possible `IInterpreterStoreV3` that could work.
