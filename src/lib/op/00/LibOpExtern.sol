@@ -13,7 +13,6 @@ import {
     StackItem
 } from "rain.interpreter.interface/interface/IInterpreterExternV4.sol";
 import {LibExtern} from "../../extern/LibExtern.sol";
-import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 import {ERC165Checker} from "openzeppelin-contracts/contracts/utils/introspection/ERC165Checker.sol";
 import {BadOutputsLength} from "../../../error/ErrExtern.sol";
@@ -21,8 +20,6 @@ import {BadOutputsLength} from "../../../error/ErrExtern.sol";
 /// @title LibOpExtern
 /// @notice Implementation of calling an external contract.
 library LibOpExtern {
-    using LibUint256Array for uint256[];
-
     /// `extern` integrity check. Validates the extern contract supports the expected interface and delegates to the extern's own integrity check.
     function integrity(IntegrityCheckState memory state, OperandV2 operand) internal view returns (uint256, uint256) {
         uint256 encodedExternDispatchIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
