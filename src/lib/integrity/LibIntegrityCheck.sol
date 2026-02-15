@@ -13,7 +13,6 @@ import {
 } from "../../error/ErrIntegrity.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
-import {BadOpInputsLength} from "../../lib/integrity/LibIntegrityCheck.sol";
 
 struct IntegrityCheckState {
     uint256 stackIndex;
