@@ -25,7 +25,7 @@ contract ParseLiteralTest is Test {
     }
 
     function checkLiteralBounds(
-        function (ParseState memory, uint256, uint256) pure returns (uint256, uint256, uint256) bounder,
+        function(ParseState memory, uint256, uint256) pure returns (uint256, uint256, uint256) bounder,
         bytes memory data,
         uint256 expectedInnerStart,
         uint256 expectedInnerEnd,

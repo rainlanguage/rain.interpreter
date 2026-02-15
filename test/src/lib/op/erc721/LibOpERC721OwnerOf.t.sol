@@ -11,9 +11,9 @@ import {
     OperandV2,
     EvalV4,
     StackItem
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV4.sol";
 import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
@@ -22,7 +22,7 @@ import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 /// @title LibOpERC721OwnerOfTest
 /// @notice Test the opcode for getting the owner of an erc721 token.
 contract LibOpERC721OwnerOfTest is OpTest {
-    function testOpERC721OwnerOfNPIntegrity(IntegrityCheckState memory state, uint8 inputs) external pure {
+    function testOpERC721OwnerOfIntegrity(IntegrityCheckState memory state, uint8 inputs) external pure {
         (uint256 calcInputs, uint256 calcOutputs) =
             LibOpERC721OwnerOf.integrity(state, OperandV2.wrap(bytes32(uint256(inputs) << 0x10)));
 
@@ -30,7 +30,7 @@ contract LibOpERC721OwnerOfTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    function testOpERC721OwnerOfNPRun(address token, bytes32 tokenId, address owner, uint16 operandData) external {
+    function testOpERC721OwnerOfRun(address token, bytes32 tokenId, address owner, uint16 operandData) external {
         assumeEtchable(token);
         vm.etch(token, hex"fe");
         vm.mockCall(token, abi.encodeWithSelector(IERC721.ownerOf.selector, tokenId), abi.encode(owner));
@@ -52,7 +52,7 @@ contract LibOpERC721OwnerOfTest is OpTest {
         );
     }
 
-    function testOpERC721OwnerOfNPEvalHappy(address token, uint256 tokenId, address owner) public {
+    function testOpERC721OwnerOfEvalHappy(address token, uint256 tokenId, address owner) public {
         bytes memory bytecode = I_DEPLOYER.parse2(
             bytes(
                 string.concat(
@@ -83,50 +83,50 @@ contract LibOpERC721OwnerOfTest is OpTest {
     }
 
     /// Test that owner of without inputs fails integrity check.
-    function testOpERC721OwnerOfNPEvalFail0() public {
+    function testOpERC721OwnerOfEvalFail0() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));
         bytes memory bytecode = I_DEPLOYER.parse2("_: erc721-owner-of();");
         (bytecode);
     }
 
     /// Test that owner of with one input fails integrity check.
-    function testOpERC721OwnerOfNPEvalFail1() public {
+    function testOpERC721OwnerOfEvalFail1() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 1, 2, 1));
         bytes memory bytecode = I_DEPLOYER.parse2("_: erc721-owner-of(0x00);");
         (bytecode);
     }
 
     /// Test that owner of with too many inputs fails integrity check.
-    function testOpERC721OwnerOfNPEvalFail3() public {
+    function testOpERC721OwnerOfEvalFail3() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 3, 2, 3));
         bytes memory bytecode = I_DEPLOYER.parse2("_: erc721-owner-of(0x00 0x01 0x02);");
         (bytecode);
     }
 
     /// Test that operand fails integrity check.
-    function testOpERC721OwnerOfNPEvalFailOperand() public {
+    function testOpERC721OwnerOfEvalFailOperand() public {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
         (bytes memory bytecode, bytes32[] memory constants) = I_PARSER.unsafeParse("_: erc721-owner-of<0>(0x00 0x01);");
         (bytecode, constants);
     }
 
-    function testOpERC721OwnerOfNPEvalZeroInputs() external {
+    function testOpERC721OwnerOfEvalZeroInputs() external {
         checkBadInputs("_: erc721-owner-of();", 0, 2, 0);
     }
 
-    function testOpERC721OwnerOfNPEvalOneInput() external {
+    function testOpERC721OwnerOfEvalOneInput() external {
         checkBadInputs("_: erc721-owner-of(0x00);", 1, 2, 1);
     }
 
-    function testOpERC721OwnerOfNPEvalThreeInputs() external {
+    function testOpERC721OwnerOfEvalThreeInputs() external {
         checkBadInputs("_: erc721-owner-of(0x00 0x01 0x02);", 3, 2, 3);
     }
 
-    function testOpERC721OwnerOfNPEvalZeroOutputs() external {
+    function testOpERC721OwnerOfEvalZeroOutputs() external {
         checkBadOutputs(": erc721-owner-of(0x00 0x01);", 2, 1, 0);
     }
 
-    function testOpERC721OwnerOfNPTwoOutputs() external {
+    function testOpERC721OwnerOfTwoOutputs() external {
         checkBadOutputs("_ _: erc721-owner-of(0x00 0x01);", 2, 1, 2);
     }
 }

@@ -5,7 +5,7 @@ import {OpTest, IntegrityCheckState, OperandV2, InterpreterState, UnexpectedOper
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {LibOpInv} from "src/lib/op/math/LibOpInv.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
-import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
 contract LibOpInvTest is OpTest {
     /// Directly test the integrity logic of LibOpInv.

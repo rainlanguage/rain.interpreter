@@ -3,13 +3,13 @@ pragma solidity ^0.8.19;
 
 import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
 import {InterpreterState} from "../../../state/LibInterpreterState.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 /// @title LibOpUint256Sub
 /// @notice Opcode to sub N integers. Errors on underflow.
 library LibOpUint256Sub {
+    /// `uint256-sub` integrity check. Requires at least 2 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
         uint256 inputs = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));

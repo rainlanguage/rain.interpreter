@@ -6,7 +6,7 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {LibOpUint256Pow} from "src/lib/op/math/uint256/LibOpUint256Pow.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {StackItem, OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {StackItem, OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpUint256PowTest is OpTest {

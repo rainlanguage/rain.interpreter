@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
-import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 /// @title LibOpHeadroom
 /// @notice Opcode for the headroom (distance to ceil) of an decimal floating
@@ -14,6 +13,7 @@ import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpre
 library LibOpHeadroom {
     using LibDecimalFloat for Float;
 
+    /// `headroom` integrity check. Requires exactly 1 input and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // There must be one input and one output.
         return (1, 1);

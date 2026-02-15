@@ -21,9 +21,7 @@ import {
 import {LibParseChar} from "rain.string/lib/parse/LibParseChar.sol";
 import {LibParseMeta} from "rain.interpreter.interface/lib/parse/LibParseMeta.sol";
 import {LibParseOperand} from "./LibParseOperand.sol";
-import {
-    OperandV2, OPCODE_STACK, OPCODE_UNKNOWN
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, OPCODE_STACK, OPCODE_UNKNOWN} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibParseStackName} from "./LibParseStackName.sol";
 import {
     UnexpectedRHSChar,
@@ -172,8 +170,8 @@ library LibParse {
         }
     }
 
-    //slither-disable-start cyclomatic-complexity
     //forge-lint: disable-next-line(mixed-case-function)
+    //slither-disable-next-line cyclomatic-complexity
     function parseRHS(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
             while (cursor < end) {
@@ -336,7 +334,7 @@ library LibParse {
                         mstore8(
                             // Add 2 for the reserved bytes to the offset
                             // then read top 16 bits from the pointer.
-                            // Add 1 to sandwitch the inputs byte between
+                            // Add 1 to sandwich the inputs byte between
                             // the opcode index byte and the operand low
                             // bytes.
                             add(1, shr(0xf0, mload(add(add(stateOffset, 2), parenOffset)))),
@@ -384,7 +382,6 @@ library LibParse {
             return cursor;
         }
     }
-    //slither-disable-end
 
     function parse(ParseState memory state) internal view returns (bytes memory bytecode, bytes32[] memory) {
         unchecked {

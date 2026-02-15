@@ -7,12 +7,9 @@ import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibMemoryKV, MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
-/// Thrown when the inputs length does not match the expected inputs length.
-/// @param expected The expected number of inputs.
-/// @param actual The actual number of inputs.
-error InputsLengthMismatch(uint256 expected, uint256 actual);
+import {InputsLengthMismatch} from "../../error/ErrEval.sol";
 
 library LibEval {
     using LibMemoryKV for MemoryKV;
@@ -64,10 +61,7 @@ library LibEval {
             }
         }
 
-        function(InterpreterState memory, OperandV2, Pointer)
-                    internal
-                    view
-                    returns (Pointer) f;
+        function(InterpreterState memory, OperandV2, Pointer) internal view returns (Pointer) f;
         OperandV2 operand;
         uint256 word;
         while (cursor < end) {
@@ -175,6 +169,13 @@ library LibEval {
             {
                 stackBottom = state.stackBottoms[state.sourceIndex];
                 stackTop = stackBottom;
+                // Inputs length must always match what the bytecode
+                // expects. Without this check a caller could pass more
+                // inputs than the stack allocation, moving stackTop
+                // below allocated memory.
+                if (inputs.length != sourceInputs) {
+                    revert InputsLengthMismatch(sourceInputs, inputs.length);
+                }
                 // Copy inputs into place if needed.
                 if (inputs.length > 0) {
                     // Inline some logic to avoid jumping due to function calls
@@ -186,8 +187,6 @@ library LibEval {
                         inputsDataPointer := add(inputs, 0x20)
                     }
                     LibMemCpy.unsafeCopyWordsTo(inputsDataPointer, stackTop, inputs.length);
-                } else if (inputs.length != sourceInputs) {
-                    revert InputsLengthMismatch(sourceInputs, inputs.length);
                 }
             }
 

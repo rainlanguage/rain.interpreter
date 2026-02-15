@@ -5,7 +5,7 @@ import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {ExcessRHSItems} from "src/error/ErrParse.sol";
 import {LibOpEnsure} from "src/lib/op/logic/LibOpEnsure.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {LibIntOrAString, IntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
@@ -52,7 +52,7 @@ contract LibOpEnsureTest is OpTest {
         InterpreterState memory state = opTestDefaultInterpreterState();
         StackItem[] memory inputs = new StackItem[](2);
         inputs[0] = condition;
-        inputs[1] = StackItem.wrap(bytes32(IntOrAString.unwrap(LibIntOrAString.fromString2(reason))));
+        inputs[1] = StackItem.wrap(bytes32(IntOrAString.unwrap(LibIntOrAString.fromStringV3(reason))));
 
         OperandV2 operand = LibOperand.build(2, 0, 0);
         opReferenceCheck(state, operand, LibOpEnsure.referenceFn, LibOpEnsure.integrity, LibOpEnsure.run, inputs);

@@ -13,3 +13,6 @@
 [submodule "lib/rain.string"]
 	path = lib/rain.string
 	url = https://github.com/rainlanguage/rain.string
+[submodule "lib/rain.deploy"]
+	path = lib/rain.deploy
+	url = https://github.com/rainlanguage/rain.deploy

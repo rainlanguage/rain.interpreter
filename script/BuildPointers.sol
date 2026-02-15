@@ -5,10 +5,7 @@ import {Script} from "forge-std/Script.sol";
 import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
 import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
 import {RainterpreterParser, PARSE_META_BUILD_DEPTH} from "src/concrete/RainterpreterParser.sol";
-import {
-    RainterpreterExpressionDeployer,
-    RainterpreterExpressionDeployerConstructionConfigV2
-} from "src/concrete/RainterpreterExpressionDeployer.sol";
+import {RainterpreterExpressionDeployer} from "src/concrete/RainterpreterExpressionDeployer.sol";
 import {
     RainterpreterReferenceExtern,
     LibRainterpreterReferenceExtern,
@@ -19,7 +16,15 @@ import {LibCodeGen} from "rain.sol.codegen/lib/LibCodeGen.sol";
 import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";
 import {LibFs} from "rain.sol.codegen/lib/LibFs.sol";
 
+/// @title BuildPointers
+/// @notice Forge script that generates Solidity source files containing
+/// precomputed constant values (bytecode hashes, function pointer tables,
+/// parse meta) for each concrete contract. Run via `forge script` during the
+/// build step. Each `build*` function deploys the contract in a local EVM,
+/// extracts its runtime pointers, and writes a `.pointers.sol` file into
+/// `src/generated/`.
 contract BuildPointers is Script {
+    /// Builds the Rainterpreter opcode function pointer table.
     function buildRainterpreterPointers() internal {
         Rainterpreter interpreter = new Rainterpreter();
 
@@ -28,12 +33,16 @@ contract BuildPointers is Script {
         );
     }
 
+    /// Builds the RainterpreterStore pointer file (no additional constants).
     function buildRainterpreterStorePointers() internal {
         RainterpreterStore store = new RainterpreterStore();
 
         LibFs.buildFileForContract(vm, address(store), "RainterpreterStore", "");
     }
 
+    /// Builds the RainterpreterParser pointer file including the parse meta
+    /// (generated from `authoringMetaV2`), operand handler pointers, and
+    /// literal parser pointers.
     function buildRainterpreterParserPointers() internal {
         RainterpreterParser parser = new RainterpreterParser();
 
@@ -42,21 +51,19 @@ contract BuildPointers is Script {
             address(parser),
             "RainterpreterParser",
             string.concat(
-                LibGenParseMeta.parseMetaConstantString(vm, LibAllStandardOps.authoringMetaV2(), PARSE_META_BUILD_DEPTH),
+                LibGenParseMeta.parseMetaConstantString(
+                    vm, LibAllStandardOps.authoringMetaV2(), PARSE_META_BUILD_DEPTH
+                ),
                 LibCodeGen.operandHandlerFunctionPointersConstantString(vm, parser),
                 LibCodeGen.literalParserFunctionPointersConstantString(vm, parser)
             )
         );
     }
 
+    /// Builds the RainterpreterExpressionDeployer pointer file including
+    /// the described-by meta hash and integrity function pointers.
     function buildRainterpreterExpressionDeployerPointers() internal {
-        Rainterpreter interpreter = new Rainterpreter();
-        RainterpreterStore store = new RainterpreterStore();
-        RainterpreterParser parser = new RainterpreterParser();
-
-        RainterpreterExpressionDeployer deployer = new RainterpreterExpressionDeployer(
-            RainterpreterExpressionDeployerConstructionConfigV2(address(interpreter), address(store), address(parser))
-        );
+        RainterpreterExpressionDeployer deployer = new RainterpreterExpressionDeployer();
 
         string memory name = "RainterpreterExpressionDeployer";
 
@@ -71,6 +78,9 @@ contract BuildPointers is Script {
         );
     }
 
+    /// Builds the RainterpreterReferenceExtern pointer file including
+    /// described-by meta hash, parse meta, sub-parser word parsers, operand
+    /// handlers, literal parsers, integrity pointers, and opcode pointers.
     function buildRainterpreterReferenceExternPointers() internal {
         RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();
 
@@ -79,7 +89,7 @@ contract BuildPointers is Script {
         LibFs.buildFileForContract(
             vm,
             address(extern),
-            "RainterpreterReferenceExtern",
+            name,
             string.concat(
                 string.concat(
                     LibCodeGen.describedByMetaHashConstantString(vm, name),
@@ -96,6 +106,7 @@ contract BuildPointers is Script {
         );
     }
 
+    /// Entry point. Builds all pointer files.
     function run() external {
         buildRainterpreterPointers();
         buildRainterpreterStorePointers();

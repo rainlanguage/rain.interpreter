@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {Test} from "forge-std/Test.sol";
+import {Test, console2} from "forge-std/Test.sol";
 import {ParseState, Pointer, LibParseState} from "src/lib/parse/LibParseState.sol";
 import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseLiteralSubParseable} from "src/lib/parse/literal/LibParseLiteralSubParseable.sol";
 import {UnclosedSubParseableLiteral, SubParseableMissingDispatch} from "src/error/ErrParse.sol";
-import {ISubParserV4} from "rain.interpreter.interface/interface/unstable/ISubParserV4.sol";
+import {ISubParserV4} from "rain.interpreter.interface/interface/ISubParserV4.sol";
 import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {CMASK_WHITESPACE, CMASK_SUB_PARSEABLE_LITERAL_END} from "rain.string/lib/parse/LibParseCMask.sol";
+import {LibParseChar} from "rain.string/lib/parse/LibParseChar.sol";
 
 contract LibParseLiteralSubParseableTest is Test {
     using LibBytes for bytes;
@@ -121,11 +122,13 @@ contract LibParseLiteralSubParseableTest is Test {
         checkParseSubParseable("[hi\na]", "hi", "a", 6);
         checkParseSubParseable("[hi\na ]", "hi", "a ", 7);
         checkParseSubParseable("[hi\na\n]", "hi", "a\n", 7);
+        // Examples from fuzzing.
+        checkParseSubParseable("[[pi\n\n\n\na]", "[pi", "a", 10);
     }
 
     /// Fuzz the happy path.
     function testParseLiteralSubParseableHappyFuzz(string memory dispatch, string memory whitespace, string memory body)
-        external
+        public
     {
         vm.assume(bytes(dispatch).length > 0);
         vm.assume(bytes(whitespace).length > 0);
@@ -138,11 +141,29 @@ contract LibParseLiteralSubParseableTest is Test {
         // whitespace.
         LibConformString.conformStringToMask(body, ~CMASK_SUB_PARSEABLE_LITERAL_END);
 
+        string memory data = string(abi.encodePacked("[", dispatch, whitespace, body, "]"));
+
+        // Expected body excludes any leading whitespace in the body.
+        string memory expectedBody = string.concat(body);
+        uint256 cursor;
+        uint256 end;
+        assembly ("memory-safe") {
+            cursor := add(expectedBody, 0x20)
+            end := add(cursor, mload(expectedBody))
+        }
+        cursor = LibParseChar.skipMask(cursor, end, CMASK_WHITESPACE);
+        assembly ("memory-safe") {
+            let whitespaceLength := sub(cursor, add(expectedBody, 0x20))
+            mstore(expectedBody, sub(mload(expectedBody), whitespaceLength))
+            mcopy(add(expectedBody, 0x20), cursor, mload(expectedBody))
+        }
+
         checkParseSubParseable(
-            string(abi.encodePacked("[", dispatch, whitespace, body, "]")),
-            dispatch,
-            body,
-            bytes(dispatch).length + bytes(whitespace).length + bytes(body).length + 2
+            data, dispatch, expectedBody, bytes(dispatch).length + bytes(whitespace).length + bytes(body).length + 2
         );
+    }
+
+    function testParseLiteralSubParseableHappyKnown() external {
+        testParseLiteralSubParseableHappyFuzz("2 max-positive-value() 2", unicode"3¹&\\u{a3c}È", " ,");
     }
 }

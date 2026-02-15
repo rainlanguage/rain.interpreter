@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {
     IInterpreterExternV4,
     ExternDispatchV2,
-    EncodedExternDispatchV2,
-    // Export for convenience.
-    //forge-lint: disable-next-line(unused-import)
-    StackItem
-} from "rain.interpreter.interface/interface/unstable/IInterpreterExternV4.sol";
+    EncodedExternDispatchV2
+} from "rain.interpreter.interface/interface/IInterpreterExternV4.sol";
+// StackItem exported for convenience.
+//forge-lint: disable-next-line(unused-import)
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
 /// @title LibExtern
 /// Defines and implements an encoding and decoding scheme for the data that

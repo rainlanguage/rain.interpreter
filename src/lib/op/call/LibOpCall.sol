@@ -1,18 +1,13 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {Pointer, LibPointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {LibEval} from "../../eval/LibEval.sol";
-
-/// Thrown when the outputs requested by the operand exceed the outputs
-/// available from the source.
-/// @param sourceOutputs The number of outputs available from the source.
-/// @param outputs The number of outputs requested by the operand.
-error CallOutputsExceedSource(uint256 sourceOutputs, uint256 outputs);
+import {CallOutputsExceedSource} from "../../../error/ErrIntegrity.sol";
 
 /// @title LibOpCall
 /// @notice Contains the call operation. This allows sources to be treated in a

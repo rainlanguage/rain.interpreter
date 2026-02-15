@@ -7,11 +7,12 @@ import {
     SourceIndexV2,
     EvalV4,
     StackItem
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
 import {BytecodeTest} from "rain.interpreter.interface/../test/abstract/BytecodeTest.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {LibOpCall, CallOutputsExceedSource} from "src/lib/op/call/LibOpCall.sol";
+import {LibOpCall} from "src/lib/op/call/LibOpCall.sol";
+import {CallOutputsExceedSource} from "src/error/ErrIntegrity.sol";
 import {LibBytecode, SourceIndexOutOfBounds} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {STACK_TRACER} from "src/lib/state/LibInterpreterState.sol";
@@ -28,7 +29,7 @@ contract LibOpCallTest is OpTest, BytecodeTest {
     /// Directly test the integrity logic of LibOpCall. This tests that if the
     /// outputs in the operand exceed the outputs available from the source, then
     /// the call will revert.
-    function testOpCallNPIntegrityTooManyOutputs(
+    function testOpCallIntegrityTooManyOutputs(
         IntegrityCheckState memory state,
         uint256 inputs,
         uint256 outputs,
@@ -57,7 +58,7 @@ contract LibOpCallTest is OpTest, BytecodeTest {
     /// Directly test the integrity logic of LibOpCall. This tests that if the
     /// source index in the operand is outside the source count of the bytecode,
     /// this will revert as `SourceIndexOutOfBounds`.
-    function testOpCallNPIntegritySourceIndexOutOfBounds(
+    function testOpCallIntegritySourceIndexOutOfBounds(
         IntegrityCheckState memory state,
         uint256 inputs,
         uint256 outputs,
@@ -84,7 +85,7 @@ contract LibOpCallTest is OpTest, BytecodeTest {
     /// outputs in the operand are within the bounds set by the source, then the
     /// inputs is always specified by the source (callee), and the outputs are
     /// always specified by the operand (caller).
-    function testOpCallNPIntegrityIO(
+    function testOpCallIntegrityIO(
         IntegrityCheckState memory state,
         uint256 inputs,
         uint256 outputs,
@@ -118,7 +119,7 @@ contract LibOpCallTest is OpTest, BytecodeTest {
 
     /// Test that the eval of a call into a source that doesn't exist reverts
     /// upon deploy.
-    function testOpCallNPRunSourceDoesNotExist() external {
+    function testOpCallRunSourceDoesNotExist() external {
         // 0 inputs and outputs different source indexes.
         checkSourceDoesNotExist(": call<1>();", 1, hex"010000010000000b000001");
         checkSourceDoesNotExist(": call<2>();", 2, hex"010000010000000b000002");
@@ -193,7 +194,7 @@ contract LibOpCallTest is OpTest, BytecodeTest {
     //     traces[1].sourceIndex = 1;
     //     traces[1].stack = new uint256[](1);
     //     traces[1].stack[0] = 1e18;
-    //     checkCallNPTraces("_:add(call<1>() 1);_:1;", traces);
+    //     checkCallTraces("_:add(call<1>() 1);_:1;", traces);
     // }
 
     // function testCallTraceOuterAndTwoInner() external {
@@ -210,7 +211,7 @@ contract LibOpCallTest is OpTest, BytecodeTest {
     //     traces[2].sourceIndex = 2;
     //     traces[2].stack = new uint256[](1);
     //     traces[2].stack[0] = 10e18;
-    //     checkCallNPTraces("_:add(call<1>(2) 1);two:,_:add(call<2>() 1);_:10;", traces);
+    //     checkCallTraces("_:add(call<1>(2) 1);two:,_:add(call<2>() 1);_:10;", traces);
     // }
 
     /// Boilerplate for checking the stack and kvs of a call.
@@ -238,54 +239,54 @@ contract LibOpCallTest is OpTest, BytecodeTest {
     }
 
     // /// Test the eval of call to see various stacks.
-    // function testOpCallNPRunNoIO() external view {
+    // function testOpCallRunNoIO() external view {
     //     // Check evals that result in no stack or kvs.
     //     uint256[] memory stack = new uint256[](0);
     //     uint256[] memory kvs = new uint256[](0);
     //     // 0 IO, call noop.
-    //     checkCallNPRun(":call<1>();:;", stack, kvs);
+    //     checkCallRun(":call<1>();:;", stack, kvs);
     //     // Single input and no outputs.
-    //     checkCallNPRun(":call<1>(10);ten:;", stack, kvs);
+    //     checkCallRun(":call<1>(10);ten:;", stack, kvs);
 
     //     // Check evals that result in a stack of one item but no kvs.
     //     stack = new uint256[](1);
     //     // Single input and single output.
     //     stack[0] = 10e18;
-    //     checkCallNPRun("ten:call<1>(10);ten:;", stack, kvs);
+    //     checkCallRun("ten:call<1>(10);ten:;", stack, kvs);
     //     // zero input single output.
-    //     checkCallNPRun("ten:call<1>();ten:10;", stack, kvs);
+    //     checkCallRun("ten:call<1>();ten:10;", stack, kvs);
     //     // Two inputs and one output.
     //     stack[0] = 12e18;
-    //     checkCallNPRun("a: call<1>(10 11); ten eleven:,a b c:ten eleven 12;", stack, kvs);
+    //     checkCallRun("a: call<1>(10 11); ten eleven:,a b c:ten eleven 12;", stack, kvs);
 
     //     // Check evals that result in a stack of two items but no kvs.
     //     stack = new uint256[](2);
     //     // Order dependent inputs and outputs.
     //     stack[0] = 9e18;
     //     stack[1] = 2e18;
-    //     checkCallNPRun("a b: call<1>(10 5); ten five:, a b: div(ten five) 9;", stack, kvs);
+    //     checkCallRun("a b: call<1>(10 5); ten five:, a b: div(ten five) 9;", stack, kvs);
 
     //     // One input two outputs.
     //     stack[0] = 11e18;
     //     stack[1] = 10e18;
-    //     checkCallNPRun("a b: call<1>(10); ten:,a b:ten 11;", stack, kvs);
+    //     checkCallRun("a b: call<1>(10); ten:,a b:ten 11;", stack, kvs);
 
     //     // Can call something with no IO purely for the kv side effects.
     //     stack = new uint256[](0);
     //     kvs = new uint256[](2);
     //     kvs[0] = 10e18;
     //     kvs[1] = 11e18;
-    //     checkCallNPRun(":call<1>();:set(10 11);", stack, kvs);
+    //     checkCallRun(":call<1>();:set(10 11);", stack, kvs);
 
     //     // Can call for side effects and also get a stack based on IO.
     //     stack = new uint256[](1);
     //     stack[0] = 10e18;
-    //     checkCallNPRun("a:call<1>(9);nine:,:set(10 11),ret:add(nine 1);", stack, kvs);
+    //     checkCallRun("a:call<1>(9);nine:,:set(10 11),ret:add(nine 1);", stack, kvs);
 
     //     // Can call a few different things without a final stack.
     //     stack = new uint256[](0);
     //     kvs = new uint256[](0);
-    //     checkCallNPRun(":call<1>();one two three: 1 2 3, :call<2>();five six: 5 6;", stack, kvs);
+    //     checkCallRun(":call<1>();one two three: 1 2 3, :call<2>();five six: 5 6;", stack, kvs);
     // }
 
     /// Boilerplate to check a generic runtime error happens upon recursion.
@@ -308,24 +309,24 @@ contract LibOpCallTest is OpTest, BytecodeTest {
     }
 
     // /// Test that recursive calls are a (very gas intensive) runtime error.
-    // function testOpCallNPRunRecursive() external {
+    // function testOpCallRunRecursive() external {
     //     // Simple call self.
-    //     checkCallNPRunRecursive(":call<0>();");
+    //     checkCallRunRecursive(":call<0>();");
     //     // Ping pong between two calls.
-    //     checkCallNPRunRecursive(":call<1>();:call<0>();");
+    //     checkCallRunRecursive(":call<1>();:call<0>();");
     //     // If is eager so doesn't help.
-    //     checkCallNPRunRecursive("a:call<1>(1);do-call:,a:if(do-call call<1>(0) 5);");
+    //     checkCallRunRecursive("a:call<1>(1);do-call:,a:if(do-call call<1>(0) 5);");
     // }
 
     /// Test a mismatch in the inputs from caller and callee.
-    function testOpCallNPRunInputsMismatch() external {
+    function testOpCallRunInputsMismatch() external {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 2, 1, 2));
         bytes memory bytecode = I_DEPLOYER.parse2("a: call<1>(10 11); ten:,a b c:ten 11 12;");
         (bytecode);
     }
 
     /// Test a mismatch in the outputs from caller and callee.
-    function testOpCallNPRunOutputsMismatch() external {
+    function testOpCallRunOutputsMismatch() external {
         vm.expectRevert(abi.encodeWithSelector(CallOutputsExceedSource.selector, 3, 4));
         bytes memory bytecode = I_DEPLOYER.parse2("ten eleven a b: call<1>(10 11); ten eleven:,a:9;");
         (bytecode);

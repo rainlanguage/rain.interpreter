@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {LibIntOrAString, IntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
@@ -33,7 +33,7 @@ library LibOpEnsure {
         }
 
         if (condition.isZero()) {
-            revert(reason.toString());
+            revert(reason.toStringV3());
         }
         return stackTop;
     }
@@ -46,7 +46,7 @@ library LibOpEnsure {
     {
         require(
             !Float.wrap(StackItem.unwrap(inputs[0])).isZero(),
-            IntOrAString.wrap(uint256(StackItem.unwrap(inputs[1]))).toString()
+            IntOrAString.wrap(uint256(StackItem.unwrap(inputs[1]))).toStringV3()
         );
         outputs = new StackItem[](0);
     }

@@ -5,6 +5,7 @@ use alloy::{
     primitives::{Address, Bytes, U256, utils::parse_units},
     providers::{
         PendingTransactionError, Provider, ProviderBuilder, RootProvider,
+        ext::AnvilApi,
         fillers::{FillProvider, JoinFill, WalletFiller},
         utils::JoinedRecommendedFillers,
     },
@@ -46,6 +47,12 @@ sol!(
     "../../out/RainterpreterExpressionDeployer.sol/RainterpreterExpressionDeployer.json"
 );
 
+sol!(
+    #![sol(all_derives = true, rpc = true)]
+    DISPaiRegistry,
+    "../../out/RainterpreterDISPaiRegistry.sol/RainterpreterDISPaiRegistry.json"
+);
+
 // type aliases for LocalEvm fillers and provider
 pub type LocalEvmFillers = JoinFill<JoinedRecommendedFillers, WalletFiller<EthereumWallet>>;
 pub type LocalEvmProvider = FillProvider<LocalEvmFillers, RootProvider<AnyNetwork>, AnyNetwork>;
@@ -75,6 +82,11 @@ pub struct LocalEvm {
 
     /// Array of alloy ERC20 contract instances deployed on this blockchain
     pub tokens: Vec<ERC20::ERC20Instance<LocalEvmProvider, AnyNetwork>>,
+
+    /// Deterministic Zoltu addresses for interpreter, store, and parser.
+    pub zoltu_interpreter: Address,
+    pub zoltu_store: Address,
+    pub zoltu_parser: Address,
 
     /// All wallets of this local blockchain that can be used to perform transactions.
     /// the first wallet is the blockchain's default wallet, ie transactions that dont
@@ -107,16 +119,40 @@ impl LocalEvm {
             .wallet(signer_wallets[0].clone())
             .connect_http(anvil.endpoint_url());
 
-        // deploy rain contracts
+        // Deploy the constants helper to read the deterministic Zoltu
+        // addresses that the deployer hardcodes.
+        let constants = DISPaiRegistry::deploy(provider.clone()).await.unwrap();
+        let parser_addr = constants.parserAddress().call().await.unwrap();
+        let store_addr = constants.storeAddress().call().await.unwrap();
+        let interpreter_addr = constants.interpreterAddress().call().await.unwrap();
+
+        // Deploy rain contracts, then copy their runtime code to the
+        // deterministic Zoltu addresses that the deployer hardcodes.
         let interpreter = Interpreter::deploy(provider.clone()).await.unwrap();
         let store = Store::deploy(provider.clone()).await.unwrap();
         let parser = Parser::deploy(provider.clone()).await.unwrap();
-        let config = Deployer::RainterpreterExpressionDeployerConstructionConfigV2 {
-            interpreter: *interpreter.address(),
-            parser: *parser.address(),
-            store: *store.address(),
-        };
-        let deployer = Deployer::deploy(provider.clone(), config).await.unwrap();
+
+        // The expression deployer references the parser, store, and
+        // interpreter at their deterministic Zoltu addresses. Copy runtime
+        // code to those addresses so calls resolve correctly.
+        let parser_code = provider.get_code_at(*parser.address()).await.unwrap();
+        let store_code = provider.get_code_at(*store.address()).await.unwrap();
+        let interpreter_code = provider.get_code_at(*interpreter.address()).await.unwrap();
+
+        provider
+            .anvil_set_code(parser_addr, parser_code)
+            .await
+            .unwrap();
+        provider
+            .anvil_set_code(store_addr, store_code)
+            .await
+            .unwrap();
+        provider
+            .anvil_set_code(interpreter_addr, interpreter_code)
+            .await
+            .unwrap();
+
+        let deployer = Deployer::deploy(provider.clone()).await.unwrap();
 
         Self {
             anvil,
@@ -127,6 +163,9 @@ impl LocalEvm {
             deployer,
             tokens: vec![],
             signer_wallets,
+            zoltu_interpreter: interpreter_addr,
+            zoltu_store: store_addr,
+            zoltu_parser: parser_addr,
         }
     }
 

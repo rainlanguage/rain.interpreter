@@ -17,8 +17,6 @@ jobs:
             task: rainix-sol-test
           - os: ubuntu-latest
             task: rainix-sol-static
-          - os: ubuntu-latest
-            task: rainix-sol-artifacts
           # We don't need to do rust static analysis on multiple platforms
           - os: ubuntu-latest
             task: rainix-rs-static
@@ -58,6 +56,7 @@ jobs:
       - name: Run ${{ matrix.task }}
         env:
           ETH_RPC_URL: ${{ secrets.CI_DEPLOY_SEPOLIA_RPC_URL || vars.CI_DEPLOY_SEPOLIA_RPC_URL }}
+          CI_FORK_ETH_RPC_URL: ${{ secrets.RPC_URL_ETHEREUM_FORK || vars.RPC_URL_ETHEREUM_FORK || '' }}
           ETHERSCAN_API_KEY: ${{ secrets.EXPLORER_VERIFICATION_KEY }}
           DEPLOY_BROADCAST: ""
           DEPLOY_VERIFIER: ""

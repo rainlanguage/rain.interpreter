@@ -60,7 +60,8 @@ contract LibParseUnexpectedLHSTest is ParseTest {
         vm.assume(
             //forge-lint: disable-next-line(incorrect-shift)
             1 << uint256(a)
-                & (CMASK_LHS_RHS_DELIMITER | CMASK_LHS_STACK_HEAD | CMASK_LHS_STACK_DELIMITER | CMASK_COMMENT_HEAD) == 0
+                    & (CMASK_LHS_RHS_DELIMITER | CMASK_LHS_STACK_HEAD | CMASK_LHS_STACK_DELIMITER | CMASK_COMMENT_HEAD)
+                == 0
         );
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 0));
@@ -73,7 +74,8 @@ contract LibParseUnexpectedLHSTest is ParseTest {
         vm.assume(
             //forge-lint: disable-next-line(incorrect-shift)
             1 << uint256(a)
-                & (CMASK_LHS_RHS_DELIMITER | CMASK_IDENTIFIER_TAIL | CMASK_LHS_STACK_DELIMITER | CMASK_COMMENT_HEAD) == 0
+                    & (CMASK_LHS_RHS_DELIMITER | CMASK_IDENTIFIER_TAIL | CMASK_LHS_STACK_DELIMITER | CMASK_COMMENT_HEAD)
+                == 0
         );
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, 1));
@@ -100,9 +102,12 @@ contract LibParseUnexpectedLHSTest is ParseTest {
         }
         vm.assume(hasInvalidChar);
 
+        bytes memory identifier = bytes.concat(bytes1(a), b);
+        vm.assume(identifier.length > 0);
+        vm.assume(identifier.length < 32);
+
         vm.expectRevert(abi.encodeWithSelector(UnexpectedLHSChar.selector, i + 1));
-        (bytes memory bytecode, bytes32[] memory constants) =
-            this.parseExternal(string(bytes.concat(bytes1(a), b, ":;")));
+        (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal(string(bytes.concat(identifier, ":;")));
         (bytecode, constants);
     }
 }

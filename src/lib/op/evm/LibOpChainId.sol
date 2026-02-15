@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
@@ -12,10 +12,12 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibOpChainId {
     using LibDecimalFloat for Float;
 
+    /// `chain-id` integrity check. Requires 0 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (0, 1);
     }
 
+    /// `chain-id` opcode. Reads the current chain ID.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
@@ -24,6 +26,7 @@ library LibOpChainId {
         return stackTop;
     }
 
+    /// Reference implementation of `chain-id` for testing.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory)
         internal
         view

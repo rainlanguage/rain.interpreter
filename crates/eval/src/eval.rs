@@ -1,7 +1,6 @@
 use crate::error::ForkCallError;
 use crate::fork::{ForkTypedReturn, Forker};
 use alloy::primitives::{Address, U256};
-use rain_interpreter_bindings::DeployerISP::{I_INTERPRETERCall, I_STORECall};
 use rain_interpreter_bindings::IInterpreterStoreV3::FullyQualifiedNamespace;
 use rain_interpreter_bindings::IInterpreterV4::{EvalV4, eval4Call};
 use rain_interpreter_bindings::IParserV2::parse2Call;
@@ -15,6 +14,10 @@ pub struct ForkEvalArgs {
     pub source_index: u16,
     /// The address of the deployer
     pub deployer: Address,
+    /// The address of the interpreter
+    pub interpreter: Address,
+    /// The address of the store
+    pub store: Address,
     /// The fully qualified namespace
     pub namespace: FullyQualifiedNamespace,
     /// The context matrix, that will be available in "context" word and its aliases
@@ -97,6 +100,8 @@ impl Forker {
             rainlang_string,
             source_index,
             deployer,
+            interpreter,
+            store,
             namespace,
             context,
             decode_errors,
@@ -110,21 +115,6 @@ impl Forker {
                 decode_errors,
             })
             .await?;
-
-        let store = self
-            .alloy_call(Address::default(), deployer, I_STORECall {}, decode_errors)
-            .await?
-            .typed_return;
-
-        let interpreter = self
-            .alloy_call(
-                Address::default(),
-                deployer,
-                I_INTERPRETERCall {},
-                decode_errors,
-            )
-            .await?
-            .typed_return;
 
         let eval_args = eval4Call {
             eval: EvalV4 {
@@ -194,6 +184,8 @@ mod tests {
                 rainlang_string: r"_: 3;".into(),
                 source_index: 0,
                 deployer,
+                interpreter: local_evm.zoltu_interpreter,
+                store: local_evm.zoltu_store,
                 namespace: FullyQualifiedNamespace::default(),
                 context: vec![],
                 decode_errors: true,
@@ -233,6 +225,8 @@ mod tests {
     async fn test_fork_eval_parallel() {
         let local_evm = LocalEvm::new().await;
         let deployer = *local_evm.deployer.address();
+        let zoltu_interpreter = local_evm.zoltu_interpreter;
+        let zoltu_store = local_evm.zoltu_store;
         let args = NewForkedEvm {
             fork_url: local_evm.url(),
             fork_block_number: None,
@@ -249,6 +243,8 @@ mod tests {
                         rainlang_string: r"_: 3;".into(),
                         source_index: 0,
                         deployer,
+                        interpreter: zoltu_interpreter,
+                        store: zoltu_store,
                         namespace: FullyQualifiedNamespace::default(),
                         context: vec![],
                         decode_errors: true,
