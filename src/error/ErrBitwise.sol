@@ -8,6 +8,7 @@ contract ErrBitwise {}
 /// with a shift amount greater than 255 or 0. As the shift amount is taken from
 /// the operand, this is a compile time error so there's no need to support
 /// behaviour that would always evaluate to 0 or be a noop.
+/// @param shiftAmount The unsupported shift amount from the operand.
 error UnsupportedBitwiseShiftAmount(uint256 shiftAmount);
 
 /// Thrown during integrity check when bitwise (en|de)coding would be truncated
