@@ -66,7 +66,7 @@ error ZeroLengthDecimal(uint256 offset);
 /// The expression does not finish with a semicolon (EOF).
 error MissingFinalSemi(uint256 offset);
 
-/// Enountered an unexpected character on the LHS.
+/// Encountered an unexpected character on the LHS.
 error UnexpectedLHSChar(uint256 offset);
 
 /// Encountered an unexpected character on the RHS.
