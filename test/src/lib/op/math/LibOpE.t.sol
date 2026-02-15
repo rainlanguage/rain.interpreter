@@ -6,12 +6,14 @@ import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {LibOpE} from "src/lib/op/math/LibOpE.sol";
 import {LibOperand, OperandV2} from "test/lib/operand/LibOperand.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {EvalV4} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
+import {
+    EvalV4,
+    StackItem,
+    FullyQualifiedNamespace,
+    SourceIndexV2
+} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV4.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
-import {FullyQualifiedNamespace} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {SourceIndexV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpETest

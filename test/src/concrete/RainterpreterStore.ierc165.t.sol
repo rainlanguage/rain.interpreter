@@ -5,10 +5,10 @@ import {Test} from "forge-std/Test.sol";
 
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
-import {IInterpreterStoreV3} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV3.sol";
+import {IInterpreterStoreV3} from "rain.interpreter.interface/interface/IInterpreterStoreV3.sol";
 
 contract RainterpreterStoreIERC165Test is Test {
-    /// Store should introspect support for `IERC165` and `IInterpreterStoreV2`.
+    /// Store should introspect support for `IERC165` and `IInterpreterStoreV3`.
     /// It should not support any other interface.
     function testRainterpreterStoreIERC165(bytes4 badInterfaceId) external {
         vm.assume(badInterfaceId != type(IERC165).interfaceId);

@@ -5481,15 +5481,6 @@ name = "rain_interpreter_dispair"
 version = "0.1.0"
 dependencies = [
  "alloy",
- "alloy-ethers-typecast",
- "rain_interpreter_bindings",
- "rain_interpreter_test_fixtures",
- "serde",
- "serde_json",
- "thiserror 1.0.69",
- "tokio",
- "tracing",
- "tracing-subscriber 0.3.19",
 ]
 
 [[package]]

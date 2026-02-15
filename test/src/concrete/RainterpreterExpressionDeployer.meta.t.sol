@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {RainterpreterExpressionDeployerDeploymentTest} from
-    "test/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
+import {
+    RainterpreterExpressionDeployerDeploymentTest
+} from "test/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
 import {DESCRIBED_BY_META_HASH} from "src/concrete/RainterpreterExpressionDeployer.sol";
 
 /// @title RainterpreterExpressionDeployerMetaTest

@@ -55,8 +55,8 @@ contract LibParseSingleRHSNamedGasTest is Test {
     }
 
     function operandHandlers() internal pure returns (bytes memory) {
-        function (bytes32[] memory) internal pure returns (OperandV2)[] memory handlers =
-            new function (bytes32[] memory) internal pure returns (OperandV2)[](32);
+        function(bytes32[] memory) internal pure returns (OperandV2)[] memory handlers =
+            new function(bytes32[] memory) internal pure returns (OperandV2)[](32);
         handlers[0] = LibParseOperand.handleOperandDisallowed;
         handlers[1] = LibParseOperand.handleOperandDisallowed;
         handlers[2] = LibParseOperand.handleOperandDisallowed;

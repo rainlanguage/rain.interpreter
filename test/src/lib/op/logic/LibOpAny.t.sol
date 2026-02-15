@@ -7,16 +7,15 @@ import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {LibOpAny} from "src/lib/op/logic/LibOpAny.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {
     IInterpreterStoreV3,
     FullyQualifiedNamespace
-} from "rain.interpreter.interface/interface/unstable/IInterpreterStoreV3.sol";
+} from "rain.interpreter.interface/interface/IInterpreterStoreV3.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
-import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 contract LibOpAnyTest is OpTest {
     using LibUint256Array for uint256[];

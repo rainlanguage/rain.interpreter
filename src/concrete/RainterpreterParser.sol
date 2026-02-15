@@ -12,11 +12,13 @@ import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseInterstitial} from "../lib/parse/LibParseInterstitial.sol";
 import {
     LITERAL_PARSER_FUNCTION_POINTERS,
+
     // Exported for convenience.
     //forge-lint: disable-next-line(unused-import)
     BYTECODE_HASH as PARSER_BYTECODE_HASH,
     OPERAND_HANDLER_FUNCTION_POINTERS,
     PARSE_META,
+
     // Exported for convenience.
     //forge-lint: disable-next-line(unused-import)
     PARSE_META_BUILD_DEPTH
@@ -39,8 +41,8 @@ contract RainterpreterParser is ERC165, IParserToolingV1 {
         // The return is used by returning it, so this is a false positive.
         //slither-disable-next-line unused-return
         return LibParseState.newState(
-            data, parseMeta(), operandHandlerFunctionPointers(), literalParserFunctionPointers()
-        ).parse();
+                data, parseMeta(), operandHandlerFunctionPointers(), literalParserFunctionPointers()
+            ).parse();
     }
 
     /// @inheritdoc ERC165
@@ -49,8 +51,9 @@ contract RainterpreterParser is ERC165, IParserToolingV1 {
     }
 
     function parsePragma1(bytes memory data) external pure virtual returns (PragmaV1 memory) {
-        ParseState memory parseState =
-            LibParseState.newState(data, parseMeta(), operandHandlerFunctionPointers(), literalParserFunctionPointers());
+        ParseState memory parseState = LibParseState.newState(
+            data, parseMeta(), operandHandlerFunctionPointers(), literalParserFunctionPointers()
+        );
         uint256 cursor = Pointer.unwrap(data.dataPointer());
         uint256 end = Pointer.unwrap(data.endDataPointer());
         cursor = parseState.parseInterstitial(cursor, end);

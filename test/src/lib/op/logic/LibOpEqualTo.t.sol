@@ -4,11 +4,11 @@ pragma solidity =0.8.25;
 import {OpTest} from "test/abstract/OpTest.sol";
 import {LibOpEqualTo} from "src/lib/op/logic/LibOpEqualTo.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-contract LibOpEqualToNPTest is OpTest {
+contract LibOpEqualToTest is OpTest {
     /// Directly test the integrity logic of LibOpEqualTo. No matter the
     /// operand inputs, the calc inputs must be 2, and the calc outputs must be
     /// 1.

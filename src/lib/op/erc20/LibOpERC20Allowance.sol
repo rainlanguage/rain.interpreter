@@ -4,21 +4,23 @@ pragma solidity ^0.8.18;
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IERC20Metadata} from "openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
-import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
 /// @title LibOpERC20Allowance
 /// @notice Opcode for getting the current erc20 allowance of an account.
 library LibOpERC20Allowance {
+    /// `erc20-allowance` integrity check. Requires 3 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // Always 3 inputs, the token, the owner and the spender.
         // Always 1 output, the allowance.
         return (3, 1);
     }
 
+    /// `erc20-allowance` opcode. Calls `allowance` on the token and converts the result to a decimal float using the token's `decimals`.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
         uint256 token;
         uint256 owner;
@@ -33,7 +35,7 @@ library LibOpERC20Allowance {
         // owner and spender are valid addresses.
         uint256 tokenAllowance =
         //forge-lint: disable-next-line(unsafe-typecast)
-         IERC20(address(uint160(token))).allowance(address(uint160(owner)), address(uint160(spender)));
+        IERC20(address(uint160(token))).allowance(address(uint160(owner)), address(uint160(spender)));
 
         // This can fail as `decimals` is an OPTIONAL part of the ERC20 standard.
         //forge-lint: disable-next-line(unsafe-typecast)
@@ -51,6 +53,7 @@ library LibOpERC20Allowance {
         return stackTop;
     }
 
+    /// Reference implementation of `erc20-allowance` for testing.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         view

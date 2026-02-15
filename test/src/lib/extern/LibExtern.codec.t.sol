@@ -2,10 +2,8 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {
-    LibExtern, EncodedExternDispatchV2, ExternDispatchV2, IInterpreterExternV4
-} from "src/lib/extern/LibExtern.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
+import {LibExtern, EncodedExternDispatchV2, ExternDispatchV2, IInterpreterExternV4} from "src/lib/extern/LibExtern.sol";
 
 /// @title LibExternCodecTest
 /// Tests the encoding and decoding of the types associated with extern contract

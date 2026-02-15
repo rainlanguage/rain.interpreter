@@ -9,7 +9,7 @@ import {
     UnexpectedOperandValue,
     OperandOverflow
 } from "../../error/ErrParse.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 import {CMASK_OPERAND_END, CMASK_WHITESPACE, CMASK_OPERAND_START} from "rain.string/lib/parse/LibParseCMask.sol";
 import {ParseState, OPERAND_VALUES_LENGTH, FSM_YANG_MASK} from "./LibParseState.sol";
@@ -123,10 +123,10 @@ library LibParseOperand {
     /// will have to be done by the sub parser, alongside the values provided
     /// by the main parser.
     function handleOperand(ParseState memory state, uint256 wordIndex) internal pure returns (OperandV2) {
-        function (bytes32[] memory) internal pure returns (OperandV2) handler;
+        function(bytes32[] memory) internal pure returns (OperandV2) handler;
         bytes memory handlers = state.operandHandlers;
         assembly ("memory-safe") {
-            // There is no bounds check here because the indexes are calcualted
+            // There is no bounds check here because the indexes are calculated
             // by the parser itself, NOT provided by the user. Therefore the
             // scope of corrupt data is limited to a bug in the parser itself,
             // which can and should have direct test coverage.

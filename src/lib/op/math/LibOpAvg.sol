@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
-import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 /// @title LibOpAvg
 /// @notice Opcode for the average of two decimal floating point numbers.
 library LibOpAvg {
     using LibDecimalFloat for Float;
 
+    /// `avg` integrity check. Requires exactly 2 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // There must be two inputs and one output.
         return (2, 1);

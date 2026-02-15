@@ -112,8 +112,8 @@ contract LibParseNamedLHSTest is ParseTest {
         meta[2] = AuthoringMetaV2("c", "c");
         bytes memory parseMeta = LibGenParseMeta.buildParseMetaV2(meta, 1);
 
-        function (bytes32[] memory) internal pure returns (OperandV2)[] memory operandHandlers =
-            new function (bytes32[] memory) internal pure returns (OperandV2)[](3);
+        function(bytes32[] memory) internal pure returns (OperandV2)[] memory operandHandlers =
+            new function(bytes32[] memory) internal pure returns (OperandV2)[](3);
         operandHandlers[0] = LibParseOperand.handleOperandDisallowed;
         operandHandlers[1] = LibParseOperand.handleOperandDisallowed;
         operandHandlers[2] = LibParseOperand.handleOperandSingleFull;
@@ -124,11 +124,11 @@ contract LibParseNamedLHSTest is ParseTest {
         bytes memory operandHandlerPointers = LibConvert.unsafeTo16BitBytes(pointers);
 
         (bytes memory bytecode, bytes32[] memory constants) = LibParseState.newState(
-            bytes("a _:1 2,b:a,:c(),d:3,e:d;"),
-            parseMeta,
-            operandHandlerPointers,
-            LibAllStandardOps.literalParserFunctionPointers()
-        ).parse();
+                bytes("a _:1 2,b:a,:c(),d:3,e:d;"),
+                parseMeta,
+                operandHandlerPointers,
+                LibAllStandardOps.literalParserFunctionPointers()
+            ).parse();
         assertEq(
             bytecode,
             // 2 sources.
@@ -171,8 +171,8 @@ contract LibParseNamedLHSTest is ParseTest {
     /// Duplicate names are allowed across different sources.
     function testParseNamedDuplicateDifferentSource() external view {
         (bytes memory bytecode, bytes32[] memory constants) = LibParseState.newState(
-            "a b:1 2, e:a;c d:3 4,e:d;", "", "", LibAllStandardOps.literalParserFunctionPointers()
-        ).parse();
+                "a b:1 2, e:a;c d:3 4,e:d;", "", "", LibAllStandardOps.literalParserFunctionPointers()
+            ).parse();
         assertEq(
             bytecode,
             // 2 sources.

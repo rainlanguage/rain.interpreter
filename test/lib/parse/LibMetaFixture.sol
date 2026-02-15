@@ -45,8 +45,8 @@ library LibMetaFixture {
     }
 
     function operandHandlerFunctionPointers() internal pure returns (bytes memory) {
-        function (bytes32[] memory) internal pure returns (OperandV2)[] memory handlers =
-            new function (bytes32[] memory) internal pure returns (OperandV2)[](FIXTURE_OPS_LENGTH);
+        function(bytes32[] memory) internal pure returns (OperandV2)[] memory handlers =
+            new function(bytes32[] memory) internal pure returns (OperandV2)[](FIXTURE_OPS_LENGTH);
         handlers[0] = LibParseOperand.handleOperandSingleFull;
         handlers[1] = LibParseOperand.handleOperandSingleFull;
         // a

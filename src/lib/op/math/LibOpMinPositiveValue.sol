@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
-import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
@@ -12,10 +12,12 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibOpMinPositiveValue {
     using LibDecimalFloat for Float;
 
+    /// `min-positive-value` integrity check. Requires 0 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (0, 1);
     }
 
+    /// `min-positive-value` opcode. Pushes the minimum representable positive float onto the stack.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
         Float value = LibDecimalFloat.FLOAT_MIN_POSITIVE_VALUE;
         assembly ("memory-safe") {
@@ -25,6 +27,7 @@ library LibOpMinPositiveValue {
         return stackTop;
     }
 
+    /// Reference implementation of `min-positive-value` for testing.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory)
         internal
         pure

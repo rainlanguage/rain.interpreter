@@ -5,7 +5,7 @@ import {OpTest, IntegrityCheckState, OperandV2, InterpreterState, UnexpectedOper
 import {LibOpPow} from "src/lib/op/math/LibOpPow.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
-import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {PowNegativeBase} from "rain.math.float/error/ErrDecimalFloat.sol";
 
 contract LibOpPowTest is OpTest {

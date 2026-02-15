@@ -5,7 +5,7 @@ import {Test} from "forge-std/Test.sol";
 
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
-import {IInterpreterV4} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {IInterpreterV4} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
 contract RainterpreterIERC165Test is Test {
     /// Test that ERC165 is implemented for all interfaces.

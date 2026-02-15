@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {LibIntOrAString, IntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
-import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpConditions
@@ -63,7 +62,7 @@ library LibOpConditions {
             }
 
             if (conditionIsZero) {
-                revert(reason.toString());
+                revert(reason.toStringV3());
             }
             // require(condition > 0, reason.toString());
             return stackTop;
@@ -89,7 +88,7 @@ library LibOpConditions {
             }
             if (inputs.length % 2 != 0) {
                 IntOrAString reason = IntOrAString.wrap(uint256(StackItem.unwrap(inputs[length - 1])));
-                require(false, reason.toString());
+                require(false, reason.toStringV3());
             } else {
                 require(false, "");
             }

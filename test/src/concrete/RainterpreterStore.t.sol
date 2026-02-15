@@ -7,7 +7,8 @@ import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibMemoryKV, MemoryKV, MemoryKVVal, MemoryKVKey} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {LibNamespace, StateNamespace} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
-import {RainterpreterStore, OddSetLength} from "src/concrete/RainterpreterStore.sol";
+import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
+import {OddSetLength} from "src/error/ErrStore.sol";
 
 /// @title RainterpreterStoreTest
 /// Test suite for RainterpreterStore.

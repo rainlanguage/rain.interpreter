@@ -11,11 +11,9 @@ import {
 } from "rain.string/lib/parse/LibParseCMask.sol";
 import {MalformedCommentStart, UnclosedComment} from "../../error/ErrParse.sol";
 import {LibParseError} from "./LibParseError.sol";
-import {LibParse} from "./LibParse.sol";
 import {LibParseChar} from "rain.string/lib/parse/LibParseChar.sol";
 
 library LibParseInterstitial {
-    using LibParse for ParseState;
     using LibParseError for ParseState;
     using LibParseInterstitial for ParseState;
 

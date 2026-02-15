@@ -28,25 +28,23 @@ contract LibParseUnexpectedRHSTest is ParseTest {
         vm.assume(
             0
                 == shifted
-                // Word heads are expected in this position.
-                & (
-                    CMASK_RHS_WORD_HEAD
-                    // Literals are expected in this position.
-                    | CMASK_LITERAL_HEAD
-                    // Right parens are NOT expected in this position but have a dedicated
-                    // error message.
-                    | CMASK_RIGHT_PAREN
-                    // Whitespace is expected in this position.
-                    | CMASK_WHITESPACE
-                    // EOL is expected in this position. Note that the implied string for
-                    // this test ":,;` is NOT valid.
-                    | CMASK_EOL
-                    // EOS is also expected in this position. Note that the implied string
-                    // for this test ":;;` is NOT valid.
-                    | CMASK_EOS
-                    // Comments will give a more specialized error on the RHS.
-                    | CMASK_COMMENT_HEAD
-                )
+                    // Word heads are expected in this position.
+                    & (CMASK_RHS_WORD_HEAD
+                        // Literals are expected in this position.
+                        | CMASK_LITERAL_HEAD
+                        // Right parens are NOT expected in this position but have a dedicated
+                        // error message.
+                        | CMASK_RIGHT_PAREN
+                        // Whitespace is expected in this position.
+                        | CMASK_WHITESPACE
+                        // EOL is expected in this position. Note that the implied string for
+                        // this test ":,;` is NOT valid.
+                        | CMASK_EOL
+                        // EOS is also expected in this position. Note that the implied string
+                        // for this test ":;;` is NOT valid.
+                        | CMASK_EOS
+                        // Comments will give a more specialized error on the RHS.
+                        | CMASK_COMMENT_HEAD)
         );
         string memory s = string(bytes.concat(":", bytes1(unexpected), ";"));
 

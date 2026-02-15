@@ -4,18 +4,20 @@ pragma solidity ^0.8.25;
 import {IERC5313} from "openzeppelin-contracts/contracts/interfaces/IERC5313.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
-import {OperandV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 
 /// @title LibOpERC5313Owner
 /// @notice Opcode for ERC5313 `owner`.
 library LibOpERC5313Owner {
+    /// `erc5313-owner` integrity check. Requires 1 input and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // Always 1 input, the contract.
         // Always 1 output, the owner.
         return (1, 1);
     }
 
+    /// `erc5313-owner` opcode. Calls `owner()` on the given contract address.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
         uint256 account;
         assembly ("memory-safe") {
@@ -31,6 +33,7 @@ library LibOpERC5313Owner {
         return stackTop;
     }
 
+    /// Reference implementation of `erc5313-owner` for testing.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         view

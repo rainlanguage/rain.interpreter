@@ -3,7 +3,7 @@ use alloy::primitives::*;
 use alloy_ethers_typecast::{ReadContractParametersBuilder, ReadableClient};
 use rain_interpreter_bindings::IParserPragmaV1::*;
 use rain_interpreter_bindings::IParserV2::*;
-use rain_interpreter_dispair::DISPair;
+use rain_interpreter_dispair::DISPaiR;
 
 #[cfg(not(target_family = "wasm"))]
 pub trait Parser2 {
@@ -74,8 +74,8 @@ pub struct ParserV2 {
     pub deployer_address: Address,
 }
 
-impl From<DISPair> for ParserV2 {
-    fn from(val: DISPair) -> Self {
+impl From<DISPaiR> for ParserV2 {
+    fn from(val: DISPaiR) -> Self {
         Self {
             deployer_address: val.deployer,
         }
@@ -160,7 +160,7 @@ mod tests {
     async fn test_from_dispair() {
         let deployer_address = Address::repeat_byte(0x4);
 
-        let dispair = DISPair {
+        let dispair = DISPaiR {
             deployer: deployer_address,
             interpreter: Address::repeat_byte(0x2),
             store: Address::repeat_byte(0x3),

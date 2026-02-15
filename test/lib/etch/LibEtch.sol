@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: CAL
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.25;
 
-bytes constant INVALID_BYTECODE = hex"FE";
+library LibEtch {
+    bytes constant INVALID_BYTECODE = hex"FE";
+}

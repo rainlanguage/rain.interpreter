@@ -5,14 +5,13 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibOpIsZero} from "src/lib/op/logic/LibOpIsZero.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
-import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
 
 contract LibOpIsZeroTest is OpTest {
-    /// Directly test the integrity logic of LibOpIsZeroNP. This tests the happy
+    /// Directly test the integrity logic of LibOpIsZero. This tests the happy
     /// path where the operand is valid. IsZero is a 1 input, 1 output op.
-    function testOpIsZeroNPIntegrityHappy(
+    function testOpIsZeroIntegrityHappy(
         IntegrityCheckState memory state,
         uint8 inputs,
         uint8 outputs,
@@ -28,7 +27,7 @@ contract LibOpIsZeroTest is OpTest {
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpIsZeroNP.
+    /// Directly test the runtime logic of LibOpIsZero.
     function testOpIsZeroRun(StackItem input) external view {
         InterpreterState memory state = opTestDefaultInterpreterState();
         StackItem[] memory inputs = new StackItem[](1);

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
-import {OperandV2, OPCODE_CONSTANT} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2, OPCODE_CONSTANT} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibParseStackTracker, ParseStackTracker} from "./LibParseStackTracker.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
@@ -95,7 +95,7 @@ uint256 constant OPERAND_VALUES_LENGTH = 4;
 /// of top level items as at the beginning of the line. This is reset to the high
 /// byte of `topLevel0` on each new line.
 /// - bytes 2+: A sequence of 2 byte pointers to before the start of each top
-/// level item, which is implictly after the end of the previous top level item.
+/// level item, which is implicitly after the end of the previous top level item.
 /// Allows us to quickly find the start of the RHS source for each top level
 /// item.
 /// @param stackNames A linked list of stack names. As the parser encounters
@@ -577,17 +577,16 @@ library LibParseState {
                 // counter always increases by 1.
                 // Hardcoded offset into the state struct.
                 let inputCounterPos := add(state, 0x60)
-                inputCounterPos :=
+                inputCounterPos := add(
                     add(
-                        add(
-                            inputCounterPos,
-                            // the offset
-                            byte(0, mload(inputCounterPos))
-                        ),
-                        // +2 for the reserved bytes -1 to move back to the counter
-                        // for the previous paren group.
-                        1
-                    )
+                        inputCounterPos,
+                        // the offset
+                        byte(0, mload(inputCounterPos))
+                    ),
+                    // +2 for the reserved bytes -1 to move back to the counter
+                    // for the previous paren group.
+                    1
+                )
                 // Increment the parent counter.
                 mstore8(inputCounterPos, add(byte(0, mload(inputCounterPos)), 1))
                 // Zero out the current counter.
@@ -595,7 +594,7 @@ library LibParseState {
 
                 // Write the operand low byte pointer into the paren tracker.
                 // Move 3 bytes after the input counter pos, then shift down 32
-                // bytes to accomodate the full mload.
+                // bytes to accommodate the full mload.
                 let parenTrackerPointer := sub(inputCounterPos, 29)
                 mstore(parenTrackerPointer, or(and(mload(parenTrackerPointer), not(0xFFFF)), inputsBytePointer))
             }
@@ -605,13 +604,13 @@ library LibParseState {
             // increment offset. We have 16 bits allocated to the offset and stop
             // processing at 0x100 so this never overflows into the actual source
             // data.
-            bytes32(uint256(activeSource) + 0x20)
-            // include the operand. The operand is assumed to be 16 bits, so we shift
-            // it into the correct position.
-            | OperandV2.unwrap(operand) << offset
-            // include new op. The opcode is assumed to be 8 bits, so we shift it
-            // into the correct position, beyond the operand.
-            | bytes32(opcode << (offset + 0x18));
+             bytes32(uint256(activeSource) + 0x20)
+                // include the operand. The operand is assumed to be 16 bits, so we shift
+                // it into the correct position.
+                | OperandV2.unwrap(operand) << offset
+                // include new op. The opcode is assumed to be 8 bits, so we shift it
+                // into the correct position, beyond the operand.
+                | bytes32(opcode << (offset + 0x18));
             assembly ("memory-safe") {
                 mstore(activeSourcePointer, activeSource)
             }
@@ -742,7 +741,7 @@ library LibParseState {
             //slither-disable-next-line incorrect-shift
             state.sourcesBuilder =
             //forge-lint: disable-next-line(incorrect-shift)
-             ((offset + 0x10) << 0xf0) | (source << offset) | (sourcesBuilder & ((1 << offset) - 1));
+                ((offset + 0x10) << 0xf0) | (source << offset) | (sourcesBuilder & ((1 << offset) - 1));
 
             // Reset source as we're done with this one.
             state.fsm &= ~FSM_ACTIVE_SOURCE_MASK;

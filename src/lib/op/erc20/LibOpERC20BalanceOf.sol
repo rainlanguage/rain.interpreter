@@ -4,21 +4,23 @@ pragma solidity ^0.8.18;
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IERC20Metadata} from "openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
-import {StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
 /// @title LibOpERC20BalanceOf
 /// @notice Opcode for getting the current erc20 balance of an account.
 library LibOpERC20BalanceOf {
+    /// `erc20-balance-of` integrity check. Requires 2 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // Always 2 inputs, the token and the account.
         // Always 1 output, the balance.
         return (2, 1);
     }
 
+    /// `erc20-balance-of` opcode. Calls `balanceOf` on the token and converts the result to a decimal float using the token's `decimals`.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
         uint256 token;
         uint256 account;
@@ -44,6 +46,7 @@ library LibOpERC20BalanceOf {
         return stackTop;
     }
 
+    /// Reference implementation of `erc20-balance-of` for testing.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         view

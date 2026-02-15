@@ -8,9 +8,9 @@ import {
     OPCODE_CONSTANT,
     OPCODE_CONTEXT,
     OperandV2
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibBytecode, Pointer} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
-import {ISubParserV4} from "rain.interpreter.interface/interface/unstable/ISubParserV4.sol";
+import {ISubParserV4} from "rain.interpreter.interface/interface/ISubParserV4.sol";
 import {BadSubParserResult, UnknownWord, UnsupportedLiteralType} from "../../error/ErrParse.sol";
 import {IInterpreterExternV4, LibExtern, EncodedExternDispatchV2} from "../extern/LibExtern.sol";
 import {ExternDispatchConstantsHeightOverflow} from "../../error/ErrSubParse.sol";
@@ -338,7 +338,7 @@ library LibSubParse {
         }
         // Literal parsers are empty for the sub parser as the main parser should
         // be handling all literals in operands. The sub parser handles literal
-        // parsing as a dedicated interface seperately.
+        // parsing as a dedicated interface separately.
         state = LibParseState.newState(data, meta, operandHandlers, "");
         state.operandValues = operandValues;
     }

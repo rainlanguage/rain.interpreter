@@ -22,9 +22,9 @@ import {
     IInterpreterStoreV3,
     EvalV4,
     StackItem
-} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
-import {FullyQualifiedNamespace, StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV3.sol";
+} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
+import {FullyQualifiedNamespace, StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV3.sol";
+import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV4.sol";
 import {LibNamespace} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
 import {ExponentOverflow, CoefficientOverflow} from "rain.math.float/error/ErrDecimalFloat.sol";
 

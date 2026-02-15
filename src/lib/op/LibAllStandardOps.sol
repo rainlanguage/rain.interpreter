@@ -4,28 +4,28 @@ pragma solidity ^0.8.19;
 import {BadDynamicLength} from "../../error/ErrOpList.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV2.sol";
 import {IntegrityCheckState} from "../integrity/LibIntegrityCheck.sol";
 import {InterpreterState} from "../state/LibInterpreterState.sol";
 import {LibParseOperand} from "../parse/LibParseOperand.sol";
 
-import {LibOpStackNP} from "./00/LibOpStackNP.sol";
+import {LibOpStack} from "./00/LibOpStack.sol";
 import {LibOpConstant} from "./00/LibOpConstant.sol";
-import {LibOpContextNP} from "./00/LibOpContextNP.sol";
-import {LibOpExternNP} from "./00/LibOpExternNP.sol";
+import {LibOpContext} from "./00/LibOpContext.sol";
+import {LibOpExtern} from "./00/LibOpExtern.sol";
 
-import {LibOpBitwiseAndNP} from "./bitwise/LibOpBitwiseAndNP.sol";
-import {LibOpBitwiseOrNP} from "./bitwise/LibOpBitwiseOrNP.sol";
-import {LibOpCtPopNP} from "./bitwise/LibOpCtPopNP.sol";
-import {LibOpDecodeBitsNP} from "./bitwise/LibOpDecodeBitsNP.sol";
-import {LibOpEncodeBitsNP} from "./bitwise/LibOpEncodeBitsNP.sol";
-import {LibOpShiftBitsLeftNP} from "./bitwise/LibOpShiftBitsLeftNP.sol";
-import {LibOpShiftBitsRightNP} from "./bitwise/LibOpShiftBitsRightNP.sol";
+import {LibOpBitwiseAnd} from "./bitwise/LibOpBitwiseAnd.sol";
+import {LibOpBitwiseOr} from "./bitwise/LibOpBitwiseOr.sol";
+import {LibOpCtPop} from "./bitwise/LibOpCtPop.sol";
+import {LibOpDecodeBits} from "./bitwise/LibOpDecodeBits.sol";
+import {LibOpEncodeBits} from "./bitwise/LibOpEncodeBits.sol";
+import {LibOpShiftBitsLeft} from "./bitwise/LibOpShiftBitsLeft.sol";
+import {LibOpShiftBitsRight} from "./bitwise/LibOpShiftBitsRight.sol";
 
 import {LibOpCall} from "./call/LibOpCall.sol";
 
-import {LibOpHashNP} from "./crypto/LibOpHashNP.sol";
+import {LibOpHash} from "./crypto/LibOpHash.sol";
 
 import {LibOpUint256ERC20Allowance} from "./erc20/uint256/LibOpUint256ERC20Allowance.sol";
 import {LibOpUint256ERC20BalanceOf} from "./erc20/uint256/LibOpUint256ERC20BalanceOf.sol";
@@ -82,22 +82,13 @@ import {LibOpFrac} from "./math/LibOpFrac.sol";
 import {LibOpGm} from "./math/LibOpGm.sol";
 import {LibOpHeadroom} from "./math/LibOpHeadroom.sol";
 import {LibOpInv} from "./math/LibOpInv.sol";
-// import {LibOpLn} from "./math/LibOpLn.sol";
-// import {LibOpLog10} from "./math/LibOpLog10.sol";
 import {LibOpMax} from "./math/LibOpMax.sol";
 import {LibOpMaxNegativeValue} from "./math/LibOpMaxNegativeValue.sol";
 import {LibOpMaxPositiveValue} from "./math/LibOpMaxPositiveValue.sol";
 import {LibOpMin} from "./math/LibOpMin.sol";
 import {LibOpMinNegativeValue} from "./math/LibOpMinNegativeValue.sol";
 import {LibOpMinPositiveValue} from "./math/LibOpMinPositiveValue.sol";
-// import {LibOpMod} from "./math/LibOpMod.sol";
-// import {LibOpLog2} from "./math/LibOpLog2.sol";
 import {LibOpPow} from "./math/LibOpPow.sol";
-// import {LibOpScale18Dynamic} from "./math/LibOpScale18Dynamic.sol";
-// import {LibOpScale18} from "./math/LibOpScale18.sol";
-// import {LibOpScaleNDynamic} from "./math/LibOpScaleNDynamic.sol";
-// import {LibOpScaleN} from "./math/LibOpScaleN.sol";
-// import {LibOpSnapToUnit} from "./math/LibOpSnapToUnit.sol";
 import {LibOpSqrt} from "./math/LibOpSqrt.sol";
 import {LibOpSub} from "./math/LibOpSub.sol";
 
@@ -117,6 +108,15 @@ uint256 constant ALL_STANDARD_OPS_LENGTH = 72;
 /// @notice Every opcode available from the core repository laid out as a single
 /// array to easily build function pointers for `IInterpreterV2`.
 library LibAllStandardOps {
+    /// Builds the authoring meta for all standard opcodes. Each entry is an
+    /// `AuthoringMetaV2` struct with a word (the Rainlang keyword) and a
+    /// description of the opcode's behaviour. The ordering of entries MUST
+    /// match the ordering in `integrityFunctionPointers`,
+    /// `opcodeFunctionPointers`, and `operandHandlerFunctionPointers`.
+    /// The first four opcodes (stack, constant, extern, context) are at
+    /// fixed well-known indexes required by the parser. All remaining opcodes
+    /// are ordered alphabetically by folder then by name.
+    /// Used by `BuildPointers` to generate parse meta at build time.
     function authoringMetaV2() internal pure returns (bytes memory) {
         AuthoringMetaV2 memory lengthPlaceholder;
         AuthoringMetaV2[ALL_STANDARD_OPS_LENGTH + 1] memory wordsFixed = [
@@ -221,11 +221,13 @@ library LibAllStandardOps {
             AuthoringMetaV2("equal-to", "1 if all inputs are equal, 0 otherwise. Equality is numerical."),
             AuthoringMetaV2("binary-equal-to", "1 if all inputs are equal, 0 otherwise. Equality is binary."),
             AuthoringMetaV2("every", "The last nonzero value out of all inputs, or 0 if any input is 0."),
-            AuthoringMetaV2("greater-than", "true if the first input is greater than the second input, false otherwise."),
             AuthoringMetaV2(
-                "greater-than-or-equal-to",
-                "1 if the first input is greater than or equal to the second input, 0 otherwise."
+                "greater-than", "true if the first input is greater than the second input, false otherwise."
             ),
+            AuthoringMetaV2(
+                    "greater-than-or-equal-to",
+                    "1 if the first input is greater than or equal to the second input, 0 otherwise."
+                ),
             AuthoringMetaV2(
                 "if",
                 "If the first input is nonzero, the second input is used. Otherwise, the third input is used. If is eagerly evaluated."
@@ -246,11 +248,13 @@ library LibAllStandardOps {
                 "linear-growth",
                 "Calculates a linear growth curve as `base + (rate * t)` where `base` is the initial value, `rate` is the rate of growth and `t` is units of time. Inputs in order are `base`, `rate`, and `t` respectively."
             ),
-            AuthoringMetaV2("uint256-max-value", "The maximum possible unsigned integer value (all binary bits are 1)."),
             AuthoringMetaV2(
-                "uint256-add",
-                "Adds all inputs together as uint256 values. Errors if the addition exceeds `uint256-max-value()`."
+                "uint256-max-value", "The maximum possible unsigned integer value (all binary bits are 1)."
             ),
+            AuthoringMetaV2(
+                    "uint256-add",
+                    "Adds all inputs together as uint256 values. Errors if the addition exceeds `uint256-max-value()`."
+                ),
             AuthoringMetaV2(
                 "uint256-div",
                 "Divides the first input by all other inputs as uint256 values. Errors if any divisor is zero. Rounds down."
@@ -327,15 +331,19 @@ library LibAllStandardOps {
         return abi.encode(wordsDynamic);
     }
 
+    /// Builds the literal parser function pointers array. Each pointer
+    /// corresponds to a literal type the parser can handle (hex, decimal,
+    /// string, sub-parseable). Encoded as 16-bit relative pointers.
     function literalParserFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
-            function (ParseState memory, uint256, uint256) view returns (uint256, bytes32) lengthPointer;
+            function(ParseState memory, uint256, uint256) view returns (uint256, bytes32) lengthPointer;
             uint256 length = LITERAL_PARSERS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function (ParseState memory, uint256, uint256) view returns (uint256, bytes32)[LITERAL_PARSERS_LENGTH + 1]
-                memory pointersFixed = [
+            function(ParseState memory, uint256, uint256) view returns (uint256, bytes32)[LITERAL_PARSERS_LENGTH + 1]
+                memory
+                pointersFixed = [
                     lengthPointer,
                     LibParseLiteralHex.parseHex,
                     LibParseLiteralDecimal.parseDecimalFloatPacked,
@@ -355,14 +363,18 @@ library LibAllStandardOps {
         }
     }
 
+    /// Builds the operand handler function pointers array. Each pointer
+    /// corresponds to a function that parses the operand for the opcode at
+    /// the same index. The ordering MUST match `authoringMetaV2`,
+    /// `integrityFunctionPointers`, and `opcodeFunctionPointers`.
     function operandHandlerFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
-            function (bytes32[] memory) internal pure returns (OperandV2) lengthPointer;
+            function(bytes32[] memory) internal pure returns (OperandV2) lengthPointer;
             uint256 length = ALL_STANDARD_OPS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function (bytes32[] memory) internal pure returns (OperandV2)[ALL_STANDARD_OPS_LENGTH + 1] memory
+            function(bytes32[] memory) internal pure returns (OperandV2)[ALL_STANDARD_OPS_LENGTH + 1] memory
                 pointersFixed = [
                     lengthPointer,
                     // stack
@@ -533,35 +545,37 @@ library LibAllStandardOps {
         }
     }
 
+    /// Builds the integrity check function pointers array. Each pointer
+    /// corresponds to the integrity check for the opcode at the same index.
+    /// The ordering MUST match `authoringMetaV2`,
+    /// `operandHandlerFunctionPointers`, and `opcodeFunctionPointers`.
     function integrityFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
-            function(IntegrityCheckState memory, OperandV2)
-                view
-                returns (uint256, uint256) lengthPointer;
+            function(IntegrityCheckState memory, OperandV2) view returns (uint256, uint256) lengthPointer;
             uint256 length = ALL_STANDARD_OPS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(IntegrityCheckState memory, OperandV2)
-                view
-                returns (uint256, uint256)[ALL_STANDARD_OPS_LENGTH + 1] memory pointersFixed = [
+            function(IntegrityCheckState memory, OperandV2) view returns (uint256, uint256)[ALL_STANDARD_OPS_LENGTH + 1]
+                memory
+                pointersFixed = [
                     lengthPointer,
                     // The first ops are out of lexical ordering so that they
                     // can sit at stable well known indexes.
-                    LibOpStackNP.integrity,
+                    LibOpStack.integrity,
                     LibOpConstant.integrity,
-                    LibOpExternNP.integrity,
-                    LibOpContextNP.integrity,
+                    LibOpExtern.integrity,
+                    LibOpContext.integrity,
                     // Everything else is alphabetical, including folders.
-                    LibOpBitwiseAndNP.integrity,
-                    LibOpBitwiseOrNP.integrity,
-                    LibOpCtPopNP.integrity,
-                    LibOpDecodeBitsNP.integrity,
-                    LibOpEncodeBitsNP.integrity,
-                    LibOpShiftBitsLeftNP.integrity,
-                    LibOpShiftBitsRightNP.integrity,
+                    LibOpBitwiseAnd.integrity,
+                    LibOpBitwiseOr.integrity,
+                    LibOpCtPop.integrity,
+                    LibOpDecodeBits.integrity,
+                    LibOpEncodeBits.integrity,
+                    LibOpShiftBitsLeft.integrity,
+                    LibOpShiftBitsRight.integrity,
                     LibOpCall.integrity,
-                    LibOpHashNP.integrity,
+                    LibOpHash.integrity,
                     LibOpUint256ERC20Allowance.integrity,
                     LibOpUint256ERC20BalanceOf.integrity,
                     LibOpUint256ERC20TotalSupply.integrity,
@@ -646,33 +660,31 @@ library LibAllStandardOps {
     /// method can just be a thin wrapper around this function.
     function opcodeFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
-            function(InterpreterState memory, OperandV2, Pointer)
-                view
-                returns (Pointer) lengthPointer;
+            function(InterpreterState memory, OperandV2, Pointer) view returns (Pointer) lengthPointer;
             uint256 length = ALL_STANDARD_OPS_LENGTH;
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(InterpreterState memory, OperandV2, Pointer)
-                view
-                returns (Pointer)[ALL_STANDARD_OPS_LENGTH + 1] memory pointersFixed = [
+            function(InterpreterState memory, OperandV2, Pointer) view returns (Pointer)[ALL_STANDARD_OPS_LENGTH + 1]
+                memory
+                pointersFixed = [
                     lengthPointer,
                     // The first ops are out of lexical ordering so that they
                     // can sit at stable well known indexes.
-                    LibOpStackNP.run,
+                    LibOpStack.run,
                     LibOpConstant.run,
-                    LibOpExternNP.run,
-                    LibOpContextNP.run,
+                    LibOpExtern.run,
+                    LibOpContext.run,
                     // Everything else is alphabetical, including folders.
-                    LibOpBitwiseAndNP.run,
-                    LibOpBitwiseOrNP.run,
-                    LibOpCtPopNP.run,
-                    LibOpDecodeBitsNP.run,
-                    LibOpEncodeBitsNP.run,
-                    LibOpShiftBitsLeftNP.run,
-                    LibOpShiftBitsRightNP.run,
+                    LibOpBitwiseAnd.run,
+                    LibOpBitwiseOr.run,
+                    LibOpCtPop.run,
+                    LibOpDecodeBits.run,
+                    LibOpEncodeBits.run,
+                    LibOpShiftBitsLeft.run,
+                    LibOpShiftBitsRight.run,
                     LibOpCall.run,
-                    LibOpHashNP.run,
+                    LibOpHash.run,
                     LibOpUint256ERC20Allowance.run,
                     LibOpUint256ERC20BalanceOf.run,
                     LibOpUint256ERC20TotalSupply.run,

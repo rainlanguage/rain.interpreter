@@ -1,14 +1,36 @@
 // SPDX-License-Identifier: CAL
 pragma solidity =0.8.25;
 
-import {RainterpreterExpressionDeployerDeploymentTest} from
-    "test/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
-import {StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV2.sol";
-import {EvalV4, SourceIndexV2, StackItem} from "rain.interpreter.interface/interface/unstable/IInterpreterV4.sol";
+import {
+    RainterpreterExpressionDeployerDeploymentTest
+} from "test/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
+import {StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV3.sol";
+import {EvalV4, SourceIndexV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibNamespace} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {OddSetLength} from "src/error/ErrStore.sol";
 
 contract RainterpreterStateOverlayTest is RainterpreterExpressionDeployerDeploymentTest {
+    /// Odd-length stateOverlay MUST revert with OddSetLength.
+    function testStateOverlayOddLength(bytes32[] memory stateOverlay) external {
+        vm.assume(stateOverlay.length % 2 != 0);
+
+        bytes memory bytecode = I_DEPLOYER.parse2("_: 1;");
+
+        vm.expectRevert(abi.encodeWithSelector(OddSetLength.selector, stateOverlay.length));
+        I_INTERPRETER.eval4(
+            EvalV4({
+                store: I_STORE,
+                namespace: LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: new bytes32[][](0),
+                inputs: new StackItem[](0),
+                stateOverlay: stateOverlay
+            })
+        );
+    }
+
     /// Show that state overlay can prewarm a get.
     function testStateOverlayGet() external view {
         bytes memory bytecode = I_DEPLOYER.parse2("_: get(9);");
