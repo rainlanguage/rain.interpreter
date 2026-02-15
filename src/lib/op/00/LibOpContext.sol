@@ -5,6 +5,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
+import {StackPointerUnderflow} from "../../../error/ErrEval.sol";
 
 library LibOpContext {
     /// `context` integrity check. Requires 0 inputs and produces 1 output.
@@ -24,7 +25,7 @@ library LibOpContext {
         // Solidity handles that for us as long as we don't invoke yul for the
         // reads.
         if (Pointer.unwrap(stackTop) < 0x20) {
-            revert("stack underflow");
+            revert StackPointerUnderflow();
         }
         bytes32 v = state.context[i][j];
         assembly ("memory-safe") {
