@@ -103,7 +103,7 @@ library LibOpExtern {
         }
         // The stack is built backwards, so we need to reverse the outputs.
         bytes32[] memory outputsBytes32;
-        assembly {
+        assembly ("memory-safe") {
             outputsBytes32 := outputs
         }
         LibBytes32Array.reverse(outputsBytes32);
