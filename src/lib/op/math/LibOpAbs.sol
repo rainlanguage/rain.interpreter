@@ -1,4 +1,4 @@
-// SPDX-Li// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: CAL
 pragma solidity ^0.8.18;
 
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
