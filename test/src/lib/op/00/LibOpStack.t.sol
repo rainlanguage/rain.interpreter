@@ -5,7 +5,8 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
 import {OperandV2, SourceIndexV2, EvalV4, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
-import {OutOfBoundsStackRead, LibOpStack} from "src/lib/op/00/LibOpStack.sol";
+import {LibOpStack} from "src/lib/op/00/LibOpStack.sol";
+import {OutOfBoundsStackRead} from "src/error/ErrIntegrity.sol";
 import {LibIntegrityCheck, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {FullyQualifiedNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV3.sol";

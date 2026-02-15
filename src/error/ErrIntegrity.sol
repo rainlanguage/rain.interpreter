@@ -25,3 +25,12 @@ error StackOutputsMismatch(uint256 stackIndex, uint256 bytecodeOutputs);
 
 /// Thrown when a constant read index is outside the constants array.
 error OutOfBoundsConstantRead(uint256 opIndex, uint256 constantsLength, uint256 constantRead);
+
+/// Thrown when a stack read index is outside the current stack top.
+error OutOfBoundsStackRead(uint256 opIndex, uint256 stackTopIndex, uint256 stackRead);
+
+/// Thrown when the outputs requested by the operand exceed the outputs
+/// available from the source.
+/// @param sourceOutputs The number of outputs available from the source.
+/// @param outputs The number of outputs requested by the operand.
+error CallOutputsExceedSource(uint256 sourceOutputs, uint256 outputs);

@@ -16,9 +16,7 @@ import {LibExtern} from "../../extern/LibExtern.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 import {ERC165Checker} from "openzeppelin-contracts/contracts/utils/introspection/ERC165Checker.sol";
-
-/// Thrown when the outputs length is not equal to the expected length.
-error BadOutputsLength(uint256 expectedLength, uint256 actualLength);
+import {BadOutputsLength} from "../../../error/ErrExtern.sol";
 
 /// @title LibOpExtern
 /// @notice Implementation of calling an external contract.

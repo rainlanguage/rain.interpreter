@@ -5,9 +5,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
-/// Thrown when a stack read index is outside the current stack top.
-
-error OutOfBoundsStackRead(uint256 opIndex, uint256 stackTopIndex, uint256 stackRead);
+import {OutOfBoundsStackRead} from "../../../error/ErrIntegrity.sol";
 
 /// @title LibOpStack
 /// Implementation of copying a stack item from the stack to the stack.

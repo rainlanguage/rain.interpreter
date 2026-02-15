@@ -9,10 +9,7 @@ import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.s
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
-/// Thrown when the inputs length does not match the expected inputs length.
-/// @param expected The expected number of inputs.
-/// @param actual The actual number of inputs.
-error InputsLengthMismatch(uint256 expected, uint256 actual);
+import {InputsLengthMismatch} from "../../error/ErrEval.sol";
 
 library LibEval {
     using LibMemoryKV for MemoryKV;
