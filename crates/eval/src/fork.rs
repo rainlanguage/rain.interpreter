@@ -553,7 +553,9 @@ mod tests {
             .await
             .unwrap();
         let parser_address = result.typed_return;
-        let expected_address: Address = "0x34ACfD304C67a78b8b3b64a1A3ae19b6854Fb5C1".parse().unwrap();
+        let expected_address: Address = "0x34ACfD304C67a78b8b3b64a1A3ae19b6854Fb5C1"
+            .parse()
+            .unwrap();
         assert_eq!(parser_address, expected_address);
     }
 

@@ -83,9 +83,15 @@ mod tests {
         assert_eq!(dispair.deployer, deployer);
         // The deployer returns the deterministic Zoltu addresses, not the
         // addresses where the contracts were originally deployed.
-        let expected_interpreter: Address = "0x288F6ef6f56617963B80c6136eB93b3b9839Dfc2".parse().unwrap();
-        let expected_store: Address = "0x08d847643144D0bC1964b024b2CcCFFB94836f79".parse().unwrap();
-        let expected_parser: Address = "0x34ACfD304C67a78b8b3b64a1A3ae19b6854Fb5C1".parse().unwrap();
+        let expected_interpreter: Address = "0x288F6ef6f56617963B80c6136eB93b3b9839Dfc2"
+            .parse()
+            .unwrap();
+        let expected_store: Address = "0x08d847643144D0bC1964b024b2CcCFFB94836f79"
+            .parse()
+            .unwrap();
+        let expected_parser: Address = "0x34ACfD304C67a78b8b3b64a1A3ae19b6854Fb5C1"
+            .parse()
+            .unwrap();
         assert_eq!(dispair.interpreter, expected_interpreter);
         assert_eq!(dispair.store, expected_store);
         assert_eq!(dispair.parser, expected_parser);
