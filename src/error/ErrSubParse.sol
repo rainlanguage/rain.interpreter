@@ -8,3 +8,7 @@ contract ErrSubParse {}
 /// @dev Thrown when a subparser is asked to build an extern dispatch when the
 /// constants height is outside the range a single byte can represent.
 error ExternDispatchConstantsHeightOverflow(uint256 constantsHeight);
+
+/// @dev Thrown when a subparser is asked to build a constant opcode when the
+/// constants height overflows the 16-bit operand encoding.
+error ConstantOpcodeConstantsHeightOverflow(uint256 constantsHeight);

@@ -14,7 +14,10 @@ import {LibBytecode, Pointer} from "rain.interpreter.interface/lib/bytecode/LibB
 import {ISubParserV4} from "rain.interpreter.interface/interface/ISubParserV4.sol";
 import {BadSubParserResult, UnknownWord, UnsupportedLiteralType} from "../../error/ErrParse.sol";
 import {IInterpreterExternV4, LibExtern, EncodedExternDispatchV2} from "../extern/LibExtern.sol";
-import {ExternDispatchConstantsHeightOverflow} from "../../error/ErrSubParse.sol";
+import {
+    ExternDispatchConstantsHeightOverflow,
+    ConstantOpcodeConstantsHeightOverflow
+} from "../../error/ErrSubParse.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibParseError} from "./LibParseError.sol";
 
@@ -82,6 +85,9 @@ library LibSubParse {
         pure
         returns (bool, bytes memory, bytes32[] memory)
     {
+        if (constantsHeight > 0xFFFF) {
+            revert ConstantOpcodeConstantsHeightOverflow(constantsHeight);
+        }
         // Build a constant opcode that the interpreter will run itself.
         bytes memory bytecode;
         uint256 opIndex = OPCODE_CONSTANT;
