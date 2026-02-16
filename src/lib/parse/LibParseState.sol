@@ -17,7 +17,10 @@ import {
     NotAcceptingInputs,
     UnsupportedLiteralType,
     InvalidSubParser,
-    OpcodeIOOverflow
+    OpcodeIOOverflow,
+    SourceItemOpsOverflow,
+    ParenInputOverflow,
+    LineRHSItemsOverflow
 } from "../../error/ErrParse.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 import {LibParseError} from "./LibParseError.sol";
@@ -310,6 +313,7 @@ library LibParseState {
     /// @param state The parse state to snapshot.
     function snapshotSourceHeadToLineTracker(ParseState memory state) internal pure {
         uint256 activeSourcePtr = state.activeSourcePtr;
+        bool didOverflow;
         assembly ("memory-safe") {
             let topLevel0Pointer := add(state, 0x20)
             let totalRHSTopLevel := byte(0, mload(topLevel0Pointer))
@@ -321,9 +325,16 @@ library LibParseState {
                 let lineTracker := mload(add(state, 0xa0))
                 let lineRHSTopLevel := sub(totalRHSTopLevel, byte(30, lineTracker))
                 let offset := mul(0x10, add(lineRHSTopLevel, 1))
+                // 14 items max — offset 0xF0 is the last valid slot.
+                // Beyond that, shl shifts past 256 bits and silently
+                // discards the pointer.
+                didOverflow := gt(offset, 0xF0)
                 lineTracker := or(lineTracker, shl(offset, sourceHead))
                 mstore(add(state, 0xa0), lineTracker)
             }
+        }
+        if (didOverflow) {
+            revert LineRHSItemsOverflow();
         }
     }
 
@@ -602,53 +613,69 @@ library LibParseState {
 
             // Increment the top level stack counter for the current top level
             // word. MAY be setting 0 to 1 if this is the top level.
-            assembly ("memory-safe") {
-                // Hardcoded offset into the state struct.
-                let counterOffset := add(state, 0x20)
-                let counterPointer := add(counterOffset, add(byte(0, mload(counterOffset)), 1))
-                // Increment the counter.
-                mstore8(counterPointer, add(byte(0, mload(counterPointer)), 1))
+            {
+                bool didOverflow;
+                assembly ("memory-safe") {
+                    // Hardcoded offset into the state struct.
+                    let counterOffset := add(state, 0x20)
+                    let counterPointer := add(counterOffset, add(byte(0, mload(counterOffset)), 1))
+                    let val := byte(0, mload(counterPointer))
+                    didOverflow := eq(val, 0xFF)
+                    // Increment the counter.
+                    mstore8(counterPointer, add(val, 1))
+                }
+                if (didOverflow) {
+                    revert SourceItemOpsOverflow();
+                }
             }
 
             bytes32 activeSource;
             uint256 offset;
             uint256 activeSourcePointer = state.activeSourcePtr;
-            assembly ("memory-safe") {
-                activeSource := mload(activeSourcePointer)
-                // The low 16 bits of the active source is the current offset.
-                offset := and(activeSource, 0xFFFF)
+            {
+                bool didOverflow;
+                assembly ("memory-safe") {
+                    activeSource := mload(activeSourcePointer)
+                    // The low 16 bits of the active source is the current offset.
+                    offset := and(activeSource, 0xFFFF)
 
-                // The offset is in bits so for a byte pointer we need to divide
-                // by 8, then add 4 to move to the operand low byte.
-                let inputsBytePointer := sub(add(activeSourcePointer, 0x20), add(div(offset, 8), 4))
+                    // The offset is in bits so for a byte pointer we need to divide
+                    // by 8, then add 4 to move to the operand low byte.
+                    let inputsBytePointer := sub(add(activeSourcePointer, 0x20), add(div(offset, 8), 4))
 
-                // Increment the paren input counter. The input counter is for the paren
-                // group that is currently being built. This means the counter is for
-                // the paren group that is one level above the current paren offset.
-                // Assumes that every word has exactly 1 output, therefore the input
-                // counter always increases by 1.
-                // Hardcoded offset into the state struct.
-                let inputCounterPos := add(state, 0x60)
-                inputCounterPos := add(
-                    add(
-                        inputCounterPos,
-                        // the offset
-                        byte(0, mload(inputCounterPos))
-                    ),
-                    // +2 for the reserved bytes -1 to move back to the counter
-                    // for the previous paren group.
-                    1
-                )
-                // Increment the parent counter.
-                mstore8(inputCounterPos, add(byte(0, mload(inputCounterPos)), 1))
-                // Zero out the current counter.
-                mstore8(add(inputCounterPos, 3), 0)
+                    // Increment the paren input counter. The input counter is for the paren
+                    // group that is currently being built. This means the counter is for
+                    // the paren group that is one level above the current paren offset.
+                    // Assumes that every word has exactly 1 output, therefore the input
+                    // counter always increases by 1.
+                    // Hardcoded offset into the state struct.
+                    let inputCounterPos := add(state, 0x60)
+                    inputCounterPos := add(
+                        add(
+                            inputCounterPos,
+                            // the offset
+                            byte(0, mload(inputCounterPos))
+                        ),
+                        // +2 for the reserved bytes -1 to move back to the counter
+                        // for the previous paren group.
+                        1
+                    )
+                    // Increment the parent counter.
+                    let val := byte(0, mload(inputCounterPos))
+                    didOverflow := eq(val, 0xFF)
+                    mstore8(inputCounterPos, add(val, 1))
+                    // Zero out the current counter.
+                    mstore8(add(inputCounterPos, 3), 0)
 
-                // Write the operand low byte pointer into the paren tracker.
-                // Move 3 bytes after the input counter pos, then shift down 32
-                // bytes to accommodate the full mload.
-                let parenTrackerPointer := sub(inputCounterPos, 29)
-                mstore(parenTrackerPointer, or(and(mload(parenTrackerPointer), not(0xFFFF)), inputsBytePointer))
+                    // Write the operand low byte pointer into the paren tracker.
+                    // Move 3 bytes after the input counter pos, then shift down 32
+                    // bytes to accommodate the full mload.
+                    let parenTrackerPointer := sub(inputCounterPos, 29)
+                    mstore(parenTrackerPointer, or(and(mload(parenTrackerPointer), not(0xFFFF)), inputsBytePointer))
+                }
+                if (didOverflow) {
+                    revert ParenInputOverflow();
+                }
             }
 
             // We write sources RTL so they can run LTR.

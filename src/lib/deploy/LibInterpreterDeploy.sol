@@ -11,14 +11,14 @@ pragma solidity ^0.8.25;
 library LibInterpreterDeploy {
     /// The address of the `RainterpreterParser` contract when deployed with the
     /// rain standard zoltu deployer.
-    address constant PARSER_DEPLOYED_ADDRESS = address(0x4F4dFC674A6Dba647EAFf81cf446851695ECf5Ab);
+    address constant PARSER_DEPLOYED_ADDRESS = address(0xE61D9b1ae85dB1015257EFb5085EB9Bd8b3DE82d);
 
     /// The code hash of the `RainterpreterParser` contract when deployed with
     /// the rain standard zoltu deployer. This can be used to verify that the
     /// deployed contract has the expected bytecode, which provides stronger
     /// guarantees than just checking the address.
     bytes32 constant PARSER_DEPLOYED_CODEHASH =
-        bytes32(0x09044fe2d2d1358715c861ed6b3d96402f674c1ffec4f4efbbdd82d649fbe574);
+        bytes32(0x5f629c492f422b705c10d8e625870f0418004b3c2c5b18f20daa331acb16bbc9);
 
     /// The address of the `RainterpreterStore` contract when deployed with the
     /// rain standard zoltu deployer.
@@ -44,23 +44,23 @@ library LibInterpreterDeploy {
 
     /// The address of the `RainterpreterExpressionDeployer` contract when
     /// deployed with the rain standard zoltu deployer.
-    address constant EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS = address(0x15BB892CFc53cc9f02b53a441aaCE43Cca5DDe5f);
+    address constant EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS = address(0xE72eC943B40eA1B8C07aC79c75CBFec37385aD40);
 
     /// The code hash of the `RainterpreterExpressionDeployer` contract when
     /// deployed with the rain standard zoltu deployer. This can be used to
     /// verify that the deployed contract has the expected bytecode, which
     /// provides stronger guarantees than just checking the address.
     bytes32 constant EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH =
-        bytes32(0x7b2b48b413df7f846d0b1cd4642bf0075bc02a9cf35888a1d7e152f43414b4c9);
+        bytes32(0x29757ebde94bea3132c77de615a89adf61ecb121c85b2e13257fd693e03f241a);
 
     /// The address of the `RainterpreterDISPaiRegistry` contract when deployed
     /// with the rain standard zoltu deployer.
-    address constant DISPAIR_REGISTRY_DEPLOYED_ADDRESS = address(0x25C4eCFeeb2FeC3EB3c3d87D95CB2Df00e92B8C7);
+    address constant DISPAIR_REGISTRY_DEPLOYED_ADDRESS = address(0x4eeC75A9205ebB49a2B05a0699dC9F4bd971C0A3);
 
     /// The code hash of the `RainterpreterDISPaiRegistry` contract when
     /// deployed with the rain standard zoltu deployer. This can be used to
     /// verify that the deployed contract has the expected bytecode, which
     /// provides stronger guarantees than just checking the address.
     bytes32 constant DISPAIR_REGISTRY_DEPLOYED_CODEHASH =
-        bytes32(0xb0b5098a312db79f70cfc9107ed499fd4681060a330e8c9f043155848fa5da75);
+        bytes32(0xb33d78934e2f4a06347e9fd92d62bb4d748a1f6c28288ebb66ef4f1fe41cde6f);
 }

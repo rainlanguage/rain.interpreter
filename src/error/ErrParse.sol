@@ -149,3 +149,15 @@ error OperandOverflow();
 /// the 16-bit pointers used internally by the parse system.
 /// @param freeMemoryPointer The free memory pointer value that exceeded the limit.
 error ParseMemoryOverflow(uint256 freeMemoryPointer);
+
+/// A single top-level item exceeded 255 opcodes. The per-item byte counter
+/// would silently wrap, corrupting source bytecode.
+error SourceItemOpsOverflow();
+
+/// A paren group exceeded 255 inputs. The per-paren byte counter would
+/// silently wrap, corrupting operand data.
+error ParenInputOverflow();
+
+/// A single line exceeded the maximum number of RHS top-level items that
+/// can be tracked in the 256-bit lineTracker (14 items).
+error LineRHSItemsOverflow();
