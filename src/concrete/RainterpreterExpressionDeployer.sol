@@ -82,8 +82,8 @@ contract RainterpreterExpressionDeployer is
         return LibAllStandardOps.integrityFunctionPointers();
     }
 
-    ///@inheritdoc IDescribedByMetaV1
-    function describedByMetaV1() external pure returns (bytes32) {
+    /// @inheritdoc IDescribedByMetaV1
+    function describedByMetaV1() external pure override returns (bytes32) {
         return DESCRIBED_BY_META_HASH;
     }
 }
