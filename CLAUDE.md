@@ -86,14 +86,14 @@ External contracts can extend the interpreter with additional opcodes. `src/conc
 
 ### Deployment
 
-`script/Deploy.sol` uses the `DEPLOYMENT_SUITE` env var to select which component to deploy: `"parser"`, `"store"`, `"interpreter"`, or `"expression-deployer"`.
+`script/Deploy.sol` uses the `DEPLOYMENT_SUITE` env var to select which component to deploy: `"parser"`, `"store"`, `"interpreter"`, `"expression-deployer"`, or `"dispair-registry"`.
 
 ## Solidity Conventions
 
 - **Solidity version**: exactly `0.8.25`, EVM target `cancun`
 - **Optimizer**: enabled, 1000 runs
 - **Fuzz runs**: 2048
-- **License**: `CAL` (or `LicenseRef-DCL-1.0` for some files)
+- **License**: `LicenseRef-DCL-1.0` with copyright `Rain Open Source Software Ltd`
 - Custom bytecode serialization is used instead of ABI encoding for gas efficiency
 - Function pointer dispatch (no switch/if chains) for opcode routing
 - Assembly blocks are used extensively and marked `memory-safe` where applicable
@@ -109,9 +109,16 @@ External contracts can extend the interpreter with additional opcodes. `src/conc
 
 An audit consists of four separate passes, each run as independent agents. All four passes are mandatory. Do not combine them into a single pass.
 
-Each pass will need multiple agents to cover the full codebase. When partitioning files across agents, ensure every source file is assigned to exactly one agent per pass. Prefer partitioning by directory (e.g., one agent for `src/lib/op/math/`, another for `src/lib/op/logic/`) over partitioning by concern, so that each agent can read its files deeply rather than skimming broadly.
+Each pass will need multiple agents to cover the full codebase. When partitioning files across agents, assign one file per agent. This ensures each agent reads its file thoroughly rather than skimming across many files. For passes that require cross-file context (e.g., Pass 2 needs both source and test files), the agent receives the source file plus its corresponding test file(s) — this is still a single-file-per-agent partition from the source file perspective.
 
 Every pass requires reading every assigned file in full. Do not rely on grepping as a substitute for reading — systematic line-by-line review catches issues that keyword searches miss. Grepping is appropriate for cross-referencing (e.g., checking if an error name appears in test files) but not for understanding code.
+
+After reading each file, the agent must list evidence of thorough reading before reporting findings. For each file, list:
+- The contract/library name
+- Every function name and its line number
+- Every error/event/struct defined (if any)
+
+This evidence must appear in the agent's output before any findings for that file. If the evidence is missing or incomplete, the audit of that file is invalid and must be re-run.
 
 Findings from all passes should be reported, not fixed. Fixes are a separate step after findings are reviewed.
 
