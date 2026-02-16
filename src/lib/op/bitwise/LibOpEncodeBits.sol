@@ -45,7 +45,7 @@ library LibOpEncodeBits {
             // Build a bitmask of desired length. Max length is uint8 max which
             // is 255. A 256 length doesn't really make sense as that isn't an
             // encoding anyway, it's just the source verbatim.
-            uint256 mask = (2 ** length - 1);
+            uint256 mask = ((1 << length) - 1);
 
             // Punch a mask sized hole in target.
             target &= ~(mask << startBit);
