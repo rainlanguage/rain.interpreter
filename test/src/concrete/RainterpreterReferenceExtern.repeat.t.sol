@@ -33,8 +33,7 @@ contract RainterpreterReferenceExternRepeatTest is OpTest {
         string memory baseStr = string.concat("using-words-from ", address(extern).toHexString(), " ");
 
         vm.expectRevert();
-        bytes memory bytecode =
-            I_DEPLOYER.parse2(bytes(string.concat(baseStr, "_: [ref-extern-repeat--1 abc];")));
+        bytes memory bytecode = I_DEPLOYER.parse2(bytes(string.concat(baseStr, "_: [ref-extern-repeat--1 abc];")));
         (bytecode);
     }
 
@@ -44,8 +43,7 @@ contract RainterpreterReferenceExternRepeatTest is OpTest {
         string memory baseStr = string.concat("using-words-from ", address(extern).toHexString(), " ");
 
         vm.expectRevert();
-        bytes memory bytecode =
-            I_DEPLOYER.parse2(bytes(string.concat(baseStr, "_: [ref-extern-repeat-1.5 abc];")));
+        bytes memory bytecode = I_DEPLOYER.parse2(bytes(string.concat(baseStr, "_: [ref-extern-repeat-1.5 abc];")));
         (bytecode);
     }
 
@@ -55,8 +53,7 @@ contract RainterpreterReferenceExternRepeatTest is OpTest {
         string memory baseStr = string.concat("using-words-from ", address(extern).toHexString(), " ");
 
         vm.expectRevert();
-        bytes memory bytecode =
-            I_DEPLOYER.parse2(bytes(string.concat(baseStr, "_: [ref-extern-repeat-10 abc];")));
+        bytes memory bytecode = I_DEPLOYER.parse2(bytes(string.concat(baseStr, "_: [ref-extern-repeat-10 abc];")));
         (bytecode);
     }
 }

@@ -10,6 +10,8 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 /// @title LibOpInv
 /// @notice Opcode for the inverse 1 / x of a floating point number.
 library LibOpInv {
+    using LibDecimalFloat for Float;
+
     /// `inv` integrity check. Requires exactly 1 input and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // There must be one input and one output.
@@ -23,7 +25,7 @@ library LibOpInv {
         assembly ("memory-safe") {
             a := mload(stackTop)
         }
-        a = LibDecimalFloat.inv(a);
+        a = a.inv();
 
         assembly ("memory-safe") {
             mstore(stackTop, a)
@@ -38,7 +40,7 @@ library LibOpInv {
         returns (StackItem[] memory)
     {
         StackItem[] memory outputs = new StackItem[](1);
-        outputs[0] = StackItem.wrap(Float.unwrap((LibDecimalFloat.inv(Float.wrap(StackItem.unwrap(inputs[0]))))));
+        outputs[0] = StackItem.wrap(Float.unwrap(Float.wrap(StackItem.unwrap(inputs[0])).inv()));
         return outputs;
     }
 }

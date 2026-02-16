@@ -11,6 +11,8 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 /// @notice Opcode to return 1 if the first item on the stack is greater than or
 /// equal to the second item on the stack, else 0.
 library LibOpGreaterThanOrEqualTo {
+    using LibDecimalFloat for Float;
+
     /// `greater-than-or-equal-to` integrity check. Requires exactly 2 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (2, 1);
@@ -27,7 +29,7 @@ library LibOpGreaterThanOrEqualTo {
             stackTop := add(stackTop, 0x20)
             b := mload(stackTop)
         }
-        bool greaterThanOrEqual = LibDecimalFloat.gte(a, b);
+        bool greaterThanOrEqual = a.gte(b);
         assembly ("memory-safe") {
             mstore(stackTop, greaterThanOrEqual)
         }
@@ -42,7 +44,7 @@ library LibOpGreaterThanOrEqualTo {
     {
         Float a = Float.wrap(StackItem.unwrap(inputs[0]));
         Float b = Float.wrap(StackItem.unwrap(inputs[1]));
-        bool greaterThanOrEqual = LibDecimalFloat.gte(a, b);
+        bool greaterThanOrEqual = a.gte(b);
         outputs = new StackItem[](1);
         outputs[0] = StackItem.wrap(bytes32(uint256(greaterThanOrEqual ? 1 : 0)));
     }

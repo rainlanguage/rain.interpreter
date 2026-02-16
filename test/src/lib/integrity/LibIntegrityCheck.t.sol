@@ -41,6 +41,8 @@ contract LibIntegrityCheckTest is Test {
             uint8(1), // stackAllocation
             uint8(0), // inputs
             uint8(1), // outputs
+            // Truncation is safe because callers bound opcodeIndex to uint8 range.
+            // forge-lint: disable-next-line(unsafe-typecast)
             uint8(opcodeIndex), // opcode index
             uint8(0x10), // ioByte: 0 inputs, 1 output
             uint16(0) // operand
@@ -54,9 +56,7 @@ contract LibIntegrityCheckTest is Test {
         bytes memory bytecode = buildSingleOpBytecode(opcodeIndex);
         bytes32[] memory constants = new bytes32[](0);
 
-        vm.expectRevert(
-            abi.encodeWithSelector(OpcodeOutOfRange.selector, 0, opcodeIndex, ALL_STANDARD_OPS_LENGTH)
-        );
+        vm.expectRevert(abi.encodeWithSelector(OpcodeOutOfRange.selector, 0, opcodeIndex, ALL_STANDARD_OPS_LENGTH));
         this.integrityCheck2External(INTEGRITY_FUNCTION_POINTERS, bytecode, constants);
     }
 
@@ -75,12 +75,15 @@ contract LibIntegrityCheckTest is Test {
         // The actual revert depends on what opcode maxValidIndex is, but
         // it should never be OpcodeOutOfRange.
         try this.integrityCheck2External(INTEGRITY_FUNCTION_POINTERS, bytecode, constants) {
-            // If it doesn't revert, that's fine too — the opcode is in range.
-        } catch (bytes memory reason) {
+        // If it doesn't revert, that's fine too — the opcode is in range.
+        }
+        catch (bytes memory reason) {
             // Ensure the revert is NOT OpcodeOutOfRange.
+            // Truncation is guarded by the reason.length < 4 check.
+            // forge-lint: disable-next-line(unsafe-typecast)
+            bytes4 errorSig = reason.length >= 4 ? bytes4(reason) : bytes4(0);
             assertTrue(
-                reason.length < 4 || bytes4(reason) != OpcodeOutOfRange.selector,
-                "should not revert with OpcodeOutOfRange for in-range opcode"
+                errorSig != OpcodeOutOfRange.selector, "should not revert with OpcodeOutOfRange for in-range opcode"
             );
         }
     }

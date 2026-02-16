@@ -12,6 +12,8 @@ import {LibDecimalFloatImplementation} from "rain.math.float/lib/implementation/
 /// @title LibOpAdd
 /// @notice Opcode to add N numbers. Errors on overflow.
 library LibOpAdd {
+    using LibDecimalFloat for Float;
+
     /// `add` integrity check. Requires at least 2 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
@@ -29,8 +31,8 @@ library LibOpAdd {
             b := mload(add(stackTop, 0x20))
             stackTop := add(stackTop, 0x40)
         }
-        (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(a);
-        (int256 signedCoefficientB, int256 exponentB) = LibDecimalFloat.unpack(b);
+        (int256 signedCoefficient, int256 exponent) = a.unpack();
+        (int256 signedCoefficientB, int256 exponentB) = b.unpack();
         (signedCoefficient, exponent) =
             LibDecimalFloatImplementation.add(signedCoefficient, exponent, signedCoefficientB, exponentB);
 
@@ -42,7 +44,7 @@ library LibOpAdd {
                     b := mload(stackTop)
                     stackTop := add(stackTop, 0x20)
                 }
-                (signedCoefficientB, exponentB) = LibDecimalFloat.unpack(b);
+                (signedCoefficientB, exponentB) = b.unpack();
                 (signedCoefficient, exponent) =
                     LibDecimalFloatImplementation.add(signedCoefficient, exponent, signedCoefficientB, exponentB);
                 unchecked {
@@ -71,10 +73,9 @@ library LibOpAdd {
         // see the revert from the real function and not the reference function.
         unchecked {
             Float acc = Float.wrap(StackItem.unwrap(inputs[0]));
-            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(acc);
+            (int256 signedCoefficient, int256 exponent) = acc.unpack();
             for (uint256 i = 1; i < inputs.length; i++) {
-                (int256 signedCoefficientB, int256 exponentB) =
-                    LibDecimalFloat.unpack(Float.wrap(StackItem.unwrap(inputs[i])));
+                (int256 signedCoefficientB, int256 exponentB) = Float.wrap(StackItem.unwrap(inputs[i])).unpack();
                 (signedCoefficient, exponent) =
                     LibDecimalFloatImplementation.add(signedCoefficient, exponent, signedCoefficientB, exponentB);
             }

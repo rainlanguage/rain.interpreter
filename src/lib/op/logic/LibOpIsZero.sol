@@ -24,7 +24,7 @@ library LibOpIsZero {
         assembly ("memory-safe") {
             a := mload(stackTop)
         }
-        bool isZero = LibDecimalFloat.isZero(a);
+        bool isZero = a.isZero();
         assembly ("memory-safe") {
             mstore(stackTop, isZero)
         }
