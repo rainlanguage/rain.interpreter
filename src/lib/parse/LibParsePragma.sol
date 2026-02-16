@@ -50,6 +50,12 @@ library LibParsePragma {
                 // Move past the pragma keyword.
                 cursor += PRAGMA_KEYWORD_BYTES_LENGTH;
 
+                // If the input ends exactly at the keyword there is no
+                // whitespace char to read.
+                if (cursor >= end) {
+                    revert NoWhitespaceAfterUsingWordsFrom(state.parseErrorOffset(cursor));
+                }
+
                 // Need at least one whitespace char after the pragma keyword.
                 uint256 char;
                 assembly ("memory-safe") {
