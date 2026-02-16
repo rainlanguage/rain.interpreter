@@ -22,9 +22,11 @@ library LibSubParse {
     using LibParseState for ParseState;
     using LibParseError for ParseState;
 
-    /// Sub parse a word into a context grid position.
-    /// @param column The column index in the context grid.
-    /// @param row The row index in the context grid.
+    /// Sub parse a word into a context grid position. The column and row are
+    /// encoded as single bytes in the operand, so values MUST be <= 255.
+    /// Values > 255 will be silently truncated by `mstore8`.
+    /// @param column The column index in the context grid. Must fit in uint8.
+    /// @param row The row index in the context grid. Must fit in uint8.
     /// @return Whether the sub parse succeeded.
     /// @return The bytecode for the context opcode.
     /// @return The constants array (empty for context ops).
