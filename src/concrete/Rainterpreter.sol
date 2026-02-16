@@ -24,6 +24,7 @@ import {
 } from "../generated/Rainterpreter.pointers.sol";
 import {IOpcodeToolingV1} from "rain.sol.codegen/interface/IOpcodeToolingV1.sol";
 import {OddSetLength} from "../error/ErrStore.sol";
+import {ZeroFunctionPointers} from "../error/ErrEval.sol";
 
 /// @title Rainterpreter
 /// @notice Implementation of a Rainlang interpreter that is compatible with
@@ -31,6 +32,15 @@ import {OddSetLength} from "../error/ErrStore.sol";
 contract Rainterpreter is IInterpreterV4, IOpcodeToolingV1, ERC165 {
     using LibEval for InterpreterState;
     using LibInterpreterStateDataContract for bytes;
+
+    constructor() {
+        if (opcodeFunctionPointers().length == 0) revert ZeroFunctionPointers();
+    }
+
+    /// @return The opcode function pointers for the interpreter.
+    function opcodeFunctionPointers() internal view virtual returns (bytes memory) {
+        return OPCODE_FUNCTION_POINTERS;
+    }
 
     /// @inheritdoc IInterpreterV4
     function eval4(EvalV4 calldata eval) external view virtual override returns (StackItem[] memory, bytes32[] memory) {
@@ -40,7 +50,7 @@ contract Rainterpreter is IInterpreterV4, IOpcodeToolingV1, ERC165 {
                 eval.namespace,
                 eval.store,
                 eval.context,
-                OPCODE_FUNCTION_POINTERS
+                opcodeFunctionPointers()
             );
         if (eval.stateOverlay.length % 2 != 0) {
             revert OddSetLength(eval.stateOverlay.length);

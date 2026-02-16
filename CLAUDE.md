@@ -105,6 +105,10 @@ External contracts can extend the interpreter with additional opcodes. `src/conc
 - Use `opReferenceCheck` to test opcode runtime behavior against a reference implementation
 - Rust test fixtures (`crates/test_fixtures/`) deploy all four contracts on a local Anvil instance
 
+## Process (Jidoka)
+
+Each fix is a complete cycle: understand → fix → test → build → verify. Do not move to the next item with incomplete work. When a process defect is found, stop and fix the process before resuming. When the user asks "why" about a defect, they are asking for root cause analysis of the process failure — not requesting that you go do the thing. Answer the "why" first, agree on the process fix, then resume.
+
 ## Audit Review
 
 Audit instructions are in `AUDIT.md`. Read that file before running any audit pass.

@@ -9,3 +9,7 @@ contract ErrEval {}
 /// @param expected The expected number of inputs.
 /// @param actual The actual number of inputs.
 error InputsLengthMismatch(uint256 expected, uint256 actual);
+
+/// Thrown when the function pointer table is empty, which would cause
+/// mod-by-zero in the eval loop opcode dispatch.
+error ZeroFunctionPointers();
