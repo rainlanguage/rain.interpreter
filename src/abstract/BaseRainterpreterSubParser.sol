@@ -37,6 +37,12 @@ bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"";
 /// parsers.
 bytes constant SUB_PARSER_LITERAL_PARSERS = hex"";
 
+/// @dev Thrown when a sub parser dispatch index is out of bounds for the
+/// function pointer table.
+/// @param index The out-of-bounds index.
+/// @param length The number of function pointers available.
+error SubParserIndexOutOfBounds(uint256 index, uint256 length);
+
 /// Base implementation of `ISubParserV4`. Inherit from this contract and
 /// override the virtual functions to align all the relevant pointers and
 /// metadata bytes so that it can actually run.
@@ -162,6 +168,10 @@ abstract contract BaseRainterpreterSubParser is
         if (success) {
             function(bytes32, uint256, uint256) internal pure returns (bytes32) subParser;
             bytes memory localSubParserLiteralParsers = subParserLiteralParsers();
+            uint256 parsersLength = localSubParserLiteralParsers.length / 2;
+            if (index >= parsersLength) {
+                revert SubParserIndexOutOfBounds(index, parsersLength);
+            }
             assembly ("memory-safe") {
                 subParser := and(mload(add(localSubParserLiteralParsers, mul(add(index, 1), 2))), 0xFFFF)
             }
@@ -192,6 +202,10 @@ abstract contract BaseRainterpreterSubParser is
             OperandV2 operand = state.handleOperand(index);
             function(uint256, uint256, OperandV2) internal pure returns (bool, bytes memory, bytes32[] memory) subParser;
             bytes memory localSubParserWordParsers = subParserWordParsers();
+            uint256 parsersLength = localSubParserWordParsers.length / 2;
+            if (index >= parsersLength) {
+                revert SubParserIndexOutOfBounds(index, parsersLength);
+            }
             assembly ("memory-safe") {
                 subParser := and(mload(add(localSubParserWordParsers, mul(add(index, 1), 2))), 0xFFFF)
             }
