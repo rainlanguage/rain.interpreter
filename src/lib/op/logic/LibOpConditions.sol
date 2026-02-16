@@ -17,7 +17,7 @@ library LibOpConditions {
 
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
-        uint256 inputs = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
+        uint256 inputs = uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F;
         inputs = inputs > 2 ? inputs : 2;
         return (inputs, 1);
     }

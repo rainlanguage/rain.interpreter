@@ -16,7 +16,7 @@ library LibOpAny {
     /// `any` integrity check. Requires at least 1 input and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least one input.
-        uint256 inputs = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
+        uint256 inputs = uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F;
         inputs = inputs > 0 ? inputs : 1;
         return (inputs, 1);
     }
@@ -25,7 +25,7 @@ library LibOpAny {
     /// ANY is the first nonzero item, else 0.
     function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         unchecked {
-            uint256 length = 0x20 * uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
+            uint256 length = 0x20 * (uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F);
             Float item;
             Pointer cursor = stackTop;
             Pointer end = Pointer.wrap(Pointer.unwrap(stackTop) + length);

@@ -30,8 +30,8 @@ library LibOpExtern {
         if (!ERC165Checker.supportsInterface(address(extern), type(IInterpreterExternV4).interfaceId)) {
             revert NotAnExternContract(address(extern));
         }
-        uint256 expectedInputsLength = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
-        uint256 expectedOutputsLength = uint256((OperandV2.unwrap(operand) >> 0x14) & bytes32(uint256(0x0F)));
+        uint256 expectedInputsLength = uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F;
+        uint256 expectedOutputsLength = uint256(OperandV2.unwrap(operand) >> 0x14) & 0x0F;
         //slither-disable-next-line unused-return
         return extern.externIntegrity(dispatch, expectedInputsLength, expectedOutputsLength);
     }
@@ -39,8 +39,8 @@ library LibOpExtern {
     /// `extern` opcode. Calls an external contract's `extern` function with stack inputs and pushes its outputs.
     function run(InterpreterState memory state, OperandV2 operand, Pointer stackTop) internal view returns (Pointer) {
         uint256 encodedExternDispatchIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
-        uint256 inputsLength = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
-        uint256 outputsLength = uint256((OperandV2.unwrap(operand) >> 0x14) & bytes32(uint256(0x0F)));
+        uint256 inputsLength = uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F;
+        uint256 outputsLength = uint256(OperandV2.unwrap(operand) >> 0x14) & 0x0F;
 
         bytes32 encodedExternDispatch = state.constants[encodedExternDispatchIndex];
         (IInterpreterExternV4 extern, ExternDispatchV2 dispatch) =
@@ -92,7 +92,7 @@ library LibOpExtern {
         returns (StackItem[] memory outputs)
     {
         uint256 encodedExternDispatchIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
-        uint256 outputsLength = uint256((OperandV2.unwrap(operand) >> 0x14) & bytes32(uint256(0x0F)));
+        uint256 outputsLength = uint256(OperandV2.unwrap(operand) >> 0x14) & 0x0F;
 
         bytes32 encodedExternDispatch = state.constants[encodedExternDispatchIndex];
         (IInterpreterExternV4 extern, ExternDispatchV2 dispatch) =

@@ -17,7 +17,7 @@ library LibOpAdd {
     /// `add` integrity check. Requires at least 2 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
-        uint256 inputs = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
+        uint256 inputs = uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F;
         inputs = inputs > 1 ? inputs : 2;
         return (inputs, 1);
     }
@@ -37,7 +37,7 @@ library LibOpAdd {
             LibDecimalFloatImplementation.add(signedCoefficient, exponent, signedCoefficientB, exponentB);
 
         {
-            uint256 inputs = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
+            uint256 inputs = uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F;
             uint256 i = 2;
             while (i < inputs) {
                 assembly ("memory-safe") {
