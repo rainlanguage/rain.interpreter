@@ -4,8 +4,25 @@ pragma solidity ^0.8.25;
 
 import {ParseState} from "./LibParseState.sol";
 
+/// @title LibParseStackName
+/// Stack names are stored as a singly-linked list of 256-bit nodes in memory.
+/// Each node packs three fields into a single word:
+///   - bits [255:32] — 224-bit fingerprint (keccak256 of the name, top 224 bits)
+///   - bits [31:16]  — stack index assigned when the name was first pushed
+///   - bits [15:0]   — memory pointer to the next node (0 = end of list)
+///
+/// A 256-position bloom filter (`stackNameBloom`) provides a fast-path reject
+/// for names that have never been pushed. The bloom key is the low 8 bits of
+/// the fingerprint, giving a single bit per name. On a bloom miss the linked
+/// list is not traversed at all. On a bloom hit (true or false positive) the
+/// list is walked linearly comparing 224-bit fingerprints until a match is
+/// found or the list is exhausted. Because n is small (number of LHS names in
+/// one expression) the linear walk is cheap even on false positives.
 library LibParseStackName {
-    /// Push a word onto the stack name stack.
+    /// Push a word onto the stack name linked list. If the word already exists
+    /// (by fingerprint), returns the existing index without allocating a new
+    /// node. Otherwise allocates a new node at the free memory pointer and
+    /// prepends it to the list.
     /// @param state The parser state containing the stack names.
     /// @param word The word to push onto the stack name stack.
     /// @return exists Whether the word already existed.
@@ -34,7 +51,10 @@ library LibParseStackName {
         }
     }
 
-    /// Retrieve the index of a previously pushed stack name.
+    /// Look up a word in the stack name linked list. First checks the bloom
+    /// filter for an early exit when the name is definitely absent. On a bloom
+    /// hit, walks the linked list comparing 224-bit fingerprints. Also updates
+    /// the bloom filter so that future lookups for this word will hit.
     /// @param state The parser state containing the stack names.
     /// @param word The word to look up.
     /// @return exists Whether the word was found.

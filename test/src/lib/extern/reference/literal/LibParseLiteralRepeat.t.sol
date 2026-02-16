@@ -12,11 +12,7 @@ import {
 contract LibParseLiteralRepeatTest is Test {
     /// External wrapper for parseRepeat so that expectRevert can catch
     /// the revert at a deeper call depth.
-    function externalParseRepeat(uint256 dispatchValue, uint256 cursor, uint256 end)
-        external
-        pure
-        returns (uint256)
-    {
+    function externalParseRepeat(uint256 dispatchValue, uint256 cursor, uint256 end) external pure returns (uint256) {
         return LibParseLiteralRepeat.parseRepeat(dispatchValue, cursor, end);
     }
 
