@@ -252,8 +252,11 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
                     state, cursor + SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH, end
                 );
                 Float float = Float.wrap(floatBytes);
-                // We can only repeat a single digit.
-                if (float.gt(LibDecimalFloat.packLossless(9, 0))) {
+                // We can only repeat a single digit integer 0-9.
+                if (
+                    float.lt(LibDecimalFloat.packLossless(0, 0))
+                        || float.gt(LibDecimalFloat.packLossless(9, 0)) || !float.frac().isZero()
+                ) {
                     revert InvalidRepeatCount();
                 }
 
