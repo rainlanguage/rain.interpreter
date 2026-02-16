@@ -39,7 +39,10 @@ library LibSubParse {
         uint256 opIndex = OPCODE_CONTEXT;
         assembly ("memory-safe") {
             // Allocate the bytecode.
-            // This is an UNALIGNED allocation.
+            // This is an UNALIGNED allocation. The 4-byte bytecode is
+            // returned to the caller and copied directly over an opcode
+            // slot in the main bytecode, so it never reaches Solidity
+            // code that expects 32-byte aligned memory.
             bytecode := mload(0x40)
             mstore(0x40, add(bytecode, 0x24))
 
@@ -84,7 +87,10 @@ library LibSubParse {
         uint256 opIndex = OPCODE_CONSTANT;
         assembly ("memory-safe") {
             // Allocate the bytecode.
-            // This is an UNALIGNED allocation.
+            // This is an UNALIGNED allocation. The 4-byte bytecode is
+            // returned to the caller and copied directly over an opcode
+            // slot in the main bytecode, so it never reaches Solidity
+            // code that expects 32-byte aligned memory.
             bytecode := mload(0x40)
             mstore(0x40, add(bytecode, 0x24))
 
@@ -148,7 +154,10 @@ library LibSubParse {
         uint256 opIndex = OPCODE_EXTERN;
         assembly ("memory-safe") {
             // Allocate the bytecode.
-            // This is an UNALIGNED allocation.
+            // This is an UNALIGNED allocation. The 4-byte bytecode is
+            // returned to the caller and copied directly over an opcode
+            // slot in the main bytecode, so it never reaches Solidity
+            // code that expects 32-byte aligned memory.
             bytecode := mload(0x40)
             mstore(0x40, add(bytecode, 0x24))
             mstore(add(bytecode, 4), constantsHeight)
