@@ -32,9 +32,16 @@ pragma solidity ^0.8.25;
 /// @param length The length of the literal body.
 error RepeatLiteralTooLong(uint256 length);
 
+/// @dev Thrown when the dispatch value is not a single decimal digit.
+/// @param dispatchValue The invalid dispatch value.
+error RepeatDispatchNotDigit(uint256 dispatchValue);
+
 library LibParseLiteralRepeat {
     //slither-disable-next-line dead-code
     function parseRepeat(uint256 dispatchValue, uint256 cursor, uint256 end) internal pure returns (uint256) {
+        if (dispatchValue > 9) {
+            revert RepeatDispatchNotDigit(dispatchValue);
+        }
         unchecked {
             uint256 value = 0;
             uint256 length = end - cursor;
