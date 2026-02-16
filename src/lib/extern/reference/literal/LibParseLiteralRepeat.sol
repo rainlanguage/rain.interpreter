@@ -25,12 +25,21 @@ pragma solidity ^0.8.25;
 /// /* 333 */
 /// [ref-extern-repeat-3 123]
 /// ```
+
+/// @dev Thrown when a repeat literal body exceeds the maximum length that can
+/// be computed without overflow in `10 ** i`.
+/// @param length The length of the literal body.
+error RepeatLiteralTooLong(uint256 length);
+
 library LibParseLiteralRepeat {
     //slither-disable-next-line dead-code
     function parseRepeat(uint256 dispatchValue, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
             uint256 value = 0;
             uint256 length = end - cursor;
+            if (length >= 78) {
+                revert RepeatLiteralTooLong(length);
+            }
             for (uint256 i = 0; i < length; ++i) {
                 value += dispatchValue * 10 ** i;
             }
