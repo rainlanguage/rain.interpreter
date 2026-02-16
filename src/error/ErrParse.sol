@@ -85,7 +85,8 @@ error MalformedCommentStart(uint256 offset);
 
 /// @dev Thrown when a stack name is duplicated. Shadowing in all forms is
 /// disallowed in Rainlang.
-error DuplicateLHSItem(uint256 errorOffset);
+/// @param offset The byte offset of the duplicate item in the parse data.
+error DuplicateLHSItem(uint256 offset);
 
 /// Encountered too many LHS items.
 error ExcessLHSItems(uint256 offset);
