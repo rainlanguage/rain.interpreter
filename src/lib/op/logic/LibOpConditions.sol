@@ -79,8 +79,9 @@ library LibOpConditions {
         // implementation.
         unchecked {
             uint256 length = inputs.length;
+            uint256 pairsLength = length - (length % 2);
             outputs = new StackItem[](1);
-            for (uint256 i = 0; i < length; i += 2) {
+            for (uint256 i = 0; i < pairsLength; i += 2) {
                 if (!Float.wrap(StackItem.unwrap(inputs[i])).isZero()) {
                     outputs[0] = inputs[i + 1];
                     return outputs;
