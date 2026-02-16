@@ -9,8 +9,8 @@ import {LibIntOrAString, IntOrAString} from "rain.intorastring/lib/LibIntOrAStri
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpConditions
-/// @notice Opcode to return the first nonzero item on the stack up to the inputs
-/// limit.
+/// Opcode to evaluate pairwise condition-value slots and return the value
+/// corresponding to the first nonzero condition.
 library LibOpConditions {
     using LibIntOrAString for IntOrAString;
     using LibDecimalFloat for Float;
