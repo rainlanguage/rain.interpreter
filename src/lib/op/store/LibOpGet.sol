@@ -38,7 +38,10 @@ library LibOpGet {
             bytes32 storeValue = state.store.get(state.namespace, key);
 
             // Push fetched value to memory to make subsequent lookups on the
-            // same key find a cache HIT.
+            // same key find a cache HIT. Note: this means read-only keys will
+            // also be persisted to the store at the end of eval, paying an
+            // unnecessary SSTORE. In practice the gas saved by caching
+            // repeated reads outweighs this cost.
             state.stateKV = state.stateKV.set(MemoryKVKey.wrap(key), MemoryKVVal.wrap(storeValue));
 
             assembly ("memory-safe") {
