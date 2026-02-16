@@ -51,7 +51,7 @@ library LibOpUint256Sub {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of addition for testing.
+    /// Gas intensive reference implementation of subtraction for testing.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure

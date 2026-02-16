@@ -8,7 +8,7 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpFloor
-/// @notice Opcode for the floor of an decimal floating point number.
+/// Opcode for the floor of a decimal floating point number.
 library LibOpFloor {
     using LibDecimalFloat for Float;
 

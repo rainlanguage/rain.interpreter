@@ -8,7 +8,7 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpHeadroom
-/// @notice Opcode for the headroom (distance to ceil) of an decimal floating
+/// Opcode for the headroom (distance to ceil) of a decimal floating
 /// point number.
 library LibOpHeadroom {
     using LibDecimalFloat for Float;

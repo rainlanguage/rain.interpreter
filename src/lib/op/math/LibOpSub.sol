@@ -9,7 +9,7 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {LibDecimalFloatImplementation} from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
 
 /// @title LibOpSub
-/// @notice Opcode to subtract N integers.
+/// Opcode to subtract N decimal floating point values.
 library LibOpSub {
     using LibDecimalFloat for Float;
 

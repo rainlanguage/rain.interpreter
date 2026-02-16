@@ -18,7 +18,7 @@ library LibOpIf {
     }
 
     /// IF
-    /// IF is a conditional. If the first item on the stack is nonero, the second
+    /// IF is a conditional. If the first item on the stack is nonzero, the second
     /// item is returned, else the third item is returned.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
         Float condition;
