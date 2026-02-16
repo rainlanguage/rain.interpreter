@@ -78,6 +78,11 @@ contract Deploy is Script {
             );
         } else if (suite == DEPLOYMENT_SUITE_EXPRESSION_DEPLOYER) {
             console2.log("Deploying RainterpreterExpressionDeployer...");
+            address[] memory deployerDeps = new address[](4);
+            deployerDeps[0] = LibDecimalFloatDeploy.ZOLTU_DEPLOYED_LOG_TABLES_ADDRESS;
+            deployerDeps[1] = LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS;
+            deployerDeps[2] = LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS;
+            deployerDeps[3] = LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS;
             LibRainDeploy.deployAndBroadcastToSupportedNetworks(
                 vm,
                 LibRainDeploy.supportedNetworks(),
@@ -86,10 +91,15 @@ contract Deploy is Script {
                 "src/concrete/RainterpreterExpressionDeployer.sol:RainterpreterExpressionDeployer",
                 LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS,
                 LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH,
-                deps
+                deployerDeps
             );
         } else if (suite == DEPLOYMENT_SUITE_DISPAIR_REGISTRY) {
             console2.log("Deploying RainterpreterDISPaiRegistry...");
+            address[] memory registryDeps = new address[](4);
+            registryDeps[0] = LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS;
+            registryDeps[1] = LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS;
+            registryDeps[2] = LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS;
+            registryDeps[3] = LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS;
             LibRainDeploy.deployAndBroadcastToSupportedNetworks(
                 vm,
                 LibRainDeploy.supportedNetworks(),
@@ -98,7 +108,7 @@ contract Deploy is Script {
                 "src/concrete/RainterpreterDISPaiRegistry.sol:RainterpreterDISPaiRegistry",
                 LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_ADDRESS,
                 LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_CODEHASH,
-                deps
+                registryDeps
             );
         } else {
             revert UnknownDeploymentSuite(suite);
