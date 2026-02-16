@@ -21,6 +21,16 @@ library LibEval {
     /// in the function pointer table (bounded by modulo) and dispatched.
     /// A remainder loop handles sources whose opcode count is not a multiple
     /// of 8. Emits a stack trace via `STACK_TRACER` after execution.
+    ///
+    /// TRUST: `state.sourceIndex` is NOT bounds-checked against the bytecode's
+    /// source count. All callers MUST validate it before calling. `eval2` does
+    /// this via `LibBytecode.sourceInputsOutputsLength` (which reverts with
+    /// `SourceIndexOutOfBounds`). `LibOpCall.run` relies on integrity checks
+    /// at deploy time to reject invalid source indices in operands. The
+    /// function pointer table is read-only during evaluation so a corrupt
+    /// source index cannot modify the dispatch table, but it would cause the
+    /// cursor to land at an arbitrary bytecode position and execute whatever
+    /// bytes happen to be there as opcodes.
     /// @param state The interpreter state containing bytecode, constants,
     /// stacks, and function pointers.
     /// @param parentSourceIndex The source index of the caller (used for stack
