@@ -4,6 +4,7 @@ pragma solidity ^0.8.25;
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
 import {
+    OpcodeOutOfRange,
     StackAllocationMismatch,
     StackOutputsMismatch,
     StackUnderflow,
@@ -77,8 +78,10 @@ library LibIntegrityCheck {
             uint256 sourceCount = LibBytecode.sourceCount(bytecode);
 
             uint256 fPointersStart;
+            uint256 fsCount;
             assembly ("memory-safe") {
                 fPointersStart := add(fPointers, 0x20)
+                fsCount := div(mload(fPointers), 2)
             }
 
             // Ensure that the bytecode has no out of bounds pointers BEFORE we
@@ -120,15 +123,22 @@ library LibIntegrityCheck {
                     OperandV2 operand;
                     uint256 bytecodeOpInputs;
                     uint256 bytecodeOpOutputs;
+                    uint256 opcodeIndex;
                     function(IntegrityCheckState memory, OperandV2) view returns (uint256, uint256) f;
                     assembly ("memory-safe") {
                         let word := mload(cursor)
-                        f := shr(0xf0, mload(add(fPointersStart, mul(byte(28, word), 2))))
+                        opcodeIndex := byte(28, word)
                         // 3 bytes mask.
                         operand := and(word, 0xFFFFFF)
                         let ioByte := byte(29, word)
                         bytecodeOpInputs := and(ioByte, 0x0F)
                         bytecodeOpOutputs := shr(4, ioByte)
+                    }
+                    if (opcodeIndex >= fsCount) {
+                        revert OpcodeOutOfRange(state.opIndex, opcodeIndex, fsCount);
+                    }
+                    assembly ("memory-safe") {
+                        f := shr(0xf0, mload(add(fPointersStart, mul(opcodeIndex, 2))))
                     }
                     (uint256 calcOpInputs, uint256 calcOpOutputs) = f(state, operand);
                     if (calcOpInputs != bytecodeOpInputs) {

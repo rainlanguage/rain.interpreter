@@ -10,7 +10,7 @@ pragma solidity ^0.8.25;
 // file needs the contract to exist so that it can be compiled.
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0xcd7de1628ea5f78480895cad3c6d6a1b50685acc97e599914a44d9eb230d68a1);
+bytes32 constant BYTECODE_HASH = bytes32(0x0e1a894bf3cb89da9a39f4e2581e51f6693a3c565aaf7553e4826e6210b6fb39);
 
 /// @dev The function pointers known to the interpreter for dynamic dispatch.
 /// By setting these as a constant they can be inlined into the interpreter
