@@ -17,6 +17,9 @@ library LibInterpreterStateDataContract {
     /// Returns the total byte size needed to serialize `bytecode` and
     /// `constants` into a single contiguous memory region. The layout is:
     /// `[constants length][constants data...][bytecode length][bytecode data...]`.
+    /// Uses unchecked arithmetic — the caller MUST ensure the in-memory length
+    /// fields of `bytecode` and `constants` are not corrupt, otherwise the
+    /// multiplication or addition can silently overflow.
     /// @param bytecode The bytecode to serialize.
     /// @param constants The constants array to serialize.
     /// @return size The total byte size of the serialized representation.
