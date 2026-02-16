@@ -135,6 +135,7 @@ When reviewing code for audit, read every file in full. Do not rely on grepping 
 - Ensure no build warnings from `forge build` or `cargo check`
 - Identify leaky abstractions: internal details exposed through public interfaces, implementation concerns bleeding across module boundaries, or tight coupling between components that should be independent
 - Check that all submodules sharing the same dependency are pinned to the same git commit
+- Audit for style consistency across the repo — when similar code uses different patterns for the same thing, flag it
 
 ### Test Coverage
 - Every function in every contract and library must have associated test cases
