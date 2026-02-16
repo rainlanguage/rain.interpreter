@@ -46,7 +46,7 @@ contract RainterpreterParser is ERC165, IParserToolingV1 {
     }
 
     /// @inheritdoc ERC165
-    function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(IParserToolingV1).interfaceId || super.supportsInterface(interfaceId);
     }
 
