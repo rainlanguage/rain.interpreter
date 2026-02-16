@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: CAL
 pragma solidity ^0.8.25;
 
-import {ParseStackUnderflow} from "../../error/ErrParse.sol";
+import {ParseStackUnderflow, ParseStackOverflow} from "../../error/ErrParse.sol";
 
 type ParseStackTracker is uint256;
 
@@ -18,6 +18,9 @@ library LibParseStackTracker {
             tracker = tracker.push(n);
             uint256 inputs = (ParseStackTracker.unwrap(tracker) >> 8) & 0xFF;
             inputs += n;
+            if (inputs > 0xFF) {
+                revert ParseStackOverflow();
+            }
             return ParseStackTracker.wrap((ParseStackTracker.unwrap(tracker) & ~uint256(0xFF00)) | (inputs << 8));
         }
     }
@@ -33,6 +36,9 @@ library LibParseStackTracker {
             uint256 inputs = (ParseStackTracker.unwrap(tracker) >> 8) & 0xFF;
             uint256 max = ParseStackTracker.unwrap(tracker) >> 0x10;
             current += n;
+            if (current > 0xFF) {
+                revert ParseStackOverflow();
+            }
             if (current > max) {
                 max = current;
             }

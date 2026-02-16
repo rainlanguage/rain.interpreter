@@ -109,6 +109,10 @@ contract RainterpreterReferenceExternIntIncTest is OpTest {
         bytes memory unknownWord
     ) external {
         vm.assume(keccak256(unknownWord) != keccak256("ref-extern-inc"));
+        vm.assume(keccak256(unknownWord) != keccak256("ref-extern-stack-operand"));
+        vm.assume(keccak256(unknownWord) != keccak256("ref-extern-context-sender"));
+        vm.assume(keccak256(unknownWord) != keccak256("ref-extern-context-contract"));
+        vm.assume(keccak256(unknownWord) != keccak256("ref-extern-context-rainlen"));
         vm.assume(unknownWord.length < 32);
         // Extern "only" supports up to constant height of 0xFF.
         constantsHeight = uint16(bound(constantsHeight, 0, 0xFF));
