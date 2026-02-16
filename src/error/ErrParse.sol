@@ -144,3 +144,8 @@ error OpcodeIOOverflow(uint256 offset);
 
 /// Thrown when an operand value is larger than the maximum allowed.
 error OperandOverflow();
+
+/// The parser's free memory pointer exceeded 0x10000, which would corrupt
+/// the 16-bit pointers used internally by the parse system.
+/// @param freeMemoryPointer The free memory pointer value that exceeded the limit.
+error ParseMemoryOverflow(uint256 freeMemoryPointer);

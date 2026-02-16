@@ -10,7 +10,7 @@ pragma solidity ^0.8.25;
 // file needs the contract to exist so that it can be compiled.
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0x822c1d64a2ae067d6392b45a235a3d526dc148695059a98bfaada8af8f3aa3f4);
+bytes32 constant BYTECODE_HASH = bytes32(0x21256ae85166174a0d3b37c65502e7888198f18ae96f5edbd479c93ebeedc2db);
 
 /// @dev The parse meta that is used to lookup word definitions.
 /// The structure of the parse meta is:
@@ -39,11 +39,11 @@ uint8 constant PARSE_META_BUILD_DEPTH = 2;
 /// These positional indexes all map to the same indexes looked up in the parse
 /// meta.
 bytes constant OPERAND_HANDLER_FUNCTION_POINTERS =
-    hex"18ec18ec18ec198f1a601a601a60198f198f18ec18ec18ec1a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a601a6018ec1a601a60";
+    hex"193c193c193c19df1ab01ab01ab019df19df193c193c193c1ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab01ab0193c1ab01ab0";
 
 /// @dev Every two bytes is a function pointer for a literal parser.
 /// Literal dispatches are determined by the first byte(s) of the literal
 /// rather than a full word lookup, and are done with simple conditional
 /// jumps as the possibilities are limited compared to the number of words we
 /// have.
-bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"14f816cb170b174a";
+bytes constant LITERAL_PARSER_FUNCTION_POINTERS = hex"1548171b175b179a";

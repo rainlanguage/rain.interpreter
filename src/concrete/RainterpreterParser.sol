@@ -5,6 +5,7 @@ pragma solidity =0.8.25;
 import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
 import {LibParse} from "../lib/parse/LibParse.sol";
+import {ParseMemoryOverflow} from "../error/ErrParse.sol";
 import {PragmaV1} from "rain.interpreter.interface/interface/IParserPragmaV1.sol";
 import {LibParseState, ParseState} from "../lib/parse/LibParseState.sol";
 import {LibParsePragma} from "../lib/parse/LibParsePragma.sol";
@@ -41,9 +42,20 @@ contract RainterpreterParser is ERC165, IParserToolingV1 {
     function unsafeParse(bytes memory data) external view returns (bytes memory, bytes32[] memory) {
         // The return is used by returning it, so this is a false positive.
         //slither-disable-next-line unused-return
-        return LibParseState.newState(
+        (bytes memory bytecode, bytes32[] memory constants) = LibParseState.newState(
                 data, parseMeta(), operandHandlerFunctionPointers(), literalParserFunctionPointers()
             ).parse();
+        // The parse system uses 16-bit pointers internally. If the free
+        // memory pointer exceeded 0x10000 during parsing, those pointers
+        // may have been silently truncated, corrupting the result.
+        uint256 freeMemoryPointer;
+        assembly ("memory-safe") {
+            freeMemoryPointer := mload(0x40)
+        }
+        if (freeMemoryPointer >= 0x10000) {
+            revert ParseMemoryOverflow(freeMemoryPointer);
+        }
+        return (bytecode, constants);
     }
 
     /// @inheritdoc ERC165
