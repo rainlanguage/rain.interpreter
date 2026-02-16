@@ -30,7 +30,7 @@ library LibOpShiftBitsLeft {
     /// Shift bits left by the amount specified in the operand.
     function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         assembly ("memory-safe") {
-            mstore(stackTop, shl(and(operand, 0xFF), mload(stackTop)))
+            mstore(stackTop, shl(and(operand, 0xFFFF), mload(stackTop)))
         }
         return stackTop;
     }
