@@ -10,7 +10,7 @@ pragma solidity ^0.8.25;
 // file needs the contract to exist so that it can be compiled.
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0xc289dff0afd51804b276f5c712320da0032f6316f5a927d9ce8c29c7276e2207);
+bytes32 constant BYTECODE_HASH = bytes32(0xe1b7b61f017eb90405878959f768ec50a64af6b30b0d870b35bce9213ec1c6a3);
 
 /// @dev The hash of the meta that describes the contract.
 bytes32 constant DESCRIBED_BY_META_HASH = bytes32(0xadf71693c6ecf3fd560904bc46973d1b6e651440d15366673f9b3984749e7c16);
@@ -48,7 +48,7 @@ bytes constant SUB_PARSER_WORD_PARSERS = hex"079f07bf07cd07db07ea";
 /// @dev Every two bytes is a function pointer for an operand handler.
 /// These positional indexes all map to the same indexes looked up in the parse
 /// meta.
-bytes constant OPERAND_HANDLER_FUNCTION_POINTERS = hex"0d9c0dde0d9c0d9c0d9c";
+bytes constant OPERAND_HANDLER_FUNCTION_POINTERS = hex"0dda0e1c0dda0dda0dda";
 
 /// @dev Every two bytes is a function pointer for a literal parser.
 /// Literal dispatches are determined by the first byte(s) of the literal

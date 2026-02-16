@@ -10,7 +10,7 @@ pragma solidity ^0.8.25;
 // file needs the contract to exist so that it can be compiled.
 
 /// @dev Hash of the known bytecode.
-bytes32 constant BYTECODE_HASH = bytes32(0xc1407cd6436d9fac5721c1ac169e2c12ae908b99e9ac82b4147641d2f7c3df75);
+bytes32 constant BYTECODE_HASH = bytes32(0x48bb3bf1fc6846aab08a22cc0f7c6f2f74dbcf25708ff2d895262acfdbb7c0f7);
 
 /// @dev The hash of the meta that describes the contract.
 bytes32 constant DESCRIBED_BY_META_HASH = bytes32(0xb2500441a27ea683f814327be6e43c90f516b8f033203ad3e0ba2cde847fb0ba);

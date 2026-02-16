@@ -36,9 +36,9 @@ library LibParseStackName {
                 uint256 ptr;
                 uint256 oldStackNames = state.stackNames;
                 assembly ("memory-safe") {
+                    mstore(0, word)
+                    fingerprint := and(keccak256(0, 0x20), not(0xFFFFFFFF))
                     ptr := mload(0x40)
-                    mstore(ptr, word)
-                    fingerprint := and(keccak256(ptr, 0x20), not(0xFFFFFFFF))
                     mstore(ptr, oldStackNames)
                     mstore(0x40, add(ptr, 0x20))
                 }
