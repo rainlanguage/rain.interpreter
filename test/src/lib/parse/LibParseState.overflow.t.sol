@@ -43,9 +43,8 @@ contract LibParseStateOverflowTest is ParseTest {
     /// endLine calls snapshotSourceHeadToLineTracker once more, using
     /// the 15th slot (offset 0xF0) which is the last valid position.
     function testLineRHSItems14NoOverflow() external view {
-        LibMetaFixture.newState(
-            "_ _ _ _ _ _ _ _ _ _ _ _ _ _: a() a() a() a() a() a() a() a() a() a() a() a() a() a();"
-        ).parse();
+        LibMetaFixture.newState("_ _ _ _ _ _ _ _ _ _ _ _ _ _: a() a() a() a() a() a() a() a() a() a() a() a() a() a();")
+            .parse();
     }
 
     /// 15 top-level RHS items on one line MUST overflow.
