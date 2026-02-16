@@ -27,6 +27,9 @@ library LibOpTimestamp {
     }
 
     /// Reference implementation of `block-timestamp` for testing.
+    /// Uses the float conversion with exponent 0 to verify that
+    /// `fromFixedDecimalLosslessPacked(value, 0)` is identity, unlike `run()`
+    /// which stores the raw value directly as a gas optimization.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory)
         internal
         view
