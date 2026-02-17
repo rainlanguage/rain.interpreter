@@ -13,8 +13,6 @@ rain_interpreter_bindings = { workspace = true }
 rain-interpreter-eval = { workspace = true }
 anyhow = { workspace = true }
 clap = { workspace = true }
-serde = { workspace = true }
-serde_bytes = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true, features = ['env-filter'] }
 alloy = { workspace = true }
