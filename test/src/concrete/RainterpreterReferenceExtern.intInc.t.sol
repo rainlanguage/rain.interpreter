@@ -143,6 +143,25 @@ contract RainterpreterReferenceExternIntIncTest is OpTest {
         assertEq(StackItem.unwrap(outputs[1]), Float.unwrap(LibDecimalFloat.packLossless(4e66, -66)));
     }
 
+    /// Direct call to externIntegrity() with a valid opcode. Verifies the base
+    /// contract dispatch returns the same result as calling the library directly.
+    /// forge-config: default.fuzz.runs = 100
+    function testRainterpreterReferenceExternIntegrityDirect(
+        uint16 operand,
+        uint256 expectedInputs,
+        uint256 expectedOutputs
+    ) external {
+        RainterpreterReferenceExtern ext = new RainterpreterReferenceExtern();
+
+        OperandV2 op = OperandV2.wrap(bytes32(uint256(operand)));
+        ExternDispatchV2 dispatch = LibExtern.encodeExternDispatch(OP_INDEX_INCREMENT, op);
+
+        (uint256 actualInputs, uint256 actualOutputs) = ext.externIntegrity(dispatch, expectedInputs, expectedOutputs);
+        (uint256 libInputs, uint256 libOutputs) = LibExternOpIntInc.integrity(op, expectedInputs, expectedOutputs);
+        assertEq(actualInputs, libInputs);
+        assertEq(actualOutputs, libOutputs);
+    }
+
     /// Out-of-range opcode wraps via mod in extern(). RainterpreterReferenceExtern
     /// has 1 opcode, so any opcode should mod to 0 (intInc).
     function testRainterpreterReferenceExternExternModWrap(uint16 opcode) external {
