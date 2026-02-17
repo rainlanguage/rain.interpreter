@@ -10,6 +10,7 @@ import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {
     DanglingSource,
     MaxSources,
+    ParseMemoryOverflow,
     ParseStackOverflow,
     UnclosedLeftParen,
     ExcessRHSItems,
@@ -967,6 +968,28 @@ library LibParseState {
                 // Store the values not the keys.
                 mstore(cursor, mload(add(tailPtr, 0x20)))
             }
+        }
+    }
+
+    /// The parse system packs memory pointers into 16 bits throughout its
+    /// linked list structures (active source slots, paren tracker, line
+    /// tracker, sources builder, constants builder, stack names). This is
+    /// safe as long as all memory allocated during parsing stays below
+    /// 0x10000. If the free memory pointer reaches or exceeds that limit,
+    /// any pointer stored after the overflow was silently truncated,
+    /// corrupting the linked lists and producing invalid bytecode.
+    ///
+    /// This check MUST run after any complete parse operation. Callers that
+    /// use `LibParse.parse` or `LibParsePragma.parsePragma` through a
+    /// concrete contract should apply this check (or the
+    /// `checkParseMemoryOverflow` modifier) after the call returns.
+    function checkParseMemoryOverflow() internal pure {
+        uint256 freeMemoryPointer;
+        assembly ("memory-safe") {
+            freeMemoryPointer := mload(0x40)
+        }
+        if (freeMemoryPointer >= 0x10000) {
+            revert ParseMemoryOverflow(freeMemoryPointer);
         }
     }
 }
