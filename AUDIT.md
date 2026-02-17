@@ -13,7 +13,7 @@ After reading each file, the agent must list evidence of thorough reading before
 
 This evidence must appear in the agent's output before any findings for that file. If the evidence is missing or incomplete, the audit of that file is invalid and must be re-run.
 
-Findings from all passes should be reported, not fixed. Fixes are a separate step after findings are reviewed.
+Findings from all passes should be reported, not fixed. Fixes are a separate step after findings are reviewed. Each agent must write its findings to `audit/<YYYY-MM-DD>/pass<N>/<AgentName>.md`. Each audit run uses an ISO 8601 date namespace so previous runs are preserved as history. Findings that only exist in agent task output are lost when context compacts — the file is the record of truth.
 
 ## Pass 1: Security
 
