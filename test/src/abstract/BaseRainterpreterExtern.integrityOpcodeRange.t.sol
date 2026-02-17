@@ -33,13 +33,33 @@ contract BaseRainterpreterExternIntegrityOpcodeRangeTest is Test {
     function testExternIntegrityRevertsOpcodeOutOfRange(uint16 opcode, uint16 operand) external {
         // TwoOpExtern has 2 pointers, so valid opcodes are 0 and 1.
         vm.assume(opcode >= 2);
-        TwoOpExtern extern = new TwoOpExtern();
+        TwoOpExtern ext = new TwoOpExtern();
 
         // Encode opcode into bits 16-31 and operand into bits 0-15 of the
         // dispatch bytes32.
         bytes32 dispatch = bytes32(uint256(opcode)) << 0x10 | bytes32(uint256(operand));
 
         vm.expectRevert(abi.encodeWithSelector(ExternOpcodeOutOfRange.selector, uint256(opcode), 2));
-        extern.externIntegrity(ExternDispatchV2.wrap(dispatch), 0, 0);
+        ext.externIntegrity(ExternDispatchV2.wrap(dispatch), 0, 0);
+    }
+
+    /// Boundary: opcode == fsCount - 1 must NOT revert with ExternOpcodeOutOfRange.
+    /// TwoOpExtern has fsCount == 2, so opcode 1 is valid.
+    function testExternIntegrityBoundaryHighestValidOpcode(uint16 operand) external {
+        TwoOpExtern ext = new TwoOpExtern();
+
+        // opcode 1 is fsCount - 1
+        bytes32 dispatch = bytes32(uint256(1)) << 0x10 | bytes32(uint256(operand));
+
+        // Dummy function pointers will cause some other revert, but NOT
+        // ExternOpcodeOutOfRange. That's what we're testing.
+        try ext.externIntegrity(ExternDispatchV2.wrap(dispatch), 0, 0) {}
+        catch (bytes memory reason) {
+            assertTrue(
+                keccak256(reason)
+                    != keccak256(abi.encodeWithSelector(ExternOpcodeOutOfRange.selector, uint256(1), 2)),
+                "should not revert with ExternOpcodeOutOfRange for valid opcode"
+            );
+        }
     }
 }
