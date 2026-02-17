@@ -620,9 +620,13 @@ library LibParseState {
     /// Writes an opcode and operand pair into the active source at the current
     /// bit offset. Updates paren tracking counters, top-level word counters,
     /// and allocates a new source slot if the current one is full.
+    /// The caller MUST ensure `opcode` fits in 8 bits and `operand` fits in
+    /// 16 bits. Wider values will silently corrupt adjacent slots in the
+    /// packed source because neither is masked before shifting into position.
     /// @param state The parse state containing the active source.
-    /// @param opcode The opcode to write into the source.
-    /// @param operand The operand to write alongside the opcode.
+    /// @param opcode The opcode to write into the source. MUST fit in 8 bits.
+    /// @param operand The operand to write alongside the opcode. MUST fit in
+    /// 16 bits.
     function pushOpToSource(ParseState memory state, uint256 opcode, OperandV2 operand) internal pure {
         unchecked {
             // This might be a top level item so try to snapshot its pointer to
