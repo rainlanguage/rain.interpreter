@@ -66,6 +66,54 @@ contract MismatchedWordSubParser is BaseRainterpreterSubParser {
     }
 }
 
+/// @dev Sub parser with 1 word in meta but zero word parser pointers.
+/// Looking up the word at index 0 triggers SubParserIndexOutOfBounds(0, 0).
+contract EmptyWordParsersSubParser is BaseRainterpreterSubParser {
+    function subParserParseMeta() internal pure override returns (bytes memory) {
+        AuthoringMetaV2[] memory meta = new AuthoringMetaV2[](1);
+        meta[0] = AuthoringMetaV2("aaa", "");
+        return LibGenParseMeta.buildParseMetaV2(meta, 1);
+    }
+
+    function subParserOperandHandlers() internal pure override returns (bytes memory) {
+        unchecked {
+            function(bytes32[] memory) internal pure returns (OperandV2) lengthPointer;
+            uint256 length = 1;
+            assembly ("memory-safe") {
+                lengthPointer := length
+            }
+            function(bytes32[] memory) internal pure returns (OperandV2)[2] memory handlersFixed =
+                [lengthPointer, LibParseOperand.handleOperandDisallowed];
+            uint256[] memory handlersDynamic;
+            assembly ("memory-safe") {
+                handlersDynamic := handlersFixed
+            }
+            return LibConvert.unsafeTo16BitBytes(handlersDynamic);
+        }
+    }
+
+    function subParserWordParsers() internal pure override returns (bytes memory) {
+        // Empty — parsersLength = 0.
+        return "";
+    }
+
+    function describedByMetaV1() external pure override returns (bytes32) {
+        return bytes32(0);
+    }
+
+    function buildLiteralParserFunctionPointers() external pure returns (bytes memory) {
+        return "";
+    }
+
+    function buildOperandHandlerFunctionPointers() external pure returns (bytes memory) {
+        return "";
+    }
+
+    function buildSubParserWordParsers() external pure returns (bytes memory) {
+        return "";
+    }
+}
+
 /// @title BaseRainterpreterSubParserWord2Test
 /// Direct unit tests for subParseWord2.
 contract BaseRainterpreterSubParserWord2Test is Test {
@@ -84,6 +132,23 @@ contract BaseRainterpreterSubParserWord2Test is Test {
         );
 
         vm.expectRevert(abi.encodeWithSelector(SubParserIndexOutOfBounds.selector, uint256(1), uint256(1)));
+        subParser.subParseWord2(data);
+    }
+
+    /// Empty word parsers table: even index 0 is out of range.
+    function testSubParseWord2RevertsEmptyWordParsers() external {
+        EmptyWordParsersSubParser subParser = new EmptyWordParsersSubParser();
+
+        bytes memory word = bytes("aaa");
+        bytes memory data = bytes.concat(
+            bytes2(0), // constantsHeight
+            bytes1(0), // ioByte
+            bytes2(uint16(word.length)), // word length
+            word, // word data
+            bytes32(0) // operand values array (length 0)
+        );
+
+        vm.expectRevert(abi.encodeWithSelector(SubParserIndexOutOfBounds.selector, uint256(0), uint256(0)));
         subParser.subParseWord2(data);
     }
 }
