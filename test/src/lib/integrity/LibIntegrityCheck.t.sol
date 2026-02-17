@@ -4,7 +4,7 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {LibIntegrityCheck, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {OpcodeOutOfRange, StackUnderflow} from "src/error/ErrIntegrity.sol";
+import {OpcodeOutOfRange, StackUnderflow, StackUnderflowHighwater} from "src/error/ErrIntegrity.sol";
 import {INTEGRITY_FUNCTION_POINTERS} from "src/generated/RainterpreterExpressionDeployer.pointers.sol";
 import {ALL_STANDARD_OPS_LENGTH} from "src/lib/op/LibAllStandardOps.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
@@ -26,6 +26,44 @@ contract IntegrityTestHelper {
             }
             function(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256)[2] memory
                 pointersFixed = [lengthPointer, oneInputOneOutput];
+            uint256[] memory pointersDynamic;
+            assembly ("memory-safe") {
+                pointersDynamic := pointersFixed
+            }
+            return LibConvert.unsafeTo16BitBytes(pointersDynamic);
+        }
+    }
+
+    function runIntegrityCheck(bytes memory fPointers, bytes memory bytecode, bytes32[] memory constants)
+        external
+        view
+        returns (bytes memory)
+    {
+        return LibIntegrityCheck.integrityCheck2(fPointers, bytecode, constants);
+    }
+}
+
+/// @dev Helper with 2 opcodes for testing StackUnderflowHighwater.
+/// Opcode 0: 0 inputs, 2 outputs (advances highwater).
+/// Opcode 1: 2 inputs, 1 output (drops stack below highwater).
+contract HighwaterTestHelper {
+    function zeroInputTwoOutput(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
+        return (0, 2);
+    }
+
+    function twoInputOneOutput(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
+        return (2, 1);
+    }
+
+    function buildIntegrityPointers() external pure returns (bytes memory) {
+        unchecked {
+            function(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) lengthPointer;
+            uint256 length = 2;
+            assembly ("memory-safe") {
+                lengthPointer := length
+            }
+            function(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256)[3] memory
+                pointersFixed = [lengthPointer, zeroInputTwoOutput, twoInputOneOutput];
             uint256[] memory pointersDynamic;
             assembly ("memory-safe") {
                 pointersDynamic := pointersFixed
@@ -145,6 +183,36 @@ contract LibIntegrityCheckTest is Test {
         bytes32[] memory constants = new bytes32[](0);
 
         vm.expectRevert(abi.encodeWithSelector(StackUnderflow.selector, 0, 0, 1));
+        helper.runIntegrityCheck(fPointers, bytecode, constants);
+    }
+
+    /// StackUnderflowHighwater: opcode 0 produces 2 outputs (advancing the
+    /// highwater to 2), then opcode 1 consumes 2 inputs (dropping the stack
+    /// to 0, which is below the highwater of 2).
+    function testStackUnderflowHighwater() external {
+        HighwaterTestHelper helper = new HighwaterTestHelper();
+        bytes memory fPointers = helper.buildIntegrityPointers();
+
+        // 2 opcodes in a single source, 0 source inputs, 1 output.
+        // Op 0: opcode 0, ioByte 0x20 (0 inputs, 2 outputs)
+        // Op 1: opcode 1, ioByte 0x12 (2 inputs, 1 output)
+        bytes memory bytecode = abi.encodePacked(
+            uint8(1), // sourceCount
+            uint16(0), // relative offset source 0
+            uint8(2), // opsCount = 2
+            uint8(2), // stackAllocation
+            uint8(0), // source inputs = 0
+            uint8(1), // source outputs = 1
+            uint8(0), // opcode 0 (zeroInputTwoOutput)
+            uint8(0x20), // ioByte: 0 inputs, 2 outputs
+            uint16(0), // operand
+            uint8(1), // opcode 1 (twoInputOneOutput)
+            uint8(0x12), // ioByte: 2 inputs, 1 output
+            uint16(0) // operand
+        );
+        bytes32[] memory constants = new bytes32[](0);
+
+        vm.expectRevert(abi.encodeWithSelector(StackUnderflowHighwater.selector, 1, 0, 2));
         helper.runIntegrityCheck(fPointers, bytecode, constants);
     }
 }
