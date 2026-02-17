@@ -191,9 +191,8 @@ contract LibOpCallTest is OpTest, BytecodeTest {
         ExpectedTrace[] memory traces = new ExpectedTrace[](2);
         traces[0].sourceIndex = 0;
         traces[0].stack = new StackItem[](1);
-        traces[0].stack[0] = StackItem.wrap(
-            Float.unwrap(LibDecimalFloat.add(LibDecimalFloat.FLOAT_ONE, LibDecimalFloat.FLOAT_ONE))
-        );
+        traces[0].stack[0] =
+            StackItem.wrap(Float.unwrap(LibDecimalFloat.add(LibDecimalFloat.FLOAT_ONE, LibDecimalFloat.FLOAT_ONE)));
         traces[1].sourceIndex = 1;
         traces[1].stack = new StackItem[](1);
         traces[1].stack[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.FLOAT_ONE));
@@ -274,9 +273,9 @@ contract LibOpCallTest is OpTest, BytecodeTest {
         stack = new StackItem[](2);
         // Order dependent inputs and outputs.
         stack[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(9, 0)));
-        stack[1] = StackItem.wrap(Float.unwrap(LibDecimalFloat.div(
-            LibDecimalFloat.packLossless(10, 0), LibDecimalFloat.packLossless(5, 0)
-        )));
+        stack[1] = StackItem.wrap(
+            Float.unwrap(LibDecimalFloat.div(LibDecimalFloat.packLossless(10, 0), LibDecimalFloat.packLossless(5, 0)))
+        );
         checkCallRun("a b: call<1>(10 5); ten five:, a b: div(ten five) 9;", stack, kvs);
 
         // One input two outputs.

@@ -12,3 +12,6 @@ error ExternDispatchConstantsHeightOverflow(uint256 constantsHeight);
 /// @dev Thrown when a subparser is asked to build a constant opcode when the
 /// constants height overflows the 16-bit operand encoding.
 error ConstantOpcodeConstantsHeightOverflow(uint256 constantsHeight);
+
+/// @dev Thrown when a context column or row overflows uint8.
+error ContextGridOverflow(uint256 column, uint256 row);

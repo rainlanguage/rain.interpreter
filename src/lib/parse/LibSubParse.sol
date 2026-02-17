@@ -16,7 +16,8 @@ import {BadSubParserResult, UnknownWord, UnsupportedLiteralType} from "../../err
 import {IInterpreterExternV4, LibExtern, EncodedExternDispatchV2} from "../extern/LibExtern.sol";
 import {
     ExternDispatchConstantsHeightOverflow,
-    ConstantOpcodeConstantsHeightOverflow
+    ConstantOpcodeConstantsHeightOverflow,
+    ContextGridOverflow
 } from "../../error/ErrSubParse.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibParseError} from "./LibParseError.sol";
@@ -27,7 +28,7 @@ library LibSubParse {
 
     /// Sub parse a word into a context grid position. The column and row are
     /// encoded as single bytes in the operand, so values MUST be <= 255.
-    /// Values > 255 will be silently truncated by `mstore8`.
+    /// Reverts with `ContextGridOverflow` if either value exceeds uint8.
     /// @param column The column index in the context grid. Must fit in uint8.
     /// @param row The row index in the context grid. Must fit in uint8.
     /// @return Whether the sub parse succeeded.
@@ -38,6 +39,9 @@ library LibSubParse {
         pure
         returns (bool, bytes memory, bytes32[] memory)
     {
+        if (column > 0xFF || row > 0xFF) {
+            revert ContextGridOverflow(column, row);
+        }
         bytes memory bytecode;
         uint256 opIndex = OPCODE_CONTEXT;
         assembly ("memory-safe") {
@@ -49,8 +53,6 @@ library LibSubParse {
             bytecode := mload(0x40)
             mstore(0x40, add(bytecode, 0x24))
 
-            // The caller is responsible for ensuring the column and row are
-            // within `uint8`.
             mstore8(add(bytecode, 0x23), column)
             mstore8(add(bytecode, 0x22), row)
 
