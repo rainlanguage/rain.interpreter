@@ -24,9 +24,9 @@
 | A25-2 | FIXED | Removed unused dependencies `serde` and `serde_bytes` from CLI `Cargo.toml` |
 | A26-1 | FIXED | Changed `From<ForkTypedReturn<eval4Call>>` to `TryFrom` with `MissingTraces` error instead of `unwrap()` on traces |
 | A26-4 | FIXED | Fixed `search_trace_by_path` parent tracking: loop now searches by `current_source_index` and advances parent correctly; added 3-level path test |
-| A27-3 | PENDING | Edition inconsistency — `parser` and `dispair` crates hardcode `edition = "2021"` vs workspace `edition = "2024"` |
+| A27-3 | FIXED | Updated `parser` and `dispair` crates from `edition = "2021"` to `edition = "2024"` to match workspace |
 | A27-5 | PENDING | Duplicated `Parser2` trait definition for wasm vs non-wasm targets |
-| A27-13 | PENDING | `parse_pragma_text` is inherent method while other parse methods are on the `Parser2` trait |
+| A27-13 | FIXED | Moved `parse_pragma_text` from inherent method on `ParserV2` to default method on `Parser2` trait |
 
 ## LOW — Dead Code / Unused Declarations
 

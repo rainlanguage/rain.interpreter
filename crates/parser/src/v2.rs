@@ -34,6 +34,21 @@ pub trait Parser2 {
         data: Vec<u8>,
         client: ReadableClient,
     ) -> impl std::future::Future<Output = Result<parsePragma1Return, ParserError>> + Send;
+
+    /// Call Parser contract to parse the provided rainlang text and return the pragma addresses.
+    fn parse_pragma_text(
+        &self,
+        text: &str,
+        client: ReadableClient,
+    ) -> impl std::future::Future<Output = Result<Vec<Address>, ParserError>> + Send
+    where
+        Self: Sync,
+    {
+        async {
+            let res = self.parse_pragma(text.as_bytes().to_vec(), client).await?;
+            Ok(res._0.usingWordsFrom)
+        }
+    }
 }
 
 #[cfg(target_family = "wasm")]
@@ -65,6 +80,21 @@ pub trait Parser2 {
         data: Vec<u8>,
         client: ReadableClient,
     ) -> impl std::future::Future<Output = Result<parsePragma1Return, ParserError>>;
+
+    /// Call Parser contract to parse the provided rainlang text and return the pragma addresses.
+    fn parse_pragma_text(
+        &self,
+        text: &str,
+        client: ReadableClient,
+    ) -> impl std::future::Future<Output = Result<Vec<Address>, ParserError>>
+    where
+        Self: Sync,
+    {
+        async {
+            let res = self.parse_pragma(text.as_bytes().to_vec(), client).await?;
+            Ok(res._0.usingWordsFrom)
+        }
+    }
 }
 
 /// ParserV2
@@ -133,21 +163,6 @@ impl Parser2 for ParserV2 {
             .map_err(ParserError::ReadableClientError)?;
 
         Ok(parsePragma1Return { _0: pragma })
-    }
-}
-
-impl ParserV2 {
-    /// Call Parser contract to parse the provided rainlang text and provide the pragma.
-    pub async fn parse_pragma_text(
-        &self,
-        text: &str,
-        client: ReadableClient,
-    ) -> Result<Vec<Address>, ParserError>
-    where
-        Self: Sync,
-    {
-        let res = self.parse_pragma(text.as_bytes().to_vec(), client).await?;
-        Ok(res._0.usingWordsFrom)
     }
 }
 
