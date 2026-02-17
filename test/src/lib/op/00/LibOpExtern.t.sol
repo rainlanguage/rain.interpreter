@@ -189,9 +189,7 @@ contract LibOpExternTest is OpTest {
             abi.encode(badOutputs)
         );
 
-        vm.expectRevert(
-            abi.encodeWithSelector(BadOutputsLength.selector, outputs.length, badOutputs.length)
-        );
+        vm.expectRevert(abi.encodeWithSelector(BadOutputsLength.selector, outputs.length, badOutputs.length));
         this.externalRun(state, operand, inputs);
     }
 
@@ -247,9 +245,7 @@ contract LibOpExternTest is OpTest {
             abi.encode(extraOutputs)
         );
 
-        vm.expectRevert(
-            abi.encodeWithSelector(BadOutputsLength.selector, outputs.length, extraOutputs.length)
-        );
+        vm.expectRevert(abi.encodeWithSelector(BadOutputsLength.selector, outputs.length, extraOutputs.length));
         this.externalRun(state, operand, inputs);
     }
 

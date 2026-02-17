@@ -2,6 +2,9 @@
   "lib/rain.deploy": {
     "rev": "f972424d1f8fb62378ebc5f5e95872f7a9647755"
   },
+  "lib/rain.extrospection": {
+    "rev": "6445dbc995a923cbec32860cc84a88dbfea3ba68"
+  },
   "lib/rain.interpreter.interface": {
     "rev": "639b80f929d8a8213fe75e35b446708ba49a8e6a"
   },

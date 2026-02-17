@@ -39,11 +39,7 @@ contract LibSubParseBadSubParserResultTest is OpTest {
     function checkBadSubParserResult(bytes memory badBytecodeValue) internal {
         BadLengthSubParser bad = new BadLengthSubParser(badBytecodeValue);
         checkUnhappyParse(
-            bytes(
-                string.concat(
-                    "using-words-from ", address(bad).toHexString(), " _: some-unknown-word();"
-                )
-            ),
+            bytes(string.concat("using-words-from ", address(bad).toHexString(), " _: some-unknown-word();")),
             abi.encodeWithSelector(BadSubParserResult.selector, badBytecodeValue)
         );
     }

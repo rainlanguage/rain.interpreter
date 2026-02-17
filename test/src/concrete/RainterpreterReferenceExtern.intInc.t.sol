@@ -127,6 +127,22 @@ contract RainterpreterReferenceExternIntIncTest is OpTest {
         assertEq(constants.length, 0);
     }
 
+    /// Direct call to extern() on the base contract with the intInc opcode.
+    function testRainterpreterReferenceExternExternDirect() external {
+        RainterpreterReferenceExtern ext = new RainterpreterReferenceExtern();
+
+        ExternDispatchV2 dispatch = LibExtern.encodeExternDispatch(OP_INDEX_INCREMENT, OperandV2.wrap(0));
+
+        StackItem[] memory inputs = new StackItem[](2);
+        inputs[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(2e66, -66)));
+        inputs[1] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(3e66, -66)));
+
+        StackItem[] memory outputs = ext.extern(dispatch, inputs);
+        assertEq(outputs.length, 2);
+        assertEq(StackItem.unwrap(outputs[0]), Float.unwrap(LibDecimalFloat.packLossless(3e66, -66)));
+        assertEq(StackItem.unwrap(outputs[1]), Float.unwrap(LibDecimalFloat.packLossless(4e66, -66)));
+    }
+
     /// Test the inc library directly. The run function should increment every
     /// value it is passed by 1.
     /// forge-config: default.fuzz.runs = 100
