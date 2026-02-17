@@ -86,11 +86,10 @@ uint256 constant PARSE_STATE_LINE_TRACKER_OFFSET = 0xa0;
 /// @param sourcesBuilder A builder for the sources array. This is a 256 bit
 /// integer where each 16 bits is a literal memory pointer to a source.
 /// @param fsm The finite state machine representation of the parser.
-/// - bit 0: LHS/RHS => 0 = LHS, 1 = RHS
-/// - bit 1: yang/yin => 0 = yin, 1 = yang
-/// - bit 2: word end => 0 = not end, 1 = end
-/// - bit 3: accepting inputs => 0 = not accepting, 1 = accepting
-/// - bit 4: interstitial => 0 = not interstitial, 1 = interstitial
+/// - bit 0 (FSM_YANG_MASK): yang/yin => 0 = yin, 1 = yang
+/// - bit 1 (FSM_WORD_END_MASK): word end => 0 = not end, 1 = end
+/// - bit 2 (FSM_ACCEPTING_INPUTS_MASK): accepting inputs => 0 = not accepting, 1 = accepting
+/// - bit 3 (FSM_ACTIVE_SOURCE_MASK): active source => 0 = no active source, 1 = active source
 /// @param topLevel0 Memory region for stack word counters. The first byte is a
 /// counter/offset into the region, which increments for every top level item
 /// parsed on the RHS. The remaining 31 bytes are the word counters for each

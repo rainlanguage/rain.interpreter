@@ -18,7 +18,7 @@
 
 | ID | Status | Description |
 |----|--------|-------------|
-| A21-1 | PENDING | Dead constants `NOT_LOW_16_BIT_MASK` and `ACTIVE_SOURCE_MASK` in LibParse.sol |
+| A21-1 | FIXED | Dead constants `NOT_LOW_16_BIT_MASK` and `ACTIVE_SOURCE_MASK` removed from LibParse.sol |
 | A23-3 | PENDING | FSM NatSpec does not match defined constants in LibParseState.sol |
 | A24-2 | PENDING | Function pointer mutability mismatch between storage and retrieval in LibParseLiteral.sol |
 | A25-2 | PENDING | Unused dependencies `serde` and `serde_bytes` in CLI `Cargo.toml` |
