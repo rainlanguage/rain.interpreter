@@ -4,13 +4,47 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {LibIntegrityCheck, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {OpcodeOutOfRange} from "src/error/ErrIntegrity.sol";
+import {OpcodeOutOfRange, StackUnderflow} from "src/error/ErrIntegrity.sol";
 import {INTEGRITY_FUNCTION_POINTERS} from "src/generated/RainterpreterExpressionDeployer.pointers.sol";
 import {ALL_STANDARD_OPS_LENGTH} from "src/lib/op/LibAllStandardOps.sol";
+import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
+import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
+
+/// @dev Helper contract whose integrity function pointers are valid for its
+/// own bytecode. Has a single opcode (index 0) that always returns (1, 1).
+contract IntegrityTestHelper {
+    function oneInputOneOutput(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
+        return (1, 1);
+    }
+
+    function buildIntegrityPointers() external pure returns (bytes memory) {
+        unchecked {
+            function(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) lengthPointer;
+            uint256 length = 1;
+            assembly ("memory-safe") {
+                lengthPointer := length
+            }
+            function(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256)[2] memory
+                pointersFixed = [lengthPointer, oneInputOneOutput];
+            uint256[] memory pointersDynamic;
+            assembly ("memory-safe") {
+                pointersDynamic := pointersFixed
+            }
+            return LibConvert.unsafeTo16BitBytes(pointersDynamic);
+        }
+    }
+
+    function runIntegrityCheck(bytes memory fPointers, bytes memory bytecode, bytes32[] memory constants)
+        external
+        view
+        returns (bytes memory)
+    {
+        return LibIntegrityCheck.integrityCheck2(fPointers, bytecode, constants);
+    }
+}
 
 /// @title LibIntegrityCheckTest
-/// @notice Tests for LibIntegrityCheck, particularly the OpcodeOutOfRange
-/// bounds check on opcode indexes in bytecode.
+/// @notice Tests for LibIntegrityCheck.
 contract LibIntegrityCheckTest is Test {
     /// Wrap integrityCheck2 in an external call so vm.expectRevert works.
     function integrityCheck2External(bytes memory fPointers, bytes memory bytecode, bytes32[] memory constants)
@@ -87,5 +121,30 @@ contract LibIntegrityCheckTest is Test {
                 errorSig != OpcodeOutOfRange.selector, "should not revert with OpcodeOutOfRange for in-range opcode"
             );
         }
+    }
+
+    /// StackUnderflow: opcode 0 needs 1 input but the stack is empty.
+    /// Uses IntegrityTestHelper which has its own valid function pointers.
+    function testStackUnderflow() external {
+        IntegrityTestHelper helper = new IntegrityTestHelper();
+        bytes memory fPointers = helper.buildIntegrityPointers();
+
+        // Single source, 0 source inputs, 1 output.
+        // Opcode 0 with ioByte 0x11 (1 input, 1 output).
+        bytes memory bytecode = abi.encodePacked(
+            uint8(1), // sourceCount
+            uint16(0), // relative offset source 0
+            uint8(1), // opsCount
+            uint8(1), // stackAllocation
+            uint8(0), // source inputs = 0
+            uint8(1), // source outputs = 1
+            uint8(0), // opcode index 0 (oneInputOneOutput)
+            uint8(0x11), // ioByte: 1 input, 1 output
+            uint16(0) // operand
+        );
+        bytes32[] memory constants = new bytes32[](0);
+
+        vm.expectRevert(abi.encodeWithSelector(StackUnderflow.selector, 0, 0, 1));
+        helper.runIntegrityCheck(fPointers, bytecode, constants);
     }
 }
