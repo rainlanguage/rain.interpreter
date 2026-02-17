@@ -57,6 +57,13 @@ uint256 constant NOT_LOW_16_BIT_MASK = ~uint256(0xFFFF);
 uint256 constant ACTIVE_SOURCE_MASK = NOT_LOW_16_BIT_MASK;
 uint256 constant SUB_PARSER_BYTECODE_HEADER_SIZE = 5;
 
+/// @title LibParse
+/// Core parsing library for Rainlang source text.
+///
+/// The parser only supports single-byte ASCII input. All character masks are
+/// 128-bit bitmaps indexed by byte value, so bytes above 0x7F (non-ASCII /
+/// multibyte UTF-8 sequences) will never match any mask and will be rejected
+/// as unexpected characters. Callers MUST NOT pass non-ASCII input.
 library LibParse {
     using LibPointer for Pointer;
     using LibParseStackName for ParseState;
