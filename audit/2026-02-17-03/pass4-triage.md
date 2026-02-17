@@ -22,8 +22,8 @@
 | A23-3 | FIXED | FSM NatSpec corrected to match actual bit positions and constant names in LibParseState.sol |
 | A24-2 | FIXED | Literal parser function pointer type corrected from `pure` to `view`; cascaded to callers |
 | A25-2 | FIXED | Removed unused dependencies `serde` and `serde_bytes` from CLI `Cargo.toml` |
-| A26-1 | PENDING | `unwrap()` on `traces` in `From<ForkTypedReturn<eval4Call>>` for `RainEvalResult` |
-| A26-4 | PENDING | `search_trace_by_path` has a logic bug in parent tracking |
+| A26-1 | FIXED | Changed `From<ForkTypedReturn<eval4Call>>` to `TryFrom` with `MissingTraces` error instead of `unwrap()` on traces |
+| A26-4 | FIXED | Fixed `search_trace_by_path` parent tracking: loop now searches by `current_source_index` and advances parent correctly; added 3-level path test |
 | A27-3 | PENDING | Edition inconsistency — `parser` and `dispair` crates hardcode `edition = "2021"` vs workspace `edition = "2024"` |
 | A27-5 | PENDING | Duplicated `Parser2` trait definition for wasm vs non-wasm targets |
 | A27-13 | PENDING | `parse_pragma_text` is inherent method while other parse methods are on the `Parser2` trait |

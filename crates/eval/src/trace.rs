@@ -67,11 +67,17 @@ pub struct RainEvalResult {
 }
 
 #[cfg(not(target_family = "wasm"))]
-impl From<ForkTypedReturn<eval4Call>> for RainEvalResult {
-    fn from(typed_return: ForkTypedReturn<eval4Call>) -> Self {
+impl TryFrom<ForkTypedReturn<eval4Call>> for RainEvalResult {
+    type Error = RainEvalResultFromRawCallResultError;
+
+    fn try_from(typed_return: ForkTypedReturn<eval4Call>) -> Result<Self, Self::Error> {
         let eval4Return { stack, writes } = typed_return.typed_return;
 
-        let call_trace_arena = typed_return.raw.traces.unwrap().to_owned();
+        let call_trace_arena = typed_return
+            .raw
+            .traces
+            .ok_or(RainEvalResultFromRawCallResultError::MissingTraces)?
+            .to_owned();
         let mut traces: Vec<RainSourceTrace> = call_trace_arena
             .deref()
             .clone()
@@ -87,12 +93,12 @@ impl From<ForkTypedReturn<eval4Call>> for RainEvalResult {
             .collect();
         traces.reverse();
 
-        RainEvalResult {
+        Ok(RainEvalResult {
             reverted: typed_return.raw.reverted,
             stack: stack.into_iter().map(Into::into).collect(),
             writes: writes.into_iter().map(Into::into).collect(),
             traces,
-        }
+        })
     }
 }
 
@@ -168,15 +174,15 @@ impl RainEvalResult {
                 .parse::<u16>()
                 .map_err(|_| TraceSearchError::BadTracePath(path.to_string()))?;
 
-            if let Some(trace) = self.traces.iter().find(|t| {
-                t.parent_source_index == current_parent_index && t.source_index == next_source_index
+            if self.traces.iter().any(|t| {
+                t.parent_source_index == current_source_index && t.source_index == next_source_index
             }) {
-                current_parent_index = trace.parent_source_index;
-                current_source_index = trace.source_index;
+                current_parent_index = current_source_index;
+                current_source_index = next_source_index;
             } else {
                 return Err(TraceSearchError::TraceNotFound(format!(
                     "Trace with parent {}.{} not found",
-                    current_parent_index, next_source_index
+                    current_source_index, next_source_index
                 )));
             }
         }
@@ -350,7 +356,7 @@ mod tests {
             .await
             .unwrap();
 
-        let rain_eval_result = RainEvalResult::from(res);
+        let rain_eval_result = RainEvalResult::try_from(res).unwrap();
 
         // reverted
         assert!(!rain_eval_result.reverted);
@@ -423,7 +429,7 @@ mod tests {
             .await
             .unwrap();
 
-        let rain_eval_result = RainEvalResult::from(res);
+        let rain_eval_result = RainEvalResult::try_from(res).unwrap();
 
         // search_trace_by_path
         let trace_0 = rain_eval_result.search_trace_by_path("0.1").unwrap();
@@ -432,6 +438,16 @@ mod tests {
         assert_eq!(trace_1, U256::from(3));
         let trace_2 = rain_eval_result.search_trace_by_path("0.1.2").unwrap();
         assert_eq!(trace_2, U256::from(2));
+
+        // 3-level path: source 0 → source 1 → source 2
+        // trace 2 has parent=1, source=2, stack=[2, 2, 1]
+        // stack is reversed when indexing: index 0 → stack[2]=1, index 1 → stack[1]=2, index 2 → stack[0]=2
+        let trace_3 = rain_eval_result.search_trace_by_path("0.1.2.0").unwrap();
+        assert_eq!(trace_3, U256::from(1));
+        let trace_4 = rain_eval_result.search_trace_by_path("0.1.2.1").unwrap();
+        assert_eq!(trace_4, U256::from(2));
+        let trace_5 = rain_eval_result.search_trace_by_path("0.1.2.2").unwrap();
+        assert_eq!(trace_5, U256::from(2));
 
         // test the various errors
         // bad trace path

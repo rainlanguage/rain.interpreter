@@ -123,7 +123,7 @@ impl Execute for Eval {
 
         match result {
             Ok(res) => {
-                let rain_eval_result: RainEvalResult = res.into();
+                let rain_eval_result: RainEvalResult = res.try_into().map_err(|e| anyhow!("{:?}", e))?;
                 crate::output::output(
                     &self.output_path,
                     SupportedOutputEncoding::Binary,
