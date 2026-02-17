@@ -511,7 +511,7 @@ library LibParseState {
                 newStackRHSOffset := add(byte(0, mload(stackRHSOffsetPtr)), 1)
                 mstore8(stackRHSOffsetPtr, newStackRHSOffset)
             }
-            if (newStackRHSOffset == 0x3f) {
+            if (newStackRHSOffset >= 0x3f) {
                 revert ParseStackOverflow();
             }
         }

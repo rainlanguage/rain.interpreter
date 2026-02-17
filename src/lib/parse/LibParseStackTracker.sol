@@ -56,6 +56,12 @@ library LibParseStackTracker {
 
     /// Pops n items from the tracked stack. Reverts with
     /// `ParseStackUnderflow` if the current stack height is less than n.
+    ///
+    /// Unlike `push`, this subtracts `n` directly from the packed word
+    /// rather than extracting, modifying, and repacking. This is safe
+    /// because `n <= current <= 0xFF`, so the subtraction cannot borrow
+    /// into the `inputs` byte (bits 8-15) or `max` byte (bits 16+).
+    /// `push` cannot use this shortcut because it must also update `max`.
     /// @param tracker The current stack tracker state.
     /// @param n The number of items to pop.
     /// @return The updated stack tracker.
