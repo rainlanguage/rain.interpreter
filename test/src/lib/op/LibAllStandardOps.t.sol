@@ -5,6 +5,7 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std/Test.sol";
 
 import {LibAllStandardOps, ALL_STANDARD_OPS_LENGTH} from "src/lib/op/LibAllStandardOps.sol";
+import {LITERAL_PARSERS_LENGTH} from "src/lib/parse/literal/LibParseLiteral.sol";
 
 /// @title LibAllStandardOpsTest
 /// Some basic guard rails around the `LibAllStandardOps` library. Most of the
@@ -34,5 +35,12 @@ contract LibAllStandardOpsTest is Test {
 
         assertEq(integrityFunctionPointers.length, functionPointers.length);
         assertEq(integrityFunctionPointers.length, words.length * 2);
+    }
+
+    /// Test that the literal parser function pointers length matches
+    /// LITERAL_PARSERS_LENGTH.
+    function testLiteralParserFunctionPointersLength() external pure {
+        bytes memory pointers = LibAllStandardOps.literalParserFunctionPointers();
+        assertEq(pointers.length, LITERAL_PARSERS_LENGTH * 2);
     }
 }
