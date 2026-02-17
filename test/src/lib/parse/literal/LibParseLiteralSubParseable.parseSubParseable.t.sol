@@ -164,6 +164,28 @@ contract LibParseLiteralSubParseableTest is Test {
         );
     }
 
+    /// External wrapper that constructs data with a `]` past the logical end.
+    /// The assembly shrinks the length after allocation so `]` remains in
+    /// memory but is past `end`.
+    function parseSubParseableBracketPastEnd(bytes memory data) external view {
+        assembly ("memory-safe") {
+            mstore(data, sub(mload(data), 1))
+        }
+        ParseState memory state = LibParseState.newState(data, "", "", "");
+        uint256 cursor = Pointer.unwrap(state.data.dataPointer());
+        uint256 end = cursor + data.length;
+        state.parseSubParseable(cursor, end);
+    }
+
+    /// A `]` sitting in memory just past `end` must not cause the parser to
+    /// incorrectly accept the literal. We construct a string ending in `]`
+    /// then shrink its length by 1 so `]` is still in memory but logically
+    /// past the end of the data.
+    function testParseLiteralSubParseableUnclosedBracketPastEnd() external {
+        vm.expectRevert(abi.encodeWithSelector(UnclosedSubParseableLiteral.selector, 4));
+        this.parseSubParseableBracketPastEnd(bytes("[a b]"));
+    }
+
     function testParseLiteralSubParseableHappyKnown() external {
         testParseLiteralSubParseableHappyFuzz("2 max-positive-value() 2", unicode"3¹&\\u{a3c}È", " ,");
     }
