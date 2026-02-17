@@ -92,3 +92,250 @@ Agent IDs assigned alphabetically by source file path.
 - [DISMISSED] A49-1: Assembly reinterprets fixed-length arrays as dynamic — established pattern with sanity checks
 - [DISMISSED] A49-2: `matchSubParseLiteralDispatch` reads 32 bytes without bounds check — mask discards extra bytes
 - [DISMISSED] A49-3: `matchSubParseLiteralDispatch` unchecked subtraction — `end >= cursor` guaranteed by caller
+
+# Pass 2 Triage
+
+Tracks the disposition of every LOW+ finding from pass2 audit reports (test coverage).
+
+## Agent Index
+
+| ID | File |
+|----|------|
+| A01 | BaseRainterpreterExtern.md |
+| A02 | BaseRainterpreterSubParser.md |
+| A03 | ErrAll.md |
+| A04 | LibAllStandardOps.md |
+| A05 | LibEval.md |
+| A06 | LibExtern.md |
+| A07 | LibExternOpContextCallingContract.md |
+| A08 | LibExternOpContextRainlen.md |
+| A09 | LibExternOpContextSender.md |
+| A10 | LibExternOpIntInc.md |
+| A11 | LibExternOpStackOperand.md |
+| A12 | LibIntegrityCheck.md |
+| A14 | LibInterpreterState.md |
+| A15 | LibInterpreterStateDataContract.md |
+| A16 | LibOpBitwise.md |
+| A17 | LibOpCall.md |
+| A18 | LibOpConstant.md |
+| A19 | LibOpContext.md |
+| A20 | LibOpERC20.md |
+| A21 | LibOpExtern.md |
+| A23 | LibOpLogic.md |
+| A24 | LibOpMath1.md |
+| A25 | LibOpMath2.md |
+| A26 | LibOpMisc.md |
+| A28 | LibOpStore.md |
+| A29 | LibOpUint256Math.md |
+| A30 | LibParse.md |
+| A31 | LibParseError.md |
+| A32 | LibParseInterstitial.md |
+| A33 | LibParseLiteral.md |
+| A34 | LibParseLiteralDecimal.md |
+| A35 | LibParseLiteralHex.md |
+| A36 | LibParseLiteralRepeat.md |
+| A37 | LibParseLiteralString.md |
+| A38 | LibParseLiteralSubParseable.md |
+| A39 | LibParseOperand.md |
+| A40 | LibParsePragma.md |
+| A41 | LibParseStackName.md |
+| A42 | LibParseStackTracker.md |
+| A43 | LibParseState.md |
+| A44 | LibSubParse.md |
+| A45 | Rainterpreter.md |
+| A47 | RainterpreterExpressionDeployer.md |
+| A48 | RainterpreterParser.md |
+| A49 | RainterpreterReferenceExtern.md |
+| A50 | RainterpreterStore.md |
+
+## Findings
+
+- [FIXED] A01-1: (LOW) No direct test for `extern()` happy path on BaseRainterpreterExtern — added in commit `738670ca`
+- [FIXED] A01-2: (MEDIUM) No test for `extern()` opcode mod-wrapping behavior — added in commit `6575278e`
+- [FIXED] A01-3: (LOW) No test for `externIntegrity()` happy path on BaseRainterpreterExtern — added in commit `da2c3ef1`
+- [FIXED] A01-4: (LOW) No test for `externIntegrity()` boundary at opcode == fsCount - 1 — added in commit `7f34586c`
+- [DISMISSED] A01-5: (LOW) No test for dispatch encoding extraction correctness in `extern()` and `externIntegrity()` — already covered by LibExtern.codec.t.sol roundtrip tests and A01-3 fuzz test
+- [FIXED] A02-1: (MEDIUM) No test for `SubParserIndexOutOfBounds` revert in `subParseWord2` — added in commit `5f84a073`
+- [FIXED] A02-2: (MEDIUM) No test for `SubParserIndexOutOfBounds` revert in `subParseLiteral2` — added in commit `fc5de00d`
+- [FIXED] A02-3: (LOW) No direct unit tests for `subParseLiteral2` on BaseRainterpreterSubParser — added in commit `59ce761f`
+- [FIXED] A02-4: (LOW) No test for `subParseWord2` with empty/zero-length word parsers table — added in commit `9e163d06`
+- [FIXED] A03-1: (MEDIUM) No test coverage for `StackUnderflow` error — added in commit `40cfbd3f`
+- [FIXED] A03-2: (MEDIUM) No test coverage for `StackUnderflowHighwater` error — added in commit `fcc6ab97`
+- [FIXED] A03-3: (MEDIUM) No test coverage for `StackAllocationMismatch` error — added in commit `2b4ff3e6`
+- [FIXED] A03-4: (MEDIUM) No test coverage for `StackOutputsMismatch` error — added in commit `cafb9430`
+- [FIXED] A03-5: (LOW) No test coverage for `HexLiteralOverflow` error — added in commit `b1a0f3ca`
+- [FIXED] A03-6: (LOW) No test coverage for `ZeroLengthHexLiteral` error — added in commit `adc0f858`
+- [FIXED] A03-7: (LOW) No test coverage for `OddLengthHexLiteral` error — added in commit `66f2d6f9`
+- [DISMISSED] A03-8: (LOW) No test coverage for `MalformedHexLiteral` error — unreachable defensive code; `boundHex` constrains the range to valid hex characters before the loop runs
+- [FIXED] A03-9: (LOW) No test coverage for `MalformedCommentStart` error — added in commit `18339c10`
+- [FIXED] A03-10: (LOW) No test coverage for `NotAcceptingInputs` error — added in commit `2878c38b`
+- [DISMISSED] A03-11: (LOW) No test coverage for `DanglingSource` error — unreachable defensive code; `MissingFinalSemi` fires first for any user input that leaves a source open
+- [FIXED] A03-12: (LOW) No test coverage for `ParseStackOverflow` error — added in commit `9ff8560f`
+- [DISMISSED] A03-13: (LOW) No test coverage for `ParseStackUnderflow` error — unreachable defensive code; parser paren-counting guarantees child ops push exactly the inputs each parent pops
+- [FIXED] A03-14: (LOW) No test coverage for `ParenOverflow` error — added in commit `fe692342`
+- [FIXED] A03-15: (LOW) No test coverage for `OpcodeIOOverflow` error — added in commit `4cbcff64`
+- [DISMISSED] A03-16: (LOW) No test coverage for `ParenInputOverflow` error — unreachable defensive code; `SourceItemOpsOverflow` is checked first at the same threshold in `pushOpToSource`
+- [DISMISSED] A03-17: (LOW) No test coverage for `BadDynamicLength` error — unreachable defensive code; guards compile-time fixed-to-dynamic array casts, code comments "Should be an unreachable error"
+- [FIXED] A04-1: (LOW) No direct test for `literalParserFunctionPointers()` output length — added in commit `82389695`
+- [FIXED] A04-2: (LOW) No direct test for `operandHandlerFunctionPointers()` output length — added in commit `c7e65302`
+- [FIXED] A04-4: (LOW) No test verifying `authoringMetaV2()` content correctness — added in commit `efe2a7f3`
+- [FIXED] A04-5: (MEDIUM) No test verifying four-array ordering consistency — added in commit `1efea00e`
+- [DISMISSED] A05-1: (LOW) No direct unit test for `evalLoop` function — extensively exercised through every opcode test and eval4 integration test; standalone test would duplicate existing coverage
+- [PENDING] A05-2: (MEDIUM) `InputsLengthMismatch` only tested for too-many-inputs direction
+- [PENDING] A05-3: (MEDIUM) No test for `maxOutputs` truncation behavior in `eval2`
+- [PENDING] A05-4: (LOW) No test for zero-opcode source in `evalLoop`
+- [PENDING] A05-5: (LOW) No test for multiple sources exercised through `eval2`
+- [PENDING] A05-6: (LOW) No test for `eval2` with non-zero inputs that match source expectation
+- [PENDING] A05-7: (LOW) No test for exact multiple-of-8 opcode count (zero remainder)
+- [PENDING] A06-1: (LOW) No test for encode/decode roundtrip with varied extern addresses
+- [PENDING] A06-2: (MEDIUM) No test for overflow/truncation behavior when opcode or operand exceeds 16 bits
+- [PENDING] A06-3: (LOW) `decodeExternDispatch` and `decodeExternCall` have no standalone unit tests
+- [PENDING] A07-1: (LOW) No direct unit test for LibExternOpContextCallingContract.subParser
+- [PENDING] A07-2: (LOW) No test for subParser with varying constantsHeight or ioByte inputs
+- [PENDING] A08-1: (LOW) No direct unit test for LibExternOpContextRainlen.subParser
+- [PENDING] A08-2: (LOW) No test for subParser with varying constantsHeight or ioByte inputs
+- [PENDING] A08-3: (LOW) Only one end-to-end test with a single rainlang string length
+- [PENDING] A09-1: (LOW) No direct unit test for LibExternOpContextSender.subParser
+- [PENDING] A09-2: (LOW) No test for subParser with varying constantsHeight or ioByte inputs
+- [PENDING] A09-3: (LOW) No test with different msg.sender values
+- [PENDING] A10-1: (LOW) run() test bounds inputs away from float overflow region
+- [PENDING] A11-1: (LOW) No direct unit test for LibExternOpStackOperand.subParser
+- [PENDING] A11-2: (LOW) No test for subParser with constantsHeight > 0
+- [PENDING] A12-1: (HIGH) No direct test for `StackUnderflow` revert path
+- [PENDING] A12-2: (HIGH) No direct test for `StackUnderflowHighwater` revert path
+- [PENDING] A12-3: (HIGH) No direct test for `StackAllocationMismatch` revert path
+- [PENDING] A12-4: (HIGH) No direct test for `StackOutputsMismatch` revert path
+- [PENDING] A12-5: (MEDIUM) No test for `newState` initialization correctness
+- [PENDING] A12-6: (MEDIUM) No test for multi-output highwater advancement logic
+- [PENDING] A12-7: (LOW) No test for `stackMaxIndex` tracking logic
+- [PENDING] A12-8: (LOW) No test for zero-source bytecode (`sourceCount == 0`)
+- [PENDING] A12-9: (LOW) No test for multi-source bytecode integrity checking
+- [PENDING] A14-1: (LOW) No dedicated test for `fingerprint` function
+- [PENDING] A14-2: (LOW) No dedicated test for `stackBottoms` function
+- [PENDING] A14-3: (LOW) `stackTrace` test does not cover parentSourceIndex/sourceIndex encoding edge cases
+- [PENDING] A15-1: (HIGH) No test file exists for LibInterpreterStateDataContract
+- [PENDING] A15-2: (MEDIUM) `serializeSize` unchecked overflow not tested
+- [PENDING] A15-3: (MEDIUM) `unsafeSerialize` correctness not independently tested
+- [PENDING] A15-4: (HIGH) `unsafeDeserialize` complex assembly not independently tested
+- [PENDING] A15-5: (MEDIUM) No test for serialize/deserialize round-trip property
+- [PENDING] A16-1: (LOW) LibOpCtPop missing test for disallowed operand
+- [PENDING] A17-1: (MEDIUM) No referenceFn or direct unit test for `run` function assembly logic
+- [PENDING] A17-2: (LOW) No test for `run` with maximum inputs (15) and maximum outputs simultaneously
+- [PENDING] A17-3: (LOW) No isolated test for operand field extraction consistency between `integrity` and `run`
+- [PENDING] A18-1: (LOW) No test for `run` with a constants array at maximum operand index (65535)
+- [PENDING] A19-1: (LOW) No test for context with empty inner array (context[i].length == 0, j == 0)
+- [PENDING] A19-2: (LOW) No test for large context dimensions (i or j near 255)
+- [PENDING] A20-1: (LOW) No test verifying `erc20-allowance` handles infinite approvals without revert
+- [PENDING] A20-2: (LOW) No test for `decimals()` revert when token does not implement `IERC20Metadata`
+- [PENDING] A20-4: (LOW) No test for input values with upper 96 bits set (address truncation)
+- [PENDING] A21-1: (LOW) No test for `referenceFn` `BadOutputsLength` revert path
+- [PENDING] A23-1: (LOW) LibOpGreaterThanOrEqualTo missing negative number and float equality eval tests
+- [PENDING] A23-2: (LOW) LibOpLessThanOrEqualTo missing negative number and float equality eval tests
+- [PENDING] A23-3: (LOW) LibOpConditions no test for exactly 2 inputs (minimum case)
+- [PENDING] A23-4: (LOW) LibOpConditions odd-input revert path with reason string not tested via opReferenceCheck
+- [PENDING] A24-1: (LOW) LibOpE missing operand disallowed test
+- [PENDING] A24-2: (LOW) LibOpExp and LibOpExp2 fuzz tests restrict inputs to non-negative small values only
+- [PENDING] A24-3: (LOW) LibOpGm fuzz test restricts inputs to non-negative small values only
+- [PENDING] A24-4: (LOW) LibOpFloor eval tests missing negative value coverage
+- [PENDING] A25-1: (LOW) LibOpInv missing test for division by zero (inv(0))
+- [PENDING] A25-2: (LOW) LibOpSub missing zero outputs and two outputs tests
+- [PENDING] A25-3: (LOW) LibOpSub missing operand handler test
+- [PENDING] A25-4: (LOW) LibOpMin missing zero outputs and two outputs tests
+- [PENDING] A25-5: (LOW) LibOpMax missing zero outputs test
+- [PENDING] A25-6: (LOW) LibOpSqrt missing test for negative input error path
+- [PENDING] A26-1: (LOW) Missing operand disallowed test for LibOpBlockNumber
+- [PENDING] A26-2: (LOW) Missing operand disallowed test for LibOpChainId
+- [PENDING] A26-3: (LOW) Missing operand disallowed test for LibOpTimestamp
+- [PENDING] A28-1: (LOW) No test for get() caching side effect on read-only keys
+- [PENDING] A29-1: (LOW) LibOpMaxUint256 missing operand disallowed test
+- [PENDING] A30-1: (MEDIUM) No test triggers `ParenOverflow` error
+- [PENDING] A30-2: (LOW) No test triggers `ParserOutOfBounds` error from `parse()`
+- [PENDING] A30-3: (LOW) No test for yang-state `UnexpectedRHSChar` in `parseRHS`
+- [PENDING] A30-4: (LOW) No test for stack name fallback path in `parseRHS` via `stackNameIndex`
+- [PENDING] A30-5: (LOW) No test for `OPCODE_UNKNOWN` sub-parser bytecode construction boundary conditions
+- [PENDING] A31-1: (LOW) No direct unit tests for `parseErrorOffset`
+- [PENDING] A31-2: (LOW) No direct unit tests for `handleErrorSelector`
+- [PENDING] A32-1: (LOW) No direct unit tests for `skipComment`, `skipWhitespace`, or `parseInterstitial`
+- [PENDING] A32-2: (MEDIUM) `MalformedCommentStart` error path is never tested
+- [PENDING] A32-3: (LOW) No test for `skipComment` when `cursor + 4 > end`
+- [PENDING] A32-4: (LOW) No test for `skipWhitespace` in isolation
+- [PENDING] A33-1: (MEDIUM) No direct unit test for `selectLiteralParserByIndex`
+- [PENDING] A33-2: (LOW) No direct unit test for `tryParseLiteral` dispatch logic
+- [PENDING] A33-3: (LOW) No test for `parseLiteral` revert path
+- [PENDING] A34-1: (MEDIUM) No happy-path unit test for `parseDecimalFloatPacked`
+- [PENDING] A34-2: (LOW) No fuzz test for decimal parsing round-trip
+- [PENDING] A34-3: (LOW) No test for cursor position after successful parse
+- [PENDING] A34-4: (LOW) No test for decimal values with fractional parts
+- [PENDING] A35-1: (MEDIUM) No test for `HexLiteralOverflow` error
+- [PENDING] A35-2: (MEDIUM) No test for `ZeroLengthHexLiteral` error
+- [PENDING] A35-3: (MEDIUM) No test for `OddLengthHexLiteral` error
+- [PENDING] A35-4: (LOW) No test for `MalformedHexLiteral` error
+- [PENDING] A35-5: (LOW) No test for mixed-case hex parsing
+- [PENDING] A36-1: (MEDIUM) No test for RepeatLiteralTooLong revert path
+- [PENDING] A36-2: (MEDIUM) No test for parseRepeat output value correctness
+- [PENDING] A36-3: (LOW) No test for zero-length literal body (cursor == end)
+- [PENDING] A36-4: (LOW) No test for length = 1 (single character body)
+- [PENDING] A36-5: (LOW) No test for length = 77 (maximum valid length)
+- [PENDING] A36-6: (LOW) Integration tests use bare vm.expectRevert() without specifying expected error
+- [PENDING] A37-1: (LOW) No explicit test for `parseString` memory snapshot restoration
+- [PENDING] A37-3: (LOW) No test for `UnclosedStringLiteral` when `end == innerEnd`
+- [PENDING] A38-1: (MEDIUM) No test for `subParseLiteral` returning `(false, ...)` (sub-parser rejection)
+- [PENDING] A38-2: (LOW) No fuzz test for the error paths
+- [PENDING] A39-1: (MEDIUM) `handleOperandDisallowedAlwaysOne` has no test file or any test coverage
+- [PENDING] A39-2: (LOW) `handleOperand` (dispatch function) has no direct unit test
+- [PENDING] A39-3: (LOW) `parseOperand` -- no test for `UnclosedOperand` revert from yang state
+- [PENDING] A39-5: (LOW) `handleOperandM1M1` -- no test for first value overflow with two values provided
+- [PENDING] A39-6: (LOW) `handleOperand8M1M1` -- no test for first value overflow with all three values provided
+- [PENDING] A40-1: (LOW) No unit test for `cursor >= end` revert path after keyword
+- [PENDING] A40-2: (LOW) No test for multiple pragmas in sequence
+- [PENDING] A40-3: (LOW) No test for pragma with comments between addresses
+- [PENDING] A41-1: (LOW) No test for bloom filter false positive path
+- [PENDING] A41-2: (LOW) No test for fingerprint collision behavior
+- [PENDING] A41-3: (LOW) No negative lookup test on populated list
+- [PENDING] A42-1: (CRITICAL) No direct unit tests for any function in LibParseStackTracker
+- [PENDING] A42-2: (HIGH) ParseStackOverflow in push() never tested
+- [PENDING] A42-3: (HIGH) ParseStackUnderflow in pop() never tested
+- [PENDING] A42-4: (HIGH) ParseStackOverflow in pushInputs() never tested
+- [PENDING] A42-5: (MEDIUM) High watermark update logic not tested
+- [PENDING] A42-6: (MEDIUM) Packed representation correctness not tested
+- [PENDING] A43-1: (HIGH) No direct unit test for endLine()
+- [PENDING] A43-2: (MEDIUM) NotAcceptingInputs error path never tested
+- [PENDING] A43-3: (MEDIUM) OpcodeIOOverflow error path never tested
+- [PENDING] A43-4: (MEDIUM) DanglingSource error path never tested
+- [PENDING] A43-5: (MEDIUM) ParenInputOverflow error path never tested
+- [PENDING] A43-6: (MEDIUM) ParseStackOverflow in highwater() never tested
+- [PENDING] A43-7: (MEDIUM) No direct unit tests for pushOpToSource()
+- [PENDING] A43-8: (MEDIUM) No direct unit tests for endSource()
+- [PENDING] A43-9: (MEDIUM) No direct unit tests for buildBytecode()
+- [PENDING] A43-10: (LOW) No direct unit tests for buildConstants()
+- [PENDING] A43-11: (LOW) No direct unit tests for pushLiteral()
+- [PENDING] A44-1: (HIGH) No direct unit test for subParseWordSlice()
+- [PENDING] A44-2: (MEDIUM) UnknownWord error path tested only via integration
+- [PENDING] A44-3: (MEDIUM) UnsupportedLiteralType error path in subParseLiteral() not directly tested
+- [PENDING] A44-4: (LOW) No direct unit test for subParseWords()
+- [PENDING] A44-5: (LOW) No direct unit test for subParseLiteral()
+- [PENDING] A44-6: (LOW) No direct unit test for consumeSubParseWordInputData()
+- [PENDING] A44-7: (LOW) No direct unit test for consumeSubParseLiteralInputData()
+- [PENDING] A44-8: (LOW) Sub parser constant accumulation not tested
+- [PENDING] A45-1: (LOW) No test for `InputsLengthMismatch` with fewer inputs than expected
+- [PENDING] A45-2: (LOW) No direct test for `eval4` happy path with inputs
+- [PENDING] A45-3: (LOW) No test for `eval4` with non-zero `sourceIndex`
+- [PENDING] A45-5: (LOW) No test for `stateOverlay` with multiple key-value pairs
+- [PENDING] A45-6: (LOW) No test for `stateOverlay` with duplicate keys
+- [PENDING] A47-1: (MEDIUM) No direct test for `parse2` with invalid input
+- [PENDING] A47-2: (MEDIUM) No direct test for `parsePragma1` on the expression deployer
+- [PENDING] A47-3: (LOW) No test for `buildIntegrityFunctionPointers` return value consistency
+- [PENDING] A47-4: (LOW) No test for `parse2` assembly block memory allocation
+- [PENDING] A48-1: (MEDIUM) No direct test for `unsafeParse`
+- [PENDING] A48-3: (LOW) No test for `unsafeParse` with input triggering `ParseMemoryOverflow`
+- [PENDING] A48-4: (LOW) No test for `parsePragma1` with empty input
+- [PENDING] A49-1: (LOW) `InvalidRepeatCount` error not directly asserted in revert tests
+- [PENDING] A49-2: (LOW) `BadDynamicLength` error path never tested
+- [PENDING] A49-3: (LOW) `SubParserIndexOutOfBounds` error path never tested for RainterpreterReferenceExtern
+- [PENDING] A49-4: (LOW) No test for `extern()` function called directly on RainterpreterReferenceExtern
+- [PENDING] A49-5: (LOW) No test for `externIntegrity()` called directly on RainterpreterReferenceExtern
+- [PENDING] A50-1: (MEDIUM) No test for namespace isolation across different `msg.sender` values
+- [PENDING] A50-2: (LOW) `Set` event emission never tested
+- [PENDING] A50-3: (LOW) No test for `set` with empty array (zero-length `kvs`)
+- [PENDING] A50-4: (LOW) No test for `get` on uninitialized key (default value)
+- [PENDING] A50-5: (LOW) No test for overwriting a key with a different value in a single `set` call
