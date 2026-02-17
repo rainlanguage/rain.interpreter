@@ -70,6 +70,7 @@ library LibIntegrityCheck {
     /// @param constants The constants array for the expression.
     /// @return io Packed byte array with two bytes per source encoding
     /// (inputs, outputs).
+    //slither-disable-next-line cyclomatic-complexity
     function integrityCheck2(bytes memory fPointers, bytes memory bytecode, bytes32[] memory constants)
         internal
         view
