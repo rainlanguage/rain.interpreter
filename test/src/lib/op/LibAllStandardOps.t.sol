@@ -43,4 +43,11 @@ contract LibAllStandardOpsTest is Test {
         bytes memory pointers = LibAllStandardOps.literalParserFunctionPointers();
         assertEq(pointers.length, LITERAL_PARSERS_LENGTH * 2);
     }
+
+    /// Test that the operand handler function pointers length matches
+    /// ALL_STANDARD_OPS_LENGTH.
+    function testOperandHandlerFunctionPointersLength() external pure {
+        bytes memory pointers = LibAllStandardOps.operandHandlerFunctionPointers();
+        assertEq(pointers.length, ALL_STANDARD_OPS_LENGTH * 2);
+    }
 }
