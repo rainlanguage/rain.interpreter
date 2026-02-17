@@ -17,7 +17,7 @@ Findings from all passes should be reported, not fixed. Fixes are a separate ste
 
 ## Pass 0: Process Review
 
-Review CLAUDE.md and AUDIT.md for issues that would cause future sessions to misinterpret instructions. This pass reviews process documents, not source code. Run in the main conversation before launching code audit agents — the documents are small enough to review without subagents. Record findings to `audit/<YYYY-MM-DD>-<NN>/pass0/process.md`.
+Review CLAUDE.md and AUDIT.md for issues that would cause future sessions to misinterpret instructions. This pass reviews process documents, not source code. No subagents needed — the documents are small enough to review in the main conversation. Record findings to `audit/<YYYY-MM-DD>-<NN>/pass0/process.md`.
 
 Check for:
 - Ambiguous instructions a future session could misinterpret (e.g. reused placeholder names, unclear defaults)
