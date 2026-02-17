@@ -44,11 +44,15 @@ library LibParseLiteralRepeat {
         }
         unchecked {
             uint256 value = 0;
+            // Safe: cursor always <= end (parser invariant).
             uint256 length = end - cursor;
             if (length >= 78) {
                 revert RepeatLiteralTooLong(length);
             }
             for (uint256 i = 0; i < length; ++i) {
+                // Safe: i < 78, so 10**i < 10**78 < 2^256.
+                // dispatchValue <= 9, so dispatchValue * 10**i <= 9 * 10**77 < 2^256.
+                // value accumulates at most 78 terms, sum < 10**78 < 2^256.
                 value += dispatchValue * 10 ** i;
             }
             return value;
