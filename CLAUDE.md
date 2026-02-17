@@ -111,7 +111,7 @@ External contracts can extend the interpreter with additional opcodes. `src/conc
 
 ## Process (Jidoka)
 
-Each fix is a complete cycle: understand → fix → test → build → verify. Do not move to the next item with incomplete work. The "test" step means both: write tests for any new code paths introduced by the fix, then run the full test suite to confirm nothing is broken. New code must meet the same audit requirements defined in `AUDIT.md` — a fix that introduces untested error paths, missing NatSpec, or other audit findings is not complete. When a process defect is found, stop and fix the process before resuming. When the user asks "why" about a defect, they are asking for root cause analysis of the process failure — not requesting that you go do the thing. Answer the "why" first, agree on the process fix, then resume.
+Each fix is a complete cycle: understand → fix → build → test → verify. Do not move to the next item with incomplete work. The "test" step means both: write tests for any new code paths introduced by the fix, then run the full test suite to confirm nothing is broken. New code must meet the same audit requirements defined in `AUDIT.md` — a fix that introduces untested error paths, missing NatSpec, or other audit findings is not complete. When a process defect is found, stop and fix the process before resuming. When the user asks "why" about a defect, they are asking for root cause analysis of the process failure — not requesting that you go do the thing. Answer the "why" first, agree on the process fix, then resume.
 
 ## Audit Review
 
