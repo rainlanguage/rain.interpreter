@@ -7,7 +7,7 @@ import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibParseLiteralHex} from "src/lib/parse/literal/LibParseLiteralHex.sol";
-import {HexLiteralOverflow, ZeroLengthHexLiteral} from "src/error/ErrParse.sol";
+import {HexLiteralOverflow, ZeroLengthHexLiteral, OddLengthHexLiteral} from "src/error/ErrParse.sol";
 
 /// @title LibParseLiteralHexParseHexTest
 /// Tests parsing hex literals with LibParseLiteralHex.
@@ -48,6 +48,16 @@ contract LibParseLiteralHexParseHexTest is Test {
 
         // Offset 2: the (empty) hex body starts after the "0x" prefix.
         vm.expectRevert(abi.encodeWithSelector(ZeroLengthHexLiteral.selector, 2));
+        this.externalParseHex(data);
+    }
+
+    /// "0x" followed by an odd number of hex digits must revert with
+    /// OddLengthHexLiteral.
+    function testParseHexOddLength() external {
+        bytes memory data = bytes("0xabc");
+
+        // Offset 2: the hex body starts after the "0x" prefix.
+        vm.expectRevert(abi.encodeWithSelector(OddLengthHexLiteral.selector, 2));
         this.externalParseHex(data);
     }
 
