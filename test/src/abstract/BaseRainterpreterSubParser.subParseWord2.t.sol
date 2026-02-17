@@ -66,10 +66,9 @@ contract MismatchedWordSubParser is BaseRainterpreterSubParser {
     }
 }
 
-/// @title BaseRainterpreterSubParserWordIndexTest
-/// Tests that subParseWord2 reverts with SubParserIndexOutOfBounds when
-/// the word parser index from the meta exceeds the word parsers table.
-contract BaseRainterpreterSubParserWordIndexTest is Test {
+/// @title BaseRainterpreterSubParserWord2Test
+/// Direct unit tests for subParseWord2.
+contract BaseRainterpreterSubParserWord2Test is Test {
     /// Calling subParseWord2 with a word that maps to index 1 when only 1
     /// word parser exists must revert with SubParserIndexOutOfBounds.
     function testSubParseWord2RevertsIndexOutOfBounds() external {
