@@ -56,8 +56,7 @@ contract BaseRainterpreterExternIntegrityOpcodeRangeTest is Test {
         try ext.externIntegrity(ExternDispatchV2.wrap(dispatch), 0, 0) {}
         catch (bytes memory reason) {
             assertTrue(
-                keccak256(reason)
-                    != keccak256(abi.encodeWithSelector(ExternOpcodeOutOfRange.selector, uint256(1), 2)),
+                keccak256(reason) != keccak256(abi.encodeWithSelector(ExternOpcodeOutOfRange.selector, uint256(1), 2)),
                 "should not revert with ExternOpcodeOutOfRange for valid opcode"
             );
         }

@@ -53,8 +53,6 @@ import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 
-uint256 constant NOT_LOW_16_BIT_MASK = ~uint256(0xFFFF);
-uint256 constant ACTIVE_SOURCE_MASK = NOT_LOW_16_BIT_MASK;
 uint256 constant SUB_PARSER_BYTECODE_HEADER_SIZE = 5;
 
 /// @title LibParse

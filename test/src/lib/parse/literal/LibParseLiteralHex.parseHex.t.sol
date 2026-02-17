@@ -34,8 +34,7 @@ contract LibParseLiteralHexParseHexTest is Test {
     /// HexLiteralOverflow.
     function testParseHexOverflow() external {
         // 65 hex digits after "0x" — one more than the 64 (0x40) limit.
-        bytes memory data =
-            bytes("0x00000000000000000000000000000000000000000000000000000000000000000a");
+        bytes memory data = bytes("0x00000000000000000000000000000000000000000000000000000000000000000a");
 
         // Offset 2: the hex digits start after the "0x" prefix.
         vm.expectRevert(abi.encodeWithSelector(HexLiteralOverflow.selector, 2));

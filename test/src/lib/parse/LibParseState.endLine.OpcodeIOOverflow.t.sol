@@ -2,7 +2,9 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {RainterpreterExpressionDeployerDeploymentTest} from "test/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
+import {
+    RainterpreterExpressionDeployerDeploymentTest
+} from "test/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
 import {OpcodeIOOverflow} from "src/error/ErrParse.sol";
 
 /// @title LibParseStateOpcodeIOOverflowTest

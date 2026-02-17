@@ -30,11 +30,8 @@ contract MismatchedWordSubParser is BaseRainterpreterSubParser {
             assembly ("memory-safe") {
                 lengthPointer := length
             }
-            function(bytes32[] memory) internal pure returns (OperandV2)[3] memory handlersFixed = [
-                lengthPointer,
-                LibParseOperand.handleOperandDisallowed,
-                LibParseOperand.handleOperandDisallowed
-            ];
+            function(bytes32[] memory) internal pure returns (OperandV2)[3] memory handlersFixed =
+                [lengthPointer, LibParseOperand.handleOperandDisallowed, LibParseOperand.handleOperandDisallowed];
             uint256[] memory handlersDynamic;
             assembly ("memory-safe") {
                 handlersDynamic := handlersFixed

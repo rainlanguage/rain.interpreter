@@ -3,10 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {
-    BaseRainterpreterSubParser,
-    SubParserIndexOutOfBounds
-} from "src/abstract/BaseRainterpreterSubParser.sol";
+import {BaseRainterpreterSubParser, SubParserIndexOutOfBounds} from "src/abstract/BaseRainterpreterSubParser.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 
 /// @dev Simple literal parser that returns the dispatch value unchanged.
@@ -18,12 +15,7 @@ function echoLiteralParser(bytes32 dispatchValue, uint256, uint256) pure returns
 /// index 0, returning a known dispatch value. subParserLiteralParsers has a
 /// single valid function pointer to echoLiteralParser.
 contract HappyPathLiteralSubParser is BaseRainterpreterSubParser {
-    function matchSubParseLiteralDispatch(uint256, uint256)
-        internal
-        pure
-        override
-        returns (bool, uint256, bytes32)
-    {
+    function matchSubParseLiteralDispatch(uint256, uint256) internal pure override returns (bool, uint256, bytes32) {
         return (true, 0, bytes32(uint256(0x42)));
     }
 
@@ -84,12 +76,7 @@ contract NoMatchLiteralSubParser is BaseRainterpreterSubParser {
 /// index 1, but subParserLiteralParsers returns only 1 pointer (2 bytes).
 /// This triggers SubParserIndexOutOfBounds(1, 1) in subParseLiteral2.
 contract MismatchedLiteralSubParser is BaseRainterpreterSubParser {
-    function matchSubParseLiteralDispatch(uint256, uint256)
-        internal
-        pure
-        override
-        returns (bool, uint256, bytes32)
-    {
+    function matchSubParseLiteralDispatch(uint256, uint256) internal pure override returns (bool, uint256, bytes32) {
         return (true, 1, bytes32(0));
     }
 
