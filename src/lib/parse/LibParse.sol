@@ -42,7 +42,8 @@ import {
     FSM_YANG_MASK,
     FSM_DEFAULT,
     FSM_ACTIVE_SOURCE_MASK,
-    FSM_WORD_END_MASK
+    FSM_WORD_END_MASK,
+    PARSE_STATE_PAREN_TRACKER0_OFFSET
 } from "./LibParseState.sol";
 import {LibParsePragma} from "./LibParsePragma.sol";
 import {LibParseInterstitial} from "./LibParseInterstitial.sol";
@@ -318,9 +319,10 @@ library LibParse {
                     // the expectation that it will be overwritten by
                     // the next paren group.
                     uint256 newParenOffset;
+                    uint256 parenTracker0Offset = PARSE_STATE_PAREN_TRACKER0_OFFSET;
                     assembly ("memory-safe") {
-                        newParenOffset := add(byte(0, mload(add(state, 0x60))), 3)
-                        mstore8(add(state, 0x60), newParenOffset)
+                        newParenOffset := add(byte(0, mload(add(state, parenTracker0Offset))), 3)
+                        mstore8(add(state, parenTracker0Offset), newParenOffset)
                     }
                     // first 2 bytes are reserved, then remaining 62
                     // bytes are for paren groups, so the offset MUST NOT
@@ -335,8 +337,9 @@ library LibParse {
                     state.fsm &= ~(FSM_WORD_END_MASK | FSM_YANG_MASK);
                 } else if (char & CMASK_RIGHT_PAREN > 0) {
                     uint256 parenOffset;
+                    uint256 parenTracker0Offset = PARSE_STATE_PAREN_TRACKER0_OFFSET;
                     assembly ("memory-safe") {
-                        parenOffset := byte(0, mload(add(state, 0x60)))
+                        parenOffset := byte(0, mload(add(state, parenTracker0Offset)))
                     }
                     if (parenOffset == 0) {
                         revert UnexpectedRightParen(state.parseErrorOffset(cursor));
@@ -347,8 +350,7 @@ library LibParse {
                     // write the input counter out to the operand pointed
                     // to by the pointer we deallocated.
                     assembly ("memory-safe") {
-                        // State field offset.
-                        let stateOffset := add(state, 0x60)
+                        let stateOffset := add(state, parenTracker0Offset)
                         parenOffset := sub(parenOffset, 3)
                         mstore8(stateOffset, parenOffset)
                         mstore8(

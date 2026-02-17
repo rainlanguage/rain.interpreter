@@ -55,6 +55,22 @@ uint256 constant FSM_DEFAULT = FSM_ACCEPTING_INPUTS_MASK;
 /// for anything other than bit flags.
 uint256 constant OPERAND_VALUES_LENGTH = 4;
 
+/// @dev Byte offset of `topLevel0` within a memory `ParseState` struct.
+/// Used in assembly to read/write per-source word counters.
+uint256 constant PARSE_STATE_TOP_LEVEL0_OFFSET = 0x20;
+
+/// @dev Byte offset of the data region of `topLevel0`, past the counter
+/// byte. Each byte in this region is a per-word ops counter.
+uint256 constant PARSE_STATE_TOP_LEVEL0_DATA_OFFSET = 0x21;
+
+/// @dev Byte offset of `parenTracker0` within a memory `ParseState` struct.
+/// Used in assembly to read/write paren depth and input counters.
+uint256 constant PARSE_STATE_PAREN_TRACKER0_OFFSET = 0x60;
+
+/// @dev Byte offset of `lineTracker` within a memory `ParseState` struct.
+/// Used in assembly to snapshot source head pointers per line.
+uint256 constant PARSE_STATE_LINE_TRACKER_OFFSET = 0xa0;
+
 /// The parser is stateful. This struct keeps track of the entire state.
 /// @param activeSourcePtr The pointer to the current source being built.
 /// The active source being pointed to is:
@@ -314,16 +330,18 @@ library LibParseState {
     /// @param state The parse state to snapshot.
     function snapshotSourceHeadToLineTracker(ParseState memory state) internal pure {
         uint256 activeSourcePtr = state.activeSourcePtr;
+        uint256 topLevel0Offset = PARSE_STATE_TOP_LEVEL0_OFFSET;
+        uint256 lineTrackerOffset = PARSE_STATE_LINE_TRACKER_OFFSET;
         bool didOverflow;
         assembly ("memory-safe") {
-            let topLevel0Pointer := add(state, 0x20)
+            let topLevel0Pointer := add(state, topLevel0Offset)
             let totalRHSTopLevel := byte(0, mload(topLevel0Pointer))
             // Only do stuff if the current word counter is zero.
             if iszero(byte(0, mload(add(topLevel0Pointer, add(totalRHSTopLevel, 1))))) {
                 let byteOffset := div(and(mload(activeSourcePtr), 0xFFFF), 8)
                 let sourceHead := add(activeSourcePtr, sub(0x20, byteOffset))
 
-                let lineTracker := mload(add(state, 0xa0))
+                let lineTracker := mload(add(state, lineTrackerOffset))
                 let lineRHSTopLevel := sub(totalRHSTopLevel, byte(30, lineTracker))
                 let offset := mul(0x10, add(lineRHSTopLevel, 1))
                 // 14 items max — offset 0xF0 is the last valid slot.
@@ -331,7 +349,7 @@ library LibParseState {
                 // discards the pointer.
                 didOverflow := gt(offset, 0xF0)
                 lineTracker := or(lineTracker, shl(offset, sourceHead))
-                mstore(add(state, 0xa0), lineTracker)
+                mstore(add(state, lineTrackerOffset), lineTracker)
             }
         }
         if (didOverflow) {
@@ -349,8 +367,9 @@ library LibParseState {
         unchecked {
             {
                 uint256 parenOffset;
+                uint256 parenTracker0Offset = PARSE_STATE_PAREN_TRACKER0_OFFSET;
                 assembly ("memory-safe") {
-                    parenOffset := byte(0, mload(add(state, 0x60)))
+                    parenOffset := byte(0, mload(add(state, parenTracker0Offset)))
                 }
                 if (parenOffset > 0) {
                     revert UnclosedLeftParen(state.parseErrorOffset(cursor));
@@ -419,8 +438,9 @@ library LibParseState {
             for (uint256 offset = 0x20; offset < end; offset += 0x10) {
                 uint256 itemSourceHead = (state.lineTracker >> offset) & 0xFFFF;
                 uint256 opsDepth;
+                uint256 topLevel0Offset = PARSE_STATE_TOP_LEVEL0_OFFSET;
                 assembly ("memory-safe") {
-                    opsDepth := byte(0, mload(add(state, add(0x20, topLevelOffset))))
+                    opsDepth := byte(0, mload(add(state, add(topLevel0Offset, topLevelOffset))))
                 }
                 for (uint256 i = 1; i <= opsDepth; i++) {
                     {
@@ -471,14 +491,16 @@ library LibParseState {
     /// @param state The parse state to advance the highwater mark for.
     function highwater(ParseState memory state) internal pure {
         uint256 parenOffset;
+        uint256 parenTracker0Offset = PARSE_STATE_PAREN_TRACKER0_OFFSET;
         assembly ("memory-safe") {
-            parenOffset := byte(0, mload(add(state, 0x60)))
+            parenOffset := byte(0, mload(add(state, parenTracker0Offset)))
         }
         if (parenOffset == 0) {
             //forge-lint: disable-next-line(mixed-case-variable)
             uint256 newStackRHSOffset;
+            uint256 topLevel0Offset = PARSE_STATE_TOP_LEVEL0_OFFSET;
             assembly ("memory-safe") {
-                let stackRHSOffsetPtr := add(state, 0x20)
+                let stackRHSOffsetPtr := add(state, topLevel0Offset)
                 newStackRHSOffset := add(byte(0, mload(stackRHSOffsetPtr)), 1)
                 mstore8(stackRHSOffsetPtr, newStackRHSOffset)
             }
@@ -616,9 +638,9 @@ library LibParseState {
             // word. MAY be setting 0 to 1 if this is the top level.
             {
                 bool didOverflow;
+                uint256 topLevel0Offset = PARSE_STATE_TOP_LEVEL0_OFFSET;
                 assembly ("memory-safe") {
-                    // Hardcoded offset into the state struct.
-                    let counterOffset := add(state, 0x20)
+                    let counterOffset := add(state, topLevel0Offset)
                     let counterPointer := add(counterOffset, add(byte(0, mload(counterOffset)), 1))
                     let val := byte(0, mload(counterPointer))
                     didOverflow := eq(val, 0xFF)
@@ -635,6 +657,7 @@ library LibParseState {
             uint256 activeSourcePointer = state.activeSourcePtr;
             {
                 bool didOverflow;
+                uint256 parenTracker0Offset = PARSE_STATE_PAREN_TRACKER0_OFFSET;
                 assembly ("memory-safe") {
                     activeSource := mload(activeSourcePointer)
                     // The low 16 bits of the active source is the current offset.
@@ -649,8 +672,7 @@ library LibParseState {
                     // the paren group that is one level above the current paren offset.
                     // Assumes that every word has exactly 1 output, therefore the input
                     // counter always increases by 1.
-                    // Hardcoded offset into the state struct.
-                    let inputCounterPos := add(state, 0x60)
+                    let inputCounterPos := add(state, parenTracker0Offset)
                     inputCounterPos := add(
                         add(
                             inputCounterPos,
@@ -715,8 +737,9 @@ library LibParseState {
         // End is the number of top level words in the source, which is the
         // byte offset index + 1.
         uint256 end;
+        uint256 topLevel0Offset = PARSE_STATE_TOP_LEVEL0_OFFSET;
         assembly ("memory-safe") {
-            end := add(byte(0, mload(add(state, 0x20))), 1)
+            end := add(byte(0, mload(add(state, topLevel0Offset))), 1)
         }
 
         if (offset == 0xf0) {
@@ -732,6 +755,7 @@ library LibParseState {
             uint256 source;
             ParseStackTracker stackTracker = state.stackTracker;
             uint256 cursor = state.activeSourcePtr;
+            uint256 topLevel0DataOffset = PARSE_STATE_TOP_LEVEL0_DATA_OFFSET;
             assembly ("memory-safe") {
                 // find the end of the LL tail.
                 let tailPointer := and(shr(0x10, mload(cursor)), 0xFFFF)
@@ -752,7 +776,7 @@ library LibParseState {
                 let writeCursor := add(source, 0x20)
                 writeCursor := add(writeCursor, 4)
 
-                let counterCursor := add(state, 0x21)
+                let counterCursor := add(state, topLevel0DataOffset)
                 for {
                     let i := 0
                     let wordsTotal := byte(0, mload(counterCursor))
