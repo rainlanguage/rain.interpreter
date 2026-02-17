@@ -22,6 +22,17 @@ import {
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibParseError} from "./LibParseError.sol";
 
+/// @title LibSubParse
+/// Handles delegation of unknown words and literals to external sub-parser
+/// contracts registered via `using-words-from`.
+///
+/// Trust model: sub-parsers are fully trusted by the Rainlang author who
+/// opted into them. A sub-parser can return arbitrary bytecode (opcode,
+/// operand, IO byte) and constants. The only parse-time validation is that
+/// the returned bytecode is exactly 4 bytes (`BadSubParserResult`). All
+/// other safety comes from the integrity check that runs on the complete
+/// bytecode after all sub-parsing is done — invalid opcodes, stack
+/// mismatches, or malformed operands will be caught there.
 library LibSubParse {
     using LibParseState for ParseState;
     using LibParseError for ParseState;
