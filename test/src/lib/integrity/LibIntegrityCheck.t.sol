@@ -4,7 +4,7 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {LibIntegrityCheck, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {OpcodeOutOfRange, StackUnderflow, StackUnderflowHighwater} from "src/error/ErrIntegrity.sol";
+import {OpcodeOutOfRange, StackUnderflow, StackUnderflowHighwater, StackAllocationMismatch} from "src/error/ErrIntegrity.sol";
 import {INTEGRITY_FUNCTION_POINTERS} from "src/generated/RainterpreterExpressionDeployer.pointers.sol";
 import {ALL_STANDARD_OPS_LENGTH} from "src/lib/op/LibAllStandardOps.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
@@ -214,5 +214,29 @@ contract LibIntegrityCheckTest is Test {
 
         vm.expectRevert(abi.encodeWithSelector(StackUnderflowHighwater.selector, 1, 0, 2));
         helper.runIntegrityCheck(fPointers, bytecode, constants);
+    }
+
+    /// StackAllocationMismatch: opcode 0 produces 2 outputs from 0 inputs,
+    /// so stackMaxIndex reaches 2. Declaring stackAllocation = 3 triggers
+    /// StackAllocationMismatch(2, 3).
+    function testStackAllocationMismatch() external {
+        IntegrityHighwater twoOp = new IntegrityHighwater();
+        bytes memory fPointers = twoOp.buildIntegrityPointers();
+
+        bytes memory bytecode = abi.encodePacked(
+            uint8(1), // sourceCount
+            uint16(0), // relative offset source 0
+            uint8(1), // opsCount
+            uint8(3), // stackAllocation = 3 (WRONG — actual max is 2)
+            uint8(0), // source inputs = 0
+            uint8(2), // source outputs = 2
+            uint8(0), // opcode 0 (zeroInputTwoOutput)
+            uint8(0x20), // ioByte: 0 inputs, 2 outputs
+            uint16(0) // operand
+        );
+        bytes32[] memory constants = new bytes32[](0);
+
+        vm.expectRevert(abi.encodeWithSelector(StackAllocationMismatch.selector, 2, 3));
+        twoOp.runIntegrityCheck(fPointers, bytecode, constants);
     }
 }
