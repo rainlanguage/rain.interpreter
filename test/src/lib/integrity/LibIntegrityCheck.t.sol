@@ -4,7 +4,7 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {LibIntegrityCheck, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {OpcodeOutOfRange, StackUnderflow, StackUnderflowHighwater, StackAllocationMismatch} from "src/error/ErrIntegrity.sol";
+import {OpcodeOutOfRange, StackUnderflow, StackUnderflowHighwater, StackAllocationMismatch, StackOutputsMismatch} from "src/error/ErrIntegrity.sol";
 import {INTEGRITY_FUNCTION_POINTERS} from "src/generated/RainterpreterExpressionDeployer.pointers.sol";
 import {ALL_STANDARD_OPS_LENGTH} from "src/lib/op/LibAllStandardOps.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
@@ -237,6 +237,30 @@ contract LibIntegrityCheckTest is Test {
         bytes32[] memory constants = new bytes32[](0);
 
         vm.expectRevert(abi.encodeWithSelector(StackAllocationMismatch.selector, 2, 3));
+        twoOp.runIntegrityCheck(fPointers, bytecode, constants);
+    }
+
+    /// StackOutputsMismatch: opcode 0 produces 2 outputs from 0 inputs, so
+    /// the final stackIndex is 2. Declaring source outputs = 1 (with correct
+    /// stackAllocation = 2) triggers StackOutputsMismatch(2, 1).
+    function testStackOutputsMismatch() external {
+        IntegrityHighwater twoOp = new IntegrityHighwater();
+        bytes memory fPointers = twoOp.buildIntegrityPointers();
+
+        bytes memory bytecode = abi.encodePacked(
+            uint8(1), // sourceCount
+            uint16(0), // relative offset source 0
+            uint8(1), // opsCount
+            uint8(2), // stackAllocation = 2 (correct)
+            uint8(0), // source inputs = 0
+            uint8(1), // source outputs = 1 (WRONG — actual final stack is 2)
+            uint8(0), // opcode 0 (zeroInputTwoOutput)
+            uint8(0x20), // ioByte: 0 inputs, 2 outputs
+            uint16(0) // operand
+        );
+        bytes32[] memory constants = new bytes32[](0);
+
+        vm.expectRevert(abi.encodeWithSelector(StackOutputsMismatch.selector, 2, 1));
         twoOp.runIntegrityCheck(fPointers, bytecode, constants);
     }
 }
