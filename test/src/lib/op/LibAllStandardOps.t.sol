@@ -5,6 +5,7 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std/Test.sol";
 
 import {LibAllStandardOps, ALL_STANDARD_OPS_LENGTH} from "src/lib/op/LibAllStandardOps.sol";
+import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV2.sol";
 import {LITERAL_PARSERS_LENGTH} from "src/lib/parse/literal/LibParseLiteral.sol";
 
 /// @title LibAllStandardOpsTest
@@ -49,5 +50,26 @@ contract LibAllStandardOpsTest is Test {
     function testOperandHandlerFunctionPointersLength() external pure {
         bytes memory pointers = LibAllStandardOps.operandHandlerFunctionPointers();
         assertEq(pointers.length, ALL_STANDARD_OPS_LENGTH * 2);
+    }
+
+    /// Test that authoringMetaV2 word names are correct and in the expected
+    /// order. The first four opcodes (stack, constant, extern, context) MUST
+    /// be in this exact order for parsing to work.
+    function testAuthoringMetaV2Content() external pure {
+        bytes memory authoringMeta = LibAllStandardOps.authoringMetaV2();
+        AuthoringMetaV2[] memory words = abi.decode(authoringMeta, (AuthoringMetaV2[]));
+
+        assertEq(words.length, ALL_STANDARD_OPS_LENGTH);
+
+        // The first four opcodes must be in this order for parsing.
+        assertEq(words[0].word, bytes32("stack"));
+        assertEq(words[1].word, bytes32("constant"));
+        assertEq(words[2].word, bytes32("extern"));
+        assertEq(words[3].word, bytes32("context"));
+
+        // Every word must be non-empty.
+        for (uint256 i = 0; i < words.length; i++) {
+            assertTrue(words[i].word != bytes32(0));
+        }
     }
 }
