@@ -7,10 +7,11 @@ import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibParseLiteralHex} from "src/lib/parse/literal/LibParseLiteralHex.sol";
+import {HexLiteralOverflow} from "src/error/ErrParse.sol";
 
-/// @title LibParseLiteralHexTest
+/// @title LibParseLiteralHexParseHexTest
 /// Tests parsing hex literals with LibParseLiteralHex.
-contract LibParseLiteralHexBoundHexTest is Test {
+contract LibParseLiteralHexParseHexTest is Test {
     using LibParseLiteralHex for ParseState;
     using LibBytes for bytes;
 
@@ -27,5 +28,25 @@ contract LibParseLiteralHexBoundHexTest is Test {
         );
         assertEq(parsedValue, value);
         assertEq(cursorAfter, cursor + bytes(hexString).length);
+    }
+
+    /// A hex literal with 65 hex digits (> 64 = 32 bytes) must revert with
+    /// HexLiteralOverflow.
+    function testParseHexOverflow() external {
+        // 65 hex digits after "0x" — one more than the 64 (0x40) limit.
+        bytes memory data =
+            bytes("0x00000000000000000000000000000000000000000000000000000000000000000a");
+
+        // Offset 2: the hex digits start after the "0x" prefix.
+        vm.expectRevert(abi.encodeWithSelector(HexLiteralOverflow.selector, 2));
+        this.externalParseHex(data);
+    }
+
+    /// External wrapper that constructs ParseState internally so memory
+    /// pointers remain valid across the external call boundary.
+    function externalParseHex(bytes memory data) external pure returns (uint256, bytes32) {
+        ParseState memory state = LibParseState.newState(data, "", "", "");
+        uint256 cursor = Pointer.unwrap(state.data.dataPointer());
+        return state.parseHex(cursor, Pointer.unwrap(data.endDataPointer()));
     }
 }
