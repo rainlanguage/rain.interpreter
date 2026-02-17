@@ -16,3 +16,6 @@
 [submodule "lib/rain.deploy"]
 	path = lib/rain.deploy
 	url = https://github.com/rainlanguage/rain.deploy
+[submodule "lib/rain.extrospection"]
+	path = lib/rain.extrospection
+	url = https://github.com/rainlanguage/rain.extrospection

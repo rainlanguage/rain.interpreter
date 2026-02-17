@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 import {ParseState} from "../LibParseState.sol";
 import {
@@ -20,6 +21,8 @@ library LibParseLiteralHex {
     using LibParseLiteralHex for ParseState;
     using LibParseError for ParseState;
 
+    /// Finds the bounds of a hex literal by scanning forward from past the
+    /// "0x" prefix until a non-hex character is encountered.
     function boundHex(ParseState memory, uint256 cursor, uint256 end)
         internal
         pure

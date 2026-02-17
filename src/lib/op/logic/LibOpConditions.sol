@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
@@ -9,15 +10,15 @@ import {LibIntOrAString, IntOrAString} from "rain.intorastring/lib/LibIntOrAStri
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpConditions
-/// @notice Opcode to return the first nonzero item on the stack up to the inputs
-/// limit.
+/// Opcode to evaluate pairwise condition-value slots and return the value
+/// corresponding to the first nonzero condition.
 library LibOpConditions {
     using LibIntOrAString for IntOrAString;
     using LibDecimalFloat for Float;
 
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
-        uint256 inputs = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
+        uint256 inputs = uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F;
         inputs = inputs > 2 ? inputs : 2;
         return (inputs, 1);
     }
@@ -79,8 +80,9 @@ library LibOpConditions {
         // implementation.
         unchecked {
             uint256 length = inputs.length;
+            uint256 pairsLength = length - (length % 2);
             outputs = new StackItem[](1);
-            for (uint256 i = 0; i < length; i += 2) {
+            for (uint256 i = 0; i < pairsLength; i += 2) {
                 if (!Float.wrap(StackItem.unwrap(inputs[i])).isZero()) {
                     outputs[0] = inputs[i + 1];
                     return outputs;

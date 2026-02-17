@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
@@ -18,7 +19,7 @@ library LibOpIf {
     }
 
     /// IF
-    /// IF is a conditional. If the first item on the stack is nonero, the second
+    /// IF is a conditional. If the first item on the stack is nonzero, the second
     /// item is returned, else the third item is returned.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
         Float condition;

@@ -1,12 +1,13 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
-import {StackPointerUnderflow} from "../../../error/ErrEval.sol";
 
+/// @title LibOpContext
 library LibOpContext {
     /// `context` integrity check. Requires 0 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
@@ -24,9 +25,6 @@ library LibOpContext {
         // because we don't know the shape of the context at compile time.
         // Solidity handles that for us as long as we don't invoke yul for the
         // reads.
-        if (Pointer.unwrap(stackTop) < 0x20) {
-            revert StackPointerUnderflow();
-        }
         bytes32 v = state.context[i][j];
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)

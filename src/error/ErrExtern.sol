@@ -1,17 +1,11 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
+
+import {NotAnExternContract} from "rain.interpreter.interface/error/ErrExtern.sol";
 
 /// @dev Workaround for https://github.com/foundry-rs/foundry/issues/6572
 contract ErrExtern {}
-
-/// Thrown when the extern interface is not supported.
-error NotAnExternContract(address extern);
-
-/// Thrown by the extern contract at runtime when the inputs don't match the
-/// expected inputs.
-/// @param expected The expected number of inputs.
-/// @param actual The actual number of inputs.
-error BadInputs(uint256 expected, uint256 actual);
 
 /// Thrown when an extern opcode is out of range of the available function
 /// pointers.
@@ -27,3 +21,6 @@ error ExternPointersMismatch(uint256 opcodeCount, uint256 integrityCount);
 
 /// Thrown when the outputs length is not equal to the expected length.
 error BadOutputsLength(uint256 expectedLength, uint256 actualLength);
+
+/// Thrown at construction when there are no opcode function pointers.
+error ExternOpcodePointersEmpty();

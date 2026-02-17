@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
@@ -31,8 +32,8 @@ library LibOpDiv {
             b := mload(add(stackTop, 0x20))
             stackTop := add(stackTop, 0x40)
         }
-        (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(a);
-        (int256 signedCoefficientB, int256 exponentB) = LibDecimalFloat.unpack(b);
+        (int256 signedCoefficient, int256 exponent) = a.unpack();
+        (int256 signedCoefficientB, int256 exponentB) = b.unpack();
         (signedCoefficient, exponent) =
             LibDecimalFloatImplementation.div(signedCoefficient, exponent, signedCoefficientB, exponentB);
 
@@ -44,7 +45,7 @@ library LibOpDiv {
                     b := mload(stackTop)
                     stackTop := add(stackTop, 0x20)
                 }
-                (signedCoefficientB, exponentB) = LibDecimalFloat.unpack(b);
+                (signedCoefficientB, exponentB) = b.unpack();
                 (signedCoefficient, exponent) =
                     LibDecimalFloatImplementation.div(signedCoefficient, exponent, signedCoefficientB, exponentB);
                 unchecked {
@@ -71,7 +72,7 @@ library LibOpDiv {
         // see the revert from the real function and not the reference function.
         unchecked {
             Float a = Float.wrap(StackItem.unwrap(inputs[0]));
-            (int256 signedCoefficient, int256 exponent) = LibDecimalFloat.unpack(a);
+            (int256 signedCoefficient, int256 exponent) = a.unpack();
             for (uint256 i = 1; i < inputs.length; i++) {
                 Float b = Float.wrap(StackItem.unwrap(inputs[i]));
                 // Just bail out with a = some sentinel value if we're going to
@@ -84,7 +85,7 @@ library LibOpDiv {
                     a = Float.wrap(bytes32(keccak256(abi.encodePacked("overflow sentinel"))));
                     break;
                 }
-                (int256 signedCoefficientB, int256 exponentB) = LibDecimalFloat.unpack(b);
+                (int256 signedCoefficientB, int256 exponentB) = b.unpack();
                 (signedCoefficient, exponent) =
                     LibDecimalFloatImplementation.div(signedCoefficient, exponent, signedCoefficientB, exponentB);
             }

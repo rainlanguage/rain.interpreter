@@ -1,4 +1,5 @@
-// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
@@ -6,7 +7,7 @@ import {RainterpreterExpressionDeployer} from "src/concrete/RainterpreterExpress
 import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
 import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
 import {RainterpreterParser} from "src/concrete/RainterpreterParser.sol";
-import {EXPRESSION_DEPLOYER_META_PATH} from "src/lib/constants/ExpressionDeployerConstants.sol";
+string constant EXPRESSION_DEPLOYER_META_PATH = "meta/RainterpreterExpressionDeployer.rain.meta";
 
 contract RainterpreterExpressionDeployerDescribedByMetaV1Test is Test {
     function testRainterpreterExpressionDeployerDescribedByMetaV1Happy() external {

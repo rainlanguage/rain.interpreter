@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 import {OperandV2, OPCODE_CONSTANT} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibParseStackTracker, ParseStackTracker} from "./LibParseStackTracker.sol";
@@ -16,7 +17,10 @@ import {
     NotAcceptingInputs,
     UnsupportedLiteralType,
     InvalidSubParser,
-    OpcodeIOOverflow
+    OpcodeIOOverflow,
+    SourceItemOpsOverflow,
+    ParenInputOverflow,
+    LineRHSItemsOverflow
 } from "../../error/ErrParse.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 import {LibParseError} from "./LibParseError.sol";
@@ -148,6 +152,11 @@ library LibParseState {
     using LibParseLiteral for ParseState;
     using LibUint256Array for uint256[];
 
+    /// Allocates a new 32-byte-aligned active source pointer in memory and
+    /// links it into the doubly linked list of source slots.
+    /// @param oldActiveSourcePointer The pointer to the previous active source
+    /// slot to link into the doubly linked list.
+    /// @return The pointer to the newly allocated active source slot.
     function newActiveSourcePointer(uint256 oldActiveSourcePointer) internal pure returns (uint256) {
         uint256 activeSourcePtr;
         uint256 emptyActiveSource = EMPTY_ACTIVE_SOURCE;
@@ -165,6 +174,10 @@ library LibParseState {
         return activeSourcePtr;
     }
 
+    /// Resets all per-source state fields to prepare for parsing a new source.
+    /// Allocates a fresh active source pointer and zeroes out top-level
+    /// counters, paren trackers, line tracker, stack names, and stack tracker.
+    /// @param state The parse state to reset.
     function resetSource(ParseState memory state) internal pure {
         state.activeSourcePtr = newActiveSourcePointer(0);
         state.topLevel0 = 0;
@@ -181,6 +194,16 @@ library LibParseState {
         state.stackTracker = ParseStackTracker.wrap(0);
     }
 
+    /// Constructs and returns a fully initialised `ParseState` from the given
+    /// raw expression data, word metadata, operand handlers, and literal
+    /// parsers. Calls `resetSource` to set up the first active source.
+    /// @param data The raw expression data to parse.
+    /// @param meta The word metadata for opcode lookups.
+    /// @param operandHandlers Packed 2-byte function pointers for operand
+    /// handlers.
+    /// @param literalParsers Packed 2-byte function pointers for literal
+    /// parsers.
+    /// @return The fully initialised parse state.
     function newState(bytes memory data, bytes memory meta, bytes memory operandHandlers, bytes memory literalParsers)
         internal
         pure
@@ -236,6 +259,9 @@ library LibParseState {
     /// sub parsers in memory. The sub parser is expected to be an `address` so
     /// the pointer for the linked list is ORed in the 16 high bits of the
     /// `uint256`.
+    /// @param state The parse state containing the sub parser linked list.
+    /// @param cursor The current cursor for error reporting.
+    /// @param subParser The sub parser address as a bytes32.
     function pushSubParser(ParseState memory state, uint256 cursor, bytes32 subParser) internal pure {
         if (uint256(subParser) > uint256(type(uint160).max)) {
             revert InvalidSubParser(state.parseErrorOffset(cursor));
@@ -254,6 +280,8 @@ library LibParseState {
     }
 
     /// Builds a memory array of sub parsers from the linked list of sub parsers.
+    /// @param state The parse state containing the sub parser linked list.
+    /// @return The array of sub parser addresses.
     function exportSubParsers(ParseState memory state) internal pure returns (address[] memory) {
         bytes32 tail = state.subParsers;
         uint256[] memory subParsersUint256;
@@ -279,10 +307,13 @@ library LibParseState {
         return subParsers;
     }
 
-    // Find the pointer to the first opcode in the source LL. Put it in the line
-    // tracker at the appropriate offset.
+    /// Snapshots the current source head pointer into the line tracker at the
+    /// appropriate offset, but only when the current top-level word counter is
+    /// zero. This records where each top-level RHS item begins in the source.
+    /// @param state The parse state to snapshot.
     function snapshotSourceHeadToLineTracker(ParseState memory state) internal pure {
         uint256 activeSourcePtr = state.activeSourcePtr;
+        bool didOverflow;
         assembly ("memory-safe") {
             let topLevel0Pointer := add(state, 0x20)
             let totalRHSTopLevel := byte(0, mload(topLevel0Pointer))
@@ -294,12 +325,24 @@ library LibParseState {
                 let lineTracker := mload(add(state, 0xa0))
                 let lineRHSTopLevel := sub(totalRHSTopLevel, byte(30, lineTracker))
                 let offset := mul(0x10, add(lineRHSTopLevel, 1))
+                // 14 items max — offset 0xF0 is the last valid slot.
+                // Beyond that, shl shifts past 256 bits and silently
+                // discards the pointer.
+                didOverflow := gt(offset, 0xF0)
                 lineTracker := or(lineTracker, shl(offset, sourceHead))
                 mstore(add(state, 0xa0), lineTracker)
             }
         }
+        if (didOverflow) {
+            revert LineRHSItemsOverflow();
+        }
     }
 
+    /// Finalises the current line by validating paren balance, reconciling
+    /// LHS and RHS item counts, computing opcode input/output counts, and
+    /// updating the stack tracker. Resets the line tracker for the next line.
+    /// @param state The parse state to finalise the current line for.
+    /// @param cursor The current cursor position for error reporting.
     //slither-disable-next-line cyclomatic-complexity
     function endLine(ParseState memory state, uint256 cursor) internal pure {
         unchecked {
@@ -424,6 +467,7 @@ library LibParseState {
     /// OR a lone literal value at the top level. IF we are at the top level we
     /// move the immutable stack highwater mark forward 1 item, which moves the
     /// RHS offset forward 1 byte to start a new word counter.
+    /// @param state The parse state to advance the highwater mark for.
     function highwater(ParseState memory state) internal pure {
         uint256 parenOffset;
         assembly ("memory-safe") {
@@ -443,12 +487,18 @@ library LibParseState {
         }
     }
 
+    /// Computes a single-bit bloom filter hash for a constant value, used to
+    /// quickly check for potential duplicates before traversing the linked list.
+    /// @param value The constant value to compute the bloom hash for.
+    /// @return bloom The single-bit bloom filter hash.
     function constantValueBloom(bytes32 value) internal pure returns (bytes32 bloom) {
         return bytes32(uint256(1) << (uint256(value) % 256));
     }
 
     /// Includes a constant value in the constants linked list so that it will
     /// appear in the final constants array.
+    /// @param state The parse state containing the constants builder.
+    /// @param value The constant value to push onto the linked list.
     function pushConstantValue(ParseState memory state, bytes32 value) internal pure {
         unchecked {
             uint256 headPtr;
@@ -472,6 +522,13 @@ library LibParseState {
         }
     }
 
+    /// Parses a literal value at the cursor, deduplicates it against existing
+    /// constants using a bloom filter and linked list, and pushes a constant
+    /// opcode referencing the value's index onto the current source.
+    /// @param state The parse state.
+    /// @param cursor The current cursor position pointing at the literal.
+    /// @param end The end of the source data.
+    /// @return The updated cursor position after parsing the literal.
     function pushLiteral(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
             bytes32 constantValue;
@@ -537,6 +594,12 @@ library LibParseState {
         }
     }
 
+    /// Writes an opcode and operand pair into the active source at the current
+    /// bit offset. Updates paren tracking counters, top-level word counters,
+    /// and allocates a new source slot if the current one is full.
+    /// @param state The parse state containing the active source.
+    /// @param opcode The opcode to write into the source.
+    /// @param operand The operand to write alongside the opcode.
     function pushOpToSource(ParseState memory state, uint256 opcode, OperandV2 operand) internal pure {
         unchecked {
             // This might be a top level item so try to snapshot its pointer to
@@ -550,53 +613,69 @@ library LibParseState {
 
             // Increment the top level stack counter for the current top level
             // word. MAY be setting 0 to 1 if this is the top level.
-            assembly ("memory-safe") {
-                // Hardcoded offset into the state struct.
-                let counterOffset := add(state, 0x20)
-                let counterPointer := add(counterOffset, add(byte(0, mload(counterOffset)), 1))
-                // Increment the counter.
-                mstore8(counterPointer, add(byte(0, mload(counterPointer)), 1))
+            {
+                bool didOverflow;
+                assembly ("memory-safe") {
+                    // Hardcoded offset into the state struct.
+                    let counterOffset := add(state, 0x20)
+                    let counterPointer := add(counterOffset, add(byte(0, mload(counterOffset)), 1))
+                    let val := byte(0, mload(counterPointer))
+                    didOverflow := eq(val, 0xFF)
+                    // Increment the counter.
+                    mstore8(counterPointer, add(val, 1))
+                }
+                if (didOverflow) {
+                    revert SourceItemOpsOverflow();
+                }
             }
 
             bytes32 activeSource;
             uint256 offset;
             uint256 activeSourcePointer = state.activeSourcePtr;
-            assembly ("memory-safe") {
-                activeSource := mload(activeSourcePointer)
-                // The low 16 bits of the active source is the current offset.
-                offset := and(activeSource, 0xFFFF)
+            {
+                bool didOverflow;
+                assembly ("memory-safe") {
+                    activeSource := mload(activeSourcePointer)
+                    // The low 16 bits of the active source is the current offset.
+                    offset := and(activeSource, 0xFFFF)
 
-                // The offset is in bits so for a byte pointer we need to divide
-                // by 8, then add 4 to move to the operand low byte.
-                let inputsBytePointer := sub(add(activeSourcePointer, 0x20), add(div(offset, 8), 4))
+                    // The offset is in bits so for a byte pointer we need to divide
+                    // by 8, then add 4 to move to the operand low byte.
+                    let inputsBytePointer := sub(add(activeSourcePointer, 0x20), add(div(offset, 8), 4))
 
-                // Increment the paren input counter. The input counter is for the paren
-                // group that is currently being built. This means the counter is for
-                // the paren group that is one level above the current paren offset.
-                // Assumes that every word has exactly 1 output, therefore the input
-                // counter always increases by 1.
-                // Hardcoded offset into the state struct.
-                let inputCounterPos := add(state, 0x60)
-                inputCounterPos := add(
-                    add(
-                        inputCounterPos,
-                        // the offset
-                        byte(0, mload(inputCounterPos))
-                    ),
-                    // +2 for the reserved bytes -1 to move back to the counter
-                    // for the previous paren group.
-                    1
-                )
-                // Increment the parent counter.
-                mstore8(inputCounterPos, add(byte(0, mload(inputCounterPos)), 1))
-                // Zero out the current counter.
-                mstore8(add(inputCounterPos, 3), 0)
+                    // Increment the paren input counter. The input counter is for the paren
+                    // group that is currently being built. This means the counter is for
+                    // the paren group that is one level above the current paren offset.
+                    // Assumes that every word has exactly 1 output, therefore the input
+                    // counter always increases by 1.
+                    // Hardcoded offset into the state struct.
+                    let inputCounterPos := add(state, 0x60)
+                    inputCounterPos := add(
+                        add(
+                            inputCounterPos,
+                            // the offset
+                            byte(0, mload(inputCounterPos))
+                        ),
+                        // +2 for the reserved bytes -1 to move back to the counter
+                        // for the previous paren group.
+                        1
+                    )
+                    // Increment the parent counter.
+                    let val := byte(0, mload(inputCounterPos))
+                    didOverflow := eq(val, 0xFF)
+                    mstore8(inputCounterPos, add(val, 1))
+                    // Zero out the current counter.
+                    mstore8(add(inputCounterPos, 3), 0)
 
-                // Write the operand low byte pointer into the paren tracker.
-                // Move 3 bytes after the input counter pos, then shift down 32
-                // bytes to accommodate the full mload.
-                let parenTrackerPointer := sub(inputCounterPos, 29)
-                mstore(parenTrackerPointer, or(and(mload(parenTrackerPointer), not(0xFFFF)), inputsBytePointer))
+                    // Write the operand low byte pointer into the paren tracker.
+                    // Move 3 bytes after the input counter pos, then shift down 32
+                    // bytes to accommodate the full mload.
+                    let parenTrackerPointer := sub(inputCounterPos, 29)
+                    mstore(parenTrackerPointer, or(and(mload(parenTrackerPointer), not(0xFFFF)), inputsBytePointer))
+                }
+                if (didOverflow) {
+                    revert ParenInputOverflow();
+                }
             }
 
             // We write sources RTL so they can run LTR.
@@ -623,6 +702,11 @@ library LibParseState {
         }
     }
 
+    /// Finalises the current source by traversing the linked list of source
+    /// slots, reordering opcodes from RTL to LTR at the top level, writing
+    /// the source prefix, and registering the source in the sources builder.
+    /// Resets per-source state for the next source via `resetSource`.
+    /// @param state The parse state containing the active source to finalise.
     function endSource(ParseState memory state) internal pure {
         uint256 sourcesBuilder = state.sourcesBuilder;
         uint256 offset = sourcesBuilder >> 0xf0;
@@ -749,6 +833,11 @@ library LibParseState {
         }
     }
 
+    /// Assembles the final bytecode from all completed sources. Writes the
+    /// source count, relative pointers, and copies each source's opcodes into
+    /// a single contiguous byte array. Reverts if a source is still active.
+    /// @param state The parse state containing all completed sources.
+    /// @return bytecode The assembled bytecode as a contiguous byte array.
     function buildBytecode(ParseState memory state) internal pure returns (bytes memory bytecode) {
         unchecked {
             uint256 sourcesBuilder = state.sourcesBuilder;
@@ -837,6 +926,12 @@ library LibParseState {
         }
     }
 
+    /// Builds the final constants array by traversing the constants linked
+    /// list from head to tail and writing values in reverse so that indices
+    /// in the source bytecode reference the correct positions.
+    /// @param state The parse state containing the constants builder.
+    /// @return constants The final constants array ordered by their stable
+    /// indices in the source bytecode.
     function buildConstants(ParseState memory state) internal pure returns (bytes32[] memory constants) {
         uint256 constantsHeight = state.constantsBuilder & 0xFFFF;
         uint256 tailPtr = state.constantsBuilder >> 0x10;

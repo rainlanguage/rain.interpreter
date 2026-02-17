@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
@@ -13,6 +14,15 @@ import {InterpreterState} from "./LibInterpreterState.sol";
 library LibInterpreterStateDataContract {
     using LibBytes for bytes;
 
+    /// Returns the total byte size needed to serialize `bytecode` and
+    /// `constants` into a single contiguous memory region. The layout is:
+    /// `[constants length][constants data...][bytecode length][bytecode data...]`.
+    /// Uses unchecked arithmetic — the caller MUST ensure the in-memory length
+    /// fields of `bytecode` and `constants` are not corrupt, otherwise the
+    /// multiplication or addition can silently overflow.
+    /// @param bytecode The bytecode to serialize.
+    /// @param constants The constants array to serialize.
+    /// @return size The total byte size of the serialized representation.
     function serializeSize(bytes memory bytecode, bytes32[] memory constants) internal pure returns (uint256 size) {
         unchecked {
             // bytecode length + constants length * 0x20 + 0x40 for both the bytecode and constants length words.
@@ -20,6 +30,12 @@ library LibInterpreterStateDataContract {
         }
     }
 
+    /// Writes `constants` (with length prefix) then `bytecode` (with length
+    /// prefix) into the memory region starting at `cursor`. The caller must
+    /// ensure `cursor` points to a region of at least `serializeSize` bytes.
+    /// @param cursor Pointer to the start of the destination memory region.
+    /// @param bytecode The bytecode to serialize.
+    /// @param constants The constants array to serialize.
     function unsafeSerialize(Pointer cursor, bytes memory bytecode, bytes32[] memory constants) internal pure {
         unchecked {
             // Copy constants into place with length.
@@ -37,6 +53,19 @@ library LibInterpreterStateDataContract {
         }
     }
 
+    /// Reconstructs an `InterpreterState` from a previously serialized byte
+    /// array. References the constants and bytecode arrays in-place (no copy).
+    /// Allocates a fresh stack for each source according to the bytecode's
+    /// declared stack allocation, and returns a fully populated state ready
+    /// for evaluation.
+    /// @param serialized The serialized byte array produced by
+    /// `unsafeSerialize`.
+    /// @param sourceIndex The index of the source to evaluate.
+    /// @param namespace The fully qualified namespace for store reads/writes.
+    /// @param store The interpreter store contract for persistent state.
+    /// @param context The 2D context array passed by the caller.
+    /// @param fs The packed function pointer table for opcode dispatch.
+    /// @return The fully populated interpreter state ready for evaluation.
     function unsafeDeserialize(
         bytes memory serialized,
         uint256 sourceIndex,

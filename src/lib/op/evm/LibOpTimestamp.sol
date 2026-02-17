@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
@@ -27,6 +28,9 @@ library LibOpTimestamp {
     }
 
     /// Reference implementation of `block-timestamp` for testing.
+    /// Uses the float conversion with exponent 0 to verify that
+    /// `fromFixedDecimalLosslessPacked(value, 0)` is identity, unlike `run()`
+    /// which stores the raw value directly as a gas optimization.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory)
         internal
         view

@@ -1,16 +1,17 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.19;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
 import {
+    OpcodeOutOfRange,
     StackAllocationMismatch,
     StackOutputsMismatch,
     StackUnderflow,
-    StackUnderflowHighwater,
-    BadOpInputsLength,
-    BadOpOutputsLength
+    StackUnderflowHighwater
 } from "../../error/ErrIntegrity.sol";
+import {BadOpInputsLength, BadOpOutputsLength} from "rain.interpreter.interface/error/ErrIntegrity.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
@@ -26,6 +27,15 @@ struct IntegrityCheckState {
 library LibIntegrityCheck {
     using LibIntegrityCheck for IntegrityCheckState;
 
+    /// Builds a fresh `IntegrityCheckState` for a single source. The initial
+    /// stack index, max index, and read highwater are all set to `stackIndex`
+    /// (the number of source inputs), so that source inputs are treated as
+    /// immutable during the integrity walk.
+    /// @param bytecode The full bytecode containing all sources.
+    /// @param stackIndex The number of source inputs, used as the initial
+    /// stack depth and read highwater.
+    /// @param constants The constants array for the expression.
+    /// @return The initialized integrity check state.
     function newState(bytes memory bytecode, uint256 stackIndex, bytes32[] memory constants)
         internal
         pure
@@ -47,6 +57,20 @@ library LibIntegrityCheck {
         );
     }
 
+    /// Walks every opcode in every source of `bytecode`, calling each opcode's
+    /// integrity function via `fPointers` to compute expected inputs/outputs.
+    /// Validates that the computed IO matches the bytecode-declared IO, that
+    /// the stack never underflows or drops below the read highwater, and that
+    /// the final stack depth matches the declared allocation and outputs.
+    /// Reverts on any mismatch. Returns a packed `io` byte array with two
+    /// bytes per source (inputs, outputs).
+    /// @param fPointers Packed 2-byte function pointers for each opcode's
+    /// integrity function.
+    /// @param bytecode The full bytecode containing all sources to check.
+    /// @param constants The constants array for the expression.
+    /// @return io Packed byte array with two bytes per source encoding
+    /// (inputs, outputs).
+    //slither-disable-next-line cyclomatic-complexity
     function integrityCheck2(bytes memory fPointers, bytes memory bytecode, bytes32[] memory constants)
         internal
         view
@@ -56,8 +80,10 @@ library LibIntegrityCheck {
             uint256 sourceCount = LibBytecode.sourceCount(bytecode);
 
             uint256 fPointersStart;
+            uint256 fsCount;
             assembly ("memory-safe") {
                 fPointersStart := add(fPointers, 0x20)
+                fsCount := div(mload(fPointers), 2)
             }
 
             // Ensure that the bytecode has no out of bounds pointers BEFORE we
@@ -99,15 +125,22 @@ library LibIntegrityCheck {
                     OperandV2 operand;
                     uint256 bytecodeOpInputs;
                     uint256 bytecodeOpOutputs;
+                    uint256 opcodeIndex;
                     function(IntegrityCheckState memory, OperandV2) view returns (uint256, uint256) f;
                     assembly ("memory-safe") {
                         let word := mload(cursor)
-                        f := shr(0xf0, mload(add(fPointersStart, mul(byte(28, word), 2))))
+                        opcodeIndex := byte(28, word)
                         // 3 bytes mask.
                         operand := and(word, 0xFFFFFF)
                         let ioByte := byte(29, word)
                         bytecodeOpInputs := and(ioByte, 0x0F)
                         bytecodeOpOutputs := shr(4, ioByte)
+                    }
+                    if (opcodeIndex >= fsCount) {
+                        revert OpcodeOutOfRange(state.opIndex, opcodeIndex, fsCount);
+                    }
+                    assembly ("memory-safe") {
+                        f := shr(0xf0, mload(add(fPointersStart, mul(opcodeIndex, 2))))
                     }
                     (uint256 calcOpInputs, uint256 calcOpOutputs) = f(state, operand);
                     if (calcOpInputs != bytecodeOpInputs) {

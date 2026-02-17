@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 import {MemoryKVKey, MemoryKVVal, MemoryKV, LibMemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
@@ -37,7 +38,10 @@ library LibOpGet {
             bytes32 storeValue = state.store.get(state.namespace, key);
 
             // Push fetched value to memory to make subsequent lookups on the
-            // same key find a cache HIT.
+            // same key find a cache HIT. Note: this means read-only keys will
+            // also be persisted to the store at the end of eval, paying an
+            // unnecessary SSTORE. In practice the gas saved by caching
+            // repeated reads outweighs this cost.
             state.stateKV = state.stateKV.set(MemoryKVKey.wrap(key), MemoryKVVal.wrap(storeValue));
 
             assembly ("memory-safe") {

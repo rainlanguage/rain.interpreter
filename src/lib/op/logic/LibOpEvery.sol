@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
@@ -16,7 +17,7 @@ library LibOpEvery {
     /// `every` integrity check. Requires at least 1 input and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least one input.
-        uint256 inputs = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
+        uint256 inputs = uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F;
         inputs = inputs > 0 ? inputs : 1;
         return (inputs, 1);
     }
@@ -24,7 +25,7 @@ library LibOpEvery {
     /// EVERY is the last nonzero item, else 0.
     function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         unchecked {
-            uint256 length = 0x20 * uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
+            uint256 length = 0x20 * (uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F);
             Float item;
             Pointer cursor = stackTop;
             Pointer end = Pointer.wrap(Pointer.unwrap(stackTop) + length);

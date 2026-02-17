@@ -1,4 +1,5 @@
-// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
@@ -13,7 +14,7 @@ import {FullyQualifiedNamespace} from "rain.interpreter.interface/interface/IInt
 import {OpTest, PRE, POST} from "test/abstract/OpTest.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV4.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
-import {BadOpOutputsLength} from "src/error/ErrIntegrity.sol";
+import {BadOpOutputsLength} from "rain.interpreter.interface/error/ErrIntegrity.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpStackTest
@@ -127,6 +128,28 @@ contract LibOpStackTest is OpTest {
         assertEq(actualPost, POST, "post");
         assertEq(actualStackValue, StackItem.unwrap(stackValue), "stackValue");
         assertEq(actualPre, PRE, "pre");
+    }
+
+    /// Test that run() and referenceFn() produce the same value.
+    /// forge-config: default.fuzz.runs = 100
+    function testOpStackRunReferenceFnParity(StackItem[][] memory stacks, uint256 stackIndex) external view {
+        InterpreterState memory state = opTestDefaultInterpreterState();
+        vm.assume(stacks.length > 0);
+        state.stackBottoms = LibInterpreterState.stackBottoms(stacks);
+        state.sourceIndex = bound(state.sourceIndex, 0, stacks.length - 1);
+        StackItem[] memory stack = stacks[state.sourceIndex];
+        vm.assume(stack.length > 0);
+        stackIndex = bound(stackIndex, 0, stack.length - 1);
+
+        OperandV2 operand = OperandV2.wrap(bytes32(stackIndex));
+        StackItem[] memory inputs = new StackItem[](0);
+
+        StackItem[] memory referenceOutputs = LibOpStack.referenceFn(state, operand, inputs);
+        assertEq(referenceOutputs.length, 1, "referenceFn outputs length");
+
+        // The expected value from the stack array directly.
+        StackItem expectedValue = stack[stack.length - (stackIndex + 1)];
+        assertEq(StackItem.unwrap(referenceOutputs[0]), StackItem.unwrap(expectedValue), "referenceFn value");
     }
 
     /// Test the eval of a stack opcode parsed from a string.

@@ -1,4 +1,5 @@
-// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
@@ -17,7 +18,7 @@ import {
 } from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV4.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
-import {BadOpOutputsLength} from "src/error/ErrIntegrity.sol";
+import {BadOpOutputsLength} from "rain.interpreter.interface/error/ErrIntegrity.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpConstantTest

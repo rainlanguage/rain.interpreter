@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
@@ -11,6 +12,8 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 /// @notice Linear growth is base + rate * t where a is the initial value, r is
 /// the growth rate, and t is time.
 library LibOpLinearGrowth {
+    using LibDecimalFloat for Float;
+
     /// `linear-growth` integrity check. Requires exactly 3 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // There must be three inputs and one output.
@@ -29,7 +32,7 @@ library LibOpLinearGrowth {
             t := mload(stackTop)
         }
 
-        base = LibDecimalFloat.add(base, LibDecimalFloat.mul(rate, t));
+        base = base.add(rate.mul(t));
 
         assembly ("memory-safe") {
             mstore(stackTop, base)
@@ -47,7 +50,7 @@ library LibOpLinearGrowth {
         Float rate = Float.wrap(StackItem.unwrap(inputs[1]));
         Float t = Float.wrap(StackItem.unwrap(inputs[2]));
         StackItem[] memory outputs = new StackItem[](1);
-        outputs[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.add(base, LibDecimalFloat.mul(rate, t))));
+        outputs[0] = StackItem.wrap(Float.unwrap(base.add(rate.mul(t))));
         return outputs;
     }
 }

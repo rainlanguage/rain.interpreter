@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 import {NotAnExternContract} from "../../../error/ErrExtern.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
@@ -13,7 +14,6 @@ import {
     StackItem
 } from "rain.interpreter.interface/interface/IInterpreterExternV4.sol";
 import {LibExtern} from "../../extern/LibExtern.sol";
-import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 import {ERC165Checker} from "openzeppelin-contracts/contracts/utils/introspection/ERC165Checker.sol";
 import {BadOutputsLength} from "../../../error/ErrExtern.sol";
@@ -21,8 +21,6 @@ import {BadOutputsLength} from "../../../error/ErrExtern.sol";
 /// @title LibOpExtern
 /// @notice Implementation of calling an external contract.
 library LibOpExtern {
-    using LibUint256Array for uint256[];
-
     /// `extern` integrity check. Validates the extern contract supports the expected interface and delegates to the extern's own integrity check.
     function integrity(IntegrityCheckState memory state, OperandV2 operand) internal view returns (uint256, uint256) {
         uint256 encodedExternDispatchIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
@@ -33,8 +31,8 @@ library LibOpExtern {
         if (!ERC165Checker.supportsInterface(address(extern), type(IInterpreterExternV4).interfaceId)) {
             revert NotAnExternContract(address(extern));
         }
-        uint256 expectedInputsLength = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
-        uint256 expectedOutputsLength = uint256((OperandV2.unwrap(operand) >> 0x14) & bytes32(uint256(0x0F)));
+        uint256 expectedInputsLength = uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F;
+        uint256 expectedOutputsLength = uint256(OperandV2.unwrap(operand) >> 0x14) & 0x0F;
         //slither-disable-next-line unused-return
         return extern.externIntegrity(dispatch, expectedInputsLength, expectedOutputsLength);
     }
@@ -42,8 +40,8 @@ library LibOpExtern {
     /// `extern` opcode. Calls an external contract's `extern` function with stack inputs and pushes its outputs.
     function run(InterpreterState memory state, OperandV2 operand, Pointer stackTop) internal view returns (Pointer) {
         uint256 encodedExternDispatchIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
-        uint256 inputsLength = uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F)));
-        uint256 outputsLength = uint256((OperandV2.unwrap(operand) >> 0x14) & bytes32(uint256(0x0F)));
+        uint256 inputsLength = uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F;
+        uint256 outputsLength = uint256(OperandV2.unwrap(operand) >> 0x14) & 0x0F;
 
         bytes32 encodedExternDispatch = state.constants[encodedExternDispatchIndex];
         (IInterpreterExternV4 extern, ExternDispatchV2 dispatch) =
@@ -95,7 +93,7 @@ library LibOpExtern {
         returns (StackItem[] memory outputs)
     {
         uint256 encodedExternDispatchIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
-        uint256 outputsLength = uint256((OperandV2.unwrap(operand) >> 0x14) & bytes32(uint256(0x0F)));
+        uint256 outputsLength = uint256(OperandV2.unwrap(operand) >> 0x14) & 0x0F;
 
         bytes32 encodedExternDispatch = state.constants[encodedExternDispatchIndex];
         (IInterpreterExternV4 extern, ExternDispatchV2 dispatch) =
@@ -106,7 +104,7 @@ library LibOpExtern {
         }
         // The stack is built backwards, so we need to reverse the outputs.
         bytes32[] memory outputsBytes32;
-        assembly {
+        assembly ("memory-safe") {
             outputsBytes32 := outputs
         }
         LibBytes32Array.reverse(outputsBytes32);

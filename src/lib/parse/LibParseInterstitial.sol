@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 import {FSM_YANG_MASK, ParseState} from "./LibParseState.sol";
 import {
@@ -22,7 +23,8 @@ library LibParseInterstitial {
     /// the comment is malformed, e.g. if the comment doesn't start with `/*`.
     /// @param state The parser state.
     /// @param cursor The current cursor position.
-    /// @return The new cursor position.
+    /// @param end The end of the data to parse.
+    /// @return The new cursor position after the comment.
     function skipComment(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         // Set yang for comments to force a little breathing room between
         // comments and the next item.
@@ -85,6 +87,12 @@ library LibParseInterstitial {
         }
     }
 
+    /// Advances the cursor past any contiguous whitespace characters and
+    /// resets the FSM to yin state.
+    /// @param state The parser state.
+    /// @param cursor The current cursor position.
+    /// @param end The end of the data to parse.
+    /// @return The new cursor position after the whitespace.
     function skipWhitespace(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
             // Set ying as we now open to possibilities.
@@ -93,6 +101,13 @@ library LibParseInterstitial {
         }
     }
 
+    /// Skips over all interstitial content (whitespace and comments) between
+    /// meaningful parse tokens, returning the cursor at the next non-interstitial
+    /// character.
+    /// @param state The parser state.
+    /// @param cursor The current cursor position.
+    /// @param end The end of the data to parse.
+    /// @return The new cursor position after all interstitial content.
     function parseInterstitial(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         while (cursor < end) {
             uint256 char;

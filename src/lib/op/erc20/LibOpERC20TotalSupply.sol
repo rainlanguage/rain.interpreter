@@ -1,7 +1,8 @@
-// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity ^0.8.25;
 
-import {IERC20} from "openzeppelin-contracts/contracts/interfaces/IERC20.sol";
+import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
@@ -49,10 +50,10 @@ library LibOpERC20TotalSupply {
         view
         returns (StackItem[] memory)
     {
-        address account = address(uint160(uint256(StackItem.unwrap(inputs[0]))));
-        uint256 totalSupply = IERC20(account).totalSupply();
+        address token = address(uint160(uint256(StackItem.unwrap(inputs[0]))));
+        uint256 totalSupply = IERC20(token).totalSupply();
 
-        uint8 tokenDecimals = IERC20Metadata(address(uint160(account))).decimals();
+        uint8 tokenDecimals = IERC20Metadata(token).decimals();
         Float totalSupplyFloat = LibDecimalFloat.fromFixedDecimalLosslessPacked(totalSupply, tokenDecimals);
 
         StackItem[] memory outputs = new StackItem[](1);

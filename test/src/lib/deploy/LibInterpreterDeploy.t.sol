@@ -10,6 +10,7 @@ import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
 import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
 import {RainterpreterExpressionDeployer} from "src/concrete/RainterpreterExpressionDeployer.sol";
 import {RainterpreterDISPaiRegistry} from "src/concrete/RainterpreterDISPaiRegistry.sol";
+import {LibExtrospectBytecode} from "rain.extrospection/lib/LibExtrospectBytecode.sol";
 
 contract LibInterpreterDeployTest is Test {
     function testDeployAddressParser() external {
@@ -99,5 +100,50 @@ contract LibInterpreterDeployTest is Test {
         RainterpreterDISPaiRegistry registry = new RainterpreterDISPaiRegistry();
 
         assertEq(address(registry).codehash, LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_CODEHASH);
+    }
+
+    /// Parser bytecode MUST NOT contain Solidity CBOR metadata.
+    function testNoCborMetadataParser() external {
+        RainterpreterParser parser = new RainterpreterParser();
+        assertFalse(
+            LibExtrospectBytecode.tryTrimSolidityCBORMetadata(address(parser).code),
+            "Parser bytecode contains CBOR metadata"
+        );
+    }
+
+    /// Store bytecode MUST NOT contain Solidity CBOR metadata.
+    function testNoCborMetadataStore() external {
+        RainterpreterStore store = new RainterpreterStore();
+        assertFalse(
+            LibExtrospectBytecode.tryTrimSolidityCBORMetadata(address(store).code),
+            "Store bytecode contains CBOR metadata"
+        );
+    }
+
+    /// Interpreter bytecode MUST NOT contain Solidity CBOR metadata.
+    function testNoCborMetadataInterpreter() external {
+        Rainterpreter interpreter = new Rainterpreter();
+        assertFalse(
+            LibExtrospectBytecode.tryTrimSolidityCBORMetadata(address(interpreter).code),
+            "Interpreter bytecode contains CBOR metadata"
+        );
+    }
+
+    /// ExpressionDeployer bytecode MUST NOT contain Solidity CBOR metadata.
+    function testNoCborMetadataExpressionDeployer() external {
+        RainterpreterExpressionDeployer expressionDeployer = new RainterpreterExpressionDeployer();
+        assertFalse(
+            LibExtrospectBytecode.tryTrimSolidityCBORMetadata(address(expressionDeployer).code),
+            "ExpressionDeployer bytecode contains CBOR metadata"
+        );
+    }
+
+    /// DISPaiRegistry bytecode MUST NOT contain Solidity CBOR metadata.
+    function testNoCborMetadataDISPaiRegistry() external {
+        RainterpreterDISPaiRegistry registry = new RainterpreterDISPaiRegistry();
+        assertFalse(
+            LibExtrospectBytecode.tryTrimSolidityCBORMetadata(address(registry).code),
+            "DISPaiRegistry bytecode contains CBOR metadata"
+        );
     }
 }

@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 import {ZeroLengthBitwiseEncoding, TruncatedBitwiseEncoding} from "../../../error/ErrBitwise.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
@@ -45,7 +46,8 @@ library LibOpEncodeBits {
             // Build a bitmask of desired length. Max length is uint8 max which
             // is 255. A 256 length doesn't really make sense as that isn't an
             // encoding anyway, it's just the source verbatim.
-            uint256 mask = (2 ** length - 1);
+            // forge-lint: disable-next-line(incorrect-shift)
+            uint256 mask = ((1 << length) - 1);
 
             // Punch a mask sized hole in target.
             target &= ~(mask << startBit);

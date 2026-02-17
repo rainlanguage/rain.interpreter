@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 /// @dev Workaround for https://github.com/foundry-rs/foundry/issues/6572
 contract ErrParse {}
@@ -47,21 +48,12 @@ error OddLengthHexLiteral(uint256 offset);
 /// Encountered a hex literal with an invalid character.
 error MalformedHexLiteral(uint256 offset);
 
-/// Encountered a decimal literal that is larger than supported.
-error DecimalLiteralOverflow(uint256 offset);
-
-/// Encountered a decimal literal with precision loss.
-error DecimalLiteralPrecisionLoss(uint256 offset);
-
 /// Encountered a decimal literal with an exponent that has too many or no
 /// digits.
 error MalformedExponentDigits(uint256 offset);
 
 /// Encountered a decimal literal with a malformed decimal point.
 error MalformedDecimalPoint(uint256 offset);
-
-/// Encountered a zero length decimal literal.
-error ZeroLengthDecimal(uint256 offset);
 
 /// The expression does not finish with a semicolon (EOF).
 error MissingFinalSemi(uint256 offset);
@@ -93,7 +85,8 @@ error MalformedCommentStart(uint256 offset);
 
 /// @dev Thrown when a stack name is duplicated. Shadowing in all forms is
 /// disallowed in Rainlang.
-error DuplicateLHSItem(uint256 errorOffset);
+/// @param offset The byte offset of the duplicate item in the parse data.
+error DuplicateLHSItem(uint256 offset);
 
 /// Encountered too many LHS items.
 error ExcessLHSItems(uint256 offset);
@@ -151,3 +144,20 @@ error OpcodeIOOverflow(uint256 offset);
 
 /// Thrown when an operand value is larger than the maximum allowed.
 error OperandOverflow();
+
+/// The parser's free memory pointer exceeded 0x10000, which would corrupt
+/// the 16-bit pointers used internally by the parse system.
+/// @param freeMemoryPointer The free memory pointer value that exceeded the limit.
+error ParseMemoryOverflow(uint256 freeMemoryPointer);
+
+/// A single top-level item exceeded 255 opcodes. The per-item byte counter
+/// would silently wrap, corrupting source bytecode.
+error SourceItemOpsOverflow();
+
+/// A paren group exceeded 255 inputs. The per-paren byte counter would
+/// silently wrap, corrupting operand data.
+error ParenInputOverflow();
+
+/// A single line exceeded the maximum number of RHS top-level items that
+/// can be tracked in the 256-bit lineTracker (14 items).
+error LineRHSItemsOverflow();

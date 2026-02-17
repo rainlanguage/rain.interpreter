@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: LicenseRef-DCL-1.0
-// SPDX-FileCopyrightText: Copyright (c) 2020 thedavidmeister
-pragma solidity ^0.8.18;
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 import {ParseState} from "../LibParseState.sol";
 import {LibParseError} from "../LibParseError.sol";
@@ -10,6 +10,8 @@ import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibParseLiteralDecimal {
     using LibParseError for ParseState;
 
+    /// Parses a decimal float literal from the source and returns it as a
+    /// losslessly packed float in bytes32 form.
     function parseDecimalFloatPacked(ParseState memory state, uint256 start, uint256 end)
         internal
         pure

@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
@@ -27,7 +28,7 @@ library LibOpUint256ERC721BalanceOf {
             account := mload(stackTop)
         }
         // It is the rainlang author's responsibility to ensure the correctness
-        // of token and amount as addresses.
+        // of token and account as addresses.
         //forge-lint: disable-next-line(unsafe-typecast)
         uint256 tokenBalance = IERC721(address(uint160(token))).balanceOf(address(uint160(account)));
         assembly ("memory-safe") {

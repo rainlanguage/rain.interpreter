@@ -1,9 +1,11 @@
-// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {RainterpreterParser} from "src/concrete/RainterpreterParser.sol";
 import {PragmaV1} from "rain.interpreter.interface/interface/IParserPragmaV1.sol";
+import {NoWhitespaceAfterUsingWordsFrom} from "src/error/ErrParse.sol";
 
 contract RainterpreterParserParserPragma is Test {
     function checkPragma(bytes memory source, address[] memory expectedAddresses) internal {
@@ -36,6 +38,14 @@ contract RainterpreterParserParserPragma is Test {
             "using-words-from 0x4050b49bA93f5774f66f54F06a6042552d76308A 0xfa56232Df6ABea43Dda27C197DFECe8383CF1368 foo:1;",
             addresses
         );
+    }
+
+    /// Input ending exactly at the pragma keyword with no trailing whitespace
+    /// must revert.
+    function testParsePragmaNoWhitespaceAfterKeyword() external {
+        RainterpreterParser parser = new RainterpreterParser();
+        vm.expectRevert(abi.encodeWithSelector(NoWhitespaceAfterUsingWordsFrom.selector, 16));
+        parser.parsePragma1("using-words-from");
     }
 
     function testParsePragmaWithInterstitial() external {

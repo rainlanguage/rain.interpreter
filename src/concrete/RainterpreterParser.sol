@@ -1,9 +1,11 @@
-// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
 import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
 import {LibParse} from "../lib/parse/LibParse.sol";
+import {ParseMemoryOverflow} from "../error/ErrParse.sol";
 import {PragmaV1} from "rain.interpreter.interface/interface/IParserPragmaV1.sol";
 import {LibParseState, ParseState} from "../lib/parse/LibParseState.sol";
 import {LibParsePragma} from "../lib/parse/LibParsePragma.sol";
@@ -37,7 +39,36 @@ contract RainterpreterParser is ERC165, IParserToolingV1 {
     using LibParseInterstitial for ParseState;
     using LibBytes for bytes;
 
-    function unsafeParse(bytes memory data) external view returns (bytes memory, bytes32[] memory) {
+    /// The parse system uses 16-bit pointers internally. If the free memory
+    /// pointer exceeded 0x10000 during parsing, those pointers may have been
+    /// silently truncated, corrupting the result. This check MUST run after
+    /// any function that invokes the parser.
+    function _checkParseMemoryOverflow() internal pure {
+        uint256 freeMemoryPointer;
+        assembly ("memory-safe") {
+            freeMemoryPointer := mload(0x40)
+        }
+        if (freeMemoryPointer >= 0x10000) {
+            revert ParseMemoryOverflow(freeMemoryPointer);
+        }
+    }
+
+    /// Modifier form of `_checkParseMemoryOverflow`. Runs the overflow check
+    /// after the modified function body completes.
+    modifier checkParseMemoryOverflow() {
+        _;
+        _checkParseMemoryOverflow();
+    }
+
+    /// Parses Rainlang source `data` into bytecode and constants. Called by
+    /// the expression deployer. Does not perform integrity checks — those are
+    /// the deployer's responsibility.
+    function unsafeParse(bytes memory data)
+        external
+        view
+        checkParseMemoryOverflow
+        returns (bytes memory, bytes32[] memory)
+    {
         // The return is used by returning it, so this is a false positive.
         //slither-disable-next-line unused-return
         return LibParseState.newState(
@@ -46,11 +77,13 @@ contract RainterpreterParser is ERC165, IParserToolingV1 {
     }
 
     /// @inheritdoc ERC165
-    function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(IParserToolingV1).interfaceId || super.supportsInterface(interfaceId);
     }
 
-    function parsePragma1(bytes memory data) external pure virtual returns (PragmaV1 memory) {
+    /// Parses only the pragma section of Rainlang source `data`. Returns the
+    /// list of sub-parsers declared by the pragma.
+    function parsePragma1(bytes memory data) external pure virtual checkParseMemoryOverflow returns (PragmaV1 memory) {
         ParseState memory parseState = LibParseState.newState(
             data, parseMeta(), operandHandlerFunctionPointers(), literalParserFunctionPointers()
         );

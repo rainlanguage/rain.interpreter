@@ -1,4 +1,5 @@
-// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
 import {ERC165, IERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
@@ -82,8 +83,8 @@ contract RainterpreterExpressionDeployer is
         return LibAllStandardOps.integrityFunctionPointers();
     }
 
-    ///@inheritdoc IDescribedByMetaV1
-    function describedByMetaV1() external pure returns (bytes32) {
+    /// @inheritdoc IDescribedByMetaV1
+    function describedByMetaV1() external pure override returns (bytes32) {
         return DESCRIBED_BY_META_HASH;
     }
 }

@@ -1,4 +1,5 @@
-// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
 // Exported for convenience in op tests.
@@ -95,7 +96,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
         IntegrityCheckState memory integrityState = LibIntegrityCheck.newState("", 0, constants);
         (uint256 calcInputs, uint256 calcOutputs) = integrityFn(integrityState, operand);
         assertEq(calcInputs, inputs.length, "inputs length");
-        assertEq(calcInputs, uint256((OperandV2.unwrap(operand) >> 0x10) & bytes32(uint256(0x0F))), "operand inputs");
+        assertEq(calcInputs, uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F, "operand inputs");
         assertEq(calcOutputs, uint256(OperandV2.unwrap(operand) >> 0x14), "operand outputs");
         return calcOutputs;
     }

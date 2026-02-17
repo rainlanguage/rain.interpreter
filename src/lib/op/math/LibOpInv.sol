@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
@@ -10,9 +11,11 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 /// @title LibOpInv
 /// @notice Opcode for the inverse 1 / x of a floating point number.
 library LibOpInv {
+    using LibDecimalFloat for Float;
+
     /// `inv` integrity check. Requires exactly 1 input and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
-        // There must be one inputs and one output.
+        // There must be one input and one output.
         return (1, 1);
     }
 
@@ -23,7 +26,7 @@ library LibOpInv {
         assembly ("memory-safe") {
             a := mload(stackTop)
         }
-        a = LibDecimalFloat.inv(a);
+        a = a.inv();
 
         assembly ("memory-safe") {
             mstore(stackTop, a)
@@ -38,7 +41,7 @@ library LibOpInv {
         returns (StackItem[] memory)
     {
         StackItem[] memory outputs = new StackItem[](1);
-        outputs[0] = StackItem.wrap(Float.unwrap((LibDecimalFloat.inv(Float.wrap(StackItem.unwrap(inputs[0]))))));
+        outputs[0] = StackItem.wrap(Float.unwrap(Float.wrap(StackItem.unwrap(inputs[0])).inv()));
         return outputs;
     }
 }

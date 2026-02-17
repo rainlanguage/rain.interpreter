@@ -1,7 +1,8 @@
-// SPDX-License-Identifier: CAL
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity ^0.8.25;
 
-import {IERC20} from "openzeppelin-contracts/contracts/interfaces/IERC20.sol";
+import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
@@ -19,14 +20,14 @@ library LibOpUint256ERC20TotalSupply {
 
     /// `uint256-erc20-total-supply` opcode. Calls `totalSupply` on the token and returns the raw uint256 value.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
-        uint256 account;
+        uint256 token;
         assembly ("memory-safe") {
-            account := mload(stackTop)
+            token := mload(stackTop)
         }
-        // It is the rainlang author's responsibility to ensure that account is
+        // It is the rainlang author's responsibility to ensure that token is
         // a valid address.
         // forge-lint: disable-next-line(unsafe-typecast)
-        uint256 totalSupply = IERC20(address(uint160(account))).totalSupply();
+        uint256 totalSupply = IERC20(address(uint160(token))).totalSupply();
         assembly ("memory-safe") {
             mstore(stackTop, totalSupply)
         }
@@ -39,8 +40,8 @@ library LibOpUint256ERC20TotalSupply {
         view
         returns (StackItem[] memory)
     {
-        address account = address(uint160(uint256(StackItem.unwrap(inputs[0]))));
-        uint256 totalSupply = IERC20(account).totalSupply();
+        address token = address(uint160(uint256(StackItem.unwrap(inputs[0]))));
+        uint256 totalSupply = IERC20(token).totalSupply();
         StackItem[] memory outputs = new StackItem[](1);
         outputs[0] = StackItem.wrap(bytes32(totalSupply));
         return outputs;

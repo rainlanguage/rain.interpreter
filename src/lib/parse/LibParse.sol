@@ -1,5 +1,6 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
@@ -82,6 +83,11 @@ library LibParse {
     /// tail mask. If any invalid characters are found, the parsing will stop
     /// looping as it is assumed the remaining data is valid as something else,
     /// just not a word.
+    /// @param cursor The current cursor position pointing at the word start.
+    /// @param end The end of the data to parse.
+    /// @param mask The character mask for valid tail characters.
+    /// @return The new cursor position after the word.
+    /// @return The parsed word as a bytes32.
     function parseWord(uint256 cursor, uint256 end, uint256 mask) internal pure returns (uint256, bytes32) {
         unchecked {
             bytes32 word;
@@ -110,6 +116,13 @@ library LibParse {
         }
     }
 
+    /// Parses the left-hand side (LHS) of a source line. Handles named and
+    /// anonymous stack items, whitespace, and the LHS/RHS delimiter. Reverts
+    /// on unexpected characters, comments, or duplicate named stack items.
+    /// @param state The parser state.
+    /// @param cursor The current cursor position.
+    /// @param end The end of the data to parse.
+    /// @return The new cursor position after the LHS.
     //forge-lint: disable-next-line(mixed-case-function)
     function parseLHS(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
         unchecked {
@@ -170,6 +183,13 @@ library LibParse {
         }
     }
 
+    /// Parses the right-hand side (RHS) of a source line. Resolves words
+    /// against known opcodes, LHS stack names, and sub parsers. Handles
+    /// parenthesised operand groups, literals, and line/source terminators.
+    /// @param state The parser state.
+    /// @param cursor The current cursor position.
+    /// @param end The end of the data to parse.
+    /// @return The new cursor position after the RHS.
     //forge-lint: disable-next-line(mixed-case-function)
     //slither-disable-next-line cyclomatic-complexity
     function parseRHS(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
@@ -383,6 +403,12 @@ library LibParse {
         }
     }
 
+    /// Top-level entry point for parsing. Processes pragmas, then iterates
+    /// over interstitial, LHS, and RHS sections to build the final bytecode
+    /// and constants array. Sub-parses any unknown words after initial parsing.
+    /// @param state The parser state.
+    /// @return bytecode The compiled bytecode.
+    /// @return The constants array.
     function parse(ParseState memory state) internal view returns (bytes memory bytecode, bytes32[] memory) {
         unchecked {
             if (state.data.length > 0) {

@@ -1,10 +1,11 @@
-// SPDX-License-Identifier: CAL
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
 
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
-import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {OutOfBoundsStackRead} from "../../../error/ErrIntegrity.sol";
 
 /// @title LibOpStack
@@ -38,5 +39,24 @@ library LibOpStack {
             mstore(stackTop, stackValue)
         }
         return stackTop;
+    }
+
+    /// Reference implementation of `stack` for testing. Uses Solidity for
+    /// bounds-checked array access and operand extraction, with only the
+    /// final pointer dereference in assembly.
+    function referenceFn(InterpreterState memory state, OperandV2 operand, StackItem[] memory)
+        internal
+        pure
+        returns (StackItem[] memory outputs)
+    {
+        uint256 readIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
+        // Solidity bounds-checked array access, unlike run() which relies on
+        // integrity.
+        uint256 stackBottom = Pointer.unwrap(state.stackBottoms[state.sourceIndex]);
+        uint256 readPointer = stackBottom - (readIndex + 1) * 0x20;
+        outputs = new StackItem[](1);
+        assembly ("memory-safe") {
+            mstore(add(outputs, 0x20), mload(readPointer))
+        }
     }
 }
