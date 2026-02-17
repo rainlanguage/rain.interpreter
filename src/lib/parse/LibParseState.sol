@@ -558,7 +558,7 @@ library LibParseState {
     /// @param cursor The current cursor position pointing at the literal.
     /// @param end The end of the source data.
     /// @return The updated cursor position after parsing the literal.
-    function pushLiteral(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
+    function pushLiteral(ParseState memory state, uint256 cursor, uint256 end) internal view returns (uint256) {
         unchecked {
             bytes32 constantValue;
             bool success;

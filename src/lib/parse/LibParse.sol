@@ -198,7 +198,7 @@ library LibParse {
     /// @return The new cursor position after the RHS.
     //forge-lint: disable-next-line(mixed-case-function)
     //slither-disable-next-line cyclomatic-complexity
-    function parseRHS(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
+    function parseRHS(ParseState memory state, uint256 cursor, uint256 end) internal view returns (uint256) {
         unchecked {
             while (cursor < end) {
                 bytes32 word;

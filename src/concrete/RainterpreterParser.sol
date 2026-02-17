@@ -70,7 +70,7 @@ contract RainterpreterParser is ERC165, IParserToolingV1 {
 
     /// Parses only the pragma section of Rainlang source `data`. Returns the
     /// list of sub-parsers declared by the pragma.
-    function parsePragma1(bytes memory data) external pure virtual checkParseMemoryOverflow returns (PragmaV1 memory) {
+    function parsePragma1(bytes memory data) external view virtual checkParseMemoryOverflow returns (PragmaV1 memory) {
         ParseState memory parseState = LibParseState.newState(
             data, parseMeta(), operandHandlerFunctionPointers(), literalParserFunctionPointers()
         );

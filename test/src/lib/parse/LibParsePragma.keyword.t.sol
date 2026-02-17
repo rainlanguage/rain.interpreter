@@ -29,7 +29,7 @@ contract LibParsePragmaKeywordTest is Test {
         uint256 expectedCursorDiff,
         address[] memory values,
         string memory err
-    ) internal pure {
+    ) internal view {
         ParseState memory state = LibParseState.newState(
             bytes(str), "", "", LibAllStandardOps.literalParserFunctionPointers()
         );
@@ -58,7 +58,7 @@ contract LibParsePragmaKeywordTest is Test {
         }
     }
 
-    function externalParsePragma(string memory str) external pure {
+    function externalParsePragma(string memory str) external view {
         ParseState memory state =
             LibParseState.newState(bytes(str), "", "", LibAllStandardOps.literalParserFunctionPointers());
         uint256 cursor = Pointer.unwrap(bytes(str).dataPointer());
@@ -69,7 +69,7 @@ contract LibParsePragmaKeywordTest is Test {
 
     /// Anything that DOES NOT start with the keyword should be a noop.
     /// forge-config: default.fuzz.runs = 100
-    function testPragmaKeywordNoop(ParseState memory state, string calldata calldataStr) external pure {
+    function testPragmaKeywordNoop(ParseState memory state, string calldata calldataStr) external view {
         if (bytes(calldataStr).length >= PRAGMA_KEYWORD_BYTES_LENGTH) {
             bytes memory prefix = bytes(calldataStr)[0:PRAGMA_KEYWORD_BYTES_LENGTH];
             vm.assume(keccak256(prefix) != keccak256(PRAGMA_KEYWORD_BYTES));
@@ -97,7 +97,7 @@ contract LibParsePragmaKeywordTest is Test {
     /// hex values should more the cursor forward exactly the length of the
     /// keyword + the whitespace char.
     /// forge-config: default.fuzz.runs = 100
-    function testPragmaKeywordWhitespaceNoHex(uint256 seed, string calldata calldataStr) external pure {
+    function testPragmaKeywordWhitespaceNoHex(uint256 seed, string calldata calldataStr) external view {
         seed = bound(seed, 0, type(uint256).max - 1);
         bytes1 whitespace = LibConformString.charFromMask(seed, CMASK_WHITESPACE);
         bytes1 notInterstitialHead = LibConformString.charFromMask(seed + 1, ~CMASK_INTERSTITIAL_HEAD);
@@ -130,7 +130,7 @@ contract LibParsePragmaKeywordTest is Test {
         address subParser,
         uint256 seed,
         string calldata suffix
-    ) external pure {
+    ) external view {
         vm.assume(bytes(whitespace).length > 0);
         bytes1 notHexData = LibConformString.charFromMask(seed, ~CMASK_HEX);
         LibConformString.conformStringToMask(whitespace, CMASK_WHITESPACE, 0x80);
@@ -169,7 +169,7 @@ contract LibParsePragmaKeywordTest is Test {
         address subParser1,
         uint256 seed,
         string calldata suffix
-    ) external pure {
+    ) external view {
         vm.assume(bytes(whitespace0).length > 0);
         vm.assume(bytes(whitespace1).length > 0);
 
@@ -219,7 +219,7 @@ contract LibParsePragmaKeywordTest is Test {
     }
 
     /// Test a specific string.
-    function testPragmaKeywordParseSubParserSpecificStrings() external pure {
+    function testPragmaKeywordParseSubParserSpecificStrings() external view {
         string memory str =
             "using-words-from 0x1234567890123456789012345678901234567890 0x1234567890123456789012345678901234567891";
         address[] memory values = new address[](2);

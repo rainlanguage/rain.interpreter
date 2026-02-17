@@ -19,8 +19,8 @@
 | ID | Status | Description |
 |----|--------|-------------|
 | A21-1 | FIXED | Dead constants `NOT_LOW_16_BIT_MASK` and `ACTIVE_SOURCE_MASK` removed from LibParse.sol |
-| A23-3 | PENDING | FSM NatSpec does not match defined constants in LibParseState.sol |
-| A24-2 | PENDING | Function pointer mutability mismatch between storage and retrieval in LibParseLiteral.sol |
+| A23-3 | FIXED | FSM NatSpec corrected to match actual bit positions and constant names in LibParseState.sol |
+| A24-2 | FIXED | Literal parser function pointer type corrected from `pure` to `view`; cascaded to callers |
 | A25-2 | PENDING | Unused dependencies `serde` and `serde_bytes` in CLI `Cargo.toml` |
 | A26-1 | PENDING | `unwrap()` on `traces` in `From<ForkTypedReturn<eval4Call>>` for `RainEvalResult` |
 | A26-4 | PENDING | `search_trace_by_path` has a logic bug in parent tracking |

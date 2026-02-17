@@ -34,10 +34,10 @@ library LibParseLiteral {
     function selectLiteralParserByIndex(ParseState memory state, uint256 index)
         internal
         pure
-        returns (function(ParseState memory, uint256, uint256) pure returns (uint256, bytes32))
+        returns (function(ParseState memory, uint256, uint256) view returns (uint256, bytes32))
     {
         bytes memory literalParsers = state.literalParsers;
-        function(ParseState memory, uint256, uint256) pure returns (uint256, bytes32) parser;
+        function(ParseState memory, uint256, uint256) view returns (uint256, bytes32) parser;
         // This is NOT bounds checked because the indexes are all expected to
         // be provided by the parser itself and not user input.
         assembly ("memory-safe") {
@@ -50,7 +50,7 @@ library LibParseLiteral {
     /// `UnsupportedLiteralType` if the literal type cannot be determined.
     function parseLiteral(ParseState memory state, uint256 cursor, uint256 end)
         internal
-        pure
+        view
         returns (uint256, bytes32)
     {
         (bool success, uint256 newCursor, bytes32 value) = tryParseLiteral(state, cursor, end);
@@ -66,7 +66,7 @@ library LibParseLiteral {
     /// character. Returns false if the literal type is not recognized.
     function tryParseLiteral(ParseState memory state, uint256 cursor, uint256 end)
         internal
-        pure
+        view
         returns (bool, uint256, bytes32)
     {
         uint256 index;

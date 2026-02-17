@@ -32,7 +32,7 @@ library LibParseOperand {
     /// @param cursor The current cursor position in the source string.
     /// @param end The end of the source string.
     /// @return The updated cursor position after parsing the operand.
-    function parseOperand(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
+    function parseOperand(ParseState memory state, uint256 cursor, uint256 end) internal view returns (uint256) {
         uint256 char;
         assembly ("memory-safe") {
             //slither-disable-next-line incorrect-shift
