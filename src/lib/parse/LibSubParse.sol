@@ -149,8 +149,12 @@ library LibSubParse {
     /// @param extern The extern contract to call at eval time.
     /// @param constantsHeight The current height of the constants array.
     /// @param ioByte The IO byte encoding inputs and outputs for the opcode.
+    /// MUST fit in 8 bits. Written via `mstore8` which silently truncates
+    /// to the least significant byte if wider.
     /// @param operand The operand for the extern dispatch.
-    /// @param opcodeIndex The opcode index on the extern contract.
+    /// @param opcodeIndex The opcode index on the extern contract. MUST fit
+    /// in 16 bits. Passed to `encodeExternDispatch` which does not validate
+    /// the range — wider values silently corrupt the encoding.
     /// @return Whether the sub parse succeeded.
     /// @return The bytecode for the extern opcode.
     /// @return The constants array containing the encoded extern dispatch.
