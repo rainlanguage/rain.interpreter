@@ -10,9 +10,9 @@ import {ALL_STANDARD_OPS_LENGTH} from "src/lib/op/LibAllStandardOps.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
-/// @dev Helper contract whose integrity function pointers are valid for its
-/// own bytecode. Has a single opcode (index 0) that always returns (1, 1).
-contract IntegrityTestHelper {
+/// @dev Contract whose integrity function pointers are valid for its own
+/// bytecode. Has a single opcode (index 0) that always returns (1, 1).
+contract IntegritySingleOp {
     function oneInputOneOutput(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (1, 1);
     }
@@ -43,10 +43,10 @@ contract IntegrityTestHelper {
     }
 }
 
-/// @dev Helper with 2 opcodes for testing StackUnderflowHighwater.
+/// @dev Contract with 2 opcodes for testing StackUnderflowHighwater.
 /// Opcode 0: 0 inputs, 2 outputs (advances highwater).
 /// Opcode 1: 2 inputs, 1 output (drops stack below highwater).
-contract HighwaterTestHelper {
+contract IntegrityHighwater {
     function zeroInputTwoOutput(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (0, 2);
     }
@@ -162,9 +162,9 @@ contract LibIntegrityCheckTest is Test {
     }
 
     /// StackUnderflow: opcode 0 needs 1 input but the stack is empty.
-    /// Uses IntegrityTestHelper which has its own valid function pointers.
+    /// Uses IntegritySingleOp which has its own valid function pointers.
     function testStackUnderflow() external {
-        IntegrityTestHelper helper = new IntegrityTestHelper();
+        IntegritySingleOp helper = new IntegritySingleOp();
         bytes memory fPointers = helper.buildIntegrityPointers();
 
         // Single source, 0 source inputs, 1 output.
@@ -190,7 +190,7 @@ contract LibIntegrityCheckTest is Test {
     /// highwater to 2), then opcode 1 consumes 2 inputs (dropping the stack
     /// to 0, which is below the highwater of 2).
     function testStackUnderflowHighwater() external {
-        HighwaterTestHelper helper = new HighwaterTestHelper();
+        IntegrityHighwater helper = new IntegrityHighwater();
         bytes memory fPointers = helper.buildIntegrityPointers();
 
         // 2 opcodes in a single source, 0 source inputs, 1 output.
