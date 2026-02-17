@@ -10,9 +10,11 @@ library LibParseStackTracker {
     using LibParseStackTracker for ParseStackTracker;
 
     /// Pushing inputs requires special handling as the inputs need to be tallied
-    /// separately and in addition to the regular stack pushes.
+    /// separately and in addition to the regular stack pushes. The `inputs`
+    /// addition is unchecked and relies on both `inputs` and `n` being ≤ 0xFF
+    /// so that their sum cannot wrap a `uint256`.
     /// @param tracker The current stack tracker state.
-    /// @param n The number of inputs to push.
+    /// @param n The number of inputs to push. MUST be ≤ 0xFF.
     /// @return The updated stack tracker.
     function pushInputs(ParseStackTracker tracker, uint256 n) internal pure returns (ParseStackTracker) {
         unchecked {
@@ -28,8 +30,13 @@ library LibParseStackTracker {
 
     /// Pushes n items onto the tracked stack, updating the current height
     /// and the high watermark if the new height exceeds it.
+    /// The addition `current += n` is unchecked. This is safe only because
+    /// `current` is masked to 8 bits and all callers pass `n` ≤ 0xFF, so
+    /// the sum cannot exceed 0x1FE and cannot wrap a `uint256`. If `n`
+    /// could be large, the `> 0xFF` overflow check would be ineffective
+    /// after a wrapping addition.
     /// @param tracker The current stack tracker state.
-    /// @param n The number of items to push.
+    /// @param n The number of items to push. MUST be ≤ 0xFF.
     /// @return The updated stack tracker.
     function push(ParseStackTracker tracker, uint256 n) internal pure returns (ParseStackTracker) {
         unchecked {
