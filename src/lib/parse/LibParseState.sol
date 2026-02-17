@@ -171,6 +171,10 @@ library LibParseState {
 
     /// Allocates a new 32-byte-aligned active source pointer in memory and
     /// links it into the doubly linked list of source slots.
+    ///
+    /// The free-pointer arithmetic is unchecked. This is safe only because
+    /// `checkParseMemoryOverflow` keeps the free memory pointer below
+    /// `0x10000`, so the alignment and bump additions cannot overflow.
     /// @param oldActiveSourcePointer The pointer to the previous active source
     /// slot to link into the doubly linked list.
     /// @return The pointer to the newly allocated active source slot.
