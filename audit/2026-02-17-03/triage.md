@@ -788,16 +788,16 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [PENDING] A49-1: (LOW) Error `InvalidRepeatCount` defined inline instead of in `src/error/` directory per codebase convention
 - [FIXED] A49-2: (LOW) Variable named `float` shadows its type name `Float` differing only in case — renamed to `repeatCount`
 - [PENDING] A49-3: (LOW) `matchSubParseLiteralDispatch` narrows from `view` to `pure virtual override` constraining future subclass override chain
-- [PENDING] R01-1: (HIGH) Duplicate short flag `-i` on both `fork_url` and `fork_block_number` in fork.rs causes clap runtime panic
-- [PENDING] R01-2: (MEDIUM) Unused dependencies `serde` and `serde_bytes` in CLI crate Cargo.toml
+- [DISMISSED] R01-1: (HIGH) Duplicate short flag `-i` on both `fork_url` and `fork_block_number` in fork.rs causes clap runtime panic — false positive; no collision
+- [DISMISSED] R01-2: (MEDIUM) Unused dependencies `serde` and `serde_bytes` in CLI crate Cargo.toml — false positive; neither dependency exists in CLI Cargo.toml
 - [PENDING] R01-3: (LOW) Incorrect `homepage` URL in CLI Cargo.toml points to `rain.orderbook` instead of `rain.interpreter`
 - [PENDING] R01-4: (LOW) Inconsistent error handling pattern between eval.rs and parse.rs wraps errors with `anyhow!` losing original error chain
 - [PENDING] R01-5: (LOW) Eval output uses Debug formatting `{:#?}` labeled as Binary encoding, inconsistent with Parse subcommand
 - [PENDING] R01-6: (LOW) `Execute` trait uses native async fn in trait producing non-Send futures limiting future flexibility
-- [PENDING] R02-1: (MEDIUM) `unwrap()` on `traces` in `From<ForkTypedReturn<eval4Call>>` for `RainEvalResult` will panic if traces are None
+- [DISMISSED] R02-1: (MEDIUM) `unwrap()` on `traces` in `From<ForkTypedReturn<eval4Call>>` for `RainEvalResult` will panic if traces are None — false positive; impl is TryFrom with .ok_or(MissingTraces)?, not From with unwrap
 - [PENDING] R02-2: (LOW) Redundant `.to_owned()`, `.deref()`, `.clone()` chain in trace extraction creates multiple unnecessary copies
 - [PENDING] R02-3: (LOW) Inconsistent trace ordering approach between `From<ForkTypedReturn>` and `TryFrom<RawCallResult>` implementations
-- [PENDING] R02-4: (MEDIUM) `search_trace_by_path` has logic bug in parent tracking — sets `current_parent_index` to `trace.parent_source_index` instead of current source index
+- [DISMISSED] R02-4: (MEDIUM) `search_trace_by_path` has logic bug in parent tracking — false positive; code correctly does current_parent_index = current_source_index at line 180
 - [PENDING] R02-5: (LOW) `CreateNamespace` is an empty struct used only as function namespace; should be a free function
 - [PENDING] R02-6: (LOW) Typo "commiting" should be "committing" in doc comments for `alloy_call` and `call`
 - [PENDING] R02-7: (LOW) `#[allow(clippy::for_kv_map)]` suppresses valid lint; should use `.values()` instead
@@ -807,11 +807,11 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [PENDING] R02-11: (LOW) `roll_fork` uses `unwrap()` after `is_none()` check instead of idiomatic `if let Some`
 - [PENDING] R03-1: (LOW) Unused dependencies `serde` and `serde_json` in parser crate Cargo.toml
 - [PENDING] R03-2: (LOW) Unused dependency `serde_json` in test_fixtures crate Cargo.toml
-- [PENDING] R03-3: (MEDIUM) Edition inconsistency — parser and dispair crates hardcode edition 2021 instead of workspace 2024
+- [DISMISSED] R03-3: (MEDIUM) Edition inconsistency — false positive; parser and dispair both hardcode edition = "2024" matching workspace, not 2021
 - [PENDING] R03-4: (LOW) Homepage URL inconsistency — parser and dispair use `rainlanguage` org instead of workspace `rainprotocol`
 - [PENDING] R03-5: (MEDIUM) Duplicated `Parser2` trait definition for wasm vs non-wasm targets violates DRY
 - [PENDING] R03-6: (LOW) `DISPaiR` doc comment mentions "Registry" but struct has no registry field
 - [PENDING] R03-7: (LOW) Excessive `unwrap()` in `LocalEvm::new()` and `deploy_new_token()` produces unhelpful panic messages
-- [PENDING] R03-8: (MEDIUM) `parse_pragma_text` is an inherent method while `parse_text` is a trait method creating asymmetry
+- [DISMISSED] R03-8: (MEDIUM) `parse_pragma_text` is an inherent method while `parse_text` is a trait method creating asymmetry — false positive; both are trait methods with default implementations
 - [PENDING] R03-9: (LOW) `DISPaiR` struct lacks `Debug` derive which is unusual for data-carrying struct
 - [PENDING] R03-10: (LOW) Cargo.toml metadata inconsistency — parser and dispair hardcode license instead of using workspace
