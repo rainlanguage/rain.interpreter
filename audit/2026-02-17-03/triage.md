@@ -201,10 +201,10 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [PENDING] A10-1: (LOW) run() test bounds inputs away from float overflow region
 - [PENDING] A11-1: (LOW) No direct unit test for LibExternOpStackOperand.subParser
 - [PENDING] A11-2: (LOW) No test for subParser with constantsHeight > 0
-- [PENDING] A12-1: (HIGH) No direct test for `StackUnderflow` revert path
-- [PENDING] A12-2: (HIGH) No direct test for `StackUnderflowHighwater` revert path
-- [PENDING] A12-3: (HIGH) No direct test for `StackAllocationMismatch` revert path
-- [PENDING] A12-4: (HIGH) No direct test for `StackOutputsMismatch` revert path
+- [FIXED] A12-1: (HIGH) No direct test for `StackUnderflow` revert path — testStackUnderflow() added
+- [FIXED] A12-2: (HIGH) No direct test for `StackUnderflowHighwater` revert path — testStackUnderflowHighwater() added
+- [FIXED] A12-3: (HIGH) No direct test for `StackAllocationMismatch` revert path — testStackAllocationMismatch() added
+- [FIXED] A12-4: (HIGH) No direct test for `StackOutputsMismatch` revert path — testStackOutputsMismatch() added
 - [PENDING] A12-5: (MEDIUM) No test for `newState` initialization correctness
 - [PENDING] A12-6: (MEDIUM) No test for multi-output highwater advancement logic
 - [PENDING] A12-7: (LOW) No test for `stackMaxIndex` tracking logic
@@ -213,10 +213,10 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [PENDING] A14-1: (LOW) No dedicated test for `fingerprint` function
 - [PENDING] A14-2: (LOW) No dedicated test for `stackBottoms` function
 - [PENDING] A14-3: (LOW) `stackTrace` test does not cover parentSourceIndex/sourceIndex encoding edge cases
-- [PENDING] A15-1: (HIGH) No test file exists for LibInterpreterStateDataContract
+- [FIXED] A15-1: (HIGH) No test file exists for LibInterpreterStateDataContract — added LibInterpreterStateDataContract.t.sol
 - [PENDING] A15-2: (MEDIUM) `serializeSize` unchecked overflow not tested
 - [PENDING] A15-3: (MEDIUM) `unsafeSerialize` correctness not independently tested
-- [PENDING] A15-4: (HIGH) `unsafeDeserialize` complex assembly not independently tested
+- [FIXED] A15-4: (HIGH) `unsafeDeserialize` complex assembly not independently tested — covered by round-trip and stack allocation tests
 - [PENDING] A15-5: (MEDIUM) No test for serialize/deserialize round-trip property
 - [PENDING] A16-1: (LOW) LibOpCtPop missing test for disallowed operand
 - [PENDING] A17-1: (MEDIUM) No referenceFn or direct unit test for `run` function assembly logic
