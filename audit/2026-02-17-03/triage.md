@@ -641,11 +641,11 @@ Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
 - [PENDING] A33-7: (LOW) `boundString` missing `@param` and `@return` tags
 - [PENDING] A33-8: (LOW) `parseString` missing `@param` and `@return` tags
 - [PENDING] A33-9: (LOW) `parseSubParseable` missing `@param` and `@return` tags
-- [PENDING] A39-1: (LOW) `LibParseOperand.handleOperandSingleFull` NatSpec description is partially inaccurate
-- [PENDING] A39-2: (LOW) `LibParseOperand.handleOperandSingleFullNoDefault` NatSpec description is incomplete
-- [PENDING] A39-3: (LOW) `LibParseOperand.handleOperandDoublePerByteNoDefault` NatSpec description is partially inaccurate
-- [PENDING] A39-4: (LOW) `LibParseOperand.handleOperand8M1M1` NatSpec incomplete for bit layout
-- [PENDING] A39-5: (LOW) `LibParseOperand.handleOperandM1M1` NatSpec incomplete for bit layout
+- [FIXED] A39-1: (LOW) `LibParseOperand.handleOperandSingleFull` NatSpec description is partially inaccurate — corrected "used as is" to describe Float-to-integer conversion
+- [FIXED] A39-2: (LOW) `LibParseOperand.handleOperandSingleFullNoDefault` NatSpec description is incomplete — added Float-to-integer conversion and uint16 constraint
+- [FIXED] A39-3: (LOW) `LibParseOperand.handleOperandDoublePerByteNoDefault` NatSpec description is partially inaccurate — corrected "used as is" and added bit layout
+- [FIXED] A39-4: (LOW) `LibParseOperand.handleOperand8M1M1` NatSpec incomplete for bit layout — added `a | (b << 8) | (c << 9)`
+- [FIXED] A39-5: (LOW) `LibParseOperand.handleOperandM1M1` NatSpec incomplete for bit layout — added `a | (b << 1)`
 - [FIXED] A43-1: (MEDIUM) `ParseState` struct has stale `@param literalBloom` referencing non-existent field — removed stale param, added correct docs
 - [FIXED] A43-2: (MEDIUM) `ParseState` struct missing `@param` for 8 fields — added NatSpec for subParsers, stackNameBloom, constantsBloom, operandHandlers, operandValues, stackTracker, data, meta
 - [PENDING] A43-3: (LOW) Constants `FSM_YANG_MASK` and `FSM_WORD_END_MASK` have no NatSpec

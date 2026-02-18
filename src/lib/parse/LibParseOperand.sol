@@ -169,8 +169,8 @@ library LibParseOperand {
     }
 
     /// There must be one or zero values. The fallback is 0 if nothing is
-    /// provided, else the provided value MUST fit in two bytes and is used as
-    /// is.
+    /// provided, else the provided Float value is converted to a lossless
+    /// integer and MUST fit in a uint16.
     /// @param values The parsed operand values from the source string.
     /// @return operand The single full operand, defaulting to 0 if not
     /// provided.
@@ -193,7 +193,9 @@ library LibParseOperand {
         }
     }
 
-    /// There must be exactly one value. There is no default fallback.
+    /// There must be exactly one value. There is no default fallback. The
+    /// provided Float value is converted to a lossless integer and MUST fit
+    /// in a uint16.
     /// @param values The parsed operand values from the source string.
     /// @return operand The single full operand with no default.
     function handleOperandSingleFullNoDefault(bytes32[] memory values) internal pure returns (OperandV2 operand) {
@@ -216,7 +218,8 @@ library LibParseOperand {
     }
 
     /// There must be exactly two values. There is no default fallback. Each
-    /// value MUST fit in one byte and is used as is.
+    /// Float value is converted to a lossless integer and MUST fit in a
+    /// uint8. Packed as `a | (b << 8)`.
     /// @param values The parsed operand values from the source string.
     /// @return operand The double-per-byte operand with no default.
     function handleOperandDoublePerByteNoDefault(bytes32[] memory values) internal pure returns (OperandV2 operand) {
@@ -247,7 +250,7 @@ library LibParseOperand {
     }
 
     /// 8 bit value then maybe 1 bit flag then maybe 1 bit flag. Fallback to 0
-    /// for both flags if not provided.
+    /// for both flags if not provided. Packed as `a | (b << 8) | (c << 9)`.
     /// @param values The parsed operand values from the source string.
     /// @return operand The operand encoding an 8-bit value and two optional
     /// 1-bit flags.
@@ -300,6 +303,7 @@ library LibParseOperand {
     }
 
     /// 2x maybe 1 bit flags. Fallback to 0 for both flags if not provided.
+    /// Packed as `a | (b << 1)`.
     /// @param values The parsed operand values from the source string.
     /// @return operand The operand encoding two optional 1-bit flags.
     //forge-lint: disable-next-line(mixed-case-function)
