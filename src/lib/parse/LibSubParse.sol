@@ -16,18 +16,30 @@ import {BadSubParserResult, UnknownWord, UnsupportedLiteralType} from "../../err
 import {IInterpreterExternV4, LibExtern, EncodedExternDispatchV2} from "../extern/LibExtern.sol";
 import {
     ExternDispatchConstantsHeightOverflow,
-    ConstantOpcodeConstantsHeightOverflow
+    ConstantOpcodeConstantsHeightOverflow,
+    ContextGridOverflow
 } from "../../error/ErrSubParse.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibParseError} from "./LibParseError.sol";
 
+/// @title LibSubParse
+/// Handles delegation of unknown words and literals to external sub-parser
+/// contracts registered via `using-words-from`.
+///
+/// Trust model: sub-parsers are fully trusted by the Rainlang author who
+/// opted into them. A sub-parser can return arbitrary bytecode (opcode,
+/// operand, IO byte) and constants. The only parse-time validation is that
+/// the returned bytecode is exactly 4 bytes (`BadSubParserResult`). All
+/// other safety comes from the integrity check that runs on the complete
+/// bytecode after all sub-parsing is done — invalid opcodes, stack
+/// mismatches, or malformed operands will be caught there.
 library LibSubParse {
     using LibParseState for ParseState;
     using LibParseError for ParseState;
 
     /// Sub parse a word into a context grid position. The column and row are
     /// encoded as single bytes in the operand, so values MUST be <= 255.
-    /// Values > 255 will be silently truncated by `mstore8`.
+    /// Reverts with `ContextGridOverflow` if either value exceeds uint8.
     /// @param column The column index in the context grid. Must fit in uint8.
     /// @param row The row index in the context grid. Must fit in uint8.
     /// @return Whether the sub parse succeeded.
@@ -38,6 +50,9 @@ library LibSubParse {
         pure
         returns (bool, bytes memory, bytes32[] memory)
     {
+        if (column > 0xFF || row > 0xFF) {
+            revert ContextGridOverflow(column, row);
+        }
         bytes memory bytecode;
         uint256 opIndex = OPCODE_CONTEXT;
         assembly ("memory-safe") {
@@ -49,8 +64,6 @@ library LibSubParse {
             bytecode := mload(0x40)
             mstore(0x40, add(bytecode, 0x24))
 
-            // The caller is responsible for ensuring the column and row are
-            // within `uint8`.
             mstore8(add(bytecode, 0x23), column)
             mstore8(add(bytecode, 0x22), row)
 
@@ -136,8 +149,12 @@ library LibSubParse {
     /// @param extern The extern contract to call at eval time.
     /// @param constantsHeight The current height of the constants array.
     /// @param ioByte The IO byte encoding inputs and outputs for the opcode.
+    /// MUST fit in 8 bits. Written via `mstore8` which silently truncates
+    /// to the least significant byte if wider.
     /// @param operand The operand for the extern dispatch.
-    /// @param opcodeIndex The opcode index on the extern contract.
+    /// @param opcodeIndex The opcode index on the extern contract. MUST fit
+    /// in 16 bits. Passed to `encodeExternDispatch` which does not validate
+    /// the range — wider values silently corrupt the encoding.
     /// @return Whether the sub parse succeeded.
     /// @return The bytecode for the extern opcode.
     /// @return The constants array containing the encoded extern dispatch.

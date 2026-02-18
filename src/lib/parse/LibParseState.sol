@@ -10,6 +10,7 @@ import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {
     DanglingSource,
     MaxSources,
+    ParseMemoryOverflow,
     ParseStackOverflow,
     UnclosedLeftParen,
     ExcessRHSItems,
@@ -54,6 +55,22 @@ uint256 constant FSM_DEFAULT = FSM_ACCEPTING_INPUTS_MASK;
 /// for anything other than bit flags.
 uint256 constant OPERAND_VALUES_LENGTH = 4;
 
+/// @dev Byte offset of `topLevel0` within a memory `ParseState` struct.
+/// Used in assembly to read/write per-source word counters.
+uint256 constant PARSE_STATE_TOP_LEVEL0_OFFSET = 0x20;
+
+/// @dev Byte offset of the data region of `topLevel0`, past the counter
+/// byte. Each byte in this region is a per-word ops counter.
+uint256 constant PARSE_STATE_TOP_LEVEL0_DATA_OFFSET = 0x21;
+
+/// @dev Byte offset of `parenTracker0` within a memory `ParseState` struct.
+/// Used in assembly to read/write paren depth and input counters.
+uint256 constant PARSE_STATE_PAREN_TRACKER0_OFFSET = 0x60;
+
+/// @dev Byte offset of `lineTracker` within a memory `ParseState` struct.
+/// Used in assembly to snapshot source head pointers per line.
+uint256 constant PARSE_STATE_LINE_TRACKER_OFFSET = 0xa0;
+
 /// The parser is stateful. This struct keeps track of the entire state.
 /// @param activeSourcePtr The pointer to the current source being built.
 /// The active source being pointed to is:
@@ -69,11 +86,10 @@ uint256 constant OPERAND_VALUES_LENGTH = 4;
 /// @param sourcesBuilder A builder for the sources array. This is a 256 bit
 /// integer where each 16 bits is a literal memory pointer to a source.
 /// @param fsm The finite state machine representation of the parser.
-/// - bit 0: LHS/RHS => 0 = LHS, 1 = RHS
-/// - bit 1: yang/yin => 0 = yin, 1 = yang
-/// - bit 2: word end => 0 = not end, 1 = end
-/// - bit 3: accepting inputs => 0 = not accepting, 1 = accepting
-/// - bit 4: interstitial => 0 = not interstitial, 1 = interstitial
+/// - bit 0 (FSM_YANG_MASK): yang/yin => 0 = yin, 1 = yang
+/// - bit 1 (FSM_WORD_END_MASK): word end => 0 = not end, 1 = end
+/// - bit 2 (FSM_ACCEPTING_INPUTS_MASK): accepting inputs => 0 = not accepting, 1 = accepting
+/// - bit 3 (FSM_ACTIVE_SOURCE_MASK): active source => 0 = no active source, 1 = active source
 /// @param topLevel0 Memory region for stack word counters. The first byte is a
 /// counter/offset into the region, which increments for every top level item
 /// parsed on the RHS. The remaining 31 bytes are the word counters for each
@@ -154,6 +170,10 @@ library LibParseState {
 
     /// Allocates a new 32-byte-aligned active source pointer in memory and
     /// links it into the doubly linked list of source slots.
+    ///
+    /// The free-pointer arithmetic is unchecked. This is safe only because
+    /// `checkParseMemoryOverflow` keeps the free memory pointer below
+    /// `0x10000`, so the alignment and bump additions cannot overflow.
     /// @param oldActiveSourcePointer The pointer to the previous active source
     /// slot to link into the doubly linked list.
     /// @return The pointer to the newly allocated active source slot.
@@ -258,7 +278,10 @@ library LibParseState {
     /// Pushes a `uint256` representation of a sub parser onto the linked list of
     /// sub parsers in memory. The sub parser is expected to be an `address` so
     /// the pointer for the linked list is ORed in the 16 high bits of the
-    /// `uint256`.
+    /// `uint256`. Only 16 bits are available for the linked-list pointer, so
+    /// this function relies on `checkParseMemoryOverflow` keeping the free
+    /// memory pointer below `0x10000`. If that invariant is violated, the
+    /// tail pointer will be silently truncated and the linked list corrupted.
     /// @param state The parse state containing the sub parser linked list.
     /// @param cursor The current cursor for error reporting.
     /// @param subParser The sub parser address as a bytes32.
@@ -313,16 +336,18 @@ library LibParseState {
     /// @param state The parse state to snapshot.
     function snapshotSourceHeadToLineTracker(ParseState memory state) internal pure {
         uint256 activeSourcePtr = state.activeSourcePtr;
+        uint256 topLevel0Offset = PARSE_STATE_TOP_LEVEL0_OFFSET;
+        uint256 lineTrackerOffset = PARSE_STATE_LINE_TRACKER_OFFSET;
         bool didOverflow;
         assembly ("memory-safe") {
-            let topLevel0Pointer := add(state, 0x20)
+            let topLevel0Pointer := add(state, topLevel0Offset)
             let totalRHSTopLevel := byte(0, mload(topLevel0Pointer))
             // Only do stuff if the current word counter is zero.
             if iszero(byte(0, mload(add(topLevel0Pointer, add(totalRHSTopLevel, 1))))) {
                 let byteOffset := div(and(mload(activeSourcePtr), 0xFFFF), 8)
                 let sourceHead := add(activeSourcePtr, sub(0x20, byteOffset))
 
-                let lineTracker := mload(add(state, 0xa0))
+                let lineTracker := mload(add(state, lineTrackerOffset))
                 let lineRHSTopLevel := sub(totalRHSTopLevel, byte(30, lineTracker))
                 let offset := mul(0x10, add(lineRHSTopLevel, 1))
                 // 14 items max — offset 0xF0 is the last valid slot.
@@ -330,7 +355,7 @@ library LibParseState {
                 // discards the pointer.
                 didOverflow := gt(offset, 0xF0)
                 lineTracker := or(lineTracker, shl(offset, sourceHead))
-                mstore(add(state, 0xa0), lineTracker)
+                mstore(add(state, lineTrackerOffset), lineTracker)
             }
         }
         if (didOverflow) {
@@ -348,8 +373,9 @@ library LibParseState {
         unchecked {
             {
                 uint256 parenOffset;
+                uint256 parenTracker0Offset = PARSE_STATE_PAREN_TRACKER0_OFFSET;
                 assembly ("memory-safe") {
-                    parenOffset := byte(0, mload(add(state, 0x60)))
+                    parenOffset := byte(0, mload(add(state, parenTracker0Offset)))
                 }
                 if (parenOffset > 0) {
                     revert UnclosedLeftParen(state.parseErrorOffset(cursor));
@@ -418,8 +444,9 @@ library LibParseState {
             for (uint256 offset = 0x20; offset < end; offset += 0x10) {
                 uint256 itemSourceHead = (state.lineTracker >> offset) & 0xFFFF;
                 uint256 opsDepth;
+                uint256 topLevel0Offset = PARSE_STATE_TOP_LEVEL0_OFFSET;
                 assembly ("memory-safe") {
-                    opsDepth := byte(0, mload(add(state, add(0x20, topLevelOffset))))
+                    opsDepth := byte(0, mload(add(state, add(topLevel0Offset, topLevelOffset))))
                 }
                 for (uint256 i = 1; i <= opsDepth; i++) {
                     {
@@ -470,18 +497,20 @@ library LibParseState {
     /// @param state The parse state to advance the highwater mark for.
     function highwater(ParseState memory state) internal pure {
         uint256 parenOffset;
+        uint256 parenTracker0Offset = PARSE_STATE_PAREN_TRACKER0_OFFSET;
         assembly ("memory-safe") {
-            parenOffset := byte(0, mload(add(state, 0x60)))
+            parenOffset := byte(0, mload(add(state, parenTracker0Offset)))
         }
         if (parenOffset == 0) {
             //forge-lint: disable-next-line(mixed-case-variable)
             uint256 newStackRHSOffset;
+            uint256 topLevel0Offset = PARSE_STATE_TOP_LEVEL0_OFFSET;
             assembly ("memory-safe") {
-                let stackRHSOffsetPtr := add(state, 0x20)
+                let stackRHSOffsetPtr := add(state, topLevel0Offset)
                 newStackRHSOffset := add(byte(0, mload(stackRHSOffsetPtr)), 1)
                 mstore8(stackRHSOffsetPtr, newStackRHSOffset)
             }
-            if (newStackRHSOffset == 0x3f) {
+            if (newStackRHSOffset >= 0x3f) {
                 revert ParseStackOverflow();
             }
         }
@@ -529,7 +558,7 @@ library LibParseState {
     /// @param cursor The current cursor position pointing at the literal.
     /// @param end The end of the source data.
     /// @return The updated cursor position after parsing the literal.
-    function pushLiteral(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
+    function pushLiteral(ParseState memory state, uint256 cursor, uint256 end) internal view returns (uint256) {
         unchecked {
             bytes32 constantValue;
             bool success;
@@ -597,9 +626,13 @@ library LibParseState {
     /// Writes an opcode and operand pair into the active source at the current
     /// bit offset. Updates paren tracking counters, top-level word counters,
     /// and allocates a new source slot if the current one is full.
+    /// The caller MUST ensure `opcode` fits in 8 bits and `operand` fits in
+    /// 16 bits. Wider values will silently corrupt adjacent slots in the
+    /// packed source because neither is masked before shifting into position.
     /// @param state The parse state containing the active source.
-    /// @param opcode The opcode to write into the source.
-    /// @param operand The operand to write alongside the opcode.
+    /// @param opcode The opcode to write into the source. MUST fit in 8 bits.
+    /// @param operand The operand to write alongside the opcode. MUST fit in
+    /// 16 bits.
     function pushOpToSource(ParseState memory state, uint256 opcode, OperandV2 operand) internal pure {
         unchecked {
             // This might be a top level item so try to snapshot its pointer to
@@ -615,9 +648,9 @@ library LibParseState {
             // word. MAY be setting 0 to 1 if this is the top level.
             {
                 bool didOverflow;
+                uint256 topLevel0Offset = PARSE_STATE_TOP_LEVEL0_OFFSET;
                 assembly ("memory-safe") {
-                    // Hardcoded offset into the state struct.
-                    let counterOffset := add(state, 0x20)
+                    let counterOffset := add(state, topLevel0Offset)
                     let counterPointer := add(counterOffset, add(byte(0, mload(counterOffset)), 1))
                     let val := byte(0, mload(counterPointer))
                     didOverflow := eq(val, 0xFF)
@@ -634,6 +667,7 @@ library LibParseState {
             uint256 activeSourcePointer = state.activeSourcePtr;
             {
                 bool didOverflow;
+                uint256 parenTracker0Offset = PARSE_STATE_PAREN_TRACKER0_OFFSET;
                 assembly ("memory-safe") {
                     activeSource := mload(activeSourcePointer)
                     // The low 16 bits of the active source is the current offset.
@@ -648,8 +682,7 @@ library LibParseState {
                     // the paren group that is one level above the current paren offset.
                     // Assumes that every word has exactly 1 output, therefore the input
                     // counter always increases by 1.
-                    // Hardcoded offset into the state struct.
-                    let inputCounterPos := add(state, 0x60)
+                    let inputCounterPos := add(state, parenTracker0Offset)
                     inputCounterPos := add(
                         add(
                             inputCounterPos,
@@ -714,8 +747,9 @@ library LibParseState {
         // End is the number of top level words in the source, which is the
         // byte offset index + 1.
         uint256 end;
+        uint256 topLevel0Offset = PARSE_STATE_TOP_LEVEL0_OFFSET;
         assembly ("memory-safe") {
-            end := add(byte(0, mload(add(state, 0x20))), 1)
+            end := add(byte(0, mload(add(state, topLevel0Offset))), 1)
         }
 
         if (offset == 0xf0) {
@@ -731,6 +765,7 @@ library LibParseState {
             uint256 source;
             ParseStackTracker stackTracker = state.stackTracker;
             uint256 cursor = state.activeSourcePtr;
+            uint256 topLevel0DataOffset = PARSE_STATE_TOP_LEVEL0_DATA_OFFSET;
             assembly ("memory-safe") {
                 // find the end of the LL tail.
                 let tailPointer := and(shr(0x10, mload(cursor)), 0xFFFF)
@@ -751,7 +786,7 @@ library LibParseState {
                 let writeCursor := add(source, 0x20)
                 writeCursor := add(writeCursor, 4)
 
-                let counterCursor := add(state, 0x21)
+                let counterCursor := add(state, topLevel0DataOffset)
                 for {
                     let i := 0
                     let wordsTotal := byte(0, mload(counterCursor))
@@ -967,6 +1002,28 @@ library LibParseState {
                 // Store the values not the keys.
                 mstore(cursor, mload(add(tailPtr, 0x20)))
             }
+        }
+    }
+
+    /// The parse system packs memory pointers into 16 bits throughout its
+    /// linked list structures (active source slots, paren tracker, line
+    /// tracker, sources builder, constants builder, stack names). This is
+    /// safe as long as all memory allocated during parsing stays below
+    /// 0x10000. If the free memory pointer reaches or exceeds that limit,
+    /// any pointer stored after the overflow was silently truncated,
+    /// corrupting the linked lists and producing invalid bytecode.
+    ///
+    /// This check MUST run after any complete parse operation. Callers that
+    /// use `LibParse.parse` or `LibParsePragma.parsePragma` through a
+    /// concrete contract should apply this check (or the
+    /// `checkParseMemoryOverflow` modifier) after the call returns.
+    function checkParseMemoryOverflow() internal pure {
+        uint256 freeMemoryPointer;
+        assembly ("memory-safe") {
+            freeMemoryPointer := mload(0x40)
+        }
+        if (freeMemoryPointer >= 0x10000) {
+            revert ParseMemoryOverflow(freeMemoryPointer);
         }
     }
 }

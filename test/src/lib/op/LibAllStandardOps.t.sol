@@ -5,6 +5,8 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std/Test.sol";
 
 import {LibAllStandardOps, ALL_STANDARD_OPS_LENGTH} from "src/lib/op/LibAllStandardOps.sol";
+import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV2.sol";
+import {LITERAL_PARSERS_LENGTH} from "src/lib/parse/literal/LibParseLiteral.sol";
 
 /// @title LibAllStandardOpsTest
 /// Some basic guard rails around the `LibAllStandardOps` library. Most of the
@@ -23,16 +25,57 @@ contract LibAllStandardOpsTest is Test {
         assertEq(functionPointers.length, ALL_STANDARD_OPS_LENGTH * 2);
     }
 
-    /// Test that the integrity function pointers length and opcode function
-    /// pointers length are the same.
-    function testIntegrityAndOpcodeFunctionPointersLength() external pure {
-        bytes memory integrityFunctionPointers = LibAllStandardOps.integrityFunctionPointers();
-        bytes memory functionPointers = LibAllStandardOps.opcodeFunctionPointers();
+    /// All four parallel arrays (authoring meta, operand handlers, integrity
+    /// pointers, opcode pointers) must have consistent lengths. A mismatch
+    /// means opcodes would be dispatched to the wrong function.
+    function testFourArrayOrderingConsistency() external pure {
+        bytes memory integrityPointers = LibAllStandardOps.integrityFunctionPointers();
+        bytes memory opcodePointers = LibAllStandardOps.opcodeFunctionPointers();
+        bytes memory operandHandlers = LibAllStandardOps.operandHandlerFunctionPointers();
 
         bytes memory authoringMeta = LibAllStandardOps.authoringMetaV2();
-        bytes32[] memory words = abi.decode(authoringMeta, (bytes32[]));
+        AuthoringMetaV2[] memory words = abi.decode(authoringMeta, (AuthoringMetaV2[]));
 
-        assertEq(integrityFunctionPointers.length, functionPointers.length);
-        assertEq(integrityFunctionPointers.length, words.length * 2);
+        // All four arrays must have the same number of entries.
+        uint256 expected = ALL_STANDARD_OPS_LENGTH * 2;
+        assertEq(integrityPointers.length, expected);
+        assertEq(opcodePointers.length, expected);
+        assertEq(operandHandlers.length, expected);
+        assertEq(words.length * 2, expected);
+    }
+
+    /// Test that the literal parser function pointers length matches
+    /// LITERAL_PARSERS_LENGTH.
+    function testLiteralParserFunctionPointersLength() external pure {
+        bytes memory pointers = LibAllStandardOps.literalParserFunctionPointers();
+        assertEq(pointers.length, LITERAL_PARSERS_LENGTH * 2);
+    }
+
+    /// Test that the operand handler function pointers length matches
+    /// ALL_STANDARD_OPS_LENGTH.
+    function testOperandHandlerFunctionPointersLength() external pure {
+        bytes memory pointers = LibAllStandardOps.operandHandlerFunctionPointers();
+        assertEq(pointers.length, ALL_STANDARD_OPS_LENGTH * 2);
+    }
+
+    /// Test that authoringMetaV2 word names are correct and in the expected
+    /// order. The first four opcodes (stack, constant, extern, context) MUST
+    /// be in this exact order for parsing to work.
+    function testAuthoringMetaV2Content() external pure {
+        bytes memory authoringMeta = LibAllStandardOps.authoringMetaV2();
+        AuthoringMetaV2[] memory words = abi.decode(authoringMeta, (AuthoringMetaV2[]));
+
+        assertEq(words.length, ALL_STANDARD_OPS_LENGTH);
+
+        // The first four opcodes must be in this order for parsing.
+        assertEq(words[0].word, bytes32("stack"));
+        assertEq(words[1].word, bytes32("constant"));
+        assertEq(words[2].word, bytes32("extern"));
+        assertEq(words[3].word, bytes32("context"));
+
+        // Every word must be non-empty.
+        for (uint256 i = 0; i < words.length; i++) {
+            assertTrue(words[i].word != bytes32(0));
+        }
     }
 }

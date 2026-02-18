@@ -33,4 +33,26 @@ contract RainterpreterEvalTest is RainterpreterExpressionDeployerDeploymentTest 
             })
         );
     }
+
+    /// Passing fewer inputs than the source expects MUST revert.
+    function testInputsLengthMismatchTooFew() external {
+        // Source expects 1 input (a).
+        bytes memory bytecode = I_DEPLOYER.parse2("a:;");
+
+        // Pass 0 inputs when 1 is expected.
+        StackItem[] memory inputs = new StackItem[](0);
+
+        vm.expectRevert(abi.encodeWithSelector(InputsLengthMismatch.selector, 1, 0));
+        I_INTERPRETER.eval4(
+            EvalV4({
+                store: I_STORE,
+                namespace: LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: new bytes32[][](0),
+                inputs: inputs,
+                stateOverlay: new bytes32[](0)
+            })
+        );
+    }
 }

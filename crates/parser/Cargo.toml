@@ -1,7 +1,7 @@
 [package]
 name = "rain_interpreter_parser"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 license = "CAL-1.0"
 description = "Rain Interpreter Parser Rust Crate."
 homepage = "https://github.com/rainlanguage/rain.interpreter"

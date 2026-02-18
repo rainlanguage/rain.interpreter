@@ -10,9 +10,11 @@ library LibParseStackTracker {
     using LibParseStackTracker for ParseStackTracker;
 
     /// Pushing inputs requires special handling as the inputs need to be tallied
-    /// separately and in addition to the regular stack pushes.
+    /// separately and in addition to the regular stack pushes. The `inputs`
+    /// addition is unchecked and relies on both `inputs` and `n` being ≤ 0xFF
+    /// so that their sum cannot wrap a `uint256`.
     /// @param tracker The current stack tracker state.
-    /// @param n The number of inputs to push.
+    /// @param n The number of inputs to push. MUST be ≤ 0xFF.
     /// @return The updated stack tracker.
     function pushInputs(ParseStackTracker tracker, uint256 n) internal pure returns (ParseStackTracker) {
         unchecked {
@@ -28,8 +30,13 @@ library LibParseStackTracker {
 
     /// Pushes n items onto the tracked stack, updating the current height
     /// and the high watermark if the new height exceeds it.
+    /// The addition `current += n` is unchecked. This is safe only because
+    /// `current` is masked to 8 bits and all callers pass `n` ≤ 0xFF, so
+    /// the sum cannot exceed 0x1FE and cannot wrap a `uint256`. If `n`
+    /// could be large, the `> 0xFF` overflow check would be ineffective
+    /// after a wrapping addition.
     /// @param tracker The current stack tracker state.
-    /// @param n The number of items to push.
+    /// @param n The number of items to push. MUST be ≤ 0xFF.
     /// @return The updated stack tracker.
     function push(ParseStackTracker tracker, uint256 n) internal pure returns (ParseStackTracker) {
         unchecked {
@@ -49,6 +56,12 @@ library LibParseStackTracker {
 
     /// Pops n items from the tracked stack. Reverts with
     /// `ParseStackUnderflow` if the current stack height is less than n.
+    ///
+    /// Unlike `push`, this subtracts `n` directly from the packed word
+    /// rather than extracting, modifying, and repacking. This is safe
+    /// because `n <= current <= 0xFF`, so the subtraction cannot borrow
+    /// into the `inputs` byte (bits 8-15) or `max` byte (bits 16+).
+    /// `push` cannot use this shortcut because it must also update `max`.
     /// @param tracker The current stack tracker state.
     /// @param n The number of items to pop.
     /// @return The updated stack tracker.

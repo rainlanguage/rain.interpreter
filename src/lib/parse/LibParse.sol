@@ -42,7 +42,8 @@ import {
     FSM_YANG_MASK,
     FSM_DEFAULT,
     FSM_ACTIVE_SOURCE_MASK,
-    FSM_WORD_END_MASK
+    FSM_WORD_END_MASK,
+    PARSE_STATE_PAREN_TRACKER0_OFFSET
 } from "./LibParseState.sol";
 import {LibParsePragma} from "./LibParsePragma.sol";
 import {LibParseInterstitial} from "./LibParseInterstitial.sol";
@@ -52,10 +53,15 @@ import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 
-uint256 constant NOT_LOW_16_BIT_MASK = ~uint256(0xFFFF);
-uint256 constant ACTIVE_SOURCE_MASK = NOT_LOW_16_BIT_MASK;
 uint256 constant SUB_PARSER_BYTECODE_HEADER_SIZE = 5;
 
+/// @title LibParse
+/// Core parsing library for Rainlang source text.
+///
+/// The parser only supports single-byte ASCII input. All character masks are
+/// 128-bit bitmaps indexed by byte value, so bytes above 0x7F (non-ASCII /
+/// multibyte UTF-8 sequences) will never match any mask and will be rejected
+/// as unexpected characters. Callers MUST NOT pass non-ASCII input.
 library LibParse {
     using LibPointer for Pointer;
     using LibParseStackName for ParseState;
@@ -192,7 +198,7 @@ library LibParse {
     /// @return The new cursor position after the RHS.
     //forge-lint: disable-next-line(mixed-case-function)
     //slither-disable-next-line cyclomatic-complexity
-    function parseRHS(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
+    function parseRHS(ParseState memory state, uint256 cursor, uint256 end) internal view returns (uint256) {
         unchecked {
             while (cursor < end) {
                 bytes32 word;
@@ -318,9 +324,10 @@ library LibParse {
                     // the expectation that it will be overwritten by
                     // the next paren group.
                     uint256 newParenOffset;
+                    uint256 parenTracker0Offset = PARSE_STATE_PAREN_TRACKER0_OFFSET;
                     assembly ("memory-safe") {
-                        newParenOffset := add(byte(0, mload(add(state, 0x60))), 3)
-                        mstore8(add(state, 0x60), newParenOffset)
+                        newParenOffset := add(byte(0, mload(add(state, parenTracker0Offset))), 3)
+                        mstore8(add(state, parenTracker0Offset), newParenOffset)
                     }
                     // first 2 bytes are reserved, then remaining 62
                     // bytes are for paren groups, so the offset MUST NOT
@@ -335,8 +342,9 @@ library LibParse {
                     state.fsm &= ~(FSM_WORD_END_MASK | FSM_YANG_MASK);
                 } else if (char & CMASK_RIGHT_PAREN > 0) {
                     uint256 parenOffset;
+                    uint256 parenTracker0Offset = PARSE_STATE_PAREN_TRACKER0_OFFSET;
                     assembly ("memory-safe") {
-                        parenOffset := byte(0, mload(add(state, 0x60)))
+                        parenOffset := byte(0, mload(add(state, parenTracker0Offset)))
                     }
                     if (parenOffset == 0) {
                         revert UnexpectedRightParen(state.parseErrorOffset(cursor));
@@ -347,8 +355,7 @@ library LibParse {
                     // write the input counter out to the operand pointed
                     // to by the pointer we deallocated.
                     assembly ("memory-safe") {
-                        // State field offset.
-                        let stateOffset := add(state, 0x60)
+                        let stateOffset := add(state, parenTracker0Offset)
                         parenOffset := sub(parenOffset, 3)
                         mstore8(stateOffset, parenOffset)
                         mstore8(

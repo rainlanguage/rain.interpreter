@@ -30,7 +30,7 @@ library LibParsePragma {
     /// @param cursor The current cursor position.
     /// @param end The end of the data to parse.
     /// @return The updated cursor position after the pragma.
-    function parsePragma(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256) {
+    function parsePragma(ParseState memory state, uint256 cursor, uint256 end) internal view returns (uint256) {
         unchecked {
             // Not-pragma guard.
             {

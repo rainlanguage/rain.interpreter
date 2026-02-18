@@ -127,6 +127,57 @@ contract RainterpreterReferenceExternIntIncTest is OpTest {
         assertEq(constants.length, 0);
     }
 
+    /// Direct call to extern() on the base contract with the intInc opcode.
+    function testRainterpreterReferenceExternExternDirect() external {
+        RainterpreterReferenceExtern ext = new RainterpreterReferenceExtern();
+
+        ExternDispatchV2 dispatch = LibExtern.encodeExternDispatch(OP_INDEX_INCREMENT, OperandV2.wrap(0));
+
+        StackItem[] memory inputs = new StackItem[](2);
+        inputs[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(2e66, -66)));
+        inputs[1] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(3e66, -66)));
+
+        StackItem[] memory outputs = ext.extern(dispatch, inputs);
+        assertEq(outputs.length, 2);
+        assertEq(StackItem.unwrap(outputs[0]), Float.unwrap(LibDecimalFloat.packLossless(3e66, -66)));
+        assertEq(StackItem.unwrap(outputs[1]), Float.unwrap(LibDecimalFloat.packLossless(4e66, -66)));
+    }
+
+    /// Direct call to externIntegrity() with a valid opcode. Verifies the base
+    /// contract dispatch returns the same result as calling the library directly.
+    /// forge-config: default.fuzz.runs = 100
+    function testRainterpreterReferenceExternIntegrityDirect(
+        uint16 operand,
+        uint256 expectedInputs,
+        uint256 expectedOutputs
+    ) external {
+        RainterpreterReferenceExtern ext = new RainterpreterReferenceExtern();
+
+        OperandV2 op = OperandV2.wrap(bytes32(uint256(operand)));
+        ExternDispatchV2 dispatch = LibExtern.encodeExternDispatch(OP_INDEX_INCREMENT, op);
+
+        (uint256 actualInputs, uint256 actualOutputs) = ext.externIntegrity(dispatch, expectedInputs, expectedOutputs);
+        (uint256 libInputs, uint256 libOutputs) = LibExternOpIntInc.integrity(op, expectedInputs, expectedOutputs);
+        assertEq(actualInputs, libInputs);
+        assertEq(actualOutputs, libOutputs);
+    }
+
+    /// Out-of-range opcode wraps via mod in extern(). RainterpreterReferenceExtern
+    /// has 1 opcode, so any opcode should mod to 0 (intInc).
+    function testRainterpreterReferenceExternExternModWrap(uint16 opcode) external {
+        vm.assume(opcode >= 1);
+        RainterpreterReferenceExtern ext = new RainterpreterReferenceExtern();
+
+        ExternDispatchV2 dispatch = LibExtern.encodeExternDispatch(uint256(opcode), OperandV2.wrap(0));
+
+        StackItem[] memory inputs = new StackItem[](1);
+        inputs[0] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(5e66, -66)));
+
+        StackItem[] memory outputs = ext.extern(dispatch, inputs);
+        assertEq(outputs.length, 1);
+        assertEq(StackItem.unwrap(outputs[0]), Float.unwrap(LibDecimalFloat.packLossless(6e66, -66)));
+    }
+
     /// Test the inc library directly. The run function should increment every
     /// value it is passed by 1.
     /// forge-config: default.fuzz.runs = 100

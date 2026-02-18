@@ -20,7 +20,7 @@ contract LibParseOperandParseOperandTest is Test {
 
     function checkParsingOperandFromData(string memory s, bytes32[] memory expectedValues, uint256 expectedEnd)
         public
-        pure
+        view
     {
         ParseState memory state = LibMetaFixture.newState(s);
         // Before parsing any operand values the state gets initialized at the
@@ -43,7 +43,7 @@ contract LibParseOperandParseOperandTest is Test {
     // Test that parsing a string that doesn't start with the operand opening
     // character always results in a zero length operand values array.
     /// forge-config: default.fuzz.runs = 100
-    function testParseOperandNoOpeningCharacter(string memory s) external pure {
+    function testParseOperandNoOpeningCharacter(string memory s) external view {
         vm.assume(bytes(s).length > 0);
         vm.assume(bytes(s)[0] != "<");
 
@@ -54,7 +54,7 @@ contract LibParseOperandParseOperandTest is Test {
     // values array. The cursor moves past both the opening and closing
     // characters.
     /// forge-config: default.fuzz.runs = 100
-    function testParseOperandEmptyOperand(string memory s) external pure {
+    function testParseOperandEmptyOperand(string memory s) external view {
         vm.assume(bytes(s).length > 2);
         bytes(s)[0] = "<";
         bytes(s)[1] = ">";
@@ -70,7 +70,7 @@ contract LibParseOperandParseOperandTest is Test {
         string memory maybeWhitespaceA,
         string memory maybeWhitespaceB,
         string memory suffix
-    ) external pure {
+    ) external view {
         LibConformString.conformStringToWhitespace(maybeWhitespaceA);
         LibConformString.conformStringToWhitespace(maybeWhitespaceB);
 
@@ -105,7 +105,7 @@ contract LibParseOperandParseOperandTest is Test {
         string memory maybeWhitespaceB,
         string memory maybeWhitespaceC,
         string memory suffix
-    ) external pure {
+    ) external view {
         vm.assume(bytes(maybeWhitespaceB).length > 0);
 
         valueA = bound(valueA, 0, type(int224).max);
@@ -156,7 +156,7 @@ contract LibParseOperandParseOperandTest is Test {
         string memory maybeWhitespaceC,
         string memory maybeWhitespaceD,
         string memory suffix
-    ) external pure {
+    ) external view {
         vm.assume(bytes(maybeWhitespaceB).length > 0);
         vm.assume(bytes(maybeWhitespaceC).length > 0);
 
@@ -215,7 +215,7 @@ contract LibParseOperandParseOperandTest is Test {
         int256[4] memory values,
         string[5] memory maybeWhitespace,
         string memory suffix
-    ) external pure {
+    ) external view {
         {
             vm.assume(bytes(maybeWhitespace[1]).length > 0);
             vm.assume(bytes(maybeWhitespace[2]).length > 0);

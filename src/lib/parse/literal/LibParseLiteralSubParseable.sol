@@ -60,6 +60,9 @@ library LibParseLiteralSubParseable {
             cursor = LibParseChar.skipMask(cursor, end, ~CMASK_SUB_PARSEABLE_LITERAL_END);
             uint256 bodyEnd = cursor;
 
+            if (cursor >= end) {
+                revert UnclosedSubParseableLiteral(state.parseErrorOffset(cursor));
+            }
             {
                 uint256 finalChar;
                 assembly ("memory-safe") {
