@@ -256,7 +256,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [PENDING] A31-1: (LOW) No direct unit tests for `parseErrorOffset`
 - [PENDING] A31-2: (LOW) No direct unit tests for `handleErrorSelector`
 - [PENDING] A32-1: (LOW) No direct unit tests for `skipComment`, `skipWhitespace`, or `parseInterstitial`
-- [PENDING] A32-2: (MEDIUM) `MalformedCommentStart` error path is never tested
+- [FIXED] A32-2: (MEDIUM) `MalformedCommentStart` error path is never tested — fuzzed over all non-'*' second bytes
 - [PENDING] A32-3: (LOW) No test for `skipComment` when `cursor + 4 > end`
 - [PENDING] A32-4: (LOW) No test for `skipWhitespace` in isolation
 - [PENDING] A33-1: (MEDIUM) No direct unit test for `selectLiteralParserByIndex`
@@ -266,9 +266,9 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [PENDING] A34-2: (LOW) No fuzz test for decimal parsing round-trip
 - [PENDING] A34-3: (LOW) No test for cursor position after successful parse
 - [PENDING] A34-4: (LOW) No test for decimal values with fractional parts
-- [PENDING] A35-1: (MEDIUM) No test for `HexLiteralOverflow` error
-- [PENDING] A35-2: (MEDIUM) No test for `ZeroLengthHexLiteral` error
-- [PENDING] A35-3: (MEDIUM) No test for `OddLengthHexLiteral` error
+- [FIXED] A35-1: (MEDIUM) No test for `HexLiteralOverflow` error — testParseHexOverflow with boundary at 65 digits
+- [FIXED] A35-2: (MEDIUM) No test for `ZeroLengthHexLiteral` error — fuzzed over non-hex trailing bytes
+- [FIXED] A35-3: (MEDIUM) No test for `OddLengthHexLiteral` error — fuzzed over odd lengths 1-63
 - [PENDING] A35-4: (LOW) No test for `MalformedHexLiteral` error
 - [PENDING] A35-5: (LOW) No test for mixed-case hex parsing
 - [PENDING] A36-1: (MEDIUM) No test for RepeatLiteralTooLong revert path
