@@ -206,7 +206,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A12-3: (HIGH) No direct test for `StackAllocationMismatch` revert path — testStackAllocationMismatch() added
 - [FIXED] A12-4: (HIGH) No direct test for `StackOutputsMismatch` revert path — testStackOutputsMismatch() added
 - [FIXED] A12-5: (MEDIUM) No test for `newState` initialization correctness — fuzzed all struct fields
-- [PENDING] A12-6: (MEDIUM) No test for multi-output highwater advancement logic
+- [FIXED] A12-6: (MEDIUM) No test for multi-output highwater advancement logic — multi-output call passes integrity via parse2
 - [PENDING] A12-7: (LOW) No test for `stackMaxIndex` tracking logic
 - [PENDING] A12-8: (LOW) No test for zero-source bytecode (`sourceCount == 0`)
 - [PENDING] A12-9: (LOW) No test for multi-source bytecode integrity checking
