@@ -279,7 +279,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [PENDING] A36-6: (LOW) Integration tests use bare vm.expectRevert() without specifying expected error
 - [PENDING] A37-1: (LOW) No explicit test for `parseString` memory snapshot restoration
 - [PENDING] A37-3: (LOW) No test for `UnclosedStringLiteral` when `end == innerEnd`
-- [PENDING] A38-1: (MEDIUM) No test for `subParseLiteral` returning `(false, ...)` (sub-parser rejection)
+- [FIXED] A38-1: (MEDIUM) No test for `subParseLiteral` returning `(false, ...)` (sub-parser rejection) — added fuzz tests for first-rejects-second-accepts and all-reject paths
 - [PENDING] A38-2: (LOW) No fuzz test for the error paths
 - [PENDING] A39-1: (MEDIUM) `handleOperandDisallowedAlwaysOne` has no test file or any test coverage
 - [PENDING] A39-2: (LOW) `handleOperand` (dispatch function) has no direct unit test

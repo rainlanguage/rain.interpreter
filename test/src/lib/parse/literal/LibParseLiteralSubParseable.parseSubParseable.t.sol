@@ -6,7 +6,7 @@ import {Test, console2} from "forge-std/Test.sol";
 import {ParseState, Pointer, LibParseState} from "src/lib/parse/LibParseState.sol";
 import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseLiteralSubParseable} from "src/lib/parse/literal/LibParseLiteralSubParseable.sol";
-import {UnclosedSubParseableLiteral, SubParseableMissingDispatch} from "src/error/ErrParse.sol";
+import {UnclosedSubParseableLiteral, SubParseableMissingDispatch, UnsupportedLiteralType} from "src/error/ErrParse.sol";
 import {ISubParserV4} from "rain.interpreter.interface/interface/ISubParserV4.sol";
 import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {CMASK_WHITESPACE, CMASK_SUB_PARSEABLE_LITERAL_END} from "rain.string/lib/parse/LibParseCMask.sol";
@@ -188,5 +188,57 @@ contract LibParseLiteralSubParseableTest is Test {
 
     function testParseLiteralSubParseableHappyKnown() external {
         testParseLiteralSubParseableHappyFuzz("2 max-positive-value() 2", unicode"3¹&\\u{a3c}È", " ,");
+    }
+
+    function externalParseWithTwoSubParsers(bytes memory data, address subParserA, address subParserB)
+        external
+        view
+        returns (uint256, bytes32)
+    {
+        ParseState memory state = LibParseState.newState(data, "", "", "");
+        uint256 cursor = Pointer.unwrap(state.data.dataPointer());
+        uint256 end = Pointer.unwrap(state.data.endDataPointer());
+        // B is pushed first so A (pushed last) is tried first.
+        state.pushSubParser(0, bytes32(uint256(uint160(subParserB))));
+        state.pushSubParser(0, bytes32(uint256(uint160(subParserA))));
+        return state.parseSubParseable(cursor, end);
+    }
+
+    function mockSubParseLiteral(address subParser, bool success, bytes32 value) internal {
+        bytes memory subParseData = bytes.concat(bytes2(uint16(3)), bytes("foo"));
+        vm.mockCall(
+            subParser,
+            abi.encodeWithSelector(ISubParserV4.subParseLiteral2.selector, subParseData),
+            abi.encode(success, value)
+        );
+    }
+
+    /// When the first sub-parser returns (false, ...), subParseLiteral must
+    /// continue to the next sub-parser. If the second returns (true, value),
+    /// that value is used.
+    function testSubParseLiteralFirstRejectsSecondAccepts(string memory nameA, string memory nameB) external {
+        address first = makeAddr(nameA);
+        address second = makeAddr(nameB);
+        vm.assume(first != second);
+
+        mockSubParseLiteral(first, false, bytes32(0));
+        mockSubParseLiteral(second, true, bytes32(uint256(42)));
+
+        (, bytes32 value) = this.externalParseWithTwoSubParsers(bytes("[foo]"), first, second);
+        assertEq(value, bytes32(uint256(42)));
+    }
+
+    /// When all sub-parsers return (false, ...), subParseLiteral must revert
+    /// with UnsupportedLiteralType.
+    function testSubParseLiteralAllReject(string memory nameA, string memory nameB) external {
+        address first = makeAddr(nameA);
+        address second = makeAddr(nameB);
+        vm.assume(first != second);
+
+        mockSubParseLiteral(first, false, bytes32(0));
+        mockSubParseLiteral(second, false, bytes32(0));
+
+        vm.expectRevert(abi.encodeWithSelector(UnsupportedLiteralType.selector, 1));
+        this.externalParseWithTwoSubParsers(bytes("[foo]"), first, second);
     }
 }
