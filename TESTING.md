@@ -1,0 +1,37 @@
+# Testing Conventions
+
+## Base Contracts
+
+Test base contracts in `test/abstract/`:
+
+- **`RainterpreterExpressionDeployerDeploymentTest`** — Full stack deployment. Exposes `I_PARSER`, `I_INTERPRETER`, `I_STORE`, `I_DEPLOYER`.
+- **`OpTest`** — Opcode tests. Provides `opReferenceCheck()`, `checkHappy()`, `checkUnhappy()`.
+- **`ParseTest`** — Parser tests. Provides `parseExternal()`.
+- **`OperandTest`** — Operand handler tests. Provides `checkOperandParse()`.
+- **`ParseLiteralTest`** — Literal parsing tests. Provides `checkLiteralBounds()`.
+
+## Fuzz Testing
+
+- Use `bound()` to constrain fuzz inputs, not `vm.assume()`. `vm.assume()` wastes runs by discarding inputs. `vm.assume()` is acceptable only for excluding a single value.
+- When fuzzing over a non-contiguous set (e.g., non-hex bytes), `bound()` to the count of valid values, then map with arithmetic to skip excluded ranges.
+- When a fuzz parameter affects expression structure, build rainlang dynamically. The fuzz variable must match what the rainlang produces.
+
+## Library Internals
+
+Internal library functions need an external wrapper in the test contract. Construct `ParseState` inside the wrapper so memory pointers are valid. Call via `this.externalFoo()`.
+
+## Revert Paths
+
+Use `vm.expectRevert` with `abi.encodeWithSelector` and the custom error type. Call through `this.externalFoo()` for library functions or directly on `I_PARSER`/`I_INTERPRETER` for integration tests.
+
+## Bytecode Inspection
+
+Use `LibBytecode` from `rain.interpreter.interface/lib/bytecode/LibBytecode.sol`. Do not manually index into bytecode bytes.
+
+## Opcode Testing
+
+Use `opReferenceCheck` to validate that `run` output matches a pure reference implementation and that `integrity` correctly declares inputs/outputs.
+
+## Boundary Tests
+
+Always test both sides: the max valid value (should succeed) and one past it (should revert).

@@ -104,9 +104,9 @@ External contracts can extend the interpreter with additional opcodes. `src/conc
 
 ## Test Conventions
 
+Testing patterns and conventions are in `TESTING.md`. Read that file before writing tests.
+
 - Test files are in `test/` mirroring `src/` structure, suffixed `.t.sol`
-- Base test contracts in `test/abstract/` — `OpTest` for opcodes, `ParseTest` for parser tests
-- Use `opReferenceCheck` to test opcode runtime behavior against a reference implementation
 - Rust test fixtures (`crates/test_fixtures/`) deploy all four contracts on a local Anvil instance
 
 ## Process (Jidoka)
