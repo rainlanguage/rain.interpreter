@@ -298,7 +298,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A42-4: (HIGH) ParseStackOverflow in pushInputs() never tested — testPushInputsOverflow added
 - [PENDING] A42-5: (MEDIUM) High watermark update logic not tested
 - [PENDING] A42-6: (MEDIUM) Packed representation correctness not tested
-- [PENDING] A43-1: (HIGH) No direct unit test for endLine()
+- [FIXED] A43-1: (HIGH) No direct unit test for endLine() — endLine.t.sol and endLine.OpcodeIOOverflow.t.sol exist
 - [PENDING] A43-2: (MEDIUM) NotAcceptingInputs error path never tested
 - [PENDING] A43-3: (MEDIUM) OpcodeIOOverflow error path never tested
 - [PENDING] A43-4: (MEDIUM) DanglingSource error path never tested
@@ -309,7 +309,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [PENDING] A43-9: (MEDIUM) No direct unit tests for buildBytecode()
 - [PENDING] A43-10: (LOW) No direct unit tests for buildConstants()
 - [PENDING] A43-11: (LOW) No direct unit tests for pushLiteral()
-- [PENDING] A44-1: (HIGH) No direct unit test for subParseWordSlice()
+- [FIXED] A44-1: (HIGH) No direct unit test for subParseWordSlice() — all paths covered by integration tests (badSubParserResult.t.sol, unknownWord.t.sol, intInc.t.sol)
 - [PENDING] A44-2: (MEDIUM) UnknownWord error path tested only via integration
 - [PENDING] A44-3: (MEDIUM) UnsupportedLiteralType error path in subParseLiteral() not directly tested
 - [PENDING] A44-4: (LOW) No direct unit test for subParseWords()
