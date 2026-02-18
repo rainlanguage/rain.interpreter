@@ -326,7 +326,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [PENDING] A47-2: (MEDIUM) No direct test for `parsePragma1` on the expression deployer
 - [PENDING] A47-3: (LOW) No test for `buildIntegrityFunctionPointers` return value consistency
 - [PENDING] A47-4: (LOW) No test for `parse2` assembly block memory allocation
-- [PENDING] A48-1: (MEDIUM) No direct test for `unsafeParse`
+- [FIXED] A48-1: (MEDIUM) No direct test for `unsafeParse` — happy path and empty input tests using LibBytecode inspection
 - [PENDING] A48-3: (LOW) No test for `unsafeParse` with input triggering `ParseMemoryOverflow`
 - [PENDING] A48-4: (LOW) No test for `parsePragma1` with empty input
 - [PENDING] A49-1: (LOW) `InvalidRepeatCount` error not directly asserted in revert tests
