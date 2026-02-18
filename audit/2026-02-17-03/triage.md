@@ -453,39 +453,39 @@ Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
 - [PENDING] A14-2: (LOW) `STACK_TRACER` constant has no NatSpec documentation
 - [FIXED] A14-3: (LOW) `stackTrace` NatSpec inaccurately describes the 4-byte prefix content — corrected to describe 2-byte parentSourceIndex + 2-byte sourceIndex encoding
 - [PENDING] A14-4: (LOW) `unsafeSerialize` missing `@return` tag and cursor side-effect not documented
-- [PENDING] A16-1: (LOW) LibOpBitwiseAnd integrity missing `@param` and `@return` NatSpec tags
-- [PENDING] A16-2: (LOW) LibOpBitwiseAnd run missing `@param` and `@return` NatSpec tags
-- [PENDING] A16-3: (LOW) LibOpBitwiseAnd referenceFn missing `@param` and `@return` NatSpec tags
-- [PENDING] A16-4: (LOW) LibOpBitwiseOr integrity missing `@param` and `@return` NatSpec tags
-- [PENDING] A16-5: (LOW) LibOpBitwiseOr run missing `@param` and `@return` NatSpec tags
-- [PENDING] A16-6: (LOW) LibOpBitwiseOr referenceFn missing `@param` and `@return` NatSpec tags
-- [PENDING] A16-7: (LOW) LibOpCtPop integrity missing `@param` and `@return` NatSpec tags
-- [PENDING] A16-8: (LOW) LibOpCtPop run missing `@param` and `@return` NatSpec tags
-- [PENDING] A16-9: (LOW) LibOpCtPop referenceFn missing `@param` and `@return` NatSpec tags
-- [PENDING] A16-10: (LOW) LibOpDecodeBits integrity missing `@param` and `@return` NatSpec tags
-- [PENDING] A16-11: (LOW) LibOpDecodeBits run missing `@param` and `@return` NatSpec tags
-- [PENDING] A16-12: (LOW) LibOpDecodeBits referenceFn missing `@param` and `@return` NatSpec tags
-- [PENDING] A16-13: (LOW) LibOpEncodeBits integrity missing `@param` and `@return` NatSpec tags
-- [PENDING] A16-14: (LOW) LibOpEncodeBits run missing `@param` and `@return` NatSpec tags
-- [PENDING] A16-15: (LOW) LibOpEncodeBits referenceFn missing `@param` and `@return` NatSpec tags
-- [PENDING] A16-16: (LOW) LibOpShiftBitsLeft integrity missing `@param` and `@return` NatSpec tags
-- [PENDING] A16-17: (LOW) LibOpShiftBitsLeft run missing `@param` and `@return` NatSpec tags
-- [PENDING] A16-18: (LOW) LibOpShiftBitsLeft referenceFn missing `@param` and `@return` NatSpec tags
-- [PENDING] A16-19: (LOW) LibOpShiftBitsRight integrity missing `@param` and `@return` NatSpec tags
-- [PENDING] A16-20: (LOW) LibOpShiftBitsRight run missing `@param` and `@return` NatSpec tags
-- [PENDING] A16-21: (LOW) LibOpShiftBitsRight referenceFn missing `@param` and `@return` NatSpec tags
-- [PENDING] A20-1: (LOW) LibOpHash integrity missing `@param` and `@return` NatSpec
+- [FIXED] A16-1: (LOW) LibOpBitwiseAnd integrity missing `@param` and `@return` NatSpec tags — added `@return` tags
+- [FIXED] A16-2: (LOW) LibOpBitwiseAnd run missing `@param` and `@return` NatSpec tags — added `@param stackTop` and `@return`
+- [FIXED] A16-3: (LOW) LibOpBitwiseAnd referenceFn missing `@param` and `@return` NatSpec tags — added `@param inputs` and `@return`
+- [FIXED] A16-4: (LOW) LibOpBitwiseOr integrity missing `@param` and `@return` NatSpec tags — added `@return` tags
+- [FIXED] A16-5: (LOW) LibOpBitwiseOr run missing `@param` and `@return` NatSpec tags — added `@param stackTop` and `@return`
+- [FIXED] A16-6: (LOW) LibOpBitwiseOr referenceFn missing `@param` and `@return` NatSpec tags — added `@param inputs` and `@return`
+- [FIXED] A16-7: (LOW) LibOpCtPop integrity missing `@param` and `@return` NatSpec tags — added `@return` tags
+- [FIXED] A16-8: (LOW) LibOpCtPop run missing `@param` and `@return` NatSpec tags — added `@param stackTop` and `@return`
+- [FIXED] A16-9: (LOW) LibOpCtPop referenceFn missing `@param` and `@return` NatSpec tags — added `@param inputs` and `@return`
+- [FIXED] A16-10: (LOW) LibOpDecodeBits integrity missing `@param` and `@return` NatSpec tags — added `@param state`, `@param operand`, `@return` tags
+- [FIXED] A16-11: (LOW) LibOpDecodeBits run missing `@param` and `@return` NatSpec tags — added `@param operand`, `@param stackTop`, `@return`
+- [FIXED] A16-12: (LOW) LibOpDecodeBits referenceFn missing `@param` and `@return` NatSpec tags — added `@param operand`, `@param inputs`, `@return outputs`
+- [FIXED] A16-13: (LOW) LibOpEncodeBits integrity missing `@param` and `@return` NatSpec tags — added `@param operand` and `@return` tags
+- [FIXED] A16-14: (LOW) LibOpEncodeBits run missing `@param` and `@return` NatSpec tags — added `@param operand`, `@param stackTop`, `@return`
+- [FIXED] A16-15: (LOW) LibOpEncodeBits referenceFn missing `@param` and `@return` NatSpec tags — added `@param operand`, `@param inputs`, `@return outputs`
+- [FIXED] A16-16: (LOW) LibOpShiftBitsLeft integrity missing `@param` and `@return` NatSpec tags — added `@param operand` and `@return` tags
+- [FIXED] A16-17: (LOW) LibOpShiftBitsLeft run missing `@param` and `@return` NatSpec tags — added `@param operand`, `@param stackTop`, `@return`
+- [FIXED] A16-18: (LOW) LibOpShiftBitsLeft referenceFn missing `@param` and `@return` NatSpec tags — added `@param operand`, `@param inputs`, `@return`
+- [FIXED] A16-19: (LOW) LibOpShiftBitsRight integrity missing `@param` and `@return` NatSpec tags — added `@param operand` and `@return` tags
+- [FIXED] A16-20: (LOW) LibOpShiftBitsRight run missing `@param` and `@return` NatSpec tags — added `@param operand`, `@param stackTop`, `@return`
+- [FIXED] A16-21: (LOW) LibOpShiftBitsRight referenceFn missing `@param` and `@return` NatSpec tags — added `@param operand`, `@param inputs`, `@return`
+- [FIXED] A20-1: (LOW) LibOpHash integrity missing `@param` and `@return` NatSpec — added `@param operand` and `@return` tags
 - [PENDING] A20-2: (LOW) LibOpHash run missing `@param` and `@return` NatSpec
 - [PENDING] A20-3: (LOW) LibOpHash referenceFn missing `@param` and `@return` NatSpec
-- [PENDING] A20-4: (LOW) LibOpERC20Allowance integrity missing `@param` and `@return` NatSpec
-- [PENDING] A20-5: (LOW) LibOpERC20Allowance run missing `@param` and `@return` NatSpec
-- [PENDING] A20-6: (LOW) LibOpERC20Allowance referenceFn missing `@param` and `@return` NatSpec
-- [PENDING] A20-7: (LOW) LibOpERC20BalanceOf integrity missing `@param` and `@return` NatSpec
-- [PENDING] A20-8: (LOW) LibOpERC20BalanceOf run missing `@param` and `@return` NatSpec
-- [PENDING] A20-9: (LOW) LibOpERC20BalanceOf referenceFn missing `@param` and `@return` NatSpec
-- [PENDING] A20-10: (LOW) LibOpERC20TotalSupply integrity missing `@param` and `@return` NatSpec
-- [PENDING] A20-11: (LOW) LibOpERC20TotalSupply run missing `@param` and `@return` NatSpec
-- [PENDING] A20-12: (LOW) LibOpERC20TotalSupply referenceFn missing `@param` and `@return` NatSpec
+- [FIXED] A20-4: (LOW) LibOpERC20Allowance integrity missing `@param` and `@return` NatSpec — added `@return` tags
+- [FIXED] A20-5: (LOW) LibOpERC20Allowance run missing `@param` and `@return` NatSpec — added `@param stackTop` and `@return`
+- [FIXED] A20-6: (LOW) LibOpERC20Allowance referenceFn missing `@param` and `@return` NatSpec — added `@param inputs` and `@return`
+- [FIXED] A20-7: (LOW) LibOpERC20BalanceOf integrity missing `@param` and `@return` NatSpec — added `@return` tags
+- [FIXED] A20-8: (LOW) LibOpERC20BalanceOf run missing `@param` and `@return` NatSpec — added `@param stackTop` and `@return`
+- [FIXED] A20-9: (LOW) LibOpERC20BalanceOf referenceFn missing `@param` and `@return` NatSpec — added `@param inputs` and `@return`
+- [FIXED] A20-10: (LOW) LibOpERC20TotalSupply integrity missing `@param` and `@return` NatSpec — added `@return` tags
+- [FIXED] A20-11: (LOW) LibOpERC20TotalSupply run missing `@param` and `@return` NatSpec — added `@param stackTop` and `@return`
+- [FIXED] A20-12: (LOW) LibOpERC20TotalSupply referenceFn missing `@param` and `@return` NatSpec — added `@param inputs` and `@return`
 - [PENDING] A20-13: (LOW) LibOpUint256ERC20Allowance integrity missing `@param` and `@return` NatSpec
 - [PENDING] A20-14: (LOW) LibOpUint256ERC20Allowance run missing `@param` and `@return` NatSpec
 - [PENDING] A20-15: (LOW) LibOpUint256ERC20Allowance referenceFn missing `@param` and `@return` NatSpec
@@ -496,10 +496,10 @@ Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
 - [PENDING] A20-20: (LOW) LibOpUint256ERC20TotalSupply integrity missing `@param` and `@return` NatSpec
 - [PENDING] A20-21: (LOW) LibOpUint256ERC20TotalSupply run missing `@param` and `@return` NatSpec
 - [PENDING] A20-22: (LOW) LibOpUint256ERC20TotalSupply referenceFn missing `@param` and `@return` NatSpec
-- [PENDING] A22-1: (LOW) All ERC721/ERC5313/EVM integrity functions missing `@param` and `@return` tags
-- [PENDING] A22-2: (LOW) All ERC721/ERC5313/EVM run functions missing `@param` and `@return` tags
-- [PENDING] A22-3: (LOW) All ERC721/ERC5313/EVM referenceFn functions missing `@param` and `@return` tags
-- [PENDING] A22-4: (LOW) All ERC721/ERC5313/EVM unnamed function parameters prevent formal `@param` tags
+- [FIXED] A22-1: (LOW) All ERC721/ERC5313/EVM integrity functions missing `@param` and `@return` tags — added `@return` tags to all 6 files
+- [FIXED] A22-2: (LOW) All ERC721/ERC5313/EVM run functions missing `@param` and `@return` tags — added `@param stackTop` and `@return` to all 6 files
+- [FIXED] A22-3: (LOW) All ERC721/ERC5313/EVM referenceFn functions missing `@param` and `@return` tags — added `@param inputs` and `@return` where params are named
+- [DISMISSED] A22-4: (LOW) All ERC721/ERC5313/EVM unnamed function parameters prevent formal `@param` tags — by convention unnamed params are skipped in NatSpec
 - [PENDING] A23a-1: (LOW) LibOpAny integrity missing `@param` and `@return` NatSpec
 - [PENDING] A23a-2: (LOW) LibOpAny run missing `@param` and `@return` NatSpec
 - [PENDING] A23a-3: (LOW) LibOpAny referenceFn missing `@param` and `@return` NatSpec
@@ -725,9 +725,9 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [PENDING] A01-4: (LOW) Inconsistent mutability between `opcodeFunctionPointers` (view) and `integrityFunctionPointers` (pure) in BaseRainterpreterExtern
 - [FIXED] A03-1: (LOW) `MalformedExponentDigits` and `MalformedDecimalPoint` errors are unused dead code in ErrParse.sol — removed both
 - [FIXED] A03-2: (LOW) Inconsistent NatSpec `@dev` usage across error files; ErrSubParse uses `@dev` while others use plain `///` — removed `@dev` from all 3 errors
-- [PENDING] A03-3: (LOW) Missing `@param` tags on 28 parameterized errors in ErrParse.sol
-- [PENDING] A03-4: (LOW) Missing `@param` tags on `BadOutputsLength` in ErrExtern.sol
-- [PENDING] A03-5: (LOW) Missing `@param` tags on all 3 errors in ErrSubParse.sol
+- [FIXED] A03-3: (LOW) Missing `@param` tags on 28 parameterized errors in ErrParse.sol — added `@param` tags to all parameterized errors
+- [FIXED] A03-4: (LOW) Missing `@param` tags on `BadOutputsLength` in ErrExtern.sol — added `@param expectedLength` and `@param actualLength`
+- [FIXED] A03-5: (LOW) Missing `@param` tags on all 3 errors in ErrSubParse.sol — added `@param` tags to all 3 errors
 - [FIXED] A03-6: (LOW) `DuplicateLHSItem` is the only error in ErrParse.sol using `@dev` prefix, inconsistent with all other errors in the file — removed `@dev`
 - [PENDING] A04-1: (LOW) `LibOpCall` is missing `referenceFn` unlike all other opcode libraries
 - [FIXED] A04-2: (LOW) Unused `using LibPointer for Pointer` declaration and import in LibOpCall — removed using directive and LibPointer import
