@@ -293,9 +293,9 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [PENDING] A41-2: (LOW) No test for fingerprint collision behavior
 - [PENDING] A41-3: (LOW) No negative lookup test on populated list
 - [PENDING] A42-1: (CRITICAL) No direct unit tests for any function in LibParseStackTracker
-- [PENDING] A42-2: (HIGH) ParseStackOverflow in push() never tested
-- [PENDING] A42-3: (HIGH) ParseStackUnderflow in pop() never tested
-- [PENDING] A42-4: (HIGH) ParseStackOverflow in pushInputs() never tested
+- [FIXED] A42-2: (HIGH) ParseStackOverflow in push() never tested — testPushOverflow added
+- [FIXED] A42-3: (HIGH) ParseStackUnderflow in pop() never tested — testPopUnderflow added
+- [FIXED] A42-4: (HIGH) ParseStackOverflow in pushInputs() never tested — testPushInputsOverflow added
 - [PENDING] A42-5: (MEDIUM) High watermark update logic not tested
 - [PENDING] A42-6: (MEDIUM) Packed representation correctness not tested
 - [PENDING] A43-1: (HIGH) No direct unit test for endLine()
