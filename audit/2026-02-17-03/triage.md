@@ -281,7 +281,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [PENDING] A37-3: (LOW) No test for `UnclosedStringLiteral` when `end == innerEnd`
 - [FIXED] A38-1: (MEDIUM) No test for `subParseLiteral` returning `(false, ...)` (sub-parser rejection) — added fuzz tests for first-rejects-second-accepts and all-reject paths
 - [PENDING] A38-2: (LOW) No fuzz test for the error paths
-- [PENDING] A39-1: (MEDIUM) `handleOperandDisallowedAlwaysOne` has no test file or any test coverage
+- [FIXED] A39-1: (MEDIUM) `handleOperandDisallowedAlwaysOne` has no test file or any test coverage — added tests for empty values returning 1 and non-empty values reverting
 - [PENDING] A39-2: (LOW) `handleOperand` (dispatch function) has no direct unit test
 - [PENDING] A39-3: (LOW) `parseOperand` -- no test for `UnclosedOperand` revert from yang state
 - [PENDING] A39-5: (LOW) `handleOperandM1M1` -- no test for first value overflow with two values provided
