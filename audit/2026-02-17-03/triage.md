@@ -292,12 +292,12 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [PENDING] A41-1: (LOW) No test for bloom filter false positive path
 - [PENDING] A41-2: (LOW) No test for fingerprint collision behavior
 - [PENDING] A41-3: (LOW) No negative lookup test on populated list
-- [PENDING] A42-1: (CRITICAL) No direct unit tests for any function in LibParseStackTracker
+- [FIXED] A42-1: (CRITICAL) No direct unit tests for any function in LibParseStackTracker — LibParseStackTracker.t.sol added with 12 tests
 - [FIXED] A42-2: (HIGH) ParseStackOverflow in push() never tested — testPushOverflow added
 - [FIXED] A42-3: (HIGH) ParseStackUnderflow in pop() never tested — testPopUnderflow added
 - [FIXED] A42-4: (HIGH) ParseStackOverflow in pushInputs() never tested — testPushInputsOverflow added
-- [PENDING] A42-5: (MEDIUM) High watermark update logic not tested
-- [PENDING] A42-6: (MEDIUM) Packed representation correctness not tested
+- [FIXED] A42-5: (MEDIUM) High watermark update logic not tested — testPushUpdatesHighWatermark and testPushPreservesHighWatermark added
+- [FIXED] A42-6: (MEDIUM) Packed representation correctness not tested — testPopPreservesInputsAndMax, testPushPreservesInputs, testPushZero, testPopZero added
 - [FIXED] A43-1: (HIGH) No direct unit test for endLine() — endLine.t.sol and endLine.OpcodeIOOverflow.t.sol exist
 - [PENDING] A43-2: (MEDIUM) NotAcceptingInputs error path never tested
 - [PENDING] A43-3: (MEDIUM) OpcodeIOOverflow error path never tested
