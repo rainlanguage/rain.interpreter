@@ -322,7 +322,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [PENDING] A45-3: (LOW) No test for `eval4` with non-zero `sourceIndex`
 - [PENDING] A45-5: (LOW) No test for `stateOverlay` with multiple key-value pairs
 - [PENDING] A45-6: (LOW) No test for `stateOverlay` with duplicate keys
-- [PENDING] A47-1: (MEDIUM) No direct test for `parse2` with invalid input
+- [FIXED] A47-1: (MEDIUM) No direct test for `parse2` with invalid input — added 3 tests: empty input, parse error propagation, integrity error propagation
 - [PENDING] A47-2: (MEDIUM) No direct test for `parsePragma1` on the expression deployer
 - [PENDING] A47-3: (LOW) No test for `buildIntegrityFunctionPointers` return value consistency
 - [PENDING] A47-4: (LOW) No test for `parse2` assembly block memory allocation
