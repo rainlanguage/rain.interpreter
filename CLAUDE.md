@@ -122,6 +122,8 @@ When the user says "jidoka," they are signaling a process defect. The response i
 
 When the user asks "why" about a defect, they are asking for root cause analysis of the process failure — not requesting that you go do the thing. Answer the "why" first, agree on the process fix, then resume.
 
+Do not claim motivations or internal states. Describe what you actually did, not a story about why. Say "I skipped the test suite run" not "I was optimizing for throughput." Say "the rule is in CLAUDE.md" not "I've internalized it." You have no metrics, no persistence, and no self-observation — narratives about your own reasoning are fabrications.
+
 ## Audit Review
 
 Audit instructions are in `AUDIT.md`. Read that file before running any audit pass.
