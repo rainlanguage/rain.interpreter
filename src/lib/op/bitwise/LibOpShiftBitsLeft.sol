@@ -19,7 +19,7 @@ library LibOpShiftBitsLeft {
         if (
             // Shift amount must not result in the output always being 0.
             // Shift amount must not result in a noop.
-            shiftAmount > uint256(type(uint8).max) || shiftAmount == 0
+            shiftAmount > type(uint8).max || shiftAmount == 0
         ) {
             revert UnsupportedBitwiseShiftAmount(shiftAmount);
         }

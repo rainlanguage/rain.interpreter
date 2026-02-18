@@ -741,11 +741,11 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [FIXED] A14-1: (LOW) Unused variable `success` from `staticcall` in `stackTrace` assembly should use `pop()` idiom in LibInterpreterState — changed to `pop(staticcall(...))`
 - [FIXED] A14-2: (LOW) Incorrect arithmetic in `stackTrace` NatSpec gas cost analysis in LibInterpreterState — fixed division denominator and included memory term
 - [PENDING] A16-1: (LOW) Inconsistent `referenceFn` return pattern (new array vs mutate-in-place) across bitwise ops; LibOpDecodeBits is 1-input/1-output but allocates new array unlike other 1-in/1-out ops
-- [PENDING] A16-2: (LOW) Inconsistent `uint256` cast on `type(uint8).max` between LibOpShiftBitsLeft and LibOpShiftBitsRight
-- [PENDING] A16-3: (LOW) Inconsistent lint suppression comments between LibOpDecodeBits and LibOpEncodeBits for identical shift operation
+- [FIXED] A16-2: (LOW) Inconsistent `uint256` cast on `type(uint8).max` between LibOpShiftBitsLeft and LibOpShiftBitsRight — removed unnecessary cast from ShiftBitsLeft
+- [FIXED] A16-3: (LOW) Inconsistent lint suppression comments between LibOpDecodeBits and LibOpEncodeBits for identical shift operation — added slither suppression to EncodeBits to match DecodeBits
 - [PENDING] A16-4: (LOW) Repeated operand parsing logic for `startBit` and `length` duplicated 6 times across LibOpDecodeBits and LibOpEncodeBits
 - [PENDING] A20-1: (LOW) `@title` NatSpec mismatch in `LibOpUint256ERC20BalanceOf.sol` missing `Lib` prefix
-- [PENDING] A20-2: (LOW) Inconsistent `forge-lint` comment formatting in `LibOpUint256ERC20TotalSupply.sol` (space after `//` vs no space)
+- [FIXED] A20-2: (LOW) Inconsistent `forge-lint` comment formatting in `LibOpUint256ERC20TotalSupply.sol` (space after `//` vs no space) — removed space to match other files
 - [PENDING] A22-1: (LOW) `@title` NatSpec missing `Lib` prefix in `LibOpUint256ERC721BalanceOf`
 - [DISMISSED] A22-2: (LOW) Unused `using LibDecimalFloat for Float` directive in all three EVM opcode libraries (LibOpBlockNumber, LibOpChainId, LibOpTimestamp) — false positive; all three use LibDecimalFloat in referenceFn
 - [FIXED] A23a-1: (LOW) Commented-out code in LibOpConditions.sol line 68 — removed
@@ -755,7 +755,7 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [DISMISSED] A25a-1: (LOW) `using LibDecimalFloat for Float` declared but unused in LibOpMaxNegativeValue and LibOpMaxPositiveValue — false positive; both use LibDecimalFloat constants and methods
 - [FIXED] A25a-2: (LOW) Missing "point" in LibOpHeadroom run NatSpec ("decimal floating headroom" should be "decimal floating point headroom") — fixed in earlier commit
 - [FIXED] A25a-3: (LOW) Missing "decimal" in LibOpInv run NatSpec (says "floating point" instead of "decimal floating point") — fixed as part of @notice removal
-- [PENDING] A25a-4: (LOW) Misleading `unchecked` block with overflow comment in LibOpMax.referenceFn irrelevant to `max` operation
+- [FIXED] A25a-4: (LOW) Misleading `unchecked` block with overflow comment in LibOpMax.referenceFn irrelevant to `max` operation — removed unnecessary unchecked block and comment
 - [PENDING] A28-1: (LOW) Unnecessary `unchecked` block wrapping entire `run` body in LibOpSet has no semantic effect on assembly-only arithmetic
 - [FIXED] A29-1: (LOW) Misleading comment in `referenceFn` for LibOpUint256Div and LibOpUint256Sub says "overflow" but Div reverts on divide-by-zero and Sub reverts on underflow — corrected both
 - [FIXED] A29-2: (LOW) Inconsistent NatSpec description in LibOpLinearGrowth references wrong variable names ("a" and "r" instead of "base" and "rate") — corrected to "base" and "rate", also removed `@notice`
@@ -779,14 +779,14 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [DISMISSED] A43-3: (MEDIUM) FSM NatSpec does not match defined constants (bit positions shifted, missing/extra fields) — false positive; NatSpec bits 0-3 match FSM_YANG_MASK(1), FSM_WORD_END_MASK(1<<1), FSM_ACCEPTING_INPUTS_MASK(1<<2), FSM_ACTIVE_SOURCE_MASK(1<<3) exactly
 - [PENDING] A43-4: (LOW) Magic number `0x3f` in `highwater` should be a named constant
 - [PENDING] A45-1: (LOW) Constructor lacks NatSpec documentation in Rainterpreter.sol
-- [PENDING] A45-2: (LOW) NatSpec triple-slash used for inline code comment inside RainterpreterStore.set function body
+- [FIXED] A45-2: (LOW) NatSpec triple-slash used for inline code comment inside RainterpreterStore.set function body — changed `///` to `//`
 - [PENDING] A45-3: (LOW) `type(uint256).max` used as `maxOutputs` parameter without named constant in Rainterpreter.eval4
 - [PENDING] A45-4: (LOW) `buildOperandHandlerFunctionPointers` and `buildLiteralParserFunctionPointers` missing `override` keyword in RainterpreterParser, inconsistent with Rainterpreter
-- [PENDING] A47-1: (LOW) `@inheritdoc IERC165` inconsistent with other concrete contracts that use `@inheritdoc ERC165` in RainterpreterExpressionDeployer
-- [PENDING] A47-2: (LOW) Redundant NatSpec before `@inheritdoc` on `buildIntegrityFunctionPointers` is dead documentation in RainterpreterExpressionDeployer
+- [FIXED] A47-1: (LOW) `@inheritdoc IERC165` inconsistent with other concrete contracts that use `@inheritdoc ERC165` in RainterpreterExpressionDeployer — changed to `@inheritdoc ERC165`
+- [FIXED] A47-2: (LOW) Redundant NatSpec before `@inheritdoc` on `buildIntegrityFunctionPointers` is dead documentation in RainterpreterExpressionDeployer — removed dead NatSpec
 - [PENDING] A47-3: (LOW) RainterpreterDISPaiRegistry does not implement ERC165 unlike all other concrete contracts
 - [PENDING] A49-1: (LOW) Error `InvalidRepeatCount` defined inline instead of in `src/error/` directory per codebase convention
-- [PENDING] A49-2: (LOW) Variable named `float` shadows its type name `Float` differing only in case
+- [FIXED] A49-2: (LOW) Variable named `float` shadows its type name `Float` differing only in case — renamed to `repeatCount`
 - [PENDING] A49-3: (LOW) `matchSubParseLiteralDispatch` narrows from `view` to `pure virtual override` constraining future subclass override chain
 - [PENDING] R01-1: (HIGH) Duplicate short flag `-i` on both `fork_url` and `fork_block_number` in fork.rs causes clap runtime panic
 - [PENDING] R01-2: (MEDIUM) Unused dependencies `serde` and `serde_bytes` in CLI crate Cargo.toml

@@ -46,7 +46,8 @@ library LibOpEncodeBits {
             // Build a bitmask of desired length. Max length is uint8 max which
             // is 255. A 256 length doesn't really make sense as that isn't an
             // encoding anyway, it's just the source verbatim.
-            // forge-lint: disable-next-line(incorrect-shift)
+            //slither-disable-next-line incorrect-shift
+            //forge-lint: disable-next-line(incorrect-shift)
             uint256 mask = ((1 << length) - 1);
 
             // Punch a mask sized hole in target.

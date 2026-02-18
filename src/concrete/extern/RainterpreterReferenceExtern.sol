@@ -253,11 +253,11 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
                 (cursor, floatBytes) = LibParseLiteralDecimal.parseDecimalFloatPacked(
                     state, cursor + SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH, end
                 );
-                Float float = Float.wrap(floatBytes);
+                Float repeatCount = Float.wrap(floatBytes);
                 // We can only repeat a single digit integer 0-9.
                 if (
-                    float.lt(LibDecimalFloat.packLossless(0, 0)) || float.gt(LibDecimalFloat.packLossless(9, 0))
-                        || !float.frac().isZero()
+                    repeatCount.lt(LibDecimalFloat.packLossless(0, 0))
+                        || repeatCount.gt(LibDecimalFloat.packLossless(9, 0)) || !repeatCount.frac().isZero()
                 ) {
                     revert InvalidRepeatCount();
                 }

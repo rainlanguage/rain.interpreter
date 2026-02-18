@@ -61,15 +61,11 @@ library LibOpMax {
         pure
         returns (StackItem[] memory outputs)
     {
-        // Unchecked so that when we assert that an overflow error is thrown, we
-        // see the revert from the real function and not the reference function.
-        unchecked {
-            Float acc = Float.wrap(StackItem.unwrap(inputs[0]));
-            for (uint256 i = 1; i < inputs.length; i++) {
-                acc = acc.max(Float.wrap(StackItem.unwrap(inputs[i])));
-            }
-            outputs = new StackItem[](1);
-            outputs[0] = StackItem.wrap(Float.unwrap(acc));
+        Float acc = Float.wrap(StackItem.unwrap(inputs[0]));
+        for (uint256 i = 1; i < inputs.length; i++) {
+            acc = acc.max(Float.wrap(StackItem.unwrap(inputs[i])));
         }
+        outputs = new StackItem[](1);
+        outputs[0] = StackItem.wrap(Float.unwrap(acc));
     }
 }
