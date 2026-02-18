@@ -215,9 +215,9 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [PENDING] A14-3: (LOW) `stackTrace` test does not cover parentSourceIndex/sourceIndex encoding edge cases
 - [FIXED] A15-1: (HIGH) No test file exists for LibInterpreterStateDataContract — added LibInterpreterStateDataContract.t.sol
 - [PENDING] A15-2: (MEDIUM) `serializeSize` unchecked overflow not tested
-- [PENDING] A15-3: (MEDIUM) `unsafeSerialize` correctness not independently tested
+- [FIXED] A15-3: (MEDIUM) `unsafeSerialize` correctness not independently tested — fuzzed round-trip tests added
 - [FIXED] A15-4: (HIGH) `unsafeDeserialize` complex assembly not independently tested — covered by round-trip and stack allocation tests
-- [PENDING] A15-5: (MEDIUM) No test for serialize/deserialize round-trip property
+- [FIXED] A15-5: (MEDIUM) No test for serialize/deserialize round-trip property — fuzzed single and two-source round-trips added
 - [PENDING] A16-1: (LOW) LibOpCtPop missing test for disallowed operand
 - [PENDING] A17-1: (MEDIUM) No referenceFn or direct unit test for `run` function assembly logic
 - [PENDING] A17-2: (LOW) No test for `run` with maximum inputs (15) and maximum outputs simultaneously
@@ -299,8 +299,8 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A42-5: (MEDIUM) High watermark update logic not tested — testPushUpdatesHighWatermark and testPushPreservesHighWatermark added
 - [FIXED] A42-6: (MEDIUM) Packed representation correctness not tested — testPopPreservesInputsAndMax, testPushPreservesInputs, testPushZero, testPopZero added
 - [FIXED] A43-1: (HIGH) No direct unit test for endLine() — endLine.t.sol and endLine.OpcodeIOOverflow.t.sol exist
-- [PENDING] A43-2: (MEDIUM) NotAcceptingInputs error path never tested
-- [PENDING] A43-3: (MEDIUM) OpcodeIOOverflow error path never tested
+- [FIXED] A43-2: (MEDIUM) NotAcceptingInputs error path never tested — testNotAcceptingInputs in endLine.t.sol
+- [FIXED] A43-3: (MEDIUM) OpcodeIOOverflow error path never tested — testOpcodeIOOverflowInputs and testOpcodeIOOverflowOutputs added
 - [PENDING] A43-4: (MEDIUM) DanglingSource error path never tested
 - [PENDING] A43-5: (MEDIUM) ParenInputOverflow error path never tested
 - [PENDING] A43-6: (MEDIUM) ParseStackOverflow in highwater() never tested
