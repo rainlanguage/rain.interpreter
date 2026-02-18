@@ -188,7 +188,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [PENDING] A05-6: (LOW) No test for `eval2` with non-zero inputs that match source expectation
 - [PENDING] A05-7: (LOW) No test for exact multiple-of-8 opcode count (zero remainder)
 - [PENDING] A06-1: (LOW) No test for encode/decode roundtrip with varied extern addresses
-- [PENDING] A06-2: (MEDIUM) No test for overflow/truncation behavior when opcode or operand exceeds 16 bits
+- [DISMISSED] A06-2: (MEDIUM) No test for overflow/truncation behavior when opcode or operand exceeds 16 bits — only caller passes compile-time constant 0, NatSpec documents precondition
 - [PENDING] A06-3: (LOW) `decodeExternDispatch` and `decodeExternCall` have no standalone unit tests
 - [PENDING] A07-1: (LOW) No direct unit test for LibExternOpContextCallingContract.subParser
 - [PENDING] A07-2: (LOW) No test for subParser with varying constantsHeight or ioByte inputs
@@ -205,7 +205,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A12-2: (HIGH) No direct test for `StackUnderflowHighwater` revert path — testStackUnderflowHighwater() added
 - [FIXED] A12-3: (HIGH) No direct test for `StackAllocationMismatch` revert path — testStackAllocationMismatch() added
 - [FIXED] A12-4: (HIGH) No direct test for `StackOutputsMismatch` revert path — testStackOutputsMismatch() added
-- [PENDING] A12-5: (MEDIUM) No test for `newState` initialization correctness
+- [FIXED] A12-5: (MEDIUM) No test for `newState` initialization correctness — fuzzed all struct fields
 - [PENDING] A12-6: (MEDIUM) No test for multi-output highwater advancement logic
 - [PENDING] A12-7: (LOW) No test for `stackMaxIndex` tracking logic
 - [PENDING] A12-8: (LOW) No test for zero-source bytecode (`sourceCount == 0`)
