@@ -12,8 +12,6 @@ import {
 import {UnsupportedLiteralType} from "../../../error/ErrParse.sol";
 import {ParseState} from "../LibParseState.sol";
 import {LibParseError} from "../LibParseError.sol";
-import {LibParseInterstitial} from "../LibParseInterstitial.sol";
-import {LibSubParse} from "../LibSubParse.sol";
 
 uint256 constant LITERAL_PARSERS_LENGTH = 4;
 
@@ -25,8 +23,6 @@ uint256 constant LITERAL_PARSER_INDEX_SUB_PARSE = 3;
 library LibParseLiteral {
     using LibParseLiteral for ParseState;
     using LibParseError for ParseState;
-    using LibParseInterstitial for ParseState;
-    using LibSubParse for ParseState;
 
     /// Selects a literal parser function pointer from the state's literal
     /// parsers array by index. Not bounds checked as indexes are expected to

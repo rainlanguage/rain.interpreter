@@ -14,8 +14,7 @@ contract LibIntegrityCheckZeroSourceTest is RainterpreterExpressionDeployerDeplo
     /// byte (sourceCount = 0), and the integrity check (run inside parse2)
     /// must handle this without reverting.
     function testZeroSourceEmptyInput() external view {
-        (bytes memory bytecode,) =
-            RainterpreterParser(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS).unsafeParse("");
+        (bytes memory bytecode,) = RainterpreterParser(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS).unsafeParse("");
         assertEq(LibBytecode.sourceCount(bytecode), 0);
         assertEq(bytecode.length, 1);
     }

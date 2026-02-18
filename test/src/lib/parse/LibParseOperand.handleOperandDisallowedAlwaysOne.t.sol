@@ -13,7 +13,9 @@ contract LibParseOperandHandleOperandDisallowedAlwaysOneTest is Test {
 
     /// Empty values must return operand 1.
     function testHandleOperandDisallowedAlwaysOneNoValues() external pure {
-        assertEq(OperandV2.unwrap(LibParseOperand.handleOperandDisallowedAlwaysOne(new bytes32[](0))), bytes32(uint256(1)));
+        assertEq(
+            OperandV2.unwrap(LibParseOperand.handleOperandDisallowedAlwaysOne(new bytes32[](0))), bytes32(uint256(1))
+        );
     }
 
     /// Any non-empty values must revert with UnexpectedOperand.

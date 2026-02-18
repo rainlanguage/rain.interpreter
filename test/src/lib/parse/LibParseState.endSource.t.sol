@@ -3,12 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {
-    LibParseState,
-    ParseState,
-    EMPTY_ACTIVE_SOURCE,
-    FSM_ACTIVE_SOURCE_MASK
-} from "src/lib/parse/LibParseState.sol";
+import {LibParseState, ParseState, EMPTY_ACTIVE_SOURCE, FSM_ACTIVE_SOURCE_MASK} from "src/lib/parse/LibParseState.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {MaxSources} from "src/error/ErrParse.sol";
 

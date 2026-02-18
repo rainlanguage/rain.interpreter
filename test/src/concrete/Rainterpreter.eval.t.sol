@@ -13,6 +13,7 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 contract RainterpreterEvalTest is RainterpreterExpressionDeployerDeploymentTest {
     using LibDecimalFloat for Float;
+
     /// Passing more inputs than the source expects MUST revert.
     function testInputsLengthMismatchTooMany(uint8 extraInputs) external {
         vm.assume(extraInputs > 0);

@@ -5,7 +5,7 @@ pragma solidity ^0.8.25;
 import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
-import {Pointer, LibPointer} from "rain.solmem/lib/LibPointer.sol";
+import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {LibEval} from "../../eval/LibEval.sol";
 import {CallOutputsExceedSource} from "../../../error/ErrIntegrity.sol";
@@ -67,8 +67,6 @@ import {CallOutputsExceedSource} from "../../../error/ErrIntegrity.sol";
 /// a b: call<1 2>(10 5); ten five:, a b: int-div(ten five) 9;
 /// ```
 library LibOpCall {
-    using LibPointer for Pointer;
-
     /// Validates a `call` operand against the bytecode at integrity-check
     /// time. Extracts `sourceIndex` (low 16 bits) and `outputs` (bits 20+)
     /// from the operand.

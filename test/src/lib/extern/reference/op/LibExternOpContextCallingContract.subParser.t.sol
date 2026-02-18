@@ -8,8 +8,7 @@ import {
     CONTEXT_BASE_COLUMN,
     CONTEXT_BASE_ROW_CALLING_CONTRACT
 } from "rain.interpreter.interface/lib/caller/LibContext.sol";
-import {LibExternOpContextCallingContract} from
-    "src/lib/extern/reference/op/LibExternOpContextCallingContract.sol";
+import {LibExternOpContextCallingContract} from "src/lib/extern/reference/op/LibExternOpContextCallingContract.sol";
 
 contract LibExternOpContextCallingContractSubParserTest is Test {
     /// subParser must return context bytecode targeting column 0, row 1

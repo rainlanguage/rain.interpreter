@@ -48,13 +48,6 @@ error OddLengthHexLiteral(uint256 offset);
 /// Encountered a hex literal with an invalid character.
 error MalformedHexLiteral(uint256 offset);
 
-/// Encountered a decimal literal with an exponent that has too many or no
-/// digits.
-error MalformedExponentDigits(uint256 offset);
-
-/// Encountered a decimal literal with a malformed decimal point.
-error MalformedDecimalPoint(uint256 offset);
-
 /// The expression does not finish with a semicolon (EOF).
 error MissingFinalSemi(uint256 offset);
 
@@ -83,7 +76,7 @@ error UnclosedComment(uint256 offset);
 /// Encountered a comment start sequence that is malformed.
 error MalformedCommentStart(uint256 offset);
 
-/// @dev Thrown when a stack name is duplicated. Shadowing in all forms is
+/// Thrown when a stack name is duplicated. Shadowing in all forms is
 /// disallowed in Rainlang.
 /// @param offset The byte offset of the duplicate item in the parse data.
 error DuplicateLHSItem(uint256 offset);

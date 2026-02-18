@@ -41,11 +41,7 @@ contract LibParseLiteralSelectByIndexTest is Test {
 
     /// External wrapper that constructs ParseState with real literal
     /// parsers, selects by index, and calls the returned function.
-    function externalSelectAndParse(uint256 index, bytes memory data)
-        external
-        view
-        returns (uint256, bytes32)
-    {
+    function externalSelectAndParse(uint256 index, bytes memory data) external view returns (uint256, bytes32) {
         bytes memory literalParsers = LibAllStandardOps.literalParserFunctionPointers();
         ParseState memory state = LibParseState.newState(data, "", "", literalParsers);
         uint256 cursor = Pointer.unwrap(state.data.dataPointer());

@@ -30,9 +30,8 @@ contract LibIntegrityCheckMultiSourceTest is RainterpreterExpressionDeployerDepl
 
     /// Three-source expression with different shapes must pass integrity.
     function testIntegrityThreeSources() external view {
-        (bytes memory bytecode,) = RainterpreterParser(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS).unsafeParse(
-            "_: 1;_: add(1 2);_: 3, _: 4, _: 5;"
-        );
+        (bytes memory bytecode,) = RainterpreterParser(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS)
+            .unsafeParse("_: 1;_: add(1 2);_: 3, _: 4, _: 5;");
         assertEq(LibBytecode.sourceCount(bytecode), 3);
 
         // Source 0: 1 op, 1 output.

@@ -60,16 +60,8 @@ contract LibEvalOpcodeCountEdgeCasesTest is RainterpreterExpressionDeployerDeplo
     /// Each opcode is a distinct hex literal so we can verify every value
     /// was executed in the correct order.
     function testEvalExactly8Opcodes() external view {
-        bytes memory bytecode = I_DEPLOYER.parse2(
-            "_: 0x01,"
-            "_: 0x02,"
-            "_: 0x03,"
-            "_: 0x04,"
-            "_: 0x05,"
-            "_: 0x06,"
-            "_: 0x07,"
-            "_: 0x08;"
-        );
+        bytes memory bytecode =
+            I_DEPLOYER.parse2("_: 0x01," "_: 0x02," "_: 0x03," "_: 0x04," "_: 0x05," "_: 0x06," "_: 0x07," "_: 0x08;");
         (StackItem[] memory stack,) = I_INTERPRETER.eval4(
             EvalV4({
                 store: I_STORE,
@@ -98,22 +90,8 @@ contract LibEvalOpcodeCountEdgeCasesTest is RainterpreterExpressionDeployerDeplo
     /// re-enters) while still having zero remainder.
     function testEvalExactly16Opcodes() external view {
         bytes memory bytecode = I_DEPLOYER.parse2(
-            "_: 0x01,"
-            "_: 0x02,"
-            "_: 0x03,"
-            "_: 0x04,"
-            "_: 0x05,"
-            "_: 0x06,"
-            "_: 0x07,"
-            "_: 0x08,"
-            "_: 0x09,"
-            "_: 0x0a,"
-            "_: 0x0b,"
-            "_: 0x0c,"
-            "_: 0x0d,"
-            "_: 0x0e,"
-            "_: 0x0f,"
-            "_: 0x10;"
+            "_: 0x01," "_: 0x02," "_: 0x03," "_: 0x04," "_: 0x05," "_: 0x06," "_: 0x07," "_: 0x08," "_: 0x09,"
+            "_: 0x0a," "_: 0x0b," "_: 0x0c," "_: 0x0d," "_: 0x0e," "_: 0x0f," "_: 0x10;"
         );
         (StackItem[] memory stack,) = I_INTERPRETER.eval4(
             EvalV4({

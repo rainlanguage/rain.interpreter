@@ -65,7 +65,6 @@ library LibOpConditions {
             if (conditionIsZero) {
                 revert(reason.toStringV3());
             }
-            // require(condition > 0, reason.toString());
             return stackTop;
         }
     }
@@ -90,9 +89,9 @@ library LibOpConditions {
             }
             if (inputs.length % 2 != 0) {
                 IntOrAString reason = IntOrAString.wrap(uint256(StackItem.unwrap(inputs[length - 1])));
-                require(false, reason.toStringV3());
+                revert(reason.toStringV3());
             } else {
-                require(false, "");
+                revert("");
             }
         }
     }

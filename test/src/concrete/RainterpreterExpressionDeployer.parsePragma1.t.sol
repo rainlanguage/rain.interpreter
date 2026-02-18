@@ -15,9 +15,8 @@ contract RainterpreterExpressionDeployerParsePragma1Test is OpTest {
 
     /// Single address pragma.
     function testParsePragma1SingleAddress() external view {
-        PragmaV1 memory pragma_ = I_DEPLOYER.parsePragma1(
-            bytes("using-words-from 0x4050b49bA93f5774f66f54F06a6042552d76308A _: 1;")
-        );
+        PragmaV1 memory pragma_ =
+            I_DEPLOYER.parsePragma1(bytes("using-words-from 0x4050b49bA93f5774f66f54F06a6042552d76308A _: 1;"));
         assertEq(pragma_.usingWordsFrom.length, 1);
         assertEq(pragma_.usingWordsFrom[0], 0x4050b49bA93f5774f66f54F06a6042552d76308A);
     }

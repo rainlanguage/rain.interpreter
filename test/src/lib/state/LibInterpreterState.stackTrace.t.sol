@@ -36,9 +36,7 @@ contract LibInterpreterStateStackTraceTest is Test {
         vm.expectCall(
             STACK_TRACER,
             //forge-lint: disable-next-line(unsafe-typecast)
-            abi.encodePacked(
-                bytes2(uint16(parentSourceIndex & 0xFFFF)), bytes2(uint16(sourceIndex & 0xFFFF)), inputs
-            ),
+            abi.encodePacked(bytes2(uint16(parentSourceIndex & 0xFFFF)), bytes2(uint16(sourceIndex & 0xFFFF)), inputs),
             1
         );
         LibInterpreterState.stackTrace(parentSourceIndex, sourceIndex, inputs.dataPointer(), inputs.endPointer());

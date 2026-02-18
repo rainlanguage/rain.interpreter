@@ -719,18 +719,18 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 
 ## Findings
 
-- [PENDING] A01-1: (LOW) Dead `using` directives and unused imports (LibStackPointer, LibUint256Array, Pointer) in BaseRainterpreterExtern
+- [FIXED] A01-1: (LOW) Dead `using` directives and unused imports (LibStackPointer, LibUint256Array, Pointer) in BaseRainterpreterExtern — removed all 4 using directives and 3 imports
 - [PENDING] A01-2: (LOW) Inconsistent assembly idioms for function pointer extraction (`shr(0xf0,...)` vs `and(..., 0xFFFF)`) across BaseRainterpreterExtern and BaseRainterpreterSubParser
 - [PENDING] A01-3: (LOW) Error `SubParserIndexOutOfBounds` defined inline in BaseRainterpreterSubParser instead of in `src/error/ErrSubParse.sol`
 - [PENDING] A01-4: (LOW) Inconsistent mutability between `opcodeFunctionPointers` (view) and `integrityFunctionPointers` (pure) in BaseRainterpreterExtern
-- [PENDING] A03-1: (LOW) `MalformedExponentDigits` and `MalformedDecimalPoint` errors are unused dead code in ErrParse.sol
-- [PENDING] A03-2: (LOW) Inconsistent NatSpec `@dev` usage across error files; ErrSubParse uses `@dev` while others use plain `///`
+- [FIXED] A03-1: (LOW) `MalformedExponentDigits` and `MalformedDecimalPoint` errors are unused dead code in ErrParse.sol — removed both
+- [FIXED] A03-2: (LOW) Inconsistent NatSpec `@dev` usage across error files; ErrSubParse uses `@dev` while others use plain `///` — removed `@dev` from all 3 errors
 - [PENDING] A03-3: (LOW) Missing `@param` tags on 28 parameterized errors in ErrParse.sol
 - [PENDING] A03-4: (LOW) Missing `@param` tags on `BadOutputsLength` in ErrExtern.sol
 - [PENDING] A03-5: (LOW) Missing `@param` tags on all 3 errors in ErrSubParse.sol
-- [PENDING] A03-6: (LOW) `DuplicateLHSItem` is the only error in ErrParse.sol using `@dev` prefix, inconsistent with all other errors in the file
+- [FIXED] A03-6: (LOW) `DuplicateLHSItem` is the only error in ErrParse.sol using `@dev` prefix, inconsistent with all other errors in the file — removed `@dev`
 - [PENDING] A04-1: (LOW) `LibOpCall` is missing `referenceFn` unlike all other opcode libraries
-- [PENDING] A04-2: (LOW) Unused `using LibPointer for Pointer` declaration and import in LibOpCall
+- [FIXED] A04-2: (LOW) Unused `using LibPointer for Pointer` declaration and import in LibOpCall — removed using directive and LibPointer import
 - [PENDING] A05-1: (LOW) Magic numbers throughout `evalLoop` assembly shared with LibIntegrityCheck should be named constants
 - [FIXED] A05-2: (LOW) Stale reference to variable name `tail` instead of `stack` in `eval2` NatSpec comment in LibEval — corrected to `stack`
 - [PENDING] A06-1: (LOW) Inconsistent constant sourcing for context ops; LibExternOpContextRainlen defines inline constants while siblings import from LibContext.sol
@@ -738,7 +738,7 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [PENDING] A06-3: (LOW) Magic number in LibExternOpIntInc.run for decimal float value 1 should use named constant
 - [PENDING] A06-4: (LOW) Magic number 78 in LibParseLiteralRepeat bound check should use named constant
 - [PENDING] A12-1: (LOW) Magic number `0x18` for cursor alignment in `integrityCheck2` lacks derivation explanation
-- [PENDING] A14-1: (LOW) Unused variable `success` from `staticcall` in `stackTrace` assembly should use `pop()` idiom in LibInterpreterState
+- [FIXED] A14-1: (LOW) Unused variable `success` from `staticcall` in `stackTrace` assembly should use `pop()` idiom in LibInterpreterState — changed to `pop(staticcall(...))`
 - [FIXED] A14-2: (LOW) Incorrect arithmetic in `stackTrace` NatSpec gas cost analysis in LibInterpreterState — fixed division denominator and included memory term
 - [PENDING] A16-1: (LOW) Inconsistent `referenceFn` return pattern (new array vs mutate-in-place) across bitwise ops; LibOpDecodeBits is 1-input/1-output but allocates new array unlike other 1-in/1-out ops
 - [PENDING] A16-2: (LOW) Inconsistent `uint256` cast on `type(uint8).max` between LibOpShiftBitsLeft and LibOpShiftBitsRight
@@ -747,12 +747,12 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [PENDING] A20-1: (LOW) `@title` NatSpec mismatch in `LibOpUint256ERC20BalanceOf.sol` missing `Lib` prefix
 - [PENDING] A20-2: (LOW) Inconsistent `forge-lint` comment formatting in `LibOpUint256ERC20TotalSupply.sol` (space after `//` vs no space)
 - [PENDING] A22-1: (LOW) `@title` NatSpec missing `Lib` prefix in `LibOpUint256ERC721BalanceOf`
-- [PENDING] A22-2: (LOW) Unused `using LibDecimalFloat for Float` directive in all three EVM opcode libraries (LibOpBlockNumber, LibOpChainId, LibOpTimestamp)
-- [PENDING] A23a-1: (LOW) Commented-out code in LibOpConditions.sol line 68
-- [PENDING] A23a-2: (LOW) `require(false, ...)` with string messages in `referenceFn` of LibOpConditions.sol instead of custom errors
+- [DISMISSED] A22-2: (LOW) Unused `using LibDecimalFloat for Float` directive in all three EVM opcode libraries (LibOpBlockNumber, LibOpChainId, LibOpTimestamp) — false positive; all three use LibDecimalFloat in referenceFn
+- [FIXED] A23a-1: (LOW) Commented-out code in LibOpConditions.sol line 68 — removed
+- [FIXED] A23a-2: (LOW) `require(false, ...)` with string messages in `referenceFn` of LibOpConditions.sol instead of custom errors — replaced with `revert(...)` to match run()
 - [PENDING] A23b-1: (LOW) Missing NatSpec on `integrity` function in LibOpIf
 - [FIXED] A24-1: (LOW) `referenceFn` NatSpec in LibOpExp2 says "exp" instead of "exp2" (copy-paste documentation error) — fixed in earlier commit
-- [PENDING] A25a-1: (LOW) `using LibDecimalFloat for Float` declared but unused in LibOpMaxNegativeValue and LibOpMaxPositiveValue
+- [DISMISSED] A25a-1: (LOW) `using LibDecimalFloat for Float` declared but unused in LibOpMaxNegativeValue and LibOpMaxPositiveValue — false positive; both use LibDecimalFloat constants and methods
 - [FIXED] A25a-2: (LOW) Missing "point" in LibOpHeadroom run NatSpec ("decimal floating headroom" should be "decimal floating point headroom") — fixed in earlier commit
 - [FIXED] A25a-3: (LOW) Missing "decimal" in LibOpInv run NatSpec (says "floating point" instead of "decimal floating point") — fixed as part of @notice removal
 - [PENDING] A25a-4: (LOW) Misleading `unchecked` block with overflow comment in LibOpMax.referenceFn irrelevant to `max` operation
@@ -760,10 +760,10 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [FIXED] A29-1: (LOW) Misleading comment in `referenceFn` for LibOpUint256Div and LibOpUint256Sub says "overflow" but Div reverts on divide-by-zero and Sub reverts on underflow — corrected both
 - [FIXED] A29-2: (LOW) Inconsistent NatSpec description in LibOpLinearGrowth references wrong variable names ("a" and "r" instead of "base" and "rate") — corrected to "base" and "rate", also removed `@notice`
 - [DISMISSED] A30-1: (MEDIUM) Dead constants `NOT_LOW_16_BIT_MASK` and `ACTIVE_SOURCE_MASK` defined but never referenced anywhere in the codebase — false positive; neither constant exists in the codebase
-- [PENDING] A30-2: (LOW) Potentially unused `using LibBytes32Array` declaration in LibParse.sol
+- [DISMISSED] A30-2: (LOW) Potentially unused `using LibBytes32Array` declaration in LibParse.sol — false positive; used for `.startPointer()` on operandValues
 - [PENDING] A30-3: (LOW) Magic numbers in paren tracking logic (group size 3, reserved bytes 2, max offset 59, shift 0xf0)
 - [PENDING] A30-4: (LOW) `parseRHS` function length (~210 lines) makes it harder to review and audit
-- [PENDING] A33-1: (LOW) Unused `using` directives (`LibParseInterstitial`, `LibSubParse`) and corresponding unused imports in LibParseLiteral.sol
+- [FIXED] A33-1: (LOW) Unused `using` directives (`LibParseInterstitial`, `LibSubParse`) and corresponding unused imports in LibParseLiteral.sol — removed both using directives and imports
 - [PENDING] A33-2: (MEDIUM) Function pointer mutability mismatch: `selectLiteralParserByIndex` returns `pure` typed pointer but literal parsers array stores `view` typed pointers, bypassing Solidity mutability checking via raw assembly
 - [PENDING] A33-3: (LOW) Parameter naming inconsistency: `parseDecimalFloatPacked` uses `start` instead of `cursor` unlike all other parse functions
 - [PENDING] A33-4: (LOW) Unnamed `ParseState memory` parameter in `boundHex` inconsistent with named `state` parameter in `boundString`
