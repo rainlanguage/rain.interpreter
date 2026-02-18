@@ -190,24 +190,24 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A06-1: (LOW) No test for encode/decode roundtrip with varied extern addresses — d44b4d6a
 - [DISMISSED] A06-2: (MEDIUM) No test for overflow/truncation behavior when opcode or operand exceeds 16 bits — only caller passes compile-time constant 0, NatSpec documents precondition
 - [FIXED] A06-3: (LOW) `decodeExternDispatch` and `decodeExternCall` have no standalone unit tests — 7a09fc12
-- [PENDING] A07-1: (LOW) No direct unit test for LibExternOpContextCallingContract.subParser
-- [PENDING] A07-2: (LOW) No test for subParser with varying constantsHeight or ioByte inputs
-- [PENDING] A08-1: (LOW) No direct unit test for LibExternOpContextRainlen.subParser
-- [PENDING] A08-2: (LOW) No test for subParser with varying constantsHeight or ioByte inputs
-- [PENDING] A08-3: (LOW) Only one end-to-end test with a single rainlang string length
-- [PENDING] A09-1: (LOW) No direct unit test for LibExternOpContextSender.subParser
-- [PENDING] A09-2: (LOW) No test for subParser with varying constantsHeight or ioByte inputs
-- [PENDING] A09-3: (LOW) No test with different msg.sender values
-- [PENDING] A10-1: (LOW) run() test bounds inputs away from float overflow region
-- [PENDING] A11-1: (LOW) No direct unit test for LibExternOpStackOperand.subParser
-- [PENDING] A11-2: (LOW) No test for subParser with constantsHeight > 0
+- [FIXED] A07-1: (LOW) No direct unit test for LibExternOpContextCallingContract.subParser — 6cc2a9a3
+- [FIXED] A07-2: (LOW) No test for subParser with varying constantsHeight or ioByte inputs — 6cc2a9a3
+- [FIXED] A08-1: (LOW) No direct unit test for LibExternOpContextRainlen.subParser — 6825e95d
+- [FIXED] A08-2: (LOW) No test for subParser with varying constantsHeight or ioByte inputs — 6825e95d
+- [DISMISSED] A08-3: (LOW) Only one end-to-end test with a single rainlang string length — length is a caller-provided context value, different lengths exercise the same code path
+- [FIXED] A09-1: (LOW) No direct unit test for LibExternOpContextSender.subParser — 67be7726
+- [FIXED] A09-2: (LOW) No test for subParser with varying constantsHeight or ioByte inputs — 67be7726
+- [DISMISSED] A09-3: (LOW) No test with different msg.sender values — sender is a caller-provided context value, different values exercise the same code path
+- [DISMISSED] A10-1: (LOW) run() test bounds inputs away from float overflow region — add(x, 1) cannot overflow for any valid Float; adding 1 to a huge value is a lossy noop, not an error
+- [FIXED] A11-1: (LOW) No direct unit test for LibExternOpStackOperand.subParser — 7a4c7846
+- [FIXED] A11-2: (LOW) No test for subParser with constantsHeight > 0 — 7a4c7846
 - [FIXED] A12-1: (HIGH) No direct test for `StackUnderflow` revert path — testStackUnderflow() added
 - [FIXED] A12-2: (HIGH) No direct test for `StackUnderflowHighwater` revert path — testStackUnderflowHighwater() added
 - [FIXED] A12-3: (HIGH) No direct test for `StackAllocationMismatch` revert path — testStackAllocationMismatch() added
 - [FIXED] A12-4: (HIGH) No direct test for `StackOutputsMismatch` revert path — testStackOutputsMismatch() added
 - [FIXED] A12-5: (MEDIUM) No test for `newState` initialization correctness — fuzzed all struct fields
 - [FIXED] A12-6: (MEDIUM) No test for multi-output highwater advancement logic — multi-output call passes integrity via parse2
-- [PENDING] A12-7: (LOW) No test for `stackMaxIndex` tracking logic
+- [FIXED] A12-7: (LOW) No test for `stackMaxIndex` tracking logic — parse add(1 2) and assert stackAllocation (peak=2) > outputs (final=1)
 - [PENDING] A12-8: (LOW) No test for zero-source bytecode (`sourceCount == 0`)
 - [PENDING] A12-9: (LOW) No test for multi-source bytecode integrity checking
 - [PENDING] A14-1: (LOW) No dedicated test for `fingerprint` function
