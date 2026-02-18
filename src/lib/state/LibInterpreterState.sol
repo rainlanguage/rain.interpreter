@@ -26,15 +26,6 @@ struct InterpreterState {
 }
 
 library LibInterpreterState {
-    /// Computes a keccak256 fingerprint of the entire interpreter state,
-    /// including bytecode, constants, stack bottoms, and context. Used to
-    /// detect state mutations between evaluation calls.
-    /// @param state The interpreter state to fingerprint.
-    /// @return The keccak256 hash of the ABI-encoded state.
-    function fingerprint(InterpreterState memory state) internal pure returns (bytes32) {
-        return keccak256(abi.encode(state));
-    }
-
     /// Converts pre-allocated stack arrays into an array of bottom pointers.
     /// Each stack's bottom pointer is the address just past its last element,
     /// i.e. `array + 0x20 * (length + 1)`. The eval loop uses these pointers

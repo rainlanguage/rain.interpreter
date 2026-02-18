@@ -10,6 +10,7 @@ import {LibOpStack} from "src/lib/op/00/LibOpStack.sol";
 import {OutOfBoundsStackRead} from "src/error/ErrIntegrity.sol";
 import {LibIntegrityCheck, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
+import {LibInterpreterStateFingerprint} from "test/lib/state/LibInterpreterStateFingerprint.sol";
 import {FullyQualifiedNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV3.sol";
 import {OpTest, PRE, POST} from "test/abstract/OpTest.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV4.sol";
@@ -21,6 +22,7 @@ import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 /// @notice Test the runtime and integrity time logic of LibOpStack.
 contract LibOpStackTest is OpTest {
     using LibInterpreterState for InterpreterState;
+    using LibInterpreterStateFingerprint for InterpreterState;
 
     function integrityExternal(IntegrityCheckState memory state, OperandV2 operand)
         external
