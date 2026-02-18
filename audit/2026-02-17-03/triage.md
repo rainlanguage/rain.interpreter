@@ -208,7 +208,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A12-5: (MEDIUM) No test for `newState` initialization correctness — fuzzed all struct fields
 - [FIXED] A12-6: (MEDIUM) No test for multi-output highwater advancement logic — multi-output call passes integrity via parse2
 - [FIXED] A12-7: (LOW) No test for `stackMaxIndex` tracking logic — parse add(1 2) and assert stackAllocation (peak=2) > outputs (final=1)
-- [PENDING] A12-8: (LOW) No test for zero-source bytecode (`sourceCount == 0`)
+- [FIXED] A12-8: (LOW) No test for zero-source bytecode (`sourceCount == 0`) — empty and comment-only inputs both produce sourceCount=0 bytecode
 - [PENDING] A12-9: (LOW) No test for multi-source bytecode integrity checking
 - [PENDING] A14-1: (LOW) No dedicated test for `fingerprint` function
 - [PENDING] A14-2: (LOW) No dedicated test for `stackBottoms` function
