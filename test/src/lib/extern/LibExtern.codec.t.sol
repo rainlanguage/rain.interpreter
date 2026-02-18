@@ -34,4 +34,25 @@ contract LibExternCodecTest is Test {
         assertEq(decodedOpcode, opcode);
         assertEq(OperandV2.unwrap(decodedOperand), operand);
     }
+
+    /// Standalone decode of `ExternDispatchV2` from a manually constructed
+    /// word, independent of `encodeExternDispatch`. Catches symmetric bugs
+    /// where encode and decode are both wrong in the same way.
+    function testDecodeExternDispatchStandalone(uint16 opcode, uint16 operandVal) external pure {
+        bytes32 raw = bytes32(uint256(opcode)) << 0x10 | bytes32(uint256(operandVal));
+        (uint256 decodedOpcode, OperandV2 decodedOperand) = LibExtern.decodeExternDispatch(ExternDispatchV2.wrap(raw));
+        assertEq(decodedOpcode, uint256(opcode));
+        assertEq(OperandV2.unwrap(decodedOperand), bytes32(uint256(operandVal)));
+    }
+
+    /// Standalone decode of `EncodedExternDispatchV2` from a manually
+    /// constructed word, independent of `encodeExternCall`.
+    function testDecodeExternCallStandalone(address externAddr, uint16 opcode, uint16 operandVal) external pure {
+        bytes32 dispatch = bytes32(uint256(opcode)) << 0x10 | bytes32(uint256(operandVal));
+        bytes32 raw = bytes32(uint256(uint160(externAddr))) | dispatch << 160;
+        (IInterpreterExternV4 decodedExtern, ExternDispatchV2 decodedDispatch) =
+            LibExtern.decodeExternCall(EncodedExternDispatchV2.wrap(raw));
+        assertEq(address(decodedExtern), externAddr);
+        assertEq(ExternDispatchV2.unwrap(decodedDispatch), dispatch);
+    }
 }
