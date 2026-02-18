@@ -301,7 +301,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A43-1: (HIGH) No direct unit test for endLine() — endLine.t.sol and endLine.OpcodeIOOverflow.t.sol exist
 - [FIXED] A43-2: (MEDIUM) NotAcceptingInputs error path never tested — testNotAcceptingInputs in endLine.t.sol
 - [FIXED] A43-3: (MEDIUM) OpcodeIOOverflow error path never tested — testOpcodeIOOverflowInputs and testOpcodeIOOverflowOutputs added
-- [PENDING] A43-4: (MEDIUM) DanglingSource error path never tested
+- [FIXED] A43-4: (MEDIUM) DanglingSource error path never tested — added test that pushes op without ending source then calls buildBytecode
 - [PENDING] A43-5: (MEDIUM) ParenInputOverflow error path never tested
 - [PENDING] A43-6: (MEDIUM) ParseStackOverflow in highwater() never tested
 - [PENDING] A43-7: (MEDIUM) No direct unit tests for pushOpToSource()
