@@ -58,6 +58,7 @@ contract LibInterpreterStateDataContractExtern {
 /// Tests for LibInterpreterStateDataContract serialization and deserialization.
 contract LibInterpreterStateDataContractTest is Test {
     LibInterpreterStateDataContractExtern internal immutable iExtern = new LibInterpreterStateDataContractExtern();
+
     function serialize(bytes memory bytecode, bytes32[] memory constants) internal pure returns (bytes memory) {
         uint256 size = LibInterpreterStateDataContract.serializeSize(bytecode, constants);
         bytes memory serialized;
@@ -103,19 +104,11 @@ contract LibInterpreterStateDataContractTest is Test {
         pure
         returns (bytes memory)
     {
-        bytes memory header = abi.encodePacked(
-            uint8(2),
-            uint16(0x0000),
-            uint16(0x0008)
-        );
-        bytes memory source0 = abi.encodePacked(
-            uint8(1), stackAllocation0, uint8(0), uint8(1),
-            uint8(0), uint8(0x10), uint16(0)
-        );
-        bytes memory source1 = abi.encodePacked(
-            uint8(1), stackAllocation1, uint8(0), uint8(1),
-            uint8(0), uint8(0x10), uint16(0)
-        );
+        bytes memory header = abi.encodePacked(uint8(2), uint16(0x0000), uint16(0x0008));
+        bytes memory source0 =
+            abi.encodePacked(uint8(1), stackAllocation0, uint8(0), uint8(1), uint8(0), uint8(0x10), uint16(0));
+        bytes memory source1 =
+            abi.encodePacked(uint8(1), stackAllocation1, uint8(0), uint8(1), uint8(0), uint8(0x10), uint16(0));
         return abi.encodePacked(header, source0, source1);
     }
 
@@ -179,7 +172,12 @@ contract LibInterpreterStateDataContractTest is Test {
         bytes memory serialized = serialize(buildSingleSourceBytecode(1, 1, 0, 1), new bytes32[](0));
 
         InterpreterState memory state = iExtern.deserialize(
-            serialized, sourceIndex, FullyQualifiedNamespace.wrap(0), IInterpreterStoreV3(address(0)), new bytes32[][](0), ""
+            serialized,
+            sourceIndex,
+            FullyQualifiedNamespace.wrap(0),
+            IInterpreterStoreV3(address(0)),
+            new bytes32[][](0),
+            ""
         );
 
         assertEq(state.sourceIndex, sourceIndex);
@@ -190,7 +188,12 @@ contract LibInterpreterStateDataContractTest is Test {
         bytes memory serialized = serialize(buildSingleSourceBytecode(1, 1, 0, 1), new bytes32[](0));
 
         InterpreterState memory state = iExtern.deserialize(
-            serialized, 0, FullyQualifiedNamespace.wrap(namespaceRaw), IInterpreterStoreV3(address(0)), new bytes32[][](0), ""
+            serialized,
+            0,
+            FullyQualifiedNamespace.wrap(namespaceRaw),
+            IInterpreterStoreV3(address(0)),
+            new bytes32[][](0),
+            ""
         );
 
         assertEq(FullyQualifiedNamespace.unwrap(state.namespace), namespaceRaw);
@@ -254,7 +257,8 @@ contract LibInterpreterStateDataContractTest is Test {
         vm.assume(stackAllocation0 > 0);
         vm.assume(stackAllocation1 > 0);
 
-        bytes memory serialized = serialize(buildTwoSourceBytecode(stackAllocation0, stackAllocation1), new bytes32[](0));
+        bytes memory serialized =
+            serialize(buildTwoSourceBytecode(stackAllocation0, stackAllocation1), new bytes32[](0));
         uint256[] memory lengths = iExtern.deserializeStackLengths(serialized);
 
         assertEq(lengths.length, 2);
