@@ -449,7 +449,7 @@ Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
 - [PENDING] A06-10: (LOW) `LibExternOpIntInc.subParser` missing `@param` and `@return` tags
 - [PENDING] A06-11: (LOW) `LibExternOpStackOperand.subParser` missing NatSpec entirely
 - [PENDING] A12-1: (LOW) `IntegrityCheckState` struct has no NatSpec documentation
-- [PENDING] A14-1: (MEDIUM) `InterpreterState` struct has no NatSpec documentation
+- [FIXED] A14-1: (MEDIUM) `InterpreterState` struct has no NatSpec documentation — added struct-level and per-field NatSpec
 - [PENDING] A14-2: (LOW) `STACK_TRACER` constant has no NatSpec documentation
 - [PENDING] A14-3: (LOW) `stackTrace` NatSpec inaccurately describes the 4-byte prefix content
 - [PENDING] A14-4: (LOW) `unsafeSerialize` missing `@return` tag and cursor side-effect not documented
@@ -585,18 +585,18 @@ Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
 - [PENDING] A25a-18: (LOW) LibOpMinPositiveValue referenceFn missing `@param` and `@return` NatSpec
 - [PENDING] A25b-1: (LOW) LibOpPow `@notice` tag used in library-level NatSpec
 - [PENDING] A25b-2: (LOW) LibOpSqrt `@notice` tag used in library-level NatSpec
-- [PENDING] A25b-3: (MEDIUM) LibOpMul integrity missing `@param` and `@return` tags
-- [PENDING] A25b-4: (MEDIUM) LibOpMul run missing `@param` and `@return` tags
-- [PENDING] A25b-5: (MEDIUM) LibOpMul referenceFn missing `@param` and `@return` tags
-- [PENDING] A25b-6: (MEDIUM) LibOpPow integrity missing `@param` and `@return` tags
-- [PENDING] A25b-7: (MEDIUM) LibOpPow run missing `@param` and `@return` tags
-- [PENDING] A25b-8: (MEDIUM) LibOpPow referenceFn missing `@param` and `@return` tags
-- [PENDING] A25b-9: (MEDIUM) LibOpSqrt integrity missing `@param` and `@return` tags
-- [PENDING] A25b-10: (MEDIUM) LibOpSqrt run missing `@param` and `@return` tags
-- [PENDING] A25b-11: (MEDIUM) LibOpSqrt referenceFn missing `@param` and `@return` tags
-- [PENDING] A25b-12: (MEDIUM) LibOpSub integrity missing `@param` and `@return` tags
-- [PENDING] A25b-13: (MEDIUM) LibOpSub run missing `@param` and `@return` tags
-- [PENDING] A25b-14: (MEDIUM) LibOpSub referenceFn missing `@param` and `@return` tags
+- [FIXED] A25b-3: (MEDIUM) LibOpMul integrity missing `@param` and `@return` tags — added
+- [FIXED] A25b-4: (MEDIUM) LibOpMul run missing `@param` and `@return` tags — added
+- [FIXED] A25b-5: (MEDIUM) LibOpMul referenceFn missing `@param` and `@return` tags — added
+- [FIXED] A25b-6: (MEDIUM) LibOpPow integrity missing `@param` and `@return` tags — added
+- [FIXED] A25b-7: (MEDIUM) LibOpPow run missing `@param` and `@return` tags — added
+- [FIXED] A25b-8: (MEDIUM) LibOpPow referenceFn missing `@param` and `@return` tags — added
+- [FIXED] A25b-9: (MEDIUM) LibOpSqrt integrity missing `@param` and `@return` tags — added
+- [FIXED] A25b-10: (MEDIUM) LibOpSqrt run missing `@param` and `@return` tags — added
+- [FIXED] A25b-11: (MEDIUM) LibOpSqrt referenceFn missing `@param` and `@return` tags — added
+- [FIXED] A25b-12: (MEDIUM) LibOpSub integrity missing `@param` and `@return` tags — added
+- [FIXED] A25b-13: (MEDIUM) LibOpSub run missing `@param` and `@return` tags — added
+- [FIXED] A25b-14: (MEDIUM) LibOpSub referenceFn missing `@param` and `@return` tags — added
 - [PENDING] A25b-15: (LOW) LibOpMul run and LibOpSub run NatSpec is a single word with no behavioral description
 - [PENDING] A28-1: (LOW) LibOpGet integrity missing `@param` and `@return` NatSpec
 - [PENDING] A28-2: (LOW) LibOpGet run missing `@param` for OperandV2 and `@return` NatSpec
@@ -646,8 +646,8 @@ Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
 - [PENDING] A39-3: (LOW) `LibParseOperand.handleOperandDoublePerByteNoDefault` NatSpec description is partially inaccurate
 - [PENDING] A39-4: (LOW) `LibParseOperand.handleOperand8M1M1` NatSpec incomplete for bit layout
 - [PENDING] A39-5: (LOW) `LibParseOperand.handleOperandM1M1` NatSpec incomplete for bit layout
-- [PENDING] A43-1: (MEDIUM) `ParseState` struct has stale `@param literalBloom` referencing non-existent field
-- [PENDING] A43-2: (MEDIUM) `ParseState` struct missing `@param` for 8 fields
+- [FIXED] A43-1: (MEDIUM) `ParseState` struct has stale `@param literalBloom` referencing non-existent field — removed stale param, added correct docs
+- [FIXED] A43-2: (MEDIUM) `ParseState` struct missing `@param` for 8 fields — added NatSpec for subParsers, stackNameBloom, constantsBloom, operandHandlers, operandValues, stackTracker, data, meta
 - [PENDING] A43-3: (LOW) Constants `FSM_YANG_MASK` and `FSM_WORD_END_MASK` have no NatSpec
 - [PENDING] A43-4: (LOW) `ParseState.fsm` NatSpec describes bit layout that does not match implemented constants
 - [PENDING] A43-5: (LOW) `endLine` function NatSpec is minimal — missing `@param cursor` description
@@ -657,7 +657,7 @@ Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
 - [PENDING] A45-3: (LOW) Contract-level NatSpec uses `@notice` and is minimal
 - [PENDING] A45-4: (LOW) All four getter functions in `RainterpreterDISPaiRegistry` lack `@return` tags
 - [PENDING] A47-1: (LOW) Contract-level NatSpec is title-only, no description
-- [PENDING] A47-2: (MEDIUM) `parse2` has no meaningful NatSpec — `@inheritdoc` inherits nothing
+- [DISMISSED] A47-2: (MEDIUM) `parse2` has no meaningful NatSpec — `@inheritdoc` inherits nothing — upstream issue in rain.interpreter.interface; IParserV2 has no NatSpec
 - [PENDING] A47-3: (LOW) `parsePragma1` missing `@param` and `@return` tags
 - [PENDING] A48-1: (LOW) `unsafeParse` missing `@param` and `@return` tags
 - [PENDING] A48-2: (LOW) `parsePragma1` missing `@param` and `@return` tags
@@ -674,7 +674,7 @@ Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
 - [PENDING] A49-6: (LOW) `subParserLiteralParsers()` lacks `@return` tag
 - [PENDING] A49-7: (LOW) `opcodeFunctionPointers()` lacks `@return` tag
 - [PENDING] A49-8: (LOW) `integrityFunctionPointers()` lacks `@return` tag
-- [PENDING] A49-9: (MEDIUM) `matchSubParseLiteralDispatch()` is entirely undocumented
+- [FIXED] A49-9: (MEDIUM) `matchSubParseLiteralDispatch()` is entirely undocumented — added `@inheritdoc BaseRainterpreterSubParser`
 - [PENDING] A49-10: (LOW) `buildLiteralParserFunctionPointers()` lacks `@return` tag
 - [PENDING] A49-11: (LOW) `buildOperandHandlerFunctionPointers()` lacks `@return` tag
 - [PENDING] A49-12: (LOW) `buildSubParserWordParsers()` lacks `@return` tag
@@ -759,7 +759,7 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [PENDING] A28-1: (LOW) Unnecessary `unchecked` block wrapping entire `run` body in LibOpSet has no semantic effect on assembly-only arithmetic
 - [PENDING] A29-1: (LOW) Misleading comment in `referenceFn` for LibOpUint256Div and LibOpUint256Sub says "overflow" but Div reverts on divide-by-zero and Sub reverts on underflow
 - [PENDING] A29-2: (LOW) Inconsistent NatSpec description in LibOpLinearGrowth references wrong variable names ("a" and "r" instead of "base" and "rate")
-- [PENDING] A30-1: (MEDIUM) Dead constants `NOT_LOW_16_BIT_MASK` and `ACTIVE_SOURCE_MASK` defined but never referenced anywhere in the codebase
+- [DISMISSED] A30-1: (MEDIUM) Dead constants `NOT_LOW_16_BIT_MASK` and `ACTIVE_SOURCE_MASK` defined but never referenced anywhere in the codebase — false positive; neither constant exists in the codebase
 - [PENDING] A30-2: (LOW) Potentially unused `using LibBytes32Array` declaration in LibParse.sol
 - [PENDING] A30-3: (LOW) Magic numbers in paren tracking logic (group size 3, reserved bytes 2, max offset 59, shift 0xf0)
 - [PENDING] A30-4: (LOW) `parseRHS` function length (~210 lines) makes it harder to review and audit
@@ -776,7 +776,7 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [PENDING] A39-5: (LOW) Different fingerprint representations in `pushStackName` vs `stackNameIndex` is confusing
 - [PENDING] A43-1: (LOW) Incorrect inline comments in `newState` constructor misaligned with struct field order
 - [PENDING] A43-2: (LOW) Stale function name `newActiveSource` in comment should be `newActiveSourcePointer`
-- [PENDING] A43-3: (MEDIUM) FSM NatSpec does not match defined constants (bit positions shifted, missing/extra fields)
+- [DISMISSED] A43-3: (MEDIUM) FSM NatSpec does not match defined constants (bit positions shifted, missing/extra fields) — false positive; NatSpec bits 0-3 match FSM_YANG_MASK(1), FSM_WORD_END_MASK(1<<1), FSM_ACCEPTING_INPUTS_MASK(1<<2), FSM_ACTIVE_SOURCE_MASK(1<<3) exactly
 - [PENDING] A43-4: (LOW) Magic number `0x3f` in `highwater` should be a named constant
 - [PENDING] A45-1: (LOW) Constructor lacks NatSpec documentation in Rainterpreter.sol
 - [PENDING] A45-2: (LOW) NatSpec triple-slash used for inline code comment inside RainterpreterStore.set function body

@@ -118,19 +118,34 @@ uint256 constant PARSE_STATE_LINE_TRACKER_OFFSET = 0xa0;
 /// level item, which is implicitly after the end of the previous top level item.
 /// Allows us to quickly find the start of the RHS source for each top level
 /// item.
+/// @param subParsers Linked list of sub-parser addresses registered via
+/// `using-words-from` pragmas. Each entry is a `bytes32` with the address in
+/// the low 160 bits and a pointer to the next entry in the high bits.
 /// @param stackNames A linked list of stack names. As the parser encounters
 /// named stack items it pushes them onto this linked list. The linked list is
 /// in FILO order, so the first item on the stack is the last item in the list.
 /// This makes it more efficient to reference more recent stack names on the RHS.
-/// @param literalBloom A bloom filter of all the literals that have been
-/// encountered so far. This is used to quickly dedupe literals.
+/// @param stackNameBloom Bloom filter over stack name fingerprints. Used for
+/// fast negative lookups before traversing the `stackNames` linked list.
 /// @param constantsBuilder A builder for the constants array.
 /// - low 16 bits: the height (length) of the constants array.
 /// - high 240 bits: a linked list of constant values. Each constant value is
 ///   stored as a 256 bit key/value pair. The key is the fingerprint of the
 ///   constant value, and the value is the constant value itself.
+/// @param constantsBloom Bloom filter over constant value fingerprints. Used
+/// to quickly dedupe constants before traversing the `constantsBuilder` list.
 /// @param literalParsers A 256 bit integer where each 16 bits is a function
 /// pointer to a literal parser.
+/// @param operandHandlers Packed 2-byte function pointers to operand handler
+/// functions, one per opcode. Indexed by opcode to parse operand bytes.
+/// @param operandValues Scratch array for operand values being parsed for the
+/// current word. Fixed length of `OPERAND_VALUES_LENGTH` (4).
+/// @param stackTracker Tracks stack height, high watermark, and input count
+/// for the current source. Used by `endLine` to emit per-word IO metadata.
+/// @param data Raw input bytes being parsed. Sub-parsers also receive this
+/// to resolve words and literals not recognized by the main parser.
+/// @param meta Packed parse metadata (bloom filter + fingerprint table) used
+/// by `lookupWord` to resolve word strings to opcode indices.
 struct ParseState {
     /// @dev START things that are referenced directly in assembly by hardcoded
     /// offsets. E.g.

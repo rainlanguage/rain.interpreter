@@ -15,6 +15,9 @@ library LibOpSub {
     using LibDecimalFloat for Float;
 
     /// `sub` integrity check. Requires at least 2 inputs and produces 1 output.
+    /// @param operand Low 4 bits of the high byte encode the input count.
+    /// @return inputs The number of stack items consumed (minimum 2).
+    /// @return outputs Always 1.
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
         uint256 inputs = uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F;
@@ -22,7 +25,11 @@ library LibOpSub {
         return (inputs, 1);
     }
 
-    /// sub
+    /// Subtracts N decimal floating point values from the first value on the
+    /// stack. Pops all inputs and pushes the result.
+    /// @param operand Low 4 bits of the high byte encode the input count.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The updated stack top with the difference written.
     function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         Float a;
         Float b;
@@ -63,6 +70,8 @@ library LibOpSub {
     }
 
     /// Gas intensive reference implementation of subtraction for testing.
+    /// @param inputs The stack items to subtract (first minus rest).
+    /// @return outputs Single-element array containing the difference.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure

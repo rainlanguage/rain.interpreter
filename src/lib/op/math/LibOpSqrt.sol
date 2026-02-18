@@ -14,13 +14,17 @@ library LibOpSqrt {
     using LibDecimalFloat for Float;
 
     /// `sqrt` integrity check. Requires exactly 1 input and produces 1 output.
+    /// @return inputs Always 1.
+    /// @return outputs Always 1.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // There must be one input and one output.
         return (1, 1);
     }
 
-    /// sqrt
-    /// decimal floating point square root of a number.
+    /// Decimal floating point square root. Pops one value from the stack
+    /// and pushes its square root.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The updated stack top with the result written.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
         Float a;
         assembly ("memory-safe") {
@@ -35,6 +39,8 @@ library LibOpSqrt {
     }
 
     /// Gas intensive reference implementation of sqrt for testing.
+    /// @param inputs Single-element array containing the radicand.
+    /// @return Single-element array containing the square root.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         view
