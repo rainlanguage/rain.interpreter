@@ -211,8 +211,8 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A12-8: (LOW) No test for zero-source bytecode (`sourceCount == 0`) — empty and comment-only inputs both produce sourceCount=0 bytecode
 - [FIXED] A12-9: (LOW) No test for multi-source bytecode integrity checking — 2 and 3 source expressions with different shapes
 - [FIXED] A14-1: (LOW) No dedicated test for `fingerprint` function — moved to test library, added determinism and field-sensitivity tests
-- [PENDING] A14-2: (LOW) No dedicated test for `stackBottoms` function
-- [PENDING] A14-3: (LOW) `stackTrace` test does not cover parentSourceIndex/sourceIndex encoding edge cases
+- [FIXED] A14-2: (LOW) No dedicated test for `stackBottoms` function — added 3 fuzz tests: empty stacks, single stack pointer math, multiple stacks of different sizes
+- [FIXED] A14-3: (LOW) `stackTrace` test does not cover parentSourceIndex/sourceIndex encoding edge cases — masked both parentSourceIndex and sourceIndex to 16 bits in stackTrace; added fuzz test that verifies upper bits are stripped
 - [FIXED] A15-1: (HIGH) No test file exists for LibInterpreterStateDataContract — added LibInterpreterStateDataContract.t.sol
 - [DISMISSED] A15-2: (MEDIUM) `serializeSize` unchecked overflow not tested — constants.length near 2^256/0x20 is unreachable, memory allocation fails first
 - [FIXED] A15-3: (MEDIUM) `unsafeSerialize` correctness not independently tested — fuzzed round-trip tests added

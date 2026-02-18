@@ -104,7 +104,7 @@ library LibInterpreterState {
             let beforePtr := sub(stackTop, 0x20)
             // We need to save the value at the pointer before we overwrite it.
             let before := mload(beforePtr)
-            mstore(beforePtr, or(shl(0x10, parentSourceIndex), sourceIndex))
+            mstore(beforePtr, or(shl(0x10, and(parentSourceIndex, 0xFFFF)), and(sourceIndex, 0xFFFF)))
             // We don't care about success, we just want to call the tracer.
             let success := staticcall(gas(), tracer, sub(stackTop, 4), add(sub(stackBottom, stackTop), 4), 0, 0)
             // Restore the value at the pointer that we mutated above.
