@@ -310,7 +310,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [PENDING] A43-10: (LOW) No direct unit tests for buildConstants()
 - [PENDING] A43-11: (LOW) No direct unit tests for pushLiteral()
 - [FIXED] A44-1: (HIGH) No direct unit test for subParseWordSlice() — all paths covered by integration tests (badSubParserResult.t.sol, unknownWord.t.sol, intInc.t.sol)
-- [PENDING] A44-2: (MEDIUM) UnknownWord error path tested only via integration
+- [FIXED] A44-2: (MEDIUM) UnknownWord error path tested only via integration — added direct test with mock sub-parser rejection and fuzzed address
 - [PENDING] A44-3: (MEDIUM) UnsupportedLiteralType error path in subParseLiteral() not directly tested
 - [PENDING] A44-4: (LOW) No direct unit test for subParseWords()
 - [PENDING] A44-5: (LOW) No direct unit test for subParseLiteral()
