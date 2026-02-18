@@ -334,7 +334,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [PENDING] A49-3: (LOW) `SubParserIndexOutOfBounds` error path never tested for RainterpreterReferenceExtern
 - [PENDING] A49-4: (LOW) No test for `extern()` function called directly on RainterpreterReferenceExtern
 - [PENDING] A49-5: (LOW) No test for `externIntegrity()` called directly on RainterpreterReferenceExtern
-- [PENDING] A50-1: (MEDIUM) No test for namespace isolation across different `msg.sender` values
+- [FIXED] A50-1: (MEDIUM) No test for namespace isolation across different `msg.sender` values — added 2 fuzz tests: unidirectional isolation and bidirectional write isolation
 - [PENDING] A50-2: (LOW) `Set` event emission never tested
 - [PENDING] A50-3: (LOW) No test for `set` with empty array (zero-length `kvs`)
 - [PENDING] A50-4: (LOW) No test for `get` on uninitialized key (default value)
