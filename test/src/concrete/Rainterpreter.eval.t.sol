@@ -35,14 +35,25 @@ contract RainterpreterEvalTest is RainterpreterExpressionDeployerDeploymentTest 
     }
 
     /// Passing fewer inputs than the source expects MUST revert.
-    function testInputsLengthMismatchTooFew() external {
-        // Source expects 1 input (a).
-        bytes memory bytecode = I_DEPLOYER.parse2("a:;");
+    function testInputsLengthMismatchTooFew(uint8 expectedInputs, uint8 actualInputs) external {
+        expectedInputs = uint8(bound(expectedInputs, 1, 15));
+        vm.assume(actualInputs < expectedInputs);
 
-        // Pass 0 inputs when 1 is expected.
-        StackItem[] memory inputs = new StackItem[](0);
+        // Build rainlang with expectedInputs LHS names: "a b c ... :;"
+        bytes memory rainlang = new bytes(2 * uint256(expectedInputs) + 1);
+        for (uint256 i = 0; i < expectedInputs; i++) {
+            rainlang[i * 2] = bytes1(uint8(0x61) + uint8(i));
+            if (i < uint256(expectedInputs) - 1) {
+                rainlang[i * 2 + 1] = " ";
+            }
+        }
+        rainlang[uint256(expectedInputs) * 2 - 1] = ":";
+        rainlang[uint256(expectedInputs) * 2] = ";";
 
-        vm.expectRevert(abi.encodeWithSelector(InputsLengthMismatch.selector, 1, 0));
+        bytes memory bytecode = I_DEPLOYER.parse2(rainlang);
+        StackItem[] memory inputs = new StackItem[](actualInputs);
+
+        vm.expectRevert(abi.encodeWithSelector(InputsLengthMismatch.selector, expectedInputs, actualInputs));
         I_INTERPRETER.eval4(
             EvalV4({
                 store: I_STORE,

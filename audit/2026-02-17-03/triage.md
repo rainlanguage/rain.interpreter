@@ -181,7 +181,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A04-4: (LOW) No test verifying `authoringMetaV2()` content correctness — added in commit `efe2a7f3`
 - [FIXED] A04-5: (MEDIUM) No test verifying four-array ordering consistency — added in commit `1efea00e`
 - [DISMISSED] A05-1: (LOW) No direct unit test for `evalLoop` function — extensively exercised through every opcode test and eval4 integration test; standalone test would duplicate existing coverage
-- [PENDING] A05-2: (MEDIUM) `InputsLengthMismatch` only tested for too-many-inputs direction
+- [FIXED] A05-2: (MEDIUM) `InputsLengthMismatch` only tested for too-many-inputs direction — fuzzed testInputsLengthMismatchTooFew added
 - [PENDING] A05-3: (MEDIUM) No test for `maxOutputs` truncation behavior in `eval2`
 - [PENDING] A05-4: (LOW) No test for zero-opcode source in `evalLoop`
 - [PENDING] A05-5: (LOW) No test for multiple sources exercised through `eval2`
@@ -248,7 +248,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [PENDING] A26-3: (LOW) Missing operand disallowed test for LibOpTimestamp
 - [PENDING] A28-1: (LOW) No test for get() caching side effect on read-only keys
 - [PENDING] A29-1: (LOW) LibOpMaxUint256 missing operand disallowed test
-- [PENDING] A30-1: (MEDIUM) No test triggers `ParenOverflow` error
+- [FIXED] A30-1: (MEDIUM) No test triggers `ParenOverflow` error — testParenOverflow and testParenMaxNesting boundary tests added
 - [PENDING] A30-2: (LOW) No test triggers `ParserOutOfBounds` error from `parse()`
 - [PENDING] A30-3: (LOW) No test for yang-state `UnexpectedRHSChar` in `parseRHS`
 - [PENDING] A30-4: (LOW) No test for stack name fallback path in `parseRHS` via `stackNameIndex`
