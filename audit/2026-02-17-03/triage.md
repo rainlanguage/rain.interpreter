@@ -262,7 +262,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A33-1: (MEDIUM) No direct unit test for `selectLiteralParserByIndex` — added direct test calling returned function pointer for hex, decimal, and string indices
 - [PENDING] A33-2: (LOW) No direct unit test for `tryParseLiteral` dispatch logic
 - [PENDING] A33-3: (LOW) No test for `parseLiteral` revert path
-- [PENDING] A34-1: (MEDIUM) No happy-path unit test for `parseDecimalFloatPacked`
+- [FIXED] A34-1: (MEDIUM) No happy-path unit test for `parseDecimalFloatPacked` — added 52 happy-path cases covering zero, integers, negatives, positive/negative exponents, decimal points, no exponent, and large coefficients using float eq
 - [PENDING] A34-2: (LOW) No fuzz test for decimal parsing round-trip
 - [PENDING] A34-3: (LOW) No test for cursor position after successful parse
 - [PENDING] A34-4: (LOW) No test for decimal values with fractional parts
