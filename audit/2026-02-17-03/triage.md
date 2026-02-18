@@ -271,8 +271,8 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A35-3: (MEDIUM) No test for `OddLengthHexLiteral` error — fuzzed over odd lengths 1-63
 - [PENDING] A35-4: (LOW) No test for `MalformedHexLiteral` error
 - [PENDING] A35-5: (LOW) No test for mixed-case hex parsing
-- [PENDING] A36-1: (MEDIUM) No test for RepeatLiteralTooLong revert path
-- [PENDING] A36-2: (MEDIUM) No test for parseRepeat output value correctness
+- [FIXED] A36-1: (MEDIUM) No test for RepeatLiteralTooLong revert path — added fuzz test for length >= 78
+- [FIXED] A36-2: (MEDIUM) No test for parseRepeat output value correctness — added fuzz test asserting output against reference sum
 - [PENDING] A36-3: (LOW) No test for zero-length literal body (cursor == end)
 - [PENDING] A36-4: (LOW) No test for length = 1 (single character body)
 - [PENDING] A36-5: (LOW) No test for length = 77 (maximum valid length)
