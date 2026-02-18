@@ -305,7 +305,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A43-5: (MEDIUM) ParenInputOverflow error path never tested — added direct test setting paren counter to 0xFF then pushing one more op
 - [FIXED] A43-6: (MEDIUM) ParseStackOverflow in highwater() never tested — added direct test setting RHS offset to 0x3e then calling highwater()
 - [FIXED] A43-7: (MEDIUM) No direct unit tests for pushOpToSource() — added 5 tests: encoding fuzz, FSM flags, two-op encoding, slot overflow linked list, SourceItemOpsOverflow
-- [PENDING] A43-8: (MEDIUM) No direct unit tests for endSource()
+- [FIXED] A43-8: (MEDIUM) No direct unit tests for endSource() — added 5 tests: single-op source, state reset, two sources, byte length fuzz, MaxSources revert
 - [PENDING] A43-9: (MEDIUM) No direct unit tests for buildBytecode()
 - [PENDING] A43-10: (LOW) No direct unit tests for buildConstants()
 - [PENDING] A43-11: (LOW) No direct unit tests for pushLiteral()
