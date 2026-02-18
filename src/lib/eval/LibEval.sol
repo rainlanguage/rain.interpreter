@@ -234,9 +234,9 @@ library LibEval {
             // If the stack top is pointing to the base of Solidity's understanding
             // of the stack array, then this will simply write the same length over
             // the length the stack was initialized with, otherwise a shorter array
-            // will be built within the bounds of the stack. After this point `tail`
-            // and the original stack MUST be immutable as they're both pointing to
-            // the same memory region.
+            // will be built within the bounds of the stack. After this point `stack`
+            // and the original stack array MUST be immutable as they're both
+            // pointing to the same memory region.
             uint256 outputs = maxOutputs < sourceOutputs ? maxOutputs : sourceOutputs;
             StackItem[] memory stack;
             assembly ("memory-safe") {

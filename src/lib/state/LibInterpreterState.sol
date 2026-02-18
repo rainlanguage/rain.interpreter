@@ -102,8 +102,9 @@ library LibInterpreterState {
     ///   Let's say we have 50 stack items spread over 5 calls:
     ///   - Using the tracer:
     ///     ( 2600 + 100 * 4 ) + (51 ** 2) / 512 + (3 * 51)
-    ///     = 3000 + 2601 / 665
-    ///     = 3000 + 4 ~= 3000
+    ///     = 3000 + 2601 / 512 + 153
+    ///     = 3000 + 5 + 153
+    ///     ~= 3158
     ///   - Using an event (assuming same memory expansion cost):
     ///     (375 * 5) + (8 * 50 * 32) + 4
     ///     = 1875 + 12800 + 4

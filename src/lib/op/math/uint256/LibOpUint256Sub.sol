@@ -58,8 +58,9 @@ library LibOpUint256Sub {
         pure
         returns (StackItem[] memory outputs)
     {
-        // Unchecked so that when we assert that an overflow error is thrown, we
-        // see the revert from the real function and not the reference function.
+        // Unchecked so that when we assert that an underflow error is thrown,
+        // we see the revert from the real function and not the reference
+        // function.
         unchecked {
             uint256 acc = uint256(StackItem.unwrap(inputs[0]));
             for (uint256 i = 1; i < inputs.length; i++) {

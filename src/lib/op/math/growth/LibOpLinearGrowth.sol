@@ -9,7 +9,7 @@ import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpLinearGrowth
-/// @notice Linear growth is base + rate * t where a is the initial value, r is
+/// Linear growth is base + rate * t where base is the initial value, rate is
 /// the growth rate, and t is time.
 library LibOpLinearGrowth {
     using LibDecimalFloat for Float;

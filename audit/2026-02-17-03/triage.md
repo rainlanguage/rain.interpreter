@@ -732,14 +732,14 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [PENDING] A04-1: (LOW) `LibOpCall` is missing `referenceFn` unlike all other opcode libraries
 - [PENDING] A04-2: (LOW) Unused `using LibPointer for Pointer` declaration and import in LibOpCall
 - [PENDING] A05-1: (LOW) Magic numbers throughout `evalLoop` assembly shared with LibIntegrityCheck should be named constants
-- [PENDING] A05-2: (LOW) Stale reference to variable name `tail` instead of `stack` in `eval2` NatSpec comment in LibEval
+- [FIXED] A05-2: (LOW) Stale reference to variable name `tail` instead of `stack` in `eval2` NatSpec comment in LibEval — corrected to `stack`
 - [PENDING] A06-1: (LOW) Inconsistent constant sourcing for context ops; LibExternOpContextRainlen defines inline constants while siblings import from LibContext.sol
 - [PENDING] A06-2: (LOW) Inconsistent function mutability across subParser functions; LibExternOpIntInc is `view` while others are `pure`
 - [PENDING] A06-3: (LOW) Magic number in LibExternOpIntInc.run for decimal float value 1 should use named constant
 - [PENDING] A06-4: (LOW) Magic number 78 in LibParseLiteralRepeat bound check should use named constant
 - [PENDING] A12-1: (LOW) Magic number `0x18` for cursor alignment in `integrityCheck2` lacks derivation explanation
 - [PENDING] A14-1: (LOW) Unused variable `success` from `staticcall` in `stackTrace` assembly should use `pop()` idiom in LibInterpreterState
-- [PENDING] A14-2: (LOW) Incorrect arithmetic in `stackTrace` NatSpec gas cost analysis in LibInterpreterState
+- [FIXED] A14-2: (LOW) Incorrect arithmetic in `stackTrace` NatSpec gas cost analysis in LibInterpreterState — fixed division denominator and included memory term
 - [PENDING] A16-1: (LOW) Inconsistent `referenceFn` return pattern (new array vs mutate-in-place) across bitwise ops; LibOpDecodeBits is 1-input/1-output but allocates new array unlike other 1-in/1-out ops
 - [PENDING] A16-2: (LOW) Inconsistent `uint256` cast on `type(uint8).max` between LibOpShiftBitsLeft and LibOpShiftBitsRight
 - [PENDING] A16-3: (LOW) Inconsistent lint suppression comments between LibOpDecodeBits and LibOpEncodeBits for identical shift operation
@@ -751,14 +751,14 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [PENDING] A23a-1: (LOW) Commented-out code in LibOpConditions.sol line 68
 - [PENDING] A23a-2: (LOW) `require(false, ...)` with string messages in `referenceFn` of LibOpConditions.sol instead of custom errors
 - [PENDING] A23b-1: (LOW) Missing NatSpec on `integrity` function in LibOpIf
-- [PENDING] A24-1: (LOW) `referenceFn` NatSpec in LibOpExp2 says "exp" instead of "exp2" (copy-paste documentation error)
+- [FIXED] A24-1: (LOW) `referenceFn` NatSpec in LibOpExp2 says "exp" instead of "exp2" (copy-paste documentation error) — fixed in earlier commit
 - [PENDING] A25a-1: (LOW) `using LibDecimalFloat for Float` declared but unused in LibOpMaxNegativeValue and LibOpMaxPositiveValue
-- [PENDING] A25a-2: (LOW) Missing "point" in LibOpHeadroom run NatSpec ("decimal floating headroom" should be "decimal floating point headroom")
+- [FIXED] A25a-2: (LOW) Missing "point" in LibOpHeadroom run NatSpec ("decimal floating headroom" should be "decimal floating point headroom") — fixed in earlier commit
 - [FIXED] A25a-3: (LOW) Missing "decimal" in LibOpInv run NatSpec (says "floating point" instead of "decimal floating point") — fixed as part of @notice removal
 - [PENDING] A25a-4: (LOW) Misleading `unchecked` block with overflow comment in LibOpMax.referenceFn irrelevant to `max` operation
 - [PENDING] A28-1: (LOW) Unnecessary `unchecked` block wrapping entire `run` body in LibOpSet has no semantic effect on assembly-only arithmetic
-- [PENDING] A29-1: (LOW) Misleading comment in `referenceFn` for LibOpUint256Div and LibOpUint256Sub says "overflow" but Div reverts on divide-by-zero and Sub reverts on underflow
-- [PENDING] A29-2: (LOW) Inconsistent NatSpec description in LibOpLinearGrowth references wrong variable names ("a" and "r" instead of "base" and "rate")
+- [FIXED] A29-1: (LOW) Misleading comment in `referenceFn` for LibOpUint256Div and LibOpUint256Sub says "overflow" but Div reverts on divide-by-zero and Sub reverts on underflow — corrected both
+- [FIXED] A29-2: (LOW) Inconsistent NatSpec description in LibOpLinearGrowth references wrong variable names ("a" and "r" instead of "base" and "rate") — corrected to "base" and "rate", also removed `@notice`
 - [DISMISSED] A30-1: (MEDIUM) Dead constants `NOT_LOW_16_BIT_MASK` and `ACTIVE_SOURCE_MASK` defined but never referenced anywhere in the codebase — false positive; neither constant exists in the codebase
 - [PENDING] A30-2: (LOW) Potentially unused `using LibBytes32Array` declaration in LibParse.sol
 - [PENDING] A30-3: (LOW) Magic numbers in paren tracking logic (group size 3, reserved bytes 2, max offset 59, shift 0xf0)
@@ -774,8 +774,8 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [PENDING] A39-3: (LOW) Duplicated Float-to-uint conversion pattern across five operand handlers in LibParseOperand
 - [PENDING] A39-4: (LOW) Tight coupling between LibParseStackName and ParseState internal layout via direct `topLevel1` access
 - [PENDING] A39-5: (LOW) Different fingerprint representations in `pushStackName` vs `stackNameIndex` is confusing
-- [PENDING] A43-1: (LOW) Incorrect inline comments in `newState` constructor misaligned with struct field order
-- [PENDING] A43-2: (LOW) Stale function name `newActiveSource` in comment should be `newActiveSourcePointer`
+- [FIXED] A43-1: (LOW) Incorrect inline comments in `newState` constructor misaligned with struct field order — corrected "literalBloom" to "constantsBuilder" and "constantsBuilder" to "constantsBloom"
+- [FIXED] A43-2: (LOW) Stale function name `newActiveSource` in comment should be `newActiveSourcePointer` — corrected to `resetSource` which is the actual caller
 - [DISMISSED] A43-3: (MEDIUM) FSM NatSpec does not match defined constants (bit positions shifted, missing/extra fields) — false positive; NatSpec bits 0-3 match FSM_YANG_MASK(1), FSM_WORD_END_MASK(1<<1), FSM_ACCEPTING_INPUTS_MASK(1<<2), FSM_ACTIVE_SOURCE_MASK(1<<3) exactly
 - [PENDING] A43-4: (LOW) Magic number `0x3f` in `highwater` should be a named constant
 - [PENDING] A45-1: (LOW) Constructor lacks NatSpec documentation in Rainterpreter.sol

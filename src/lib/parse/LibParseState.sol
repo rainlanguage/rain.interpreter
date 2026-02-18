@@ -246,7 +246,7 @@ library LibParseState {
     {
         ParseState memory state = ParseState(
             // activeSource
-            // (will be built in `newActiveSource`)
+            // (will be built in `resetSource`)
             0,
             // topLevel0
             0,
@@ -269,9 +269,9 @@ library LibParseState {
             0,
             // stackNameBloom
             0,
-            // literalBloom
-            0,
             // constantsBuilder
+            0,
+            // constantsBloom
             0,
             // literalParsers
             literalParsers,
