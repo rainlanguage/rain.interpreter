@@ -339,3 +339,479 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [PENDING] A50-3: (LOW) No test for `set` with empty array (zero-length `kvs`)
 - [PENDING] A50-4: (LOW) No test for `get` on uninitialized key (default value)
 - [PENDING] A50-5: (LOW) No test for overwriting a key with a different value in a single `set` call
+
+# Pass 3 Triage
+
+Tracks the disposition of every LOW+ finding from pass3 audit reports (documentation).
+Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
+
+## Agent Index
+
+| ID | File |
+|----|------|
+| A01 | BaseRainterpreterExtern.md |
+| A02 | BaseRainterpreterSubParser.md |
+| A03 | ErrAll.md |
+| A04 | LibAllStandardOps.md |
+| A05 | LibEval.md |
+| A06 | LibExtern.md |
+| A12 | LibIntegrityCheck.md |
+| A14 | LibInterpreterState.md |
+| A16 | LibOpBitwise.md |
+| A20 | LibOpERC20.md (includes Hash, ERC20, Uint256ERC20 ops) |
+| A22 | LibOpERC721EVM.md |
+| A23a | LibOpLogic1.md |
+| A23b | LibOpLogic2.md |
+| A24a | LibOpMath1.md |
+| A24b | LibOpMath2.md (Frac, Gm, Inv, Headroom) |
+| A25a | LibOpMath3.md |
+| A25b | LibOpMath4.md |
+| A28 | LibOpStore.md |
+| A29 | LibOpMathUint256.md |
+| A30 | LibParse.md |
+| A33 | LibParseLiteral.md |
+| A39 | LibParseOperand.md |
+| A43 | LibParseState.md |
+| A45 | Rainterpreter.md (includes RainterpreterStore, RainterpreterDISPaiRegistry) |
+| A47 | RainterpreterExpressionDeployer.md |
+| A48 | RainterpreterParserStore.md |
+| A49 | RainterpreterReferenceExtern.md |
+
+## Findings
+
+- [PENDING] A01-1: (LOW) `opcodeFunctionPointers` missing `@return` tag
+- [PENDING] A01-2: (LOW) `integrityFunctionPointers` missing `@return` tag
+- [PENDING] A02-1: (LOW) `subParserParseMeta` missing `@return` tag
+- [PENDING] A02-2: (LOW) `subParserWordParsers` missing `@return` tag
+- [PENDING] A02-3: (LOW) `subParserOperandHandlers` missing `@return` tag
+- [PENDING] A02-4: (LOW) `subParserLiteralParsers` missing `@return` tag
+- [PENDING] A02-5: (LOW) `subParseLiteral2` `@inheritdoc` lacks implementation-specific param/return docs
+- [PENDING] A02-6: (LOW) `subParseWord2` `@inheritdoc` lacks implementation-specific param/return docs
+- [PENDING] A02-7: (LOW) `supportsInterface` override does not document which additional interfaces it supports
+- [PENDING] A03-1: (LOW) `BadOutputsLength` in ErrExtern.sol missing `@param` tags
+- [PENDING] A03-2: (LOW) `UnsupportedLiteralType` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-3: (LOW) `StringTooLong` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-4: (LOW) `UnclosedStringLiteral` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-5: (LOW) `HexLiteralOverflow` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-6: (LOW) `ZeroLengthHexLiteral` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-7: (LOW) `OddLengthHexLiteral` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-8: (LOW) `MalformedHexLiteral` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-9: (LOW) `MalformedExponentDigits` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-10: (LOW) `MalformedDecimalPoint` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-11: (LOW) `MissingFinalSemi` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-12: (LOW) `UnexpectedLHSChar` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-13: (LOW) `UnexpectedRHSChar` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-14: (LOW) `ExpectedLeftParen` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-15: (LOW) `UnexpectedRightParen` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-16: (LOW) `UnclosedLeftParen` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-17: (LOW) `UnexpectedComment` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-18: (LOW) `UnclosedComment` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-19: (LOW) `MalformedCommentStart` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-20: (LOW) `ExcessLHSItems` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-21: (LOW) `NotAcceptingInputs` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-22: (LOW) `ExcessRHSItems` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-23: (LOW) `WordSize` in ErrParse.sol missing `@param word` tag
+- [PENDING] A03-24: (LOW) `UnknownWord` in ErrParse.sol missing `@param word` tag
+- [PENDING] A03-25: (LOW) `NoWhitespaceAfterUsingWordsFrom` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-26: (LOW) `InvalidSubParser` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-27: (LOW) `UnclosedSubParseableLiteral` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-28: (LOW) `SubParseableMissingDispatch` in ErrParse.sol missing `@param` tags
+- [PENDING] A03-29: (LOW) `BadSubParserResult` in ErrParse.sol missing `@param bytecode` tag
+- [PENDING] A03-30: (LOW) `OpcodeIOOverflow` in ErrParse.sol missing `@param` tags
+- [PENDING] A04-1: (LOW) `authoringMetaV2()` missing `@return` tag
+- [PENDING] A04-2: (LOW) `literalParserFunctionPointers()` missing `@return` tag
+- [PENDING] A04-3: (LOW) `operandHandlerFunctionPointers()` missing `@return` tag
+- [PENDING] A04-4: (LOW) `integrityFunctionPointers()` missing `@return` tag
+- [PENDING] A04-5: (LOW) `opcodeFunctionPointers()` missing `@return` tag
+- [PENDING] A04-6: (LOW) `LibOpConstant.integrity()` missing `@param` and `@return` tags
+- [PENDING] A04-7: (LOW) `LibOpConstant.run()` missing `@param` and `@return` tags
+- [PENDING] A04-8: (LOW) `LibOpConstant.referenceFn()` missing `@param` and `@return` tags
+- [PENDING] A04-9: (LOW) `LibOpContext` library-level NatSpec lacks description
+- [PENDING] A04-10: (LOW) `LibOpContext.integrity()` missing `@param` and `@return` tags
+- [PENDING] A04-11: (LOW) `LibOpContext.run()` missing `@param` and `@return` tags
+- [PENDING] A04-12: (LOW) `LibOpContext.referenceFn()` missing `@param` and `@return` tags
+- [PENDING] A04-13: (LOW) `LibOpExtern.integrity()` missing `@param` and `@return` tags
+- [PENDING] A04-14: (LOW) `LibOpExtern.run()` missing `@param` and `@return` tags
+- [PENDING] A04-15: (LOW) `LibOpExtern.referenceFn()` missing `@param` and `@return` tags
+- [PENDING] A04-16: (LOW) `LibOpStack.integrity()` missing `@param` and `@return` tags
+- [PENDING] A04-17: (LOW) `LibOpStack.run()` missing `@param` and `@return` tags
+- [PENDING] A04-18: (LOW) `LibOpStack.referenceFn()` missing `@param` and `@return` tags
+- [PENDING] A05-1: (LOW) `eval2` NatSpec "parallel arrays of keys and values" is ambiguous
+- [PENDING] A06-1: (LOW) `encodeExternDispatch` missing `@param` and `@return` tags
+- [PENDING] A06-2: (LOW) `decodeExternDispatch` missing `@param` and `@return` tags
+- [PENDING] A06-3: (LOW) `encodeExternCall` missing `@param` and `@return` tags
+- [PENDING] A06-4: (LOW) `decodeExternCall` missing `@param` and `@return` tags
+- [PENDING] A06-5: (LOW) `LibExternOpContextCallingContract.subParser` missing `@param` and `@return` tags
+- [PENDING] A06-6: (LOW) `LibExternOpContextRainlen.subParser` missing `@param` and `@return` tags
+- [PENDING] A06-7: (LOW) `LibExternOpContextSender.subParser` missing `@param` and `@return` tags
+- [PENDING] A06-8: (LOW) `LibExternOpIntInc.run` missing `@param` and `@return` tags
+- [PENDING] A06-9: (LOW) `LibExternOpIntInc.integrity` missing `@param` and `@return` tags
+- [PENDING] A06-10: (LOW) `LibExternOpIntInc.subParser` missing `@param` and `@return` tags
+- [PENDING] A06-11: (LOW) `LibExternOpStackOperand.subParser` missing NatSpec entirely
+- [PENDING] A12-1: (LOW) `IntegrityCheckState` struct has no NatSpec documentation
+- [PENDING] A14-1: (MEDIUM) `InterpreterState` struct has no NatSpec documentation
+- [PENDING] A14-2: (LOW) `STACK_TRACER` constant has no NatSpec documentation
+- [PENDING] A14-3: (LOW) `stackTrace` NatSpec inaccurately describes the 4-byte prefix content
+- [PENDING] A14-4: (LOW) `unsafeSerialize` missing `@return` tag and cursor side-effect not documented
+- [PENDING] A16-1: (LOW) LibOpBitwiseAnd integrity missing `@param` and `@return` NatSpec tags
+- [PENDING] A16-2: (LOW) LibOpBitwiseAnd run missing `@param` and `@return` NatSpec tags
+- [PENDING] A16-3: (LOW) LibOpBitwiseAnd referenceFn missing `@param` and `@return` NatSpec tags
+- [PENDING] A16-4: (LOW) LibOpBitwiseOr integrity missing `@param` and `@return` NatSpec tags
+- [PENDING] A16-5: (LOW) LibOpBitwiseOr run missing `@param` and `@return` NatSpec tags
+- [PENDING] A16-6: (LOW) LibOpBitwiseOr referenceFn missing `@param` and `@return` NatSpec tags
+- [PENDING] A16-7: (LOW) LibOpCtPop integrity missing `@param` and `@return` NatSpec tags
+- [PENDING] A16-8: (LOW) LibOpCtPop run missing `@param` and `@return` NatSpec tags
+- [PENDING] A16-9: (LOW) LibOpCtPop referenceFn missing `@param` and `@return` NatSpec tags
+- [PENDING] A16-10: (LOW) LibOpDecodeBits integrity missing `@param` and `@return` NatSpec tags
+- [PENDING] A16-11: (LOW) LibOpDecodeBits run missing `@param` and `@return` NatSpec tags
+- [PENDING] A16-12: (LOW) LibOpDecodeBits referenceFn missing `@param` and `@return` NatSpec tags
+- [PENDING] A16-13: (LOW) LibOpEncodeBits integrity missing `@param` and `@return` NatSpec tags
+- [PENDING] A16-14: (LOW) LibOpEncodeBits run missing `@param` and `@return` NatSpec tags
+- [PENDING] A16-15: (LOW) LibOpEncodeBits referenceFn missing `@param` and `@return` NatSpec tags
+- [PENDING] A16-16: (LOW) LibOpShiftBitsLeft integrity missing `@param` and `@return` NatSpec tags
+- [PENDING] A16-17: (LOW) LibOpShiftBitsLeft run missing `@param` and `@return` NatSpec tags
+- [PENDING] A16-18: (LOW) LibOpShiftBitsLeft referenceFn missing `@param` and `@return` NatSpec tags
+- [PENDING] A16-19: (LOW) LibOpShiftBitsRight integrity missing `@param` and `@return` NatSpec tags
+- [PENDING] A16-20: (LOW) LibOpShiftBitsRight run missing `@param` and `@return` NatSpec tags
+- [PENDING] A16-21: (LOW) LibOpShiftBitsRight referenceFn missing `@param` and `@return` NatSpec tags
+- [PENDING] A20-1: (LOW) LibOpHash integrity missing `@param` and `@return` NatSpec
+- [PENDING] A20-2: (LOW) LibOpHash run missing `@param` and `@return` NatSpec
+- [PENDING] A20-3: (LOW) LibOpHash referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A20-4: (LOW) LibOpERC20Allowance integrity missing `@param` and `@return` NatSpec
+- [PENDING] A20-5: (LOW) LibOpERC20Allowance run missing `@param` and `@return` NatSpec
+- [PENDING] A20-6: (LOW) LibOpERC20Allowance referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A20-7: (LOW) LibOpERC20BalanceOf integrity missing `@param` and `@return` NatSpec
+- [PENDING] A20-8: (LOW) LibOpERC20BalanceOf run missing `@param` and `@return` NatSpec
+- [PENDING] A20-9: (LOW) LibOpERC20BalanceOf referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A20-10: (LOW) LibOpERC20TotalSupply integrity missing `@param` and `@return` NatSpec
+- [PENDING] A20-11: (LOW) LibOpERC20TotalSupply run missing `@param` and `@return` NatSpec
+- [PENDING] A20-12: (LOW) LibOpERC20TotalSupply referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A20-13: (LOW) LibOpUint256ERC20Allowance integrity missing `@param` and `@return` NatSpec
+- [PENDING] A20-14: (LOW) LibOpUint256ERC20Allowance run missing `@param` and `@return` NatSpec
+- [PENDING] A20-15: (LOW) LibOpUint256ERC20Allowance referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A20-16: (LOW) LibOpUint256ERC20BalanceOf `@title` missing Lib prefix vs library name
+- [PENDING] A20-17: (LOW) LibOpUint256ERC20BalanceOf integrity missing `@param` and `@return` NatSpec
+- [PENDING] A20-18: (LOW) LibOpUint256ERC20BalanceOf run missing `@param` and `@return` NatSpec
+- [PENDING] A20-19: (LOW) LibOpUint256ERC20BalanceOf referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A20-20: (LOW) LibOpUint256ERC20TotalSupply integrity missing `@param` and `@return` NatSpec
+- [PENDING] A20-21: (LOW) LibOpUint256ERC20TotalSupply run missing `@param` and `@return` NatSpec
+- [PENDING] A20-22: (LOW) LibOpUint256ERC20TotalSupply referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A22-1: (LOW) All ERC721/ERC5313/EVM integrity functions missing `@param` and `@return` tags
+- [PENDING] A22-2: (LOW) All ERC721/ERC5313/EVM run functions missing `@param` and `@return` tags
+- [PENDING] A22-3: (LOW) All ERC721/ERC5313/EVM referenceFn functions missing `@param` and `@return` tags
+- [PENDING] A22-4: (LOW) All ERC721/ERC5313/EVM unnamed function parameters prevent formal `@param` tags
+- [PENDING] A23a-1: (LOW) LibOpAny integrity missing `@param` and `@return` NatSpec
+- [PENDING] A23a-2: (LOW) LibOpAny run missing `@param` and `@return` NatSpec
+- [PENDING] A23a-3: (LOW) LibOpAny referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A23a-4: (LOW) LibOpBinaryEqualTo integrity missing NatSpec entirely
+- [PENDING] A23a-5: (LOW) LibOpBinaryEqualTo run missing `@param` and `@return` NatSpec
+- [PENDING] A23a-6: (LOW) LibOpBinaryEqualTo referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A23a-7: (LOW) LibOpConditions integrity missing NatSpec entirely
+- [PENDING] A23a-8: (LOW) LibOpConditions run missing `@param` and `@return` NatSpec
+- [PENDING] A23a-9: (LOW) LibOpConditions referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A23a-10: (LOW) LibOpEnsure integrity missing NatSpec entirely
+- [PENDING] A23a-11: (LOW) LibOpEnsure run missing `@param` and `@return` NatSpec
+- [PENDING] A23a-12: (LOW) LibOpEnsure referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A23a-13: (LOW) LibOpEqualTo integrity missing `@param` and `@return` NatSpec
+- [PENDING] A23a-14: (LOW) LibOpEqualTo run missing `@param` and `@return` NatSpec
+- [PENDING] A23a-15: (LOW) LibOpEqualTo referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A23a-16: (LOW) LibOpEvery integrity missing `@param` and `@return` NatSpec
+- [PENDING] A23a-17: (LOW) LibOpEvery run missing `@param` and `@return` NatSpec
+- [PENDING] A23a-18: (LOW) LibOpEvery referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A23b-1: (LOW) LibOpGreaterThan integrity missing `@param` and `@return` tags
+- [PENDING] A23b-2: (LOW) LibOpGreaterThan run missing `@param` and `@return` tags
+- [PENDING] A23b-3: (LOW) LibOpGreaterThan referenceFn missing `@param` and `@return` tags
+- [PENDING] A23b-4: (LOW) LibOpGreaterThanOrEqualTo integrity missing `@param` and `@return` tags
+- [PENDING] A23b-5: (LOW) LibOpGreaterThanOrEqualTo run missing `@param` and `@return` tags
+- [PENDING] A23b-6: (LOW) LibOpGreaterThanOrEqualTo referenceFn missing `@param` and `@return` tags
+- [PENDING] A23b-7: (LOW) LibOpIf integrity completely missing NatSpec
+- [PENDING] A23b-8: (LOW) LibOpIf run missing `@param` and `@return` tags
+- [PENDING] A23b-9: (LOW) LibOpIf referenceFn missing `@param` and `@return` tags
+- [PENDING] A23b-10: (LOW) LibOpIsZero integrity missing `@param` and `@return` tags
+- [PENDING] A23b-11: (LOW) LibOpIsZero run missing `@param` and `@return` tags
+- [PENDING] A23b-12: (LOW) LibOpIsZero referenceFn missing `@param` and `@return` tags
+- [PENDING] A23b-13: (LOW) LibOpLessThan integrity missing `@param` and `@return` tags
+- [PENDING] A23b-14: (LOW) LibOpLessThan run missing `@param` and `@return` tags
+- [PENDING] A23b-15: (LOW) LibOpLessThan referenceFn missing `@param` and `@return` tags
+- [PENDING] A23b-16: (LOW) LibOpLessThanOrEqualTo integrity missing `@param` and `@return` tags
+- [PENDING] A23b-17: (LOW) LibOpLessThanOrEqualTo run missing `@param` and `@return` tags
+- [PENDING] A23b-18: (LOW) LibOpLessThanOrEqualTo referenceFn missing `@param` and `@return` tags
+- [PENDING] A24a-1: (LOW) LibOpAbs integrity missing `@param` and `@return` NatSpec
+- [PENDING] A24a-2: (LOW) LibOpAbs run missing `@param` and `@return` NatSpec
+- [PENDING] A24a-3: (LOW) LibOpAbs referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A24a-4: (LOW) LibOpAdd integrity missing `@param` and `@return` NatSpec
+- [PENDING] A24a-5: (LOW) LibOpAdd run missing `@param` and `@return` NatSpec
+- [PENDING] A24a-6: (LOW) LibOpAdd referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A24a-7: (LOW) LibOpAvg integrity missing `@param` and `@return` NatSpec
+- [PENDING] A24a-8: (LOW) LibOpAvg run missing `@param` and `@return` NatSpec
+- [PENDING] A24a-9: (LOW) LibOpAvg referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A24a-10: (LOW) LibOpCeil integrity missing `@param` and `@return` NatSpec
+- [PENDING] A24a-11: (LOW) LibOpCeil run missing `@param` and `@return` NatSpec
+- [PENDING] A24a-12: (LOW) LibOpCeil referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A24a-13: (LOW) LibOpDiv integrity missing `@param` and `@return` NatSpec
+- [PENDING] A24a-14: (LOW) LibOpDiv run missing `@param` and `@return` NatSpec
+- [PENDING] A24a-15: (LOW) LibOpDiv referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A24a-16: (LOW) LibOpE integrity missing `@param` and `@return` NatSpec
+- [PENDING] A24a-17: (LOW) LibOpE run missing `@param` and `@return` NatSpec
+- [PENDING] A24a-18: (LOW) LibOpE referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A24a-19: (LOW) LibOpExp2 referenceFn NatSpec says "exp" instead of "exp2"
+- [PENDING] A24a-20: (LOW) LibOpExp2 integrity missing `@param` and `@return` NatSpec
+- [PENDING] A24a-21: (LOW) LibOpExp2 run missing `@param` and `@return` NatSpec
+- [PENDING] A24a-22: (LOW) LibOpExp2 referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A24a-23: (LOW) LibOpExp integrity missing `@param` and `@return` NatSpec
+- [PENDING] A24a-24: (LOW) LibOpExp run missing `@param` and `@return` NatSpec
+- [PENDING] A24a-25: (LOW) LibOpExp referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A24b-1: (LOW) LibOpFrac library-level NatSpec uses `@notice`
+- [PENDING] A24b-2: (LOW) LibOpGm library-level NatSpec uses `@notice`
+- [PENDING] A24b-3: (LOW) LibOpInv library-level NatSpec uses `@notice`
+- [PENDING] A24b-4: (LOW) LibOpHeadroom run NatSpec is inaccurate — missing "point" and undocumented special-case behavior for integer inputs returning 1
+- [PENDING] A25a-1: (LOW) LibOpMax integrity missing `@param` and `@return` NatSpec
+- [PENDING] A25a-2: (LOW) LibOpMax run missing `@param` and `@return` NatSpec
+- [PENDING] A25a-3: (LOW) LibOpMax referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A25a-4: (LOW) LibOpMaxNegativeValue integrity missing `@param` and `@return` NatSpec
+- [PENDING] A25a-5: (LOW) LibOpMaxNegativeValue run missing `@param` and `@return` NatSpec
+- [PENDING] A25a-6: (LOW) LibOpMaxNegativeValue referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A25a-7: (LOW) LibOpMaxPositiveValue integrity missing `@param` and `@return` NatSpec
+- [PENDING] A25a-8: (LOW) LibOpMaxPositiveValue run missing `@param` and `@return` NatSpec
+- [PENDING] A25a-9: (LOW) LibOpMaxPositiveValue referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A25a-10: (LOW) LibOpMin integrity missing `@param` and `@return` NatSpec
+- [PENDING] A25a-11: (LOW) LibOpMin run missing `@param` and `@return` NatSpec
+- [PENDING] A25a-12: (LOW) LibOpMin referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A25a-13: (LOW) LibOpMinNegativeValue integrity missing `@param` and `@return` NatSpec
+- [PENDING] A25a-14: (LOW) LibOpMinNegativeValue run missing `@param` and `@return` NatSpec
+- [PENDING] A25a-15: (LOW) LibOpMinNegativeValue referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A25a-16: (LOW) LibOpMinPositiveValue integrity missing `@param` and `@return` NatSpec
+- [PENDING] A25a-17: (LOW) LibOpMinPositiveValue run missing `@param` and `@return` NatSpec
+- [PENDING] A25a-18: (LOW) LibOpMinPositiveValue referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A25b-1: (LOW) LibOpPow `@notice` tag used in library-level NatSpec
+- [PENDING] A25b-2: (LOW) LibOpSqrt `@notice` tag used in library-level NatSpec
+- [PENDING] A25b-3: (MEDIUM) LibOpMul integrity missing `@param` and `@return` tags
+- [PENDING] A25b-4: (MEDIUM) LibOpMul run missing `@param` and `@return` tags
+- [PENDING] A25b-5: (MEDIUM) LibOpMul referenceFn missing `@param` and `@return` tags
+- [PENDING] A25b-6: (MEDIUM) LibOpPow integrity missing `@param` and `@return` tags
+- [PENDING] A25b-7: (MEDIUM) LibOpPow run missing `@param` and `@return` tags
+- [PENDING] A25b-8: (MEDIUM) LibOpPow referenceFn missing `@param` and `@return` tags
+- [PENDING] A25b-9: (MEDIUM) LibOpSqrt integrity missing `@param` and `@return` tags
+- [PENDING] A25b-10: (MEDIUM) LibOpSqrt run missing `@param` and `@return` tags
+- [PENDING] A25b-11: (MEDIUM) LibOpSqrt referenceFn missing `@param` and `@return` tags
+- [PENDING] A25b-12: (MEDIUM) LibOpSub integrity missing `@param` and `@return` tags
+- [PENDING] A25b-13: (MEDIUM) LibOpSub run missing `@param` and `@return` tags
+- [PENDING] A25b-14: (MEDIUM) LibOpSub referenceFn missing `@param` and `@return` tags
+- [PENDING] A25b-15: (LOW) LibOpMul run and LibOpSub run NatSpec is a single word with no behavioral description
+- [PENDING] A28-1: (LOW) LibOpGet integrity missing `@param` and `@return` NatSpec
+- [PENDING] A28-2: (LOW) LibOpGet run missing `@param` for OperandV2 and `@return` NatSpec
+- [PENDING] A28-3: (LOW) LibOpGet referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A28-4: (LOW) LibOpSet integrity missing `@param` and `@return` NatSpec
+- [PENDING] A28-5: (LOW) LibOpSet run missing `@param` and `@return` NatSpec
+- [PENDING] A28-6: (LOW) LibOpSet referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A29-1: (LOW) LibOpExponentialGrowth integrity missing `@param` and `@return` NatSpec
+- [PENDING] A29-2: (LOW) LibOpExponentialGrowth run missing `@param` and `@return` NatSpec
+- [PENDING] A29-3: (LOW) LibOpExponentialGrowth referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A29-4: (LOW) LibOpLinearGrowth integrity missing `@param` and `@return` NatSpec
+- [PENDING] A29-5: (LOW) LibOpLinearGrowth run missing `@param` and `@return` NatSpec
+- [PENDING] A29-6: (LOW) LibOpLinearGrowth referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A29-7: (LOW) LibOpMaxUint256 integrity missing `@param` and `@return` NatSpec
+- [PENDING] A29-8: (LOW) LibOpMaxUint256 run missing `@param` and `@return` NatSpec
+- [PENDING] A29-9: (LOW) LibOpMaxUint256 referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A29-10: (LOW) LibOpUint256Add integrity missing `@param` and `@return` NatSpec
+- [PENDING] A29-11: (LOW) LibOpUint256Add run missing `@param` and `@return` NatSpec
+- [PENDING] A29-12: (LOW) LibOpUint256Add referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A29-13: (LOW) LibOpUint256Div integrity missing `@param` and `@return` NatSpec
+- [PENDING] A29-14: (LOW) LibOpUint256Div run missing `@param` and `@return` NatSpec
+- [PENDING] A29-15: (LOW) LibOpUint256Div referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A29-16: (LOW) LibOpUint256Mul integrity missing `@param` and `@return` NatSpec
+- [PENDING] A29-17: (LOW) LibOpUint256Mul run missing `@param` and `@return` NatSpec
+- [PENDING] A29-18: (LOW) LibOpUint256Mul referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A29-19: (LOW) LibOpUint256Pow integrity missing `@param` and `@return` NatSpec
+- [PENDING] A29-20: (LOW) LibOpUint256Pow run missing `@param` and `@return` NatSpec
+- [PENDING] A29-21: (LOW) LibOpUint256Pow referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A29-22: (LOW) LibOpUint256Sub integrity missing `@param` and `@return` NatSpec
+- [PENDING] A29-23: (LOW) LibOpUint256Sub run missing `@param` and `@return` NatSpec
+- [PENDING] A29-24: (LOW) LibOpUint256Sub referenceFn missing `@param` and `@return` NatSpec
+- [PENDING] A30-1: (LOW) File-level constants `NOT_LOW_16_BIT_MASK`, `ACTIVE_SOURCE_MASK`, and `SUB_PARSER_BYTECODE_HEADER_SIZE` lack NatSpec
+- [PENDING] A30-2: (LOW) `LibParse.parseWord` NatSpec describes `@return` as two separate values but does not name them
+- [PENDING] A30-3: (LOW) `LibParse.parseLHS` NatSpec does not document the yang/yin FSM transitions or the `CMASK_COMMENT_HEAD` special-case revert
+- [PENDING] A30-4: (LOW) `LibParse.parseRHS` NatSpec does not describe FSM state transitions or the paren-tracking mechanism
+- [PENDING] A33-1: (LOW) `selectLiteralParserByIndex` missing `@param` and `@return` tags
+- [PENDING] A33-2: (LOW) `parseLiteral` missing `@param` and `@return` tags
+- [PENDING] A33-3: (LOW) `tryParseLiteral` missing `@param` and `@return` tags
+- [PENDING] A33-4: (LOW) `parseDecimalFloatPacked` missing `@param` and `@return` tags
+- [PENDING] A33-5: (LOW) `boundHex` missing `@param` and `@return` tags
+- [PENDING] A33-6: (LOW) `parseHex` missing `@param` and `@return` tags
+- [PENDING] A33-7: (LOW) `boundString` missing `@param` and `@return` tags
+- [PENDING] A33-8: (LOW) `parseString` missing `@param` and `@return` tags
+- [PENDING] A33-9: (LOW) `parseSubParseable` missing `@param` and `@return` tags
+- [PENDING] A39-1: (LOW) `LibParseOperand.handleOperandSingleFull` NatSpec description is partially inaccurate
+- [PENDING] A39-2: (LOW) `LibParseOperand.handleOperandSingleFullNoDefault` NatSpec description is incomplete
+- [PENDING] A39-3: (LOW) `LibParseOperand.handleOperandDoublePerByteNoDefault` NatSpec description is partially inaccurate
+- [PENDING] A39-4: (LOW) `LibParseOperand.handleOperand8M1M1` NatSpec incomplete for bit layout
+- [PENDING] A39-5: (LOW) `LibParseOperand.handleOperandM1M1` NatSpec incomplete for bit layout
+- [PENDING] A43-1: (MEDIUM) `ParseState` struct has stale `@param literalBloom` referencing non-existent field
+- [PENDING] A43-2: (MEDIUM) `ParseState` struct missing `@param` for 8 fields
+- [PENDING] A43-3: (LOW) Constants `FSM_YANG_MASK` and `FSM_WORD_END_MASK` have no NatSpec
+- [PENDING] A43-4: (LOW) `ParseState.fsm` NatSpec describes bit layout that does not match implemented constants
+- [PENDING] A43-5: (LOW) `endLine` function NatSpec is minimal — missing `@param cursor` description
+- [PENDING] A43-6: (LOW) `PARSE_STATE_TOP_LEVEL0_OFFSET` and sibling constants document offsets but not how they were derived
+- [PENDING] A45-1: (LOW) Constructor has no NatSpec documentation
+- [PENDING] A45-2: (LOW) `opcodeFunctionPointers()` NatSpec lacks a function description line
+- [PENDING] A45-3: (LOW) Contract-level NatSpec uses `@notice` and is minimal
+- [PENDING] A45-4: (LOW) All four getter functions in `RainterpreterDISPaiRegistry` lack `@return` tags
+- [PENDING] A47-1: (LOW) Contract-level NatSpec is title-only, no description
+- [PENDING] A47-2: (MEDIUM) `parse2` has no meaningful NatSpec — `@inheritdoc` inherits nothing
+- [PENDING] A47-3: (LOW) `parsePragma1` missing `@param` and `@return` tags
+- [PENDING] A48-1: (LOW) `unsafeParse` missing `@param` and `@return` tags
+- [PENDING] A48-2: (LOW) `parsePragma1` missing `@param` and `@return` tags
+- [PENDING] A48-3: (LOW) `parseMeta` missing `@return` tag
+- [PENDING] A48-4: (LOW) `operandHandlerFunctionPointers` missing `@return` tag
+- [PENDING] A48-5: (LOW) `literalParserFunctionPointers` missing `@return` tag
+- [PENDING] A48-6: (LOW) `buildOperandHandlerFunctionPointers` missing `@return` tag
+- [PENDING] A48-7: (LOW) `buildLiteralParserFunctionPointers` missing `@return` tag
+- [PENDING] A49-1: (LOW) `authoringMetaV2()` lacks `@return` tag
+- [PENDING] A49-2: (LOW) `describedByMetaV1()` relies solely on `@inheritdoc` with no supplementary documentation
+- [PENDING] A49-3: (LOW) `subParserParseMeta()` lacks `@return` tag
+- [PENDING] A49-4: (LOW) `subParserWordParsers()` lacks `@return` tag
+- [PENDING] A49-5: (LOW) `subParserOperandHandlers()` lacks `@return` tag
+- [PENDING] A49-6: (LOW) `subParserLiteralParsers()` lacks `@return` tag
+- [PENDING] A49-7: (LOW) `opcodeFunctionPointers()` lacks `@return` tag
+- [PENDING] A49-8: (LOW) `integrityFunctionPointers()` lacks `@return` tag
+- [PENDING] A49-9: (MEDIUM) `matchSubParseLiteralDispatch()` is entirely undocumented
+- [PENDING] A49-10: (LOW) `buildLiteralParserFunctionPointers()` lacks `@return` tag
+- [PENDING] A49-11: (LOW) `buildOperandHandlerFunctionPointers()` lacks `@return` tag
+- [PENDING] A49-12: (LOW) `buildSubParserWordParsers()` lacks `@return` tag
+- [PENDING] A49-13: (LOW) `buildOpcodeFunctionPointers()` lacks `@return` and `@inheritdoc`
+- [PENDING] A49-14: (LOW) `buildIntegrityFunctionPointers()` lacks `@return` and `@inheritdoc`
+- [PENDING] A49-15: (LOW) `supportsInterface()` lacks `@param` tag
+
+# Pass 4 Triage
+
+Tracks the disposition of every LOW+ finding from pass4 audit reports (code quality and consistency).
+
+## Agent Index
+
+| ID | File |
+|----|------|
+| A01 | AbstractContracts.md |
+| A03 | ErrorFiles.md |
+| A04 | AllStdOps00Call.md |
+| A05 | LibEval.md |
+| A06 | ExternLibs.md |
+| A12 | LibIntegrityCheck.md |
+| A14 | DeployStateLibs.md |
+| A16 | BitwiseOps.md |
+| A20 | HashERC20Ops.md |
+| A22 | ERC5313_721_EVMOps.md |
+| A23a | LogicOps1.md |
+| A23b | LogicOps2.md |
+| A24 | MathOps1.md |
+| A25a | MathOps2.md |
+| A28 | StoreOps.md |
+| A29 | GrowthUint256Math.md |
+| A30 | LibParse.md |
+| A33 | LiteralParseLibs.md |
+| A39 | ParseUtilities.md |
+| A43 | ParseStateLibs.md |
+| A45 | CoreConcrete.md |
+| A47 | DeployerRegistry.md |
+| A49 | ReferenceExtern.md |
+| R01 | RustCLI.md |
+| R02 | RustEval.md |
+| R03 | RustParserMisc.md |
+
+## Findings
+
+- [PENDING] A01-1: (LOW) Dead `using` directives and unused imports (LibStackPointer, LibUint256Array, Pointer) in BaseRainterpreterExtern
+- [PENDING] A01-2: (LOW) Inconsistent assembly idioms for function pointer extraction (`shr(0xf0,...)` vs `and(..., 0xFFFF)`) across BaseRainterpreterExtern and BaseRainterpreterSubParser
+- [PENDING] A01-3: (LOW) Error `SubParserIndexOutOfBounds` defined inline in BaseRainterpreterSubParser instead of in `src/error/ErrSubParse.sol`
+- [PENDING] A01-4: (LOW) Inconsistent mutability between `opcodeFunctionPointers` (view) and `integrityFunctionPointers` (pure) in BaseRainterpreterExtern
+- [PENDING] A03-1: (LOW) `MalformedExponentDigits` and `MalformedDecimalPoint` errors are unused dead code in ErrParse.sol
+- [PENDING] A03-2: (LOW) Inconsistent NatSpec `@dev` usage across error files; ErrSubParse uses `@dev` while others use plain `///`
+- [PENDING] A03-3: (LOW) Missing `@param` tags on 28 parameterized errors in ErrParse.sol
+- [PENDING] A03-4: (LOW) Missing `@param` tags on `BadOutputsLength` in ErrExtern.sol
+- [PENDING] A03-5: (LOW) Missing `@param` tags on all 3 errors in ErrSubParse.sol
+- [PENDING] A03-6: (LOW) `DuplicateLHSItem` is the only error in ErrParse.sol using `@dev` prefix, inconsistent with all other errors in the file
+- [PENDING] A04-1: (LOW) `LibOpCall` is missing `referenceFn` unlike all other opcode libraries
+- [PENDING] A04-2: (LOW) Unused `using LibPointer for Pointer` declaration and import in LibOpCall
+- [PENDING] A05-1: (LOW) Magic numbers throughout `evalLoop` assembly shared with LibIntegrityCheck should be named constants
+- [PENDING] A05-2: (LOW) Stale reference to variable name `tail` instead of `stack` in `eval2` NatSpec comment in LibEval
+- [PENDING] A06-1: (LOW) Inconsistent constant sourcing for context ops; LibExternOpContextRainlen defines inline constants while siblings import from LibContext.sol
+- [PENDING] A06-2: (LOW) Inconsistent function mutability across subParser functions; LibExternOpIntInc is `view` while others are `pure`
+- [PENDING] A06-3: (LOW) Magic number in LibExternOpIntInc.run for decimal float value 1 should use named constant
+- [PENDING] A06-4: (LOW) Magic number 78 in LibParseLiteralRepeat bound check should use named constant
+- [PENDING] A12-1: (LOW) Magic number `0x18` for cursor alignment in `integrityCheck2` lacks derivation explanation
+- [PENDING] A14-1: (LOW) Unused variable `success` from `staticcall` in `stackTrace` assembly should use `pop()` idiom in LibInterpreterState
+- [PENDING] A14-2: (LOW) Incorrect arithmetic in `stackTrace` NatSpec gas cost analysis in LibInterpreterState
+- [PENDING] A16-1: (LOW) Inconsistent `referenceFn` return pattern (new array vs mutate-in-place) across bitwise ops; LibOpDecodeBits is 1-input/1-output but allocates new array unlike other 1-in/1-out ops
+- [PENDING] A16-2: (LOW) Inconsistent `uint256` cast on `type(uint8).max` between LibOpShiftBitsLeft and LibOpShiftBitsRight
+- [PENDING] A16-3: (LOW) Inconsistent lint suppression comments between LibOpDecodeBits and LibOpEncodeBits for identical shift operation
+- [PENDING] A16-4: (LOW) Repeated operand parsing logic for `startBit` and `length` duplicated 6 times across LibOpDecodeBits and LibOpEncodeBits
+- [PENDING] A20-1: (LOW) `@title` NatSpec mismatch in `LibOpUint256ERC20BalanceOf.sol` missing `Lib` prefix
+- [PENDING] A20-2: (LOW) Inconsistent `forge-lint` comment formatting in `LibOpUint256ERC20TotalSupply.sol` (space after `//` vs no space)
+- [PENDING] A22-1: (LOW) `@title` NatSpec missing `Lib` prefix in `LibOpUint256ERC721BalanceOf`
+- [PENDING] A22-2: (LOW) Unused `using LibDecimalFloat for Float` directive in all three EVM opcode libraries (LibOpBlockNumber, LibOpChainId, LibOpTimestamp)
+- [PENDING] A23a-1: (LOW) Commented-out code in LibOpConditions.sol line 68
+- [PENDING] A23a-2: (LOW) `require(false, ...)` with string messages in `referenceFn` of LibOpConditions.sol instead of custom errors
+- [PENDING] A23b-1: (LOW) Missing NatSpec on `integrity` function in LibOpIf
+- [PENDING] A24-1: (LOW) `referenceFn` NatSpec in LibOpExp2 says "exp" instead of "exp2" (copy-paste documentation error)
+- [PENDING] A25a-1: (LOW) `using LibDecimalFloat for Float` declared but unused in LibOpMaxNegativeValue and LibOpMaxPositiveValue
+- [PENDING] A25a-2: (LOW) Missing "point" in LibOpHeadroom run NatSpec ("decimal floating headroom" should be "decimal floating point headroom")
+- [PENDING] A25a-3: (LOW) Missing "decimal" in LibOpInv run NatSpec (says "floating point" instead of "decimal floating point")
+- [PENDING] A25a-4: (LOW) Misleading `unchecked` block with overflow comment in LibOpMax.referenceFn irrelevant to `max` operation
+- [PENDING] A28-1: (LOW) Unnecessary `unchecked` block wrapping entire `run` body in LibOpSet has no semantic effect on assembly-only arithmetic
+- [PENDING] A29-1: (LOW) Misleading comment in `referenceFn` for LibOpUint256Div and LibOpUint256Sub says "overflow" but Div reverts on divide-by-zero and Sub reverts on underflow
+- [PENDING] A29-2: (LOW) Inconsistent NatSpec description in LibOpLinearGrowth references wrong variable names ("a" and "r" instead of "base" and "rate")
+- [PENDING] A30-1: (MEDIUM) Dead constants `NOT_LOW_16_BIT_MASK` and `ACTIVE_SOURCE_MASK` defined but never referenced anywhere in the codebase
+- [PENDING] A30-2: (LOW) Potentially unused `using LibBytes32Array` declaration in LibParse.sol
+- [PENDING] A30-3: (LOW) Magic numbers in paren tracking logic (group size 3, reserved bytes 2, max offset 59, shift 0xf0)
+- [PENDING] A30-4: (LOW) `parseRHS` function length (~210 lines) makes it harder to review and audit
+- [PENDING] A33-1: (LOW) Unused `using` directives (`LibParseInterstitial`, `LibSubParse`) and corresponding unused imports in LibParseLiteral.sol
+- [PENDING] A33-2: (MEDIUM) Function pointer mutability mismatch: `selectLiteralParserByIndex` returns `pure` typed pointer but literal parsers array stores `view` typed pointers, bypassing Solidity mutability checking via raw assembly
+- [PENDING] A33-3: (LOW) Parameter naming inconsistency: `parseDecimalFloatPacked` uses `start` instead of `cursor` unlike all other parse functions
+- [PENDING] A33-4: (LOW) Unnamed `ParseState memory` parameter in `boundHex` inconsistent with named `state` parameter in `boundString`
+- [PENDING] A33-5: (LOW) Magic number `0x40` in hex overflow check represents max hex literal length (64 nybbles) without named constant
+- [PENDING] A33-6: (LOW) Inconsistent `unchecked` block usage across parse functions: some wrap entire body, others do not use it at all
+- [PENDING] A39-1: (LOW) Magic numbers in LibParseStackName linked-list encoding without named constants
+- [PENDING] A39-2: (LOW) Magic number `0xf0` in comment sequence parsing in LibParseInterstitial
+- [PENDING] A39-3: (LOW) Duplicated Float-to-uint conversion pattern across five operand handlers in LibParseOperand
+- [PENDING] A39-4: (LOW) Tight coupling between LibParseStackName and ParseState internal layout via direct `topLevel1` access
+- [PENDING] A39-5: (LOW) Different fingerprint representations in `pushStackName` vs `stackNameIndex` is confusing
+- [PENDING] A43-1: (LOW) Incorrect inline comments in `newState` constructor misaligned with struct field order
+- [PENDING] A43-2: (LOW) Stale function name `newActiveSource` in comment should be `newActiveSourcePointer`
+- [PENDING] A43-3: (MEDIUM) FSM NatSpec does not match defined constants (bit positions shifted, missing/extra fields)
+- [PENDING] A43-4: (LOW) Magic number `0x3f` in `highwater` should be a named constant
+- [PENDING] A45-1: (LOW) Constructor lacks NatSpec documentation in Rainterpreter.sol
+- [PENDING] A45-2: (LOW) NatSpec triple-slash used for inline code comment inside RainterpreterStore.set function body
+- [PENDING] A45-3: (LOW) `type(uint256).max` used as `maxOutputs` parameter without named constant in Rainterpreter.eval4
+- [PENDING] A45-4: (LOW) `buildOperandHandlerFunctionPointers` and `buildLiteralParserFunctionPointers` missing `override` keyword in RainterpreterParser, inconsistent with Rainterpreter
+- [PENDING] A47-1: (LOW) `@inheritdoc IERC165` inconsistent with other concrete contracts that use `@inheritdoc ERC165` in RainterpreterExpressionDeployer
+- [PENDING] A47-2: (LOW) Redundant NatSpec before `@inheritdoc` on `buildIntegrityFunctionPointers` is dead documentation in RainterpreterExpressionDeployer
+- [PENDING] A47-3: (LOW) RainterpreterDISPaiRegistry does not implement ERC165 unlike all other concrete contracts
+- [PENDING] A49-1: (LOW) Error `InvalidRepeatCount` defined inline instead of in `src/error/` directory per codebase convention
+- [PENDING] A49-2: (LOW) Variable named `float` shadows its type name `Float` differing only in case
+- [PENDING] A49-3: (LOW) `matchSubParseLiteralDispatch` narrows from `view` to `pure virtual override` constraining future subclass override chain
+- [PENDING] R01-1: (HIGH) Duplicate short flag `-i` on both `fork_url` and `fork_block_number` in fork.rs causes clap runtime panic
+- [PENDING] R01-2: (MEDIUM) Unused dependencies `serde` and `serde_bytes` in CLI crate Cargo.toml
+- [PENDING] R01-3: (LOW) Incorrect `homepage` URL in CLI Cargo.toml points to `rain.orderbook` instead of `rain.interpreter`
+- [PENDING] R01-4: (LOW) Inconsistent error handling pattern between eval.rs and parse.rs wraps errors with `anyhow!` losing original error chain
+- [PENDING] R01-5: (LOW) Eval output uses Debug formatting `{:#?}` labeled as Binary encoding, inconsistent with Parse subcommand
+- [PENDING] R01-6: (LOW) `Execute` trait uses native async fn in trait producing non-Send futures limiting future flexibility
+- [PENDING] R02-1: (MEDIUM) `unwrap()` on `traces` in `From<ForkTypedReturn<eval4Call>>` for `RainEvalResult` will panic if traces are None
+- [PENDING] R02-2: (LOW) Redundant `.to_owned()`, `.deref()`, `.clone()` chain in trace extraction creates multiple unnecessary copies
+- [PENDING] R02-3: (LOW) Inconsistent trace ordering approach between `From<ForkTypedReturn>` and `TryFrom<RawCallResult>` implementations
+- [PENDING] R02-4: (MEDIUM) `search_trace_by_path` has logic bug in parent tracking — sets `current_parent_index` to `trace.parent_source_index` instead of current source index
+- [PENDING] R02-5: (LOW) `CreateNamespace` is an empty struct used only as function namespace; should be a free function
+- [PENDING] R02-6: (LOW) Typo "commiting" should be "committing" in doc comments for `alloy_call` and `call`
+- [PENDING] R02-7: (LOW) `#[allow(clippy::for_kv_map)]` suppresses valid lint; should use `.values()` instead
+- [PENDING] R02-8: (LOW) `add_or_select` uses `unwrap()` on `fork_evm_env` where `new_with_fork` uses `?` for same call
+- [PENDING] R02-9: (LOW) `TryFrom<RawCallResult>` for `RainEvalResult` always produces empty `stack` and `writes` without documenting this limitation
+- [PENDING] R02-10: (LOW) `#[derive]` placed before doc comments in `ForkEvalArgs` and `ForkParseArgs` is unconventional
+- [PENDING] R02-11: (LOW) `roll_fork` uses `unwrap()` after `is_none()` check instead of idiomatic `if let Some`
+- [PENDING] R03-1: (LOW) Unused dependencies `serde` and `serde_json` in parser crate Cargo.toml
+- [PENDING] R03-2: (LOW) Unused dependency `serde_json` in test_fixtures crate Cargo.toml
+- [PENDING] R03-3: (MEDIUM) Edition inconsistency — parser and dispair crates hardcode edition 2021 instead of workspace 2024
+- [PENDING] R03-4: (LOW) Homepage URL inconsistency — parser and dispair use `rainlanguage` org instead of workspace `rainprotocol`
+- [PENDING] R03-5: (MEDIUM) Duplicated `Parser2` trait definition for wasm vs non-wasm targets violates DRY
+- [PENDING] R03-6: (LOW) `DISPaiR` doc comment mentions "Registry" but struct has no registry field
+- [PENDING] R03-7: (LOW) Excessive `unwrap()` in `LocalEvm::new()` and `deploy_new_token()` produces unhelpful panic messages
+- [PENDING] R03-8: (MEDIUM) `parse_pragma_text` is an inherent method while `parse_text` is a trait method creating asymmetry
+- [PENDING] R03-9: (LOW) `DISPaiR` struct lacks `Debug` derive which is unusual for data-carrying struct
+- [PENDING] R03-10: (LOW) Cargo.toml metadata inconsistency — parser and dispair hardcode license instead of using workspace
