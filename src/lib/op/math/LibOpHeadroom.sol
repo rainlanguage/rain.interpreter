@@ -20,8 +20,11 @@ library LibOpHeadroom {
         return (1, 1);
     }
 
-    /// headroom
-    /// decimal floating headroom of a number.
+    /// Decimal floating point headroom (distance to ceil) of a number.
+    /// Returns `ceil(x) - x`, except when `x` is already an integer
+    /// (headroom would be zero), in which case it returns 1.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The updated stack top with the headroom written.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
         Float a;
         assembly ("memory-safe") {

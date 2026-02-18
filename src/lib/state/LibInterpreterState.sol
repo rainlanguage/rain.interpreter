@@ -76,10 +76,10 @@ library LibInterpreterState {
 
     /// Does something that a full node can easily track in its traces that isn't
     /// an event. Specifically, it calls the tracer contract with the memory
-    /// region between `stackTop` and `stackBottom` as an argument. The source
-    /// index is used literally as a 4 byte prefix to the memory region, so that
-    /// it will be interpreted as a function selector by most tooling that is
-    /// expecting ABI encoded data.
+    /// region between `stackTop` and `stackBottom` as an argument. The parent
+    /// source index and source index are packed as two uint16 values into a
+    /// 4 byte prefix to the memory region, so that it will be interpreted as a
+    /// function selector by most tooling that is expecting ABI encoded data.
     ///
     /// The tracer contract doesn't exist, the whole point is that the call will
     /// be a no-op, but it will be visible in traces and unambiguous as no other
@@ -87,8 +87,9 @@ library LibInterpreterState {
     /// tracing stacks.
     ///
     /// Note that the trace is a literal memory region, no ABI encoding or other
-    /// processing is done. The structure is 4 bytes of the source index, then
-    /// 32 byte items for each stack item, in order from top to bottom.
+    /// processing is done. The structure is 2 bytes of parent source index
+    /// followed by 2 bytes of source index, then 32 byte items for each stack
+    /// item, in order from top to bottom.
     ///
     /// There are several reasons we do this instead of emitting an event:
     /// - It's cheaper. Way cheaper in the case of large stacks. There is a one

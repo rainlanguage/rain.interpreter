@@ -179,15 +179,15 @@ library LibEval {
     /// Top-level evaluation entry point. Validates that `inputs` length matches
     /// the source's declared input count, copies inputs onto the stack, runs
     /// `evalLoop`, then constructs the output array from the final stack
-    /// position. Returns the output stack items and any state KV writes as
-    /// parallel arrays.
+    /// position.
     /// @param state The interpreter state containing bytecode, constants,
     /// stacks, store, and function pointers.
     /// @param inputs The stack items to pass as inputs to the source.
     /// @param maxOutputs The maximum number of outputs to return from the
     /// final stack.
-    /// @return The output stack items and any state KV writes as parallel
-    /// arrays of keys and values.
+    /// @return The output stack items, truncated to `maxOutputs`.
+    /// @return The state KV writes as a flat array of interleaved keys and
+    /// values from the in-memory KV store.
     function eval2(InterpreterState memory state, StackItem[] memory inputs, uint256 maxOutputs)
         internal
         view

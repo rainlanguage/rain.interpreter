@@ -35,7 +35,7 @@ library LibOpExp2 {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of exp for testing.
+    /// Gas intensive reference implementation of exp2 for testing.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         view

@@ -436,7 +436,7 @@ Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
 - [PENDING] A04-16: (LOW) `LibOpStack.integrity()` missing `@param` and `@return` tags
 - [PENDING] A04-17: (LOW) `LibOpStack.run()` missing `@param` and `@return` tags
 - [PENDING] A04-18: (LOW) `LibOpStack.referenceFn()` missing `@param` and `@return` tags
-- [PENDING] A05-1: (LOW) `eval2` NatSpec "parallel arrays of keys and values" is ambiguous
+- [FIXED] A05-1: (LOW) `eval2` NatSpec "parallel arrays of keys and values" is ambiguous — rewritten to describe outputs truncation and flat interleaved KV array
 - [PENDING] A06-1: (LOW) `encodeExternDispatch` missing `@param` and `@return` tags
 - [PENDING] A06-2: (LOW) `decodeExternDispatch` missing `@param` and `@return` tags
 - [PENDING] A06-3: (LOW) `encodeExternCall` missing `@param` and `@return` tags
@@ -451,7 +451,7 @@ Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
 - [PENDING] A12-1: (LOW) `IntegrityCheckState` struct has no NatSpec documentation
 - [FIXED] A14-1: (MEDIUM) `InterpreterState` struct has no NatSpec documentation — added struct-level and per-field NatSpec
 - [PENDING] A14-2: (LOW) `STACK_TRACER` constant has no NatSpec documentation
-- [PENDING] A14-3: (LOW) `stackTrace` NatSpec inaccurately describes the 4-byte prefix content
+- [FIXED] A14-3: (LOW) `stackTrace` NatSpec inaccurately describes the 4-byte prefix content — corrected to describe 2-byte parentSourceIndex + 2-byte sourceIndex encoding
 - [PENDING] A14-4: (LOW) `unsafeSerialize` missing `@return` tag and cursor side-effect not documented
 - [PENDING] A16-1: (LOW) LibOpBitwiseAnd integrity missing `@param` and `@return` NatSpec tags
 - [PENDING] A16-2: (LOW) LibOpBitwiseAnd run missing `@param` and `@return` NatSpec tags
@@ -554,7 +554,7 @@ Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
 - [PENDING] A24a-16: (LOW) LibOpE integrity missing `@param` and `@return` NatSpec
 - [PENDING] A24a-17: (LOW) LibOpE run missing `@param` and `@return` NatSpec
 - [PENDING] A24a-18: (LOW) LibOpE referenceFn missing `@param` and `@return` NatSpec
-- [PENDING] A24a-19: (LOW) LibOpExp2 referenceFn NatSpec says "exp" instead of "exp2"
+- [FIXED] A24a-19: (LOW) LibOpExp2 referenceFn NatSpec says "exp" instead of "exp2" — corrected to "exp2"
 - [PENDING] A24a-20: (LOW) LibOpExp2 integrity missing `@param` and `@return` NatSpec
 - [PENDING] A24a-21: (LOW) LibOpExp2 run missing `@param` and `@return` NatSpec
 - [PENDING] A24a-22: (LOW) LibOpExp2 referenceFn missing `@param` and `@return` NatSpec
@@ -564,7 +564,7 @@ Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
 - [PENDING] A24b-1: (LOW) LibOpFrac library-level NatSpec uses `@notice`
 - [PENDING] A24b-2: (LOW) LibOpGm library-level NatSpec uses `@notice`
 - [PENDING] A24b-3: (LOW) LibOpInv library-level NatSpec uses `@notice`
-- [PENDING] A24b-4: (LOW) LibOpHeadroom run NatSpec is inaccurate — missing "point" and undocumented special-case behavior for integer inputs returning 1
+- [FIXED] A24b-4: (LOW) LibOpHeadroom run NatSpec is inaccurate — missing "point" and undocumented special-case behavior for integer inputs returning 1 — rewritten with correct terminology and special case documented
 - [PENDING] A25a-1: (LOW) LibOpMax integrity missing `@param` and `@return` NatSpec
 - [PENDING] A25a-2: (LOW) LibOpMax run missing `@param` and `@return` NatSpec
 - [PENDING] A25a-3: (LOW) LibOpMax referenceFn missing `@param` and `@return` NatSpec
