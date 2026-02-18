@@ -303,7 +303,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A43-3: (MEDIUM) OpcodeIOOverflow error path never tested — testOpcodeIOOverflowInputs and testOpcodeIOOverflowOutputs added
 - [FIXED] A43-4: (MEDIUM) DanglingSource error path never tested — added test that pushes op without ending source then calls buildBytecode
 - [FIXED] A43-5: (MEDIUM) ParenInputOverflow error path never tested — added direct test setting paren counter to 0xFF then pushing one more op
-- [PENDING] A43-6: (MEDIUM) ParseStackOverflow in highwater() never tested
+- [FIXED] A43-6: (MEDIUM) ParseStackOverflow in highwater() never tested — added direct test setting RHS offset to 0x3e then calling highwater()
 - [PENDING] A43-7: (MEDIUM) No direct unit tests for pushOpToSource()
 - [PENDING] A43-8: (MEDIUM) No direct unit tests for endSource()
 - [PENDING] A43-9: (MEDIUM) No direct unit tests for buildBytecode()
