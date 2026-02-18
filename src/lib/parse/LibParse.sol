@@ -329,9 +329,12 @@ library LibParse {
                         newParenOffset := add(byte(0, mload(add(state, parenTracker0Offset))), 3)
                         mstore8(add(state, parenTracker0Offset), newParenOffset)
                     }
-                    // first 2 bytes are reserved, then remaining 62
-                    // bytes are for paren groups, so the offset MUST NOT
-                    // imply writing to the 63rd byte.
+                    // 62 bytes of group data (3 bytes each) fit 20
+                    // groups by size, but pushOpToSource zeroes a
+                    // phantom counter at parenOffset + 4, so the
+                    // effective max is 19 groups (offset 57). The
+                    // check must reject offset 60 to prevent that
+                    // phantom write from corrupting lineTracker.
                     if (newParenOffset > 59) {
                         revert ParenOverflow();
                     }
