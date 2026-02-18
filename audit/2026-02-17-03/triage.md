@@ -214,12 +214,12 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [PENDING] A14-2: (LOW) No dedicated test for `stackBottoms` function
 - [PENDING] A14-3: (LOW) `stackTrace` test does not cover parentSourceIndex/sourceIndex encoding edge cases
 - [FIXED] A15-1: (HIGH) No test file exists for LibInterpreterStateDataContract — added LibInterpreterStateDataContract.t.sol
-- [PENDING] A15-2: (MEDIUM) `serializeSize` unchecked overflow not tested
+- [DISMISSED] A15-2: (MEDIUM) `serializeSize` unchecked overflow not tested — constants.length near 2^256/0x20 is unreachable, memory allocation fails first
 - [FIXED] A15-3: (MEDIUM) `unsafeSerialize` correctness not independently tested — fuzzed round-trip tests added
 - [FIXED] A15-4: (HIGH) `unsafeDeserialize` complex assembly not independently tested — covered by round-trip and stack allocation tests
 - [FIXED] A15-5: (MEDIUM) No test for serialize/deserialize round-trip property — fuzzed single and two-source round-trips added
 - [PENDING] A16-1: (LOW) LibOpCtPop missing test for disallowed operand
-- [PENDING] A17-1: (MEDIUM) No referenceFn or direct unit test for `run` function assembly logic
+- [DISMISSED] A17-1: (MEDIUM) No referenceFn or direct unit test for `run` function assembly logic — call opcode is a control flow instruction, referenceFn would share evalLoop making it not truly independent; E2E tests cover the copy logic
 - [PENDING] A17-2: (LOW) No test for `run` with maximum inputs (15) and maximum outputs simultaneously
 - [PENDING] A17-3: (LOW) No isolated test for operand field extraction consistency between `integrity` and `run`
 - [PENDING] A18-1: (LOW) No test for `run` with a constants array at maximum operand index (65535)
@@ -259,7 +259,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A32-2: (MEDIUM) `MalformedCommentStart` error path is never tested — fuzzed over all non-'*' second bytes
 - [PENDING] A32-3: (LOW) No test for `skipComment` when `cursor + 4 > end`
 - [PENDING] A32-4: (LOW) No test for `skipWhitespace` in isolation
-- [PENDING] A33-1: (MEDIUM) No direct unit test for `selectLiteralParserByIndex`
+- [FIXED] A33-1: (MEDIUM) No direct unit test for `selectLiteralParserByIndex` — added direct test calling returned function pointer for hex, decimal, and string indices
 - [PENDING] A33-2: (LOW) No direct unit test for `tryParseLiteral` dispatch logic
 - [PENDING] A33-3: (LOW) No test for `parseLiteral` revert path
 - [PENDING] A34-1: (MEDIUM) No happy-path unit test for `parseDecimalFloatPacked`
