@@ -13,6 +13,9 @@ import {UnsupportedBitwiseShiftAmount} from "../../../error/ErrBitwise.sol";
 /// operand so it is compile time constant.
 library LibOpShiftBitsRight {
     /// Shift bits right by the amount specified in the operand.
+    /// @param operand The operand encoding the shift amount.
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         uint256 shiftAmount = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
 
@@ -29,6 +32,9 @@ library LibOpShiftBitsRight {
     }
 
     /// Shift bits right by the amount specified in the operand.
+    /// @param operand The operand encoding the shift amount.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         assembly ("memory-safe") {
             mstore(stackTop, shr(and(operand, 0xFFFF), mload(stackTop)))
@@ -37,6 +43,9 @@ library LibOpShiftBitsRight {
     }
 
     /// Reference implementation for shifting bits right.
+    /// @param operand The operand encoding the shift amount.
+    /// @param inputs The input values from the stack.
+    /// @return The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2 operand, StackItem[] memory inputs)
         internal
         pure

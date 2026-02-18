@@ -388,36 +388,36 @@ Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
 - [PENDING] A02-5: (LOW) `subParseLiteral2` `@inheritdoc` lacks implementation-specific param/return docs
 - [PENDING] A02-6: (LOW) `subParseWord2` `@inheritdoc` lacks implementation-specific param/return docs
 - [PENDING] A02-7: (LOW) `supportsInterface` override does not document which additional interfaces it supports
-- [PENDING] A03-1: (LOW) `BadOutputsLength` in ErrExtern.sol missing `@param` tags
-- [PENDING] A03-2: (LOW) `UnsupportedLiteralType` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-3: (LOW) `StringTooLong` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-4: (LOW) `UnclosedStringLiteral` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-5: (LOW) `HexLiteralOverflow` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-6: (LOW) `ZeroLengthHexLiteral` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-7: (LOW) `OddLengthHexLiteral` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-8: (LOW) `MalformedHexLiteral` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-9: (LOW) `MalformedExponentDigits` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-10: (LOW) `MalformedDecimalPoint` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-11: (LOW) `MissingFinalSemi` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-12: (LOW) `UnexpectedLHSChar` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-13: (LOW) `UnexpectedRHSChar` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-14: (LOW) `ExpectedLeftParen` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-15: (LOW) `UnexpectedRightParen` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-16: (LOW) `UnclosedLeftParen` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-17: (LOW) `UnexpectedComment` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-18: (LOW) `UnclosedComment` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-19: (LOW) `MalformedCommentStart` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-20: (LOW) `ExcessLHSItems` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-21: (LOW) `NotAcceptingInputs` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-22: (LOW) `ExcessRHSItems` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-23: (LOW) `WordSize` in ErrParse.sol missing `@param word` tag
-- [PENDING] A03-24: (LOW) `UnknownWord` in ErrParse.sol missing `@param word` tag
-- [PENDING] A03-25: (LOW) `NoWhitespaceAfterUsingWordsFrom` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-26: (LOW) `InvalidSubParser` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-27: (LOW) `UnclosedSubParseableLiteral` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-28: (LOW) `SubParseableMissingDispatch` in ErrParse.sol missing `@param` tags
-- [PENDING] A03-29: (LOW) `BadSubParserResult` in ErrParse.sol missing `@param bytecode` tag
-- [PENDING] A03-30: (LOW) `OpcodeIOOverflow` in ErrParse.sol missing `@param` tags
+- [FIXED] A03-1: (LOW) `BadOutputsLength` in ErrExtern.sol missing `@param` tags — added @param expectedLength, @param actualLength
+- [FIXED] A03-2: (LOW) `UnsupportedLiteralType` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-3: (LOW) `StringTooLong` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-4: (LOW) `UnclosedStringLiteral` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-5: (LOW) `HexLiteralOverflow` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-6: (LOW) `ZeroLengthHexLiteral` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-7: (LOW) `OddLengthHexLiteral` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-8: (LOW) `MalformedHexLiteral` in ErrParse.sol missing `@param` tags — added @param offset
+- [DISMISSED] A03-9: (LOW) `MalformedExponentDigits` in ErrParse.sol missing `@param` tags — error was removed in earlier commit
+- [DISMISSED] A03-10: (LOW) `MalformedDecimalPoint` in ErrParse.sol missing `@param` tags — error was removed in earlier commit
+- [FIXED] A03-11: (LOW) `MissingFinalSemi` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-12: (LOW) `UnexpectedLHSChar` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-13: (LOW) `UnexpectedRHSChar` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-14: (LOW) `ExpectedLeftParen` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-15: (LOW) `UnexpectedRightParen` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-16: (LOW) `UnclosedLeftParen` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-17: (LOW) `UnexpectedComment` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-18: (LOW) `UnclosedComment` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-19: (LOW) `MalformedCommentStart` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-20: (LOW) `ExcessLHSItems` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-21: (LOW) `NotAcceptingInputs` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-22: (LOW) `ExcessRHSItems` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-23: (LOW) `WordSize` in ErrParse.sol missing `@param word` tag — added @param word
+- [FIXED] A03-24: (LOW) `UnknownWord` in ErrParse.sol missing `@param word` tag — added @param word
+- [FIXED] A03-25: (LOW) `NoWhitespaceAfterUsingWordsFrom` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-26: (LOW) `InvalidSubParser` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-27: (LOW) `UnclosedSubParseableLiteral` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-28: (LOW) `SubParseableMissingDispatch` in ErrParse.sol missing `@param` tags — added @param offset
+- [FIXED] A03-29: (LOW) `BadSubParserResult` in ErrParse.sol missing `@param bytecode` tag — added @param bytecode
+- [FIXED] A03-30: (LOW) `OpcodeIOOverflow` in ErrParse.sol missing `@param` tags — added @param offset
 - [PENDING] A04-1: (LOW) `authoringMetaV2()` missing `@return` tag
 - [PENDING] A04-2: (LOW) `literalParserFunctionPointers()` missing `@return` tag
 - [PENDING] A04-3: (LOW) `operandHandlerFunctionPointers()` missing `@return` tag

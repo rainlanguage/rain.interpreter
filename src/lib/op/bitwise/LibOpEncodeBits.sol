@@ -13,6 +13,9 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 library LibOpEncodeBits {
     /// Encode takes two values and returns one value. The first value is the
     /// source, the second value is the target.
+    /// @param operand The operand encoding the start bit and length.
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         uint256 startBit = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFF)));
         uint256 length = uint256((OperandV2.unwrap(operand) >> 8) & bytes32(uint256(0xFF)));
@@ -27,6 +30,9 @@ library LibOpEncodeBits {
     }
 
     /// `encode-bits` opcode. Encodes a source value into a target at the bit position and length specified by the operand.
+    /// @param operand The operand encoding the start bit and length.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         unchecked {
             uint256 source;
@@ -64,6 +70,9 @@ library LibOpEncodeBits {
     }
 
     /// Reference implementation of `encode-bits` for testing.
+    /// @param operand The operand encoding the start bit and length.
+    /// @param inputs The input values from the stack.
+    /// @return outputs The encoded output values.
     function referenceFn(InterpreterState memory, OperandV2 operand, StackItem[] memory inputs)
         internal
         pure

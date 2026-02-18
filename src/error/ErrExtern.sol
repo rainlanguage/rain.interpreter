@@ -20,6 +20,8 @@ error ExternOpcodeOutOfRange(uint256 opcode, uint256 fsCount);
 error ExternPointersMismatch(uint256 opcodeCount, uint256 integrityCount);
 
 /// Thrown when the outputs length is not equal to the expected length.
+/// @param expectedLength The number of outputs the caller expected.
+/// @param actualLength The number of outputs actually returned.
 error BadOutputsLength(uint256 expectedLength, uint256 actualLength);
 
 /// Thrown at construction when there are no opcode function pointers.

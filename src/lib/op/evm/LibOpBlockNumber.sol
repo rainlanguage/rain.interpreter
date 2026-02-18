@@ -14,11 +14,15 @@ library LibOpBlockNumber {
     using LibDecimalFloat for Float;
 
     /// `block-number` integrity check. Requires 0 inputs and produces 1 output.
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (0, 1);
     }
 
     /// `block-number` opcode. Reads the current block number.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
@@ -31,6 +35,7 @@ library LibOpBlockNumber {
     /// Uses the float conversion with exponent 0 to verify that
     /// `fromFixedDecimalLosslessPacked(value, 0)` is identity, unlike `run()`
     /// which stores the raw value directly as a gas optimization.
+    /// @return The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory)
         internal
         view

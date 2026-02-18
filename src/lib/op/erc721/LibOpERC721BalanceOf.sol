@@ -13,6 +13,8 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 /// @notice Opcode for getting the current ERC721 balance of an account.
 library LibOpERC721BalanceOf {
     /// `erc721-balance-of` integrity check. Requires 2 inputs and produces 1 output.
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // Always 2 inputs, the token and the account.
         // Always 1 output, the balance.
@@ -20,6 +22,8 @@ library LibOpERC721BalanceOf {
     }
 
     /// `erc721-balance-of` opcode. Calls `balanceOf` on the token and converts the result to a decimal float.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
         uint256 token;
         uint256 account;
@@ -42,6 +46,8 @@ library LibOpERC721BalanceOf {
     }
 
     /// Reference implementation of `erc721-balance-of` for testing.
+    /// @param inputs The input values from the stack.
+    /// @return The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         view

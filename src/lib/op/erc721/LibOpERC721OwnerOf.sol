@@ -12,6 +12,8 @@ import {InterpreterState} from "../../state/LibInterpreterState.sol";
 /// @notice Opcode for getting the current owner of an erc721 token.
 library LibOpERC721OwnerOf {
     /// `erc721-owner-of` integrity check. Requires 2 inputs and produces 1 output.
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // Always 2 inputs, the token and the tokenId.
         // Always 1 output, the owner.
@@ -19,6 +21,8 @@ library LibOpERC721OwnerOf {
     }
 
     /// `erc721-owner-of` opcode. Calls `ownerOf` on the token contract to get the owner of a specific token ID.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
         uint256 token;
         uint256 tokenId;
@@ -38,6 +42,8 @@ library LibOpERC721OwnerOf {
     }
 
     /// Reference implementation of `erc721-owner-of` for testing.
+    /// @param inputs The input values from the stack.
+    /// @return The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         view

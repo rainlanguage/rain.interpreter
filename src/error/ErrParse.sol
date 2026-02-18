@@ -27,53 +27,69 @@ error OperandValuesOverflow(uint256 offset);
 error UnclosedOperand(uint256 offset);
 
 /// The parser tried to bound an unsupported literal that we have no type for.
+/// @param offset The byte offset in the source where the error occurred.
 error UnsupportedLiteralType(uint256 offset);
 
 /// Encountered a string literal that is larger than supported.
+/// @param offset The byte offset in the source where the error occurred.
 error StringTooLong(uint256 offset);
 
 /// Encountered a string that does not have a valid end, e.g. we found some char
 /// that was not printable ASCII and had to stop.
+/// @param offset The byte offset in the source where the error occurred.
 error UnclosedStringLiteral(uint256 offset);
 
 /// Encountered a literal that is larger than supported.
+/// @param offset The byte offset in the source where the error occurred.
 error HexLiteralOverflow(uint256 offset);
 
 /// Encountered a zero length hex literal.
+/// @param offset The byte offset in the source where the error occurred.
 error ZeroLengthHexLiteral(uint256 offset);
 
 /// Encountered an odd sized hex literal.
+/// @param offset The byte offset in the source where the error occurred.
 error OddLengthHexLiteral(uint256 offset);
 
 /// Encountered a hex literal with an invalid character.
+/// @param offset The byte offset in the source where the error occurred.
 error MalformedHexLiteral(uint256 offset);
 
 /// The expression does not finish with a semicolon (EOF).
+/// @param offset The byte offset in the source where the error occurred.
 error MissingFinalSemi(uint256 offset);
 
 /// Encountered an unexpected character on the LHS.
+/// @param offset The byte offset in the source where the error occurred.
 error UnexpectedLHSChar(uint256 offset);
 
 /// Encountered an unexpected character on the RHS.
+/// @param offset The byte offset in the source where the error occurred.
 error UnexpectedRHSChar(uint256 offset);
 
 /// More specific version of UnexpectedRHSChar where we specifically expected
 /// a left paren but got some other char.
+/// @param offset The byte offset in the source where the error occurred.
 error ExpectedLeftParen(uint256 offset);
 
 /// Encountered a right paren without a matching left paren.
+/// @param offset The byte offset in the source where the error occurred.
 error UnexpectedRightParen(uint256 offset);
 
 /// Encountered an unclosed left paren.
+/// @param offset The byte offset in the source where the error occurred.
 error UnclosedLeftParen(uint256 offset);
 
 /// Encountered a comment outside the interstitial space between lines.
+/// @param offset The byte offset in the source where the error occurred.
 error UnexpectedComment(uint256 offset);
 
 /// Encountered a comment that never ends.
+/// @param offset The byte offset in the source where the error occurred.
 error UnclosedComment(uint256 offset);
 
 /// Encountered a comment start sequence that is malformed.
+/// @param offset The byte offset in the source where the error occurred.
 error MalformedCommentStart(uint256 offset);
 
 /// Thrown when a stack name is duplicated. Shadowing in all forms is
@@ -82,18 +98,23 @@ error MalformedCommentStart(uint256 offset);
 error DuplicateLHSItem(uint256 offset);
 
 /// Encountered too many LHS items.
+/// @param offset The byte offset in the source where the error occurred.
 error ExcessLHSItems(uint256 offset);
 
 /// Encountered inputs where they can't be handled.
+/// @param offset The byte offset in the source where the error occurred.
 error NotAcceptingInputs(uint256 offset);
 
 /// Encountered too many RHS items.
+/// @param offset The byte offset in the source where the error occurred.
 error ExcessRHSItems(uint256 offset);
 
 /// Encountered a word that is longer than 32 bytes.
+/// @param word The word that exceeded the maximum length.
 error WordSize(string word);
 
 /// Parsed a word that is not in the meta.
+/// @param word The word that was not found.
 error UnknownWord(string word);
 
 /// The parser exceeded the maximum number of sources that it can build.
@@ -117,22 +138,28 @@ error ParseStackUnderflow();
 error ParenOverflow();
 
 /// The parser did not find any whitespace after the pragma keyword.
+/// @param offset The byte offset in the source where the error occurred.
 error NoWhitespaceAfterUsingWordsFrom(uint256 offset);
 
 /// The parser encountered a literal that it cannot use as a sub parser.
+/// @param offset The byte offset in the source where the error occurred.
 error InvalidSubParser(uint256 offset);
 
 /// The parser encountered an unclosed sub parsed literal.
+/// @param offset The byte offset in the source where the error occurred.
 error UnclosedSubParseableLiteral(uint256 offset);
 
 /// The parser encountered a sub parseable literal with a missing dispatch.
+/// @param offset The byte offset in the source where the error occurred.
 error SubParseableMissingDispatch(uint256 offset);
 
 /// The sub parser returned some bytecode that the main parser could not
 /// understand.
+/// @param bytecode The bytecode that was returned by the sub parser.
 error BadSubParserResult(bytes bytecode);
 
 /// Thrown when there are more than 16 inputs or outputs for a given opcode.
+/// @param offset The byte offset in the source where the error occurred.
 error OpcodeIOOverflow(uint256 offset);
 
 /// Thrown when an operand value is larger than the maximum allowed.
