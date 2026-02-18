@@ -9,8 +9,10 @@ import {StateNamespace} from "rain.interpreter.interface/interface/IInterpreterS
 import {EvalV4, SourceIndexV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibNamespace} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
 import {InputsLengthMismatch} from "src/error/ErrEval.sol";
+import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 contract RainterpreterEvalTest is RainterpreterExpressionDeployerDeploymentTest {
+    using LibDecimalFloat for Float;
     /// Passing more inputs than the source expects MUST revert.
     function testInputsLengthMismatchTooMany(uint8 extraInputs) external {
         vm.assume(extraInputs > 0);
@@ -65,5 +67,35 @@ contract RainterpreterEvalTest is RainterpreterExpressionDeployerDeploymentTest 
                 stateOverlay: new bytes32[](0)
             })
         );
+    }
+
+    /// Passing the correct number of non-zero inputs must succeed and the
+    /// inputs must be usable by ops in the source.
+    function testEvalWithMatchingInputs(int256 a, int256 b) external view {
+        a = bound(a, -1e18, 1e18);
+        b = bound(b, -1e18, 1e18);
+        Float fa = LibDecimalFloat.packLossless(a, 0);
+        Float fb = LibDecimalFloat.packLossless(b, 0);
+
+        bytes memory bytecode = I_DEPLOYER.parse2("a b:, _: add(a b);");
+        StackItem[] memory inputs = new StackItem[](2);
+        inputs[0] = StackItem.wrap(Float.unwrap(fa));
+        inputs[1] = StackItem.wrap(Float.unwrap(fb));
+        (StackItem[] memory stack,) = I_INTERPRETER.eval4(
+            EvalV4({
+                store: I_STORE,
+                namespace: LibNamespace.qualifyNamespace(StateNamespace.wrap(0), address(this)),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: new bytes32[][](0),
+                inputs: inputs,
+                stateOverlay: new bytes32[](0)
+            })
+        );
+        // 2 inputs + 1 op output = 3 stack items.
+        assertEq(stack.length, 3);
+        // Top of stack is the add result.
+        Float expected = fa.add(fb);
+        assertTrue(Float.wrap(StackItem.unwrap(stack[0])).eq(expected));
     }
 }
