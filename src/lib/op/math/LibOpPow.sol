@@ -9,7 +9,7 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpPow
-/// @notice Opcode to pow a decimal floating point value to a float decimal power.
+/// Opcode to pow a decimal floating point value to a float decimal power.
 library LibOpPow {
     using LibDecimalFloat for Float;
 

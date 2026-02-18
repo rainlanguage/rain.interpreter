@@ -27,7 +27,7 @@ import {OddSetLength} from "../error/ErrStore.sol";
 import {ZeroFunctionPointers} from "../error/ErrEval.sol";
 
 /// @title Rainterpreter
-/// @notice Implementation of a Rainlang interpreter that is compatible with
+/// Implementation of a Rainlang interpreter that is compatible with
 /// native onchain Rainlang parsing.
 contract Rainterpreter is IInterpreterV4, IOpcodeToolingV1, ERC165 {
     using LibEval for InterpreterState;

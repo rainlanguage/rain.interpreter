@@ -9,7 +9,7 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpInv
-/// @notice Opcode for the inverse 1 / x of a floating point number.
+/// Opcode for the inverse 1 / x of a decimal floating point number.
 library LibOpInv {
     using LibDecimalFloat for Float;
 

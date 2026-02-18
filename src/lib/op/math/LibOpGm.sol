@@ -9,7 +9,7 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpGm
-/// @notice Opcode for the geometric average of two decimal floating point
+/// Opcode for the geometric average of two decimal floating point
 /// numbers.
 library LibOpGm {
     using LibDecimalFloat for Float;

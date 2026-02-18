@@ -561,9 +561,9 @@ Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
 - [PENDING] A24a-23: (LOW) LibOpExp integrity missing `@param` and `@return` NatSpec
 - [PENDING] A24a-24: (LOW) LibOpExp run missing `@param` and `@return` NatSpec
 - [PENDING] A24a-25: (LOW) LibOpExp referenceFn missing `@param` and `@return` NatSpec
-- [PENDING] A24b-1: (LOW) LibOpFrac library-level NatSpec uses `@notice`
-- [PENDING] A24b-2: (LOW) LibOpGm library-level NatSpec uses `@notice`
-- [PENDING] A24b-3: (LOW) LibOpInv library-level NatSpec uses `@notice`
+- [FIXED] A24b-1: (LOW) LibOpFrac library-level NatSpec uses `@notice` — removed `@notice` tag
+- [FIXED] A24b-2: (LOW) LibOpGm library-level NatSpec uses `@notice` — removed `@notice` tag
+- [FIXED] A24b-3: (LOW) LibOpInv library-level NatSpec uses `@notice` — removed `@notice` tag, also added missing "decimal"
 - [FIXED] A24b-4: (LOW) LibOpHeadroom run NatSpec is inaccurate — missing "point" and undocumented special-case behavior for integer inputs returning 1 — rewritten with correct terminology and special case documented
 - [PENDING] A25a-1: (LOW) LibOpMax integrity missing `@param` and `@return` NatSpec
 - [PENDING] A25a-2: (LOW) LibOpMax run missing `@param` and `@return` NatSpec
@@ -583,8 +583,8 @@ Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
 - [PENDING] A25a-16: (LOW) LibOpMinPositiveValue integrity missing `@param` and `@return` NatSpec
 - [PENDING] A25a-17: (LOW) LibOpMinPositiveValue run missing `@param` and `@return` NatSpec
 - [PENDING] A25a-18: (LOW) LibOpMinPositiveValue referenceFn missing `@param` and `@return` NatSpec
-- [PENDING] A25b-1: (LOW) LibOpPow `@notice` tag used in library-level NatSpec
-- [PENDING] A25b-2: (LOW) LibOpSqrt `@notice` tag used in library-level NatSpec
+- [FIXED] A25b-1: (LOW) LibOpPow `@notice` tag used in library-level NatSpec — removed `@notice` tag
+- [FIXED] A25b-2: (LOW) LibOpSqrt `@notice` tag used in library-level NatSpec — removed `@notice` tag
 - [FIXED] A25b-3: (MEDIUM) LibOpMul integrity missing `@param` and `@return` tags — added
 - [FIXED] A25b-4: (MEDIUM) LibOpMul run missing `@param` and `@return` tags — added
 - [FIXED] A25b-5: (MEDIUM) LibOpMul referenceFn missing `@param` and `@return` tags — added
@@ -654,7 +654,7 @@ Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
 - [PENDING] A43-6: (LOW) `PARSE_STATE_TOP_LEVEL0_OFFSET` and sibling constants document offsets but not how they were derived
 - [PENDING] A45-1: (LOW) Constructor has no NatSpec documentation
 - [PENDING] A45-2: (LOW) `opcodeFunctionPointers()` NatSpec lacks a function description line
-- [PENDING] A45-3: (LOW) Contract-level NatSpec uses `@notice` and is minimal
+- [FIXED] A45-3: (LOW) Contract-level NatSpec uses `@notice` and is minimal — removed `@notice` tag from Rainterpreter
 - [PENDING] A45-4: (LOW) All four getter functions in `RainterpreterDISPaiRegistry` lack `@return` tags
 - [PENDING] A47-1: (LOW) Contract-level NatSpec is title-only, no description
 - [DISMISSED] A47-2: (MEDIUM) `parse2` has no meaningful NatSpec — `@inheritdoc` inherits nothing — upstream issue in rain.interpreter.interface; IParserV2 has no NatSpec
@@ -754,7 +754,7 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [PENDING] A24-1: (LOW) `referenceFn` NatSpec in LibOpExp2 says "exp" instead of "exp2" (copy-paste documentation error)
 - [PENDING] A25a-1: (LOW) `using LibDecimalFloat for Float` declared but unused in LibOpMaxNegativeValue and LibOpMaxPositiveValue
 - [PENDING] A25a-2: (LOW) Missing "point" in LibOpHeadroom run NatSpec ("decimal floating headroom" should be "decimal floating point headroom")
-- [PENDING] A25a-3: (LOW) Missing "decimal" in LibOpInv run NatSpec (says "floating point" instead of "decimal floating point")
+- [FIXED] A25a-3: (LOW) Missing "decimal" in LibOpInv run NatSpec (says "floating point" instead of "decimal floating point") — fixed as part of @notice removal
 - [PENDING] A25a-4: (LOW) Misleading `unchecked` block with overflow comment in LibOpMax.referenceFn irrelevant to `max` operation
 - [PENDING] A28-1: (LOW) Unnecessary `unchecked` block wrapping entire `run` body in LibOpSet has no semantic effect on assembly-only arithmetic
 - [PENDING] A29-1: (LOW) Misleading comment in `referenceFn` for LibOpUint256Div and LibOpUint256Sub says "overflow" but Div reverts on divide-by-zero and Sub reverts on underflow
