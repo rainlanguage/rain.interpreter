@@ -21,10 +21,10 @@ contract LibExternCodecTest is Test {
     }
 
     /// Ensure `encodeExternCall` encodes the address and dispatch correctly.
-    function testLibExternCodecEncodeExternCall(uint256 opcode, bytes32 operand) external pure {
+    function testLibExternCodecEncodeExternCall(string memory name, uint256 opcode, bytes32 operand) external {
         opcode = bound(opcode, 0, type(uint16).max);
         operand = bytes32(bound(uint256(operand), 0, type(uint16).max));
-        IInterpreterExternV4 extern = IInterpreterExternV4(address(0x1234567890123456789012345678901234567890));
+        IInterpreterExternV4 extern = IInterpreterExternV4(makeAddr(name));
         ExternDispatchV2 dispatch = LibExtern.encodeExternDispatch(opcode, OperandV2.wrap(operand));
         EncodedExternDispatchV2 encoded = LibExtern.encodeExternCall(extern, dispatch);
         (IInterpreterExternV4 decodedExtern, ExternDispatchV2 decodedDispatch) = LibExtern.decodeExternCall(encoded);

@@ -186,7 +186,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A05-4: (LOW) No test for zero-opcode source in `evalLoop` — added 2 tests: zero inputs/zero ops, fuzzed inputs passthrough with zero ops
 - [FIXED] A05-5: (LOW) No test for multiple sources exercised through `eval2` — added 2 tests: sourceIndex 1 eval and source 0 vs source 1 value independence
 - [FIXED] A05-6: (LOW) No test for `eval2` with non-zero inputs that match source expectation — added fuzz test with 2 inputs consumed by add op in Rainterpreter.eval.t.sol
-- [PENDING] A05-7: (LOW) No test for exact multiple-of-8 opcode count (zero remainder)
+- [FIXED] A05-7: (LOW) No test for exact multiple-of-8 opcode count (zero remainder) — cb7e0e68
 - [PENDING] A06-1: (LOW) No test for encode/decode roundtrip with varied extern addresses
 - [DISMISSED] A06-2: (MEDIUM) No test for overflow/truncation behavior when opcode or operand exceeds 16 bits — only caller passes compile-time constant 0, NatSpec documents precondition
 - [PENDING] A06-3: (LOW) `decodeExternDispatch` and `decodeExternCall` have no standalone unit tests
