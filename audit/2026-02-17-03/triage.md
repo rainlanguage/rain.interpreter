@@ -189,7 +189,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A05-7: (LOW) No test for exact multiple-of-8 opcode count (zero remainder) — cb7e0e68
 - [FIXED] A06-1: (LOW) No test for encode/decode roundtrip with varied extern addresses — d44b4d6a
 - [DISMISSED] A06-2: (MEDIUM) No test for overflow/truncation behavior when opcode or operand exceeds 16 bits — only caller passes compile-time constant 0, NatSpec documents precondition
-- [PENDING] A06-3: (LOW) `decodeExternDispatch` and `decodeExternCall` have no standalone unit tests
+- [FIXED] A06-3: (LOW) `decodeExternDispatch` and `decodeExternCall` have no standalone unit tests — 7a09fc12
 - [PENDING] A07-1: (LOW) No direct unit test for LibExternOpContextCallingContract.subParser
 - [PENDING] A07-2: (LOW) No test for subParser with varying constantsHeight or ioByte inputs
 - [PENDING] A08-1: (LOW) No direct unit test for LibExternOpContextRainlen.subParser
