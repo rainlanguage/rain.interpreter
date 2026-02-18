@@ -24,6 +24,10 @@ Internal library functions need an external wrapper in the test contract. Constr
 
 Use `vm.expectRevert` with `abi.encodeWithSelector` and the custom error type. Call through `this.externalFoo()` for library functions or directly on `I_PARSER`/`I_INTERPRETER` for integration tests.
 
+## Bytecode Construction
+
+Use the parse library to generate bytecode from rainlang when the test needs valid bytecode. Only hand-encode bytecode when the test intentionally needs invalid or malformed bytecode that the parser cannot produce.
+
 ## Bytecode Inspection
 
 Use `LibBytecode` from `rain.interpreter.interface/lib/bytecode/LibBytecode.sol`. Do not manually index into bytecode bytes.
