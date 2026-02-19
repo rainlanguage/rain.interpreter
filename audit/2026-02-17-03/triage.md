@@ -220,7 +220,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A15-5: (MEDIUM) No test for serialize/deserialize round-trip property — fuzzed single and two-source round-trips added
 - [FIXED] A16-1: (LOW) LibOpCtPop missing test for disallowed operand — added `testOpCtPopEvalBadOperand` test
 - [DISMISSED] A17-1: (MEDIUM) No referenceFn or direct unit test for `run` function assembly logic — call opcode is a control flow instruction, referenceFn would share evalLoop making it not truly independent; E2E tests cover the copy logic
-- [PENDING] A17-2: (LOW) No test for `run` with maximum inputs (15) and maximum outputs simultaneously
+- [FIXED] A17-2: (LOW) No test for `run` with maximum inputs (15) and maximum outputs simultaneously — added `testOpCallRunMaxInputsMaxOutputs` with 15-input/15-output no-body callee
 - [PENDING] A17-3: (LOW) No isolated test for operand field extraction consistency between `integrity` and `run`
 - [PENDING] A18-1: (LOW) No test for `run` with a constants array at maximum operand index (65535)
 - [PENDING] A19-1: (LOW) No test for context with empty inner array (context[i].length == 0, j == 0)
