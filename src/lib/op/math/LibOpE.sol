@@ -11,12 +11,16 @@ import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 /// @title LibOpE
 /// @notice Stacks the mathematical constant e.
 library LibOpE {
-    /// `e` integrity check. Requires 0 inputs and produces 1 output.
+    /// @notice `e` integrity check. Requires 0 inputs and produces 1 output.
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (0, 1);
     }
 
-    /// `e` opcode. Pushes the mathematical constant e onto the stack.
+    /// @notice `e` opcode. Pushes the mathematical constant e onto the stack.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
         Float e = LibDecimalFloat.FLOAT_E;
         assembly ("memory-safe") {
@@ -26,7 +30,8 @@ library LibOpE {
         return stackTop;
     }
 
-    /// Reference implementation of `e` for testing.
+    /// @notice Reference implementation of `e` for testing.
+    /// @return The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory)
         internal
         pure

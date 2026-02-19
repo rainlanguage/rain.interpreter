@@ -13,7 +13,10 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibOpMax {
     using LibDecimalFloat for Float;
 
-    /// `max` integrity check. Requires at least 2 inputs and produces 1 output.
+    /// @notice `max` integrity check. Requires at least 2 inputs and produces 1 output.
+    /// @param operand Low 4 bits of the high byte encode the input count.
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
         uint256 inputs = uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F;
@@ -21,8 +24,11 @@ library LibOpMax {
         return (inputs, 1);
     }
 
-    /// max
+    /// @notice max
     /// Finds the maximum value from N floats.
+    /// @param operand Low 4 bits of the high byte encode the input count.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         Float a;
         Float b;
@@ -55,7 +61,9 @@ library LibOpMax {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of maximum for testing.
+    /// @notice Gas intensive reference implementation of maximum for testing.
+    /// @param inputs The input values from the stack.
+    /// @return outputs The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure

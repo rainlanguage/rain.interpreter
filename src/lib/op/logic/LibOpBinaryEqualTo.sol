@@ -11,6 +11,7 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 /// @notice Opcode to return 1 if the first item on the stack is equal to
 /// the second item on the stack, else 0.
 library LibOpBinaryEqualTo {
+    /// @notice `binary-equal-to` integrity check. Requires exactly 2 inputs and produces 1 output.
     /// @return The number of inputs.
     /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {

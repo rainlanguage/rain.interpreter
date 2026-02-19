@@ -13,12 +13,16 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibOpMaxPositiveValue {
     using LibDecimalFloat for Float;
 
-    /// `max-positive-value` integrity check. Requires 0 inputs and produces 1 output.
+    /// @notice `max-positive-value` integrity check. Requires 0 inputs and produces 1 output.
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (0, 1);
     }
 
-    /// `max-positive-value` opcode. Pushes the maximum representable positive float onto the stack.
+    /// @notice `max-positive-value` opcode. Pushes the maximum representable positive float onto the stack.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
         Float value = LibDecimalFloat.FLOAT_MAX_POSITIVE_VALUE;
         assembly ("memory-safe") {
@@ -28,7 +32,8 @@ library LibOpMaxPositiveValue {
         return stackTop;
     }
 
-    /// Reference implementation of `max-positive-value` for testing.
+    /// @notice Reference implementation of `max-positive-value` for testing.
+    /// @return The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory)
         internal
         pure

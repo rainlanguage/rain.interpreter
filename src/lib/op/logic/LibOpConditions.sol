@@ -16,6 +16,7 @@ library LibOpConditions {
     using LibIntOrAString for IntOrAString;
     using LibDecimalFloat for Float;
 
+    /// @notice `conditions` integrity check. Requires at least 2 inputs and produces 1 output.
     /// @param operand The operand encoding the number of inputs.
     /// @return The number of inputs.
     /// @return The number of outputs.

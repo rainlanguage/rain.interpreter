@@ -96,7 +96,7 @@ library LibOpCall {
         return (sourceInputs, outputs);
     }
 
-    /// Executes a call to another source within the same expression.
+    /// @notice Executes a call to another source within the same expression.
     ///
     /// 1. Extracts `sourceIndex`, `inputs`, and `outputs` from the operand.
     /// 2. Looks up the callee's stack bottom from `state.stackBottoms` and
@@ -114,6 +114,11 @@ library LibOpCall {
     /// `LibBytecode.sourceInputsOutputsLength`, which reverts with
     /// `SourceIndexOutOfBounds` for invalid indices. Bytecode is immutable
     /// once serialized so the index cannot become stale.
+    /// @param state The interpreter state containing the stack bottoms and bytecode.
+    /// @param operand Encodes sourceIndex (low 16 bits), inputs (bits 16–19),
+    /// and outputs (bits 20+).
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory state, OperandV2 operand, Pointer stackTop) internal view returns (Pointer) {
         // Extract config from the operand.
         uint256 sourceIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));

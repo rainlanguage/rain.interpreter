@@ -22,10 +22,12 @@ library LibOpEnsure {
         return (2, 0);
     }
 
-    /// `ensure`
+    /// @notice `ensure`
     /// If the condition is zero, the expression will revert with the given
     /// string.
     /// All conditions are eagerly evaluated and there are no outputs.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
         Float condition;
         IntOrAString reason;
@@ -41,7 +43,9 @@ library LibOpEnsure {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of `ensure` for testing.
+    /// @notice Gas intensive reference implementation of `ensure` for testing.
+    /// @param inputs The input values from the stack.
+    /// @return outputs The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure
