@@ -18,7 +18,9 @@ library LibOpUint256ERC721BalanceOf {
         return (2, 1);
     }
 
-    /// `uint256-erc721-balance-of` opcode. Calls `balanceOf` on the token and returns the raw uint256 balance.
+    /// @notice `uint256-erc721-balance-of` opcode. Calls `balanceOf` on the token and returns the raw uint256 balance.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
         uint256 token;
         uint256 account;
@@ -37,7 +39,9 @@ library LibOpUint256ERC721BalanceOf {
         return stackTop;
     }
 
-    /// Reference implementation of `uint256-erc721-balance-of` for testing.
+    /// @notice Reference implementation of `uint256-erc721-balance-of` for testing.
+    /// @param inputs The input values from the stack.
+    /// @return The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         view

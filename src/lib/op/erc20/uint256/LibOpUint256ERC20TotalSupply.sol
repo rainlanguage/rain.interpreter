@@ -18,7 +18,9 @@ library LibOpUint256ERC20TotalSupply {
         return (1, 1);
     }
 
-    /// `uint256-erc20-total-supply` opcode. Calls `totalSupply` on the token and returns the raw uint256 value.
+    /// @notice `uint256-erc20-total-supply` opcode. Calls `totalSupply` on the token and returns the raw uint256 value.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
         uint256 token;
         assembly ("memory-safe") {
@@ -34,7 +36,9 @@ library LibOpUint256ERC20TotalSupply {
         return stackTop;
     }
 
-    /// Reference implementation of `uint256-erc20-total-supply` for testing.
+    /// @notice Reference implementation of `uint256-erc20-total-supply` for testing.
+    /// @param inputs The input values from the stack.
+    /// @return The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         view

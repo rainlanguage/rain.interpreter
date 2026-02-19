@@ -10,7 +10,10 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 /// @title LibOpUint256Add
 /// @notice Opcode to add N integers. Errors on overflow.
 library LibOpUint256Add {
-    /// `uint256-add` integrity check. Requires at least 2 inputs and produces 1 output.
+    /// @notice `uint256-add` integrity check. Requires at least 2 inputs and produces 1 output.
+    /// @param operand Low 4 bits of the high byte encode the input count.
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
         uint256 inputs = uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F;
@@ -18,9 +21,12 @@ library LibOpUint256Add {
         return (inputs, 1);
     }
 
-    /// uint256-add
+    /// @notice uint256-add
     /// Addition with implied overflow checks from the Solidity 0.8.x
     /// compiler.
+    /// @param operand Low 4 bits of the high byte encode the input count.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 a;
         uint256 b;
@@ -52,7 +58,9 @@ library LibOpUint256Add {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of addition for testing.
+    /// @notice Gas intensive reference implementation of addition for testing.
+    /// @param inputs The input values from the stack.
+    /// @return outputs The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure

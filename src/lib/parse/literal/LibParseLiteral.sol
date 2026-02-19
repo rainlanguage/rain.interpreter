@@ -24,9 +24,12 @@ library LibParseLiteral {
     using LibParseLiteral for ParseState;
     using LibParseError for ParseState;
 
-    /// Selects a literal parser function pointer from the state's literal
+    /// @notice Selects a literal parser function pointer from the state's literal
     /// parsers array by index. Not bounds checked as indexes are expected to
     /// be provided by the parser itself.
+    /// @param state The current parse state.
+    /// @param index The index of the literal parser to select.
+    /// @return The selected literal parser function pointer.
     function selectLiteralParserByIndex(ParseState memory state, uint256 index)
         internal
         pure
@@ -42,8 +45,13 @@ library LibParseLiteral {
         return parser;
     }
 
-    /// Parses a literal value at the cursor position. Reverts with
+    /// @notice Parses a literal value at the cursor position. Reverts with
     /// `UnsupportedLiteralType` if the literal type cannot be determined.
+    /// @param state The current parse state.
+    /// @param cursor The current cursor position in the source string.
+    /// @param end The end of the source string.
+    /// @return The updated cursor position after parsing.
+    /// @return The parsed literal value.
     function parseLiteral(ParseState memory state, uint256 cursor, uint256 end)
         internal
         view
@@ -57,9 +65,15 @@ library LibParseLiteral {
         }
     }
 
-    /// Attempts to parse a literal value at the cursor position. Dispatches
+    /// @notice Attempts to parse a literal value at the cursor position. Dispatches
     /// to hex, decimal, string, or sub-parseable parsers based on the head
     /// character. Returns false if the literal type is not recognized.
+    /// @param state The current parse state.
+    /// @param cursor The current cursor position in the source string.
+    /// @param end The end of the source string.
+    /// @return Whether a literal was successfully parsed.
+    /// @return The updated cursor position after parsing.
+    /// @return The parsed literal value.
     function tryParseLiteral(ParseState memory state, uint256 cursor, uint256 end)
         internal
         view

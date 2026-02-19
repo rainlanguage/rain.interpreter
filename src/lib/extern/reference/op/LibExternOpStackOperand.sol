@@ -12,6 +12,13 @@ import {LibSubParse} from "../../../parse/LibSubParse.sol";
 /// `integrity` logic, only a sub parser. This demonstrates both how to
 /// implement constants, and handling operands in the sub parser.
 library LibExternOpStackOperand {
+    /// @notice The sub parser for the stack operand opcode. Copies the operand
+    /// value into the constants array so the interpreter can push it directly.
+    /// @param constantsHeight The current height of the constants array.
+    /// @param operand The operand value to copy to constants.
+    /// @return Whether the sub parse succeeded.
+    /// @return The bytecode for the sub parse.
+    /// @return The constants for the sub parse.
     //slither-disable-next-line dead-code
     function subParser(uint256 constantsHeight, uint256, OperandV2 operand)
         internal

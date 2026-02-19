@@ -18,7 +18,9 @@ library LibOpUint256ERC20Allowance {
         return (3, 1);
     }
 
-    /// `uint256-erc20-allowance` opcode. Calls `allowance` on the token and returns the raw uint256 allowance.
+    /// @notice `uint256-erc20-allowance` opcode. Calls `allowance` on the token and returns the raw uint256 allowance.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
         uint256 token;
         uint256 owner;
@@ -40,7 +42,9 @@ library LibOpUint256ERC20Allowance {
         return stackTop;
     }
 
-    /// Reference implementation of `uint256-erc20-allowance` for testing.
+    /// @notice Reference implementation of `uint256-erc20-allowance` for testing.
+    /// @param inputs The input values from the stack.
+    /// @return The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         view

@@ -21,8 +21,13 @@ library LibParseLiteralHex {
     using LibParseLiteralHex for ParseState;
     using LibParseError for ParseState;
 
-    /// Finds the bounds of a hex literal by scanning forward from past the
+    /// @notice Finds the bounds of a hex literal by scanning forward from past the
     /// "0x" prefix until a non-hex character is encountered.
+    /// @param cursor The cursor position at the start of the hex literal.
+    /// @param end The end of the source string.
+    /// @return The start of the hex digits (past "0x").
+    /// @return The end of the hex digits.
+    /// @return The new cursor position after the hex literal.
     function boundHex(ParseState memory, uint256 cursor, uint256 end)
         internal
         pure
@@ -43,13 +48,18 @@ library LibParseLiteralHex {
         return (innerStart, innerEnd, innerEnd);
     }
 
-    /// Algorithm for parsing hexadecimal literals:
+    /// @notice Algorithm for parsing hexadecimal literals:
     /// - start at the end of the literal
     /// - for each character:
     ///   - convert the character to a nybble
     ///   - shift the nybble into the total at the correct position
     ///     (4 bits per nybble)
     /// - return the total
+    /// @param state The current parse state.
+    /// @param cursor The cursor position at the start of the hex literal.
+    /// @param end The end of the source string.
+    /// @return The updated cursor position after parsing.
+    /// @return The parsed hex value.
     function parseHex(ParseState memory state, uint256 cursor, uint256 end) internal pure returns (uint256, bytes32) {
         unchecked {
             bytes32 value;

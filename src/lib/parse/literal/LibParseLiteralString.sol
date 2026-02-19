@@ -14,9 +14,15 @@ library LibParseLiteralString {
     using LibParseError for ParseState;
     using LibParseLiteralString for ParseState;
 
-    /// Find the bounds for some string literal at the cursor. The caller is
+    /// @notice Find the bounds for some string literal at the cursor. The caller is
     /// responsible for checking that the cursor is at the start of a string
     /// literal. Bounds are as per `boundLiteral`.
+    /// @param state The current parse state.
+    /// @param cursor The cursor position at the start of the string literal.
+    /// @param end The end of the source string.
+    /// @return The start of the string content (past opening quote).
+    /// @return The end of the string content (before closing quote).
+    /// @return The new cursor position after the string literal.
     function boundString(ParseState memory state, uint256 cursor, uint256 end)
         internal
         pure
@@ -68,12 +74,17 @@ library LibParseLiteralString {
         }
     }
 
-    /// Algorithm for parsing string literals:
+    /// @notice Algorithm for parsing string literals:
     /// - Get the inner length of the string
     /// - Mutate memory in place to add a length prefix, record the original data
     /// - Use this solidity string to build an `IntOrAString`
     /// - Restore the original data that the length prefix overwrote
     /// - Return the `IntOrAString`
+    /// @param state The current parse state.
+    /// @param cursor The cursor position at the start of the string literal.
+    /// @param end The end of the source string.
+    /// @return The updated cursor position after parsing.
+    /// @return The parsed string as an IntOrAString in bytes32 form.
     function parseString(ParseState memory state, uint256 cursor, uint256 end)
         internal
         pure

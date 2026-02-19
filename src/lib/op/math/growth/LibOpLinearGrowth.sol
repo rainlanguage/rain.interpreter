@@ -20,7 +20,9 @@ library LibOpLinearGrowth {
         return (3, 1);
     }
 
-    /// linear-growth
+    /// @notice linear-growth
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
         Float base;
         Float rate;
@@ -40,7 +42,9 @@ library LibOpLinearGrowth {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation for testing.
+    /// @notice Gas intensive reference implementation for testing.
+    /// @param inputs The input values from the stack.
+    /// @return The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure

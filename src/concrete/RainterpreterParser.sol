@@ -48,9 +48,12 @@ contract RainterpreterParser is ERC165, IParserToolingV1 {
         LibParseState.checkParseMemoryOverflow();
     }
 
-    /// Parses Rainlang source `data` into bytecode and constants. Called by
+    /// @notice Parses Rainlang source `data` into bytecode and constants. Called by
     /// the expression deployer. Does not perform integrity checks — those are
     /// the deployer's responsibility.
+    /// @param data The Rainlang source bytes to parse.
+    /// @return The compiled bytecode.
+    /// @return The constants array extracted during parsing.
     function unsafeParse(bytes memory data)
         external
         view
@@ -69,8 +72,10 @@ contract RainterpreterParser is ERC165, IParserToolingV1 {
         return interfaceId == type(IParserToolingV1).interfaceId || super.supportsInterface(interfaceId);
     }
 
-    /// Parses only the pragma section of Rainlang source `data`. Returns the
+    /// @notice Parses only the pragma section of Rainlang source `data`. Returns the
     /// list of sub-parsers declared by the pragma.
+    /// @param data The Rainlang source bytes to parse the pragma from.
+    /// @return The pragma containing declared sub-parsers.
     function parsePragma1(bytes memory data) external view virtual checkParseMemoryOverflow returns (PragmaV1 memory) {
         ParseState memory parseState = LibParseState.newState(
             data, parseMeta(), operandHandlerFunctionPointers(), literalParserFunctionPointers()

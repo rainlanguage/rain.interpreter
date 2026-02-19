@@ -14,7 +14,10 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibOpEvery {
     using LibDecimalFloat for Float;
 
-    /// `every` integrity check. Requires at least 1 input and produces 1 output.
+    /// @notice `every` integrity check. Requires at least 1 input and produces 1 output.
+    /// @param operand The operand encoding the number of inputs.
+    /// @return The number of inputs (at least 1).
+    /// @return Always 1 output.
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least one input.
         uint256 inputs = uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F;
