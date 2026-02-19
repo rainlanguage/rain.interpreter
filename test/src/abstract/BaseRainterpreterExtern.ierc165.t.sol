@@ -31,7 +31,7 @@ contract ChildRainterpreterExtern is BaseRainterpreterExtern {
 }
 
 /// @title BaseRainterpreterExternTest
-/// Test suite for BaseRainterpreterExtern.
+/// @notice Test suite for BaseRainterpreterExtern.
 contract BaseRainterpreterExternIERC165Test is Test {
     /// Test that ERC165 and IInterpreterExternV4 are supported interfaces as
     /// per ERC165.

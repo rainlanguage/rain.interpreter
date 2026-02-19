@@ -103,7 +103,7 @@ contract MismatchedLiteralSubParser is BaseRainterpreterSubParser {
 }
 
 /// @title BaseRainterpreterSubParserLiteral2Test
-/// Direct unit tests for subParseLiteral2: happy path, no-match, and
+/// @notice Direct unit tests for subParseLiteral2: happy path, no-match, and
 /// index-out-of-bounds.
 contract BaseRainterpreterSubParserLiteral2Test is Test {
     /// Happy path: dispatch matches, literal parser is called, returns

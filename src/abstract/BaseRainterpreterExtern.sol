@@ -4,10 +4,6 @@ pragma solidity =0.8.25;
 
 import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
-import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
-import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
-
 import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {
     IInterpreterExternV4,
@@ -31,11 +27,6 @@ bytes constant INTEGRITY_FUNCTION_POINTERS = hex"";
 /// and override `opcodeFunctionPointers` and `integrityFunctionPointers` to
 /// provide lists of function pointers.
 abstract contract BaseRainterpreterExtern is IInterpreterExternV4, IIntegrityToolingV1, IOpcodeToolingV1, ERC165 {
-    using LibStackPointer for uint256[];
-    using LibStackPointer for Pointer;
-    using LibUint256Array for uint256;
-    using LibUint256Array for uint256[];
-
     /// Validates that opcode function pointers are non-empty and that opcode
     /// and integrity function pointer tables have the same length. This ensures
     /// every opcode has a corresponding integrity check, and that the mod in

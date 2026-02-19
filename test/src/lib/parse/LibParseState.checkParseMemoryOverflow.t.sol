@@ -7,7 +7,7 @@ import {LibParseState} from "src/lib/parse/LibParseState.sol";
 import {ParseMemoryOverflow} from "src/error/ErrParse.sol";
 
 /// @title LibParseStateCheckParseMemoryOverflowTest
-/// Tests that `LibParseState.checkParseMemoryOverflow` reverts when the free
+/// @notice Tests that `LibParseState.checkParseMemoryOverflow` reverts when the free
 /// memory pointer reaches or exceeds 0x10000 and passes when it stays below.
 contract LibParseStateCheckParseMemoryOverflowTest is Test {
     /// Must not revert when the free memory pointer is below 0x10000.

@@ -8,7 +8,7 @@ import {
 import {DESCRIBED_BY_META_HASH} from "src/concrete/RainterpreterExpressionDeployer.sol";
 
 /// @title RainterpreterExpressionDeployerMetaTest
-/// Tests that the RainterpreterExpressionDeployer meta is correct. Also
+/// @notice Tests that the RainterpreterExpressionDeployer meta is correct. Also
 /// tests basic functionality of the `IParserV1View` interface implementation, except
 /// parsing which is tested more extensively elsewhere.
 contract RainterpreterExpressionDeployerMetaTest is RainterpreterExpressionDeployerDeploymentTest {

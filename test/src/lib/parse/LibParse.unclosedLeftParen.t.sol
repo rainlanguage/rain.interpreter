@@ -8,7 +8,7 @@ import {UnclosedLeftParen} from "src/error/ErrParse.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseUnclosedLeftParenTest
-/// Test that the parser errors when it encounters an unclosed left paren.
+/// @notice Test that the parser errors when it encounters an unclosed left paren.
 contract LibParseUnclosedLeftParenTest is ParseTest {
     using LibParse for ParseState;
 

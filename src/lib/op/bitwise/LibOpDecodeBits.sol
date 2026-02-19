@@ -12,7 +12,11 @@ import {LibOpEncodeBits} from "./LibOpEncodeBits.sol";
 /// @notice Opcode for decoding binary data from a 256 bit value that was encoded
 /// with LibOpEncodeBits.
 library LibOpDecodeBits {
-    /// Decode takes a single value and returns the decoded value.
+    /// @notice Decode takes a single value and returns the decoded value.
+    /// @param state The current integrity check state.
+    /// @param operand The operand for this opcode.
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory state, OperandV2 operand) internal pure returns (uint256, uint256) {
         // Use exact same integrity check as encode other than the return values.
         // All we're interested in is the errors that might be thrown.
@@ -22,7 +26,10 @@ library LibOpDecodeBits {
         return (1, 1);
     }
 
-    /// `decode-bits` opcode. Decodes a value from the bit position and length specified by the operand.
+    /// @notice `decode-bits` opcode. Decodes a value from the bit position and length specified by the operand.
+    /// @param operand The operand encoding the start bit and length.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         unchecked {
             uint256 value;
@@ -51,7 +58,10 @@ library LibOpDecodeBits {
         }
     }
 
-    /// Reference implementation of `decode-bits` for testing.
+    /// @notice Reference implementation of `decode-bits` for testing.
+    /// @param operand The operand encoding the start bit and length.
+    /// @param inputs The input values from the stack.
+    /// @return outputs The decoded output values.
     function referenceFn(InterpreterState memory, OperandV2 operand, StackItem[] memory inputs)
         internal
         pure

@@ -23,6 +23,8 @@ Each agent must write its findings to `audit/<YYYY-MM-DD>-<NN>/pass<M>/<FileName
 
 During triage, maintain `audit/<YYYY-MM-DD>-<NN>/triage.md` recording the disposition of every LOW+ finding, keyed by finding ID (e.g., A03-1). Each entry has a status: **FIXED** (code changed), **DOCUMENTED** (NatSpec/comments added), **DISMISSED** (no action needed), or **PENDING** (not yet triaged). This file is the durable record of triage progress — conversation context is lost on compaction, but the file persists. Before presenting the next finding, check the triage file for the first PENDING ID in sort order. Present findings neutrally and let the user decide the disposition.
 
+When triaging a finding as already FIXED (test already exists), apply the same rigor as writing a new fix: read the actual test code, verify it covers the finding, check for missing edge cases and boundary conditions, and add tests if gaps exist. "Test exists" is not the same as "properly tested." One finding at a time — no batch-marking.
+
 ## Pass 0: Process Review
 
 Review CLAUDE.md and AUDIT.md for issues that would cause future sessions to misinterpret instructions. This pass reviews process documents, not source code. No subagents needed — the documents are small enough to review in the main conversation. Record findings to `audit/<YYYY-MM-DD>-<NN>/pass0/process.md`.
@@ -67,6 +69,7 @@ Review all documentation for completeness and accuracy, including but not limite
 - Systematically enumerate every function in every contract and library, and verify each has NatSpec documentation
 - Explicitly list undocumented functions as findings
 - All NatSpec must include `@param` and `@return` tags as relevant for functions, structs, errors, etc.
+- When a doc block contains any explicit tag (e.g. `@title`), all entries must be explicitly tagged. Untagged lines after a tag are parsed as continuation of the previous tag, not as implicit `@notice`. Every contract/library-level doc block with `@title` must also have an explicit `@notice`.
 - After ensuring documentation exists, review it against the implementation for accuracy
 
 ## Pass 4: Code Quality

@@ -9,7 +9,7 @@ import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseEmptyGasTest
-/// Exercise a few different sized empty expressions to get a gas snapshot of the
+/// @notice Exercise a few different sized empty expressions to get a gas snapshot of the
 /// parsing cost.
 contract LibParseEmptyGasTest is Test {
     using LibParse for ParseState;

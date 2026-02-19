@@ -9,16 +9,20 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpMinPositiveValue
-/// Exposes the minimum positive representable float value as a Rainlang opcode.
+/// @notice Exposes the minimum positive representable float value as a Rainlang opcode.
 library LibOpMinPositiveValue {
     using LibDecimalFloat for Float;
 
-    /// `min-positive-value` integrity check. Requires 0 inputs and produces 1 output.
+    /// @notice `min-positive-value` integrity check. Requires 0 inputs and produces 1 output.
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (0, 1);
     }
 
-    /// `min-positive-value` opcode. Pushes the minimum representable positive float onto the stack.
+    /// @notice `min-positive-value` opcode. Pushes the minimum representable positive float onto the stack.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
         Float value = LibDecimalFloat.FLOAT_MIN_POSITIVE_VALUE;
         assembly ("memory-safe") {
@@ -28,7 +32,8 @@ library LibOpMinPositiveValue {
         return stackTop;
     }
 
-    /// Reference implementation of `min-positive-value` for testing.
+    /// @notice Reference implementation of `min-positive-value` for testing.
+    /// @return The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory)
         internal
         pure

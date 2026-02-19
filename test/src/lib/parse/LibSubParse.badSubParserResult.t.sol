@@ -31,7 +31,7 @@ contract BadLengthSubParser is ISubParserV4, IERC165 {
 }
 
 /// @title LibSubParseBadSubParserResultTest
-/// Tests that parsing reverts with `BadSubParserResult` when a sub parser
+/// @notice Tests that parsing reverts with `BadSubParserResult` when a sub parser
 /// returns success with bytecode that is not exactly 4 bytes.
 contract LibSubParseBadSubParserResultTest is OpTest {
     using Strings for address;

@@ -3,7 +3,7 @@
 pragma solidity ^0.8.25;
 
 /// @title LibInterpreterDeploy
-/// A library containing the deployed address and code hash of the Interpreter
+/// @notice A library containing the deployed address and code hash of the Interpreter
 /// contracts when deployed with the rain standard zoltu deployer. This allows
 /// idempotent deployments against precommitted addresses and hashes that can be
 /// easily verified automatically in tests and scripts rather than relying on
@@ -33,14 +33,14 @@ library LibInterpreterDeploy {
 
     /// The address of the `Rainterpreter` contract when deployed with the rain
     /// standard zoltu deployer.
-    address constant INTERPRETER_DEPLOYED_ADDRESS = address(0x6B6d5a8fDeB7dBF27abbd96E302Cf07dCfb0A41D);
+    address constant INTERPRETER_DEPLOYED_ADDRESS = address(0x51185c559976E269E6F7ff404F33bdEfD2AAC22F);
 
     /// The code hash of the `Rainterpreter` contract when deployed with the rain
     /// standard zoltu deployer. This can be used to verify that the deployed
     /// contract has the expected bytecode, which provides stronger guarantees
     /// than just checking the address.
     bytes32 constant INTERPRETER_DEPLOYED_CODEHASH =
-        bytes32(0x20007a17748b5ac442ec1a49ba7fcc664d6a2151b6ecc827a24330101862374f);
+        bytes32(0x2b208d69bc985366814dde37da58d464a50a5bd54a0b214d79b5aafc67542b94);
 
     /// The address of the `RainterpreterExpressionDeployer` contract when
     /// deployed with the rain standard zoltu deployer.
@@ -55,12 +55,12 @@ library LibInterpreterDeploy {
 
     /// The address of the `RainterpreterDISPaiRegistry` contract when deployed
     /// with the rain standard zoltu deployer.
-    address constant DISPAIR_REGISTRY_DEPLOYED_ADDRESS = address(0xbcF832cCDb268D10ae064E6192fE539A0037e5C2);
+    address constant DISPAIR_REGISTRY_DEPLOYED_ADDRESS = address(0xdc14bC12824e33B7D31D9D46E63899055C271f1A);
 
     /// The code hash of the `RainterpreterDISPaiRegistry` contract when
     /// deployed with the rain standard zoltu deployer. This can be used to
     /// verify that the deployed contract has the expected bytecode, which
     /// provides stronger guarantees than just checking the address.
     bytes32 constant DISPAIR_REGISTRY_DEPLOYED_CODEHASH =
-        bytes32(0xe017b7474231b887c30359e7f88202d29a3588e6d749d2a3bf81094ffcd4b0f4);
+        bytes32(0x38091fe95462588426e068ab0b5f3b899864062c8039580835aff3831db46b8a);
 }

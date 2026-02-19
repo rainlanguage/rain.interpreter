@@ -6,6 +6,7 @@ import {Test} from "forge-std/Test.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseStatePushConstantValueTest
+/// @notice Tests for pushing constant values onto the parse state.
 contract LibParseStatePushConstantValueTest is Test {
     using LibParseState for ParseState;
 

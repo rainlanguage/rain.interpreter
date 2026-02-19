@@ -12,6 +12,7 @@ import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 
 import {RainterpreterExpressionDeployerDeploymentTest} from "./RainterpreterExpressionDeployerDeploymentTest.sol";
 import {LibInterpreterState, InterpreterState} from "../../src/lib/state/LibInterpreterState.sol";
+import {LibInterpreterStateFingerprint} from "../lib/state/LibInterpreterStateFingerprint.sol";
 import {IntegrityCheckState, LibIntegrityCheck} from "../../src/lib/integrity/LibIntegrityCheck.sol";
 
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
@@ -37,6 +38,7 @@ bytes32 constant POST = keccak256(abi.encodePacked("post"));
 
 abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
     using LibInterpreterState for InterpreterState;
+    using LibInterpreterStateFingerprint for InterpreterState;
     using LibUint256Array for uint256[];
     using LibPointer for Pointer;
 

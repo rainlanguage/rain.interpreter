@@ -5,7 +5,7 @@ pragma solidity ^0.8.25;
 /// @dev Workaround for https://github.com/foundry-rs/foundry/issues/6572
 contract ErrDeploy {}
 
-/// Thrown when the `DEPLOYMENT_SUITE` env var does not match any known suite
+/// @notice Thrown when the `DEPLOYMENT_SUITE` env var does not match any known suite
 /// selector.
 /// @param suite The unrecognised suite selector hash.
 error UnknownDeploymentSuite(bytes32 suite);

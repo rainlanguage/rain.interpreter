@@ -10,7 +10,7 @@ import {
 } from "rain.interpreter.interface/lib/caller/LibContext.sol";
 
 /// @title LibExternOpContextCallingContract
-/// This op is a simple reference to the contract that called the interpreter.
+/// @notice This op is a simple reference to the contract that called the interpreter.
 /// It is used to demonstrate how to implement context references.
 library LibExternOpContextCallingContract {
     /// The sub parser for the calling contract context opcode. It has no special logic

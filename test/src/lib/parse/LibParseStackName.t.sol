@@ -7,7 +7,7 @@ import {Test} from "forge-std/Test.sol";
 import {ParseState, LibParseStackName} from "src/lib/parse/LibParse.sol";
 
 /// @title LibParseStackNameTest
-/// Tests for handling named stack items.
+/// @notice Tests for handling named stack items.
 contract LibParseStackNameTest is Test {
     /// Test that we can push and retrieve a stack name.
     function testPushAndRetrieveStackNameSingle(ParseState memory state, bytes32 word) external pure {

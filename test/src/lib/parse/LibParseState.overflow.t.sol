@@ -9,7 +9,7 @@ import {ParseState} from "src/lib/parse/LibParseState.sol";
 import {SourceItemOpsOverflow, LineRHSItemsOverflow} from "src/error/ErrParse.sol";
 
 /// @title LibParseStateOverflowTest
-/// Tests that byte-counter overflow guards in LibParseState revert correctly.
+/// @notice Tests that byte-counter overflow guards in LibParseState revert correctly.
 contract LibParseStateOverflowTest is ParseTest {
     using LibParse for ParseState;
 

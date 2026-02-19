@@ -30,8 +30,14 @@ import {LibParseError} from "./LibParseError.sol";
 /// 0x20.
 uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
 
+/// @dev Bit 0 of the FSM. When set, the parser is in "yang" state (building
+/// an RHS word). When clear, the parser is in "yin" state (between words).
 uint256 constant FSM_YANG_MASK = 1;
+/// @dev Bit 1 of the FSM. When set, the current word has ended and the parser
+/// should finalize it before processing the next character.
 uint256 constant FSM_WORD_END_MASK = 1 << 1;
+/// @dev Bit 2 of the FSM. When set, the current line is still accepting LHS
+/// input names. Cleared after the first RHS item on a line.
 uint256 constant FSM_ACCEPTING_INPUTS_MASK = 1 << 2;
 
 /// @dev If a source is active we cannot finish parsing without a semi to trigger
@@ -71,7 +77,7 @@ uint256 constant PARSE_STATE_PAREN_TRACKER0_OFFSET = 0x60;
 /// Used in assembly to snapshot source head pointers per line.
 uint256 constant PARSE_STATE_LINE_TRACKER_OFFSET = 0xa0;
 
-/// The parser is stateful. This struct keeps track of the entire state.
+/// @notice The parser is stateful. This struct keeps track of the entire state.
 /// @param activeSourcePtr The pointer to the current source being built.
 /// The active source being pointed to is:
 /// - low 16 bits: bitwise offset into the source for the next word to be
@@ -118,19 +124,34 @@ uint256 constant PARSE_STATE_LINE_TRACKER_OFFSET = 0xa0;
 /// level item, which is implicitly after the end of the previous top level item.
 /// Allows us to quickly find the start of the RHS source for each top level
 /// item.
+/// @param subParsers Linked list of sub-parser addresses registered via
+/// `using-words-from` pragmas. Each entry is a `bytes32` with the address in
+/// the low 160 bits and a pointer to the next entry in the high bits.
 /// @param stackNames A linked list of stack names. As the parser encounters
 /// named stack items it pushes them onto this linked list. The linked list is
 /// in FILO order, so the first item on the stack is the last item in the list.
 /// This makes it more efficient to reference more recent stack names on the RHS.
-/// @param literalBloom A bloom filter of all the literals that have been
-/// encountered so far. This is used to quickly dedupe literals.
+/// @param stackNameBloom Bloom filter over stack name fingerprints. Used for
+/// fast negative lookups before traversing the `stackNames` linked list.
 /// @param constantsBuilder A builder for the constants array.
 /// - low 16 bits: the height (length) of the constants array.
 /// - high 240 bits: a linked list of constant values. Each constant value is
 ///   stored as a 256 bit key/value pair. The key is the fingerprint of the
 ///   constant value, and the value is the constant value itself.
+/// @param constantsBloom Bloom filter over constant value fingerprints. Used
+/// to quickly dedupe constants before traversing the `constantsBuilder` list.
 /// @param literalParsers A 256 bit integer where each 16 bits is a function
 /// pointer to a literal parser.
+/// @param operandHandlers Packed 2-byte function pointers to operand handler
+/// functions, one per opcode. Indexed by opcode to parse operand bytes.
+/// @param operandValues Scratch array for operand values being parsed for the
+/// current word. Fixed length of `OPERAND_VALUES_LENGTH` (4).
+/// @param stackTracker Tracks stack height, high watermark, and input count
+/// for the current source. Used by `endLine` to emit per-word IO metadata.
+/// @param data Raw input bytes being parsed. Sub-parsers also receive this
+/// to resolve words and literals not recognized by the main parser.
+/// @param meta Packed parse metadata (bloom filter + fingerprint table) used
+/// by `lookupWord` to resolve word strings to opcode indices.
 struct ParseState {
     /// @dev START things that are referenced directly in assembly by hardcoded
     /// offsets. E.g.
@@ -168,7 +189,7 @@ library LibParseState {
     using LibParseLiteral for ParseState;
     using LibUint256Array for uint256[];
 
-    /// Allocates a new 32-byte-aligned active source pointer in memory and
+    /// @notice Allocates a new 32-byte-aligned active source pointer in memory and
     /// links it into the doubly linked list of source slots.
     ///
     /// The free-pointer arithmetic is unchecked. This is safe only because
@@ -194,7 +215,7 @@ library LibParseState {
         return activeSourcePtr;
     }
 
-    /// Resets all per-source state fields to prepare for parsing a new source.
+    /// @notice Resets all per-source state fields to prepare for parsing a new source.
     /// Allocates a fresh active source pointer and zeroes out top-level
     /// counters, paren trackers, line tracker, stack names, and stack tracker.
     /// @param state The parse state to reset.
@@ -214,7 +235,7 @@ library LibParseState {
         state.stackTracker = ParseStackTracker.wrap(0);
     }
 
-    /// Constructs and returns a fully initialised `ParseState` from the given
+    /// @notice Constructs and returns a fully initialised `ParseState` from the given
     /// raw expression data, word metadata, operand handlers, and literal
     /// parsers. Calls `resetSource` to set up the first active source.
     /// @param data The raw expression data to parse.
@@ -231,7 +252,7 @@ library LibParseState {
     {
         ParseState memory state = ParseState(
             // activeSource
-            // (will be built in `newActiveSource`)
+            // (will be built in `resetSource`)
             0,
             // topLevel0
             0,
@@ -254,9 +275,9 @@ library LibParseState {
             0,
             // stackNameBloom
             0,
-            // literalBloom
-            0,
             // constantsBuilder
+            0,
+            // constantsBloom
             0,
             // literalParsers
             literalParsers,
@@ -275,7 +296,7 @@ library LibParseState {
         return state;
     }
 
-    /// Pushes a `uint256` representation of a sub parser onto the linked list of
+    /// @notice Pushes a `uint256` representation of a sub parser onto the linked list of
     /// sub parsers in memory. The sub parser is expected to be an `address` so
     /// the pointer for the linked list is ORed in the 16 high bits of the
     /// `uint256`. Only 16 bits are available for the linked-list pointer, so
@@ -302,7 +323,7 @@ library LibParseState {
         state.subParsers = subParser | bytes32(tailPointer << 0xF0);
     }
 
-    /// Builds a memory array of sub parsers from the linked list of sub parsers.
+    /// @notice Builds a memory array of sub parsers from the linked list of sub parsers.
     /// @param state The parse state containing the sub parser linked list.
     /// @return The array of sub parser addresses.
     function exportSubParsers(ParseState memory state) internal pure returns (address[] memory) {
@@ -330,7 +351,7 @@ library LibParseState {
         return subParsers;
     }
 
-    /// Snapshots the current source head pointer into the line tracker at the
+    /// @notice Snapshots the current source head pointer into the line tracker at the
     /// appropriate offset, but only when the current top-level word counter is
     /// zero. This records where each top-level RHS item begins in the source.
     /// @param state The parse state to snapshot.
@@ -363,7 +384,7 @@ library LibParseState {
         }
     }
 
-    /// Finalises the current line by validating paren balance, reconciling
+    /// @notice Finalises the current line by validating paren balance, reconciling
     /// LHS and RHS item counts, computing opcode input/output counts, and
     /// updating the stack tracker. Resets the line tracker for the next line.
     /// @param state The parse state to finalise the current line for.
@@ -490,7 +511,7 @@ library LibParseState {
         }
     }
 
-    /// We potentially just closed out some group of arbitrarily nested parens
+    /// @notice We potentially just closed out some group of arbitrarily nested parens
     /// OR a lone literal value at the top level. IF we are at the top level we
     /// move the immutable stack highwater mark forward 1 item, which moves the
     /// RHS offset forward 1 byte to start a new word counter.
@@ -516,7 +537,7 @@ library LibParseState {
         }
     }
 
-    /// Computes a single-bit bloom filter hash for a constant value, used to
+    /// @notice Computes a single-bit bloom filter hash for a constant value, used to
     /// quickly check for potential duplicates before traversing the linked list.
     /// @param value The constant value to compute the bloom hash for.
     /// @return bloom The single-bit bloom filter hash.
@@ -524,7 +545,7 @@ library LibParseState {
         return bytes32(uint256(1) << (uint256(value) % 256));
     }
 
-    /// Includes a constant value in the constants linked list so that it will
+    /// @notice Includes a constant value in the constants linked list so that it will
     /// appear in the final constants array.
     /// @param state The parse state containing the constants builder.
     /// @param value The constant value to push onto the linked list.
@@ -551,7 +572,7 @@ library LibParseState {
         }
     }
 
-    /// Parses a literal value at the cursor, deduplicates it against existing
+    /// @notice Parses a literal value at the cursor, deduplicates it against existing
     /// constants using a bloom filter and linked list, and pushes a constant
     /// opcode referencing the value's index onto the current source.
     /// @param state The parse state.
@@ -623,7 +644,7 @@ library LibParseState {
         }
     }
 
-    /// Writes an opcode and operand pair into the active source at the current
+    /// @notice Writes an opcode and operand pair into the active source at the current
     /// bit offset. Updates paren tracking counters, top-level word counters,
     /// and allocates a new source slot if the current one is full.
     /// The caller MUST ensure `opcode` fits in 8 bits and `operand` fits in
@@ -735,7 +756,7 @@ library LibParseState {
         }
     }
 
-    /// Finalises the current source by traversing the linked list of source
+    /// @notice Finalises the current source by traversing the linked list of source
     /// slots, reordering opcodes from RTL to LTR at the top level, writing
     /// the source prefix, and registering the source in the sources builder.
     /// Resets per-source state for the next source via `resetSource`.
@@ -868,7 +889,7 @@ library LibParseState {
         }
     }
 
-    /// Assembles the final bytecode from all completed sources. Writes the
+    /// @notice Assembles the final bytecode from all completed sources. Writes the
     /// source count, relative pointers, and copies each source's opcodes into
     /// a single contiguous byte array. Reverts if a source is still active.
     /// @param state The parse state containing all completed sources.
@@ -961,7 +982,7 @@ library LibParseState {
         }
     }
 
-    /// Builds the final constants array by traversing the constants linked
+    /// @notice Builds the final constants array by traversing the constants linked
     /// list from head to tail and writing values in reverse so that indices
     /// in the source bytecode reference the correct positions.
     /// @param state The parse state containing the constants builder.

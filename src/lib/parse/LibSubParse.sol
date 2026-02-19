@@ -23,7 +23,7 @@ import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibParseError} from "./LibParseError.sol";
 
 /// @title LibSubParse
-/// Handles delegation of unknown words and literals to external sub-parser
+/// @notice Handles delegation of unknown words and literals to external sub-parser
 /// contracts registered via `using-words-from`.
 ///
 /// Trust model: sub-parsers are fully trusted by the Rainlang author who
@@ -37,7 +37,7 @@ library LibSubParse {
     using LibParseState for ParseState;
     using LibParseError for ParseState;
 
-    /// Sub parse a word into a context grid position. The column and row are
+    /// @notice Sub parse a word into a context grid position. The column and row are
     /// encoded as single bytes in the operand, so values MUST be <= 255.
     /// Reverts with `ContextGridOverflow` if either value exceeds uint8.
     /// @param column The column index in the context grid. Must fit in uint8.
@@ -86,7 +86,7 @@ library LibSubParse {
         return (true, bytecode, constants);
     }
 
-    /// Sub parse a value into the bytecode that will run on the interpreter to
+    /// @notice Sub parse a value into the bytecode that will run on the interpreter to
     /// push the given value onto the stack, using the constant opcode at eval.
     /// @param constantsHeight The current height of the constants array.
     /// @param value The constant value to push onto the stack.
@@ -141,7 +141,7 @@ library LibSubParse {
         return (true, bytecode, constants);
     }
 
-    /// Sub parse a known extern opcode index into the bytecode that will run
+    /// @notice Sub parse a known extern opcode index into the bytecode that will run
     /// on the interpreter to call the given extern contract. This requires the
     /// parsing has already matched a word to the extern opcode index, so it
     /// implies the parse meta has been traversed and the parse index has been
@@ -207,7 +207,7 @@ library LibSubParse {
         return (true, bytecode, constants);
     }
 
-    /// Iterates over a slice of bytecode ops and attempts to resolve any
+    /// @notice Iterates over a slice of bytecode ops and attempts to resolve any
     /// unknown opcodes by delegating to the registered sub parsers.
     /// @param state The current parse state containing sub parser references.
     /// @param cursor The memory pointer to the start of the bytecode slice.
@@ -313,7 +313,7 @@ library LibSubParse {
         }
     }
 
-    /// Resolves all unknown words across every source in the given bytecode
+    /// @notice Resolves all unknown words across every source in the given bytecode
     /// by calling `subParseWordSlice` for each source, then returns the
     /// mutated bytecode and the final constants array.
     /// @param state The current parse state containing sub parser references.
@@ -337,7 +337,7 @@ library LibSubParse {
         }
     }
 
-    /// Delegates literal parsing to registered sub parsers. Packs the dispatch
+    /// @notice Delegates literal parsing to registered sub parsers. Packs the dispatch
     /// and body regions into a single `bytes` payload and tries each sub parser
     /// until one succeeds, reverting if none can handle the literal type.
     /// @param state The current parse state containing sub parser references.
@@ -393,7 +393,7 @@ library LibSubParse {
         }
     }
 
-    /// Unpacks the sub-parse word input data by extracting the constants
+    /// @notice Unpacks the sub-parse word input data by extracting the constants
     /// height, IO byte, and operand values from the header, then constructs
     /// a fresh `ParseState` from the remaining word string and provided meta.
     /// @param data The raw sub-parse input data containing the header and
@@ -428,7 +428,7 @@ library LibSubParse {
         state.operandValues = operandValues;
     }
 
-    /// Unpacks the sub-parse literal input data by extracting memory pointers
+    /// @notice Unpacks the sub-parse literal input data by extracting memory pointers
     /// for the dispatch and body regions from the encoded `bytes` payload.
     /// @param data The raw sub-parse literal input data.
     /// @return dispatchStart Memory pointer to the start of the dispatch

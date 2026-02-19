@@ -14,13 +14,18 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibOpIf {
     using LibDecimalFloat for Float;
 
+    /// @notice `if` integrity check. Requires exactly 3 inputs and produces 1 output.
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (3, 1);
     }
 
-    /// IF
+    /// @notice IF
     /// IF is a conditional. If the first item on the stack is nonzero, the second
     /// item is returned, else the third item is returned.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
         Float condition;
         assembly ("memory-safe") {
@@ -36,7 +41,9 @@ library LibOpIf {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of IF for testing.
+    /// @notice Gas intensive reference implementation of IF for testing.
+    /// @param inputs The input values from the stack.
+    /// @return outputs The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure

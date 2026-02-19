@@ -9,7 +9,7 @@ import {LibParse} from "src/lib/parse/LibParse.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseSourceInputsTest
-/// Test that inputs to the source (leading LHS items) are handled.
+/// @notice Test that inputs to the source (leading LHS items) are handled.
 contract LibParseSourceInputsTest is Test {
     using LibParse for ParseState;
 

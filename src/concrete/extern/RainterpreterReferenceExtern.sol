@@ -77,7 +77,7 @@ error InvalidRepeatCount();
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
 
 /// @title LibRainterpreterReferenceExtern
-/// This library allows code SEPARATE FROM the implementation contract to do
+/// @notice This library allows code SEPARATE FROM the implementation contract to do
 /// offchain processing of supporting data without needing to compile all this
 /// information into the implementation contract. Any tooling that supports
 /// solidity can read this data and expose it to end users.
@@ -126,7 +126,7 @@ library LibRainterpreterReferenceExtern {
 }
 
 /// @title RainterpreterReferenceExtern
-/// This is a reference implementation of BOTH the sub parser and extern
+/// @notice This is a reference implementation of BOTH the sub parser and extern
 /// interfaces. It is NOT REQUIRED that these be one and the same. It is entirely
 /// possible to implement standalone parsers and extern contracts that each
 /// implement the relevant interface. In that case, the parser could construct
@@ -204,7 +204,7 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
         return INTEGRITY_FUNCTION_POINTERS;
     }
 
-    /// The literal parsers are the same as the main parser.
+    /// @notice The literal parsers are the same as the main parser.
     /// @inheritdoc IParserToolingV1
     function buildLiteralParserFunctionPointers() external pure returns (bytes memory) {
         unchecked {
@@ -228,6 +228,7 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
         }
     }
 
+    /// @inheritdoc BaseRainterpreterSubParser
     function matchSubParseLiteralDispatch(uint256 cursor, uint256 end)
         internal
         pure
@@ -252,11 +253,11 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
                 (cursor, floatBytes) = LibParseLiteralDecimal.parseDecimalFloatPacked(
                     state, cursor + SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH, end
                 );
-                Float float = Float.wrap(floatBytes);
+                Float repeatCount = Float.wrap(floatBytes);
                 // We can only repeat a single digit integer 0-9.
                 if (
-                    float.lt(LibDecimalFloat.packLossless(0, 0)) || float.gt(LibDecimalFloat.packLossless(9, 0))
-                        || !float.frac().isZero()
+                    repeatCount.lt(LibDecimalFloat.packLossless(0, 0))
+                        || repeatCount.gt(LibDecimalFloat.packLossless(9, 0)) || !repeatCount.frac().isZero()
                 ) {
                     revert InvalidRepeatCount();
                 }
@@ -268,7 +269,7 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
         }
     }
 
-    /// There's only one operand parser for this implementation, the disallowed
+    /// @notice There's only one operand parser for this implementation, the disallowed
     /// parser. We haven't implemented any words with meaningful operands yet.
     /// @inheritdoc IParserToolingV1
     function buildOperandHandlerFunctionPointers() external pure override returns (bytes memory) {
@@ -305,7 +306,7 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
         }
     }
 
-    /// This mimics how `LibAllStandardOps` builds bytes out of function
+    /// @notice This mimics how `LibAllStandardOps` builds bytes out of function
     /// pointers, but for sub parser functions. This is NOT intended to be
     /// called at runtime, instead tooling (e.g. the test suite) can call this
     /// function and compare it to `subParserFunctionPointers` to ensure they
@@ -410,7 +411,7 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
         }
     }
 
-    /// This is only needed because the parser and extern base contracts both
+    /// @notice This is only needed because the parser and extern base contracts both
     /// implement IERC165, and the compiler needs to be told how to resolve the
     /// ambiguity.
     /// @inheritdoc BaseRainterpreterSubParser
