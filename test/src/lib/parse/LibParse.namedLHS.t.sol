@@ -16,6 +16,7 @@ import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenPars
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibParseNamedLHSTest
+/// @notice Tests for parsing named LHS items.
 contract LibParseNamedLHSTest is ParseTest {
     using LibParse for ParseState;
 

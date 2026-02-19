@@ -10,7 +10,7 @@ import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.s
 import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseLiteralIntegerHexTest
-/// Tests parsing integer literal hex values.
+/// @notice Tests parsing integer literal hex values.
 contract LibParseLiteralIntegerHexTest is Test {
     using LibParse for ParseState;
     /// Check a single hex literal. Should not revert and return length 1

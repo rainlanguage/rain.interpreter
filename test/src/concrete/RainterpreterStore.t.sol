@@ -12,7 +12,7 @@ import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
 import {OddSetLength} from "src/error/ErrStore.sol";
 
 /// @title RainterpreterStoreTest
-/// Test suite for RainterpreterStore.
+/// @notice Test suite for RainterpreterStore.
 contract RainterpreterStoreTest is Test {
     using LibNamespace for StateNamespace;
     using LibMemoryKV for MemoryKV;

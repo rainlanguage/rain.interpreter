@@ -9,7 +9,7 @@ import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV2.so
 import {LITERAL_PARSERS_LENGTH} from "src/lib/parse/literal/LibParseLiteral.sol";
 
 /// @title LibAllStandardOpsTest
-/// Some basic guard rails around the `LibAllStandardOps` library. Most of the
+/// @notice Some basic guard rails around the `LibAllStandardOps` library. Most of the
 /// logic can only be tested by deploying an interpreter and running it.
 contract LibAllStandardOpsTest is Test {
     /// Test that the dynamic length of the function pointers is correct.

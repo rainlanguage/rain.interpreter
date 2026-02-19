@@ -8,7 +8,7 @@ import {
 import {ParenOverflow} from "src/error/ErrParse.sol";
 
 /// @title LibParseParenOverflowTest
-/// Tests for paren overflow in LibParse.
+/// @notice Tests for paren overflow in LibParse.
 contract LibParseParenOverflowTest is RainterpreterExpressionDeployerDeploymentTest {
     /// Exactly 19 levels of paren nesting must succeed.
     /// 62 bytes of group data at 3 bytes each fits 20 by size, but

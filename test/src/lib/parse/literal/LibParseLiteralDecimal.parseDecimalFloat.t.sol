@@ -17,6 +17,7 @@ import {
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibParseLiteralDecimalParseDecimalFloatTest
+/// @notice Tests for parsing decimal float literals.
 contract LibParseLiteralDecimalParseDecimalFloatTest is Test {
     using LibParseLiteralDecimal for ParseState;
     using LibBytes for bytes;

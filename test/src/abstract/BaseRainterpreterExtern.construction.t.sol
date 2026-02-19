@@ -51,7 +51,7 @@ contract MismatchedExternMoreIntegrity is TestableExtern {
 }
 
 /// @title BaseRainterpreterExternConstructionTest
-/// Tests construction invariants for BaseRainterpreterExtern.
+/// @notice Tests construction invariants for BaseRainterpreterExtern.
 contract BaseRainterpreterExternConstructionTest is Test {
     /// Construction reverts when opcode pointers outnumber integrity pointers.
     function testExternConstructorRevertsMoreOpcodes() external {

@@ -6,7 +6,7 @@ import {Test} from "forge-std/Test.sol";
 import {LibIntegrityCheck, IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 
 /// @title LibIntegrityCheckNewStateTest
-/// Tests that newState initializes all IntegrityCheckState fields correctly.
+/// @notice Tests that newState initializes all IntegrityCheckState fields correctly.
 contract LibIntegrityCheckNewStateTest is Test {
     /// Every field of the returned IntegrityCheckState must match the
     /// documented initialization: stackIndex, stackMaxIndex, and

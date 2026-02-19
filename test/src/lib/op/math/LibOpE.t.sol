@@ -18,6 +18,7 @@ import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpETest
+/// @notice Tests for the mathematical constant e opcode.
 contract LibOpETest is OpTest {
     /// Directly test the integrity logic of LibOpE.
     function testOpEIntegrity(IntegrityCheckState memory state, uint8 inputs, uint8 outputs, uint16 operandData)

@@ -9,7 +9,7 @@ import {LibParseInterstitial} from "src/lib/parse/LibParseInterstitial.sol";
 import {MalformedCommentStart} from "src/error/ErrParse.sol";
 
 /// @title LibParseInterstitialTest
-/// Tests for LibParseInterstitial.
+/// @notice Tests for LibParseInterstitial.
 contract LibParseInterstitialTest is Test {
     using LibParseInterstitial for ParseState;
     using LibBytes for bytes;

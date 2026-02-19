@@ -12,7 +12,7 @@ import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {UnclosedStringLiteral} from "src/error/ErrParse.sol";
 
 /// @title LibParseLiteralStringTest
-/// Tests parsing strings with the LibParseLiteral library.
+/// @notice Tests parsing strings with the LibParseLiteral library.
 contract LibParseLiteralStringTest is Test {
     using LibBytes for bytes;
     using LibParseLiteralString for ParseState;

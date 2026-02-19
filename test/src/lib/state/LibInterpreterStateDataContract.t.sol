@@ -55,7 +55,7 @@ contract LibInterpreterStateDataContractExtern {
 }
 
 /// @title LibInterpreterStateDataContractTest
-/// Tests for LibInterpreterStateDataContract serialization and deserialization.
+/// @notice Tests for LibInterpreterStateDataContract serialization and deserialization.
 contract LibInterpreterStateDataContractTest is Test {
     LibInterpreterStateDataContractExtern internal immutable iExtern = new LibInterpreterStateDataContractExtern();
 

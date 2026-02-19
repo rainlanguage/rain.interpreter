@@ -19,6 +19,7 @@ import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 
 /// @title LibParsePragmaKeywordTest
+/// @notice Tests for pragma keyword parsing.
 contract LibParsePragmaKeywordTest is Test {
     using LibParsePragma for ParseState;
     using LibBytes for bytes;

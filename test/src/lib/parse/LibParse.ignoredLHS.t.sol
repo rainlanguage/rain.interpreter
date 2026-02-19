@@ -10,7 +10,7 @@ import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.s
 import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseIgnoredLHSTest
-/// Tests parsing ignored LHS items. An ignored LHS item is one that starts with
+/// @notice Tests parsing ignored LHS items. An ignored LHS item is one that starts with
 /// an underscore and is cheaper than named LHS items as they don't need to be
 /// tracked for potential use in the RHS.
 contract LibParseIgnoredLHSTest is Test {

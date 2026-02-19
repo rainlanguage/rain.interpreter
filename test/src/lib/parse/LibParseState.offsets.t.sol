@@ -12,7 +12,7 @@ import {
 } from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseStateOffsetsTest
-/// Validates that the named offset constants match the actual memory layout
+/// @notice Validates that the named offset constants match the actual memory layout
 /// of the `ParseState` struct. Each test writes a sentinel value via Solidity
 /// field access and asserts it appears at the expected assembly offset.
 contract LibParseStateOffsetsTest is Test {

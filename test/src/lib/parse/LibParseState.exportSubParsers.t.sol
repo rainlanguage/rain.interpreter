@@ -7,6 +7,7 @@ import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 
 /// @title LibParseStateExportSubParsersTest
+/// @notice Tests for exporting sub parsers from LibParseState.
 contract LibParseStateExportSubParsersTest is Test {
     using LibParseState for ParseState;
     using LibBytes for bytes;

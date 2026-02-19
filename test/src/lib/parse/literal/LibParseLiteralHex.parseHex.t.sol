@@ -10,7 +10,7 @@ import {LibParseLiteralHex} from "src/lib/parse/literal/LibParseLiteralHex.sol";
 import {HexLiteralOverflow, ZeroLengthHexLiteral, OddLengthHexLiteral} from "src/error/ErrParse.sol";
 
 /// @title LibParseLiteralHexParseHexTest
-/// Tests parsing hex literals with LibParseLiteralHex.
+/// @notice Tests parsing hex literals with LibParseLiteralHex.
 contract LibParseLiteralHexParseHexTest is Test {
     using LibParseLiteralHex for ParseState;
     using LibBytes for bytes;

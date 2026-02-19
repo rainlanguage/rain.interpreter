@@ -7,7 +7,7 @@ import {
 } from "test/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
 
 /// @title LibIntegrityCheckHighwaterTest
-/// Tests that readHighwater advances after a multi-output opcode.
+/// @notice Tests that readHighwater advances after a multi-output opcode.
 contract LibIntegrityCheckHighwaterTest is RainterpreterExpressionDeployerDeploymentTest {
     /// A multi-output call (2 outputs) must pass the integrity check.
     /// The call opcode returns (sourceInputs, outputs) where outputs > 1,

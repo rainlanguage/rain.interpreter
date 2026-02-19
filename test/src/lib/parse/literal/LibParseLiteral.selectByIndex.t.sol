@@ -11,7 +11,7 @@ import {IntOrAString, LibIntOrAString} from "rain.intorastring/lib/LibIntOrAStri
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibParseLiteralSelectByIndexTest
-/// Directly tests selectLiteralParserByIndex by calling the returned
+/// @notice Directly tests selectLiteralParserByIndex by calling the returned
 /// function pointer with known input for each literal type index.
 contract LibParseLiteralSelectByIndexTest is Test {
     using LibParseLiteral for ParseState;

@@ -11,6 +11,7 @@ import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 
 /// @title LibParseLiteralStringBoundTest
+/// @notice Tests for string literal boundary detection.
 contract LibParseLiteralStringBoundTest is Test {
     using LibBytes for bytes;
     using LibParseLiteralString for ParseState;

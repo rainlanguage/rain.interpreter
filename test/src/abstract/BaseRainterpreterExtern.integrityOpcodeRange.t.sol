@@ -27,7 +27,7 @@ contract TwoOpExtern is BaseRainterpreterExtern {
 }
 
 /// @title BaseRainterpreterExternIntegrityOpcodeRangeTest
-/// Tests that externIntegrity reverts for out-of-range opcodes.
+/// @notice Tests that externIntegrity reverts for out-of-range opcodes.
 contract BaseRainterpreterExternIntegrityOpcodeRangeTest is Test {
     /// Any opcode >= fsCount must revert with ExternOpcodeOutOfRange.
     function testExternIntegrityRevertsOpcodeOutOfRange(uint16 opcode, uint16 operand) external {

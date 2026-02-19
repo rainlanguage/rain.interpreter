@@ -7,7 +7,7 @@ import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol
 import {LibExtern, EncodedExternDispatchV2, ExternDispatchV2, IInterpreterExternV4} from "src/lib/extern/LibExtern.sol";
 
 /// @title LibExternCodecTest
-/// Tests the encoding and decoding of the types associated with extern contract
+/// @notice Tests the encoding and decoding of the types associated with extern contract
 /// calling and internal dispatch.
 contract LibExternCodecTest is Test {
     /// Ensure `encodeExternDispatch` encodes the opcode and operand correctly.

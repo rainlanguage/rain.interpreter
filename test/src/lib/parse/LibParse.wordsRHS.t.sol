@@ -12,7 +12,7 @@ import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 
 /// @title LibParseNamedRHSTest
-/// Test that the parser can handle named RHS values.
+/// @notice Test that the parser can handle named RHS values.
 contract LibParseNamedRHSTest is Test {
     using LibParse for ParseState;
 

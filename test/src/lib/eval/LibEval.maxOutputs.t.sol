@@ -16,7 +16,7 @@ import {
 import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
 /// @title LibEvalMaxOutputsTest
-/// Tests that eval2 truncates outputs when maxOutputs < sourceOutputs.
+/// @notice Tests that eval2 truncates outputs when maxOutputs < sourceOutputs.
 contract LibEvalMaxOutputsTest is RainterpreterExpressionDeployerDeploymentTest {
     /// When maxOutputs < sourceOutputs, the returned array length must
     /// equal maxOutputs and contain the topmost stack items.

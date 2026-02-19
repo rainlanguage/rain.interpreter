@@ -8,7 +8,7 @@ import {
 import {OpcodeIOOverflow} from "src/error/ErrParse.sol";
 
 /// @title LibParseStateOpcodeIOOverflowTest
-/// Tests for OpcodeIOOverflow in endLine.
+/// @notice Tests for OpcodeIOOverflow in endLine.
 contract LibParseStateOpcodeIOOverflowTest is RainterpreterExpressionDeployerDeploymentTest {
     /// A word with 16 paren-enclosed inputs overflows the 4-bit ioByte
     /// input nybble (max 15), triggering OpcodeIOOverflow.
