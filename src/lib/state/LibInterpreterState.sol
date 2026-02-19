@@ -12,7 +12,7 @@ import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol
 
 address constant STACK_TRACER = address(uint160(uint256(keccak256("rain.interpreter.stack-tracer.0"))));
 
-/// Runtime state threaded through the eval loop and all opcode
+/// @notice Runtime state threaded through the eval loop and all opcode
 /// implementations. Built once per `eval2` call from deserialized
 /// bytecode, caller-provided context, and store configuration.
 /// @param stackBottoms Bottom pointer for each source's stack. The eval
@@ -49,7 +49,7 @@ struct InterpreterState {
 }
 
 library LibInterpreterState {
-    /// Converts pre-allocated stack arrays into an array of bottom pointers.
+    /// @notice Converts pre-allocated stack arrays into an array of bottom pointers.
     /// Each stack's bottom pointer is the address just past its last element,
     /// i.e. `array + 0x20 * (length + 1)`. The eval loop uses these pointers
     /// as the starting stack top, growing downward as values are pushed.
@@ -74,7 +74,7 @@ library LibInterpreterState {
         return bottoms;
     }
 
-    /// Does something that a full node can easily track in its traces that isn't
+    /// @notice Does something that a full node can easily track in its traces that isn't
     /// an event. Specifically, it calls the tracer contract with the memory
     /// region between `stackTop` and `stackBottom` as an argument. The parent
     /// source index and source index are packed as two uint16 values into a

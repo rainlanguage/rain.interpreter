@@ -60,7 +60,7 @@ contract RainterpreterExpressionDeployer is
         return serialized;
     }
 
-    /// This is just here for convenience for `IParserV2` consumers, it would be
+    /// @notice This is just here for convenience for `IParserV2` consumers, it would be
     /// more gas efficient to call the parser directly.
     /// @inheritdoc IParserPragmaV1
     function parsePragma1(bytes calldata data) external view virtual override returns (PragmaV1 memory) {

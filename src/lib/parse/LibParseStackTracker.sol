@@ -9,7 +9,7 @@ type ParseStackTracker is uint256;
 library LibParseStackTracker {
     using LibParseStackTracker for ParseStackTracker;
 
-    /// Pushing inputs requires special handling as the inputs need to be tallied
+    /// @notice Pushing inputs requires special handling as the inputs need to be tallied
     /// separately and in addition to the regular stack pushes. The `inputs`
     /// addition is unchecked and relies on both `inputs` and `n` being ≤ 0xFF
     /// so that their sum cannot wrap a `uint256`.
@@ -28,7 +28,7 @@ library LibParseStackTracker {
         }
     }
 
-    /// Pushes n items onto the tracked stack, updating the current height
+    /// @notice Pushes n items onto the tracked stack, updating the current height
     /// and the high watermark if the new height exceeds it.
     /// The addition `current += n` is unchecked. This is safe only because
     /// `current` is masked to 8 bits and all callers pass `n` ≤ 0xFF, so
@@ -54,7 +54,7 @@ library LibParseStackTracker {
         }
     }
 
-    /// Pops n items from the tracked stack. Reverts with
+    /// @notice Pops n items from the tracked stack. Reverts with
     /// `ParseStackUnderflow` if the current stack height is less than n.
     ///
     /// Unlike `push`, this subtracts `n` directly from the packed word

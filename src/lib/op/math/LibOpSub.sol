@@ -14,7 +14,7 @@ import {LibDecimalFloatImplementation} from "rain.math.float/lib/implementation/
 library LibOpSub {
     using LibDecimalFloat for Float;
 
-    /// `sub` integrity check. Requires at least 2 inputs and produces 1 output.
+    /// @notice `sub` integrity check. Requires at least 2 inputs and produces 1 output.
     /// @param operand Low 4 bits of the high byte encode the input count.
     /// @return inputs The number of stack items consumed (minimum 2).
     /// @return outputs Always 1.
@@ -25,7 +25,7 @@ library LibOpSub {
         return (inputs, 1);
     }
 
-    /// Subtracts N decimal floating point values from the first value on the
+    /// @notice Subtracts N decimal floating point values from the first value on the
     /// stack. Pops all inputs and pushes the result.
     /// @param operand Low 4 bits of the high byte encode the input count.
     /// @param stackTop Pointer to the top of the stack.
@@ -69,7 +69,7 @@ library LibOpSub {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of subtraction for testing.
+    /// @notice Gas intensive reference implementation of subtraction for testing.
     /// @param inputs The stack items to subtract (first minus rest).
     /// @return outputs Single-element array containing the difference.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)

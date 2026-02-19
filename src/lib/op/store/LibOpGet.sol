@@ -20,7 +20,7 @@ library LibOpGet {
         return (1, 1);
     }
 
-    /// Implements runtime behaviour of the `get` opcode. Attempts to lookup the
+    /// @notice Implements runtime behaviour of the `get` opcode. Attempts to lookup the
     /// key in the memory key/value store then falls back to the interpreter's
     /// storage interface as an external call. If the key is not found in either,
     /// the value will fallback to `0` as per default Solidity/EVM behaviour.

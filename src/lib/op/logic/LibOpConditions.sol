@@ -26,7 +26,7 @@ library LibOpConditions {
         return (inputs, 1);
     }
 
-    /// `conditions`
+    /// @notice `conditions`
     /// Pairwise list of conditions and values. The first nonzero condition
     /// evaluated puts its corresponding value on the stack. `conditions` is
     /// eagerly evaluated. If no condition is nonzero, the expression will
@@ -75,7 +75,7 @@ library LibOpConditions {
         }
     }
 
-    /// Gas intensive reference implementation of `condition` for testing.
+    /// @notice Gas intensive reference implementation of `condition` for testing.
     /// @param inputs The input values from the stack.
     /// @return outputs The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)

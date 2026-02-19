@@ -27,7 +27,7 @@ struct IntegrityCheckState {
 library LibIntegrityCheck {
     using LibIntegrityCheck for IntegrityCheckState;
 
-    /// Builds a fresh `IntegrityCheckState` for a single source. The initial
+    /// @notice Builds a fresh `IntegrityCheckState` for a single source. The initial
     /// stack index, max index, and read highwater are all set to `stackIndex`
     /// (the number of source inputs), so that source inputs are treated as
     /// immutable during the integrity walk.
@@ -57,7 +57,7 @@ library LibIntegrityCheck {
         );
     }
 
-    /// Walks every opcode in every source of `bytecode`, calling each opcode's
+    /// @notice Walks every opcode in every source of `bytecode`, calling each opcode's
     /// integrity function via `fPointers` to compute expected inputs/outputs.
     /// Validates that the computed IO matches the bytecode-declared IO, that
     /// the stack never underflows or drops below the read highwater, and that

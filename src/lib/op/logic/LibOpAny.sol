@@ -14,7 +14,7 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibOpAny {
     using LibDecimalFloat for Float;
 
-    /// `any` integrity check. Requires at least 1 input and produces 1 output.
+    /// @notice `any` integrity check. Requires at least 1 input and produces 1 output.
     /// @param operand The operand encoding the number of inputs.
     /// @return The number of inputs.
     /// @return The number of outputs.
@@ -25,7 +25,7 @@ library LibOpAny {
         return (inputs, 1);
     }
 
-    /// ANY
+    /// @notice ANY
     /// ANY is the first nonzero item, else 0.
     /// @param operand The operand encoding the number of inputs.
     /// @param stackTop Pointer to the top of the stack.
@@ -54,7 +54,7 @@ library LibOpAny {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of ANY for testing.
+    /// @notice Gas intensive reference implementation of ANY for testing.
     /// @param inputs The input values from the stack.
     /// @return outputs The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)

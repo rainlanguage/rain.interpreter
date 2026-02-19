@@ -12,7 +12,7 @@ import {UnsupportedBitwiseShiftAmount} from "../../../error/ErrBitwise.sol";
 /// @notice Opcode for shifting bits left. The shift amount is taken from the
 /// operand so it is compile time constant.
 library LibOpShiftBitsLeft {
-    /// Shift bits left by the amount specified in the operand.
+    /// @notice Shift bits left by the amount specified in the operand.
     /// @param operand The operand encoding the shift amount.
     /// @return The number of inputs.
     /// @return The number of outputs.
@@ -31,7 +31,7 @@ library LibOpShiftBitsLeft {
         return (1, 1);
     }
 
-    /// Shift bits left by the amount specified in the operand.
+    /// @notice Shift bits left by the amount specified in the operand.
     /// @param operand The operand encoding the shift amount.
     /// @param stackTop Pointer to the top of the stack.
     /// @return The new stack top pointer after execution.
@@ -42,7 +42,7 @@ library LibOpShiftBitsLeft {
         return stackTop;
     }
 
-    /// Reference implementation for shifting bits left.
+    /// @notice Reference implementation for shifting bits left.
     /// @param operand The operand encoding the shift amount.
     /// @param inputs The input values from the stack.
     /// @return The output values to push onto the stack.

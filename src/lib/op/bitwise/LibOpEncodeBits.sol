@@ -11,7 +11,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 /// @title LibOpEncodeBits
 /// @notice Opcode for encoding binary data into a 256 bit value.
 library LibOpEncodeBits {
-    /// Encode takes two values and returns one value. The first value is the
+    /// @notice Encode takes two values and returns one value. The first value is the
     /// source, the second value is the target.
     /// @param operand The operand encoding the start bit and length.
     /// @return The number of inputs.
@@ -29,7 +29,7 @@ library LibOpEncodeBits {
         return (2, 1);
     }
 
-    /// `encode-bits` opcode. Encodes a source value into a target at the bit position and length specified by the operand.
+    /// @notice `encode-bits` opcode. Encodes a source value into a target at the bit position and length specified by the operand.
     /// @param operand The operand encoding the start bit and length.
     /// @param stackTop Pointer to the top of the stack.
     /// @return The new stack top pointer after execution.
@@ -69,7 +69,7 @@ library LibOpEncodeBits {
         }
     }
 
-    /// Reference implementation of `encode-bits` for testing.
+    /// @notice Reference implementation of `encode-bits` for testing.
     /// @param operand The operand encoding the start bit and length.
     /// @param inputs The input values from the stack.
     /// @return outputs The encoded output values.

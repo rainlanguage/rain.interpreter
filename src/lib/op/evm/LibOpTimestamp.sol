@@ -13,14 +13,14 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibOpTimestamp {
     using LibDecimalFloat for Float;
 
-    /// `block-timestamp` integrity check. Requires 0 inputs and produces 1 output.
+    /// @notice `block-timestamp` integrity check. Requires 0 inputs and produces 1 output.
     /// @return The number of inputs.
     /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (0, 1);
     }
 
-    /// `block-timestamp` opcode. Reads the current block timestamp.
+    /// @notice `block-timestamp` opcode. Reads the current block timestamp.
     /// @param stackTop Pointer to the top of the stack.
     /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
@@ -31,7 +31,7 @@ library LibOpTimestamp {
         return stackTop;
     }
 
-    /// Reference implementation of `block-timestamp` for testing.
+    /// @notice Reference implementation of `block-timestamp` for testing.
     /// Uses the float conversion with exponent 0 to verify that
     /// `fromFixedDecimalLosslessPacked(value, 0)` is identity, unlike `run()`
     /// which stores the raw value directly as a gas optimization.

@@ -25,7 +25,7 @@ library LibParseOperand {
     using LibParseInterstitial for ParseState;
     using LibDecimalFloat for Float;
 
-    /// Parses an operand from the source string at the cursor position,
+    /// @notice Parses an operand from the source string at the cursor position,
     /// extracting literal values between the operand delimiters into the
     /// state's operandValues array.
     /// @param state The current parse state.
@@ -122,7 +122,7 @@ library LibParseOperand {
         return cursor;
     }
 
-    /// Standard dispatch for handling an operand after it is parsed, using the
+    /// @notice Standard dispatch for handling an operand after it is parsed, using the
     /// encoded function pointers on the current parse state. Requires that the
     /// word index has been looked up by the parser, exists, and the literal
     /// values have all been parsed out of the operand string. In the case of
@@ -146,7 +146,7 @@ library LibParseOperand {
         return handler(state.operandValues);
     }
 
-    /// Operand handler that disallows any operand values. Reverts if any
+    /// @notice Operand handler that disallows any operand values. Reverts if any
     /// values are provided, otherwise returns a zero operand.
     /// @param values The parsed operand values from the source string.
     /// @return The zero operand.
@@ -157,7 +157,7 @@ library LibParseOperand {
         return OperandV2.wrap(0);
     }
 
-    /// Operand handler that disallows any operand values but always returns
+    /// @notice Operand handler that disallows any operand values but always returns
     /// an operand of 1 instead of 0.
     /// @param values The parsed operand values from the source string.
     /// @return The operand with a constant value of 1.
@@ -168,7 +168,7 @@ library LibParseOperand {
         return OperandV2.wrap(bytes32(uint256(1)));
     }
 
-    /// There must be one or zero values. The fallback is 0 if nothing is
+    /// @notice There must be one or zero values. The fallback is 0 if nothing is
     /// provided, else the provided Float value is converted to a lossless
     /// integer and MUST fit in a uint16.
     /// @param values The parsed operand values from the source string.
@@ -193,7 +193,7 @@ library LibParseOperand {
         }
     }
 
-    /// There must be exactly one value. There is no default fallback. The
+    /// @notice There must be exactly one value. There is no default fallback. The
     /// provided Float value is converted to a lossless integer and MUST fit
     /// in a uint16.
     /// @param values The parsed operand values from the source string.
@@ -217,7 +217,7 @@ library LibParseOperand {
         }
     }
 
-    /// There must be exactly two values. There is no default fallback. Each
+    /// @notice There must be exactly two values. There is no default fallback. Each
     /// Float value is converted to a lossless integer and MUST fit in a
     /// uint8. Packed as `a | (b << 8)`.
     /// @param values The parsed operand values from the source string.
@@ -249,7 +249,7 @@ library LibParseOperand {
         }
     }
 
-    /// 8 bit value then maybe 1 bit flag then maybe 1 bit flag. Fallback to 0
+    /// @notice 8 bit value then maybe 1 bit flag then maybe 1 bit flag. Fallback to 0
     /// for both flags if not provided. Packed as `a | (b << 8) | (c << 9)`.
     /// @param values The parsed operand values from the source string.
     /// @return operand The operand encoding an 8-bit value and two optional
@@ -302,7 +302,7 @@ library LibParseOperand {
         }
     }
 
-    /// 2x maybe 1 bit flags. Fallback to 0 for both flags if not provided.
+    /// @notice 2x maybe 1 bit flags. Fallback to 0 for both flags if not provided.
     /// Packed as `a | (b << 1)`.
     /// @param values The parsed operand values from the source string.
     /// @return operand The operand encoding two optional 1-bit flags.

@@ -120,7 +120,7 @@ abstract contract BaseRainterpreterSubParser is
         return SUB_PARSER_LITERAL_PARSERS;
     }
 
-    /// Overrideable function to allow implementations to define their
+    /// @notice Overrideable function to allow implementations to define their
     /// literal dispatch matching. This is optional, and if not overridden
     /// simply won't attempt to parse any literals. This is usually what you
     /// want, as the main parser will handle common literals and the subparser
@@ -153,7 +153,7 @@ abstract contract BaseRainterpreterSubParser is
         value = 0;
     }
 
-    /// A basic implementation of sub parsing literals that uses encoded
+    /// @notice A basic implementation of sub parsing literals that uses encoded
     /// function pointers to dispatch everything necessary in O(1) and allows
     /// for the child contract to override all relevant functions with some
     /// modest boilerplate.
@@ -182,7 +182,7 @@ abstract contract BaseRainterpreterSubParser is
         }
     }
 
-    /// A basic implementation of sub parsing words that uses encoded function
+    /// @notice A basic implementation of sub parsing words that uses encoded function
     /// pointers to dispatch everything necessary in O(1) and allows for the
     /// child contract to override all relevant functions with some modest
     /// boilerplate.

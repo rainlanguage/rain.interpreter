@@ -20,7 +20,7 @@ library LibOpHeadroom {
         return (1, 1);
     }
 
-    /// Decimal floating point headroom (distance to ceil) of a number.
+    /// @notice Decimal floating point headroom (distance to ceil) of a number.
     /// Returns `ceil(x) - x`, except when `x` is already an integer
     /// (headroom would be zero), in which case it returns 1.
     /// @param stackTop Pointer to the top of the stack.

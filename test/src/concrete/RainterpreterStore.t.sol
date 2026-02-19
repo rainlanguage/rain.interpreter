@@ -50,7 +50,7 @@ contract RainterpreterStoreTest is Test {
         }
     }
 
-    /// Represents a single `set` call to the store.
+    /// @notice Represents a single `set` call to the store.
     /// @param namespace The namespace to set values in.
     /// @param kvs The key/value pairs to set.
     struct Set {
@@ -90,7 +90,7 @@ contract RainterpreterStoreTest is Test {
         }
     }
 
-    /// Fixed size version of `Set` that helps the fuzzer NOT blow up all
+    /// @notice Fixed size version of `Set` that helps the fuzzer NOT blow up all
     /// available memory. Requires some cheeky assembly to get around the
     /// fixed size to dynamic size conversion.
     /// @param namespace The namespace to set values in.

@@ -17,7 +17,7 @@ library LibOpBinaryEqualTo {
         return (2, 1);
     }
 
-    /// Binary Equality
+    /// @notice Binary Equality
     /// Binary Equality is 1 if the first item is equal to the second item,
     /// else 0.
     /// @param stackTop Pointer to the top of the stack.
@@ -31,7 +31,7 @@ library LibOpBinaryEqualTo {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of binary equal for testing.
+    /// @notice Gas intensive reference implementation of binary equal for testing.
     /// @param inputs The input values from the stack.
     /// @return outputs The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)

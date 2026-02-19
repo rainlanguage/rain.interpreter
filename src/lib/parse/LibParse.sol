@@ -77,7 +77,7 @@ library LibParse {
     using LibUint256Array for uint256[];
     using LibBytes32Array for bytes32[];
 
-    /// Parses a word that matches a tail mask between cursor and end. The caller
+    /// @notice Parses a word that matches a tail mask between cursor and end. The caller
     /// has several responsibilities while safely using this word.
     /// - The caller MUST ensure that the word is not zero length.
     ///   I.e. `end - cursor > 0`.
@@ -122,7 +122,7 @@ library LibParse {
         }
     }
 
-    /// Parses the left-hand side (LHS) of a source line. Handles named and
+    /// @notice Parses the left-hand side (LHS) of a source line. Handles named and
     /// anonymous stack items, whitespace, and the LHS/RHS delimiter. Reverts
     /// on unexpected characters, comments, or duplicate named stack items.
     /// @param state The parser state.
@@ -189,7 +189,7 @@ library LibParse {
         }
     }
 
-    /// Parses the right-hand side (RHS) of a source line. Resolves words
+    /// @notice Parses the right-hand side (RHS) of a source line. Resolves words
     /// against known opcodes, LHS stack names, and sub parsers. Handles
     /// parenthesised operand groups, literals, and line/source terminators.
     /// @param state The parser state.
@@ -413,7 +413,7 @@ library LibParse {
         }
     }
 
-    /// Top-level entry point for parsing. Processes pragmas, then iterates
+    /// @notice Top-level entry point for parsing. Processes pragmas, then iterates
     /// over interstitial, LHS, and RHS sections to build the final bytecode
     /// and constants array. Sub-parses any unknown words after initial parsing.
     /// @param state The parser state.

@@ -13,14 +13,14 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibOpChainId {
     using LibDecimalFloat for Float;
 
-    /// `chain-id` integrity check. Requires 0 inputs and produces 1 output.
+    /// @notice `chain-id` integrity check. Requires 0 inputs and produces 1 output.
     /// @return The number of inputs.
     /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (0, 1);
     }
 
-    /// `chain-id` opcode. Reads the current chain ID.
+    /// @notice `chain-id` opcode. Reads the current chain ID.
     /// @param stackTop Pointer to the top of the stack.
     /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
@@ -31,7 +31,7 @@ library LibOpChainId {
         return stackTop;
     }
 
-    /// Reference implementation of `chain-id` for testing.
+    /// @notice Reference implementation of `chain-id` for testing.
     /// Uses the float conversion with exponent 0 to verify that
     /// `fromFixedDecimalLosslessPacked(value, 0)` is identity, unlike `run()`
     /// which stores the raw value directly as a gas optimization.

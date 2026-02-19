@@ -204,7 +204,7 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
         return INTEGRITY_FUNCTION_POINTERS;
     }
 
-    /// The literal parsers are the same as the main parser.
+    /// @notice The literal parsers are the same as the main parser.
     /// @inheritdoc IParserToolingV1
     function buildLiteralParserFunctionPointers() external pure returns (bytes memory) {
         unchecked {
@@ -269,7 +269,7 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
         }
     }
 
-    /// There's only one operand parser for this implementation, the disallowed
+    /// @notice There's only one operand parser for this implementation, the disallowed
     /// parser. We haven't implemented any words with meaningful operands yet.
     /// @inheritdoc IParserToolingV1
     function buildOperandHandlerFunctionPointers() external pure override returns (bytes memory) {
@@ -306,7 +306,7 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
         }
     }
 
-    /// This mimics how `LibAllStandardOps` builds bytes out of function
+    /// @notice This mimics how `LibAllStandardOps` builds bytes out of function
     /// pointers, but for sub parser functions. This is NOT intended to be
     /// called at runtime, instead tooling (e.g. the test suite) can call this
     /// function and compare it to `subParserFunctionPointers` to ensure they
@@ -411,7 +411,7 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
         }
     }
 
-    /// This is only needed because the parser and extern base contracts both
+    /// @notice This is only needed because the parser and extern base contracts both
     /// implement IERC165, and the compiler needs to be told how to resolve the
     /// ambiguity.
     /// @inheritdoc BaseRainterpreterSubParser

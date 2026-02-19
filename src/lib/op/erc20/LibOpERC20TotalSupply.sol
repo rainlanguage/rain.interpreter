@@ -14,7 +14,7 @@ import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol
 /// @title LibOpERC20TotalSupply
 /// @notice Opcode for ERC20 `totalSupply`.
 library LibOpERC20TotalSupply {
-    /// `erc20-total-supply` integrity check. Requires 1 input and produces 1 output.
+    /// @notice `erc20-total-supply` integrity check. Requires 1 input and produces 1 output.
     /// @return The number of inputs.
     /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
@@ -23,7 +23,7 @@ library LibOpERC20TotalSupply {
         return (1, 1);
     }
 
-    /// `erc20-total-supply` opcode. Calls `totalSupply` on the token and converts the result to a decimal float using the token's `decimals`.
+    /// @notice `erc20-total-supply` opcode. Calls `totalSupply` on the token and converts the result to a decimal float using the token's `decimals`.
     /// @param stackTop Pointer to the top of the stack.
     /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
@@ -48,7 +48,7 @@ library LibOpERC20TotalSupply {
         return stackTop;
     }
 
-    /// Reference implementation of `erc20-total-supply` for testing.
+    /// @notice Reference implementation of `erc20-total-supply` for testing.
     /// @param inputs The input values from the stack.
     /// @return The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)

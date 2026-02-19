@@ -67,7 +67,7 @@ import {CallOutputsExceedSource} from "../../../error/ErrIntegrity.sol";
 /// a b: call<1 2>(10 5); ten five:, a b: int-div(ten five) 9;
 /// ```
 library LibOpCall {
-    /// Validates a `call` operand against the bytecode at integrity-check
+    /// @notice Validates a `call` operand against the bytecode at integrity-check
     /// time. Extracts `sourceIndex` (low 16 bits) and `outputs` (bits 20+)
     /// from the operand.
     ///

@@ -19,7 +19,7 @@ import {ParseState} from "./LibParseState.sol";
 /// found or the list is exhausted. Because n is small (number of LHS names in
 /// one expression) the linear walk is cheap even on false positives.
 library LibParseStackName {
-    /// Push a word onto the stack name linked list. If the word already exists
+    /// @notice Push a word onto the stack name linked list. If the word already exists
     /// (by fingerprint), returns the existing index without allocating a new
     /// node. Otherwise allocates a new node at the free memory pointer and
     /// prepends it to the list.
@@ -51,7 +51,7 @@ library LibParseStackName {
         }
     }
 
-    /// Look up a word in the stack name linked list. First checks the bloom
+    /// @notice Look up a word in the stack name linked list. First checks the bloom
     /// filter for an early exit when the name is definitely absent. On a bloom
     /// hit, walks the linked list comparing 224-bit fingerprints. Also updates
     /// the bloom filter so that future lookups for this word will hit.

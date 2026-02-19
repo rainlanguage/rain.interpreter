@@ -23,7 +23,7 @@ library LibParsePragma {
     using LibParseLiteral for ParseState;
     using LibParseState for ParseState;
 
-    /// Parses an optional `using-words-from` pragma at the cursor. If the
+    /// @notice Parses an optional `using-words-from` pragma at the cursor. If the
     /// pragma keyword is present, reads one or more literal sub parser
     /// addresses and pushes them onto the state's sub parser list.
     /// @param state The parser state.
