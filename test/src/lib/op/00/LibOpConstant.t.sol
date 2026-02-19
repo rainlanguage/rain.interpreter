@@ -112,6 +112,30 @@ contract LibOpConstantTest is OpTest {
         assertEq(kvs.length, 0);
     }
 
+    /// Test integrity at the maximum operand index boundary (65535).
+    /// Index 65535 is OOB for length 65535, valid for length 65536.
+    function testOpConstantIntegrityMaxIndex() external {
+        IntegrityCheckState memory state;
+        state.constants = new bytes32[](0);
+        OperandV2 operand = OperandV2.wrap(bytes32(uint256(0xFFFF)));
+
+        // Set constants.length to 65535 via assembly. Index 65535 is OOB.
+        bytes32[] memory constants = state.constants;
+        assembly ("memory-safe") {
+            mstore(constants, 0xFFFF)
+        }
+        vm.expectRevert(abi.encodeWithSelector(OutOfBoundsConstantRead.selector, state.opIndex, 0xFFFF, 0xFFFF));
+        this.integrityExternal(state, operand);
+
+        // Set constants.length to 65536. Index 65535 is now valid.
+        assembly ("memory-safe") {
+            mstore(constants, 0x10000)
+        }
+        (uint256 calcInputs, uint256 calcOutputs) = this.integrityExternal(state, operand);
+        assertEq(calcInputs, 0, "inputs");
+        assertEq(calcOutputs, 1, "outputs");
+    }
+
     /// It is an error to have multiple outputs for a constant.
     function testOpConstantMultipleOutputErrorSugared() external {
         checkUnhappyParse2("_ _: 1;", abi.encodeWithSelector(BadOpOutputsLength.selector, 0, 1, 2));
