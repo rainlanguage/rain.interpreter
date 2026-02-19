@@ -11,8 +11,8 @@ import {
 contract LibIntegrityCheckHighwaterTest is RainterpreterExpressionDeployerDeploymentTest {
     /// A multi-output call (2 outputs) must pass the integrity check.
     /// The call opcode returns (sourceInputs, outputs) where outputs > 1,
-    /// which triggers readHighwater advancement at line 173-175 of
-    /// LibIntegrityCheck. If highwater did not advance correctly,
+    /// which triggers readHighwater advancement in the multi-output
+    /// branch of LibIntegrityCheck. If highwater did not advance correctly,
     /// parse2 would revert during its internal integrity check.
     function testHighwaterAdvancesAfterMultiOutputCall() external view {
         I_DEPLOYER.parse2(bytes("a b: call<1>(10); ten:,a b:ten 11;"));

@@ -12,7 +12,7 @@ Test base contracts in `test/abstract/`:
 
 ## Fuzz Testing
 
-- Use `bound()` to constrain fuzz inputs, not `vm.assume()`. `vm.assume()` wastes runs by discarding inputs. `vm.assume()` is acceptable only for excluding a single value.
+- Use `bound()` to constrain fuzz inputs, not `vm.assume()`. `vm.assume()` wastes runs by discarding inputs. `vm.assume()` is acceptable when the rejection rate is low or `bound()` cannot express the constraint.
 - When fuzzing over a non-contiguous set (e.g., non-hex bytes), `bound()` to the count of valid values, then map with arithmetic to skip excluded ranges.
 - When a fuzz parameter affects expression structure, build rainlang dynamically. The fuzz variable must match what the rainlang produces.
 

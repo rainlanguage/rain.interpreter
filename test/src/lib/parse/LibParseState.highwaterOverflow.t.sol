@@ -19,6 +19,21 @@ contract LibParseStateHighwaterOverflowTest is Test {
         state.highwater();
     }
 
+    /// External wrapper for the just-below-boundary case.
+    function externalHighwaterJustBelowOverflow() external pure {
+        ParseState memory state = LibParseState.newState("", "", "", "");
+        // Set the RHS offset to 0x3d so highwater() increments to 0x3e,
+        // which is just below the 0x3f overflow threshold.
+        state.topLevel0 = uint256(0x3d) << 248;
+        state.highwater();
+    }
+
+    /// highwater() must NOT revert when the RHS offset is just below
+    /// the overflow boundary (0x3d → 0x3e).
+    function testHighwaterJustBelowOverflow() external view {
+        this.externalHighwaterJustBelowOverflow();
+    }
+
     /// highwater() must revert with ParseStackOverflow when the RHS
     /// offset reaches 0x3f.
     function testHighwaterOverflow() external {

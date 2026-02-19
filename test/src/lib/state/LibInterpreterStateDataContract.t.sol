@@ -167,6 +167,7 @@ contract LibInterpreterStateDataContractTest is Test {
             assertEq(state.constants[i], constants[i]);
         }
         assertEq(keccak256(state.bytecode), keccak256(bytecode));
+        assertEq(state.bytecode.length, bytecode.length);
     }
 
     /// Two-source round-trip: verify bytecode and constants survive serialize/deserialize.
@@ -183,6 +184,7 @@ contract LibInterpreterStateDataContractTest is Test {
             assertEq(state.constants[i], constants[i]);
         }
         assertEq(keccak256(state.bytecode), keccak256(bytecode));
+        assertEq(state.bytecode.length, bytecode.length);
     }
 
     /// Round-trip with empty constants.

@@ -8,6 +8,7 @@ import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibParseLiteral} from "src/lib/parse/literal/LibParseLiteral.sol";
 import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 import {IntOrAString, LibIntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
+import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibParseLiteralSelectByIndexTest
 /// Directly tests selectLiteralParserByIndex by calling the returned
@@ -28,7 +29,8 @@ contract LibParseLiteralSelectByIndexTest is Test {
     /// digits must return the parsed decimal value.
     function testSelectIndex1Decimal() external view {
         (uint256 cursorAfter, bytes32 value) = this.externalSelectAndParse(1, bytes("42e0"));
-        (cursorAfter, value);
+        assertTrue(Float.wrap(value).eq(LibDecimalFloat.packLossless(42, 0)));
+        (cursorAfter);
     }
 
     /// Index 2 selects the string parser. Calling it with a quoted

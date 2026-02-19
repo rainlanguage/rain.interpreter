@@ -169,12 +169,12 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [DISMISSED] A03-8: (LOW) No test coverage for `MalformedHexLiteral` error — unreachable defensive code; `boundHex` constrains the range to valid hex characters before the loop runs
 - [FIXED] A03-9: (LOW) No test coverage for `MalformedCommentStart` error — added in commit `18339c10`
 - [FIXED] A03-10: (LOW) No test coverage for `NotAcceptingInputs` error — added in commit `2878c38b`
-- [DISMISSED] A03-11: (LOW) No test coverage for `DanglingSource` error — unreachable defensive code; `MissingFinalSemi` fires first for any user input that leaves a source open
+- [DISMISSED] A03-11: (LOW) No test coverage for `DanglingSource` error — unreachable defensive code via public `parse()` API; `MissingFinalSemi` fires first for any user input that leaves a source open (see A43-4 for direct internal test)
 - [FIXED] A03-12: (LOW) No test coverage for `ParseStackOverflow` error — added in commit `9ff8560f`
 - [DISMISSED] A03-13: (LOW) No test coverage for `ParseStackUnderflow` error — unreachable defensive code; parser paren-counting guarantees child ops push exactly the inputs each parent pops
 - [FIXED] A03-14: (LOW) No test coverage for `ParenOverflow` error — added in commit `fe692342`
 - [FIXED] A03-15: (LOW) No test coverage for `OpcodeIOOverflow` error — added in commit `4cbcff64`
-- [DISMISSED] A03-16: (LOW) No test coverage for `ParenInputOverflow` error — unreachable defensive code; `SourceItemOpsOverflow` is checked first at the same threshold in `pushOpToSource`
+- [DISMISSED] A03-16: (LOW) No test coverage for `ParenInputOverflow` error — unreachable defensive code via public `parse()` API; `SourceItemOpsOverflow` is checked first at the same threshold in `pushOpToSource` (see A43-5 for direct internal test)
 - [DISMISSED] A03-17: (LOW) No test coverage for `BadDynamicLength` error — unreachable defensive code; guards compile-time fixed-to-dynamic array casts, code comments "Should be an unreachable error"
 - [FIXED] A04-1: (LOW) No direct test for `literalParserFunctionPointers()` output length — added in commit `82389695`
 - [FIXED] A04-2: (LOW) No direct test for `operandHandlerFunctionPointers()` output length — added in commit `c7e65302`
@@ -262,7 +262,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A33-1: (MEDIUM) No direct unit test for `selectLiteralParserByIndex` — added direct test calling returned function pointer for hex, decimal, and string indices
 - [PENDING] A33-2: (LOW) No direct unit test for `tryParseLiteral` dispatch logic
 - [PENDING] A33-3: (LOW) No test for `parseLiteral` revert path
-- [FIXED] A34-1: (MEDIUM) No happy-path unit test for `parseDecimalFloatPacked` — added 52 happy-path cases covering zero, integers, negatives, positive/negative exponents, decimal points, no exponent, and large coefficients using float eq
+- [FIXED] A34-1: (MEDIUM) No happy-path unit test for `parseDecimalFloatPacked` — added 47 happy-path cases covering zero, integers, negatives, positive/negative exponents, decimal points, no exponent, and large coefficients using float eq
 - [PENDING] A34-2: (LOW) No fuzz test for decimal parsing round-trip
 - [PENDING] A34-3: (LOW) No test for cursor position after successful parse
 - [PENDING] A34-4: (LOW) No test for decimal values with fractional parts

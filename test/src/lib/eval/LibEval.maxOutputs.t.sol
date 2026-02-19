@@ -23,6 +23,8 @@ contract LibEvalMaxOutputsTest is RainterpreterExpressionDeployerDeploymentTest 
     function testMaxOutputsTruncation(uint8 maxOutputs, bytes32 c0, bytes32 c1, bytes32 c2) external view {
         maxOutputs = uint8(bound(maxOutputs, 0, 2));
 
+        // unsafeParse assigns constants in encounter order: 0xaa=0, 0xbb=1, 0xcc=2.
+        // The assertions below depend on this ordering (stack top is c2).
         (bytes memory bytecode,) = I_PARSER.unsafeParse(bytes("_ _ _: 0xaa 0xbb 0xcc;"));
 
         bytes32[] memory constants = new bytes32[](3);
