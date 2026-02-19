@@ -223,7 +223,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A17-2: (LOW) No test for `run` with maximum inputs (15) and maximum outputs simultaneously — added `testOpCallRunMaxInputsMaxOutputs` with 15-input/15-output no-body callee
 - [DISMISSED] A17-3: (LOW) No isolated test for operand field extraction consistency between `integrity` and `run` — bit extraction code is identical in both functions; testOpCallIntegrityIO fuzz + E2E run tests cover both paths
 - [FIXED] A18-1: (LOW) No test for `run` with a constants array at maximum operand index (65535) — added `testOpConstantIntegrityMaxIndex` testing boundary at 65535 with assembly-overridden array length
-- [PENDING] A19-1: (LOW) No test for context with empty inner array (context[i].length == 0, j == 0)
+- [FIXED] A19-1: (LOW) No test for context with empty inner array (context[i].length == 0, j == 0) — added `testOpContextEvalEmptyInnerArray`
 - [PENDING] A19-2: (LOW) No test for large context dimensions (i or j near 255)
 - [PENDING] A20-1: (LOW) No test verifying `erc20-allowance` handles infinite approvals without revert
 - [PENDING] A20-2: (LOW) No test for `decimals()` revert when token does not implement `IERC20Metadata`

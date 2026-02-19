@@ -234,6 +234,26 @@ contract LibOpContextTest is OpTest {
         );
     }
 
+    /// Test that accessing context[i][0] reverts when the inner array is empty.
+    function testOpContextEvalEmptyInnerArray() external {
+        bytes32[][] memory context = new bytes32[][](1);
+        context[0] = new bytes32[](0);
+        bytes memory bytecode = I_DEPLOYER.parse2("_: context<0 0>();");
+
+        vm.expectRevert(stdError.indexOOBError);
+        I_INTERPRETER.eval4(
+            EvalV4({
+                store: I_STORE,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: context,
+                inputs: new StackItem[](0),
+                stateOverlay: new bytes32[](0)
+            })
+        );
+    }
+
     function testOpContextOneInput() external {
         checkBadInputs("_: context<0 0>(0);", 1, 0, 1);
     }
