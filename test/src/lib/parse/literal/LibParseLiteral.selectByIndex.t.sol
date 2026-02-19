@@ -15,6 +15,7 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 /// function pointer with known input for each literal type index.
 contract LibParseLiteralSelectByIndexTest is Test {
     using LibParseLiteral for ParseState;
+    using LibDecimalFloat for Float;
     using LibBytes for bytes;
 
     /// Index 0 selects the hex parser. Calling it with hex digits
