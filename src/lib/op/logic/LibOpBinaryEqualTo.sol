@@ -11,6 +11,8 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 /// @notice Opcode to return 1 if the first item on the stack is equal to
 /// the second item on the stack, else 0.
 library LibOpBinaryEqualTo {
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (2, 1);
     }
@@ -18,6 +20,8 @@ library LibOpBinaryEqualTo {
     /// Binary Equality
     /// Binary Equality is 1 if the first item is equal to the second item,
     /// else 0.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
         assembly ("memory-safe") {
             let a := mload(stackTop)
@@ -28,6 +32,8 @@ library LibOpBinaryEqualTo {
     }
 
     /// Gas intensive reference implementation of binary equal for testing.
+    /// @param inputs The input values from the stack.
+    /// @return outputs The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure

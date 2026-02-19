@@ -22,6 +22,9 @@ library LibOpHash {
     }
 
     /// `hash` opcode. Computes keccak256 over the operand-specified number of stack items.
+    /// @param operand The operand encoding the number of inputs to hash.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         assembly ("memory-safe") {
             let length := mul(and(shr(0x10, operand), 0x0F), 0x20)
@@ -33,6 +36,8 @@ library LibOpHash {
     }
 
     /// Reference implementation of `hash` for testing.
+    /// @param inputs The input values from the stack.
+    /// @return outputs The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure
