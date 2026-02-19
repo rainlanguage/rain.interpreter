@@ -3,4 +3,5 @@ reviews:
     - "!audit/**"
     - "!CLAUDE.md"
     - "!AUDIT.md"
+    - "!TESTING.md"
     - "!.claude/**"
