@@ -30,8 +30,14 @@ import {LibParseError} from "./LibParseError.sol";
 /// 0x20.
 uint256 constant EMPTY_ACTIVE_SOURCE = 0x20;
 
+/// @dev Bit 0 of the FSM. When set, the parser is in "yang" state (building
+/// an RHS word). When clear, the parser is in "yin" state (between words).
 uint256 constant FSM_YANG_MASK = 1;
+/// @dev Bit 1 of the FSM. When set, the current word has ended and the parser
+/// should finalize it before processing the next character.
 uint256 constant FSM_WORD_END_MASK = 1 << 1;
+/// @dev Bit 2 of the FSM. When set, the current line is still accepting LHS
+/// input names. Cleared after the first RHS item on a line.
 uint256 constant FSM_ACCEPTING_INPUTS_MASK = 1 << 2;
 
 /// @dev If a source is active we cannot finish parsing without a semi to trigger

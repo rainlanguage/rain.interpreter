@@ -10,6 +10,10 @@ import {
 } from "rain.interpreter.interface/interface/IInterpreterStoreV3.sol";
 import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
+/// @dev Deterministic address used as the `staticcall` target for stack trace
+/// emissions. Derived from a domain-specific keccak hash so it cannot collide
+/// with a deployed contract. The call always fails (no code at this address),
+/// but the calldata is visible in traces for debugging.
 address constant STACK_TRACER = address(uint160(uint256(keccak256("rain.interpreter.stack-tracer.0"))));
 
 /// @notice Runtime state threaded through the eval loop and all opcode

@@ -15,6 +15,19 @@ import {BadOpInputsLength, BadOpOutputsLength} from "rain.interpreter.interface/
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
+/// Tracks the state of the integrity check walk over a single source.
+/// @param stackIndex Current logical stack depth. Increases with opcode
+/// outputs and decreases with opcode inputs.
+/// @param stackMaxIndex Peak stack depth seen so far, used to verify the
+/// bytecode-declared stack allocation.
+/// @param readHighwater Lowest stack index that opcodes are allowed to read
+/// from. Advances past multi-output regions to prevent aliasing reads.
+/// @param constants The constants array for the expression, passed through
+/// to opcode integrity functions that need it.
+/// @param opIndex Sequential counter of opcodes processed, used for error
+/// reporting.
+/// @param bytecode The full bytecode containing all sources, retained so
+/// opcode integrity functions can inspect other sources (e.g. call).
 struct IntegrityCheckState {
     uint256 stackIndex;
     uint256 stackMaxIndex;

@@ -8,7 +8,7 @@ import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../../state/LibInterpreterState.sol";
 
-/// @title OpUint256ERC721BalanceOf
+/// @title LibOpUint256ERC721BalanceOf
 /// @notice Opcode for getting the current erc721 balance of an account.
 library LibOpUint256ERC721BalanceOf {
     /// `uint256-erc721-balance-of` integrity check. Requires 2 inputs and produces 1 output.

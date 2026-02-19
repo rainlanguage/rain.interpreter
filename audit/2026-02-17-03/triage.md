@@ -448,9 +448,9 @@ Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
 - [FIXED] A06-9: (LOW) `LibExternOpIntInc.integrity` missing `@param` and `@return` tags — added @notice, @param, @return
 - [FIXED] A06-10: (LOW) `LibExternOpIntInc.subParser` missing `@param` and `@return` tags — added @notice, @param, @return
 - [FIXED] A06-11: (LOW) `LibExternOpStackOperand.subParser` missing NatSpec entirely — added @notice, @param, @return
-- [PENDING] A12-1: (LOW) `IntegrityCheckState` struct has no NatSpec documentation
+- [FIXED] A12-1: (LOW) `IntegrityCheckState` struct has no NatSpec documentation — added struct-level and per-field NatSpec
 - [FIXED] A14-1: (MEDIUM) `InterpreterState` struct has no NatSpec documentation — added struct-level and per-field NatSpec
-- [PENDING] A14-2: (LOW) `STACK_TRACER` constant has no NatSpec documentation
+- [FIXED] A14-2: (LOW) `STACK_TRACER` constant has no NatSpec documentation — added NatSpec describing derivation and purpose
 - [FIXED] A14-3: (LOW) `stackTrace` NatSpec inaccurately describes the 4-byte prefix content — corrected to describe 2-byte parentSourceIndex + 2-byte sourceIndex encoding
 - [FIXED] A14-4: (LOW) `unsafeSerialize` missing `@return` tag and cursor side-effect not documented — all params/returns unnamed, bare `///` acceptable
 - [FIXED] A16-1: (LOW) LibOpBitwiseAnd integrity missing `@param` and `@return` NatSpec tags — added `@return` tags
@@ -489,7 +489,7 @@ Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
 - [FIXED] A20-13: (LOW) LibOpUint256ERC20Allowance integrity missing `@param` and `@return` NatSpec — added @notice, @param, @return
 - [FIXED] A20-14: (LOW) LibOpUint256ERC20Allowance run missing `@param` and `@return` NatSpec — added @notice, @param, @return
 - [FIXED] A20-15: (LOW) LibOpUint256ERC20Allowance referenceFn missing `@param` and `@return` NatSpec — added @notice, @param, @return
-- [PENDING] A20-16: (LOW) LibOpUint256ERC20BalanceOf `@title` missing Lib prefix vs library name
+- [FIXED] A20-16: (LOW) LibOpUint256ERC20BalanceOf `@title` missing Lib prefix vs library name — corrected to LibOpUint256ERC20BalanceOf
 - [FIXED] A20-17: (LOW) LibOpUint256ERC20BalanceOf integrity missing `@param` and `@return` NatSpec — added @notice, @param, @return
 - [FIXED] A20-18: (LOW) LibOpUint256ERC20BalanceOf run missing `@param` and `@return` NatSpec — added @notice, @param, @return
 - [FIXED] A20-19: (LOW) LibOpUint256ERC20BalanceOf referenceFn missing `@param` and `@return` NatSpec — added @notice, @param, @return
@@ -628,7 +628,7 @@ Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
 - [FIXED] A29-22: (LOW) LibOpUint256Sub integrity missing `@param` and `@return` NatSpec — added @notice, @param, @return
 - [FIXED] A29-23: (LOW) LibOpUint256Sub run missing `@param` and `@return` NatSpec — added @notice, @param, @return
 - [FIXED] A29-24: (LOW) LibOpUint256Sub referenceFn missing `@param` and `@return` NatSpec — added @notice, @param, @return
-- [PENDING] A30-1: (LOW) File-level constants `NOT_LOW_16_BIT_MASK`, `ACTIVE_SOURCE_MASK`, and `SUB_PARSER_BYTECODE_HEADER_SIZE` lack NatSpec
+- [FIXED] A30-1: (LOW) File-level constants `NOT_LOW_16_BIT_MASK`, `ACTIVE_SOURCE_MASK`, and `SUB_PARSER_BYTECODE_HEADER_SIZE` lack NatSpec — NOT_LOW_16_BIT_MASK and ACTIVE_SOURCE_MASK don't exist (false positive); added NatSpec to SUB_PARSER_BYTECODE_HEADER_SIZE
 - [FIXED] A30-2: (LOW) `LibParse.parseWord` NatSpec describes `@return` as two separate values but does not name them — added two named @return tags
 - [FIXED] A30-3: (LOW) `LibParse.parseLHS` NatSpec does not document the yang/yin FSM transitions or the `CMASK_COMMENT_HEAD` special-case revert — added FSM transition documentation
 - [FIXED] A30-4: (LOW) `LibParse.parseRHS` NatSpec does not describe FSM state transitions or the paren-tracking mechanism — added FSM state transition documentation
@@ -648,14 +648,14 @@ Agent IDs assigned by source file, matching the agent index from Pass 1/Pass 2.
 - [FIXED] A39-5: (LOW) `LibParseOperand.handleOperandM1M1` NatSpec incomplete for bit layout — added `a | (b << 1)`
 - [FIXED] A43-1: (MEDIUM) `ParseState` struct has stale `@param literalBloom` referencing non-existent field — removed stale param, added correct docs
 - [FIXED] A43-2: (MEDIUM) `ParseState` struct missing `@param` for 8 fields — added NatSpec for subParsers, stackNameBloom, constantsBloom, operandHandlers, operandValues, stackTracker, data, meta
-- [PENDING] A43-3: (LOW) Constants `FSM_YANG_MASK` and `FSM_WORD_END_MASK` have no NatSpec
+- [FIXED] A43-3: (LOW) Constants `FSM_YANG_MASK` and `FSM_WORD_END_MASK` have no NatSpec — added @dev NatSpec to FSM_YANG_MASK, FSM_WORD_END_MASK, and FSM_ACCEPTING_INPUTS_MASK
 - [FIXED] A43-4: (LOW) `ParseState.fsm` NatSpec describes bit layout that does not match implemented constants — bit layout now matches constants
 - [FIXED] A43-5: (LOW) `endLine` function NatSpec is minimal — missing `@param cursor` description — added @param cursor
-- [PENDING] A43-6: (LOW) `PARSE_STATE_TOP_LEVEL0_OFFSET` and sibling constants document offsets but not how they were derived
-- [PENDING] A45-1: (LOW) Constructor has no NatSpec documentation
-- [PENDING] A45-2: (LOW) `opcodeFunctionPointers()` NatSpec lacks a function description line
+- [DISMISSED] A43-6: (LOW) `PARSE_STATE_TOP_LEVEL0_OFFSET` and sibling constants document offsets but not how they were derived — existing docs explain purpose; derivation is standard Solidity struct memory layout
+- [FIXED] A45-1: (LOW) Constructor has no NatSpec documentation — added NatSpec describing the zero-pointer guard
+- [FIXED] A45-2: (LOW) `opcodeFunctionPointers()` NatSpec lacks a function description line — added description of packed pointer table and virtual override
 - [FIXED] A45-3: (LOW) Contract-level NatSpec uses `@notice` and is minimal — removed `@notice` tag from Rainterpreter
-- [PENDING] A45-4: (LOW) All four getter functions in `RainterpreterDISPaiRegistry` lack `@return` tags
+- [FIXED] A45-4: (LOW) All four getter functions in `RainterpreterDISPaiRegistry` lack `@return` tags — added IDISPaiRegistry interface with @return tags, concrete contract uses @inheritdoc
 - [FIXED] A47-1: (LOW) Contract-level NatSpec is title-only, no description — added @title and @notice
 - [DISMISSED] A47-2: (MEDIUM) `parse2` has no meaningful NatSpec — `@inheritdoc` inherits nothing — upstream issue in rain.interpreter.interface; IParserV2 has no NatSpec
 - [FIXED] A47-3: (LOW) `parsePragma1` missing `@param` and `@return` tags — added @notice, @param data, @return (deployer version)
@@ -744,9 +744,9 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [FIXED] A16-2: (LOW) Inconsistent `uint256` cast on `type(uint8).max` between LibOpShiftBitsLeft and LibOpShiftBitsRight — removed unnecessary cast from ShiftBitsLeft
 - [FIXED] A16-3: (LOW) Inconsistent lint suppression comments between LibOpDecodeBits and LibOpEncodeBits for identical shift operation — added slither suppression to EncodeBits to match DecodeBits
 - [PENDING] A16-4: (LOW) Repeated operand parsing logic for `startBit` and `length` duplicated 6 times across LibOpDecodeBits and LibOpEncodeBits
-- [PENDING] A20-1: (LOW) `@title` NatSpec mismatch in `LibOpUint256ERC20BalanceOf.sol` missing `Lib` prefix
+- [FIXED] A20-1: (LOW) `@title` NatSpec mismatch in `LibOpUint256ERC20BalanceOf.sol` missing `Lib` prefix — corrected to LibOpUint256ERC20BalanceOf
 - [FIXED] A20-2: (LOW) Inconsistent `forge-lint` comment formatting in `LibOpUint256ERC20TotalSupply.sol` (space after `//` vs no space) — removed space to match other files
-- [PENDING] A22-1: (LOW) `@title` NatSpec missing `Lib` prefix in `LibOpUint256ERC721BalanceOf`
+- [FIXED] A22-1: (LOW) `@title` NatSpec missing `Lib` prefix in `LibOpUint256ERC721BalanceOf` — corrected to LibOpUint256ERC721BalanceOf
 - [DISMISSED] A22-2: (LOW) Unused `using LibDecimalFloat for Float` directive in all three EVM opcode libraries (LibOpBlockNumber, LibOpChainId, LibOpTimestamp) — false positive; all three use LibDecimalFloat in referenceFn
 - [FIXED] A23a-1: (LOW) Commented-out code in LibOpConditions.sol line 68 — removed
 - [FIXED] A23a-2: (LOW) `require(false, ...)` with string messages in `referenceFn` of LibOpConditions.sol instead of custom errors — replaced with `revert(...)` to match run()

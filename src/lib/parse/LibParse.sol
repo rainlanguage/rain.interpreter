@@ -53,6 +53,9 @@ import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 
+/// @dev Size in bytes of the fixed header prepended to sub-parser bytecode.
+/// Comprises the operand values tail pointer (2 bytes), the literal parsers
+/// tail pointer (2 bytes), and the word length (1 byte).
 uint256 constant SUB_PARSER_BYTECODE_HEADER_SIZE = 5;
 
 /// @title LibParse
