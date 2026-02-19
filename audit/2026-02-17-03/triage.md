@@ -339,3 +339,236 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [PENDING] A50-3: (LOW) No test for `set` with empty array (zero-length `kvs`)
 - [PENDING] A50-4: (LOW) No test for `get` on uninitialized key (default value)
 - [PENDING] A50-5: (LOW) No test for overwriting a key with a different value in a single `set` call
+
+# Pass 3 Triage
+
+Tracks the disposition of every LOW+ finding from pass3 audit reports (documentation).
+Agent IDs are prefixed P3- to disambiguate from other passes.
+
+## Findings
+
+### MEDIUM
+
+- [UPSTREAM] P3-A04-2: (MEDIUM) `parse2` has no meaningful NatSpec -- `@inheritdoc` inherits nothing from IParserV2 — fix in rain.interpreter.interface
+- [FIXED] P3-A06-9: (MEDIUM) `matchSubParseLiteralDispatch()` is entirely undocumented — added @inheritdoc BaseRainterpreterSubParser
+- [PENDING] P3-A20-3: (MEDIUM) LibOpMul `integrity` missing `@param` and `@return` tags
+- [PENDING] P3-A20-4: (MEDIUM) LibOpMul `run` missing `@param` and `@return` tags
+- [PENDING] P3-A20-5: (MEDIUM) LibOpMul `referenceFn` missing `@param` and `@return` tags
+- [PENDING] P3-A20-6: (MEDIUM) LibOpPow `integrity` missing `@param` and `@return` tags
+- [PENDING] P3-A20-7: (MEDIUM) LibOpPow `run` missing `@param` and `@return` tags
+- [PENDING] P3-A20-8: (MEDIUM) LibOpPow `referenceFn` missing `@param` and `@return` tags
+- [PENDING] P3-A20-9: (MEDIUM) LibOpSqrt `integrity` missing `@param` and `@return` tags
+- [PENDING] P3-A20-10: (MEDIUM) LibOpSqrt `run` missing `@param` and `@return` tags
+- [PENDING] P3-A20-11: (MEDIUM) LibOpSqrt `referenceFn` missing `@param` and `@return` tags
+- [PENDING] P3-A20-12: (MEDIUM) LibOpSub `integrity` missing `@param` and `@return` tags
+- [PENDING] P3-A20-13: (MEDIUM) LibOpSub `run` missing `@param` and `@return` tags
+- [PENDING] P3-A20-14: (MEDIUM) LibOpSub `referenceFn` missing `@param` and `@return` tags
+- [PENDING] P3-A25-2: (MEDIUM) `ParseState` struct has stale `@param literalBloom` referencing non-existent field
+- [PENDING] P3-A25-3: (MEDIUM) `ParseState` struct missing `@param` for 8 fields
+- [PENDING] P3-A28-1: (MEDIUM) `InterpreterState` struct has no NatSpec documentation
+
+### LOW (unique findings)
+
+- [PENDING] P3-A01-1: (LOW) `opcodeFunctionPointers` missing `@return` tag
+- [PENDING] P3-A01-2: (LOW) `integrityFunctionPointers` missing `@return` tag
+- [PENDING] P3-A02-1: (LOW) `subParserParseMeta` missing `@return` tag
+- [PENDING] P3-A02-2: (LOW) `subParserWordParsers` missing `@return` tag
+- [PENDING] P3-A02-3: (LOW) `subParserOperandHandlers` missing `@return` tag
+- [PENDING] P3-A02-4: (LOW) `subParserLiteralParsers` missing `@return` tag
+- [PENDING] P3-A02-5: (LOW) `subParseLiteral2` `@inheritdoc` lacks implementation-specific docs
+- [PENDING] P3-A02-6: (LOW) `subParseWord2` `@inheritdoc` lacks implementation-specific docs
+- [PENDING] P3-A02-7: (LOW) `supportsInterface` override does not document which interfaces it supports
+- [PENDING] P3-A03-1: (LOW) Rainterpreter constructor has no NatSpec
+- [PENDING] P3-A03-2: (LOW) `opcodeFunctionPointers()` NatSpec lacks function description
+- [PENDING] P3-A03-6: (LOW) Contract-level NatSpec uses `@notice` and is minimal
+- [PENDING] P3-A03-7: (LOW) RainterpreterDISPaiRegistry all four getters lack `@return` tags
+- [PENDING] P3-A04-1: (LOW) RainterpreterExpressionDeployer contract-level NatSpec is title-only
+- [PENDING] P3-A04-3: (LOW) `parsePragma1` missing `@param` and `@return` tags
+- [PENDING] P3-A05-1: (LOW) `unsafeParse` missing `@param` and `@return` tags
+- [PENDING] P3-A05-2: (LOW) `parsePragma1` on RainterpreterParser missing `@param` and `@return` tags
+- [PENDING] P3-A05-3: (LOW) `parseMeta` missing `@return` tag
+- [PENDING] P3-A05-4: (LOW) `operandHandlerFunctionPointers` missing `@return` tag
+- [PENDING] P3-A05-5: (LOW) `literalParserFunctionPointers` missing `@return` tag
+- [PENDING] P3-A05-6: (LOW) `buildOperandHandlerFunctionPointers` missing `@return` tag
+- [PENDING] P3-A05-7: (LOW) `buildLiteralParserFunctionPointers` missing `@return` tag
+- [PENDING] P3-A06-1: (LOW) `authoringMetaV2()` lacks `@return` tag on RainterpreterReferenceExtern
+- [PENDING] P3-A06-2: (LOW) `describedByMetaV1()` relies solely on `@inheritdoc`
+- [PENDING] P3-A06-3: (LOW) `subParserParseMeta()` lacks `@return` tag on RainterpreterReferenceExtern
+- [PENDING] P3-A06-4: (LOW) `subParserWordParsers()` lacks `@return` tag on RainterpreterReferenceExtern
+- [PENDING] P3-A06-5: (LOW) `subParserOperandHandlers()` lacks `@return` tag on RainterpreterReferenceExtern
+- [PENDING] P3-A06-6: (LOW) `subParserLiteralParsers()` lacks `@return` tag on RainterpreterReferenceExtern
+- [PENDING] P3-A06-7: (LOW) `opcodeFunctionPointers()` lacks `@return` tag on RainterpreterReferenceExtern
+- [PENDING] P3-A06-8: (LOW) `integrityFunctionPointers()` lacks `@return` tag on RainterpreterReferenceExtern
+- [PENDING] P3-A06-10: (LOW) `buildLiteralParserFunctionPointers()` lacks `@return` tag on RainterpreterReferenceExtern
+- [PENDING] P3-A06-11: (LOW) `buildOperandHandlerFunctionPointers()` lacks `@return` tag on RainterpreterReferenceExtern
+- [PENDING] P3-A06-12: (LOW) `buildSubParserWordParsers()` lacks `@return` tag on RainterpreterReferenceExtern
+- [PENDING] P3-A06-13: (LOW) `buildOpcodeFunctionPointers()` lacks `@return` and `@inheritdoc`
+- [PENDING] P3-A06-14: (LOW) `buildIntegrityFunctionPointers()` lacks `@return` and `@inheritdoc`
+- [PENDING] P3-A06-15: (LOW) `supportsInterface()` lacks `@param` tag on RainterpreterReferenceExtern
+- [PENDING] P3-A07-1: (LOW) `BadOutputsLength` in ErrExtern.sol missing `@param` tags
+- [PENDING] P3-A07-2..A07-30: (LOW) 29 errors in ErrParse.sol missing `@param` tags
+- [PENDING] P3-A08-2: (LOW) `eval2` NatSpec "parallel arrays" is ambiguous
+- [PENDING] P3-A09-1: (LOW) `encodeExternDispatch` missing `@param` and `@return` tags
+- [PENDING] P3-A09-2: (LOW) `decodeExternDispatch` missing `@param` and `@return` tags
+- [PENDING] P3-A09-3: (LOW) `encodeExternCall` missing `@param` and `@return` tags
+- [PENDING] P3-A09-4: (LOW) `decodeExternCall` missing `@param` and `@return` tags
+- [PENDING] P3-A09-5: (LOW) `LibExternOpContextCallingContract.subParser` missing `@param`/`@return`
+- [PENDING] P3-A09-6: (LOW) `LibExternOpContextRainlen.subParser` missing `@param`/`@return`
+- [PENDING] P3-A09-8: (LOW) `LibExternOpContextSender.subParser` missing `@param`/`@return`
+- [PENDING] P3-A09-9: (LOW) `LibExternOpIntInc.run` missing `@param`/`@return`
+- [PENDING] P3-A09-10: (LOW) `LibExternOpIntInc.integrity` missing `@param`/`@return`
+- [PENDING] P3-A09-11: (LOW) `LibExternOpIntInc.subParser` missing `@param`/`@return`
+- [PENDING] P3-A09-12: (LOW) `LibExternOpStackOperand.subParser` missing NatSpec entirely
+- [PENDING] P3-A10-1: (LOW) `IntegrityCheckState` struct has no NatSpec
+- [PENDING] P3-A11-1: (LOW) `authoringMetaV2()` missing `@return` tag in LibAllStandardOps
+- [PENDING] P3-A11-2: (LOW) `literalParserFunctionPointers()` missing `@return` tag
+- [PENDING] P3-A11-3: (LOW) `operandHandlerFunctionPointers()` missing `@return` tag
+- [PENDING] P3-A11-4: (LOW) `integrityFunctionPointers()` missing `@return` tag
+- [PENDING] P3-A11-5: (LOW) `opcodeFunctionPointers()` missing `@return` tag
+- [PENDING] P3-A13-16: (LOW) `@title` NatSpec missing `Lib` prefix on `LibOpUint256ERC20BalanceOf`
+- [PENDING] P3-A14-7: (LOW) Unnamed function parameters prevent formal `@param` tags
+- [PENDING] P3-A17-21: (LOW) LibOpExp2 `referenceFn` NatSpec says "exp" instead of "exp2"
+- [PENDING] P3-A18-1: (LOW) LibOpFrac library-level NatSpec uses `@notice` contrary to convention
+- [PENDING] P3-A18-2: (LOW) LibOpGm library-level NatSpec uses `@notice` contrary to convention
+- [PENDING] P3-A18-3: (LOW) LibOpInv library-level NatSpec uses `@notice` contrary to convention
+- [PENDING] P3-A18-7: (LOW) LibOpHeadroom `run` NatSpec is inaccurate/incomplete
+- [PENDING] P3-A20-1: (LOW) LibOpPow library-level NatSpec uses `@notice` contrary to convention
+- [PENDING] P3-A20-2: (LOW) LibOpSqrt library-level NatSpec uses `@notice` contrary to convention
+- [PENDING] P3-A20-15: (LOW) LibOpMul/LibOpSub `run` NatSpec is single word with no description
+- [PENDING] P3-A23-1: (LOW) File-level constants in LibParse lack NatSpec
+- [PENDING] P3-A23-3: (LOW) `parseWord` `@return` tags lack named identifiers
+- [PENDING] P3-A23-4: (LOW) `parseLHS` NatSpec omits FSM transition details
+- [PENDING] P3-A23-5: (LOW) `parseRHS` NatSpec omits significant implementation details
+- [PENDING] P3-A24-4: (LOW) `handleOperandSingleFull` NatSpec inaccurate
+- [PENDING] P3-A24-5: (LOW) `handleOperandSingleFullNoDefault` NatSpec omits conversion detail
+- [PENDING] P3-A24-6: (LOW) `handleOperandDoublePerByteNoDefault` NatSpec inaccurate
+- [PENDING] P3-A24-7: (LOW) `handleOperand8M1M1` NatSpec incomplete
+- [PENDING] P3-A24-8: (LOW) `handleOperandM1M1` NatSpec incomplete
+- [PENDING] P3-A25-1: (LOW) `ParseStackTracker` user-defined type has no NatSpec
+- [PENDING] P3-A25-4: (LOW) Constants `FSM_YANG_MASK` and `FSM_WORD_END_MASK` have no NatSpec
+- [PENDING] P3-A25-5: (LOW) `ParseState.fsm` NatSpec bit layout does not match constants
+- [PENDING] P3-A25-6: (LOW) `endLine` function NatSpec is minimal
+- [PENDING] P3-A25-8: (LOW) Offset constants do not document how values were derived
+- [PENDING] P3-A27-1: (LOW) `selectLiteralParserByIndex` missing `@param`/`@return`
+- [PENDING] P3-A27-2: (LOW) `parseLiteral` missing `@param`/`@return`
+- [PENDING] P3-A27-3: (LOW) `tryParseLiteral` missing `@param`/`@return`
+- [PENDING] P3-A27-4: (LOW) `parseDecimalFloatPacked` missing `@param`/`@return`
+- [PENDING] P3-A27-5: (LOW) `boundHex` missing `@param`/`@return`
+- [PENDING] P3-A27-6: (LOW) `parseHex` missing `@param`/`@return`
+- [PENDING] P3-A27-7: (LOW) `boundString` missing `@param`/`@return`
+- [PENDING] P3-A27-9: (LOW) `parseString` missing `@param`/`@return`
+- [PENDING] P3-A27-10: (LOW) `parseSubParseable` missing `@param`/`@return`
+- [PENDING] P3-A28-2: (LOW) `STACK_TRACER` constant has no NatSpec
+- [PENDING] P3-A28-3: (LOW) `stackTrace` NatSpec stale
+- [PENDING] P3-A28-5: (LOW) `unsafeSerialize` NatSpec doesn't document local cursor advancement
+
+### LOW (batch: missing @param/@return on opcode functions)
+
+- [PENDING] P3-BATCH-OPCODES: (LOW) ~150 findings for missing `@param`/`@return` tags on `integrity`/`run`/`referenceFn` across opcode libraries (LibOpConstant, LibOpContext, LibOpExtern, LibOpStack, all bitwise ops, all ERC20 ops, all ERC5313/ERC721/EVM ops, all logic ops, all math ops except Mul/Pow/Sqrt/Sub which are MEDIUM above, all growth/uint256 math ops, store ops)
+
+# Pass 4 Triage
+
+Tracks the disposition of every LOW+ finding from pass4 audit reports (code quality).
+Agent IDs are prefixed P4- to disambiguate from other passes.
+Findings duplicated from pass 3 have been removed (pass 3 version kept).
+
+## Findings
+
+### HIGH
+
+- [DISMISSED] P4-A25-1: (HIGH) Duplicate short flag `-i` on both fork_url and fork_block_number — false positive, fork_url uses -i and fork_block_number uses -b
+
+### MEDIUM
+
+- [PENDING] P4-A21-1: (MEDIUM) Dead constants NOT_LOW_16_BIT_MASK and ACTIVE_SOURCE_MASK in LibParse.sol
+- [PENDING] P4-A24-2: (MEDIUM) Function pointer mutability mismatch: selectLiteralParserByIndex returns pure but stores view pointers
+- [PENDING] P4-A25-2: (MEDIUM) Unused dependencies serde and serde_bytes in CLI Cargo.toml
+- [PENDING] P4-A26-1: (MEDIUM) unwrap() on traces in From<ForkTypedReturn> will panic if traces are None
+- [PENDING] P4-A26-4: (MEDIUM) search_trace_by_path has logic bug in parent tracking
+- [PENDING] P4-A27-3: (MEDIUM) Edition inconsistency: parser and dispair hardcode edition 2021 instead of workspace 2024
+- [PENDING] P4-A27-5: (MEDIUM) Duplicated Parser2 trait definition for wasm vs non-wasm
+- [PENDING] P4-A27-13: (MEDIUM) parse_pragma_text is inherent method while parse_text is trait method
+
+### LOW
+
+- [PENDING] P4-A01-1: (LOW) Dead `using` directives and unused imports in BaseRainterpreterExtern
+- [PENDING] P4-A01-2: (LOW) Inconsistent assembly idioms for function pointer extraction
+- [PENDING] P4-A01-4: (LOW) Error SubParserIndexOutOfBounds defined inline instead of in src/error/
+- [PENDING] P4-A01-5: (LOW) Inconsistent mutability: opcodeFunctionPointers view vs integrityFunctionPointers pure
+- [PENDING] P4-A02-2: (LOW) Rainterpreter constructor lacks NatSpec
+- [PENDING] P4-A02-7: (LOW) NatSpec /// used for inline code comment inside function body
+- [PENDING] P4-A02-8: (LOW) type(uint256).max as "no limit" without named constant
+- [PENDING] P4-A02-10: (LOW) build* functions missing override keyword
+- [PENDING] P4-A03-1: (LOW) @inheritdoc IERC165 inconsistent with ERC165
+- [PENDING] P4-A03-2: (LOW) Redundant NatSpec before @inheritdoc on buildIntegrityFunctionPointers
+- [PENDING] P4-A03-3: (LOW) RainterpreterDISPaiRegistry does not implement ERC165
+- [PENDING] P4-A04-1: (LOW) Error InvalidRepeatCount defined inline instead of in src/error/
+- [PENDING] P4-A04-3: (LOW) Variable named float shadows type name Float
+- [PENDING] P4-A04-7: (LOW) matchSubParseLiteralDispatch narrowed from view to pure
+- [PENDING] P4-A05-1: (LOW) MalformedExponentDigits and MalformedDecimalPoint are dead code
+- [PENDING] P4-A05-2: (LOW) Inconsistent NatSpec @dev usage across error files
+- [PENDING] P4-A05-7: (LOW) DuplicateLHSItem uses @dev while adjacent errors do not
+- [PENDING] P4-A06-1: (LOW) Magic numbers throughout evalLoop assembly
+- [PENDING] P4-A06-3: (LOW) Stale reference to "tail" in NatSpec comment in LibEval
+- [PENDING] P4-A07-1: (LOW) Inconsistent constant sourcing for context ops
+- [PENDING] P4-A07-2: (LOW) Inconsistent function mutability across subParser functions
+- [PENDING] P4-A07-3: (LOW) Magic number in LibExternOpIntInc.run for float value 1
+- [PENDING] P4-A07-4: (LOW) Magic number 78 in LibParseLiteralRepeat boundary check
+- [PENDING] P4-A08-1: (LOW) Magic number 0x18 for cursor alignment lacks explanation
+- [PENDING] P4-A09-1: (LOW) Unused variable success in stackTrace assembly
+- [PENDING] P4-A09-2: (LOW) Incorrect arithmetic in stackTrace NatSpec cost analysis
+- [PENDING] P4-A10-1: (LOW) LibOpCall is missing referenceFn unlike all other opcode libraries
+- [PENDING] P4-A10-2: (LOW) Unused using LibPointer and import in LibOpCall
+- [PENDING] P4-A11-1: (LOW) Inconsistent referenceFn return pattern across bitwise ops
+- [PENDING] P4-A11-2: (LOW) Inconsistent uint256 cast on type(uint8).max between shift ops
+- [PENDING] P4-A11-3: (LOW) Inconsistent lint suppression comments between DecodeBits and EncodeBits
+- [PENDING] P4-A11-4: (LOW) Repeated operand parsing logic in DecodeBits and EncodeBits
+- [PENDING] P4-A12-3: (LOW) Inconsistent forge-lint comment formatting
+- [PENDING] P4-A13-1: (LOW) @title NatSpec missing Lib prefix in LibOpUint256ERC721BalanceOf
+- [PENDING] P4-A13-2: (LOW) Unused using LibDecimalFloat for Float in EVM ops
+- [PENDING] P4-A14-1: (LOW) Commented-out require statement in LibOpConditions.sol
+- [PENDING] P4-A14-2: (LOW) require(false, ...) with string messages in referenceFn
+- [PENDING] P4-A17-4: (LOW) using LibDecimalFloat for Float unused in MaxNegativeValue/MaxPositiveValue
+- [PENDING] P4-A17-8: (LOW) Missing "decimal" in NatSpec: says "floating point" not "decimal floating point"
+- [PENDING] P4-A17-9: (LOW) Misleading unchecked block with overflow comment on max operation
+- [PENDING] P4-A19-2: (LOW) Misleading comment says "overflow" for div/sub referenceFn
+- [PENDING] P4-A19-3: (LOW) NatSpec references wrong variable names in linear growth formula
+- [PENDING] P4-A20-2: (LOW) Unnecessary unchecked block wrapping entire run body in LibOpSet
+- [PENDING] P4-A21-2: (LOW) Potentially unused using LibBytes32Array in LibParse
+- [PENDING] P4-A21-3: (LOW) Magic numbers in paren tracking logic
+- [PENDING] P4-A21-4: (LOW) parseRHS function length (~210 lines)
+- [PENDING] P4-A22-4: (LOW) Magic numbers in LibParseStackName linked-list encoding
+- [PENDING] P4-A22-5: (LOW) Magic number 0xf0 for comment sequence shift
+- [PENDING] P4-A22-6: (LOW) Duplicated Float-to-uint conversion pattern across 5 operand handlers
+- [PENDING] P4-A22-11: (LOW) Tight coupling between LibParseStackName and ParseState layout
+- [PENDING] P4-A22-12: (LOW) Different fingerprint representations in pushStackName vs stackNameIndex
+- [PENDING] P4-A23-1: (LOW) Incorrect inline comments in newState constructor
+- [PENDING] P4-A23-2: (LOW) Stale function name newActiveSource in comment
+- [PENDING] P4-A23-4: (LOW) Magic number 0x3f for max stack items
+- [PENDING] P4-A24-1: (LOW) Unused using directives in LibParseLiteral
+- [PENDING] P4-A24-3: (LOW) Parameter naming inconsistency: start instead of cursor
+- [PENDING] P4-A24-4: (LOW) Unnamed ParseState memory parameter in boundHex
+- [PENDING] P4-A24-6: (LOW) Magic number 0x40 in hex overflow check
+- [PENDING] P4-A24-7: (LOW) Inconsistent unchecked block usage across parse functions
+- [PENDING] P4-A25-3: (LOW) Incorrect homepage URL points to rain.orderbook
+- [PENDING] P4-A25-4: (LOW) Inconsistent error handling: anyhow loses error chain
+- [PENDING] P4-A25-5: (LOW) Eval output uses Debug formatting labeled as Binary encoding
+- [PENDING] P4-A25-6: (LOW) Execute trait uses async fn without Send bound
+- [PENDING] P4-A26-2: (LOW) Redundant .clone() and .deref() chain in trace extraction
+- [PENDING] P4-A26-3: (LOW) Inconsistent trace ordering approach
+- [PENDING] P4-A26-5: (LOW) CreateNamespace is an empty struct used only as function namespace
+- [PENDING] P4-A26-6: (LOW) Typo "commiting" should be "committing"
+- [PENDING] P4-A26-7: (LOW) #[allow(clippy::for_kv_map)] suppresses valid lint
+- [PENDING] P4-A26-8: (LOW) Inconsistent error handling: unwrap() vs ?
+- [PENDING] P4-A26-11: (LOW) TryFrom<RawCallResult> always produces empty stack and writes
+- [PENDING] P4-A26-13: (LOW) Inconsistent #[derive] placement relative to doc comments
+- [PENDING] P4-A26-15: (LOW) roll_fork uses unwrap() after is_none() check
+- [PENDING] P4-A27-1: (LOW) Unused dependencies serde and serde_json in parser crate
+- [PENDING] P4-A27-2: (LOW) Unused dependency serde_json in test_fixtures crate
+- [PENDING] P4-A27-4: (LOW) Homepage URL inconsistency: rainlanguage vs rainprotocol
+- [PENDING] P4-A27-6: (LOW) DISPaiR doc comment mentions "Registry" but struct has no registry field
+- [PENDING] P4-A27-7: (LOW) Excessive unwrap() in LocalEvm::new()
+- [PENDING] P4-A27-11: (LOW) Cargo.toml metadata inconsistency
+- [PENDING] P4-A27-14: (LOW) DISPaiR struct lacks Debug derive
+- [PENDING] P4-A28-1: (LOW) Inconsistent import path style in script files
+- [PENDING] P4-A28-2: (LOW) Deploy.sol NatSpec omits "dispair-registry" as valid suite value

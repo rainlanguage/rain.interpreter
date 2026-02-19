@@ -228,6 +228,7 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
         }
     }
 
+    /// @inheritdoc BaseRainterpreterSubParser
     function matchSubParseLiteralDispatch(uint256 cursor, uint256 end)
         internal
         pure
