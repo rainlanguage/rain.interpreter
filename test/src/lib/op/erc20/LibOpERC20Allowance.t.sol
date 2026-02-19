@@ -91,6 +91,23 @@ contract LibOpERC20AllowanceTest is OpTest {
         checkBadOutputs("_ _: erc20-allowance(0xdeadbeef 0xdeadc0de 0xdeaddead);", 3, 1, 2);
     }
 
+    /// Test that infinite approval (type(uint256).max) does not revert.
+    /// The lossy conversion is used specifically to handle this case.
+    function testOpERC20AllowanceInfiniteApproval(uint8 decimals) external {
+        vm.mockCall(
+            address(0xdeadbeef),
+            abi.encodeWithSelector(IERC20.allowance.selector, address(0xdeadc0de), address(0xdeaddead)),
+            abi.encode(type(uint256).max)
+        );
+        vm.mockCall(address(0xdeadbeef), abi.encodeWithSelector(IERC20Metadata.decimals.selector), abi.encode(decimals));
+        (Float tokenAllowanceFloat,) = LibDecimalFloat.fromFixedDecimalLossyPacked(type(uint256).max, decimals);
+        checkHappy(
+            "_: erc20-allowance(0xdeadbeef 0xdeadc0de 0xdeaddead);",
+            Float.unwrap(tokenAllowanceFloat),
+            "0xdeadbeef 0xdeadc0de 0xdeaddead"
+        );
+    }
+
     /// Test that operand is disallowed.
     function testOpERC20AllowanceEvalOperandDisallowed() external {
         checkUnhappyParse(
