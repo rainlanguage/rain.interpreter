@@ -7,7 +7,7 @@ import {LibSubParse} from "../../../parse/LibSubParse.sol";
 import {CONTEXT_BASE_COLUMN, CONTEXT_BASE_ROW_SENDER} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 
 /// @title LibExternOpContextSender
-/// This op is a simple reference to the sender of the transaction that called
+/// @notice This op is a simple reference to the sender of the transaction that called
 /// the interpreter. It is used to demonstrate how to implement context
 /// references.
 library LibExternOpContextSender {

@@ -9,16 +9,20 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpMaxNegativeValue
-/// Exposes the maximum negative representable float value as a Rainlang opcode.
+/// @notice Exposes the maximum negative representable float value as a Rainlang opcode.
 library LibOpMaxNegativeValue {
     using LibDecimalFloat for Float;
 
-    /// `max-negative-value` integrity check. Requires 0 inputs and produces 1 output.
+    /// @notice `max-negative-value` integrity check. Requires 0 inputs and produces 1 output.
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (0, 1);
     }
 
-    /// `max-negative-value` opcode. Pushes the maximum negative float (closest to zero) onto the stack.
+    /// @notice `max-negative-value` opcode. Pushes the maximum negative float (closest to zero) onto the stack.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
         Float value = LibDecimalFloat.FLOAT_MAX_NEGATIVE_VALUE;
         assembly ("memory-safe") {
@@ -28,7 +32,8 @@ library LibOpMaxNegativeValue {
         return stackTop;
     }
 
-    /// Reference implementation of `max-negative-value` for testing.
+    /// @notice Reference implementation of `max-negative-value` for testing.
+    /// @return The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory)
         internal
         pure

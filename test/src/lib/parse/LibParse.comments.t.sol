@@ -12,7 +12,7 @@ import {UnclosedComment, UnexpectedComment, UnexpectedLHSChar} from "src/error/E
 import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseCommentsTest
-/// Test that the parser correctly parses comments.
+/// @notice Test that the parser correctly parses comments.
 contract LibParseCommentsTest is OperandTest {
     using LibParse for ParseState;
 

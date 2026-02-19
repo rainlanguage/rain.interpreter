@@ -7,7 +7,7 @@ import {Test} from "forge-std/Test.sol";
 import {OPCODE_FUNCTION_POINTERS} from "src/concrete/Rainterpreter.sol";
 
 /// @title RainterpreterTest
-/// Test suite for Rainterpreter.
+/// @notice Test suite for Rainterpreter.
 contract RainterpreterTest is Test {
     /// The function pointers of the interpreter must be even non-zero length.
     function testRainterpreterOddFunctionPointersLength() external pure {

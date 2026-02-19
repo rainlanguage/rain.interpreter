@@ -55,7 +55,7 @@ contract LibInterpreterStateDataContractExtern {
 }
 
 /// @title LibInterpreterStateDataContractTest
-/// Tests for LibInterpreterStateDataContract serialization and deserialization.
+/// @notice Tests for LibInterpreterStateDataContract serialization and deserialization.
 contract LibInterpreterStateDataContractTest is Test {
     LibInterpreterStateDataContractExtern internal immutable iExtern = new LibInterpreterStateDataContractExtern();
 
@@ -139,6 +139,40 @@ contract LibInterpreterStateDataContractTest is Test {
         constants[2] = bytes32(uint256(0xCC));
 
         bytes memory bytecode = buildSingleSourceBytecode(1, 2, 0, 1);
+        bytes memory serialized = serialize(bytecode, constants);
+
+        InterpreterState memory state = iExtern.deserialize(
+            serialized, 0, FullyQualifiedNamespace.wrap(0), IInterpreterStoreV3(address(0)), new bytes32[][](0), ""
+        );
+
+        assertEq(state.constants.length, constants.length);
+        for (uint256 i = 0; i < constants.length; i++) {
+            assertEq(state.constants[i], constants[i]);
+        }
+        assertEq(keccak256(state.bytecode), keccak256(bytecode));
+        assertEq(state.bytecode.length, bytecode.length);
+    }
+
+    /// Fuzzed round-trip: serialize then deserialize with arbitrary constants.
+    function testSerializeDeserializeRoundTripFuzzed(bytes32[] memory constants) external view {
+        bytes memory bytecode = buildSingleSourceBytecode(1, 2, 0, 1);
+        bytes memory serialized = serialize(bytecode, constants);
+
+        InterpreterState memory state = iExtern.deserialize(
+            serialized, 0, FullyQualifiedNamespace.wrap(0), IInterpreterStoreV3(address(0)), new bytes32[][](0), ""
+        );
+
+        assertEq(state.constants.length, constants.length);
+        for (uint256 i = 0; i < constants.length; i++) {
+            assertEq(state.constants[i], constants[i]);
+        }
+        assertEq(keccak256(state.bytecode), keccak256(bytecode));
+        assertEq(state.bytecode.length, bytecode.length);
+    }
+
+    /// Two-source round-trip: verify bytecode and constants survive serialize/deserialize.
+    function testSerializeDeserializeTwoSourceRoundTrip(bytes32[] memory constants) external view {
+        bytes memory bytecode = buildTwoSourceBytecode(3, 5);
         bytes memory serialized = serialize(bytecode, constants);
 
         InterpreterState memory state = iExtern.deserialize(

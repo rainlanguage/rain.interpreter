@@ -8,6 +8,7 @@ import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {InvalidSubParser} from "src/error/ErrParse.sol";
 
 /// @title LibParseStatePushSubParserTest
+/// @notice Tests for pushing sub parsers onto the parse state.
 contract LibParseStatePushSubParserTest is Test {
     using LibParseState for ParseState;
     using LibBytes for bytes;

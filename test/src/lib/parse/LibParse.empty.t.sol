@@ -11,7 +11,7 @@ import {ParseState} from "src/lib/parse/LibParseState.sol";
 import {MaxSources} from "src/error/ErrParse.sol";
 
 /// @title LibParseEmptyTest
-/// Tests parsing empty sources and constants. All we want to check is that the
+/// @notice Tests parsing empty sources and constants. All we want to check is that the
 /// parser doesn't revert and the correct number of sources and constants are
 /// returned.
 contract LibParseEmptyTest is OperandTest {

@@ -12,7 +12,7 @@ import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {ParseDecimalOverflow} from "rain.string/error/ErrParse.sol";
 
 /// @title LibParseLiteralIntegerDecimalTest
-/// Tests parsing integer literal decimal values.
+/// @notice Tests parsing integer literal decimal values.
 contract LibParseLiteralIntegerDecimalTest is ParseTest {
     using LibParse for ParseState;
 

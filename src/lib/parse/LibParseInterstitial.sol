@@ -18,7 +18,7 @@ library LibParseInterstitial {
     using LibParseError for ParseState;
     using LibParseInterstitial for ParseState;
 
-    /// The cursor currently points at the head of a comment. We need to skip
+    /// @notice The cursor currently points at the head of a comment. We need to skip
     /// over all data until we find the end of the comment. This MAY REVERT if
     /// the comment is malformed, e.g. if the comment doesn't start with `/*`.
     /// @param state The parser state.
@@ -87,7 +87,7 @@ library LibParseInterstitial {
         }
     }
 
-    /// Advances the cursor past any contiguous whitespace characters and
+    /// @notice Advances the cursor past any contiguous whitespace characters and
     /// resets the FSM to yin state.
     /// @param state The parser state.
     /// @param cursor The current cursor position.
@@ -101,7 +101,7 @@ library LibParseInterstitial {
         }
     }
 
-    /// Skips over all interstitial content (whitespace and comments) between
+    /// @notice Skips over all interstitial content (whitespace and comments) between
     /// meaningful parse tokens, returning the cursor at the next non-interstitial
     /// character.
     /// @param state The parser state.

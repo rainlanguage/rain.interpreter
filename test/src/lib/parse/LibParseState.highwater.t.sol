@@ -8,7 +8,7 @@ import {
 import {ParseStackOverflow} from "src/error/ErrParse.sol";
 
 /// @title LibParseStateHighwaterTest
-/// Tests for highwater in LibParseState.
+/// @notice Tests for highwater in LibParseState.
 contract LibParseStateHighwaterTest is RainterpreterExpressionDeployerDeploymentTest {
     /// 63 top-level RHS items overflows the stack RHS offset (>= 0x3f),
     /// triggering ParseStackOverflow. Items are spread across multiple

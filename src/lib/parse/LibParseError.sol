@@ -5,7 +5,7 @@ pragma solidity ^0.8.25;
 import {ParseState} from "./LibParseState.sol";
 
 library LibParseError {
-    /// Calculates the byte offset of a cursor position relative to the start
+    /// @notice Calculates the byte offset of a cursor position relative to the start
     /// of the parse data, for use in error reporting.
     /// @param state The parser state containing the source data reference.
     /// @param cursor The cursor position to calculate the offset for.
@@ -17,7 +17,7 @@ library LibParseError {
         }
     }
 
-    /// Reverts with the given error selector and the cursor's byte offset if
+    /// @notice Reverts with the given error selector and the cursor's byte offset if
     /// the selector is non-zero. A zero selector indicates no error.
     /// @param state The parser state for error offset calculation.
     /// @param cursor The cursor position for the error offset.

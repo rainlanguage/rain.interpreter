@@ -12,7 +12,7 @@ import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";
 
 /// @title LibParseSingleRHSNamedGasTest
-/// Parse a single RHS name for many different sized RHS names just to include
+/// @notice Parse a single RHS name for many different sized RHS names just to include
 /// the gas cost of the name lookup in the gas snapshot.
 contract LibParseSingleRHSNamedGasTest is Test {
     using LibParse for ParseState;

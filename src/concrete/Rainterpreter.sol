@@ -33,10 +33,14 @@ contract Rainterpreter is IInterpreterV4, IOpcodeToolingV1, ERC165 {
     using LibEval for InterpreterState;
     using LibInterpreterStateDataContract for bytes;
 
+    /// Guards against deployment with an empty opcode function pointer table,
+    /// which would make every eval call revert.
     constructor() {
         if (opcodeFunctionPointers().length == 0) revert ZeroFunctionPointers();
     }
 
+    /// Returns the packed 2-byte function pointer table used by the eval loop
+    /// to dispatch each opcode. Virtual so subclasses can override the table.
     /// @return The opcode function pointers for the interpreter.
     function opcodeFunctionPointers() internal view virtual returns (bytes memory) {
         return OPCODE_FUNCTION_POINTERS;

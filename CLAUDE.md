@@ -101,17 +101,29 @@ External contracts can extend the interpreter with additional opcodes. `src/conc
 - Custom bytecode serialization is used instead of ABI encoding for gas efficiency
 - Function pointer dispatch (no switch/if chains) for opcode routing
 - Assembly blocks are used extensively and marked `memory-safe` where applicable
+- NatSpec: when a doc block contains any explicit tag (e.g. `@title`), all entries must be explicitly tagged — untagged lines continue the previous tag, not implicit `@notice`
 
 ## Test Conventions
 
+Testing patterns and conventions are in `TESTING.md`. Read that file before writing tests.
+
 - Test files are in `test/` mirroring `src/` structure, suffixed `.t.sol`
-- Base test contracts in `test/abstract/` — `OpTest` for opcodes, `ParseTest` for parser tests
-- Use `opReferenceCheck` to test opcode runtime behavior against a reference implementation
 - Rust test fixtures (`crates/test_fixtures/`) deploy all four contracts on a local Anvil instance
 
 ## Process (Jidoka)
 
-Each fix is a complete cycle: understand → fix → build → test → verify. Do not move to the next item with incomplete work. The "test" step means both: write tests for any new code paths introduced by the fix, then run the full test suite to confirm nothing is broken. New code must meet the same audit requirements defined in `AUDIT.md` — a fix that introduces untested error paths, missing NatSpec, or other audit findings is not complete. When a process defect is found, stop and fix the process before resuming. When the user asks "why" about a defect, they are asking for root cause analysis of the process failure — not requesting that you go do the thing. Answer the "why" first, agree on the process fix, then resume.
+Jidoka is a priority: process correctness (correct future) over ad hoc progress (present state). Quality at the source enables throughput; skipping quality steps creates rework and slows overall flow. Process introspection takes precedence over following the process.
+
+Each fix is a complete cycle: understand → fix → build → test → verify. Do not move to the next item with incomplete work. The "test" step means both: write tests for any new code paths introduced by the fix, then run the full test suite to confirm nothing is broken. New code must meet the same audit requirements defined in `AUDIT.md` — a fix that introduces untested error paths, missing NatSpec, or other audit findings is not complete.
+
+When the user says "jidoka," they are signaling a process defect. The response is:
+1. Identify the process defect.
+2. Propose a durable fix (document edit, rule change).
+3. **Stop and wait for agreement.** Do not resume task work, run commands, or do anything else. The process fix is the deliverable of that moment.
+
+When the user asks "why" about a defect, they are asking for root cause analysis of the process failure — not requesting that you go do the thing. Answer the "why" first, agree on the process fix, then resume.
+
+Do not claim motivations or internal states. Describe what you actually did, not a story about why. Say "I skipped the test suite run" not "I was optimizing for throughput." Say "the rule is in CLAUDE.md" not "I've internalized it." You have no metrics, no persistence, and no self-observation — narratives about your own reasoning are fabrications.
 
 ## Audit Review
 

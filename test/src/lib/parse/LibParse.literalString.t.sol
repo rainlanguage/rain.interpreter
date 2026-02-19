@@ -12,6 +12,7 @@ import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseLiteralStringTest
+/// @notice Tests for parsing string literals.
 contract LibParseLiteralStringTest is Test {
     using LibParse for ParseState;
 

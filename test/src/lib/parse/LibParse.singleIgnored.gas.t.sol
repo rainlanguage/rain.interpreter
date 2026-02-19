@@ -8,7 +8,7 @@ import {LibParse} from "src/lib/parse/LibParse.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseSingleLHSIgnoredGasTest
-/// Parse a single ignored LHS for many different sized LHS names just to include
+/// @notice Parse a single ignored LHS for many different sized LHS names just to include
 /// the gas cost of the parsing in the gas snapshot.
 contract LibParseSingleLHSIgnoredGasTest is Test {
     using LibParse for ParseState;

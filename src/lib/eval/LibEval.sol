@@ -15,7 +15,7 @@ import {InputsLengthMismatch} from "../../error/ErrEval.sol";
 library LibEval {
     using LibMemoryKV for MemoryKV;
 
-    /// Evaluates opcodes from a single source in the bytecode. Reads 32-byte
+    /// @notice Evaluates opcodes from a single source in the bytecode. Reads 32-byte
     /// words from the source, each containing up to 8 packed 4-byte opcodes
     /// (1 byte opcode index + 3 bytes operand). Each opcode index is looked up
     /// in the function pointer table (bounded by modulo) and dispatched.
@@ -176,18 +176,18 @@ library LibEval {
         return stackTop;
     }
 
-    /// Top-level evaluation entry point. Validates that `inputs` length matches
+    /// @notice Top-level evaluation entry point. Validates that `inputs` length matches
     /// the source's declared input count, copies inputs onto the stack, runs
     /// `evalLoop`, then constructs the output array from the final stack
-    /// position. Returns the output stack items and any state KV writes as
-    /// parallel arrays.
+    /// position.
     /// @param state The interpreter state containing bytecode, constants,
     /// stacks, store, and function pointers.
     /// @param inputs The stack items to pass as inputs to the source.
     /// @param maxOutputs The maximum number of outputs to return from the
     /// final stack.
-    /// @return The output stack items and any state KV writes as parallel
-    /// arrays of keys and values.
+    /// @return The output stack items, truncated to `maxOutputs`.
+    /// @return The state KV writes as a flat array of interleaved keys and
+    /// values from the in-memory KV store.
     function eval2(InterpreterState memory state, StackItem[] memory inputs, uint256 maxOutputs)
         internal
         view
@@ -234,9 +234,9 @@ library LibEval {
             // If the stack top is pointing to the base of Solidity's understanding
             // of the stack array, then this will simply write the same length over
             // the length the stack was initialized with, otherwise a shorter array
-            // will be built within the bounds of the stack. After this point `tail`
-            // and the original stack MUST be immutable as they're both pointing to
-            // the same memory region.
+            // will be built within the bounds of the stack. After this point `stack`
+            // and the original stack array MUST be immutable as they're both
+            // pointing to the same memory region.
             uint256 outputs = maxOutputs < sourceOutputs ? maxOutputs : sourceOutputs;
             StackItem[] memory stack;
             assembly ("memory-safe") {

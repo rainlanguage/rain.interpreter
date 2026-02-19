@@ -9,15 +9,17 @@ import {LibParseInterstitial} from "src/lib/parse/LibParseInterstitial.sol";
 import {MalformedCommentStart} from "src/error/ErrParse.sol";
 
 /// @title LibParseInterstitialTest
-/// Tests for LibParseInterstitial.
+/// @notice Tests for LibParseInterstitial.
 contract LibParseInterstitialTest is Test {
     using LibParseInterstitial for ParseState;
     using LibBytes for bytes;
 
-    /// "//" is not a valid comment start sequence ("/*" is required), so
-    /// skipComment must revert with MalformedCommentStart.
-    function testMalformedCommentStart() external {
-        bytes memory data = bytes("// not a comment */");
+    /// Any second byte other than '*' after '/' must revert with
+    /// MalformedCommentStart. Data must be >= 4 bytes to pass the
+    /// UnclosedComment check first.
+    function testMalformedCommentStart(uint8 secondByte) external {
+        vm.assume(secondByte != 0x2A); // not '*'
+        bytes memory data = abi.encodePacked(bytes1("/"), bytes1(secondByte), bytes2("*/"));
 
         vm.expectRevert(abi.encodeWithSelector(MalformedCommentStart.selector, 0));
         this.externalSkipComment(data);

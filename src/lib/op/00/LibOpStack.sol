@@ -9,11 +9,15 @@ import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterp
 import {OutOfBoundsStackRead} from "../../../error/ErrIntegrity.sol";
 
 /// @title LibOpStack
-/// Implementation of copying a stack item from the stack to the stack.
+/// @notice Implementation of copying a stack item from the stack to the stack.
 /// Integrated deeply into LibParse, which requires this opcode or a variant
 /// to be present at a known opcode index.
 library LibOpStack {
-    /// `stack` integrity check. Validates the read index is within bounds.
+    /// @notice `stack` integrity check. Validates the read index is within bounds.
+    /// @param state The current integrity check state containing the stack index.
+    /// @param operand Encodes the stack read index in the low 16 bits.
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory state, OperandV2 operand) internal pure returns (uint256, uint256) {
         uint256 readIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
         // Operand is the index so ensure it doesn't exceed the stack index.
@@ -29,7 +33,11 @@ library LibOpStack {
         return (0, 1);
     }
 
-    /// `stack` opcode. Copies a value from a previous stack position to the top.
+    /// @notice `stack` opcode. Copies a value from a previous stack position to the top.
+    /// @param state The interpreter state containing the stack bottoms.
+    /// @param operand Encodes the stack read index in the low 16 bits.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory state, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         uint256 sourceIndex = state.sourceIndex;
         assembly ("memory-safe") {
@@ -41,9 +49,12 @@ library LibOpStack {
         return stackTop;
     }
 
-    /// Reference implementation of `stack` for testing. Uses Solidity for
+    /// @notice Reference implementation of `stack` for testing. Uses Solidity for
     /// bounds-checked array access and operand extraction, with only the
     /// final pointer dereference in assembly.
+    /// @param state The interpreter state containing the stack bottoms.
+    /// @param operand Encodes the stack read index in the low 16 bits.
+    /// @return outputs The output values to push onto the stack.
     function referenceFn(InterpreterState memory state, OperandV2 operand, StackItem[] memory)
         internal
         pure

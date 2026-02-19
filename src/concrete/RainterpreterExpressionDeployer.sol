@@ -21,6 +21,8 @@ import {RainterpreterParser} from "./RainterpreterParser.sol";
 import {LibInterpreterDeploy} from "../lib/deploy/LibInterpreterDeploy.sol";
 
 /// @title RainterpreterExpressionDeployer
+/// @notice Coordinates parse, integrity check, and serialization for
+/// deploying Rainlang expressions.
 contract RainterpreterExpressionDeployer is
     IDescribedByMetaV1,
     IParserV2,
@@ -28,7 +30,7 @@ contract RainterpreterExpressionDeployer is
     IIntegrityToolingV1,
     ERC165
 {
-    /// @inheritdoc IERC165
+    /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(IDescribedByMetaV1).interfaceId || interfaceId == type(IParserV2).interfaceId
             || interfaceId == type(IParserPragmaV1).interfaceId || interfaceId == type(IIntegrityToolingV1).interfaceId
@@ -58,7 +60,7 @@ contract RainterpreterExpressionDeployer is
         return serialized;
     }
 
-    /// This is just here for convenience for `IParserV2` consumers, it would be
+    /// @notice This is just here for convenience for `IParserV2` consumers, it would be
     /// more gas efficient to call the parser directly.
     /// @inheritdoc IParserPragmaV1
     function parsePragma1(bytes calldata data) external view virtual override returns (PragmaV1 memory) {
@@ -67,17 +69,6 @@ contract RainterpreterExpressionDeployer is
         return RainterpreterParser(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS).parsePragma1(data);
     }
 
-    /// Defines all the function pointers to integrity checks. This is the
-    /// expression deployer's equivalent of the opcode function pointers and
-    /// follows a near identical dispatch process. These are never compiled into
-    /// source and are instead indexed into directly by the integrity check. The
-    /// indexing into integrity pointers (which has an out of bounds check) is a
-    /// proxy for enforcing that all opcode pointers exist at runtime, so the
-    /// length of the integrity pointers MUST match the length of opcode function
-    /// pointers. This function is `virtual` so that it can be overridden
-    /// pairwise with overrides to `buildOpcodeFunctionPointers` on
-    /// `Rainterpreter`.
-    /// @return The list of integrity function pointers.
     /// @inheritdoc IIntegrityToolingV1
     function buildIntegrityFunctionPointers() external view virtual returns (bytes memory) {
         return LibAllStandardOps.integrityFunctionPointers();

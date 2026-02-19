@@ -9,16 +9,20 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpChainId
-/// Implementation of the EVM `CHAINID` opcode as a standard Rainlang opcode.
+/// @notice Implementation of the EVM `CHAINID` opcode as a standard Rainlang opcode.
 library LibOpChainId {
     using LibDecimalFloat for Float;
 
-    /// `chain-id` integrity check. Requires 0 inputs and produces 1 output.
+    /// @notice `chain-id` integrity check. Requires 0 inputs and produces 1 output.
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (0, 1);
     }
 
-    /// `chain-id` opcode. Reads the current chain ID.
+    /// @notice `chain-id` opcode. Reads the current chain ID.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
         assembly ("memory-safe") {
             stackTop := sub(stackTop, 0x20)
@@ -27,10 +31,11 @@ library LibOpChainId {
         return stackTop;
     }
 
-    /// Reference implementation of `chain-id` for testing.
+    /// @notice Reference implementation of `chain-id` for testing.
     /// Uses the float conversion with exponent 0 to verify that
     /// `fromFixedDecimalLosslessPacked(value, 0)` is identity, unlike `run()`
     /// which stores the raw value directly as a gas optimization.
+    /// @return The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory)
         internal
         view

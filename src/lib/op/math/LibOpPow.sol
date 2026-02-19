@@ -13,14 +13,18 @@ import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibOpPow {
     using LibDecimalFloat for Float;
 
-    /// `pow` integrity check. Requires exactly 2 inputs and produces 1 output.
+    /// @notice `pow` integrity check. Requires exactly 2 inputs and produces 1 output.
+    /// @return inputs Always 2 (base and exponent).
+    /// @return outputs Always 1.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // There must be two inputs and one output.
         return (2, 1);
     }
 
-    /// pow
-    /// decimal floating point exponentiation.
+    /// @notice Decimal floating point exponentiation. Pops base and exponent from
+    /// the stack and pushes base^exponent.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The updated stack top with the result written.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
         Float a;
         Float b;
@@ -37,7 +41,9 @@ library LibOpPow {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of pow for testing.
+    /// @notice Gas intensive reference implementation of pow for testing.
+    /// @param inputs Two-element array: [base, exponent].
+    /// @return Single-element array containing base^exponent.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         view

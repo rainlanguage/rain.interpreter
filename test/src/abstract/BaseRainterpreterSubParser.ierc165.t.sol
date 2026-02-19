@@ -31,7 +31,7 @@ contract ChildRainterpreterSubParser is BaseRainterpreterSubParser {
 }
 
 /// @title BaseRainterpreterSubParserTest
-/// Test suite for BaseRainterpreterSubParser.
+/// @notice Test suite for BaseRainterpreterSubParser.
 contract BaseRainterpreterSubParserIERC165Test is Test {
     /// Test that ERC165 and ISubParserV3 are supported interfaces as
     /// per ERC165.

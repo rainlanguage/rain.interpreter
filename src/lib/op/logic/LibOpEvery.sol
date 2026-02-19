@@ -14,7 +14,10 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibOpEvery {
     using LibDecimalFloat for Float;
 
-    /// `every` integrity check. Requires at least 1 input and produces 1 output.
+    /// @notice `every` integrity check. Requires at least 1 input and produces 1 output.
+    /// @param operand The operand encoding the number of inputs.
+    /// @return The number of inputs (at least 1).
+    /// @return Always 1 output.
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least one input.
         uint256 inputs = uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F;
@@ -22,7 +25,10 @@ library LibOpEvery {
         return (inputs, 1);
     }
 
-    /// EVERY is the last nonzero item, else 0.
+    /// @notice EVERY is the last nonzero item, else 0.
+    /// @param operand The operand encoding the number of inputs.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         unchecked {
             uint256 length = 0x20 * (uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F);
@@ -46,7 +52,9 @@ library LibOpEvery {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of EVERY for testing.
+    /// @notice Gas intensive reference implementation of EVERY for testing.
+    /// @param inputs The input values from the stack.
+    /// @return outputs The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure

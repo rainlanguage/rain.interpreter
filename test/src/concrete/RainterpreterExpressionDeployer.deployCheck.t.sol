@@ -10,7 +10,7 @@ import {RainterpreterParser} from "src/concrete/RainterpreterParser.sol";
 import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
 
 /// @title RainterpreterExpressionDeployerDeployCheckTest
-/// Test that the RainterpreterExpressionDeployer deploy check reverts if the
+/// @notice Test that the RainterpreterExpressionDeployer deploy check reverts if the
 /// passed config does not match expectations.
 contract RainterpreterExpressionDeployerDeployCheckTest is Test {
     /// Test the deployer can deploy if everything is valid.

@@ -3,7 +3,7 @@
 pragma solidity ^0.8.25;
 
 /// @title LibParseLiteralRepeat
-/// This is a library that mimics the literal libraries elsewhere in this repo,
+/// @notice This is a library that mimics the literal libraries elsewhere in this repo,
 /// but structured to fit sub parsing rather than internal logic. It is NOT
 /// required to use this pattern, of libs outside the implementation contract,
 /// but it MAY be convenient to do so, as the libs can be moved to dedicated
@@ -37,6 +37,12 @@ error RepeatLiteralTooLong(uint256 length);
 error RepeatDispatchNotDigit(uint256 dispatchValue);
 
 library LibParseLiteralRepeat {
+    /// @notice Parses a repeat literal by repeating the dispatch digit for every
+    /// byte in the literal body.
+    /// @param dispatchValue The single decimal digit to repeat (0-9).
+    /// @param cursor Pointer to the start of the literal body.
+    /// @param end Pointer to the end of the literal body.
+    /// @return The computed repeated value.
     //slither-disable-next-line dead-code
     function parseRepeat(uint256 dispatchValue, uint256 cursor, uint256 end) internal pure returns (uint256) {
         if (dispatchValue > 9) {

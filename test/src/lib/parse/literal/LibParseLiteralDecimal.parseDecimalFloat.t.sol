@@ -14,11 +14,14 @@ import {
     MalformedExponentDigits,
     MalformedDecimalPoint
 } from "rain.math.float/error/ErrParse.sol";
+import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibParseLiteralDecimalParseDecimalFloatTest
+/// @notice Tests for parsing decimal float literals.
 contract LibParseLiteralDecimalParseDecimalFloatTest is Test {
     using LibParseLiteralDecimal for ParseState;
     using LibBytes for bytes;
+    using LibDecimalFloat for Float;
     using Strings for uint256;
 
     function parseDecimalFloatPackedExternal(ParseState memory state)
@@ -29,6 +32,80 @@ contract LibParseLiteralDecimalParseDecimalFloatTest is Test {
         return state.parseDecimalFloatPacked(
             Pointer.unwrap(state.data.dataPointer()), Pointer.unwrap(state.data.endDataPointer())
         );
+    }
+
+    function checkParseDecimalHappy(string memory data, int256 expectedCoefficient, int256 expectedExponent)
+        internal
+        view
+    {
+        ParseState memory state = LibParseState.newState(bytes(data), "", "", "");
+        (, bytes32 value) = this.parseDecimalFloatPackedExternal(state);
+        Float expected = LibDecimalFloat.packLossless(expectedCoefficient, expectedExponent);
+        assertTrue(Float.wrap(value).eq(expected));
+    }
+
+    /// Happy-path tests for parseDecimalFloatPacked across a range of
+    /// decimal literal forms.
+    function testParseDecimalFloatHappyPath() external view {
+        // Zero
+        checkParseDecimalHappy("0e0", 0, 0);
+        // Simple integers
+        checkParseDecimalHappy("1e0", 1, 0);
+        checkParseDecimalHappy("42e0", 42, 0);
+        checkParseDecimalHappy("100e0", 100, 0);
+        checkParseDecimalHappy("999e0", 999, 0);
+        // Negative coefficient
+        checkParseDecimalHappy("-1e0", -1, 0);
+        checkParseDecimalHappy("-42e0", -42, 0);
+        checkParseDecimalHappy("-999e0", -999, 0);
+        // Positive exponents
+        checkParseDecimalHappy("1e1", 1, 1);
+        checkParseDecimalHappy("1e18", 1, 18);
+        checkParseDecimalHappy("5e10", 5, 10);
+        checkParseDecimalHappy("1e37", 1, 37);
+        // Negative exponents
+        checkParseDecimalHappy("1e-1", 1, -1);
+        checkParseDecimalHappy("5e-3", 5, -3);
+        checkParseDecimalHappy("1e-18", 1, -18);
+        checkParseDecimalHappy("1e-37", 1, -37);
+        // Negative coefficient with exponents
+        checkParseDecimalHappy("-1e18", -1, 18);
+        checkParseDecimalHappy("-1e-18", -1, -18);
+        checkParseDecimalHappy("-5e-3", -5, -3);
+        // Decimal point
+        checkParseDecimalHappy("1.5e0", 15, -1);
+        checkParseDecimalHappy("0.001e0", 1, -3);
+        checkParseDecimalHappy("123.456e0", 123456, -3);
+        checkParseDecimalHappy("1.5e2", 15, 1);
+        checkParseDecimalHappy("0.1e0", 1, -1);
+        checkParseDecimalHappy("99.99e0", 9999, -2);
+        // Negative coefficient with decimal point
+        checkParseDecimalHappy("-1.5e0", -15, -1);
+        checkParseDecimalHappy("-0.001e0", -1, -3);
+        checkParseDecimalHappy("-123.456e2", -123456, -1);
+        // Large coefficients
+        checkParseDecimalHappy("123456789e0", 123456789, 0);
+        checkParseDecimalHappy("999999999999999999e0", 999999999999999999, 0);
+        // Large exponents with small coefficients
+        checkParseDecimalHappy("1e30", 1, 30);
+        checkParseDecimalHappy("1e-30", 1, -30);
+        // No exponent, integer
+        checkParseDecimalHappy("0", 0, 0);
+        checkParseDecimalHappy("1", 1, 0);
+        checkParseDecimalHappy("42", 42, 0);
+        checkParseDecimalHappy("100", 100, 0);
+        checkParseDecimalHappy("-1", -1, 0);
+        checkParseDecimalHappy("-42", -42, 0);
+        checkParseDecimalHappy("123456789", 123456789, 0);
+        // No exponent, non-integer
+        checkParseDecimalHappy("1.5", 15, -1);
+        checkParseDecimalHappy("0.1", 1, -1);
+        checkParseDecimalHappy("0.001", 1, -3);
+        checkParseDecimalHappy("99.99", 9999, -2);
+        checkParseDecimalHappy("123.456", 123456, -3);
+        checkParseDecimalHappy("-1.5", -15, -1);
+        checkParseDecimalHappy("-0.001", -1, -3);
+        checkParseDecimalHappy("-99.99", -9999, -2);
     }
 
     function checkParseDecimalRevert(string memory data, bytes memory err) internal {

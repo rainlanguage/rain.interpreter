@@ -13,19 +13,22 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 library LibOpGet {
     using LibMemoryKV for MemoryKV;
 
-    /// `get` integrity check. Requires 1 input (key) and produces 1 output (value).
+    /// @notice `get` integrity check. Requires 1 input (key) and produces 1 output (value).
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // Always 1 input. The key. `hash()` is recommended to build compound
         // keys.
         return (1, 1);
     }
 
-    /// Implements runtime behaviour of the `get` opcode. Attempts to lookup the
+    /// @notice Implements runtime behaviour of the `get` opcode. Attempts to lookup the
     /// key in the memory key/value store then falls back to the interpreter's
     /// storage interface as an external call. If the key is not found in either,
     /// the value will fallback to `0` as per default Solidity/EVM behaviour.
     /// @param state The interpreter state of the current eval.
     /// @param stackTop Pointer to the current stack top.
+    /// @return The new stack top pointer after execution.
     function run(InterpreterState memory state, OperandV2, Pointer stackTop) internal view returns (Pointer) {
         bytes32 key;
         assembly ("memory-safe") {
@@ -58,7 +61,10 @@ library LibOpGet {
         return stackTop;
     }
 
-    /// Reference implementation of `get` for testing.
+    /// @notice Reference implementation of `get` for testing.
+    /// @param state The interpreter state containing the store and KV cache.
+    /// @param inputs The input values from the stack.
+    /// @return The output values to push onto the stack.
     function referenceFn(InterpreterState memory state, OperandV2, StackItem[] memory inputs)
         internal
         view

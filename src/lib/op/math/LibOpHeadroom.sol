@@ -9,19 +9,24 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpHeadroom
-/// Opcode for the headroom (distance to ceil) of a decimal floating
+/// @notice Opcode for the headroom (distance to ceil) of a decimal floating
 /// point number.
 library LibOpHeadroom {
     using LibDecimalFloat for Float;
 
-    /// `headroom` integrity check. Requires exactly 1 input and produces 1 output.
+    /// @notice `headroom` integrity check. Requires exactly 1 input and produces 1 output.
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // There must be one input and one output.
         return (1, 1);
     }
 
-    /// headroom
-    /// decimal floating headroom of a number.
+    /// @notice Decimal floating point headroom (distance to ceil) of a number.
+    /// Returns `ceil(x) - x`, except when `x` is already an integer
+    /// (headroom would be zero), in which case it returns 1.
+    /// @param stackTop Pointer to the top of the stack.
+    /// @return The updated stack top with the headroom written.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
         Float a;
         assembly ("memory-safe") {
@@ -38,7 +43,9 @@ library LibOpHeadroom {
         return stackTop;
     }
 
-    /// Gas intensive reference implementation of headroom for testing.
+    /// @notice Gas intensive reference implementation of headroom for testing.
+    /// @param inputs The input values from the stack.
+    /// @return The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)
         internal
         pure

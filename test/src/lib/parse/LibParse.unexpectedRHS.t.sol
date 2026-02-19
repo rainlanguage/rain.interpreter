@@ -17,7 +17,7 @@ import {
 import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseUnexpectedRHSTest
-/// The parser should revert if it encounters an unexpected character on the RHS.
+/// @notice The parser should revert if it encounters an unexpected character on the RHS.
 contract LibParseUnexpectedRHSTest is ParseTest {
     using LibParse for ParseState;
 

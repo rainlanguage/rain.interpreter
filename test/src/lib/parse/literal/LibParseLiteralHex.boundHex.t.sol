@@ -8,7 +8,7 @@ import {CMASK_HEX} from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibParseLiteralHex} from "src/lib/parse/literal/LibParseLiteralHex.sol";
 
 /// @title LibParseLiteralBoundLiteralHexTest
-/// Tests parsing bound literal hex values.
+/// @notice Tests parsing bound literal hex values.
 contract LibParseLiteralBoundLiteralHexTest is ParseLiteralTest {
     function checkHexBounds(
         bytes memory data,

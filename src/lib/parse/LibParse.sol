@@ -53,10 +53,13 @@ import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 
+/// @dev Size in bytes of the fixed header prepended to sub-parser bytecode.
+/// Comprises the operand values tail pointer (2 bytes), the literal parsers
+/// tail pointer (2 bytes), and the word length (1 byte).
 uint256 constant SUB_PARSER_BYTECODE_HEADER_SIZE = 5;
 
 /// @title LibParse
-/// Core parsing library for Rainlang source text.
+/// @notice Core parsing library for Rainlang source text.
 ///
 /// The parser only supports single-byte ASCII input. All character masks are
 /// 128-bit bitmaps indexed by byte value, so bytes above 0x7F (non-ASCII /
@@ -77,7 +80,7 @@ library LibParse {
     using LibUint256Array for uint256[];
     using LibBytes32Array for bytes32[];
 
-    /// Parses a word that matches a tail mask between cursor and end. The caller
+    /// @notice Parses a word that matches a tail mask between cursor and end. The caller
     /// has several responsibilities while safely using this word.
     /// - The caller MUST ensure that the word is not zero length.
     ///   I.e. `end - cursor > 0`.
@@ -122,7 +125,7 @@ library LibParse {
         }
     }
 
-    /// Parses the left-hand side (LHS) of a source line. Handles named and
+    /// @notice Parses the left-hand side (LHS) of a source line. Handles named and
     /// anonymous stack items, whitespace, and the LHS/RHS delimiter. Reverts
     /// on unexpected characters, comments, or duplicate named stack items.
     /// @param state The parser state.
@@ -189,7 +192,7 @@ library LibParse {
         }
     }
 
-    /// Parses the right-hand side (RHS) of a source line. Resolves words
+    /// @notice Parses the right-hand side (RHS) of a source line. Resolves words
     /// against known opcodes, LHS stack names, and sub parsers. Handles
     /// parenthesised operand groups, literals, and line/source terminators.
     /// @param state The parser state.
@@ -329,9 +332,12 @@ library LibParse {
                         newParenOffset := add(byte(0, mload(add(state, parenTracker0Offset))), 3)
                         mstore8(add(state, parenTracker0Offset), newParenOffset)
                     }
-                    // first 2 bytes are reserved, then remaining 62
-                    // bytes are for paren groups, so the offset MUST NOT
-                    // imply writing to the 63rd byte.
+                    // 62 bytes of group data (3 bytes each) fit 20
+                    // groups by size, but pushOpToSource zeroes a
+                    // phantom counter at parenOffset + 4, so the
+                    // effective max is 19 groups (offset 57). The
+                    // check must reject offset 60 to prevent that
+                    // phantom write from corrupting lineTracker.
                     if (newParenOffset > 59) {
                         revert ParenOverflow();
                     }
@@ -410,7 +416,7 @@ library LibParse {
         }
     }
 
-    /// Top-level entry point for parsing. Processes pragmas, then iterates
+    /// @notice Top-level entry point for parsing. Processes pragmas, then iterates
     /// over interstitial, LHS, and RHS sections to build the final bytecode
     /// and constants array. Sub-parses any unknown words after initial parsing.
     /// @param state The parser state.

@@ -11,7 +11,7 @@ import {ExcessLHSItems, ExcessRHSItems} from "src/error/ErrParse.sol";
 import {ParseState} from "src/lib/parse/LibParseState.sol";
 
 /// @title LibParseNOutputTest
-/// Test that the parser can handle multi and zero outputs for RHS items when
+/// @notice Test that the parser can handle multi and zero outputs for RHS items when
 /// they are singular on a line, and mandates individual items otherwise.
 contract LibParseNOutputTest is ParseTest {
     using LibParse for ParseState;
