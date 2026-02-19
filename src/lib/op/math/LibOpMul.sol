@@ -14,16 +14,10 @@ import {LibDecimalFloatImplementation} from "rain.math.float/lib/implementation/
 library LibOpMul {
     using LibDecimalFloat for Float;
 
-<<<<<<< HEAD
-    /// `mul` integrity check. Requires at least 2 inputs and produces 1 output.
-    /// @param operand The operand encoding the number of inputs.
-    /// @return The number of inputs and outputs.
-=======
     /// @notice `mul` integrity check. Requires at least 2 inputs and produces 1 output.
     /// @param operand Low 4 bits of the high byte encode the input count.
     /// @return inputs The number of stack items consumed (minimum 2).
     /// @return outputs Always 1.
->>>>>>> 1d5a174932d8e824bc50110ada1748d651403653
     function integrity(IntegrityCheckState memory, OperandV2 operand) internal pure returns (uint256, uint256) {
         // There must be at least two inputs.
         uint256 inputs = uint256(OperandV2.unwrap(operand) >> 0x10) & 0x0F;
@@ -31,17 +25,10 @@ library LibOpMul {
         return (inputs, 1);
     }
 
-<<<<<<< HEAD
-    /// Multiplies N decimal floating point values from the stack.
-    /// @param operand The operand encoding the number of inputs.
-    /// @param stackTop Pointer to the top of the stack.
-    /// @return The new stack top after the operation.
-=======
     /// @notice Multiplies N decimal floating point values from the stack.
     /// @param operand Low 4 bits of the high byte encode the input count.
     /// @param stackTop Pointer to the top of the stack.
     /// @return The updated stack top with the product written.
->>>>>>> 1d5a174932d8e824bc50110ada1748d651403653
     function run(InterpreterState memory, OperandV2 operand, Pointer stackTop) internal pure returns (Pointer) {
         Float a;
         Float b;
