@@ -56,7 +56,7 @@
 
         devShells.default = pkgs.mkShell {
           shellHook = rainix.devShells.${system}.default.shellHook;
-          packages = [ packages.i9r-prelude packages.test-wasm-build pkgs.gh ];
+          packages = [ packages.i9r-prelude packages.test-wasm-build ];
           inputsFrom = [ rainix.devShells.${system}.default ];
         };
       });
