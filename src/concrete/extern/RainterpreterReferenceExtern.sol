@@ -77,7 +77,7 @@ error InvalidRepeatCount();
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
 
 /// @title LibRainterpreterReferenceExtern
-/// This library allows code SEPARATE FROM the implementation contract to do
+/// @notice This library allows code SEPARATE FROM the implementation contract to do
 /// offchain processing of supporting data without needing to compile all this
 /// information into the implementation contract. Any tooling that supports
 /// solidity can read this data and expose it to end users.
@@ -126,7 +126,7 @@ library LibRainterpreterReferenceExtern {
 }
 
 /// @title RainterpreterReferenceExtern
-/// This is a reference implementation of BOTH the sub parser and extern
+/// @notice This is a reference implementation of BOTH the sub parser and extern
 /// interfaces. It is NOT REQUIRED that these be one and the same. It is entirely
 /// possible to implement standalone parsers and extern contracts that each
 /// implement the relevant interface. In that case, the parser could construct

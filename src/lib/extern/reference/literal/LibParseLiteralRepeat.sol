@@ -3,7 +3,7 @@
 pragma solidity ^0.8.25;
 
 /// @title LibParseLiteralRepeat
-/// This is a library that mimics the literal libraries elsewhere in this repo,
+/// @notice This is a library that mimics the literal libraries elsewhere in this repo,
 /// but structured to fit sub parsing rather than internal logic. It is NOT
 /// required to use this pattern, of libs outside the implementation contract,
 /// but it MAY be convenient to do so, as the libs can be moved to dedicated

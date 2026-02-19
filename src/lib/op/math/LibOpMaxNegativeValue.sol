@@ -9,7 +9,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpMaxNegativeValue
-/// Exposes the maximum negative representable float value as a Rainlang opcode.
+/// @notice Exposes the maximum negative representable float value as a Rainlang opcode.
 library LibOpMaxNegativeValue {
     using LibDecimalFloat for Float;
 

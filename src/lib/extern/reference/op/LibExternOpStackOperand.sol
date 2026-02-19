@@ -6,7 +6,7 @@ import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol
 import {LibSubParse} from "../../../parse/LibSubParse.sol";
 
 /// @title LibExternOpStackOperand
-/// This op copies its operand value to the stack by copying it to the constants
+/// @notice This op copies its operand value to the stack by copying it to the constants
 /// array at parse time. This means that it doesn't exist as an externed opcode,
 /// the interpreter will run it directly, therefore it has no `run` or
 /// `integrity` logic, only a sub parser. This demonstrates both how to

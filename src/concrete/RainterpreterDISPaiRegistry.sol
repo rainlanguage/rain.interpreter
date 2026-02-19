@@ -5,7 +5,7 @@ pragma solidity =0.8.25;
 import {LibInterpreterDeploy} from "../lib/deploy/LibInterpreterDeploy.sol";
 
 /// @title RainterpreterDISPaiRegistry
-/// DISPaiR registry contract that exposes the deterministic Zoltu deploy
+/// @notice DISPaiR registry contract that exposes the deterministic Zoltu deploy
 /// addresses of the four core interpreter components: Deployer, Interpreter,
 /// Store, and Parser. Deployed via the same Zoltu pattern so that external
 /// tooling can discover all component addresses from a single known registry

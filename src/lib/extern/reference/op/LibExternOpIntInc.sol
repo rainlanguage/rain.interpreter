@@ -13,7 +13,7 @@ import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 uint256 constant OP_INDEX_INCREMENT = 0;
 
 /// @title LibExternOpIntInc
-/// This op is a simple increment of every input by 1. It is used to demonstrate
+/// @notice This op is a simple increment of every input by 1. It is used to demonstrate
 /// handling both multiple inputs and outputs in extern dispatching logic.
 library LibExternOpIntInc {
     using LibDecimalFloat for Float;

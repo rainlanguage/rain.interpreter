@@ -9,7 +9,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpTimestamp
-/// Implementation of the EVM `TIMESTAMP` opcode as a standard Rainlang opcode.
+/// @notice Implementation of the EVM `TIMESTAMP` opcode as a standard Rainlang opcode.
 library LibOpTimestamp {
     using LibDecimalFloat for Float;
 

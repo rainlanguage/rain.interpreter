@@ -9,7 +9,7 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpBlockNumber
-/// Implementation of the EVM `BLOCKNUMBER` opcode as a standard Rainlang opcode.
+/// @notice Implementation of the EVM `BLOCKNUMBER` opcode as a standard Rainlang opcode.
 library LibOpBlockNumber {
     using LibDecimalFloat for Float;
 

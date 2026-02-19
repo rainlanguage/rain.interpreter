@@ -8,7 +8,7 @@ import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 
 /// @title LibOpHash
-/// Implementation of keccak256 hashing as a standard Rainlang opcode.
+/// @notice Implementation of keccak256 hashing as a standard Rainlang opcode.
 library LibOpHash {
     /// `hash` integrity check. Inputs count is operand-defined, produces 1 output.
     /// @param operand The operand encoding the number of inputs to hash.

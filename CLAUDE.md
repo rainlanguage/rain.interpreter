@@ -101,6 +101,7 @@ External contracts can extend the interpreter with additional opcodes. `src/conc
 - Custom bytecode serialization is used instead of ABI encoding for gas efficiency
 - Function pointer dispatch (no switch/if chains) for opcode routing
 - Assembly blocks are used extensively and marked `memory-safe` where applicable
+- NatSpec: when a doc block contains any explicit tag (e.g. `@title`), all entries must be explicitly tagged — untagged lines continue the previous tag, not implicit `@notice`
 
 ## Test Conventions
 

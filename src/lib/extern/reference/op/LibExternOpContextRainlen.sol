@@ -9,7 +9,7 @@ uint256 constant CONTEXT_CALLER_CONTEXT_COLUMN = 1;
 uint256 constant CONTEXT_CALLER_CONTEXT_ROW_RAINLEN = 0;
 
 /// @title LibExternOpContextRainlen
-/// This op is a simple reference to the length of the rainlang bytes. It is
+/// @notice This op is a simple reference to the length of the rainlang bytes. It is
 /// used to demonstrate how to implement context references.
 library LibExternOpContextRainlen {
     /// The sub parser for the rainlen context opcode. It has no special logic

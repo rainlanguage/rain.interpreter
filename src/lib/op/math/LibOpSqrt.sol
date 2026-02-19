@@ -9,7 +9,7 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpSqrt
-/// Opcode for the square root of a decimal floating point number.
+/// @notice Opcode for the square root of a decimal floating point number.
 library LibOpSqrt {
     using LibDecimalFloat for Float;
 

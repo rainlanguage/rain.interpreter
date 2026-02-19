@@ -23,7 +23,7 @@ import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibParseError} from "./LibParseError.sol";
 
 /// @title LibSubParse
-/// Handles delegation of unknown words and literals to external sub-parser
+/// @notice Handles delegation of unknown words and literals to external sub-parser
 /// contracts registered via `using-words-from`.
 ///
 /// Trust model: sub-parsers are fully trusted by the Rainlang author who

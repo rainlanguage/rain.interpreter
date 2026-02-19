@@ -9,7 +9,7 @@ import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterp
 import {OutOfBoundsStackRead} from "../../../error/ErrIntegrity.sol";
 
 /// @title LibOpStack
-/// Implementation of copying a stack item from the stack to the stack.
+/// @notice Implementation of copying a stack item from the stack to the stack.
 /// Integrated deeply into LibParse, which requires this opcode or a variant
 /// to be present at a known opcode index.
 library LibOpStack {

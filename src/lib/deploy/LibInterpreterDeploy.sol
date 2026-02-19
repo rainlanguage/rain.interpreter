@@ -3,7 +3,7 @@
 pragma solidity ^0.8.25;
 
 /// @title LibInterpreterDeploy
-/// A library containing the deployed address and code hash of the Interpreter
+/// @notice A library containing the deployed address and code hash of the Interpreter
 /// contracts when deployed with the rain standard zoltu deployer. This allows
 /// idempotent deployments against precommitted addresses and hashes that can be
 /// easily verified automatically in tests and scripts rather than relying on

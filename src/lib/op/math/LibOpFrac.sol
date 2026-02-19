@@ -9,7 +9,7 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpFrac
-/// Opcode for the frac of a decimal floating point number.
+/// @notice Opcode for the frac of a decimal floating point number.
 library LibOpFrac {
     using LibDecimalFloat for Float;
 

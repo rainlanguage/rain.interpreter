@@ -8,6 +8,7 @@ import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 
 /// @title LibOpContext
+/// @notice Implementation of reading from the context matrix onto the stack.
 library LibOpContext {
     /// `context` integrity check. Requires 0 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {

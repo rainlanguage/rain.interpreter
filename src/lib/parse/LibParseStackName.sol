@@ -5,7 +5,7 @@ pragma solidity ^0.8.25;
 import {ParseState} from "./LibParseState.sol";
 
 /// @title LibParseStackName
-/// Stack names are stored as a singly-linked list of 256-bit nodes in memory.
+/// @notice Stack names are stored as a singly-linked list of 256-bit nodes in memory.
 /// Each node packs three fields into a single word:
 ///   - bits [255:32] — 224-bit fingerprint (keccak256 of the name, top 224 bits)
 ///   - bits [31:16]  — stack index assigned when the name was first pushed

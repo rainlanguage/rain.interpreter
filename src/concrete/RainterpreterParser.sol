@@ -28,6 +28,7 @@ import {
 import {IParserToolingV1} from "rain.sol.codegen/interface/IParserToolingV1.sol";
 
 /// @title RainterpreterParser
+/// @notice Converts Rainlang text to bytecode.
 /// @dev The parser implementation. NOT intended to be called directly so
 /// intentionally does NOT implement various interfaces. The expression deployer
 /// calls into this contract and exposes the relevant interfaces, with additional

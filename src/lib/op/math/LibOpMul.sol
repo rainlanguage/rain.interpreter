@@ -10,7 +10,7 @@ import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {LibDecimalFloatImplementation} from "rain.math.float/lib/implementation/LibDecimalFloatImplementation.sol";
 
 /// @title LibOpMul
-/// Opcode to multiply N decimal floating point values.
+/// @notice Opcode to multiply N decimal floating point values.
 library LibOpMul {
     using LibDecimalFloat for Float;
 

@@ -56,7 +56,7 @@ import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 uint256 constant SUB_PARSER_BYTECODE_HEADER_SIZE = 5;
 
 /// @title LibParse
-/// Core parsing library for Rainlang source text.
+/// @notice Core parsing library for Rainlang source text.
 ///
 /// The parser only supports single-byte ASCII input. All character masks are
 /// 128-bit bitmaps indexed by byte value, so bytes above 0x7F (non-ASCII /

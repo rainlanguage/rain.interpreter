@@ -21,6 +21,8 @@ import {RainterpreterParser} from "./RainterpreterParser.sol";
 import {LibInterpreterDeploy} from "../lib/deploy/LibInterpreterDeploy.sol";
 
 /// @title RainterpreterExpressionDeployer
+/// @notice Coordinates parse, integrity check, and serialization for
+/// deploying Rainlang expressions.
 contract RainterpreterExpressionDeployer is
     IDescribedByMetaV1,
     IParserV2,

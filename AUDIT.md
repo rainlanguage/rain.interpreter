@@ -69,6 +69,7 @@ Review all documentation for completeness and accuracy, including but not limite
 - Systematically enumerate every function in every contract and library, and verify each has NatSpec documentation
 - Explicitly list undocumented functions as findings
 - All NatSpec must include `@param` and `@return` tags as relevant for functions, structs, errors, etc.
+- When a doc block contains any explicit tag (e.g. `@title`), all entries must be explicitly tagged. Untagged lines after a tag are parsed as continuation of the previous tag, not as implicit `@notice`. Every contract/library-level doc block with `@title` must also have an explicit `@notice`.
 - After ensuring documentation exists, review it against the implementation for accuracy
 
 ## Pass 4: Code Quality

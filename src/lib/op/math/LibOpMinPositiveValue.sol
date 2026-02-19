@@ -9,7 +9,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpMinPositiveValue
-/// Exposes the minimum positive representable float value as a Rainlang opcode.
+/// @notice Exposes the minimum positive representable float value as a Rainlang opcode.
 library LibOpMinPositiveValue {
     using LibDecimalFloat for Float;
 

@@ -9,7 +9,7 @@ import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
 /// @title LibOpConstant
-/// Implementation of copying a constant from the constants array to the stack.
+/// @notice Implementation of copying a constant from the constants array to the stack.
 /// Integrated deeply into LibParse, which requires this opcode or a variant
 /// to be present at a known opcode index.
 library LibOpConstant {

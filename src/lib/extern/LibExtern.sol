@@ -12,7 +12,7 @@ import {
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
 /// @title LibExtern
-/// Defines and implements an encoding and decoding scheme for the data that
+/// @notice Defines and implements an encoding and decoding scheme for the data that
 /// controls the behaviour of externs.
 library LibExtern {
     /// Converts an opcode and operand pair into a single 32-byte word.

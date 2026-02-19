@@ -9,7 +9,7 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpChainId
-/// Implementation of the EVM `CHAINID` opcode as a standard Rainlang opcode.
+/// @notice Implementation of the EVM `CHAINID` opcode as a standard Rainlang opcode.
 library LibOpChainId {
     using LibDecimalFloat for Float;
 

@@ -10,7 +10,7 @@ import {LibIntOrAString, IntOrAString} from "rain.intorastring/lib/LibIntOrAStri
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpConditions
-/// Opcode to evaluate pairwise condition-value slots and return the value
+/// @notice Opcode to evaluate pairwise condition-value slots and return the value
 /// corresponding to the first nonzero condition.
 library LibOpConditions {
     using LibIntOrAString for IntOrAString;
