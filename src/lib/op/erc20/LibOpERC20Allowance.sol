@@ -9,7 +9,6 @@ import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {LibTOFUTokenDecimals} from "rain.tofu.erc20-decimals/lib/LibTOFUTokenDecimals.sol";
-import {TOFUOutcome, ITOFUTokenDecimals} from "rain.tofu.erc20-decimals/interface/ITOFUTokenDecimals.sol";
 import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
 /// @title LibOpERC20Allowance
@@ -43,16 +42,8 @@ library LibOpERC20Allowance {
         //forge-lint: disable-next-line(unsafe-typecast)
         IERC20(address(uint160(token))).allowance(address(uint160(owner)), address(uint160(spender)));
 
-        // Use TOFU to safely read decimals. This handles tokens that don't
-        // implement the optional `decimals()` function by returning a
-        // `ReadFailure` outcome instead of reverting with an opaque error.
         //forge-lint: disable-next-line(unsafe-typecast)
-        (TOFUOutcome tofuOutcome, uint8 tokenDecimals) =
-            LibTOFUTokenDecimals.decimalsForTokenReadOnly(address(uint160(token)));
-        if (tofuOutcome == TOFUOutcome.ReadFailure || tofuOutcome == TOFUOutcome.Inconsistent) {
-            //forge-lint: disable-next-line(unsafe-typecast)
-            revert ITOFUTokenDecimals.TokenDecimalsReadFailure(address(uint160(token)), tofuOutcome);
-        }
+        uint8 tokenDecimals = LibTOFUTokenDecimals.safeDecimalsForTokenReadOnly(address(uint160(token)));
 
         // Unlike `balanceOf` and `totalSupply`, allowance uses the lossy
         // conversion. Infinite approvals (`type(uint256).max`) are extremely
@@ -84,10 +75,7 @@ library LibOpERC20Allowance {
         address owner = address(uint160(uint256(StackItem.unwrap(inputs[1]))));
         address spender = address(uint160(uint256(StackItem.unwrap(inputs[2]))));
 
-        (TOFUOutcome tofuOutcome, uint8 tokenDecimals) = LibTOFUTokenDecimals.decimalsForTokenReadOnly(token);
-        if (tofuOutcome == TOFUOutcome.ReadFailure || tofuOutcome == TOFUOutcome.Inconsistent) {
-            revert ITOFUTokenDecimals.TokenDecimalsReadFailure(token, tofuOutcome);
-        }
+        uint8 tokenDecimals = LibTOFUTokenDecimals.safeDecimalsForTokenReadOnly(token);
         uint256 tokenAllowance = IERC20(token).allowance(owner, spender);
         // Same as in the run implementation.
         //slither-disable-next-line unused-return
