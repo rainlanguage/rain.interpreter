@@ -3,7 +3,7 @@
     "rev": "f972424d1f8fb62378ebc5f5e95872f7a9647755"
   },
   "lib/rain.extrospection": {
-    "rev": "6445dbc995a923cbec32860cc84a88dbfea3ba68"
+    "rev": "f9a46744a66daf4004a3edc1d4387ae14a9dc8e4"
   },
   "lib/rain.interpreter.interface": {
     "rev": "639b80f929d8a8213fe75e35b446708ba49a8e6a"
@@ -16,6 +16,9 @@
   },
   "lib/rain.string": {
     "rev": "488f237cd59874e4eb91b5a4f747bd57578fec7f"
+  },
+  "lib/rain.tofu.erc20-decimals": {
+    "rev": "bcf1f45248a2e45a3e28dda06e21b3617610f86b"
   },
   "lib/sol.lib.binmaskflag": {
     "rev": "3ea4a8b4e5cc2ecf80ee408ecd0a213de44841c0"

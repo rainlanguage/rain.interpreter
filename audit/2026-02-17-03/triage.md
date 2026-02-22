@@ -218,14 +218,14 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A15-3: (MEDIUM) `unsafeSerialize` correctness not independently tested — fuzzed round-trip tests added
 - [FIXED] A15-4: (HIGH) `unsafeDeserialize` complex assembly not independently tested — covered by round-trip and stack allocation tests
 - [FIXED] A15-5: (MEDIUM) No test for serialize/deserialize round-trip property — fuzzed single and two-source round-trips added
-- [PENDING] A16-1: (LOW) LibOpCtPop missing test for disallowed operand
+- [FIXED] A16-1: (LOW) LibOpCtPop missing test for disallowed operand — added `testOpCtPopEvalBadOperand` test
 - [DISMISSED] A17-1: (MEDIUM) No referenceFn or direct unit test for `run` function assembly logic — call opcode is a control flow instruction, referenceFn would share evalLoop making it not truly independent; E2E tests cover the copy logic
-- [PENDING] A17-2: (LOW) No test for `run` with maximum inputs (15) and maximum outputs simultaneously
-- [PENDING] A17-3: (LOW) No isolated test for operand field extraction consistency between `integrity` and `run`
-- [PENDING] A18-1: (LOW) No test for `run` with a constants array at maximum operand index (65535)
-- [PENDING] A19-1: (LOW) No test for context with empty inner array (context[i].length == 0, j == 0)
-- [PENDING] A19-2: (LOW) No test for large context dimensions (i or j near 255)
-- [PENDING] A20-1: (LOW) No test verifying `erc20-allowance` handles infinite approvals without revert
+- [FIXED] A17-2: (LOW) No test for `run` with maximum inputs (15) and maximum outputs simultaneously — added `testOpCallRunMaxInputsMaxOutputs` with 15-input/15-output no-body callee
+- [DISMISSED] A17-3: (LOW) No isolated test for operand field extraction consistency between `integrity` and `run` — bit extraction code is identical in both functions; testOpCallIntegrityIO fuzz + E2E run tests cover both paths
+- [FIXED] A18-1: (LOW) No test for `run` with a constants array at maximum operand index (65535) — added `testOpConstantIntegrityMaxIndex` testing boundary at 65535 with assembly-overridden array length
+- [FIXED] A19-1: (LOW) No test for context with empty inner array (context[i].length == 0, j == 0) — added `testOpContextEvalEmptyInnerArray`
+- [FIXED] A19-2: (LOW) No test for large context dimensions (i or j near 255) — added `testOpContextEvalMaxI` (i=255) and `testOpContextEvalMaxJ` (j=255)
+- [FIXED] A20-1: (LOW) No test verifying `erc20-allowance` handles infinite approvals without revert — added `testOpERC20AllowanceInfiniteApproval` with type(uint256).max allowance
 - [PENDING] A20-2: (LOW) No test for `decimals()` revert when token does not implement `IERC20Metadata`
 - [PENDING] A20-4: (LOW) No test for input values with upper 96 bits set (address truncation)
 - [PENDING] A21-1: (LOW) No test for `referenceFn` `BadOutputsLength` revert path

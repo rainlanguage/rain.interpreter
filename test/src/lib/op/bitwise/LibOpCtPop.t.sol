@@ -9,6 +9,7 @@ import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
+import {UnexpectedOperand} from "src/error/ErrParse.sol";
 
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 
@@ -57,5 +58,10 @@ contract LibOpCtPopTest is OpTest {
 
     function testOpCtPopTwoOutputs() external {
         checkBadOutputs("_ _: bitwise-count-ones(0);", 1, 1, 2);
+    }
+
+    /// Test that operand is disallowed.
+    function testOpCtPopEvalBadOperand() external {
+        checkUnhappyParse("_: bitwise-count-ones<0>(0);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

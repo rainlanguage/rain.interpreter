@@ -301,6 +301,25 @@ contract LibOpCallTest is OpTest, BytecodeTest {
         checkCallRun(":call<1>();one two three: 1 2 3, :call<2>();five six: 5 6;", stack, kvs);
     }
 
+    /// Test that call works with maximum inputs (15) and maximum outputs (15)
+    /// simultaneously, exercising the boundary of the 4-bit operand fields.
+    function testOpCallRunMaxInputsMaxOutputs() external view {
+        StackItem[] memory stack = new StackItem[](15);
+        for (uint256 i = 0; i < 15; i++) {
+            // Outputs are read from top of callee stack, so the last input
+            // (15) is returned first as stack[0].
+            //forge-lint: disable-next-line(unsafe-typecast)
+            stack[i] = StackItem.wrap(Float.unwrap(LibDecimalFloat.packLossless(int256(15 - i), 0)));
+        }
+        bytes32[] memory kvs = new bytes32[](0);
+        checkCallRun(
+            "a b c d e f g h i j k l m n o: call<1>(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15); "
+            "v1 v2 v3 v4 v5 v6 v7 v8 v9 v10 v11 v12 v13 v14 v15:;",
+            stack,
+            kvs
+        );
+    }
+
     /// Boilerplate to check a generic runtime error happens upon recursion.
     function checkCallRunRecursive(bytes memory rainlang) internal {
         bytes memory bytecode = I_DEPLOYER.parse2(rainlang);

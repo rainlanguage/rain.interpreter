@@ -11,6 +11,7 @@ import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {IERC20Metadata} from "openzeppelin-contracts/contracts/interfaces/IERC20Metadata.sol";
 import {LibDecimalFloat, Float, LossyConversionToFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {TOFUOutcome, ITOFUTokenDecimals} from "rain.tofu.erc20-decimals/interface/ITOFUTokenDecimals.sol";
 
 /// @title LibOpERC20TotalSupplyTest
 /// @notice Test the opcode for getting the total supply of an erc20 contract.
@@ -95,6 +96,18 @@ contract LibOpERC20TotalSupplyTest is OpTest {
 
     function testOpERC20TotalSupplyEvalTwoOutputs() external {
         checkBadOutputs("_ _: erc20-total-supply(0xdeadbeef);", 1, 1, 2);
+    }
+
+    /// Test that a token without `decimals()` reverts with ReadFailure.
+    function testOpERC20TotalSupplyDecimalsReadFailure() external {
+        vm.mockCall(address(0xdeadbeef), abi.encodeWithSelector(IERC20.totalSupply.selector), abi.encode(uint256(1000)));
+        // No mock for decimals — token doesn't implement it.
+        checkUnhappy(
+            "_: erc20-total-supply(0xdeadbeef);",
+            abi.encodeWithSelector(
+                ITOFUTokenDecimals.TokenDecimalsReadFailure.selector, address(0xdeadbeef), TOFUOutcome.ReadFailure
+            )
+        );
     }
 
     /// Test that operand is disallowed.

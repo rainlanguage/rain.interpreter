@@ -45,6 +45,7 @@ remappings = [
     "rain.math.float/=lib/rain.interpreter.interface/lib/rain.math.float/src/",
     "rain.intorastring/=lib/rain.interpreter.interface/lib/rain.intorastring/src/",
     "rain.deploy/=lib/rain.deploy/src/",
+    "rain.tofu.erc20-decimals/=lib/rain.tofu.erc20-decimals/src/",
 ]
 
 gas_limit = "18446744073709551615"

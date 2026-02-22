@@ -29,6 +29,7 @@ import {FullyQualifiedNamespace, StateNamespace} from "rain.interpreter.interfac
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV4.sol";
 import {LibNamespace} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
 import {ExponentOverflow, CoefficientOverflow} from "rain.math.float/error/ErrDecimalFloat.sol";
+import {LibTOFUTokenDecimals} from "rain.tofu.erc20-decimals/lib/LibTOFUTokenDecimals.sol";
 
 import {console2} from "forge-std/console2.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
@@ -67,6 +68,7 @@ abstract contract OpTest is RainterpreterExpressionDeployerDeploymentTest {
         vm.assume(account != address(expression));
         // The console.
         vm.assume(account != address(0x000000000000000000636F6e736F6c652e6c6f67));
+        vm.assume(account != address(LibTOFUTokenDecimals.TOFU_DECIMALS_DEPLOYMENT));
     }
 
     function opTestDefaultIngegrityCheckState() internal pure returns (IntegrityCheckState memory) {

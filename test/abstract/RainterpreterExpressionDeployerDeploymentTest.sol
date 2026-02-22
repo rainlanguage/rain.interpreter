@@ -21,6 +21,7 @@ import {LibAllStandardOps} from "../../src/lib/op/LibAllStandardOps.sol";
 import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";
 import {LibRainDeploy} from "rain.deploy/lib/LibRainDeploy.sol";
 import {LibInterpreterDeploy} from "../../src/lib/deploy/LibInterpreterDeploy.sol";
+import {LibTOFUTokenDecimals} from "rain.tofu.erc20-decimals/lib/LibTOFUTokenDecimals.sol";
 
 /// @title RainterpreterExpressionDeployerDeploymentTest
 /// @notice Tests that the RainterpreterExpressionDeployer meta is correct. Also
@@ -56,6 +57,13 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
         if (LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH != LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS.codehash) {
             console2.log("Deploying Store");
             LibRainDeploy.deployZoltu(type(RainterpreterStore).creationCode);
+        }
+        if (
+            address(LibTOFUTokenDecimals.TOFU_DECIMALS_DEPLOYMENT).codehash
+                != LibTOFUTokenDecimals.TOFU_DECIMALS_EXPECTED_CODE_HASH
+        ) {
+            console2.log("Deploying TOFUTokenDecimals");
+            LibRainDeploy.deployZoltu(LibTOFUTokenDecimals.TOFU_DECIMALS_EXPECTED_CREATION_CODE);
         }
 
         I_PARSER = RainterpreterParser(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS);

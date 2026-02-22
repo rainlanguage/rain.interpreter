@@ -7,8 +7,8 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
-import {IERC20Metadata} from "openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibTOFUTokenDecimals} from "rain.tofu.erc20-decimals/lib/LibTOFUTokenDecimals.sol";
 import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
 /// @title LibOpERC20BalanceOf
@@ -39,9 +39,8 @@ library LibOpERC20BalanceOf {
         //forge-lint: disable-next-line(unsafe-typecast)
         uint256 tokenBalance = IERC20(address(uint160(token))).balanceOf(address(uint160(account)));
 
-        // This can fail as `decimals` is an OPTIONAL part of the ERC20 standard.
         //forge-lint: disable-next-line(unsafe-typecast)
-        uint8 tokenDecimals = IERC20Metadata(address(uint160(token))).decimals();
+        uint8 tokenDecimals = LibTOFUTokenDecimals.safeDecimalsForTokenReadOnly(address(uint160(token)));
 
         Float tokenBalanceFloat = LibDecimalFloat.fromFixedDecimalLosslessPacked(tokenBalance, tokenDecimals);
 
@@ -64,7 +63,7 @@ library LibOpERC20BalanceOf {
 
         uint256 tokenBalance = IERC20(token).balanceOf(account);
 
-        uint8 tokenDecimals = IERC20Metadata(token).decimals();
+        uint8 tokenDecimals = LibTOFUTokenDecimals.safeDecimalsForTokenReadOnly(token);
         Float tokenBalanceFloat = LibDecimalFloat.fromFixedDecimalLosslessPacked(tokenBalance, tokenDecimals);
 
         StackItem[] memory outputs = new StackItem[](1);

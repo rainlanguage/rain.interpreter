@@ -7,8 +7,8 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
-import {IERC20Metadata} from "openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibTOFUTokenDecimals} from "rain.tofu.erc20-decimals/lib/LibTOFUTokenDecimals.sol";
 import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
 /// @title LibOpERC20Allowance
@@ -42,9 +42,8 @@ library LibOpERC20Allowance {
         //forge-lint: disable-next-line(unsafe-typecast)
         IERC20(address(uint160(token))).allowance(address(uint160(owner)), address(uint160(spender)));
 
-        // This can fail as `decimals` is an OPTIONAL part of the ERC20 standard.
         //forge-lint: disable-next-line(unsafe-typecast)
-        uint8 tokenDecimals = IERC20Metadata(address(uint160(token))).decimals();
+        uint8 tokenDecimals = LibTOFUTokenDecimals.safeDecimalsForTokenReadOnly(address(uint160(token)));
 
         // Unlike `balanceOf` and `totalSupply`, allowance uses the lossy
         // conversion. Infinite approvals (`type(uint256).max`) are extremely
@@ -76,7 +75,7 @@ library LibOpERC20Allowance {
         address owner = address(uint160(uint256(StackItem.unwrap(inputs[1]))));
         address spender = address(uint160(uint256(StackItem.unwrap(inputs[2]))));
 
-        uint8 tokenDecimals = IERC20Metadata(token).decimals();
+        uint8 tokenDecimals = LibTOFUTokenDecimals.safeDecimalsForTokenReadOnly(token);
         uint256 tokenAllowance = IERC20(token).allowance(owner, spender);
         // Same as in the run implementation.
         //slither-disable-next-line unused-return

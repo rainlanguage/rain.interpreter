@@ -234,6 +234,74 @@ contract LibOpContextTest is OpTest {
         );
     }
 
+    /// Test that accessing context[i][0] reverts when the inner array is empty.
+    function testOpContextEvalEmptyInnerArray() external {
+        bytes32[][] memory context = new bytes32[][](1);
+        context[0] = new bytes32[](0);
+        bytes memory bytecode = I_DEPLOYER.parse2("_: context<0 0>();");
+
+        vm.expectRevert(stdError.indexOOBError);
+        I_INTERPRETER.eval4(
+            EvalV4({
+                store: I_STORE,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: context,
+                inputs: new StackItem[](0),
+                stateOverlay: new bytes32[](0)
+            })
+        );
+    }
+
+    /// Test context access at maximum row index (i = 255).
+    function testOpContextEvalMaxI() external view {
+        bytes32[][] memory context = new bytes32[][](256);
+        for (uint256 k = 0; k < 256; k++) {
+            context[k] = new bytes32[](1);
+        }
+        context[255][0] = bytes32(uint256(42));
+        bytes memory bytecode = I_DEPLOYER.parse2("_: context<255 0>();");
+
+        (StackItem[] memory stack, bytes32[] memory kvs) = I_INTERPRETER.eval4(
+            EvalV4({
+                store: I_STORE,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: context,
+                inputs: new StackItem[](0),
+                stateOverlay: new bytes32[](0)
+            })
+        );
+        assertEq(stack.length, 1, "stack length");
+        assertEq(StackItem.unwrap(stack[0]), bytes32(uint256(42)), "stack[0]");
+        assertEq(kvs.length, 0, "kvs length");
+    }
+
+    /// Test context access at maximum column index (j = 255).
+    function testOpContextEvalMaxJ() external view {
+        bytes32[][] memory context = new bytes32[][](1);
+        context[0] = new bytes32[](256);
+        context[0][255] = bytes32(uint256(99));
+        bytes memory bytecode = I_DEPLOYER.parse2("_: context<0 255>();");
+
+        (StackItem[] memory stack, bytes32[] memory kvs) = I_INTERPRETER.eval4(
+            EvalV4({
+                store: I_STORE,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: context,
+                inputs: new StackItem[](0),
+                stateOverlay: new bytes32[](0)
+            })
+        );
+        assertEq(stack.length, 1, "stack length");
+        assertEq(StackItem.unwrap(stack[0]), bytes32(uint256(99)), "stack[0]");
+        assertEq(kvs.length, 0, "kvs length");
+    }
+
     function testOpContextOneInput() external {
         checkBadInputs("_: context<0 0>(0);", 1, 0, 1);
     }
