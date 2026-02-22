@@ -11,6 +11,7 @@ import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {IERC20Metadata} from "openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {TOFUOutcome, ITOFUTokenDecimals} from "rain.tofu.erc20-decimals/interface/ITOFUTokenDecimals.sol";
 
 /// @title LibOpERC20AllowanceTest
 /// @notice Test the opcode for getting the allowance of an erc20 token.
@@ -105,6 +106,22 @@ contract LibOpERC20AllowanceTest is OpTest {
             "_: erc20-allowance(0xdeadbeef 0xdeadc0de 0xdeaddead);",
             Float.unwrap(tokenAllowanceFloat),
             "0xdeadbeef 0xdeadc0de 0xdeaddead"
+        );
+    }
+
+    /// Test that a token without `decimals()` reverts with ReadFailure.
+    function testOpERC20AllowanceDecimalsReadFailure() external {
+        vm.mockCall(
+            address(0xdeadbeef),
+            abi.encodeWithSelector(IERC20.allowance.selector, address(0xdeadc0de), address(0xdeaddead)),
+            abi.encode(uint256(1000))
+        );
+        // No mock for decimals — token doesn't implement it.
+        checkUnhappy(
+            "_: erc20-allowance(0xdeadbeef 0xdeadc0de 0xdeaddead);",
+            abi.encodeWithSelector(
+                ITOFUTokenDecimals.TokenDecimalsReadFailure.selector, address(0xdeadbeef), TOFUOutcome.ReadFailure
+            )
         );
     }
 

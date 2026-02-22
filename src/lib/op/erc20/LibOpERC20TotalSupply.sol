@@ -7,8 +7,9 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
-import {IERC20Metadata} from "openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {LibTOFUTokenDecimals} from "rain.tofu.erc20-decimals/lib/LibTOFUTokenDecimals.sol";
+import {TOFUOutcome, ITOFUTokenDecimals} from "rain.tofu.erc20-decimals/interface/ITOFUTokenDecimals.sol";
 import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
 /// @title LibOpERC20TotalSupply
@@ -36,9 +37,16 @@ library LibOpERC20TotalSupply {
         //forge-lint: disable-next-line(unsafe-typecast)
         uint256 totalSupply = IERC20(address(uint160(token))).totalSupply();
 
-        // This can fail as `decimals` is an OPTIONAL part of the ERC20 standard.
+        // Use TOFU to safely read decimals. This handles tokens that don't
+        // implement the optional `decimals()` function by returning a
+        // `ReadFailure` outcome instead of reverting with an opaque error.
         //forge-lint: disable-next-line(unsafe-typecast)
-        uint8 tokenDecimals = IERC20Metadata(address(uint160(token))).decimals();
+        (TOFUOutcome tofuOutcome, uint8 tokenDecimals) =
+            LibTOFUTokenDecimals.decimalsForTokenReadOnly(address(uint160(token)));
+        if (tofuOutcome == TOFUOutcome.ReadFailure || tofuOutcome == TOFUOutcome.Inconsistent) {
+            //forge-lint: disable-next-line(unsafe-typecast)
+            revert ITOFUTokenDecimals.TokenDecimalsReadFailure(address(uint160(token)), tofuOutcome);
+        }
 
         Float totalSupplyFloat = LibDecimalFloat.fromFixedDecimalLosslessPacked(totalSupply, tokenDecimals);
 
@@ -59,7 +67,10 @@ library LibOpERC20TotalSupply {
         address token = address(uint160(uint256(StackItem.unwrap(inputs[0]))));
         uint256 totalSupply = IERC20(token).totalSupply();
 
-        uint8 tokenDecimals = IERC20Metadata(token).decimals();
+        (TOFUOutcome tofuOutcome, uint8 tokenDecimals) = LibTOFUTokenDecimals.decimalsForTokenReadOnly(token);
+        if (tofuOutcome == TOFUOutcome.ReadFailure || tofuOutcome == TOFUOutcome.Inconsistent) {
+            revert ITOFUTokenDecimals.TokenDecimalsReadFailure(token, tofuOutcome);
+        }
         Float totalSupplyFloat = LibDecimalFloat.fromFixedDecimalLosslessPacked(totalSupply, tokenDecimals);
 
         StackItem[] memory outputs = new StackItem[](1);

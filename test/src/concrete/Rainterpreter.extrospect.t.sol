@@ -5,7 +5,7 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std/Test.sol";
 import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
 import {LibExtrospectBytecode} from "rain.extrospection/lib/LibExtrospectBytecode.sol";
-import {INTERPRETER_DISALLOWED_OPS} from "rain.extrospection/interface/IExtrospectInterpreterV1.sol";
+import {INTERPRETER_DISALLOWED_OPS} from "rain.extrospection/lib/EVMOpcodes.sol";
 
 contract RainterpreterExtrospectTest is Test {
     /// The interpreter bytecode MUST NOT contain any reachable state-changing

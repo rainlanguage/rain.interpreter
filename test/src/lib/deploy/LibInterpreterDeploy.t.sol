@@ -11,6 +11,7 @@ import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
 import {RainterpreterExpressionDeployer} from "src/concrete/RainterpreterExpressionDeployer.sol";
 import {RainterpreterDISPaiRegistry} from "src/concrete/RainterpreterDISPaiRegistry.sol";
 import {LibExtrospectBytecode} from "rain.extrospection/lib/LibExtrospectBytecode.sol";
+import {LibExtrospectMetamorphic} from "rain.extrospection/lib/LibExtrospectMetamorphic.sol";
 
 contract LibInterpreterDeployTest is Test {
     function testDeployAddressParser() external {
@@ -145,5 +146,37 @@ contract LibInterpreterDeployTest is Test {
             LibExtrospectBytecode.tryTrimSolidityCBORMetadata(address(registry).code),
             "DISPaiRegistry bytecode contains CBOR metadata"
         );
+    }
+
+    /// Parser bytecode MUST NOT contain reachable metamorphic risk opcodes.
+    function testNotMetamorphicParser() external {
+        RainterpreterParser parser = new RainterpreterParser();
+        LibExtrospectMetamorphic.checkNotMetamorphic(address(parser).code);
+    }
+
+    /// Store bytecode MUST NOT contain reachable metamorphic risk opcodes.
+    function testNotMetamorphicStore() external {
+        RainterpreterStore store = new RainterpreterStore();
+        LibExtrospectMetamorphic.checkNotMetamorphic(address(store).code);
+    }
+
+    /// Interpreter bytecode MUST NOT contain reachable metamorphic risk opcodes.
+    function testNotMetamorphicInterpreter() external {
+        Rainterpreter interpreter = new Rainterpreter();
+        LibExtrospectMetamorphic.checkNotMetamorphic(address(interpreter).code);
+    }
+
+    /// ExpressionDeployer bytecode MUST NOT contain reachable metamorphic risk
+    /// opcodes.
+    function testNotMetamorphicExpressionDeployer() external {
+        RainterpreterExpressionDeployer expressionDeployer = new RainterpreterExpressionDeployer();
+        LibExtrospectMetamorphic.checkNotMetamorphic(address(expressionDeployer).code);
+    }
+
+    /// DISPaiRegistry bytecode MUST NOT contain reachable metamorphic risk
+    /// opcodes.
+    function testNotMetamorphicDISPaiRegistry() external {
+        RainterpreterDISPaiRegistry registry = new RainterpreterDISPaiRegistry();
+        LibExtrospectMetamorphic.checkNotMetamorphic(address(registry).code);
     }
 }
