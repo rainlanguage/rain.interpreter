@@ -12,10 +12,16 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {IERC20Metadata} from "openzeppelin-contracts/contracts/interfaces/IERC20Metadata.sol";
 import {LibDecimalFloat, Float, LossyConversionToFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {TOFUOutcome, ITOFUTokenDecimals} from "rain.tofu.erc20-decimals/interface/ITOFUTokenDecimals.sol";
+import {NotAnAddress} from "src/error/ErrRainType.sol";
+import {LibTestCast} from "test/lib/typecast/LibTestCast.sol";
+import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 
 /// @title LibOpERC20TotalSupplyTest
 /// @notice Test the opcode for getting the total supply of an erc20 contract.
 contract LibOpERC20TotalSupplyTest is OpTest {
+    using LibTestCast for StackItem[];
+    using LibBytes32Array for bytes32[];
+
     function testOpERC20TotalSupplyIntegrity(IntegrityCheckState memory state, OperandV2 operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpERC20TotalSupply.integrity(state, operand);
 
@@ -108,6 +114,22 @@ contract LibOpERC20TotalSupplyTest is OpTest {
                 ITOFUTokenDecimals.TokenDecimalsReadFailure.selector, address(0xdeadbeef), TOFUOutcome.ReadFailure
             )
         );
+    }
+
+    /// Test that non-address token input reverts.
+    function testOpERC20TotalSupplyNotAnAddress(uint256 token) external {
+        // Casting to `uint160` is intentional to detect non-address values.
+        //forge-lint: disable-next-line(unsafe-typecast)
+        vm.assume(token != uint256(uint160(token)));
+        StackItem[] memory inputs = new StackItem[](1);
+        inputs[0] = StackItem.wrap(bytes32(token));
+        OperandV2 operand = LibOperand.build(1, 1, 0);
+        vm.expectRevert(abi.encodeWithSelector(NotAnAddress.selector, token));
+        this.externalRun(operand, inputs);
+    }
+
+    function externalRun(OperandV2 operand, StackItem[] memory inputs) external view {
+        LibOpERC20TotalSupply.run(opTestDefaultInterpreterState(), operand, inputs.asBytes32Array().dataPointer());
     }
 
     /// Test that operand is disallowed.

@@ -7,6 +7,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../../state/LibInterpreterState.sol";
+import {NotAnAddress} from "../../../../error/ErrRainType.sol";
 
 /// @title LibOpUint256ERC20TotalSupply
 /// @notice Opcode for ERC20 `totalSupply`.
@@ -26,8 +27,13 @@ library LibOpUint256ERC20TotalSupply {
         assembly ("memory-safe") {
             token := mload(stackTop)
         }
-        // It is the rainlang author's responsibility to ensure that token is
-        // a valid address.
+        // It is the rainlang author's responsibility to ensure the correctness
+        // of token as an address.
+        // Casting to `uint160` is intentional to detect non-address values.
+        //forge-lint: disable-next-line(unsafe-typecast)
+        if (token != uint256(uint160(token))) revert NotAnAddress(token);
+        // Casting to `uint160` is safe because `NotAnAddress` above
+        // ensures the value fits in 160 bits.
         //forge-lint: disable-next-line(unsafe-typecast)
         uint256 totalSupply = IERC20(address(uint160(token))).totalSupply();
         assembly ("memory-safe") {
@@ -44,7 +50,14 @@ library LibOpUint256ERC20TotalSupply {
         view
         returns (StackItem[] memory)
     {
-        address token = address(uint160(uint256(StackItem.unwrap(inputs[0]))));
+        uint256 tokenValue = uint256(StackItem.unwrap(inputs[0]));
+        // Casting to `uint160` is intentional to detect non-address values.
+        //forge-lint: disable-next-line(unsafe-typecast)
+        if (tokenValue != uint256(uint160(tokenValue))) revert NotAnAddress(tokenValue);
+        // Casting to `uint160` is safe because `NotAnAddress` above
+        // ensures the value fits in 160 bits.
+        //forge-lint: disable-next-line(unsafe-typecast)
+        address token = address(uint160(tokenValue));
         uint256 totalSupply = IERC20(token).totalSupply();
         StackItem[] memory outputs = new StackItem[](1);
         outputs[0] = StackItem.wrap(bytes32(totalSupply));

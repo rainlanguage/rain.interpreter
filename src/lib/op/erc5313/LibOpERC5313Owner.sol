@@ -7,6 +7,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
+import {NotAnAddress} from "../../../error/ErrRainType.sol";
 
 /// @title LibOpERC5313Owner
 /// @notice Opcode for ERC5313 `owner`.
@@ -28,8 +29,13 @@ library LibOpERC5313Owner {
         assembly ("memory-safe") {
             account := mload(stackTop)
         }
-        // The rainlang author is responsible for ensuring the input is a valid
-        // ERC5313 contract address.
+        // It is the rainlang author's responsibility to ensure the correctness
+        // of account as an address.
+        // Casting to `uint160` is intentional to detect non-address values.
+        //forge-lint: disable-next-line(unsafe-typecast)
+        if (account != uint256(uint160(account))) revert NotAnAddress(account);
+        // Casting to `uint160` is safe because `NotAnAddress` above
+        // ensures the value fits in 160 bits.
         //forge-lint: disable-next-line(unsafe-typecast)
         address owner = IERC5313(address(uint160(account))).owner();
         assembly ("memory-safe") {
@@ -46,8 +52,14 @@ library LibOpERC5313Owner {
         view
         returns (StackItem[] memory)
     {
-        bytes32 account = StackItem.unwrap(inputs[0]);
-        address owner = IERC5313(address(uint160(uint256(account)))).owner();
+        uint256 accountValue = uint256(StackItem.unwrap(inputs[0]));
+        // Casting to `uint160` is intentional to detect non-address values.
+        //forge-lint: disable-next-line(unsafe-typecast)
+        if (accountValue != uint256(uint160(accountValue))) revert NotAnAddress(accountValue);
+        // Casting to `uint160` is safe because `NotAnAddress` above
+        // ensures the value fits in 160 bits.
+        //forge-lint: disable-next-line(unsafe-typecast)
+        address owner = IERC5313(address(uint160(accountValue))).owner();
         StackItem[] memory outputs = new StackItem[](1);
         outputs[0] = StackItem.wrap(bytes32(uint256(uint160(owner))));
         return outputs;

@@ -19,10 +19,16 @@ import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {NotAnAddress} from "src/error/ErrRainType.sol";
+import {LibTestCast} from "test/lib/typecast/LibTestCast.sol";
+import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 
 /// @title LibOpERC721BalanceOfTest
 /// @notice Test the opcode for getting the balance of an erc721 token.
 contract LibOpERC721BalanceOfTest is OpTest {
+    using LibTestCast for StackItem[];
+    using LibBytes32Array for bytes32[];
+
     function testOpERC721BalanceOfIntegrity(
         IntegrityCheckState memory state,
         uint8 inputs,
@@ -136,6 +142,36 @@ contract LibOpERC721BalanceOfTest is OpTest {
 
     function testOpERC721BalanceOfThreeInputs() external {
         checkBadInputs("_: erc721-balance-of(0x00 0x01 0x02);", 3, 2, 3);
+    }
+
+    /// Test that non-address token input reverts.
+    function testOpERC721BalanceOfNotAnAddressToken(uint256 token) external {
+        // Casting to `uint160` is intentional to detect non-address values.
+        //forge-lint: disable-next-line(unsafe-typecast)
+        vm.assume(token != uint256(uint160(token)));
+        StackItem[] memory inputs = new StackItem[](2);
+        inputs[0] = StackItem.wrap(bytes32(token));
+        inputs[1] = StackItem.wrap(bytes32(uint256(uint160(address(0xdeadc0de)))));
+        OperandV2 operand = LibOperand.build(2, 1, 0);
+        vm.expectRevert(abi.encodeWithSelector(NotAnAddress.selector, token));
+        this.externalRun(operand, inputs);
+    }
+
+    /// Test that non-address account input reverts.
+    function testOpERC721BalanceOfNotAnAddressAccount(uint256 account) external {
+        // Casting to `uint160` is intentional to detect non-address values.
+        //forge-lint: disable-next-line(unsafe-typecast)
+        vm.assume(account != uint256(uint160(account)));
+        StackItem[] memory inputs = new StackItem[](2);
+        inputs[0] = StackItem.wrap(bytes32(uint256(uint160(address(0xdeadbeef)))));
+        inputs[1] = StackItem.wrap(bytes32(account));
+        OperandV2 operand = LibOperand.build(2, 1, 0);
+        vm.expectRevert(abi.encodeWithSelector(NotAnAddress.selector, account));
+        this.externalRun(operand, inputs);
+    }
+
+    function externalRun(OperandV2 operand, StackItem[] memory inputs) external view {
+        LibOpERC721BalanceOf.run(opTestDefaultInterpreterState(), operand, inputs.asBytes32Array().dataPointer());
     }
 
     function testOpERC721BalanceOfZeroOutputs() external {
