@@ -227,7 +227,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A19-2: (LOW) No test for large context dimensions (i or j near 255) — added `testOpContextEvalMaxI` (i=255) and `testOpContextEvalMaxJ` (j=255)
 - [FIXED] A20-1: (LOW) No test verifying `erc20-allowance` handles infinite approvals without revert — added `testOpERC20AllowanceInfiniteApproval` with type(uint256).max allowance
 - [FIXED] A20-2: (LOW) No test for `decimals()` revert when token does not implement `IERC20Metadata` — all three ERC20 ops have `testOp*DecimalsReadFailure` tests verifying `TokenDecimalsReadFailure` revert via TOFU `safeDecimalsForTokenReadOnly`
-- [PENDING] A20-4: (LOW) No test for input values with upper 96 bits set (address truncation)
+- [FIXED] A20-4: (LOW) No test for input values with upper 96 bits set (address truncation) — added NotAnAddress runtime validation with fuzz tests across all 10 address-taking opcodes
 - [PENDING] A21-1: (LOW) No test for `referenceFn` `BadOutputsLength` revert path
 - [PENDING] A23-1: (LOW) LibOpGreaterThanOrEqualTo missing negative number and float equality eval tests
 - [PENDING] A23-2: (LOW) LibOpLessThanOrEqualTo missing negative number and float equality eval tests
