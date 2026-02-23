@@ -228,13 +228,13 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A20-1: (LOW) No test verifying `erc20-allowance` handles infinite approvals without revert — added `testOpERC20AllowanceInfiniteApproval` with type(uint256).max allowance
 - [FIXED] A20-2: (LOW) No test for `decimals()` revert when token does not implement `IERC20Metadata` — all three ERC20 ops have `testOp*DecimalsReadFailure` tests verifying `TokenDecimalsReadFailure` revert via TOFU `safeDecimalsForTokenReadOnly`
 - [FIXED] A20-4: (LOW) No test for input values with upper 96 bits set (address truncation) — added NotAnAddress runtime validation with fuzz tests across all 10 address-taking opcodes
-- [PENDING] A21-1: (LOW) No test for `referenceFn` `BadOutputsLength` revert path
-- [PENDING] A23-1: (LOW) LibOpGreaterThanOrEqualTo missing negative number and float equality eval tests
-- [PENDING] A23-2: (LOW) LibOpLessThanOrEqualTo missing negative number and float equality eval tests
-- [PENDING] A23-3: (LOW) LibOpConditions no test for exactly 2 inputs (minimum case)
-- [PENDING] A23-4: (LOW) LibOpConditions odd-input revert path with reason string not tested via opReferenceCheck
-- [PENDING] A24-1: (LOW) LibOpE missing operand disallowed test
-- [PENDING] A24-2: (LOW) LibOpExp and LibOpExp2 fuzz tests restrict inputs to non-negative small values only
+- [FIXED] A21-1: (LOW) No test for `referenceFn` `BadOutputsLength` revert path — added testOpExternReferenceFnBadOutputsLength and testOpExternReferenceFnBadOutputsLengthTooMany
+- [FIXED] A23-1: (LOW) LibOpGreaterThanOrEqualTo missing negative number and float equality eval tests — added 4 eval tests: 1.1>=1.2, 1.0>=1, -1.1>=-1.2, -1>=0
+- [FIXED] A23-2: (LOW) LibOpLessThanOrEqualTo missing negative number and float equality eval tests — added 4 eval tests: 1.1<=1.2, 1.0<=1, -1.1<=-1.2, -1<=0
+- [DISMISSED] A23-3: (LOW) LibOpConditions no test for exactly 2 inputs (minimum case) — false positive; testOpConditionsEval1TrueInputZeroOutput and testOpConditionsEval2MixedInputs both use exactly 2 inputs
+- [DISMISSED] A23-4: (LOW) LibOpConditions odd-input revert path with reason string not tested via opReferenceCheck — finding itself acknowledges "adequate coverage"; testOpConditionsRunNoConditionsMet fuzz covers odd inputs with reason strings, testOpConditionsEvalErrorCode covers it at eval level
+- [FIXED] A24-1: (LOW) LibOpE missing operand disallowed test — added testOpEEvalOperandDisallowed
+- [FIXED] A24-2: (LOW) LibOpExp and LibOpExp2 fuzz tests restrict inputs to non-negative small values only — added testOpExpEvalNegativeInput (exp(-1)=1/e) and testOpExp2EvalNegativeInput (exp2(-1)=0.5)
 - [PENDING] A24-3: (LOW) LibOpGm fuzz test restricts inputs to non-negative small values only
 - [PENDING] A24-4: (LOW) LibOpFloor eval tests missing negative value coverage
 - [PENDING] A25-1: (LOW) LibOpInv missing test for division by zero (inv(0))

@@ -78,6 +78,13 @@ contract LibOpExpTest is OpTest {
         );
     }
 
+    /// Test exp with negative input. exp(-1) = 1/e ≈ 0.3678794...
+    function testOpExpEvalNegativeInput() external view {
+        (Float expected,) =
+            LibDecimalFloat.packLossy(3678794411714423215955237701614608674458111310317678345078368016974, -67);
+        checkHappy("_: exp(-1);", Float.unwrap(expected), "e^(-1)");
+    }
+
     /// Test the eval of `exp` for bad inputs.
     function testOpExpEvalZeroInputs() external {
         checkBadInputs("_: exp();", 0, 1, 0);

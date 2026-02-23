@@ -138,6 +138,26 @@ contract LibOpLessThanOrEqualToTest is OpTest {
         assertEq(kvs.length, 0);
     }
 
+    /// Test 1.1 <= 1.2, which should return 1.
+    function testOpLessThanOrEqualToEvalOnePointOneLteOnePointTwo() external view {
+        checkHappy("_: less-than-or-equal-to(1.1 1.2);", bytes32(uint256(1)), "");
+    }
+
+    /// Test 1.0 <= 1, which should return 1 (equal).
+    function testOpLessThanOrEqualToEvalOnePointZeroLteOne() external view {
+        checkHappy("_: less-than-or-equal-to(1.0 1);", bytes32(uint256(1)), "");
+    }
+
+    /// Test -1.1 <= -1.2, which should return 0.
+    function testOpLessThanOrEqualToEvalNegOnePointOneLteNegOnePointTwo() external view {
+        checkHappy("_: less-than-or-equal-to(-1.1 -1.2);", 0, "");
+    }
+
+    /// Test -1 <= 0, which should return 1.
+    function testOpLessThanOrEqualToEvalNegOneLteZero() external view {
+        checkHappy("_: less-than-or-equal-to(-1 0);", bytes32(uint256(1)), "");
+    }
+
     /// Test that a less than or equal to without inputs fails integrity check.
     function testOpLessThanOrEqualToEvalFail0Inputs() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));

@@ -39,3 +39,7 @@ Use `opReferenceCheck` to validate that `run` output matches a pure reference im
 ## Boundary Tests
 
 Always test both sides: the max valid value (should succeed) and one past it (should revert).
+
+## One Test at a Time
+
+Write one test function per edit-compile-run cycle. Do not batch multiple new tests into a single edit. Writing one test at a time produces higher quality code — each test gets full attention, compilation errors are caught immediately, and failures are unambiguous.
