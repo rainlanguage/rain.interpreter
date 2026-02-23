@@ -19,10 +19,16 @@ import {UnexpectedOperand} from "src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
+import {NotAnAddress} from "src/error/ErrRainType.sol";
+import {LibTestCast} from "test/lib/typecast/LibTestCast.sol";
+import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 
 /// @title LibOpERC721OwnerOfTest
 /// @notice Test the opcode for getting the owner of an erc721 token.
 contract LibOpERC721OwnerOfTest is OpTest {
+    using LibTestCast for StackItem[];
+    using LibBytes32Array for bytes32[];
+
     function testOpERC721OwnerOfIntegrity(IntegrityCheckState memory state, uint8 inputs) external pure {
         (uint256 calcInputs, uint256 calcOutputs) =
             LibOpERC721OwnerOf.integrity(state, OperandV2.wrap(bytes32(uint256(inputs) << 0x10)));
@@ -109,6 +115,23 @@ contract LibOpERC721OwnerOfTest is OpTest {
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
         (bytes memory bytecode, bytes32[] memory constants) = I_PARSER.unsafeParse("_: erc721-owner-of<0>(0x00 0x01);");
         (bytecode, constants);
+    }
+
+    /// Test that non-address token input reverts.
+    function testOpERC721OwnerOfNotAnAddressToken(uint256 token) external {
+        // Casting to `uint160` is intentional to detect non-address values.
+        //forge-lint: disable-next-line(unsafe-typecast)
+        vm.assume(token != uint256(uint160(token)));
+        StackItem[] memory inputs = new StackItem[](2);
+        inputs[0] = StackItem.wrap(bytes32(token));
+        inputs[1] = StackItem.wrap(bytes32(uint256(1)));
+        OperandV2 operand = LibOperand.build(2, 1, 0);
+        vm.expectRevert(abi.encodeWithSelector(NotAnAddress.selector, token));
+        this.externalRun(operand, inputs);
+    }
+
+    function externalRun(OperandV2 operand, StackItem[] memory inputs) external view {
+        LibOpERC721OwnerOf.run(opTestDefaultInterpreterState(), operand, inputs.asBytes32Array().dataPointer());
     }
 
     function testOpERC721OwnerOfEvalZeroInputs() external {

@@ -10,6 +10,7 @@ import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {LibTOFUTokenDecimals} from "rain.tofu.erc20-decimals/lib/LibTOFUTokenDecimals.sol";
 import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
+import {NotAnAddress} from "../../../error/ErrRainType.sol";
 
 /// @title LibOpERC20TotalSupply
 /// @notice Opcode for ERC20 `totalSupply`.
@@ -31,11 +32,18 @@ library LibOpERC20TotalSupply {
         assembly ("memory-safe") {
             token := mload(stackTop)
         }
-        // It is the rainlang author's responsibility to ensure that the token
-        // is a valid address.
+        // It is the rainlang author's responsibility to ensure the correctness
+        // of token as an address.
+        // Casting to `uint160` is intentional to detect non-address values.
+        //forge-lint: disable-next-line(unsafe-typecast)
+        if (token != uint256(uint160(token))) revert NotAnAddress(token);
+        // Casting to `uint160` is safe because `NotAnAddress` above
+        // ensures the value fits in 160 bits.
         //forge-lint: disable-next-line(unsafe-typecast)
         uint256 totalSupply = IERC20(address(uint160(token))).totalSupply();
 
+        // Casting to `uint160` is safe because `NotAnAddress` above
+        // ensures the value fits in 160 bits.
         //forge-lint: disable-next-line(unsafe-typecast)
         uint8 tokenDecimals = LibTOFUTokenDecimals.safeDecimalsForTokenReadOnly(address(uint160(token)));
 
@@ -55,7 +63,14 @@ library LibOpERC20TotalSupply {
         view
         returns (StackItem[] memory)
     {
-        address token = address(uint160(uint256(StackItem.unwrap(inputs[0]))));
+        uint256 tokenValue = uint256(StackItem.unwrap(inputs[0]));
+        // Casting to `uint160` is intentional to detect non-address values.
+        //forge-lint: disable-next-line(unsafe-typecast)
+        if (tokenValue != uint256(uint160(tokenValue))) revert NotAnAddress(tokenValue);
+        // Casting to `uint160` is safe because `NotAnAddress` above
+        // ensures the value fits in 160 bits.
+        //forge-lint: disable-next-line(unsafe-typecast)
+        address token = address(uint160(tokenValue));
         uint256 totalSupply = IERC20(token).totalSupply();
 
         uint8 tokenDecimals = LibTOFUTokenDecimals.safeDecimalsForTokenReadOnly(token);

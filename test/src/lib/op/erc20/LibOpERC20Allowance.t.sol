@@ -12,10 +12,16 @@ import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {IERC20Metadata} from "openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {TOFUOutcome, ITOFUTokenDecimals} from "rain.tofu.erc20-decimals/interface/ITOFUTokenDecimals.sol";
+import {NotAnAddress} from "src/error/ErrRainType.sol";
+import {LibTestCast} from "test/lib/typecast/LibTestCast.sol";
+import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 
 /// @title LibOpERC20AllowanceTest
 /// @notice Test the opcode for getting the allowance of an erc20 token.
 contract LibOpERC20AllowanceTest is OpTest {
+    using LibTestCast for StackItem[];
+    using LibBytes32Array for bytes32[];
+
     function testOpERC20AllowanceIntegrity(IntegrityCheckState memory state, OperandV2 operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpERC20Allowance.integrity(state, operand);
 
@@ -123,6 +129,52 @@ contract LibOpERC20AllowanceTest is OpTest {
                 ITOFUTokenDecimals.TokenDecimalsReadFailure.selector, address(0xdeadbeef), TOFUOutcome.ReadFailure
             )
         );
+    }
+
+    /// Test that non-address token input reverts.
+    function testOpERC20AllowanceNotAnAddressToken(uint256 token) external {
+        // Casting to `uint160` is intentional to detect non-address values.
+        //forge-lint: disable-next-line(unsafe-typecast)
+        vm.assume(token != uint256(uint160(token)));
+        StackItem[] memory inputs = new StackItem[](3);
+        inputs[0] = StackItem.wrap(bytes32(token));
+        inputs[1] = StackItem.wrap(bytes32(uint256(uint160(address(0xdeadc0de)))));
+        inputs[2] = StackItem.wrap(bytes32(uint256(uint160(address(0xdeaddead)))));
+        OperandV2 operand = LibOperand.build(3, 1, 0);
+        vm.expectRevert(abi.encodeWithSelector(NotAnAddress.selector, token));
+        this.externalRun(operand, inputs);
+    }
+
+    /// Test that non-address owner input reverts.
+    function testOpERC20AllowanceNotAnAddressOwner(uint256 owner) external {
+        // Casting to `uint160` is intentional to detect non-address values.
+        //forge-lint: disable-next-line(unsafe-typecast)
+        vm.assume(owner != uint256(uint160(owner)));
+        StackItem[] memory inputs = new StackItem[](3);
+        inputs[0] = StackItem.wrap(bytes32(uint256(uint160(address(0xdeadbeef)))));
+        inputs[1] = StackItem.wrap(bytes32(owner));
+        inputs[2] = StackItem.wrap(bytes32(uint256(uint160(address(0xdeaddead)))));
+        OperandV2 operand = LibOperand.build(3, 1, 0);
+        vm.expectRevert(abi.encodeWithSelector(NotAnAddress.selector, owner));
+        this.externalRun(operand, inputs);
+    }
+
+    /// Test that non-address spender input reverts.
+    function testOpERC20AllowanceNotAnAddressSpender(uint256 spender) external {
+        // Casting to `uint160` is intentional to detect non-address values.
+        //forge-lint: disable-next-line(unsafe-typecast)
+        vm.assume(spender != uint256(uint160(spender)));
+        StackItem[] memory inputs = new StackItem[](3);
+        inputs[0] = StackItem.wrap(bytes32(uint256(uint160(address(0xdeadbeef)))));
+        inputs[1] = StackItem.wrap(bytes32(uint256(uint160(address(0xdeadc0de)))));
+        inputs[2] = StackItem.wrap(bytes32(spender));
+        OperandV2 operand = LibOperand.build(3, 1, 0);
+        vm.expectRevert(abi.encodeWithSelector(NotAnAddress.selector, spender));
+        this.externalRun(operand, inputs);
+    }
+
+    function externalRun(OperandV2 operand, StackItem[] memory inputs) external view {
+        LibOpERC20Allowance.run(opTestDefaultInterpreterState(), operand, inputs.asBytes32Array().dataPointer());
     }
 
     /// Test that operand is disallowed.
