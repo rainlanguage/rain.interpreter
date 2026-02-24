@@ -4,6 +4,7 @@ pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckState, OperandV2, InterpreterState, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
+import {DivisionByZero} from "rain.math.float/error/ErrDecimalFloat.sol";
 import {LibOpInv} from "src/lib/op/math/LibOpInv.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
@@ -46,6 +47,19 @@ contract LibOpInvTest is OpTest {
             ),
             "3"
         );
+    }
+
+    /// Test the eval of `inv` with negative inputs.
+    function testOpInvEvalNegative() external view {
+        (Float expected,) = LibDecimalFloat.packLossy(-1e67, -67);
+        checkHappy("_: inv(-1);", Float.unwrap(expected), "-1");
+        (expected,) = LibDecimalFloat.packLossy(-0.5e67, -67);
+        checkHappy("_: inv(-2);", Float.unwrap(expected), "-2");
+    }
+
+    /// Test that inv(0) reverts with division by zero.
+    function testOpInvEvalDivisionByZero() external {
+        checkUnhappy("_: inv(0);", abi.encodeWithSelector(DivisionByZero.selector, 1e76, -76));
     }
 
     /// Test the eval of `inv` for bad inputs.

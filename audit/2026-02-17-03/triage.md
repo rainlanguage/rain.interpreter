@@ -237,7 +237,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A24-2: (LOW) LibOpExp and LibOpExp2 fuzz tests restrict inputs to non-negative small values only — added testOpExpEvalNegativeInput (exp(-1)=1/e) and testOpExp2EvalNegativeInput (exp2(-1)=0.5)
 - [FIXED] A24-3: (LOW) LibOpGm fuzz test restricts inputs to non-negative small values only — fixed implementation to compute signed geometric mean: sign * sqrt(|a| * |b|). Expanded fuzz bounds to include negatives. Added eval tests for mixed signs (unit and non-unit), both negative (equal and unequal), zero with negative, and zero bytes identity. Signed GM function upstreamed to rain.math.float as GitHub issue.
 - [FIXED] A24-4: (LOW) LibOpFloor eval tests missing negative value coverage — added testOpFloorEvalNegative covering floor(-1), floor(-1.1)=-2, floor(-0.5)=-1, floor(-1.5)=-2, floor(-2), floor(-2.5)=-3. Uses float equality for fractional cases where internal normalization differs from packLossless.
-- [PENDING] A25-1: (LOW) LibOpInv missing test for division by zero (inv(0))
+- [FIXED] A25-1: (LOW) LibOpInv missing test for division by zero (inv(0)) — added testOpInvEvalDivisionByZero verifying inv(0) reverts with DivisionByZero, and testOpInvEvalNegative for inv(-1)=-1, inv(-2)=-0.5
 - [PENDING] A25-2: (LOW) LibOpSub missing zero outputs and two outputs tests
 - [PENDING] A25-3: (LOW) LibOpSub missing operand handler test
 - [PENDING] A25-4: (LOW) LibOpMin missing zero outputs and two outputs tests
