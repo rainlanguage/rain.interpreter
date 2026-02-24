@@ -294,6 +294,127 @@ contract LibOpExternTest is OpTest {
         LibOpExtern.run(state, operand, stackTop);
     }
 
+    /// Exposed externally so mocks and reverts play nice with referenceFn.
+    function externalReferenceFn(InterpreterState memory state, OperandV2 operand, StackItem[] memory inputs)
+        external
+        view
+        returns (StackItem[] memory)
+    {
+        return LibOpExtern.referenceFn(state, operand, inputs);
+    }
+
+    /// Test that `referenceFn` reverts with `BadOutputsLength` when the extern
+    /// returns fewer outputs than the operand specifies.
+    function testOpExternReferenceFnBadOutputsLength(
+        IInterpreterExternV4 extern,
+        bytes32[] memory constants,
+        uint16 constantIndex,
+        StackItem[] memory inputs,
+        StackItem[] memory outputs
+    ) external {
+        vm.assume(constants.length > 0);
+        if (inputs.length > 0x0F) {
+            uint256[] memory inputsCopy;
+            assembly ("memory-safe") {
+                inputsCopy := inputs
+            }
+            inputsCopy.truncate(0x0F);
+        }
+        if (outputs.length > 0x0F) {
+            uint256[] memory outputsCopy;
+            assembly ("memory-safe") {
+                outputsCopy := outputs
+            }
+            outputsCopy.truncate(0x0F);
+        }
+        // Need at least 1 output so we can return a mismatched count.
+        vm.assume(outputs.length > 0);
+
+        InterpreterState memory state = opTestDefaultInterpreterState();
+        state.constants = constants;
+
+        assumeEtchable(address(extern));
+        vm.etch(address(extern), hex"fe");
+        mockImplementsERC165IInterpreterExternV4(extern);
+
+        constantIndex = uint16(bound(constantIndex, 0, state.constants.length - 1));
+
+        OperandV2 operand = LibOperand.build(uint8(inputs.length), uint8(outputs.length), constantIndex);
+        ExternDispatchV2 externDispatch = LibExtern.encodeExternDispatch(0, operand);
+        EncodedExternDispatchV2 encodedExternDispatch = LibExtern.encodeExternCall(extern, externDispatch);
+        state.constants[constantIndex] = EncodedExternDispatchV2.unwrap(encodedExternDispatch);
+
+        // Mock extern to return one fewer output than expected.
+        StackItem[] memory badOutputs = new StackItem[](outputs.length - 1);
+        for (uint256 i = 0; i < badOutputs.length; i++) {
+            badOutputs[i] = outputs[i];
+        }
+        vm.mockCall(
+            address(extern),
+            abi.encodeWithSelector(IInterpreterExternV4.extern.selector, externDispatch),
+            abi.encode(badOutputs)
+        );
+
+        vm.expectRevert(abi.encodeWithSelector(BadOutputsLength.selector, outputs.length, badOutputs.length));
+        this.externalReferenceFn(state, operand, inputs);
+    }
+
+    /// Test that `referenceFn` reverts with `BadOutputsLength` when the extern
+    /// returns more outputs than the operand specifies.
+    function testOpExternReferenceFnBadOutputsLengthTooMany(
+        IInterpreterExternV4 extern,
+        bytes32[] memory constants,
+        uint16 constantIndex,
+        StackItem[] memory inputs,
+        StackItem[] memory outputs
+    ) external {
+        vm.assume(constants.length > 0);
+        if (inputs.length > 0x0F) {
+            uint256[] memory inputsCopy;
+            assembly ("memory-safe") {
+                inputsCopy := inputs
+            }
+            inputsCopy.truncate(0x0F);
+        }
+        // Cap outputs to 0x0E so we can add one more.
+        if (outputs.length > 0x0E) {
+            uint256[] memory outputsCopy;
+            assembly ("memory-safe") {
+                outputsCopy := outputs
+            }
+            outputsCopy.truncate(0x0E);
+        }
+
+        InterpreterState memory state = opTestDefaultInterpreterState();
+        state.constants = constants;
+
+        assumeEtchable(address(extern));
+        vm.etch(address(extern), hex"fe");
+        mockImplementsERC165IInterpreterExternV4(extern);
+
+        constantIndex = uint16(bound(constantIndex, 0, state.constants.length - 1));
+
+        OperandV2 operand = LibOperand.build(uint8(inputs.length), uint8(outputs.length), constantIndex);
+        ExternDispatchV2 externDispatch = LibExtern.encodeExternDispatch(0, operand);
+        EncodedExternDispatchV2 encodedExternDispatch = LibExtern.encodeExternCall(extern, externDispatch);
+        state.constants[constantIndex] = EncodedExternDispatchV2.unwrap(encodedExternDispatch);
+
+        // Mock extern to return one more output than expected.
+        StackItem[] memory extraOutputs = new StackItem[](outputs.length + 1);
+        for (uint256 i = 0; i < outputs.length; i++) {
+            extraOutputs[i] = outputs[i];
+        }
+
+        vm.mockCall(
+            address(extern),
+            abi.encodeWithSelector(IInterpreterExternV4.extern.selector, externDispatch),
+            abi.encode(extraOutputs)
+        );
+
+        vm.expectRevert(abi.encodeWithSelector(BadOutputsLength.selector, outputs.length, extraOutputs.length));
+        this.externalReferenceFn(state, operand, inputs);
+    }
+
     /// Test the eval of extern directly.
     function testOpExternRunHappy(
         IInterpreterExternV4 extern,

@@ -63,6 +63,26 @@ contract LibOpGreaterThanOrEqualToTest is OpTest {
         checkHappy("_: greater-than-or-equal-to(1 1);", bytes32(uint256(1)), "");
     }
 
+    /// Test 1.1 >= 1.2, which should return 0.
+    function testOpGreaterThanOrEqualToEvalOnePointOneGteOnePointTwo() external view {
+        checkHappy("_: greater-than-or-equal-to(1.1 1.2);", 0, "");
+    }
+
+    /// Test 1.0 >= 1, which should return 1 (equal).
+    function testOpGreaterThanOrEqualToEvalOnePointZeroGteOne() external view {
+        checkHappy("_: greater-than-or-equal-to(1.0 1);", bytes32(uint256(1)), "");
+    }
+
+    /// Test -1.1 >= -1.2, which should return 1.
+    function testOpGreaterThanOrEqualToEvalNegOnePointOneGteNegOnePointTwo() external view {
+        checkHappy("_: greater-than-or-equal-to(-1.1 -1.2);", bytes32(uint256(1)), "");
+    }
+
+    /// Test -1 >= 0, which should return 0.
+    function testOpGreaterThanOrEqualToEvalNegOneGteZero() external view {
+        checkHappy("_: greater-than-or-equal-to(-1 0);", 0, "");
+    }
+
     /// Test that a greater than or equal to without inputs fails integrity check.
     function testOpGreaterThanOrEqualToEvalFail0Inputs() public {
         vm.expectRevert(abi.encodeWithSelector(BadOpInputsLength.selector, 0, 2, 0));

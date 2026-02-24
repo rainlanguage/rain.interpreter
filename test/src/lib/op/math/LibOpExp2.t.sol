@@ -44,6 +44,13 @@ contract LibOpExp2Test is OpTest {
         checkHappy("_: exp2(3);", Float.unwrap(LibDecimalFloat.packLossless(8000, -3)), "2^3");
     }
 
+    /// Test exp2 with negative input. exp2(-1) = 0.5.
+    function testOpExp2EvalNegativeInput() external view {
+        (Float expected,) =
+            LibDecimalFloat.packLossy(5000000000000000000000000000000000000000000000000000000000000000000, -67);
+        checkHappy("_: exp2(-1);", Float.unwrap(expected), "2^(-1)");
+    }
+
     /// Test the eval of `exp2` for bad inputs.
     function testOpExp2EvalBad() external {
         checkBadInputs("_: exp2();", 0, 1, 0);

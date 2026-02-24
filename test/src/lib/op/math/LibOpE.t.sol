@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {OpTest} from "test/abstract/OpTest.sol";
+import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {LibOpE} from "src/lib/op/math/LibOpE.sol";
 import {LibOperand, OperandV2} from "test/lib/operand/LibOperand.sol";
@@ -73,5 +73,10 @@ contract LibOpETest is OpTest {
 
     function testOpEEvalTwoOutputs() external {
         checkBadOutputs("_ _: e();", 0, 1, 2);
+    }
+
+    /// Test that operand is disallowed.
+    function testOpEEvalOperandDisallowed() external {
+        checkUnhappyParse("_: e<0>();", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

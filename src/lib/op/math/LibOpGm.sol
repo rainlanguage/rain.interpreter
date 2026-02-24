@@ -9,8 +9,9 @@ import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 /// @title LibOpGm
-/// @notice Opcode for the geometric average of two decimal floating point
-/// numbers.
+/// @notice Opcode for the signed geometric mean of two decimal floating point
+/// numbers. Computes `sign * sqrt(|a| * |b|)`, where the sign is negative when
+/// an odd number of inputs are negative.
 library LibOpGm {
     using LibDecimalFloat for Float;
 
@@ -22,8 +23,9 @@ library LibOpGm {
         return (2, 1);
     }
 
-    /// @notice gm
-    /// decimal floating point geometric average of two numbers.
+    /// @notice Signed geometric mean of two decimal floating point numbers.
+    /// Computes `sign * sqrt(|a| * |b|)`. The result is negative when exactly
+    /// one input is negative, positive otherwise.
     /// @param stackTop Pointer to the top of the stack.
     /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal view returns (Pointer) {
@@ -34,10 +36,15 @@ library LibOpGm {
             stackTop := add(stackTop, 0x20)
             b := mload(stackTop)
         }
-        a = a.mul(b).pow(LibDecimalFloat.FLOAT_HALF, LibDecimalFloat.LOG_TABLES_ADDRESS);
+        bool aNeg = a.lt(LibDecimalFloat.FLOAT_ZERO);
+        bool bNeg = b.lt(LibDecimalFloat.FLOAT_ZERO);
+        Float result = a.abs().mul(b.abs()).pow(LibDecimalFloat.FLOAT_HALF, LibDecimalFloat.LOG_TABLES_ADDRESS);
+        if (aNeg != bNeg) {
+            result = result.minus();
+        }
 
         assembly ("memory-safe") {
-            mstore(stackTop, a)
+            mstore(stackTop, result)
         }
         return stackTop;
     }
@@ -50,12 +57,18 @@ library LibOpGm {
         view
         returns (StackItem[] memory)
     {
-        // The geometric mean is sqrt(a * b).
+        // The geometric mean is sign * sqrt(|a| * |b|), where sign is
+        // negative if an odd number of inputs are negative.
         Float a = Float.wrap(StackItem.unwrap(inputs[0]));
         Float b = Float.wrap(StackItem.unwrap(inputs[1]));
-        a = a.mul(b).pow(LibDecimalFloat.FLOAT_HALF, LibDecimalFloat.LOG_TABLES_ADDRESS);
+        bool aNeg = a.lt(LibDecimalFloat.FLOAT_ZERO);
+        bool bNeg = b.lt(LibDecimalFloat.FLOAT_ZERO);
+        Float result = a.abs().mul(b.abs()).pow(LibDecimalFloat.FLOAT_HALF, LibDecimalFloat.LOG_TABLES_ADDRESS);
+        if (aNeg != bNeg) {
+            result = result.minus();
+        }
         StackItem[] memory outputs = new StackItem[](1);
-        outputs[0] = StackItem.wrap(Float.unwrap(a));
+        outputs[0] = StackItem.wrap(Float.unwrap(result));
         return outputs;
     }
 }
