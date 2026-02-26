@@ -46,6 +46,27 @@ contract LibParseLiteralStringTest is Test {
         assertEq(cursorAfter, cursor + data.length + 2);
     }
 
+    /// parseString temporarily overwrites memory before the string content
+    /// with a length prefix, then restores it. Verify the data bytes are
+    /// intact after parsing by checking that a second parse of the same
+    /// data produces the same result.
+    function testParseStringMemoryRestoration(bytes memory data) external pure {
+        LibConformString.conformStringToMask(string(data), CMASK_STRING_LITERAL_TAIL, 0x80);
+        vm.assume(data.length > 0 && data.length < 32);
+        bytes memory wrapped = bytes(string.concat("\"", string(data), "\""));
+        ParseState memory state = LibParseState.newState(wrapped, "", "", "");
+        uint256 cursor = Pointer.unwrap(state.data.dataPointer());
+        uint256 end = Pointer.unwrap(state.data.endDataPointer());
+
+        (, bytes32 value1) = state.parseString(cursor, end);
+        // If memory was not restored, the data length or content would be
+        // corrupted and the second parse would produce a different result
+        // or revert.
+        (, bytes32 value2) = state.parseString(cursor, end);
+        assertEq(value1, value2, "memory restoration: values differ");
+        assertEq(state.data.length, wrapped.length, "memory restoration: data length corrupted");
+    }
+
     /// If any character in the string is not in the mask, the parser will error.
     function testParseStringLiteralCorrupt(bytes memory data, uint256 corruptIndex) external {
         vm.assume(data.length > 0);

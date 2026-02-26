@@ -99,4 +99,26 @@ contract LibParseLiteralStringBoundTest is Test {
             this.externalBoundLiteralForceLength(bytes(str), length);
         (outerStart, innerStart, innerEnd, outerEnd);
     }
+
+    /// UnclosedStringLiteral when end == innerEnd: the closing quote character
+    /// is at exactly the end boundary, so there is no room for it.
+    function testBoundStringUnclosedAtEndBoundary() external {
+        // "hi" — length 4. Force length to 3 so end points at the closing ".
+        // innerEnd scans "hi" (2 chars), lands at offset 3 which equals end.
+        bytes memory data = bytes("\"hi\"");
+        vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, 3));
+        this.externalBoundLiteralForceLength(data, 3);
+    }
+
+    /// Fuzz variant: any valid string with end set to exclude the closing
+    /// quote hits the end == innerEnd branch.
+    function testBoundStringUnclosedAtEndBoundaryFuzz(string memory str) external {
+        vm.assume(bytes(str).length > 0 && bytes(str).length < 0x20);
+        LibConformString.conformValidPrintableStringContent(str);
+        bytes memory data = bytes(string.concat("\"", str, "\""));
+        // Force length to data.length - 1, placing end at the closing ".
+        uint256 length = data.length - 1;
+        vm.expectRevert(abi.encodeWithSelector(UnclosedStringLiteral.selector, length));
+        this.externalBoundLiteralForceLength(data, length);
+    }
 }

@@ -28,32 +28,32 @@ contract RainterpreterReferenceExternRepeatTest is OpTest {
         checkHappy(bytes(string.concat(baseStr, "eighteight: [ref-extern-repeat-8 zz];")), expectedStack, "repeat 8 zz");
     }
 
-    /// Negative repeat count must revert.
+    /// Negative repeat count must revert with InvalidRepeatCount.
     function testRainterpreterReferenceExternRepeatNegative() external {
         RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();
         string memory baseStr = string.concat("using-words-from ", address(extern).toHexString(), " ");
 
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(InvalidRepeatCount.selector));
         bytes memory bytecode = I_DEPLOYER.parse2(bytes(string.concat(baseStr, "_: [ref-extern-repeat--1 abc];")));
         (bytecode);
     }
 
-    /// Non-integer repeat count (e.g. 1.5) must revert.
+    /// Non-integer repeat count (e.g. 1.5) must revert with InvalidRepeatCount.
     function testRainterpreterReferenceExternRepeatNonInteger() external {
         RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();
         string memory baseStr = string.concat("using-words-from ", address(extern).toHexString(), " ");
 
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(InvalidRepeatCount.selector));
         bytes memory bytecode = I_DEPLOYER.parse2(bytes(string.concat(baseStr, "_: [ref-extern-repeat-1.5 abc];")));
         (bytecode);
     }
 
-    /// Repeat count > 9 must revert.
+    /// Repeat count > 9 must revert with InvalidRepeatCount.
     function testRainterpreterReferenceExternRepeatTooLarge() external {
         RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();
         string memory baseStr = string.concat("using-words-from ", address(extern).toHexString(), " ");
 
-        vm.expectRevert();
+        vm.expectRevert(abi.encodeWithSelector(InvalidRepeatCount.selector));
         bytes memory bytecode = I_DEPLOYER.parse2(bytes(string.concat(baseStr, "_: [ref-extern-repeat-10 abc];")));
         (bytecode);
     }

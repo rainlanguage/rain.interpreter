@@ -273,14 +273,14 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A35-5: (LOW) No test for mixed-case hex parsing — added testParseHexMixedCase, testParseHexUpperCase, testParseHexLowerCase, testParseHexAlternatingCase
 - [FIXED] A36-1: (MEDIUM) No test for RepeatLiteralTooLong revert path — added fuzz test for length >= 78
 - [FIXED] A36-2: (MEDIUM) No test for parseRepeat output value correctness — added fuzz test asserting output against reference sum
-- [PENDING] A36-3: (LOW) No test for zero-length literal body (cursor == end)
-- [PENDING] A36-4: (LOW) No test for length = 1 (single character body)
-- [PENDING] A36-5: (LOW) No test for length = 77 (maximum valid length)
-- [PENDING] A36-6: (LOW) Integration tests use bare vm.expectRevert() without specifying expected error
-- [PENDING] A37-1: (LOW) No explicit test for `parseString` memory snapshot restoration
-- [PENDING] A37-3: (LOW) No test for `UnclosedStringLiteral` when `end == innerEnd`
+- [FIXED] A36-3: (LOW) No test for zero-length literal body (cursor == end) — covered by A36-2 fuzz test which fuzzes length 0-77
+- [FIXED] A36-4: (LOW) No test for length = 1 (single character body) — covered by A36-2 fuzz test
+- [FIXED] A36-5: (LOW) No test for length = 77 (maximum valid length) — covered by A36-2 fuzz test
+- [FIXED] A36-6: (LOW) Integration tests use bare vm.expectRevert() without specifying expected error — added InvalidRepeatCount selector to all three negative integration tests
+- [FIXED] A37-1: (LOW) No explicit test for `parseString` memory snapshot restoration — added testParseStringMemoryRestoration fuzz test that parses twice and verifies values match and data length is intact
+- [FIXED] A37-3: (LOW) No test for `UnclosedStringLiteral` when `end == innerEnd` — added testBoundStringUnclosedAtEndBoundary concrete test and fuzz variant targeting end at closing quote
 - [FIXED] A38-1: (MEDIUM) No test for `subParseLiteral` returning `(false, ...)` (sub-parser rejection) — added fuzz tests for first-rejects-second-accepts and all-reject paths
-- [PENDING] A38-2: (LOW) No fuzz test for the error paths
+- [DISMISSED] A38-2: (LOW) No fuzz test for the error paths — 9 concrete tests cover every error branch; fuzz would only generate variations hitting the same branches
 - [FIXED] A39-1: (MEDIUM) `handleOperandDisallowedAlwaysOne` has no test file or any test coverage — added tests for empty values returning 1 and non-empty values reverting
 - [PENDING] A39-2: (LOW) `handleOperand` (dispatch function) has no direct unit test
 - [PENDING] A39-3: (LOW) `parseOperand` -- no test for `UnclosedOperand` revert from yang state
