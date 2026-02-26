@@ -260,17 +260,17 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A32-3: (LOW) No test for `skipComment` when `cursor + 4 > end` — added testSkipCommentTooShort (2 bytes) and testSkipCommentThreeBytes (3 bytes)
 - [FIXED] A32-4: (LOW) No test for `skipWhitespace` in isolation — added testSkipWhitespaceClearsYang and testSkipWhitespaceAtEnd
 - [FIXED] A33-1: (MEDIUM) No direct unit test for `selectLiteralParserByIndex` — added direct test calling returned function pointer for hex, decimal, and string indices
-- [PENDING] A33-2: (LOW) No direct unit test for `tryParseLiteral` dispatch logic
-- [PENDING] A33-3: (LOW) No test for `parseLiteral` revert path
+- [FIXED] A33-2: (LOW) No direct unit test for `tryParseLiteral` dispatch logic — added LibParseLiteral.dispatch.t.sol with 24 tests covering all dispatch paths, value correctness, cursor advancement, and edge cases
+- [FIXED] A33-3: (LOW) No test for `parseLiteral` revert path — added testParseLiteralUnsupportedType and testParseLiteralHappyPath in same file
 - [FIXED] A34-1: (MEDIUM) No happy-path unit test for `parseDecimalFloatPacked` — added 47 happy-path cases covering zero, integers, negatives, positive/negative exponents, decimal points, no exponent, and large coefficients using float eq
-- [PENDING] A34-2: (LOW) No fuzz test for decimal parsing round-trip
-- [PENDING] A34-3: (LOW) No test for cursor position after successful parse
-- [PENDING] A34-4: (LOW) No test for decimal values with fractional parts
+- [UPSTREAM] A34-2: (LOW) No fuzz test for decimal parsing round-trip — covered by testParseLiteralDecimalFloatFuzz in rain.math.float/test/src/lib/parse/LibParseDecimalFloat.t.sol:108
+- [UPSTREAM] A34-3: (LOW) No test for cursor position after successful parse — covered by checkParseDecimalFloat helper in same upstream file which asserts cursorAfter on every call including fuzz test
+- [FIXED] A34-4: (LOW) No test for decimal values with fractional parts — already covered by A34-1 fix (1.5, 0.001, 123.456, 0.1, 99.99, etc.)
 - [FIXED] A35-1: (MEDIUM) No test for `HexLiteralOverflow` error — testParseHexOverflow with boundary at 65 digits
 - [FIXED] A35-2: (MEDIUM) No test for `ZeroLengthHexLiteral` error — fuzzed over non-hex trailing bytes
 - [FIXED] A35-3: (MEDIUM) No test for `OddLengthHexLiteral` error — fuzzed over odd lengths 1-63
-- [PENDING] A35-4: (LOW) No test for `MalformedHexLiteral` error
-- [PENDING] A35-5: (LOW) No test for mixed-case hex parsing
+- [DISMISSED] A35-4: (LOW) No test for `MalformedHexLiteral` error — unreachable defensive invariant; boundHex uses CMASK_HEX (= CMASK_NUMERIC_0_9 | CMASK_LOWER_ALPHA_A_F | CMASK_UPPER_ALPHA_A_F) to bound the region, same three masks used in nybble conversion
+- [FIXED] A35-5: (LOW) No test for mixed-case hex parsing — added testParseHexMixedCase, testParseHexUpperCase, testParseHexLowerCase, testParseHexAlternatingCase
 - [FIXED] A36-1: (MEDIUM) No test for RepeatLiteralTooLong revert path — added fuzz test for length >= 78
 - [FIXED] A36-2: (MEDIUM) No test for parseRepeat output value correctness — added fuzz test asserting output against reference sum
 - [PENDING] A36-3: (LOW) No test for zero-length literal body (cursor == end)

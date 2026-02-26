@@ -76,6 +76,44 @@ contract LibParseLiteralHexParseHexTest is Test {
         this.externalParseHex(data);
     }
 
+    /// Mixed-case hex digits parse to the correct value.
+    function testParseHexMixedCase() external pure {
+        // 0xAbCd = 0xabcd = 43981
+        bytes memory data = bytes("0xAbCd");
+        ParseState memory state = LibParseState.newState(data, "", "", "");
+        uint256 cursor = Pointer.unwrap(state.data.dataPointer());
+        (, bytes32 value) = state.parseHex(cursor, Pointer.unwrap(data.endDataPointer()));
+        assertEq(value, bytes32(uint256(0xAbCd)), "mixed case value");
+    }
+
+    /// All uppercase hex digits parse correctly.
+    function testParseHexUpperCase() external pure {
+        bytes memory data = bytes("0xABCDEF");
+        ParseState memory state = LibParseState.newState(data, "", "", "");
+        uint256 cursor = Pointer.unwrap(state.data.dataPointer());
+        (, bytes32 value) = state.parseHex(cursor, Pointer.unwrap(data.endDataPointer()));
+        assertEq(value, bytes32(uint256(0xABCDEF)), "upper case value");
+    }
+
+    /// All lowercase hex digits parse correctly.
+    function testParseHexLowerCase() external pure {
+        bytes memory data = bytes("0xabcdef");
+        ParseState memory state = LibParseState.newState(data, "", "", "");
+        uint256 cursor = Pointer.unwrap(state.data.dataPointer());
+        (, bytes32 value) = state.parseHex(cursor, Pointer.unwrap(data.endDataPointer()));
+        assertEq(value, bytes32(uint256(0xabcdef)), "lower case value");
+    }
+
+    /// Alternating case across all hex alpha digits.
+    function testParseHexAlternatingCase() external pure {
+        // aB cD eF Ab Cd Ef
+        bytes memory data = bytes("0xaBcDeFAbCdEf");
+        ParseState memory state = LibParseState.newState(data, "", "", "");
+        uint256 cursor = Pointer.unwrap(state.data.dataPointer());
+        (, bytes32 value) = state.parseHex(cursor, Pointer.unwrap(data.endDataPointer()));
+        assertEq(value, bytes32(uint256(0xaBcDeFAbCdEf)), "alternating case value");
+    }
+
     /// External wrapper that constructs ParseState internally so memory
     /// pointers remain valid across the external call boundary.
     function externalParseHex(bytes memory data) external pure returns (uint256, bytes32) {
