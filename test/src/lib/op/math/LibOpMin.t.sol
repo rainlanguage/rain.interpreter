@@ -252,6 +252,14 @@ contract LibOpMinTest is OpTest {
         checkHappy("_: min(-1.1 -1.0 0);", Float.unwrap(LibDecimalFloat.packLossless(-11, -1)), "-1.1 -1.0 0");
     }
 
+    function testOpMinZeroOutputs() external {
+        checkBadOutputs(": min(1 1);", 2, 1, 0);
+    }
+
+    function testOpMinTwoOutputs() external {
+        checkBadOutputs("_ _: min(1 1);", 2, 1, 2);
+    }
+
     /// Test the eval of `min` opcode parsed from a string.
     /// Tests that operands are disallowed.
     function testOpMinEvalOperandDisallowed() external {

@@ -240,8 +240,8 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A25-1: (LOW) LibOpInv missing test for division by zero (inv(0)) — added testOpInvEvalDivisionByZero verifying inv(0) reverts with DivisionByZero, and testOpInvEvalNegative for inv(-1)=-1, inv(-2)=-0.5
 - [FIXED] A25-2: (LOW) LibOpSub missing zero outputs and two outputs tests — added testOpSubZeroOutputs and testOpSubTwoOutputs using checkBadOutputs
 - [FIXED] A25-3: (LOW) LibOpSub missing operand handler test — added testOpSubEvalTwoOperandsDisallowed verifying two-operand syntax <0 0>, <0 1>, <1 0> reverts with UnexpectedOperandValue
-- [PENDING] A25-4: (LOW) LibOpMin missing zero outputs and two outputs tests
-- [PENDING] A25-5: (LOW) LibOpMax missing zero outputs test
+- [FIXED] A25-4: (LOW) LibOpMin missing zero outputs and two outputs tests — added testOpMinZeroOutputs and testOpMinTwoOutputs
+- [FIXED] A25-5: (LOW) LibOpMax missing zero outputs test — added testOpMaxZeroOutputs
 - [PENDING] A25-6: (LOW) LibOpSqrt missing test for negative input error path
 - [PENDING] A26-1: (LOW) Missing operand disallowed test for LibOpBlockNumber
 - [PENDING] A26-2: (LOW) Missing operand disallowed test for LibOpChainId
