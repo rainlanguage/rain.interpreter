@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {OpTest} from "test/abstract/OpTest.sol";
+import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 
 import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
@@ -59,5 +59,10 @@ contract LibOpChainIdTest is OpTest {
 
     function testOpChainIdTwoOutputs() external {
         checkBadOutputs("_ _: chain-id();", 0, 1, 2);
+    }
+
+    /// Test that operand is disallowed.
+    function testOpChainIdEvalOperandDisallowed() external {
+        checkUnhappyParse("_: chain-id<0>();", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

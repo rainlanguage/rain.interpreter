@@ -243,9 +243,9 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A25-4: (LOW) LibOpMin missing zero outputs and two outputs tests — added testOpMinZeroOutputs and testOpMinTwoOutputs
 - [FIXED] A25-5: (LOW) LibOpMax missing zero outputs test — added testOpMaxZeroOutputs
 - [FIXED] A25-6: (LOW) LibOpSqrt missing test for negative input error path — added testOpSqrtEvalNegativeInput verifying sqrt(-1) reverts with PowNegativeBase
-- [PENDING] A26-1: (LOW) Missing operand disallowed test for LibOpBlockNumber
-- [PENDING] A26-2: (LOW) Missing operand disallowed test for LibOpChainId
-- [PENDING] A26-3: (LOW) Missing operand disallowed test for LibOpTimestamp
+- [FIXED] A26-1: (LOW) Missing operand disallowed test for LibOpBlockNumber — added testOpBlockNumberEvalOperandDisallowed
+- [FIXED] A26-2: (LOW) Missing operand disallowed test for LibOpChainId — added testOpChainIdEvalOperandDisallowed
+- [FIXED] A26-3: (LOW) Missing operand disallowed test for LibOpTimestamp — added testOpBlockTimestampEvalOperandDisallowed and testOpNowEvalOperandDisallowed as separate tests
 - [PENDING] A28-1: (LOW) No test for get() caching side effect on read-only keys
 - [PENDING] A29-1: (LOW) LibOpMaxUint256 missing operand disallowed test
 - [FIXED] A30-1: (MEDIUM) No test triggers `ParenOverflow` error — testParenOverflow and testParenMaxNesting boundary tests added

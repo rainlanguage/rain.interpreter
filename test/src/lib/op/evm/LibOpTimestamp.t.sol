@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {OpTest} from "test/abstract/OpTest.sol";
+import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {Pointer, LibPointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
 import {LibInterpreterState} from "src/lib/state/LibInterpreterState.sol";
@@ -107,5 +107,15 @@ contract LibOpTimestampTest is OpTest {
         for (uint256 i; i < words.length; ++i) {
             checkBadOutputs(bytes(string.concat("_ _: ", words[i], "();")), 0, 1, 2);
         }
+    }
+
+    /// Test that operand is disallowed for block-timestamp.
+    function testOpBlockTimestampEvalOperandDisallowed() external {
+        checkUnhappyParse("_: block-timestamp<0>();", abi.encodeWithSelector(UnexpectedOperand.selector));
+    }
+
+    /// Test that operand is disallowed for now.
+    function testOpNowEvalOperandDisallowed() external {
+        checkUnhappyParse("_: now<0>();", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }
