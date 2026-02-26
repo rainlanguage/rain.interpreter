@@ -255,10 +255,10 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A30-5: (LOW) No test for `OPCODE_UNKNOWN` sub-parser bytecode construction boundary conditions — added testUnknownWordMaxLength (31-byte word), testUnknownWordMinLength (1-byte word), testUnknownWordWithOperandValues (operand data appended)
 - [FIXED] A31-1: (LOW) No direct unit tests for `parseErrorOffset` — added LibParseError.t.sol with testParseErrorOffsetFirstByte, testParseErrorOffsetLastByte, testParseErrorOffsetFuzz
 - [FIXED] A31-2: (LOW) No direct unit tests for `handleErrorSelector` — added testHandleErrorSelectorReverts (non-zero selector) and testHandleErrorSelectorZeroNoOp (zero selector no-op)
-- [PENDING] A32-1: (LOW) No direct unit tests for `skipComment`, `skipWhitespace`, or `parseInterstitial`
+- [FIXED] A32-1: (LOW) No direct unit tests for `skipComment`, `skipWhitespace`, or `parseInterstitial` — added testSkipCommentSetsYang, testSkipWhitespaceClearsYang, testSkipWhitespaceAtEnd, testParseInterstitialMixed, testParseInterstitialAtEnd
 - [FIXED] A32-2: (MEDIUM) `MalformedCommentStart` error path is never tested — fuzzed over all non-'*' second bytes
-- [PENDING] A32-3: (LOW) No test for `skipComment` when `cursor + 4 > end`
-- [PENDING] A32-4: (LOW) No test for `skipWhitespace` in isolation
+- [FIXED] A32-3: (LOW) No test for `skipComment` when `cursor + 4 > end` — added testSkipCommentTooShort (2 bytes) and testSkipCommentThreeBytes (3 bytes)
+- [FIXED] A32-4: (LOW) No test for `skipWhitespace` in isolation — added testSkipWhitespaceClearsYang and testSkipWhitespaceAtEnd
 - [FIXED] A33-1: (MEDIUM) No direct unit test for `selectLiteralParserByIndex` — added direct test calling returned function pointer for hex, decimal, and string indices
 - [PENDING] A33-2: (LOW) No direct unit test for `tryParseLiteral` dispatch logic
 - [PENDING] A33-3: (LOW) No test for `parseLiteral` revert path
