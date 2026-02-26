@@ -249,8 +249,8 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [DISMISSED] A28-1: (LOW) No test for get() caching side effect on read-only keys — already tested: testLibOpGetRunUnset verifies stateKV populated on miss (lines 59-64), testLibOpGetEvalKeyNotSet verifies kvs output includes cached value (lines 214-216). Finding acknowledges behavior is by design.
 - [FIXED] A29-1: (LOW) LibOpMaxUint256 missing operand disallowed test — added testOpMaxUint256EvalOperandDisallowed
 - [FIXED] A30-1: (MEDIUM) No test triggers `ParenOverflow` error — testParenOverflow and testParenMaxNesting boundary tests added
-- [PENDING] A30-2: (LOW) No test triggers `ParserOutOfBounds` error from `parse()`
-- [PENDING] A30-3: (LOW) No test for yang-state `UnexpectedRHSChar` in `parseRHS`
+- [DISMISSED] A30-2: (LOW) No test triggers `ParserOutOfBounds` error from `parse()` — untestable defensive invariant. All cursor advancement in parseInterstitial, parseLHS, parseRHS is bounded by end checks; no code path can advance cursor past end under the current implementation.
+- [FIXED] A30-3: (LOW) No test for yang-state `UnexpectedRHSChar` in `parseRHS` — added testParseUnexpectedRHSYangWordWord verifying consecutive words without whitespace reverts
 - [PENDING] A30-4: (LOW) No test for stack name fallback path in `parseRHS` via `stackNameIndex`
 - [PENDING] A30-5: (LOW) No test for `OPCODE_UNKNOWN` sub-parser bytecode construction boundary conditions
 - [PENDING] A31-1: (LOW) No direct unit tests for `parseErrorOffset`
