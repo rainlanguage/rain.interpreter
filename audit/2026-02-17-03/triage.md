@@ -251,7 +251,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A30-1: (MEDIUM) No test triggers `ParenOverflow` error — testParenOverflow and testParenMaxNesting boundary tests added
 - [DISMISSED] A30-2: (LOW) No test triggers `ParserOutOfBounds` error from `parse()` — untestable defensive invariant. All cursor advancement in parseInterstitial, parseLHS, parseRHS is bounded by end checks; no code path can advance cursor past end under the current implementation.
 - [FIXED] A30-3: (LOW) No test for yang-state `UnexpectedRHSChar` in `parseRHS` — added testParseUnexpectedRHSYangWordWord verifying consecutive words without whitespace reverts
-- [PENDING] A30-4: (LOW) No test for stack name fallback path in `parseRHS` via `stackNameIndex`
+- [FIXED] A30-4: (LOW) No test for stack name fallback path in `parseRHS` via `stackNameIndex` — added testParseNamedLHSStackNameOnly (sole RHS item) and testParseNamedLHSStackNameLastPosition (last position after literal)
 - [PENDING] A30-5: (LOW) No test for `OPCODE_UNKNOWN` sub-parser bytecode construction boundary conditions
 - [PENDING] A31-1: (LOW) No direct unit tests for `parseErrorOffset`
 - [PENDING] A31-2: (LOW) No direct unit tests for `handleErrorSelector`

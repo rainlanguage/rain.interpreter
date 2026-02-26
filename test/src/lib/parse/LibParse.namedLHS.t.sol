@@ -164,6 +164,66 @@ contract LibParseNamedLHSTest is ParseTest {
         assertEq(constants[2], Float.unwrap(LibDecimalFloat.packLossless(3, 0)));
     }
 
+    /// Stack name as the sole item on RHS of a line.
+    function testParseNamedLHSStackNameOnly() external view {
+        (bytes memory bytecode, bytes32[] memory constants) =
+            LibParseState.newState("a:1,b:a;", "", "", LibAllStandardOps.literalParserFunctionPointers()).parse();
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // offset 0
+            hex"0000"
+            // 2 ops
+            hex"02"
+            // 2 stack allocation
+            hex"02"
+            // 0 input
+            hex"00"
+            // 2 output
+            hex"02"
+            // constant 0
+            hex"01100000"
+            // stack 0
+            hex"00100000"
+        );
+        assertEq(constants.length, 1);
+        assertEq(constants[0], Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
+    }
+
+    /// Stack name at the last position on RHS after other items.
+    function testParseNamedLHSStackNameLastPosition() external view {
+        (bytes memory bytecode, bytes32[] memory constants) =
+            LibParseState.newState("a _:1 2,b c:3 a;", "", "", LibAllStandardOps.literalParserFunctionPointers()).parse();
+        assertEq(
+            bytecode,
+            // 1 source
+            hex"01"
+            // offset 0
+            hex"0000"
+            // 4 ops
+            hex"04"
+            // 4 stack allocation
+            hex"04"
+            // 0 input
+            hex"00"
+            // 4 output
+            hex"04"
+            // constant 0
+            hex"01100000"
+            // constant 1
+            hex"01100001"
+            // constant 2
+            hex"01100002"
+            // stack 0
+            hex"00100000"
+        );
+        assertEq(constants.length, 3);
+        assertEq(constants[0], Float.unwrap(LibDecimalFloat.packLossless(1, 0)));
+        assertEq(constants[1], Float.unwrap(LibDecimalFloat.packLossless(2, 0)));
+        assertEq(constants[2], Float.unwrap(LibDecimalFloat.packLossless(3, 0)));
+    }
+
     /// Duplicate names are disallowed in the same source.
     function testParseNamedErrorDuplicateSameSource() external {
         vm.expectRevert(abi.encodeWithSelector(DuplicateLHSItem.selector, 4));
