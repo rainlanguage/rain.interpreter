@@ -253,8 +253,8 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A30-3: (LOW) No test for yang-state `UnexpectedRHSChar` in `parseRHS` — added testParseUnexpectedRHSYangWordWord verifying consecutive words without whitespace reverts
 - [FIXED] A30-4: (LOW) No test for stack name fallback path in `parseRHS` via `stackNameIndex` — added testParseNamedLHSStackNameOnly (sole RHS item) and testParseNamedLHSStackNameLastPosition (last position after literal)
 - [FIXED] A30-5: (LOW) No test for `OPCODE_UNKNOWN` sub-parser bytecode construction boundary conditions — added testUnknownWordMaxLength (31-byte word), testUnknownWordMinLength (1-byte word), testUnknownWordWithOperandValues (operand data appended)
-- [PENDING] A31-1: (LOW) No direct unit tests for `parseErrorOffset`
-- [PENDING] A31-2: (LOW) No direct unit tests for `handleErrorSelector`
+- [FIXED] A31-1: (LOW) No direct unit tests for `parseErrorOffset` — added LibParseError.t.sol with testParseErrorOffsetFirstByte, testParseErrorOffsetLastByte, testParseErrorOffsetFuzz
+- [FIXED] A31-2: (LOW) No direct unit tests for `handleErrorSelector` — added testHandleErrorSelectorReverts (non-zero selector) and testHandleErrorSelectorZeroNoOp (zero selector no-op)
 - [PENDING] A32-1: (LOW) No direct unit tests for `skipComment`, `skipWhitespace`, or `parseInterstitial`
 - [FIXED] A32-2: (MEDIUM) `MalformedCommentStart` error path is never tested — fuzzed over all non-'*' second bytes
 - [PENDING] A32-3: (LOW) No test for `skipComment` when `cursor + 4 > end`
