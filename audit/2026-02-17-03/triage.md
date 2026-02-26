@@ -246,8 +246,8 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A26-1: (LOW) Missing operand disallowed test for LibOpBlockNumber — added testOpBlockNumberEvalOperandDisallowed
 - [FIXED] A26-2: (LOW) Missing operand disallowed test for LibOpChainId — added testOpChainIdEvalOperandDisallowed
 - [FIXED] A26-3: (LOW) Missing operand disallowed test for LibOpTimestamp — added testOpBlockTimestampEvalOperandDisallowed and testOpNowEvalOperandDisallowed as separate tests
-- [PENDING] A28-1: (LOW) No test for get() caching side effect on read-only keys
-- [PENDING] A29-1: (LOW) LibOpMaxUint256 missing operand disallowed test
+- [DISMISSED] A28-1: (LOW) No test for get() caching side effect on read-only keys — already tested: testLibOpGetRunUnset verifies stateKV populated on miss (lines 59-64), testLibOpGetEvalKeyNotSet verifies kvs output includes cached value (lines 214-216). Finding acknowledges behavior is by design.
+- [FIXED] A29-1: (LOW) LibOpMaxUint256 missing operand disallowed test — added testOpMaxUint256EvalOperandDisallowed
 - [FIXED] A30-1: (MEDIUM) No test triggers `ParenOverflow` error — testParenOverflow and testParenMaxNesting boundary tests added
 - [PENDING] A30-2: (LOW) No test triggers `ParserOutOfBounds` error from `parse()`
 - [PENDING] A30-3: (LOW) No test for yang-state `UnexpectedRHSChar` in `parseRHS`

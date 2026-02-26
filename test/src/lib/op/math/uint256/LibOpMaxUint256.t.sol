@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {OpTest} from "test/abstract/OpTest.sol";
+import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpMaxUint256} from "src/lib/op/math/uint256/LibOpMaxUint256.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
@@ -59,5 +59,10 @@ contract LibOpMaxUint256Test is OpTest {
 
     function testOpMaxUint256TwoOutputs() external {
         checkBadOutputs("_ _: uint256-max-value();", 0, 1, 2);
+    }
+
+    /// Test that operand is disallowed.
+    function testOpMaxUint256EvalOperandDisallowed() external {
+        checkUnhappyParse("_: uint256-max-value<0>();", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }
