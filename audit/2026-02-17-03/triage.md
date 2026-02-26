@@ -242,7 +242,7 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A25-3: (LOW) LibOpSub missing operand handler test — added testOpSubEvalTwoOperandsDisallowed verifying two-operand syntax <0 0>, <0 1>, <1 0> reverts with UnexpectedOperandValue
 - [FIXED] A25-4: (LOW) LibOpMin missing zero outputs and two outputs tests — added testOpMinZeroOutputs and testOpMinTwoOutputs
 - [FIXED] A25-5: (LOW) LibOpMax missing zero outputs test — added testOpMaxZeroOutputs
-- [PENDING] A25-6: (LOW) LibOpSqrt missing test for negative input error path
+- [FIXED] A25-6: (LOW) LibOpSqrt missing test for negative input error path — added testOpSqrtEvalNegativeInput verifying sqrt(-1) reverts with PowNegativeBase
 - [PENDING] A26-1: (LOW) Missing operand disallowed test for LibOpBlockNumber
 - [PENDING] A26-2: (LOW) Missing operand disallowed test for LibOpChainId
 - [PENDING] A26-3: (LOW) Missing operand disallowed test for LibOpTimestamp
