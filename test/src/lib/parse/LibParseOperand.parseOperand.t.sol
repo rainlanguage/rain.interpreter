@@ -287,4 +287,12 @@ contract LibParseOperandParseOperandTest is Test {
         vm.expectRevert(abi.encodeWithSelector(UnclosedOperand.selector, 6));
         this.checkParsingOperandFromData("<1 2 3;> 6", new bytes32[](0), 0);
     }
+
+    // Two literals back-to-back without whitespace hit the yang-state
+    // UnclosedOperand revert at line 111. After parsing `2`, yang is set,
+    // then `"` is a valid literal head but yang prevents parsing it.
+    function testParseOperandYangStateLiteralCollision() external {
+        vm.expectRevert(abi.encodeWithSelector(UnclosedOperand.selector, 4));
+        this.checkParsingOperandFromData("<1 2\"hi\">", new bytes32[](0), 0);
+    }
 }

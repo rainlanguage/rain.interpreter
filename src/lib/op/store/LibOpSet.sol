@@ -27,18 +27,16 @@ library LibOpSet {
     /// @param stackTop Pointer to the top of the stack.
     /// @return The new stack top pointer after execution.
     function run(InterpreterState memory state, OperandV2, Pointer stackTop) internal pure returns (Pointer) {
-        unchecked {
-            bytes32 key;
-            bytes32 value;
-            assembly ("memory-safe") {
-                key := mload(stackTop)
-                value := mload(add(stackTop, 0x20))
-                stackTop := add(stackTop, 0x40)
-            }
-
-            state.stateKV = state.stateKV.set(MemoryKVKey.wrap(key), MemoryKVVal.wrap(value));
-            return stackTop;
+        bytes32 key;
+        bytes32 value;
+        assembly ("memory-safe") {
+            key := mload(stackTop)
+            value := mload(add(stackTop, 0x20))
+            stackTop := add(stackTop, 0x40)
         }
+
+        state.stateKV = state.stateKV.set(MemoryKVKey.wrap(key), MemoryKVVal.wrap(value));
+        return stackTop;
     }
 
     /// @notice Reference implementation of `set` for testing.

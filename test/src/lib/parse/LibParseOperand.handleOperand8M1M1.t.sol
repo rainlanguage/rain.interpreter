@@ -76,6 +76,22 @@ contract LibParseOperandHandleOperand8M1M1Test is Test {
         assertEq(OperandV2.unwrap(LibParseOperand.handleOperand8M1M1(values)), bytes32((c << 9) | (b << 8) | a));
     }
 
+    // If all the values are provided but the first is greater than 1 byte, it
+    // is an error.
+    function testHandleOperand8M1M1AllValuesFirstValueTooLarge(int256 a, uint256 b, uint256 c) external {
+        a = bound(a, int256(uint256(type(uint8).max)) + 1, type(int128).max);
+        b = bound(b, 0, 1);
+        c = bound(c, 0, 1);
+
+        bytes32[] memory values = new bytes32[](3);
+        //forge-lint: disable-next-line(unsafe-typecast)
+        values[0] = bytes32(uint256(a));
+        values[1] = bytes32(b);
+        values[2] = bytes32(c);
+        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
+        this.handleOperand8M1M1External(values);
+    }
+
     // If all the values are provided, the first is 1 byte, the second is 1 bit
     // but the third is greater than 1 bit, it is an error.
     function testHandleOperand8M1M1AllValuesThirdValueTooLarge(uint256 a, uint256 b, uint256 c) external {

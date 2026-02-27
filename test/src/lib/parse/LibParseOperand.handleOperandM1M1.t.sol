@@ -60,6 +60,19 @@ contract LibParseOperandHandleOperandM1M1Test is Test {
         this.handleOperandM1M1External(values);
     }
 
+    // If two values are provided and the first is greater than 1 bit, it is
+    // an error.
+    function testHandleOperandM1M1TwoValuesFirstValueTooLarge(uint256 a, uint256 b) external {
+        a = bound(a, 2, uint256(int256(type(int128).max)));
+        b = bound(b, 0, 1);
+
+        bytes32[] memory values = new bytes32[](2);
+        values[0] = bytes32(a);
+        values[1] = bytes32(b);
+        vm.expectRevert(abi.encodeWithSelector(OperandOverflow.selector));
+        this.handleOperandM1M1External(values);
+    }
+
     // If more than two values are provided, it is an error.
     function testHandleOperandM1M1ManyValues(bytes32[] memory values) external {
         vm.assume(values.length > 2);

@@ -104,12 +104,12 @@ contract RainterpreterParser is ERC165, IParserToolingV1 {
     }
 
     /// External function to build the operand handler function pointers.
-    function buildOperandHandlerFunctionPointers() external pure returns (bytes memory) {
+    function buildOperandHandlerFunctionPointers() external pure override returns (bytes memory) {
         return LibAllStandardOps.operandHandlerFunctionPointers();
     }
 
     /// External function to build the literal parser function pointers.
-    function buildLiteralParserFunctionPointers() external pure returns (bytes memory) {
+    function buildLiteralParserFunctionPointers() external pure override returns (bytes memory) {
         return LibAllStandardOps.literalParserFunctionPointers();
     }
 }
