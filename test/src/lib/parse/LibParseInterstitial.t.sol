@@ -20,6 +20,8 @@ contract LibParseInterstitialTest is Test {
     /// UnclosedComment check first.
     function testMalformedCommentStart(uint8 secondByte) external {
         vm.assume(secondByte != 0x2A); // not '*'
+        // Safe: single-byte values fit in bytes1; "*/" fits in bytes2.
+        //forge-lint: disable-next-line(unsafe-typecast)
         bytes memory data = abi.encodePacked(bytes1("/"), bytes1(secondByte), bytes2("*/"));
 
         vm.expectRevert(abi.encodeWithSelector(MalformedCommentStart.selector, 0));
@@ -59,6 +61,8 @@ contract LibParseInterstitialTest is Test {
         assembly ("memory-safe") {
             charAtCursor := byte(0, mload(cursor))
         }
+        // Safe: "x" is a single ASCII character.
+        //forge-lint: disable-next-line(unsafe-typecast)
         assertEq(charAtCursor, uint256(uint8(bytes1("x"))), "cursor at x");
     }
 
@@ -75,6 +79,8 @@ contract LibParseInterstitialTest is Test {
         assembly ("memory-safe") {
             charAtCursor := byte(0, mload(cursor))
         }
+        // Safe: "x" is a single ASCII character.
+        //forge-lint: disable-next-line(unsafe-typecast)
         assertEq(charAtCursor, uint256(uint8(bytes1("x"))), "cursor at x");
     }
 
@@ -98,6 +104,8 @@ contract LibParseInterstitialTest is Test {
         assembly ("memory-safe") {
             charAtCursor := byte(0, mload(cursor))
         }
+        // Safe: "x" is a single ASCII character.
+        //forge-lint: disable-next-line(unsafe-typecast)
         assertEq(charAtCursor, uint256(uint8(bytes1("x"))), "cursor at x");
     }
 
@@ -122,6 +130,8 @@ contract LibParseInterstitialTest is Test {
         assembly ("memory-safe") {
             charAtCursor := byte(0, mload(cursor))
         }
+        // Safe: "x" is a single ASCII character.
+        //forge-lint: disable-next-line(unsafe-typecast)
         assertEq(charAtCursor, uint256(uint8(bytes1("x"))), "cursor at x after all ws types");
     }
 
@@ -136,6 +146,8 @@ contract LibParseInterstitialTest is Test {
         assembly ("memory-safe") {
             charAtCursor := byte(0, mload(cursor))
         }
+        // Safe: "x" is a single ASCII character.
+        //forge-lint: disable-next-line(unsafe-typecast)
         assertEq(charAtCursor, uint256(uint8(bytes1("x"))), "cursor at x after content comment");
     }
 
@@ -161,6 +173,8 @@ contract LibParseInterstitialTest is Test {
         assembly ("memory-safe") {
             charAtCursor := byte(0, mload(cursor))
         }
+        // Safe: "x" is a single ASCII character.
+        //forge-lint: disable-next-line(unsafe-typecast)
         assertEq(charAtCursor, uint256(uint8(bytes1("x"))), "cursor at x after multiple comments");
     }
 }

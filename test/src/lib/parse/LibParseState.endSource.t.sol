@@ -105,6 +105,8 @@ contract LibParseStateEndSourceTest is Test {
         ParseState memory state = LibParseState.newState("", "", "", "");
 
         for (uint256 i = 0; i < opCount; i++) {
+            // Safe: i % 256 fits in uint8 by definition.
+            //forge-lint: disable-next-line(unsafe-typecast)
             state.pushOpToSource(uint8(i % 256), OperandV2.wrap(bytes32(uint256(i))));
         }
         state.endSource();

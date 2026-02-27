@@ -51,6 +51,8 @@ contract LibParseLiteralHexParseHexTest is Test {
         if (trailingByte >= 0x41) trailingByte += 6; // skip A-F
         if (trailingByte >= 0x61) trailingByte += 6; // skip a-f
 
+        // Safe: "0x" fits in bytes2; trailingByte is uint8.
+        //forge-lint: disable-next-line(unsafe-typecast)
         bytes memory data = abi.encodePacked(bytes2("0x"), bytes1(trailingByte));
 
         vm.expectRevert(abi.encodeWithSelector(ZeroLengthHexLiteral.selector, 2));

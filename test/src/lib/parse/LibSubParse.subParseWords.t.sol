@@ -31,7 +31,10 @@ contract ContextReturningSubParser is ISubParserV4, IERC165 {
     /// @notice Returns a context opcode (0,0) with no constants.
     function subParseWord2(bytes calldata) external pure override returns (bool, bytes memory, bytes32[] memory) {
         bytes memory bytecode = new bytes(4);
+        // Safe: opcode constant and IO byte are small known values.
+        //forge-lint: disable-next-line(unsafe-typecast)
         bytecode[0] = bytes1(uint8(OPCODE_CONTEXT));
+        //forge-lint: disable-next-line(unsafe-typecast)
         bytecode[1] = bytes1(uint8(0x10)); // 0 inputs, 1 output
         bytecode[2] = bytes1(0); // row 0
         bytecode[3] = bytes1(0); // column 0
@@ -81,6 +84,8 @@ contract LibSubParseSubParseWordsTest is Test {
     function testSubParseWordsSingleSourceNoUnknown() external view {
         ParseState memory state = LibParseState.newState("", "", "", "");
         bytes memory bytecode = buildSingleOpBytecode(
+            // Safe: OPCODE_CONSTANT fits in uint8.
+            //forge-lint: disable-next-line(unsafe-typecast)
             uint8(OPCODE_CONSTANT), 0x10, 0x0000
         );
         (bytes memory result, bytes32[] memory constants) = state.subParseWords(bytecode);
@@ -169,12 +174,16 @@ contract LibSubParseSubParseWordsTest is Test {
     /// @notice Multiple known opcodes in a single source are not modified.
     function testSubParseWordsMultipleKnownOpcodes() external view {
         ParseState memory state = LibParseState.newState("", "", "", "");
+        // Safe: opcode constants fit in uint8.
+        //forge-lint: disable-next-line(unsafe-typecast)
         bytes memory bytecode = abi.encodePacked(
             uint8(1),            // 1 source
             uint16(0),           // relative offset = 0
             uint8(2),            // ops count = 2
             uint8(0), uint8(0), uint8(0), // stack tracker
+            //forge-lint: disable-next-line(unsafe-typecast)
             uint8(OPCODE_CONSTANT), uint8(0x10), uint16(0),
+            //forge-lint: disable-next-line(unsafe-typecast)
             uint8(OPCODE_CONTEXT), uint8(0x10), uint16(0)
         );
         (bytes memory result, bytes32[] memory constants) = state.subParseWords(bytecode);

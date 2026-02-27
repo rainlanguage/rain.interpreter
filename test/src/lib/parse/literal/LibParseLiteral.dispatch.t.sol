@@ -149,8 +149,11 @@ contract LibParseLiteralDispatchTest is Test {
 
     /// Multiple unrecognized characters all return false.
     function testTryParseLiteralUnrecognizedMultiple() external view {
+        // Safe: single ASCII characters fit in bytes1.
+        //forge-lint: disable-next-line(unsafe-typecast)
         bytes1[4] memory chars = [bytes1("@"), bytes1("!"), bytes1("#"), bytes1("$")];
         for (uint256 i = 0; i < chars.length; i++) {
+            //forge-lint: disable-next-line(unsafe-typecast)
             (bool success,,) = this.externalTryParseLiteral(abi.encodePacked(chars[i], bytes1(" ")));
             assertFalse(success, string(abi.encodePacked("unrecognized: ", chars[i])));
         }

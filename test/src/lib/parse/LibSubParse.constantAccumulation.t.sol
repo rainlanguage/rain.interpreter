@@ -33,9 +33,15 @@ contract ConstantReturningSubParser is ISubParserV4, IERC165 {
 
         // Build 4-byte constant opcode: [OPCODE_CONSTANT][IO=0x10][operand=constantsHeight]
         bytes memory bytecode = new bytes(4);
+        // Safe: opcode constants and IO byte are small known values that fit
+        // in uint8/bytes1.
+        //forge-lint: disable-next-line(unsafe-typecast)
         bytecode[0] = bytes1(uint8(OPCODE_CONSTANT));
+        //forge-lint: disable-next-line(unsafe-typecast)
         bytecode[1] = bytes1(uint8(0x10)); // 0 inputs, 1 output
+        //forge-lint: disable-next-line(unsafe-typecast)
         bytecode[2] = bytes1(uint8(constantsHeight >> 8));
+        //forge-lint: disable-next-line(unsafe-typecast)
         bytecode[3] = bytes1(uint8(constantsHeight));
 
         bytes32[] memory constants = new bytes32[](1);
@@ -64,9 +70,15 @@ contract MultiConstantSubParser is ISubParserV4, IERC165 {
         uint256 constantsHeight = uint256(uint16(bytes2(data[0:2])));
 
         bytes memory bytecode = new bytes(4);
+        // Safe: opcode constants and IO byte are small known values that fit
+        // in uint8/bytes1.
+        //forge-lint: disable-next-line(unsafe-typecast)
         bytecode[0] = bytes1(uint8(OPCODE_CONSTANT));
+        //forge-lint: disable-next-line(unsafe-typecast)
         bytecode[1] = bytes1(uint8(0x10));
+        //forge-lint: disable-next-line(unsafe-typecast)
         bytecode[2] = bytes1(uint8(constantsHeight >> 8));
+        //forge-lint: disable-next-line(unsafe-typecast)
         bytecode[3] = bytes1(uint8(constantsHeight));
 
         bytes32[] memory constants = new bytes32[](2);

@@ -55,6 +55,8 @@ contract LibParseStateBuildBytecodeTest is Test {
             uint256 nOps = bound(uint256(keccak256(abi.encode(opsPerSourceSeed, s))), 1, 20);
             expectedOps[s] = nOps;
             for (uint256 j = 0; j < nOps; j++) {
+                // Safe: j % 256 fits in uint8 by definition.
+                //forge-lint: disable-next-line(unsafe-typecast)
                 state.pushOpToSource(uint8(j % 256), OperandV2.wrap(bytes32(uint256(j))));
             }
             state.endSource();
