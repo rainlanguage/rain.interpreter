@@ -790,28 +790,28 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [DISMISSED] A49-3: (LOW) `matchSubParseLiteralDispatch` narrows view to pure — correct Solidity override semantics, intentional constraint
 - [DISMISSED] R01-1: (HIGH) Duplicate short flag `-i` on both `fork_url` and `fork_block_number` in fork.rs causes clap runtime panic — false positive; no collision
 - [DISMISSED] R01-2: (MEDIUM) Unused dependencies `serde` and `serde_bytes` in CLI crate Cargo.toml — false positive; neither dependency exists in CLI Cargo.toml
-- [PENDING] R01-3: (LOW) Incorrect `homepage` URL in CLI Cargo.toml points to `rain.orderbook` instead of `rain.interpreter`
-- [PENDING] R01-4: (LOW) Inconsistent error handling pattern between eval.rs and parse.rs wraps errors with `anyhow!` losing original error chain
+- [FIXED] R01-3: (LOW) Incorrect `homepage` URL in CLI Cargo.toml points to `rain.orderbook` instead of `rain.interpreter` — fixed URL and switched to workspace reference
+- [FIXED] R01-4: (LOW) Inconsistent error handling pattern between eval.rs and parse.rs wraps errors with `anyhow!` losing original error chain — replaced `anyhow!("{:?}", e)` with `anyhow!(e)` to preserve error chain
 - [DISMISSED] R01-5: (LOW) Eval output uses Debug formatting — CLI UX issue, proper fix requires JSON serialization feature work
 - [DISMISSED] R01-6: (LOW) `Execute` trait non-Send futures — execute() called directly in main, not spawned
 - [DISMISSED] R02-1: (MEDIUM) `unwrap()` on `traces` in `From<ForkTypedReturn<eval4Call>>` for `RainEvalResult` will panic if traces are None — false positive; impl is TryFrom with .ok_or(MissingTraces)?, not From with unwrap
-- [PENDING] R02-2: (LOW) Redundant `.to_owned()`, `.deref()`, `.clone()` chain in trace extraction creates multiple unnecessary copies
-- [PENDING] R02-3: (LOW) Inconsistent trace ordering approach between `From<ForkTypedReturn>` and `TryFrom<RawCallResult>` implementations
+- [FIXED] R02-2: (LOW) Redundant `.to_owned()`, `.deref()`, `.clone()` chain in trace extraction creates multiple unnecessary copies — simplified to `.nodes().iter()`, removed unused `Deref` import
+- [FIXED] R02-3: (LOW) Inconsistent trace ordering approach between `From<ForkTypedReturn>` and `TryFrom<RawCallResult>` implementations — both now use `.rev()` on iterator
 - [DISMISSED] R02-4: (MEDIUM) `search_trace_by_path` has logic bug in parent tracking — false positive; code correctly does current_parent_index = current_source_index at line 180
-- [PENDING] R02-5: (LOW) `CreateNamespace` is an empty struct used only as function namespace; should be a free function
-- [PENDING] R02-6: (LOW) Typo "commiting" should be "committing" in doc comments for `alloy_call` and `call`
-- [PENDING] R02-7: (LOW) `#[allow(clippy::for_kv_map)]` suppresses valid lint; should use `.values()` instead
-- [PENDING] R02-8: (LOW) `add_or_select` uses `unwrap()` on `fork_evm_env` where `new_with_fork` uses `?` for same call
-- [PENDING] R02-9: (LOW) `TryFrom<RawCallResult>` for `RainEvalResult` always produces empty `stack` and `writes` without documenting this limitation
-- [PENDING] R02-10: (LOW) `#[derive]` placed before doc comments in `ForkEvalArgs` and `ForkParseArgs` is unconventional
-- [PENDING] R02-11: (LOW) `roll_fork` uses `unwrap()` after `is_none()` check instead of idiomatic `if let Some`
-- [PENDING] R03-1: (LOW) Unused dependencies `serde` and `serde_json` in parser crate Cargo.toml
-- [PENDING] R03-2: (LOW) Unused dependency `serde_json` in test_fixtures crate Cargo.toml
+- [FIXED] R02-5: (LOW) `CreateNamespace` is an empty struct used only as function namespace; should be a free function — converted to free function `qualify_namespace`, updated call sites
+- [FIXED] R02-6: (LOW) Typo "commiting" should be "committing" in doc comments for `alloy_call` and `call` — corrected both occurrences
+- [FIXED] R02-7: (LOW) `#[allow(clippy::for_kv_map)]` suppresses valid lint; should use `.values()` instead — replaced with `.values()` iteration
+- [FIXED] R02-8: (LOW) `add_or_select` uses `unwrap()` on `fork_evm_env` where `new_with_fork` uses `?` for same call — replaced with `?`
+- [FIXED] R02-9: (LOW) `TryFrom<RawCallResult>` for `RainEvalResult` always produces empty `stack` and `writes` without documenting this limitation — added doc comment explaining why
+- [FIXED] R02-10: (LOW) `#[derive]` placed before doc comments in `ForkEvalArgs` and `ForkParseArgs` is unconventional — moved doc comments before `#[derive]`
+- [FIXED] R02-11: (LOW) `roll_fork` uses `unwrap()` after `is_none()` check instead of idiomatic `if let Some` — replaced with `.ok_or()?.unwrap_or()`
+- [FIXED] R03-1: (LOW) Unused dependencies `serde` and `serde_json` in parser crate Cargo.toml — removed both
+- [FIXED] R03-2: (LOW) Unused dependency `serde_json` in test_fixtures crate Cargo.toml — removed
 - [DISMISSED] R03-3: (MEDIUM) Edition inconsistency — false positive; parser and dispair both hardcode edition = "2024" matching workspace, not 2021
-- [PENDING] R03-4: (LOW) Homepage URL inconsistency — parser and dispair use `rainlanguage` org instead of workspace `rainprotocol`
+- [FIXED] R03-4: (LOW) Homepage URL inconsistency — workspace had wrong org `rainprotocol`, corrected to `rainlanguage`; parser/dispair/cli now use `homepage.workspace = true`
 - [DISMISSED] R03-5: (MEDIUM) Duplicated `Parser2` trait — intentional Send bound difference between targets, duplication clearer than macro alternatives
-- [PENDING] R03-6: (LOW) `DISPaiR` doc comment mentions "Registry" but struct has no registry field
+- [FIXED] R03-6: (LOW) `DISPaiR` doc comment mentions "Registry" but struct has no registry field — removed "Registry" from doc comment
 - [DISMISSED] R03-7: (LOW) Excessive `unwrap()` in test fixtures — standard test-code practice, stack traces sufficient
 - [DISMISSED] R03-8: (MEDIUM) `parse_pragma_text` is an inherent method while `parse_text` is a trait method creating asymmetry — false positive; both are trait methods with default implementations
-- [PENDING] R03-9: (LOW) `DISPaiR` struct lacks `Debug` derive which is unusual for data-carrying struct
-- [PENDING] R03-10: (LOW) Cargo.toml metadata inconsistency — parser and dispair hardcode license instead of using workspace
+- [FIXED] R03-9: (LOW) `DISPaiR` struct lacks `Debug` derive which is unusual for data-carrying struct — added `Debug` derive
+- [FIXED] R03-10: (LOW) Cargo.toml metadata inconsistency — parser and dispair hardcode license instead of using workspace — switched to `edition.workspace`, `license.workspace`, `homepage.workspace`

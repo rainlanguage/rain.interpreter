@@ -5,8 +5,8 @@ use rain_interpreter_bindings::IInterpreterStoreV3::FullyQualifiedNamespace;
 use rain_interpreter_bindings::IInterpreterV4::{EvalV4, eval4Call};
 use rain_interpreter_bindings::IParserV2::parse2Call;
 
-#[derive(Debug, Clone)]
 /// Arguments for evaluating a Rainlang string in a forked EVM context
+#[derive(Debug, Clone)]
 pub struct ForkEvalArgs {
     /// The Rainalang string to evaluate
     pub rainlang_string: String,
@@ -30,8 +30,8 @@ pub struct ForkEvalArgs {
     pub state_overlay: Vec<U256>,
 }
 
-#[derive(Debug, Clone)]
 /// Arguments for parsing a Rainlang string in a forked EVM context
+#[derive(Debug, Clone)]
 pub struct ForkParseArgs {
     /// The Rainlang string to parse
     pub rainlang_string: String,

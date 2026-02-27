@@ -5489,8 +5489,6 @@ dependencies = [
  "alloy-ethers-typecast",
  "rain_interpreter_bindings",
  "rain_interpreter_dispair",
- "serde",
- "serde_json",
  "thiserror 1.0.69",
  "tokio",
 ]
@@ -5501,7 +5499,6 @@ version = "0.0.0"
 dependencies = [
  "alloy",
  "getrandom 0.2.16",
- "serde_json",
 ]
 
 [[package]]

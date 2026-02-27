@@ -58,7 +58,7 @@ impl Execute for Parse {
                 self.output_encoding.clone(),
                 res.raw.result.to_owned().to_vec().as_slice(),
             ),
-            Err(e) => Err(anyhow!("Error: {:?}", e)),
+            Err(e) => Err(anyhow!(e)),
         }
     }
 }

@@ -192,7 +192,7 @@ impl Forker {
             let create_fork = CreateFork {
                 url: fork_url.to_string(),
                 enable_caching: true,
-                env: evm_opts.fork_evm_env(&fork_url).await.unwrap().0,
+                env: evm_opts.fork_evm_env(&fork_url).await?.0,
                 evm_opts,
             };
             let block_number = if let Some(block_number) = fork_block_number {
@@ -222,7 +222,7 @@ impl Forker {
         }
     }
 
-    /// Calls the forked EVM without commiting to state using alloy typed arguments.
+    /// Calls the forked EVM without committing to state using alloy typed arguments.
     /// # Arguments
     /// * `from_address` - The address to call from.
     /// * `to_address` - The address to call to.
@@ -304,7 +304,7 @@ impl Forker {
         Ok(ForkTypedReturn { raw, typed_return })
     }
 
-    /// Calls the forked EVM without commiting to state.
+    /// Calls the forked EVM without committing to state.
     /// # Arguments
     /// * `from_address` - The address to call from.
     /// * `to_address` - The address to call to.
@@ -381,18 +381,16 @@ impl Forker {
             .ok_or(ForkCallError::ExecutorError("no active fork!".to_owned()))?;
         let mut org_block_number = None;
         let mut spec_id = SpecId::default();
-        #[allow(clippy::for_kv_map)]
-        for (_fork_id, (local_id, sid, bnumber)) in &self.forks {
+        for (local_id, sid, bnumber) in self.forks.values() {
             if *local_id == active_fork_local_id {
                 spec_id = *sid;
                 org_block_number = Some(*bnumber);
                 break;
             }
         }
-        if org_block_number.is_none() {
-            return Err(ForkCallError::ExecutorError("no active fork!".to_owned()));
-        }
-        let block_number = block_number.unwrap_or(org_block_number.unwrap());
+        let org_block_number =
+            org_block_number.ok_or(ForkCallError::ExecutorError("no active fork!".to_owned()))?;
+        let block_number = block_number.unwrap_or(org_block_number);
 
         self.executor.env_mut().evm_env.block_env.number = block_number;
 
@@ -511,7 +509,7 @@ impl Forker {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::namespace::CreateNamespace;
+    use crate::namespace::qualify_namespace;
     use alloy::eips::BlockNumberOrTag;
     use alloy::sol;
     use alloy::{
@@ -589,7 +587,7 @@ mod tests {
             .unwrap();
 
         let fully_quallified_namespace =
-            CreateNamespace::qualify_namespace(namespace.into(), from_address);
+            qualify_namespace(namespace.into(), from_address);
 
         let get = forker
             .alloy_call(

@@ -124,14 +124,14 @@ impl Execute for Eval {
         match result {
             Ok(res) => {
                 let rain_eval_result: RainEvalResult =
-                    res.try_into().map_err(|e| anyhow!("{:?}", e))?;
+                    res.try_into().map_err(|e: rain_interpreter_eval::trace::RainEvalResultFromRawCallResultError| anyhow!(e))?;
                 crate::output::output(
                     &self.output_path,
                     SupportedOutputEncoding::Binary,
                     format!("{:#?}", rain_eval_result).as_bytes(),
                 )
             }
-            Err(e) => Err(anyhow!("Error: {:?}", e)),
+            Err(e) => Err(anyhow!(e)),
         }
     }
 }

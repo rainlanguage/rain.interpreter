@@ -1,8 +1,8 @@
 use alloy::primitives::*;
 
 /// DISPaiR
-/// Struct representing Deployer/Interpreter/Store/Parser/Registry instances.
-#[derive(Clone, Default)]
+/// Struct representing Deployer/Interpreter/Store/Parser instances.
+#[derive(Debug, Clone, Default)]
 pub struct DISPaiR {
     pub deployer: Address,
     pub interpreter: Address,

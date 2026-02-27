@@ -7,8 +7,6 @@ use foundry_evm::executors::RawCallResult;
 use rain_interpreter_bindings::IInterpreterV4::{eval4Call, eval4Return};
 use revm::primitives::address;
 use serde::{Deserialize, Serialize};
-#[cfg(not(target_family = "wasm"))]
-use std::ops::Deref;
 use thiserror::Error;
 #[cfg(target_family = "wasm")]
 use wasm_bindgen_utils::{impl_wasm_traits, prelude::*};
@@ -76,12 +74,9 @@ impl TryFrom<ForkTypedReturn<eval4Call>> for RainEvalResult {
         let call_trace_arena = typed_return
             .raw
             .traces
-            .ok_or(RainEvalResultFromRawCallResultError::MissingTraces)?
-            .to_owned();
-        let mut traces: Vec<RainSourceTrace> = call_trace_arena
-            .deref()
-            .clone()
-            .into_nodes()
+            .ok_or(RainEvalResultFromRawCallResultError::MissingTraces)?;
+        let traces: Vec<RainSourceTrace> = call_trace_arena
+            .nodes()
             .iter()
             .filter_map(|trace_node| {
                 if Address::from(trace_node.trace.address.into_array()) == RAIN_TRACER_ADDRESS {
@@ -90,8 +85,8 @@ impl TryFrom<ForkTypedReturn<eval4Call>> for RainEvalResult {
                     None
                 }
             })
+            .rev()
             .collect();
-        traces.reverse();
 
         Ok(RainEvalResult {
             reverted: typed_return.raw.reverted,
@@ -108,6 +103,8 @@ pub enum RainEvalResultFromRawCallResultError {
     MissingTraces,
 }
 
+/// Note: `RawCallResult` does not contain ABI-decoded stack/writes, so these
+/// fields are left empty. Only traces are populated from the call trace arena.
 #[cfg(not(target_family = "wasm"))]
 impl TryFrom<RawCallResult> for RainEvalResult {
     type Error = RainEvalResultFromRawCallResultError;
