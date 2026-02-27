@@ -721,7 +721,7 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 
 - [FIXED] A01-1: (LOW) Dead `using` directives and unused imports (LibStackPointer, LibUint256Array, Pointer) in BaseRainterpreterExtern — removed all 4 using directives and 3 imports
 - [DISMISSED] A01-2: (LOW) Inconsistent assembly idioms for function pointer extraction — idiom differences arise from different offset calculations, unifying changes bytecode with no safety benefit
-- [PENDING] A01-3: (LOW) Error `SubParserIndexOutOfBounds` defined inline in BaseRainterpreterSubParser instead of in `src/error/ErrSubParse.sol`
+- [FIXED] A01-3: (LOW) Error `SubParserIndexOutOfBounds` defined inline in BaseRainterpreterSubParser instead of in `src/error/ErrSubParse.sol` — moved to ErrSubParse.sol, updated import
 - [DISMISSED] A01-4: (LOW) Inconsistent mutability between `opcodeFunctionPointers` (view) and `integrityFunctionPointers` (pure) — view may be intentional for override flexibility
 - [FIXED] A03-1: (LOW) `MalformedExponentDigits` and `MalformedDecimalPoint` errors are unused dead code in ErrParse.sol — removed both
 - [FIXED] A03-2: (LOW) Inconsistent NatSpec `@dev` usage across error files; ErrSubParse uses `@dev` while others use plain `///` — removed `@dev` from all 3 errors
@@ -731,16 +731,16 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [FIXED] A03-6: (LOW) `DuplicateLHSItem` is the only error in ErrParse.sol using `@dev` prefix, inconsistent with all other errors in the file — removed `@dev`
 - [DISMISSED] A04-1: (LOW) `LibOpCall` is missing `referenceFn` — call opcode cannot have a meaningful referenceFn, it would duplicate run
 - [FIXED] A04-2: (LOW) Unused `using LibPointer for Pointer` declaration and import in LibOpCall — removed using directive and LibPointer import
-- [PENDING] A05-1: (LOW) Magic numbers throughout `evalLoop` assembly shared with LibIntegrityCheck should be named constants
+- [DISMISSED] A05-1: (LOW) Magic numbers throughout `evalLoop` assembly shared with LibIntegrityCheck should be named constants — EVM word-size intrinsics and unrolled loop byte positions; named constants would make the loop harder to verify visually; existing comments adequate
 - [FIXED] A05-2: (LOW) Stale reference to variable name `tail` instead of `stack` in `eval2` NatSpec comment in LibEval — corrected to `stack`
 - [DISMISSED] A06-1: (LOW) Inconsistent constant sourcing for context ops — rainlen constants are application-specific (different context column), local definition is appropriate
 - [DISMISSED] A06-2: (LOW) Inconsistent function mutability across subParser functions — mutability difference structurally required, address(this) requires view
-- [PENDING] A06-3: (LOW) Magic number in LibExternOpIntInc.run for decimal float value 1 should use named constant
-- [PENDING] A06-4: (LOW) Magic number 78 in LibParseLiteralRepeat bound check should use named constant
+- [FIXED] A06-3: (LOW) Magic number in LibExternOpIntInc.run for decimal float value 1 should use named constant — hoisted packLossless(1e37, -37) out of loop into local variable with comment
+- [FIXED] A06-4: (LOW) Magic number 78 in LibParseLiteralRepeat bound check should use named constant — added MAX_REPEAT_LITERAL_LENGTH constant
 - [DISMISSED] A12-1: (LOW) Magic number `0x18` for cursor alignment — single occurrence with adequate comment, named constant would not clarify derivation
 - [FIXED] A14-1: (LOW) Unused variable `success` from `staticcall` in `stackTrace` assembly should use `pop()` idiom in LibInterpreterState — changed to `pop(staticcall(...))`
 - [FIXED] A14-2: (LOW) Incorrect arithmetic in `stackTrace` NatSpec gas cost analysis in LibInterpreterState — fixed division denominator and included memory term
-- [PENDING] A16-1: (LOW) Inconsistent `referenceFn` return pattern (new array vs mutate-in-place) across bitwise ops; LibOpDecodeBits is 1-input/1-output but allocates new array unlike other 1-in/1-out ops
+- [DISMISSED] A16-1: (LOW) Inconsistent `referenceFn` return pattern (new array vs mutate-in-place) across bitwise ops; LibOpDecodeBits is 1-input/1-output but allocates new array unlike other 1-in/1-out ops — false positive; referenceFn already mutates inputs[0] in place and returns inputs
 - [FIXED] A16-2: (LOW) Inconsistent `uint256` cast on `type(uint8).max` between LibOpShiftBitsLeft and LibOpShiftBitsRight — removed unnecessary cast from ShiftBitsLeft
 - [FIXED] A16-3: (LOW) Inconsistent lint suppression comments between LibOpDecodeBits and LibOpEncodeBits for identical shift operation — added slither suppression to EncodeBits to match DecodeBits
 - [DISMISSED] A16-4: (LOW) Repeated operand parsing logic for `startBit` and `length` duplicated 6 times — inline for gas in run, consistent pattern across integrity/referenceFn
@@ -756,13 +756,13 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [FIXED] A25a-2: (LOW) Missing "point" in LibOpHeadroom run NatSpec ("decimal floating headroom" should be "decimal floating point headroom") — fixed in earlier commit
 - [FIXED] A25a-3: (LOW) Missing "decimal" in LibOpInv run NatSpec (says "floating point" instead of "decimal floating point") — fixed as part of @notice removal
 - [FIXED] A25a-4: (LOW) Misleading `unchecked` block with overflow comment in LibOpMax.referenceFn irrelevant to `max` operation — removed unnecessary unchecked block and comment
-- [PENDING] A28-1: (LOW) Unnecessary `unchecked` block wrapping entire `run` body in LibOpSet has no semantic effect on assembly-only arithmetic
+- [FIXED] A28-1: (LOW) Unnecessary `unchecked` block wrapping entire `run` body in LibOpSet — already removed in prior commit
 - [FIXED] A29-1: (LOW) Misleading comment in `referenceFn` for LibOpUint256Div and LibOpUint256Sub says "overflow" but Div reverts on divide-by-zero and Sub reverts on underflow — corrected both
 - [FIXED] A29-2: (LOW) Inconsistent NatSpec description in LibOpLinearGrowth references wrong variable names ("a" and "r" instead of "base" and "rate") — corrected to "base" and "rate", also removed `@notice`
 - [DISMISSED] A30-1: (MEDIUM) Dead constants `NOT_LOW_16_BIT_MASK` and `ACTIVE_SOURCE_MASK` defined but never referenced anywhere in the codebase — false positive; neither constant exists in the codebase
 - [DISMISSED] A30-2: (LOW) Potentially unused `using LibBytes32Array` declaration in LibParse.sol — false positive; used for `.startPointer()` on operandValues
 - [DISMISSED] A30-3: (LOW) Magic numbers in paren tracking logic — compact performance-sensitive assembly, inline comments explain values
-- [PENDING] A30-4: (LOW) `parseRHS` function length (~210 lines) makes it harder to review and audit
+- [DISMISSED] A30-4: (LOW) `parseRHS` function length (~210 lines) makes it harder to review and audit — refactoring suggestion only; hot-path parser function, extraction adds gas overhead with no correctness benefit
 - [FIXED] A33-1: (LOW) Unused `using` directives (`LibParseInterstitial`, `LibSubParse`) and corresponding unused imports in LibParseLiteral.sol — removed both using directives and imports
 - [DISMISSED] A33-2: (MEDIUM) Function pointer mutability mismatch — re-reading source shows return type is already view, finding is stale
 - [DISMISSED] A33-3: (LOW) Parameter naming inconsistency — `start` avoids collision with local variable `cursor` in parseDecimalFloatInline
@@ -781,7 +781,7 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [DISMISSED] A45-1: (LOW) Constructor lacks NatSpec in Rainterpreter.sol — false positive, constructor already has NatSpec
 - [FIXED] A45-2: (LOW) NatSpec triple-slash used for inline code comment inside RainterpreterStore.set function body — changed `///` to `//`
 - [DISMISSED] A45-3: (LOW) `type(uint256).max` without named constant — universally recognized Solidity idiom
-- [PENDING] A45-4: (LOW) `buildOperandHandlerFunctionPointers` and `buildLiteralParserFunctionPointers` missing `override` keyword in RainterpreterParser, inconsistent with Rainterpreter
+- [FIXED] A45-4: (LOW) `buildOperandHandlerFunctionPointers` and `buildLiteralParserFunctionPointers` missing `override` keyword in RainterpreterParser — already fixed, both functions have `override`
 - [FIXED] A47-1: (LOW) `@inheritdoc IERC165` inconsistent with other concrete contracts that use `@inheritdoc ERC165` in RainterpreterExpressionDeployer — changed to `@inheritdoc ERC165`
 - [FIXED] A47-2: (LOW) Redundant NatSpec before `@inheritdoc` on `buildIntegrityFunctionPointers` is dead documentation in RainterpreterExpressionDeployer — removed dead NatSpec
 - [FIXED] A47-3: (LOW) RainterpreterDISPaiRegistry does not implement ERC165 — added ERC165 with IDISPaiRegistry interface support and test

@@ -27,6 +27,10 @@ pragma solidity ^0.8.25;
 /// [ref-extern-repeat-3 123]
 /// ```
 
+/// @dev The maximum length of a repeat literal body. 10^78 < 2^256, but
+/// 10^78 * 9 (worst-case accumulation) would overflow, so we cap at 78.
+uint256 constant MAX_REPEAT_LITERAL_LENGTH = 78;
+
 /// @dev Thrown when a repeat literal body exceeds the maximum length that can
 /// be computed without overflow in `10 ** i`.
 /// @param length The length of the literal body.
@@ -52,7 +56,7 @@ library LibParseLiteralRepeat {
             uint256 value = 0;
             // Safe: cursor always <= end (parser invariant).
             uint256 length = end - cursor;
-            if (length >= 78) {
+            if (length >= MAX_REPEAT_LITERAL_LENGTH) {
                 revert RepeatLiteralTooLong(length);
             }
             for (uint256 i = 0; i < length; ++i) {
