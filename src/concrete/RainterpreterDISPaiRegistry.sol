@@ -14,8 +14,8 @@ import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC16
 /// address.
 contract RainterpreterDISPaiRegistry is IDISPaiRegistry, ERC165 {
     /// @inheritdoc ERC165
-    function supportsInterface(bytes4 interfaceId) public pure override returns (bool) {
-        return interfaceId == type(IDISPaiRegistry).interfaceId || interfaceId == type(ERC165).interfaceId;
+    function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
+        return interfaceId == type(IDISPaiRegistry).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /// @inheritdoc IDISPaiRegistry
