@@ -586,8 +586,7 @@ mod tests {
             .await
             .unwrap();
 
-        let fully_quallified_namespace =
-            qualify_namespace(namespace.into(), from_address);
+        let fully_quallified_namespace = qualify_namespace(namespace.into(), from_address);
 
         let get = forker
             .alloy_call(
