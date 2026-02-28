@@ -35,7 +35,6 @@ contract RainterpreterStoreSetEmptyArrayTest is Test {
 
     /// @notice Fuzz variant: set() with empty array and any namespace must not
     /// revert.
-    /// forge-config: default.fuzz.runs = 100
     function testSetEmptyArrayFuzz(StateNamespace namespace) external {
         RainterpreterStore store = new RainterpreterStore();
         bytes32[] memory kvs = new bytes32[](0);

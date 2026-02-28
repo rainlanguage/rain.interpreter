@@ -45,7 +45,7 @@ contract RainterpreterEvalTest is RainterpreterExpressionDeployerDeploymentTest 
         // Build rainlang with expectedInputs LHS names: "a b c ... :;"
         bytes memory rainlang = new bytes(2 * uint256(expectedInputs) + 1);
         for (uint256 i = 0; i < expectedInputs; i++) {
-            // Safe: i is bounded by expectedInputs which is bounded to < 26 by the test.
+            // Safe: i is bounded by expectedInputs which is bounded to <= 15 by the test.
             //forge-lint: disable-next-line(unsafe-typecast)
             rainlang[i * 2] = bytes1(uint8(0x61) + uint8(i));
             if (i < uint256(expectedInputs) - 1) {

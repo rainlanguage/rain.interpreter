@@ -28,7 +28,6 @@ contract RainterpreterStoreGetUninitializedTest is Test {
     }
 
     /// @notice Fuzz: get() on any never-set namespace+key must return 0.
-    /// forge-config: default.fuzz.runs = 100
     function testGetUninitializedKeyFuzz(StateNamespace namespace, bytes32 key) external {
         RainterpreterStore store = new RainterpreterStore();
         FullyQualifiedNamespace fqn = namespace.qualifyNamespace(address(this));

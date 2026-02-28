@@ -28,9 +28,16 @@ contract LibSubParseConsumeSubParseWordInputDataTest is Test {
         returns (bytes memory)
     {
         // Encode the operand values as raw memory: length word + value words.
-        bytes memory operandBytes;
+        // Cannot alias bytes32[] as bytes directly because the length field
+        // semantics differ (element count vs byte count). Encode manually.
+        bytes memory operandBytes = new bytes(32 + operandValues.length * 32);
         assembly ("memory-safe") {
-            operandBytes := operandValues
+            // Write the element count as the first 32 bytes (matches bytes32[] ABI).
+            mstore(add(operandBytes, 0x20), mload(operandValues))
+            // Copy the value words.
+            for { let i := 0 } lt(i, mload(operandValues)) { i := add(i, 1) } {
+                mstore(add(operandBytes, add(0x40, mul(i, 0x20))), mload(add(operandValues, add(0x20, mul(i, 0x20)))))
+            }
         }
         return bytes.concat(bytes2(constantsHeight), bytes1(ioByte), bytes2(uint16(word.length)), word, operandBytes);
     }
@@ -115,5 +122,24 @@ contract LibSubParseConsumeSubParseWordInputDataTest is Test {
         assertEq(constantsHeight, 100);
         assertEq(ioByte, 0x21);
         assertEq(keccak256(state.data), keccak256(word));
+    }
+
+    /// @notice Non-empty operand values round-trip through the input data.
+    function testConsumeSubParseWordInputDataWithOperands() external pure {
+        bytes memory word = bytes("op");
+        bytes32[] memory operandValues = new bytes32[](2);
+        operandValues[0] = bytes32(uint256(0xaa));
+        operandValues[1] = bytes32(uint256(0xbb));
+        bytes memory data = buildInputData(7, 0x42, word, operandValues);
+
+        (uint256 constantsHeight, uint256 ioByte, ParseState memory state) =
+            LibSubParse.consumeSubParseWordInputData(data, "", "");
+
+        assertEq(constantsHeight, 7);
+        assertEq(ioByte, 0x42);
+        assertEq(keccak256(state.data), keccak256(word));
+        assertEq(state.operandValues.length, 2);
+        assertEq(state.operandValues[0], bytes32(uint256(0xaa)));
+        assertEq(state.operandValues[1], bytes32(uint256(0xbb)));
     }
 }

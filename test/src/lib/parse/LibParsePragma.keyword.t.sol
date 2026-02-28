@@ -254,6 +254,14 @@ contract LibParsePragmaKeywordTest is Test {
             deref := mload(pointer)
         }
         assertEq(uint160(uint256(deref)), uint160(addr1), "first address");
+        // The list must terminate: dereferencing the first node's next pointer
+        // yields zero (the initial empty subParsers value).
+        uint256 nextPointer = uint256(deref) >> 0xF0;
+        bytes32 nextDeref;
+        assembly ("memory-safe") {
+            nextDeref := mload(nextPointer)
+        }
+        assertEq(uint256(nextDeref), 0, "list must terminate after first address");
     }
 
     /// Comments between addresses in a pragma are handled by parseInterstitial.

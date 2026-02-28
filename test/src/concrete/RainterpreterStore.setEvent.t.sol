@@ -58,7 +58,6 @@ contract RainterpreterStoreSetEventTest is Test {
 
     /// @notice The fullyQualifiedNamespace in the event must match what
     /// qualifyNamespace produces for the msg.sender.
-    /// forge-config: default.fuzz.runs = 100
     function testSetEventFQNMatchesQualifyNamespace(StateNamespace namespace, bytes32 key, bytes32 value) external {
         RainterpreterStore store = new RainterpreterStore();
         FullyQualifiedNamespace fqn = namespace.qualifyNamespace(address(this));

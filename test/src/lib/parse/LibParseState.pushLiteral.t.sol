@@ -69,8 +69,7 @@ contract LibParseStatePushLiteralTest is Test {
 
     /// Two identical hex literals should deduplicate: height stays 1.
     function testPushLiteralDuplicate() external view {
-        // We need the state to persist between calls, so use a single data
-        // buffer containing both literals separated by a space.
+        // State persists between calls because ParseState is a memory struct.
         bytes memory data1 = bytes("0xff");
         bytes memory data2 = bytes("0xff");
 
