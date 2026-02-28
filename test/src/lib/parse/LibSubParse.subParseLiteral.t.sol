@@ -18,11 +18,11 @@ contract LibSubParseSubParseLiteralTest is Test {
     using LibBytes for bytes;
 
     /// @notice External wrapper for subParseLiteral so vm.expectRevert works.
-    function externalSubParseLiteral(
-        bytes memory dispatch,
-        bytes memory body,
-        address[] memory subParserAddresses
-    ) external view returns (bytes32) {
+    function externalSubParseLiteral(bytes memory dispatch, bytes memory body, address[] memory subParserAddresses)
+        external
+        view
+        returns (bytes32)
+    {
         bytes memory data = bytes.concat(dispatch, body);
         ParseState memory state = LibParseState.newState(data, "", "", "");
 
@@ -178,16 +178,8 @@ contract LibSubParseSubParseLiteralTest is Test {
             abi.encode(true, expectedValue)
         );
 
-        vm.expectCall(
-            first,
-            abi.encodeWithSelector(ISubParserV4.subParseLiteral2.selector, expectedData),
-            1
-        );
-        vm.expectCall(
-            second,
-            abi.encodeWithSelector(ISubParserV4.subParseLiteral2.selector, expectedData),
-            0
-        );
+        vm.expectCall(first, abi.encodeWithSelector(ISubParserV4.subParseLiteral2.selector, expectedData), 1);
+        vm.expectCall(second, abi.encodeWithSelector(ISubParserV4.subParseLiteral2.selector, expectedData), 0);
 
         address[] memory subs = new address[](2);
         subs[0] = first;

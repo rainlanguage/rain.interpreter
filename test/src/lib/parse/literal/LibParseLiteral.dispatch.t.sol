@@ -19,11 +19,7 @@ contract LibParseLiteralDispatchTest is Test {
     using LibParseLiteral for ParseState;
 
     /// External wrapper for parseLiteral so expectRevert works.
-    function externalParseLiteral(bytes memory data)
-        external
-        view
-        returns (uint256 newCursor, bytes32 value)
-    {
+    function externalParseLiteral(bytes memory data) external view returns (uint256 newCursor, bytes32 value) {
         ParseState memory state =
             LibParseState.newState(data, "", "", LibAllStandardOps.literalParserFunctionPointers());
         state.literalParsers = LibAllStandardOps.literalParserFunctionPointers();
@@ -135,14 +131,11 @@ contract LibParseLiteralDispatchTest is Test {
         bytes32 expectedValue = bytes32(uint256(0x42));
 
         vm.mockCall(
-            subParser,
-            abi.encodeWithSelector(ISubParserV4.subParseLiteral2.selector),
-            abi.encode(true, expectedValue)
+            subParser, abi.encodeWithSelector(ISubParserV4.subParseLiteral2.selector), abi.encode(true, expectedValue)
         );
         vm.expectCall(subParser, abi.encodeWithSelector(ISubParserV4.subParseLiteral2.selector));
 
-        (bool success,, bytes32 value) =
-            this.externalTryParseLiteralWithSubParser(bytes("[1]"), subParser);
+        (bool success,, bytes32 value) = this.externalTryParseLiteralWithSubParser(bytes("[1]"), subParser);
         assertTrue(success, "sub-parseable dispatch");
         assertEq(value, expectedValue, "sub-parseable value");
     }
@@ -218,9 +211,8 @@ contract LibParseLiteralDispatchTest is Test {
 
     /// Full 32-byte hex literal parses correctly.
     function testTryParseLiteralMaxHex() external view {
-        (bool success,, bytes32 value) = this.externalTryParseLiteral(
-            bytes("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF ")
-        );
+        (bool success,, bytes32 value) =
+            this.externalTryParseLiteral(bytes("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF "));
         assertTrue(success, "max hex success");
         assertEq(value, bytes32(type(uint256).max), "max hex value");
     }

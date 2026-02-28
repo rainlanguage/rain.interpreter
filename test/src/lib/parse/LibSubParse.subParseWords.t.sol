@@ -10,11 +10,7 @@ import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {LibBytecode, Pointer} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {ISubParserV4} from "rain.interpreter.interface/interface/ISubParserV4.sol";
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
-import {
-    OPCODE_UNKNOWN,
-    OPCODE_CONSTANT,
-    OPCODE_CONTEXT
-} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
+import {OPCODE_UNKNOWN, OPCODE_CONSTANT, OPCODE_CONTEXT} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 
 /// @dev A sub parser that resolves any word by returning a context opcode with
@@ -51,18 +47,14 @@ contract LibSubParseSubParseWordsTest is Test {
     using Strings for address;
 
     /// @notice Build a minimal single-source bytecode containing one 4-byte op.
-    function buildSingleOpBytecode(uint8 opcode, uint8 ioByte, uint16 operand)
-        internal
-        pure
-        returns (bytes memory)
-    {
+    function buildSingleOpBytecode(uint8 opcode, uint8 ioByte, uint16 operand) internal pure returns (bytes memory) {
         return abi.encodePacked(
-            uint8(1),           // 1 source
-            uint16(0),          // relative offset = 0
-            uint8(1),           // ops count = 1
-            uint8(0),           // stack allocation
-            uint8(0),           // stack high water
-            uint8(0),           // stack inputs
+            uint8(1), // 1 source
+            uint16(0), // relative offset = 0
+            uint8(1), // ops count = 1
+            uint8(0), // stack allocation
+            uint8(0), // stack high water
+            uint8(0), // stack inputs
             opcode,
             ioByte,
             operand
@@ -86,7 +78,9 @@ contract LibSubParseSubParseWordsTest is Test {
         bytes memory bytecode = buildSingleOpBytecode(
             // Safe: OPCODE_CONSTANT fits in uint8.
             //forge-lint: disable-next-line(unsafe-typecast)
-            uint8(OPCODE_CONSTANT), 0x10, 0x0000
+            uint8(OPCODE_CONSTANT),
+            0x10,
+            0x0000
         );
         (bytes memory result, bytes32[] memory constants) = state.subParseWords(bytecode);
         assertEq(keccak256(result), keccak256(bytecode));
@@ -98,9 +92,7 @@ contract LibSubParseSubParseWordsTest is Test {
     /// the word is resolved to a valid opcode.
     function testSubParseWordsSingleSourceResolvesUnknown() external {
         ContextReturningSubParser sub = new ContextReturningSubParser();
-        string memory src = string.concat(
-            "using-words-from ", address(sub).toHexString(), " _: some-word();"
-        );
+        string memory src = string.concat("using-words-from ", address(sub).toHexString(), " _: some-word();");
         ParseState memory state = LibMetaFixture.newState(src);
         (bytes memory bytecode, bytes32[] memory constants) = state.parse();
 
@@ -121,10 +113,8 @@ contract LibSubParseSubParseWordsTest is Test {
     /// iterates over both and resolves unknown words in each.
     function testSubParseWordsTwoSourcesBothResolved() external {
         ContextReturningSubParser sub = new ContextReturningSubParser();
-        string memory src = string.concat(
-            "using-words-from ", address(sub).toHexString(),
-            " _: some-word(); _: another-word();"
-        );
+        string memory src =
+            string.concat("using-words-from ", address(sub).toHexString(), " _: some-word(); _: another-word();");
         ParseState memory state = LibMetaFixture.newState(src);
         (bytes memory bytecode, bytes32[] memory constants) = state.parse();
 
@@ -163,9 +153,7 @@ contract LibSubParseSubParseWordsTest is Test {
             abi.encode(false, bytes(""), new bytes32[](0))
         );
 
-        string memory src = string.concat(
-            "using-words-from ", address(sub).toHexString(), " _: unknown-word();"
-        );
+        string memory src = string.concat("using-words-from ", address(sub).toHexString(), " _: unknown-word();");
 
         vm.expectRevert();
         this.externalParse(src);
@@ -177,14 +165,20 @@ contract LibSubParseSubParseWordsTest is Test {
         // Safe: opcode constants fit in uint8.
         //forge-lint: disable-next-line(unsafe-typecast)
         bytes memory bytecode = abi.encodePacked(
-            uint8(1),            // 1 source
-            uint16(0),           // relative offset = 0
-            uint8(2),            // ops count = 2
-            uint8(0), uint8(0), uint8(0), // stack tracker
+            uint8(1), // 1 source
+            uint16(0), // relative offset = 0
+            uint8(2), // ops count = 2
+            uint8(0),
+            uint8(0),
+            uint8(0), // stack tracker
             //forge-lint: disable-next-line(unsafe-typecast)
-            uint8(OPCODE_CONSTANT), uint8(0x10), uint16(0),
+            uint8(OPCODE_CONSTANT),
+            uint8(0x10),
+            uint16(0),
             //forge-lint: disable-next-line(unsafe-typecast)
-            uint8(OPCODE_CONTEXT), uint8(0x10), uint16(0)
+            uint8(OPCODE_CONTEXT),
+            uint8(0x10),
+            uint16(0)
         );
         (bytes memory result, bytes32[] memory constants) = state.subParseWords(bytecode);
         assertEq(keccak256(result), keccak256(bytecode));

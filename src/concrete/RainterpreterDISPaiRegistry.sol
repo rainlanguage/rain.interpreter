@@ -17,6 +17,7 @@ contract RainterpreterDISPaiRegistry is IDISPaiRegistry, ERC165 {
     function supportsInterface(bytes4 interfaceId) public pure override returns (bool) {
         return interfaceId == type(IDISPaiRegistry).interfaceId || interfaceId == type(ERC165).interfaceId;
     }
+
     /// @inheritdoc IDISPaiRegistry
     function expressionDeployerAddress() external pure override returns (address) {
         return LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS;

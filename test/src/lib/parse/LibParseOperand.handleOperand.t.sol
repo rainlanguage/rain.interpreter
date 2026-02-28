@@ -13,11 +13,7 @@ import {UnexpectedOperand, ExpectedOperand} from "src/error/ErrParse.sol";
 contract LibParseOperandHandleOperandTest is Test {
     using LibParseOperand for ParseState;
 
-    function handleOperandExternal(ParseState memory state, uint256 wordIndex)
-        external
-        pure
-        returns (OperandV2)
-    {
+    function handleOperandExternal(ParseState memory state, uint256 wordIndex) external pure returns (OperandV2) {
         return state.handleOperand(wordIndex);
     }
 

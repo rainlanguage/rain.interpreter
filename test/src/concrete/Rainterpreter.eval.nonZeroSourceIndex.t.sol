@@ -35,10 +35,7 @@ contract RainterpreterEvalNonZeroSourceIndexTest is RainterpreterExpressionDeplo
 
         assertEq(stack.length, 1, "source 1 should produce exactly 1 output");
         Float expected = LibDecimalFloat.packLossless(99, 0);
-        assertTrue(
-            Float.wrap(StackItem.unwrap(stack[0])).eq(expected),
-            "source 1 should return 99"
-        );
+        assertTrue(Float.wrap(StackItem.unwrap(stack[0])).eq(expected), "source 1 should return 99");
     }
 
     /// @notice eval4 with sourceIndex = 1 where source 1 expects inputs MUST
@@ -65,10 +62,7 @@ contract RainterpreterEvalNonZeroSourceIndexTest is RainterpreterExpressionDeplo
 
         assertEq(stack.length, 2, "source 1 should produce 2 outputs (1 input + 1 op)");
         Float expected = LibDecimalFloat.packLossless(11, 0);
-        assertTrue(
-            Float.wrap(StackItem.unwrap(stack[0])).eq(expected),
-            "source 1 should return add(10, 1) = 11"
-        );
+        assertTrue(Float.wrap(StackItem.unwrap(stack[0])).eq(expected), "source 1 should return add(10, 1) = 11");
     }
 
     /// @notice Source index 0 and source index 1 produce different results from
@@ -102,13 +96,7 @@ contract RainterpreterEvalNonZeroSourceIndexTest is RainterpreterExpressionDeplo
 
         Float expected0 = LibDecimalFloat.packLossless(7, 0);
         Float expected1 = LibDecimalFloat.packLossless(13, 0);
-        assertTrue(
-            Float.wrap(StackItem.unwrap(stack0[0])).eq(expected0),
-            "source 0 should return 7"
-        );
-        assertTrue(
-            Float.wrap(StackItem.unwrap(stack1[0])).eq(expected1),
-            "source 1 should return 13"
-        );
+        assertTrue(Float.wrap(StackItem.unwrap(stack0[0])).eq(expected0), "source 0 should return 7");
+        assertTrue(Float.wrap(StackItem.unwrap(stack1[0])).eq(expected1), "source 1 should return 13");
     }
 }

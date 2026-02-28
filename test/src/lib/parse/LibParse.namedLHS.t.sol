@@ -193,8 +193,9 @@ contract LibParseNamedLHSTest is ParseTest {
 
     /// Stack name at the last position on RHS after other items.
     function testParseNamedLHSStackNameLastPosition() external view {
-        (bytes memory bytecode, bytes32[] memory constants) =
-            LibParseState.newState("a _:1 2,b c:3 a;", "", "", LibAllStandardOps.literalParserFunctionPointers()).parse();
+        (bytes memory bytecode, bytes32[] memory constants) = LibParseState.newState(
+                "a _:1 2,b c:3 a;", "", "", LibAllStandardOps.literalParserFunctionPointers()
+            ).parse();
         assertEq(
             bytecode,
             // 1 source

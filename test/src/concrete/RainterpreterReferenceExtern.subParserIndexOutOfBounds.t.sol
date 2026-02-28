@@ -10,12 +10,7 @@ import {SubParserIndexOutOfBounds} from "src/error/ErrSubParse.sol";
 /// out-of-bounds index, triggering the SubParserIndexOutOfBounds check.
 contract MockExternBadLiteralIndex is RainterpreterReferenceExtern {
     /// @notice Override to always return success with an out-of-bounds index.
-    function matchSubParseLiteralDispatch(uint256, uint256)
-        internal
-        pure
-        override
-        returns (bool, uint256, bytes32)
-    {
+    function matchSubParseLiteralDispatch(uint256, uint256) internal pure override returns (bool, uint256, bytes32) {
         return (true, 999, bytes32(0));
     }
 }
@@ -29,11 +24,7 @@ contract RainterpreterReferenceExternSubParserIndexOutOfBoundsTest is Test {
     function testSubParseLiteral2IndexOutOfBounds() external {
         MockExternBadLiteralIndex ext = new MockExternBadLiteralIndex();
 
-        bytes memory data = abi.encodePacked(
-            uint16(4),
-            bytes4(0x01020304),
-            bytes4(0x05060708)
-        );
+        bytes memory data = abi.encodePacked(uint16(4), bytes4(0x01020304), bytes4(0x05060708));
 
         vm.expectRevert(abi.encodeWithSelector(SubParserIndexOutOfBounds.selector, uint256(999), uint256(1)));
         ext.subParseLiteral2(data);

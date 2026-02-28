@@ -162,11 +162,7 @@ contract RainterpreterStateOverlayTest is RainterpreterExpressionDeployerDeploym
         );
 
         assertEq(stack.length, 1, "single get should produce one stack item");
-        assertEq(
-            StackItem.unwrap(stack[0]),
-            v2,
-            "duplicate key in overlay: last value should win"
-        );
+        assertEq(StackItem.unwrap(stack[0]), v2, "duplicate key in overlay: last value should win");
         assertEq(kvs.length, 2, "kvs should contain one key-value pair (deduplicated)");
         assertEq(kvs[0], k, "kvs key should be the overlay key");
         assertEq(kvs[1], v2, "kvs value should be the last-written value");
@@ -207,16 +203,8 @@ contract RainterpreterStateOverlayTest is RainterpreterExpressionDeployerDeploym
         );
 
         assertEq(stack.length, 2, "two get ops should produce two stack items");
-        assertEq(
-            StackItem.unwrap(stack[0]),
-            v2Second,
-            "get(2) should return the second value for k2"
-        );
-        assertEq(
-            StackItem.unwrap(stack[1]),
-            v1Second,
-            "get(1) should return the second value for k1"
-        );
+        assertEq(StackItem.unwrap(stack[0]), v2Second, "get(2) should return the second value for k2");
+        assertEq(StackItem.unwrap(stack[1]), v1Second, "get(1) should return the second value for k1");
     }
 
     /// Show that state overlay can be overridden by a set in the bytecode.

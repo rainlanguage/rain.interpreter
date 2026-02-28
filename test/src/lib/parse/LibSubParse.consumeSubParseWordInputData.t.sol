@@ -32,13 +32,7 @@ contract LibSubParseConsumeSubParseWordInputDataTest is Test {
         assembly ("memory-safe") {
             operandBytes := operandValues
         }
-        return bytes.concat(
-            bytes2(constantsHeight),
-            bytes1(ioByte),
-            bytes2(uint16(word.length)),
-            word,
-            operandBytes
-        );
+        return bytes.concat(bytes2(constantsHeight), bytes1(ioByte), bytes2(uint16(word.length)), word, operandBytes);
     }
 
     /// @notice Basic happy path: extract constants height, IO byte, and word

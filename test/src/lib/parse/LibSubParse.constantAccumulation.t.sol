@@ -104,8 +104,7 @@ contract LibSubParseConstantAccumulationTest is Test {
     /// constant. The constant must appear in the final constants array.
     function testSubParserSingleConstantAccumulation() external {
         ConstantReturningSubParser sub = new ConstantReturningSubParser();
-        string memory src =
-            string.concat("using-words-from ", address(sub).toHexString(), " _: some-word();");
+        string memory src = string.concat("using-words-from ", address(sub).toHexString(), " _: some-word();");
 
         ParseState memory state = LibMetaFixture.newState(src);
         (, bytes32[] memory constants) = state.parse();
@@ -120,11 +119,8 @@ contract LibSubParseConstantAccumulationTest is Test {
     /// the correct order.
     function testSubParserTwoWordsConstantAccumulation() external {
         ConstantReturningSubParser sub = new ConstantReturningSubParser();
-        string memory src = string.concat(
-            "using-words-from ",
-            address(sub).toHexString(),
-            " _ _: some-word() another-word();"
-        );
+        string memory src =
+            string.concat("using-words-from ", address(sub).toHexString(), " _ _: some-word() another-word();");
 
         ParseState memory state = LibMetaFixture.newState(src);
         (, bytes32[] memory constants) = state.parse();
@@ -142,8 +138,7 @@ contract LibSubParseConstantAccumulationTest is Test {
     /// constants must be accumulated.
     function testSubParserMultiConstantAccumulation() external {
         MultiConstantSubParser sub = new MultiConstantSubParser();
-        string memory src =
-            string.concat("using-words-from ", address(sub).toHexString(), " _: multi-word();");
+        string memory src = string.concat("using-words-from ", address(sub).toHexString(), " _: multi-word();");
 
         ParseState memory state = LibMetaFixture.newState(src);
         (, bytes32[] memory constants) = state.parse();
@@ -161,11 +156,7 @@ contract LibSubParseConstantAccumulationTest is Test {
         ConstantReturningSubParser sub = new ConstantReturningSubParser();
         // "1e0" is a literal that becomes constant[0].
         // "some-word" should get constant[1].
-        string memory src = string.concat(
-            "using-words-from ",
-            address(sub).toHexString(),
-            " _ _: 1e0 some-word();"
-        );
+        string memory src = string.concat("using-words-from ", address(sub).toHexString(), " _ _: 1e0 some-word();");
 
         (bytes memory bytecode, bytes32[] memory constants) = LibMetaFixture.newState(src).parse();
 

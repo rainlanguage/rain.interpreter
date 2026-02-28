@@ -24,8 +24,7 @@ contract LibSubParseConsumeSubParseLiteralInputDataTest is Test {
         bytes memory body = bytes("bar");
         bytes memory data = buildLiteralData(dispatch, body);
 
-        (uint256 dispatchStart, uint256 bodyStart, uint256 bodyEnd) =
-            LibSubParse.consumeSubParseLiteralInputData(data);
+        (uint256 dispatchStart, uint256 bodyStart, uint256 bodyEnd) = LibSubParse.consumeSubParseLiteralInputData(data);
 
         // Dispatch region length should be 3.
         assertEq(bodyStart - dispatchStart, dispatch.length);
@@ -42,8 +41,7 @@ contract LibSubParseConsumeSubParseLiteralInputDataTest is Test {
         bytes memory body = bytes("xyz");
         bytes memory data = buildLiteralData(dispatch, body);
 
-        (uint256 dispatchStart, uint256 bodyStart,) =
-            LibSubParse.consumeSubParseLiteralInputData(data);
+        (uint256 dispatchStart, uint256 bodyStart,) = LibSubParse.consumeSubParseLiteralInputData(data);
 
         // Read dispatch bytes from memory and compare.
         uint256 dispatchLength = bodyStart - dispatchStart;
@@ -65,8 +63,7 @@ contract LibSubParseConsumeSubParseLiteralInputDataTest is Test {
         bytes memory body = bytes("xyz");
         bytes memory data = buildLiteralData(dispatch, body);
 
-        (, uint256 bodyStart, uint256 bodyEnd) =
-            LibSubParse.consumeSubParseLiteralInputData(data);
+        (, uint256 bodyStart, uint256 bodyEnd) = LibSubParse.consumeSubParseLiteralInputData(data);
 
         // Read body bytes from memory and compare.
         uint256 bodyLength = bodyEnd - bodyStart;
@@ -87,8 +84,7 @@ contract LibSubParseConsumeSubParseLiteralInputDataTest is Test {
         bytes memory body = bytes("");
         bytes memory data = buildLiteralData(dispatch, body);
 
-        (uint256 dispatchStart, uint256 bodyStart, uint256 bodyEnd) =
-            LibSubParse.consumeSubParseLiteralInputData(data);
+        (uint256 dispatchStart, uint256 bodyStart, uint256 bodyEnd) = LibSubParse.consumeSubParseLiteralInputData(data);
 
         assertEq(bodyStart - dispatchStart, dispatch.length);
         assertEq(bodyEnd - bodyStart, 0);
@@ -100,8 +96,7 @@ contract LibSubParseConsumeSubParseLiteralInputDataTest is Test {
         bytes memory body = bytes("");
         bytes memory data = buildLiteralData(dispatch, body);
 
-        (uint256 dispatchStart, uint256 bodyStart, uint256 bodyEnd) =
-            LibSubParse.consumeSubParseLiteralInputData(data);
+        (uint256 dispatchStart, uint256 bodyStart, uint256 bodyEnd) = LibSubParse.consumeSubParseLiteralInputData(data);
 
         assertEq(bodyStart - dispatchStart, 1);
         assertEq(bodyEnd - bodyStart, 0);
@@ -117,8 +112,7 @@ contract LibSubParseConsumeSubParseLiteralInputDataTest is Test {
 
         bytes memory data = buildLiteralData(dispatch, body);
 
-        (uint256 dispatchStart, uint256 bodyStart, uint256 bodyEnd) =
-            LibSubParse.consumeSubParseLiteralInputData(data);
+        (uint256 dispatchStart, uint256 bodyStart, uint256 bodyEnd) = LibSubParse.consumeSubParseLiteralInputData(data);
 
         assertEq(bodyStart - dispatchStart, dispatch.length);
         assertEq(bodyEnd - bodyStart, body.length);
@@ -132,8 +126,7 @@ contract LibSubParseConsumeSubParseLiteralInputDataTest is Test {
         bytes memory body = bytes("world");
         bytes memory data = buildLiteralData(dispatch, body);
 
-        (uint256 dispatchStart, uint256 bodyStart, uint256 bodyEnd) =
-            LibSubParse.consumeSubParseLiteralInputData(data);
+        (uint256 dispatchStart, uint256 bodyStart, uint256 bodyEnd) = LibSubParse.consumeSubParseLiteralInputData(data);
 
         uint256 dispatchLength = dispatch.length;
         uint256 bodyLength = body.length;

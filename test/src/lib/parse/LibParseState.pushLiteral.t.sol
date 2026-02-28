@@ -74,9 +74,7 @@ contract LibParseStatePushLiteralTest is Test {
         bytes memory data1 = bytes("0xff");
         bytes memory data2 = bytes("0xff");
 
-        ParseState memory state = LibParseState.newState(
-            "", "", "", LibAllStandardOps.literalParserFunctionPointers()
-        );
+        ParseState memory state = LibParseState.newState("", "", "", LibAllStandardOps.literalParserFunctionPointers());
 
         // Push first literal.
         {
@@ -101,9 +99,7 @@ contract LibParseStatePushLiteralTest is Test {
         bytes memory data1 = bytes("0xaa");
         bytes memory data2 = bytes("0xbb");
 
-        ParseState memory state = LibParseState.newState(
-            "", "", "", LibAllStandardOps.literalParserFunctionPointers()
-        );
+        ParseState memory state = LibParseState.newState("", "", "", LibAllStandardOps.literalParserFunctionPointers());
 
         {
             uint256 cursor = Pointer.unwrap(data1.dataPointer());

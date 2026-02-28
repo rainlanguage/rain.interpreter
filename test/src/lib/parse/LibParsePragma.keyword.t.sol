@@ -86,9 +86,7 @@ contract LibParsePragmaKeywordTest is Test {
     /// Input ends exactly at the keyword boundary with no trailing bytes.
     /// Hits the `cursor >= end` revert at line 55.
     function testPragmaKeywordEndAtKeyword() external {
-        vm.expectRevert(
-            abi.encodeWithSelector(NoWhitespaceAfterUsingWordsFrom.selector, PRAGMA_KEYWORD_BYTES_LENGTH)
-        );
+        vm.expectRevert(abi.encodeWithSelector(NoWhitespaceAfterUsingWordsFrom.selector, PRAGMA_KEYWORD_BYTES_LENGTH));
         this.externalParsePragma(string(PRAGMA_KEYWORD_BYTES));
     }
 
@@ -233,13 +231,10 @@ contract LibParsePragmaKeywordTest is Test {
     function testPragmaKeywordTwoSequentialPragmas() external view {
         address addr1 = 0x1234567890123456789012345678901234567890;
         address addr2 = 0x0987654321098765432109876543210987654321;
-        string memory str = string.concat(
-            "using-words-from ", addr1.toHexString(),
-            " using-words-from ", addr2.toHexString()
-        );
-        ParseState memory state = LibParseState.newState(
-            bytes(str), "", "", LibAllStandardOps.literalParserFunctionPointers()
-        );
+        string memory str =
+            string.concat("using-words-from ", addr1.toHexString(), " using-words-from ", addr2.toHexString());
+        ParseState memory state =
+            LibParseState.newState(bytes(str), "", "", LibAllStandardOps.literalParserFunctionPointers());
         uint256 cursor = Pointer.unwrap(bytes(str).dataPointer());
         uint256 end = Pointer.unwrap(bytes(str).endDataPointer());
 
@@ -265,10 +260,8 @@ contract LibParsePragmaKeywordTest is Test {
     function testPragmaKeywordCommentBetweenAddresses() external view {
         address addr1 = 0x1234567890123456789012345678901234567890;
         address addr2 = 0x0987654321098765432109876543210987654321;
-        string memory str = string.concat(
-            "using-words-from ", addr1.toHexString(),
-            " /* a comment */ ", addr2.toHexString()
-        );
+        string memory str =
+            string.concat("using-words-from ", addr1.toHexString(), " /* a comment */ ", addr2.toHexString());
 
         address[] memory values = new address[](2);
         values[0] = addr1;
