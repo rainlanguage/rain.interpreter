@@ -19,3 +19,9 @@ error ConstantOpcodeConstantsHeightOverflow(uint256 constantsHeight);
 /// @param column The column value that overflowed.
 /// @param row The row value that overflowed.
 error ContextGridOverflow(uint256 column, uint256 row);
+
+/// @notice Thrown when a sub parser dispatch index is out of bounds for the
+/// function pointer table.
+/// @param index The out-of-bounds index.
+/// @param length The number of function pointers available.
+error SubParserIndexOutOfBounds(uint256 index, uint256 length);

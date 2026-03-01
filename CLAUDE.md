@@ -109,6 +109,7 @@ Testing patterns and conventions are in `TESTING.md`. Read that file before writ
 
 - Test files are in `test/` mirroring `src/` structure, suffixed `.t.sol`
 - Rust test fixtures (`crates/test_fixtures/`) deploy all four contracts on a local Anvil instance
+- Always run test commands with `run_in_background: true` so work continues in parallel
 
 ## Process (Jidoka)
 

@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {OpTest} from "test/abstract/OpTest.sol";
+import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 
 import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
@@ -65,5 +65,10 @@ contract LibOpBlockNumberTest is OpTest {
 
     function testOpBlockNumberEvalTwoOutputs() external {
         checkBadOutputs("_ _: block-number();", 0, 1, 2);
+    }
+
+    /// Test that operand is disallowed.
+    function testOpBlockNumberEvalOperandDisallowed() external {
+        checkUnhappyParse("_: block-number<0>();", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

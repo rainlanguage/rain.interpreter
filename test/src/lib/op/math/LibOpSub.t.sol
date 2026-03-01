@@ -3,6 +3,7 @@
 pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckState, OperandV2} from "test/abstract/OpTest.sol";
+import {UnexpectedOperandValue} from "src/error/ErrParse.sol";
 import {LibOpSub} from "src/lib/op/math/LibOpSub.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
@@ -104,5 +105,19 @@ contract LibOpSubTest is OpTest {
         checkHappy("_: sub(1 1 0);", Float.unwrap(LibDecimalFloat.packLossless(0, 0)), "1 1 0");
         checkHappy("_: sub(2 1 1);", Float.unwrap(LibDecimalFloat.packLossless(0, -76)), "2 1 1");
         checkHappy("_: sub(2 2 0);", Float.unwrap(LibDecimalFloat.packLossless(0, 0)), "2 2 0");
+    }
+
+    function testOpSubZeroOutputs() external {
+        checkBadOutputs(": sub(1 1);", 2, 1, 0);
+    }
+
+    function testOpSubTwoOutputs() external {
+        checkBadOutputs("_ _: sub(1 1);", 2, 1, 2);
+    }
+
+    function testOpSubEvalTwoOperandsDisallowed() external {
+        checkUnhappyParse("_: sub<0 0>(1 1);", abi.encodeWithSelector(UnexpectedOperandValue.selector));
+        checkUnhappyParse("_: sub<0 1>(1 1);", abi.encodeWithSelector(UnexpectedOperandValue.selector));
+        checkUnhappyParse("_: sub<1 0>(1 1);", abi.encodeWithSelector(UnexpectedOperandValue.selector));
     }
 }

@@ -83,6 +83,13 @@ contract LibParsePragmaKeywordTest is Test {
         assertEq(cursorAfter, cursor);
     }
 
+    /// Input ends exactly at the keyword boundary with no trailing bytes.
+    /// Hits the `cursor >= end` revert at line 55.
+    function testPragmaKeywordEndAtKeyword() external {
+        vm.expectRevert(abi.encodeWithSelector(NoWhitespaceAfterUsingWordsFrom.selector, PRAGMA_KEYWORD_BYTES_LENGTH));
+        this.externalParsePragma(string(PRAGMA_KEYWORD_BYTES));
+    }
+
     /// Anything that DOES start with the keyword but WITHOUT whitespace should
     /// error.
     /// forge-config: default.fuzz.runs = 100
@@ -217,6 +224,59 @@ contract LibParsePragmaKeywordTest is Test {
             deref := mload(pointer)
         }
         assertEq(deref, 0);
+    }
+
+    /// Two pragmas in sequence. The first parsePragma call stops at the second
+    /// keyword. Calling parsePragma again from that cursor parses the second.
+    function testPragmaKeywordTwoSequentialPragmas() external view {
+        address addr1 = 0x1234567890123456789012345678901234567890;
+        address addr2 = 0x0987654321098765432109876543210987654321;
+        string memory str =
+            string.concat("using-words-from ", addr1.toHexString(), " using-words-from ", addr2.toHexString());
+        ParseState memory state =
+            LibParseState.newState(bytes(str), "", "", LibAllStandardOps.literalParserFunctionPointers());
+        uint256 cursor = Pointer.unwrap(bytes(str).dataPointer());
+        uint256 end = Pointer.unwrap(bytes(str).endDataPointer());
+
+        // First pragma: "using-words-from " (17) + 42-char address + " " interstitial = 60.
+        uint256 cursor2 = state.parsePragma(cursor, end);
+        assertEq(cursor2, cursor + 60, "first pragma cursor");
+
+        // Second pragma parses the second address.
+        uint256 cursor3 = state.parsePragma(cursor2, end);
+        assertEq(cursor3, end, "should reach end");
+
+        // Both sub parsers should be in the linked list.
+        bytes32 deref = state.subParsers;
+        assertEq(uint160(uint256(deref)), uint160(addr2), "second address");
+        uint256 pointer = uint256(deref) >> 0xF0;
+        assembly ("memory-safe") {
+            deref := mload(pointer)
+        }
+        assertEq(uint160(uint256(deref)), uint160(addr1), "first address");
+        // The list must terminate: dereferencing the first node's next pointer
+        // yields zero (the initial empty subParsers value).
+        uint256 nextPointer = uint256(deref) >> 0xF0;
+        bytes32 nextDeref;
+        assembly ("memory-safe") {
+            nextDeref := mload(nextPointer)
+        }
+        assertEq(uint256(nextDeref), 0, "list must terminate after first address");
+    }
+
+    /// Comments between addresses in a pragma are handled by parseInterstitial.
+    function testPragmaKeywordCommentBetweenAddresses() external view {
+        address addr1 = 0x1234567890123456789012345678901234567890;
+        address addr2 = 0x0987654321098765432109876543210987654321;
+        string memory str =
+            string.concat("using-words-from ", addr1.toHexString(), " /* a comment */ ", addr2.toHexString());
+
+        address[] memory values = new address[](2);
+        values[0] = addr1;
+        values[1] = addr2;
+
+        // "using-words-from " (17) + 42 + " /* a comment */ " (17) + 42 = 118
+        checkPragmaParsing(str, 118, values, "comment between addresses");
     }
 
     /// Test a specific string.

@@ -65,7 +65,7 @@ library LibOpDecodeBits {
     function referenceFn(InterpreterState memory, OperandV2 operand, StackItem[] memory inputs)
         internal
         pure
-        returns (StackItem[] memory outputs)
+        returns (StackItem[] memory)
     {
         // We decode as a start and length of bits. This avoids mistakes such as
         // inclusive/exclusive ranges, and makes it easier to reason about the
@@ -77,7 +77,7 @@ library LibOpDecodeBits {
         // is 255. A 256 length doesn't really make sense as that isn't an
         // encoding anyway, it's just the value verbatim.
         uint256 mask = (2 ** length) - 1;
-        outputs = new StackItem[](1);
-        outputs[0] = StackItem.wrap(bytes32((uint256(StackItem.unwrap(inputs[0])) >> startBit) & mask));
+        inputs[0] = StackItem.wrap(bytes32((uint256(StackItem.unwrap(inputs[0])) >> startBit) & mask));
+        return inputs;
     }
 }

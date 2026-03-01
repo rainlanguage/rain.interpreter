@@ -25,9 +25,11 @@ library LibExternOpIntInc {
     /// @return The incremented values.
     //slither-disable-next-line dead-code
     function run(OperandV2, StackItem[] memory inputs) internal pure returns (StackItem[] memory) {
+        // packLossless(1e37, -37) encodes the decimal float value 1.
+        Float one = LibDecimalFloat.packLossless(1e37, -37);
         for (uint256 i = 0; i < inputs.length; i++) {
             Float a = Float.wrap(StackItem.unwrap(inputs[i]));
-            a = a.add(LibDecimalFloat.packLossless(1e37, -37));
+            a = a.add(one);
             inputs[i] = StackItem.wrap(Float.unwrap(a));
         }
         return inputs;

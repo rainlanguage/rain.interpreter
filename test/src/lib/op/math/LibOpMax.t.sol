@@ -62,6 +62,10 @@ contract LibOpMaxTest is OpTest {
         checkBadInputs("_: max(max-positive-value());", 1, 2, 1);
     }
 
+    function testOpMaxZeroOutputs() external {
+        checkBadOutputs(": max(0 0);", 2, 1, 0);
+    }
+
     function testOpMaxEvalTwoOutputs() external {
         checkBadOutputs("_ _: max(0 0);", 2, 1, 2);
     }

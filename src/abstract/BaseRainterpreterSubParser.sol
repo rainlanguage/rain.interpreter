@@ -16,6 +16,7 @@ import {LibParseOperand} from "../lib/parse/LibParseOperand.sol";
 import {IDescribedByMetaV1} from "rain.metadata/interface/IDescribedByMetaV1.sol";
 import {IParserToolingV1} from "rain.sol.codegen/interface/IParserToolingV1.sol";
 import {ISubParserToolingV1} from "rain.sol.codegen/interface/ISubParserToolingV1.sol";
+import {SubParserIndexOutOfBounds} from "../error/ErrSubParse.sol";
 
 /// @dev This is a placeholder for the subparser function pointers.
 /// The subparser function pointers are a list of 16 bit function pointers,
@@ -37,12 +38,6 @@ bytes constant SUB_PARSER_OPERAND_HANDLERS = hex"";
 /// @dev This is a placeholder for the int that encodes pointers to literal
 /// parsers.
 bytes constant SUB_PARSER_LITERAL_PARSERS = hex"";
-
-/// @dev Thrown when a sub parser dispatch index is out of bounds for the
-/// function pointer table.
-/// @param index The out-of-bounds index.
-/// @param length The number of function pointers available.
-error SubParserIndexOutOfBounds(uint256 index, uint256 length);
 
 /// Base implementation of `ISubParserV4`. Inherit from this contract and
 /// override the virtual functions to align all the relevant pointers and

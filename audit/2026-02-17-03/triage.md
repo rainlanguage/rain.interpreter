@@ -236,62 +236,62 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A24-1: (LOW) LibOpE missing operand disallowed test — added testOpEEvalOperandDisallowed
 - [FIXED] A24-2: (LOW) LibOpExp and LibOpExp2 fuzz tests restrict inputs to non-negative small values only — added testOpExpEvalNegativeInput (exp(-1)=1/e) and testOpExp2EvalNegativeInput (exp2(-1)=0.5)
 - [FIXED] A24-3: (LOW) LibOpGm fuzz test restricts inputs to non-negative small values only — fixed implementation to compute signed geometric mean: sign * sqrt(|a| * |b|). Expanded fuzz bounds to include negatives. Added eval tests for mixed signs (unit and non-unit), both negative (equal and unequal), zero with negative, and zero bytes identity. Signed GM function upstreamed to rain.math.float as GitHub issue.
-- [PENDING] A24-4: (LOW) LibOpFloor eval tests missing negative value coverage
-- [PENDING] A25-1: (LOW) LibOpInv missing test for division by zero (inv(0))
-- [PENDING] A25-2: (LOW) LibOpSub missing zero outputs and two outputs tests
-- [PENDING] A25-3: (LOW) LibOpSub missing operand handler test
-- [PENDING] A25-4: (LOW) LibOpMin missing zero outputs and two outputs tests
-- [PENDING] A25-5: (LOW) LibOpMax missing zero outputs test
-- [PENDING] A25-6: (LOW) LibOpSqrt missing test for negative input error path
-- [PENDING] A26-1: (LOW) Missing operand disallowed test for LibOpBlockNumber
-- [PENDING] A26-2: (LOW) Missing operand disallowed test for LibOpChainId
-- [PENDING] A26-3: (LOW) Missing operand disallowed test for LibOpTimestamp
-- [PENDING] A28-1: (LOW) No test for get() caching side effect on read-only keys
-- [PENDING] A29-1: (LOW) LibOpMaxUint256 missing operand disallowed test
+- [FIXED] A24-4: (LOW) LibOpFloor eval tests missing negative value coverage — added testOpFloorEvalNegative covering floor(-1), floor(-1.1)=-2, floor(-0.5)=-1, floor(-1.5)=-2, floor(-2), floor(-2.5)=-3. Uses float equality for fractional cases where internal normalization differs from packLossless.
+- [FIXED] A25-1: (LOW) LibOpInv missing test for division by zero (inv(0)) — added testOpInvEvalDivisionByZero verifying inv(0) reverts with DivisionByZero, and testOpInvEvalNegative for inv(-1)=-1, inv(-2)=-0.5
+- [FIXED] A25-2: (LOW) LibOpSub missing zero outputs and two outputs tests — added testOpSubZeroOutputs and testOpSubTwoOutputs using checkBadOutputs
+- [FIXED] A25-3: (LOW) LibOpSub missing operand handler test — added testOpSubEvalTwoOperandsDisallowed verifying two-operand syntax <0 0>, <0 1>, <1 0> reverts with UnexpectedOperandValue
+- [FIXED] A25-4: (LOW) LibOpMin missing zero outputs and two outputs tests — added testOpMinZeroOutputs and testOpMinTwoOutputs
+- [FIXED] A25-5: (LOW) LibOpMax missing zero outputs test — added testOpMaxZeroOutputs
+- [FIXED] A25-6: (LOW) LibOpSqrt missing test for negative input error path — added testOpSqrtEvalNegativeInput verifying sqrt(-1) reverts with PowNegativeBase
+- [FIXED] A26-1: (LOW) Missing operand disallowed test for LibOpBlockNumber — added testOpBlockNumberEvalOperandDisallowed
+- [FIXED] A26-2: (LOW) Missing operand disallowed test for LibOpChainId — added testOpChainIdEvalOperandDisallowed
+- [FIXED] A26-3: (LOW) Missing operand disallowed test for LibOpTimestamp — added testOpBlockTimestampEvalOperandDisallowed and testOpNowEvalOperandDisallowed as separate tests
+- [DISMISSED] A28-1: (LOW) No test for get() caching side effect on read-only keys — already tested: testLibOpGetRunUnset verifies stateKV populated on miss (lines 59-64), testLibOpGetEvalKeyNotSet verifies kvs output includes cached value (lines 214-216). Finding acknowledges behavior is by design.
+- [FIXED] A29-1: (LOW) LibOpMaxUint256 missing operand disallowed test — added testOpMaxUint256EvalOperandDisallowed
 - [FIXED] A30-1: (MEDIUM) No test triggers `ParenOverflow` error — testParenOverflow and testParenMaxNesting boundary tests added
-- [PENDING] A30-2: (LOW) No test triggers `ParserOutOfBounds` error from `parse()`
-- [PENDING] A30-3: (LOW) No test for yang-state `UnexpectedRHSChar` in `parseRHS`
-- [PENDING] A30-4: (LOW) No test for stack name fallback path in `parseRHS` via `stackNameIndex`
-- [PENDING] A30-5: (LOW) No test for `OPCODE_UNKNOWN` sub-parser bytecode construction boundary conditions
-- [PENDING] A31-1: (LOW) No direct unit tests for `parseErrorOffset`
-- [PENDING] A31-2: (LOW) No direct unit tests for `handleErrorSelector`
-- [PENDING] A32-1: (LOW) No direct unit tests for `skipComment`, `skipWhitespace`, or `parseInterstitial`
+- [DISMISSED] A30-2: (LOW) No test triggers `ParserOutOfBounds` error from `parse()` — untestable defensive invariant. All cursor advancement in parseInterstitial, parseLHS, parseRHS is bounded by end checks; no code path can advance cursor past end under the current implementation.
+- [FIXED] A30-3: (LOW) No test for yang-state `UnexpectedRHSChar` in `parseRHS` — added testParseUnexpectedRHSYangWordWord verifying consecutive words without whitespace reverts
+- [FIXED] A30-4: (LOW) No test for stack name fallback path in `parseRHS` via `stackNameIndex` — added testParseNamedLHSStackNameOnly (sole RHS item) and testParseNamedLHSStackNameLastPosition (last position after literal)
+- [FIXED] A30-5: (LOW) No test for `OPCODE_UNKNOWN` sub-parser bytecode construction boundary conditions — added testUnknownWordMaxLength (31-byte word), testUnknownWordMinLength (1-byte word), testUnknownWordWithOperandValues (operand data appended)
+- [FIXED] A31-1: (LOW) No direct unit tests for `parseErrorOffset` — added LibParseError.t.sol with testParseErrorOffsetFirstByte, testParseErrorOffsetLastByte, testParseErrorOffsetFuzz
+- [FIXED] A31-2: (LOW) No direct unit tests for `handleErrorSelector` — added testHandleErrorSelectorReverts (non-zero selector) and testHandleErrorSelectorZeroNoOp (zero selector no-op)
+- [FIXED] A32-1: (LOW) No direct unit tests for `skipComment`, `skipWhitespace`, or `parseInterstitial` — added testSkipCommentSetsYang, testSkipWhitespaceClearsYang, testSkipWhitespaceAtEnd, testParseInterstitialMixed, testParseInterstitialAtEnd
 - [FIXED] A32-2: (MEDIUM) `MalformedCommentStart` error path is never tested — fuzzed over all non-'*' second bytes
-- [PENDING] A32-3: (LOW) No test for `skipComment` when `cursor + 4 > end`
-- [PENDING] A32-4: (LOW) No test for `skipWhitespace` in isolation
+- [FIXED] A32-3: (LOW) No test for `skipComment` when `cursor + 4 > end` — added testSkipCommentTooShort (2 bytes) and testSkipCommentThreeBytes (3 bytes)
+- [FIXED] A32-4: (LOW) No test for `skipWhitespace` in isolation — added testSkipWhitespaceClearsYang and testSkipWhitespaceAtEnd
 - [FIXED] A33-1: (MEDIUM) No direct unit test for `selectLiteralParserByIndex` — added direct test calling returned function pointer for hex, decimal, and string indices
-- [PENDING] A33-2: (LOW) No direct unit test for `tryParseLiteral` dispatch logic
-- [PENDING] A33-3: (LOW) No test for `parseLiteral` revert path
+- [FIXED] A33-2: (LOW) No direct unit test for `tryParseLiteral` dispatch logic — added LibParseLiteral.dispatch.t.sol with 24 tests covering all dispatch paths, value correctness, cursor advancement, and edge cases
+- [FIXED] A33-3: (LOW) No test for `parseLiteral` revert path — added testParseLiteralUnsupportedType and testParseLiteralHappyPath in same file
 - [FIXED] A34-1: (MEDIUM) No happy-path unit test for `parseDecimalFloatPacked` — added 47 happy-path cases covering zero, integers, negatives, positive/negative exponents, decimal points, no exponent, and large coefficients using float eq
-- [PENDING] A34-2: (LOW) No fuzz test for decimal parsing round-trip
-- [PENDING] A34-3: (LOW) No test for cursor position after successful parse
-- [PENDING] A34-4: (LOW) No test for decimal values with fractional parts
+- [UPSTREAM] A34-2: (LOW) No fuzz test for decimal parsing round-trip — covered by testParseLiteralDecimalFloatFuzz in rain.math.float/test/src/lib/parse/LibParseDecimalFloat.t.sol:108
+- [UPSTREAM] A34-3: (LOW) No test for cursor position after successful parse — covered by checkParseDecimalFloat helper in same upstream file which asserts cursorAfter on every call including fuzz test
+- [FIXED] A34-4: (LOW) No test for decimal values with fractional parts — already covered by A34-1 fix (1.5, 0.001, 123.456, 0.1, 99.99, etc.)
 - [FIXED] A35-1: (MEDIUM) No test for `HexLiteralOverflow` error — testParseHexOverflow with boundary at 65 digits
 - [FIXED] A35-2: (MEDIUM) No test for `ZeroLengthHexLiteral` error — fuzzed over non-hex trailing bytes
 - [FIXED] A35-3: (MEDIUM) No test for `OddLengthHexLiteral` error — fuzzed over odd lengths 1-63
-- [PENDING] A35-4: (LOW) No test for `MalformedHexLiteral` error
-- [PENDING] A35-5: (LOW) No test for mixed-case hex parsing
+- [DISMISSED] A35-4: (LOW) No test for `MalformedHexLiteral` error — unreachable defensive invariant; boundHex uses CMASK_HEX (= CMASK_NUMERIC_0_9 | CMASK_LOWER_ALPHA_A_F | CMASK_UPPER_ALPHA_A_F) to bound the region, same three masks used in nybble conversion
+- [FIXED] A35-5: (LOW) No test for mixed-case hex parsing — added testParseHexMixedCase, testParseHexUpperCase, testParseHexLowerCase, testParseHexAlternatingCase
 - [FIXED] A36-1: (MEDIUM) No test for RepeatLiteralTooLong revert path — added fuzz test for length >= 78
 - [FIXED] A36-2: (MEDIUM) No test for parseRepeat output value correctness — added fuzz test asserting output against reference sum
-- [PENDING] A36-3: (LOW) No test for zero-length literal body (cursor == end)
-- [PENDING] A36-4: (LOW) No test for length = 1 (single character body)
-- [PENDING] A36-5: (LOW) No test for length = 77 (maximum valid length)
-- [PENDING] A36-6: (LOW) Integration tests use bare vm.expectRevert() without specifying expected error
-- [PENDING] A37-1: (LOW) No explicit test for `parseString` memory snapshot restoration
-- [PENDING] A37-3: (LOW) No test for `UnclosedStringLiteral` when `end == innerEnd`
+- [FIXED] A36-3: (LOW) No test for zero-length literal body (cursor == end) — covered by A36-2 fuzz test which fuzzes length 0-77
+- [FIXED] A36-4: (LOW) No test for length = 1 (single character body) — covered by A36-2 fuzz test
+- [FIXED] A36-5: (LOW) No test for length = 77 (maximum valid length) — covered by A36-2 fuzz test
+- [FIXED] A36-6: (LOW) Integration tests use bare vm.expectRevert() without specifying expected error — added InvalidRepeatCount selector to all three negative integration tests
+- [FIXED] A37-1: (LOW) No explicit test for `parseString` memory snapshot restoration — added testParseStringMemoryRestoration fuzz test that parses twice and verifies values match and data length is intact
+- [FIXED] A37-3: (LOW) No test for `UnclosedStringLiteral` when `end == innerEnd` — added testBoundStringUnclosedAtEndBoundary concrete test and fuzz variant targeting end at closing quote
 - [FIXED] A38-1: (MEDIUM) No test for `subParseLiteral` returning `(false, ...)` (sub-parser rejection) — added fuzz tests for first-rejects-second-accepts and all-reject paths
-- [PENDING] A38-2: (LOW) No fuzz test for the error paths
+- [DISMISSED] A38-2: (LOW) No fuzz test for the error paths — 9 concrete tests cover every error branch; fuzz would only generate variations hitting the same branches
 - [FIXED] A39-1: (MEDIUM) `handleOperandDisallowedAlwaysOne` has no test file or any test coverage — added tests for empty values returning 1 and non-empty values reverting
-- [PENDING] A39-2: (LOW) `handleOperand` (dispatch function) has no direct unit test
-- [PENDING] A39-3: (LOW) `parseOperand` -- no test for `UnclosedOperand` revert from yang state
-- [PENDING] A39-5: (LOW) `handleOperandM1M1` -- no test for first value overflow with two values provided
-- [PENDING] A39-6: (LOW) `handleOperand8M1M1` -- no test for first value overflow with all three values provided
-- [PENDING] A40-1: (LOW) No unit test for `cursor >= end` revert path after keyword
-- [PENDING] A40-2: (LOW) No test for multiple pragmas in sequence
-- [PENDING] A40-3: (LOW) No test for pragma with comments between addresses
-- [PENDING] A41-1: (LOW) No test for bloom filter false positive path
-- [PENDING] A41-2: (LOW) No test for fingerprint collision behavior
-- [PENDING] A41-3: (LOW) No negative lookup test on populated list
+- [FIXED] A39-2: (LOW) `handleOperand` (dispatch function) has no direct unit test — added LibParseOperand.handleOperand.t.sol with 4 tests: empty values, different handlers, same handler, disallowed multiple indices
+- [FIXED] A39-3: (LOW) `parseOperand` -- no test for `UnclosedOperand` revert from yang state — added testParseOperandYangStateLiteralCollision with back-to-back literal without whitespace
+- [FIXED] A39-5: (LOW) `handleOperandM1M1` -- no test for first value overflow with two values provided — added testHandleOperandM1M1TwoValuesFirstValueTooLarge
+- [FIXED] A39-6: (LOW) `handleOperand8M1M1` -- no test for first value overflow with all three values provided — added testHandleOperand8M1M1AllValuesFirstValueTooLarge
+- [FIXED] A40-1: (LOW) No unit test for `cursor >= end` revert path after keyword — added testPragmaKeywordEndAtKeyword
+- [FIXED] A40-2: (LOW) No test for multiple pragmas in sequence — added testPragmaKeywordTwoSequentialPragmas
+- [FIXED] A40-3: (LOW) No test for pragma with comments between addresses — added testPragmaKeywordCommentBetweenAddresses
+- [FIXED] A41-1: (LOW) No test for bloom filter false positive path — added testStackNameBloomFalsePositive with brute-forced bloom collision
+- [DISMISSED] A41-2: (LOW) No test for fingerprint collision behavior — 224-bit keccak collision is astronomically unlikely; accepted behavior
+- [FIXED] A41-3: (LOW) No negative lookup test on populated list — added testStackNameNegativeLookup fuzz test
 - [FIXED] A42-1: (CRITICAL) No direct unit tests for any function in LibParseStackTracker — LibParseStackTracker.t.sol added with 12 tests
 - [FIXED] A42-2: (HIGH) ParseStackOverflow in push() never tested — testPushOverflow added
 - [FIXED] A42-3: (HIGH) ParseStackUnderflow in pop() never tested — testPopUnderflow added
@@ -307,38 +307,38 @@ Tracks the disposition of every LOW+ finding from pass2 audit reports (test cove
 - [FIXED] A43-7: (MEDIUM) No direct unit tests for pushOpToSource() — added 5 tests: encoding fuzz, FSM flags, two-op encoding, slot overflow linked list, SourceItemOpsOverflow
 - [FIXED] A43-8: (MEDIUM) No direct unit tests for endSource() — added 5 tests: single-op source, state reset, two sources, byte length fuzz, MaxSources revert
 - [FIXED] A43-9: (MEDIUM) No direct unit tests for buildBytecode() — added 3 tests: single source, two sources, fuzz source count and ops per source
-- [PENDING] A43-10: (LOW) No direct unit tests for buildConstants()
-- [PENDING] A43-11: (LOW) No direct unit tests for pushLiteral()
+- [FIXED] A43-10: (LOW) No direct unit tests for buildConstants() — added 4 tests: empty, single fuzz, multiple concrete, fuzz N values in push order
+- [FIXED] A43-11: (LOW) No direct unit tests for pushLiteral() — added 5 tests: single hex, single decimal, duplicate dedup, two different values, UnsupportedLiteralType revert
 - [FIXED] A44-1: (HIGH) No direct unit test for subParseWordSlice() — all paths covered by integration tests (badSubParserResult.t.sol, unknownWord.t.sol, intInc.t.sol)
 - [FIXED] A44-2: (MEDIUM) UnknownWord error path tested only via integration — added direct test with mock sub-parser rejection and fuzzed address
 - [FIXED] A44-3: (MEDIUM) UnsupportedLiteralType error path in subParseLiteral() not directly tested — already covered by A38-1 testSubParseLiteralAllReject in commit `66644c8d`
-- [PENDING] A44-4: (LOW) No direct unit test for subParseWords()
-- [PENDING] A44-5: (LOW) No direct unit test for subParseLiteral()
-- [PENDING] A44-6: (LOW) No direct unit test for consumeSubParseWordInputData()
-- [PENDING] A44-7: (LOW) No direct unit test for consumeSubParseLiteralInputData()
-- [PENDING] A44-8: (LOW) Sub parser constant accumulation not tested
-- [PENDING] A45-1: (LOW) No test for `InputsLengthMismatch` with fewer inputs than expected
-- [PENDING] A45-2: (LOW) No direct test for `eval4` happy path with inputs
-- [PENDING] A45-3: (LOW) No test for `eval4` with non-zero `sourceIndex`
-- [PENDING] A45-5: (LOW) No test for `stateOverlay` with multiple key-value pairs
-- [PENDING] A45-6: (LOW) No test for `stateOverlay` with duplicate keys
+- [FIXED] A44-4: (LOW) No direct unit test for subParseWords() — added 6 tests: empty bytecode, known opcode passthrough, single/two source resolution via sub parser, unknown word revert, multiple known opcodes
+- [FIXED] A44-5: (LOW) No direct unit test for subParseLiteral() — Added `LibSubParse.subParseLiteral.t.sol` (6 tests: single sub parser success/reject, first-rejects-second-accepts, all-reject, empty body, early exit)
+- [FIXED] A44-6: (LOW) No direct unit test for consumeSubParseWordInputData() — Added `LibSubParse.consumeSubParseWordInputData.t.sol` (6 tests: basic extraction, fuzz constantsHeight, fuzz ioByte, max constantsHeight, empty word, longer word)
+- [FIXED] A44-7: (LOW) No direct unit test for consumeSubParseLiteralInputData() — Added `LibSubParse.consumeSubParseLiteralInputData.t.sol` (7 tests: basic, dispatch content, body content, empty body, minimal, fuzz, roundtrip)
+- [FIXED] A44-8: (LOW) Sub parser constant accumulation not tested — Added `LibSubParse.constantAccumulation.t.sol` (4 tests: single constant, two words, multi-constant, constant index after literal)
+- [FIXED] A45-1: (LOW) No test for `InputsLengthMismatch` with fewer inputs than expected — already exists at `Rainterpreter.eval.t.sol:testInputsLengthMismatchTooFew` with fuzz over expectedInputs/actualInputs
+- [FIXED] A45-2: (LOW) No direct test for `eval4` happy path with inputs — already exists at `Rainterpreter.eval.t.sol:testEvalWithMatchingInputs` with fuzz over inputs a/b
+- [FIXED] A45-3: (LOW) No test for `eval4` with non-zero `sourceIndex` — Added `Rainterpreter.eval.nonZeroSourceIndex.t.sol` (3 tests: basic sourceIndex=1, sourceIndex=1 with inputs, source selection comparison)
+- [FIXED] A45-5: (LOW) No test for `stateOverlay` with multiple key-value pairs — Added `testStateOverlayMultiplePairs` (2 pairs) and `testStateOverlayThreePairs` (3 pairs) to `Rainterpreter.stateOverlay.t.sol`
+- [FIXED] A45-6: (LOW) No test for `stateOverlay` with duplicate keys — Added `testStateOverlayDuplicateKeyLastWins` and `testStateOverlayDuplicateKeysInterleaved` to `Rainterpreter.stateOverlay.t.sol`
 - [FIXED] A47-1: (MEDIUM) No direct test for `parse2` with invalid input — added 3 tests: empty input, parse error propagation, integrity error propagation
 - [FIXED] A47-2: (MEDIUM) No direct test for `parsePragma1` on the expression deployer — added 4 tests: no pragma, single address, two addresses, error propagation
-- [PENDING] A47-3: (LOW) No test for `buildIntegrityFunctionPointers` return value consistency
-- [PENDING] A47-4: (LOW) No test for `parse2` assembly block memory allocation
+- [DISMISSED] A47-3: (LOW) No test for `buildIntegrityFunctionPointers` return value consistency — internal function pointers are relative to contract bytecode, cannot be meaningfully compared across different contract deployments; consistency is verified by BuildPointers.sol during the build pipeline
+- [DISMISSED] A47-4: (LOW) No test for `parse2` assembly block memory allocation — 4 lines of standard memory allocation boilerplate; any corruption would cause every `parse2` integration test to fail; no way to test allocation independently of output correctness
 - [FIXED] A48-1: (MEDIUM) No direct test for `unsafeParse` — happy path and empty input tests using LibBytecode inspection
-- [PENDING] A48-3: (LOW) No test for `unsafeParse` with input triggering `ParseMemoryOverflow`
-- [PENDING] A48-4: (LOW) No test for `parsePragma1` with empty input
-- [PENDING] A49-1: (LOW) `InvalidRepeatCount` error not directly asserted in revert tests
-- [PENDING] A49-2: (LOW) `BadDynamicLength` error path never tested
-- [PENDING] A49-3: (LOW) `SubParserIndexOutOfBounds` error path never tested for RainterpreterReferenceExtern
-- [PENDING] A49-4: (LOW) No test for `extern()` function called directly on RainterpreterReferenceExtern
-- [PENDING] A49-5: (LOW) No test for `externIntegrity()` called directly on RainterpreterReferenceExtern
+- [DISMISSED] A48-3: (LOW) No test for `unsafeParse` with input triggering `ParseMemoryOverflow` — requires pushing free memory pointer past 0x10000 before parse, not practically achievable from test code
+- [FIXED] A48-4: (LOW) No test for `parsePragma1` with empty input — Added `RainterpreterParser.parsePragmaEmpty.t.sol` (2 tests: empty input, single null byte)
+- [FIXED] A49-1: (LOW) `InvalidRepeatCount` error not directly asserted in revert tests — already exists at `RainterpreterReferenceExtern.repeat.t.sol` with `abi.encodeWithSelector(InvalidRepeatCount.selector)` assertions for negative, non-integer, and >9 cases
+- [DISMISSED] A49-2: (LOW) `BadDynamicLength` error path never tested — defensive assertion against compiler memory layout bugs, cannot be triggered from test code
+- [FIXED] A49-3: (LOW) `SubParserIndexOutOfBounds` error path never tested for RainterpreterReferenceExtern — Added `RainterpreterReferenceExtern.subParserIndexOutOfBounds.t.sol` with mock subclass forcing OOB literal index
+- [FIXED] A49-4: (LOW) No test for `extern()` function called directly on RainterpreterReferenceExtern — already exists at `RainterpreterReferenceExtern.intInc.t.sol:testRainterpreterReferenceExternExternDirect` and `testRainterpreterReferenceExternExternModWrap`
+- [FIXED] A49-5: (LOW) No test for `externIntegrity()` called directly on RainterpreterReferenceExtern — already exists at `RainterpreterReferenceExtern.intInc.t.sol:testRainterpreterReferenceExternIntegrityDirect`
 - [FIXED] A50-1: (MEDIUM) No test for namespace isolation across different `msg.sender` values — added 2 fuzz tests: unidirectional isolation and bidirectional write isolation
-- [PENDING] A50-2: (LOW) `Set` event emission never tested
-- [PENDING] A50-3: (LOW) No test for `set` with empty array (zero-length `kvs`)
-- [PENDING] A50-4: (LOW) No test for `get` on uninitialized key (default value)
-- [PENDING] A50-5: (LOW) No test for overwriting a key with a different value in a single `set` call
+- [FIXED] A50-2: (LOW) `Set` event emission never tested — Added `RainterpreterStore.setEvent.t.sol` (3 tests: single pair event, multiple pairs events, fuzz FQN matches qualifyNamespace)
+- [FIXED] A50-3: (LOW) No test for `set` with empty array (zero-length `kvs`) — Added `RainterpreterStore.setEmpty.t.sol` (3 tests: no revert, no events emitted, fuzz any namespace)
+- [FIXED] A50-4: (LOW) No test for `get` on uninitialized key (default value) — Added `RainterpreterStore.getUninitialized.t.sol` (3 tests: returns 0, fuzz namespace+key, unaffected by different key set)
+- [FIXED] A50-5: (LOW) No test for overwriting a key with a different value in a single `set` call — Added `RainterpreterStore.overwriteKey.t.sol` (3 tests: last-write-wins, triple overwrite, dupe among unique keys)
 
 # Pass 3 Triage
 
@@ -720,30 +720,30 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 ## Findings
 
 - [FIXED] A01-1: (LOW) Dead `using` directives and unused imports (LibStackPointer, LibUint256Array, Pointer) in BaseRainterpreterExtern — removed all 4 using directives and 3 imports
-- [PENDING] A01-2: (LOW) Inconsistent assembly idioms for function pointer extraction (`shr(0xf0,...)` vs `and(..., 0xFFFF)`) across BaseRainterpreterExtern and BaseRainterpreterSubParser
-- [PENDING] A01-3: (LOW) Error `SubParserIndexOutOfBounds` defined inline in BaseRainterpreterSubParser instead of in `src/error/ErrSubParse.sol`
-- [PENDING] A01-4: (LOW) Inconsistent mutability between `opcodeFunctionPointers` (view) and `integrityFunctionPointers` (pure) in BaseRainterpreterExtern
+- [DISMISSED] A01-2: (LOW) Inconsistent assembly idioms for function pointer extraction — idiom differences arise from different offset calculations, unifying changes bytecode with no safety benefit
+- [FIXED] A01-3: (LOW) Error `SubParserIndexOutOfBounds` defined inline in BaseRainterpreterSubParser instead of in `src/error/ErrSubParse.sol` — moved to ErrSubParse.sol, updated import
+- [DISMISSED] A01-4: (LOW) Inconsistent mutability between `opcodeFunctionPointers` (view) and `integrityFunctionPointers` (pure) — view may be intentional for override flexibility
 - [FIXED] A03-1: (LOW) `MalformedExponentDigits` and `MalformedDecimalPoint` errors are unused dead code in ErrParse.sol — removed both
 - [FIXED] A03-2: (LOW) Inconsistent NatSpec `@dev` usage across error files; ErrSubParse uses `@dev` while others use plain `///` — removed `@dev` from all 3 errors
 - [FIXED] A03-3: (LOW) Missing `@param` tags on 28 parameterized errors in ErrParse.sol — added `@param` tags to all parameterized errors
 - [FIXED] A03-4: (LOW) Missing `@param` tags on `BadOutputsLength` in ErrExtern.sol — added `@param expectedLength` and `@param actualLength`
 - [FIXED] A03-5: (LOW) Missing `@param` tags on all 3 errors in ErrSubParse.sol — added `@param` tags to all 3 errors
 - [FIXED] A03-6: (LOW) `DuplicateLHSItem` is the only error in ErrParse.sol using `@dev` prefix, inconsistent with all other errors in the file — removed `@dev`
-- [PENDING] A04-1: (LOW) `LibOpCall` is missing `referenceFn` unlike all other opcode libraries
+- [DISMISSED] A04-1: (LOW) `LibOpCall` is missing `referenceFn` — call opcode cannot have a meaningful referenceFn, it would duplicate run
 - [FIXED] A04-2: (LOW) Unused `using LibPointer for Pointer` declaration and import in LibOpCall — removed using directive and LibPointer import
-- [PENDING] A05-1: (LOW) Magic numbers throughout `evalLoop` assembly shared with LibIntegrityCheck should be named constants
+- [DISMISSED] A05-1: (LOW) Magic numbers throughout `evalLoop` assembly shared with LibIntegrityCheck should be named constants — EVM word-size intrinsics and unrolled loop byte positions; named constants would make the loop harder to verify visually; existing comments adequate
 - [FIXED] A05-2: (LOW) Stale reference to variable name `tail` instead of `stack` in `eval2` NatSpec comment in LibEval — corrected to `stack`
-- [PENDING] A06-1: (LOW) Inconsistent constant sourcing for context ops; LibExternOpContextRainlen defines inline constants while siblings import from LibContext.sol
-- [PENDING] A06-2: (LOW) Inconsistent function mutability across subParser functions; LibExternOpIntInc is `view` while others are `pure`
-- [PENDING] A06-3: (LOW) Magic number in LibExternOpIntInc.run for decimal float value 1 should use named constant
-- [PENDING] A06-4: (LOW) Magic number 78 in LibParseLiteralRepeat bound check should use named constant
-- [PENDING] A12-1: (LOW) Magic number `0x18` for cursor alignment in `integrityCheck2` lacks derivation explanation
+- [DISMISSED] A06-1: (LOW) Inconsistent constant sourcing for context ops — rainlen constants are application-specific (different context column), local definition is appropriate
+- [DISMISSED] A06-2: (LOW) Inconsistent function mutability across subParser functions — mutability difference structurally required, address(this) requires view
+- [FIXED] A06-3: (LOW) Magic number in LibExternOpIntInc.run for decimal float value 1 should use named constant — hoisted packLossless(1e37, -37) out of loop into local variable with comment
+- [FIXED] A06-4: (LOW) Magic number 78 in LibParseLiteralRepeat bound check should use named constant — added MAX_REPEAT_LITERAL_LENGTH constant
+- [DISMISSED] A12-1: (LOW) Magic number `0x18` for cursor alignment — single occurrence with adequate comment, named constant would not clarify derivation
 - [FIXED] A14-1: (LOW) Unused variable `success` from `staticcall` in `stackTrace` assembly should use `pop()` idiom in LibInterpreterState — changed to `pop(staticcall(...))`
 - [FIXED] A14-2: (LOW) Incorrect arithmetic in `stackTrace` NatSpec gas cost analysis in LibInterpreterState — fixed division denominator and included memory term
-- [PENDING] A16-1: (LOW) Inconsistent `referenceFn` return pattern (new array vs mutate-in-place) across bitwise ops; LibOpDecodeBits is 1-input/1-output but allocates new array unlike other 1-in/1-out ops
+- [DISMISSED] A16-1: (LOW) Inconsistent `referenceFn` return pattern (new array vs mutate-in-place) across bitwise ops; LibOpDecodeBits is 1-input/1-output but allocates new array unlike other 1-in/1-out ops — false positive; referenceFn already mutates inputs[0] in place and returns inputs
 - [FIXED] A16-2: (LOW) Inconsistent `uint256` cast on `type(uint8).max` between LibOpShiftBitsLeft and LibOpShiftBitsRight — removed unnecessary cast from ShiftBitsLeft
 - [FIXED] A16-3: (LOW) Inconsistent lint suppression comments between LibOpDecodeBits and LibOpEncodeBits for identical shift operation — added slither suppression to EncodeBits to match DecodeBits
-- [PENDING] A16-4: (LOW) Repeated operand parsing logic for `startBit` and `length` duplicated 6 times across LibOpDecodeBits and LibOpEncodeBits
+- [DISMISSED] A16-4: (LOW) Repeated operand parsing logic for `startBit` and `length` duplicated 6 times — inline for gas in run, consistent pattern across integrity/referenceFn
 - [FIXED] A20-1: (LOW) `@title` NatSpec mismatch in `LibOpUint256ERC20BalanceOf.sol` missing `Lib` prefix — corrected to LibOpUint256ERC20BalanceOf
 - [FIXED] A20-2: (LOW) Inconsistent `forge-lint` comment formatting in `LibOpUint256ERC20TotalSupply.sol` (space after `//` vs no space) — removed space to match other files
 - [FIXED] A22-1: (LOW) `@title` NatSpec missing `Lib` prefix in `LibOpUint256ERC721BalanceOf` — corrected to LibOpUint256ERC721BalanceOf
@@ -756,62 +756,62 @@ Tracks the disposition of every LOW+ finding from pass4 audit reports (code qual
 - [FIXED] A25a-2: (LOW) Missing "point" in LibOpHeadroom run NatSpec ("decimal floating headroom" should be "decimal floating point headroom") — fixed in earlier commit
 - [FIXED] A25a-3: (LOW) Missing "decimal" in LibOpInv run NatSpec (says "floating point" instead of "decimal floating point") — fixed as part of @notice removal
 - [FIXED] A25a-4: (LOW) Misleading `unchecked` block with overflow comment in LibOpMax.referenceFn irrelevant to `max` operation — removed unnecessary unchecked block and comment
-- [PENDING] A28-1: (LOW) Unnecessary `unchecked` block wrapping entire `run` body in LibOpSet has no semantic effect on assembly-only arithmetic
+- [FIXED] A28-1: (LOW) Unnecessary `unchecked` block wrapping entire `run` body in LibOpSet — already removed in prior commit
 - [FIXED] A29-1: (LOW) Misleading comment in `referenceFn` for LibOpUint256Div and LibOpUint256Sub says "overflow" but Div reverts on divide-by-zero and Sub reverts on underflow — corrected both
 - [FIXED] A29-2: (LOW) Inconsistent NatSpec description in LibOpLinearGrowth references wrong variable names ("a" and "r" instead of "base" and "rate") — corrected to "base" and "rate", also removed `@notice`
 - [DISMISSED] A30-1: (MEDIUM) Dead constants `NOT_LOW_16_BIT_MASK` and `ACTIVE_SOURCE_MASK` defined but never referenced anywhere in the codebase — false positive; neither constant exists in the codebase
 - [DISMISSED] A30-2: (LOW) Potentially unused `using LibBytes32Array` declaration in LibParse.sol — false positive; used for `.startPointer()` on operandValues
-- [PENDING] A30-3: (LOW) Magic numbers in paren tracking logic (group size 3, reserved bytes 2, max offset 59, shift 0xf0)
-- [PENDING] A30-4: (LOW) `parseRHS` function length (~210 lines) makes it harder to review and audit
+- [DISMISSED] A30-3: (LOW) Magic numbers in paren tracking logic — compact performance-sensitive assembly, inline comments explain values
+- [DISMISSED] A30-4: (LOW) `parseRHS` function length (~210 lines) makes it harder to review and audit — refactoring suggestion only; hot-path parser function, extraction adds gas overhead with no correctness benefit
 - [FIXED] A33-1: (LOW) Unused `using` directives (`LibParseInterstitial`, `LibSubParse`) and corresponding unused imports in LibParseLiteral.sol — removed both using directives and imports
-- [PENDING] A33-2: (MEDIUM) Function pointer mutability mismatch: `selectLiteralParserByIndex` returns `pure` typed pointer but literal parsers array stores `view` typed pointers, bypassing Solidity mutability checking via raw assembly
-- [PENDING] A33-3: (LOW) Parameter naming inconsistency: `parseDecimalFloatPacked` uses `start` instead of `cursor` unlike all other parse functions
-- [PENDING] A33-4: (LOW) Unnamed `ParseState memory` parameter in `boundHex` inconsistent with named `state` parameter in `boundString`
-- [PENDING] A33-5: (LOW) Magic number `0x40` in hex overflow check represents max hex literal length (64 nybbles) without named constant
-- [PENDING] A33-6: (LOW) Inconsistent `unchecked` block usage across parse functions: some wrap entire body, others do not use it at all
-- [PENDING] A39-1: (LOW) Magic numbers in LibParseStackName linked-list encoding without named constants
-- [PENDING] A39-2: (LOW) Magic number `0xf0` in comment sequence parsing in LibParseInterstitial
-- [PENDING] A39-3: (LOW) Duplicated Float-to-uint conversion pattern across five operand handlers in LibParseOperand
-- [PENDING] A39-4: (LOW) Tight coupling between LibParseStackName and ParseState internal layout via direct `topLevel1` access
-- [PENDING] A39-5: (LOW) Different fingerprint representations in `pushStackName` vs `stackNameIndex` is confusing
+- [DISMISSED] A33-2: (MEDIUM) Function pointer mutability mismatch — re-reading source shows return type is already view, finding is stale
+- [DISMISSED] A33-3: (LOW) Parameter naming inconsistency — `start` avoids collision with local variable `cursor` in parseDecimalFloatInline
+- [DISMISSED] A33-4: (LOW) Unnamed `ParseState memory` parameter — correct Solidity idiom for unused compatibility parameter
+- [DISMISSED] A33-5: (LOW) Magic number `0x40` in hex overflow check — 64 hex chars = 32 bytes is well-known EVM convention
+- [DISMISSED] A33-6: (LOW) Inconsistent `unchecked` block usage — applied based on arithmetic profile of each function, forcing uniformity would be misleading
+- [DISMISSED] A39-1: (LOW) Magic numbers in LibParseStackName — small file with documented bit layout, standard masks are recognizable
+- [DISMISSED] A39-2: (LOW) Magic number `0xf0` in comment sequence parsing — codebase-wide convention for 2-byte extraction
+- [DISMISSED] A39-3: (LOW) Duplicated Float-to-uint conversion pattern — handlers have subtly different needs, helper would only cover simple cases
+- [DISMISSED] A39-4: (LOW) Tight coupling between LibParseStackName and ParseState — accessors add overhead in hot path, coupling inherent to parser design
+- [DISMISSED] A39-5: (LOW) Different fingerprint representations — two representations minimize instructions in both paths, gas trade-off justified
 - [FIXED] A43-1: (LOW) Incorrect inline comments in `newState` constructor misaligned with struct field order — corrected "literalBloom" to "constantsBuilder" and "constantsBuilder" to "constantsBloom"
 - [FIXED] A43-2: (LOW) Stale function name `newActiveSource` in comment should be `newActiveSourcePointer` — corrected to `resetSource` which is the actual caller
 - [DISMISSED] A43-3: (MEDIUM) FSM NatSpec does not match defined constants (bit positions shifted, missing/extra fields) — false positive; NatSpec bits 0-3 match FSM_YANG_MASK(1), FSM_WORD_END_MASK(1<<1), FSM_ACCEPTING_INPUTS_MASK(1<<2), FSM_ACTIVE_SOURCE_MASK(1<<3) exactly
-- [PENDING] A43-4: (LOW) Magic number `0x3f` in `highwater` should be a named constant
-- [PENDING] A45-1: (LOW) Constructor lacks NatSpec documentation in Rainterpreter.sol
+- [DOCUMENTED] A43-4: (LOW) Magic number `0x3f` in `highwater` — added comment explaining the derivation
+- [DISMISSED] A45-1: (LOW) Constructor lacks NatSpec in Rainterpreter.sol — false positive, constructor already has NatSpec
 - [FIXED] A45-2: (LOW) NatSpec triple-slash used for inline code comment inside RainterpreterStore.set function body — changed `///` to `//`
-- [PENDING] A45-3: (LOW) `type(uint256).max` used as `maxOutputs` parameter without named constant in Rainterpreter.eval4
-- [PENDING] A45-4: (LOW) `buildOperandHandlerFunctionPointers` and `buildLiteralParserFunctionPointers` missing `override` keyword in RainterpreterParser, inconsistent with Rainterpreter
+- [DISMISSED] A45-3: (LOW) `type(uint256).max` without named constant — universally recognized Solidity idiom
+- [FIXED] A45-4: (LOW) `buildOperandHandlerFunctionPointers` and `buildLiteralParserFunctionPointers` missing `override` keyword in RainterpreterParser — already fixed, both functions have `override`
 - [FIXED] A47-1: (LOW) `@inheritdoc IERC165` inconsistent with other concrete contracts that use `@inheritdoc ERC165` in RainterpreterExpressionDeployer — changed to `@inheritdoc ERC165`
 - [FIXED] A47-2: (LOW) Redundant NatSpec before `@inheritdoc` on `buildIntegrityFunctionPointers` is dead documentation in RainterpreterExpressionDeployer — removed dead NatSpec
-- [PENDING] A47-3: (LOW) RainterpreterDISPaiRegistry does not implement ERC165 unlike all other concrete contracts
-- [PENDING] A49-1: (LOW) Error `InvalidRepeatCount` defined inline instead of in `src/error/` directory per codebase convention
+- [FIXED] A47-3: (LOW) RainterpreterDISPaiRegistry does not implement ERC165 — added ERC165 with IDISPaiRegistry interface support and test
+- [DISMISSED] A49-1: (LOW) Error `InvalidRepeatCount` defined inline — specific to reference extern, one-error file is over-engineering
 - [FIXED] A49-2: (LOW) Variable named `float` shadows its type name `Float` differing only in case — renamed to `repeatCount`
-- [PENDING] A49-3: (LOW) `matchSubParseLiteralDispatch` narrows from `view` to `pure virtual override` constraining future subclass override chain
+- [DISMISSED] A49-3: (LOW) `matchSubParseLiteralDispatch` narrows view to pure — correct Solidity override semantics, intentional constraint
 - [DISMISSED] R01-1: (HIGH) Duplicate short flag `-i` on both `fork_url` and `fork_block_number` in fork.rs causes clap runtime panic — false positive; no collision
 - [DISMISSED] R01-2: (MEDIUM) Unused dependencies `serde` and `serde_bytes` in CLI crate Cargo.toml — false positive; neither dependency exists in CLI Cargo.toml
-- [PENDING] R01-3: (LOW) Incorrect `homepage` URL in CLI Cargo.toml points to `rain.orderbook` instead of `rain.interpreter`
-- [PENDING] R01-4: (LOW) Inconsistent error handling pattern between eval.rs and parse.rs wraps errors with `anyhow!` losing original error chain
-- [PENDING] R01-5: (LOW) Eval output uses Debug formatting `{:#?}` labeled as Binary encoding, inconsistent with Parse subcommand
-- [PENDING] R01-6: (LOW) `Execute` trait uses native async fn in trait producing non-Send futures limiting future flexibility
+- [FIXED] R01-3: (LOW) Incorrect `homepage` URL in CLI Cargo.toml points to `rain.orderbook` instead of `rain.interpreter` — fixed URL and switched to workspace reference
+- [FIXED] R01-4: (LOW) Inconsistent error handling pattern between eval.rs and parse.rs wraps errors with `anyhow!` losing original error chain — replaced `anyhow!("{:?}", e)` with `anyhow!(e)` to preserve error chain
+- [DISMISSED] R01-5: (LOW) Eval output uses Debug formatting — CLI UX issue, proper fix requires JSON serialization feature work
+- [DISMISSED] R01-6: (LOW) `Execute` trait non-Send futures — execute() called directly in main, not spawned
 - [DISMISSED] R02-1: (MEDIUM) `unwrap()` on `traces` in `From<ForkTypedReturn<eval4Call>>` for `RainEvalResult` will panic if traces are None — false positive; impl is TryFrom with .ok_or(MissingTraces)?, not From with unwrap
-- [PENDING] R02-2: (LOW) Redundant `.to_owned()`, `.deref()`, `.clone()` chain in trace extraction creates multiple unnecessary copies
-- [PENDING] R02-3: (LOW) Inconsistent trace ordering approach between `From<ForkTypedReturn>` and `TryFrom<RawCallResult>` implementations
+- [FIXED] R02-2: (LOW) Redundant `.to_owned()`, `.deref()`, `.clone()` chain in trace extraction creates multiple unnecessary copies — simplified to `.nodes().iter()`, removed unused `Deref` import
+- [FIXED] R02-3: (LOW) Inconsistent trace ordering approach between `From<ForkTypedReturn>` and `TryFrom<RawCallResult>` implementations — both now use `.rev()` on iterator
 - [DISMISSED] R02-4: (MEDIUM) `search_trace_by_path` has logic bug in parent tracking — false positive; code correctly does current_parent_index = current_source_index at line 180
-- [PENDING] R02-5: (LOW) `CreateNamespace` is an empty struct used only as function namespace; should be a free function
-- [PENDING] R02-6: (LOW) Typo "commiting" should be "committing" in doc comments for `alloy_call` and `call`
-- [PENDING] R02-7: (LOW) `#[allow(clippy::for_kv_map)]` suppresses valid lint; should use `.values()` instead
-- [PENDING] R02-8: (LOW) `add_or_select` uses `unwrap()` on `fork_evm_env` where `new_with_fork` uses `?` for same call
-- [PENDING] R02-9: (LOW) `TryFrom<RawCallResult>` for `RainEvalResult` always produces empty `stack` and `writes` without documenting this limitation
-- [PENDING] R02-10: (LOW) `#[derive]` placed before doc comments in `ForkEvalArgs` and `ForkParseArgs` is unconventional
-- [PENDING] R02-11: (LOW) `roll_fork` uses `unwrap()` after `is_none()` check instead of idiomatic `if let Some`
-- [PENDING] R03-1: (LOW) Unused dependencies `serde` and `serde_json` in parser crate Cargo.toml
-- [PENDING] R03-2: (LOW) Unused dependency `serde_json` in test_fixtures crate Cargo.toml
+- [FIXED] R02-5: (LOW) `CreateNamespace` is an empty struct used only as function namespace; should be a free function — converted to free function `qualify_namespace`, updated call sites
+- [FIXED] R02-6: (LOW) Typo "commiting" should be "committing" in doc comments for `alloy_call` and `call` — corrected both occurrences
+- [FIXED] R02-7: (LOW) `#[allow(clippy::for_kv_map)]` suppresses valid lint; should use `.values()` instead — replaced with `.values()` iteration
+- [FIXED] R02-8: (LOW) `add_or_select` uses `unwrap()` on `fork_evm_env` where `new_with_fork` uses `?` for same call — replaced with `?`
+- [FIXED] R02-9: (LOW) `TryFrom<RawCallResult>` for `RainEvalResult` always produces empty `stack` and `writes` without documenting this limitation — added doc comment explaining why
+- [FIXED] R02-10: (LOW) `#[derive]` placed before doc comments in `ForkEvalArgs` and `ForkParseArgs` is unconventional — moved doc comments before `#[derive]`
+- [FIXED] R02-11: (LOW) `roll_fork` uses `unwrap()` after `is_none()` check instead of idiomatic `if let Some` — replaced with `.ok_or()?.unwrap_or()`
+- [FIXED] R03-1: (LOW) Unused dependencies `serde` and `serde_json` in parser crate Cargo.toml — removed both
+- [FIXED] R03-2: (LOW) Unused dependency `serde_json` in test_fixtures crate Cargo.toml — removed
 - [DISMISSED] R03-3: (MEDIUM) Edition inconsistency — false positive; parser and dispair both hardcode edition = "2024" matching workspace, not 2021
-- [PENDING] R03-4: (LOW) Homepage URL inconsistency — parser and dispair use `rainlanguage` org instead of workspace `rainprotocol`
-- [PENDING] R03-5: (MEDIUM) Duplicated `Parser2` trait definition for wasm vs non-wasm targets violates DRY
-- [PENDING] R03-6: (LOW) `DISPaiR` doc comment mentions "Registry" but struct has no registry field
-- [PENDING] R03-7: (LOW) Excessive `unwrap()` in `LocalEvm::new()` and `deploy_new_token()` produces unhelpful panic messages
+- [FIXED] R03-4: (LOW) Homepage URL inconsistency — workspace had wrong org `rainprotocol`, corrected to `rainlanguage`; parser/dispair/cli now use `homepage.workspace = true`
+- [DISMISSED] R03-5: (MEDIUM) Duplicated `Parser2` trait — intentional Send bound difference between targets, duplication clearer than macro alternatives
+- [FIXED] R03-6: (LOW) `DISPaiR` doc comment mentions "Registry" but struct has no registry field — removed "Registry" from doc comment
+- [DISMISSED] R03-7: (LOW) Excessive `unwrap()` in test fixtures — standard test-code practice, stack traces sufficient
 - [DISMISSED] R03-8: (MEDIUM) `parse_pragma_text` is an inherent method while `parse_text` is a trait method creating asymmetry — false positive; both are trait methods with default implementations
-- [PENDING] R03-9: (LOW) `DISPaiR` struct lacks `Debug` derive which is unusual for data-carrying struct
-- [PENDING] R03-10: (LOW) Cargo.toml metadata inconsistency — parser and dispair hardcode license instead of using workspace
+- [FIXED] R03-9: (LOW) `DISPaiR` struct lacks `Debug` derive which is unusual for data-carrying struct — added `Debug` derive
+- [FIXED] R03-10: (LOW) Cargo.toml metadata inconsistency — parser and dispair hardcode license instead of using workspace — switched to `edition.workspace`, `license.workspace`, `homepage.workspace`

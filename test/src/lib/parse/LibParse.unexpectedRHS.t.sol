@@ -63,4 +63,12 @@ contract LibParseUnexpectedRHSTest is ParseTest {
         (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal(s);
         (bytecode, constants);
     }
+
+    /// Check the parser reverts when two words appear consecutively without
+    /// whitespace (yang-state word-word path).
+    function testParseUnexpectedRHSYangWordWord() external {
+        vm.expectRevert(abi.encodeWithSelector(UnexpectedRHSChar.selector, 10));
+        (bytes memory bytecode, bytes32[] memory constants) = this.parseExternal("_:add(1 2)add(3 4);");
+        (bytecode, constants);
+    }
 }

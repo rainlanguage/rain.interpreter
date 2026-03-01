@@ -68,9 +68,14 @@ contract LibAllStandardOpsTest is Test {
         assertEq(words.length, ALL_STANDARD_OPS_LENGTH);
 
         // The first four opcodes must be in this order for parsing.
+        // Safe: string literals are <= 32 bytes, right-padded by Solidity.
+        //forge-lint: disable-next-line(unsafe-typecast)
         assertEq(words[0].word, bytes32("stack"));
+        //forge-lint: disable-next-line(unsafe-typecast)
         assertEq(words[1].word, bytes32("constant"));
+        //forge-lint: disable-next-line(unsafe-typecast)
         assertEq(words[2].word, bytes32("extern"));
+        //forge-lint: disable-next-line(unsafe-typecast)
         assertEq(words[3].word, bytes32("context"));
 
         // Every word must be non-empty.

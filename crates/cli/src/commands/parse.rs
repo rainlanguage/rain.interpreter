@@ -2,8 +2,8 @@ use crate::execute::Execute;
 use crate::fork::NewForkedEvmCliArgs;
 use crate::output::SupportedOutputEncoding;
 use alloy::primitives::Address;
-use anyhow::anyhow;
 use anyhow::Result;
+use anyhow::anyhow;
 use clap::Args;
 use rain_interpreter_eval::eval::ForkParseArgs;
 use rain_interpreter_eval::fork::Forker;
@@ -58,7 +58,7 @@ impl Execute for Parse {
                 self.output_encoding.clone(),
                 res.raw.result.to_owned().to_vec().as_slice(),
             ),
-            Err(e) => Err(anyhow!("Error: {:?}", e)),
+            Err(e) => Err(anyhow!(e)),
         }
     }
 }

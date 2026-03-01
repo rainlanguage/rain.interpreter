@@ -90,6 +90,8 @@ contract LibParseStatePushOpToSourceTest is Test {
         uint256 initialPtr = state.activeSourcePtr;
 
         for (uint256 i = 0; i < 7; i++) {
+            // Safe: i < 7, fits in uint8.
+            //forge-lint: disable-next-line(unsafe-typecast)
             state.pushOpToSource(uint8(i), OperandV2.wrap(bytes32(0)));
         }
 

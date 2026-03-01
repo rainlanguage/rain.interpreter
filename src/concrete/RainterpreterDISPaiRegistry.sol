@@ -4,6 +4,7 @@ pragma solidity =0.8.25;
 
 import {LibInterpreterDeploy} from "../lib/deploy/LibInterpreterDeploy.sol";
 import {IDISPaiRegistry} from "../interface/IDISPaiRegistry.sol";
+import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 
 /// @title RainterpreterDISPaiRegistry
 /// @notice DISPaiR registry contract that exposes the deterministic Zoltu deploy
@@ -11,7 +12,12 @@ import {IDISPaiRegistry} from "../interface/IDISPaiRegistry.sol";
 /// Store, and Parser. Deployed via the same Zoltu pattern so that external
 /// tooling can discover all component addresses from a single known registry
 /// address.
-contract RainterpreterDISPaiRegistry is IDISPaiRegistry {
+contract RainterpreterDISPaiRegistry is IDISPaiRegistry, ERC165 {
+    /// @inheritdoc ERC165
+    function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
+        return interfaceId == type(IDISPaiRegistry).interfaceId || super.supportsInterface(interfaceId);
+    }
+
     /// @inheritdoc IDISPaiRegistry
     function expressionDeployerAddress() external pure override returns (address) {
         return LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS;

@@ -2,9 +2,9 @@ use crate::execute::Execute;
 use crate::fork::NewForkedEvmCliArgs;
 use crate::output::SupportedOutputEncoding;
 use alloy::primitives::{Address, U256};
-use anyhow::anyhow;
 use anyhow::Context;
 use anyhow::Result;
+use anyhow::anyhow;
 use clap::Args;
 use rain_interpreter_bindings::IInterpreterStoreV3::FullyQualifiedNamespace;
 use rain_interpreter_eval::trace::RainEvalResult;
@@ -123,15 +123,18 @@ impl Execute for Eval {
 
         match result {
             Ok(res) => {
-                let rain_eval_result: RainEvalResult =
-                    res.try_into().map_err(|e| anyhow!("{:?}", e))?;
+                let rain_eval_result: RainEvalResult = res.try_into().map_err(
+                    |e: rain_interpreter_eval::trace::RainEvalResultFromRawCallResultError| {
+                        anyhow!(e)
+                    },
+                )?;
                 crate::output::output(
                     &self.output_path,
                     SupportedOutputEncoding::Binary,
                     format!("{:#?}", rain_eval_result).as_bytes(),
                 )
             }
-            Err(e) => Err(anyhow!("Error: {:?}", e)),
+            Err(e) => Err(anyhow!(e)),
         }
     }
 }

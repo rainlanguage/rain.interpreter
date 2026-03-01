@@ -27,6 +27,12 @@ pragma solidity ^0.8.25;
 /// [ref-extern-repeat-3 123]
 /// ```
 
+/// @dev The maximum length of a repeat literal body (exclusive). Length must
+/// be strictly less than this value. For length 77 the worst-case accumulation
+/// is 10^77 - 1, which fits in uint256 (10^77 < 2^256). Length 78 would
+/// accumulate up to 10^78 - 1, which overflows (10^78 > 2^256).
+uint256 constant MAX_REPEAT_LITERAL_LENGTH = 78;
+
 /// @dev Thrown when a repeat literal body exceeds the maximum length that can
 /// be computed without overflow in `10 ** i`.
 /// @param length The length of the literal body.
@@ -52,13 +58,13 @@ library LibParseLiteralRepeat {
             uint256 value = 0;
             // Safe: cursor always <= end (parser invariant).
             uint256 length = end - cursor;
-            if (length >= 78) {
+            if (length >= MAX_REPEAT_LITERAL_LENGTH) {
                 revert RepeatLiteralTooLong(length);
             }
             for (uint256 i = 0; i < length; ++i) {
-                // Safe: i < 78, so 10**i < 10**78 < 2^256.
-                // dispatchValue <= 9, so dispatchValue * 10**i <= 9 * 10**77 < 2^256.
-                // value accumulates at most 78 terms, sum < 10**78 < 2^256.
+                // Safe: i <= 76, so 10**i <= 10**76 < 2^256.
+                // dispatchValue <= 9, so dispatchValue * 10**i <= 9 * 10**76 < 2^256.
+                // value accumulates at most 77 terms, sum <= 10**77 - 1 < 2^256.
                 value += dispatchValue * 10 ** i;
             }
             return value;

@@ -531,6 +531,9 @@ library LibParseState {
                 newStackRHSOffset := add(byte(0, mload(stackRHSOffsetPtr)), 1)
                 mstore8(stackRHSOffsetPtr, newStackRHSOffset)
             }
+            // 0x3f = 63: the RHS offset is stored as a single byte within
+            // the topLevel0 field, but shares the word with other packed
+            // fields, so it must not exceed 62 (0x3e).
             if (newStackRHSOffset >= 0x3f) {
                 revert ParseStackOverflow();
             }

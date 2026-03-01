@@ -1,10 +1,10 @@
 [package]
 name = "rain_interpreter_dispair"
 version = "0.1.0"
-edition = "2024"
-license = "CAL-1.0"
+edition.workspace = true
+license.workspace = true
 description = "Rain Interpreter Rust Crate."
-homepage = "https://github.com/rainlanguage/rain.interpreter"
+homepage.workspace = true
 
 [dependencies]
 alloy = { workspace = true }
