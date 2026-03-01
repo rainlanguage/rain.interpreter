@@ -6,7 +6,7 @@
     "rev": "f9a46744a66daf4004a3edc1d4387ae14a9dc8e4"
   },
   "lib/rain.interpreter.interface": {
-    "rev": "639b80f929d8a8213fe75e35b446708ba49a8e6a"
+    "rev": "f83d8e0e2ea529acb9b76f622ff73464c65a3ba8"
   },
   "lib/rain.lib.memkv": {
     "rev": "83e607990be8b3e06549338043c6b18f430f6bd2"
