@@ -7,9 +7,9 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {InterpreterState} from "../../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
 
-/// @title LibOpUint256Pow
+/// @title LibOpUint256Power
 /// @notice Opcode to raise x successively to N integers. Errors on overflow.
-library LibOpUint256Pow {
+library LibOpUint256Power {
     /// @notice `uint256-pow` integrity check. Requires at least 2 inputs and produces 1 output.
     /// @param operand Low 4 bits of the high byte encode the input count.
     /// @return The number of inputs.

@@ -8,14 +8,11 @@ import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
 
-/// @title LibOpCtPop
-/// @notice An opcode that counts the number of bits set in a word. This is
-/// called ctpop because that's the name of this kind of thing elsewhere, but
-/// the more common name is "population count" or "Hamming weight". The word
-/// in the standard ops lib is called `bitwise-count-ones`, which follows the
-/// Rust naming convention.
+/// @title LibOpBitwiseCountOnes
+/// @notice An opcode that counts the number of bits set in a word. Also known
+/// as "population count", "Hamming weight", or "ctpop".
 /// There is no evm opcode for this, so we have to implement it ourselves.
-library LibOpCtPop {
+library LibOpBitwiseCountOnes {
     /// @notice ctpop unconditionally takes one value and returns one value.
     /// @return The number of inputs.
     /// @return The number of outputs.

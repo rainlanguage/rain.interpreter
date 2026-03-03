@@ -7,9 +7,9 @@ import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterp
 import {InterpreterState} from "../../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
-/// @title LibOpMaxUint256
+/// @title LibOpUint256MaxValue
 /// @notice Exposes `type(uint256).max` as a Rainlang opcode.
-library LibOpMaxUint256 {
+library LibOpUint256MaxValue {
     /// `max-uint256` integrity check. Requires 0 inputs and produces 1 output.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         return (0, 1);

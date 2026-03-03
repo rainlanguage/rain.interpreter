@@ -8,9 +8,9 @@ import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterp
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 
-/// @title LibOpEncodeBits
+/// @title LibOpBitwiseEncode
 /// @notice Opcode for encoding binary data into a 256 bit value.
-library LibOpEncodeBits {
+library LibOpBitwiseEncode {
     /// @notice Encode takes two values and returns one value. The first value is the
     /// source, the second value is the target.
     /// @param operand The operand encoding the start bit and length.

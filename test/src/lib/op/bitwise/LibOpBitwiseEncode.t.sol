@@ -7,19 +7,19 @@ import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {TruncatedBitwiseEncoding, ZeroLengthBitwiseEncoding} from "src/error/ErrBitwise.sol";
-import {LibOpEncodeBits} from "src/lib/op/bitwise/LibOpEncodeBits.sol";
+import {LibOpBitwiseEncode} from "src/lib/op/bitwise/LibOpBitwiseEncode.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-contract LibOpEncodeBitsTest is OpTest {
+contract LibOpBitwiseEncodeTest is OpTest {
     function integrityExternal(IntegrityCheckState memory state, OperandV2 operand)
         external
         pure
         returns (uint256 inputs, uint256 outputs)
     {
-        return LibOpEncodeBits.integrity(state, operand);
+        return LibOpBitwiseEncode.integrity(state, operand);
     }
 
-    /// Directly test the integrity logic of LibOpEncodeBits. All possible
+    /// Directly test the integrity logic of LibOpBitwiseEncode. All possible
     /// operands result in the same number of inputs and outputs, (2, 1).
     /// However, lengths can overflow and error so we bound the operand to avoid
     /// that here.
@@ -34,12 +34,12 @@ contract LibOpEncodeBitsTest is OpTest {
         // Bounds ensure the typecast is safe.
         //forge-lint: disable-next-line(unsafe-typecast)
         OperandV2 operand = LibOperand.build(2, 1, uint16((uint256(length) << 8) | uint256(start)));
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpEncodeBits.integrity(state, operand);
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpBitwiseEncode.integrity(state, operand);
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the integrity logic of LibOpEncodeBits. This tests the
+    /// Directly test the integrity logic of LibOpBitwiseEncode. This tests the
     /// error when the length overflows.
     function testOpEncodeBitsIntegrityFail(IntegrityCheckState memory state, uint8 start8Bit, uint8 length8Bit)
         external
@@ -55,7 +55,7 @@ contract LibOpEncodeBitsTest is OpTest {
         (calcInputs, calcOutputs);
     }
 
-    /// Directly test the integrity logic of LibOpEncodeBits. This tests the
+    /// Directly test the integrity logic of LibOpBitwiseEncode. This tests the
     /// error when the length is zero.
     function testOpEncodeBitsIntegrityFailZeroLength(IntegrityCheckState memory state, uint8 start) external {
         OperandV2 operand = LibOperand.build(2, 1, uint16(0 << 8 | uint256(start)));
@@ -64,7 +64,7 @@ contract LibOpEncodeBitsTest is OpTest {
         (calcInputs, calcOutputs);
     }
 
-    /// Directly test the runtime logic of LibOpEncodeBits. This tests that the
+    /// Directly test the runtime logic of LibOpBitwiseEncode. This tests that the
     /// opcode correctly pushes the encoded bits onto the stack.
     function testOpEncodeBitsRun(StackItem source, StackItem target, uint8 start8Bit, uint8 length8Bit) external view {
         uint256 start = uint256(start8Bit);
@@ -79,7 +79,7 @@ contract LibOpEncodeBitsTest is OpTest {
         inputs[1] = target;
         InterpreterState memory state = opTestDefaultInterpreterState();
         opReferenceCheck(
-            state, operand, LibOpEncodeBits.referenceFn, LibOpEncodeBits.integrity, LibOpEncodeBits.run, inputs
+            state, operand, LibOpBitwiseEncode.referenceFn, LibOpBitwiseEncode.integrity, LibOpBitwiseEncode.run, inputs
         );
     }
 

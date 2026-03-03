@@ -13,12 +13,12 @@ import {FullyQualifiedNamespace} from "rain.interpreter.interface/interface/IInt
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV4.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 
-import {LibOpTimestamp} from "src/lib/op/evm/LibOpTimestamp.sol";
+import {LibOpBlockTimestamp} from "src/lib/op/evm/LibOpBlockTimestamp.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-/// @title LibOpTimestampTest
-/// @notice Test the runtime and integrity time logic of LibOpTimestamp.
-contract LibOpTimestampTest is OpTest {
+/// @title LibOpBlockTimestampTest
+/// @notice Test the runtime and integrity time logic of LibOpBlockTimestamp.
+contract LibOpBlockTimestampTest is OpTest {
     using LibPointer for Pointer;
     using LibStackPointer for Pointer;
     using LibInterpreterState for InterpreterState;
@@ -30,7 +30,7 @@ contract LibOpTimestampTest is OpTest {
         return words;
     }
 
-    /// Directly test the integrity logic of LibOpTimestamp.
+    /// Directly test the integrity logic of LibOpBlockTimestamp.
     function testOpTimestampIntegrity(IntegrityCheckState memory state, uint8 inputs, uint8 outputs, uint16 operandData)
         external
         pure
@@ -38,13 +38,13 @@ contract LibOpTimestampTest is OpTest {
         inputs = uint8(bound(inputs, 0, 0x0F));
         outputs = uint8(bound(outputs, 0, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpTimestamp.integrity(state, LibOperand.build(inputs, outputs, operandData));
+            LibOpBlockTimestamp.integrity(state, LibOperand.build(inputs, outputs, operandData));
 
         assertEq(calcInputs, 0);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpTimestamp. This tests that the
+    /// Directly test the runtime logic of LibOpBlockTimestamp. This tests that the
     /// opcode correctly pushes the timestamp onto the stack.
     function testOpTimestampRun(uint256 blockTimestamp) external {
         blockTimestamp = bound(blockTimestamp, 0, uint128(type(int128).max));
@@ -53,7 +53,12 @@ contract LibOpTimestampTest is OpTest {
         StackItem[] memory inputs = new StackItem[](0);
         OperandV2 operand = LibOperand.build(0, 1, 0);
         opReferenceCheck(
-            state, operand, LibOpTimestamp.referenceFn, LibOpTimestamp.integrity, LibOpTimestamp.run, inputs
+            state,
+            operand,
+            LibOpBlockTimestamp.referenceFn,
+            LibOpBlockTimestamp.integrity,
+            LibOpBlockTimestamp.run,
+            inputs
         );
     }
 

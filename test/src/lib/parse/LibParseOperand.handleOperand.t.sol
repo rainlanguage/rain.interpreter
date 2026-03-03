@@ -18,7 +18,7 @@ contract LibParseOperandHandleOperandTest is Test {
     }
 
     /// Both handleOperandSingleFull (index 1, stack) and
-    /// handleOperandDisallowed (index 5, bitwise-and) return 0 for empty
+    /// handleOperandDisallowed (index 4, bitwise-and) return 0 for empty
     /// operand values.
     function testHandleOperandDispatchEmptyValues() external pure {
         ParseState memory state = LibParseState.newState("", "", "", "");
@@ -27,13 +27,13 @@ contract LibParseOperandHandleOperandTest is Test {
 
         // Index 1 (stack) -> handleOperandSingleFull -> returns 0.
         assertEq(OperandV2.unwrap(state.handleOperand(1)), 0, "stack empty");
-        // Index 5 (bitwise-and) -> handleOperandDisallowed -> returns 0.
-        assertEq(OperandV2.unwrap(state.handleOperand(5)), 0, "bitwise-and empty");
+        // Index 4 (bitwise-and) -> handleOperandDisallowed -> returns 0.
+        assertEq(OperandV2.unwrap(state.handleOperand(4)), 0, "bitwise-and empty");
     }
 
     /// Prove different indices dispatch to different handlers: index 1 (stack,
     /// handleOperandSingleFull) accepts a single value and returns it;
-    /// index 5 (bitwise-and, handleOperandDisallowed) reverts.
+    /// index 4 (bitwise-and, handleOperandDisallowed) reverts.
     function testHandleOperandDispatchDifferentHandlers(uint256 value) external {
         value = bound(value, 0, type(uint16).max);
         ParseState memory state = LibParseState.newState("", "", "", "");
@@ -46,9 +46,9 @@ contract LibParseOperandHandleOperandTest is Test {
         // Index 1 (stack) -> handleOperandSingleFull -> returns the value.
         assertEq(OperandV2.unwrap(state.handleOperand(1)), bytes32(value), "stack single value");
 
-        // Index 5 (bitwise-and) -> handleOperandDisallowed -> reverts.
+        // Index 4 (bitwise-and) -> handleOperandDisallowed -> reverts.
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
-        this.handleOperandExternal(state, 5);
+        this.handleOperandExternal(state, 4);
     }
 
     /// Multiple indices that share the same handler produce the same result.
@@ -77,15 +77,15 @@ contract LibParseOperandHandleOperandTest is Test {
         values[0] = bytes32(uint256(1));
         state.operandValues = values;
 
-        // Index 5 (bitwise-and), 6 (bitwise-or), 13 (hash) all use
+        // Index 4 (bitwise-and), 8 (bitwise-or), 12 (hash) all use
         // handleOperandDisallowed.
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
-        this.handleOperandExternal(state, 5);
+        this.handleOperandExternal(state, 4);
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
-        this.handleOperandExternal(state, 6);
+        this.handleOperandExternal(state, 8);
 
         vm.expectRevert(abi.encodeWithSelector(UnexpectedOperand.selector));
-        this.handleOperandExternal(state, 13);
+        this.handleOperandExternal(state, 12);
     }
 }

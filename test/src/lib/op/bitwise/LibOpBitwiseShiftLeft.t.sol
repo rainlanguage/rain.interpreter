@@ -4,23 +4,23 @@ pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {LibOpShiftBitsLeft} from "src/lib/op/bitwise/LibOpShiftBitsLeft.sol";
+import {LibOpBitwiseShiftLeft} from "src/lib/op/bitwise/LibOpBitwiseShiftLeft.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {UnsupportedBitwiseShiftAmount} from "src/error/ErrBitwise.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {OperandOverflow} from "src/error/ErrParse.sol";
 
-contract LibOpShiftBitsLeftTest is OpTest {
+contract LibOpBitwiseShiftLeftTest is OpTest {
     function integrityExternal(IntegrityCheckState memory state, OperandV2 operand)
         external
         pure
         returns (uint256, uint256)
     {
-        return LibOpShiftBitsLeft.integrity(state, operand);
+        return LibOpBitwiseShiftLeft.integrity(state, operand);
     }
 
-    /// Directly test the integrity logic of LibOpShiftBitsLeft. Tests the
+    /// Directly test the integrity logic of LibOpBitwiseShiftLeft. Tests the
     /// happy path where the integrity check does not error due to an unsupported
     /// shift amount.
     function testOpShiftBitsLeftIntegrityHappy(
@@ -33,12 +33,12 @@ contract LibOpShiftBitsLeftTest is OpTest {
         inputs = uint8(bound(inputs, 1, 0x0F));
         outputs = uint8(bound(outputs, 1, 0x0F));
         OperandV2 operand = LibOperand.build(inputs, outputs, shiftAmount);
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpShiftBitsLeft.integrity(state, operand);
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpBitwiseShiftLeft.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the execution logic of LibOpShiftBitsLeft. Tests that
+    /// Directly test the execution logic of LibOpBitwiseShiftLeft. Tests that
     /// any shift amount that always results in an output of 0 will error as
     /// an unsupported shift amount.
     function testOpShiftBitsLeftIntegrityZero(IntegrityCheckState memory state, uint8 inputs, uint16 shiftAmount16)
@@ -54,7 +54,7 @@ contract LibOpShiftBitsLeftTest is OpTest {
         (calcInputs, calcOutputs);
     }
 
-    /// Directly test the execution logic of LibOpShiftBitsLeft. Tests that
+    /// Directly test the execution logic of LibOpBitwiseShiftLeft. Tests that
     /// any shift amount that is a noop (0) will error as an unsupported shift
     /// amount.
     function testOpShiftBitsLeftIntegrityNoop(IntegrityCheckState memory state, uint8 inputs) external {
@@ -64,7 +64,7 @@ contract LibOpShiftBitsLeftTest is OpTest {
         (calcInputs, calcOutputs);
     }
 
-    /// Directly test the runtime logic of LibOpShiftBitsLeft. This tests that
+    /// Directly test the runtime logic of LibOpBitwiseShiftLeft. This tests that
     /// the opcode correctly shifts bits left.
     function testOpShiftBitsLeftRun(StackItem x, uint8 shiftAmount) external view {
         vm.assume(shiftAmount != 0);
@@ -73,7 +73,12 @@ contract LibOpShiftBitsLeftTest is OpTest {
         inputs[0] = x;
         OperandV2 operand = LibOperand.build(1, 1, shiftAmount);
         opReferenceCheck(
-            state, operand, LibOpShiftBitsLeft.referenceFn, LibOpShiftBitsLeft.integrity, LibOpShiftBitsLeft.run, inputs
+            state,
+            operand,
+            LibOpBitwiseShiftLeft.referenceFn,
+            LibOpBitwiseShiftLeft.integrity,
+            LibOpBitwiseShiftLeft.run,
+            inputs
         );
     }
 

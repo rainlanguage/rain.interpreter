@@ -4,23 +4,23 @@ pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {LibOpShiftBitsRight} from "src/lib/op/bitwise/LibOpShiftBitsRight.sol";
+import {LibOpBitwiseShiftRight} from "src/lib/op/bitwise/LibOpBitwiseShiftRight.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {UnsupportedBitwiseShiftAmount} from "src/error/ErrBitwise.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {OperandOverflow} from "src/error/ErrParse.sol";
 
-contract LibOpShiftBitsRightTest is OpTest {
+contract LibOpBitwiseShiftRightTest is OpTest {
     function integrityExternal(IntegrityCheckState memory state, OperandV2 operand)
         external
         pure
         returns (uint256, uint256)
     {
-        return LibOpShiftBitsRight.integrity(state, operand);
+        return LibOpBitwiseShiftRight.integrity(state, operand);
     }
 
-    /// Directly test the integrity logic of LibOpShiftBitsRight. Tests the
+    /// Directly test the integrity logic of LibOpBitwiseShiftRight. Tests the
     /// happy path where the integrity check does not error due to an unsupported
     /// shift amount.
     /// forge-config: default.fuzz.runs = 100
@@ -34,12 +34,12 @@ contract LibOpShiftBitsRightTest is OpTest {
         inputs = uint8(bound(inputs, 1, 0x0F));
         outputs = uint8(bound(outputs, 1, 0x0F));
         OperandV2 operand = LibOperand.build(inputs, outputs, shiftAmount);
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpShiftBitsRight.integrity(state, operand);
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpBitwiseShiftRight.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the execution logic of LibOpShiftBitsRight. Tests that
+    /// Directly test the execution logic of LibOpBitwiseShiftRight. Tests that
     /// any shift amount that always results in an output of 0 will error as
     /// an unsupported shift amount.
     /// forge-config: default.fuzz.runs = 100
@@ -53,7 +53,7 @@ contract LibOpShiftBitsRightTest is OpTest {
         (calcInputs, calcOutputs);
     }
 
-    /// Directly test the execution logic of LibOpShiftBitsRight. Tests that
+    /// Directly test the execution logic of LibOpBitwiseShiftRight. Tests that
     /// any shift amount that is a noop (0) will error as an unsupported shift
     /// amount.
     /// forge-config: default.fuzz.runs = 100
@@ -64,7 +64,7 @@ contract LibOpShiftBitsRightTest is OpTest {
         (calcInputs, calcOutputs);
     }
 
-    /// Directly test the runtime logic of LibOpShiftBitsRight. This tests that
+    /// Directly test the runtime logic of LibOpBitwiseShiftRight. This tests that
     /// the opcode correctly shifts bits right.
     function testOpShiftBitsRightRun(StackItem x, uint8 shiftAmount) external view {
         vm.assume(shiftAmount != 0);
@@ -75,9 +75,9 @@ contract LibOpShiftBitsRightTest is OpTest {
         opReferenceCheck(
             state,
             operand,
-            LibOpShiftBitsRight.referenceFn,
-            LibOpShiftBitsRight.integrity,
-            LibOpShiftBitsRight.run,
+            LibOpBitwiseShiftRight.referenceFn,
+            LibOpBitwiseShiftRight.integrity,
+            LibOpBitwiseShiftRight.run,
             inputs
         );
     }

@@ -4,14 +4,14 @@ pragma solidity =0.8.25;
 
 import {stdError} from "forge-std/Test.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
-import {LibOpUint256Pow} from "src/lib/op/math/uint256/LibOpUint256Pow.sol";
+import {LibOpUint256Power} from "src/lib/op/math/uint256/LibOpUint256Power.sol";
 import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
 import {StackItem, OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
-contract LibOpUint256PowTest is OpTest {
-    /// Directly test the integrity logic of LibOpUint256Pow. This tests the happy
+contract LibOpUint256PowerTest is OpTest {
+    /// Directly test the integrity logic of LibOpUint256Power. This tests the happy
     /// path where the inputs input and calc match.
     function testOpUint256ExpIntegrityHappy(IntegrityCheckState memory state, uint8 inputs, uint16 operandData)
         external
@@ -19,26 +19,26 @@ contract LibOpUint256PowTest is OpTest {
     {
         inputs = uint8(bound(inputs, 2, 0x0F));
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpUint256Pow.integrity(state, LibOperand.build(inputs, 1, operandData));
+            LibOpUint256Power.integrity(state, LibOperand.build(inputs, 1, operandData));
 
         assertEq(calcInputs, inputs);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the integrity logic of LibOpUint256Pow. This tests the unhappy
+    /// Directly test the integrity logic of LibOpUint256Power. This tests the unhappy
     /// path where the operand is invalid due to 0 inputs.
     function testOpUint256PowIntegrityUnhappyZeroInputs(IntegrityCheckState memory state) external pure {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256Pow.integrity(state, OperandV2.wrap(0));
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpUint256Power.integrity(state, OperandV2.wrap(0));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the integrity logic of LibOpUint256Pow. This tests the unhappy
+    /// Directly test the integrity logic of LibOpUint256Power. This tests the unhappy
     /// path where the operand is invalid due to 1 inputs.
     function testOpUint256PowIntegrityUnhappyOneInput(IntegrityCheckState memory state) external pure {
         (uint256 calcInputs, uint256 calcOutputs) =
-            LibOpUint256Pow.integrity(state, OperandV2.wrap(bytes32(uint256(0x010000))));
+            LibOpUint256Power.integrity(state, OperandV2.wrap(bytes32(uint256(0x010000))));
         // Calc inputs will be minimum 2.
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
@@ -47,11 +47,11 @@ contract LibOpUint256PowTest is OpTest {
     function _testOpUint256PowRun(OperandV2 operand, StackItem[] memory inputs) external view {
         InterpreterState memory state = opTestDefaultInterpreterState();
         opReferenceCheck(
-            state, operand, LibOpUint256Pow.referenceFn, LibOpUint256Pow.integrity, LibOpUint256Pow.run, inputs
+            state, operand, LibOpUint256Power.referenceFn, LibOpUint256Power.integrity, LibOpUint256Power.run, inputs
         );
     }
 
-    /// Directly test the runtime logic of LibOpUint256Pow.
+    /// Directly test the runtime logic of LibOpUint256Power.
     function testOpUint256PowRun(StackItem[] memory inputs) external {
         vm.assume(inputs.length >= 2);
         vm.assume(inputs.length <= 0x0F);

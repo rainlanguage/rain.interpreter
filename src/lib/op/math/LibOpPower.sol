@@ -8,9 +8,9 @@ import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
-/// @title LibOpPow
-/// @notice Opcode to pow a decimal floating point value to a float decimal power.
-library LibOpPow {
+/// @title LibOpPower
+/// @notice Opcode to raise a decimal floating point value to a float decimal power.
+library LibOpPower {
     using LibDecimalFloat for Float;
 
     /// @notice `pow` integrity check. Requires exactly 2 inputs and produces 1 output.

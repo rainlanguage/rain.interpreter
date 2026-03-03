@@ -3,26 +3,26 @@
 pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckState, OperandV2, InterpreterState, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {LibOpPow} from "src/lib/op/math/LibOpPow.sol";
+import {LibOpPower} from "src/lib/op/math/LibOpPower.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {PowNegativeBase} from "rain.math.float/error/ErrDecimalFloat.sol";
 
-contract LibOpPowTest is OpTest {
+contract LibOpPowerTest is OpTest {
     function beforeOpTestConstructor() internal virtual override {
         vm.createSelectFork(vm.envString("ETH_RPC_URL"));
     }
 
-    /// Directly test the integrity logic of LibOpPow.
+    /// Directly test the integrity logic of LibOpPower.
     /// Inputs are always 2, outputs are always 1.
     function testOpPowIntegrity(IntegrityCheckState memory state, OperandV2 operand) external pure {
-        (uint256 calcInputs, uint256 calcOutputs) = LibOpPow.integrity(state, operand);
+        (uint256 calcInputs, uint256 calcOutputs) = LibOpPower.integrity(state, operand);
         assertEq(calcInputs, 2);
         assertEq(calcOutputs, 1);
     }
 
-    /// Directly test the runtime logic of LibOpPow.
+    /// Directly test the runtime logic of LibOpPower.
     function testOpPowRun(int224 signedCoefficientA, int32 exponentA, int224 signedCoefficientB, int32 exponentB)
         public
         view
@@ -40,7 +40,7 @@ contract LibOpPowTest is OpTest {
         inputs[0] = StackItem.wrap(Float.unwrap(a));
         inputs[1] = StackItem.wrap(Float.unwrap(b));
 
-        opReferenceCheck(state, operand, LibOpPow.referenceFn, LibOpPow.integrity, LibOpPow.run, inputs);
+        opReferenceCheck(state, operand, LibOpPower.referenceFn, LibOpPower.integrity, LibOpPower.run, inputs);
     }
 
     /// Test the eval of `power`.

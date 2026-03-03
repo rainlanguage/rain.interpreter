@@ -8,9 +8,9 @@ import {InterpreterState} from "../../state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
-/// @title LibOpTimestamp
+/// @title LibOpBlockTimestamp
 /// @notice Implementation of the EVM `TIMESTAMP` opcode as a standard Rainlang opcode.
-library LibOpTimestamp {
+library LibOpBlockTimestamp {
     using LibDecimalFloat for Float;
 
     /// @notice `block-timestamp` integrity check. Requires 0 inputs and produces 1 output.
