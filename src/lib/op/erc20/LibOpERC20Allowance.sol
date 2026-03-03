@@ -110,8 +110,8 @@ library LibOpERC20Allowance {
         //forge-lint: disable-next-line(unsafe-typecast)
         address spender = address(uint160(spenderValue));
 
-        uint8 tokenDecimals = LibTOFUTokenDecimals.safeDecimalsForTokenReadOnly(token);
         uint256 tokenAllowance = IERC20(token).allowance(owner, spender);
+        uint8 tokenDecimals = LibTOFUTokenDecimals.safeDecimalsForTokenReadOnly(token);
         // Same as in the run implementation.
         //slither-disable-next-line unused-return
         (Float tokenAllowanceFloat,) = LibDecimalFloat.fromFixedDecimalLossyPacked(tokenAllowance, tokenDecimals);

@@ -20,6 +20,7 @@ import {
     InvalidSubParser,
     OpcodeIOOverflow,
     SourceItemOpsOverflow,
+    SourceTotalOpsOverflow,
     ParenInputOverflow,
     LineRHSItemsOverflow
 } from "../../error/ErrParse.sol";
@@ -787,6 +788,7 @@ library LibParseState {
         // evaluated correctly similar to reverse polish notation.
         else {
             uint256 source;
+            bool totalOpsOverflow;
             ParseStackTracker stackTracker = state.stackTracker;
             uint256 cursor = state.activeSourcePtr;
             uint256 topLevel0DataOffset = PARSE_STATE_TOP_LEVEL0_DATA_OFFSET;
@@ -864,6 +866,11 @@ library LibParseState {
                         }
                     }
                 }
+                // The total ops count across all top-level items must
+                // fit in a single byte. `length` includes the 4-byte
+                // prefix, so `div(length, 4) - 1` is the opcode count.
+                totalOpsOverflow := gt(sub(div(length, 4), 1), 0xFF)
+
                 // Store the bytes length in the source.
                 mstore(source, length)
                 // Store the opcodes length and stack tracker in the source
@@ -879,6 +886,9 @@ library LibParseState {
 
                 // Round up to the nearest 32 bytes to realign memory.
                 mstore(0x40, and(add(writeCursor, 0x1f), not(0x1f)))
+            }
+            if (totalOpsOverflow) {
+                revert SourceTotalOpsOverflow();
             }
 
             //slither-disable-next-line incorrect-shift

@@ -279,6 +279,44 @@ contract LibParsePragmaKeywordTest is Test {
         checkPragmaParsing(str, 118, values, "comment between addresses");
     }
 
+    /// After parseInterstitial advances cursor to end, tryParseLiteral
+    /// reads past bounds via mload(cursor). If adjacent memory contains bytes
+    /// that look like a valid literal head (e.g., a digit), garbage is parsed
+    /// and pushed as a sub-parser address.
+    ///
+    /// To reproduce: include poison bytes inside the buffer but set end before
+    /// them. parseInterstitial consumes the trailing space to reach end, then
+    /// tryParseLiteral reads the poison digit '1' at end and dispatches to the
+    /// decimal parser, which pushes a garbage sub-parser.
+    function testParsePragmaOOBAfterInterstitial() external view {
+        // Data includes the real pragma + poison bytes ("1 ") past where end
+        // will point. The pragma is 60 bytes: "using-words-from " (17) +
+        // 42-char hex address + " " (1 trailing space).
+        bytes memory data = bytes("using-words-from 0x1234567890123456789012345678901234567890 1 ");
+
+        ParseState memory state =
+            LibParseState.newState(data, "", "", LibAllStandardOps.literalParserFunctionPointers());
+        state.literalParsers = LibAllStandardOps.literalParserFunctionPointers();
+
+        uint256 cursor = Pointer.unwrap(data.dataPointer());
+        // Set end to 60: just past the trailing space after the address.
+        // The "1 " at positions 60-61 is our poison — in memory but past end.
+        uint256 end = cursor + 60;
+
+        uint256 cursorAfter = state.parsePragma(cursor, end);
+        (cursorAfter);
+
+        // Verify exactly one sub-parser was pushed (the real address).
+        bytes32 deref = state.subParsers;
+        assertEq(uint160(uint256(deref)), uint160(0x1234567890123456789012345678901234567890), "real address");
+        // The linked list must terminate: no garbage sub-parser was pushed.
+        uint256 pointer = uint256(deref) >> 0xF0;
+        assembly ("memory-safe") {
+            deref := mload(pointer)
+        }
+        assertEq(uint256(deref), 0, "should have only one sub-parser, not garbage from OOB read");
+    }
+
     /// Test a specific string.
     function testPragmaKeywordParseSubParserSpecificStrings() external view {
         string memory str =

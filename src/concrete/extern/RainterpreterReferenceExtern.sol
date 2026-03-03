@@ -73,6 +73,10 @@ uint256 constant SUB_PARSER_LITERAL_REPEAT_INDEX = 0;
 /// @dev Thrown when the repeat literal parser is not a single digit.
 error InvalidRepeatCount();
 
+/// @dev Thrown when the repeat literal dispatch has trailing bytes after
+/// the decimal digit.
+error UnconsumedRepeatDispatchBytes();
+
 /// @dev Number of opcode function pointers available to run at eval time.
 uint256 constant OPCODE_FUNCTION_POINTERS_LENGTH = 1;
 
@@ -253,6 +257,9 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
                 (cursor, floatBytes) = LibParseLiteralDecimal.parseDecimalFloatPacked(
                     state, cursor + SUB_PARSER_LITERAL_REPEAT_KEYWORD_BYTES_LENGTH, end
                 );
+                if (cursor != end) {
+                    revert UnconsumedRepeatDispatchBytes();
+                }
                 Float repeatCount = Float.wrap(floatBytes);
                 // We can only repeat a single digit integer 0-9.
                 if (

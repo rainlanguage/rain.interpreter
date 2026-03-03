@@ -22,7 +22,9 @@ library LibParseLiteralHex {
     using LibParseError for ParseState;
 
     /// @notice Finds the bounds of a hex literal by scanning forward from past the
-    /// "0x" prefix until a non-hex character is encountered.
+    /// "0x" prefix until a non-hex character is encountered. The `ParseState`
+    /// parameter is unused here but kept for a consistent `bound*` signature
+    /// across literal types (e.g. `boundString` uses it for error reporting).
     /// @param cursor The cursor position at the start of the hex literal.
     /// @param end The end of the source string.
     /// @return The start of the hex digits (past "0x").

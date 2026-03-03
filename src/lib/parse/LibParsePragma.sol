@@ -74,6 +74,13 @@ library LibParsePragma {
                 // the last address as we don't break til just below.
                 cursor = state.parseInterstitial(cursor, end);
 
+                // parseInterstitial may have consumed trailing whitespace
+                // up to end. Must re-check before tryParseLiteral, which
+                // does mload(cursor) and would read past bounds.
+                if (cursor >= end) {
+                    break;
+                }
+
                 // Try to parse a literal and treat it as an address.
                 bool success;
                 bytes32 value;

@@ -17,7 +17,8 @@ import {IInterpreterExternV4, LibExtern, EncodedExternDispatchV2} from "../exter
 import {
     ExternDispatchConstantsHeightOverflow,
     ConstantOpcodeConstantsHeightOverflow,
-    ContextGridOverflow
+    ContextGridOverflow,
+    SubParseLiteralDispatchLengthOverflow
 } from "../../error/ErrSubParse.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibParseError} from "./LibParseError.sol";
@@ -359,12 +360,17 @@ library LibSubParse {
             {
                 uint256 copyPointer;
                 uint256 dispatchLength = dispatchEnd - dispatchStart;
+                if (dispatchLength > 0xFFFF) {
+                    revert SubParseLiteralDispatchLengthOverflow(dispatchLength);
+                }
                 uint256 bodyLength = bodyEnd - bodyStart;
                 {
                     uint256 dataLength = 2 + dispatchLength + bodyLength;
                     assembly ("memory-safe") {
                         data := mload(0x40)
-                        mstore(0x40, add(data, add(dataLength, 0x20)))
+                        // Round up to 32-byte alignment to maintain
+                        // Solidity's free memory pointer invariant.
+                        mstore(0x40, and(add(add(data, add(dataLength, 0x20)), 0x1f), not(0x1f)))
                         mstore(add(data, 2), dispatchLength)
                         mstore(data, dataLength)
                         copyPointer := add(data, 0x22)

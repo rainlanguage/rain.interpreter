@@ -6,7 +6,8 @@ import {OpTest} from "test/abstract/OpTest.sol";
 import {
     RainterpreterReferenceExtern,
     StackItem,
-    InvalidRepeatCount
+    InvalidRepeatCount,
+    UnconsumedRepeatDispatchBytes
 } from "src/concrete/extern/RainterpreterReferenceExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 
@@ -55,6 +56,16 @@ contract RainterpreterReferenceExternRepeatTest is OpTest {
 
         vm.expectRevert(abi.encodeWithSelector(InvalidRepeatCount.selector));
         bytes memory bytecode = I_DEPLOYER.parse2(bytes(string.concat(baseStr, "_: [ref-extern-repeat-10 abc];")));
+        (bytecode);
+    }
+
+    /// Trailing bytes after the decimal digit must revert.
+    function testRainterpreterReferenceExternRepeatTrailingBytes() external {
+        RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();
+        string memory baseStr = string.concat("using-words-from ", address(extern).toHexString(), " ");
+
+        vm.expectRevert(abi.encodeWithSelector(UnconsumedRepeatDispatchBytes.selector));
+        bytes memory bytecode = I_DEPLOYER.parse2(bytes(string.concat(baseStr, "_: [ref-extern-repeat-5x abc];")));
         (bytecode);
     }
 }

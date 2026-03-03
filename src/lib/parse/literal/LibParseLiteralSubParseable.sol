@@ -58,10 +58,11 @@ library LibParseLiteralSubParseable {
 
             uint256 bodyStart = cursor;
 
-            // Skip all chars til the close.
-            // Note that as multibyte is not supported, and the mask is 128 bits,
-            // non-ascii chars MAY either fail to be skipped or will be treated
-            // as a closing bracket.
+            // Skip all chars til the close. Each byte is checked independently
+            // against the mask — multibyte encodings are not understood. A byte
+            // in a multibyte sequence that equals `]` (0x5D) would stop the
+            // scan prematurely. This cannot happen in valid UTF-8 (continuation
+            // bytes are 0x80-0xBF), but is possible in other encodings.
             cursor = LibParseChar.skipMask(cursor, end, ~CMASK_SUB_PARSEABLE_LITERAL_END);
             uint256 bodyEnd = cursor;
 

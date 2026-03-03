@@ -7,7 +7,7 @@ import {RainterpreterParser} from "src/concrete/RainterpreterParser.sol";
 import {PragmaV1} from "rain.interpreter.interface/interface/IParserPragmaV1.sol";
 
 /// @title RainterpreterParserParsePragmaEmptyInputTest
-/// @notice A48-4: Test that `parsePragma1` handles empty input correctly.
+/// @notice Test that `parsePragma1` handles empty input correctly.
 contract RainterpreterParserParsePragmaEmptyInputTest is Test {
     /// @notice parsePragma1 with empty bytes should return a PragmaV1 with an
     /// empty usingWordsFrom array.

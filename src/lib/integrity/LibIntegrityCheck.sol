@@ -21,7 +21,11 @@ import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol
 /// @param stackMaxIndex Peak stack depth seen so far, used to verify the
 /// bytecode-declared stack allocation.
 /// @param readHighwater Lowest stack index that opcodes are allowed to read
-/// from. Advances past multi-output regions to prevent aliasing reads.
+/// from via consumption. After an opcode produces multiple outputs, the
+/// highwater advances to prevent subsequent opcodes from consuming below
+/// the multi-output region, which would leave orphaned values. Read-only
+/// access (e.g. the `stack` opcode) is permitted below the highwater
+/// because copying does not create aliasing.
 /// @param constants The constants array for the expression, passed through
 /// to opcode integrity functions that need it.
 /// @param opIndex Sequential counter of opcodes processed, used for error

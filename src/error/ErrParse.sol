@@ -174,6 +174,10 @@ error ParseMemoryOverflow(uint256 freeMemoryPointer);
 /// would silently wrap, corrupting source bytecode.
 error SourceItemOpsOverflow();
 
+/// The total number of opcodes across all top-level items in a single source
+/// exceeded 255. The source prefix byte can only represent 0-255.
+error SourceTotalOpsOverflow();
+
 /// A paren group exceeded 255 inputs. The per-paren byte counter would
 /// silently wrap, corrupting operand data.
 error ParenInputOverflow();
@@ -181,3 +185,15 @@ error ParenInputOverflow();
 /// A single line exceeded the maximum number of RHS top-level items that
 /// can be tracked in the 256-bit lineTracker (14 items).
 error LineRHSItemsOverflow();
+
+/// @notice Thrown when a numeric literal starts with `0X` (uppercase). Only
+/// lowercase `0x` is a valid hexadecimal prefix. Uppercase `0X` would
+/// otherwise silently parse as decimal zero.
+/// @param offset The byte offset in the source where the error occurred.
+error UppercaseHexPrefix(uint256 offset);
+
+/// The number of LHS items overflowed the single-byte counter in
+/// `lineTracker` (per line) or `topLevel1` (per source). Maximum 255 LHS
+/// items per line and per source.
+/// @param offset The byte offset in the source where the error occurred.
+error LHSItemCountOverflow(uint256 offset);

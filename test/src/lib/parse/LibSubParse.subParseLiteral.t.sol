@@ -9,6 +9,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
 import {ISubParserV4} from "rain.interpreter.interface/interface/ISubParserV4.sol";
 import {UnsupportedLiteralType} from "src/error/ErrParse.sol";
+import {SubParseLiteralDispatchLengthOverflow} from "src/error/ErrSubParse.sol";
 
 /// @title LibSubParseSubParseLiteralTest
 /// @notice Direct unit tests for `LibSubParse.subParseLiteral`.
@@ -161,6 +162,28 @@ contract LibSubParseSubParseLiteralTest is Test {
 
         bytes32 result = this.externalSubParseLiteral(dispatch, body, subs);
         assertEq(result, expectedValue);
+    }
+
+    /// Dispatch region exceeding 0xFFFF bytes causes silent truncation of
+    /// the 2-byte encoded length. The sub-parser receives corrupted data
+    /// where the dispatch/body boundary is wrong.
+    function testSubParseLiteralDispatchLengthOverflow() external {
+        address subParser = makeAddr("subParser");
+        // Create a dispatch of 0x10001 bytes — one byte past the 16-bit max.
+        bytes memory dispatch = new bytes(0x10001);
+        bytes memory body = bytes("");
+
+        vm.mockCall(
+            subParser,
+            abi.encodeWithSelector(ISubParserV4.subParseLiteral2.selector),
+            abi.encode(true, bytes32(uint256(1)))
+        );
+
+        address[] memory subs = new address[](1);
+        subs[0] = subParser;
+
+        vm.expectRevert(abi.encodeWithSelector(SubParseLiteralDispatchLengthOverflow.selector, 0x10001));
+        this.externalSubParseLiteral(dispatch, body, subs);
     }
 
     /// @notice First sub parser accepts, second is never called.

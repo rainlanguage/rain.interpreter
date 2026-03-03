@@ -7,7 +7,7 @@ import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
 import {StateNamespace} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
 
 /// @title RainterpreterStoreSetEmptyArrayTest
-/// @notice A50-3: Test that `set()` with an empty (zero-length) `kvs` array
+/// @notice Test that `set()` with an empty (zero-length) `kvs` array
 /// succeeds without reverting.
 contract RainterpreterStoreSetEmptyArrayTest is Test {
     /// @notice set() with a zero-length kvs array must not revert.

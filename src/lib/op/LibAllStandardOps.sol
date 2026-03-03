@@ -509,7 +509,7 @@ library LibAllStandardOps {
                     // sqrt
                     LibParseOperand.handleOperandDisallowed,
                     // sub
-                    LibParseOperand.handleOperandSingleFull,
+                    LibParseOperand.handleOperandDisallowed,
                     // get
                     LibParseOperand.handleOperandDisallowed,
                     // set

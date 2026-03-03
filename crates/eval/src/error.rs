@@ -40,6 +40,8 @@ pub enum ReplayTransactionError {
     NoBlockNumberFound(String, String),
     #[error("No from address found in transaction for hash {0} and fork url {1}")]
     NoFromAddressFound(String, String),
+    #[error("Cannot replay genesis block (block 0) transaction for hash {0} and fork url {1}")]
+    GenesisBlockReplay(String, String),
 }
 
 #[cfg(not(target_family = "wasm"))]

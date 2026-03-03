@@ -34,7 +34,8 @@ import {
     UnexpectedLHSChar,
     MissingFinalSemi,
     UnexpectedComment,
-    ParenOverflow
+    ParenOverflow,
+    LHSItemCountOverflow
 } from "../../error/ErrParse.sol";
 import {
     LibParseState,
@@ -165,7 +166,17 @@ library LibParse {
                         cursor = LibParseChar.skipMask(cursor + 1, end, CMASK_LHS_STACK_TAIL);
                     }
                     // Bump the index regardless of whether the stack
-                    // item is named or not.
+                    // item is named or not. Both counters are packed into
+                    // the low byte of their respective uint256 fields.
+                    // Exceeding 0xFF would carry into the adjacent byte,
+                    // silently corrupting parser state.
+                    // The low byte of each field is only ever mutated by
+                    // single increments (here) and resets to 0 (newSource
+                    // / endLine), so reading via `& 0xFF` reliably gives
+                    // the true count at this point.
+                    if ((state.topLevel1 & 0xFF) == 0xFF || (state.lineTracker & 0xFF) == 0xFF) {
+                        revert LHSItemCountOverflow(state.parseErrorOffset(cursor));
+                    }
                     state.topLevel1++;
                     state.lineTracker++;
 
