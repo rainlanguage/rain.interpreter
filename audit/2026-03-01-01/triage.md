@@ -121,3 +121,9 @@
 - [PENDING] P4-RUST-01: (LOW) Unused dependencies serde_json, reqwest, once_cell in eval Cargo.toml
 - [PENDING] P4-RUST-02: (LOW) Wildcard use alloy::primitives::* in dispair and parser
 - [PENDING] P4-RUST-03: (LOW) Duplicated error-handling logic in alloy_call/alloy_call_committing with inconsistent format
+
+## Pass 5: Correctness
+
+- [DISMISSED] P5-HEADROOM-01: (INFO) Headroom semantics for negative non-integers may surprise users — Rain-invented opcode, well tested including negative cases, semantics defined by NatSpec
+- [FIXED] P5-EXPGROWTH-01: (INFO) integrity NatSpec in exponential-growth, linear-growth, uint256-max-value missing explicit @notice tag
+- [FIXED] P5-UINT256POW-01: (INFO) uint256-power left-to-right associativity NatSpec could be clearer
