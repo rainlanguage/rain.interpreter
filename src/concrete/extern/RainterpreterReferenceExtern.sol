@@ -354,14 +354,16 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
         }
     }
 
-    /// This mimics how LibAllStandardOps builds function pointers for the
-    /// Rainterpreter. The same pattern applies to externs but for a different
-    /// function signature for each opcode. Call this function somehow, e.g. from
-    /// within a test, and then copy the output into the
+    /// @notice Builds the opcode function pointer table for this extern
+    /// contract. This mimics how LibAllStandardOps builds function pointers for
+    /// the Rainterpreter. The same pattern applies to externs but for a
+    /// different function signature for each opcode. Call this function somehow,
+    /// e.g. from within a test, and then copy the output into the
     /// `OPCODE_FUNCTION_POINTERS` if there is a mismatch. This makes the
     /// function pointer lookup much more gas efficient. The reason this can't be
     /// done within the test itself is that the pointers need to be calculated
     /// relative to the bytecode of the current contract, not the test contract.
+    /// @return The packed 16-bit function pointers for each extern opcode.
     function buildOpcodeFunctionPointers() external pure returns (bytes memory) {
         unchecked {
             function(OperandV2, StackItem[] memory) internal view returns (StackItem[] memory) lengthPointer;
@@ -386,14 +388,16 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
         }
     }
 
-    /// This applies the same pattern to integrity function pointers as the
-    /// opcode and parser function pointers on this same contract. Call this
-    /// function somehow, e.g. from within a test, and then check there is no
-    /// mismatch with the `INTEGRITY_FUNCTION_POINTERS` constant. This makes the
-    /// function pointer lookup at runtime much more gas efficient by allowing
-    /// it to be constant. The reason this can't be done within the test itself
-    /// is that the pointers need to be calculated relative to the bytecode of
-    /// the current contract, not the test contract.
+    /// @notice Builds the integrity function pointer table for this extern
+    /// contract. This applies the same pattern to integrity function pointers
+    /// as the opcode and parser function pointers on this same contract. Call
+    /// this function somehow, e.g. from within a test, and then check there is
+    /// no mismatch with the `INTEGRITY_FUNCTION_POINTERS` constant. This makes
+    /// the function pointer lookup at runtime much more gas efficient by
+    /// allowing it to be constant. The reason this can't be done within the
+    /// test itself is that the pointers need to be calculated relative to the
+    /// bytecode of the current contract, not the test contract.
+    /// @return The packed 16-bit function pointers for each integrity check.
     function buildIntegrityFunctionPointers() external pure returns (bytes memory) {
         unchecked {
             function(OperandV2, uint256, uint256) internal pure returns (uint256, uint256) lengthPointer;

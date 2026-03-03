@@ -66,10 +66,10 @@
 
 ## Pass 3: Documentation
 
-- [PENDING] P3-ERR-1: (LOW) 16 errors use plain /// without @notice while siblings use @notice
-- [PENDING] P3-EA-01: (LOW) "word dispatches" should be "opcode dispatches" in BaseRainterpreterExtern NatSpec
-- [PENDING] P3-EA-02: (LOW) Missing @return tags on buildOpcodeFunctionPointers/buildIntegrityFunctionPointers
-- [PENDING] P3-EA-03: (LOW) Three context op subParser functions have unnamed parameters and no @param/@return
+- [FIXED] P3-ERR-1: (LOW) 16 errors use plain /// without @notice while siblings use @notice — added @notice to 17 errors across ErrBitwise, ErrEval, ErrExtern, ErrParse
+- [FIXED] P3-EA-01: (LOW) "word dispatches" should be "opcode dispatches" in BaseRainterpreterExtern NatSpec
+- [FIXED] P3-EA-02: (LOW) Missing @return tags on buildOpcodeFunctionPointers/buildIntegrityFunctionPointers
+- [FIXED] P3-EA-03: (LOW) Three context op subParser functions have unnamed parameters and no @param/@return
 - [PENDING] P3-EA-04: (LOW) Undocumented CONTEXT_CALLER_CONTEXT constants in LibExternOpContextRainlen
 - [PENDING] P3-EA-05: (LOW) Typo "determin" in SUB_PARSER_LITERAL_REPEAT_KEYWORD_MASK NatSpec
 - [PENDING] P3-LPS-01: (LOW) LibParseState library missing library-level NatSpec
@@ -77,7 +77,7 @@
 - [PENDING] P3-LPP-02: (LOW) 4 pragma keyword constants missing NatSpec
 - [PENDING] P3-LPST-02: (LOW) ParseStackTracker user-defined type missing NatSpec
 - [PENDING] P3-LPL-02: (LOW) 5 literal parser index constants missing NatSpec
-- [PENDING] P3-ERR-01: (LOW) 13 errors in ErrParse.sol have doc comments but no explicit @notice tag
+- [FIXED] P3-ERR-01: (LOW) 13 errors in ErrParse.sol have doc comments but no explicit @notice tag — fixed as part of P3-ERR-1
 - [PENDING] P3-CC-01: (LOW) opcodeFunctionPointers has untagged lines before @return tag
 - [PENDING] P3-CC-02: (LOW) buildOperandHandlerFunctionPointers/buildLiteralParserFunctionPointers use bare /// instead of @inheritdoc
 - [PENDING] P3-CC-03: (LOW) Three internal virtual functions missing @return tags in RainterpreterParser

@@ -18,6 +18,6 @@ error UnsupportedBitwiseShiftAmount(uint256 shiftAmount);
 /// @param length The length of the OOB encoding.
 error TruncatedBitwiseEncoding(uint256 startBit, uint256 length);
 
-/// Thrown during integrity check when the length of a bitwise (en|de)coding
-/// would be 0.
+/// @notice Thrown during integrity check when the length of a bitwise
+/// (en|de)coding would be 0.
 error ZeroLengthBitwiseEncoding();

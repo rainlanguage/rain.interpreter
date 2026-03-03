@@ -24,5 +24,5 @@ error ExternPointersMismatch(uint256 opcodeCount, uint256 integrityCount);
 /// @param actualLength The number of outputs actually returned.
 error BadOutputsLength(uint256 expectedLength, uint256 actualLength);
 
-/// Thrown at construction when there are no opcode function pointers.
+/// @notice Thrown at construction when there are no opcode function pointers.
 error ExternOpcodePointersEmpty();
