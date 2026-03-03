@@ -114,8 +114,6 @@ contract LibOpGreaterThanOrEqualToTest is OpTest {
 
     /// Test that operand is disallowed.
     function testOpGreaterThanOrEqualToEvalOperandDisallowed() external {
-        checkUnhappyParse(
-            "_: greater-than-or-equal-to<0>(1 2);", abi.encodeWithSelector(UnexpectedOperand.selector)
-        );
+        checkUnhappyParse("_: greater-than-or-equal-to<0>(1 2);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }
