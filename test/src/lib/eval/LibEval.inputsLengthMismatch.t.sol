@@ -20,11 +20,11 @@ import {InputsLengthMismatch} from "src/error/ErrEval.sol";
 /// LibEval.eval4, using hand-built bytecode and InterpreterState.
 contract LibEvalInputsLengthMismatchTest is Test {
     /// External wrapper so vm.expectRevert works with the library call.
-    function externalEval4(
-        InterpreterState memory state,
-        StackItem[] memory inputs,
-        uint256 maxOutputs
-    ) external view returns (StackItem[] memory, bytes32[] memory) {
+    function externalEval4(InterpreterState memory state, StackItem[] memory inputs, uint256 maxOutputs)
+        external
+        view
+        returns (StackItem[] memory, bytes32[] memory)
+    {
         return LibEval.eval4(state, inputs, maxOutputs);
     }
 
@@ -35,9 +35,7 @@ contract LibEvalInputsLengthMismatchTest is Test {
 
         // Bytecode: 1 source, 0 offset, 0 ops, sourceInputs stack allocation,
         // sourceInputs inputs, 0 outputs.
-        bytes memory bytecode = abi.encodePacked(
-            uint8(1), uint16(0), uint8(0), sourceInputs, sourceInputs, uint8(0)
-        );
+        bytes memory bytecode = abi.encodePacked(uint8(1), uint16(0), uint8(0), sourceInputs, sourceInputs, uint8(0));
 
         StackItem[][] memory stacks = new StackItem[][](1);
         stacks[0] = new StackItem[](sourceInputs);

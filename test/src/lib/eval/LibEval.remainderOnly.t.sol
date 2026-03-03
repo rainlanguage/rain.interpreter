@@ -33,8 +33,7 @@ contract LibEvalRemainderOnlyTest is RainterpreterExpressionDeployerDeploymentTe
         bytes32 c6
     ) external view {
         // 7 distinct hex literals produce 7 constant opcodes.
-        (bytes memory bytecode,) =
-            I_PARSER.unsafeParse(bytes("_ _ _ _ _ _ _: 0xaa 0xbb 0xcc 0xdd 0xee 0xff 0x11;"));
+        (bytes memory bytecode,) = I_PARSER.unsafeParse(bytes("_ _ _ _ _ _ _: 0xaa 0xbb 0xcc 0xdd 0xee 0xff 0x11;"));
 
         bytes32[] memory constants = new bytes32[](7);
         constants[0] = c0;
@@ -60,8 +59,7 @@ contract LibEvalRemainderOnlyTest is RainterpreterExpressionDeployerDeploymentTe
             LibAllStandardOps.opcodeFunctionPointers()
         );
 
-        (StackItem[] memory outputs, bytes32[] memory kvs) =
-            LibEval.eval4(state, new StackItem[](0), type(uint256).max);
+        (StackItem[] memory outputs, bytes32[] memory kvs) = LibEval.eval4(state, new StackItem[](0), type(uint256).max);
 
         assertEq(outputs.length, 7);
         // Stack outputs are top-first: last pushed constant is first output.
