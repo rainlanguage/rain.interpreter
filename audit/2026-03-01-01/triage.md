@@ -70,22 +70,22 @@
 - [FIXED] P3-EA-01: (LOW) "word dispatches" should be "opcode dispatches" in BaseRainterpreterExtern NatSpec
 - [FIXED] P3-EA-02: (LOW) Missing @return tags on buildOpcodeFunctionPointers/buildIntegrityFunctionPointers
 - [FIXED] P3-EA-03: (LOW) Three context op subParser functions have unnamed parameters and no @param/@return
-- [PENDING] P3-EA-04: (LOW) Undocumented CONTEXT_CALLER_CONTEXT constants in LibExternOpContextRainlen
-- [PENDING] P3-EA-05: (LOW) Typo "determin" in SUB_PARSER_LITERAL_REPEAT_KEYWORD_MASK NatSpec
-- [PENDING] P3-LPS-01: (LOW) LibParseState library missing library-level NatSpec
-- [PENDING] P3-LPS-02: (LOW) checkParseMemoryOverflow missing explicit @notice tag
-- [PENDING] P3-LPP-02: (LOW) 4 pragma keyword constants missing NatSpec
-- [PENDING] P3-LPST-02: (LOW) ParseStackTracker user-defined type missing NatSpec
-- [PENDING] P3-LPL-02: (LOW) 5 literal parser index constants missing NatSpec
+- [FIXED] P3-EA-04: (LOW) Undocumented CONTEXT_CALLER_CONTEXT constants in LibExternOpContextRainlen — already documented as part of A49-8
+- [FIXED] P3-EA-05: (LOW) Typo "determin" in SUB_PARSER_LITERAL_REPEAT_KEYWORD_MASK NatSpec
+- [FIXED] P3-LPS-01: (LOW) LibParseState library missing library-level NatSpec
+- [FIXED] P3-LPS-02: (LOW) checkParseMemoryOverflow missing explicit @notice tag
+- [FIXED] P3-LPP-02: (LOW) 4 pragma keyword constants missing NatSpec
+- [FIXED] P3-LPST-02: (LOW) ParseStackTracker user-defined type missing NatSpec
+- [FIXED] P3-LPL-02: (LOW) 5 literal parser index constants missing NatSpec
 - [FIXED] P3-ERR-01: (LOW) 13 errors in ErrParse.sol have doc comments but no explicit @notice tag — fixed as part of P3-ERR-1
-- [PENDING] P3-CC-01: (LOW) opcodeFunctionPointers has untagged lines before @return tag
-- [PENDING] P3-CC-02: (LOW) buildOperandHandlerFunctionPointers/buildLiteralParserFunctionPointers use bare /// instead of @inheritdoc
-- [PENDING] P3-CC-03: (LOW) Three internal virtual functions missing @return tags in RainterpreterParser
-- [PENDING] P3-CC-04: (LOW) IDISPaiRegistry functions have untagged description + @return tag
-- [PENDING] P3-OPALL-01: (LOW) Missing @notice tag on integrity() in 7 files
-- [PENDING] P3-OPALL-02: (LOW) Missing @return tags on integrity() in 7 files
-- [PENDING] P3-OPALL-03: (LOW) Missing @notice and @return on referenceFn() in LibOpMaxUint256
-- [PENDING] P3-OPALL-04: (LOW) Missing @notice on integrity() in LibOpEnsure
+- [FIXED] P3-CC-01: (LOW) opcodeFunctionPointers has untagged lines before @return tag
+- [FIXED] P3-CC-02: (LOW) buildOperandHandlerFunctionPointers/buildLiteralParserFunctionPointers use bare /// instead of @inheritdoc
+- [FIXED] P3-CC-03: (LOW) Three internal virtual functions missing @return tags in RainterpreterParser
+- [FIXED] P3-CC-04: (LOW) IDISPaiRegistry functions have untagged description + @return tag
+- [FIXED] P3-OPALL-01: (LOW) Missing @notice tag on integrity() in 7 files — 4 ERC uint256 files fixed; 3 others already fixed in P5-EXPGROWTH-01
+- [FIXED] P3-OPALL-02: (LOW) Missing @return tags on integrity() in 7 files — same as P3-OPALL-01
+- [FIXED] P3-OPALL-03: (LOW) Missing @return on referenceFn() in LibOpUint256MaxValue
+- [FIXED] P3-OPALL-04: (LOW) Missing @notice on integrity() in LibOpEnsure
 - [PENDING] P3-RC-01: (LOW) No crate-level //! documentation on any Rust crate
 - [PENDING] P3-RC-02: (LOW) CLI crate all 13 public items completely undocumented
 - [PENDING] P3-RC-03: (LOW) eval crate 10 undocumented public items

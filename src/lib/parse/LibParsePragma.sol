@@ -9,11 +9,16 @@ import {LibParseError} from "./LibParseError.sol";
 import {LibParseInterstitial} from "./LibParseInterstitial.sol";
 import {LibParseLiteral} from "./literal/LibParseLiteral.sol";
 
+/// @dev The raw bytes of the pragma keyword "using-words-from".
 bytes constant PRAGMA_KEYWORD_BYTES = bytes("using-words-from");
+/// @dev The pragma keyword as a left-aligned bytes32 for single-word comparison.
 // Constant is safe to typecast.
 //forge-lint: disable-next-line(unsafe-typecast)
 bytes32 constant PRAGMA_KEYWORD_BYTES32 = bytes32(PRAGMA_KEYWORD_BYTES);
+/// @dev The byte length of the pragma keyword (16 bytes for "using-words-from").
 uint256 constant PRAGMA_KEYWORD_BYTES_LENGTH = 16;
+/// @dev Bitmask that isolates the first `PRAGMA_KEYWORD_BYTES_LENGTH` bytes of
+/// a bytes32 value, used to compare only the keyword portion.
 //forge-lint: disable-next-line(incorrect-shift)
 bytes32 constant PRAGMA_KEYWORD_MASK = bytes32(~((1 << (32 - PRAGMA_KEYWORD_BYTES_LENGTH) * 8) - 1));
 

@@ -15,10 +15,11 @@ library LibOpEnsure {
     using LibDecimalFloat for Float;
     using LibIntOrAString for IntOrAString;
 
+    /// @notice `ensure` integrity check. Requires exactly 2 inputs and
+    /// produces 0 outputs.
     /// @return The number of inputs.
     /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
-        // There must be exactly 2 inputs.
         return (2, 0);
     }
 

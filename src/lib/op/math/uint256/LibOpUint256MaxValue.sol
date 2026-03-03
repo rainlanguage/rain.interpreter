@@ -30,6 +30,7 @@ library LibOpUint256MaxValue {
     }
 
     /// @notice Reference implementation of `uint256-max-value` for testing.
+    /// @return The stack item outputs.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory)
         internal
         pure

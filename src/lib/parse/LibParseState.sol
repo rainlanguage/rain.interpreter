@@ -183,6 +183,8 @@ struct ParseState {
     bytes meta;
 }
 
+/// @title LibParseState
+/// @notice Utilities for constructing and managing `ParseState` during parsing.
 library LibParseState {
     using LibParseState for ParseState;
     using LibParseStackTracker for ParseStackTracker;
@@ -1039,7 +1041,7 @@ library LibParseState {
         }
     }
 
-    /// The parse system packs memory pointers into 16 bits throughout its
+    /// @notice The parse system packs memory pointers into 16 bits throughout its
     /// linked list structures (active source slots, paren tracker, line
     /// tracker, sources builder, constants builder, stack names). This is
     /// safe as long as all memory allocated during parsing stays below

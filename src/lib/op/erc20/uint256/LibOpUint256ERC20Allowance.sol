@@ -12,7 +12,10 @@ import {NotAnAddress} from "../../../../error/ErrRainType.sol";
 /// @title LibOpUint256ERC20Allowance
 /// @notice Opcode for getting the current erc20 allowance of an account.
 library LibOpUint256ERC20Allowance {
-    /// `uint256-erc20-allowance` integrity check. Requires 3 inputs and produces 1 output.
+    /// @notice `uint256-erc20-allowance` integrity check. Requires 3 inputs
+    /// and produces 1 output.
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // Always 3 inputs, the token, the owner and the spender.
         // Always 1 output, the allowance.

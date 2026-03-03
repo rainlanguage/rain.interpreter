@@ -39,9 +39,9 @@ contract Rainterpreter is IInterpreterV4, IOpcodeToolingV1, ERC165 {
         if (opcodeFunctionPointers().length == 0) revert ZeroFunctionPointers();
     }
 
-    /// Returns the packed 2-byte function pointer table used by the eval loop
-    /// to dispatch each opcode. Virtual so subclasses can override the table.
-    /// @notice Overrides MUST return the same non-empty value at construction
+    /// @notice Returns the packed 2-byte function pointer table used by the
+    /// eval loop to dispatch each opcode. Virtual so subclasses can override
+    /// the table. Overrides MUST return the same non-empty value at construction
     /// time and at runtime. Returning empty bytes at runtime would cause
     /// division-by-zero in the eval loop's modulo-based dispatch, leading to
     /// reads from arbitrary memory interpreted as function pointers.

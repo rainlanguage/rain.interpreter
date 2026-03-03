@@ -88,27 +88,32 @@ contract RainterpreterParser is ERC165, IParserToolingV1 {
         return PragmaV1(parseState.exportSubParsers());
     }
 
-    /// Virtual function to return the parse meta.
+    /// @notice Virtual function to return the parse meta.
+    /// @return The parse meta bytes.
     function parseMeta() internal pure virtual returns (bytes memory) {
         return PARSE_META;
     }
 
-    /// Virtual function to return the operand handler function pointers.
+    /// @notice Virtual function to return the operand handler function
+    /// pointers.
+    /// @return The packed operand handler function pointers.
     function operandHandlerFunctionPointers() internal pure virtual returns (bytes memory) {
         return OPERAND_HANDLER_FUNCTION_POINTERS;
     }
 
-    /// Virtual function to return the literal parser function pointers.
+    /// @notice Virtual function to return the literal parser function
+    /// pointers.
+    /// @return The packed literal parser function pointers.
     function literalParserFunctionPointers() internal pure virtual returns (bytes memory) {
         return LITERAL_PARSER_FUNCTION_POINTERS;
     }
 
-    /// External function to build the operand handler function pointers.
+    /// @inheritdoc IParserToolingV1
     function buildOperandHandlerFunctionPointers() external pure override returns (bytes memory) {
         return LibAllStandardOps.operandHandlerFunctionPointers();
     }
 
-    /// External function to build the literal parser function pointers.
+    /// @inheritdoc IParserToolingV1
     function buildLiteralParserFunctionPointers() external pure override returns (bytes memory) {
         return LibAllStandardOps.literalParserFunctionPointers();
     }

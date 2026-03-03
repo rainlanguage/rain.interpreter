@@ -15,11 +15,16 @@ import {UnsupportedLiteralType, UppercaseHexPrefix} from "../../../error/ErrPars
 import {ParseState} from "../LibParseState.sol";
 import {LibParseError} from "../LibParseError.sol";
 
+/// @dev The number of built-in literal parser types.
 uint256 constant LITERAL_PARSERS_LENGTH = 4;
 
+/// @dev Index of the hexadecimal literal parser (e.g. `0xDEAD`).
 uint256 constant LITERAL_PARSER_INDEX_HEX = 0;
+/// @dev Index of the decimal literal parser (e.g. `42`, `1e18`).
 uint256 constant LITERAL_PARSER_INDEX_DECIMAL = 1;
+/// @dev Index of the string literal parser (e.g. `"hello"`).
 uint256 constant LITERAL_PARSER_INDEX_STRING = 2;
+/// @dev Index of the sub-parseable literal parser (e.g. `[dispatch body]`).
 uint256 constant LITERAL_PARSER_INDEX_SUB_PARSE = 3;
 
 library LibParseLiteral {
