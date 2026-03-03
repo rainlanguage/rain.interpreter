@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {OpTest} from "test/abstract/OpTest.sol";
+import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpLessThan} from "src/lib/op/logic/LibOpLessThan.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
@@ -110,5 +110,10 @@ contract LibOpLessThanTest is OpTest {
 
     function testOpLessThanTwoOutputs() external {
         checkBadOutputs("_ _: less-than(30 0);", 2, 1, 2);
+    }
+
+    /// Test that operand is disallowed.
+    function testOpLessThanEvalOperandDisallowed() external {
+        checkUnhappyParse("_: less-than<0>(1 2);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

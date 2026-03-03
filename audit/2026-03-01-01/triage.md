@@ -56,9 +56,9 @@
 - [FIXED] A44-1-P2: (LOW) subParseWordSlice no test for no-sub-parsers-registered path
 - [DISMISSED] P2-EAD-01: (LOW) BaseRainterpreterSubParser.subParseWord2 missing happy-path and no-match tests — both paths tested in RainterpreterReferenceExtern.intInc.t.sol (lines 78-81 happy, 122-127 no-match)
 - [FIXED] P2-EAD-02: (LOW) authoringMetaV2 word names not verified beyond index 3
-- [PENDING] P2-01: (LOW) Missing operand-disallowed tests for 10 logic opcodes
-- [PENDING] P2-02: (LOW) Missing operand-disallowed tests for 5 math opcodes
-- [PENDING] P2-03: (LOW) Missing operand-disallowed test for LibOpHash
+- [FIXED] P2-01: (LOW) Missing operand-disallowed tests for 10 logic opcodes
+- [FIXED] P2-02: (LOW) Missing operand-disallowed tests for 5 math opcodes — LibOpSub already had test; added tests for LibOpMaxPositiveValue, LibOpMaxNegativeValue, LibOpMinPositiveValue, LibOpMinNegativeValue
+- [FIXED] P2-03: (LOW) Missing operand-disallowed test for LibOpHash
 - [PENDING] R02-PASS2-01: (LOW) No tests for error paths in Forker methods
 - [PENDING] R02-PASS2-02: (LOW) Forker::new() has no test
 - [PENDING] R02-PASS2-04: (LOW) RainSourceTrace::from_data() edge cases untested

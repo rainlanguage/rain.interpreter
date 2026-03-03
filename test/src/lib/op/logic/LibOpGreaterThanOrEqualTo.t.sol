@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {OpTest} from "test/abstract/OpTest.sol";
+import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpGreaterThanOrEqualTo} from "src/lib/op/logic/LibOpGreaterThanOrEqualTo.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
@@ -110,5 +110,12 @@ contract LibOpGreaterThanOrEqualToTest is OpTest {
 
     function testOpGreaterThanOrEqualToTwoOutputs() external {
         checkBadOutputs("_ _: greater-than-or-equal-to(1 2);", 2, 1, 2);
+    }
+
+    /// Test that operand is disallowed.
+    function testOpGreaterThanOrEqualToEvalOperandDisallowed() external {
+        checkUnhappyParse(
+            "_: greater-than-or-equal-to<0>(1 2);", abi.encodeWithSelector(UnexpectedOperand.selector)
+        );
     }
 }

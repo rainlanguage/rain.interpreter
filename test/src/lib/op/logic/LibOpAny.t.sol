@@ -6,7 +6,7 @@ import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 
-import {OpTest} from "test/abstract/OpTest.sol";
+import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpAny} from "src/lib/op/logic/LibOpAny.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {
@@ -147,5 +147,10 @@ contract LibOpAnyTest is OpTest {
 
     function testOpAnyTwoOutputs() external {
         checkBadOutputs("_ _: any(0);", 1, 1, 2);
+    }
+
+    /// Test that operand is disallowed.
+    function testOpAnyEvalOperandDisallowed() external {
+        checkUnhappyParse("_: any<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {OpTest} from "test/abstract/OpTest.sol";
+import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpEqualTo} from "src/lib/op/logic/LibOpEqualTo.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
@@ -101,5 +101,10 @@ contract LibOpEqualToTest is OpTest {
 
     function testOpEqualToTwoOutputs() external {
         checkBadOutputs("_ _: equal-to(0 0);", 2, 1, 2);
+    }
+
+    /// Test that operand is disallowed.
+    function testOpEqualToEvalOperandDisallowed() external {
+        checkUnhappyParse("_: equal-to<0>(1 2);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

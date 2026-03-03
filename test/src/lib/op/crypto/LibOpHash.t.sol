@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {OpTest} from "test/abstract/OpTest.sol";
+import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 
 import {LibOpHash} from "src/lib/op/crypto/LibOpHash.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
@@ -109,5 +109,10 @@ contract LibOpHashTest is OpTest {
 
     function testOpHashTwoOutputs() external {
         checkBadOutputs("_ _: hash();", 0, 1, 2);
+    }
+
+    /// Test that operand is disallowed.
+    function testOpHashEvalOperandDisallowed() external {
+        checkUnhappyParse("_: hash<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }
