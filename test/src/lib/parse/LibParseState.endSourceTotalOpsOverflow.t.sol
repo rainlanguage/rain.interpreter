@@ -35,7 +35,7 @@ contract LibParseStateEndSourceTotalOpsOverflowTest is ParseTest {
     /// 256 total ops across two items MUST overflow.
     /// Two items: 128 ops + 128 ops = 256 total.
     function testTotalOpsOverflow256() external {
-        bytes memory tree128 = bytes.concat("a(", buildTree(6), " a())");
+        bytes memory tree128 = bytes.concat("a(", buildTree(6), ")");
         string memory s = string(bytes.concat("_: ", tree128, ",\n_: ", tree128, ";"));
         vm.expectRevert(abi.encodeWithSelector(SourceTotalOpsOverflow.selector));
         this.parseExternal(s);

@@ -127,3 +127,16 @@
 - [DISMISSED] P5-HEADROOM-01: (INFO) Headroom semantics for negative non-integers may surprise users — Rain-invented opcode, well tested including negative cases, semantics defined by NatSpec
 - [FIXED] P5-EXPGROWTH-01: (INFO) integrity NatSpec in exponential-growth, linear-growth, uint256-max-value missing explicit @notice tag
 - [FIXED] P5-UINT256POW-01: (INFO) uint256-power left-to-right associativity NatSpec could be clearer
+
+## CodeRabbit (PR #438)
+
+- [FIXED] CR-7: (LOW) endSourceTotalOpsOverflow test boundary off by one — tree128 was 129 ops not 128, testing 258 not 256
+- [FIXED] CR-8: (LOW) Stale comment in subParseLiteral test — described old silent truncation behavior, now reverts
+- [FIXED] CR-12: (LOW) Test function names in LibOpBitwiseCountOnes.t.sol still used old CtPop prefix
+- [DISMISSED] CR-3: (LOW) Per-test fuzz run overrides in LibOpBitwiseShiftRight.t.sol — intentional for slow tests
+- [FIXED] CR-10: (LOW) Broad vm.expectRevert() in subParseWords test — now asserts UnknownWord("") specifically
+- [FIXED] CR-9: (LOW) Redundant state.literalParsers reassignment in LibParsePragma.keyword.t.sol
+- [DISMISSED] CR-1/2: (LOW) Pragma ^ vs = in library files — intentional for downstream compatibility
+- [DISMISSED] CR-5: (LOW) LibCamelToKebab NatSpec — false positive, continuation lines are valid
+- [DISMISSED] CR-6: (LOW) LibIntegrityCheck NatSpec — false positive, correctly tagged
+- [DISMISSED] CR-11: (INFO) Alias detection docs — suggestion only, not a bug

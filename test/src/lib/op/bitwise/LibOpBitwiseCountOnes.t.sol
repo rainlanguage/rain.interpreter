@@ -16,7 +16,7 @@ import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 contract LibOpBitwiseCountOnesTest is OpTest {
     /// Directly test the integrity logic of LibOpBitwiseCountOnes. All possible operands
     /// result in the same number of inputs and outputs, (1, 1).
-    function testOpCtPopIntegrity(IntegrityCheckState memory state, OperandV2 operand) external pure {
+    function testOpBitwiseCountOnesIntegrity(IntegrityCheckState memory state, OperandV2 operand) external pure {
         (uint256 calcInputs, uint256 calcOutputs) = LibOpBitwiseCountOnes.integrity(state, operand);
         assertEq(calcInputs, 1);
         assertEq(calcOutputs, 1);
@@ -24,7 +24,7 @@ contract LibOpBitwiseCountOnesTest is OpTest {
 
     /// Directly test the runtime logic of LibOpBitwiseCountOnes. This tests that the
     /// opcode correctly pushes the ct pop onto the stack.
-    function testOpCtPopRun(StackItem x) external view {
+    function testOpBitwiseCountOnesRun(StackItem x) external view {
         InterpreterState memory state = opTestDefaultInterpreterState();
         StackItem[] memory inputs = new StackItem[](1);
         inputs[0] = x;
@@ -40,7 +40,7 @@ contract LibOpBitwiseCountOnesTest is OpTest {
     }
 
     /// Test the eval of a ct pop opcode parsed from a string.
-    function testOpCtPopEval(StackItem x) external view {
+    function testOpBitwiseCountOnesEval(StackItem x) external view {
         StackItem[] memory stack = new StackItem[](1);
         stack[0] = StackItem.wrap(bytes32(LibCtPop.ctpop(uint256(StackItem.unwrap(x)))));
         checkHappy(
@@ -51,24 +51,24 @@ contract LibOpBitwiseCountOnesTest is OpTest {
     }
 
     /// Test that a bitwise count with bad inputs fails integrity.
-    function testOpCtPopZeroInputs() external {
+    function testOpBitwiseCountOnesZeroInputs() external {
         checkBadInputs("_: bitwise-count-ones();", 0, 1, 0);
     }
 
-    function testOpCtPopTwoInputs() external {
+    function testOpBitwiseCountOnesTwoInputs() external {
         checkBadInputs("_: bitwise-count-ones(0 0);", 2, 1, 2);
     }
 
-    function testOpCtPopZeroOutputs() external {
+    function testOpBitwiseCountOnesZeroOutputs() external {
         checkBadOutputs(": bitwise-count-ones(0);", 1, 1, 0);
     }
 
-    function testOpCtPopTwoOutputs() external {
+    function testOpBitwiseCountOnesTwoOutputs() external {
         checkBadOutputs("_ _: bitwise-count-ones(0);", 1, 1, 2);
     }
 
     /// Test that operand is disallowed.
-    function testOpCtPopEvalBadOperand() external {
+    function testOpBitwiseCountOnesEvalOperandDisallowed() external {
         checkUnhappyParse("_: bitwise-count-ones<0>(0);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

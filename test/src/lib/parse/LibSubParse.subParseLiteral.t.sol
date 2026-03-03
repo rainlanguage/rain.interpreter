@@ -164,9 +164,9 @@ contract LibSubParseSubParseLiteralTest is Test {
         assertEq(result, expectedValue);
     }
 
-    /// Dispatch region exceeding 0xFFFF bytes causes silent truncation of
-    /// the 2-byte encoded length. The sub-parser receives corrupted data
-    /// where the dispatch/body boundary is wrong.
+    /// Dispatch region exceeding 0xFFFF bytes reverts with
+    /// SubParseLiteralDispatchLengthOverflow to prevent silent truncation
+    /// of the 2-byte encoded length.
     function testSubParseLiteralDispatchLengthOverflow() external {
         address subParser = makeAddr("subParser");
         // Create a dispatch of 0x10001 bytes — one byte past the 16-bit max.

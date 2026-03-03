@@ -296,7 +296,6 @@ contract LibParsePragmaKeywordTest is Test {
 
         ParseState memory state =
             LibParseState.newState(data, "", "", LibAllStandardOps.literalParserFunctionPointers());
-        state.literalParsers = LibAllStandardOps.literalParserFunctionPointers();
 
         uint256 cursor = Pointer.unwrap(data.dataPointer());
         // Set end to 60: just past the trailing space after the address.

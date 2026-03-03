@@ -448,14 +448,12 @@ impl Forker {
         self.add_or_select(
             NewForkedEvm {
                 fork_url: fork_url.clone(),
-                fork_block_number: Some(
-                    block_number
-                        .checked_sub(1)
-                        .ok_or(ReplayTransactionError::GenesisBlockReplay(
-                            tx_hash.to_string(),
-                            fork_url.clone(),
-                        ))?,
-                ),
+                fork_block_number: Some(block_number.checked_sub(1).ok_or(
+                    ReplayTransactionError::GenesisBlockReplay(
+                        tx_hash.to_string(),
+                        fork_url.clone(),
+                    ),
+                )?),
             },
             None,
         )
