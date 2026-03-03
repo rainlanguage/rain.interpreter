@@ -35,7 +35,7 @@ library LibExtern {
     function decodeExternDispatch(ExternDispatchV2 dispatch) internal pure returns (uint256, OperandV2) {
         return (
             uint256(ExternDispatchV2.unwrap(dispatch) >> 0x10),
-            OperandV2.wrap(ExternDispatchV2.unwrap(dispatch) & bytes32(uint256(0xFFFF)))
+            OperandV2.wrap(ExternDispatchV2.unwrap(dispatch) & bytes32(uint256(type(uint16).max)))
         );
     }
 

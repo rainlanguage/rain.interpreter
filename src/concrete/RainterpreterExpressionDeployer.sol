@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {ERC165, IERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
+import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC165.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {IParserV2} from "rain.interpreter.interface/interface/IParserV2.sol";
 import {IParserPragmaV1, PragmaV1} from "rain.interpreter.interface/interface/IParserPragmaV1.sol";
@@ -70,12 +70,12 @@ contract RainterpreterExpressionDeployer is
     }
 
     /// @inheritdoc IIntegrityToolingV1
-    function buildIntegrityFunctionPointers() external view virtual returns (bytes memory) {
+    function buildIntegrityFunctionPointers() external view virtual override returns (bytes memory) {
         return LibAllStandardOps.integrityFunctionPointers();
     }
 
     /// @inheritdoc IDescribedByMetaV1
-    function describedByMetaV1() external pure override returns (bytes32) {
+    function describedByMetaV1() external pure virtual override returns (bytes32) {
         return DESCRIBED_BY_META_HASH;
     }
 }

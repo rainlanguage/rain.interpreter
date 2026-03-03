@@ -1,12 +1,16 @@
 use std::io::Write;
 use std::path::PathBuf;
 
+/// Output encoding formats supported by the CLI.
 #[derive(clap::ValueEnum, Clone)]
 pub enum SupportedOutputEncoding {
+    /// Raw binary bytes.
     Binary,
+    /// 0x-prefixed hex string.
     Hex,
 }
 
+/// Writes `bytes` to `output_path` (or stdout) using the given encoding.
 pub fn output(
     output_path: &Option<PathBuf>,
     output_encoding: SupportedOutputEncoding,

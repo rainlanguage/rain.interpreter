@@ -11,6 +11,7 @@ use rain_interpreter_eval::trace::RainEvalResult;
 use rain_interpreter_eval::{eval::ForkEvalArgs, fork::Forker};
 use std::path::PathBuf;
 
+/// CLI arguments for evaluating a Rainlang expression.
 #[derive(Args, Clone, Debug)]
 pub struct ForkEvalCliArgs {
     #[arg(short, long, help = "The Rainlang string to parse")]
@@ -101,6 +102,7 @@ fn parse_int_or_hex(value: &str) -> Result<U256> {
     }
 }
 
+/// CLI subcommand that evaluates a Rainlang expression against a forked EVM.
 #[derive(Args, Clone)]
 pub struct Eval {
     /// Output path. If not specified, the output is written to stdout.

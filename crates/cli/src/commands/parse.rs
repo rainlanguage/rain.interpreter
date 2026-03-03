@@ -9,6 +9,7 @@ use rain_interpreter_eval::eval::ForkParseArgs;
 use rain_interpreter_eval::fork::Forker;
 use std::path::PathBuf;
 
+/// CLI arguments for parsing a Rainlang expression.
 #[derive(Args, Clone, Debug)]
 pub struct ForkParseArgsCli {
     #[arg(short, long, help = "The address of the deployer")]
@@ -21,6 +22,7 @@ pub struct ForkParseArgsCli {
     decode_errors: bool,
 }
 
+/// CLI subcommand that parses a Rainlang expression into bytecode.
 #[derive(Args, Clone)]
 pub struct Parse {
     /// Output path. If not specified, the output is written to stdout.
@@ -60,5 +62,35 @@ impl Execute for Parse {
             ),
             Err(e) => Err(anyhow!(e)),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::fork::NewForkedEvmCliArgs;
+    use rain_interpreter_test_fixtures::LocalEvm;
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+    async fn test_execute() {
+        let local_evm = LocalEvm::new().await;
+        let deployer = *local_evm.deployer.address();
+
+        let parse = Parse {
+            output_path: None,
+            output_encoding: SupportedOutputEncoding::Binary,
+            forked_evm: NewForkedEvmCliArgs {
+                fork_url: local_evm.url(),
+                fork_block_number: None,
+            },
+            fork_parse_args: ForkParseArgsCli {
+                deployer,
+                rainlang_string: "_: 1;".into(),
+                decode_errors: false,
+            },
+        };
+
+        let result = parse.execute().await;
+        assert!(result.is_ok());
     }
 }

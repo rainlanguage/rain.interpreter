@@ -78,6 +78,12 @@ uint256 constant PARSE_STATE_PAREN_TRACKER0_OFFSET = 0x60;
 /// Used in assembly to snapshot source head pointers per line.
 uint256 constant PARSE_STATE_LINE_TRACKER_OFFSET = 0xa0;
 
+/// @dev Maximum RHS offset value. The RHS offset is stored as a single
+/// byte within the topLevel0 field but shares the word with other packed
+/// fields, so it must not exceed 62 (0x3e). The check uses >= 0x3f (63)
+/// to reject offset 63 and above.
+uint256 constant MAX_STACK_RHS_OFFSET = 0x3f;
+
 /// @notice The parser is stateful. This struct keeps track of the entire state.
 /// @param activeSourcePtr The pointer to the current source being built.
 /// The active source being pointed to is:
@@ -534,10 +540,7 @@ library LibParseState {
                 newStackRHSOffset := add(byte(0, mload(stackRHSOffsetPtr)), 1)
                 mstore8(stackRHSOffsetPtr, newStackRHSOffset)
             }
-            // 0x3f = 63: the RHS offset is stored as a single byte within
-            // the topLevel0 field, but shares the word with other packed
-            // fields, so it must not exceed 62 (0x3e).
-            if (newStackRHSOffset >= 0x3f) {
+            if (newStackRHSOffset >= MAX_STACK_RHS_OFFSET) {
                 revert ParseStackOverflow();
             }
         }

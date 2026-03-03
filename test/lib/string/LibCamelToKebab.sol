@@ -23,11 +23,15 @@ library LibCamelToKebab {
                 uint8 prev = uint8(src[i - 1]);
                 // Rule 2: lowercase/digit followed by uppercase.
                 if (isLower(prev) || isDigit(prev)) {
+                    // Casting "-" to bytes1 is safe because it is a single ASCII byte.
+                    //forge-lint: disable-next-line(unsafe-typecast)
                     buf[len++] = bytes1("-");
                 }
                 // Rule 1: uppercase followed by uppercase+lowercase
                 // (split before the last uppercase in a run).
                 else if (isUpper(prev) && i + 1 < src.length && isLower(uint8(src[i + 1]))) {
+                    // Casting "-" to bytes1 is safe because it is a single ASCII byte.
+                    //forge-lint: disable-next-line(unsafe-typecast)
                     buf[len++] = bytes1("-");
                 }
             }

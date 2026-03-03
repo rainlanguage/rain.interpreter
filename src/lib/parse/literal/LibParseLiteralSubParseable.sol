@@ -11,6 +11,9 @@ import {LibParseError} from "../LibParseError.sol";
 import {LibSubParse} from "../LibSubParse.sol";
 import {LibParseChar} from "rain.string/lib/parse/LibParseChar.sol";
 
+/// @title LibParseLiteralSubParseable
+/// @notice Parses sub-parseable literals delimited by `[` and `]` by
+/// delegating to registered sub-parser contracts.
 library LibParseLiteralSubParseable {
     using LibParse for ParseState;
     using LibParseInterstitial for ParseState;

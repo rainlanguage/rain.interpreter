@@ -1,10 +1,11 @@
 use crate::error::ParserError;
-use alloy::primitives::*;
+use alloy::primitives::Address;
 use alloy_ethers_typecast::{ReadContractParametersBuilder, ReadableClient};
 use rain_interpreter_bindings::IParserPragmaV1::*;
 use rain_interpreter_bindings::IParserV2::*;
 use rain_interpreter_dispair::DISPaiR;
 
+/// Trait for interacting with the on-chain Rainlang parser contract.
 #[cfg(not(target_family = "wasm"))]
 pub trait Parser2 {
     /// Call Parser contract to parse the provided rainlang text.
@@ -51,6 +52,7 @@ pub trait Parser2 {
     }
 }
 
+/// Trait for interacting with the on-chain Rainlang parser contract.
 #[cfg(target_family = "wasm")]
 pub trait Parser2 {
     /// Call Parser contract to parse the provided rainlang text.
@@ -97,10 +99,11 @@ pub trait Parser2 {
     }
 }
 
-/// ParserV2
-/// Struct representing ParserV2 instances.
+/// Client-side wrapper around a deployer address that implements [`Parser2`]
+/// by making read calls to the on-chain parser contract.
 #[derive(Clone, Default)]
 pub struct ParserV2 {
+    /// The address of the expression deployer whose parser will be called.
     pub deployer_address: Address,
 }
 
@@ -121,6 +124,7 @@ impl From<Address> for ParserV2 {
 }
 
 impl ParserV2 {
+    /// Creates a new `ParserV2` for the given deployer address.
     pub fn new(deployer_address: Address) -> Self {
         Self { deployer_address }
     }
@@ -169,7 +173,7 @@ impl Parser2 for ParserV2 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use alloy::{primitives::Address, providers::mock::Asserter};
+    use alloy::{hex, primitives::Address, providers::mock::Asserter};
 
     #[tokio::test]
     async fn test_from_dispair() {

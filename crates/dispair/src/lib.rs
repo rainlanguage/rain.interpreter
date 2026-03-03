@@ -1,7 +1,11 @@
-use alloy::primitives::*;
+//! DISPaiR (Deployer/Interpreter/Store/Parser) address tuple.
 
-/// DISPaiR
-/// Struct representing Deployer/Interpreter/Store/Parser instances.
+use alloy::primitives::Address;
+
+/// Deployer/Interpreter/Store/Parser address tuple.
+///
+/// Groups the four contract addresses that together form a complete
+/// Rain interpreter deployment.
 #[derive(Debug, Clone, Default)]
 pub struct DISPaiR {
     pub deployer: Address,
@@ -11,6 +15,7 @@ pub struct DISPaiR {
 }
 
 impl DISPaiR {
+    /// Creates a new `DISPaiR` from the four component addresses.
     pub fn new(deployer: Address, interpreter: Address, store: Address, parser: Address) -> Self {
         DISPaiR {
             deployer,

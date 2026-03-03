@@ -156,7 +156,10 @@ contract LibParseInterstitialTest is Test {
     function testSkipCommentFuzzBody(bytes memory body) external pure {
         // Replace all `*` in body with `~` so no `*/` can appear.
         for (uint256 i = 0; i < body.length; i++) {
+            // Casting single ASCII chars to bytes1 is safe.
+            //forge-lint: disable-next-line(unsafe-typecast)
             if (body[i] == bytes1("*")) {
+                //forge-lint: disable-next-line(unsafe-typecast)
                 body[i] = bytes1("~");
             }
         }

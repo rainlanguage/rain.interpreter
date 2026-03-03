@@ -17,6 +17,9 @@ import {
 } from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibParseError} from "../LibParseError.sol";
 
+/// @title LibParseLiteralHex
+/// @notice Parses hexadecimal literals from Rainlang source text into
+/// bytes32 values.
 library LibParseLiteralHex {
     using LibParseLiteralHex for ParseState;
     using LibParseError for ParseState;

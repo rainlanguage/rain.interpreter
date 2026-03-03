@@ -7,6 +7,9 @@ import {LibParseError} from "../LibParseError.sol";
 import {LibParseDecimalFloat, Float} from "rain.math.float/lib/parse/LibParseDecimalFloat.sol";
 import {LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
+/// @title LibParseLiteralDecimal
+/// @notice Parses decimal numeric literals from Rainlang source text into
+/// packed decimal float values.
 library LibParseLiteralDecimal {
     using LibParseError for ParseState;
 

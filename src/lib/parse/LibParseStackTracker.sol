@@ -9,6 +9,9 @@ import {ParseStackUnderflow, ParseStackOverflow} from "../../error/ErrParse.sol"
 /// maximum height seen so far (used to size the runtime stack allocation).
 type ParseStackTracker is uint256;
 
+/// @title LibParseStackTracker
+/// @notice Tracks current and high-water stack heights during parsing to
+/// size the runtime stack allocation.
 library LibParseStackTracker {
     using LibParseStackTracker for ParseStackTracker;
 

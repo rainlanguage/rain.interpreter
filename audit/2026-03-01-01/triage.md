@@ -59,10 +59,10 @@
 - [FIXED] P2-01: (LOW) Missing operand-disallowed tests for 10 logic opcodes
 - [FIXED] P2-02: (LOW) Missing operand-disallowed tests for 5 math opcodes — LibOpSub already had test; added tests for LibOpMaxPositiveValue, LibOpMaxNegativeValue, LibOpMinPositiveValue, LibOpMinNegativeValue
 - [FIXED] P2-03: (LOW) Missing operand-disallowed test for LibOpHash
-- [PENDING] R02-PASS2-01: (LOW) No tests for error paths in Forker methods
-- [PENDING] R02-PASS2-02: (LOW) Forker::new() has no test
-- [PENDING] R02-PASS2-04: (LOW) RainSourceTrace::from_data() edge cases untested
-- [PENDING] R02-PASS2-07: (LOW) CLI Parse command entirely untested
+- [FIXED] R02-PASS2-01: (LOW) No tests for error paths in Forker methods — added 11 tests for call/call_committing invalid address lengths and roll_fork with no active fork
+- [FIXED] R02-PASS2-02: (LOW) Forker::new() has no test — added test_forker_new_then_add_or_select covering constructor and empty-forks add_or_select branch
+- [FIXED] R02-PASS2-04: (LOW) RainSourceTrace::from_data() edge cases untested — added 7 tests covering empty, 1/3/4 bytes, trailing partial word, one full word, one full word plus partial, two full words
+- [FIXED] R02-PASS2-07: (LOW) CLI Parse command entirely untested — added test_execute for Parse command
 
 ## Pass 3: Documentation
 
@@ -86,41 +86,41 @@
 - [FIXED] P3-OPALL-02: (LOW) Missing @return tags on integrity() in 7 files — same as P3-OPALL-01
 - [FIXED] P3-OPALL-03: (LOW) Missing @return on referenceFn() in LibOpUint256MaxValue
 - [FIXED] P3-OPALL-04: (LOW) Missing @notice on integrity() in LibOpEnsure
-- [PENDING] P3-RC-01: (LOW) No crate-level //! documentation on any Rust crate
-- [PENDING] P3-RC-02: (LOW) CLI crate all 13 public items completely undocumented
-- [PENDING] P3-RC-03: (LOW) eval crate 10 undocumented public items
-- [PENDING] P3-RC-04: (LOW) parser crate 3 undocumented public items
-- [PENDING] P3-RC-05: (LOW) dispair crate DISPaiR::new constructor lacks doc comment
-- [PENDING] P3-RC-06: (LOW) "Rainalang" typo in ForkEvalArgs.rainlang_string field doc
-- [PENDING] P3-RC-07: (LOW) Forker::new_with_fork doc lists wrong params and missing await
-- [PENDING] P3-RC-08: (LOW) alloy_call/alloy_call_committing docs omit decode_error param
+- [FIXED] P3-RC-01: (LOW) No crate-level //! documentation on any Rust crate — added //! docs to all 6 crates
+- [FIXED] P3-RC-02: (LOW) CLI crate all 13 public items completely undocumented — added /// doc comments to Interpreter enum/variants, Execute trait, Parse/Eval/ForkParseArgsCli/ForkEvalCliArgs structs, SupportedOutputEncoding enum/variants, output fn
+- [FIXED] P3-RC-03: (LOW) eval crate 10 undocumented public items — added /// docs to ForkTypedReturn, NewForkedEvm (structs + fields), ForkCallError, ReplayTransactionError enums
+- [FIXED] P3-RC-04: (LOW) parser crate 3 undocumented public items — added docs to Parser2 trait (both wasm/non-wasm), ParserV2 struct + field, new()
+- [FIXED] P3-RC-05: (LOW) dispair crate DISPaiR::new constructor lacks doc comment — replaced bare struct doc, added doc to new()
+- [FIXED] P3-RC-06: (LOW) "Rainalang" typo in ForkEvalArgs.rainlang_string field doc — changed to "Rainlang"
+- [FIXED] P3-RC-07: (LOW) Forker::new_with_fork doc lists wrong params and missing await — updated param names to match signature, added .await to example
+- [FIXED] P3-RC-08: (LOW) alloy_call/alloy_call_committing docs omit decode_error param — added decode_error to both # Arguments sections
 
 ## Pass 4: Code Quality
 
-- [PENDING] P4-CC-01: (LOW) Unused IERC165 import in RainterpreterExpressionDeployer
-- [PENDING] P4-CC-02: (LOW) No virtual on any function in RainterpreterDISPaiRegistry
-- [PENDING] P4-CC-03: (LOW) buildIntegrityFunctionPointers missing override in RainterpreterExpressionDeployer
-- [PENDING] P4-CC-04: (LOW) describedByMetaV1 missing virtual in RainterpreterExpressionDeployer
-- [PENDING] P4-CC-05: (LOW) unsafeParse missing virtual in RainterpreterParser
-- [PENDING] P4-EVLP-1: (LOW) Unused using LibUint256Array and import in LibParse.sol
-- [PENDING] P4-EVLP-2: (LOW) Unused return value suppressed with (index); instead of blank destructuring
-- [PENDING] P4-EVLP-5: (LOW) Magic number 59 for paren depth limit
-- [PENDING] P4-EVLP-6: (LOW) Magic number 0x3f for stack RHS overflow
-- [PENDING] P4-PARSE-2: (LOW) handleOperandSingleFull type(uint16).max vs uint256() inconsistency
-- [PENDING] P4-PARSE-3: (LOW) Redundant double-parentheses in LibSubParse.sol
-- [PENDING] P4-PARSE-4: (LOW) type(uint8).max vs raw 0xFF bounds check inconsistency
-- [PENDING] P4-PARSE-5: (LOW) 7 of 10 parse libraries missing @title NatSpec
-- [PENDING] P4-EA-01: (LOW) Dispatch decoding duplicated inline instead of reusing LibExtern
-- [PENDING] P4-EA-02: (LOW) Inconsistent bitmask style type(uint16).max vs 0xFFFF
-- [PENDING] P4-EA-03: (LOW) Context position constants defined locally instead of shared
-- [PENDING] P4-EA-04: (LOW) Inconsistent subParser parameter naming across context ops
-- [PENDING] P4-EA-05: (LOW) Five build* functions in RainterpreterReferenceExtern repeat boilerplate
-- [PENDING] PASS4-LIBOP-1: (LOW) Missing @notice tag on integrity/referenceFn in 8 files
-- [PENDING] PASS4-LIBOP-2: (LOW) LibOpCall only standard opcode without referenceFn
-- [PENDING] P4-ERR-01: (LOW) Inconsistent @notice tags across error files
-- [PENDING] P4-RUST-01: (LOW) Unused dependencies serde_json, reqwest, once_cell in eval Cargo.toml
-- [PENDING] P4-RUST-02: (LOW) Wildcard use alloy::primitives::* in dispair and parser
-- [PENDING] P4-RUST-03: (LOW) Duplicated error-handling logic in alloy_call/alloy_call_committing with inconsistent format
+- [FIXED] P4-CC-01: (LOW) Unused IERC165 import in RainterpreterExpressionDeployer
+- [FIXED] P4-CC-02: (LOW) No virtual on any function in RainterpreterDISPaiRegistry — added virtual to all 5 functions
+- [FIXED] P4-CC-03: (LOW) buildIntegrityFunctionPointers missing override in RainterpreterExpressionDeployer
+- [FIXED] P4-CC-04: (LOW) describedByMetaV1 missing virtual in RainterpreterExpressionDeployer
+- [FIXED] P4-CC-05: (LOW) unsafeParse missing virtual in RainterpreterParser
+- [FIXED] P4-EVLP-1: (LOW) Unused using LibUint256Array and import in LibParse.sol
+- [FIXED] P4-EVLP-2: (LOW) Unused return value suppressed with (index); instead of blank destructuring
+- [FIXED] P4-EVLP-5: (LOW) Magic number 59 for paren depth limit — extracted to MAX_PAREN_OFFSET constant
+- [FIXED] P4-EVLP-6: (LOW) Magic number 0x3f for stack RHS overflow — extracted to MAX_STACK_RHS_OFFSET constant
+- [FIXED] P4-PARSE-2: (LOW) handleOperandSingleFull type(uint16).max vs uint256() inconsistency
+- [FIXED] P4-PARSE-3: (LOW) Redundant double-parentheses in LibSubParse.sol
+- [FIXED] P4-PARSE-4: (LOW) type(uint8).max vs raw 0xFF bounds check inconsistency
+- [FIXED] P4-PARSE-5: (LOW) 7 of 10 parse libraries missing @title NatSpec
+- [DISMISSED] P4-EA-01: (LOW) Dispatch decoding duplicated inline instead of reusing LibExtern — inline code is interleaved with surrounding logic (unchecked mod, bounds check); refactoring adds bytecode risk for no functional benefit
+- [FIXED] P4-EA-02: (LOW) Inconsistent bitmask style type(uint16).max vs 0xFFFF — updated LibExtern.decodeExternDispatch
+- [UPSTREAM] P4-EA-03: (LOW) Context position constants defined locally instead of shared — belongs in rain.interpreter.interface; local constants already have NatSpec (A49-8)
+- [FIXED] P4-EA-04: (LOW) Inconsistent subParser parameter naming across context ops — already fixed in P3-EA-03
+- [DISMISSED] P4-EA-05: (LOW) Five build* functions in RainterpreterReferenceExtern repeat boilerplate — extraction blocked by varying function pointer types; accepted duplication
+- [FIXED] PASS4-LIBOP-1: (LOW) Missing @notice tag on integrity/referenceFn in 8 files — already fixed in P3-OPALL-01/02/03/04 and P5-EXPGROWTH-01
+- [DISMISSED] PASS4-LIBOP-2: (LOW) LibOpCall only standard opcode without referenceFn — intentional; cross-source call semantics cannot be expressed in standard referenceFn signature
+- [FIXED] P4-ERR-01: (LOW) Inconsistent @notice tags across error files — already fixed in P3-ERR-1
+- [FIXED] P4-RUST-01: (LOW) Unused dependencies serde_json, reqwest, once_cell in eval Cargo.toml — removed all three
+- [FIXED] P4-RUST-02: (LOW) Wildcard use alloy::primitives::* in dispair and parser — replaced with use alloy::primitives::Address in both
+- [FIXED] P4-RUST-03: (LOW) Duplicated error-handling logic in alloy_call/alloy_call_committing with inconsistent format — added Raw:{:?} to alloy_call_committing to match alloy_call
 
 ## Pass 5: Correctness
 

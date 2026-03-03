@@ -51,7 +51,7 @@ library LibSubParse {
         pure
         returns (bool, bytes memory, bytes32[] memory)
     {
-        if (column > 0xFF || row > 0xFF) {
+        if (column > type(uint8).max || row > type(uint8).max) {
             revert ContextGridOverflow(column, row);
         }
         bytes memory bytecode;
@@ -99,7 +99,7 @@ library LibSubParse {
         pure
         returns (bool, bytes memory, bytes32[] memory)
     {
-        if (constantsHeight > 0xFFFF) {
+        if (constantsHeight > type(uint16).max) {
             revert ConstantOpcodeConstantsHeightOverflow(constantsHeight);
         }
         // Build a constant opcode that the interpreter will run itself.
@@ -169,7 +169,7 @@ library LibSubParse {
         // The constants height is an error check because the main parser can
         // provide two bytes for it. Everything else is expected to be more
         // directly controlled by the subparser itself.
-        if (constantsHeight > 0xFFFF) {
+        if (constantsHeight > type(uint16).max) {
             revert ExternDispatchConstantsHeightOverflow(constantsHeight);
         }
         // Build an extern call that dials back into the current contract at eval
@@ -223,7 +223,7 @@ library LibSubParse {
                 if (memoryAtCursor >> 0xf8 == OPCODE_UNKNOWN) {
                     bytes32 deref = state.subParsers;
                     while (deref != 0) {
-                        ISubParserV4 subParser = ISubParserV4(address(uint160(uint256((deref)))));
+                        ISubParserV4 subParser = ISubParserV4(address(uint160(uint256(deref))));
                         assembly ("memory-safe") {
                             deref := mload(shr(0xf0, deref))
                         }
@@ -360,7 +360,7 @@ library LibSubParse {
             {
                 uint256 copyPointer;
                 uint256 dispatchLength = dispatchEnd - dispatchStart;
-                if (dispatchLength > 0xFFFF) {
+                if (dispatchLength > type(uint16).max) {
                     revert SubParseLiteralDispatchLengthOverflow(dispatchLength);
                 }
                 uint256 bodyLength = bodyEnd - bodyStart;

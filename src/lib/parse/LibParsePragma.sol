@@ -22,6 +22,9 @@ uint256 constant PRAGMA_KEYWORD_BYTES_LENGTH = 16;
 //forge-lint: disable-next-line(incorrect-shift)
 bytes32 constant PRAGMA_KEYWORD_MASK = bytes32(~((1 << (32 - PRAGMA_KEYWORD_BYTES_LENGTH) * 8) - 1));
 
+/// @title LibParsePragma
+/// @notice Parses the `using-words-from` pragma from Rainlang source text
+/// and registers sub-parser contract addresses on the parse state.
 library LibParsePragma {
     using LibParseError for ParseState;
     using LibParseInterstitial for ParseState;

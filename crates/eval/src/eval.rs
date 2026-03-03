@@ -8,7 +8,7 @@ use rain_interpreter_bindings::IParserV2::parse2Call;
 /// Arguments for evaluating a Rainlang string in a forked EVM context
 #[derive(Debug, Clone)]
 pub struct ForkEvalArgs {
-    /// The Rainalang string to evaluate
+    /// The Rainlang string to evaluate
     pub rainlang_string: String,
     /// The source index of the rainlang to evaluate
     pub source_index: u16,

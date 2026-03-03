@@ -27,6 +27,9 @@ uint256 constant LITERAL_PARSER_INDEX_STRING = 2;
 /// @dev Index of the sub-parseable literal parser (e.g. `[dispatch body]`).
 uint256 constant LITERAL_PARSER_INDEX_SUB_PARSE = 3;
 
+/// @title LibParseLiteral
+/// @notice Dispatches literal parsing to the appropriate type-specific parser
+/// (hex, decimal, string, or sub-parseable) based on the head character.
 library LibParseLiteral {
     using LibParseLiteral for ParseState;
     using LibParseError for ParseState;

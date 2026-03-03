@@ -4,6 +4,7 @@ use foundry_evm::{backend::DatabaseError, executors::RawCallResult};
 use rain_error_decoding::{AbiDecodeFailedErrors, AbiDecodedErrorType};
 use thiserror::Error;
 
+/// Errors that can occur when calling a forked EVM.
 #[derive(Debug, Error)]
 pub enum ForkCallError {
     #[error("Executor error: {0}")]
@@ -27,6 +28,7 @@ pub enum ForkCallError {
     ReplayTransactionError(#[from] ReplayTransactionError),
 }
 
+/// Errors specific to replaying a historical transaction.
 #[derive(Debug, Error)]
 pub enum ReplayTransactionError {
     #[error("Transaction not found for hash {0} and fork url {1}")]

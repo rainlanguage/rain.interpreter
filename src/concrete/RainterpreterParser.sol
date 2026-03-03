@@ -57,6 +57,7 @@ contract RainterpreterParser is ERC165, IParserToolingV1 {
     function unsafeParse(bytes memory data)
         external
         view
+        virtual
         checkParseMemoryOverflow
         returns (bytes memory, bytes32[] memory)
     {

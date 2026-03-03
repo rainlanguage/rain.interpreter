@@ -541,6 +541,87 @@ mod tests {
     }
 
     #[test]
+    fn test_from_data_empty() {
+        assert!(RainSourceTrace::from_data(&[]).is_none());
+    }
+
+    #[test]
+    fn test_from_data_one_byte() {
+        assert!(RainSourceTrace::from_data(&[0x01]).is_none());
+    }
+
+    #[test]
+    fn test_from_data_three_bytes() {
+        assert!(RainSourceTrace::from_data(&[0x00, 0x01, 0x02]).is_none());
+    }
+
+    #[test]
+    fn test_from_data_exactly_four_bytes() {
+        let data = [0x00, 0x01, 0x00, 0x02];
+        let trace = RainSourceTrace::from_data(&data).unwrap();
+        assert_eq!(trace.parent_source_index, 1);
+        assert_eq!(trace.source_index, 2);
+        assert!(trace.stack.is_empty());
+    }
+
+    #[test]
+    fn test_from_data_trailing_partial_word() {
+        // 4 header bytes + 31 payload bytes = 35 total.
+        // 31 bytes is less than 32, so no stack item is produced.
+        let mut data = vec![0x00, 0x03, 0x00, 0x04];
+        data.extend_from_slice(&[0xFF; 31]);
+        let trace = RainSourceTrace::from_data(&data).unwrap();
+        assert_eq!(trace.parent_source_index, 3);
+        assert_eq!(trace.source_index, 4);
+        assert!(trace.stack.is_empty());
+    }
+
+    #[test]
+    fn test_from_data_one_full_word() {
+        // 4 header bytes + 32 payload bytes = 36 total.
+        let mut data = vec![0x00, 0x00, 0x00, 0x01];
+        let mut word = [0u8; 32];
+        word[31] = 0x42;
+        data.extend_from_slice(&word);
+        let trace = RainSourceTrace::from_data(&data).unwrap();
+        assert_eq!(trace.parent_source_index, 0);
+        assert_eq!(trace.source_index, 1);
+        assert_eq!(trace.stack.len(), 1);
+        assert_eq!(trace.stack[0], U256::from(0x42));
+    }
+
+    #[test]
+    fn test_from_data_one_full_word_plus_partial() {
+        // 4 header + 32 full word + 15 trailing = 51 total.
+        // Only 1 stack item should be produced; the 15 trailing bytes are dropped.
+        let mut data = vec![0x00, 0x05, 0x00, 0x06];
+        let mut word = [0u8; 32];
+        word[31] = 0x07;
+        data.extend_from_slice(&word);
+        data.extend_from_slice(&[0xFF; 15]);
+        let trace = RainSourceTrace::from_data(&data).unwrap();
+        assert_eq!(trace.parent_source_index, 5);
+        assert_eq!(trace.source_index, 6);
+        assert_eq!(trace.stack.len(), 1);
+        assert_eq!(trace.stack[0], U256::from(0x07));
+    }
+
+    #[test]
+    fn test_from_data_two_full_words() {
+        let mut data = vec![0x00, 0x00, 0x00, 0x00];
+        let mut word1 = [0u8; 32];
+        word1[31] = 0x0A;
+        let mut word2 = [0u8; 32];
+        word2[31] = 0x0B;
+        data.extend_from_slice(&word1);
+        data.extend_from_slice(&word2);
+        let trace = RainSourceTrace::from_data(&data).unwrap();
+        assert_eq!(trace.stack.len(), 2);
+        assert_eq!(trace.stack[0], U256::from(0x0A));
+        assert_eq!(trace.stack[1], U256::from(0x0B));
+    }
+
+    #[test]
     fn test_rain_eval_result_into_flattened_table() {
         let trace1 = RainSourceTrace {
             parent_source_index: 1,

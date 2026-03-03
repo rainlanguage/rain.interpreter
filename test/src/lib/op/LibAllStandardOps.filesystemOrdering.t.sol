@@ -81,6 +81,8 @@ contract LibAllStandardOpsFilesystemOrderingTest is Test {
     /// @notice Returns true if the word is a known alias (shares a file with
     /// another word). Currently only "now" (alias for "block-timestamp").
     function isAlias(bytes32 word) internal pure returns (bool) {
+        // "now" is 3 bytes; left-aligning into bytes32 is safe.
+        //forge-lint: disable-next-line(unsafe-typecast)
         return word == bytes32("now");
     }
 
