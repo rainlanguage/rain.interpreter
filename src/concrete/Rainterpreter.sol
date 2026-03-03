@@ -70,12 +70,13 @@ contract Rainterpreter is IInterpreterV4, IOpcodeToolingV1, ERC165 {
         }
         // We use the return by returning it. Slither false positive.
         //slither-disable-next-line unused-return
-        return state.eval2(eval.inputs, type(uint256).max);
+        return state.eval4(eval.inputs, type(uint256).max);
     }
 
     /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IInterpreterV4).interfaceId || super.supportsInterface(interfaceId);
+        return interfaceId == type(IInterpreterV4).interfaceId || interfaceId == type(IOpcodeToolingV1).interfaceId
+            || super.supportsInterface(interfaceId);
     }
 
     /// @inheritdoc IOpcodeToolingV1

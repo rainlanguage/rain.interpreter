@@ -123,7 +123,11 @@ error MaxSources();
 /// The parser encountered a dangling source. This is a bug in the parser.
 error DanglingSource();
 
-/// The parser moved past the end of the data.
+/// The parser moved past the end of the data. Defensive guard only — all
+/// sub-parsers (parseInterstitial, parseLHS, parseRHS) receive `end` and
+/// respect it, so this condition is unreachable under normal operation. It
+/// exists to catch internal sub-parser bugs that advance the cursor past
+/// `end`. Cannot be tested without mocking a sub-parser to force overshoot.
 error ParserOutOfBounds();
 
 /// The parser encountered a stack deeper than it can process in the memory

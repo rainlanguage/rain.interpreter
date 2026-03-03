@@ -23,7 +23,7 @@ library LibEval {
     /// of 8. Emits a stack trace via `STACK_TRACER` after execution.
     ///
     /// TRUST: `state.sourceIndex` is NOT bounds-checked against the bytecode's
-    /// source count. All callers MUST validate it before calling. `eval2` does
+    /// source count. All callers MUST validate it before calling. `eval4` does
     /// this via `LibBytecode.sourceInputsOutputsLength` (which reverts with
     /// `SourceIndexOutOfBounds`). `LibOpCall.run` relies on integrity checks
     /// at deploy time to reject invalid source indices in operands. The
@@ -188,7 +188,7 @@ library LibEval {
     /// @return The output stack items, truncated to `maxOutputs`.
     /// @return The state KV writes as a flat array of interleaved keys and
     /// values from the in-memory KV store.
-    function eval2(InterpreterState memory state, StackItem[] memory inputs, uint256 maxOutputs)
+    function eval4(InterpreterState memory state, StackItem[] memory inputs, uint256 maxOutputs)
         internal
         view
         returns (StackItem[] memory, bytes32[] memory)

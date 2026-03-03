@@ -42,20 +42,20 @@
 ## Pass 2: Test Coverage
 
 - [FIXED] A30-P2-1: (MEDIUM) No test for total source ops > 255 across multiple top-level items
-- [PENDING] P2-EI-1: (LOW) eval2 InputsLengthMismatch not tested at library level
-- [PENDING] P2-EI-2: (LOW) integrityCheck2 BadOpInputsLength/BadOpOutputsLength not directly tested
-- [PENDING] P2-EI-3: (LOW) evalLoop remainder-only path (1-7 opcodes) not tested
-- [PENDING] P2-CC-01: (LOW) Rainterpreter.supportsInterface omits IOpcodeToolingV1
-- [PENDING] P2-CC-02: (LOW) RainterpreterExpressionDeployer missing dedicated pointer consistency test
-- [PENDING] P2-CC-03: (LOW) Missing direct test for StateNamespace isolation (same sender)
-- [PENDING] A30-P2-2: (LOW) No test for ParserOutOfBounds error in parse()
-- [PENDING] A30-P2-3: (LOW) testEndSourceByteLengthFuzz upper bound too low
-- [PENDING] A32-1: (LOW) skipComment no test for UnclosedComment when well-formed but never closed
-- [PENDING] A32-2: (LOW) skipComment no fuzz test for well-formed comments
-- [PENDING] A42-1: (LOW) pushInputs no test for push-overflow-inside-pushInputs
-- [PENDING] A44-1-P2: (LOW) subParseWordSlice no test for no-sub-parsers-registered path
-- [PENDING] P2-EAD-01: (LOW) BaseRainterpreterSubParser.subParseWord2 missing happy-path and no-match tests
-- [PENDING] P2-EAD-02: (LOW) authoringMetaV2 word names not verified beyond index 3
+- [FIXED] P2-EI-1: (LOW) eval4 InputsLengthMismatch not tested at library level (also renamed eval2 -> eval4 to match interface)
+- [FIXED] P2-EI-2: (LOW) integrityCheck2 BadOpInputsLength/BadOpOutputsLength not directly tested
+- [FIXED] P2-EI-3: (LOW) evalLoop remainder-only path (1-7 opcodes) not tested
+- [FIXED] P2-CC-01: (LOW) Rainterpreter.supportsInterface omits IOpcodeToolingV1
+- [FIXED] P2-CC-02: (LOW) RainterpreterExpressionDeployer missing dedicated pointer consistency test
+- [FIXED] P2-CC-03: (LOW) Missing direct test for StateNamespace isolation (same sender)
+- [DOCUMENTED] A30-P2-2: (LOW) No test for ParserOutOfBounds error in parse() — unreachable defensive guard; documented in ErrParse.sol
+- [FIXED] A30-P2-3: (LOW) testEndSourceByteLengthFuzz upper bound too low
+- [DISMISSED] A32-1: (LOW) skipComment no test for UnclosedComment when well-formed but never closed — already tested by testParseCommentUnclosed in LibParse.comments.t.sol (line 445-449)
+- [FIXED] A32-2: (LOW) skipComment no fuzz test for well-formed comments
+- [FIXED] A42-1: (LOW) pushInputs no test for push-overflow-inside-pushInputs
+- [FIXED] A44-1-P2: (LOW) subParseWordSlice no test for no-sub-parsers-registered path
+- [DISMISSED] P2-EAD-01: (LOW) BaseRainterpreterSubParser.subParseWord2 missing happy-path and no-match tests — both paths tested in RainterpreterReferenceExtern.intInc.t.sol (lines 78-81 happy, 122-127 no-match)
+- [FIXED] P2-EAD-02: (LOW) authoringMetaV2 word names not verified beyond index 3
 - [PENDING] P2-01: (LOW) Missing operand-disallowed tests for 10 logic opcodes
 - [PENDING] P2-02: (LOW) Missing operand-disallowed tests for 5 math opcodes
 - [PENDING] P2-03: (LOW) Missing operand-disallowed test for LibOpHash

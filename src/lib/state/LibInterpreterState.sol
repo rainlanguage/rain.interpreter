@@ -17,7 +17,7 @@ import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol
 address constant STACK_TRACER = address(uint160(uint256(keccak256("rain.interpreter.stack-tracer.0"))));
 
 /// @notice Runtime state threaded through the eval loop and all opcode
-/// implementations. Built once per `eval2` call from deserialized
+/// implementations. Built once per `eval4` call from deserialized
 /// bytecode, caller-provided context, and store configuration.
 /// @param stackBottoms Bottom pointer for each source's stack. The eval
 /// loop starts the stack top here and grows downward as values are pushed.

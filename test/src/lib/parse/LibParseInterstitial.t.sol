@@ -151,6 +151,34 @@ contract LibParseInterstitialTest is Test {
         assertEq(charAtCursor, uint256(uint8(bytes1("x"))), "cursor at x after content comment");
     }
 
+    /// Fuzz: skipComment with arbitrary body content always lands cursor
+    /// immediately after the closing `*/`.
+    function testSkipCommentFuzzBody(bytes memory body) external pure {
+        // Replace all `*` in body with `~` so no `*/` can appear.
+        for (uint256 i = 0; i < body.length; i++) {
+            if (body[i] == bytes1("*")) {
+                body[i] = bytes1("~");
+            }
+        }
+
+        // Build: /* <body> */ x
+        bytes memory data = abi.encodePacked("/*", body, "*/x");
+
+        ParseState memory state = LibParseState.newState(data, "", "", "");
+        uint256 cursor = Pointer.unwrap(state.data.dataPointer());
+        uint256 end = Pointer.unwrap(data.endDataPointer());
+        cursor = state.skipComment(cursor, end);
+
+        // Cursor should be at 'x', which is one byte before end.
+        assertEq(cursor, end - 1, "cursor at x after fuzzed comment");
+        uint256 charAtCursor;
+        assembly ("memory-safe") {
+            charAtCursor := byte(0, mload(cursor))
+        }
+        //forge-lint: disable-next-line(unsafe-typecast)
+        assertEq(charAtCursor, uint256(uint8(bytes1("x"))), "char is x");
+    }
+
     /// parseInterstitial returns immediately when first character is not
     /// whitespace or comment head.
     function testParseInterstitialNonInterstitialFirst() external pure {
