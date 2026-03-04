@@ -820,77 +820,99 @@ mod tests {
     fn test_call_invalid_from_address_too_short() {
         let forker = Forker::new().unwrap();
         let result = forker.call(&[0u8; 19], &[0u8; 20], &[]);
-        assert!(matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!"));
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!")
+        );
     }
 
     #[test]
     fn test_call_invalid_from_address_too_long() {
         let forker = Forker::new().unwrap();
         let result = forker.call(&[0u8; 21], &[0u8; 20], &[]);
-        assert!(matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!"));
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!")
+        );
     }
 
     #[test]
     fn test_call_invalid_from_address_empty() {
         let forker = Forker::new().unwrap();
         let result = forker.call(&[], &[0u8; 20], &[]);
-        assert!(matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!"));
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!")
+        );
     }
 
     #[test]
     fn test_call_invalid_to_address_too_short() {
         let forker = Forker::new().unwrap();
         let result = forker.call(&[0u8; 20], &[0u8; 19], &[]);
-        assert!(matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!"));
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!")
+        );
     }
 
     #[test]
     fn test_call_invalid_to_address_too_long() {
         let forker = Forker::new().unwrap();
         let result = forker.call(&[0u8; 20], &[0u8; 21], &[]);
-        assert!(matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!"));
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!")
+        );
     }
 
     #[test]
     fn test_call_invalid_to_address_empty() {
         let forker = Forker::new().unwrap();
         let result = forker.call(&[0u8; 20], &[], &[]);
-        assert!(matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!"));
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!")
+        );
     }
 
     #[test]
     fn test_call_committing_invalid_from_address() {
         let mut forker = Forker::new().unwrap();
         let result = forker.call_committing(&[0u8; 19], &[0u8; 20], &[], U256::ZERO);
-        assert!(matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!"));
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!")
+        );
     }
 
     #[test]
     fn test_call_committing_invalid_to_address() {
         let mut forker = Forker::new().unwrap();
         let result = forker.call_committing(&[0u8; 20], &[0u8; 21], &[], U256::ZERO);
-        assert!(matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!"));
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!")
+        );
     }
 
     #[test]
     fn test_call_committing_both_addresses_invalid() {
         let mut forker = Forker::new().unwrap();
         let result = forker.call_committing(&[], &[], &[], U256::ZERO);
-        assert!(matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!"));
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!")
+        );
     }
 
     #[test]
     fn test_roll_fork_no_active_fork() {
         let mut forker = Forker::new().unwrap();
         let result = forker.roll_fork(None, None);
-        assert!(matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "no active fork!"));
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "no active fork!")
+        );
     }
 
     #[test]
     fn test_roll_fork_no_active_fork_with_block_number() {
         let mut forker = Forker::new().unwrap();
         let result = forker.roll_fork(Some(100), None);
-        assert!(matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "no active fork!"));
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "no active fork!")
+        );
     }
 
     /// Forker::new() creates a valid empty forker, and add_or_select on an
