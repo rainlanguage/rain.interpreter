@@ -54,8 +54,8 @@ import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
 import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 
 /// @dev Size in bytes of the fixed header prepended to sub-parser bytecode.
-/// Comprises the operand values tail pointer (2 bytes), the literal parsers
-/// tail pointer (2 bytes), and the word length (1 byte).
+/// Comprises the constants height (2 bytes), the IO byte (1 byte), and the
+/// word length (2 bytes).
 uint256 constant SUB_PARSER_BYTECODE_HEADER_SIZE = 5;
 
 /// @dev Maximum paren offset before the paren tracker overflows. The tracker

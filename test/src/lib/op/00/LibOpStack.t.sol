@@ -219,4 +219,14 @@ contract LibOpStackTest is OpTest {
     function testOpStackZeroOutputErrorUnsugared() external {
         checkUnhappyParse2("foo: 1,: stack<0>();", abi.encodeWithSelector(BadOpOutputsLength.selector, 1, 1, 0));
     }
+
+    /// It is an error to provide inputs to a stack opcode.
+    function testOpStackOneInput() external {
+        checkBadInputs("foo: 1, _: stack<0>(foo);", 2, 0, 1);
+    }
+
+    /// It is an error to provide multiple inputs to a stack opcode.
+    function testOpStackTwoInputs() external {
+        checkBadInputs("foo bar: 1 2, _: stack<0>(foo bar);", 4, 0, 2);
+    }
 }

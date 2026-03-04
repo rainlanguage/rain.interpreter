@@ -107,6 +107,18 @@ contract LibOpMulTest is OpTest {
         );
     }
 
+    /// Deterministic eval examples with negative values.
+    function testOpMulEvalNegativeExamples() external view {
+        // mul(-2, 3) = -6
+        checkHappy("_: mul(-2 3);", Float.unwrap(LibDecimalFloat.packLossless(-6, 0)), "-2 3");
+        // mul(2, -3) = -6
+        checkHappy("_: mul(2 -3);", Float.unwrap(LibDecimalFloat.packLossless(-6, 0)), "2 -3");
+        // mul(-2, -3) = 6
+        checkHappy("_: mul(-2 -3);", Float.unwrap(LibDecimalFloat.packLossless(6, 0)), "-2 -3");
+        // mul(0, -1) = 0
+        checkHappy("_: mul(0 -1);", Float.unwrap(LibDecimalFloat.packLossless(0, 0)), "0 -1");
+    }
+
     /// Test the eval of `mul` opcode parsed from a string.
     /// Tests two inputs.
     /// Tests the unhappy path where the final result overflows.

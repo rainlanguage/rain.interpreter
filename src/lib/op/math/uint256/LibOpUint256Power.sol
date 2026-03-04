@@ -11,7 +11,7 @@ import {IntegrityCheckState} from "../../../integrity/LibIntegrityCheck.sol";
 /// @notice Opcode for left-to-right uint256 exponentiation, i.e. `((a**b)**c)`.
 /// Errors on overflow.
 library LibOpUint256Power {
-    /// @notice `uint256-pow` integrity check. Requires at least 2 inputs and produces 1 output.
+    /// @notice `uint256-power` integrity check. Requires at least 2 inputs and produces 1 output.
     /// @param operand Low 4 bits of the high byte encode the input count.
     /// @return The number of inputs.
     /// @return The number of outputs.

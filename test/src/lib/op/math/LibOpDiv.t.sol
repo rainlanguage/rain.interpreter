@@ -117,6 +117,16 @@ contract LibOpDivTest is OpTest {
         );
     }
 
+    /// Deterministic eval examples with negative values.
+    function testOpDivEvalNegativeExamples() external view {
+        // div(-6, 3) = -2
+        checkHappy("_: div(-6 3);", Float.unwrap(LibDecimalFloat.packLossless(-2e66, -66)), "-6 3");
+        // div(6, -3) = -2
+        checkHappy("_: div(6 -3);", Float.unwrap(LibDecimalFloat.packLossless(-2e66, -66)), "6 -3");
+        // div(-6, -3) = 2
+        checkHappy("_: div(-6 -3);", Float.unwrap(LibDecimalFloat.packLossless(2e66, -66)), "-6 -3");
+    }
+
     /// Test the eval of `div` opcode parsed from a string.
     /// Tests two inputs.
     /// Tests the unhappy path where we divide by zero.

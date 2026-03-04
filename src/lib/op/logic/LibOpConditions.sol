@@ -76,7 +76,7 @@ library LibOpConditions {
         }
     }
 
-    /// @notice Gas intensive reference implementation of `condition` for testing.
+    /// @notice Gas intensive reference implementation of `conditions` for testing.
     /// @param inputs The input values from the stack.
     /// @return outputs The output values to push onto the stack.
     function referenceFn(InterpreterState memory, OperandV2, StackItem[] memory inputs)

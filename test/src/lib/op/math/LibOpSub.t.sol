@@ -99,6 +99,25 @@ contract LibOpSubTest is OpTest {
         );
     }
 
+    /// Deterministic eval examples with negative values.
+    function testOpSubEvalNegativeExamples() external view {
+        // sub(-1, -2) = 1
+        checkHappy("_: sub(-1 -2);", Float.unwrap(LibDecimalFloat.packLossless(1e67, -67)), "-1 -2");
+        // sub(-1, 2) = -3
+        checkHappy("_: sub(-1 2);", Float.unwrap(LibDecimalFloat.packLossless(-3e66, -66)), "-1 2");
+        // sub(1, -2) = 3
+        checkHappy("_: sub(1 -2);", Float.unwrap(LibDecimalFloat.packLossless(3e66, -66)), "1 -2");
+    }
+
+    /// Subtracting min-negative-value from max-positive-value should overflow.
+    function testOpSubEvalOverflow() external {
+        checkUnhappyOverflow(
+            "_: sub(max-positive-value() min-negative-value());",
+            26959946667150639794667015087019630673637144422540572481103610249215000000000,
+            2147483638
+        );
+    }
+
     /// Test the eval of `sub` opcode parsed from a string. Tests three inputs.
     function testOpSubEvalThreeInputs() external view {
         checkHappy("_: sub(1 0 0);", Float.unwrap(LibDecimalFloat.packLossless(1, 0)), "1 0 0");

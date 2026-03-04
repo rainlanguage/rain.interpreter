@@ -3,7 +3,6 @@
 pragma solidity ^0.8.25;
 
 import {ParseState} from "../LibParseState.sol";
-import {LibParse} from "../LibParse.sol";
 import {UnclosedSubParseableLiteral, SubParseableMissingDispatch} from "../../../error/ErrParse.sol";
 import {CMASK_WHITESPACE, CMASK_SUB_PARSEABLE_LITERAL_END} from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibParseInterstitial} from "../LibParseInterstitial.sol";
@@ -15,7 +14,6 @@ import {LibParseChar} from "rain.string/lib/parse/LibParseChar.sol";
 /// @notice Parses sub-parseable literals delimited by `[` and `]` by
 /// delegating to registered sub-parser contracts.
 library LibParseLiteralSubParseable {
-    using LibParse for ParseState;
     using LibParseInterstitial for ParseState;
     using LibParseError for ParseState;
     using LibSubParse for ParseState;

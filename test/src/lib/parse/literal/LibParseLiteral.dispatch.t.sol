@@ -248,7 +248,7 @@ contract LibParseLiteralDispatchTest is Test {
     /// next byte in memory must route to decimal, not hex. Without a bounds
     /// check the parser reads past end and sees "0x", incorrectly dispatching
     /// to the hex parser which reverts with ZeroLengthHexLiteral.
-    function testTryParseLiteralOOBSecondBytePoison() external {
+    function testTryParseLiteralOOBSecondBytePoison() external view {
         // Allocate data "0" then immediately write 0x78 ('x') right after
         // the data in memory. end = cursor+1 (just the "0" byte), but
         // mload(cursor) reads 32 bytes so byte(1, word) picks up the 'x'.

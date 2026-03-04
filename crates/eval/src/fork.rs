@@ -142,10 +142,15 @@ impl Forker {
         let builder =
             builder.inspectors(|stack| stack.trace_mode(TraceMode::Call.with_debug(false)));
 
+        let executor = builder.build(env.unwrap_or(create_fork.env.clone()), db);
+        let initial_fork_id = executor
+            .backend()
+            .active_fork_id()
+            .expect("Backend::spawn with a fork must have an active fork");
         let mut forks_map = HashMap::new();
-        forks_map.insert(fork_id, (U256::from(0), SpecId::default(), block_number));
+        forks_map.insert(fork_id, (initial_fork_id, SpecId::default(), block_number));
         Ok(Self {
-            executor: builder.build(env.unwrap_or(create_fork.env.clone()), db),
+            executor,
             forks: forks_map,
         })
     }
@@ -208,24 +213,19 @@ impl Forker {
                 create_fork.env.evm_env.block_env.number
             };
 
-            self.forks.insert(
-                fork_id,
-                (
-                    U256::from(self.forks.len()),
-                    SpecId::default(),
-                    block_number,
-                ),
-            );
-
-            self.executor
+            let local_fork_id = self
+                .executor
                 .backend_mut()
                 .create_select_fork(
                     create_fork,
                     &mut mk_env_mut(&mut env.unwrap_or_default()),
                     &mut mk_journaled_state(SpecId::default()),
                 )
-                .map(|_| ())
-                .map_err(|e| ForkCallError::ExecutorError(e.to_string()))
+                .map_err(|e| ForkCallError::ExecutorError(e.to_string()))?;
+
+            self.forks
+                .insert(fork_id, (local_fork_id, SpecId::default(), block_number));
+            Ok(())
         }
     }
 

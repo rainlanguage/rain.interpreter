@@ -136,6 +136,16 @@ contract LibOpConstantTest is OpTest {
         assertEq(calcOutputs, 1, "outputs");
     }
 
+    /// It is an error to provide inputs to a constant opcode.
+    function testOpConstantOneInput() external {
+        checkBadInputs("_:1, _: constant<0>(0);", 2, 0, 1);
+    }
+
+    /// It is an error to provide multiple inputs to a constant opcode.
+    function testOpConstantTwoInputs() external {
+        checkBadInputs("_ _:1 2, _: constant<0>(0 0);", 4, 0, 2);
+    }
+
     /// It is an error to have multiple outputs for a constant.
     function testOpConstantMultipleOutputErrorSugared() external {
         checkUnhappyParse2("_ _: 1;", abi.encodeWithSelector(BadOpOutputsLength.selector, 0, 1, 2));

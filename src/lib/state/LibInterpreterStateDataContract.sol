@@ -11,6 +11,8 @@ import {IInterpreterStoreV3} from "rain.interpreter.interface/interface/IInterpr
 
 import {InterpreterState} from "./LibInterpreterState.sol";
 
+/// @title LibInterpreterStateDataContract
+/// @notice Serialization and deserialization of interpreter state from data contracts.
 library LibInterpreterStateDataContract {
     using LibBytes for bytes;
 

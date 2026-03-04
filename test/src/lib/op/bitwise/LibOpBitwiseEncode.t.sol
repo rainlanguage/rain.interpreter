@@ -107,7 +107,13 @@ contract LibOpBitwiseEncodeTest is OpTest {
         checkHappy(
             "_:bitwise-encode<0 0xFF>(uint256-max-value() 0);",
             bytes32(type(uint256).max >> 1),
-            "uint256-max-value 2 0xFF 1"
+            "uint256-max-value 0 0xFF"
+        );
+        // start=1, length=255 (sum=256): bits 1..255 set, bit 0 clear.
+        checkHappy(
+            "_:bitwise-encode<1 0xFF>(uint256-max-value() 0);",
+            bytes32(type(uint256).max - 1),
+            "uint256-max-value 1 0xFF"
         );
     }
 

@@ -11,6 +11,8 @@ use thiserror::Error;
 #[cfg(target_family = "wasm")]
 use wasm_bindgen_utils::{impl_wasm_traits, prelude::*};
 
+/// Address of the non-existent tracer contract used by the interpreter to emit
+/// stack traces via failed `staticcall`. Matches the Solidity `STACK_TRACER`.
 pub const RAIN_TRACER_ADDRESS: Address = address!("F06Cd48c98d7321649dB7D8b2C396A81A2046555");
 
 /// A struct representing a single trace from a Rain source. Intended to be decoded
@@ -97,6 +99,7 @@ impl TryFrom<ForkTypedReturn<eval4Call>> for RainEvalResult {
     }
 }
 
+/// Errors that can occur when converting a raw call result into a `RainEvalResult`.
 #[derive(Error, Debug)]
 pub enum RainEvalResultFromRawCallResultError {
     #[error("Traces are missing")]
@@ -137,6 +140,7 @@ impl TryFrom<RawCallResult> for RainEvalResult {
     }
 }
 
+/// Errors that can occur when searching for a value in traces by path.
 #[derive(Error, Debug)]
 pub enum TraceSearchError {
     #[error("Unparseable trace path: {0}")]
@@ -146,6 +150,9 @@ pub enum TraceSearchError {
 }
 
 impl RainEvalResult {
+    /// Searches for a stack value by dot-separated path (e.g. "0.1.2").
+    /// Segments navigate parent-child source indices; the last segment is the
+    /// stack index (0 = top of stack).
     pub fn search_trace_by_path(&self, path: &str) -> Result<U256, TraceSearchError> {
         let mut parts = path.split('.').collect::<Vec<_>>();
 
@@ -214,6 +221,7 @@ impl RainEvalResult {
     }
 }
 
+/// A flattened table representation of eval results for display or serialization.
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(target_family = "wasm", derive(Tsify))]
@@ -225,6 +233,7 @@ pub struct RainEvalResultsTable {
 #[cfg(target_family = "wasm")]
 impl_wasm_traits!(RainEvalResultsTable);
 
+/// A collection of `RainEvalResult`s that can be flattened into a table.
 #[derive(Debug, Clone)]
 pub struct RainEvalResults {
     pub results: Vec<RainEvalResult>,
@@ -237,6 +246,8 @@ impl From<Vec<RainEvalResult>> for RainEvalResults {
 }
 
 impl RainEvalResults {
+    /// Flattens all results into a table with one column per trace stack item
+    /// and one row per eval result.
     pub fn into_flattened_table(&self) -> RainEvalResultsTable {
         if self.results.is_empty() {
             return RainEvalResultsTable {
@@ -652,5 +663,66 @@ mod tests {
             table.rows[0],
             vec![U256::from(2), U256::from(1), U256::from(3)]
         );
+    }
+
+    #[test]
+    fn test_into_flattened_table_empty_results() {
+        let rain_eval_results = RainEvalResults {
+            results: vec![],
+        };
+        let table = rain_eval_results.into_flattened_table();
+        assert!(table.column_names.is_empty());
+        assert!(table.rows.is_empty());
+    }
+
+    #[test]
+    fn test_flattened_trace_path_names_unresolved_parent() {
+        // Trace with parent_source_index=5, source_index=3.
+        // No prior trace has source_index=5, so the parent cannot be resolved.
+        let traces = vec![RainSourceTrace {
+            parent_source_index: 5,
+            source_index: 3,
+            stack: vec![U256::from(1)],
+        }];
+        let names = flattened_trace_path_names(&traces);
+        assert_eq!(names, vec!["5?.3.0"]);
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+    async fn test_search_trace_by_path_stack_index_out_of_bounds() {
+        let local_evm = LocalEvm::new().await;
+        let deployer_address = *local_evm.deployer.address();
+        let args = NewForkedEvm {
+            fork_url: local_evm.url(),
+            fork_block_number: None,
+        };
+        let fork = Forker::new_with_fork(args, None, None).await.unwrap();
+
+        let res = fork
+            .fork_eval(ForkEvalArgs {
+                rainlang_string: r"
+                a: 3,
+                b: 2;
+                "
+                .into(),
+                source_index: 0,
+                deployer: deployer_address,
+                interpreter: local_evm.zoltu_interpreter,
+                store: local_evm.zoltu_store,
+                namespace: FullyQualifiedNamespace::default(),
+                context: vec![],
+                decode_errors: true,
+                state_overlay: vec![],
+                inputs: vec![],
+            })
+            .await
+            .unwrap();
+
+        let rain_eval_result = RainEvalResult::try_from(res).unwrap();
+
+        // Trace 0 has 2 stack items (indices 0 and 1).
+        // Requesting index 2 should be out of bounds.
+        let result = rain_eval_result.search_trace_by_path("0.2");
+        assert!(matches!(result, Err(TraceSearchError::TraceNotFound(_))));
     }
 }

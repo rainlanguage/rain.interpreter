@@ -108,8 +108,8 @@ uint256 constant ALL_STANDARD_OPS_LENGTH = 72;
 /// @notice Every opcode available from the core repository laid out as a single
 /// array to easily build function pointers for `IInterpreterV4`.
 library LibAllStandardOps {
-    /// Builds the authoring meta for all standard opcodes. Each entry is an
-    /// `AuthoringMetaV2` struct with a word (the Rainlang keyword) and a
+    /// @notice Builds the authoring meta for all standard opcodes. Each entry
+    /// is an `AuthoringMetaV2` struct with a word (the Rainlang keyword) and a
     /// description of the opcode's behaviour. The ordering of entries MUST
     /// match the ordering in `integrityFunctionPointers`,
     /// `opcodeFunctionPointers`, and `operandHandlerFunctionPointers`.
@@ -117,6 +117,7 @@ library LibAllStandardOps {
     /// fixed well-known indexes required by the parser. All remaining opcodes
     /// are ordered alphabetically by folder then by name.
     /// Used by `BuildPointers` to generate parse meta at build time.
+    /// @return ABI-encoded array of `AuthoringMetaV2` structs.
     function authoringMetaV2() internal pure returns (bytes memory) {
         AuthoringMetaV2 memory lengthPlaceholder;
         AuthoringMetaV2[ALL_STANDARD_OPS_LENGTH + 1] memory wordsFixed = [
@@ -338,9 +339,10 @@ library LibAllStandardOps {
         return abi.encode(wordsDynamic);
     }
 
-    /// Builds the literal parser function pointers array. Each pointer
+    /// @notice Builds the literal parser function pointers array. Each pointer
     /// corresponds to a literal type the parser can handle (hex, decimal,
     /// string, sub-parseable). Encoded as 16-bit relative pointers.
+    /// @return Packed 16-bit relative function pointers for literal parsers.
     function literalParserFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
             function(ParseState memory, uint256, uint256) view returns (uint256, bytes32) lengthPointer;
@@ -370,10 +372,11 @@ library LibAllStandardOps {
         }
     }
 
-    /// Builds the operand handler function pointers array. Each pointer
+    /// @notice Builds the operand handler function pointers array. Each pointer
     /// corresponds to a function that parses the operand for the opcode at
     /// the same index. The ordering MUST match `authoringMetaV2`,
     /// `integrityFunctionPointers`, and `opcodeFunctionPointers`.
+    /// @return Packed 16-bit relative function pointers for operand handlers.
     function operandHandlerFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
             function(bytes32[] memory) internal pure returns (OperandV2) lengthPointer;
@@ -542,10 +545,11 @@ library LibAllStandardOps {
         }
     }
 
-    /// Builds the integrity check function pointers array. Each pointer
+    /// @notice Builds the integrity check function pointers array. Each pointer
     /// corresponds to the integrity check for the opcode at the same index.
     /// The ordering MUST match `authoringMetaV2`,
     /// `operandHandlerFunctionPointers`, and `opcodeFunctionPointers`.
+    /// @return Packed 16-bit relative function pointers for integrity checks.
     function integrityFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
             function(IntegrityCheckState memory, OperandV2) view returns (uint256, uint256) lengthPointer;
@@ -647,9 +651,10 @@ library LibAllStandardOps {
         }
     }
 
-    /// All function pointers for the standard opcodes. Intended to be used to
-    /// build a `IInterpreterV4` instance, specifically the `functionPointers`
-    /// method can just be a thin wrapper around this function.
+    /// @notice All function pointers for the standard opcodes. Intended to be
+    /// used to build a `IInterpreterV4` instance, specifically the
+    /// `functionPointers` method can just be a thin wrapper around this.
+    /// @return Packed 16-bit relative function pointers for opcode runtime.
     function opcodeFunctionPointers() internal pure returns (bytes memory) {
         unchecked {
             function(InterpreterState memory, OperandV2, Pointer) view returns (Pointer) lengthPointer;

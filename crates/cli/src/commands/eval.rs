@@ -33,11 +33,11 @@ pub struct ForkEvalCliArgs {
     #[arg(short, long, help = "The namespace")]
     pub namespace: String,
 
-    // Accept context as a vector of string key-value pairs
+    // Each --context flag provides one context column as comma-separated U256 values.
     #[arg(
         short,
         long,
-        help = "The context in key=value format, key is the context column name and value is the context rows as a comma separated list"
+        help = "A context column as comma-separated U256 values (repeatable for multiple columns)"
     )]
     pub context: Vec<String>,
 

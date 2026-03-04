@@ -43,3 +43,35 @@ Always test both sides: the max valid value (should succeed) and one past it (sh
 ## One Test at a Time
 
 Write one test function per edit-compile-run cycle. Do not batch multiple new tests into a single edit. Writing one test at a time produces higher quality code — each test gets full attention, compilation errors are caught immediately, and failures are unambiguous.
+
+# Rust Testing Conventions
+
+## Test Location
+
+Tests are collocated with source code using `#[cfg(test)] mod tests { }` blocks. No separate `tests/` directory.
+
+## Shared Test Fixtures
+
+`crates/test_fixtures` provides `LocalEvm` — an Anvil instance with all Rain contracts pre-deployed.
+
+- `LocalEvm::new().await` — empty instance with interpreter, store, parser, deployer
+- `LocalEvm::new_with_tokens(count).await` — also pre-deploys ERC20 tokens
+- Exposed fields: `interpreter`, `store`, `parser`, `deployer`, `tokens`, `signer_wallets`
+- Fork URL: `local_evm.url()`
+
+## Async Tests
+
+Use `tokio::test` for async tests (anything using `LocalEvm` or `Forker`):
+
+- Sequential: `#[tokio::test(flavor = "multi_thread", worker_threads = 1)]`
+- Parallel: `#[tokio::test(flavor = "multi_thread", worker_threads = 10)]`
+
+Use `#[test]` for synchronous unit tests that don't need EVM interaction.
+
+## Naming
+
+Prefix all tests with `test_`. Use descriptive names: `test_fork_parse`, `test_fork_eval_parallel`.
+
+## Assertions
+
+Use `assert_eq!()` for equality, `assert!()` for boolean conditions. Use `.unwrap()` for expected successes — the panic on failure is the test assertion.

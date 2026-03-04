@@ -31,3 +31,64 @@ pub fn output(
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_output_hex_to_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("out.txt");
+        output(
+            &Some(path.clone()),
+            SupportedOutputEncoding::Hex,
+            &[0xDE, 0xAD, 0xBE, 0xEF],
+        )
+        .unwrap();
+        let contents = std::fs::read_to_string(&path).unwrap();
+        assert_eq!(contents, "0xdeadbeef");
+    }
+
+    #[test]
+    fn test_output_binary_to_file() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("out.bin");
+        output(
+            &Some(path.clone()),
+            SupportedOutputEncoding::Binary,
+            &[0xDE, 0xAD, 0xBE, 0xEF],
+        )
+        .unwrap();
+        let contents = std::fs::read(&path).unwrap();
+        assert_eq!(contents, vec![0xDE, 0xAD, 0xBE, 0xEF]);
+    }
+
+    #[test]
+    fn test_output_hex_empty_bytes() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("out.txt");
+        output(
+            &Some(path.clone()),
+            SupportedOutputEncoding::Hex,
+            &[],
+        )
+        .unwrap();
+        let contents = std::fs::read_to_string(&path).unwrap();
+        assert_eq!(contents, "0x");
+    }
+
+    #[test]
+    fn test_output_binary_empty_bytes() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("out.bin");
+        output(
+            &Some(path.clone()),
+            SupportedOutputEncoding::Binary,
+            &[],
+        )
+        .unwrap();
+        let contents = std::fs::read(&path).unwrap();
+        assert!(contents.is_empty());
+    }
+}

@@ -115,4 +115,31 @@ contract LibOpHashTest is OpTest {
     function testOpHashEvalOperandDisallowed() external {
         checkUnhappyParse("_: hash<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
+
+    /// Hash with maximum inputs (15) through the full eval path.
+    function testOpHashEval15Inputs() external view {
+        bytes memory bytecode =
+            I_DEPLOYER.parse2("_: hash(0x01 0x02 0x03 0x04 0x05 0x06 0x07 0x08 0x09 0x0a 0x0b 0x0c 0x0d 0x0e 0x0f);");
+        (StackItem[] memory stack, bytes32[] memory kvs) = I_INTERPRETER.eval4(
+            EvalV4({
+                store: I_STORE,
+                namespace: FullyQualifiedNamespace.wrap(0),
+                bytecode: bytecode,
+                sourceIndex: SourceIndexV2.wrap(0),
+                context: LibContext.build(new bytes32[][](0), new SignedContextV1[](0)),
+                inputs: new StackItem[](0),
+                stateOverlay: new bytes32[](0)
+            })
+        );
+        assertEq(stack.length, 1);
+        // Build expected hash by concatenating 15 uint256 values manually.
+        bytes memory packed = new bytes(15 * 32);
+        for (uint256 i = 0; i < 15; i++) {
+            assembly ("memory-safe") {
+                mstore(add(add(packed, 0x20), mul(i, 0x20)), add(i, 1))
+            }
+        }
+        assertEq(StackItem.unwrap(stack[0]), keccak256(packed));
+        assertEq(kvs.length, 0);
+    }
 }

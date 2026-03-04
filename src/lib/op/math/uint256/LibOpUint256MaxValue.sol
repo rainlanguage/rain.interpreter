@@ -17,7 +17,7 @@ library LibOpUint256MaxValue {
         return (0, 1);
     }
 
-    /// @notice `max-uint256` opcode. Pushes type(uint256).max onto the stack.
+    /// @notice `uint256-max-value` opcode. Pushes type(uint256).max onto the stack.
     /// @param stackTop Pointer to the top of the stack.
     /// @return The new stack top pointer after execution.
     function run(InterpreterState memory, OperandV2, Pointer stackTop) internal pure returns (Pointer) {

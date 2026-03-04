@@ -62,7 +62,7 @@ pub type LocalEvmProvider = FillProvider<LocalEvmFillers, RootProvider<AnyNetwor
 /// LocalEvm is a thin wrapper around Anvil instance and alloy provider with
 /// signers as well as rain contracts already deployed on it.
 /// The first signer wallet is the main wallet that would sign any transactions
-/// that dont specify a sender (transaction's 'to' field)
+/// that dont specify a sender (transaction's 'from' field)
 pub struct LocalEvm {
     /// The Anvil instance, ie the local blockchain
     pub anvil: AnvilInstance,

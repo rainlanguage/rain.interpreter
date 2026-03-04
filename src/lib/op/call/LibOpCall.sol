@@ -81,7 +81,8 @@ library LibOpCall {
     /// @param state The current integrity check state containing the bytecode.
     /// @param operand Encodes sourceIndex (low 16 bits), inputs (bits 16–19),
     /// and outputs (bits 20+).
-    /// @return The number of inputs and outputs for stack tracking.
+    /// @return The number of inputs the call consumes from the caller's stack.
+    /// @return The number of outputs the call pushes onto the caller's stack.
     function integrity(IntegrityCheckState memory state, OperandV2 operand) internal pure returns (uint256, uint256) {
         uint256 sourceIndex = uint256(OperandV2.unwrap(operand) & bytes32(uint256(0xFFFF)));
         uint256 outputs = uint256(OperandV2.unwrap(operand) >> 0x14);

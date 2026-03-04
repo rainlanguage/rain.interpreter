@@ -62,7 +62,7 @@ impl Forker {
     ///
     /// # Returns
     ///
-    /// The typed return of the parse and deployExpression2, plus Foundry's RawCallResult struct.
+    /// The typed return of the parse2 call, plus Foundry's RawCallResult struct.
     pub async fn fork_parse(
         &self,
         args: ForkParseArgs,

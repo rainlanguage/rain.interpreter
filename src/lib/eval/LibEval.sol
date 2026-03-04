@@ -12,6 +12,8 @@ import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterp
 
 import {InputsLengthMismatch} from "../../error/ErrEval.sol";
 
+/// @title LibEval
+/// @notice Opcode evaluation loop for the Rain interpreter.
 library LibEval {
     using LibMemoryKV for MemoryKV;
 

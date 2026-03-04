@@ -5440,6 +5440,7 @@ dependencies = [
  "rain-interpreter-eval",
  "rain_interpreter_bindings",
  "rain_interpreter_test_fixtures",
+ "tempfile",
  "tokio",
  "tracing",
  "tracing-subscriber 0.3.19",

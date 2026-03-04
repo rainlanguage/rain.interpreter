@@ -52,6 +52,8 @@ struct InterpreterState {
     bytes fs;
 }
 
+/// @title LibInterpreterState
+/// @notice Utilities for building and managing interpreter runtime state.
 library LibInterpreterState {
     /// @notice Converts pre-allocated stack arrays into an array of bottom pointers.
     /// Each stack's bottom pointer is the address just past its last element,

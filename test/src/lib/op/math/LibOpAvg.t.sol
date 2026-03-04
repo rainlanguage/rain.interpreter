@@ -55,6 +55,18 @@ contract LibOpAvgTest is OpTest {
         checkHappy("_: avg(4 0.5);", Float.unwrap(LibDecimalFloat.packLossless(2.25e66, -66)), "4 5");
     }
 
+    /// Deterministic eval examples with negative values.
+    function testOpAvgEvalNegativeExamples() external view {
+        // avg(-2, -4) = -3
+        checkHappy("_: avg(-2 -4);", Float.unwrap(LibDecimalFloat.packLossless(-3e66, -66)), "-2 -4");
+        // avg(-1, 1) = 0
+        checkHappy("_: avg(-1 1);", Float.unwrap(LibDecimalFloat.packLossless(0, 0)), "-1 1");
+        // avg(1, -1) = 0
+        checkHappy("_: avg(1 -1);", Float.unwrap(LibDecimalFloat.packLossless(0, 0)), "1 -1");
+        // avg(-1, -1) = -1
+        checkHappy("_: avg(-1 -1);", Float.unwrap(LibDecimalFloat.packLossless(-1e67, -67)), "-1 -1");
+    }
+
     /// Test the eval of `avg` for bad inputs.
     function testOpAvgEvalOneInput() external {
         checkBadInputs("_: avg(1);", 1, 2, 1);

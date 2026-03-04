@@ -4,9 +4,10 @@ pragma solidity ^0.8.25;
 
 import {ParseStackUnderflow, ParseStackOverflow} from "../../error/ErrParse.sol";
 
-/// @dev Tracks the current and high-water stack heights during parsing. The
-/// low 128 bits hold the current stack height; the high 128 bits hold the
-/// maximum height seen so far (used to size the runtime stack allocation).
+/// @dev Tracks the current and high-water stack heights during parsing.
+/// Bits 0-7: current stack height; bits 8-15: inputs count;
+/// bits 16+: maximum height seen so far (used to size the runtime stack
+/// allocation).
 type ParseStackTracker is uint256;
 
 /// @title LibParseStackTracker

@@ -6,7 +6,7 @@ pragma solidity ^0.8.25;
 contract ErrSubParse {}
 
 /// @notice Thrown when a subparser is asked to build an extern dispatch when the
-/// constants height is outside the range a single byte can represent.
+/// constants height exceeds the 16-bit encoding limit (uint16).
 /// @param constantsHeight The constants height that overflowed.
 error ExternDispatchConstantsHeightOverflow(uint256 constantsHeight);
 
