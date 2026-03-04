@@ -128,7 +128,7 @@ contract LibEvalFBoundsTest is Test {
             fs
         );
 
-        (StackItem[] memory outputs, bytes32[] memory kvs) = LibEval.eval2(state, new StackItem[](0), type(uint256).max);
+        (StackItem[] memory outputs, bytes32[] memory kvs) = LibEval.eval4(state, new StackItem[](0), type(uint256).max);
         assertEq(outputs.length, expectedLength);
         for (uint256 i = 0; i < outputs.length; i++) {
             assertEq(StackItem.unwrap(outputs[i]), c);
@@ -140,7 +140,7 @@ contract LibEvalFBoundsTest is Test {
             bytecode[i] = bytes1(uint8(uint8(fs.length / 2) + 1));
         }
 
-        (outputs, kvs) = LibEval.eval2(state, new StackItem[](0), type(uint256).max);
+        (outputs, kvs) = LibEval.eval4(state, new StackItem[](0), type(uint256).max);
         assertEq(outputs.length, expectedLength);
         for (uint256 i = 0; i < outputs.length; i++) {
             assertEq(StackItem.unwrap(outputs[i]), c);

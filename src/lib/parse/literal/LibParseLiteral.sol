@@ -6,20 +6,30 @@ import {
     CMASK_STRING_LITERAL_HEAD,
     CMASK_LITERAL_HEX_DISPATCH,
     CMASK_NUMERIC_LITERAL_HEAD,
-    CMASK_SUB_PARSEABLE_LITERAL_HEAD
+    CMASK_SUB_PARSEABLE_LITERAL_HEAD,
+    CMASK_ZERO,
+    CMASK_UPPER_X
 } from "rain.string/lib/parse/LibParseCMask.sol";
 
-import {UnsupportedLiteralType} from "../../../error/ErrParse.sol";
+import {UnsupportedLiteralType, UppercaseHexPrefix} from "../../../error/ErrParse.sol";
 import {ParseState} from "../LibParseState.sol";
 import {LibParseError} from "../LibParseError.sol";
 
+/// @dev The number of built-in literal parser types.
 uint256 constant LITERAL_PARSERS_LENGTH = 4;
 
+/// @dev Index of the hexadecimal literal parser (e.g. `0xDEAD`).
 uint256 constant LITERAL_PARSER_INDEX_HEX = 0;
+/// @dev Index of the decimal literal parser (e.g. `42`, `1e18`).
 uint256 constant LITERAL_PARSER_INDEX_DECIMAL = 1;
+/// @dev Index of the string literal parser (e.g. `"hello"`).
 uint256 constant LITERAL_PARSER_INDEX_STRING = 2;
+/// @dev Index of the sub-parseable literal parser (e.g. `[dispatch body]`).
 uint256 constant LITERAL_PARSER_INDEX_SUB_PARSE = 3;
 
+/// @title LibParseLiteral
+/// @notice Dispatches literal parsing to the appropriate type-specific parser
+/// (hex, decimal, string, or sub-parseable) based on the head character.
 library LibParseLiteral {
     using LibParseLiteral for ParseState;
     using LibParseError for ParseState;
@@ -92,15 +102,29 @@ library LibParseLiteral {
             // Figure out the literal type and dispatch to the correct parser.
             // Probably a numeric, most things are.
             if ((head & CMASK_NUMERIC_LITERAL_HEAD) != 0) {
-                uint256 disambiguate;
-                assembly ("memory-safe") {
-                    //slither-disable-next-line incorrect-shift
-                    disambiguate := shl(byte(1, word), 1)
-                }
-                // Hexadecimal literal dispatch is 0x. We can't accidentally
-                // match x0 because we already checked that the head is 0-9.
-                if ((head | disambiguate) == CMASK_LITERAL_HEX_DISPATCH) {
-                    index = LITERAL_PARSER_INDEX_HEX;
+                // Only read the second byte for hex disambiguation if it
+                // exists within the source bounds. If the numeric literal is
+                // the last byte of the source, default to decimal — reading
+                // past end would pick up adjacent memory that could
+                // coincidentally be 'x' (0x78).
+                if (cursor + 1 < end) {
+                    uint256 disambiguate;
+                    assembly ("memory-safe") {
+                        //slither-disable-next-line incorrect-shift
+                        disambiguate := shl(byte(1, word), 1)
+                    }
+                    // Hexadecimal literal dispatch is 0x. We can't accidentally
+                    // match x0 because we already checked that the head is 0-9.
+                    if ((head | disambiguate) == CMASK_LITERAL_HEX_DISPATCH) {
+                        index = LITERAL_PARSER_INDEX_HEX;
+                    }
+                    // Uppercase 0X is not valid — revert explicitly rather
+                    // than silently parsing as decimal zero.
+                    else if ((head | disambiguate) == (CMASK_ZERO | CMASK_UPPER_X)) {
+                        revert UppercaseHexPrefix(state.parseErrorOffset(cursor));
+                    } else {
+                        index = LITERAL_PARSER_INDEX_DECIMAL;
+                    }
                 } else {
                     index = LITERAL_PARSER_INDEX_DECIMAL;
                 }

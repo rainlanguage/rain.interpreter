@@ -1,3 +1,5 @@
+//! Shared test fixtures for rain.interpreter Rust crates.
+
 use alloy::{
     contract::SolCallBuilder,
     network::{AnyNetwork, AnyReceiptEnvelope, EthereumWallet},

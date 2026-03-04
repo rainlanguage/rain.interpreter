@@ -34,7 +34,8 @@ import {
     UnexpectedLHSChar,
     MissingFinalSemi,
     UnexpectedComment,
-    ParenOverflow
+    ParenOverflow,
+    LHSItemCountOverflow
 } from "../../error/ErrParse.sol";
 import {
     LibParseState,
@@ -50,13 +51,19 @@ import {LibParseInterstitial} from "./LibParseInterstitial.sol";
 import {LibParseError} from "./LibParseError.sol";
 import {LibSubParse} from "./LibSubParse.sol";
 import {LibBytes} from "rain.solmem/lib/LibBytes.sol";
-import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 
 /// @dev Size in bytes of the fixed header prepended to sub-parser bytecode.
 /// Comprises the operand values tail pointer (2 bytes), the literal parsers
 /// tail pointer (2 bytes), and the word length (1 byte).
 uint256 constant SUB_PARSER_BYTECODE_HEADER_SIZE = 5;
+
+/// @dev Maximum paren offset before the paren tracker overflows. The tracker
+/// has 62 bytes of group data (3 bytes each, fitting 20 groups), but
+/// `pushOpToSource` writes a phantom counter at `parenOffset + 4`, so the
+/// effective limit is 19 groups (offset 57). The check rejects offset 60
+/// because `newParenOffset` is already incremented by 3.
+uint256 constant MAX_PAREN_OFFSET = 59;
 
 /// @title LibParse
 /// @notice Core parsing library for Rainlang source text.
@@ -77,7 +84,6 @@ library LibParse {
     using LibParseOperand for ParseState;
     using LibSubParse for ParseState;
     using LibBytes for bytes;
-    using LibUint256Array for uint256[];
     using LibBytes32Array for bytes32[];
 
     /// @notice Parses a word that matches a tail mask between cursor and end. The caller
@@ -152,8 +158,8 @@ library LibParse {
                     // Named stack item.
                     if (char & CMASK_IDENTIFIER_HEAD > 0) {
                         (cursor, word) = parseWord(cursor, end, CMASK_LHS_STACK_TAIL);
-                        (bool exists, uint256 index) = state.pushStackName(word);
-                        (index);
+                        // slither-disable-next-line unused-return
+                        (bool exists,) = state.pushStackName(word);
                         // If the stack name already exists, then we
                         // revert as shadowing is not allowed.
                         if (exists) {
@@ -165,7 +171,17 @@ library LibParse {
                         cursor = LibParseChar.skipMask(cursor + 1, end, CMASK_LHS_STACK_TAIL);
                     }
                     // Bump the index regardless of whether the stack
-                    // item is named or not.
+                    // item is named or not. Both counters are packed into
+                    // the low byte of their respective uint256 fields.
+                    // Exceeding 0xFF would carry into the adjacent byte,
+                    // silently corrupting parser state.
+                    // The low byte of each field is only ever mutated by
+                    // single increments (here) and resets to 0 (newSource
+                    // / endLine), so reading via `& 0xFF` reliably gives
+                    // the true count at this point.
+                    if ((state.topLevel1 & 0xFF) == 0xFF || (state.lineTracker & 0xFF) == 0xFF) {
+                        revert LHSItemCountOverflow(state.parseErrorOffset(cursor));
+                    }
                     state.topLevel1++;
                     state.lineTracker++;
 
@@ -332,13 +348,7 @@ library LibParse {
                         newParenOffset := add(byte(0, mload(add(state, parenTracker0Offset))), 3)
                         mstore8(add(state, parenTracker0Offset), newParenOffset)
                     }
-                    // 62 bytes of group data (3 bytes each) fit 20
-                    // groups by size, but pushOpToSource zeroes a
-                    // phantom counter at parenOffset + 4, so the
-                    // effective max is 19 groups (offset 57). The
-                    // check must reject offset 60 to prevent that
-                    // phantom write from corrupting lineTracker.
-                    if (newParenOffset > 59) {
+                    if (newParenOffset > MAX_PAREN_OFFSET) {
                         revert ParenOverflow();
                     }
                     cursor++;

@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {OpTest} from "test/abstract/OpTest.sol";
+import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpMinNegativeValue} from "src/lib/op/math/LibOpMinNegativeValue.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
@@ -66,5 +66,10 @@ contract LibOpMinNegativeValueTest is OpTest {
 
     function testOpMinNegativeValueTwoOutputs() external {
         checkBadOutputs("_ _: min-negative-value();", 0, 1, 2);
+    }
+
+    /// Test that operand is disallowed.
+    function testOpMinNegativeValueEvalOperandDisallowed() external {
+        checkUnhappyParse("_: min-negative-value<0>();", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

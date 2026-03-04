@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {OpTest} from "test/abstract/OpTest.sol";
+import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {LibOpIsZero} from "src/lib/op/logic/LibOpIsZero.sol";
 import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
@@ -72,5 +72,10 @@ contract LibOpIsZeroTest is OpTest {
 
     function testOpIsZeroTwoOutputs() external {
         checkBadOutputs("_ _: is-zero(30);", 1, 1, 2);
+    }
+
+    /// Test that operand is disallowed.
+    function testOpIsZeroEvalOperandDisallowed() external {
+        checkUnhappyParse("_: is-zero<0>(1);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

@@ -115,8 +115,8 @@ abstract contract BaseRainterpreterExtern is IInterpreterExternV4, IIntegrityToo
             || super.supportsInterface(interfaceId);
     }
 
-    /// Overrideable function to provide the list of function pointers for
-    /// word dispatches.
+    /// @notice Overrideable function to provide the list of function pointers
+    /// for opcode dispatches.
     //slither-disable-next-line dead-code
     function opcodeFunctionPointers() internal view virtual returns (bytes memory) {
         return OPCODE_FUNCTION_POINTERS;

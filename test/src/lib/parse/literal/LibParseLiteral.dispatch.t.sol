@@ -6,6 +6,7 @@ import {Test} from "forge-std/Test.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
 import {LibParseLiteral, UnsupportedLiteralType} from "src/lib/parse/literal/LibParseLiteral.sol";
+import {UppercaseHexPrefix} from "src/error/ErrParse.sol";
 import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {ISubParserV4} from "rain.interpreter.interface/interface/ISubParserV4.sol";
@@ -108,12 +109,11 @@ contract LibParseLiteralDispatchTest is Test {
         assertEq(value, bytes32(0), "zero value");
     }
 
-    /// Uppercase '0X' does NOT route to hex — only lowercase '0x' does.
-    /// '0X' routes to decimal and parses '0', leaving 'X' for the next token.
-    function testTryParseLiteralUppercaseXNotHex() external view {
-        (bool success,, bytes32 value) = this.externalTryParseLiteral(bytes("0X "));
-        assertTrue(success, "0X dispatches as decimal");
-        assertEq(value, bytes32(0), "0X value is 0");
+    /// Uppercase '0X' must revert with UppercaseHexPrefix rather than
+    /// silently parsing as decimal 0.
+    function testTryParseLiteralUppercaseXReverts() external {
+        vm.expectRevert(abi.encodeWithSelector(UppercaseHexPrefix.selector, 0));
+        this.externalParseLiteral(bytes("0X "));
     }
 
     /// Decimal literal returns correct float-encoded value.
@@ -242,5 +242,31 @@ contract LibParseLiteralDispatchTest is Test {
     function testParseLiteralUnsupportedType() external {
         vm.expectRevert(abi.encodeWithSelector(UnsupportedLiteralType.selector, 0));
         this.externalParseLiteral(bytes("@ "));
+    }
+
+    /// A single "0" at the end of the source with 0x78 ('x') as the
+    /// next byte in memory must route to decimal, not hex. Without a bounds
+    /// check the parser reads past end and sees "0x", incorrectly dispatching
+    /// to the hex parser which reverts with ZeroLengthHexLiteral.
+    function testTryParseLiteralOOBSecondBytePoison() external {
+        // Allocate data "0" then immediately write 0x78 ('x') right after
+        // the data in memory. end = cursor+1 (just the "0" byte), but
+        // mload(cursor) reads 32 bytes so byte(1, word) picks up the 'x'.
+        bytes memory data = bytes("0");
+        uint256 cursor;
+        uint256 end;
+        assembly ("memory-safe") {
+            cursor := add(data, 0x20)
+            end := add(cursor, mload(data))
+            // Write 'x' immediately after the data content.
+            mstore8(end, 0x78)
+        }
+        ParseState memory state =
+            LibParseState.newState(data, "", "", LibAllStandardOps.literalParserFunctionPointers());
+        state.literalParsers = LibAllStandardOps.literalParserFunctionPointers();
+        // If the bug exists, tryParseLiteral dispatches to hex and reverts.
+        (bool success,, bytes32 value) = state.tryParseLiteral(cursor, end);
+        assertTrue(success, "single 0 with poison x must parse as decimal");
+        assertEq(value, bytes32(0), "single 0 value");
     }
 }

@@ -16,7 +16,7 @@ contract MockExternBadLiteralIndex is RainterpreterReferenceExtern {
 }
 
 /// @title RainterpreterReferenceExternSubParserIndexOutOfBoundsTest
-/// @notice A49-3: Test that `SubParserIndexOutOfBounds` reverts when an
+/// @notice Test that `SubParserIndexOutOfBounds` reverts when an
 /// out-of-bounds index is returned from the literal dispatch lookup.
 contract RainterpreterReferenceExternSubParserIndexOutOfBoundsTest is Test {
     /// @notice Calling subParseLiteral2 on a mock that returns an out-of-bounds

@@ -7,19 +7,20 @@ pragma solidity ^0.8.25;
 /// registry that exposes the deterministic deploy addresses of the four core
 /// interpreter components.
 interface IDISPaiRegistry {
-    /// Returns the deterministic deploy address of the expression deployer.
+    /// @notice Returns the deterministic deploy address of the expression
+    /// deployer.
     /// @return The expression deployer address.
     function expressionDeployerAddress() external pure returns (address);
 
-    /// Returns the deterministic deploy address of the interpreter.
+    /// @notice Returns the deterministic deploy address of the interpreter.
     /// @return The interpreter address.
     function interpreterAddress() external pure returns (address);
 
-    /// Returns the deterministic deploy address of the store.
+    /// @notice Returns the deterministic deploy address of the store.
     /// @return The store address.
     function storeAddress() external pure returns (address);
 
-    /// Returns the deterministic deploy address of the parser.
+    /// @notice Returns the deterministic deploy address of the parser.
     /// @return The parser address.
     function parserAddress() external pure returns (address);
 }

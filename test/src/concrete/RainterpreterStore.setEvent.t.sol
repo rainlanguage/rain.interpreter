@@ -12,7 +12,7 @@ import {
 import {IInterpreterStoreV3} from "rain.interpreter.interface/interface/IInterpreterStoreV3.sol";
 
 /// @title RainterpreterStoreSetEventTest
-/// @notice A50-2: Test that the `Set` event is emitted correctly for every
+/// @notice Test that the `Set` event is emitted correctly for every
 /// key-value pair stored via `set()`.
 contract RainterpreterStoreSetEventTest is Test {
     using LibNamespace for StateNamespace;

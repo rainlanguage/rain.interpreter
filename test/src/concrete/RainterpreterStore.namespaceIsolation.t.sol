@@ -46,6 +46,41 @@ contract RainterpreterStoreNamespaceIsolationTest is Test {
         assertEq(store.get(fqnB, key), bytes32(0));
     }
 
+    /// Same sender, different StateNamespace values — data must be isolated
+    /// per namespace.
+    function testNamespaceIsolationSameSender(
+        address sender,
+        uint256 nsSeedA,
+        uint256 nsSeedB,
+        bytes32 key,
+        bytes32 valueA,
+        bytes32 valueB
+    ) external {
+        vm.assume(nsSeedA != nsSeedB);
+        vm.assume(valueA != valueB);
+
+        StateNamespace nsA = StateNamespace.wrap(nsSeedA);
+        StateNamespace nsB = StateNamespace.wrap(nsSeedB);
+        RainterpreterStore store = new RainterpreterStore();
+
+        bytes32[] memory kvs = new bytes32[](2);
+        kvs[0] = key;
+
+        kvs[1] = valueA;
+        vm.prank(sender);
+        store.set(nsA, kvs);
+
+        kvs[1] = valueB;
+        vm.prank(sender);
+        store.set(nsB, kvs);
+
+        FullyQualifiedNamespace fqnA = nsA.qualifyNamespace(sender);
+        FullyQualifiedNamespace fqnB = nsB.qualifyNamespace(sender);
+
+        assertEq(store.get(fqnA, key), valueA);
+        assertEq(store.get(fqnB, key), valueB);
+    }
+
     /// Both A and B write different values to the same key. Each must see
     /// only their own value.
     function testNamespaceIsolationBidirectional(

@@ -22,6 +22,7 @@ optimizer = true
 # code size cap to be hit.
 optimizer_runs = 1000
 
+ffi = true
 bytecode_hash = "none"
 cbor_metadata = false
 

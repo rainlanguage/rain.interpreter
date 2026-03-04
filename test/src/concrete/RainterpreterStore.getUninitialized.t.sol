@@ -11,7 +11,7 @@ import {
 } from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
 
 /// @title RainterpreterStoreGetUninitializedTest
-/// @notice A50-4: Test that `get()` returns `bytes32(0)` for a key that has
+/// @notice Test that `get()` returns `bytes32(0)` for a key that has
 /// never been set.
 contract RainterpreterStoreGetUninitializedTest is Test {
     using LibNamespace for StateNamespace;

@@ -101,7 +101,7 @@ contract LibParseStateEndSourceTest is Test {
 
     /// Fuzz the op count: source byte length must be 4 * opCount + 4.
     function testEndSourceByteLengthFuzz(uint256 opCount) external pure {
-        opCount = bound(opCount, 1, 50);
+        opCount = bound(opCount, 1, 255);
         ParseState memory state = LibParseState.newState("", "", "", "");
 
         for (uint256 i = 0; i < opCount; i++) {

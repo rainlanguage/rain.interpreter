@@ -1,3 +1,5 @@
+//! Alloy Solidity contract bindings for rain.interpreter.
+
 use alloy::sol;
 
 sol!(

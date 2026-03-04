@@ -14,7 +14,9 @@ import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 library LibOpLinearGrowth {
     using LibDecimalFloat for Float;
 
-    /// `linear-growth` integrity check. Requires exactly 3 inputs and produces 1 output.
+    /// @notice `linear-growth` integrity check. Requires exactly 3 inputs and produces 1 output.
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // There must be three inputs and one output.
         return (3, 1);

@@ -4,11 +4,11 @@
 
 Test base contracts in `test/abstract/`:
 
-- **`RainterpreterExpressionDeployerDeploymentTest`** — Full stack deployment. Exposes `I_PARSER`, `I_INTERPRETER`, `I_STORE`, `I_DEPLOYER`.
-- **`OpTest`** — Opcode tests. Provides `opReferenceCheck()`, `checkHappy()`, `checkUnhappy()`.
-- **`ParseTest`** — Parser tests. Provides `parseExternal()`.
-- **`OperandTest`** — Operand handler tests. Provides `checkOperandParse()`.
-- **`ParseLiteralTest`** — Literal parsing tests. Provides `checkLiteralBounds()`.
+- **`RainterpreterExpressionDeployerDeploymentTest`** (`test/abstract/RainterpreterExpressionDeployerDeploymentTest.sol`) — Full stack deployment. Exposes `I_PARSER`, `I_INTERPRETER`, `I_STORE`, `I_DEPLOYER`.
+- **`OpTest`** (`test/abstract/OpTest.sol`) — Opcode tests. Provides `opReferenceCheck()`, `checkHappy()`, `checkUnhappy()`.
+- **`ParseTest`** (`test/abstract/ParseTest.sol`) — Parser tests. Provides `parseExternal()`.
+- **`OperandTest`** (`test/abstract/OperandTest.sol`) — Operand handler tests. Provides `checkOperandParse()`.
+- **`ParseLiteralTest`** (`test/abstract/ParseLiteralTest.sol`) — Literal parsing tests. Provides `checkLiteralBounds()`.
 
 ## Fuzz Testing
 

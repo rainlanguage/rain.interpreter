@@ -16,7 +16,7 @@ import {
 import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
 /// @title LibEvalMaxOutputsTest
-/// @notice Tests that eval2 truncates outputs when maxOutputs < sourceOutputs.
+/// @notice Tests that eval4 truncates outputs when maxOutputs < sourceOutputs.
 contract LibEvalMaxOutputsTest is RainterpreterExpressionDeployerDeploymentTest {
     /// When maxOutputs < sourceOutputs, the returned array length must
     /// equal maxOutputs and contain the topmost stack items.
@@ -48,7 +48,7 @@ contract LibEvalMaxOutputsTest is RainterpreterExpressionDeployerDeploymentTest 
         );
 
         (StackItem[] memory outputs, bytes32[] memory kvs) =
-            LibEval.eval2(state, new StackItem[](0), uint256(maxOutputs));
+            LibEval.eval4(state, new StackItem[](0), uint256(maxOutputs));
 
         assertEq(outputs.length, uint256(maxOutputs));
         if (maxOutputs >= 1) assertEq(StackItem.unwrap(outputs[0]), c2);

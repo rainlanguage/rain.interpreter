@@ -18,6 +18,9 @@ import {LibParseError} from "./LibParseError.sol";
 import {LibParseInterstitial} from "./LibParseInterstitial.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
+/// @title LibParseOperand
+/// @notice Parses operand values from Rainlang source text and dispatches
+/// to type-specific operand handlers.
 library LibParseOperand {
     using LibParseError for ParseState;
     using LibParseLiteral for ParseState;
@@ -206,7 +209,7 @@ library LibParseOperand {
             }
             (int256 signedCoefficient, int256 exponent) = Float.wrap(OperandV2.unwrap(operand)).unpack();
             uint256 operandUint = LibDecimalFloat.toFixedDecimalLossless(signedCoefficient, exponent, 0);
-            if (operandUint > uint256(type(uint16).max)) {
+            if (operandUint > type(uint16).max) {
                 revert OperandOverflow();
             }
             operand = OperandV2.wrap(bytes32(operandUint));

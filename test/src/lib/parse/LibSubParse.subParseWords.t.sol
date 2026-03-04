@@ -12,6 +12,7 @@ import {ISubParserV4} from "rain.interpreter.interface/interface/ISubParserV4.so
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 import {OPCODE_UNKNOWN, OPCODE_CONSTANT, OPCODE_CONTEXT} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
+import {UnknownWord} from "src/error/ErrParse.sol";
 
 /// @dev A sub parser that resolves any word by returning a context opcode with
 /// no constants. Used to verify that subParseWords iterates multiple sources.
@@ -141,6 +142,12 @@ contract LibSubParseSubParseWordsTest is Test {
         return state.parse();
     }
 
+    /// @notice External wrapper for subParseWords so reverts can be caught.
+    function externalSubParseWords(bytes memory bytecode) external view returns (bytes memory, bytes32[] memory) {
+        ParseState memory state = LibParseState.newState("", "", "", "");
+        return state.subParseWords(bytecode);
+    }
+
     /// @notice When the sub parser rejects a word, parsing reverts with
     /// UnknownWord.
     function testSubParseWordsUnknownWordReverts() external {
@@ -157,6 +164,17 @@ contract LibSubParseSubParseWordsTest is Test {
 
         vm.expectRevert();
         this.externalParse(src);
+    }
+
+    /// @notice When no sub parsers are registered and bytecode contains an
+    /// unknown opcode, subParseWords reverts with UnknownWord.
+    function testSubParseWordsNoSubParsersUnknownReverts() external {
+        // Build bytecode with OPCODE_UNKNOWN directly.
+        //forge-lint: disable-next-line(unsafe-typecast)
+        bytes memory bytecode = buildSingleOpBytecode(uint8(OPCODE_UNKNOWN), 0x10, 0x0000);
+
+        vm.expectRevert(abi.encodeWithSelector(UnknownWord.selector, ""));
+        this.externalSubParseWords(bytecode);
     }
 
     /// @notice Multiple known opcodes in a single source are not modified.

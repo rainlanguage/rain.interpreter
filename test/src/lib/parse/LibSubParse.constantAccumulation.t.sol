@@ -92,9 +92,8 @@ contract MultiConstantSubParser is ISubParserV4, IERC165 {
 /// @title LibSubParseConstantAccumulationTest
 /// @notice Tests that constants returned by sub parsers during word resolution
 /// are correctly accumulated into the final constants array at the right
-/// indices. This addresses finding A44-8: the existing `badSubParserResult`
-/// test returns empty constants arrays, so constant accumulation from sub
-/// parsers was never verified.
+/// indices. The existing `badSubParserResult` test returns empty constants
+/// arrays, so constant accumulation from sub parsers was never verified.
 contract LibSubParseConstantAccumulationTest is Test {
     using LibParseState for ParseState;
     using LibParse for ParseState;

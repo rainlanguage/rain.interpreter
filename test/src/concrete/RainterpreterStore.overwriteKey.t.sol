@@ -11,7 +11,7 @@ import {
 } from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
 
 /// @title RainterpreterStoreOverwriteKeyTest
-/// @notice A50-5: Test that a key appearing twice in a single `kvs` array
+/// @notice Test that a key appearing twice in a single `kvs` array
 /// results in the last value winning.
 contract RainterpreterStoreOverwriteKeyTest is Test {
     using LibNamespace for StateNamespace;

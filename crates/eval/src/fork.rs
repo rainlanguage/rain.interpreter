@@ -28,14 +28,21 @@ pub struct Forker {
     forks: HashMap<ForkId, (LocalForkId, SpecId, BlockNumber)>,
 }
 
+/// Result of an alloy-typed call containing both the raw EVM result and the
+/// ABI-decoded return value.
 pub struct ForkTypedReturn<C: SolCall> {
+    /// The raw EVM call result including traces and exit reason.
     pub raw: RawCallResult,
+    /// The ABI-decoded return value.
     pub typed_return: C::Return,
 }
 
+/// Configuration for creating a new forked EVM instance.
 #[derive(Debug, Clone)]
 pub struct NewForkedEvm {
+    /// RPC URL of the network to fork.
     pub fork_url: String,
+    /// Optional block number to fork from. Uses latest if `None`.
     pub fork_block_number: Option<BlockNumber>,
 }
 
@@ -71,24 +78,24 @@ impl Forker {
     ///
     /// # Arguments
     ///
-    /// * `fork_url` - The URL of the fork to connect to.
-    /// * `fork_block_number` - Optional fork block number to start from.
-    /// * `env` - Optional fork environment.
-    /// * `gas_limit` - Optional fork gas limit.
+    /// * `args` - Fork configuration containing URL and optional block number.
+    /// * `env` - Optional EVM environment override.
+    /// * `gas_limit` - Optional gas limit override.
     ///
     /// # Returns
     ///
     /// A new instance of `Forker`.
+    ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use rain_interpreter_eval::fork::{Forker, NewForkedEvm};
     ///
-    /// let fork_url = "https://example.com/fork".to_owned();
-    /// let fork_block_number = Some(12345u64);
-    /// let args = NewForkedEvm { fork_url, fork_block_number };
-    ///
-    /// let forker = Forker::new_with_fork(args, None, None);
+    /// let args = NewForkedEvm {
+    ///     fork_url: "https://example.com/fork".to_owned(),
+    ///     fork_block_number: Some(12345u64),
+    /// };
+    /// let forker = Forker::new_with_fork(args, None, None).await;
     /// ```
     pub async fn new_with_fork(
         args: NewForkedEvm,
@@ -227,6 +234,7 @@ impl Forker {
     /// * `from_address` - The address to call from.
     /// * `to_address` - The address to call to.
     /// * `call` - The call to make.
+    /// * `decode_error` - Whether to decode revert data using the error selector registry.
     /// # Returns
     /// A result containing the raw call result and the typed return.
     pub async fn alloy_call<T: SolCall>(
@@ -270,6 +278,7 @@ impl Forker {
     /// * `to_address` - The address to call to.
     /// * `call` - The call to make.
     /// * `value` - The value to send with the call.
+    /// * `decode_error` - Whether to decode revert data using the error selector registry.
     /// # Returns
     /// A result containing the raw call result and the typed return.
     pub async fn alloy_call_committing<T: SolCall>(
@@ -299,7 +308,12 @@ impl Forker {
         }
 
         let typed_return = T::abi_decode_returns(&raw.result.0).map_err(|e| {
-            ForkCallError::TypedError(format!("Call:{:?} Error:{:?}", type_name::<T>(), e))
+            ForkCallError::TypedError(format!(
+                "Call:{:?} Error:{:?} Raw:{:?}",
+                type_name::<T>(),
+                e,
+                raw
+            ))
         })?;
         Ok(ForkTypedReturn { raw, typed_return })
     }
@@ -448,7 +462,12 @@ impl Forker {
         self.add_or_select(
             NewForkedEvm {
                 fork_url: fork_url.clone(),
-                fork_block_number: Some(block_number - 1),
+                fork_block_number: Some(block_number.checked_sub(1).ok_or(
+                    ReplayTransactionError::GenesisBlockReplay(
+                        tx_hash.to_string(),
+                        fork_url.clone(),
+                    ),
+                )?),
             },
             None,
         )
@@ -795,5 +814,137 @@ mod tests {
 
         assert!(replay_result.env.tx.caller == local_evm.anvil.addresses()[0]);
         assert!(replay_result.exit_reason.is_ok());
+    }
+
+    #[test]
+    fn test_call_invalid_from_address_too_short() {
+        let forker = Forker::new().unwrap();
+        let result = forker.call(&[0u8; 19], &[0u8; 20], &[]);
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!")
+        );
+    }
+
+    #[test]
+    fn test_call_invalid_from_address_too_long() {
+        let forker = Forker::new().unwrap();
+        let result = forker.call(&[0u8; 21], &[0u8; 20], &[]);
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!")
+        );
+    }
+
+    #[test]
+    fn test_call_invalid_from_address_empty() {
+        let forker = Forker::new().unwrap();
+        let result = forker.call(&[], &[0u8; 20], &[]);
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!")
+        );
+    }
+
+    #[test]
+    fn test_call_invalid_to_address_too_short() {
+        let forker = Forker::new().unwrap();
+        let result = forker.call(&[0u8; 20], &[0u8; 19], &[]);
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!")
+        );
+    }
+
+    #[test]
+    fn test_call_invalid_to_address_too_long() {
+        let forker = Forker::new().unwrap();
+        let result = forker.call(&[0u8; 20], &[0u8; 21], &[]);
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!")
+        );
+    }
+
+    #[test]
+    fn test_call_invalid_to_address_empty() {
+        let forker = Forker::new().unwrap();
+        let result = forker.call(&[0u8; 20], &[], &[]);
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!")
+        );
+    }
+
+    #[test]
+    fn test_call_committing_invalid_from_address() {
+        let mut forker = Forker::new().unwrap();
+        let result = forker.call_committing(&[0u8; 19], &[0u8; 20], &[], U256::ZERO);
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!")
+        );
+    }
+
+    #[test]
+    fn test_call_committing_invalid_to_address() {
+        let mut forker = Forker::new().unwrap();
+        let result = forker.call_committing(&[0u8; 20], &[0u8; 21], &[], U256::ZERO);
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!")
+        );
+    }
+
+    #[test]
+    fn test_call_committing_both_addresses_invalid() {
+        let mut forker = Forker::new().unwrap();
+        let result = forker.call_committing(&[], &[], &[], U256::ZERO);
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "invalid address!")
+        );
+    }
+
+    #[test]
+    fn test_roll_fork_no_active_fork() {
+        let mut forker = Forker::new().unwrap();
+        let result = forker.roll_fork(None, None);
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "no active fork!")
+        );
+    }
+
+    #[test]
+    fn test_roll_fork_no_active_fork_with_block_number() {
+        let mut forker = Forker::new().unwrap();
+        let result = forker.roll_fork(Some(100), None);
+        assert!(
+            matches!(result, Err(ForkCallError::ExecutorError(ref msg)) if msg == "no active fork!")
+        );
+    }
+
+    /// Forker::new() creates a valid empty forker, and add_or_select on an
+    /// empty forker populates it via the is_empty branch.
+    #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+    async fn test_forker_new_then_add_or_select() {
+        let local_evm = LocalEvm::new().await;
+        let deployer = *local_evm.deployer.address();
+        let mut forker = Forker::new().unwrap();
+        assert!(forker.forks.is_empty());
+
+        forker
+            .add_or_select(
+                NewForkedEvm {
+                    fork_url: local_evm.url(),
+                    fork_block_number: None,
+                },
+                None,
+            )
+            .await
+            .unwrap();
+
+        assert!(!forker.forks.is_empty());
+
+        // Verify the fork is usable by making a call.
+        let call = IERC165::supportsInterfaceCall {
+            interfaceId: alloy::primitives::FixedBytes([0x01, 0xff, 0xc9, 0xa7]),
+        };
+        let result = forker
+            .alloy_call(Address::default(), deployer, call, false)
+            .await
+            .unwrap();
+        assert!(result.typed_return);
     }
 }

@@ -5,16 +5,16 @@ pragma solidity ^0.8.25;
 /// @dev Workaround for https://github.com/foundry-rs/foundry/issues/6572
 contract ErrParse {}
 
-/// Thrown when parsing a source string and an operand opening `<` paren is found
-/// somewhere that we don't expect it or can't handle it.
+/// @notice Thrown when parsing a source string and an operand opening `<` paren
+/// is found somewhere that we don't expect it or can't handle it.
 error UnexpectedOperand();
 
-/// Thrown when there are more operand values in the operand than the handler
-/// is expecting.
+/// @notice Thrown when there are more operand values in the operand than the
+/// handler is expecting.
 error UnexpectedOperandValue();
 
-/// Thrown when parsing an operand and some required component of the operand is
-/// not found in the source string.
+/// @notice Thrown when parsing an operand and some required component of the
+/// operand is not found in the source string.
 error ExpectedOperand();
 
 /// @notice Thrown when the number of values encountered in a single operand parsing is
@@ -117,24 +117,28 @@ error WordSize(string word);
 /// @param word The word that was not found.
 error UnknownWord(string word);
 
-/// The parser exceeded the maximum number of sources that it can build.
+/// @notice The parser exceeded the maximum number of sources that it can build.
 error MaxSources();
 
-/// The parser encountered a dangling source. This is a bug in the parser.
+/// @notice The parser encountered a dangling source. This is a bug in the parser.
 error DanglingSource();
 
-/// The parser moved past the end of the data.
+/// @notice The parser moved past the end of the data. Defensive guard only — all
+/// sub-parsers (parseInterstitial, parseLHS, parseRHS) receive `end` and
+/// respect it, so this condition is unreachable under normal operation. It
+/// exists to catch internal sub-parser bugs that advance the cursor past
+/// `end`. Cannot be tested without mocking a sub-parser to force overshoot.
 error ParserOutOfBounds();
 
-/// The parser encountered a stack deeper than it can process in the memory
-/// region allocated for stack names.
+/// @notice The parser encountered a stack deeper than it can process in the
+/// memory region allocated for stack names.
 error ParseStackOverflow();
 
-/// The parser encountered a stack underflow.
+/// @notice The parser encountered a stack underflow.
 error ParseStackUnderflow();
 
-/// The parser encountered a paren group deeper than it can process in the
-/// memory region allocated for paren tracking.
+/// @notice The parser encountered a paren group deeper than it can process in
+/// the memory region allocated for paren tracking.
 error ParenOverflow();
 
 /// @notice The parser did not find any whitespace after the pragma keyword.
@@ -162,7 +166,7 @@ error BadSubParserResult(bytes bytecode);
 /// @param offset The byte offset in the source where the error occurred.
 error OpcodeIOOverflow(uint256 offset);
 
-/// Thrown when an operand value is larger than the maximum allowed.
+/// @notice Thrown when an operand value is larger than the maximum allowed.
 error OperandOverflow();
 
 /// @notice The parser's free memory pointer exceeded 0x10000, which would corrupt
@@ -170,14 +174,30 @@ error OperandOverflow();
 /// @param freeMemoryPointer The free memory pointer value that exceeded the limit.
 error ParseMemoryOverflow(uint256 freeMemoryPointer);
 
-/// A single top-level item exceeded 255 opcodes. The per-item byte counter
-/// would silently wrap, corrupting source bytecode.
+/// @notice A single top-level item exceeded 255 opcodes. The per-item byte
+/// counter would silently wrap, corrupting source bytecode.
 error SourceItemOpsOverflow();
 
-/// A paren group exceeded 255 inputs. The per-paren byte counter would
-/// silently wrap, corrupting operand data.
+/// @notice The total number of opcodes across all top-level items in a single
+/// source exceeded 255. The source prefix byte can only represent 0-255.
+error SourceTotalOpsOverflow();
+
+/// @notice A paren group exceeded 255 inputs. The per-paren byte counter
+/// would silently wrap, corrupting operand data.
 error ParenInputOverflow();
 
-/// A single line exceeded the maximum number of RHS top-level items that
-/// can be tracked in the 256-bit lineTracker (14 items).
+/// @notice A single line exceeded the maximum number of RHS top-level items
+/// that can be tracked in the 256-bit lineTracker (14 items).
 error LineRHSItemsOverflow();
+
+/// @notice Thrown when a numeric literal starts with `0X` (uppercase). Only
+/// lowercase `0x` is a valid hexadecimal prefix. Uppercase `0X` would
+/// otherwise silently parse as decimal zero.
+/// @param offset The byte offset in the source where the error occurred.
+error UppercaseHexPrefix(uint256 offset);
+
+/// @notice The number of LHS items overflowed the single-byte counter in
+/// `lineTracker` (per line) or `topLevel1` (per source). Maximum 255 LHS
+/// items per line and per source.
+/// @param offset The byte offset in the source where the error occurred.
+error LHSItemCountOverflow(uint256 offset);

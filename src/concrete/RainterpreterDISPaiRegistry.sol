@@ -14,27 +14,27 @@ import {ERC165} from "openzeppelin-contracts/contracts/utils/introspection/ERC16
 /// address.
 contract RainterpreterDISPaiRegistry is IDISPaiRegistry, ERC165 {
     /// @inheritdoc ERC165
-    function supportsInterface(bytes4 interfaceId) public view override returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(IDISPaiRegistry).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /// @inheritdoc IDISPaiRegistry
-    function expressionDeployerAddress() external pure override returns (address) {
+    function expressionDeployerAddress() external pure virtual override returns (address) {
         return LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS;
     }
 
     /// @inheritdoc IDISPaiRegistry
-    function interpreterAddress() external pure override returns (address) {
+    function interpreterAddress() external pure virtual override returns (address) {
         return LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS;
     }
 
     /// @inheritdoc IDISPaiRegistry
-    function storeAddress() external pure override returns (address) {
+    function storeAddress() external pure virtual override returns (address) {
         return LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS;
     }
 
     /// @inheritdoc IDISPaiRegistry
-    function parserAddress() external pure override returns (address) {
+    function parserAddress() external pure virtual override returns (address) {
         return LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS;
     }
 }

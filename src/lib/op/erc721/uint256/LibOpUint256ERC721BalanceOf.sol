@@ -12,7 +12,10 @@ import {NotAnAddress} from "../../../../error/ErrRainType.sol";
 /// @title LibOpUint256ERC721BalanceOf
 /// @notice Opcode for getting the current erc721 balance of an account.
 library LibOpUint256ERC721BalanceOf {
-    /// `uint256-erc721-balance-of` integrity check. Requires 2 inputs and produces 1 output.
+    /// @notice `uint256-erc721-balance-of` integrity check. Requires 2 inputs
+    /// and produces 1 output.
+    /// @return The number of inputs.
+    /// @return The number of outputs.
     function integrity(IntegrityCheckState memory, OperandV2) internal pure returns (uint256, uint256) {
         // Always 2 inputs, the token and the account.
         // Always 1 output, the balance.

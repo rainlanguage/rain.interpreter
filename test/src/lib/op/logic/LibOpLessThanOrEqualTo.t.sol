@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {OpTest} from "test/abstract/OpTest.sol";
+import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpLessThanOrEqualTo} from "src/lib/op/logic/LibOpLessThanOrEqualTo.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {
@@ -186,5 +186,10 @@ contract LibOpLessThanOrEqualToTest is OpTest {
 
     function testOpLessThanOrEqualToTwoOutputs() external {
         checkBadOutputs("_ _: less-than-or-equal-to(1 2);", 2, 1, 2);
+    }
+
+    /// Test that operand is disallowed.
+    function testOpLessThanOrEqualToEvalOperandDisallowed() external {
+        checkUnhappyParse("_: less-than-or-equal-to<0>(1 2);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

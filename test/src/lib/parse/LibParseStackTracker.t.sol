@@ -68,6 +68,16 @@ contract LibParseStackTrackerTest is Test {
         assertEq((result >> 8) & 0xFF, uint256(existingInputs) + uint256(n));
     }
 
+    /// pushInputs reverts with ParseStackOverflow when the internal push
+    /// overflows (current + n > 0xFF), before the inputs check is reached.
+    function testPushInputsPushOverflow(uint8 current, uint8 n) external {
+        vm.assume(uint256(current) + uint256(n) > 0xFF);
+        // Inputs byte is 0 so the inputs check would pass — overflow must
+        // come from push(n).
+        vm.expectRevert(abi.encodeWithSelector(ParseStackOverflow.selector));
+        this.externalPushInputs(uint256(current), uint256(n));
+    }
+
     /// push updates high watermark when current + n exceeds previous max.
     function testPushUpdatesHighWatermark(uint8 n) external pure {
         vm.assume(n > 0);

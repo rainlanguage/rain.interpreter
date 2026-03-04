@@ -17,7 +17,8 @@ import {IInterpreterExternV4, LibExtern, EncodedExternDispatchV2} from "../exter
 import {
     ExternDispatchConstantsHeightOverflow,
     ConstantOpcodeConstantsHeightOverflow,
-    ContextGridOverflow
+    ContextGridOverflow,
+    SubParseLiteralDispatchLengthOverflow
 } from "../../error/ErrSubParse.sol";
 import {LibMemCpy} from "rain.solmem/lib/LibMemCpy.sol";
 import {LibParseError} from "./LibParseError.sol";
@@ -50,7 +51,7 @@ library LibSubParse {
         pure
         returns (bool, bytes memory, bytes32[] memory)
     {
-        if (column > 0xFF || row > 0xFF) {
+        if (column > type(uint8).max || row > type(uint8).max) {
             revert ContextGridOverflow(column, row);
         }
         bytes memory bytecode;
@@ -98,7 +99,7 @@ library LibSubParse {
         pure
         returns (bool, bytes memory, bytes32[] memory)
     {
-        if (constantsHeight > 0xFFFF) {
+        if (constantsHeight > type(uint16).max) {
             revert ConstantOpcodeConstantsHeightOverflow(constantsHeight);
         }
         // Build a constant opcode that the interpreter will run itself.
@@ -168,7 +169,7 @@ library LibSubParse {
         // The constants height is an error check because the main parser can
         // provide two bytes for it. Everything else is expected to be more
         // directly controlled by the subparser itself.
-        if (constantsHeight > 0xFFFF) {
+        if (constantsHeight > type(uint16).max) {
             revert ExternDispatchConstantsHeightOverflow(constantsHeight);
         }
         // Build an extern call that dials back into the current contract at eval
@@ -222,7 +223,7 @@ library LibSubParse {
                 if (memoryAtCursor >> 0xf8 == OPCODE_UNKNOWN) {
                     bytes32 deref = state.subParsers;
                     while (deref != 0) {
-                        ISubParserV4 subParser = ISubParserV4(address(uint160(uint256((deref)))));
+                        ISubParserV4 subParser = ISubParserV4(address(uint160(uint256(deref))));
                         assembly ("memory-safe") {
                             deref := mload(shr(0xf0, deref))
                         }
@@ -359,12 +360,17 @@ library LibSubParse {
             {
                 uint256 copyPointer;
                 uint256 dispatchLength = dispatchEnd - dispatchStart;
+                if (dispatchLength > type(uint16).max) {
+                    revert SubParseLiteralDispatchLengthOverflow(dispatchLength);
+                }
                 uint256 bodyLength = bodyEnd - bodyStart;
                 {
                     uint256 dataLength = 2 + dispatchLength + bodyLength;
                     assembly ("memory-safe") {
                         data := mload(0x40)
-                        mstore(0x40, add(data, add(dataLength, 0x20)))
+                        // Round up to 32-byte alignment to maintain
+                        // Solidity's free memory pointer invariant.
+                        mstore(0x40, and(add(add(data, add(dataLength, 0x20)), 0x1f), not(0x1f)))
                         mstore(add(data, 2), dispatchLength)
                         mstore(data, dataLength)
                         copyPointer := add(data, 0x22)

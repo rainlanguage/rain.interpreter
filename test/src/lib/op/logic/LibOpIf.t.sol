@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {OpTest} from "test/abstract/OpTest.sol";
+import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpIf} from "src/lib/op/logic/LibOpIf.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
@@ -138,5 +138,10 @@ contract LibOpIfTest is OpTest {
 
     function testOpIfEvalTwoOutputs() external {
         checkBadOutputs("_ _: if(5 0 0);", 3, 1, 2);
+    }
+
+    /// Test that operand is disallowed.
+    function testOpIfEvalOperandDisallowed() external {
+        checkUnhappyParse("_: if<0>(1 2 3);", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

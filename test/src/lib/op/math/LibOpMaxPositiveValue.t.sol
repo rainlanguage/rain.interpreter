@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {OpTest} from "test/abstract/OpTest.sol";
+import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibOpMaxPositiveValue} from "src/lib/op/math/LibOpMaxPositiveValue.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
@@ -66,5 +66,10 @@ contract LibOpMaxPositiveValueTest is OpTest {
 
     function testOpMaxPositiveValueTwoOutputs() external {
         checkBadOutputs("_ _: max-positive-value();", 0, 1, 2);
+    }
+
+    /// Test that operand is disallowed.
+    function testOpMaxPositiveValueEvalOperandDisallowed() external {
+        checkUnhappyParse("_: max-positive-value<0>();", abi.encodeWithSelector(UnexpectedOperand.selector));
     }
 }

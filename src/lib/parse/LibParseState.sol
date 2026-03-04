@@ -20,6 +20,7 @@ import {
     InvalidSubParser,
     OpcodeIOOverflow,
     SourceItemOpsOverflow,
+    SourceTotalOpsOverflow,
     ParenInputOverflow,
     LineRHSItemsOverflow
 } from "../../error/ErrParse.sol";
@@ -76,6 +77,12 @@ uint256 constant PARSE_STATE_PAREN_TRACKER0_OFFSET = 0x60;
 /// @dev Byte offset of `lineTracker` within a memory `ParseState` struct.
 /// Used in assembly to snapshot source head pointers per line.
 uint256 constant PARSE_STATE_LINE_TRACKER_OFFSET = 0xa0;
+
+/// @dev Maximum RHS offset value. The RHS offset is stored as a single
+/// byte within the topLevel0 field but shares the word with other packed
+/// fields, so it must not exceed 62 (0x3e). The check uses >= 0x3f (63)
+/// to reject offset 63 and above.
+uint256 constant MAX_STACK_RHS_OFFSET = 0x3f;
 
 /// @notice The parser is stateful. This struct keeps track of the entire state.
 /// @param activeSourcePtr The pointer to the current source being built.
@@ -182,6 +189,8 @@ struct ParseState {
     bytes meta;
 }
 
+/// @title LibParseState
+/// @notice Utilities for constructing and managing `ParseState` during parsing.
 library LibParseState {
     using LibParseState for ParseState;
     using LibParseStackTracker for ParseStackTracker;
@@ -531,10 +540,7 @@ library LibParseState {
                 newStackRHSOffset := add(byte(0, mload(stackRHSOffsetPtr)), 1)
                 mstore8(stackRHSOffsetPtr, newStackRHSOffset)
             }
-            // 0x3f = 63: the RHS offset is stored as a single byte within
-            // the topLevel0 field, but shares the word with other packed
-            // fields, so it must not exceed 62 (0x3e).
-            if (newStackRHSOffset >= 0x3f) {
+            if (newStackRHSOffset >= MAX_STACK_RHS_OFFSET) {
                 revert ParseStackOverflow();
             }
         }
@@ -787,6 +793,7 @@ library LibParseState {
         // evaluated correctly similar to reverse polish notation.
         else {
             uint256 source;
+            bool totalOpsOverflow;
             ParseStackTracker stackTracker = state.stackTracker;
             uint256 cursor = state.activeSourcePtr;
             uint256 topLevel0DataOffset = PARSE_STATE_TOP_LEVEL0_DATA_OFFSET;
@@ -864,6 +871,11 @@ library LibParseState {
                         }
                     }
                 }
+                // The total ops count across all top-level items must
+                // fit in a single byte. `length` includes the 4-byte
+                // prefix, so `div(length, 4) - 1` is the opcode count.
+                totalOpsOverflow := gt(sub(div(length, 4), 1), 0xFF)
+
                 // Store the bytes length in the source.
                 mstore(source, length)
                 // Store the opcodes length and stack tracker in the source
@@ -879,6 +891,9 @@ library LibParseState {
 
                 // Round up to the nearest 32 bytes to realign memory.
                 mstore(0x40, and(add(writeCursor, 0x1f), not(0x1f)))
+            }
+            if (totalOpsOverflow) {
+                revert SourceTotalOpsOverflow();
             }
 
             //slither-disable-next-line incorrect-shift
@@ -1029,7 +1044,7 @@ library LibParseState {
         }
     }
 
-    /// The parse system packs memory pointers into 16 bits throughout its
+    /// @notice The parse system packs memory pointers into 16 bits throughout its
     /// linked list structures (active source slots, paren tracker, line
     /// tracker, sources builder, constants builder, stack names). This is
     /// safe as long as all memory allocated during parsing stays below
