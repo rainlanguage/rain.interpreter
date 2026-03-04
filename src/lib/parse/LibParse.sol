@@ -158,6 +158,7 @@ library LibParse {
                     // Named stack item.
                     if (char & CMASK_IDENTIFIER_HEAD > 0) {
                         (cursor, word) = parseWord(cursor, end, CMASK_LHS_STACK_TAIL);
+                        // slither-disable-next-line unused-return
                         (bool exists,) = state.pushStackName(word);
                         // If the stack name already exists, then we
                         // revert as shadowing is not allowed.
