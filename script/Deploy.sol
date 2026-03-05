@@ -37,6 +37,10 @@ bytes32 constant DEPLOYMENT_SUITE_DISPAIR_REGISTRY = keccak256("dispair-registry
 /// creation code from the generated pointers files rather than compiling
 /// contracts at deploy time.
 contract Deploy is Script {
+    /// Storage mapping required by the `LibRainDeploy.deployAndBroadcast` API
+    /// to record dependency code hashes across networks.
+    mapping(string => mapping(address => bytes32)) internal sDepCodeHashes;
+
     /// Deploys the component selected by the `DEPLOYMENT_SUITE` env var.
     /// Reverts if the suite is not recognised.
     function run() external {
@@ -49,7 +53,7 @@ contract Deploy is Script {
 
         if (suite == DEPLOYMENT_SUITE_PARSER) {
             console2.log("Deploying RainterpreterParser...");
-            LibRainDeploy.deployAndBroadcastToSupportedNetworks(
+            LibRainDeploy.deployAndBroadcast(
                 vm,
                 LibRainDeploy.supportedNetworks(),
                 deployerPrivateKey,
@@ -57,11 +61,12 @@ contract Deploy is Script {
                 "src/concrete/RainterpreterParser.sol:RainterpreterParser",
                 LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS,
                 LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH,
-                deps
+                deps,
+                sDepCodeHashes
             );
         } else if (suite == DEPLOYMENT_SUITE_STORE) {
             console2.log("Deploying RainterpreterStore...");
-            LibRainDeploy.deployAndBroadcastToSupportedNetworks(
+            LibRainDeploy.deployAndBroadcast(
                 vm,
                 LibRainDeploy.supportedNetworks(),
                 deployerPrivateKey,
@@ -69,14 +74,15 @@ contract Deploy is Script {
                 "src/concrete/RainterpreterStore.sol:RainterpreterStore",
                 LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS,
                 LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH,
-                deps
+                deps,
+                sDepCodeHashes
             );
         } else if (suite == DEPLOYMENT_SUITE_INTERPRETER) {
             console2.log("Deploying Rainterpreter...");
             address[] memory interpreterDeps = new address[](2);
             interpreterDeps[0] = LibDecimalFloatDeploy.ZOLTU_DEPLOYED_LOG_TABLES_ADDRESS;
             interpreterDeps[1] = address(LibTOFUTokenDecimals.TOFU_DECIMALS_DEPLOYMENT);
-            LibRainDeploy.deployAndBroadcastToSupportedNetworks(
+            LibRainDeploy.deployAndBroadcast(
                 vm,
                 LibRainDeploy.supportedNetworks(),
                 deployerPrivateKey,
@@ -84,7 +90,8 @@ contract Deploy is Script {
                 "src/concrete/Rainterpreter.sol:Rainterpreter",
                 LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS,
                 LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH,
-                interpreterDeps
+                interpreterDeps,
+                sDepCodeHashes
             );
         } else if (suite == DEPLOYMENT_SUITE_EXPRESSION_DEPLOYER) {
             console2.log("Deploying RainterpreterExpressionDeployer...");
@@ -94,7 +101,7 @@ contract Deploy is Script {
             deployerDeps[2] = LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS;
             deployerDeps[3] = LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS;
             deployerDeps[4] = LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS;
-            LibRainDeploy.deployAndBroadcastToSupportedNetworks(
+            LibRainDeploy.deployAndBroadcast(
                 vm,
                 LibRainDeploy.supportedNetworks(),
                 deployerPrivateKey,
@@ -102,7 +109,8 @@ contract Deploy is Script {
                 "src/concrete/RainterpreterExpressionDeployer.sol:RainterpreterExpressionDeployer",
                 LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS,
                 LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH,
-                deployerDeps
+                deployerDeps,
+                sDepCodeHashes
             );
         } else if (suite == DEPLOYMENT_SUITE_DISPAIR_REGISTRY) {
             console2.log("Deploying RainterpreterDISPaiRegistry...");
@@ -112,7 +120,7 @@ contract Deploy is Script {
             registryDeps[2] = LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS;
             registryDeps[3] = LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS;
             registryDeps[4] = LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS;
-            LibRainDeploy.deployAndBroadcastToSupportedNetworks(
+            LibRainDeploy.deployAndBroadcast(
                 vm,
                 LibRainDeploy.supportedNetworks(),
                 deployerPrivateKey,
@@ -120,7 +128,8 @@ contract Deploy is Script {
                 "src/concrete/RainterpreterDISPaiRegistry.sol:RainterpreterDISPaiRegistry",
                 LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_ADDRESS,
                 LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_CODEHASH,
-                registryDeps
+                registryDeps,
+                sDepCodeHashes
             );
         } else {
             revert UnknownDeploymentSuite(suite);

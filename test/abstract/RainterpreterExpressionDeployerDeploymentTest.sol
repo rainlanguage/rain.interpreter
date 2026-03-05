@@ -41,7 +41,7 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
     constructor() {
         beforeOpTestConstructor();
 
-        vm.etch(LibRainDeploy.ZOLTU_FACTORY, hex"60003681823780368234f58015156014578182fd5b80825250506014600cf3");
+        LibRainDeploy.etchZoltuFactory(vm);
 
         if (LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH != LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS.codehash) {
             console2.log("Deploying Parser");

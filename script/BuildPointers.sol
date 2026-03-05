@@ -17,24 +17,41 @@ import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
 import {LibCodeGen} from "rain.sol.codegen/lib/LibCodeGen.sol";
 import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";
 import {LibFs} from "rain.sol.codegen/lib/LibFs.sol";
+import {LibRainDeploy} from "rain.deploy/lib/LibRainDeploy.sol";
 
 /// @title BuildPointers
 /// @notice Forge script that generates Solidity source files containing
 /// precomputed constant values (bytecode hashes, function pointer tables,
-/// parse meta) for each concrete contract. Run via `forge script` during the
-/// build step. Each `build*` function deploys the contract in a local EVM,
-/// extracts its runtime pointers, and writes a `.pointers.sol` file into
-/// `src/generated/`.
+/// parse meta, deterministic deploy addresses) for each concrete contract.
+/// Run via `forge script` during the build step. Each `build*` function
+/// deploys the contract via the Zoltu factory in a local EVM, extracts its
+/// runtime pointers, and writes a `.pointers.sol` file into `src/generated/`.
 contract BuildPointers is Script {
+    /// Generates a Solidity address constant declaration string.
+    /// @param addr The address value.
+    /// @return A string containing the Solidity code for the address constant.
+    function addressConstantString(address addr) internal view returns (string memory) {
+        return string.concat(
+            "\n",
+            "/// @dev The deterministic deploy address of the contract when deployed via\n",
+            "/// the Zoltu factory.\n",
+            "address constant DEPLOYED_ADDRESS = address(",
+            vm.toString(addr),
+            ");\n"
+        );
+    }
+
     /// Builds the Rainterpreter opcode function pointer table.
     function buildRainterpreterPointers() internal {
-        Rainterpreter interpreter = new Rainterpreter();
+        address deployed = LibRainDeploy.deployZoltu(type(Rainterpreter).creationCode);
+        Rainterpreter interpreter = Rainterpreter(deployed);
 
         LibFs.buildFileForContract(
             vm,
-            address(interpreter),
+            deployed,
             "Rainterpreter",
             string.concat(
+                addressConstantString(deployed),
                 LibCodeGen.bytesConstantString(
                     vm,
                     "/// @dev The creation bytecode of the contract.",
@@ -48,17 +65,20 @@ contract BuildPointers is Script {
 
     /// Builds the RainterpreterStore pointer file.
     function buildRainterpreterStorePointers() internal {
-        RainterpreterStore store = new RainterpreterStore();
+        address deployed = LibRainDeploy.deployZoltu(type(RainterpreterStore).creationCode);
 
         LibFs.buildFileForContract(
             vm,
-            address(store),
+            deployed,
             "RainterpreterStore",
-            LibCodeGen.bytesConstantString(
-                vm,
-                "/// @dev The creation bytecode of the contract.",
-                "CREATION_CODE",
-                type(RainterpreterStore).creationCode
+            string.concat(
+                addressConstantString(deployed),
+                LibCodeGen.bytesConstantString(
+                    vm,
+                    "/// @dev The creation bytecode of the contract.",
+                    "CREATION_CODE",
+                    type(RainterpreterStore).creationCode
+                )
             )
         );
     }
@@ -67,13 +87,15 @@ contract BuildPointers is Script {
     /// (generated from `authoringMetaV2`), operand handler pointers, and
     /// literal parser pointers.
     function buildRainterpreterParserPointers() internal {
-        RainterpreterParser parser = new RainterpreterParser();
+        address deployed = LibRainDeploy.deployZoltu(type(RainterpreterParser).creationCode);
+        RainterpreterParser parser = RainterpreterParser(deployed);
 
         LibFs.buildFileForContract(
             vm,
-            address(parser),
+            deployed,
             "RainterpreterParser",
             string.concat(
+                addressConstantString(deployed),
                 LibCodeGen.bytesConstantString(
                     vm,
                     "/// @dev The creation bytecode of the contract.",
@@ -92,15 +114,17 @@ contract BuildPointers is Script {
     /// Builds the RainterpreterExpressionDeployer pointer file including
     /// the described-by meta hash and integrity function pointers.
     function buildRainterpreterExpressionDeployerPointers() internal {
-        RainterpreterExpressionDeployer deployer = new RainterpreterExpressionDeployer();
+        address deployed = LibRainDeploy.deployZoltu(type(RainterpreterExpressionDeployer).creationCode);
+        RainterpreterExpressionDeployer deployer = RainterpreterExpressionDeployer(deployed);
 
         string memory name = "RainterpreterExpressionDeployer";
 
         LibFs.buildFileForContract(
             vm,
-            address(deployer),
+            deployed,
             name,
             string.concat(
+                addressConstantString(deployed),
                 LibCodeGen.bytesConstantString(
                     vm,
                     "/// @dev The creation bytecode of the contract.",
@@ -117,16 +141,18 @@ contract BuildPointers is Script {
     /// described-by meta hash, parse meta, sub-parser word parsers, operand
     /// handlers, literal parsers, integrity pointers, and opcode pointers.
     function buildRainterpreterReferenceExternPointers() internal {
-        RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();
+        address deployed = LibRainDeploy.deployZoltu(type(RainterpreterReferenceExtern).creationCode);
+        RainterpreterReferenceExtern extern = RainterpreterReferenceExtern(deployed);
 
         string memory name = "RainterpreterReferenceExtern";
 
         LibFs.buildFileForContract(
             vm,
-            address(extern),
+            deployed,
             name,
             string.concat(
                 string.concat(
+                    addressConstantString(deployed),
                     LibCodeGen.bytesConstantString(
                         vm,
                         "/// @dev The creation bytecode of the contract.",
@@ -151,23 +177,28 @@ contract BuildPointers is Script {
 
     /// Builds the RainterpreterDISPaiRegistry pointer file.
     function buildRainterpreterDISPaiRegistryPointers() internal {
-        RainterpreterDISPaiRegistry registry = new RainterpreterDISPaiRegistry();
+        address deployed = LibRainDeploy.deployZoltu(type(RainterpreterDISPaiRegistry).creationCode);
 
         LibFs.buildFileForContract(
             vm,
-            address(registry),
+            deployed,
             "RainterpreterDISPaiRegistry",
-            LibCodeGen.bytesConstantString(
-                vm,
-                "/// @dev The creation bytecode of the contract.",
-                "CREATION_CODE",
-                type(RainterpreterDISPaiRegistry).creationCode
+            string.concat(
+                addressConstantString(deployed),
+                LibCodeGen.bytesConstantString(
+                    vm,
+                    "/// @dev The creation bytecode of the contract.",
+                    "CREATION_CODE",
+                    type(RainterpreterDISPaiRegistry).creationCode
+                )
             )
         );
     }
 
-    /// Entry point. Builds all pointer files.
+    /// Entry point. Etches the Zoltu factory and builds all pointer files.
     function run() external {
+        LibRainDeploy.etchZoltuFactory(vm);
+
         buildRainterpreterPointers();
         buildRainterpreterStorePointers();
         buildRainterpreterParserPointers();

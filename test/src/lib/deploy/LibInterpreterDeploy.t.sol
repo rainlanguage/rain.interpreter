@@ -13,13 +13,26 @@ import {RainterpreterDISPaiRegistry} from "src/concrete/RainterpreterDISPaiRegis
 import {LibExtrospectBytecode} from "rain.extrospection/lib/LibExtrospectBytecode.sol";
 import {LibExtrospectMetamorphic} from "rain.extrospection/lib/LibExtrospectMetamorphic.sol";
 import {RainterpreterReferenceExtern} from "src/concrete/extern/RainterpreterReferenceExtern.sol";
-import {CREATION_CODE as PARSER_CREATION_CODE} from "src/generated/RainterpreterParser.pointers.sol";
-import {CREATION_CODE as STORE_CREATION_CODE} from "src/generated/RainterpreterStore.pointers.sol";
-import {CREATION_CODE as INTERPRETER_CREATION_CODE} from "src/generated/Rainterpreter.pointers.sol";
 import {
-    CREATION_CODE as EXPRESSION_DEPLOYER_CREATION_CODE
+    CREATION_CODE as PARSER_CREATION_CODE,
+    DEPLOYED_ADDRESS as PARSER_GENERATED_ADDRESS
+} from "src/generated/RainterpreterParser.pointers.sol";
+import {
+    CREATION_CODE as STORE_CREATION_CODE,
+    DEPLOYED_ADDRESS as STORE_GENERATED_ADDRESS
+} from "src/generated/RainterpreterStore.pointers.sol";
+import {
+    CREATION_CODE as INTERPRETER_CREATION_CODE,
+    DEPLOYED_ADDRESS as INTERPRETER_GENERATED_ADDRESS
+} from "src/generated/Rainterpreter.pointers.sol";
+import {
+    CREATION_CODE as EXPRESSION_DEPLOYER_CREATION_CODE,
+    DEPLOYED_ADDRESS as EXPRESSION_DEPLOYER_GENERATED_ADDRESS
 } from "src/generated/RainterpreterExpressionDeployer.pointers.sol";
-import {CREATION_CODE as DISPAIR_REGISTRY_CREATION_CODE} from "src/generated/RainterpreterDISPaiRegistry.pointers.sol";
+import {
+    CREATION_CODE as DISPAIR_REGISTRY_CREATION_CODE,
+    DEPLOYED_ADDRESS as DISPAIR_REGISTRY_GENERATED_ADDRESS
+} from "src/generated/RainterpreterDISPaiRegistry.pointers.sol";
 import {CREATION_CODE as REFERENCE_EXTERN_CREATION_CODE} from "src/generated/RainterpreterReferenceExtern.pointers.sol";
 
 contract LibInterpreterDeployTest is Test {
@@ -225,5 +238,35 @@ contract LibInterpreterDeployTest is Test {
     /// match the compiler's creation code.
     function testCreationCodeReferenceExtern() external pure {
         assertEq(keccak256(REFERENCE_EXTERN_CREATION_CODE), keccak256(type(RainterpreterReferenceExtern).creationCode));
+    }
+
+    /// The generated deployed address for the parser MUST match the deploy
+    /// library constant.
+    function testGeneratedDeployedAddressParser() external pure {
+        assertEq(PARSER_GENERATED_ADDRESS, LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS);
+    }
+
+    /// The generated deployed address for the store MUST match the deploy
+    /// library constant.
+    function testGeneratedDeployedAddressStore() external pure {
+        assertEq(STORE_GENERATED_ADDRESS, LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS);
+    }
+
+    /// The generated deployed address for the interpreter MUST match the
+    /// deploy library constant.
+    function testGeneratedDeployedAddressInterpreter() external pure {
+        assertEq(INTERPRETER_GENERATED_ADDRESS, LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS);
+    }
+
+    /// The generated deployed address for the expression deployer MUST match
+    /// the deploy library constant.
+    function testGeneratedDeployedAddressExpressionDeployer() external pure {
+        assertEq(EXPRESSION_DEPLOYER_GENERATED_ADDRESS, LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS);
+    }
+
+    /// The generated deployed address for the DISPaiRegistry MUST match the
+    /// deploy library constant.
+    function testGeneratedDeployedAddressDISPaiRegistry() external pure {
+        assertEq(DISPAIR_REGISTRY_GENERATED_ADDRESS, LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_ADDRESS);
     }
 }
