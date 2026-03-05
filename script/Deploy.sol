@@ -3,16 +3,18 @@
 pragma solidity =0.8.25;
 
 import {Script, console2} from "forge-std/Script.sol";
-import {RainterpreterStore} from "../src/concrete/RainterpreterStore.sol";
-import {Rainterpreter} from "../src/concrete/Rainterpreter.sol";
-import {RainterpreterParser} from "../src/concrete/RainterpreterParser.sol";
 import {LibRainDeploy} from "rain.deploy/lib/LibRainDeploy.sol";
 import {LibInterpreterDeploy} from "../src/lib/deploy/LibInterpreterDeploy.sol";
 import {LibDecimalFloatDeploy} from "rain.math.float/lib/deploy/LibDecimalFloatDeploy.sol";
-import {RainterpreterExpressionDeployer} from "../src/concrete/RainterpreterExpressionDeployer.sol";
-import {RainterpreterDISPaiRegistry} from "../src/concrete/RainterpreterDISPaiRegistry.sol";
 import {UnknownDeploymentSuite} from "../src/error/ErrDeploy.sol";
 import {LibTOFUTokenDecimals} from "rain.tofu.erc20-decimals/lib/LibTOFUTokenDecimals.sol";
+import {CREATION_CODE as PARSER_CREATION_CODE} from "../src/generated/RainterpreterParser.pointers.sol";
+import {CREATION_CODE as STORE_CREATION_CODE} from "../src/generated/RainterpreterStore.pointers.sol";
+import {CREATION_CODE as INTERPRETER_CREATION_CODE} from "../src/generated/Rainterpreter.pointers.sol";
+import {CREATION_CODE as EXPRESSION_DEPLOYER_CREATION_CODE} from
+    "../src/generated/RainterpreterExpressionDeployer.pointers.sol";
+import {CREATION_CODE as DISPAIR_REGISTRY_CREATION_CODE} from
+    "../src/generated/RainterpreterDISPaiRegistry.pointers.sol";
 
 /// @dev Deployment suite selector for the parser.
 bytes32 constant DEPLOYMENT_SUITE_PARSER = keccak256("parser");
@@ -28,8 +30,10 @@ bytes32 constant DEPLOYMENT_SUITE_DISPAIR_REGISTRY = keccak256("dispair-registry
 /// @title Deploy
 /// @notice Forge script that deploys a single interpreter component to all
 /// supported networks. The `DEPLOYMENT_SUITE` env var selects which component
-/// to deploy: "parser", "store", "interpreter", or "expression-deployer".
-/// Defaults to "parser" if not set.
+/// to deploy: "parser", "store", "interpreter", "expression-deployer", or
+/// "dispair-registry". Defaults to "parser" if not set. Uses precompiled
+/// creation code from the generated pointers files rather than compiling
+/// contracts at deploy time.
 contract Deploy is Script {
     /// Deploys the component selected by the `DEPLOYMENT_SUITE` env var.
     /// Reverts if the suite is not recognised.
@@ -47,7 +51,7 @@ contract Deploy is Script {
                 vm,
                 LibRainDeploy.supportedNetworks(),
                 deployerPrivateKey,
-                type(RainterpreterParser).creationCode,
+                PARSER_CREATION_CODE,
                 "src/concrete/RainterpreterParser.sol:RainterpreterParser",
                 LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS,
                 LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH,
@@ -59,7 +63,7 @@ contract Deploy is Script {
                 vm,
                 LibRainDeploy.supportedNetworks(),
                 deployerPrivateKey,
-                type(RainterpreterStore).creationCode,
+                STORE_CREATION_CODE,
                 "src/concrete/RainterpreterStore.sol:RainterpreterStore",
                 LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS,
                 LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH,
@@ -74,7 +78,7 @@ contract Deploy is Script {
                 vm,
                 LibRainDeploy.supportedNetworks(),
                 deployerPrivateKey,
-                type(Rainterpreter).creationCode,
+                INTERPRETER_CREATION_CODE,
                 "src/concrete/Rainterpreter.sol:Rainterpreter",
                 LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS,
                 LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH,
@@ -92,7 +96,7 @@ contract Deploy is Script {
                 vm,
                 LibRainDeploy.supportedNetworks(),
                 deployerPrivateKey,
-                type(RainterpreterExpressionDeployer).creationCode,
+                EXPRESSION_DEPLOYER_CREATION_CODE,
                 "src/concrete/RainterpreterExpressionDeployer.sol:RainterpreterExpressionDeployer",
                 LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS,
                 LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH,
@@ -110,7 +114,7 @@ contract Deploy is Script {
                 vm,
                 LibRainDeploy.supportedNetworks(),
                 deployerPrivateKey,
-                type(RainterpreterDISPaiRegistry).creationCode,
+                DISPAIR_REGISTRY_CREATION_CODE,
                 "src/concrete/RainterpreterDISPaiRegistry.sol:RainterpreterDISPaiRegistry",
                 LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_ADDRESS,
                 LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_CODEHASH,

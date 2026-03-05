@@ -7,6 +7,7 @@ import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
 import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
 import {RainterpreterParser, PARSE_META_BUILD_DEPTH} from "src/concrete/RainterpreterParser.sol";
 import {RainterpreterExpressionDeployer} from "src/concrete/RainterpreterExpressionDeployer.sol";
+import {RainterpreterDISPaiRegistry} from "src/concrete/RainterpreterDISPaiRegistry.sol";
 import {
     RainterpreterReferenceExtern,
     LibRainterpreterReferenceExtern,
@@ -30,15 +31,36 @@ contract BuildPointers is Script {
         Rainterpreter interpreter = new Rainterpreter();
 
         LibFs.buildFileForContract(
-            vm, address(interpreter), "Rainterpreter", LibCodeGen.opcodeFunctionPointersConstantString(vm, interpreter)
+            vm,
+            address(interpreter),
+            "Rainterpreter",
+            string.concat(
+                LibCodeGen.bytesConstantString(
+                    vm,
+                    "/// @dev The creation bytecode of the contract.",
+                    "CREATION_CODE",
+                    type(Rainterpreter).creationCode
+                ),
+                LibCodeGen.opcodeFunctionPointersConstantString(vm, interpreter)
+            )
         );
     }
 
-    /// Builds the RainterpreterStore pointer file (no additional constants).
+    /// Builds the RainterpreterStore pointer file.
     function buildRainterpreterStorePointers() internal {
         RainterpreterStore store = new RainterpreterStore();
 
-        LibFs.buildFileForContract(vm, address(store), "RainterpreterStore", "");
+        LibFs.buildFileForContract(
+            vm,
+            address(store),
+            "RainterpreterStore",
+            LibCodeGen.bytesConstantString(
+                vm,
+                "/// @dev The creation bytecode of the contract.",
+                "CREATION_CODE",
+                type(RainterpreterStore).creationCode
+            )
+        );
     }
 
     /// Builds the RainterpreterParser pointer file including the parse meta
@@ -52,6 +74,12 @@ contract BuildPointers is Script {
             address(parser),
             "RainterpreterParser",
             string.concat(
+                LibCodeGen.bytesConstantString(
+                    vm,
+                    "/// @dev The creation bytecode of the contract.",
+                    "CREATION_CODE",
+                    type(RainterpreterParser).creationCode
+                ),
                 LibGenParseMeta.parseMetaConstantString(
                     vm, LibAllStandardOps.authoringMetaV2(), PARSE_META_BUILD_DEPTH
                 ),
@@ -73,6 +101,12 @@ contract BuildPointers is Script {
             address(deployer),
             name,
             string.concat(
+                LibCodeGen.bytesConstantString(
+                    vm,
+                    "/// @dev The creation bytecode of the contract.",
+                    "CREATION_CODE",
+                    type(RainterpreterExpressionDeployer).creationCode
+                ),
                 LibCodeGen.describedByMetaHashConstantString(vm, name),
                 LibCodeGen.integrityFunctionPointersConstantString(vm, deployer)
             )
@@ -93,16 +127,41 @@ contract BuildPointers is Script {
             name,
             string.concat(
                 string.concat(
+                    LibCodeGen.bytesConstantString(
+                        vm,
+                        "/// @dev The creation bytecode of the contract.",
+                        "CREATION_CODE",
+                        type(RainterpreterReferenceExtern).creationCode
+                    ),
                     LibCodeGen.describedByMetaHashConstantString(vm, name),
                     LibGenParseMeta.parseMetaConstantString(
                         vm, LibRainterpreterReferenceExtern.authoringMetaV2(), EXTERN_PARSE_META_BUILD_DEPTH
                     ),
                     LibCodeGen.subParserWordParsersConstantString(vm, extern),
                     LibCodeGen.operandHandlerFunctionPointersConstantString(vm, extern),
-                    LibCodeGen.literalParserFunctionPointersConstantString(vm, extern),
-                    LibCodeGen.integrityFunctionPointersConstantString(vm, extern)
+                    LibCodeGen.literalParserFunctionPointersConstantString(vm, extern)
                 ),
-                LibCodeGen.opcodeFunctionPointersConstantString(vm, extern)
+                string.concat(
+                    LibCodeGen.integrityFunctionPointersConstantString(vm, extern),
+                    LibCodeGen.opcodeFunctionPointersConstantString(vm, extern)
+                )
+            )
+        );
+    }
+
+    /// Builds the RainterpreterDISPaiRegistry pointer file.
+    function buildRainterpreterDISPaiRegistryPointers() internal {
+        RainterpreterDISPaiRegistry registry = new RainterpreterDISPaiRegistry();
+
+        LibFs.buildFileForContract(
+            vm,
+            address(registry),
+            "RainterpreterDISPaiRegistry",
+            LibCodeGen.bytesConstantString(
+                vm,
+                "/// @dev The creation bytecode of the contract.",
+                "CREATION_CODE",
+                type(RainterpreterDISPaiRegistry).creationCode
             )
         );
     }
@@ -114,5 +173,6 @@ contract BuildPointers is Script {
         buildRainterpreterParserPointers();
         buildRainterpreterExpressionDeployerPointers();
         buildRainterpreterReferenceExternPointers();
+        buildRainterpreterDISPaiRegistryPointers();
     }
 }
