@@ -87,7 +87,7 @@ library LibInterpreterDeploy {
     /// provides stronger guarantees than just checking the address.
     bytes32 constant DISPAIR_REGISTRY_DEPLOYED_CODEHASH = DISPAIR_REGISTRY_HASH;
 
-    /// Etches the runtime bytecode of the parser, store, interpreter,
+    /// @notice Etches the runtime bytecode of the parser, store, interpreter,
     /// expression deployer, and DISPair registry at their expected
     /// deterministic addresses. Skips any contract whose codehash already
     /// matches.

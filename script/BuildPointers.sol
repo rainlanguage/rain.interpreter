@@ -27,7 +27,7 @@ import {LibRainDeploy} from "rain.deploy/lib/LibRainDeploy.sol";
 /// deploys the contract via the Zoltu factory in a local EVM, extracts its
 /// runtime pointers, and writes a `.pointers.sol` file into `src/generated/`.
 contract BuildPointers is Script {
-    /// Generates a Solidity address constant declaration string.
+    /// @notice Generates a Solidity address constant declaration string.
     /// @param addr The address value.
     /// @return A string containing the Solidity code for the address constant.
     function addressConstantString(address addr) internal view returns (string memory) {
