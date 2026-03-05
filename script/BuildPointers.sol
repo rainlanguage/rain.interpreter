@@ -58,6 +58,9 @@ contract BuildPointers is Script {
                     "CREATION_CODE",
                     type(Rainterpreter).creationCode
                 ),
+                LibCodeGen.bytesConstantString(
+                    vm, "/// @dev The runtime bytecode of the contract.", "RUNTIME_CODE", deployed.code
+                ),
                 LibCodeGen.opcodeFunctionPointersConstantString(vm, interpreter)
             )
         );
@@ -78,6 +81,9 @@ contract BuildPointers is Script {
                     "/// @dev The creation bytecode of the contract.",
                     "CREATION_CODE",
                     type(RainterpreterStore).creationCode
+                ),
+                LibCodeGen.bytesConstantString(
+                    vm, "/// @dev The runtime bytecode of the contract.", "RUNTIME_CODE", deployed.code
                 )
             )
         );
@@ -101,6 +107,9 @@ contract BuildPointers is Script {
                     "/// @dev The creation bytecode of the contract.",
                     "CREATION_CODE",
                     type(RainterpreterParser).creationCode
+                ),
+                LibCodeGen.bytesConstantString(
+                    vm, "/// @dev The runtime bytecode of the contract.", "RUNTIME_CODE", deployed.code
                 ),
                 LibGenParseMeta.parseMetaConstantString(
                     vm, LibAllStandardOps.authoringMetaV2(), PARSE_META_BUILD_DEPTH
@@ -131,6 +140,9 @@ contract BuildPointers is Script {
                     "CREATION_CODE",
                     type(RainterpreterExpressionDeployer).creationCode
                 ),
+                LibCodeGen.bytesConstantString(
+                    vm, "/// @dev The runtime bytecode of the contract.", "RUNTIME_CODE", deployed.code
+                ),
                 LibCodeGen.describedByMetaHashConstantString(vm, name),
                 LibCodeGen.integrityFunctionPointersConstantString(vm, deployer)
             )
@@ -158,6 +170,9 @@ contract BuildPointers is Script {
                         "/// @dev The creation bytecode of the contract.",
                         "CREATION_CODE",
                         type(RainterpreterReferenceExtern).creationCode
+                    ),
+                    LibCodeGen.bytesConstantString(
+                        vm, "/// @dev The runtime bytecode of the contract.", "RUNTIME_CODE", deployed.code
                     ),
                     LibCodeGen.describedByMetaHashConstantString(vm, name),
                     LibGenParseMeta.parseMetaConstantString(
@@ -190,6 +205,9 @@ contract BuildPointers is Script {
                     "/// @dev The creation bytecode of the contract.",
                     "CREATION_CODE",
                     type(RainterpreterDISPaiRegistry).creationCode
+                ),
+                LibCodeGen.bytesConstantString(
+                    vm, "/// @dev The runtime bytecode of the contract.", "RUNTIME_CODE", deployed.code
                 )
             )
         );

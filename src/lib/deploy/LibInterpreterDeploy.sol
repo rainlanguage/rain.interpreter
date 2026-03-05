@@ -2,25 +2,32 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity ^0.8.25;
 
+import {Vm} from "forge-std/Vm.sol";
+
 import {
     BYTECODE_HASH as PARSER_HASH,
-    DEPLOYED_ADDRESS as PARSER_ADDR
+    DEPLOYED_ADDRESS as PARSER_ADDR,
+    RUNTIME_CODE as PARSER_RUNTIME_CODE
 } from "../../generated/RainterpreterParser.pointers.sol";
 import {
     BYTECODE_HASH as STORE_HASH,
-    DEPLOYED_ADDRESS as STORE_ADDR
+    DEPLOYED_ADDRESS as STORE_ADDR,
+    RUNTIME_CODE as STORE_RUNTIME_CODE
 } from "../../generated/RainterpreterStore.pointers.sol";
 import {
     BYTECODE_HASH as INTERPRETER_HASH,
-    DEPLOYED_ADDRESS as INTERPRETER_ADDR
+    DEPLOYED_ADDRESS as INTERPRETER_ADDR,
+    RUNTIME_CODE as INTERPRETER_RUNTIME_CODE
 } from "../../generated/Rainterpreter.pointers.sol";
 import {
     BYTECODE_HASH as EXPRESSION_DEPLOYER_HASH,
-    DEPLOYED_ADDRESS as EXPRESSION_DEPLOYER_ADDR
+    DEPLOYED_ADDRESS as EXPRESSION_DEPLOYER_ADDR,
+    RUNTIME_CODE as EXPRESSION_DEPLOYER_RUNTIME_CODE
 } from "../../generated/RainterpreterExpressionDeployer.pointers.sol";
 import {
     BYTECODE_HASH as DISPAIR_REGISTRY_HASH,
-    DEPLOYED_ADDRESS as DISPAIR_REGISTRY_ADDR
+    DEPLOYED_ADDRESS as DISPAIR_REGISTRY_ADDR,
+    RUNTIME_CODE as DISPAIR_REGISTRY_RUNTIME_CODE
 } from "../../generated/RainterpreterDISPaiRegistry.pointers.sol";
 
 /// @title LibInterpreterDeploy
@@ -79,4 +86,27 @@ library LibInterpreterDeploy {
     /// verify that the deployed contract has the expected bytecode, which
     /// provides stronger guarantees than just checking the address.
     bytes32 constant DISPAIR_REGISTRY_DEPLOYED_CODEHASH = DISPAIR_REGISTRY_HASH;
+
+    /// Etches the runtime bytecode of the parser, store, interpreter,
+    /// expression deployer, and DISPair registry at their expected
+    /// deterministic addresses. Skips any contract whose codehash already
+    /// matches.
+    /// @param vm The Forge `Vm` cheatcode interface.
+    function etchDISPaiR(Vm vm) internal {
+        if (PARSER_DEPLOYED_CODEHASH != PARSER_DEPLOYED_ADDRESS.codehash) {
+            vm.etch(PARSER_DEPLOYED_ADDRESS, PARSER_RUNTIME_CODE);
+        }
+        if (STORE_DEPLOYED_CODEHASH != STORE_DEPLOYED_ADDRESS.codehash) {
+            vm.etch(STORE_DEPLOYED_ADDRESS, STORE_RUNTIME_CODE);
+        }
+        if (INTERPRETER_DEPLOYED_CODEHASH != INTERPRETER_DEPLOYED_ADDRESS.codehash) {
+            vm.etch(INTERPRETER_DEPLOYED_ADDRESS, INTERPRETER_RUNTIME_CODE);
+        }
+        if (EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH != EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS.codehash) {
+            vm.etch(EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS, EXPRESSION_DEPLOYER_RUNTIME_CODE);
+        }
+        if (DISPAIR_REGISTRY_DEPLOYED_CODEHASH != DISPAIR_REGISTRY_DEPLOYED_ADDRESS.codehash) {
+            vm.etch(DISPAIR_REGISTRY_DEPLOYED_ADDRESS, DISPAIR_REGISTRY_RUNTIME_CODE);
+        }
+    }
 }

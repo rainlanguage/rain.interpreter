@@ -15,25 +15,33 @@ import {LibExtrospectMetamorphic} from "rain.extrospection/lib/LibExtrospectMeta
 import {RainterpreterReferenceExtern} from "src/concrete/extern/RainterpreterReferenceExtern.sol";
 import {
     CREATION_CODE as PARSER_CREATION_CODE,
+    RUNTIME_CODE as PARSER_RUNTIME_CODE,
     DEPLOYED_ADDRESS as PARSER_GENERATED_ADDRESS
 } from "src/generated/RainterpreterParser.pointers.sol";
 import {
     CREATION_CODE as STORE_CREATION_CODE,
+    RUNTIME_CODE as STORE_RUNTIME_CODE,
     DEPLOYED_ADDRESS as STORE_GENERATED_ADDRESS
 } from "src/generated/RainterpreterStore.pointers.sol";
 import {
     CREATION_CODE as INTERPRETER_CREATION_CODE,
+    RUNTIME_CODE as INTERPRETER_RUNTIME_CODE,
     DEPLOYED_ADDRESS as INTERPRETER_GENERATED_ADDRESS
 } from "src/generated/Rainterpreter.pointers.sol";
 import {
     CREATION_CODE as EXPRESSION_DEPLOYER_CREATION_CODE,
+    RUNTIME_CODE as EXPRESSION_DEPLOYER_RUNTIME_CODE,
     DEPLOYED_ADDRESS as EXPRESSION_DEPLOYER_GENERATED_ADDRESS
 } from "src/generated/RainterpreterExpressionDeployer.pointers.sol";
 import {
     CREATION_CODE as DISPAIR_REGISTRY_CREATION_CODE,
+    RUNTIME_CODE as DISPAIR_REGISTRY_RUNTIME_CODE,
     DEPLOYED_ADDRESS as DISPAIR_REGISTRY_GENERATED_ADDRESS
 } from "src/generated/RainterpreterDISPaiRegistry.pointers.sol";
-import {CREATION_CODE as REFERENCE_EXTERN_CREATION_CODE} from "src/generated/RainterpreterReferenceExtern.pointers.sol";
+import {
+    CREATION_CODE as REFERENCE_EXTERN_CREATION_CODE,
+    RUNTIME_CODE as REFERENCE_EXTERN_RUNTIME_CODE
+} from "src/generated/RainterpreterReferenceExtern.pointers.sol";
 
 contract LibInterpreterDeployTest is Test {
     function testDeployAddressParser() external {
@@ -240,6 +248,48 @@ contract LibInterpreterDeployTest is Test {
         assertEq(keccak256(REFERENCE_EXTERN_CREATION_CODE), keccak256(type(RainterpreterReferenceExtern).creationCode));
     }
 
+    /// The precompiled runtime code constant for the parser MUST match the
+    /// deployed runtime bytecode.
+    function testRuntimeCodeParser() external {
+        RainterpreterParser parser = new RainterpreterParser();
+        assertEq(keccak256(PARSER_RUNTIME_CODE), keccak256(address(parser).code));
+    }
+
+    /// The precompiled runtime code constant for the store MUST match the
+    /// deployed runtime bytecode.
+    function testRuntimeCodeStore() external {
+        RainterpreterStore store = new RainterpreterStore();
+        assertEq(keccak256(STORE_RUNTIME_CODE), keccak256(address(store).code));
+    }
+
+    /// The precompiled runtime code constant for the interpreter MUST match
+    /// the deployed runtime bytecode.
+    function testRuntimeCodeInterpreter() external {
+        Rainterpreter interpreter = new Rainterpreter();
+        assertEq(keccak256(INTERPRETER_RUNTIME_CODE), keccak256(address(interpreter).code));
+    }
+
+    /// The precompiled runtime code constant for the expression deployer MUST
+    /// match the deployed runtime bytecode.
+    function testRuntimeCodeExpressionDeployer() external {
+        RainterpreterExpressionDeployer deployer = new RainterpreterExpressionDeployer();
+        assertEq(keccak256(EXPRESSION_DEPLOYER_RUNTIME_CODE), keccak256(address(deployer).code));
+    }
+
+    /// The precompiled runtime code constant for the DISPaiRegistry MUST
+    /// match the deployed runtime bytecode.
+    function testRuntimeCodeDISPaiRegistry() external {
+        RainterpreterDISPaiRegistry registry = new RainterpreterDISPaiRegistry();
+        assertEq(keccak256(DISPAIR_REGISTRY_RUNTIME_CODE), keccak256(address(registry).code));
+    }
+
+    /// The precompiled runtime code constant for the reference extern MUST
+    /// match the deployed runtime bytecode.
+    function testRuntimeCodeReferenceExtern() external {
+        RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();
+        assertEq(keccak256(REFERENCE_EXTERN_RUNTIME_CODE), keccak256(address(extern).code));
+    }
+
     /// The generated deployed address for the parser MUST match the deploy
     /// library constant.
     function testGeneratedDeployedAddressParser() external pure {
@@ -268,5 +318,48 @@ contract LibInterpreterDeployTest is Test {
     /// deploy library constant.
     function testGeneratedDeployedAddressDISPaiRegistry() external pure {
         assertEq(DISPAIR_REGISTRY_GENERATED_ADDRESS, LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_ADDRESS);
+    }
+
+    /// After calling etchDISPaiR, all five contracts MUST have the expected
+    /// codehash at their expected addresses.
+    function testEtchDISPaiR() external {
+        LibInterpreterDeploy.etchDISPaiR(vm);
+
+        assertEq(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS.codehash, LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH);
+        assertEq(LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS.codehash, LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH);
+        assertEq(
+            LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS.codehash,
+            LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH
+        );
+        assertEq(
+            LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS.codehash,
+            LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH
+        );
+        assertEq(
+            LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_ADDRESS.codehash,
+            LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_CODEHASH
+        );
+    }
+
+    /// Calling etchDISPaiR twice MUST be idempotent — codehashes remain
+    /// correct on the second call.
+    function testEtchDISPaiRIdempotent() external {
+        LibInterpreterDeploy.etchDISPaiR(vm);
+        LibInterpreterDeploy.etchDISPaiR(vm);
+
+        assertEq(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS.codehash, LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH);
+        assertEq(LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS.codehash, LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH);
+        assertEq(
+            LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS.codehash,
+            LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH
+        );
+        assertEq(
+            LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS.codehash,
+            LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH
+        );
+        assertEq(
+            LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_ADDRESS.codehash,
+            LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_CODEHASH
+        );
     }
 }
