@@ -101,21 +101,25 @@ contract BuildPointers is Script {
             deployed,
             "RainterpreterParser",
             string.concat(
-                addressConstantString(deployed),
-                LibCodeGen.bytesConstantString(
-                    vm,
-                    "/// @dev The creation bytecode of the contract.",
-                    "CREATION_CODE",
-                    type(RainterpreterParser).creationCode
+                string.concat(
+                    addressConstantString(deployed),
+                    LibCodeGen.bytesConstantString(
+                        vm,
+                        "/// @dev The creation bytecode of the contract.",
+                        "CREATION_CODE",
+                        type(RainterpreterParser).creationCode
+                    ),
+                    LibCodeGen.bytesConstantString(
+                        vm, "/// @dev The runtime bytecode of the contract.", "RUNTIME_CODE", deployed.code
+                    )
                 ),
-                LibCodeGen.bytesConstantString(
-                    vm, "/// @dev The runtime bytecode of the contract.", "RUNTIME_CODE", deployed.code
-                ),
-                LibGenParseMeta.parseMetaConstantString(
-                    vm, LibAllStandardOps.authoringMetaV2(), PARSE_META_BUILD_DEPTH
-                ),
-                LibCodeGen.operandHandlerFunctionPointersConstantString(vm, parser),
-                LibCodeGen.literalParserFunctionPointersConstantString(vm, parser)
+                string.concat(
+                    LibGenParseMeta.parseMetaConstantString(
+                        vm, LibAllStandardOps.authoringMetaV2(), PARSE_META_BUILD_DEPTH
+                    ),
+                    LibCodeGen.operandHandlerFunctionPointersConstantString(vm, parser),
+                    LibCodeGen.literalParserFunctionPointersConstantString(vm, parser)
+                )
             )
         );
     }
@@ -133,18 +137,22 @@ contract BuildPointers is Script {
             deployed,
             name,
             string.concat(
-                addressConstantString(deployed),
-                LibCodeGen.bytesConstantString(
-                    vm,
-                    "/// @dev The creation bytecode of the contract.",
-                    "CREATION_CODE",
-                    type(RainterpreterExpressionDeployer).creationCode
+                string.concat(
+                    addressConstantString(deployed),
+                    LibCodeGen.bytesConstantString(
+                        vm,
+                        "/// @dev The creation bytecode of the contract.",
+                        "CREATION_CODE",
+                        type(RainterpreterExpressionDeployer).creationCode
+                    ),
+                    LibCodeGen.bytesConstantString(
+                        vm, "/// @dev The runtime bytecode of the contract.", "RUNTIME_CODE", deployed.code
+                    )
                 ),
-                LibCodeGen.bytesConstantString(
-                    vm, "/// @dev The runtime bytecode of the contract.", "RUNTIME_CODE", deployed.code
-                ),
-                LibCodeGen.describedByMetaHashConstantString(vm, name),
-                LibCodeGen.integrityFunctionPointersConstantString(vm, deployer)
+                string.concat(
+                    LibCodeGen.describedByMetaHashConstantString(vm, name),
+                    LibCodeGen.integrityFunctionPointersConstantString(vm, deployer)
+                )
             )
         );
     }
@@ -174,7 +182,9 @@ contract BuildPointers is Script {
                     LibCodeGen.bytesConstantString(
                         vm, "/// @dev The runtime bytecode of the contract.", "RUNTIME_CODE", deployed.code
                     ),
-                    LibCodeGen.describedByMetaHashConstantString(vm, name),
+                    LibCodeGen.describedByMetaHashConstantString(vm, name)
+                ),
+                string.concat(
                     LibGenParseMeta.parseMetaConstantString(
                         vm, LibRainterpreterReferenceExtern.authoringMetaV2(), EXTERN_PARSE_META_BUILD_DEPTH
                     ),
