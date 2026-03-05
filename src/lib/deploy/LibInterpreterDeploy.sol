@@ -18,7 +18,7 @@ library LibInterpreterDeploy {
     /// deployed contract has the expected bytecode, which provides stronger
     /// guarantees than just checking the address.
     bytes32 constant PARSER_DEPLOYED_CODEHASH =
-        bytes32(0x62e660fd8299bfd11fd6aa5f1cc931b5f3574ebe6f1fd0f9bedc8400f2f6b379);
+        bytes32(0x87cd76c4ba9fc14f432880e126d67865e2ca86a7a3392fbf63c76f52ede7c76a);
 
     /// The address of the `RainterpreterStore` contract when deployed with the
     /// rain standard zoltu deployer.
@@ -29,7 +29,7 @@ library LibInterpreterDeploy {
     /// deployed contract has the expected bytecode, which provides stronger
     /// guarantees than just checking the address.
     bytes32 constant STORE_DEPLOYED_CODEHASH =
-        bytes32(0x0504fb2004eb1cad882a8eb495be50b9f2beacdc99e0b0d6b7d3eb1e32854210);
+        bytes32(0xdaa0024dc105c6a9ea0838604bad0a5e662743eca97789c2cecfdf8667d0bf9b);
 
     /// The address of the `Rainterpreter` contract when deployed with the rain
     /// standard zoltu deployer.
@@ -40,7 +40,7 @@ library LibInterpreterDeploy {
     /// contract has the expected bytecode, which provides stronger guarantees
     /// than just checking the address.
     bytes32 constant INTERPRETER_DEPLOYED_CODEHASH =
-        bytes32(0x6ed341c240b58c7e314deee17aec3f1fc7ef5165c722350ac479aed9c1003db8);
+        bytes32(0xb8b1fafca6bb155ca927e9c986e464d922281570c057f0813138e2b19633f3e0);
 
     /// The address of the `RainterpreterExpressionDeployer` contract when
     /// deployed with the rain standard zoltu deployer.
@@ -51,7 +51,7 @@ library LibInterpreterDeploy {
     /// verify that the deployed contract has the expected bytecode, which
     /// provides stronger guarantees than just checking the address.
     bytes32 constant EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH =
-        bytes32(0x282ab179f2b1bbfe4b5fc50938ee379070dc8731afa3b931b54b2b9d819527f2);
+        bytes32(0x47e1ae362ec90b215db629cc7650bb646222501297e1d6325bb1999fd0508e00);
 
     /// The address of the `RainterpreterDISPaiRegistry` contract when deployed
     /// with the rain standard zoltu deployer.

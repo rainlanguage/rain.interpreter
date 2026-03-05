@@ -11,10 +11,12 @@ import {LibTOFUTokenDecimals} from "rain.tofu.erc20-decimals/lib/LibTOFUTokenDec
 import {CREATION_CODE as PARSER_CREATION_CODE} from "../src/generated/RainterpreterParser.pointers.sol";
 import {CREATION_CODE as STORE_CREATION_CODE} from "../src/generated/RainterpreterStore.pointers.sol";
 import {CREATION_CODE as INTERPRETER_CREATION_CODE} from "../src/generated/Rainterpreter.pointers.sol";
-import {CREATION_CODE as EXPRESSION_DEPLOYER_CREATION_CODE} from
-    "../src/generated/RainterpreterExpressionDeployer.pointers.sol";
-import {CREATION_CODE as DISPAIR_REGISTRY_CREATION_CODE} from
-    "../src/generated/RainterpreterDISPaiRegistry.pointers.sol";
+import {
+    CREATION_CODE as EXPRESSION_DEPLOYER_CREATION_CODE
+} from "../src/generated/RainterpreterExpressionDeployer.pointers.sol";
+import {
+    CREATION_CODE as DISPAIR_REGISTRY_CREATION_CODE
+} from "../src/generated/RainterpreterDISPaiRegistry.pointers.sol";
 
 /// @dev Deployment suite selector for the parser.
 bytes32 constant DEPLOYMENT_SUITE_PARSER = keccak256("parser");

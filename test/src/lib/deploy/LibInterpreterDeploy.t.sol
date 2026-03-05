@@ -16,12 +16,11 @@ import {RainterpreterReferenceExtern} from "src/concrete/extern/RainterpreterRef
 import {CREATION_CODE as PARSER_CREATION_CODE} from "src/generated/RainterpreterParser.pointers.sol";
 import {CREATION_CODE as STORE_CREATION_CODE} from "src/generated/RainterpreterStore.pointers.sol";
 import {CREATION_CODE as INTERPRETER_CREATION_CODE} from "src/generated/Rainterpreter.pointers.sol";
-import {CREATION_CODE as EXPRESSION_DEPLOYER_CREATION_CODE} from
-    "src/generated/RainterpreterExpressionDeployer.pointers.sol";
-import {CREATION_CODE as DISPAIR_REGISTRY_CREATION_CODE} from
-    "src/generated/RainterpreterDISPaiRegistry.pointers.sol";
-import {CREATION_CODE as REFERENCE_EXTERN_CREATION_CODE} from
-    "src/generated/RainterpreterReferenceExtern.pointers.sol";
+import {
+    CREATION_CODE as EXPRESSION_DEPLOYER_CREATION_CODE
+} from "src/generated/RainterpreterExpressionDeployer.pointers.sol";
+import {CREATION_CODE as DISPAIR_REGISTRY_CREATION_CODE} from "src/generated/RainterpreterDISPaiRegistry.pointers.sol";
+import {CREATION_CODE as REFERENCE_EXTERN_CREATION_CODE} from "src/generated/RainterpreterReferenceExtern.pointers.sol";
 
 contract LibInterpreterDeployTest is Test {
     function testDeployAddressParser() external {
@@ -225,8 +224,6 @@ contract LibInterpreterDeployTest is Test {
     /// The precompiled creation code constant for the reference extern MUST
     /// match the compiler's creation code.
     function testCreationCodeReferenceExtern() external pure {
-        assertEq(
-            keccak256(REFERENCE_EXTERN_CREATION_CODE), keccak256(type(RainterpreterReferenceExtern).creationCode)
-        );
+        assertEq(keccak256(REFERENCE_EXTERN_CREATION_CODE), keccak256(type(RainterpreterReferenceExtern).creationCode));
     }
 }
