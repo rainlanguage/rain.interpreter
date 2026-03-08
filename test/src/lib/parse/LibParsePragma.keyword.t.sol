@@ -4,8 +4,12 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 
-import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
-import {LibParsePragma, PRAGMA_KEYWORD_BYTES_LENGTH, PRAGMA_KEYWORD_BYTES} from "src/lib/parse/LibParsePragma.sol";
+import {LibParseState, ParseState} from "../../../../src/lib/parse/LibParseState.sol";
+import {
+    LibParsePragma,
+    PRAGMA_KEYWORD_BYTES_LENGTH,
+    PRAGMA_KEYWORD_BYTES
+} from "../../../../src/lib/parse/LibParsePragma.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {
     CMASK_WHITESPACE,
@@ -14,9 +18,9 @@ import {
     CMASK_HEX
 } from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
-import {NoWhitespaceAfterUsingWordsFrom} from "src/error/ErrParse.sol";
+import {NoWhitespaceAfterUsingWordsFrom} from "../../../../src/error/ErrParse.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
-import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
+import {LibAllStandardOps} from "../../../../src/lib/op/LibAllStandardOps.sol";
 
 /// @title LibParsePragmaKeywordTest
 /// @notice Tests for pragma keyword parsing.

@@ -9,7 +9,7 @@ import {
     PARSE_STATE_TOP_LEVEL0_DATA_OFFSET,
     PARSE_STATE_PAREN_TRACKER0_OFFSET,
     PARSE_STATE_LINE_TRACKER_OFFSET
-} from "src/lib/parse/LibParseState.sol";
+} from "../../../../src/lib/parse/LibParseState.sol";
 
 /// @title LibParseStateOffsetsTest
 /// @notice Validates that the named offset constants match the actual memory layout

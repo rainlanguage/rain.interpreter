@@ -9,9 +9,9 @@ import {
     EMPTY_ACTIVE_SOURCE,
     FSM_ACTIVE_SOURCE_MASK,
     FSM_ACCEPTING_INPUTS_MASK
-} from "src/lib/parse/LibParseState.sol";
+} from "../../../../src/lib/parse/LibParseState.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
-import {SourceItemOpsOverflow} from "src/error/ErrParse.sol";
+import {SourceItemOpsOverflow} from "../../../../src/error/ErrParse.sol";
 
 contract LibParseStatePushOpToSourceTest is Test {
     using LibParseState for ParseState;

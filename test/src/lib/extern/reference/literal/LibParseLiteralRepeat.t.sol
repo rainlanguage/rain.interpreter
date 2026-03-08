@@ -8,7 +8,7 @@ import {
     LibParseLiteralRepeat,
     RepeatDispatchNotDigit,
     RepeatLiteralTooLong
-} from "src/lib/extern/reference/literal/LibParseLiteralRepeat.sol";
+} from "../../../../../../src/lib/extern/reference/literal/LibParseLiteralRepeat.sol";
 
 contract LibParseLiteralRepeatTest is Test {
     /// External wrapper for parseRepeat so that expectRevert can catch

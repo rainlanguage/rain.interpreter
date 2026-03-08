@@ -154,6 +154,63 @@ mod tests {
         assert!(parse_int_or_hex("invalid").is_err());
     }
 
+    fn simple_cli_args() -> ForkEvalCliArgs {
+        ForkEvalCliArgs {
+            rainlang_string: "_: 1;".into(),
+            source_index: 0,
+            deployer: Address::ZERO,
+            interpreter: Address::ZERO,
+            store: Address::ZERO,
+            namespace: "0x0".into(),
+            context: vec![],
+            decode_errors: false,
+            inputs: None,
+            state_overlay: None,
+        }
+    }
+
+    #[test]
+    fn test_try_from_invalid_namespace() {
+        let mut args = simple_cli_args();
+        args.namespace = "not_a_number".into();
+        let result = ForkEvalArgs::try_from(args);
+        assert!(result.is_err());
+        let err = result.unwrap_err().to_string();
+        assert!(
+            err.contains("Invalid namespace format"),
+            "expected 'Invalid namespace format', got: {err}"
+        );
+    }
+
+    #[test]
+    fn test_try_from_invalid_context_value() {
+        let mut args = simple_cli_args();
+        args.context = vec!["123,bad_value,456".into()];
+        let result = ForkEvalArgs::try_from(args);
+        assert!(result.is_err());
+        let err = result.unwrap_err().to_string();
+        assert!(
+            err.contains("Invalid context value"),
+            "expected 'Invalid context value', got: {err}"
+        );
+    }
+
+    #[test]
+    fn test_try_from_valid() {
+        let mut args = simple_cli_args();
+        args.namespace = "0xff".into();
+        args.context = vec!["1,2,3".into(), "0xa,0xb".into()];
+        let result = ForkEvalArgs::try_from(args);
+        assert!(result.is_ok());
+        let eval_args = result.unwrap();
+        assert_eq!(eval_args.context.len(), 2);
+        assert_eq!(
+            eval_args.context[0],
+            vec![U256::from(1), U256::from(2), U256::from(3)]
+        );
+        assert_eq!(eval_args.context[1], vec![U256::from(0xa), U256::from(0xb)]);
+    }
+
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_execute() {
         let local_evm = LocalEvm::new().await;

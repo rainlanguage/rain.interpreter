@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {RainterpreterReferenceExtern, StackItem} from "src/concrete/extern/RainterpreterReferenceExtern.sol";
+import {RainterpreterReferenceExtern, StackItem} from "../../../src/concrete/extern/RainterpreterReferenceExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 
 contract RainterpreterReferenceExternStackOperandTest is OpTest {

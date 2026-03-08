@@ -3,9 +3,9 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {RainterpreterReferenceExtern} from "src/concrete/extern/RainterpreterReferenceExtern.sol";
+import {RainterpreterReferenceExtern} from "../../../src/concrete/extern/RainterpreterReferenceExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
-import {UnknownWord} from "src/error/ErrParse.sol";
+import {UnknownWord} from "../../../src/error/ErrParse.sol";
 
 contract RainterpreterReferenceExternUnknownWordTest is OpTest {
     using Strings for address;

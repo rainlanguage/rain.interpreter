@@ -8,7 +8,7 @@ import {
 import {StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV3.sol";
 import {EvalV4, SourceIndexV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibNamespace} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
-import {InputsLengthMismatch} from "src/error/ErrEval.sol";
+import {InputsLengthMismatch} from "../../../src/error/ErrEval.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 contract RainterpreterEvalTest is RainterpreterExpressionDeployerDeploymentTest {

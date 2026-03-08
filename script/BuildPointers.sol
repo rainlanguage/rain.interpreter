@@ -3,17 +3,17 @@
 pragma solidity =0.8.25;
 
 import {Script} from "forge-std/Script.sol";
-import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
-import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
-import {RainterpreterParser, PARSE_META_BUILD_DEPTH} from "src/concrete/RainterpreterParser.sol";
-import {RainterpreterExpressionDeployer} from "src/concrete/RainterpreterExpressionDeployer.sol";
-import {RainterpreterDISPaiRegistry} from "src/concrete/RainterpreterDISPaiRegistry.sol";
+import {Rainterpreter} from "../src/concrete/Rainterpreter.sol";
+import {RainterpreterStore} from "../src/concrete/RainterpreterStore.sol";
+import {RainterpreterParser, PARSE_META_BUILD_DEPTH} from "../src/concrete/RainterpreterParser.sol";
+import {RainterpreterExpressionDeployer} from "../src/concrete/RainterpreterExpressionDeployer.sol";
+import {RainterpreterDISPaiRegistry} from "../src/concrete/RainterpreterDISPaiRegistry.sol";
 import {
     RainterpreterReferenceExtern,
     LibRainterpreterReferenceExtern,
     EXTERN_PARSE_META_BUILD_DEPTH
-} from "src/concrete/extern/RainterpreterReferenceExtern.sol";
-import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
+} from "../src/concrete/extern/RainterpreterReferenceExtern.sol";
+import {LibAllStandardOps} from "../src/lib/op/LibAllStandardOps.sol";
 import {LibCodeGen} from "rain.sol.codegen/lib/LibCodeGen.sol";
 import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";
 import {LibFs} from "rain.sol.codegen/lib/LibFs.sol";

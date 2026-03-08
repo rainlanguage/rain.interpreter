@@ -4,9 +4,9 @@ pragma solidity =0.8.25;
 
 import {stdError} from "forge-std/Test.sol";
 
-import {LibOpContext} from "src/lib/op/00/LibOpContext.sol";
+import {LibOpContext} from "../../../../../src/lib/op/00/LibOpContext.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
-import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
+import {IntegrityCheckState} from "../../../../../src/lib/integrity/LibIntegrityCheck.sol";
 import {
     OperandV2,
     SourceIndexV2,
@@ -14,7 +14,7 @@ import {
     EvalV4,
     StackItem
 } from "rain.interpreter.interface/interface/IInterpreterV4.sol";
-import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
+import {InterpreterState} from "../../../../../src/lib/state/LibInterpreterState.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 /// @title LibOpContextTest

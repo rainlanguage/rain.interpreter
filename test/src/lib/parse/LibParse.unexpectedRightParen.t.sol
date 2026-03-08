@@ -5,10 +5,10 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std/Test.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 
-import {LibParse} from "src/lib/parse/LibParse.sol";
-import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
-import {UnexpectedRightParen} from "src/error/ErrParse.sol";
-import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
+import {LibParse} from "../../../../src/lib/parse/LibParse.sol";
+import {LibParseState, ParseState} from "../../../../src/lib/parse/LibParseState.sol";
+import {UnexpectedRightParen} from "../../../../src/error/ErrParse.sol";
+import {LibAllStandardOps} from "../../../../src/lib/op/LibAllStandardOps.sol";
 
 /// @title LibParseUnexpectedRightParenTest
 /// @notice Test that the parser errors when it encounters an unexpected right paren.

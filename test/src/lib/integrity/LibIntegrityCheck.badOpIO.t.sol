@@ -5,8 +5,8 @@ pragma solidity =0.8.25;
 import {
     RainterpreterExpressionDeployerDeploymentTest
 } from "test/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
-import {LibIntegrityCheck} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
+import {LibIntegrityCheck} from "../../../../src/lib/integrity/LibIntegrityCheck.sol";
+import {LibAllStandardOps} from "../../../../src/lib/op/LibAllStandardOps.sol";
 import {BadOpInputsLength, BadOpOutputsLength} from "rain.interpreter.interface/error/ErrIntegrity.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";

@@ -5,8 +5,8 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std/Test.sol";
 
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
-import {RainterpreterDISPaiRegistry} from "src/concrete/RainterpreterDISPaiRegistry.sol";
-import {IDISPaiRegistry} from "src/interface/IDISPaiRegistry.sol";
+import {RainterpreterDISPaiRegistry} from "../../../src/concrete/RainterpreterDISPaiRegistry.sol";
+import {IDISPaiRegistry} from "../../../src/interface/IDISPaiRegistry.sol";
 
 /// @title RainterpreterDISPaiRegistryIERC165Test
 /// @notice Test that ERC165 is implemented for the DISPaiR registry.

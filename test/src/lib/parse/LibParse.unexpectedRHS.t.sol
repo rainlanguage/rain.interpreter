@@ -3,8 +3,8 @@
 pragma solidity =0.8.25;
 
 import {ParseTest} from "test/abstract/ParseTest.sol";
-import {LibParse} from "src/lib/parse/LibParse.sol";
-import {UnexpectedRHSChar} from "src/error/ErrParse.sol";
+import {LibParse} from "../../../../src/lib/parse/LibParse.sol";
+import {UnexpectedRHSChar} from "../../../../src/error/ErrParse.sol";
 import {
     CMASK_RHS_WORD_HEAD,
     CMASK_LITERAL_HEAD,
@@ -14,7 +14,7 @@ import {
     CMASK_EOS,
     CMASK_COMMENT_HEAD
 } from "rain.string/lib/parse/LibParseCMask.sol";
-import {ParseState} from "src/lib/parse/LibParseState.sol";
+import {ParseState} from "../../../../src/lib/parse/LibParseState.sol";
 
 /// @title LibParseUnexpectedRHSTest
 /// @notice The parser should revert if it encounters an unexpected character on the RHS.

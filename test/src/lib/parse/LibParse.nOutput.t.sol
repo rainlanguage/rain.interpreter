@@ -5,10 +5,10 @@ pragma solidity =0.8.25;
 import {ParseTest} from "test/abstract/ParseTest.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 
-import {LibParse} from "src/lib/parse/LibParse.sol";
+import {LibParse} from "../../../../src/lib/parse/LibParse.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
-import {ExcessLHSItems, ExcessRHSItems} from "src/error/ErrParse.sol";
-import {ParseState} from "src/lib/parse/LibParseState.sol";
+import {ExcessLHSItems, ExcessRHSItems} from "../../../../src/error/ErrParse.sol";
+import {ParseState} from "../../../../src/lib/parse/LibParseState.sol";
 
 /// @title LibParseNOutputTest
 /// @notice Test that the parser can handle multi and zero outputs for RHS items when

@@ -5,10 +5,10 @@ pragma solidity =0.8.25;
 import {OpTest} from "test/abstract/OpTest.sol";
 
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
-import {LibOpConstant} from "src/lib/op/00/LibOpConstant.sol";
-import {OutOfBoundsConstantRead} from "src/error/ErrIntegrity.sol";
-import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
+import {LibOpConstant} from "../../../../../src/lib/op/00/LibOpConstant.sol";
+import {OutOfBoundsConstantRead} from "../../../../../src/error/ErrIntegrity.sol";
+import {LibInterpreterState, InterpreterState} from "../../../../../src/lib/state/LibInterpreterState.sol";
+import {IntegrityCheckState} from "../../../../../src/lib/integrity/LibIntegrityCheck.sol";
 import {
     OperandV2,
     SourceIndexV2,

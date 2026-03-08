@@ -7,7 +7,7 @@ import {Test} from "forge-std/Test.sol";
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 import {IInterpreterExternV4} from "rain.interpreter.interface/interface/IInterpreterExternV4.sol";
 import {ISubParserV4} from "rain.interpreter.interface/interface/ISubParserV4.sol";
-import {RainterpreterReferenceExtern} from "src/concrete/extern/RainterpreterReferenceExtern.sol";
+import {RainterpreterReferenceExtern} from "../../../src/concrete/extern/RainterpreterReferenceExtern.sol";
 import {IDescribedByMetaV1} from "rain.metadata/interface/IDescribedByMetaV1.sol";
 import {ISubParserToolingV1} from "rain.sol.codegen/interface/ISubParserToolingV1.sol";
 import {IParserToolingV1} from "rain.sol.codegen/interface/IParserToolingV1.sol";

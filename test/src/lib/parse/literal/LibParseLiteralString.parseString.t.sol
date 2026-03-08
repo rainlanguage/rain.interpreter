@@ -3,13 +3,13 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibParseLiteralString} from "src/lib/parse/literal/LibParseLiteralString.sol";
+import {LibParseLiteralString} from "../../../../../src/lib/parse/literal/LibParseLiteralString.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {IntOrAString, LibIntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
-import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
+import {LibParseState, ParseState} from "../../../../../src/lib/parse/LibParseState.sol";
 import {CMASK_STRING_LITERAL_TAIL} from "rain.string/lib/parse/LibParseCMask.sol";
 import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
-import {UnclosedStringLiteral} from "src/error/ErrParse.sol";
+import {UnclosedStringLiteral} from "../../../../../src/error/ErrParse.sol";
 
 /// @title LibParseLiteralStringTest
 /// @notice Tests parsing strings with the LibParseLiteral library.

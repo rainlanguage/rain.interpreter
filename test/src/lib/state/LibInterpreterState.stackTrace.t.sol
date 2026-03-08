@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
-import {LibInterpreterState, STACK_TRACER} from "src/lib/state/LibInterpreterState.sol";
+import {LibInterpreterState, STACK_TRACER} from "../../../../src/lib/state/LibInterpreterState.sol";
 import {Test} from "forge-std/Test.sol";
 
 contract LibInterpreterStateStackTraceTest is Test {

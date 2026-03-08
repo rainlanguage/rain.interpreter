@@ -14,6 +14,9 @@ import {MalformedCommentStart, UnclosedComment} from "../../error/ErrParse.sol";
 import {LibParseError} from "./LibParseError.sol";
 import {LibParseChar} from "rain.string/lib/parse/LibParseChar.sol";
 
+/// @title LibParseInterstitial
+/// @notice Handles whitespace and comment skipping between meaningful tokens
+/// during parsing.
 library LibParseInterstitial {
     using LibParseError for ParseState;
     using LibParseInterstitial for ParseState;

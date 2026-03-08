@@ -3,9 +3,9 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {BaseRainterpreterExtern} from "src/abstract/BaseRainterpreterExtern.sol";
+import {BaseRainterpreterExtern} from "../../../src/abstract/BaseRainterpreterExtern.sol";
 import {ExternDispatchV2} from "rain.interpreter.interface/interface/IInterpreterExternV4.sol";
-import {ExternOpcodeOutOfRange} from "src/error/ErrExtern.sol";
+import {ExternOpcodeOutOfRange} from "../../../src/error/ErrExtern.sol";
 
 /// @dev Extern with exactly 2 opcode and integrity pointers.
 contract TwoOpExtern is BaseRainterpreterExtern {

@@ -3,8 +3,8 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibParseState} from "src/lib/parse/LibParseState.sol";
-import {ParseMemoryOverflow} from "src/error/ErrParse.sol";
+import {LibParseState} from "../../../../src/lib/parse/LibParseState.sol";
+import {ParseMemoryOverflow} from "../../../../src/error/ErrParse.sol";
 
 /// @title LibParseStateCheckParseMemoryOverflowTest
 /// @notice Tests that `LibParseState.checkParseMemoryOverflow` reverts when the free

@@ -11,6 +11,9 @@ use thiserror::Error;
 #[cfg(target_family = "wasm")]
 use wasm_bindgen_utils::{impl_wasm_traits, prelude::*};
 
+/// Address of the tracer contract that the interpreter calls during evaluation
+/// to emit trace data. No code is deployed here; calls are intercepted by the
+/// tracing inspector.
 pub const RAIN_TRACER_ADDRESS: Address = address!("F06Cd48c98d7321649dB7D8b2C396A81A2046555");
 
 /// A struct representing a single trace from a Rain source. Intended to be decoded
@@ -97,6 +100,8 @@ impl TryFrom<ForkTypedReturn<eval4Call>> for RainEvalResult {
     }
 }
 
+/// Errors that can occur when converting a raw EVM call result into a
+/// `RainEvalResult`.
 #[derive(Error, Debug)]
 pub enum RainEvalResultFromRawCallResultError {
     #[error("Traces are missing")]
@@ -137,6 +142,7 @@ impl TryFrom<RawCallResult> for RainEvalResult {
     }
 }
 
+/// Errors that can occur when searching for a trace by dot-separated path.
 #[derive(Error, Debug)]
 pub enum TraceSearchError {
     #[error("Unparseable trace path: {0}")]
@@ -146,6 +152,8 @@ pub enum TraceSearchError {
 }
 
 impl RainEvalResult {
+    /// Searches for a stack value by a dot-separated path through the trace
+    /// tree. The path format is `<source>.<source>...<stack_index>`.
     pub fn search_trace_by_path(&self, path: &str) -> Result<U256, TraceSearchError> {
         let mut parts = path.split('.').collect::<Vec<_>>();
 
@@ -159,12 +167,12 @@ impl RainEvalResult {
             .parse::<usize>()
             .map_err(|_| TraceSearchError::BadTracePath(path.to_string()))?;
 
-        let mut current_parent_index = parts[0]
+        let root_source_index = parts[0]
             .parse::<u16>()
             .map_err(|_| TraceSearchError::BadTracePath(path.to_string()))?;
-        let mut current_source_index = parts[0]
-            .parse::<u16>()
-            .map_err(|_| TraceSearchError::BadTracePath(path.to_string()))?;
+        // Root traces have parent_source_index == source_index by convention.
+        let mut current_parent_index = root_source_index;
+        let mut current_source_index = root_source_index;
 
         for part in parts.iter().skip(1) {
             let next_source_index = part
@@ -214,6 +222,8 @@ impl RainEvalResult {
     }
 }
 
+/// Tabular representation of evaluation results, with named columns derived
+/// from trace paths and one row per evaluation result.
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(target_family = "wasm", derive(Tsify))]
@@ -225,6 +235,7 @@ pub struct RainEvalResultsTable {
 #[cfg(target_family = "wasm")]
 impl_wasm_traits!(RainEvalResultsTable);
 
+/// Collection of evaluation results that can be flattened into a table.
 #[derive(Debug, Clone)]
 pub struct RainEvalResults {
     pub results: Vec<RainEvalResult>,
@@ -237,6 +248,8 @@ impl From<Vec<RainEvalResult>> for RainEvalResults {
 }
 
 impl RainEvalResults {
+    /// Flattens all results into a table where columns are trace paths and
+    /// rows are per-result stack values.
     pub fn into_flattened_table(&self) -> RainEvalResultsTable {
         if self.results.is_empty() {
             return RainEvalResultsTable {
@@ -619,6 +632,14 @@ mod tests {
         assert_eq!(trace.stack.len(), 2);
         assert_eq!(trace.stack[0], U256::from(0x0A));
         assert_eq!(trace.stack[1], U256::from(0x0B));
+    }
+
+    #[test]
+    fn test_rain_eval_results_into_flattened_table_empty() {
+        let rain_eval_results = RainEvalResults { results: vec![] };
+        let table = rain_eval_results.into_flattened_table();
+        assert!(table.column_names.is_empty());
+        assert!(table.rows.is_empty());
     }
 
     #[test]

@@ -3,13 +3,13 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
-import {ParseState} from "src/lib/parse/LibParseState.sol";
+import {LibParseOperand} from "../../../../src/lib/parse/LibParseOperand.sol";
+import {ParseState} from "../../../../src/lib/parse/LibParseState.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
-import {OperandValuesOverflow, UnclosedOperand} from "src/error/ErrParse.sol";
+import {OperandValuesOverflow, UnclosedOperand} from "../../../../src/error/ErrParse.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
 contract LibParseOperandParseOperandTest is Test {

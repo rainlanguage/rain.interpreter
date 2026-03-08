@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {RainterpreterReferenceExtern} from "src/concrete/extern/RainterpreterReferenceExtern.sol";
+import {RainterpreterReferenceExtern} from "../../../src/concrete/extern/RainterpreterReferenceExtern.sol";
 
 contract RainterpreterReferenceExternDescribedByMetaV1 is Test {
     function testRainterpreterReferenceExternDescribedByMetaV1Happy() external {

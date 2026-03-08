@@ -3,8 +3,8 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibSubParse} from "src/lib/parse/LibSubParse.sol";
-import {ParseState} from "src/lib/parse/LibParseState.sol";
+import {LibSubParse} from "../../../../src/lib/parse/LibSubParse.sol";
+import {ParseState} from "../../../../src/lib/parse/LibParseState.sol";
 
 /// @title LibSubParseConsumeSubParseWordInputDataTest
 /// @notice Direct unit tests for `LibSubParse.consumeSubParseWordInputData`.

@@ -4,9 +4,9 @@ pragma solidity =0.8.25;
 
 import {ParseTest} from "test/abstract/ParseTest.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
-import {LibParse} from "src/lib/parse/LibParse.sol";
-import {ParseState} from "src/lib/parse/LibParseState.sol";
-import {SourceTotalOpsOverflow} from "src/error/ErrParse.sol";
+import {LibParse} from "../../../../src/lib/parse/LibParse.sol";
+import {ParseState} from "../../../../src/lib/parse/LibParseState.sol";
+import {SourceTotalOpsOverflow} from "../../../../src/error/ErrParse.sol";
 
 /// @title LibParseStateEndSourceTotalOpsOverflowTest
 /// @notice Tests that endSource reverts when the total ops count across all

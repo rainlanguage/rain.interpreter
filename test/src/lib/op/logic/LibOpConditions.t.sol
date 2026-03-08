@@ -5,9 +5,9 @@ pragma solidity =0.8.25;
 import {LibUint256Array} from "rain.solmem/lib/LibUint256Array.sol";
 
 import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {LibOpConditions} from "src/lib/op/logic/LibOpConditions.sol";
-import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
+import {LibOpConditions} from "../../../../../src/lib/op/logic/LibOpConditions.sol";
+import {IntegrityCheckState, BadOpInputsLength} from "../../../../../src/lib/integrity/LibIntegrityCheck.sol";
+import {InterpreterState} from "../../../../../src/lib/state/LibInterpreterState.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibIntOrAString, IntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";

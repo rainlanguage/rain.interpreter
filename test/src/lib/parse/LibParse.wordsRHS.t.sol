@@ -4,12 +4,12 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 
-import {LibParse} from "src/lib/parse/LibParse.sol";
-import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
+import {LibParse} from "../../../../src/lib/parse/LibParse.sol";
+import {LibParseState, ParseState} from "../../../../src/lib/parse/LibParseState.sol";
 
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
-import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
+import {LibAllStandardOps} from "../../../../src/lib/op/LibAllStandardOps.sol";
 
 /// @title LibParseNamedRHSTest
 /// @notice Test that the parser can handle named RHS values.

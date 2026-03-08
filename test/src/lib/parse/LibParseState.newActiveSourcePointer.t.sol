@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {EMPTY_ACTIVE_SOURCE, LibParseState} from "src/lib/parse/LibParseState.sol";
+import {EMPTY_ACTIVE_SOURCE, LibParseState} from "../../../../src/lib/parse/LibParseState.sol";
 
 contract LibParseStateNewActiveSourcePointerTest is Test {
     function checkPointer(uint256 pointer, uint256 expectedSource) internal pure {

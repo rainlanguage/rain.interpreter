@@ -4,8 +4,8 @@ pragma solidity ^0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
-import {LibParse} from "src/lib/parse/LibParse.sol";
-import {ParseState} from "src/lib/parse/LibParseState.sol";
+import {LibParse} from "../../src/lib/parse/LibParse.sol";
+import {ParseState} from "../../src/lib/parse/LibParseState.sol";
 
 abstract contract ParseTest is Test {
     using LibParse for ParseState;

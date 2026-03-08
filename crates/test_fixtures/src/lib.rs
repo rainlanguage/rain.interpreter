@@ -55,8 +55,9 @@ sol!(
     "../../out/RainterpreterDISPaiRegistry.sol/RainterpreterDISPaiRegistry.json"
 );
 
-// type aliases for LocalEvm fillers and provider
+/// Filler stack used by `LocalEvm` combining recommended fillers with a wallet signer.
 pub type LocalEvmFillers = JoinFill<JoinedRecommendedFillers, WalletFiller<EthereumWallet>>;
+/// Provider type used by `LocalEvm`, combining the filler stack with a root provider.
 pub type LocalEvmProvider = FillProvider<LocalEvmFillers, RootProvider<AnyNetwork>, AnyNetwork>;
 
 /// LocalEvm is a thin wrapper around Anvil instance and alloy provider with

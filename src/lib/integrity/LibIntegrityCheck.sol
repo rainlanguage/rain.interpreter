@@ -15,7 +15,7 @@ import {BadOpInputsLength, BadOpOutputsLength} from "rain.interpreter.interface/
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 
-/// Tracks the state of the integrity check walk over a single source.
+/// @notice Tracks the state of the integrity check walk over a single source.
 /// @param stackIndex Current logical stack depth. Increases with opcode
 /// outputs and decreases with opcode inputs.
 /// @param stackMaxIndex Peak stack depth seen so far, used to verify the

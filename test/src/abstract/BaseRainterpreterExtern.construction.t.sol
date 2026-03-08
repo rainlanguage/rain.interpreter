@@ -3,8 +3,8 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {BaseRainterpreterExtern} from "src/abstract/BaseRainterpreterExtern.sol";
-import {ExternPointersMismatch, ExternOpcodePointersEmpty} from "src/error/ErrExtern.sol";
+import {BaseRainterpreterExtern} from "../../../src/abstract/BaseRainterpreterExtern.sol";
+import {ExternPointersMismatch, ExternOpcodePointersEmpty} from "../../../src/error/ErrExtern.sol";
 
 /// @dev Shared base that exposes the internal pointer functions externally.
 abstract contract TestableExtern is BaseRainterpreterExtern {

@@ -3,8 +3,8 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
-import {LibParse} from "src/lib/parse/LibParse.sol";
+import {LibParseState, ParseState} from "../../../../src/lib/parse/LibParseState.sol";
+import {LibParse} from "../../../../src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {ISubParserV4} from "rain.interpreter.interface/interface/ISubParserV4.sol";
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";

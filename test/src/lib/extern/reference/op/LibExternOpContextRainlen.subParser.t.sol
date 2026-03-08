@@ -8,7 +8,7 @@ import {
     LibExternOpContextRainlen,
     CONTEXT_CALLER_CONTEXT_COLUMN,
     CONTEXT_CALLER_CONTEXT_ROW_RAINLEN
-} from "src/lib/extern/reference/op/LibExternOpContextRainlen.sol";
+} from "../../../../../../src/lib/extern/reference/op/LibExternOpContextRainlen.sol";
 
 contract LibExternOpContextRainlenSubParserTest is Test {
     /// subParser must return context bytecode targeting column 1, row 0

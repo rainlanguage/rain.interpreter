@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
+import {InterpreterState} from "../../../src/lib/state/LibInterpreterState.sol";
 
 /// @title LibInterpreterStateFingerprint
 /// @notice Test-only library for computing a keccak256 fingerprint of interpreter

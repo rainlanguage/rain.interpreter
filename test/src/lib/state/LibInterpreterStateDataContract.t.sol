@@ -3,11 +3,12 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibInterpreterStateDataContract} from "src/lib/state/LibInterpreterStateDataContract.sol";
-import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
+import {LibInterpreterStateDataContract} from "../../../../src/lib/state/LibInterpreterStateDataContract.sol";
+import {InterpreterState} from "../../../../src/lib/state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {FullyQualifiedNamespace} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {IInterpreterStoreV3} from "rain.interpreter.interface/interface/IInterpreterStoreV3.sol";
+import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 
 /// @dev Wraps unsafeDeserialize as an external call to avoid
 /// stack-too-deep from inlining the 9-field struct return.
@@ -270,6 +271,17 @@ contract LibInterpreterStateDataContractTest is Test {
         );
 
         assertEq(keccak256(state.fs), keccak256(fs));
+    }
+
+    /// stateKV is initialized to zero after deserialization.
+    function testUnsafeDeserializeStateKVZero() external view {
+        bytes memory serialized = serialize(buildSingleSourceBytecode(1, 1, 0, 1), new bytes32[](0));
+
+        InterpreterState memory state = iExtern.deserialize(
+            serialized, 0, FullyQualifiedNamespace.wrap(0), IInterpreterStoreV3(address(0)), new bytes32[][](0), ""
+        );
+
+        assertEq(MemoryKV.unwrap(state.stateKV), 0, "stateKV must be zero after deserialization");
     }
 
     /// Stack allocation matches the bytecode's declared stackAllocation.

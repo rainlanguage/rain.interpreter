@@ -5,7 +5,7 @@ pragma solidity =0.8.25;
 import {
     RainterpreterExpressionDeployerDeploymentTest
 } from "test/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
-import {ParseStackOverflow} from "src/error/ErrParse.sol";
+import {ParseStackOverflow} from "../../../../src/error/ErrParse.sol";
 
 /// @title LibParseStateHighwaterTest
 /// @notice Tests for highwater in LibParseState.

@@ -5,9 +5,9 @@ pragma solidity =0.8.25;
 import {ParseTest} from "test/abstract/ParseTest.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 
-import {LibParse, UnexpectedRHSChar, UnexpectedRightParen} from "src/lib/parse/LibParse.sol";
+import {LibParse, UnexpectedRHSChar, UnexpectedRightParen} from "../../../../src/lib/parse/LibParse.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
-import {ParseState} from "src/lib/parse/LibParseState.sol";
+import {ParseState} from "../../../../src/lib/parse/LibParseState.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {ParseDecimalOverflow} from "rain.string/error/ErrParse.sol";
 

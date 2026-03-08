@@ -4,9 +4,9 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 
-import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
-import {LibEval} from "src/lib/eval/LibEval.sol";
+import {LibInterpreterState, InterpreterState} from "../../../../src/lib/state/LibInterpreterState.sol";
+import {LibAllStandardOps} from "../../../../src/lib/op/LibAllStandardOps.sol";
+import {LibEval} from "../../../../src/lib/eval/LibEval.sol";
 import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {
     IInterpreterStoreV3,

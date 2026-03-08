@@ -4,16 +4,16 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 
-import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
-import {LibEval} from "src/lib/eval/LibEval.sol";
+import {LibInterpreterState, InterpreterState} from "../../../../src/lib/state/LibInterpreterState.sol";
+import {LibAllStandardOps} from "../../../../src/lib/op/LibAllStandardOps.sol";
+import {LibEval} from "../../../../src/lib/eval/LibEval.sol";
 import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";
 import {
     IInterpreterStoreV3,
     FullyQualifiedNamespace
 } from "rain.interpreter.interface/interface/IInterpreterStoreV3.sol";
 import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
-import {InputsLengthMismatch} from "src/error/ErrEval.sol";
+import {InputsLengthMismatch} from "../../../../src/error/ErrEval.sol";
 
 /// @title LibEvalInputsLengthMismatchTest
 /// @notice Direct library-level tests for the InputsLengthMismatch revert in

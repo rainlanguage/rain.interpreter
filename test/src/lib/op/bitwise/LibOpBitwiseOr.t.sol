@@ -3,11 +3,11 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
+import {IntegrityCheckState} from "../../../../../src/lib/integrity/LibIntegrityCheck.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
-import {LibOpBitwiseOr} from "src/lib/op/bitwise/LibOpBitwiseOr.sol";
-import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {UnexpectedOperand} from "src/error/ErrParse.sol";
+import {LibOpBitwiseOr} from "../../../../../src/lib/op/bitwise/LibOpBitwiseOr.sol";
+import {InterpreterState} from "../../../../../src/lib/state/LibInterpreterState.sol";
+import {UnexpectedOperand} from "../../../../../src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 contract LibOpBitwiseOrTest is OpTest {

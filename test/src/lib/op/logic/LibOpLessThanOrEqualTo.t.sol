@@ -3,8 +3,8 @@
 pragma solidity =0.8.25;
 
 import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {LibOpLessThanOrEqualTo} from "src/lib/op/logic/LibOpLessThanOrEqualTo.sol";
-import {IntegrityCheckState, BadOpInputsLength} from "src/lib/integrity/LibIntegrityCheck.sol";
+import {LibOpLessThanOrEqualTo} from "../../../../../src/lib/op/logic/LibOpLessThanOrEqualTo.sol";
+import {IntegrityCheckState, BadOpInputsLength} from "../../../../../src/lib/integrity/LibIntegrityCheck.sol";
 import {
     OperandV2,
     SourceIndexV2,
@@ -12,7 +12,7 @@ import {
     EvalV4,
     StackItem
 } from "rain.interpreter.interface/interface/IInterpreterV4.sol";
-import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
+import {InterpreterState} from "../../../../../src/lib/state/LibInterpreterState.sol";
 import {SignedContextV1} from "rain.interpreter.interface/interface/IInterpreterCallerV4.sol";
 import {LibContext} from "rain.interpreter.interface/lib/caller/LibContext.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";

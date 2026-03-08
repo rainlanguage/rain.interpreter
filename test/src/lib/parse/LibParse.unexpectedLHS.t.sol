@@ -10,8 +10,8 @@ import {
     CMASK_LHS_STACK_DELIMITER,
     CMASK_LHS_STACK_HEAD
 } from "rain.string/lib/parse/LibParseCMask.sol";
-import {LibParse, UnexpectedLHSChar} from "src/lib/parse/LibParse.sol";
-import {ParseState} from "src/lib/parse/LibParseState.sol";
+import {LibParse, UnexpectedLHSChar} from "../../../../src/lib/parse/LibParse.sol";
+import {ParseState} from "../../../../src/lib/parse/LibParseState.sol";
 
 /// @title LibParseUnexpectedLHSTest
 /// @notice The parser should revert if it encounters an unexpected character on the LHS.

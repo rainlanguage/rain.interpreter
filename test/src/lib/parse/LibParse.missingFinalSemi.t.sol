@@ -3,9 +3,9 @@
 pragma solidity =0.8.25;
 
 import {ParseTest} from "test/abstract/ParseTest.sol";
-import {LibParse} from "src/lib/parse/LibParse.sol";
-import {ParseState} from "src/lib/parse/LibParseState.sol";
-import {MissingFinalSemi} from "src/error/ErrParse.sol";
+import {LibParse} from "../../../../src/lib/parse/LibParse.sol";
+import {ParseState} from "../../../../src/lib/parse/LibParseState.sol";
+import {MissingFinalSemi} from "../../../../src/error/ErrParse.sol";
 
 /// @title LibParseMissingFinalSemiTest
 /// @notice Tests that missing final semicolons are rejected. Every expression

@@ -7,9 +7,9 @@ import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {LibBytes32Array} from "rain.solmem/lib/LibBytes32Array.sol";
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {LibOpGet} from "src/lib/op/store/LibOpGet.sol";
-import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
+import {LibOpGet} from "../../../../../src/lib/op/store/LibOpGet.sol";
+import {IntegrityCheckState} from "../../../../../src/lib/integrity/LibIntegrityCheck.sol";
+import {InterpreterState} from "../../../../../src/lib/state/LibInterpreterState.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {StateNamespace} from "rain.interpreter.interface/interface/IInterpreterStoreV3.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";

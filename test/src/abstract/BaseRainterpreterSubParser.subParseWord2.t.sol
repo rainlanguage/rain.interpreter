@@ -7,9 +7,9 @@ import {
     BaseRainterpreterSubParser,
     SubParserIndexOutOfBounds,
     AuthoringMetaV2
-} from "src/abstract/BaseRainterpreterSubParser.sol";
+} from "../../../src/abstract/BaseRainterpreterSubParser.sol";
 import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";
-import {LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
+import {LibParseOperand} from "../../../src/lib/parse/LibParseOperand.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 

@@ -4,8 +4,8 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 
-import {RainterpreterParser} from "src/concrete/RainterpreterParser.sol";
-import {ParseMemoryOverflow} from "src/error/ErrParse.sol";
+import {RainterpreterParser} from "../../../src/concrete/RainterpreterParser.sol";
+import {ParseMemoryOverflow} from "../../../src/error/ErrParse.sol";
 
 /// Exposes the checkParseMemoryOverflow modifier on a trivial function so it
 /// can be tested in isolation without running the real parser.
