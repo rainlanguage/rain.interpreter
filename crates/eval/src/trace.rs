@@ -636,9 +636,7 @@ mod tests {
 
     #[test]
     fn test_rain_eval_results_into_flattened_table_empty() {
-        let rain_eval_results = RainEvalResults {
-            results: vec![],
-        };
+        let rain_eval_results = RainEvalResults { results: vec![] };
         let table = rain_eval_results.into_flattened_table();
         assert!(table.column_names.is_empty());
         assert!(table.rows.is_empty());

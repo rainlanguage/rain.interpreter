@@ -204,7 +204,10 @@ mod tests {
         assert!(result.is_ok());
         let eval_args = result.unwrap();
         assert_eq!(eval_args.context.len(), 2);
-        assert_eq!(eval_args.context[0], vec![U256::from(1), U256::from(2), U256::from(3)]);
+        assert_eq!(
+            eval_args.context[0],
+            vec![U256::from(1), U256::from(2), U256::from(3)]
+        );
         assert_eq!(eval_args.context[1], vec![U256::from(0xa), U256::from(0xb)]);
     }
 
