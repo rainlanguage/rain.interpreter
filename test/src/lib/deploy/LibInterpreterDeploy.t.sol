@@ -4,44 +4,44 @@ pragma solidity =0.8.25;
 
 import {Test, console2} from "forge-std/Test.sol";
 import {LibRainDeploy} from "rain.deploy/lib/LibRainDeploy.sol";
-import {LibInterpreterDeploy} from "src/lib/deploy/LibInterpreterDeploy.sol";
-import {RainterpreterParser} from "src/concrete/RainterpreterParser.sol";
-import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
-import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
-import {RainterpreterExpressionDeployer} from "src/concrete/RainterpreterExpressionDeployer.sol";
-import {RainterpreterDISPaiRegistry} from "src/concrete/RainterpreterDISPaiRegistry.sol";
+import {LibInterpreterDeploy} from "../../../../src/lib/deploy/LibInterpreterDeploy.sol";
+import {RainterpreterParser} from "../../../../src/concrete/RainterpreterParser.sol";
+import {RainterpreterStore} from "../../../../src/concrete/RainterpreterStore.sol";
+import {Rainterpreter} from "../../../../src/concrete/Rainterpreter.sol";
+import {RainterpreterExpressionDeployer} from "../../../../src/concrete/RainterpreterExpressionDeployer.sol";
+import {RainterpreterDISPaiRegistry} from "../../../../src/concrete/RainterpreterDISPaiRegistry.sol";
 import {LibExtrospectBytecode} from "rain.extrospection/lib/LibExtrospectBytecode.sol";
 import {LibExtrospectMetamorphic} from "rain.extrospection/lib/LibExtrospectMetamorphic.sol";
-import {RainterpreterReferenceExtern} from "src/concrete/extern/RainterpreterReferenceExtern.sol";
+import {RainterpreterReferenceExtern} from "../../../../src/concrete/extern/RainterpreterReferenceExtern.sol";
 import {
     CREATION_CODE as PARSER_CREATION_CODE,
     RUNTIME_CODE as PARSER_RUNTIME_CODE,
     DEPLOYED_ADDRESS as PARSER_GENERATED_ADDRESS
-} from "src/generated/RainterpreterParser.pointers.sol";
+} from "../../../../src/generated/RainterpreterParser.pointers.sol";
 import {
     CREATION_CODE as STORE_CREATION_CODE,
     RUNTIME_CODE as STORE_RUNTIME_CODE,
     DEPLOYED_ADDRESS as STORE_GENERATED_ADDRESS
-} from "src/generated/RainterpreterStore.pointers.sol";
+} from "../../../../src/generated/RainterpreterStore.pointers.sol";
 import {
     CREATION_CODE as INTERPRETER_CREATION_CODE,
     RUNTIME_CODE as INTERPRETER_RUNTIME_CODE,
     DEPLOYED_ADDRESS as INTERPRETER_GENERATED_ADDRESS
-} from "src/generated/Rainterpreter.pointers.sol";
+} from "../../../../src/generated/Rainterpreter.pointers.sol";
 import {
     CREATION_CODE as EXPRESSION_DEPLOYER_CREATION_CODE,
     RUNTIME_CODE as EXPRESSION_DEPLOYER_RUNTIME_CODE,
     DEPLOYED_ADDRESS as EXPRESSION_DEPLOYER_GENERATED_ADDRESS
-} from "src/generated/RainterpreterExpressionDeployer.pointers.sol";
+} from "../../../../src/generated/RainterpreterExpressionDeployer.pointers.sol";
 import {
     CREATION_CODE as DISPAIR_REGISTRY_CREATION_CODE,
     RUNTIME_CODE as DISPAIR_REGISTRY_RUNTIME_CODE,
     DEPLOYED_ADDRESS as DISPAIR_REGISTRY_GENERATED_ADDRESS
-} from "src/generated/RainterpreterDISPaiRegistry.pointers.sol";
+} from "../../../../src/generated/RainterpreterDISPaiRegistry.pointers.sol";
 import {
     CREATION_CODE as REFERENCE_EXTERN_CREATION_CODE,
     RUNTIME_CODE as REFERENCE_EXTERN_RUNTIME_CODE
-} from "src/generated/RainterpreterReferenceExtern.pointers.sol";
+} from "../../../../src/generated/RainterpreterReferenceExtern.pointers.sol";
 
 contract LibInterpreterDeployTest is Test {
     function testDeployAddressParser() external {

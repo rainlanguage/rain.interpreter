@@ -5,7 +5,7 @@ pragma solidity =0.8.25;
 import {
     RainterpreterExpressionDeployerDeploymentTest
 } from "test/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
-import {ParenOverflow} from "src/error/ErrParse.sol";
+import {ParenOverflow} from "../../../../src/error/ErrParse.sol";
 
 /// @title LibParseParenOverflowTest
 /// @notice Tests for paren overflow in LibParse.

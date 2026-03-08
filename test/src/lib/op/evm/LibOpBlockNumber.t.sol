@@ -7,9 +7,9 @@ import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 import {LibPointer, Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibStackPointer} from "rain.solmem/lib/LibStackPointer.sol";
-import {LibInterpreterState, InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {LibOpBlockNumber} from "src/lib/op/evm/LibOpBlockNumber.sol";
+import {LibInterpreterState, InterpreterState} from "../../../../../src/lib/state/LibInterpreterState.sol";
+import {IntegrityCheckState} from "../../../../../src/lib/integrity/LibIntegrityCheck.sol";
+import {LibOpBlockNumber} from "../../../../../src/lib/op/evm/LibOpBlockNumber.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 /// @title LibOpBlockNumberTest

@@ -4,8 +4,8 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {OPCODE_CONTEXT} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
-import {LibSubParse} from "src/lib/parse/LibSubParse.sol";
-import {ContextGridOverflow} from "src/error/ErrSubParse.sol";
+import {LibSubParse} from "../../../../src/lib/parse/LibSubParse.sol";
+import {ContextGridOverflow} from "../../../../src/error/ErrSubParse.sol";
 
 contract LibSubParseSubParserContextTest is Test {
     function subParserContextExternal(uint256 column, uint256 row)

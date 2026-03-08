@@ -4,10 +4,10 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
-import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
-import {LibParseInterstitial} from "src/lib/parse/LibParseInterstitial.sol";
-import {FSM_YANG_MASK} from "src/lib/parse/LibParseState.sol";
-import {MalformedCommentStart, UnclosedComment} from "src/error/ErrParse.sol";
+import {LibParseState, ParseState} from "../../../../src/lib/parse/LibParseState.sol";
+import {LibParseInterstitial} from "../../../../src/lib/parse/LibParseInterstitial.sol";
+import {FSM_YANG_MASK} from "../../../../src/lib/parse/LibParseState.sol";
+import {MalformedCommentStart, UnclosedComment} from "../../../../src/error/ErrParse.sol";
 
 /// @title LibParseInterstitialTest
 /// @notice Tests for LibParseInterstitial.

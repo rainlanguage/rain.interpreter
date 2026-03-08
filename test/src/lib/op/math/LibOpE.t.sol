@@ -3,10 +3,10 @@
 pragma solidity =0.8.25;
 
 import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {LibOpE} from "src/lib/op/math/LibOpE.sol";
+import {InterpreterState} from "../../../../../src/lib/state/LibInterpreterState.sol";
+import {LibOpE} from "../../../../../src/lib/op/math/LibOpE.sol";
 import {LibOperand, OperandV2} from "test/lib/operand/LibOperand.sol";
-import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
+import {IntegrityCheckState} from "../../../../../src/lib/integrity/LibIntegrityCheck.sol";
 import {
     EvalV4,
     StackItem,

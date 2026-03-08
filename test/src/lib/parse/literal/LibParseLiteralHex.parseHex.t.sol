@@ -5,9 +5,9 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std/Test.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
-import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
-import {LibParseLiteralHex} from "src/lib/parse/literal/LibParseLiteralHex.sol";
-import {HexLiteralOverflow, ZeroLengthHexLiteral, OddLengthHexLiteral} from "src/error/ErrParse.sol";
+import {LibParseState, ParseState} from "../../../../../src/lib/parse/LibParseState.sol";
+import {LibParseLiteralHex} from "../../../../../src/lib/parse/literal/LibParseLiteralHex.sol";
+import {HexLiteralOverflow, ZeroLengthHexLiteral, OddLengthHexLiteral} from "../../../../../src/error/ErrParse.sol";
 
 /// @title LibParseLiteralHexParseHexTest
 /// @notice Tests parsing hex literals with LibParseLiteralHex.

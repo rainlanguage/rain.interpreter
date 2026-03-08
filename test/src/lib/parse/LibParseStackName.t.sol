@@ -4,7 +4,7 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 
-import {ParseState, LibParseStackName} from "src/lib/parse/LibParse.sol";
+import {ParseState, LibParseStackName} from "../../../../src/lib/parse/LibParse.sol";
 
 /// @title LibParseStackNameTest
 /// @notice Tests for handling named stack items.

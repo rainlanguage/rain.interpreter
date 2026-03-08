@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
+import {InterpreterState} from "../../../../src/lib/state/LibInterpreterState.sol";
 import {LibInterpreterStateFingerprint} from "test/lib/state/LibInterpreterStateFingerprint.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {MemoryKV} from "rain.lib.memkv/lib/LibMemoryKV.sol";

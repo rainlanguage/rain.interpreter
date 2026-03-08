@@ -9,7 +9,7 @@ import {StateNamespace} from "rain.interpreter.interface/interface/IInterpreterS
 import {EvalV4, SourceIndexV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibNamespace} from "rain.interpreter.interface/lib/ns/LibNamespace.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
-import {OddSetLength} from "src/error/ErrStore.sol";
+import {OddSetLength} from "../../../src/error/ErrStore.sol";
 
 contract RainterpreterStateOverlayTest is RainterpreterExpressionDeployerDeploymentTest {
     /// Odd-length stateOverlay MUST revert with OddSetLength.

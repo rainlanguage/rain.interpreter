@@ -4,8 +4,8 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 
-import {Rainterpreter} from "src/concrete/Rainterpreter.sol";
-import {ZeroFunctionPointers} from "src/error/ErrEval.sol";
+import {Rainterpreter} from "../../../src/concrete/Rainterpreter.sol";
+import {ZeroFunctionPointers} from "../../../src/error/ErrEval.sol";
 
 contract ZeroFPRainterpreter is Rainterpreter {
     function opcodeFunctionPointers() internal pure override returns (bytes memory) {

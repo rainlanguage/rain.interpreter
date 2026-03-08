@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {Rainterpreter, OPCODE_FUNCTION_POINTERS} from "src/concrete/Rainterpreter.sol";
+import {Rainterpreter, OPCODE_FUNCTION_POINTERS} from "../../../src/concrete/Rainterpreter.sol";
 
 contract RainterpreterPointersTest is Test {
     function testOpcodeFunctionPointers() external {

@@ -3,13 +3,13 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {LibOpBitwiseShiftLeft} from "src/lib/op/bitwise/LibOpBitwiseShiftLeft.sol";
-import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
+import {IntegrityCheckState} from "../../../../../src/lib/integrity/LibIntegrityCheck.sol";
+import {LibOpBitwiseShiftLeft} from "../../../../../src/lib/op/bitwise/LibOpBitwiseShiftLeft.sol";
+import {InterpreterState} from "../../../../../src/lib/state/LibInterpreterState.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
-import {UnsupportedBitwiseShiftAmount} from "src/error/ErrBitwise.sol";
+import {UnsupportedBitwiseShiftAmount} from "../../../../../src/error/ErrBitwise.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
-import {OperandOverflow} from "src/error/ErrParse.sol";
+import {OperandOverflow} from "../../../../../src/error/ErrParse.sol";
 
 contract LibOpBitwiseShiftLeftTest is OpTest {
     function integrityExternal(IntegrityCheckState memory state, OperandV2 operand)

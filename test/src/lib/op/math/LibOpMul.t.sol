@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {console2} from "forge-std/Test.sol";
-import {LibOpMul} from "src/lib/op/math/LibOpMul.sol";
+import {LibOpMul} from "../../../../../src/lib/op/math/LibOpMul.sol";
 import {OpTest, IntegrityCheckState, OperandV2} from "test/abstract/OpTest.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";

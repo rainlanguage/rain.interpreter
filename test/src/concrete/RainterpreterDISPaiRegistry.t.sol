@@ -3,8 +3,8 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {RainterpreterDISPaiRegistry} from "src/concrete/RainterpreterDISPaiRegistry.sol";
-import {LibInterpreterDeploy} from "src/lib/deploy/LibInterpreterDeploy.sol";
+import {RainterpreterDISPaiRegistry} from "../../../src/concrete/RainterpreterDISPaiRegistry.sol";
+import {LibInterpreterDeploy} from "../../../src/lib/deploy/LibInterpreterDeploy.sol";
 
 contract RainterpreterDISPaiRegistryTest is Test {
     function testExpressionDeployerAddress() external {

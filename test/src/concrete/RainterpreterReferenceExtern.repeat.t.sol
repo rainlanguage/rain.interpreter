@@ -8,7 +8,7 @@ import {
     StackItem,
     InvalidRepeatCount,
     UnconsumedRepeatDispatchBytes
-} from "src/concrete/extern/RainterpreterReferenceExtern.sol";
+} from "../../../src/concrete/extern/RainterpreterReferenceExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 
 contract RainterpreterReferenceExternRepeatTest is OpTest {

@@ -5,8 +5,8 @@ pragma solidity =0.8.25;
 import {
     RainterpreterExpressionDeployerDeploymentTest
 } from "test/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
-import {RainterpreterParser} from "src/concrete/RainterpreterParser.sol";
-import {LibInterpreterDeploy} from "src/lib/deploy/LibInterpreterDeploy.sol";
+import {RainterpreterParser} from "../../../../src/concrete/RainterpreterParser.sol";
+import {LibInterpreterDeploy} from "../../../../src/lib/deploy/LibInterpreterDeploy.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 
 contract LibIntegrityCheckMultiSourceTest is RainterpreterExpressionDeployerDeploymentTest {

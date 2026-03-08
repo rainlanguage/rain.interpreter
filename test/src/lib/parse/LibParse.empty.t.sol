@@ -4,11 +4,11 @@ pragma solidity =0.8.25;
 
 import {OperandTest} from "test/abstract/OperandTest.sol";
 
-import {LibParse} from "src/lib/parse/LibParse.sol";
+import {LibParse} from "../../../../src/lib/parse/LibParse.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
-import {ParseState} from "src/lib/parse/LibParseState.sol";
-import {MaxSources} from "src/error/ErrParse.sol";
+import {ParseState} from "../../../../src/lib/parse/LibParseState.sol";
+import {MaxSources} from "../../../../src/error/ErrParse.sol";
 
 /// @title LibParseEmptyTest
 /// @notice Tests parsing empty sources and constants. All we want to check is that the

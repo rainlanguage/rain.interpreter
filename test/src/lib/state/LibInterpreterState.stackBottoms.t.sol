@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibInterpreterState} from "src/lib/state/LibInterpreterState.sol";
+import {LibInterpreterState} from "../../../../src/lib/state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 

@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {RainterpreterStore} from "src/concrete/RainterpreterStore.sol";
+import {RainterpreterStore} from "../../../src/concrete/RainterpreterStore.sol";
 import {
     LibNamespace,
     StateNamespace,

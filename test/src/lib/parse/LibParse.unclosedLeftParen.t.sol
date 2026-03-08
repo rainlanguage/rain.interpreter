@@ -3,9 +3,9 @@
 pragma solidity =0.8.25;
 
 import {ParseTest} from "test/abstract/ParseTest.sol";
-import {LibParse} from "src/lib/parse/LibParse.sol";
-import {UnclosedLeftParen} from "src/error/ErrParse.sol";
-import {ParseState} from "src/lib/parse/LibParseState.sol";
+import {LibParse} from "../../../../src/lib/parse/LibParse.sol";
+import {UnclosedLeftParen} from "../../../../src/error/ErrParse.sol";
+import {ParseState} from "../../../../src/lib/parse/LibParseState.sol";
 
 /// @title LibParseUnclosedLeftParenTest
 /// @notice Test that the parser errors when it encounters an unclosed left paren.

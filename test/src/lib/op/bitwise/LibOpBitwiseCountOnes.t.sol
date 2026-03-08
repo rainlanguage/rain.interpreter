@@ -3,13 +3,13 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {LibOpBitwiseCountOnes} from "src/lib/op/bitwise/LibOpBitwiseCountOnes.sol";
-import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
+import {IntegrityCheckState} from "../../../../../src/lib/integrity/LibIntegrityCheck.sol";
+import {LibOpBitwiseCountOnes} from "../../../../../src/lib/op/bitwise/LibOpBitwiseCountOnes.sol";
+import {InterpreterState} from "../../../../../src/lib/state/LibInterpreterState.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibCtPop} from "rain.math.binary/lib/LibCtPop.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
-import {UnexpectedOperand} from "src/error/ErrParse.sol";
+import {UnexpectedOperand} from "../../../../../src/error/ErrParse.sol";
 
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 

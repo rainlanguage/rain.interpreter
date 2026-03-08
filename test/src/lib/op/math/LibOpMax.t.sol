@@ -3,9 +3,9 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {LibOpMax} from "src/lib/op/math/LibOpMax.sol";
-import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
-import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
+import {LibOpMax} from "../../../../../src/lib/op/math/LibOpMax.sol";
+import {InterpreterState} from "../../../../../src/lib/state/LibInterpreterState.sol";
+import {IntegrityCheckState} from "../../../../../src/lib/integrity/LibIntegrityCheck.sol";
 import {OperandV2, StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";

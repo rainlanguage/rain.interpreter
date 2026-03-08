@@ -3,8 +3,8 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {RainterpreterReferenceExtern} from "src/concrete/extern/RainterpreterReferenceExtern.sol";
-import {SubParserIndexOutOfBounds} from "src/error/ErrSubParse.sol";
+import {RainterpreterReferenceExtern} from "../../../src/concrete/extern/RainterpreterReferenceExtern.sol";
+import {SubParserIndexOutOfBounds} from "../../../src/error/ErrSubParse.sol";
 
 /// @dev Mock subclass that forces matchSubParseLiteralDispatch to return an
 /// out-of-bounds index, triggering the SubParserIndexOutOfBounds check.

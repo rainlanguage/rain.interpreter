@@ -2,9 +2,9 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {ExpectedOperand, UnclosedOperand} from "src/error/ErrParse.sol";
+import {ExpectedOperand, UnclosedOperand} from "../../../../src/error/ErrParse.sol";
 import {OperandTest} from "test/abstract/OperandTest.sol";
-import {OperandOverflow} from "src/error/ErrParse.sol";
+import {OperandOverflow} from "../../../../src/error/ErrParse.sol";
 
 contract LibParseOperand8M1M1Test is OperandTest {
     /// Default is disallowed.

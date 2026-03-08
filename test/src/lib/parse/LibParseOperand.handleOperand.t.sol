@@ -3,10 +3,10 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibParseOperand, OperandV2} from "src/lib/parse/LibParseOperand.sol";
-import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
-import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
-import {UnexpectedOperand, ExpectedOperand} from "src/error/ErrParse.sol";
+import {LibParseOperand, OperandV2} from "../../../../src/lib/parse/LibParseOperand.sol";
+import {LibParseState, ParseState} from "../../../../src/lib/parse/LibParseState.sol";
+import {LibAllStandardOps} from "../../../../src/lib/op/LibAllStandardOps.sol";
+import {UnexpectedOperand, ExpectedOperand} from "../../../../src/error/ErrParse.sol";
 
 /// @title LibParseOperandHandleOperandTest
 /// @notice Direct unit tests for the `handleOperand` dispatch function.

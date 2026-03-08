@@ -3,16 +3,16 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
-import {LibSubParse} from "src/lib/parse/LibSubParse.sol";
-import {LibParse} from "src/lib/parse/LibParse.sol";
+import {LibParseState, ParseState} from "../../../../src/lib/parse/LibParseState.sol";
+import {LibSubParse} from "../../../../src/lib/parse/LibSubParse.sol";
+import {LibParse} from "../../../../src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {LibBytecode, Pointer} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {ISubParserV4} from "rain.interpreter.interface/interface/ISubParserV4.sol";
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 import {OPCODE_UNKNOWN, OPCODE_CONSTANT, OPCODE_CONTEXT} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
-import {UnknownWord} from "src/error/ErrParse.sol";
+import {UnknownWord} from "../../../../src/error/ErrParse.sol";
 
 /// @dev A sub parser that resolves any word by returning a context opcode with
 /// no constants. Used to verify that subParseWords iterates multiple sources.

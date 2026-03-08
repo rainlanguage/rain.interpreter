@@ -3,8 +3,8 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibParseStackTracker, ParseStackTracker} from "src/lib/parse/LibParseStackTracker.sol";
-import {ParseStackOverflow, ParseStackUnderflow} from "src/error/ErrParse.sol";
+import {LibParseStackTracker, ParseStackTracker} from "../../../../src/lib/parse/LibParseStackTracker.sol";
+import {ParseStackOverflow, ParseStackUnderflow} from "../../../../src/error/ErrParse.sol";
 
 contract LibParseStackTrackerTest is Test {
     using LibParseStackTracker for ParseStackTracker;

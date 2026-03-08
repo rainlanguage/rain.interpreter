@@ -3,8 +3,8 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibInterpreterStateDataContract} from "src/lib/state/LibInterpreterStateDataContract.sol";
-import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
+import {LibInterpreterStateDataContract} from "../../../../src/lib/state/LibInterpreterStateDataContract.sol";
+import {InterpreterState} from "../../../../src/lib/state/LibInterpreterState.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
 import {FullyQualifiedNamespace} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {IInterpreterStoreV3} from "rain.interpreter.interface/interface/IInterpreterStoreV3.sol";

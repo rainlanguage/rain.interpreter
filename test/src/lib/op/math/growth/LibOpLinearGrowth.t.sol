@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {OpTest, IntegrityCheckState, OperandV2, InterpreterState, UnexpectedOperand} from "test/abstract/OpTest.sol";
-import {LibOpLinearGrowth} from "src/lib/op/math/growth/LibOpLinearGrowth.sol";
+import {LibOpLinearGrowth} from "../../../../../../src/lib/op/math/growth/LibOpLinearGrowth.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 import {Float, LibDecimalFloat} from "rain.math.float/lib/LibDecimalFloat.sol";
 import {StackItem} from "rain.interpreter.interface/interface/IInterpreterV4.sol";

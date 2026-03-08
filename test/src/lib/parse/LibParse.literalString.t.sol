@@ -4,12 +4,12 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
-import {LibParse} from "src/lib/parse/LibParse.sol";
+import {LibParse} from "../../../../src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {IntOrAString, LibIntOrAString} from "rain.intorastring/lib/LibIntOrAString.sol";
-import {StringTooLong, UnclosedStringLiteral} from "src/error/ErrParse.sol";
+import {StringTooLong, UnclosedStringLiteral} from "../../../../src/error/ErrParse.sol";
 import {LibConformString} from "rain.string/lib/mut/LibConformString.sol";
-import {ParseState} from "src/lib/parse/LibParseState.sol";
+import {ParseState} from "../../../../src/lib/parse/LibParseState.sol";
 
 /// @title LibParseLiteralStringTest
 /// @notice Tests for parsing string literals.

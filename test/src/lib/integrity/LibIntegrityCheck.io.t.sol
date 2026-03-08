@@ -5,8 +5,8 @@ pragma solidity =0.8.25;
 import {
     RainterpreterExpressionDeployerDeploymentTest
 } from "test/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
-import {LibIntegrityCheck} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
+import {LibIntegrityCheck} from "../../../../src/lib/integrity/LibIntegrityCheck.sol";
+import {LibAllStandardOps} from "../../../../src/lib/op/LibAllStandardOps.sol";
 
 /// @title LibIntegrityCheckIoTest
 /// @notice Verifies that integrityCheck2 returns correctly encoded io bytes.

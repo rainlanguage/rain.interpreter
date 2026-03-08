@@ -9,8 +9,8 @@ import {
     LITERAL_PARSER_FUNCTION_POINTERS,
     PARSE_META,
     PARSE_META_BUILD_DEPTH
-} from "src/concrete/RainterpreterParser.sol";
-import {LibAllStandardOps, AuthoringMetaV2} from "src/lib/op/LibAllStandardOps.sol";
+} from "../../../src/concrete/RainterpreterParser.sol";
+import {LibAllStandardOps, AuthoringMetaV2} from "../../../src/lib/op/LibAllStandardOps.sol";
 import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";
 
 contract RainterpreterParserPointersTest is Test {

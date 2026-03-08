@@ -3,8 +3,8 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
-import {ParseStackOverflow} from "src/error/ErrParse.sol";
+import {LibParseState, ParseState} from "../../../../src/lib/parse/LibParseState.sol";
+import {ParseStackOverflow} from "../../../../src/error/ErrParse.sol";
 
 contract LibParseStateHighwaterOverflowTest is Test {
     using LibParseState for ParseState;

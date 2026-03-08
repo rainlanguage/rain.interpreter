@@ -4,8 +4,8 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {OPCODE_CONSTANT} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
-import {LibSubParse} from "src/lib/parse/LibSubParse.sol";
-import {ConstantOpcodeConstantsHeightOverflow} from "src/error/ErrSubParse.sol";
+import {LibSubParse} from "../../../../src/lib/parse/LibSubParse.sol";
+import {ConstantOpcodeConstantsHeightOverflow} from "../../../../src/error/ErrSubParse.sol";
 
 contract LibSubParseSubParserConstantTest is Test {
     function subParserConstantExternal(uint256 constantsHeight, bytes32 value)

@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {RainterpreterParser} from "src/concrete/RainterpreterParser.sol";
+import {RainterpreterParser} from "../../../src/concrete/RainterpreterParser.sol";
 import {PragmaV1} from "rain.interpreter.interface/interface/IParserPragmaV1.sol";
 
 /// @title RainterpreterParserParsePragmaEmptyInputTest

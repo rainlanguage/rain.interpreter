@@ -4,9 +4,9 @@ pragma solidity =0.8.25;
 
 import {ParseTest} from "test/abstract/ParseTest.sol";
 
-import {UnexpectedOperand, UnsupportedLiteralType} from "src/error/ErrParse.sol";
-import {LibParse, ExpectedLeftParen} from "src/lib/parse/LibParse.sol";
-import {ParseState} from "src/lib/parse/LibParseState.sol";
+import {UnexpectedOperand, UnsupportedLiteralType} from "../../../../src/error/ErrParse.sol";
+import {LibParse, ExpectedLeftParen} from "../../../../src/lib/parse/LibParse.sol";
+import {ParseState} from "../../../../src/lib/parse/LibParseState.sol";
 
 contract LibParseOperandDisallowedTest is ParseTest {
     using LibParse for ParseState;

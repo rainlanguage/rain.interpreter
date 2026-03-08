@@ -6,7 +6,7 @@ import {Test} from "forge-std/Test.sol";
 import {
     RainterpreterExpressionDeployer,
     INTEGRITY_FUNCTION_POINTERS
-} from "src/concrete/RainterpreterExpressionDeployer.sol";
+} from "../../../src/concrete/RainterpreterExpressionDeployer.sol";
 
 contract RainterpreterExpressionDeployerPointersTest is Test {
     function testIntegrityFunctionPointers() external {

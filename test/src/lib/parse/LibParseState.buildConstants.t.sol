@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
+import {LibParseState, ParseState} from "../../../../src/lib/parse/LibParseState.sol";
 
 /// @title LibParseStateBuildConstantsTest
 /// @notice Direct unit tests for buildConstants.

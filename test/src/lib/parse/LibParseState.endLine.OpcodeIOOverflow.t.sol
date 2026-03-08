@@ -5,7 +5,7 @@ pragma solidity =0.8.25;
 import {
     RainterpreterExpressionDeployerDeploymentTest
 } from "test/abstract/RainterpreterExpressionDeployerDeploymentTest.sol";
-import {OpcodeIOOverflow} from "src/error/ErrParse.sol";
+import {OpcodeIOOverflow} from "../../../../src/error/ErrParse.sol";
 
 /// @title LibParseStateOpcodeIOOverflowTest
 /// @notice Tests for OpcodeIOOverflow in endLine.

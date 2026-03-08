@@ -4,9 +4,9 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
-import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
-import {LibParseLiteral, UnsupportedLiteralType} from "src/lib/parse/literal/LibParseLiteral.sol";
-import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
+import {LibParseState, ParseState} from "../../src/lib/parse/LibParseState.sol";
+import {LibParseLiteral, UnsupportedLiteralType} from "../../src/lib/parse/literal/LibParseLiteral.sol";
+import {LibAllStandardOps} from "../../src/lib/op/LibAllStandardOps.sol";
 
 contract ParseLiteralTest is Test {
     using LibBytes for bytes;

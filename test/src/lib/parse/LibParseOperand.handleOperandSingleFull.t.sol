@@ -3,9 +3,9 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibParseOperand, OperandV2} from "src/lib/parse/LibParseOperand.sol";
-import {UnexpectedOperandValue} from "src/error/ErrParse.sol";
-import {OperandOverflow} from "src/error/ErrParse.sol";
+import {LibParseOperand, OperandV2} from "../../../../src/lib/parse/LibParseOperand.sol";
+import {UnexpectedOperandValue} from "../../../../src/error/ErrParse.sol";
+import {OperandOverflow} from "../../../../src/error/ErrParse.sol";
 
 contract LibParseOperandHandleOperandSingleFullTest is Test {
     function handleOperandSingleFullExternal(bytes32[] memory values) external pure returns (OperandV2) {

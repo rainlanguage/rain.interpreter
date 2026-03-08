@@ -5,7 +5,7 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std/Test.sol";
 import {IERC165} from "openzeppelin-contracts/contracts/utils/introspection/IERC165.sol";
 import {IInterpreterExternV4} from "rain.interpreter.interface/interface/IInterpreterExternV4.sol";
-import {BaseRainterpreterExtern} from "src/abstract/BaseRainterpreterExtern.sol";
+import {BaseRainterpreterExtern} from "../../../src/abstract/BaseRainterpreterExtern.sol";
 import {IIntegrityToolingV1} from "rain.sol.codegen/interface/IIntegrityToolingV1.sol";
 import {IOpcodeToolingV1} from "rain.sol.codegen/interface/IOpcodeToolingV1.sol";
 

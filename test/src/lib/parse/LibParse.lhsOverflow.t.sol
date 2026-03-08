@@ -3,8 +3,8 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {RainterpreterParser} from "src/concrete/RainterpreterParser.sol";
-import {LHSItemCountOverflow} from "src/error/ErrParse.sol";
+import {RainterpreterParser} from "../../../../src/concrete/RainterpreterParser.sol";
+import {LHSItemCountOverflow} from "../../../../src/error/ErrParse.sol";
 
 /// @title LibParseLHSOverflowTest
 /// @notice A single-byte counter in lineTracker and topLevel1 tracks LHS item

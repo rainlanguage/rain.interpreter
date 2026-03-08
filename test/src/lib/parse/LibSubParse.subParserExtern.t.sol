@@ -9,9 +9,9 @@ import {
     ExternDispatchV2,
     EncodedExternDispatchV2
 } from "rain.interpreter.interface/interface/IInterpreterExternV4.sol";
-import {LibSubParse} from "src/lib/parse/LibSubParse.sol";
-import {LibExtern} from "src/lib/extern/LibExtern.sol";
-import {ExternDispatchConstantsHeightOverflow} from "src/error/ErrSubParse.sol";
+import {LibSubParse} from "../../../../src/lib/parse/LibSubParse.sol";
+import {LibExtern} from "../../../../src/lib/extern/LibExtern.sol";
+import {ExternDispatchConstantsHeightOverflow} from "../../../../src/error/ErrSubParse.sol";
 
 contract LibSubParseSubParserExternTest is Test {
     function subParserExternExternal(

@@ -3,9 +3,9 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
+import {LibParseState, ParseState} from "../../../../src/lib/parse/LibParseState.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
-import {ParenInputOverflow} from "src/error/ErrParse.sol";
+import {ParenInputOverflow} from "../../../../src/error/ErrParse.sol";
 
 contract LibParseStateParenInputOverflowTest is Test {
     using LibParseState for ParseState;

@@ -3,9 +3,9 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std/Test.sol";
-import {LibParseOperand, OperandV2} from "src/lib/parse/LibParseOperand.sol";
-import {ExpectedOperand, UnexpectedOperandValue} from "src/error/ErrParse.sol";
-import {OperandOverflow} from "src/error/ErrParse.sol";
+import {LibParseOperand, OperandV2} from "../../../../src/lib/parse/LibParseOperand.sol";
+import {ExpectedOperand, UnexpectedOperandValue} from "../../../../src/error/ErrParse.sol";
+import {OperandOverflow} from "../../../../src/error/ErrParse.sol";
 
 contract LibParseOperandHandleOperand8M1M1Test is Test {
     //forge-lint: disable-next-line(mixed-case-function)

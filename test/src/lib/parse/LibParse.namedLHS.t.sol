@@ -5,13 +5,13 @@ pragma solidity =0.8.25;
 import {ParseTest} from "test/abstract/ParseTest.sol";
 
 import {AuthoringMetaV2} from "rain.interpreter.interface/interface/IParserV2.sol";
-import {LibParse, DuplicateLHSItem, WordSize} from "src/lib/parse/LibParse.sol";
+import {LibParse, DuplicateLHSItem, WordSize} from "../../../../src/lib/parse/LibParse.sol";
 import {LibBytecode} from "rain.interpreter.interface/lib/bytecode/LibBytecode.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
-import {LibParseState, ParseState} from "src/lib/parse/LibParseState.sol";
-import {OperandV2, LibParseOperand} from "src/lib/parse/LibParseOperand.sol";
+import {LibParseState, ParseState} from "../../../../src/lib/parse/LibParseState.sol";
+import {OperandV2, LibParseOperand} from "../../../../src/lib/parse/LibParseOperand.sol";
 import {LibConvert} from "rain.lib.typecast/LibConvert.sol";
-import {LibAllStandardOps} from "src/lib/op/LibAllStandardOps.sol";
+import {LibAllStandardOps} from "../../../../src/lib/op/LibAllStandardOps.sol";
 import {LibGenParseMeta} from "rain.interpreter.interface/lib/codegen/LibGenParseMeta.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 

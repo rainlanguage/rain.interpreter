@@ -4,13 +4,13 @@ pragma solidity ^0.8.18;
 
 import {OpTest} from "test/abstract/OpTest.sol";
 
-import {NotAnExternContract, BadOutputsLength} from "src/error/ErrExtern.sol";
-import {IntegrityCheckState} from "src/lib/integrity/LibIntegrityCheck.sol";
-import {InterpreterState} from "src/lib/state/LibInterpreterState.sol";
+import {NotAnExternContract, BadOutputsLength} from "../../../../../src/error/ErrExtern.sol";
+import {IntegrityCheckState} from "../../../../../src/lib/integrity/LibIntegrityCheck.sol";
+import {InterpreterState} from "../../../../../src/lib/state/LibInterpreterState.sol";
 import {OperandV2} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
 import {Pointer} from "rain.solmem/lib/LibPointer.sol";
-import {LibOpExtern} from "src/lib/op/00/LibOpExtern.sol";
-import {LibExtern} from "src/lib/extern/LibExtern.sol";
+import {LibOpExtern} from "../../../../../src/lib/op/00/LibOpExtern.sol";
+import {LibExtern} from "../../../../../src/lib/extern/LibExtern.sol";
 import {
     EncodedExternDispatchV2,
     IInterpreterExternV4,

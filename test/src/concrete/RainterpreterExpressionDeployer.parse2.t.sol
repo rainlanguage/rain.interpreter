@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
-import {MissingFinalSemi} from "src/error/ErrParse.sol";
+import {MissingFinalSemi} from "../../../src/error/ErrParse.sol";
 import {BadOpInputsLength} from "rain.interpreter.interface/error/ErrIntegrity.sol";
 
 contract RainterpreterExpressionDeployerParse2Test is OpTest {

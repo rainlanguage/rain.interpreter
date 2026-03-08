@@ -7,7 +7,7 @@ import {
     RainterpreterReferenceExtern,
     OP_INDEX_INCREMENT,
     LibExternOpIntInc
-} from "src/concrete/extern/RainterpreterReferenceExtern.sol";
+} from "../../../src/concrete/extern/RainterpreterReferenceExtern.sol";
 import {
     ExternDispatchV2,
     EncodedExternDispatchV2,
@@ -15,7 +15,7 @@ import {
     StackItem
 } from "rain.interpreter.interface/interface/IInterpreterExternV4.sol";
 import {OperandV2, OPCODE_EXTERN} from "rain.interpreter.interface/interface/IInterpreterV4.sol";
-import {LibExtern} from "src/lib/extern/LibExtern.sol";
+import {LibExtern} from "../../../src/lib/extern/LibExtern.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {LibDecimalFloat, Float} from "rain.math.float/lib/LibDecimalFloat.sol";
 
