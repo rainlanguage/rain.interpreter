@@ -99,7 +99,7 @@ External contracts can extend the interpreter with additional opcodes. `src/conc
 ## Solidity Conventions
 
 - **Solidity version**: exactly `0.8.25`, EVM target `cancun`
-- **Optimizer**: enabled, 1000 runs
+- **Optimizer**: enabled, 1000000 runs
 - **Fuzz runs**: 2048
 - Source of truth for these settings is `foundry.toml`
 - **License**: `LicenseRef-DCL-1.0` with copyright `Rain Open Source Software Ltd`
@@ -113,7 +113,7 @@ External contracts can extend the interpreter with additional opcodes. `src/conc
 Testing patterns and conventions are in `TESTING.md`. Read that file before writing tests.
 
 - Test files are in `test/` mirroring `src/` structure, suffixed `.t.sol`
-- Rust test fixtures (`crates/test_fixtures/`) deploy all four contracts on a local Anvil instance
+- Rust test fixtures (`crates/test_fixtures/`) deploy all five contracts on a local Anvil instance
 - Always run test commands with `run_in_background: true` so work continues in parallel
 - While background builds or tests run, continue with other work that doesn't depend on the build result — e.g. triage presentation, code review, documentation edits
 
@@ -136,4 +136,4 @@ Do not claim motivations or internal states. Describe what you actually did, not
 
 ## Audit Review
 
-Audit instructions are available as skills: `/audit` (full overview), `/audit-pass0` through `/audit-pass4` (individual passes), and `/audit-triage` (finding triage).
+Audit instructions are available as skills: `/audit` (full overview), `/audit-pass0` through `/audit-pass5` (individual passes), and `/audit-triage` (finding triage).

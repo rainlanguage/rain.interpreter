@@ -29,6 +29,23 @@ contract RainterpreterReferenceExternRepeatTest is OpTest {
         checkHappy(bytes(string.concat(baseStr, "eighteight: [ref-extern-repeat-8 zz];")), expectedStack, "repeat 8 zz");
     }
 
+    /// Repeat count 0 produces 0 regardless of body length.
+    function testRainterpreterReferenceExternRepeatZero() external {
+        RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();
+        string memory baseStr = string.concat("using-words-from ", address(extern).toHexString(), " ");
+
+        StackItem[] memory expectedStack = new StackItem[](1);
+        expectedStack[0] = StackItem.wrap(bytes32(uint256(0)));
+
+        checkHappy(
+            bytes(string.concat(baseStr, "zero: [ref-extern-repeat-0 abc];")), expectedStack, "repeat 0 abc"
+        );
+
+        checkHappy(
+            bytes(string.concat(baseStr, "zerosingle: [ref-extern-repeat-0 x];")), expectedStack, "repeat 0 x"
+        );
+    }
+
     /// Negative repeat count must revert with InvalidRepeatCount.
     function testRainterpreterReferenceExternRepeatNegative() external {
         RainterpreterReferenceExtern extern = new RainterpreterReferenceExtern();

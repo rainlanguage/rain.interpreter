@@ -27,7 +27,7 @@ bytes constant SUB_PARSER_WORD_PARSERS = hex"";
 
 /// @dev This is a placeholder for the subparser meta bytes.
 /// The subparser meta bytes are the same structure as the main parser meta
-/// bytes. The exact same process of hashing, blooming, fingeprinting and index
+/// bytes. The exact same process of hashing, blooming, fingerprinting and index
 /// lookup applies to the subparser meta bytes as the main parser meta bytes.
 bytes constant SUB_PARSER_PARSE_META = hex"";
 

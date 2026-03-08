@@ -4,6 +4,8 @@ pragma solidity ^0.8.25;
 
 import {ParseState} from "./LibParseState.sol";
 
+/// @title LibParseError
+/// @notice Utilities for computing error offsets during parsing.
 library LibParseError {
     /// @notice Calculates the byte offset of a cursor position relative to the start
     /// of the parse data, for use in error reporting.

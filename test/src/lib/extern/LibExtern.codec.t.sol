@@ -45,6 +45,18 @@ contract LibExternCodecTest is Test {
         assertEq(OperandV2.unwrap(decodedOperand), bytes32(uint256(operandVal)));
     }
 
+    /// Decode masks the opcode to 16 bits even when high bits are set in the
+    /// dispatch word above the opcode region.
+    function testDecodeExternDispatchMasksOpcode(bytes32 raw, uint16 operandVal) external pure {
+        // Force high bits above the opcode+operand region so they would leak
+        // through an unmasked shift.
+        raw = raw | bytes32(uint256(1) << 32);
+        // Preserve only the operand in the low 16 bits.
+        raw = (raw & ~bytes32(uint256(type(uint16).max))) | bytes32(uint256(operandVal));
+        (uint256 decodedOpcode,) = LibExtern.decodeExternDispatch(ExternDispatchV2.wrap(raw));
+        assertLe(decodedOpcode, type(uint16).max, "opcode must fit in 16 bits");
+    }
+
     /// Standalone decode of `EncodedExternDispatchV2` from a manually
     /// constructed word, independent of `encodeExternCall`.
     function testDecodeExternCallStandalone(address externAddr, uint16 opcode, uint16 operandVal) external pure {

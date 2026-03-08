@@ -12,7 +12,7 @@ Standard libraries and interfaces defining and working with `InterpeterState` in
 - source compilation from opcodes
 - state (de)serialization (more gas efficient than abi encoding)
 
-Interpreters are designed to be highly moddable behind the `IInterpreterV1`
+Interpreters are designed to be highly moddable behind the `IInterpreterV4`
 interface, but pretty much any interpreter that uses `InterpreterState` will
 need these low level facilities verbatim. Further, these facilities
 (with possible exception of debugging logic), while relatively short in terms
@@ -32,7 +32,7 @@ interpreter, represented as a `uint256[]` was reversed between `eval` and
 `eval2`. The compiler cannot protect downstream contracts from such a change,
 even if we were to scream it in the code comments, so such changes are considered
 dangerous and justify a version number at the method level
-(e.g. `eval` and `eval2`).
+(e.g. `eval`, `eval2`, through to the current `eval4`).
 
 The goal is to intentionally loudly break things at the compiler level, or at
 least _reliably_ at runtime (i.e. unconditionally erroring every call to X). We
@@ -87,4 +87,5 @@ There are some branches that were forked from `main` for historical reasons, tha
 MAY be of interest situationally, but otherwise should be ignored.
 
 - `main-np`: Forked from the last commit using `eval` before `eval2` was the
-  primary interface into the interpreter. No longer actively developed.
+  primary interface into the interpreter (now superseded by `eval4`). No longer
+  actively developed.

@@ -208,9 +208,10 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
         return INTEGRITY_FUNCTION_POINTERS;
     }
 
-    /// @notice The literal parsers are the same as the main parser.
+    /// @notice Builds the extern's own literal parser function pointers for
+    /// sub-parsing. Contains only the repeat literal parser.
     /// @inheritdoc IParserToolingV1
-    function buildLiteralParserFunctionPointers() external pure returns (bytes memory) {
+    function buildLiteralParserFunctionPointers() external pure override returns (bytes memory) {
         unchecked {
             function(uint256, uint256, uint256) internal pure returns (uint256) lengthPointer;
             uint256 length = SUB_PARSER_LITERAL_PARSERS_LENGTH;
@@ -322,7 +323,7 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
     /// done within the test itself is that the pointers need to be calculated
     /// relative to the bytecode of the current contract, not the test contract.
     /// @inheritdoc ISubParserToolingV1
-    function buildSubParserWordParsers() external pure returns (bytes memory) {
+    function buildSubParserWordParsers() external pure override returns (bytes memory) {
         unchecked {
             function(uint256, uint256, OperandV2) internal view returns (bool, bytes memory, bytes32[] memory)
                 lengthPointer;
@@ -364,7 +365,7 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
     /// done within the test itself is that the pointers need to be calculated
     /// relative to the bytecode of the current contract, not the test contract.
     /// @return The packed 16-bit function pointers for each extern opcode.
-    function buildOpcodeFunctionPointers() external pure returns (bytes memory) {
+    function buildOpcodeFunctionPointers() external pure override returns (bytes memory) {
         unchecked {
             function(OperandV2, StackItem[] memory) internal view returns (StackItem[] memory) lengthPointer;
             uint256 length = OPCODE_FUNCTION_POINTERS_LENGTH;
@@ -398,7 +399,7 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
     /// test itself is that the pointers need to be calculated relative to the
     /// bytecode of the current contract, not the test contract.
     /// @return The packed 16-bit function pointers for each integrity check.
-    function buildIntegrityFunctionPointers() external pure returns (bytes memory) {
+    function buildIntegrityFunctionPointers() external pure override returns (bytes memory) {
         unchecked {
             function(OperandV2, uint256, uint256) internal pure returns (uint256, uint256) lengthPointer;
             uint256 length = OPCODE_FUNCTION_POINTERS_LENGTH;
