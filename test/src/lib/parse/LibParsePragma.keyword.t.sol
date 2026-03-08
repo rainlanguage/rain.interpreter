@@ -5,7 +5,11 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std/Test.sol";
 
 import {LibParseState, ParseState} from "../../../../src/lib/parse/LibParseState.sol";
-import {LibParsePragma, PRAGMA_KEYWORD_BYTES_LENGTH, PRAGMA_KEYWORD_BYTES} from "../../../../src/lib/parse/LibParsePragma.sol";
+import {
+    LibParsePragma,
+    PRAGMA_KEYWORD_BYTES_LENGTH,
+    PRAGMA_KEYWORD_BYTES
+} from "../../../../src/lib/parse/LibParsePragma.sol";
 import {LibBytes, Pointer} from "rain.solmem/lib/LibBytes.sol";
 import {
     CMASK_WHITESPACE,

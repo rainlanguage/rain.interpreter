@@ -27,6 +27,7 @@ import {LibTestCast} from "test/lib/typecast/LibTestCast.sol";
 contract LibOpUint256ERC721BalanceOfTest is OpTest {
     using LibTestCast for StackItem[];
     using LibBytes32Array for bytes32[];
+
     function testOpERC721BalanceOfIntegrity(
         IntegrityCheckState memory state,
         uint8 inputs,

@@ -31,8 +31,7 @@ contract LibIntegrityCheckIoTest is RainterpreterExpressionDeployerDeploymentTes
 
     /// Two sources with different output counts.
     function testIntegrityCheck2IoTwoSources() external {
-        (bytes memory bytecode, bytes32[] memory constants) =
-            I_PARSER.unsafeParse(bytes("_: 1;_: 2, _: 3;"));
+        (bytes memory bytecode, bytes32[] memory constants) = I_PARSER.unsafeParse(bytes("_: 1;_: 2, _: 3;"));
         bytes memory io = this.externalIntegrityCheck(bytecode, constants);
         assertEq(io.length, 4, "io length for 2 sources");
         assertEq(uint8(io[0]), 0, "source 0 inputs");

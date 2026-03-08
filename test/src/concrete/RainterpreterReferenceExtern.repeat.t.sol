@@ -37,13 +37,9 @@ contract RainterpreterReferenceExternRepeatTest is OpTest {
         StackItem[] memory expectedStack = new StackItem[](1);
         expectedStack[0] = StackItem.wrap(bytes32(uint256(0)));
 
-        checkHappy(
-            bytes(string.concat(baseStr, "zero: [ref-extern-repeat-0 abc];")), expectedStack, "repeat 0 abc"
-        );
+        checkHappy(bytes(string.concat(baseStr, "zero: [ref-extern-repeat-0 abc];")), expectedStack, "repeat 0 abc");
 
-        checkHappy(
-            bytes(string.concat(baseStr, "zerosingle: [ref-extern-repeat-0 x];")), expectedStack, "repeat 0 x"
-        );
+        checkHappy(bytes(string.concat(baseStr, "zerosingle: [ref-extern-repeat-0 x];")), expectedStack, "repeat 0 x");
     }
 
     /// Negative repeat count must revert with InvalidRepeatCount.
