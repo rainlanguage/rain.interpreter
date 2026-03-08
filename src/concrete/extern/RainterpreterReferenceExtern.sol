@@ -176,35 +176,35 @@ contract RainterpreterReferenceExtern is BaseRainterpreterSubParser, BaseRainter
     /// Overrides the base function pointers for sub parsing. Simply returns the
     /// known constant value, which should allow the compiler to optimise the
     /// entire function call away.
-    function subParserWordParsers() internal pure override returns (bytes memory) {
+    function subParserWordParsers() internal pure virtual override returns (bytes memory) {
         return SUB_PARSER_WORD_PARSERS;
     }
 
     /// Overrides the base operand handlers for sub parsing. Simply returns the
     /// known constant value, which should allow the compiler to optimise the
     /// entire function call away.
-    function subParserOperandHandlers() internal pure override returns (bytes memory) {
+    function subParserOperandHandlers() internal pure virtual override returns (bytes memory) {
         return OPERAND_HANDLER_FUNCTION_POINTERS;
     }
 
     /// Overrides the base literal parsers for sub parsing. Simply returns the
     /// known constant value, which should allow the compiler to optimise the
     /// entire function call away.
-    function subParserLiteralParsers() internal pure override returns (bytes memory) {
+    function subParserLiteralParsers() internal pure virtual override returns (bytes memory) {
         return LITERAL_PARSER_FUNCTION_POINTERS;
     }
 
     /// Overrides the base function pointers for opcodes. Simply returns the
     /// known constant value, which should allow the compiler to optimise the
     /// entire function call away.
-    function opcodeFunctionPointers() internal pure override returns (bytes memory) {
+    function opcodeFunctionPointers() internal pure virtual override returns (bytes memory) {
         return OPCODE_FUNCTION_POINTERS;
     }
 
     /// Overrides the base function pointers for integrity checks. Simply returns
     /// the known constant value, which should allow the compiler to optimise the
     /// entire function call away.
-    function integrityFunctionPointers() internal pure override returns (bytes memory) {
+    function integrityFunctionPointers() internal pure virtual override returns (bytes memory) {
         return INTEGRITY_FUNCTION_POINTERS;
     }
 

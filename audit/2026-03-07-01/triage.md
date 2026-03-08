@@ -39,8 +39,8 @@
 ## Pass 4: Code Quality
 
 - [FIXED] P4-A01-5: (LOW) RainterpreterReferenceExtern 4 build* functions missing override
-- [PENDING] P4-A01-6: (LOW) subParserParseMeta has virtual override while siblings have only override
+- [FIXED] P4-A01-6: (LOW) subParserParseMeta has virtual override while siblings have only override
 - [DISMISSED] P4-A01-7: (LOW) Inconsistent @notice on BaseRainterpreterExtern — duplicate of P3 A01-3 INFO finding
-- [PENDING] P4-ALLOP-01: (LOW) 3 ERC20 opcodes import IInterpreterV4.sol twice
-- [PENDING] P4-RUST-01: (LOW) revm version mismatch between workspace and eval crate
-- [PENDING] P4-RUST-02: (LOW) tokio not in workspace dependencies
+- [FIXED] P4-ALLOP-01: (LOW) 3 ERC20 opcodes import IInterpreterV4.sol twice
+- [SKIPPED] P4-RUST-01: (LOW) revm version mismatch between workspace and eval crate
+- [SKIPPED] P4-RUST-02: (LOW) tokio not in workspace dependencies
