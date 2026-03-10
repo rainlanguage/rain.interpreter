@@ -100,10 +100,13 @@ pub trait Parser2 {
 }
 
 /// Client-side wrapper around a deployer address that implements [`Parser2`]
-/// by making read calls to the on-chain parser contract.
+/// by making read calls to the on-chain deployer contract (which implements
+/// `IParserV2`).
+///
+/// The deployer address is typically discovered from the DISPaiR registry.
 #[derive(Clone, Default)]
 pub struct ParserV2 {
-    /// The address of the expression deployer whose parser will be called.
+    /// The address of the expression deployer (implements `IParserV2`).
     pub deployer_address: Address,
 }
 

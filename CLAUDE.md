@@ -63,9 +63,9 @@ After any source change affecting bytecode: run `nix develop -c i9r-prelude` →
 
 3. **Rainterpreter** (`src/concrete/Rainterpreter.sol`) — Stack-based evaluation runtime. Entry point: `eval4()`. Dispatches opcodes via function pointer tables.
 
-4. **RainterpreterExpressionDeployer** (`src/concrete/RainterpreterExpressionDeployer.sol`) — Coordinates parse → integrity check → serialize. Enforces bytecode hash checks for the other three components. Implements `IParserV2`.
+4. **RainterpreterExpressionDeployer** (`src/concrete/RainterpreterExpressionDeployer.sol`) — Coordinates parse → integrity check → serialize. Implements `IParserV2`.
 
-5. **RainterpreterDISPaiRegistry** (`src/concrete/RainterpreterDISPaiRegistry.sol`) — On-chain registry of DISPair (deployer, interpreter, store, parser) tuples. Embeds the addresses of the other four components.
+5. **RainterpreterDISPaiRegistry** (`src/concrete/RainterpreterDISPaiRegistry.sol`) — On-chain registry and single discovery point for the DISPair (deployer, interpreter, store, parser) tuple. External tooling discovers all component addresses by querying a single known registry address.
 
 All five are deployed to deterministic addresses via Zoltu deployer. Addresses and code hashes are in `src/lib/deploy/LibInterpreterDeploy.sol`. Deploy constants cascade: parser → expression deployer → DISPaiRegistry. Interpreter changes also cascade to DISPaiRegistry.
 
