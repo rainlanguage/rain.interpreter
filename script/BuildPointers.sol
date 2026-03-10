@@ -7,7 +7,7 @@ import {Rainterpreter} from "../src/concrete/Rainterpreter.sol";
 import {RainterpreterStore} from "../src/concrete/RainterpreterStore.sol";
 import {RainterpreterParser, PARSE_META_BUILD_DEPTH} from "../src/concrete/RainterpreterParser.sol";
 import {RainterpreterExpressionDeployer} from "../src/concrete/RainterpreterExpressionDeployer.sol";
-import {RainterpreterDISPaiRegistry} from "../src/concrete/RainterpreterDISPaiRegistry.sol";
+import {Rainlang} from "../src/concrete/Rainlang.sol";
 import {
     RainterpreterReferenceExtern,
     LibRainterpreterReferenceExtern,
@@ -200,21 +200,21 @@ contract BuildPointers is Script {
         );
     }
 
-    /// Builds the RainterpreterDISPaiRegistry pointer file.
-    function buildRainterpreterDISPaiRegistryPointers() internal {
-        address deployed = LibRainDeploy.deployZoltu(type(RainterpreterDISPaiRegistry).creationCode);
+    /// Builds the Rainlang pointer file.
+    function buildRainlangPointers() internal {
+        address deployed = LibRainDeploy.deployZoltu(type(Rainlang).creationCode);
 
         LibFs.buildFileForContract(
             vm,
             deployed,
-            "RainterpreterDISPaiRegistry",
+            "Rainlang",
             string.concat(
                 addressConstantString(deployed),
                 LibCodeGen.bytesConstantString(
                     vm,
                     "/// @dev The creation bytecode of the contract.",
                     "CREATION_CODE",
-                    type(RainterpreterDISPaiRegistry).creationCode
+                    type(Rainlang).creationCode
                 ),
                 LibCodeGen.bytesConstantString(
                     vm, "/// @dev The runtime bytecode of the contract.", "RUNTIME_CODE", deployed.code
@@ -232,6 +232,6 @@ contract BuildPointers is Script {
         buildRainterpreterParserPointers();
         buildRainterpreterExpressionDeployerPointers();
         buildRainterpreterReferenceExternPointers();
-        buildRainterpreterDISPaiRegistryPointers();
+        buildRainlangPointers();
     }
 }

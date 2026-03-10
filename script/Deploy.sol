@@ -15,8 +15,8 @@ import {
     CREATION_CODE as EXPRESSION_DEPLOYER_CREATION_CODE
 } from "../src/generated/RainterpreterExpressionDeployer.pointers.sol";
 import {
-    CREATION_CODE as DISPAIR_REGISTRY_CREATION_CODE
-} from "../src/generated/RainterpreterDISPaiRegistry.pointers.sol";
+    CREATION_CODE as RAINLANG_CREATION_CODE
+} from "../src/generated/Rainlang.pointers.sol";
 
 /// @dev Deployment suite selector for the parser.
 bytes32 constant DEPLOYMENT_SUITE_PARSER = keccak256("parser");
@@ -26,14 +26,14 @@ bytes32 constant DEPLOYMENT_SUITE_STORE = keccak256("store");
 bytes32 constant DEPLOYMENT_SUITE_INTERPRETER = keccak256("interpreter");
 /// @dev Deployment suite selector for the expression deployer.
 bytes32 constant DEPLOYMENT_SUITE_EXPRESSION_DEPLOYER = keccak256("expression-deployer");
-/// @dev Deployment suite selector for the DISPaiR registry.
-bytes32 constant DEPLOYMENT_SUITE_DISPAIR_REGISTRY = keccak256("dispair-registry");
+/// @dev Deployment suite selector for Rainlang.
+bytes32 constant DEPLOYMENT_SUITE_RAINLANG = keccak256("rainlang");
 
 /// @title Deploy
 /// @notice Forge script that deploys a single interpreter component to all
 /// supported networks. The `DEPLOYMENT_SUITE` env var selects which component
 /// to deploy: "parser", "store", "interpreter", "expression-deployer", or
-/// "dispair-registry". Defaults to "parser" if not set. Uses precompiled
+/// "rainlang". Defaults to "parser" if not set. Uses precompiled
 /// creation code from the generated pointers files rather than compiling
 /// contracts at deploy time.
 contract Deploy is Script {
@@ -112,8 +112,8 @@ contract Deploy is Script {
                 deployerDeps,
                 sDepCodeHashes
             );
-        } else if (suite == DEPLOYMENT_SUITE_DISPAIR_REGISTRY) {
-            console2.log("Deploying RainterpreterDISPaiRegistry...");
+        } else if (suite == DEPLOYMENT_SUITE_RAINLANG) {
+            console2.log("Deploying Rainlang...");
             address[] memory registryDeps = new address[](5);
             registryDeps[0] = address(LibTOFUTokenDecimals.TOFU_DECIMALS_DEPLOYMENT);
             registryDeps[1] = LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS;
@@ -124,10 +124,10 @@ contract Deploy is Script {
                 vm,
                 LibRainDeploy.supportedNetworks(),
                 deployerPrivateKey,
-                DISPAIR_REGISTRY_CREATION_CODE,
-                "src/concrete/RainterpreterDISPaiRegistry.sol:RainterpreterDISPaiRegistry",
-                LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_ADDRESS,
-                LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_CODEHASH,
+                RAINLANG_CREATION_CODE,
+                "src/concrete/Rainlang.sol:Rainlang",
+                LibInterpreterDeploy.RAINLANG_DEPLOYED_ADDRESS,
+                LibInterpreterDeploy.RAINLANG_DEPLOYED_CODEHASH,
                 registryDeps,
                 sDepCodeHashes
             );

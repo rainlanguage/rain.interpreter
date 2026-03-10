@@ -354,7 +354,7 @@ mod tests {
                 "
                 .into(),
                 source_index: 0,
-                registry: local_evm.registry,
+                rainlang: local_evm.rainlang,
                 namespace: FullyQualifiedNamespace::default(),
                 context: vec![],
                 decode_errors: true,
@@ -425,7 +425,7 @@ mod tests {
                 "
                 .into(),
                 source_index: 0,
-                registry: local_evm.registry,
+                rainlang: local_evm.rainlang,
                 namespace: FullyQualifiedNamespace::default(),
                 context: vec![],
                 decode_errors: true,
@@ -492,7 +492,7 @@ mod tests {
                 "
                 .into(),
                 source_index: 0,
-                registry: local_evm.registry,
+                rainlang: local_evm.rainlang,
                 namespace: FullyQualifiedNamespace::default(),
                 context: vec![],
                 decode_errors: true,

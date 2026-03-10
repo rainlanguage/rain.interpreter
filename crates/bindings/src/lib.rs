@@ -32,6 +32,6 @@ sol!(
 
 sol!(
     #![sol(all_derives = true)]
-    RainterpreterDISPaiRegistry,
-    "../../out/RainterpreterDISPaiRegistry.sol/RainterpreterDISPaiRegistry.json"
+    Rainlang,
+    "../../out/Rainlang.sol/Rainlang.json"
 );

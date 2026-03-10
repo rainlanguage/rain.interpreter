@@ -9,7 +9,7 @@ import {RainterpreterParser} from "../../../../src/concrete/RainterpreterParser.
 import {RainterpreterStore} from "../../../../src/concrete/RainterpreterStore.sol";
 import {Rainterpreter} from "../../../../src/concrete/Rainterpreter.sol";
 import {RainterpreterExpressionDeployer} from "../../../../src/concrete/RainterpreterExpressionDeployer.sol";
-import {RainterpreterDISPaiRegistry} from "../../../../src/concrete/RainterpreterDISPaiRegistry.sol";
+import {Rainlang} from "../../../../src/concrete/Rainlang.sol";
 import {LibExtrospectBytecode} from "rain.extrospection/lib/LibExtrospectBytecode.sol";
 import {LibExtrospectMetamorphic} from "rain.extrospection/lib/LibExtrospectMetamorphic.sol";
 import {RainterpreterReferenceExtern} from "../../../../src/concrete/extern/RainterpreterReferenceExtern.sol";
@@ -34,10 +34,10 @@ import {
     DEPLOYED_ADDRESS as EXPRESSION_DEPLOYER_GENERATED_ADDRESS
 } from "../../../../src/generated/RainterpreterExpressionDeployer.pointers.sol";
 import {
-    CREATION_CODE as DISPAIR_REGISTRY_CREATION_CODE,
-    RUNTIME_CODE as DISPAIR_REGISTRY_RUNTIME_CODE,
-    DEPLOYED_ADDRESS as DISPAIR_REGISTRY_GENERATED_ADDRESS
-} from "../../../../src/generated/RainterpreterDISPaiRegistry.pointers.sol";
+    CREATION_CODE as RAINLANG_CREATION_CODE,
+    RUNTIME_CODE as RAINLANG_RUNTIME_CODE,
+    DEPLOYED_ADDRESS as RAINLANG_GENERATED_ADDRESS
+} from "../../../../src/generated/Rainlang.pointers.sol";
 import {
     CREATION_CODE as REFERENCE_EXTERN_CREATION_CODE,
     RUNTIME_CODE as REFERENCE_EXTERN_RUNTIME_CODE
@@ -116,21 +116,21 @@ contract LibInterpreterDeployTest is Test {
         assertEq(address(expressionDeployer).codehash, LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH);
     }
 
-    function testDeployAddressDISPaiRegistry() external {
+    function testDeployAddressRainlang() external {
         vm.createSelectFork(vm.envString("CI_FORK_ETH_RPC_URL"));
 
-        address deployedAddress = LibRainDeploy.deployZoltu(type(RainterpreterDISPaiRegistry).creationCode);
+        address deployedAddress = LibRainDeploy.deployZoltu(type(Rainlang).creationCode);
 
-        assertEq(deployedAddress, LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_ADDRESS);
+        assertEq(deployedAddress, LibInterpreterDeploy.RAINLANG_DEPLOYED_ADDRESS);
         assertTrue(address(deployedAddress).code.length > 0, "Deployed address has no code");
 
-        assertEq(address(deployedAddress).codehash, LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_CODEHASH);
+        assertEq(address(deployedAddress).codehash, LibInterpreterDeploy.RAINLANG_DEPLOYED_CODEHASH);
     }
 
-    function testExpectedCodeHashDISPaiRegistry() external {
-        RainterpreterDISPaiRegistry registry = new RainterpreterDISPaiRegistry();
+    function testExpectedCodeHashRainlang() external {
+        Rainlang rainlang = new Rainlang();
 
-        assertEq(address(registry).codehash, LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_CODEHASH);
+        assertEq(address(rainlang).codehash, LibInterpreterDeploy.RAINLANG_DEPLOYED_CODEHASH);
     }
 
     /// Parser bytecode MUST NOT contain Solidity CBOR metadata.
@@ -169,12 +169,12 @@ contract LibInterpreterDeployTest is Test {
         );
     }
 
-    /// DISPaiRegistry bytecode MUST NOT contain Solidity CBOR metadata.
-    function testNoCborMetadataDISPaiRegistry() external {
-        RainterpreterDISPaiRegistry registry = new RainterpreterDISPaiRegistry();
+    /// Rainlang bytecode MUST NOT contain Solidity CBOR metadata.
+    function testNoCborMetadataRainlang() external {
+        Rainlang rainlang = new Rainlang();
         assertFalse(
-            LibExtrospectBytecode.tryTrimSolidityCBORMetadata(address(registry).code),
-            "DISPaiRegistry bytecode contains CBOR metadata"
+            LibExtrospectBytecode.tryTrimSolidityCBORMetadata(address(rainlang).code),
+            "Rainlang bytecode contains CBOR metadata"
         );
     }
 
@@ -203,11 +203,10 @@ contract LibInterpreterDeployTest is Test {
         LibExtrospectMetamorphic.checkNotMetamorphic(address(expressionDeployer).code);
     }
 
-    /// DISPaiRegistry bytecode MUST NOT contain reachable metamorphic risk
-    /// opcodes.
-    function testNotMetamorphicDISPaiRegistry() external {
-        RainterpreterDISPaiRegistry registry = new RainterpreterDISPaiRegistry();
-        LibExtrospectMetamorphic.checkNotMetamorphic(address(registry).code);
+    /// Rainlang bytecode MUST NOT contain reachable metamorphic risk opcodes.
+    function testNotMetamorphicRainlang() external {
+        Rainlang rainlang = new Rainlang();
+        LibExtrospectMetamorphic.checkNotMetamorphic(address(rainlang).code);
     }
 
     /// The precompiled creation code constant for the parser MUST match the
@@ -236,10 +235,10 @@ contract LibInterpreterDeployTest is Test {
         );
     }
 
-    /// The precompiled creation code constant for the DISPaiRegistry MUST
-    /// match the compiler's creation code.
-    function testCreationCodeDISPaiRegistry() external pure {
-        assertEq(keccak256(DISPAIR_REGISTRY_CREATION_CODE), keccak256(type(RainterpreterDISPaiRegistry).creationCode));
+    /// The precompiled creation code constant for Rainlang MUST match the
+    /// compiler's creation code.
+    function testCreationCodeRainlang() external pure {
+        assertEq(keccak256(RAINLANG_CREATION_CODE), keccak256(type(Rainlang).creationCode));
     }
 
     /// The precompiled creation code constant for the reference extern MUST
@@ -276,11 +275,11 @@ contract LibInterpreterDeployTest is Test {
         assertEq(keccak256(EXPRESSION_DEPLOYER_RUNTIME_CODE), keccak256(address(deployer).code));
     }
 
-    /// The precompiled runtime code constant for the DISPaiRegistry MUST
-    /// match the deployed runtime bytecode.
-    function testRuntimeCodeDISPaiRegistry() external {
-        RainterpreterDISPaiRegistry registry = new RainterpreterDISPaiRegistry();
-        assertEq(keccak256(DISPAIR_REGISTRY_RUNTIME_CODE), keccak256(address(registry).code));
+    /// The precompiled runtime code constant for Rainlang MUST match the
+    /// deployed runtime bytecode.
+    function testRuntimeCodeRainlang() external {
+        Rainlang rainlang = new Rainlang();
+        assertEq(keccak256(RAINLANG_RUNTIME_CODE), keccak256(address(rainlang).code));
     }
 
     /// The precompiled runtime code constant for the reference extern MUST
@@ -314,16 +313,16 @@ contract LibInterpreterDeployTest is Test {
         assertEq(EXPRESSION_DEPLOYER_GENERATED_ADDRESS, LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS);
     }
 
-    /// The generated deployed address for the DISPaiRegistry MUST match the
-    /// deploy library constant.
-    function testGeneratedDeployedAddressDISPaiRegistry() external pure {
-        assertEq(DISPAIR_REGISTRY_GENERATED_ADDRESS, LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_ADDRESS);
+    /// The generated deployed address for Rainlang MUST match the deploy
+    /// library constant.
+    function testGeneratedDeployedAddressRainlang() external pure {
+        assertEq(RAINLANG_GENERATED_ADDRESS, LibInterpreterDeploy.RAINLANG_DEPLOYED_ADDRESS);
     }
 
-    /// After calling etchDISPaiR, all five contracts MUST have the expected
+    /// After calling etchRainlang, all five contracts MUST have the expected
     /// codehash at their expected addresses.
-    function testEtchDISPaiR() external {
-        LibInterpreterDeploy.etchDISPaiR(vm);
+    function testEtchRainlang() external {
+        LibInterpreterDeploy.etchRainlang(vm);
 
         assertEq(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS.codehash, LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH);
         assertEq(LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS.codehash, LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH);
@@ -336,16 +335,16 @@ contract LibInterpreterDeployTest is Test {
             LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH
         );
         assertEq(
-            LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_ADDRESS.codehash,
-            LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_CODEHASH
+            LibInterpreterDeploy.RAINLANG_DEPLOYED_ADDRESS.codehash,
+            LibInterpreterDeploy.RAINLANG_DEPLOYED_CODEHASH
         );
     }
 
-    /// Calling etchDISPaiR twice MUST be idempotent — codehashes remain
+    /// Calling etchRainlang twice MUST be idempotent — codehashes remain
     /// correct on the second call.
-    function testEtchDISPaiRIdempotent() external {
-        LibInterpreterDeploy.etchDISPaiR(vm);
-        LibInterpreterDeploy.etchDISPaiR(vm);
+    function testEtchRainlangIdempotent() external {
+        LibInterpreterDeploy.etchRainlang(vm);
+        LibInterpreterDeploy.etchRainlang(vm);
 
         assertEq(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS.codehash, LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH);
         assertEq(LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS.codehash, LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH);
@@ -358,8 +357,8 @@ contract LibInterpreterDeployTest is Test {
             LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH
         );
         assertEq(
-            LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_ADDRESS.codehash,
-            LibInterpreterDeploy.DISPAIR_REGISTRY_DEPLOYED_CODEHASH
+            LibInterpreterDeploy.RAINLANG_DEPLOYED_ADDRESS.codehash,
+            LibInterpreterDeploy.RAINLANG_DEPLOYED_CODEHASH
         );
     }
 }

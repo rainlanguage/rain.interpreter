@@ -51,8 +51,8 @@ sol!(
 
 sol!(
     #![sol(all_derives = true, rpc = true)]
-    DISPaiRegistry,
-    "../../out/RainterpreterDISPaiRegistry.sol/RainterpreterDISPaiRegistry.json"
+    RainlangContract,
+    "../../out/Rainlang.sol/Rainlang.json"
 );
 
 /// Filler stack used by `LocalEvm` combining recommended fillers with a wallet signer.
@@ -86,9 +86,9 @@ pub struct LocalEvm {
     /// Array of alloy ERC20 contract instances deployed on this blockchain
     pub tokens: Vec<ERC20::ERC20Instance<LocalEvmProvider, AnyNetwork>>,
 
-    /// Address of the deployed DISPaiRegistry instance. External tooling
-    /// discovers all component addresses by querying this single address.
-    pub registry: Address,
+    /// Address of the deployed Rainlang instance. External tooling discovers
+    /// all component addresses by querying this single address.
+    pub rainlang: Address,
 
     /// All wallets of this local blockchain that can be used to perform transactions.
     /// the first wallet is the blockchain's default wallet, ie transactions that dont
@@ -121,21 +121,21 @@ impl LocalEvm {
             .wallet(signer_wallets[0].clone())
             .connect_http(anvil.endpoint_url());
 
-        // Deploy the registry to discover the deterministic addresses for
-        // all components.
-        let registry_instance = DISPaiRegistry::deploy(provider.clone()).await.unwrap();
-        let registry_addr = *registry_instance.address();
-        let parser_addr = registry_instance.parserAddress().call().await.unwrap();
-        let store_addr = registry_instance.storeAddress().call().await.unwrap();
-        let interpreter_addr = registry_instance.interpreterAddress().call().await.unwrap();
-        let deployer_addr = registry_instance
+        // Deploy Rainlang to discover the deterministic addresses for all
+        // components.
+        let rainlang_instance = RainlangContract::deploy(provider.clone()).await.unwrap();
+        let rainlang_addr = *rainlang_instance.address();
+        let parser_addr = rainlang_instance.parserAddress().call().await.unwrap();
+        let store_addr = rainlang_instance.storeAddress().call().await.unwrap();
+        let interpreter_addr = rainlang_instance.interpreterAddress().call().await.unwrap();
+        let deployer_addr = rainlang_instance
             .expressionDeployerAddress()
             .call()
             .await
             .unwrap();
 
         // Deploy rain contracts, then copy their runtime code to the
-        // deterministic addresses that the registry returns.
+        // deterministic addresses that Rainlang returns.
         let interpreter = Interpreter::deploy(provider.clone()).await.unwrap();
         let store = Store::deploy(provider.clone()).await.unwrap();
         let parser = Parser::deploy(provider.clone()).await.unwrap();
@@ -172,7 +172,7 @@ impl LocalEvm {
             deployer,
             tokens: vec![],
             signer_wallets,
-            registry: registry_addr,
+            rainlang: rainlang_addr,
         }
     }
 

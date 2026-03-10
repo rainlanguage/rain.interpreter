@@ -30,7 +30,7 @@ abstract contract RainterpreterExpressionDeployerDeploymentTest is Test {
     constructor() {
         beforeOpTestConstructor();
 
-        LibInterpreterDeploy.etchDISPaiR(vm);
+        LibInterpreterDeploy.etchRainlang(vm);
 
         if (
             address(LibTOFUTokenDecimals.TOFU_DECIMALS_DEPLOYMENT).codehash

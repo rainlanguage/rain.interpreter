@@ -25,10 +25,10 @@ import {
     RUNTIME_CODE as EXPRESSION_DEPLOYER_RUNTIME_CODE
 } from "../../generated/RainterpreterExpressionDeployer.pointers.sol";
 import {
-    BYTECODE_HASH as DISPAIR_REGISTRY_HASH,
-    DEPLOYED_ADDRESS as DISPAIR_REGISTRY_ADDR,
-    RUNTIME_CODE as DISPAIR_REGISTRY_RUNTIME_CODE
-} from "../../generated/RainterpreterDISPaiRegistry.pointers.sol";
+    BYTECODE_HASH as RAINLANG_HASH,
+    DEPLOYED_ADDRESS as RAINLANG_ADDR,
+    RUNTIME_CODE as RAINLANG_RUNTIME_CODE
+} from "../../generated/Rainlang.pointers.sol";
 
 /// @title LibInterpreterDeploy
 /// @notice A library containing the deployed address and code hash of the Interpreter
@@ -77,22 +77,22 @@ library LibInterpreterDeploy {
     /// provides stronger guarantees than just checking the address.
     bytes32 constant EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH = EXPRESSION_DEPLOYER_HASH;
 
-    /// The address of the `RainterpreterDISPaiRegistry` contract when deployed
-    /// with the rain standard zoltu deployer.
-    address constant DISPAIR_REGISTRY_DEPLOYED_ADDRESS = DISPAIR_REGISTRY_ADDR;
+    /// The address of the `Rainlang` contract when deployed with the rain
+    /// standard zoltu deployer.
+    address constant RAINLANG_DEPLOYED_ADDRESS = RAINLANG_ADDR;
 
-    /// The code hash of the `RainterpreterDISPaiRegistry` contract when
-    /// deployed with the rain standard zoltu deployer. This can be used to
-    /// verify that the deployed contract has the expected bytecode, which
-    /// provides stronger guarantees than just checking the address.
-    bytes32 constant DISPAIR_REGISTRY_DEPLOYED_CODEHASH = DISPAIR_REGISTRY_HASH;
+    /// The code hash of the `Rainlang` contract when deployed with the rain
+    /// standard zoltu deployer. This can be used to verify that the deployed
+    /// contract has the expected bytecode, which provides stronger guarantees
+    /// than just checking the address.
+    bytes32 constant RAINLANG_DEPLOYED_CODEHASH = RAINLANG_HASH;
 
     /// @notice Etches the runtime bytecode of the parser, store, interpreter,
-    /// expression deployer, and DISPair registry at their expected
+    /// expression deployer, and Rainlang at their expected
     /// deterministic addresses. Skips any contract whose codehash already
     /// matches.
     /// @param vm The Forge `Vm` cheatcode interface.
-    function etchDISPaiR(Vm vm) internal {
+    function etchRainlang(Vm vm) internal {
         if (PARSER_DEPLOYED_CODEHASH != PARSER_DEPLOYED_ADDRESS.codehash) {
             vm.etch(PARSER_DEPLOYED_ADDRESS, PARSER_RUNTIME_CODE);
         }
@@ -105,8 +105,8 @@ library LibInterpreterDeploy {
         if (EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH != EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS.codehash) {
             vm.etch(EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS, EXPRESSION_DEPLOYER_RUNTIME_CODE);
         }
-        if (DISPAIR_REGISTRY_DEPLOYED_CODEHASH != DISPAIR_REGISTRY_DEPLOYED_ADDRESS.codehash) {
-            vm.etch(DISPAIR_REGISTRY_DEPLOYED_ADDRESS, DISPAIR_REGISTRY_RUNTIME_CODE);
+        if (RAINLANG_DEPLOYED_CODEHASH != RAINLANG_DEPLOYED_ADDRESS.codehash) {
+            vm.etch(RAINLANG_DEPLOYED_ADDRESS, RAINLANG_RUNTIME_CODE);
         }
     }
 }
