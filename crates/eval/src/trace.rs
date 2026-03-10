@@ -329,7 +329,7 @@ mod tests {
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_fork_trace() {
         let local_evm = LocalEvm::new().await;
-        let deployer_address = *local_evm.deployer.address();
+
         let args = NewForkedEvm {
             fork_url: local_evm.url(),
             fork_block_number: None,
@@ -354,9 +354,7 @@ mod tests {
                 "
                 .into(),
                 source_index: 0,
-                deployer: deployer_address,
-                interpreter: local_evm.zoltu_interpreter,
-                store: local_evm.zoltu_store,
+                registry: local_evm.registry,
                 namespace: FullyQualifiedNamespace::default(),
                 context: vec![],
                 decode_errors: true,
@@ -405,7 +403,7 @@ mod tests {
     #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
     async fn test_search_trace_by_path() {
         let local_evm = LocalEvm::new().await;
-        let deployer_address = *local_evm.deployer.address();
+
         let args = NewForkedEvm {
             fork_url: local_evm.url(),
             fork_block_number: None,
@@ -427,9 +425,7 @@ mod tests {
                 "
                 .into(),
                 source_index: 0,
-                deployer: deployer_address,
-                interpreter: local_evm.zoltu_interpreter,
-                store: local_evm.zoltu_store,
+                registry: local_evm.registry,
                 namespace: FullyQualifiedNamespace::default(),
                 context: vec![],
                 decode_errors: true,
@@ -472,7 +468,7 @@ mod tests {
 
     async fn get_raw_call_result() -> RawCallResult {
         let local_evm = LocalEvm::new().await;
-        let deployer_address = *local_evm.deployer.address();
+
         let args = NewForkedEvm {
             fork_url: local_evm.url(),
             fork_block_number: None,
@@ -496,9 +492,7 @@ mod tests {
                 "
                 .into(),
                 source_index: 0,
-                deployer: deployer_address,
-                interpreter: local_evm.zoltu_interpreter,
-                store: local_evm.zoltu_store,
+                registry: local_evm.registry,
                 namespace: FullyQualifiedNamespace::default(),
                 context: vec![],
                 decode_errors: true,
