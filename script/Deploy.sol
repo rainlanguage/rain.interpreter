@@ -14,9 +14,7 @@ import {CREATION_CODE as INTERPRETER_CREATION_CODE} from "../src/generated/Raint
 import {
     CREATION_CODE as EXPRESSION_DEPLOYER_CREATION_CODE
 } from "../src/generated/RainterpreterExpressionDeployer.pointers.sol";
-import {
-    CREATION_CODE as RAINLANG_CREATION_CODE
-} from "../src/generated/Rainlang.pointers.sol";
+import {CREATION_CODE as RAINLANG_CREATION_CODE} from "../src/generated/Rainlang.pointers.sol";
 
 /// @dev Deployment suite selector for the parser.
 bytes32 constant DEPLOYMENT_SUITE_PARSER = keccak256("parser");

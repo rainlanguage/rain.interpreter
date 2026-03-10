@@ -335,8 +335,7 @@ contract LibInterpreterDeployTest is Test {
             LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH
         );
         assertEq(
-            LibInterpreterDeploy.RAINLANG_DEPLOYED_ADDRESS.codehash,
-            LibInterpreterDeploy.RAINLANG_DEPLOYED_CODEHASH
+            LibInterpreterDeploy.RAINLANG_DEPLOYED_ADDRESS.codehash, LibInterpreterDeploy.RAINLANG_DEPLOYED_CODEHASH
         );
     }
 
@@ -357,8 +356,7 @@ contract LibInterpreterDeployTest is Test {
             LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH
         );
         assertEq(
-            LibInterpreterDeploy.RAINLANG_DEPLOYED_ADDRESS.codehash,
-            LibInterpreterDeploy.RAINLANG_DEPLOYED_CODEHASH
+            LibInterpreterDeploy.RAINLANG_DEPLOYED_ADDRESS.codehash, LibInterpreterDeploy.RAINLANG_DEPLOYED_CODEHASH
         );
     }
 }
