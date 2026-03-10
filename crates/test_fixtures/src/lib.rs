@@ -86,10 +86,9 @@ pub struct LocalEvm {
     /// Array of alloy ERC20 contract instances deployed on this blockchain
     pub tokens: Vec<ERC20::ERC20Instance<LocalEvmProvider, AnyNetwork>>,
 
-    /// Deterministic Zoltu addresses for interpreter, store, and parser.
-    pub zoltu_interpreter: Address,
-    pub zoltu_store: Address,
-    pub zoltu_parser: Address,
+    /// Address of the deployed DISPaiRegistry instance. External tooling
+    /// discovers all component addresses by querying this single address.
+    pub registry: Address,
 
     /// All wallets of this local blockchain that can be used to perform transactions.
     /// the first wallet is the blockchain's default wallet, ie transactions that dont
@@ -122,25 +121,30 @@ impl LocalEvm {
             .wallet(signer_wallets[0].clone())
             .connect_http(anvil.endpoint_url());
 
-        // Deploy the constants helper to read the deterministic Zoltu
-        // addresses that the deployer hardcodes.
-        let constants = DISPaiRegistry::deploy(provider.clone()).await.unwrap();
-        let parser_addr = constants.parserAddress().call().await.unwrap();
-        let store_addr = constants.storeAddress().call().await.unwrap();
-        let interpreter_addr = constants.interpreterAddress().call().await.unwrap();
+        // Deploy the registry to discover the deterministic addresses for
+        // all components.
+        let registry_instance = DISPaiRegistry::deploy(provider.clone()).await.unwrap();
+        let registry_addr = *registry_instance.address();
+        let parser_addr = registry_instance.parserAddress().call().await.unwrap();
+        let store_addr = registry_instance.storeAddress().call().await.unwrap();
+        let interpreter_addr = registry_instance.interpreterAddress().call().await.unwrap();
+        let deployer_addr = registry_instance
+            .expressionDeployerAddress()
+            .call()
+            .await
+            .unwrap();
 
         // Deploy rain contracts, then copy their runtime code to the
-        // deterministic Zoltu addresses that the deployer hardcodes.
+        // deterministic addresses that the registry returns.
         let interpreter = Interpreter::deploy(provider.clone()).await.unwrap();
         let store = Store::deploy(provider.clone()).await.unwrap();
         let parser = Parser::deploy(provider.clone()).await.unwrap();
+        let deployer = Deployer::deploy(provider.clone()).await.unwrap();
 
-        // The expression deployer references the parser, store, and
-        // interpreter at their deterministic Zoltu addresses. Copy runtime
-        // code to those addresses so calls resolve correctly.
         let parser_code = provider.get_code_at(*parser.address()).await.unwrap();
         let store_code = provider.get_code_at(*store.address()).await.unwrap();
         let interpreter_code = provider.get_code_at(*interpreter.address()).await.unwrap();
+        let deployer_code = provider.get_code_at(*deployer.address()).await.unwrap();
 
         provider
             .anvil_set_code(parser_addr, parser_code)
@@ -154,8 +158,10 @@ impl LocalEvm {
             .anvil_set_code(interpreter_addr, interpreter_code)
             .await
             .unwrap();
-
-        let deployer = Deployer::deploy(provider.clone()).await.unwrap();
+        provider
+            .anvil_set_code(deployer_addr, deployer_code)
+            .await
+            .unwrap();
 
         Self {
             anvil,
@@ -166,9 +172,7 @@ impl LocalEvm {
             deployer,
             tokens: vec![],
             signer_wallets,
-            zoltu_interpreter: interpreter_addr,
-            zoltu_store: store_addr,
-            zoltu_parser: parser_addr,
+            registry: registry_addr,
         }
     }
 
