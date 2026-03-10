@@ -103,7 +103,7 @@ pub trait Parser2 {
 /// by making read calls to the on-chain deployer contract (which implements
 /// `IParserV2`).
 ///
-/// The deployer address is typically discovered from the DISPaiR registry.
+/// The deployer address is typically discovered from Rainlang.
 #[derive(Clone, Default)]
 pub struct ParserV2 {
     /// The address of the expression deployer (implements `IParserV2`).

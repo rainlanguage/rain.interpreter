@@ -12,8 +12,8 @@ use std::path::PathBuf;
 /// CLI arguments for parsing a Rainlang expression.
 #[derive(Args, Clone, Debug)]
 pub struct ForkParseArgsCli {
-    #[arg(long, help = "The address of the DISPaiR registry")]
-    registry: Address,
+    #[arg(long, help = "The address of the Rainlang contract")]
+    rainlang: Address,
 
     #[arg(short, long, help = "The Rainlang string to parse")]
     rainlang_string: String,
@@ -42,7 +42,7 @@ pub struct Parse {
 impl From<ForkParseArgsCli> for ForkParseArgs {
     fn from(args: ForkParseArgsCli) -> Self {
         ForkParseArgs {
-            registry: args.registry,
+            rainlang: args.rainlang,
             rainlang_string: args.rainlang_string,
             decode_errors: args.decode_errors,
         }
@@ -83,7 +83,7 @@ mod tests {
                 fork_block_number: None,
             },
             fork_parse_args: ForkParseArgsCli {
-                registry: local_evm.registry,
+                rainlang: local_evm.rainlang,
                 rainlang_string: "_: 1;".into(),
                 decode_errors: false,
             },

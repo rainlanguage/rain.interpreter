@@ -4,7 +4,7 @@ use alloy::primitives::{Address, U256};
 use rain_interpreter_bindings::IInterpreterStoreV3::FullyQualifiedNamespace;
 use rain_interpreter_bindings::IInterpreterV4::{EvalV4, eval4Call};
 use rain_interpreter_bindings::IParserV2::parse2Call;
-use rain_interpreter_bindings::RainterpreterDISPaiRegistry::{
+use rain_interpreter_bindings::Rainlang::{
     expressionDeployerAddressCall, interpreterAddressCall, storeAddressCall,
 };
 
@@ -15,15 +15,15 @@ pub struct ForkEvalArgs {
     pub rainlang_string: String,
     /// The source index of the rainlang to evaluate
     pub source_index: u16,
-    /// The address of the DISPaiR registry. All component addresses
-    /// (deployer, interpreter, store, parser) are discovered from the
-    /// registry.
-    pub registry: Address,
+    /// The address of the Rainlang contract. All component addresses
+    /// (deployer, interpreter, store, parser) are discovered from this
+    /// address.
+    pub rainlang: Address,
     /// The fully qualified namespace
     pub namespace: FullyQualifiedNamespace,
     /// The context matrix, that will be available in "context" word and its aliases
     pub context: Vec<Vec<U256>>,
-    /// Whether to decode errors from the registry
+    /// Whether to decode errors
     pub decode_errors: bool,
     /// Inputs vector which are prepopulated stack items
     pub inputs: Vec<U256>,
@@ -36,9 +36,9 @@ pub struct ForkEvalArgs {
 pub struct ForkParseArgs {
     /// The Rainlang string to parse
     pub rainlang_string: String,
-    /// The address of the DISPaiR registry.
-    pub registry: Address,
-    /// Whether to decode errors from the registry
+    /// The address of the Rainlang contract.
+    pub rainlang: Address,
+    /// Whether to decode errors
     pub decode_errors: bool,
 }
 
@@ -46,7 +46,7 @@ impl From<ForkEvalArgs> for ForkParseArgs {
     fn from(args: ForkEvalArgs) -> Self {
         ForkParseArgs {
             rainlang_string: args.rainlang_string,
-            registry: args.registry,
+            rainlang: args.rainlang,
             decode_errors: args.decode_errors,
         }
     }
@@ -55,7 +55,7 @@ impl From<ForkEvalArgs> for ForkParseArgs {
 impl Forker {
     /// Parses Rainlang string and returns the parsed result.
     ///
-    /// Discovers the deployer address from the registry, then calls
+    /// Discovers the deployer address from Rainlang, then calls
     /// `parse2` on it.
     pub async fn fork_parse(
         &self,
@@ -63,14 +63,14 @@ impl Forker {
     ) -> Result<ForkTypedReturn<parse2Call>, ForkCallError> {
         let ForkParseArgs {
             rainlang_string,
-            registry,
+            rainlang,
             decode_errors,
         } = args;
 
         let deployer = self
             .alloy_call(
                 Address::default(),
-                registry,
+                rainlang,
                 expressionDeployerAddressCall {},
                 decode_errors,
             )
@@ -90,7 +90,7 @@ impl Forker {
 
     /// Evaluates the Rain language string and returns the evaluation result.
     ///
-    /// Discovers all component addresses from the registry, parses the
+    /// Discovers all component addresses from Rainlang, parses the
     /// Rainlang string via the deployer, then evaluates via the interpreter.
     pub async fn fork_eval(
         &self,
@@ -99,7 +99,7 @@ impl Forker {
         let ForkEvalArgs {
             rainlang_string,
             source_index,
-            registry,
+            rainlang,
             namespace,
             context,
             decode_errors,
@@ -110,7 +110,7 @@ impl Forker {
         let deployer = self
             .alloy_call(
                 Address::default(),
-                registry,
+                rainlang,
                 expressionDeployerAddressCall {},
                 decode_errors,
             )
@@ -119,7 +119,7 @@ impl Forker {
         let interpreter = self
             .alloy_call(
                 Address::default(),
-                registry,
+                rainlang,
                 interpreterAddressCall {},
                 decode_errors,
             )
@@ -128,7 +128,7 @@ impl Forker {
         let store = self
             .alloy_call(
                 Address::default(),
-                registry,
+                rainlang,
                 storeAddressCall {},
                 decode_errors,
             )
@@ -185,7 +185,7 @@ mod tests {
         let res = fork
             .fork_parse(ForkParseArgs {
                 rainlang_string: r"_: 1;".to_owned(),
-                registry: local_evm.registry,
+                rainlang: local_evm.rainlang,
                 decode_errors: true,
             })
             .await
@@ -207,7 +207,7 @@ mod tests {
             .fork_eval(ForkEvalArgs {
                 rainlang_string: r"_: 3;".into(),
                 source_index: 0,
-                registry: local_evm.registry,
+                rainlang: local_evm.rainlang,
                 namespace: FullyQualifiedNamespace::default(),
                 context: vec![],
                 decode_errors: true,
@@ -246,7 +246,7 @@ mod tests {
     #[tokio::test(flavor = "multi_thread", worker_threads = 10)]
     async fn test_fork_eval_parallel() {
         let local_evm = LocalEvm::new().await;
-        let registry = local_evm.registry;
+        let rainlang = local_evm.rainlang;
         let args = NewForkedEvm {
             fork_url: local_evm.url(),
             fork_block_number: None,
@@ -262,7 +262,7 @@ mod tests {
                     .fork_eval(ForkEvalArgs {
                         rainlang_string: r"_: 3;".into(),
                         source_index: 0,
-                        registry,
+                        rainlang,
                         namespace: FullyQualifiedNamespace::default(),
                         context: vec![],
                         decode_errors: true,

@@ -11,7 +11,7 @@ on:
           - store
           - interpreter
           - expression-deployer
-          - dispair-registry
+          - rainlang
 
 jobs:
   deploy:

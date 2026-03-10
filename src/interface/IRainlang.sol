@@ -2,11 +2,11 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity ^0.8.25;
 
-/// @title IDISPaiRegistry
-/// @notice Interface for a DISPaiR (Deployer, Interpreter, Store, Parser)
-/// registry that exposes the deterministic deploy addresses of the four core
-/// interpreter components.
-interface IDISPaiRegistry {
+/// @title IRainlang
+/// @notice Interface for Rainlang that exposes the deterministic deploy
+/// addresses of the four core interpreter components (Deployer, Interpreter,
+/// Store, Parser).
+interface IRainlang {
     /// @notice Returns the deterministic deploy address of the expression
     /// deployer.
     /// @return The expression deployer address.

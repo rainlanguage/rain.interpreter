@@ -65,9 +65,9 @@ After any source change affecting bytecode: run `nix develop -c i9r-prelude` →
 
 4. **RainterpreterExpressionDeployer** (`src/concrete/RainterpreterExpressionDeployer.sol`) — Coordinates parse → integrity check → serialize. Implements `IParserV2`.
 
-5. **RainterpreterDISPaiRegistry** (`src/concrete/RainterpreterDISPaiRegistry.sol`) — On-chain registry and single discovery point for the DISPair (deployer, interpreter, store, parser) tuple. External tooling discovers all component addresses by querying a single known registry address.
+5. **Rainlang** (`src/concrete/Rainlang.sol`) — On-chain registry and single discovery point for the deployer, interpreter, store, and parser. External tooling discovers all component addresses by querying a single known Rainlang address.
 
-All five are deployed to deterministic addresses via Zoltu deployer. Addresses and code hashes are in `src/lib/deploy/LibInterpreterDeploy.sol`. Deploy constants cascade: parser → expression deployer → DISPaiRegistry. Interpreter changes also cascade to DISPaiRegistry.
+All five are deployed to deterministic addresses via Zoltu deployer. Addresses and code hashes are in `src/lib/deploy/LibInterpreterDeploy.sol`. Deploy constants cascade: parser → expression deployer → Rainlang. Interpreter changes also cascade to Rainlang.
 
 ### Opcode System
 
@@ -94,7 +94,7 @@ External contracts can extend the interpreter with additional opcodes. `src/conc
 
 ### Deployment
 
-`script/Deploy.sol` uses the `DEPLOYMENT_SUITE` env var to select which component to deploy: `"parser"`, `"store"`, `"interpreter"`, `"expression-deployer"`, or `"dispair-registry"`.
+`script/Deploy.sol` uses the `DEPLOYMENT_SUITE` env var to select which component to deploy: `"parser"`, `"store"`, `"interpreter"`, `"expression-deployer"`, or `"rainlang"`.
 
 ## Solidity Conventions
 
