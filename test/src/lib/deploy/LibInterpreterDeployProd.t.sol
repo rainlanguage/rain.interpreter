@@ -11,25 +11,13 @@ import {LibInterpreterDeploy} from "../../../../src/lib/deploy/LibInterpreterDep
 /// contracts are deployed at the expected addresses with the expected codehash.
 contract LibInterpreterDeployProdTest is Test {
     function _checkAllContracts() internal view {
-        assertTrue(
-            LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS.code.length > 0, "Parser not deployed"
-        );
-        assertEq(
-            LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS.codehash,
-            LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH
-        );
+        assertTrue(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS.code.length > 0, "Parser not deployed");
+        assertEq(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS.codehash, LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH);
 
-        assertTrue(
-            LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS.code.length > 0, "Store not deployed"
-        );
-        assertEq(
-            LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS.codehash,
-            LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH
-        );
+        assertTrue(LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS.code.length > 0, "Store not deployed");
+        assertEq(LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS.codehash, LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH);
 
-        assertTrue(
-            LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS.code.length > 0, "Interpreter not deployed"
-        );
+        assertTrue(LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS.code.length > 0, "Interpreter not deployed");
         assertEq(
             LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS.codehash,
             LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH
@@ -43,12 +31,9 @@ contract LibInterpreterDeployProdTest is Test {
             LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH
         );
 
-        assertTrue(
-            LibInterpreterDeploy.RAINLANG_DEPLOYED_ADDRESS.code.length > 0, "Rainlang not deployed"
-        );
+        assertTrue(LibInterpreterDeploy.RAINLANG_DEPLOYED_ADDRESS.code.length > 0, "Rainlang not deployed");
         assertEq(
-            LibInterpreterDeploy.RAINLANG_DEPLOYED_ADDRESS.codehash,
-            LibInterpreterDeploy.RAINLANG_DEPLOYED_CODEHASH
+            LibInterpreterDeploy.RAINLANG_DEPLOYED_ADDRESS.codehash, LibInterpreterDeploy.RAINLANG_DEPLOYED_CODEHASH
         );
     }
 
