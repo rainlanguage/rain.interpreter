@@ -7,7 +7,6 @@
 .git
 .github
 .gitignore
-.gitmodules
 .pre-commit-config.yaml
 .prettierignore
 .soldeerignore
@@ -18,9 +17,7 @@ CLAUDE.md
 /dependencies
 /flake.lock
 /flake.nix
-/foundry.lock
 /foundry.toml
-/lib
 /out
 /remappings.txt
 /slither.config.json
