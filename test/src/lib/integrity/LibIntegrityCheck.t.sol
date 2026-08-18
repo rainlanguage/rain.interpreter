@@ -11,7 +11,6 @@ import {
     StackAllocationMismatch,
     StackOutputsMismatch
 } from "../../../../src/error/ErrIntegrity.sol";
-import {BadOpInputsLength, BadOpOutputsLength} from "rain-interpreter-interface-0.1.0/src/error/ErrIntegrity.sol";
 import {INTEGRITY_FUNCTION_POINTERS} from "../../../../src/generated/RainlangExpressionDeployer.pointers.sol";
 import {ALL_STANDARD_OPS_LENGTH} from "../../../../src/lib/op/LibAllStandardOps.sol";
 import {IntegritySingleOp} from "./IntegritySingleOp.sol";
