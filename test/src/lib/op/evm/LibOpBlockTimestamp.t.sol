@@ -11,12 +11,12 @@ import {
     SourceIndexV2,
     EvalV4,
     StackItem
-} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterV4.sol";
+} from "rainlang-interface-0.2.3/src/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../../../../src/lib/state/LibInterpreterState.sol";
 import {IntegrityCheckState, BadOpInputsLength} from "../../../../../src/lib/integrity/LibIntegrityCheck.sol";
-import {FullyQualifiedNamespace} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterStoreV3.sol";
-import {SignedContextV1} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterCallerV4.sol";
-import {LibContext} from "rain-interpreter-interface-0.1.0/src/lib/caller/LibContext.sol";
+import {FullyQualifiedNamespace} from "rainlang-interface-0.2.3/src/interface/IInterpreterStoreV3.sol";
+import {SignedContextV1} from "rainlang-interface-0.2.3/src/interface/IInterpreterCallerV4.sol";
+import {LibContext} from "rainlang-interface-0.2.3/src/lib/caller/LibContext.sol";
 
 import {LibOpBlockTimestamp} from "../../../../../src/lib/op/evm/LibOpBlockTimestamp.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";

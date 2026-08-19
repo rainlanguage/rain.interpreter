@@ -7,11 +7,11 @@ import {LibBytes, Pointer} from "rain-solmem-0.1.3/src/lib/LibBytes.sol";
 
 // AuthoringMetaV2 exported for convenience.
 //forge-lint: disable-next-line(unused-import)
-import {ISubParserV4, AuthoringMetaV2} from "rain-interpreter-interface-0.1.0/src/interface/ISubParserV4.sol";
+import {ISubParserV4, AuthoringMetaV2} from "rainlang-interface-0.2.3/src/interface/ISubParserV4.sol";
 import {LibSubParse, ParseState} from "../lib/parse/LibSubParse.sol";
 import {CMASK_RHS_WORD_TAIL} from "rain-string-0.2.0/src/lib/parse/LibParseCMask.sol";
 import {LibParse, OperandV2} from "../lib/parse/LibParse.sol";
-import {LibParseMeta} from "rain-interpreter-interface-0.1.0/src/lib/parse/LibParseMeta.sol";
+import {LibParseMeta} from "rainlang-interface-0.2.3/src/lib/parse/LibParseMeta.sol";
 import {LibParseOperand} from "../lib/parse/LibParseOperand.sol";
 import {IDescribedByMetaV1} from "rain-metadata-0.1.0/src/interface/IDescribedByMetaV1.sol";
 import {IParserToolingV1} from "rain-sol-codegen-0.1.0/src/interface/IParserToolingV1.sol";

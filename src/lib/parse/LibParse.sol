@@ -20,13 +20,13 @@ import {
     CMASK_IDENTIFIER_HEAD
 } from "rain-string-0.2.0/src/lib/parse/LibParseCMask.sol";
 import {LibParseChar} from "rain-string-0.2.0/src/lib/parse/LibParseChar.sol";
-import {LibParseMeta} from "rain-interpreter-interface-0.1.0/src/lib/parse/LibParseMeta.sol";
+import {LibParseMeta} from "rainlang-interface-0.2.3/src/lib/parse/LibParseMeta.sol";
 import {LibParseOperand} from "./LibParseOperand.sol";
 import {
     OperandV2,
     OPCODE_STACK,
     OPCODE_UNKNOWN
-} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterV4.sol";
+} from "rainlang-interface-0.2.3/src/interface/IInterpreterV4.sol";
 import {LibParseStackName} from "./LibParseStackName.sol";
 import {
     UnexpectedRHSChar,

@@ -5,7 +5,7 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std-1.16.1/src/Test.sol";
 
 import {LibAllStandardOps, ALL_STANDARD_OPS_LENGTH} from "../../../../src/lib/op/LibAllStandardOps.sol";
-import {AuthoringMetaV2} from "rain-interpreter-interface-0.1.0/src/interface/IParserV2.sol";
+import {AuthoringMetaV2} from "rainlang-interface-0.2.3/src/interface/IParserV2.sol";
 import {LITERAL_PARSERS_LENGTH} from "../../../../src/lib/parse/literal/LibParseLiteral.sol";
 
 /// @title LibAllStandardOpsTest

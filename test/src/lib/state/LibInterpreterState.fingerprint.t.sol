@@ -10,8 +10,8 @@ import {MemoryKV} from "rain-lib-memkv-0.1.0/src/lib/LibMemoryKV.sol";
 import {
     FullyQualifiedNamespace,
     IInterpreterStoreV3
-} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterStoreV3.sol";
-import {StackItem} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterV4.sol";
+} from "rainlang-interface-0.2.3/src/interface/IInterpreterStoreV3.sol";
+import {StackItem} from "rainlang-interface-0.2.3/src/interface/IInterpreterV4.sol";
 
 contract LibInterpreterStateFingerprintTest is Test {
     /// Two identically constructed states must produce the same fingerprint.

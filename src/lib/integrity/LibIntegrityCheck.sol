@@ -11,9 +11,9 @@ import {
     StackUnderflow,
     StackUnderflowHighwater
 } from "../../error/ErrIntegrity.sol";
-import {BadOpInputsLength, BadOpOutputsLength} from "rain-interpreter-interface-0.1.0/src/error/ErrIntegrity.sol";
-import {LibBytecode} from "rain-interpreter-interface-0.1.0/src/lib/bytecode/LibBytecode.sol";
-import {OperandV2} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterV4.sol";
+import {BadOpInputsLength, BadOpOutputsLength} from "rainlang-interface-0.2.3/src/error/ErrIntegrity.sol";
+import {LibBytecode} from "rainlang-interface-0.2.3/src/lib/bytecode/LibBytecode.sol";
+import {OperandV2} from "rainlang-interface-0.2.3/src/interface/IInterpreterV4.sol";
 import {OPCODE_FUNCTION_POINTER_SHIFT} from "../eval/LibEval.sol";
 
 /// @notice Tracks the state of the integrity check walk over a single source.

@@ -7,13 +7,13 @@ import {LibParseState, ParseState} from "../../../../src/lib/parse/LibParseState
 import {LibSubParse} from "../../../../src/lib/parse/LibSubParse.sol";
 import {LibParse} from "../../../../src/lib/parse/LibParse.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
-import {LibBytecode, Pointer} from "rain-interpreter-interface-0.1.0/src/lib/bytecode/LibBytecode.sol";
-import {ISubParserV4} from "rain-interpreter-interface-0.1.0/src/interface/ISubParserV4.sol";
+import {LibBytecode, Pointer} from "rainlang-interface-0.2.3/src/lib/bytecode/LibBytecode.sol";
+import {ISubParserV4} from "rainlang-interface-0.2.3/src/interface/ISubParserV4.sol";
 import {
     OPCODE_UNKNOWN,
     OPCODE_CONSTANT,
     OPCODE_CONTEXT
-} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterV4.sol";
+} from "rainlang-interface-0.2.3/src/interface/IInterpreterV4.sol";
 import {Strings} from "@openzeppelin-contracts-5.6.1/utils/Strings.sol";
 import {UnknownWord} from "../../../../src/error/ErrParse.sol";
 import {ContextReturningSubParser} from "./ContextReturningSubParser.sol";

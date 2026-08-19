@@ -2,12 +2,12 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity ^0.8.25;
 
-import {OperandV2} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterV4.sol";
+import {OperandV2} from "rainlang-interface-0.2.3/src/interface/IInterpreterV4.sol";
 import {LibSubParse} from "../../../parse/LibSubParse.sol";
 import {
     CONTEXT_BASE_COLUMN,
     CONTEXT_BASE_ROW_SENDER
-} from "rain-interpreter-interface-0.1.0/src/lib/caller/LibContext.sol";
+} from "rainlang-interface-0.2.3/src/lib/caller/LibContext.sol";
 
 /// @title LibExternOpContextSender
 /// @notice This op is a simple reference to the sender of the transaction that called

@@ -4,7 +4,7 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std-1.16.1/src/Test.sol";
 import {LibParseState, ParseState} from "../../../../src/lib/parse/LibParseState.sol";
-import {OperandV2} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterV4.sol";
+import {OperandV2} from "rainlang-interface-0.2.3/src/interface/IInterpreterV4.sol";
 
 /// @title LibParseStatePushOpToSourceLHSCorruptionTest
 /// @notice Tests the boundary between the per-word ops counters in

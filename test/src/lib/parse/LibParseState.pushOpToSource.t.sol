@@ -10,7 +10,7 @@ import {
     FSM_ACTIVE_SOURCE_MASK,
     FSM_ACCEPTING_INPUTS_MASK
 } from "../../../../src/lib/parse/LibParseState.sol";
-import {OperandV2} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterV4.sol";
+import {OperandV2} from "rainlang-interface-0.2.3/src/interface/IInterpreterV4.sol";
 import {SourceItemOpsOverflow} from "../../../../src/error/ErrParse.sol";
 
 contract LibParseStatePushOpToSourceTest is Test {

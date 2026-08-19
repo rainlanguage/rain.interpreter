@@ -8,7 +8,7 @@ import {
     LibNamespace,
     FullyQualifiedNamespace,
     StateNamespace
-} from "rain-interpreter-interface-0.1.0/src/lib/ns/LibNamespace.sol";
+} from "rainlang-interface-0.2.3/src/lib/ns/LibNamespace.sol";
 
 /// @title RainlangStoreGetUninitializedTest
 /// @notice Test that `get()` returns `bytes32(0)` for a key that has

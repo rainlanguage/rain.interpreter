@@ -15,7 +15,7 @@ import {LibInterpreterState, InterpreterState} from "../../src/lib/state/LibInte
 import {LibInterpreterStateFingerprint} from "../lib/state/LibInterpreterStateFingerprint.sol";
 import {IntegrityCheckState, LibIntegrityCheck} from "../../src/lib/integrity/LibIntegrityCheck.sol";
 
-import {LibContext} from "rain-interpreter-interface-0.1.0/src/lib/caller/LibContext.sol";
+import {LibContext} from "rainlang-interface-0.2.3/src/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "../../src/error/ErrParse.sol";
 import {BadOpInputsLength, BadOpOutputsLength} from "../../src/lib/integrity/LibIntegrityCheck.sol";
 import {
@@ -24,13 +24,13 @@ import {
     IInterpreterStoreV3,
     EvalV4,
     StackItem
-} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterV4.sol";
+} from "rainlang-interface-0.2.3/src/interface/IInterpreterV4.sol";
 import {
     FullyQualifiedNamespace,
     StateNamespace
-} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterStoreV3.sol";
-import {SignedContextV1} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterCallerV4.sol";
-import {LibNamespace} from "rain-interpreter-interface-0.1.0/src/lib/ns/LibNamespace.sol";
+} from "rainlang-interface-0.2.3/src/interface/IInterpreterStoreV3.sol";
+import {SignedContextV1} from "rainlang-interface-0.2.3/src/interface/IInterpreterCallerV4.sol";
+import {LibNamespace} from "rainlang-interface-0.2.3/src/lib/ns/LibNamespace.sol";
 import {ExponentOverflow, CoefficientOverflow} from "rain-math-float-0.1.1/src/error/ErrDecimalFloat.sol";
 import {LibTOFUTokenDecimals} from "rain-tofu-erc20-decimals-0.1.1/src/lib/LibTOFUTokenDecimals.sol";
 

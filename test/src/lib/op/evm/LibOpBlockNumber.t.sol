@@ -5,7 +5,7 @@ pragma solidity =0.8.25;
 import {OpTest, UnexpectedOperand} from "test/abstract/OpTest.sol";
 
 import {LibPointer, Pointer} from "rain-solmem-0.1.3/src/lib/LibPointer.sol";
-import {OperandV2, StackItem} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rainlang-interface-0.2.3/src/interface/IInterpreterV4.sol";
 import {LibStackPointer} from "rain-solmem-0.1.3/src/lib/LibStackPointer.sol";
 import {LibInterpreterState, InterpreterState} from "../../../../../src/lib/state/LibInterpreterState.sol";
 import {IntegrityCheckState} from "../../../../../src/lib/integrity/LibIntegrityCheck.sol";

@@ -12,7 +12,7 @@ import {
     UnsupportedLiteralType
 } from "../../../../../src/error/ErrParse.sol";
 import {LibParseError} from "../../../../../src/lib/parse/LibParseError.sol";
-import {ISubParserV4} from "rain-interpreter-interface-0.1.0/src/interface/ISubParserV4.sol";
+import {ISubParserV4} from "rainlang-interface-0.2.3/src/interface/ISubParserV4.sol";
 import {LibConformString} from "rain-string-0.2.0/src/lib/mut/LibConformString.sol";
 import {CMASK_WHITESPACE, CMASK_SUB_PARSEABLE_LITERAL_END} from "rain-string-0.2.0/src/lib/parse/LibParseCMask.sol";
 import {LibParseChar} from "rain-string-0.2.0/src/lib/parse/LibParseChar.sol";

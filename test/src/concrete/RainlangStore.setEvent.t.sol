@@ -8,8 +8,8 @@ import {
     LibNamespace,
     FullyQualifiedNamespace,
     StateNamespace
-} from "rain-interpreter-interface-0.1.0/src/lib/ns/LibNamespace.sol";
-import {IInterpreterStoreV3} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterStoreV3.sol";
+} from "rainlang-interface-0.2.3/src/lib/ns/LibNamespace.sol";
+import {IInterpreterStoreV3} from "rainlang-interface-0.2.3/src/interface/IInterpreterStoreV3.sol";
 
 /// @title RainlangStoreSetEventTest
 /// @notice Test that the `Set` event is emitted correctly for every
