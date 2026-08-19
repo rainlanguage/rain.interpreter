@@ -25,10 +25,7 @@ import {
     EvalV4,
     StackItem
 } from "rainlang-interface-0.2.3/src/interface/IInterpreterV4.sol";
-import {
-    FullyQualifiedNamespace,
-    StateNamespace
-} from "rainlang-interface-0.2.3/src/interface/IInterpreterStoreV3.sol";
+import {FullyQualifiedNamespace, StateNamespace} from "rainlang-interface-0.2.3/src/interface/IInterpreterStoreV3.sol";
 import {SignedContextV1} from "rainlang-interface-0.2.3/src/interface/IInterpreterCallerV4.sol";
 import {LibNamespace} from "rainlang-interface-0.2.3/src/lib/ns/LibNamespace.sol";
 import {ExponentOverflow, CoefficientOverflow} from "rain-math-float-0.1.1/src/error/ErrDecimalFloat.sol";

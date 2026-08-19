@@ -10,12 +10,7 @@ import {LibContext} from "rainlang-interface-0.2.3/src/lib/caller/LibContext.sol
 import {LibPointer, Pointer} from "rain-solmem-0.1.3/src/lib/LibPointer.sol";
 import {LibUint256Array} from "rain-solmem-0.1.3/src/lib/LibUint256Array.sol";
 
-import {
-    OperandV2,
-    SourceIndexV2,
-    EvalV4,
-    StackItem
-} from "rainlang-interface-0.2.3/src/interface/IInterpreterV4.sol";
+import {OperandV2, SourceIndexV2, EvalV4, StackItem} from "rainlang-interface-0.2.3/src/interface/IInterpreterV4.sol";
 import {FullyQualifiedNamespace} from "rainlang-interface-0.2.3/src/interface/IInterpreterStoreV3.sol";
 import {SignedContextV1} from "rainlang-interface-0.2.3/src/interface/IInterpreterCallerV4.sol";
 import {IntegrityCheckState} from "../../../../../src/lib/integrity/LibIntegrityCheck.sol";
