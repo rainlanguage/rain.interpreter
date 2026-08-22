@@ -3,9 +3,9 @@
 pragma solidity =0.8.25;
 
 import {ERC165} from "@openzeppelin-contracts-5.6.1/utils/introspection/ERC165.sol";
-import {Pointer} from "rain-solmem-0.1.3/src/lib/LibPointer.sol";
-import {IParserV2} from "rain-interpreter-interface-0.1.0/src/interface/IParserV2.sol";
-import {IParserPragmaV1, PragmaV1} from "rain-interpreter-interface-0.1.0/src/interface/IParserPragmaV1.sol";
+import {Pointer} from "rain-solmem-0.1.26/src/lib/LibPointer.sol";
+import {IParserV2} from "rainlang-interface-0.2.5/src/interface/IParserV2.sol";
+import {IParserPragmaV1, PragmaV1} from "rainlang-interface-0.2.5/src/interface/IParserPragmaV1.sol";
 
 import {IDescribedByMetaV1} from "rain-metadata-0.1.0/src/interface/IDescribedByMetaV1.sol";
 

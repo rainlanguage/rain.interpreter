@@ -4,12 +4,12 @@ pragma solidity =0.8.25;
 
 import {ERC165} from "@openzeppelin-contracts-5.6.1/utils/introspection/ERC165.sol";
 
-import {IInterpreterStoreV3} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterStoreV3.sol";
+import {IInterpreterStoreV3} from "rainlang-interface-0.2.5/src/interface/IInterpreterStoreV3.sol";
 import {
     LibNamespace,
     FullyQualifiedNamespace,
     StateNamespace
-} from "rain-interpreter-interface-0.1.0/src/lib/ns/LibNamespace.sol";
+} from "rainlang-interface-0.2.5/src/lib/ns/LibNamespace.sol";
 
 // Exported for convenience.
 //forge-lint: disable-next-line(unused-import)

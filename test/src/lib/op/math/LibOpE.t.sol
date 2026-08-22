@@ -12,9 +12,9 @@ import {
     StackItem,
     FullyQualifiedNamespace,
     SourceIndexV2
-} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterV4.sol";
-import {SignedContextV1} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterCallerV4.sol";
-import {LibContext} from "rain-interpreter-interface-0.1.0/src/lib/caller/LibContext.sol";
+} from "rainlang-interface-0.2.5/src/interface/IInterpreterV4.sol";
+import {SignedContextV1} from "rainlang-interface-0.2.5/src/interface/IInterpreterCallerV4.sol";
+import {LibContext} from "rainlang-interface-0.2.5/src/lib/caller/LibContext.sol";
 import {LibDecimalFloat, Float} from "rain-math-float-0.1.1/src/lib/LibDecimalFloat.sol";
 
 /// @title LibOpETest

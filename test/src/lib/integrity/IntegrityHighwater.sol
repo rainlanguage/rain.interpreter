@@ -4,7 +4,7 @@ pragma solidity =0.8.25;
 
 import {LibIntegrityCheck, IntegrityCheckState} from "../../../../src/lib/integrity/LibIntegrityCheck.sol";
 import {LibConvert} from "rain-lib-typecast-0.1.0/src/LibConvert.sol";
-import {OperandV2} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterV4.sol";
+import {OperandV2} from "rainlang-interface-0.2.5/src/interface/IInterpreterV4.sol";
 
 /// @dev Contract with 2 opcodes for testing StackUnderflowHighwater.
 /// Opcode 0: 0 inputs, 2 outputs (advances highwater).
