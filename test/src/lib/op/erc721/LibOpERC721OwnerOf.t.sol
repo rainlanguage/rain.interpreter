@@ -12,16 +12,16 @@ import {
     OperandV2,
     EvalV4,
     StackItem
-} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterV4.sol";
-import {LibContext} from "rain-interpreter-interface-0.1.0/src/lib/caller/LibContext.sol";
-import {SignedContextV1} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterCallerV4.sol";
+} from "rainlang-interface-0.2.5/src/interface/IInterpreterV4.sol";
+import {LibContext} from "rainlang-interface-0.2.5/src/lib/caller/LibContext.sol";
+import {SignedContextV1} from "rainlang-interface-0.2.5/src/interface/IInterpreterCallerV4.sol";
 import {UnexpectedOperand} from "../../../../../src/error/ErrParse.sol";
 import {LibOperand} from "test/lib/operand/LibOperand.sol";
 
 import {Strings} from "@openzeppelin-contracts-5.6.1/utils/Strings.sol";
 import {NotAnAddress} from "../../../../../src/error/ErrRainType.sol";
 import {LibTestCast} from "test/lib/typecast/LibTestCast.sol";
-import {LibBytes32Array} from "rain-solmem-0.1.3/src/lib/LibBytes32Array.sol";
+import {LibBytes32Array} from "rain-solmem-0.1.26/src/lib/LibBytes32Array.sol";
 
 /// @title LibOpERC721OwnerOfTest
 /// @notice Test the opcode for getting the owner of an erc721 token.

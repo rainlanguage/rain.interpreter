@@ -4,7 +4,7 @@ pragma solidity =0.8.25;
 
 import {LibIntegrityCheck, IntegrityCheckState} from "../../../../src/lib/integrity/LibIntegrityCheck.sol";
 import {LibConvert} from "rain-lib-typecast-0.1.0/src/LibConvert.sol";
-import {OperandV2} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterV4.sol";
+import {OperandV2} from "rainlang-interface-0.2.5/src/interface/IInterpreterV4.sol";
 
 /// @dev Contract whose integrity function pointers are valid for its own
 /// bytecode. Has a single opcode (index 0) that always returns (1, 1).

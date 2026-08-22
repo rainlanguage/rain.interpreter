@@ -4,10 +4,10 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std-1.16.1/src/Test.sol";
 import {Address} from "@openzeppelin-contracts-5.6.1/utils/Address.sol";
-import {LibBytes32Array} from "rain-solmem-0.1.3/src/lib/LibBytes32Array.sol";
-import {LibUint256Array} from "rain-solmem-0.1.3/src/lib/LibUint256Array.sol";
+import {LibBytes32Array} from "rain-solmem-0.1.26/src/lib/LibBytes32Array.sol";
+import {LibUint256Array} from "rain-solmem-0.1.26/src/lib/LibUint256Array.sol";
 import {LibMemoryKV, MemoryKV, MemoryKVVal, MemoryKVKey} from "rain-lib-memkv-0.1.0/src/lib/LibMemoryKV.sol";
-import {LibNamespace, StateNamespace} from "rain-interpreter-interface-0.1.0/src/lib/ns/LibNamespace.sol";
+import {LibNamespace, StateNamespace} from "rainlang-interface-0.2.5/src/lib/ns/LibNamespace.sol";
 import {RainlangStore} from "../../../src/concrete/RainlangStore.sol";
 import {OddSetLength} from "../../../src/error/ErrStore.sol";
 

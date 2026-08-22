@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std-1.16.1/src/Test.sol";
-import {OPCODE_CONSTANT, OperandV2} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterV4.sol";
+import {OPCODE_CONSTANT, OperandV2} from "rainlang-interface-0.2.5/src/interface/IInterpreterV4.sol";
 import {LibExternOpStackOperand} from "../../../../../../src/lib/extern/reference/op/LibExternOpStackOperand.sol";
 
 contract LibExternOpStackOperandSubParserTest is Test {

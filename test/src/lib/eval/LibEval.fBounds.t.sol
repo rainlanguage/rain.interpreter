@@ -11,8 +11,8 @@ import {MemoryKV} from "rain-lib-memkv-0.1.0/src/lib/LibMemoryKV.sol";
 import {
     IInterpreterStoreV3,
     FullyQualifiedNamespace
-} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterStoreV3.sol";
-import {StackItem} from "rain-interpreter-interface-0.1.0/src/interface/IInterpreterV4.sol";
+} from "rainlang-interface-0.2.5/src/interface/IInterpreterStoreV3.sol";
+import {StackItem} from "rainlang-interface-0.2.5/src/interface/IInterpreterV4.sol";
 
 contract LibEvalFBoundsTest is Test {
     /// Due to the mod of indexes to function pointers the indexes wrap at the

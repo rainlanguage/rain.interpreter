@@ -11,7 +11,7 @@ import {
     PARSE_META_BUILD_DEPTH
 } from "../../../src/concrete/RainlangParser.sol";
 import {LibAllStandardOps, AuthoringMetaV2} from "../../../src/lib/op/LibAllStandardOps.sol";
-import {LibGenParseMeta} from "rain-interpreter-interface-0.1.0/src/lib/codegen/LibGenParseMeta.sol";
+import {LibGenParseMeta} from "rainlang-interface-0.2.5/src/lib/codegen/LibGenParseMeta.sol";
 
 contract RainlangParserPointersTest is Test {
     function testOperandHandlerFunctionPointers() external {

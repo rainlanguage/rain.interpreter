@@ -5,7 +5,7 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std-1.16.1/src/Test.sol";
 
 import {LibParseState, ParseState} from "../../../../../src/lib/parse/LibParseState.sol";
-import {LibBytes, Pointer} from "rain-solmem-0.1.3/src/lib/LibBytes.sol";
+import {LibBytes, Pointer} from "rain-solmem-0.1.26/src/lib/LibBytes.sol";
 import {LibParseLiteralDecimal} from "../../../../../src/lib/parse/literal/LibParseLiteralDecimal.sol";
 import {Strings} from "@openzeppelin-contracts-5.6.1/utils/Strings.sol";
 import {ParseEmptyDecimalString} from "rain-string-0.2.0/src/error/ErrParse.sol";
