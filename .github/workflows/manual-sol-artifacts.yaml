@@ -12,12 +12,6 @@ on:
           - interpreter
           - expression-deployer
           - rainlang
-      legacy:
-        description: >-
-          Send type-0 (legacy) transactions. HyperEVM caps eth_feeHistory at a 5-block window whatever range is asked for; set this if EIP-1559 estimation cannot work with that. Type-0 works everywhere.
-        required: false
-        type: boolean
-        default: false
       verify:
         description: >-
           Verify on the block explorer after broadcasting. Turn it off when the verification retry loop would outlast the deploy; `Manual sol verify` repairs verification later without re-broadcasting.
@@ -29,6 +23,5 @@ jobs:
     uses: rainlanguage/rainix/.github/workflows/rainix-manual-sol-artifacts.yaml@main
     with:
       suite: ${{ inputs.suite }}
-      legacy: ${{ inputs.legacy }}
       verify: ${{ inputs.verify }}
     secrets: inherit
