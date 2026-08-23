@@ -14,7 +14,7 @@ on:
           - rainlang
       legacy:
         description: >-
-          Send type-0 (legacy) transactions. HyperEVM's RPC rejects the fee-history ranges EIP-1559 estimation asks for, and one dispatch broadcasts to every supported network, so a run that has to reach HyperEVM needs this. Type-0 works everywhere.
+          Send type-0 (legacy) transactions. HyperEVM caps eth_feeHistory at a 5-block window whatever range is asked for; set this if EIP-1559 estimation cannot work with that. Type-0 works everywhere.
         required: false
         type: boolean
         default: false
