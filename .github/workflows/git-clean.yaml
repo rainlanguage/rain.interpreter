@@ -1,0 +1,13 @@
+name: Git is clean
+on: [push]
+jobs:
+  copy-artifacts:
+    # Shared reusable (rainix#201): rebuild the committed artifacts from
+    # committed sources — `script/Build.sol`, `forge build`, CopyArtifacts,
+    # `forge fmt` — then `git diff --exit-code`. This is what makes the
+    # committed `src/generated/` record current at PR time rather than only at
+    # tag time. Includes the Cachix substitution + 8G GC cap; no prelude
+    # (committing the artifacts is what removes the need for one).
+    # secrets: inherit carries CACHIX_AUTH_TOKEN.
+    uses: rainlanguage/rainix/.github/workflows/rainix-copy-artifacts.yaml@main
+    secrets: inherit

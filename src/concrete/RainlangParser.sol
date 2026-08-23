@@ -24,7 +24,7 @@ import {
     // Exported for convenience.
     //forge-lint: disable-next-line(unused-import)
     PARSE_META_BUILD_DEPTH
-} from "../generated/RainlangParser.pointers.sol";
+} from "../generated/RainlangParserPointers.sol";
 import {IParserToolingV1} from "rain-sol-codegen-0.1.0/src/interface/IParserToolingV1.sol";
 
 /// @title RainlangParser

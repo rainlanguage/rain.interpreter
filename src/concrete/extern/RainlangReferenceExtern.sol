@@ -35,7 +35,7 @@ import {
     LITERAL_PARSER_FUNCTION_POINTERS,
     INTEGRITY_FUNCTION_POINTERS,
     OPCODE_FUNCTION_POINTERS
-} from "../../generated/RainlangReferenceExtern.pointers.sol";
+} from "../../generated/RainlangReferenceExternPointers.sol";
 import {LibDecimalFloat, Float} from "rain-math-float-0.1.1/src/lib/LibDecimalFloat.sol";
 import {IDescribedByMetaV1} from "rain-metadata-0.1.0/src/interface/IDescribedByMetaV1.sol";
 

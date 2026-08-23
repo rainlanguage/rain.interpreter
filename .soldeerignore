@@ -13,8 +13,12 @@
 .soldeerignore
 .vscode
 CLAUDE.md
+TESTING.md
+Cargo.lock
+Cargo.toml
 /audit
 /cache
+/crates
 /dependencies
 /flake.lock
 /flake.nix
@@ -28,3 +32,5 @@ CLAUDE.md
 /REUSE.toml
 /deployments
 /meta
+/script
+/target

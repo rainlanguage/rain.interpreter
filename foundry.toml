@@ -1,4 +1,16 @@
-[package]
+# Release metadata, not foundry config. `[external.*]` is the namespace foundry
+# reserves for other tools and ignores outright, so it raises no unknown-section
+# warning and `forge config --fix` leaves it alone (a section foundry does not
+# reserve is read as a profile, warned about on every invocation and rewritten
+# into `[profile.*]` by the fixer).
+#
+# `version` is the LAST-published Soldeer release, not a next-version slot. A
+# normal PR never moves it; only a release does, in lockstep with the frozen
+# `src/generated/<tag>/` snapshot it names. `LibRainDeploySnapshot.deployTag()`
+# reads it here when `script/Build.sol`'s `cutRelease()` runs, and rainix's
+# `release-guard` checks it against the pushed `sol-v<version>` tag before
+# anything publishes.
+[external.package]
 name = "rainlang"
 version = "0.1.8"
 
@@ -21,6 +33,11 @@ evm_version = "cancun"
 
 # These settings should be used for snapshots
 optimizer = true
+# NOT the org default of 100000. Every deploy address this repo pins is
+# `CREATE2` over creation code, so this number is part of every address and
+# codehash already live on chain. Lowering it to match the other deploy repos
+# would move all five deployments and orphan every consumer pin, so it stays at
+# the value the live deployments were compiled under.
 optimizer_runs = 1000000
 
 ffi = true
@@ -30,23 +47,51 @@ cbor_metadata = false
 fs_permissions = [
   { access = "read-write", path = "./out/test/" },
   { access = "read-write", path = "./meta" },
-  { access = "read-write", path = "src/generated" },
+  # `script/Build.sol` writes the rolling candidate snapshots under
+  # `src/generated/`, the non-deploy codegen beside them, and the generated
+  # released-suites libs under `src/lib/`.
+  { access = "read-write", path = "./src" },
   { access = "read-write", path = "./crates/bindings/abi" },
   { access = "read-write", path = "./crates/test_fixtures/abi" },
   { access = "read", path = "./out" },
+  # `LibRainDeploySnapshot.deployTag` reads `[external.package].version` to name
+  # the frozen per-release snapshot dir.
+  { access = "read", path = "foundry.toml" },
   { access = "write", path = "./deployments/latest/RainlangParser" },
   { access = "write", path = "./deployments/latest/RainlangStore" },
   { access = "write", path = "./deployments/latest/RainlangInterpreter" },
   { access = "write", path = "./deployments/latest/RainlangExpressionDeployer" },
 ]
 
+remappings = [
+  # `rain-deploy` 0.1.7, and the `rain-sol-codegen` 0.1.36 it is built on, spell
+  # forge-std as `forge-std-1.16.2/`; this repo's own sources and several of its
+  # other dependencies still spell it `forge-std-1.16.1/`. Soldeer installs ONE
+  # version per package name, so the older prefix is aliased onto the installed
+  # one. Not cosmetic: two forge-std copies in one compilation are two DISTINCT
+  # `Vm` types, and a `vm` handed from one library to another would not type
+  # check.
+  #
+  # These live here rather than in `remappings.txt` because `forge soldeer
+  # install` owns that file and regenerates it from the installed set.
+  "forge-std-1.16.1/=dependencies/forge-std-1.16.2/",
+  # Same, for `rain-sol-codegen`. `rain-deploy` 0.1.7 needs 0.1.36, while this
+  # repo and `rainlang-interface` 0.2.5 import the `IParserToolingV1` /
+  # `ISubParserToolingV1` / `IOpcodeToolingV1` / `IIntegrityToolingV1`
+  # interfaces under the `rain-sol-codegen-0.1.0/` prefix. Those four interfaces
+  # are byte-identical between the two versions bar `pure` widening to `view` on
+  # three functions, which an implementation is free to narrow again, so nothing
+  # here moves any contract's bytecode.
+  "rain-sol-codegen-0.1.0/=dependencies/rain-sol-codegen-0.1.36/",
+]
+
 gas_limit = "18446744073709551615"
 
 [dependencies]
-forge-std = "1.16.1"
+forge-std = "1.16.2"
 "@openzeppelin-contracts" = "5.6.1"
 "rain-datacontract" = "0.1.3"
-"rain-deploy" = "0.1.3"
+rain-deploy = "0.1.7"
 "rain-extrospection" = "0.1.13"
 "rain-intorastring" = "0.1.0"
 "rain-lib-hash" = "0.1.0"
@@ -55,7 +100,7 @@ forge-std = "1.16.1"
 "rain-math-binary" = "0.1.4"
 "rain-math-float" = "0.1.1"
 "rain-metadata" = "0.1.0"
-"rain-sol-codegen" = "0.1.0"
+rain-sol-codegen = "0.1.36"
 "rain-solmem" = "0.1.26"
 "rain-string" = "0.2.0"
 "rain-tofu-erc20-decimals" = "0.1.1"
@@ -71,12 +116,16 @@ runs = 2048
 arbitrum = "${ARBITRUM_RPC_URL}"
 base = "${BASE_RPC_URL}"
 base_sepolia = "${BASE_SEPOLIA_RPC_URL}"
+ethereum = "${ETHEREUM_RPC_URL}"
 flare = "${FLARE_RPC_URL}"
+hyperevm = "${HYPEREVM_RPC_URL}"
 polygon = "${POLYGON_RPC_URL}"
 
 [etherscan]
 arbitrum = { key = "${CI_DEPLOY_ARBITRUM_ETHERSCAN_API_KEY}" }
 base = { key = "${CI_DEPLOY_BASE_ETHERSCAN_API_KEY}" }
 base_sepolia = { key = "${CI_DEPLOY_BASE_SEPOLIA_ETHERSCAN_API_KEY}" }
+ethereum = { key = "${CI_DEPLOY_ETHEREUM_ETHERSCAN_API_KEY}", chain = 1 }
 flare = { key = "${CI_DEPLOY_FLARE_ETHERSCAN_API_KEY}" }
+hyperevm = { key = "${CI_DEPLOY_HYPEREVM_ETHERSCAN_API_KEY}", chain = 999 }
 polygon = { key = "${CI_DEPLOY_POLYGON_ETHERSCAN_API_KEY}" }

@@ -1,0 +1,27 @@
+name: Crates Release
+# The five rainlang crates publish to crates.io on merge to main via
+# rainix-autopublish's next-version lifecycle, as a lockstep set in dependency
+# order: changing any member republishes the others with matching version pins.
+# `rainlang_test_fixtures` depends on none of the others but is released with
+# them so its embedded bytecode stays in step.
+#
+# DELIBERATELY separate from `package-release.yaml`, which is the same split
+# rain.math.float.deploy made. The Soldeer `rainlang` package is a deploy
+# artifact that only advances at deploy time behind a chain-verified `sol-v*`
+# tag; the crates are bindings whose version tracks binding-code changes. Held
+# in one workflow, autopublish's own next-version invariant applied to both
+# halves at once and the Soldeer half — already at its published version by
+# design — blocked the crates from ever bumping.
+#
+# No `soldeer-package` input here for that reason: this half publishes crates
+# only.
+on:
+  push:
+    branches:
+      - main
+jobs:
+  release:
+    uses: rainlanguage/rainix/.github/workflows/rainix-autopublish.yaml@main
+    with:
+      crates: rainlang_bindings rainlang_dispair rainlang_parser rainlang-eval rainlang_test_fixtures
+    secrets: inherit
