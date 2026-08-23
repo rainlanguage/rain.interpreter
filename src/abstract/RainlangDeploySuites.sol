@@ -41,6 +41,18 @@ import {
 /// The suite keys are the `Manual sol artifacts` dispatch choices and MUST
 /// stay in step with `.github/workflows/manual-sol-artifacts.yaml`.
 ///
+/// A candidate declares as a dependency exactly the addresses its own bytecode
+/// bakes in, and nothing else. That is what `DeploySuite.dependencies` means —
+/// what must already have code on a network or the deployment is broken on
+/// arrival — and it is decidable from the creation code, which is what
+/// `RainlangDeploySuitesTest` decides it from, in both directions. An address
+/// the bytecode never carries is not a precondition of anything: declaring one
+/// blocks the broadcast on every chain that lacks it, for a call that cannot
+/// happen, and freezes that claim into the append-only record at the next
+/// release. The lists below are therefore SHORTER than the per-suite `deps`
+/// arrays in the `script/Deploy.sol` this replaces, which had accumulated the
+/// union of what the system needs rather than what each contract reaches.
+///
 /// `RainlangReferenceExtern` is deliberately absent. It is a reference
 /// implementation of the extern/sub-parser interfaces, compiled and codegen'd
 /// so its word tables stay honest, but it is not something this repo ships to
@@ -69,13 +81,12 @@ abstract contract RainlangDeploySuites is RainDeploySuitesBase {
         return candidates;
     }
 
-    /// The decimal float log tables, which every contract here reaches through
-    /// `LibDecimalFloat`.
-    /// @return The dependency addresses.
-    function logTablesOnly() internal pure returns (address[] memory) {
-        address[] memory deps = new address[](1);
-        deps[0] = LibDecimalFloatDeploy.ZOLTU_DEPLOYED_LOG_TABLES_ADDRESS;
-        return deps;
+    /// No dependencies. Declared through a named helper rather than an inline
+    /// `new address[](0)` so an empty list reads as a measured result and not
+    /// as a list somebody forgot to fill in.
+    /// @return The dependency addresses: none.
+    function noDependencies() internal pure returns (address[] memory) {
+        return new address[](0);
     }
 
     /// This repo's rolling `RainlangParser` candidate. Each candidate is a
@@ -83,6 +94,11 @@ abstract contract RainlangDeploySuites is RainDeploySuitesBase {
     /// `script/Build.sol` emits snapshots from these candidates specifically,
     /// and because five full creation codes built in one frame do not fit the
     /// legacy codegen's stack.
+    ///
+    /// Dependencies: none. Parsing is entirely in-contract — the parser's own
+    /// tables are operand handlers and literal parsers, and the log tables are
+    /// reached only from the `run` implementations in `src/lib/op/math/`, which
+    /// live in the interpreter's dispatch table and not this one.
     /// @return The candidate.
     function parserCandidate() internal pure returns (DeployCandidate memory) {
         return DeployCandidate({
@@ -93,13 +109,16 @@ abstract contract RainlangDeploySuites is RainDeploySuitesBase {
                 storedBytecodeHash: LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH,
                 storedRuntimeCode: PARSER_RUNTIME_CODE_CANDIDATE,
                 artifactPath: "src/concrete/RainlangParser.sol:RainlangParser",
-                dependencies: logTablesOnly()
+                dependencies: noDependencies()
             }),
             sourceCreationCode: type(RainlangParser).creationCode
         });
     }
 
     /// This repo's rolling `RainlangStore` candidate.
+    ///
+    /// Dependencies: none. It is a nested mapping behind `get` and `set` and
+    /// names no other address at all.
     /// @return The candidate.
     function storeCandidate() internal pure returns (DeployCandidate memory) {
         return DeployCandidate({
@@ -110,13 +129,20 @@ abstract contract RainlangDeploySuites is RainDeploySuitesBase {
                 storedBytecodeHash: LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH,
                 storedRuntimeCode: STORE_RUNTIME_CODE_CANDIDATE,
                 artifactPath: "src/concrete/RainlangStore.sol:RainlangStore",
-                dependencies: logTablesOnly()
+                dependencies: noDependencies()
             }),
             sourceCreationCode: type(RainlangStore).creationCode
         });
     }
 
     /// This repo's rolling `RainlangInterpreter` candidate.
+    ///
+    /// Dependencies: the decimal float log tables, staticcalled by the `pow`,
+    /// `exp`, `exp2`, `sqrt`, `gm` and `exponential-growth` opcodes, and the
+    /// TOFU decimals contract, staticcalled by the ERC20 opcodes. This is the
+    /// only candidate that reaches either: both are read from `run`
+    /// implementations, and the interpreter is the only contract here holding a
+    /// table of those.
     /// @return The candidate.
     function interpreterCandidate() internal pure returns (DeployCandidate memory) {
         address[] memory deps = new address[](2);
@@ -136,18 +162,22 @@ abstract contract RainlangDeploySuites is RainDeploySuitesBase {
         });
     }
 
-    /// This repo's rolling `RainlangExpressionDeployer` candidate. It reaches
-    /// the parser, store and interpreter at their deterministic addresses, so
-    /// all three must already be live on a network before it can be broadcast
-    /// there.
+    /// This repo's rolling `RainlangExpressionDeployer` candidate.
+    ///
+    /// Dependencies: the parser, and only the parser. Both `parse2` and
+    /// `parsePragma1` call it at its deterministic address, so it must already
+    /// be live on a network before this can be broadcast there.
+    ///
+    /// NOT the store or the interpreter. This contract parses, serialises and
+    /// integrity-checks; the interpreter is what later evals the bytecode it
+    /// returns and the store is what that eval writes to, and it calls
+    /// neither. NOT the log tables or TOFU either: the table it holds is
+    /// `LibAllStandardOps.integrityFunctionPointers()`, the integrity
+    /// functions, not the `run` implementations that reach those two.
     /// @return The candidate.
     function expressionDeployerCandidate() internal pure returns (DeployCandidate memory) {
-        address[] memory deps = new address[](5);
-        deps[0] = LibDecimalFloatDeploy.ZOLTU_DEPLOYED_LOG_TABLES_ADDRESS;
-        deps[1] = address(LibTOFUTokenDecimals.TOFU_DECIMALS_DEPLOYMENT);
-        deps[2] = LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS;
-        deps[3] = LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS;
-        deps[4] = LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS;
+        address[] memory deps = new address[](1);
+        deps[0] = LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS;
         return DeployCandidate({
             snapshot: DeploySuite({
                 suite: "expression-deployer",
@@ -162,17 +192,25 @@ abstract contract RainlangDeploySuites is RainDeploySuitesBase {
         });
     }
 
-    /// This repo's rolling `Rainlang` candidate — the facade over the other
-    /// four, so all four must already be live on a network before it can be
-    /// broadcast there.
+    /// This repo's rolling `Rainlang` candidate — the on-chain directory of the
+    /// other four.
+    ///
+    /// Dependencies: all four of the others. It calls none of them — it returns
+    /// their addresses as constants — so they are dependencies for the other
+    /// reason the struct gives: a directory whose four advertised addresses
+    /// have no code behind them is a deployment that is broken on arrival, and
+    /// every consumer that discovers the suite through this contract would
+    /// discover nothing.
+    ///
+    /// NOT TOFU, which reaches this list from the deploy script it was copied
+    /// from. `Rainlang` names four addresses and TOFU is not one of them.
     /// @return The candidate.
     function rainlangCandidate() internal pure returns (DeployCandidate memory) {
-        address[] memory deps = new address[](5);
-        deps[0] = address(LibTOFUTokenDecimals.TOFU_DECIMALS_DEPLOYMENT);
-        deps[1] = LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS;
-        deps[2] = LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS;
-        deps[3] = LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS;
-        deps[4] = LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS;
+        address[] memory deps = new address[](4);
+        deps[0] = LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS;
+        deps[1] = LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS;
+        deps[2] = LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS;
+        deps[3] = LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS;
         return DeployCandidate({
             snapshot: DeploySuite({
                 suite: "rainlang",

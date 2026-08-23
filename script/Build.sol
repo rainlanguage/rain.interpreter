@@ -49,8 +49,8 @@ struct GeneratedContract {
 /// helper are a published consumer API.
 contract Build is BuildScript, RainlangDeploySuites {
     /// Every contract this repo generates deploy pins for, in deploy order:
-    /// the expression deployer and `Rainlang` reach the ones before them at
-    /// their deterministic addresses.
+    /// the expression deployer calls the parser at its deterministic address,
+    /// and `Rainlang` names all four of the others at theirs.
     /// @return The generated contracts.
     function generatedContracts() internal pure returns (GeneratedContract[] memory) {
         GeneratedContract[] memory contracts = new GeneratedContract[](5);

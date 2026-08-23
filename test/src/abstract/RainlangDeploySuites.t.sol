@@ -5,6 +5,8 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std-1.16.1/src/Test.sol";
 import {DeployCandidate} from "../../../src/abstract/RainDeploySuitesBase.sol";
 import {RainlangDeploySuites} from "../../../src/abstract/RainlangDeploySuites.sol";
+import {LibDecimalFloatDeploy} from "rain-math-float-0.1.1/src/lib/deploy/LibDecimalFloatDeploy.sol";
+import {LibTOFUTokenDecimals} from "rain-tofu-erc20-decimals-0.1.1/src/lib/LibTOFUTokenDecimals.sol";
 
 /// @title RainlangDeploySuitesTest
 /// @notice The properties of this repo's ONE deploy declaration that
@@ -146,6 +148,88 @@ contract RainlangDeploySuitesTest is Test, RainlangDeploySuites {
                     ),
                     string.concat(
                         candidates[i].snapshot.suite, " reaches an undeclared sibling: ", candidates[j].snapshot.suite
+                    )
+                );
+            }
+        }
+    }
+
+    /// PROPERTY: every declared dependency is an address the candidate's own
+    /// bytecode actually bakes in.
+    ///
+    /// The converse of the property above, and the half a copied list fails.
+    /// `LibRainDeploy.deployToNetworks` refuses to broadcast on any network
+    /// where a declared dependency has no code, so a dependency the bytecode
+    /// never carries is a chain this suite is blocked from for no reason. It is
+    /// also worse than inert: `script/Build.sol` writes the list into the
+    /// snapshot, a release freezes that snapshot into the append-only record,
+    /// and the entry then states forever that the release required something it
+    /// never touched.
+    ///
+    /// Sound here because every dependency is a compile-time constant and the
+    /// Zoltu factory deploys with empty constructor args, so baking the address
+    /// in is the only way a candidate can reach one. A future candidate handed
+    /// a dependency it does not embed — a constructor argument, an address read
+    /// from storage — is the case that fails this, and this is where the
+    /// exemption gets written down rather than the lists quietly growing again.
+    function testCandidatesReachEveryDependencyTheyDeclare() external pure {
+        DeployCandidate[] memory candidates = checkedCandidateSuites();
+        for (uint256 i = 0; i < candidates.length; i++) {
+            address[] memory deps = candidates[i].snapshot.dependencies;
+            for (uint256 j = 0; j < deps.length; j++) {
+                assertTrue(
+                    containsAddress(candidates[i].sourceCreationCode, deps[j]),
+                    string.concat(
+                        candidates[i].snapshot.suite, " declares a dependency it never reaches: ", vm.toString(deps[j])
+                    )
+                );
+            }
+        }
+    }
+
+    /// The deterministic deployments OUTSIDE this repo that a candidate here
+    /// can reach. A second hard-coded list, for the same reason
+    /// `dispatchChoices` is one: the reach property below has to compare the
+    /// declaration against something the declaration did not supply, or it
+    /// compares a list to itself.
+    ///
+    /// Both addresses are imported from the package that deploys them and
+    /// never transcribed, so a package that moves its deployment moves this
+    /// with it. What is hand-maintained is the SET — a third external
+    /// deployment reaching a candidate is a line that has to be added here as
+    /// well as to that candidate's dependencies.
+    /// @return The external deployment addresses.
+    function externalDeployments() internal pure returns (address[] memory) {
+        address[] memory externals = new address[](2);
+        externals[0] = LibDecimalFloatDeploy.ZOLTU_DEPLOYED_LOG_TABLES_ADDRESS;
+        externals[1] = address(LibTOFUTokenDecimals.TOFU_DECIMALS_DEPLOYMENT);
+        return externals;
+    }
+
+    /// PROPERTY: a candidate that reaches an external deterministic deployment
+    /// declares it as a dependency.
+    ///
+    /// `testCandidatesDependOnTheSiblingsTheyReach` is this same property over
+    /// the siblings, and the two externals are not siblings, so nothing there
+    /// covers them. They are the pair a trimmed list gets wrong in the
+    /// dangerous direction: with only the converse property standing over
+    /// them, dropping the log tables from the interpreter would go green, the
+    /// broadcast gate would stop asking for them, and `pow` would revert on the
+    /// first chain that does not carry them.
+    function testCandidatesDependOnTheExternalsTheyReach() external pure {
+        DeployCandidate[] memory candidates = checkedCandidateSuites();
+        address[] memory externals = externalDeployments();
+        for (uint256 i = 0; i < candidates.length; i++) {
+            for (uint256 j = 0; j < externals.length; j++) {
+                if (!containsAddress(candidates[i].sourceCreationCode, externals[j])) {
+                    continue;
+                }
+                assertTrue(
+                    containsDependency(candidates[i].snapshot.dependencies, externals[j]),
+                    string.concat(
+                        candidates[i].snapshot.suite,
+                        " reaches an undeclared external deployment: ",
+                        vm.toString(externals[j])
                     )
                 );
             }
