@@ -12,9 +12,23 @@ on:
           - interpreter
           - expression-deployer
           - rainlang
+      legacy:
+        description: >-
+          Send type-0 (legacy) transactions. HyperEVM's RPC rejects the fee-history ranges EIP-1559 estimation asks for, and one dispatch broadcasts to every supported network, so a run that has to reach HyperEVM needs this. Type-0 works everywhere.
+        required: false
+        type: boolean
+        default: false
+      verify:
+        description: >-
+          Verify on the block explorer after broadcasting. Turn it off when the verification retry loop would outlast the deploy; `Manual sol verify` repairs verification later without re-broadcasting.
+        required: false
+        type: boolean
+        default: true
 jobs:
   deploy:
     uses: rainlanguage/rainix/.github/workflows/rainix-manual-sol-artifacts.yaml@main
     with:
       suite: ${{ inputs.suite }}
+      legacy: ${{ inputs.legacy }}
+      verify: ${{ inputs.verify }}
     secrets: inherit
