@@ -13,7 +13,7 @@ import {
 
 // Exported for convenience.
 //forge-lint: disable-next-line(unused-import)
-import {BYTECODE_HASH as STORE_BYTECODE_HASH} from "../generated/RainlangStore.pointers.sol";
+import {BYTECODE_HASH as STORE_BYTECODE_HASH} from "../generated/RainlangStorePointers.sol";
 import {OddSetLength} from "../error/ErrStore.sol";
 
 /// @title RainlangStore

@@ -11,7 +11,7 @@ import {
     StackAllocationMismatch,
     StackOutputsMismatch
 } from "../../../../src/error/ErrIntegrity.sol";
-import {INTEGRITY_FUNCTION_POINTERS} from "../../../../src/generated/RainlangExpressionDeployer.pointers.sol";
+import {INTEGRITY_FUNCTION_POINTERS} from "../../../../src/generated/RainlangExpressionDeployerPointers.sol";
 import {ALL_STANDARD_OPS_LENGTH} from "../../../../src/lib/op/LibAllStandardOps.sol";
 import {IntegritySingleOp} from "./IntegritySingleOp.sol";
 import {IntegrityHighwater} from "./IntegrityHighwater.sol";

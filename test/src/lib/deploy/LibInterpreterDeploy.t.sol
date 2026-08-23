@@ -2,133 +2,38 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {Test, console2} from "forge-std-1.16.1/src/Test.sol";
-import {LibRainDeploy} from "rain-deploy-0.1.3/src/lib/LibRainDeploy.sol";
+import {Test} from "forge-std-1.16.1/src/Test.sol";
 import {LibInterpreterDeploy} from "../../../../src/lib/deploy/LibInterpreterDeploy.sol";
 import {RainlangParser} from "../../../../src/concrete/RainlangParser.sol";
 import {RainlangStore} from "../../../../src/concrete/RainlangStore.sol";
 import {RainlangInterpreter} from "../../../../src/concrete/RainlangInterpreter.sol";
 import {RainlangExpressionDeployer} from "../../../../src/concrete/RainlangExpressionDeployer.sol";
 import {Rainlang} from "../../../../src/concrete/Rainlang.sol";
+import {RainlangReferenceExtern} from "../../../../src/concrete/extern/RainlangReferenceExtern.sol";
 import {LibExtrospectBytecode} from "rain-extrospection-0.1.13/src/lib/LibExtrospectBytecode.sol";
 import {LibExtrospectMetamorphic} from "rain-extrospection-0.1.13/src/lib/LibExtrospectMetamorphic.sol";
-import {RainlangReferenceExtern} from "../../../../src/concrete/extern/RainlangReferenceExtern.sol";
 import {
-    CREATION_CODE as PARSER_CREATION_CODE,
-    RUNTIME_CODE as PARSER_RUNTIME_CODE,
-    DEPLOYED_ADDRESS as PARSER_GENERATED_ADDRESS
-} from "../../../../src/generated/RainlangParser.pointers.sol";
-import {
-    CREATION_CODE as STORE_CREATION_CODE,
-    RUNTIME_CODE as STORE_RUNTIME_CODE,
-    DEPLOYED_ADDRESS as STORE_GENERATED_ADDRESS
-} from "../../../../src/generated/RainlangStore.pointers.sol";
-import {
-    CREATION_CODE as INTERPRETER_CREATION_CODE,
-    RUNTIME_CODE as INTERPRETER_RUNTIME_CODE,
-    DEPLOYED_ADDRESS as INTERPRETER_GENERATED_ADDRESS
-} from "../../../../src/generated/RainlangInterpreter.pointers.sol";
-import {
-    CREATION_CODE as EXPRESSION_DEPLOYER_CREATION_CODE,
-    RUNTIME_CODE as EXPRESSION_DEPLOYER_RUNTIME_CODE,
-    DEPLOYED_ADDRESS as EXPRESSION_DEPLOYER_GENERATED_ADDRESS
-} from "../../../../src/generated/RainlangExpressionDeployer.pointers.sol";
-import {
-    CREATION_CODE as RAINLANG_CREATION_CODE,
-    RUNTIME_CODE as RAINLANG_RUNTIME_CODE,
-    DEPLOYED_ADDRESS as RAINLANG_GENERATED_ADDRESS
-} from "../../../../src/generated/Rainlang.pointers.sol";
-import {
-    CREATION_CODE as REFERENCE_EXTERN_CREATION_CODE,
-    RUNTIME_CODE as REFERENCE_EXTERN_RUNTIME_CODE
-} from "../../../../src/generated/RainlangReferenceExtern.pointers.sol";
+    BYTECODE_HASH as REFERENCE_EXTERN_BYTECODE_HASH
+} from "../../../../src/generated/RainlangReferenceExternPointers.sol";
 
+/// @title LibInterpreterDeployTest
+/// @notice What `LibInterpreterDeploy` asserts over and above the deploy
+/// framework.
+///
+/// `RainlangDeploySnapshotTest` owns every pin assertion now: the recorded
+/// address is the derived address, the recorded code hash is what the creation
+/// code produces, the runtime code hashes to it, and every candidate still
+/// matches current source. Restating any of that here would be a second
+/// hard-coded copy of the same five records that could drift from the
+/// declaration the deploy script reads.
+///
+/// What is left is the part the framework does not model. The bytecode
+/// properties — no Solidity CBOR metadata, no reachable metamorphic opcode —
+/// are constraints on the SOURCE of a contract this repo pins by address, not
+/// on the record of it, and they cover `RainlangReferenceExtern` too, which is
+/// deliberately not a deploy candidate. `etchRainlang` is a published consumer
+/// API with no analogue in `rain-deploy` at all.
 contract LibInterpreterDeployTest is Test {
-    function testDeployAddressParser() external {
-        vm.createSelectFork(vm.envString("ARBITRUM_RPC_URL"));
-        address expected = LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS;
-        if (expected.code.length == 0) {
-            address deployedAddress = LibRainDeploy.deployZoltu(type(RainlangParser).creationCode);
-            assertEq(deployedAddress, expected);
-        }
-        assertTrue(expected.code.length > 0, "Deployed address has no code");
-        assertEq(expected.codehash, LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH);
-    }
-
-    function testExpectedCodeHashParser() external {
-        RainlangParser parser = new RainlangParser();
-
-        assertEq(address(parser).codehash, LibInterpreterDeploy.PARSER_DEPLOYED_CODEHASH);
-    }
-
-    function testDeployAddressStore() external {
-        vm.createSelectFork(vm.envString("ARBITRUM_RPC_URL"));
-        address expected = LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS;
-        if (expected.code.length == 0) {
-            address deployedAddress = LibRainDeploy.deployZoltu(type(RainlangStore).creationCode);
-            assertEq(deployedAddress, expected);
-        }
-        assertTrue(expected.code.length > 0, "Deployed address has no code");
-        assertEq(expected.codehash, LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH);
-    }
-
-    function testExpectedCodeHashStore() external {
-        RainlangStore store = new RainlangStore();
-
-        assertEq(address(store).codehash, LibInterpreterDeploy.STORE_DEPLOYED_CODEHASH);
-    }
-
-    function testDeployAddressInterpreter() external {
-        vm.createSelectFork(vm.envString("ARBITRUM_RPC_URL"));
-        address expected = LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS;
-        if (expected.code.length == 0) {
-            address deployedAddress = LibRainDeploy.deployZoltu(type(RainlangInterpreter).creationCode);
-            assertEq(deployedAddress, expected);
-        }
-        assertTrue(expected.code.length > 0, "Deployed address has no code");
-        assertEq(expected.codehash, LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH);
-    }
-
-    function testExpectedCodeHashInterpreter() external {
-        RainlangInterpreter interpreter = new RainlangInterpreter();
-
-        assertEq(address(interpreter).codehash, LibInterpreterDeploy.INTERPRETER_DEPLOYED_CODEHASH);
-    }
-
-    function testDeployAddressExpressionDeployer() external {
-        vm.createSelectFork(vm.envString("ARBITRUM_RPC_URL"));
-        address expected = LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS;
-        if (expected.code.length == 0) {
-            address deployedAddress = LibRainDeploy.deployZoltu(type(RainlangExpressionDeployer).creationCode);
-            assertEq(deployedAddress, expected);
-        }
-        assertTrue(expected.code.length > 0, "Deployed address has no code");
-        assertEq(expected.codehash, LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH);
-    }
-
-    function testExpectedCodeHashExpressionDeployer() external {
-        RainlangExpressionDeployer expressionDeployer = new RainlangExpressionDeployer();
-
-        assertEq(address(expressionDeployer).codehash, LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_CODEHASH);
-    }
-
-    function testDeployAddressRainlang() external {
-        vm.createSelectFork(vm.envString("ARBITRUM_RPC_URL"));
-        address expected = LibInterpreterDeploy.RAINLANG_DEPLOYED_ADDRESS;
-        if (expected.code.length == 0) {
-            address deployedAddress = LibRainDeploy.deployZoltu(type(Rainlang).creationCode);
-            assertEq(deployedAddress, expected);
-        }
-        assertTrue(expected.code.length > 0, "Deployed address has no code");
-        assertEq(expected.codehash, LibInterpreterDeploy.RAINLANG_DEPLOYED_CODEHASH);
-    }
-
-    function testExpectedCodeHashRainlang() external {
-        Rainlang rainlang = new Rainlang();
-
-        assertEq(address(rainlang).codehash, LibInterpreterDeploy.RAINLANG_DEPLOYED_CODEHASH);
-    }
-
     /// Parser bytecode MUST NOT contain Solidity CBOR metadata.
     function testNoCborMetadataParser() external {
         RainlangParser parser = new RainlangParser();
@@ -174,6 +79,15 @@ contract LibInterpreterDeployTest is Test {
         );
     }
 
+    /// ReferenceExtern bytecode MUST NOT contain Solidity CBOR metadata.
+    function testNoCborMetadataReferenceExtern() external {
+        RainlangReferenceExtern extern = new RainlangReferenceExtern();
+        assertFalse(
+            LibExtrospectBytecode.tryTrimSolidityCBORMetadata(address(extern).code),
+            "ReferenceExtern bytecode contains CBOR metadata"
+        );
+    }
+
     /// Parser bytecode MUST NOT contain reachable metamorphic risk opcodes.
     function testNotMetamorphicParser() external {
         RainlangParser parser = new RainlangParser();
@@ -205,112 +119,23 @@ contract LibInterpreterDeployTest is Test {
         LibExtrospectMetamorphic.checkNotMetamorphic(address(rainlang).code);
     }
 
-    /// The precompiled creation code constant for the parser MUST match the
-    /// compiler's creation code.
-    function testCreationCodeParser() external pure {
-        assertEq(keccak256(PARSER_CREATION_CODE), keccak256(type(RainlangParser).creationCode));
-    }
-
-    /// The precompiled creation code constant for the store MUST match the
-    /// compiler's creation code.
-    function testCreationCodeStore() external pure {
-        assertEq(keccak256(STORE_CREATION_CODE), keccak256(type(RainlangStore).creationCode));
-    }
-
-    /// The precompiled creation code constant for the interpreter MUST match
-    /// the compiler's creation code.
-    function testCreationCodeInterpreter() external pure {
-        assertEq(keccak256(INTERPRETER_CREATION_CODE), keccak256(type(RainlangInterpreter).creationCode));
-    }
-
-    /// The precompiled creation code constant for the expression deployer MUST
-    /// match the compiler's creation code.
-    function testCreationCodeExpressionDeployer() external pure {
-        assertEq(keccak256(EXPRESSION_DEPLOYER_CREATION_CODE), keccak256(type(RainlangExpressionDeployer).creationCode));
-    }
-
-    /// The precompiled creation code constant for Rainlang MUST match the
-    /// compiler's creation code.
-    function testCreationCodeRainlang() external pure {
-        assertEq(keccak256(RAINLANG_CREATION_CODE), keccak256(type(Rainlang).creationCode));
-    }
-
-    /// The precompiled creation code constant for the reference extern MUST
-    /// match the compiler's creation code.
-    function testCreationCodeReferenceExtern() external pure {
-        assertEq(keccak256(REFERENCE_EXTERN_CREATION_CODE), keccak256(type(RainlangReferenceExtern).creationCode));
-    }
-
-    /// The precompiled runtime code constant for the parser MUST match the
-    /// deployed runtime bytecode.
-    function testRuntimeCodeParser() external {
-        RainlangParser parser = new RainlangParser();
-        assertEq(keccak256(PARSER_RUNTIME_CODE), keccak256(address(parser).code));
-    }
-
-    /// The precompiled runtime code constant for the store MUST match the
-    /// deployed runtime bytecode.
-    function testRuntimeCodeStore() external {
-        RainlangStore store = new RainlangStore();
-        assertEq(keccak256(STORE_RUNTIME_CODE), keccak256(address(store).code));
-    }
-
-    /// The precompiled runtime code constant for the interpreter MUST match
-    /// the deployed runtime bytecode.
-    function testRuntimeCodeInterpreter() external {
-        RainlangInterpreter interpreter = new RainlangInterpreter();
-        assertEq(keccak256(INTERPRETER_RUNTIME_CODE), keccak256(address(interpreter).code));
-    }
-
-    /// The precompiled runtime code constant for the expression deployer MUST
-    /// match the deployed runtime bytecode.
-    function testRuntimeCodeExpressionDeployer() external {
-        RainlangExpressionDeployer deployer = new RainlangExpressionDeployer();
-        assertEq(keccak256(EXPRESSION_DEPLOYER_RUNTIME_CODE), keccak256(address(deployer).code));
-    }
-
-    /// The precompiled runtime code constant for Rainlang MUST match the
-    /// deployed runtime bytecode.
-    function testRuntimeCodeRainlang() external {
-        Rainlang rainlang = new Rainlang();
-        assertEq(keccak256(RAINLANG_RUNTIME_CODE), keccak256(address(rainlang).code));
-    }
-
-    /// The precompiled runtime code constant for the reference extern MUST
-    /// match the deployed runtime bytecode.
-    function testRuntimeCodeReferenceExtern() external {
+    /// ReferenceExtern bytecode MUST NOT contain reachable metamorphic risk
+    /// opcodes.
+    function testNotMetamorphicReferenceExtern() external {
         RainlangReferenceExtern extern = new RainlangReferenceExtern();
-        assertEq(keccak256(REFERENCE_EXTERN_RUNTIME_CODE), keccak256(address(extern).code));
+        LibExtrospectMetamorphic.checkNotMetamorphic(address(extern).code);
     }
 
-    /// The generated deployed address for the parser MUST match the deploy
-    /// library constant.
-    function testGeneratedDeployedAddressParser() external pure {
-        assertEq(PARSER_GENERATED_ADDRESS, LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS);
-    }
-
-    /// The generated deployed address for the store MUST match the deploy
-    /// library constant.
-    function testGeneratedDeployedAddressStore() external pure {
-        assertEq(STORE_GENERATED_ADDRESS, LibInterpreterDeploy.STORE_DEPLOYED_ADDRESS);
-    }
-
-    /// The generated deployed address for the interpreter MUST match the
-    /// deploy library constant.
-    function testGeneratedDeployedAddressInterpreter() external pure {
-        assertEq(INTERPRETER_GENERATED_ADDRESS, LibInterpreterDeploy.INTERPRETER_DEPLOYED_ADDRESS);
-    }
-
-    /// The generated deployed address for the expression deployer MUST match
-    /// the deploy library constant.
-    function testGeneratedDeployedAddressExpressionDeployer() external pure {
-        assertEq(EXPRESSION_DEPLOYER_GENERATED_ADDRESS, LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS);
-    }
-
-    /// The generated deployed address for Rainlang MUST match the deploy
-    /// library constant.
-    function testGeneratedDeployedAddressRainlang() external pure {
-        assertEq(RAINLANG_GENERATED_ADDRESS, LibInterpreterDeploy.RAINLANG_DEPLOYED_ADDRESS);
+    /// The reference extern's generated bytecode hash MUST be the hash of the
+    /// bytecode current source produces.
+    ///
+    /// The extern is not a deploy candidate, so no snapshot of it exists and
+    /// `RainlangDeploySnapshotTest` never sees it. Its generated pointers file
+    /// still carries a `BYTECODE_HASH`, written by the same build that wrote
+    /// its word tables — this is what makes that file stale-detectable at all.
+    function testReferenceExternBytecodeHash() external {
+        RainlangReferenceExtern extern = new RainlangReferenceExtern();
+        assertEq(keccak256(address(extern).code), REFERENCE_EXTERN_BYTECODE_HASH);
     }
 
     /// After calling etchRainlang, all five contracts MUST have the expected

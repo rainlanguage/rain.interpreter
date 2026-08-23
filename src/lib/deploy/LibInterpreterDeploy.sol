@@ -8,27 +8,27 @@ import {
     BYTECODE_HASH as PARSER_HASH,
     DEPLOYED_ADDRESS as PARSER_ADDR,
     RUNTIME_CODE as PARSER_RUNTIME_CODE
-} from "../../generated/RainlangParser.pointers.sol";
+} from "../../generated/candidate/RainlangParser.sol";
 import {
     BYTECODE_HASH as STORE_HASH,
     DEPLOYED_ADDRESS as STORE_ADDR,
     RUNTIME_CODE as STORE_RUNTIME_CODE
-} from "../../generated/RainlangStore.pointers.sol";
+} from "../../generated/candidate/RainlangStore.sol";
 import {
     BYTECODE_HASH as INTERPRETER_HASH,
     DEPLOYED_ADDRESS as INTERPRETER_ADDR,
     RUNTIME_CODE as INTERPRETER_RUNTIME_CODE
-} from "../../generated/RainlangInterpreter.pointers.sol";
+} from "../../generated/candidate/RainlangInterpreter.sol";
 import {
     BYTECODE_HASH as EXPRESSION_DEPLOYER_HASH,
     DEPLOYED_ADDRESS as EXPRESSION_DEPLOYER_ADDR,
     RUNTIME_CODE as EXPRESSION_DEPLOYER_RUNTIME_CODE
-} from "../../generated/RainlangExpressionDeployer.pointers.sol";
+} from "../../generated/candidate/RainlangExpressionDeployer.sol";
 import {
     BYTECODE_HASH as RAINLANG_HASH,
     DEPLOYED_ADDRESS as RAINLANG_ADDR,
     RUNTIME_CODE as RAINLANG_RUNTIME_CODE
-} from "../../generated/Rainlang.pointers.sol";
+} from "../../generated/candidate/Rainlang.sol";
 
 /// @title LibInterpreterDeploy
 /// @notice A library containing the deployed address and code hash of the Interpreter

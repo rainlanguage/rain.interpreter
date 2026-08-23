@@ -1,17 +1,33 @@
 name: Package Release
+# Deploy-shaped repo: the `rainlang` Soldeer package is released by a manual
+# `sol-v*` tag via rainix-tag-release, never by a merge.
+#
+# rainix-autopublish's merge-driven next-version lifecycle is wrong for this
+# shape. `[external.package].version` in `foundry.toml` is the LAST published
+# revision and names the frozen `src/generated/<tag>/` record cut with it, so
+# it may only move in lockstep with a deployment that already happened. The
+# tag flow enforces exactly that: it re-runs the suite, then `release-guard`
+# checks version == tag, the frozen dir present, byte-identical to a freshly
+# regenerated `candidate/`, no later release frozen and a clean tree — then
+# publishes.
+#
+# Push-free: the frozen snapshot and the version bump reach main through a
+# reviewed PR BEFORE the tag, and this workflow commits nothing, so it works
+# against a protected main.
+#
+# The Rust crates are NOT released here — see `crates-release.yaml`. They are
+# ordinary bindings whose version tracks code changes and is safe to bump on
+# merge, and coupling them to this trigger is what wedged the release lane.
+#
+# `snapshot-generate-cmd` is deliberately absent: it was removed org-wide and
+# is no longer an input at all.
 on:
   push:
-    branches:
-      - main
+    tags:
+      - sol-v*
 jobs:
   release:
-    # Bumps + publishes the rainlang crates to crates.io as a lockstep set, in
-    # dependency order (bindings, dispair, parser, eval, then test_fixtures):
-    # changing any member republishes the others with matching version pins, via
-    # the PUBLISH_PRIVATE_KEY deploy key. test_fixtures depends on none of the
-    # others but is released in lockstep so its embedded bytecode stays in sync.
-    uses: rainlanguage/rainix/.github/workflows/rainix-autopublish.yaml@main
+    uses: rainlanguage/rainix/.github/workflows/rainix-tag-release.yaml@main
     with:
-      crates: rainlang_bindings rainlang_dispair rainlang_parser rainlang-eval rainlang_test_fixtures
       soldeer-package: rainlang
     secrets: inherit

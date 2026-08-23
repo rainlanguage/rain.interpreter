@@ -12,10 +12,7 @@ import {IDescribedByMetaV1} from "rain-metadata-0.1.0/src/interface/IDescribedBy
 import {LibIntegrityCheck} from "../lib/integrity/LibIntegrityCheck.sol";
 import {LibInterpreterStateDataContract} from "../lib/state/LibInterpreterStateDataContract.sol";
 import {LibAllStandardOps} from "../lib/op/LibAllStandardOps.sol";
-import {
-    INTEGRITY_FUNCTION_POINTERS,
-    DESCRIBED_BY_META_HASH
-} from "../generated/RainlangExpressionDeployer.pointers.sol";
+import {INTEGRITY_FUNCTION_POINTERS, DESCRIBED_BY_META_HASH} from "../generated/RainlangExpressionDeployerPointers.sol";
 import {IIntegrityToolingV1} from "rain-sol-codegen-0.1.0/src/interface/IIntegrityToolingV1.sol";
 import {RainlangParser} from "./RainlangParser.sol";
 import {LibInterpreterDeploy} from "../lib/deploy/LibInterpreterDeploy.sol";

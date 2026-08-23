@@ -21,7 +21,7 @@ import {
     //forge-lint: disable-next-line(unused-import)
     BYTECODE_HASH as INTERPRETER_BYTECODE_HASH,
     OPCODE_FUNCTION_POINTERS
-} from "../generated/RainlangInterpreter.pointers.sol";
+} from "../generated/RainlangInterpreterPointers.sol";
 import {IOpcodeToolingV1} from "rain-sol-codegen-0.1.0/src/interface/IOpcodeToolingV1.sol";
 import {OddSetLength} from "../error/ErrStore.sol";
 import {ZeroFunctionPointers} from "../error/ErrEval.sol";
