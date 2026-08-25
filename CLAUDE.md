@@ -4,20 +4,6 @@ Guidance for Claude Code in this repo. This file takes precedence over session
 summaries — re-read it as written rather than trusting a summary's framing of
 what a process means.
 
-## Build Environment
-
-Nix flakes only: run everything as `nix develop -c <cmd>`. Once per session, in
-order, before any build or test:
-
-```bash
-nix develop -c rainix-sol-prelude
-nix develop -c rainix-rs-prelude
-nix develop -c rainlang-prelude   # generates meta/ needed by the sol build
-```
-
-Common tasks (all via `nix develop -c`): `rainix-sol-test`, `rainix-sol-static`,
-`rainix-rs-test`, `rainix-rs-static`, `test-wasm-build`.
-
 ## Generated code
 
 `script/Build.sol` writes ALL of it. Never hand-edit:
