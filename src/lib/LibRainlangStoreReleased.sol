@@ -6,6 +6,14 @@ pragma solidity ^0.8.25;
 
 import {DeploySuite} from "../abstract/RainDeploySuitesBase.sol";
 
+import {
+    DEPLOYED_ADDRESS as RainlangStore_0_1_9_DEPLOYED_ADDRESS,
+    BYTECODE_HASH as RainlangStore_0_1_9_BYTECODE_HASH,
+    CREATION_CODE as RainlangStore_0_1_9_CREATION_CODE,
+    RUNTIME_CODE as RainlangStore_0_1_9_RUNTIME_CODE,
+    DEPENDENCIES as RainlangStore_0_1_9_DEPENDENCIES
+} from "../generated/0_1_9/RainlangStore.sol";
+
 /// @title LibRainlangStoreReleased
 /// @notice Every frozen release of `RainlangStore`: one entry per file in
 /// the append-only `src/generated/<tag>/` record, in tag order.
@@ -26,7 +34,16 @@ library LibRainlangStoreReleased {
     /// Every frozen release, in tag order.
     /// @return The released suites.
     function releasedSuites() internal pure returns (DeploySuite[] memory) {
-        DeploySuite[] memory suites = new DeploySuite[](0);
+        DeploySuite[] memory suites = new DeploySuite[](1);
+        suites[0] = DeploySuite({
+            suite: "store@0_1_9",
+            creationCode: RainlangStore_0_1_9_CREATION_CODE,
+            storedDeployedAddress: RainlangStore_0_1_9_DEPLOYED_ADDRESS,
+            storedBytecodeHash: RainlangStore_0_1_9_BYTECODE_HASH,
+            storedRuntimeCode: RainlangStore_0_1_9_RUNTIME_CODE,
+            artifactPath: "src/concrete/RainlangStore.sol:RainlangStore",
+            dependencies: abi.decode(RainlangStore_0_1_9_DEPENDENCIES, (address[]))
+        });
         return suites;
     }
 }
