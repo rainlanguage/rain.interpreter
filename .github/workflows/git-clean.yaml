@@ -1,7 +1,7 @@
 name: Git is clean
 on: [push]
 jobs:
-  copy-artifacts:
+  git-clean:
     # Shared reusable (rainix#201): rebuild the committed artifacts from
     # committed sources — `script/Build.sol`, `forge build`, CopyArtifacts,
     # `forge fmt` — then `git diff --exit-code`. This is what makes the

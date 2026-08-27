@@ -5,7 +5,7 @@ pragma solidity ^0.8.25;
 import {Vm} from "forge-std-1.16.1/src/Vm.sol";
 
 /// @notice Shared logic between `script/CopyArtifacts.sol` (writes the
-/// committed ABI). The `copy-artifacts` CI job runs that writer then
+/// committed ABI). The `git-clean` CI job runs that writer then
 /// `git diff --exit-code`, so the committed copies are asserted fresh by
 /// the absence of drift.
 library LibCopyArtifacts {
