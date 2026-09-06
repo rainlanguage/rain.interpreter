@@ -14,6 +14,14 @@ import {
     DEPENDENCIES as RainlangExpressionDeployer_0_1_9_DEPENDENCIES
 } from "../generated/0_1_9/RainlangExpressionDeployer.sol";
 
+import {
+    DEPLOYED_ADDRESS as RainlangExpressionDeployer_0_1_10_DEPLOYED_ADDRESS,
+    BYTECODE_HASH as RainlangExpressionDeployer_0_1_10_BYTECODE_HASH,
+    CREATION_CODE as RainlangExpressionDeployer_0_1_10_CREATION_CODE,
+    RUNTIME_CODE as RainlangExpressionDeployer_0_1_10_RUNTIME_CODE,
+    DEPENDENCIES as RainlangExpressionDeployer_0_1_10_DEPENDENCIES
+} from "../generated/0_1_10/RainlangExpressionDeployer.sol";
+
 /// @title LibRainlangExpressionDeployerReleased
 /// @notice Every frozen release of `RainlangExpressionDeployer`: one entry per file in
 /// the append-only `src/generated/<tag>/` record, in tag order.
@@ -34,7 +42,7 @@ library LibRainlangExpressionDeployerReleased {
     /// Every frozen release, in tag order.
     /// @return The released suites.
     function releasedSuites() internal pure returns (DeploySuite[] memory) {
-        DeploySuite[] memory suites = new DeploySuite[](1);
+        DeploySuite[] memory suites = new DeploySuite[](2);
         suites[0] = DeploySuite({
             suite: "expression-deployer@0_1_9",
             creationCode: RainlangExpressionDeployer_0_1_9_CREATION_CODE,
@@ -43,6 +51,15 @@ library LibRainlangExpressionDeployerReleased {
             storedRuntimeCode: RainlangExpressionDeployer_0_1_9_RUNTIME_CODE,
             artifactPath: "src/concrete/RainlangExpressionDeployer.sol:RainlangExpressionDeployer",
             dependencies: abi.decode(RainlangExpressionDeployer_0_1_9_DEPENDENCIES, (address[]))
+        });
+        suites[1] = DeploySuite({
+            suite: "expression-deployer@0_1_10",
+            creationCode: RainlangExpressionDeployer_0_1_10_CREATION_CODE,
+            storedDeployedAddress: RainlangExpressionDeployer_0_1_10_DEPLOYED_ADDRESS,
+            storedBytecodeHash: RainlangExpressionDeployer_0_1_10_BYTECODE_HASH,
+            storedRuntimeCode: RainlangExpressionDeployer_0_1_10_RUNTIME_CODE,
+            artifactPath: "src/concrete/RainlangExpressionDeployer.sol:RainlangExpressionDeployer",
+            dependencies: abi.decode(RainlangExpressionDeployer_0_1_10_DEPENDENCIES, (address[]))
         });
         return suites;
     }
