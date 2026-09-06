@@ -3,11 +3,11 @@
 pragma solidity ^0.8.25;
 
 import {MemoryKV} from "rain-lib-memkv-0.1.0/src/lib/LibMemoryKV.sol";
-import {Pointer} from "rain-solmem-0.1.26/src/lib/LibPointer.sol";
-import {LibMemCpy} from "rain-solmem-0.1.26/src/lib/LibMemCpy.sol";
-import {LibBytes} from "rain-solmem-0.1.26/src/lib/LibBytes.sol";
-import {FullyQualifiedNamespace} from "rainlang-interface-0.2.5/src/interface/IInterpreterV4.sol";
-import {IInterpreterStoreV3} from "rainlang-interface-0.2.5/src/interface/IInterpreterStoreV3.sol";
+import {Pointer} from "rain-solmem-0.1.28/src/lib/LibPointer.sol";
+import {LibMemCpy} from "rain-solmem-0.1.28/src/lib/LibMemCpy.sol";
+import {LibBytes} from "rain-solmem-0.1.28/src/lib/LibBytes.sol";
+import {FullyQualifiedNamespace} from "rainlang-interface-0.2.8/src/interface/IInterpreterV4.sol";
+import {IInterpreterStoreV3} from "rainlang-interface-0.2.8/src/interface/IInterpreterStoreV3.sol";
 
 import {InterpreterState} from "./LibInterpreterState.sol";
 import {SOURCE_OFFSET_SHIFT} from "../eval/LibEval.sol";

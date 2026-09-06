@@ -4,7 +4,7 @@ pragma solidity =0.8.25;
 
 import {OpTest} from "test/abstract/OpTest.sol";
 import {IntegrityCheckState} from "../../../../../src/lib/integrity/LibIntegrityCheck.sol";
-import {OperandV2, StackItem} from "rainlang-interface-0.2.5/src/interface/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rainlang-interface-0.2.8/src/interface/IInterpreterV4.sol";
 import {LibOpERC20Allowance} from "../../../../../src/lib/op/erc20/LibOpERC20Allowance.sol";
 import {IERC20} from "@openzeppelin-contracts-5.6.1/token/ERC20/IERC20.sol";
 import {UnexpectedOperand} from "../../../../../src/error/ErrParse.sol";
@@ -14,7 +14,7 @@ import {LibDecimalFloat, Float} from "rain-math-float-0.1.1/src/lib/LibDecimalFl
 import {TOFUOutcome, ITOFUTokenDecimals} from "rain-tofu-erc20-decimals-0.1.1/src/interface/ITOFUTokenDecimals.sol";
 import {NotAnAddress} from "../../../../../src/error/ErrRainType.sol";
 import {LibTestCast} from "test/lib/typecast/LibTestCast.sol";
-import {LibBytes32Array} from "rain-solmem-0.1.26/src/lib/LibBytes32Array.sol";
+import {LibBytes32Array} from "rain-solmem-0.1.28/src/lib/LibBytes32Array.sol";
 
 /// @title LibOpERC20AllowanceTest
 /// @notice Test the opcode for getting the allowance of an erc20 token.

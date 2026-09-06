@@ -10,8 +10,8 @@ import {RainlangInterpreter} from "../../../../src/concrete/RainlangInterpreter.
 import {RainlangExpressionDeployer} from "../../../../src/concrete/RainlangExpressionDeployer.sol";
 import {Rainlang} from "../../../../src/concrete/Rainlang.sol";
 import {RainlangReferenceExtern} from "../../../../src/concrete/extern/RainlangReferenceExtern.sol";
-import {LibExtrospectBytecode} from "rain-extrospection-0.1.13/src/lib/LibExtrospectBytecode.sol";
-import {LibExtrospectMetamorphic} from "rain-extrospection-0.1.13/src/lib/LibExtrospectMetamorphic.sol";
+import {LibExtrospectBytecode} from "rain-extrospection-0.1.14/src/lib/LibExtrospectBytecode.sol";
+import {LibExtrospectMetamorphic} from "rain-extrospection-0.1.14/src/lib/LibExtrospectMetamorphic.sol";
 import {
     BYTECODE_HASH as REFERENCE_EXTERN_BYTECODE_HASH
 } from "../../../../src/generated/RainlangReferenceExternPointers.sol";

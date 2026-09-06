@@ -5,7 +5,7 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std-1.16.1/src/Test.sol";
 import {LibParseOperand} from "../../../../src/lib/parse/LibParseOperand.sol";
 import {ParseState} from "../../../../src/lib/parse/LibParseState.sol";
-import {LibBytes, Pointer} from "rain-solmem-0.1.26/src/lib/LibBytes.sol";
+import {LibBytes, Pointer} from "rain-solmem-0.1.28/src/lib/LibBytes.sol";
 import {Strings} from "@openzeppelin-contracts-5.6.1/utils/Strings.sol";
 import {LibMetaFixture} from "test/lib/parse/LibMetaFixture.sol";
 import {LibConformString} from "rain-string-0.2.0/src/lib/mut/LibConformString.sol";
