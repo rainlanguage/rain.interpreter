@@ -1,11 +1,6 @@
 {
   "abi": [
     {
-      "type": "constructor",
-      "inputs": [],
-      "stateMutability": "nonpayable"
-    },
-    {
       "type": "function",
       "name": "buildOpcodeFunctionPointers",
       "inputs": [],
