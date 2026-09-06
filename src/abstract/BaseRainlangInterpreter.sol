@@ -1,0 +1,89 @@
+// SPDX-License-Identifier: LicenseRef-DCL-1.0
+// SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
+pragma solidity ^0.8.25;
+
+import {ERC165} from "@openzeppelin-contracts-5.6.1/utils/introspection/ERC165.sol";
+import {LibMemoryKV, MemoryKVKey, MemoryKVVal} from "rain-lib-memkv-0.1.0/src/lib/LibMemoryKV.sol";
+
+import {LibEval} from "../lib/eval/LibEval.sol";
+import {LibInterpreterStateDataContract} from "../lib/state/LibInterpreterStateDataContract.sol";
+import {InterpreterState} from "../lib/state/LibInterpreterState.sol";
+import {LibAllStandardOps} from "../lib/op/LibAllStandardOps.sol";
+import {
+    IInterpreterV4,
+    SourceIndexV2,
+    EvalV4,
+    StackItem
+} from "rainlang-interface-0.2.8/src/interface/IInterpreterV4.sol";
+import {IOpcodeToolingV1} from "rain-sol-codegen-0.1.0/src/interface/IOpcodeToolingV1.sol";
+import {OddSetLength} from "../error/ErrStore.sol";
+import {ZeroFunctionPointers} from "../error/ErrEval.sol";
+
+/// @title BaseRainlangInterpreter
+/// @notice Implementation of a Rainlang interpreter that is compatible with
+/// native onchain Rainlang parsing. Everything except the opcode function
+/// pointer table, which a concrete binds by overriding
+/// `opcodeFunctionPointers`.
+abstract contract BaseRainlangInterpreter is IInterpreterV4, IOpcodeToolingV1, ERC165 {
+    using LibEval for InterpreterState;
+    using LibInterpreterStateDataContract for bytes;
+
+    /// Guards against deployment with an empty opcode function pointer table,
+    /// which would make every eval call revert.
+    constructor() {
+        if (opcodeFunctionPointers().length == 0) revert ZeroFunctionPointers();
+    }
+
+    /// @notice Returns the packed 2-byte function pointer table used by the
+    /// eval loop to dispatch each opcode. Overrides MUST return the same
+    /// non-empty value at construction time and at runtime. Returning empty
+    /// bytes at runtime would cause division-by-zero in the eval loop's
+    /// modulo-based dispatch, leading to reads from arbitrary memory
+    /// interpreted as function pointers.
+    /// @return The opcode function pointers for the interpreter.
+    function opcodeFunctionPointers() internal view virtual returns (bytes memory);
+
+    /// @inheritdoc IInterpreterV4
+    /// @dev `eval4` does NOT re-run integrity checks on `eval.bytecode`. It
+    /// deserialises via `unsafeDeserialize` and dispatches opcodes through
+    /// raw function pointer arithmetic. Memory safety, stack bounds, and
+    /// opcode well-formedness all rely on the bytecode having passed
+    /// `LibIntegrityCheck.integrityCheck2` at deploy time. Callers MUST
+    /// source `eval.bytecode` from a `RainterpreterExpressionDeployer`
+    /// that validated it against this interpreter's opcode function
+    /// pointer table. Calling `eval4` with raw, manually constructed, or
+    /// otherwise unverified bytecode is undefined behaviour and can read
+    /// from or write to arbitrary memory.
+    function eval4(EvalV4 calldata eval) external view virtual override returns (StackItem[] memory, bytes32[] memory) {
+        InterpreterState memory state = eval.bytecode
+            .unsafeDeserialize(
+                SourceIndexV2.unwrap(eval.sourceIndex),
+                eval.namespace,
+                eval.store,
+                eval.context,
+                opcodeFunctionPointers()
+            );
+        if (eval.stateOverlay.length % 2 != 0) {
+            revert OddSetLength(eval.stateOverlay.length);
+        }
+        for (uint256 i = 0; i < eval.stateOverlay.length; i += 2) {
+            state.stateKV = LibMemoryKV.set(
+                state.stateKV, MemoryKVKey.wrap(eval.stateOverlay[i]), MemoryKVVal.wrap(eval.stateOverlay[i + 1])
+            );
+        }
+        // We use the return by returning it. Slither false positive.
+        //slither-disable-next-line unused-return
+        return state.eval4(eval.inputs, type(uint256).max);
+    }
+
+    /// @inheritdoc ERC165
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return interfaceId == type(IInterpreterV4).interfaceId || interfaceId == type(IOpcodeToolingV1).interfaceId
+            || super.supportsInterface(interfaceId);
+    }
+
+    /// @inheritdoc IOpcodeToolingV1
+    function buildOpcodeFunctionPointers() public view virtual override returns (bytes memory) {
+        return LibAllStandardOps.opcodeFunctionPointers();
+    }
+}

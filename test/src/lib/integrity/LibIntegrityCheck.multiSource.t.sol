@@ -3,16 +3,13 @@
 pragma solidity =0.8.25;
 
 import {RainlangExpressionDeployerDeploymentTest} from "test/abstract/RainlangExpressionDeployerDeploymentTest.sol";
-import {RainlangParser} from "../../../../src/concrete/RainlangParser.sol";
-import {LibInterpreterDeploy} from "../../../../src/lib/deploy/LibInterpreterDeploy.sol";
 import {LibBytecode} from "rainlang-interface-0.2.8/src/lib/bytecode/LibBytecode.sol";
 
 contract LibIntegrityCheckMultiSourceTest is RainlangExpressionDeployerDeploymentTest {
     /// Two-source expression must pass integrity and produce correct
     /// per-source metadata.
     function testIntegrityTwoSources() external view {
-        (bytes memory bytecode,) =
-            RainlangParser(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS).unsafeParse("_: 1;_: 2, _: 3;");
+        (bytes memory bytecode,) = I_PARSER.unsafeParse("_: 1;_: 2, _: 3;");
         assertEq(LibBytecode.sourceCount(bytecode), 2);
 
         // Source 0: 1 op (constant), 1 output.
@@ -28,8 +25,7 @@ contract LibIntegrityCheckMultiSourceTest is RainlangExpressionDeployerDeploymen
 
     /// Three-source expression with different shapes must pass integrity.
     function testIntegrityThreeSources() external view {
-        (bytes memory bytecode,) = RainlangParser(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS)
-            .unsafeParse("_: 1;_: add(1 2);_: 3, _: 4, _: 5;");
+        (bytes memory bytecode,) = I_PARSER.unsafeParse("_: 1;_: add(1 2);_: 3, _: 4, _: 5;");
         assertEq(LibBytecode.sourceCount(bytecode), 3);
 
         // Source 0: 1 op, 1 output.

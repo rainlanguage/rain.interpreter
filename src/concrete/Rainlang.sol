@@ -3,21 +3,17 @@
 pragma solidity =0.8.25;
 
 import {LibInterpreterDeploy} from "../lib/deploy/LibInterpreterDeploy.sol";
+import {BaseRainlang} from "../abstract/BaseRainlang.sol";
+// Referenced by NatSpec only.
+//forge-lint: disable-next-line(unused-import)
 import {IRainlang} from "../interface/IRainlang.sol";
-import {ERC165} from "@openzeppelin-contracts-5.6.1/utils/introspection/ERC165.sol";
 
 /// @title Rainlang
-/// @notice Rainlang contract that exposes the deterministic Zoltu deploy
-/// addresses of the four core interpreter components: Deployer, Interpreter,
-/// Store, and Parser. Deployed via the same Zoltu pattern so that external
-/// tooling can discover all component addresses from a single known Rainlang
-/// address.
-contract Rainlang is IRainlang, ERC165 {
-    /// @inheritdoc ERC165
-    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return interfaceId == type(IRainlang).interfaceId || super.supportsInterface(interfaceId);
-    }
-
+/// @notice `BaseRainlang` bound to the deterministic Zoltu deploy addresses of
+/// the four core interpreter components. Deployed via the same Zoltu pattern
+/// so that external tooling can discover all component addresses from a
+/// single known Rainlang address.
+contract Rainlang is BaseRainlang {
     /// @inheritdoc IRainlang
     function expressionDeployerAddress() external pure virtual override returns (address) {
         return LibInterpreterDeploy.EXPRESSION_DEPLOYER_DEPLOYED_ADDRESS;

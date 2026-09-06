@@ -3,8 +3,6 @@
 pragma solidity =0.8.25;
 
 import {RainlangExpressionDeployerDeploymentTest} from "test/abstract/RainlangExpressionDeployerDeploymentTest.sol";
-import {RainlangParser} from "../../../../src/concrete/RainlangParser.sol";
-import {LibInterpreterDeploy} from "../../../../src/lib/deploy/LibInterpreterDeploy.sol";
 import {LibBytecode} from "rainlang-interface-0.2.8/src/lib/bytecode/LibBytecode.sol";
 
 contract LibIntegrityCheckStackMaxIndexTest is RainlangExpressionDeployerDeploymentTest {
@@ -13,8 +11,7 @@ contract LibIntegrityCheckStackMaxIndexTest is RainlangExpressionDeployerDeploym
     /// both and produces one result (final = 1). The stackAllocation in the
     /// bytecode must equal the peak (2), not the final output count (1).
     function testStackMaxIndexTracksPeak() external view {
-        (bytes memory bytecode,) =
-            RainlangParser(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS).unsafeParse("_: add(1 2);");
+        (bytes memory bytecode,) = I_PARSER.unsafeParse("_: add(1 2);");
 
         uint256 allocation = LibBytecode.sourceStackAllocation(bytecode, 0);
         (, uint256 outputs) = LibBytecode.sourceInputsOutputsLength(bytecode, 0);

@@ -3,8 +3,6 @@
 pragma solidity =0.8.25;
 
 import {RainlangExpressionDeployerDeploymentTest} from "test/abstract/RainlangExpressionDeployerDeploymentTest.sol";
-import {RainlangParser} from "../../../../src/concrete/RainlangParser.sol";
-import {LibInterpreterDeploy} from "../../../../src/lib/deploy/LibInterpreterDeploy.sol";
 import {LibBytecode} from "rainlang-interface-0.2.8/src/lib/bytecode/LibBytecode.sol";
 
 contract LibIntegrityCheckZeroSourceTest is RainlangExpressionDeployerDeploymentTest {
@@ -12,15 +10,14 @@ contract LibIntegrityCheckZeroSourceTest is RainlangExpressionDeployerDeployment
     /// byte (sourceCount = 0), and the integrity check (run inside parse2)
     /// must handle this without reverting.
     function testZeroSourceEmptyInput() external view {
-        (bytes memory bytecode,) = RainlangParser(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS).unsafeParse("");
+        (bytes memory bytecode,) = I_PARSER.unsafeParse("");
         assertEq(LibBytecode.sourceCount(bytecode), 0);
         assertEq(bytecode.length, 1);
     }
 
     /// Comment-only input also produces zero-source bytecode.
     function testZeroSourceCommentOnly() external view {
-        (bytes memory bytecode,) =
-            RainlangParser(LibInterpreterDeploy.PARSER_DEPLOYED_ADDRESS).unsafeParse("/* comment */");
+        (bytes memory bytecode,) = I_PARSER.unsafeParse("/* comment */");
         assertEq(LibBytecode.sourceCount(bytecode), 0);
         assertEq(bytecode.length, 1);
     }
