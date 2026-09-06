@@ -8,11 +8,11 @@ import {LibBytes32Array} from "rain-solmem-0.1.28/src/lib/LibBytes32Array.sol";
 import {LibUint256Array} from "rain-solmem-0.1.28/src/lib/LibUint256Array.sol";
 import {LibMemoryKV, MemoryKV, MemoryKVVal, MemoryKVKey} from "rain-lib-memkv-0.1.0/src/lib/LibMemoryKV.sol";
 import {LibNamespace, StateNamespace} from "rainlang-interface-0.2.8/src/lib/ns/LibNamespace.sol";
-import {RainlangStore} from "../../../src/concrete/RainlangStore.sol";
+import {TestRainlangStore} from "test/concrete/TestRainlangStore.sol";
 import {OddSetLength} from "../../../src/error/ErrStore.sol";
 
 /// @title RainlangStoreTest
-/// @notice Test suite for RainlangStore.
+/// @notice Test suite for TestRainlangStore.
 contract RainlangStoreTest is Test {
     using LibNamespace for StateNamespace;
     using LibMemoryKV for MemoryKV;
@@ -24,7 +24,7 @@ contract RainlangStoreTest is Test {
     function testRainlangStoreSetOddLength(StateNamespace namespace, bytes32[] memory kvs) external {
         vm.assume(kvs.length % 2 != 0);
 
-        RainlangStore store = new RainlangStore();
+        TestRainlangStore store = new TestRainlangStore();
         vm.expectRevert(abi.encodeWithSelector(OddSetLength.selector, kvs.length));
         store.set(namespace, kvs);
     }
@@ -40,7 +40,7 @@ contract RainlangStoreTest is Test {
         for (uint256 i = 0; i < kvs.length; i += 2) {
             kvs[i] = keccak256(abi.encodePacked(i, kvs[i]));
         }
-        RainlangStore store = new RainlangStore();
+        TestRainlangStore store = new TestRainlangStore();
         store.set(namespace, kvs);
 
         for (uint256 i = 0; i < kvs.length; i += 2) {
@@ -79,7 +79,7 @@ contract RainlangStoreTest is Test {
             }
         }
 
-        RainlangStore store = new RainlangStore();
+        TestRainlangStore store = new TestRainlangStore();
         for (uint256 i = 0; i < sets.length; i++) {
             store.set(sets[i].namespace, sets[i].kvs);
             for (uint256 j = 0; j < sets[i].kvs.length; j += 2) {
@@ -108,7 +108,7 @@ contract RainlangStoreTest is Test {
     function testRainlangStoreSetGetDupes(Set11[] memory sets) external {
         vm.assume(sets.length < 20);
 
-        RainlangStore store = new RainlangStore();
+        TestRainlangStore store = new TestRainlangStore();
         for (uint256 i = 0; i < sets.length; i++) {
             bytes32[11] memory kvsFixed = sets[i].kvs;
             bytes32[] memory kvs;

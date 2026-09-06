@@ -5,7 +5,7 @@ pragma solidity =0.8.25;
 import {Test} from "forge-std-1.16.1/src/Test.sol";
 
 import {IERC165} from "@openzeppelin-contracts-5.6.1/utils/introspection/IERC165.sol";
-import {Rainlang} from "../../../src/concrete/Rainlang.sol";
+import {TestRainlang} from "test/concrete/TestRainlang.sol";
 import {IRainlang} from "../../../src/interface/IRainlang.sol";
 
 /// @title RainlangIERC165Test
@@ -16,7 +16,7 @@ contract RainlangIERC165Test is Test {
         vm.assume(badInterfaceId != type(IERC165).interfaceId);
         vm.assume(badInterfaceId != type(IRainlang).interfaceId);
 
-        Rainlang rainlang = new Rainlang();
+        TestRainlang rainlang = new TestRainlang();
         assertTrue(rainlang.supportsInterface(type(IERC165).interfaceId));
         assertTrue(rainlang.supportsInterface(type(IRainlang).interfaceId));
 

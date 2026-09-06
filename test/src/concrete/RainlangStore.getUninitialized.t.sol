@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std-1.16.1/src/Test.sol";
-import {RainlangStore} from "../../../src/concrete/RainlangStore.sol";
+import {TestRainlangStore} from "test/concrete/TestRainlangStore.sol";
 import {
     LibNamespace,
     FullyQualifiedNamespace,
@@ -18,7 +18,7 @@ contract RainlangStoreGetUninitializedTest is Test {
 
     /// @notice get() on a key that was never set must return bytes32(0).
     function testGetUninitializedKey() external {
-        RainlangStore store = new RainlangStore();
+        TestRainlangStore store = new TestRainlangStore();
         StateNamespace namespace = StateNamespace.wrap(1);
         FullyQualifiedNamespace fqn = namespace.qualifyNamespace(address(this));
 
@@ -29,7 +29,7 @@ contract RainlangStoreGetUninitializedTest is Test {
 
     /// @notice Fuzz: get() on any never-set namespace+key must return 0.
     function testGetUninitializedKeyFuzz(StateNamespace namespace, bytes32 key) external {
-        RainlangStore store = new RainlangStore();
+        TestRainlangStore store = new TestRainlangStore();
         FullyQualifiedNamespace fqn = namespace.qualifyNamespace(address(this));
 
         bytes32 value = store.get(fqn, key);
@@ -39,7 +39,7 @@ contract RainlangStoreGetUninitializedTest is Test {
     /// @notice After setting a different key, the original uninitialized key
     /// must still return 0.
     function testGetUninitializedAfterSetDifferentKey() external {
-        RainlangStore store = new RainlangStore();
+        TestRainlangStore store = new TestRainlangStore();
         StateNamespace namespace = StateNamespace.wrap(1);
         FullyQualifiedNamespace fqn = namespace.qualifyNamespace(address(this));
 

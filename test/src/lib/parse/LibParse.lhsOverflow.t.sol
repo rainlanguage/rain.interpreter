@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std-1.16.1/src/Test.sol";
-import {RainlangParser} from "../../../../src/concrete/RainlangParser.sol";
+import {TestRainlangParser} from "test/concrete/TestRainlangParser.sol";
 import {LHSItemCountOverflow} from "../../../../src/error/ErrParse.sol";
 
 /// @title LibParseLHSOverflowTest
@@ -12,10 +12,10 @@ import {LHSItemCountOverflow} from "../../../../src/error/ErrParse.sol";
 /// adjacent byte, silently corrupting parser state. This test verifies that
 /// the parser reverts before the carry-over can occur.
 contract LibParseLHSOverflowTest is Test {
-    RainlangParser internal parser;
+    TestRainlangParser internal parser;
 
     function setUp() external {
-        parser = new RainlangParser();
+        parser = new TestRainlangParser();
     }
 
     /// External wrapper so vm.expectRevert works.

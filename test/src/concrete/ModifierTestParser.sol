@@ -2,11 +2,11 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {RainlangParser} from "../../../src/concrete/RainlangParser.sol";
+import {TestRainlangParser} from "test/concrete/TestRainlangParser.sol";
 
 /// Exposes the checkParseMemoryOverflow modifier on a trivial function so it
 /// can be tested in isolation without running the real parser.
-contract ModifierTestParser is RainlangParser {
+contract ModifierTestParser is TestRainlangParser {
     /// Sets the free memory pointer to exactly 0x10000. The modifier should
     /// revert after this function body completes.
     function overflowMemory() external pure checkParseMemoryOverflow {

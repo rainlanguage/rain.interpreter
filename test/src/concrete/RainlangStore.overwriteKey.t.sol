@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std-1.16.1/src/Test.sol";
-import {RainlangStore} from "../../../src/concrete/RainlangStore.sol";
+import {TestRainlangStore} from "test/concrete/TestRainlangStore.sol";
 import {
     LibNamespace,
     FullyQualifiedNamespace,
@@ -19,7 +19,7 @@ contract RainlangStoreOverwriteKeyTest is Test {
     /// @notice A key appearing twice in a single set call must result in the
     /// last value being stored (last-write-wins).
     function testOverwriteKeyLastValueWins() external {
-        RainlangStore store = new RainlangStore();
+        TestRainlangStore store = new TestRainlangStore();
         StateNamespace namespace = StateNamespace.wrap(1);
         FullyQualifiedNamespace fqn = namespace.qualifyNamespace(address(this));
 
@@ -41,7 +41,7 @@ contract RainlangStoreOverwriteKeyTest is Test {
 
     /// @notice A key appearing three times — the last value must persist.
     function testOverwriteKeyTriple() external {
-        RainlangStore store = new RainlangStore();
+        TestRainlangStore store = new TestRainlangStore();
         StateNamespace namespace = StateNamespace.wrap(2);
         FullyQualifiedNamespace fqn = namespace.qualifyNamespace(address(this));
 
@@ -61,7 +61,7 @@ contract RainlangStoreOverwriteKeyTest is Test {
 
     /// @notice Overwriting a key among other unique keys in the same array.
     function testOverwriteKeyAmongOtherKeys() external {
-        RainlangStore store = new RainlangStore();
+        TestRainlangStore store = new TestRainlangStore();
         StateNamespace namespace = StateNamespace.wrap(3);
         FullyQualifiedNamespace fqn = namespace.qualifyNamespace(address(this));
 

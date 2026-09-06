@@ -21,17 +21,17 @@ bytes32 constant TEST_DESCRIBED_BY_META_HASH = keccak256("TestRainlangExpression
 /// `TEST_PARSER_ADDRESS`.
 contract TestRainlangExpressionDeployer is BaseRainlangExpressionDeployer {
     /// @inheritdoc BaseRainlangExpressionDeployer
-    function parser() internal pure override returns (BaseRainlangParser) {
+    function parser() internal pure virtual override returns (BaseRainlangParser) {
         return BaseRainlangParser(TEST_PARSER_ADDRESS);
     }
 
     /// @inheritdoc BaseRainlangExpressionDeployer
-    function integrityFunctionPointers() internal pure override returns (bytes memory) {
+    function integrityFunctionPointers() internal pure virtual override returns (bytes memory) {
         return LibAllStandardOps.integrityFunctionPointers();
     }
 
     /// @inheritdoc IDescribedByMetaV1
-    function describedByMetaV1() external pure override returns (bytes32) {
+    function describedByMetaV1() external pure virtual override returns (bytes32) {
         return TEST_DESCRIBED_BY_META_HASH;
     }
 }

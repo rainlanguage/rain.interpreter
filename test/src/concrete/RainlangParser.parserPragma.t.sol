@@ -3,14 +3,14 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std-1.16.1/src/Test.sol";
-import {RainlangParser} from "../../../src/concrete/RainlangParser.sol";
+import {TestRainlangParser} from "test/concrete/TestRainlangParser.sol";
 import {PragmaV1} from "rainlang-interface-0.2.8/src/interface/IParserPragmaV1.sol";
 import {NoWhitespaceAfterUsingWordsFrom} from "../../../src/error/ErrParse.sol";
 import {LibParseError} from "../../../src/lib/parse/LibParseError.sol";
 
 contract RainlangParserParserPragma is Test {
     function checkPragma(bytes memory source, address[] memory expectedAddresses) internal {
-        RainlangParser parser = new RainlangParser();
+        TestRainlangParser parser = new TestRainlangParser();
         PragmaV1 memory pragmaV2 = parser.parsePragma1(source);
         assert(pragmaV2.usingWordsFrom.length == expectedAddresses.length);
         for (uint256 i = 0; i < expectedAddresses.length; i++) {
@@ -44,7 +44,7 @@ contract RainlangParserParserPragma is Test {
     /// Input ending exactly at the pragma keyword with no trailing whitespace
     /// must revert.
     function testParsePragmaNoWhitespaceAfterKeyword() external {
-        RainlangParser parser = new RainlangParser();
+        TestRainlangParser parser = new TestRainlangParser();
         vm.expectRevert(
             abi.encodeWithSelector(NoWhitespaceAfterUsingWordsFrom.selector, LibParseError.tagErrorOffset(16))
         );

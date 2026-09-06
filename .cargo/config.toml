@@ -1,3 +1,0 @@
-[target.wasm32-unknown-unknown]
-# Required to make the rand feature of alloy work for wasm32-unknown-unknown
-rustflags = ["--cfg", "getrandom_backend=\"wasm_js\""]

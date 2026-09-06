@@ -11,7 +11,7 @@ import {LibAllStandardOps} from "../../src/lib/op/LibAllStandardOps.sol";
 /// than a generated file.
 contract TestRainlangInterpreter is BaseRainlangInterpreter {
     /// @inheritdoc BaseRainlangInterpreter
-    function opcodeFunctionPointers() internal pure override returns (bytes memory) {
+    function opcodeFunctionPointers() internal pure virtual override returns (bytes memory) {
         return LibAllStandardOps.opcodeFunctionPointers();
     }
 }

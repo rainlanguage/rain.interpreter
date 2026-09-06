@@ -11,7 +11,7 @@ import {
     StackAllocationMismatch,
     StackOutputsMismatch
 } from "../../../../src/error/ErrIntegrity.sol";
-import {INTEGRITY_FUNCTION_POINTERS} from "../../../../src/generated/RainlangExpressionDeployerPointers.sol";
+import {LibAllStandardOps} from "../../../../src/lib/op/LibAllStandardOps.sol";
 import {ALL_STANDARD_OPS_LENGTH} from "../../../../src/lib/op/LibAllStandardOps.sol";
 import {IntegritySingleOp} from "./IntegritySingleOp.sol";
 import {IntegrityHighwater} from "./IntegrityHighwater.sol";
@@ -65,7 +65,7 @@ contract LibIntegrityCheckTest is Test {
         bytes32[] memory constants = new bytes32[](0);
 
         vm.expectRevert(abi.encodeWithSelector(OpcodeOutOfRange.selector, 0, opcodeIndex, ALL_STANDARD_OPS_LENGTH));
-        this.integrityCheck2External(INTEGRITY_FUNCTION_POINTERS, bytecode, constants);
+        this.integrityCheck2External(LibAllStandardOps.integrityFunctionPointers(), bytecode, constants);
     }
 
     /// An opcode index just below the boundary must NOT revert with
@@ -82,7 +82,7 @@ contract LibIntegrityCheckTest is Test {
         // We just verify the revert is NOT OpcodeOutOfRange.
         // The actual revert depends on what opcode maxValidIndex is, but
         // it should never be OpcodeOutOfRange.
-        try this.integrityCheck2External(INTEGRITY_FUNCTION_POINTERS, bytecode, constants) {
+        try this.integrityCheck2External(LibAllStandardOps.integrityFunctionPointers(), bytecode, constants) {
         // If it doesn't revert, that's fine too — the opcode is in range.
         }
         catch (bytes memory reason) {
