@@ -2,8 +2,8 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity ^0.8.25;
 
-import {LibPointer, Pointer} from "rain-solmem-0.1.26/src/lib/LibPointer.sol";
-import {LibMemCpy} from "rain-solmem-0.1.26/src/lib/LibMemCpy.sol";
+import {LibPointer, Pointer} from "rain-solmem-0.1.28/src/lib/LibPointer.sol";
+import {LibMemCpy} from "rain-solmem-0.1.28/src/lib/LibMemCpy.sol";
 import {
     CMASK_COMMENT_HEAD,
     CMASK_EOS,
@@ -20,9 +20,9 @@ import {
     CMASK_IDENTIFIER_HEAD
 } from "rain-string-0.2.0/src/lib/parse/LibParseCMask.sol";
 import {LibParseChar} from "rain-string-0.2.0/src/lib/parse/LibParseChar.sol";
-import {LibParseMeta} from "rainlang-interface-0.2.5/src/lib/parse/LibParseMeta.sol";
+import {LibParseMeta} from "rainlang-interface-0.2.8/src/lib/parse/LibParseMeta.sol";
 import {LibParseOperand} from "./LibParseOperand.sol";
-import {OperandV2, OPCODE_STACK, OPCODE_UNKNOWN} from "rainlang-interface-0.2.5/src/interface/IInterpreterV4.sol";
+import {OperandV2, OPCODE_STACK, OPCODE_UNKNOWN} from "rainlang-interface-0.2.8/src/interface/IInterpreterV4.sol";
 import {LibParseStackName} from "./LibParseStackName.sol";
 import {
     UnexpectedRHSChar,
@@ -51,8 +51,8 @@ import {LibParsePragma} from "./LibParsePragma.sol";
 import {LibParseInterstitial} from "./LibParseInterstitial.sol";
 import {LibParseError} from "./LibParseError.sol";
 import {LibSubParse} from "./LibSubParse.sol";
-import {LibBytes} from "rain-solmem-0.1.26/src/lib/LibBytes.sol";
-import {LibBytes32Array} from "rain-solmem-0.1.26/src/lib/LibBytes32Array.sol";
+import {LibBytes} from "rain-solmem-0.1.28/src/lib/LibBytes.sol";
+import {LibBytes32Array} from "rain-solmem-0.1.28/src/lib/LibBytes32Array.sol";
 
 /// @dev Size in bytes of the fixed header prepended to sub-parser bytecode.
 /// Comprises the operand values tail pointer (2 bytes), the literal parsers

@@ -10,7 +10,7 @@ import {
     PRAGMA_KEYWORD_BYTES_LENGTH,
     PRAGMA_KEYWORD_BYTES
 } from "../../../../src/lib/parse/LibParsePragma.sol";
-import {LibBytes, Pointer} from "rain-solmem-0.1.26/src/lib/LibBytes.sol";
+import {LibBytes, Pointer} from "rain-solmem-0.1.28/src/lib/LibBytes.sol";
 import {
     CMASK_WHITESPACE,
     CMASK_LITERAL_HEX_DISPATCH_START,

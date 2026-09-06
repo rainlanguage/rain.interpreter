@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std-1.16.1/src/Test.sol";
-import {LibBytes, Pointer} from "rain-solmem-0.1.26/src/lib/LibBytes.sol";
+import {LibBytes, Pointer} from "rain-solmem-0.1.28/src/lib/LibBytes.sol";
 import {LibParseState, ParseState} from "../../../../src/lib/parse/LibParseState.sol";
 import {LibParseInterstitial} from "../../../../src/lib/parse/LibParseInterstitial.sol";
 import {FSM_YANG_MASK} from "../../../../src/lib/parse/LibParseState.sol";

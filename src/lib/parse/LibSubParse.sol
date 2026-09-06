@@ -9,9 +9,9 @@ import {
     OPCODE_CONSTANT,
     OPCODE_CONTEXT,
     OperandV2
-} from "rainlang-interface-0.2.5/src/interface/IInterpreterV4.sol";
-import {LibBytecode, Pointer} from "rainlang-interface-0.2.5/src/lib/bytecode/LibBytecode.sol";
-import {ISubParserV4} from "rainlang-interface-0.2.5/src/interface/ISubParserV4.sol";
+} from "rainlang-interface-0.2.8/src/interface/IInterpreterV4.sol";
+import {LibBytecode, Pointer} from "rainlang-interface-0.2.8/src/lib/bytecode/LibBytecode.sol";
+import {ISubParserV4} from "rainlang-interface-0.2.8/src/interface/ISubParserV4.sol";
 import {BadSubParserResult, UnknownWord, UnsupportedLiteralType} from "../../error/ErrParse.sol";
 import {IInterpreterExternV4, LibExtern, EncodedExternDispatchV2} from "../extern/LibExtern.sol";
 import {
@@ -20,7 +20,7 @@ import {
     ContextGridOverflow,
     SubParseLiteralDispatchLengthOverflow
 } from "../../error/ErrSubParse.sol";
-import {LibMemCpy} from "rain-solmem-0.1.26/src/lib/LibMemCpy.sol";
+import {LibMemCpy} from "rain-solmem-0.1.28/src/lib/LibMemCpy.sol";
 import {LibParseError} from "./LibParseError.sol";
 
 /// @title LibSubParse

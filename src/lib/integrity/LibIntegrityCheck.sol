@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity ^0.8.25;
 
-import {Pointer} from "rain-solmem-0.1.26/src/lib/LibPointer.sol";
+import {Pointer} from "rain-solmem-0.1.28/src/lib/LibPointer.sol";
 
 import {
     OpcodeOutOfRange,
@@ -11,9 +11,9 @@ import {
     StackUnderflow,
     StackUnderflowHighwater
 } from "../../error/ErrIntegrity.sol";
-import {BadOpInputsLength, BadOpOutputsLength} from "rainlang-interface-0.2.5/src/error/ErrIntegrity.sol";
-import {LibBytecode} from "rainlang-interface-0.2.5/src/lib/bytecode/LibBytecode.sol";
-import {OperandV2} from "rainlang-interface-0.2.5/src/interface/IInterpreterV4.sol";
+import {BadOpInputsLength, BadOpOutputsLength} from "rainlang-interface-0.2.8/src/error/ErrIntegrity.sol";
+import {LibBytecode} from "rainlang-interface-0.2.8/src/lib/bytecode/LibBytecode.sol";
+import {OperandV2} from "rainlang-interface-0.2.8/src/interface/IInterpreterV4.sol";
 import {OPCODE_FUNCTION_POINTER_SHIFT} from "../eval/LibEval.sol";
 
 /// @notice Tracks the state of the integrity check walk over a single source.

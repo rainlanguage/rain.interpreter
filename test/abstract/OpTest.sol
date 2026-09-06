@@ -5,17 +5,17 @@ pragma solidity =0.8.25;
 // Exported for convenience in op tests.
 //forge-lint: disable-next-line(unused-import)
 import {Test, stdError} from "forge-std-1.16.1/src/Test.sol";
-import {LibMemCpy} from "rain-solmem-0.1.26/src/lib/LibMemCpy.sol";
+import {LibMemCpy} from "rain-solmem-0.1.28/src/lib/LibMemCpy.sol";
 import {MemoryKV} from "rain-lib-memkv-0.1.0/src/lib/LibMemoryKV.sol";
-import {LibUint256Array} from "rain-solmem-0.1.26/src/lib/LibUint256Array.sol";
-import {LibPointer, Pointer} from "rain-solmem-0.1.26/src/lib/LibPointer.sol";
+import {LibUint256Array} from "rain-solmem-0.1.28/src/lib/LibUint256Array.sol";
+import {LibPointer, Pointer} from "rain-solmem-0.1.28/src/lib/LibPointer.sol";
 
 import {RainlangExpressionDeployerDeploymentTest} from "./RainlangExpressionDeployerDeploymentTest.sol";
 import {LibInterpreterState, InterpreterState} from "../../src/lib/state/LibInterpreterState.sol";
 import {LibInterpreterStateFingerprint} from "../lib/state/LibInterpreterStateFingerprint.sol";
 import {IntegrityCheckState, LibIntegrityCheck} from "../../src/lib/integrity/LibIntegrityCheck.sol";
 
-import {LibContext} from "rainlang-interface-0.2.5/src/lib/caller/LibContext.sol";
+import {LibContext} from "rainlang-interface-0.2.8/src/lib/caller/LibContext.sol";
 import {UnexpectedOperand} from "../../src/error/ErrParse.sol";
 import {BadOpInputsLength, BadOpOutputsLength} from "../../src/lib/integrity/LibIntegrityCheck.sol";
 import {
@@ -24,10 +24,10 @@ import {
     IInterpreterStoreV3,
     EvalV4,
     StackItem
-} from "rainlang-interface-0.2.5/src/interface/IInterpreterV4.sol";
-import {FullyQualifiedNamespace, StateNamespace} from "rainlang-interface-0.2.5/src/interface/IInterpreterStoreV3.sol";
-import {SignedContextV1} from "rainlang-interface-0.2.5/src/interface/IInterpreterCallerV4.sol";
-import {LibNamespace} from "rainlang-interface-0.2.5/src/lib/ns/LibNamespace.sol";
+} from "rainlang-interface-0.2.8/src/interface/IInterpreterV4.sol";
+import {FullyQualifiedNamespace, StateNamespace} from "rainlang-interface-0.2.8/src/interface/IInterpreterStoreV3.sol";
+import {SignedContextV1} from "rainlang-interface-0.2.8/src/interface/IInterpreterCallerV4.sol";
+import {LibNamespace} from "rainlang-interface-0.2.8/src/lib/ns/LibNamespace.sol";
 import {ExponentOverflow, CoefficientOverflow} from "rain-math-float-0.1.1/src/error/ErrDecimalFloat.sol";
 import {LibTOFUTokenDecimals} from "rain-tofu-erc20-decimals-0.1.1/src/lib/LibTOFUTokenDecimals.sol";
 

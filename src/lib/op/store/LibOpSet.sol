@@ -4,9 +4,9 @@ pragma solidity ^0.8.25;
 
 import {MemoryKV, MemoryKVKey, MemoryKVVal, LibMemoryKV} from "rain-lib-memkv-0.1.0/src/lib/LibMemoryKV.sol";
 import {IntegrityCheckState} from "../../integrity/LibIntegrityCheck.sol";
-import {OperandV2, StackItem} from "rainlang-interface-0.2.5/src/interface/IInterpreterV4.sol";
+import {OperandV2, StackItem} from "rainlang-interface-0.2.8/src/interface/IInterpreterV4.sol";
 import {InterpreterState} from "../../state/LibInterpreterState.sol";
-import {Pointer} from "rain-solmem-0.1.26/src/lib/LibPointer.sol";
+import {Pointer} from "rain-solmem-0.1.28/src/lib/LibPointer.sol";
 
 /// @title LibOpSet
 /// @notice Opcode for recording k/v state changes to be set in storage.

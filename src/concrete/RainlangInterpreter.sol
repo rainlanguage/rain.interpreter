@@ -14,7 +14,7 @@ import {
     SourceIndexV2,
     EvalV4,
     StackItem
-} from "rainlang-interface-0.2.5/src/interface/IInterpreterV4.sol";
+} from "rainlang-interface-0.2.8/src/interface/IInterpreterV4.sol";
 import {
 
     // Exported for convenience.

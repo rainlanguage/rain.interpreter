@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std-1.16.1/src/Test.sol";
-import {LibBytes, Pointer} from "rain-solmem-0.1.26/src/lib/LibBytes.sol";
+import {LibBytes, Pointer} from "rain-solmem-0.1.28/src/lib/LibBytes.sol";
 import {Strings} from "@openzeppelin-contracts-5.6.1/utils/Strings.sol";
 import {LibParseState, ParseState} from "../../../../../src/lib/parse/LibParseState.sol";
 import {LibParseLiteralHex} from "../../../../../src/lib/parse/literal/LibParseLiteralHex.sol";

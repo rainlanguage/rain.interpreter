@@ -6,11 +6,11 @@ import {ERC165} from "@openzeppelin-contracts-5.6.1/utils/introspection/ERC165.s
 
 import {LibParse} from "../lib/parse/LibParse.sol";
 
-import {PragmaV1} from "rainlang-interface-0.2.5/src/interface/IParserPragmaV1.sol";
+import {PragmaV1} from "rainlang-interface-0.2.8/src/interface/IParserPragmaV1.sol";
 import {LibParseState, ParseState} from "../lib/parse/LibParseState.sol";
 import {LibParsePragma} from "../lib/parse/LibParsePragma.sol";
 import {LibAllStandardOps} from "../lib/op/LibAllStandardOps.sol";
-import {LibBytes, Pointer} from "rain-solmem-0.1.26/src/lib/LibBytes.sol";
+import {LibBytes, Pointer} from "rain-solmem-0.1.28/src/lib/LibBytes.sol";
 import {LibParseInterstitial} from "../lib/parse/LibParseInterstitial.sol";
 import {
     LITERAL_PARSER_FUNCTION_POINTERS,

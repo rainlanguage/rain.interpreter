@@ -5,7 +5,7 @@ pragma solidity =0.8.25;
 import {RainlangExpressionDeployerDeploymentTest} from "test/abstract/RainlangExpressionDeployerDeploymentTest.sol";
 import {RainlangParser} from "../../../../src/concrete/RainlangParser.sol";
 import {LibInterpreterDeploy} from "../../../../src/lib/deploy/LibInterpreterDeploy.sol";
-import {LibBytecode} from "rainlang-interface-0.2.5/src/lib/bytecode/LibBytecode.sol";
+import {LibBytecode} from "rainlang-interface-0.2.8/src/lib/bytecode/LibBytecode.sol";
 
 contract LibIntegrityCheckZeroSourceTest is RainlangExpressionDeployerDeploymentTest {
     /// Empty input produces zero-source bytecode. The parser emits a single
