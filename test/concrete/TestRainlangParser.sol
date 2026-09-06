@@ -21,17 +21,17 @@ contract TestRainlangParser is BaseRainlangParser {
     }
 
     /// @inheritdoc BaseRainlangParser
-    function parseMeta() internal view override returns (bytes memory) {
+    function parseMeta() internal view virtual override returns (bytes memory) {
         return sParseMeta;
     }
 
     /// @inheritdoc BaseRainlangParser
-    function operandHandlerFunctionPointers() internal pure override returns (bytes memory) {
+    function operandHandlerFunctionPointers() internal pure virtual override returns (bytes memory) {
         return LibAllStandardOps.operandHandlerFunctionPointers();
     }
 
     /// @inheritdoc BaseRainlangParser
-    function literalParserFunctionPointers() internal pure override returns (bytes memory) {
+    function literalParserFunctionPointers() internal pure virtual override returns (bytes memory) {
         return LibAllStandardOps.literalParserFunctionPointers();
     }
 }
