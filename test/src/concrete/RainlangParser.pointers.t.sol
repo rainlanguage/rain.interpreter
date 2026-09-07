@@ -3,13 +3,13 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std-1.16.1/src/Test.sol";
+import {RainlangParser} from "../../../src/concrete/RainlangParser.sol";
+import {PARSE_META_BUILD_DEPTH} from "../../../src/abstract/BaseRainlangParser.sol";
 import {
-    RainlangParser,
     OPERAND_HANDLER_FUNCTION_POINTERS,
     LITERAL_PARSER_FUNCTION_POINTERS,
-    PARSE_META,
-    PARSE_META_BUILD_DEPTH
-} from "../../../src/concrete/RainlangParser.sol";
+    PARSE_META
+} from "../../../src/generated/RainlangParserPointers.sol";
 import {LibAllStandardOps, AuthoringMetaV2} from "../../../src/lib/op/LibAllStandardOps.sol";
 import {LibGenParseMeta} from "rainlang-interface-0.2.8/src/lib/codegen/LibGenParseMeta.sol";
 
