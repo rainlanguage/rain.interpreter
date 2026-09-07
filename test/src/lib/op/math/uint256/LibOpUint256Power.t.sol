@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {stdError} from "forge-std-1.16.1/src/Test.sol";
+import {stdError} from "forge-std-1.16.2/src/Test.sol";
 import {OpTest} from "test/abstract/OpTest.sol";
 import {LibOpUint256Power} from "../../../../../../src/lib/op/math/uint256/LibOpUint256Power.sol";
 import {IntegrityCheckState} from "../../../../../../src/lib/integrity/LibIntegrityCheck.sol";

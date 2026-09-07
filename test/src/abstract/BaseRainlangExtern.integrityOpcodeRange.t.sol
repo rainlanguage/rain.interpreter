@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {Test} from "forge-std-1.16.1/src/Test.sol";
+import {Test} from "forge-std-1.16.2/src/Test.sol";
 import {ExternDispatchV2} from "rainlang-interface-0.2.8/src/interface/IInterpreterExternV4.sol";
 import {ExternOpcodeOutOfRange} from "../../../src/error/ErrExtern.sol";
 import {TwoOpExtern} from "./TwoOpExtern.sol";

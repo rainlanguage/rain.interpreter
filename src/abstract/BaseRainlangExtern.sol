@@ -10,8 +10,8 @@ import {
     ExternDispatchV2,
     StackItem
 } from "rainlang-interface-0.2.8/src/interface/IInterpreterExternV4.sol";
-import {IIntegrityToolingV1} from "rain-sol-codegen-0.1.0/src/interface/IIntegrityToolingV1.sol";
-import {IOpcodeToolingV1} from "rain-sol-codegen-0.1.0/src/interface/IOpcodeToolingV1.sol";
+import {IIntegrityToolingV1} from "rain-sol-codegen-0.1.36/src/interface/IIntegrityToolingV1.sol";
+import {IOpcodeToolingV1} from "rain-sol-codegen-0.1.36/src/interface/IOpcodeToolingV1.sol";
 import {ExternOpcodeOutOfRange, ExternPointersMismatch, ExternOpcodePointersEmpty} from "../error/ErrExtern.sol";
 import {OPCODE_FUNCTION_POINTER_SHIFT} from "../lib/eval/LibEval.sol";
 
