@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std-1.16.1/src/Test.sol";
-import {RainlangStore} from "../../../src/concrete/RainlangStore.sol";
+import {TestRainlangStore} from "test/concrete/TestRainlangStore.sol";
 import {
     LibNamespace,
     StateNamespace,
@@ -28,7 +28,7 @@ contract RainlangStoreNamespaceIsolationTest is Test {
         vm.assume(value != bytes32(0));
 
         StateNamespace ns = StateNamespace.wrap(nsSeed);
-        RainlangStore store = new RainlangStore();
+        TestRainlangStore store = new TestRainlangStore();
 
         // Set from address A.
         bytes32[] memory kvs = new bytes32[](2);
@@ -61,7 +61,7 @@ contract RainlangStoreNamespaceIsolationTest is Test {
 
         StateNamespace nsA = StateNamespace.wrap(nsSeedA);
         StateNamespace nsB = StateNamespace.wrap(nsSeedB);
-        RainlangStore store = new RainlangStore();
+        TestRainlangStore store = new TestRainlangStore();
 
         bytes32[] memory kvs = new bytes32[](2);
         kvs[0] = key;
@@ -97,7 +97,7 @@ contract RainlangStoreNamespaceIsolationTest is Test {
         vm.assume(valueA != valueB);
 
         StateNamespace ns = StateNamespace.wrap(nsSeed);
-        RainlangStore store = new RainlangStore();
+        TestRainlangStore store = new TestRainlangStore();
 
         bytes32[] memory kvs = new bytes32[](2);
         kvs[0] = key;

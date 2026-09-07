@@ -4,48 +4,50 @@ Guidance for Claude Code in this repo. This file takes precedence over session
 summaries — re-read it as written rather than trusting a summary's framing of
 what a process means.
 
+## What this repo is
+
+The **library half** of Rainlang: the parser, eval loop, standard ops, integrity
+checks, the `BaseRainlang*` contracts and the extern / sub-parser bases,
+published as the `rainlang` Soldeer package on every merge to main
+(`rainix-autopublish`, next-version lifecycle via `next-v*` tags). The deployed
+concretes, their generated tables and deploy records, the deploy scripts and the
+Rust crates live in `rainlang.deploy`, which consumes this package.
+
+`src/concrete/extern/RainlangReferenceExtern.sol` is a reference implementation
+of the extern and sub-parser bases, not a deployable: it stays here with its
+tests.
+
 ## Generated code
 
-`script/Build.sol` writes ALL of it. Never hand-edit:
-
-- `src/generated/<Name>Pointers.sol` — parse meta, function pointer tables, meta
-  hashes. Committed because contract and pointers file depend on each other
-  circularly.
-- `src/generated/candidate/<Name>.sol` — each deployed contract's rolling deploy
-  snapshot: hash, Zoltu address, creation/runtime code, dependencies.
-- `src/generated/<x_y_z>/` — FROZEN release records. Append-only: never
-  regenerate, move or delete a tag dir.
-- `src/lib/Lib*Released.sol` and `src/lib/LibReleasedSuites.sol`.
-
-After any source change affecting bytecode:
+`script/Build.sol` writes `src/generated/RainlangReferenceExternPointers.sol` —
+the reference extern's parse meta, function pointer tables and meta hash.
+Committed because contract and pointers file depend on each other circularly.
+Never hand-edit it. `src/generated/0_1_9/` is the frozen record of the last
+release this repo cut while it still carried the deploy half; nothing here reads
+it, and it stays because frozen snapshots are append-only org-wide (rainix
+`frozen-snapshots-append-only`). After any source change affecting the extern's
+bytecode:
 
 1. `nix develop -c rainlang-prelude`
 2. `nix develop -c forge script --silent ./script/Build.sol`
 3. `nix develop -c forge fmt`
-4. Repeat until `src/generated/` stops changing — deploy constants cascade
-   parser → expression deployer → Rainlang; interpreter also cascades to
-   Rainlang.
 
 Address all `forge build` warnings before pointer rebuild, tests, or the next
 task.
 
-## Deploy and release
+## Test harness
 
-`src/abstract/RainlangDeploySuites.sol` is the ONE declaration of what this repo
-deploys. `script/Deploy.sol`, `script/Build.sol` and the deploy tests all read
-it; a deployment declared anywhere else is invisible to all three.
+`test/concrete/Test*.sol` are the `BaseRainlang*` contracts built from current
+source with no generated tables; `test/lib/deploy/LibTestInterpreterDeploy.sol`
+places them at fixed test addresses and
+`test/abstract/RainlangExpressionDeployerDeploymentTest.deployRainlang()` is the
+one hook that binds them. `rainlang.deploy` and the word repos override that
+hook with the deployed pins, so `test/` ships in the package: `/test` is
+deliberately absent from `.soldeerignore`.
 
-`[external.package].version` in `foundry.toml` is the LAST Soldeer publish, not
-a next-version slot: a normal PR never moves it. Releasing is deploy (Manual sol
-artifacts) → verify (`RainlangDeployChainTest`) → a PR carrying `cutRelease()`'s
-frozen dir and the version bump → merge → push `sol-v<x.y.z>`.
-
-Three things look wrong and are load-bearing: `optimizer_runs = 1000000` (not
-the org's 100000 — it is baked into every live CREATE2 address here); `/test`
-absent from `.soldeerignore` (raindex imports `test/abstract/OpTest.sol` through
-the published package); and `src/lib/deploy/LibInterpreterDeploy.sol` being
-hand-written rather than a generated alias lib (its constant names and
-`etchRainlang` are a published consumer API).
+`optimizer_runs = 1000000` looks wrong (the org uses 100000) and is
+load-bearing: every live CREATE2 address in `rainlang.deploy` is a pure function
+of the bytecode this package's sources compile to.
 
 ## Conventions
 

@@ -1,33 +1,15 @@
 name: Package Release
-# Deploy-shaped repo: the `rainlang` Soldeer package is released by a manual
-# `sol-v*` tag via rainix-tag-release, never by a merge.
-#
-# rainix-autopublish's merge-driven next-version lifecycle is wrong for this
-# shape. `[external.package].version` in `foundry.toml` is the LAST published
-# revision and names the frozen `src/generated/<tag>/` record cut with it, so
-# it may only move in lockstep with a deployment that already happened. The
-# tag flow enforces exactly that: it re-runs the suite, then `release-guard`
-# checks version == tag, the frozen dir present, byte-identical to a freshly
-# regenerated `candidate/`, no later release frozen and a clean tree — then
-# publishes.
-#
-# Push-free: the frozen snapshot and the version bump reach main through a
-# reviewed PR BEFORE the tag, and this workflow commits nothing, so it works
-# against a protected main.
-#
-# The Rust crates are NOT released here — see `crates-release.yaml`. They are
-# ordinary bindings whose version tracks code changes and is safe to bump on
-# merge, and coupling them to this trigger is what wedged the release lane.
-#
-# `snapshot-generate-cmd` is deliberately absent: it was removed org-wide and
-# is no longer an input at all.
+# Library repo: the `rainlang` Soldeer package autopublishes on every merge to
+# main under rainix-autopublish's next-version lifecycle. The deployed
+# contracts, their deploy records and the manual `sol-v*` tag flow live in
+# rainlang.deploy.
 on:
   push:
-    tags:
-      - sol-v*
+    branches:
+      - main
 jobs:
   release:
-    uses: rainlanguage/rainix/.github/workflows/rainix-tag-release.yaml@main
+    uses: rainlanguage/rainix/.github/workflows/rainix-autopublish.yaml@main
     with:
       soldeer-package: rainlang
     secrets: inherit

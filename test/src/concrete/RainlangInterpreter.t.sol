@@ -4,14 +4,15 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std-1.16.1/src/Test.sol";
 
-import {OPCODE_FUNCTION_POINTERS} from "../../../src/concrete/RainlangInterpreter.sol";
+import {LibAllStandardOps} from "../../../src/lib/op/LibAllStandardOps.sol";
 
 /// @title RainlangInterpreterTest
-/// @notice Test suite for RainlangInterpreter.
+/// @notice Test suite for the interpreter's opcode function pointer table.
 contract RainlangInterpreterTest is Test {
     /// The function pointers of the interpreter must be even non-zero length.
     function testRainlangInterpreterOddFunctionPointersLength() external pure {
-        assertTrue(OPCODE_FUNCTION_POINTERS.length % 2 == 0);
-        assertTrue(OPCODE_FUNCTION_POINTERS.length > 0);
+        bytes memory pointers = LibAllStandardOps.opcodeFunctionPointers();
+        assertTrue(pointers.length % 2 == 0);
+        assertTrue(pointers.length > 0);
     }
 }

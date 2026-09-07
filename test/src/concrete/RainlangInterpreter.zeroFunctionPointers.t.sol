@@ -4,19 +4,19 @@ pragma solidity =0.8.25;
 
 import {Test} from "forge-std-1.16.1/src/Test.sol";
 
-import {RainlangInterpreter} from "../../../src/concrete/RainlangInterpreter.sol";
+import {TestRainlangInterpreter} from "test/concrete/TestRainlangInterpreter.sol";
 import {ZeroFunctionPointers} from "../../../src/error/ErrEval.sol";
 import {ZeroFPRainlangInterpreter} from "./ZeroFPRainlangInterpreter.sol";
 
 contract RainlangInterpreterZeroFunctionPointersTest is Test {
-    /// Deploying a RainlangInterpreter with empty function pointers must revert.
+    /// Deploying a TestRainlangInterpreter with empty function pointers must revert.
     function testZeroFunctionPointersReverts() external {
         vm.expectRevert(abi.encodeWithSelector(ZeroFunctionPointers.selector));
         new ZeroFPRainlangInterpreter();
     }
 
-    /// The standard RainlangInterpreter must deploy successfully.
+    /// The standard TestRainlangInterpreter must deploy successfully.
     function testStandardRainlangInterpreterDeploys() external {
-        new RainlangInterpreter();
+        new TestRainlangInterpreter();
     }
 }

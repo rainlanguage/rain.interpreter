@@ -2,21 +2,16 @@ version = 1
 
 [[annotations]]
 path = [
-  ".cargo/**/",
   ".coderabbit.yaml",
   ".devcontainer.json",
   ".envrc",
-  ".gas-snapshot",
   ".github/workflows/**/",
   ".gitignore",
   ".prettierignore",
   ".soldeerignore",
   ".vscode/**/",
   "audit/**/",
-  "Cargo.lock",
-  "Cargo.toml",
   "CLAUDE.md",
-  "crates/**/",
   "flake.lock",
   "flake.nix",
   "foundry.toml",

@@ -29,21 +29,10 @@
             body = ''
               set -euxo pipefail
 
-              # Needed by deploy script.
-              mkdir -p deployments/latest;
-
-              # Build metadata that is needed for deployments.
+              # Build the reference extern's meta, which its generated
+              # pointers file hashes.
               mkdir -p meta;
               forge script --silent ./script/BuildAuthoringMeta.sol;
-              rain meta build \
-                -i <(cat ./meta/AuthoringMeta.rain.meta) \
-                -m authoring-meta-v2 \
-                -t cbor \
-                -e deflate \
-                -l none \
-                -o meta/RainlangExpressionDeployer.rain.meta \
-              ;
-
               rain meta build \
                 -i <(cat ./meta/RainlangReferenceExternAuthoringMeta.rain.meta) \
                 -m authoring-meta-v2 \
@@ -54,15 +43,6 @@
             '';
             additionalBuildInputs = rainix.sol-build-inputs.${system} ++ [ rain.defaultPackage.${system} ];
           };
-
-          test-wasm-build = rainix.mkTask.${system} {
-            name = "test-wasm-build";
-            body = ''
-              set -euxo pipefail
-
-              cargo build --target wasm32-unknown-unknown --exclude rainlang-cli --workspace
-            '';
-          };
         }
         // rainix.packages.${system};
 
@@ -70,7 +50,6 @@
           inherit (rainix.devShells.${system}.default) shellHook;
           packages = [
             packages.rainlang-prelude
-            packages.test-wasm-build
           ];
           inputsFrom = [ rainix.devShells.${system}.default ];
         };

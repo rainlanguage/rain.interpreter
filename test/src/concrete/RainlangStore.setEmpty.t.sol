@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std-1.16.1/src/Test.sol";
-import {RainlangStore} from "../../../src/concrete/RainlangStore.sol";
+import {TestRainlangStore} from "test/concrete/TestRainlangStore.sol";
 import {StateNamespace} from "rainlang-interface-0.2.8/src/lib/ns/LibNamespace.sol";
 
 /// @title RainlangStoreSetEmptyArrayTest
@@ -12,7 +12,7 @@ import {StateNamespace} from "rainlang-interface-0.2.8/src/lib/ns/LibNamespace.s
 contract RainlangStoreSetEmptyArrayTest is Test {
     /// @notice set() with a zero-length kvs array must not revert.
     function testSetEmptyArray() external {
-        RainlangStore store = new RainlangStore();
+        TestRainlangStore store = new TestRainlangStore();
         StateNamespace namespace = StateNamespace.wrap(1);
 
         bytes32[] memory kvs = new bytes32[](0);
@@ -22,7 +22,7 @@ contract RainlangStoreSetEmptyArrayTest is Test {
     /// @notice set() with a zero-length kvs array should not emit any Set
     /// events.
     function testSetEmptyArrayNoEvents() external {
-        RainlangStore store = new RainlangStore();
+        TestRainlangStore store = new TestRainlangStore();
         StateNamespace namespace = StateNamespace.wrap(1);
 
         bytes32[] memory kvs = new bytes32[](0);
@@ -36,7 +36,7 @@ contract RainlangStoreSetEmptyArrayTest is Test {
     /// @notice Fuzz variant: set() with empty array and any namespace must not
     /// revert.
     function testSetEmptyArrayFuzz(StateNamespace namespace) external {
-        RainlangStore store = new RainlangStore();
+        TestRainlangStore store = new TestRainlangStore();
         bytes32[] memory kvs = new bytes32[](0);
         store.set(namespace, kvs);
     }

@@ -2,8 +2,6 @@
 
 Solidity docs can be generated with `nix develop --command forge doc -b`.
 
-Rust docs with `nix develop --command cargo doc`.
-
 ## Overview
 
 Standard libraries and interfaces defining and working with `InterpeterState`

@@ -1,9 +1,7 @@
 .DS_Store
-.cargo
 .coderabbit.yaml
 .devcontainer.json
 .envrc
-.gas-snapshot
 .git
 .github
 .gitignore
@@ -14,11 +12,8 @@
 .vscode
 CLAUDE.md
 TESTING.md
-Cargo.lock
-Cargo.toml
 /audit
 /cache
-/crates
 /dependencies
 /flake.lock
 /flake.nix
@@ -30,7 +25,5 @@ Cargo.toml
 /slither.config.json
 /soldeer.lock
 /REUSE.toml
-/deployments
 /meta
 /script
-/target

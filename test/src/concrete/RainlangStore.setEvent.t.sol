@@ -3,7 +3,7 @@
 pragma solidity =0.8.25;
 
 import {Test} from "forge-std-1.16.1/src/Test.sol";
-import {RainlangStore} from "../../../src/concrete/RainlangStore.sol";
+import {TestRainlangStore} from "test/concrete/TestRainlangStore.sol";
 import {
     LibNamespace,
     FullyQualifiedNamespace,
@@ -20,7 +20,7 @@ contract RainlangStoreSetEventTest is Test {
     /// @notice A single key-value pair should emit exactly one Set event with
     /// the correct fullyQualifiedNamespace, key, and value.
     function testSetEventSinglePair() external {
-        RainlangStore store = new RainlangStore();
+        TestRainlangStore store = new TestRainlangStore();
         StateNamespace namespace = StateNamespace.wrap(42);
         FullyQualifiedNamespace fqn = namespace.qualifyNamespace(address(this));
 
@@ -38,7 +38,7 @@ contract RainlangStoreSetEventTest is Test {
 
     /// @notice Multiple key-value pairs should emit one Set event per pair.
     function testSetEventMultiplePairs() external {
-        RainlangStore store = new RainlangStore();
+        TestRainlangStore store = new TestRainlangStore();
         StateNamespace namespace = StateNamespace.wrap(7);
         FullyQualifiedNamespace fqn = namespace.qualifyNamespace(address(this));
 
@@ -59,7 +59,7 @@ contract RainlangStoreSetEventTest is Test {
     /// @notice The fullyQualifiedNamespace in the event must match what
     /// qualifyNamespace produces for the msg.sender.
     function testSetEventFQNMatchesQualifyNamespace(StateNamespace namespace, bytes32 key, bytes32 value) external {
-        RainlangStore store = new RainlangStore();
+        TestRainlangStore store = new TestRainlangStore();
         FullyQualifiedNamespace fqn = namespace.qualifyNamespace(address(this));
 
         bytes32[] memory kvs = new bytes32[](2);
