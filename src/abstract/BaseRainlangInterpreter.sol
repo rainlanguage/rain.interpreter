@@ -15,7 +15,7 @@ import {
     EvalV4,
     StackItem
 } from "rainlang-interface-0.2.8/src/interface/IInterpreterV4.sol";
-import {IOpcodeToolingV1} from "rain-sol-codegen-0.1.0/src/interface/IOpcodeToolingV1.sol";
+import {IOpcodeToolingV1} from "rain-sol-codegen-0.1.36/src/interface/IOpcodeToolingV1.sol";
 import {OddSetLength} from "../error/ErrStore.sol";
 import {ZeroFunctionPointers} from "../error/ErrEval.sol";
 

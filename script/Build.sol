@@ -2,9 +2,9 @@
 // SPDX-FileCopyrightText: Copyright (c) 2020 Rain Open Source Software Ltd
 pragma solidity =0.8.25;
 
-import {Script} from "forge-std-1.16.1/src/Script.sol";
-import {LibCodeGen} from "rain-sol-codegen-0.1.0/src/lib/LibCodeGen.sol";
-import {LibFs} from "rain-sol-codegen-0.1.0/src/lib/LibFs.sol";
+import {Script} from "forge-std-1.16.2/src/Script.sol";
+import {LibCodeGen} from "rain-sol-codegen-0.1.36/src/lib/LibCodeGen.sol";
+import {LibFs} from "rain-sol-codegen-0.1.36/src/lib/LibFs.sol";
 import {LibGenParseMeta} from "rainlang-interface-0.2.8/src/lib/codegen/LibGenParseMeta.sol";
 import {
     RainlangReferenceExtern,

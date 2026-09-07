@@ -4,7 +4,7 @@ pragma solidity =0.8.25;
 
 // Exported for convenience in op tests.
 //forge-lint: disable-next-line(unused-import)
-import {Test, stdError} from "forge-std-1.16.1/src/Test.sol";
+import {Test, stdError} from "forge-std-1.16.2/src/Test.sol";
 import {LibMemCpy} from "rain-solmem-0.1.28/src/lib/LibMemCpy.sol";
 import {MemoryKV} from "rain-lib-memkv-0.1.0/src/lib/LibMemoryKV.sol";
 import {LibUint256Array} from "rain-solmem-0.1.28/src/lib/LibUint256Array.sol";
@@ -31,7 +31,7 @@ import {LibNamespace} from "rainlang-interface-0.2.8/src/lib/ns/LibNamespace.sol
 import {ExponentOverflow, CoefficientOverflow} from "rain-math-float-0.1.1/src/error/ErrDecimalFloat.sol";
 import {LibTOFUTokenDecimals} from "rain-tofu-erc20-decimals-0.1.1/src/lib/LibTOFUTokenDecimals.sol";
 
-import {console2} from "forge-std-1.16.1/src/console2.sol";
+import {console2} from "forge-std-1.16.2/src/console2.sol";
 import {Float, LibDecimalFloat} from "rain-math-float-0.1.1/src/lib/LibDecimalFloat.sol";
 
 bytes32 constant PRE = keccak256(abi.encodePacked("pre"));

@@ -12,7 +12,7 @@ import {IDescribedByMetaV1} from "rain-metadata-0.1.0/src/interface/IDescribedBy
 import {LibIntegrityCheck} from "../lib/integrity/LibIntegrityCheck.sol";
 import {LibInterpreterStateDataContract} from "../lib/state/LibInterpreterStateDataContract.sol";
 import {LibAllStandardOps} from "../lib/op/LibAllStandardOps.sol";
-import {IIntegrityToolingV1} from "rain-sol-codegen-0.1.0/src/interface/IIntegrityToolingV1.sol";
+import {IIntegrityToolingV1} from "rain-sol-codegen-0.1.36/src/interface/IIntegrityToolingV1.sol";
 import {BaseRainlangParser} from "./BaseRainlangParser.sol";
 
 /// @title BaseRainlangExpressionDeployer

@@ -14,8 +14,8 @@ import {LibParse, OperandV2} from "../lib/parse/LibParse.sol";
 import {LibParseMeta} from "rainlang-interface-0.2.8/src/lib/parse/LibParseMeta.sol";
 import {LibParseOperand} from "../lib/parse/LibParseOperand.sol";
 import {IDescribedByMetaV1} from "rain-metadata-0.1.0/src/interface/IDescribedByMetaV1.sol";
-import {IParserToolingV1} from "rain-sol-codegen-0.1.0/src/interface/IParserToolingV1.sol";
-import {ISubParserToolingV1} from "rain-sol-codegen-0.1.0/src/interface/ISubParserToolingV1.sol";
+import {IParserToolingV1} from "rain-sol-codegen-0.1.36/src/interface/IParserToolingV1.sol";
+import {ISubParserToolingV1} from "rain-sol-codegen-0.1.36/src/interface/ISubParserToolingV1.sol";
 import {SubParserIndexOutOfBounds} from "../error/ErrSubParse.sol";
 
 /// @dev This is a placeholder for the subparser function pointers.
